@@ -50,6 +50,8 @@ const ResumeSection = () => {
     const file = event.target.files?.[0];
     if (!file || !user) return;
 
+    console.log('File selected:', file.name, 'Type:', file.type, 'Size:', file.size);
+
     if (file.type !== 'application/pdf') {
       toast({
         title: "Invalid file type",
@@ -68,9 +70,13 @@ const ResumeSection = () => {
       return;
     }
 
+    // Prevent multiple uploads if one is already in progress
+    if (uploading) return;
+
     setUploading(true);
     try {
       const fileName = `${user.id}/resume.pdf`;
+      console.log('Uploading to:', fileName);
       
       const { error: uploadError } = await supabase.storage
         .from('resumes')
@@ -80,6 +86,8 @@ const ResumeSection = () => {
         console.error('Upload error:', uploadError);
         throw uploadError;
       }
+
+      console.log('Upload successful');
 
       const { data } = supabase.storage
         .from('resumes')
@@ -133,6 +141,13 @@ const ResumeSection = () => {
     }
   };
 
+  const triggerFileInput = () => {
+    if (!uploading) {
+      const fileInput = document.getElementById('resume-upload') as HTMLInputElement;
+      fileInput?.click();
+    }
+  };
+
   return (
     <Card className="bg-gray-900 border-gray-800">
       <CardHeader>
@@ -162,26 +177,25 @@ const ResumeSection = () => {
             </Button>
           </div>
         ) : (
-          <div className="border-2 border-dashed border-gray-700 rounded-lg p-8 text-center">
+          <div 
+            className="border-2 border-dashed border-gray-700 rounded-lg p-8 text-center cursor-pointer hover:border-gray-600 transition-colors"
+            onClick={triggerFileInput}
+          >
             <Upload className="w-12 h-12 text-gray-500 mx-auto mb-4" />
             <p className="text-gray-400 font-inter mb-4">
               Click to upload or drag and drop your resume
             </p>
-            <label htmlFor="resume-upload" className="cursor-pointer">
-              <Button disabled={uploading} className="font-inter" asChild>
-                <span>
-                  {uploading ? 'Uploading...' : 'Upload Resume'}
-                </span>
-              </Button>
-              <input
-                id="resume-upload"
-                type="file"
-                accept=".pdf"
-                onChange={handleFileUpload}
-                className="hidden"
-                disabled={uploading}
-              />
-            </label>
+            <Button disabled={uploading} className="font-inter">
+              {uploading ? 'Uploading...' : 'Upload Resume'}
+            </Button>
+            <input
+              id="resume-upload"
+              type="file"
+              accept=".pdf"
+              onChange={handleFileUpload}
+              className="hidden"
+              disabled={uploading}
+            />
           </div>
         )}
       </CardContent>
