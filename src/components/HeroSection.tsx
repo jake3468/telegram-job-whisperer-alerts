@@ -1,4 +1,6 @@
+
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
+
 const HeroSection = () => {
   const scrollToSignup = () => {
     const signupSection = document.getElementById('signup-section');
@@ -6,7 +8,9 @@ const HeroSection = () => {
       behavior: 'smooth'
     });
   };
-  return <section className="min-h-screen bg-black flex items-center justify-center px-4 relative">
+
+  return (
+    <section className="min-h-screen bg-black flex items-center justify-center px-4 relative">
       <div className="text-center max-w-4xl mx-auto">
         <h1 className="text-5xl md:text-7xl font-semibold text-white mb-6 leading-tight font-inter">
           Build Your Perfect<br />
@@ -18,7 +22,7 @@ const HeroSection = () => {
         </p>
         
         <SignedOut>
-          <SignUpButton mode="modal" className="text-black bg-blue-600 hover:bg-blue-500">
+          <SignUpButton mode="modal">
             <button className="bg-transparent border-2 border-white text-white px-8 py-4 text-lg rounded-xl hover:bg-white hover:text-black transition-all duration-200 font-inter font-medium">
               Get Started Now
             </button>
@@ -35,6 +39,8 @@ const HeroSection = () => {
           No credit card required. It's free to start.
         </p>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default HeroSection;
