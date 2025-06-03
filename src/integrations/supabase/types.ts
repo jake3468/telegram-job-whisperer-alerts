@@ -9,8 +9,62 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      job_alerts: {
+        Row: {
+          alert_frequency: string
+          country: string
+          created_at: string
+          id: string
+          job_title: string
+          job_type: Database["public"]["Enums"]["job_type"]
+          location: string
+          max_alerts_per_day: number
+          preferred_time: string
+          timezone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alert_frequency: string
+          country: string
+          created_at?: string
+          id?: string
+          job_title: string
+          job_type: Database["public"]["Enums"]["job_type"]
+          location: string
+          max_alerts_per_day?: number
+          preferred_time: string
+          timezone: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alert_frequency?: string
+          country?: string
+          created_at?: string
+          id?: string
+          job_title?: string
+          job_type?: Database["public"]["Enums"]["job_type"]
+          location?: string
+          max_alerts_per_day?: number
+          preferred_time?: string
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_alerts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
+          bio: string | null
           clerk_id: string
           created_at: string
           credits: number | null
@@ -21,6 +75,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          bio?: string | null
           clerk_id: string
           created_at?: string
           credits?: number | null
@@ -31,6 +86,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          bio?: string | null
           clerk_id?: string
           created_at?: string
           credits?: number | null
@@ -50,7 +106,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      job_type: "Remote" | "On-site" | "Hybrid"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -165,6 +221,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      job_type: ["Remote", "On-site", "Hybrid"],
+    },
   },
 } as const

@@ -1,12 +1,19 @@
 
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
+import { useNavigate } from 'react-router-dom';
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
   const scrollToSignup = () => {
     const signupSection = document.getElementById('signup-section');
     signupSection?.scrollIntoView({
       behavior: 'smooth'
     });
+  };
+
+  const goToDashboard = () => {
+    navigate('/dashboard');
   };
 
   return (
@@ -30,8 +37,8 @@ const HeroSection = () => {
         </SignedOut>
         
         <SignedIn>
-          <button onClick={scrollToSignup} className="bg-transparent border-2 border-white text-white px-8 py-4 text-lg rounded-xl hover:bg-white hover:text-black transition-all duration-200 font-inter font-medium">
-            Set Up Your Preferences
+          <button onClick={goToDashboard} className="bg-transparent border-2 border-white text-white px-8 py-4 text-lg rounded-xl hover:bg-white hover:text-black transition-all duration-200 font-inter font-medium">
+            Go to Dashboard
           </button>
         </SignedIn>
         
