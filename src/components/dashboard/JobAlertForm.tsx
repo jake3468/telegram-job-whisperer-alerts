@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -49,7 +48,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
         location: editingAlert.location,
         job_title: editingAlert.job_title,
         job_type: editingAlert.job_type,
-        alert_frequency: editingAlert.alert_frequency,
+        alert_frequency: 'Daily', // Always set to Daily
         preferred_time: editingAlert.preferred_time,
         max_alerts_per_day: editingAlert.max_alerts_per_day,
         timezone: editingAlert.timezone,
@@ -188,9 +187,6 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
             </SelectTrigger>
             <SelectContent className="bg-gray-800 border-gray-700">
               <SelectItem value="Daily" className="text-white hover:bg-gray-700">Daily</SelectItem>
-              <SelectItem value="Every 2 days" className="text-white hover:bg-gray-700">Every 2 days</SelectItem>
-              <SelectItem value="Every 3 days" className="text-white hover:bg-gray-700">Every 3 days</SelectItem>
-              <SelectItem value="Weekly" className="text-white hover:bg-gray-700">Weekly</SelectItem>
             </SelectContent>
           </Select>
         </div>
