@@ -1,9 +1,19 @@
 
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useUser } from '@clerk/clerk-react';
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const { user, isLoaded } = useUser();
+
+  // Automatically redirect authenticated users to dashboard
+  useEffect(() => {
+    if (isLoaded && user) {
+      navigate('/dashboard');
+    }
+  }, [user, isLoaded, navigate]);
 
   const scrollToSignup = () => {
     const signupSection = document.getElementById('signup-section');

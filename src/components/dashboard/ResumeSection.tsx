@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,39 @@ const ResumeSection = () => {
   const { toast } = useToast();
   const [uploading, setUploading] = useState(false);
   const [resumeUrl, setResumeUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    checkExistingResume();
+  }, [user]);
+
+  const checkExistingResume = async () => {
+    if (!user) return;
+
+    try {
+      const fileName = `${user.id}/resume.pdf`;
+      
+      const { data, error } = await supabase.storage
+        .from('resumes')
+        .list(user.id, {
+          limit: 1,
+          search: 'resume.pdf'
+        });
+
+      if (error) {
+        console.error('Error checking existing resume:', error);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        const { data: urlData } = supabase.storage
+          .from('resumes')
+          .getPublicUrl(fileName);
+        setResumeUrl(urlData.publicUrl);
+      }
+    } catch (error) {
+      console.error('Error checking existing resume:', error);
+    }
+  };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -43,7 +76,10 @@ const ResumeSection = () => {
         .from('resumes')
         .upload(fileName, file, { upsert: true });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
 
       const { data } = supabase.storage
         .from('resumes')
@@ -59,11 +95,13 @@ const ResumeSection = () => {
       console.error('Error uploading resume:', error);
       toast({
         title: "Upload failed",
-        description: "There was an error uploading your resume.",
+        description: "There was an error uploading your resume. Please try again.",
         variant: "destructive",
       });
     } finally {
       setUploading(false);
+      // Reset the input
+      event.target.value = '';
     }
   };
 
@@ -129,9 +167,11 @@ const ResumeSection = () => {
             <p className="text-gray-400 font-inter mb-4">
               Click to upload or drag and drop your resume
             </p>
-            <label htmlFor="resume-upload">
-              <Button disabled={uploading} className="font-inter">
-                {uploading ? 'Uploading...' : 'Upload Resume'}
+            <label htmlFor="resume-upload" className="cursor-pointer">
+              <Button disabled={uploading} className="font-inter" asChild>
+                <span>
+                  {uploading ? 'Uploading...' : 'Upload Resume'}
+                </span>
               </Button>
               <input
                 id="resume-upload"
@@ -139,6 +179,7 @@ const ResumeSection = () => {
                 accept=".pdf"
                 onChange={handleFileUpload}
                 className="hidden"
+                disabled={uploading}
               />
             </label>
           </div>
