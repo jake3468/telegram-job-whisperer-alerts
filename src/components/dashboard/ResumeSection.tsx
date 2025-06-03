@@ -12,55 +12,22 @@ const ResumeSection = () => {
   const { toast } = useToast();
   const [uploading, setUploading] = useState(false);
   const [resumeUrl, setResumeUrl] = useState<string | null>(null);
-  const [userDbId, setUserDbId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
-      getUserDbId();
+      checkExistingResume();
     }
   }, [user]);
 
-  useEffect(() => {
-    if (userDbId) {
-      checkExistingResume();
-    }
-  }, [userDbId]);
-
-  const getUserDbId = async () => {
+  const checkExistingResume = async () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('id')
-        .eq('clerk_id', user.id)
-        .single();
-
-      if (error) {
-        console.error('Error fetching user:', error);
-        toast({
-          title: "Error",
-          description: "Failed to fetch user information. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      setUserDbId(data.id);
-    } catch (error) {
-      console.error('Error fetching user:', error);
-    }
-  };
-
-  const checkExistingResume = async () => {
-    if (!userDbId) return;
-
-    try {
-      const fileName = `${user?.id}/resume.pdf`;
+      const fileName = `${user.id}/resume.pdf`;
       
       const { data, error } = await supabase.storage
         .from('resumes')
-        .list(user?.id, {
+        .list(user.id, {
           limit: 1,
           search: 'resume.pdf'
         });
@@ -83,10 +50,10 @@ const ResumeSection = () => {
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file || !user || !userDbId) return;
+    if (!file || !user) return;
 
     console.log('File selected:', file.name, 'Type:', file.type, 'Size:', file.size);
-    console.log('User Clerk ID:', user.id, 'User DB ID:', userDbId);
+    console.log('User Clerk ID:', user.id);
 
     if (file.type !== 'application/pdf') {
       toast({
