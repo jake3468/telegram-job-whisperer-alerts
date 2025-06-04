@@ -1,5 +1,4 @@
-
-import { MapPin, Briefcase, Clock, Wifi, ArrowRight, CheckCircle } from "lucide-react";
+import { MapPin, Briefcase, Clock, Wifi, ArrowRight, CheckCircle, MessageCircle } from "lucide-react";
 
 const PreferencesSection = () => {
   return (
