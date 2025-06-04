@@ -154,20 +154,21 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
         </div>
       </CardHeader>
       <CardContent>
-        {showForm ? (
-          <JobAlertForm
-            userTimezone={userTimezone}
-            editingAlert={editingAlert}
-            onSubmit={handleFormSubmit}
-            onCancel={handleFormCancel}
-          />
-        ) : (
-          <JobAlertsList
-            alerts={alerts}
-            onEdit={handleEditAlert}
-            onDelete={handleDeleteAlert}
-          />
+        {showForm && (
+          <div className="mb-8">
+            <JobAlertForm
+              userTimezone={userTimezone}
+              editingAlert={editingAlert}
+              onSubmit={handleFormSubmit}
+              onCancel={handleFormCancel}
+            />
+          </div>
         )}
+        <JobAlertsList
+          alerts={alerts}
+          onEdit={handleEditAlert}
+          onDelete={handleDeleteAlert}
+        />
       </CardContent>
     </Card>
   );

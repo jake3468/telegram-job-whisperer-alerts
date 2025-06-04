@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -136,7 +137,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
             value={formData.country}
             onChange={(e) => handleInputChange('country', e.target.value)}
             placeholder="e.g., United States"
-            className="bg-gray-800/50 border-2 border-gray-600 text-white placeholder-gray-400 font-inter focus-visible:border-pastel-blue hover:border-gray-500"
+            className="bg-gray-700/70 border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400"
             required
           />
         </div>
@@ -148,7 +149,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
             value={formData.location}
             onChange={(e) => handleInputChange('location', e.target.value)}
             placeholder="e.g., New York, NY"
-            className="bg-gray-800/50 border-2 border-gray-600 text-white placeholder-gray-400 font-inter focus-visible:border-pastel-blue hover:border-gray-500"
+            className="bg-gray-700/70 border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400"
             required
           />
         </div>
@@ -160,7 +161,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
             value={formData.job_title}
             onChange={(e) => handleInputChange('job_title', e.target.value)}
             placeholder="e.g., Software Engineer"
-            className="bg-gray-800/50 border-2 border-gray-600 text-white placeholder-gray-400 font-inter focus-visible:border-pastel-blue hover:border-gray-500"
+            className="bg-gray-700/70 border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400"
             required
           />
         </div>
@@ -168,7 +169,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
         <div>
           <Label htmlFor="job_type" className="text-white font-inter font-medium mb-2 block">Job Type</Label>
           <Select value={formData.job_type} onValueChange={(value) => handleInputChange('job_type', value)}>
-            <SelectTrigger className="bg-gray-800/50 border-2 border-gray-600 text-white font-inter focus:border-pastel-blue hover:border-gray-500 h-12">
+            <SelectTrigger className="bg-gray-700/70 border-2 border-gray-500 text-white font-inter focus:border-pastel-blue hover:border-gray-400 h-12">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-gray-800 border-gray-600 backdrop-blur-sm">
@@ -182,7 +183,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
         <div>
           <Label htmlFor="alert_frequency" className="text-white font-inter font-medium mb-2 block">Alert Frequency</Label>
           <Select value={formData.alert_frequency} onValueChange={(value) => handleInputChange('alert_frequency', value)}>
-            <SelectTrigger className="bg-gray-800/50 border-2 border-gray-600 text-white font-inter focus:border-pastel-blue hover:border-gray-500 h-12">
+            <SelectTrigger className="bg-gray-700/70 border-2 border-gray-500 text-white font-inter focus:border-pastel-blue hover:border-gray-400 h-12">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-gray-800 border-gray-600 backdrop-blur-sm">
@@ -194,7 +195,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
         <div>
           <Label htmlFor="preferred_time" className="text-white font-inter font-medium mb-2 block">Preferred Time</Label>
           <Select value={formData.preferred_time} onValueChange={(value) => handleInputChange('preferred_time', value)}>
-            <SelectTrigger className="bg-gray-800/50 border-2 border-gray-600 text-white font-inter focus:border-pastel-blue hover:border-gray-500 h-12">
+            <SelectTrigger className="bg-gray-700/70 border-2 border-gray-500 text-white font-inter focus:border-pastel-blue hover:border-gray-400 h-12">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-gray-800 border-gray-600 max-h-48 backdrop-blur-sm">
@@ -216,7 +217,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
             max="50"
             value={formData.max_alerts_per_day}
             onChange={(e) => handleInputChange('max_alerts_per_day', parseInt(e.target.value) || 1)}
-            className="bg-gray-800/50 border-2 border-gray-600 text-white font-inter focus-visible:border-pastel-blue hover:border-gray-500"
+            className="bg-gray-700/70 border-2 border-gray-500 text-white font-inter focus-visible:border-pastel-blue hover:border-gray-400"
           />
         </div>
 
@@ -226,7 +227,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
             id="timezone"
             value={formData.timezone}
             onChange={(e) => handleInputChange('timezone', e.target.value)}
-            className="bg-gray-800/50 border-2 border-gray-600 text-white font-inter focus-visible:border-pastel-blue hover:border-gray-500"
+            className="bg-gray-700/70 border-2 border-gray-500 text-white font-inter focus-visible:border-pastel-blue hover:border-gray-400"
             placeholder="Auto-detected"
           />
         </div>
@@ -236,7 +237,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
         <Button type="submit" disabled={loading} className="font-inter bg-pastel-lavender hover:bg-pastel-lavender/80 text-black font-medium">
           {loading ? 'Saving...' : editingAlert ? 'Update Alert' : 'Create Alert'}
         </Button>
-        <Button type="button" variant="outline" onClick={onCancel} className="font-inter border-gray-600 text-white hover:bg-gray-800">
+        <Button type="button" variant="outline" onClick={onCancel} className="font-inter border-gray-500 bg-gray-700 text-white hover:bg-gray-600 hover:border-gray-400">
           Cancel
         </Button>
       </div>
