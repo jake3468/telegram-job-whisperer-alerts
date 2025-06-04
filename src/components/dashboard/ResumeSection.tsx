@@ -155,28 +155,32 @@ const ResumeSection = () => {
   };
 
   return (
-    <Card className="bg-gray-900 border-gray-800">
+    <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-2 border-gray-700 shadow-xl">
       <CardHeader>
         <CardTitle className="text-white font-inter flex items-center gap-2">
-          <FileText className="w-5 h-5" />
+          <div className="w-8 h-8 bg-pastel-blue/20 rounded-full flex items-center justify-center">
+            <FileText className="w-4 h-4 text-pastel-blue" />
+          </div>
           Resume
         </CardTitle>
-        <CardDescription className="text-gray-400 font-inter">
+        <CardDescription className="text-gray-300 font-inter">
           Upload your resume (PDF only, max 5MB) for better job matching
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {resumeUrl ? (
-          <div className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-800/80 to-gray-700/80 rounded-xl border border-gray-600 backdrop-blur-sm">
             <div className="flex items-center gap-3">
-              <FileText className="w-6 h-6 text-pastel-blue" />
-              <span className="text-white font-inter">resume.pdf</span>
+              <div className="w-10 h-10 bg-pastel-blue/20 rounded-full flex items-center justify-center">
+                <FileText className="w-5 h-5 text-pastel-blue" />
+              </div>
+              <span className="text-white font-inter font-medium">resume.pdf</span>
             </div>
             <Button
               variant="destructive"
               size="sm"
               onClick={handleDeleteResume}
-              className="font-inter"
+              className="font-inter hover:bg-red-600 transition-colors"
             >
               <Trash2 className="w-4 h-4 mr-2" />
               Delete
@@ -184,14 +188,16 @@ const ResumeSection = () => {
           </div>
         ) : (
           <div 
-            className="border-2 border-dashed border-gray-700 rounded-lg p-8 text-center cursor-pointer hover:border-gray-600 transition-colors"
+            className="border-2 border-dashed border-gray-600 rounded-xl p-8 text-center cursor-pointer hover:border-pastel-blue hover:bg-gray-800/30 transition-all duration-300 backdrop-blur-sm"
             onClick={triggerFileInput}
           >
-            <Upload className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-            <p className="text-gray-400 font-inter mb-4">
+            <div className="w-16 h-16 bg-pastel-blue/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Upload className="w-8 h-8 text-pastel-blue" />
+            </div>
+            <p className="text-gray-300 font-inter mb-4 font-medium">
               Click to upload or drag and drop your resume
             </p>
-            <Button disabled={uploading} className="font-inter">
+            <Button disabled={uploading} className="font-inter bg-pastel-blue hover:bg-pastel-blue/80 text-black font-medium">
               {uploading ? 'Uploading...' : 'Upload Resume'}
             </Button>
             <input

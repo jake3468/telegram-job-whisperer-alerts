@@ -80,13 +80,15 @@ const BioSection = () => {
   }
 
   return (
-    <Card className="bg-gray-900 border-gray-800">
+    <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-2 border-gray-700 shadow-xl">
       <CardHeader>
         <CardTitle className="text-white font-inter flex items-center gap-2">
-          <User className="w-5 h-5" />
+          <div className="w-8 h-8 bg-pastel-mint/20 rounded-full flex items-center justify-center">
+            <User className="w-4 h-4 text-pastel-mint" />
+          </div>
           About You
         </CardTitle>
-        <CardDescription className="text-gray-400 font-inter">
+        <CardDescription className="text-gray-300 font-inter">
           Tell us about yourself to get better job recommendations
         </CardDescription>
       </CardHeader>
@@ -95,13 +97,13 @@ const BioSection = () => {
           value={bio}
           onChange={(e) => setBio(e.target.value)}
           placeholder="Describe your experience, skills, career goals, and what kind of opportunities you're looking for..."
-          className="min-h-[120px] bg-gray-800 border-gray-700 text-white placeholder-gray-400 font-inter"
+          className="min-h-[120px] bg-gray-800/50 border-2 border-gray-600 text-white placeholder-gray-400 font-inter focus-visible:border-pastel-mint hover:border-gray-500"
           rows={6}
         />
         <Button
           onClick={handleSaveBio}
           disabled={saving}
-          className="font-inter"
+          className="font-inter bg-pastel-mint hover:bg-pastel-mint/80 text-black font-medium"
         >
           {saving ? 'Saving...' : 'Save Bio'}
         </Button>

@@ -131,20 +131,22 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
   }
 
   return (
-    <Card className="bg-gray-900 border-gray-800">
+    <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-2 border-gray-700 shadow-xl">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-white font-inter flex items-center gap-2">
-              <Bell className="w-5 h-5" />
+              <div className="w-8 h-8 bg-pastel-peach/20 rounded-full flex items-center justify-center">
+                <Bell className="w-4 h-4 text-pastel-peach" />
+              </div>
               Job Alerts
             </CardTitle>
-            <CardDescription className="text-gray-400 font-inter">
+            <CardDescription className="text-gray-300 font-inter">
               Set up personalized job alerts based on your preferences
             </CardDescription>
           </div>
           {!showForm && (
-            <Button onClick={handleCreateAlert} className="font-inter">
+            <Button onClick={handleCreateAlert} className="font-inter bg-pastel-peach hover:bg-pastel-peach/80 text-black font-medium">
               <Plus className="w-4 h-4 mr-2" />
               Add Alert
             </Button>
