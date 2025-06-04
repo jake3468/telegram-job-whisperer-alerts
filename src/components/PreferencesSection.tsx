@@ -5,7 +5,7 @@ const PreferencesSection = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Job Preferences Card */}
           <div className="bg-pastel-mint rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-            <h3 className="font-semibold mb-6 font-inter text-4xl text-black">
+            <h3 className="font-semibold mb-6 font-inter text-black text-3xl">
               Job Preferences
             </h3>
             
