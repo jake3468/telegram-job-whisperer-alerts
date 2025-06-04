@@ -64,7 +64,9 @@ export type Database = {
       }
       users: {
         Row: {
+          activated: boolean | null
           bio: string | null
+          chat_id: number | null
           clerk_id: string
           created_at: string
           credits: number | null
@@ -75,7 +77,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          activated?: boolean | null
           bio?: string | null
+          chat_id?: number | null
           clerk_id: string
           created_at?: string
           credits?: number | null
@@ -86,7 +90,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          activated?: boolean | null
           bio?: string | null
+          chat_id?: number | null
           clerk_id?: string
           created_at?: string
           credits?: number | null

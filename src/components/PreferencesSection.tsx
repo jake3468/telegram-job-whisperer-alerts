@@ -1,6 +1,9 @@
+
 import { MapPin, Briefcase, Clock, Wifi } from "lucide-react";
+
 const PreferencesSection = () => {
-  return <section className="bg-black py-20 px-4">
+  return (
+    <section className="bg-black py-20 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Job Preferences Card */}
@@ -11,7 +14,9 @@ const PreferencesSection = () => {
             
             <div className="space-y-6">
               <div className="flex items-start space-x-3">
-                <MapPin className="w-5 h-5 text-black mt-1" />
+                <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <MapPin className="w-5 h-5 text-black" />
+                </div>
                 <div>
                   <h4 className="font-medium text-black font-inter">Location</h4>
                   <p className="text-black/70 text-sm font-inter font-light">
@@ -21,7 +26,9 @@ const PreferencesSection = () => {
               </div>
               
               <div className="flex items-start space-x-3">
-                <Briefcase className="w-5 h-5 text-black mt-1" />
+                <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Briefcase className="w-5 h-5 text-black" />
+                </div>
                 <div>
                   <h4 className="font-medium text-black font-inter">Job Titles</h4>
                   <p className="text-black/70 text-sm font-inter font-light">
@@ -31,7 +38,9 @@ const PreferencesSection = () => {
               </div>
               
               <div className="flex items-start space-x-3">
-                <Clock className="w-5 h-5 text-black mt-1" />
+                <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Clock className="w-5 h-5 text-black" />
+                </div>
                 <div>
                   <h4 className="font-medium text-black font-inter">Alert Frequency</h4>
                   <p className="text-black/70 text-sm font-inter font-light">
@@ -41,7 +50,9 @@ const PreferencesSection = () => {
               </div>
               
               <div className="flex items-start space-x-3">
-                <Wifi className="w-5 h-5 text-black mt-1" />
+                <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Wifi className="w-5 h-5 text-black" />
+                </div>
                 <div>
                   <h4 className="font-medium text-black font-inter">Job Type</h4>
                   <p className="text-black/70 text-sm font-inter font-light">
@@ -64,21 +75,27 @@ const PreferencesSection = () => {
             
             <div className="space-y-4">
               <div className="flex items-start space-x-3">
-                <span className="w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-xs font-semibold">1</span>
+                <div className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0">
+                  1
+                </div>
                 <p className="text-black/80 text-sm font-inter">
                   Open Telegram and search for @JobBotAlert
                 </p>
               </div>
               
               <div className="flex items-start space-x-3">
-                <span className="w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-xs font-semibold">2</span>
+                <div className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0">
+                  2
+                </div>
                 <p className="text-black/80 text-sm font-inter">
                   Click 'Start' to link your account
                 </p>
               </div>
               
               <div className="flex items-start space-x-3">
-                <span className="w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-xs font-semibold">3</span>
+                <div className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0">
+                  3
+                </div>
                 <p className="text-black/80 text-sm font-inter">
                   After successful verification using your unique bot ID, you're good to start!
                 </p>
@@ -94,6 +111,8 @@ const PreferencesSection = () => {
           </p>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default PreferencesSection;

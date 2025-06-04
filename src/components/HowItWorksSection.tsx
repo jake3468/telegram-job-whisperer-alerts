@@ -8,28 +8,24 @@ const HowItWorksSection = () => {
       title: "Upload Resume",
       description: "Upload your resume and tell us about your experience and preferences.",
       bgColor: "bg-pastel-blue",
-      delay: "0ms"
     },
     {
       icon: Settings,
       title: "Set Preferences", 
       description: "Choose your desired job types, locations, and how often you want alerts.",
       bgColor: "bg-pastel-mint",
-      delay: "200ms"
     },
     {
       icon: MessageCircle,
       title: "Connect Telegram",
       description: "Link your Telegram account to receive personalized job alerts.",
       bgColor: "bg-pastel-peach", 
-      delay: "400ms"
     },
     {
       icon: FileText,
       title: "Get Matched Jobs",
       description: "Receive job alerts with custom resumes and cover letters for each opportunity.",
       bgColor: "bg-pastel-lavender",
-      delay: "600ms"
     }
   ];
 
@@ -49,11 +45,10 @@ const HowItWorksSection = () => {
           {steps.map((step, index) => (
             <div 
               key={index}
-              className={`${step.bgColor} rounded-2xl p-8 text-black shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 animate-float`}
-              style={{ animationDelay: step.delay }}
+              className={`${step.bgColor} rounded-2xl p-8 text-black shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2`}
             >
-              <div className="w-12 h-12 bg-black/10 rounded-full flex items-center justify-center mb-6">
-                <step.icon className="w-6 h-6 text-black" />
+              <div className="w-16 h-16 bg-black/20 rounded-full flex items-center justify-center mb-6 shadow-lg">
+                <step.icon className="w-8 h-8 text-black" />
               </div>
               
               <h3 className="text-xl font-semibold mb-3 font-inter">
