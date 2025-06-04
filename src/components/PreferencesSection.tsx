@@ -54,7 +54,7 @@ const PreferencesSection = () => {
           
           {/* Telegram Connection Card */}
           <div className="bg-pastel-peach rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-            <h3 className="text-2xl font-semibold text-black mb-6 font-inter">
+            <h3 className="font-semibold text-black mb-6 font-inter text-3xl">
               Connect Telegram
             </h3>
             
