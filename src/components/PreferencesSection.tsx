@@ -1,112 +1,144 @@
 
-import { MapPin, Briefcase, Clock, Wifi } from "lucide-react";
+import { MapPin, Briefcase, Clock, Wifi, ArrowRight, CheckCircle } from "lucide-react";
 
 const PreferencesSection = () => {
   return (
     <section className="bg-black py-20 px-4">
       <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Job Preferences Card */}
-          <div className="bg-pastel-mint rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-            <h3 className="font-semibold mb-6 font-inter text-black text-3xl">
-              Job Preferences
-            </h3>
+          <div className="bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-pastel-mint/30 rounded-3xl p-10 shadow-2xl relative overflow-hidden">
+            {/* Background decoration */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-pastel-mint/10 rounded-full -translate-y-16 translate-x-16"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-pastel-mint/5 rounded-full translate-y-12 -translate-x-12"></div>
             
-            <div className="space-y-6">
-              <div className="flex items-start space-x-3">
-                <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-5 h-5 text-black" />
+            <div className="relative z-10">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-16 h-16 bg-gradient-to-br from-pastel-mint to-pastel-mint/80 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Briefcase className="w-8 h-8 text-black" />
                 </div>
-                <div>
-                  <h4 className="font-medium text-black font-inter">Location</h4>
-                  <p className="text-black/70 text-sm font-inter font-light">
-                    City, Country or 'Remote'
-                  </p>
-                </div>
+                <h3 className="font-bold text-white text-3xl font-inter">
+                  Job Preferences
+                </h3>
               </div>
               
-              <div className="flex items-start space-x-3">
-                <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Briefcase className="w-5 h-5 text-black" />
+              <div className="space-y-6">
+                <div className="flex items-center gap-4 p-4 bg-gray-700/50 rounded-xl border border-gray-600/50 backdrop-blur-sm">
+                  <div className="w-12 h-12 bg-pastel-mint/20 rounded-xl flex items-center justify-center">
+                    <MapPin className="w-6 h-6 text-pastel-mint" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-white font-inter text-lg">Location</h4>
+                    <p className="text-gray-300 text-sm font-inter">
+                      City, Country or 'Remote'
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-medium text-black font-inter">Job Titles</h4>
-                  <p className="text-black/70 text-sm font-inter font-light">
-                    Software Engineer, Data Analyst, Product Manager
-                  </p>
+                
+                <div className="flex items-center gap-4 p-4 bg-gray-700/50 rounded-xl border border-gray-600/50 backdrop-blur-sm">
+                  <div className="w-12 h-12 bg-pastel-mint/20 rounded-xl flex items-center justify-center">
+                    <Briefcase className="w-6 h-6 text-pastel-mint" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-white font-inter text-lg">Job Titles</h4>
+                    <p className="text-gray-300 text-sm font-inter">
+                      Software Engineer, Data Analyst, Product Manager
+                    </p>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex items-start space-x-3">
-                <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Clock className="w-5 h-5 text-black" />
+                
+                <div className="flex items-center gap-4 p-4 bg-gray-700/50 rounded-xl border border-gray-600/50 backdrop-blur-sm">
+                  <div className="w-12 h-12 bg-pastel-mint/20 rounded-xl flex items-center justify-center">
+                    <Clock className="w-6 h-6 text-pastel-mint" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-white font-inter text-lg">Alert Frequency</h4>
+                    <p className="text-gray-300 text-sm font-inter">
+                      Daily, Every 3 days, or Weekly
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-medium text-black font-inter">Alert Frequency</h4>
-                  <p className="text-black/70 text-sm font-inter font-light">
-                    Daily, Every 3 days, or Weekly
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start space-x-3">
-                <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Wifi className="w-5 h-5 text-black" />
-                </div>
-                <div>
-                  <h4 className="font-medium text-black font-inter">Job Type</h4>
-                  <p className="text-black/70 text-sm font-inter font-light">
-                    Remote, On-site, or Hybrid
-                  </p>
+                
+                <div className="flex items-center gap-4 p-4 bg-gray-700/50 rounded-xl border border-gray-600/50 backdrop-blur-sm">
+                  <div className="w-12 h-12 bg-pastel-mint/20 rounded-xl flex items-center justify-center">
+                    <Wifi className="w-6 h-6 text-pastel-mint" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-white font-inter text-lg">Job Type</h4>
+                    <p className="text-gray-300 text-sm font-inter">
+                      Remote, On-site, or Hybrid
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           
           {/* Telegram Connection Card */}
-          <div className="bg-pastel-peach rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-            <h3 className="font-semibold text-black mb-6 font-inter text-3xl">
-              Connect Telegram
-            </h3>
+          <div className="bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-pastel-peach/30 rounded-3xl p-10 shadow-2xl relative overflow-hidden">
+            {/* Background decoration */}
+            <div className="absolute top-0 left-0 w-28 h-28 bg-pastel-peach/10 rounded-full -translate-y-14 -translate-x-14"></div>
+            <div className="absolute bottom-0 right-0 w-36 h-36 bg-pastel-peach/5 rounded-full translate-y-18 translate-x-18"></div>
             
-            <p className="text-black/80 mb-6 font-inter font-light leading-relaxed">
-              We'll send all job updates and documents directly to your Telegram account.
-            </p>
-            
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0">
-                  1
+            <div className="relative z-10">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-16 h-16 bg-gradient-to-br from-pastel-peach to-pastel-peach/80 rounded-2xl flex items-center justify-center shadow-lg">
+                  <MessageCircle className="w-8 h-8 text-black" />
                 </div>
-                <p className="text-black/80 text-sm font-inter">
-                  Open Telegram and search for @JobBotAlert
-                </p>
+                <h3 className="font-bold text-white text-3xl font-inter">
+                  Connect Telegram
+                </h3>
               </div>
               
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0">
-                  2
-                </div>
-                <p className="text-black/80 text-sm font-inter">
-                  Click 'Start' to link your account
-                </p>
-              </div>
+              <p className="text-gray-300 mb-8 font-inter leading-relaxed text-lg">
+                We'll send all job updates and documents directly to your Telegram account.
+              </p>
               
-              <div className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0">
-                  3
+              <div className="space-y-6">
+                <div className="flex items-start gap-4 p-4 bg-gray-700/50 rounded-xl border border-gray-600/50 backdrop-blur-sm">
+                  <div className="w-10 h-10 bg-gradient-to-br from-pastel-peach to-pastel-peach/80 text-black rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 shadow-md">
+                    1
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-gray-300 font-inter">
+                      Open Telegram and search for <span className="text-pastel-peach font-semibold">@JobBotAlert</span>
+                    </p>
+                  </div>
                 </div>
-                <p className="text-black/80 text-sm font-inter">
-                  After successful verification using your unique bot ID, you're good to start!
-                </p>
+                
+                <div className="flex items-start gap-4 p-4 bg-gray-700/50 rounded-xl border border-gray-600/50 backdrop-blur-sm">
+                  <div className="w-10 h-10 bg-gradient-to-br from-pastel-peach to-pastel-peach/80 text-black rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 shadow-md">
+                    2
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-gray-300 font-inter">
+                      Click <span className="text-pastel-peach font-semibold">'Start'</span> to link your account
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-4 p-4 bg-gray-700/50 rounded-xl border border-gray-600/50 backdrop-blur-sm">
+                  <div className="w-10 h-10 bg-gradient-to-br from-pastel-peach to-pastel-peach/80 text-black rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 shadow-md">
+                    3
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-gray-300 font-inter">
+                      After successful verification using your unique bot ID, you're ready to start!
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
         
         {/* Info Banner */}
-        <div className="mt-12 bg-black border border-gray-800 rounded-xl p-6 text-center">
-          <p className="text-white font-inter font-light">
+        <div className="mt-16 bg-gradient-to-r from-gray-900 to-gray-800 border-2 border-gray-700 rounded-2xl p-8 text-center shadow-xl">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <CheckCircle className="w-6 h-6 text-pastel-mint" />
+            <h4 className="text-white font-inter font-semibold text-xl">Ready to Get Started?</h4>
+          </div>
+          <p className="text-gray-300 font-inter text-lg">
             📱 We'll send personalized job updates and your resume-matched openings to your Telegram bot.
           </p>
         </div>
