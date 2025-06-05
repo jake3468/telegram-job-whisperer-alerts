@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -155,24 +154,24 @@ const ResumeSection = () => {
   };
 
   return (
-    <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-2 border-gray-700 shadow-xl">
+    <Card className="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700 border-2 border-blue-400 shadow-2xl shadow-blue-500/20">
       <CardHeader>
         <CardTitle className="text-white font-inter flex items-center gap-2">
-          <div className="w-8 h-8 bg-pastel-blue/20 rounded-full flex items-center justify-center">
-            <FileText className="w-4 h-4 text-pastel-blue" />
+          <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+            <FileText className="w-4 h-4 text-white" />
           </div>
           Resume
         </CardTitle>
-        <CardDescription className="text-gray-300 font-inter">
+        <CardDescription className="text-blue-100 font-inter">
           Upload your resume (PDF only, max 5MB) for better job matching
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {resumeUrl ? (
-          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-800/80 to-gray-700/80 rounded-xl border border-gray-600 backdrop-blur-sm">
+          <div className="flex items-center justify-between p-4 bg-white/10 rounded-xl border border-white/20 backdrop-blur-sm">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-pastel-blue/20 rounded-full flex items-center justify-center">
-                <FileText className="w-5 h-5 text-pastel-blue" />
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <FileText className="w-5 h-5 text-white" />
               </div>
               <span className="text-white font-inter font-medium">resume.pdf</span>
             </div>
@@ -188,16 +187,16 @@ const ResumeSection = () => {
           </div>
         ) : (
           <div 
-            className="border-2 border-dashed border-gray-600 rounded-xl p-8 text-center cursor-pointer hover:border-pastel-blue hover:bg-gray-800/30 transition-all duration-300 backdrop-blur-sm"
+            className="border-2 border-dashed border-white/40 rounded-xl p-8 text-center cursor-pointer hover:border-white/60 hover:bg-white/5 transition-all duration-300 backdrop-blur-sm"
             onClick={triggerFileInput}
           >
-            <div className="w-16 h-16 bg-pastel-blue/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Upload className="w-8 h-8 text-pastel-blue" />
+            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Upload className="w-8 h-8 text-white" />
             </div>
-            <p className="text-gray-300 font-inter mb-4 font-medium">
+            <p className="text-white font-inter mb-4 font-medium">
               Click to upload or drag and drop your resume
             </p>
-            <Button disabled={uploading} className="font-inter bg-pastel-blue hover:bg-pastel-blue/80 text-black font-medium">
+            <Button disabled={uploading} className="font-inter bg-white text-blue-600 hover:bg-gray-100 font-medium">
               {uploading ? 'Uploading...' : 'Upload Resume'}
             </Button>
             <input

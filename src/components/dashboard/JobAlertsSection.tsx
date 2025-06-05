@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -122,7 +121,7 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
 
   if (loading) {
     return (
-      <Card className="bg-gray-900 border-gray-800">
+      <Card className="bg-gradient-to-br from-orange-500 via-red-500 to-pink-600 border-2 border-orange-400 shadow-2xl shadow-orange-500/20">
         <CardContent className="p-6">
           <div className="text-white">Loading...</div>
         </CardContent>
@@ -131,22 +130,22 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
   }
 
   return (
-    <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-2 border-gray-700 shadow-xl">
+    <Card className="bg-gradient-to-br from-orange-500 via-red-500 to-pink-600 border-2 border-orange-400 shadow-2xl shadow-orange-500/20">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-white font-inter flex items-center gap-2">
-              <div className="w-8 h-8 bg-pastel-peach/20 rounded-full flex items-center justify-center">
-                <Bell className="w-4 h-4 text-pastel-peach" />
+              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                <Bell className="w-4 h-4 text-white" />
               </div>
               Job Alerts
             </CardTitle>
-            <CardDescription className="text-gray-300 font-inter">
+            <CardDescription className="text-orange-100 font-inter">
               Set up personalized job alerts based on your preferences
             </CardDescription>
           </div>
           {!showForm && (
-            <Button onClick={handleCreateAlert} className="font-inter bg-pastel-peach hover:bg-pastel-peach/80 text-black font-medium">
+            <Button onClick={handleCreateAlert} className="font-inter bg-white text-orange-600 hover:bg-gray-100 font-medium">
               <Plus className="w-4 h-4 mr-2" />
               Add Alert
             </Button>

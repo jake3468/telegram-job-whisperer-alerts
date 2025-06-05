@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -71,7 +70,7 @@ const BioSection = () => {
 
   if (loading) {
     return (
-      <Card className="bg-gray-900 border-gray-800">
+      <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
         <CardContent className="p-6">
           <div className="text-white">Loading...</div>
         </CardContent>
@@ -80,15 +79,15 @@ const BioSection = () => {
   }
 
   return (
-    <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-2 border-gray-700 shadow-xl">
+    <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
       <CardHeader>
         <CardTitle className="text-white font-inter flex items-center gap-2">
-          <div className="w-8 h-8 bg-pastel-mint/20 rounded-full flex items-center justify-center">
-            <User className="w-4 h-4 text-pastel-mint" />
+          <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+            <User className="w-4 h-4 text-white" />
           </div>
           About You
         </CardTitle>
-        <CardDescription className="text-gray-300 font-inter">
+        <CardDescription className="text-green-100 font-inter">
           Tell us about yourself to get better job recommendations
         </CardDescription>
       </CardHeader>
@@ -97,13 +96,13 @@ const BioSection = () => {
           value={bio}
           onChange={(e) => setBio(e.target.value)}
           placeholder="Describe your experience, skills, career goals, and what kind of opportunities you're looking for..."
-          className="min-h-[120px] bg-gray-800/50 border-2 border-gray-600 text-white placeholder-gray-400 font-inter focus-visible:border-pastel-mint hover:border-gray-500"
+          className="min-h-[120px] bg-white/10 border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30"
           rows={6}
         />
         <Button
           onClick={handleSaveBio}
           disabled={saving}
-          className="font-inter bg-pastel-mint hover:bg-pastel-mint/80 text-black font-medium"
+          className="font-inter bg-white text-green-600 hover:bg-gray-100 font-medium"
         >
           {saving ? 'Saving...' : 'Save Bio'}
         </Button>
