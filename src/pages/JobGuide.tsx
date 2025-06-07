@@ -60,7 +60,7 @@ const JobGuide = () => {
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
         title: "Missing information",
-        description: "Please fill in all fields before proceeding.",
+        description: "Please fill in all fields to get your job analysis.",
         variant: "destructive",
       });
       return;
@@ -99,8 +99,8 @@ const JobGuide = () => {
       setIsSuccess(true);
       
       toast({
-        title: "Job Analysis Saved!",
-        description: "Your job analysis has been successfully saved to your profile.",
+        title: "Analysis Complete!",
+        description: "Your job match analysis has been generated successfully.",
       });
 
       // Reset form after successful submission
@@ -111,13 +111,13 @@ const JobGuide = () => {
       });
 
     } catch (err) {
-      console.error('Error saving job analysis:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to save job analysis';
+      console.error('Error generating job analysis:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to generate job analysis';
       setError(errorMessage);
       
       toast({
-        title: "Save Failed",
-        description: "There was an error saving your job analysis. Please try again.",
+        title: "Analysis Failed",
+        description: "There was an error generating your job analysis. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -145,7 +145,7 @@ const JobGuide = () => {
             <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">Job Guide</span>
           </h1>
           <p className="text-xl text-gray-300 font-inter font-light">
-            Save and organize your job applications
+            Get your personalized job match analysis and cover letter
           </p>
         </div>
 
@@ -202,10 +202,10 @@ const JobGuide = () => {
                 <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                   <FileSearch className="w-4 h-4 text-white" />
                 </div>
-                Save Job Application
+                Job Guide
               </CardTitle>
               <CardDescription className="text-emerald-100 font-inter">
-                Enter job details to save to your profile for tracking
+                Enter job details to get your personalized match analysis and cover letter
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -217,7 +217,7 @@ const JobGuide = () => {
                   <Input
                     value={formData.companyName}
                     onChange={(e) => handleInputChange('companyName', e.target.value)}
-                    placeholder="Enter the company name"
+                    placeholder="Enter the company name for analysis"
                     className="bg-white/10 border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30"
                     disabled={isLoading}
                   />
@@ -230,7 +230,7 @@ const JobGuide = () => {
                   <Input
                     value={formData.jobTitle}
                     onChange={(e) => handleInputChange('jobTitle', e.target.value)}
-                    placeholder="Enter the job title"
+                    placeholder="Enter the job title for analysis"
                     className="bg-white/10 border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30"
                     disabled={isLoading}
                   />
@@ -243,7 +243,7 @@ const JobGuide = () => {
                   <Textarea
                     value={formData.jobDescription}
                     onChange={(e) => handleInputChange('jobDescription', e.target.value)}
-                    placeholder="Paste the complete job description here including requirements, responsibilities, and qualifications..."
+                    placeholder="Paste the complete job description here for detailed analysis including requirements, responsibilities, and qualifications..."
                     className="min-h-[150px] bg-white/10 border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30"
                     rows={8}
                     disabled={isLoading}
@@ -265,13 +265,22 @@ const JobGuide = () => {
                     {isLoading ? (
                       <>
                         <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
-                        <span className="text-center text-sm sm:text-base">Saving...</span>
+                        <span className="text-center text-sm sm:text-base">Analyzing...</span>
                       </>
                     ) : (
                       <>
                         <Sparkles className="w-4 h-4 flex-shrink-0" />
                         <div className="text-center leading-tight text-sm sm:text-base">
-                          <div>Save Job Application</div>
+                          <div>
+                            Get your{' '}
+                            <span className="font-bold bg-gradient-to-r from-emerald-800 to-teal-800 bg-clip-text text-transparent">
+                              Job match %
+                            </span>
+                            {' '}and{' '}
+                            <span className="font-bold bg-gradient-to-r from-emerald-800 to-teal-800 bg-clip-text text-transparent">
+                              Cover letter
+                            </span>
+                          </div>
                         </div>
                       </>
                     )}
@@ -282,7 +291,7 @@ const JobGuide = () => {
                   <p className="text-emerald-200 text-sm font-inter text-center">
                     {!isComplete 
                       ? 'Complete your profile first to use this feature'
-                      : 'Fill in all fields to continue'
+                      : 'Fill in all fields to get your analysis'
                     }
                   </p>
                 )}
@@ -298,12 +307,13 @@ const JobGuide = () => {
                   <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                     <CheckCircle className="w-4 h-4 text-white" />
                   </div>
-                  Application Saved Successfully!
+                  Analysis Generated Successfully!
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-green-100 font-inter">
-                  Your job application details have been saved to your profile. You can now track this application and add more jobs to build your application history.
+                  Your job match analysis and cover letter have been generated based on your profile. 
+                  The analysis has been saved and you can now track this job opportunity in your profile.
                 </p>
               </CardContent>
             </Card>
@@ -315,7 +325,7 @@ const JobGuide = () => {
               <CardHeader>
                 <CardTitle className="text-white font-inter flex items-center gap-2">
                   <AlertCircle className="w-6 h-6" />
-                  Save Error
+                  Analysis Error
                 </CardTitle>
               </CardHeader>
               <CardContent>
