@@ -292,17 +292,17 @@ const JobGuide = () => {
 
           {/* Success Display */}
           {isSuccess && (
-            <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
+            <Card className="bg-gradient-to-br from-teal-400 via-teal-500 to-teal-600 border-2 border-teal-300 shadow-2xl shadow-teal-500/20">
               <CardHeader>
-                <CardTitle className="text-white font-inter flex items-center gap-2">
-                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-4 h-4 text-white" />
+                <CardTitle className="text-black font-inter flex items-center gap-2">
+                  <div className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-4 h-4 text-black" />
                   </div>
                   Application Saved Successfully!
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-green-100 font-inter">
+                <p className="text-black font-inter">
                   Your job application details have been saved to your profile. You can now track this application and add more jobs to build your application history.
                 </p>
               </CardContent>
