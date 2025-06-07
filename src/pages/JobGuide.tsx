@@ -196,55 +196,55 @@ const JobGuide = () => {
           )}
 
           {/* Job Guide Form */}
-          <Card className="bg-gradient-to-br from-teal-400 via-teal-500 to-teal-600 border-2 border-teal-300 shadow-2xl shadow-teal-500/20">
+          <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20">
             <CardHeader>
-              <CardTitle className="text-black font-inter flex items-center gap-2">
-                <div className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center">
-                  <FileSearch className="w-4 h-4 text-black" />
+              <CardTitle className="text-white font-inter flex items-center gap-2">
+                <div className="w-8 h-8 bg-emerald-500/20 rounded-full flex items-center justify-center">
+                  <FileSearch className="w-4 h-4 text-emerald-400" />
                 </div>
                 Save Job Application
               </CardTitle>
-              <CardDescription className="text-black/80 font-inter">
+              <CardDescription className="text-slate-200 font-inter">
                 Enter job details to save to your profile for tracking
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-black font-inter font-medium mb-2">
+                  <label className="block text-slate-100 font-inter font-medium mb-2">
                     Company Name
                   </label>
                   <Input
                     value={formData.companyName}
                     onChange={(e) => handleInputChange('companyName', e.target.value)}
                     placeholder="Enter the company name"
-                    className="bg-white border-2 border-gray-300 text-black placeholder-gray-500 font-inter focus-visible:border-teal-600 hover:border-gray-400"
+                    className="bg-slate-900/50 border-2 border-slate-500 text-slate-100 placeholder-slate-400 font-inter focus-visible:border-emerald-400 hover:border-slate-400"
                     disabled={isLoading}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-black font-inter font-medium mb-2">
+                  <label className="block text-slate-100 font-inter font-medium mb-2">
                     Job Title
                   </label>
                   <Input
                     value={formData.jobTitle}
                     onChange={(e) => handleInputChange('jobTitle', e.target.value)}
                     placeholder="Enter the job title"
-                    className="bg-white border-2 border-gray-300 text-black placeholder-gray-500 font-inter focus-visible:border-teal-600 hover:border-gray-400"
+                    className="bg-slate-900/50 border-2 border-slate-500 text-slate-100 placeholder-slate-400 font-inter focus-visible:border-emerald-400 hover:border-slate-400"
                     disabled={isLoading}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-black font-inter font-medium mb-2">
+                  <label className="block text-slate-100 font-inter font-medium mb-2">
                     Job Description
                   </label>
                   <Textarea
                     value={formData.jobDescription}
                     onChange={(e) => handleInputChange('jobDescription', e.target.value)}
                     placeholder="Paste the complete job description here including requirements, responsibilities, and qualifications..."
-                    className="min-h-[150px] bg-white border-2 border-gray-300 text-black placeholder-gray-500 font-inter focus-visible:border-teal-600 hover:border-gray-400"
+                    className="min-h-[150px] bg-slate-900/50 border-2 border-slate-500 text-slate-100 placeholder-slate-400 font-inter focus-visible:border-emerald-400 hover:border-slate-400"
                     rows={8}
                     disabled={isLoading}
                   />
@@ -257,8 +257,8 @@ const JobGuide = () => {
                   disabled={!isComplete || !isFormValid || isLoading}
                   className={`w-full font-inter font-medium py-4 px-3 min-h-[60px] ${
                     isComplete && isFormValid && !isLoading
-                      ? 'bg-black text-white hover:bg-gray-800'
-                      : 'bg-gray-400 text-gray-600 border-2 border-gray-300 cursor-not-allowed hover:bg-gray-400'
+                      ? 'bg-emerald-500 text-white hover:bg-emerald-600'
+                      : 'bg-slate-600 text-slate-300 border-2 border-slate-500 cursor-not-allowed hover:bg-slate-600'
                   }`}
                 >
                   <div className="flex items-center justify-center gap-2 w-full">
@@ -279,7 +279,7 @@ const JobGuide = () => {
                 </Button>
 
                 {(!isComplete || !isFormValid) && !isLoading && (
-                  <p className="text-black/80 text-sm font-inter text-center">
+                  <p className="text-slate-300 text-sm font-inter text-center">
                     {!isComplete 
                       ? 'Complete your profile first to use this feature'
                       : 'Fill in all fields to continue'
@@ -292,17 +292,17 @@ const JobGuide = () => {
 
           {/* Success Display */}
           {isSuccess && (
-            <Card className="bg-gradient-to-br from-teal-400 via-teal-500 to-teal-600 border-2 border-teal-300 shadow-2xl shadow-teal-500/20">
+            <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
               <CardHeader>
-                <CardTitle className="text-black font-inter flex items-center gap-2">
-                  <div className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-4 h-4 text-black" />
+                <CardTitle className="text-white font-inter flex items-center gap-2">
+                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-4 h-4 text-white" />
                   </div>
                   Application Saved Successfully!
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-black font-inter">
+                <p className="text-green-100 font-inter">
                   Your job application details have been saved to your profile. You can now track this application and add more jobs to build your application history.
                 </p>
               </CardContent>
