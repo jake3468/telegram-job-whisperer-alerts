@@ -186,29 +186,34 @@ const JobGuide = () => {
                 </div>
               </div>
 
-              <Button
-                onClick={handleSubmit}
-                disabled={!isComplete || !isFormValid}
-                className={`w-full font-inter font-medium text-base sm:text-lg py-6 leading-tight ${
-                  isComplete && isFormValid
-                    ? 'bg-white text-emerald-600 hover:bg-gray-100'
-                    : 'bg-white/30 text-white border border-white/50 cursor-not-allowed hover:bg-white/30'
-                }`}
-              >
-                <Sparkles className="w-5 h-5 mr-2 flex-shrink-0" />
-                <span className="text-center break-words">
-                  Get your <span className="font-bold text-yellow-500 mx-1">Job match %</span> and personalized <span className="font-bold text-blue-600 mx-1">Cover Letter</span>
-                </span>
-              </Button>
+              <div className="space-y-4">
+                <Button
+                  onClick={handleSubmit}
+                  disabled={!isComplete || !isFormValid}
+                  className={`w-full font-inter font-medium py-4 px-3 min-h-[60px] ${
+                    isComplete && isFormValid
+                      ? 'bg-white text-emerald-600 hover:bg-gray-100'
+                      : 'bg-white/50 text-gray-800 border-2 border-white/70 cursor-not-allowed hover:bg-white/50'
+                  }`}
+                >
+                  <div className="flex items-center justify-center gap-2 w-full">
+                    <Sparkles className="w-4 h-4 flex-shrink-0" />
+                    <div className="text-center leading-tight text-sm sm:text-base">
+                      <div>Get your <span className="font-bold text-yellow-600">Job match %</span></div>
+                      <div>and personalized <span className="font-bold text-blue-600">Cover Letter</span></div>
+                    </div>
+                  </div>
+                </Button>
 
-              {(!isComplete || !isFormValid) && (
-                <p className="text-emerald-200 text-sm font-inter text-center">
-                  {!isComplete 
-                    ? 'Complete your profile first to use this feature'
-                    : 'Fill in all fields to continue'
-                  }
-                </p>
-              )}
+                {(!isComplete || !isFormValid) && (
+                  <p className="text-emerald-200 text-sm font-inter text-center">
+                    {!isComplete 
+                      ? 'Complete your profile first to use this feature'
+                      : 'Fill in all fields to continue'
+                    }
+                  </p>
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>
