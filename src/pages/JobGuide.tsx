@@ -78,33 +78,69 @@ const JobGuide = () => {
     setError(null);
     setWebhookResponse(null);
 
+    // Prepare the payload
+    const payload = {
+      companyName: formData.companyName,
+      jobTitle: formData.jobTitle,
+      jobDescription: formData.jobDescription,
+      userId: user?.id,
+      userEmail: user?.emailAddresses?.[0]?.emailAddress,
+      timestamp: new Date().toISOString(),
+    };
+
     try {
-      console.log('Sending webhook request to:', WEBHOOK_URL);
-      console.log('User ID:', user?.id);
+      console.log('=== WEBHOOK DEBUG INFO ===');
+      console.log('Webhook URL:', WEBHOOK_URL);
+      console.log('Request Method: POST');
+      console.log('Request Headers:', {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      });
+      console.log('Request Payload:', JSON.stringify(payload, null, 2));
+      console.log('User Info:', {
+        id: user?.id,
+        email: user?.emailAddresses?.[0]?.emailAddress,
+        firstName: user?.firstName,
+        lastName: user?.lastName
+      });
+      console.log('========================');
       
       const response = await fetch(WEBHOOK_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'User-Agent': 'JobGuide-App/1.0',
         },
-        body: JSON.stringify({
-          companyName: formData.companyName,
-          jobTitle: formData.jobTitle,
-          jobDescription: formData.jobDescription,
-          userId: user?.id, // Include user ID for tracking
-          timestamp: new Date().toISOString(),
-        }),
+        body: JSON.stringify(payload),
       });
 
-      console.log('Webhook response status:', response.status);
-      console.log('Webhook response headers:', response.headers);
+      console.log('=== WEBHOOK RESPONSE INFO ===');
+      console.log('Response Status:', response.status);
+      console.log('Response Status Text:', response.statusText);
+      console.log('Response Headers:', Object.fromEntries(response.headers.entries()));
+      console.log('Response URL:', response.url);
+      console.log('Response OK:', response.ok);
+      console.log('=============================');
+
+      // Log the raw response text first
+      const responseText = await response.text();
+      console.log('Raw Response Text:', responseText);
 
       if (!response.ok) {
-        throw new Error(`Webhook failed with status ${response.status}`);
+        throw new Error(`Webhook failed: ${response.status} ${response.statusText}. Response: ${responseText}`);
       }
 
-      const data = await response.json();
-      console.log('Webhook response data:', data);
+      // Try to parse as JSON
+      let data;
+      try {
+        data = responseText ? JSON.parse(responseText) : {};
+      } catch (parseError) {
+        console.error('Failed to parse JSON response:', parseError);
+        throw new Error(`Invalid JSON response from webhook: ${responseText}`);
+      }
+
+      console.log('Parsed Response Data:', data);
       setWebhookResponse(data);
       
       toast({
@@ -113,13 +149,18 @@ const JobGuide = () => {
       });
 
     } catch (err) {
-      console.error('Webhook error:', err);
+      console.error('=== WEBHOOK ERROR ===');
+      console.error('Error Type:', err instanceof Error ? err.constructor.name : typeof err);
+      console.error('Error Message:', err instanceof Error ? err.message : String(err));
+      console.error('Error Stack:', err instanceof Error ? err.stack : 'No stack trace');
+      console.error('==================');
+      
       const errorMessage = err instanceof Error ? err.message : 'Failed to analyze job posting';
       setError(errorMessage);
       
       toast({
         title: "Analysis Failed",
-        description: "There was an error analyzing the job posting. Please try again.",
+        description: "There was an error analyzing the job posting. Please check the console for details and try again.",
         variant: "destructive",
       });
     } finally {
