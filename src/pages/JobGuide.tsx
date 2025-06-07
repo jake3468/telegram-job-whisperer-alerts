@@ -79,6 +79,9 @@ const JobGuide = () => {
     setWebhookResponse(null);
 
     try {
+      console.log('Sending webhook request to:', WEBHOOK_URL);
+      console.log('User ID:', user?.id);
+      
       const response = await fetch(WEBHOOK_URL, {
         method: 'POST',
         headers: {
@@ -93,11 +96,15 @@ const JobGuide = () => {
         }),
       });
 
+      console.log('Webhook response status:', response.status);
+      console.log('Webhook response headers:', response.headers);
+
       if (!response.ok) {
         throw new Error(`Webhook failed with status ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('Webhook response data:', data);
       setWebhookResponse(data);
       
       toast({
@@ -106,6 +113,7 @@ const JobGuide = () => {
       });
 
     } catch (err) {
+      console.error('Webhook error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to analyze job posting';
       setError(errorMessage);
       
