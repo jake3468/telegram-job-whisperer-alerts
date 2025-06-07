@@ -3,6 +3,7 @@ import { useUser } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthHeader from '@/components/AuthHeader';
+import DashboardNav from '@/components/DashboardNav';
 import ResumeSection from '@/components/dashboard/ResumeSection';
 import BioSection from '@/components/dashboard/BioSection';
 import JobAlertsSection from '@/components/dashboard/JobAlertsSection';
@@ -45,6 +46,8 @@ const Dashboard = () => {
             Manage your job preferences and get personalized alerts
           </p>
         </div>
+
+        <DashboardNav />
 
         <div className="space-y-8">
           <ResumeSection />
