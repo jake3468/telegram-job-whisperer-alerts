@@ -7,19 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { AlertCircle, FileSearch, Sparkles, Loader2, CheckCircle, Percent } from 'lucide-react';
+import { AlertCircle, FileSearch, Sparkles, Loader2, CheckCircle } from 'lucide-react';
 import AuthHeader from '@/components/AuthHeader';
 import DashboardNav from '@/components/DashboardNav';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
-
-// Webhook URL - Easy to modify for different environments
-const WEBHOOK_URL = 'https://n8n.srv834502.hstgr.cloud/webhook-test/ea69a2d4-dde6-4887-b169-27ba18206867';
-
-interface WebhookResponse {
-  jobMatchPercentage?: number;
-  coverLetter?: string;
-  [key: string]: any; // Allow for flexible response structure
-}
+import { supabase } from '@/integrations/supabase/client';
 
 const JobGuide = () => {
   const { user, isLoaded } = useUser();
@@ -34,7 +26,7 @@ const JobGuide = () => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [webhookResponse, setWebhookResponse] = useState<WebhookResponse | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -49,8 +41,8 @@ const JobGuide = () => {
       [field]: value
     }));
     // Clear previous results when form changes
-    if (webhookResponse || error) {
-      setWebhookResponse(null);
+    if (isSuccess || error) {
+      setIsSuccess(false);
       setError(null);
     }
   };
@@ -76,91 +68,56 @@ const JobGuide = () => {
 
     setIsLoading(true);
     setError(null);
-    setWebhookResponse(null);
-
-    // Prepare the payload
-    const payload = {
-      companyName: formData.companyName,
-      jobTitle: formData.jobTitle,
-      jobDescription: formData.jobDescription,
-      userId: user?.id,
-      userEmail: user?.emailAddresses?.[0]?.emailAddress,
-      timestamp: new Date().toISOString(),
-    };
+    setIsSuccess(false);
 
     try {
-      console.log('=== WEBHOOK DEBUG INFO ===');
-      console.log('Webhook URL:', WEBHOOK_URL);
-      console.log('Request Method: POST');
-      console.log('Request Headers:', {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      });
-      console.log('Request Payload:', JSON.stringify(payload, null, 2));
-      console.log('User Info:', {
-        id: user?.id,
-        email: user?.emailAddresses?.[0]?.emailAddress,
-        firstName: user?.firstName,
-        lastName: user?.lastName
-      });
-      console.log('========================');
-      
-      const response = await fetch(WEBHOOK_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'User-Agent': 'JobGuide-App/1.0',
-        },
-        body: JSON.stringify(payload),
-      });
+      // First, get the user's database ID from the users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('clerk_id', user?.id)
+        .single();
 
-      console.log('=== WEBHOOK RESPONSE INFO ===');
-      console.log('Response Status:', response.status);
-      console.log('Response Status Text:', response.statusText);
-      console.log('Response Headers:', Object.fromEntries(response.headers.entries()));
-      console.log('Response URL:', response.url);
-      console.log('Response OK:', response.ok);
-      console.log('=============================');
-
-      // Log the raw response text first
-      const responseText = await response.text();
-      console.log('Raw Response Text:', responseText);
-
-      if (!response.ok) {
-        throw new Error(`Webhook failed: ${response.status} ${response.statusText}. Response: ${responseText}`);
+      if (userError || !userData) {
+        throw new Error('User not found in database');
       }
 
-      // Try to parse as JSON
-      let data;
-      try {
-        data = responseText ? JSON.parse(responseText) : {};
-      } catch (parseError) {
-        console.error('Failed to parse JSON response:', parseError);
-        throw new Error(`Invalid JSON response from webhook: ${responseText}`);
+      // Insert the job analysis data
+      const { error: insertError } = await supabase
+        .from('job_analyses')
+        .insert({
+          user_id: userData.id,
+          company_name: formData.companyName,
+          job_title: formData.jobTitle,
+          job_description: formData.jobDescription,
+        });
+
+      if (insertError) {
+        throw new Error(insertError.message);
       }
 
-      console.log('Parsed Response Data:', data);
-      setWebhookResponse(data);
+      setIsSuccess(true);
       
       toast({
-        title: "Analysis Complete!",
-        description: "Your job match analysis and cover letter are ready.",
+        title: "Job Analysis Saved!",
+        description: "Your job analysis has been successfully saved to your profile.",
+      });
+
+      // Reset form after successful submission
+      setFormData({
+        companyName: '',
+        jobTitle: '',
+        jobDescription: '',
       });
 
     } catch (err) {
-      console.error('=== WEBHOOK ERROR ===');
-      console.error('Error Type:', err instanceof Error ? err.constructor.name : typeof err);
-      console.error('Error Message:', err instanceof Error ? err.message : String(err));
-      console.error('Error Stack:', err instanceof Error ? err.stack : 'No stack trace');
-      console.error('==================');
-      
-      const errorMessage = err instanceof Error ? err.message : 'Failed to analyze job posting';
+      console.error('Error saving job analysis:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to save job analysis';
       setError(errorMessage);
       
       toast({
-        title: "Analysis Failed",
-        description: "There was an error analyzing the job posting. Please check the console for details and try again.",
+        title: "Save Failed",
+        description: "There was an error saving your job analysis. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -188,7 +145,7 @@ const JobGuide = () => {
             <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">Job Guide</span>
           </h1>
           <p className="text-xl text-gray-300 font-inter font-light">
-            Get personalized job matching and cover letter assistance
+            Save and organize your job applications
           </p>
         </div>
 
@@ -245,10 +202,10 @@ const JobGuide = () => {
                 <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                   <FileSearch className="w-4 h-4 text-white" />
                 </div>
-                Job Analysis
+                Save Job Application
               </CardTitle>
               <CardDescription className="text-emerald-100 font-inter">
-                Enter job details to get personalized matching analysis and cover letter
+                Enter job details to save to your profile for tracking
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -308,14 +265,13 @@ const JobGuide = () => {
                     {isLoading ? (
                       <>
                         <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
-                        <span className="text-center text-sm sm:text-base">Processing...</span>
+                        <span className="text-center text-sm sm:text-base">Saving...</span>
                       </>
                     ) : (
                       <>
                         <Sparkles className="w-4 h-4 flex-shrink-0" />
                         <div className="text-center leading-tight text-sm sm:text-base">
-                          <div>Get your <span className="font-bold text-yellow-600">Job match %</span></div>
-                          <div>and personalized <span className="font-bold text-blue-600">Cover Letter</span></div>
+                          <div>Save Job Application</div>
                         </div>
                       </>
                     )}
@@ -334,54 +290,23 @@ const JobGuide = () => {
             </CardContent>
           </Card>
 
-          {/* Webhook Response Display */}
-          {webhookResponse && (
-            <div className="space-y-6">
-              {/* Job Match Percentage */}
-              {webhookResponse.jobMatchPercentage !== undefined && (
-                <Card className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 border-2 border-blue-400 shadow-2xl shadow-blue-500/20">
-                  <CardHeader>
-                    <CardTitle className="text-white font-inter flex items-center gap-2">
-                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                        <Percent className="w-4 h-4 text-white" />
-                      </div>
-                      Job Match Analysis
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center">
-                      <div className="text-6xl font-bold text-white mb-2">
-                        {webhookResponse.jobMatchPercentage}%
-                      </div>
-                      <p className="text-blue-100 font-inter text-lg">
-                        Match with your profile
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Cover Letter */}
-              {webhookResponse.coverLetter && (
-                <Card className="bg-gradient-to-br from-purple-600 via-pink-600 to-rose-600 border-2 border-purple-400 shadow-2xl shadow-purple-500/20">
-                  <CardHeader>
-                    <CardTitle className="text-white font-inter flex items-center gap-2">
-                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                        <CheckCircle className="w-4 h-4 text-white" />
-                      </div>
-                      Personalized Cover Letter
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="bg-white/10 rounded-lg p-4 border border-white/20">
-                      <pre className="text-white font-inter text-sm leading-relaxed whitespace-pre-wrap">
-                        {webhookResponse.coverLetter}
-                      </pre>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+          {/* Success Display */}
+          {isSuccess && (
+            <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
+              <CardHeader>
+                <CardTitle className="text-white font-inter flex items-center gap-2">
+                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-4 h-4 text-white" />
+                  </div>
+                  Application Saved Successfully!
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-green-100 font-inter">
+                  Your job application details have been saved to your profile. You can now track this application and add more jobs to build your application history.
+                </p>
+              </CardContent>
+            </Card>
           )}
 
           {/* Error Display */}
@@ -390,7 +315,7 @@ const JobGuide = () => {
               <CardHeader>
                 <CardTitle className="text-white font-inter flex items-center gap-2">
                   <AlertCircle className="w-6 h-6" />
-                  Analysis Error
+                  Save Error
                 </CardTitle>
               </CardHeader>
               <CardContent>
