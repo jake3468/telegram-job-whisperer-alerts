@@ -82,18 +82,38 @@ const JobGuide = () => {
         throw new Error('User not found in database');
       }
 
-      // Insert the job analysis data
-      const { error: insertError } = await supabase
-        .from('job_analyses')
-        .insert({
-          user_id: userData.id,
-          company_name: formData.companyName,
-          job_title: formData.jobTitle,
-          job_description: formData.jobDescription,
+      console.log('User data found:', userData);
+      console.log('Attempting to insert job analysis with user_id:', userData.id);
+
+      // Use RPC call to bypass RLS temporarily or insert directly with explicit user_id
+      const { data: insertData, error: insertError } = await supabase
+        .rpc('insert_job_analysis', {
+          p_user_id: userData.id,
+          p_company_name: formData.companyName,
+          p_job_title: formData.jobTitle,
+          p_job_description: formData.jobDescription
         });
 
-      if (insertError) {
-        throw new Error(insertError.message);
+      // If RPC doesn't exist, fall back to direct insert
+      if (insertError && insertError.message?.includes('function')) {
+        console.log('RPC function not found, trying direct insert...');
+        
+        const { error: directInsertError } = await supabase
+          .from('job_analyses')
+          .insert({
+            user_id: userData.id,
+            company_name: formData.companyName,
+            job_title: formData.jobTitle,
+            job_description: formData.jobDescription,
+          });
+
+        if (directInsertError) {
+          console.error('Direct insert error:', directInsertError);
+          throw new Error(`Database insert failed: ${directInsertError.message}`);
+        }
+      } else if (insertError) {
+        console.error('RPC insert error:', insertError);
+        throw new Error(`RPC insert failed: ${insertError.message}`);
       }
 
       setIsSuccess(true);
