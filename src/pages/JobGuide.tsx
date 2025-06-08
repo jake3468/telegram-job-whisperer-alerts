@@ -304,7 +304,7 @@ const JobGuide = () => {
                   <label className="block text-white font-inter font-medium mb-2">
                     Job Title
                   </label>
-                  <Input value={formData.jobTitle} onChange={e => handleInputChange('jobTitle', e.target.value)} placeholder="Enter the job title for analysis" disabled={isLoading || isGenerating} className="border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-slate-950" />
+                  <Input value={formData.jobTitle} onChange={e => handleInputChange('jobTitle', e.target.value)} placeholder="Enter the job title for analysis" disabled={isLoading || isGenerating} className="border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-emerald-950" />
                 </div>
 
                 <div>
