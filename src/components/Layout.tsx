@@ -20,7 +20,7 @@ export function Layout({ children }: LayoutProps) {
             <h1 className="text-white font-inter font-semibold text-lg">
               Dashboard
             </h1>
-            <SidebarTrigger asChild>
+            <SidebarTrigger>
               <Button
                 variant="ghost"
                 size="icon"
