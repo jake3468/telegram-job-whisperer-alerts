@@ -1,13 +1,9 @@
-
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-
 const AuthHeader = () => {
   const navigate = useNavigate();
-
-  return (
-    <header className="absolute top-0 right-0 p-6 z-10">
+  return <header className="absolute top-0 right-0 p-6 z-10">
       <SignedOut>
         <div className="flex space-x-4">
           <SignInButton mode="modal">
@@ -24,24 +20,14 @@ const AuthHeader = () => {
       </SignedOut>
       <SignedIn>
         <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/dashboard')}
-            className="text-white hover:text-gray-300 font-inter text-sm"
-          >
-            Dashboard
-          </Button>
-          <UserButton 
-            appearance={{
-              elements: {
-                avatarBox: "w-8 h-8"
-              }
-            }}
-          />
+          
+          <UserButton appearance={{
+          elements: {
+            avatarBox: "w-8 h-8"
+          }
+        }} />
         </div>
       </SignedIn>
-    </header>
-  );
+    </header>;
 };
-
 export default AuthHeader;
