@@ -6,7 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useClerkSupabaseSync } from "@/hooks/useClerkSupabaseSync";
 import Index from "./pages/Index";
-import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
+import JobAlerts from "./pages/JobAlerts";
 import JobGuide from "./pages/JobGuide";
 import NotFound from "./pages/NotFound";
 
@@ -18,7 +19,8 @@ const AppContent = () => {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
-      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/dashboard" element={<Profile />} />
+      <Route path="/job-alerts" element={<JobAlerts />} />
       <Route path="/job-guide" element={<JobGuide />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />

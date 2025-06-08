@@ -161,6 +161,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_current_user_uuid: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       insert_job_analysis: {
         Args: {
           p_user_id: string

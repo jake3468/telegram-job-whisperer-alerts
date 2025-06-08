@@ -1,29 +1,21 @@
 
 import { useUser } from '@clerk/clerk-react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthHeader from '@/components/AuthHeader';
 import DashboardNav from '@/components/DashboardNav';
 import ResumeSection from '@/components/dashboard/ResumeSection';
 import BioSection from '@/components/dashboard/BioSection';
-import JobAlertsSection from '@/components/dashboard/JobAlertsSection';
 
-const Dashboard = () => {
+const Profile = () => {
   const { user, isLoaded } = useUser();
   const navigate = useNavigate();
-  const [userTimezone, setUserTimezone] = useState('');
 
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
-
-  useEffect(() => {
-    // Auto-detect user timezone
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    setUserTimezone(timezone);
-  }, []);
 
   if (!isLoaded || !user) {
     return (
@@ -43,7 +35,7 @@ const Dashboard = () => {
             Welcome back, <span className="bg-gradient-to-r from-pastel-blue to-pastel-mint bg-clip-text text-transparent">{user.firstName || 'User'}</span>
           </h1>
           <p className="text-xl text-gray-300 font-inter font-light">
-            Manage your job preferences and get personalized alerts
+            Manage your profile information and resume
           </p>
         </div>
 
@@ -52,11 +44,10 @@ const Dashboard = () => {
         <div className="space-y-8">
           <ResumeSection />
           <BioSection />
-          <JobAlertsSection userTimezone={userTimezone} />
         </div>
       </div>
     </div>
   );
 };
 
-export default Dashboard;
+export default Profile;
