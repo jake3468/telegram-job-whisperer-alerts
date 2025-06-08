@@ -137,7 +137,7 @@ const JobAlertForm = ({
 
         <div>
           <Label htmlFor="job_title" className="text-white font-inter font-medium mb-2 block">Job Title</Label>
-          <Input id="job_title" value={formData.job_title} onChange={e => handleInputChange('job_title', e.target.value)} placeholder="e.g., Software Engineer" required className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-slate-950" />
+          <Input id="job_title" value={formData.job_title} onChange={e => handleInputChange('job_title', e.target.value)} placeholder="e.g., Software Engineer" required className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950" />
         </div>
 
         <div>
