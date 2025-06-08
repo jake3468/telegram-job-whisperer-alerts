@@ -27,7 +27,7 @@ const JobAlerts = () => {
       </div>;
   }
   return <Layout className="text-3xl">
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen bg-black text-3xl">
         <AuthHeader />
         
         <div className="max-w-4xl mx-auto px-3 py-8 sm:px-4 sm:py-12">
