@@ -400,8 +400,8 @@ const JobGuide = () => {
                 {/* Job Match Results */}
                 <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20">
                   <CardHeader className="pb-3 bg-red-300">
-                    <CardTitle className="text-white font-inter flex items-center gap-2 text-lg">
-                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                    <CardTitle className="font-inter flex items-center gap-2 text-lg text-gray-950">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-950">
                         <Target className="w-4 h-4 text-white" />
                       </div>
                       Job Match Analysis
