@@ -50,7 +50,7 @@ export function AppSidebar() {
                     <NavLink 
                       to={item.url} 
                       className={({ isActive: navIsActive }) => 
-                        `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm ${
+                        `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 ${
                           navIsActive || isActive(item.url) 
                             ? 'bg-gradient-to-r from-sky-500/20 to-sky-300/20 text-white border border-sky-400/30' 
                             : 'text-gray-300 hover:text-white hover:bg-white/5 hover:border hover:border-white/10'
