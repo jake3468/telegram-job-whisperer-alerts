@@ -403,9 +403,9 @@ const JobGuide = () => {
               </Card>}
 
             {/* Analysis Results Display */}
-            {analysisResults && <div className="space-y-6">
+            {analysisResults && <div className="space-y-6 w-full max-w-full overflow-hidden">
                 {/* Job Match Results */}
-                <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20">
+                <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20 w-full">
                   <CardHeader className="pb-3 bg-red-300">
                     <CardTitle className="font-inter flex items-center gap-2 text-lg text-gray-950">
                       <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-950">
@@ -414,8 +414,8 @@ const JobGuide = () => {
                       Job Match Analysis
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-0 bg-red-300 p-4">
-                    <div className="bg-white rounded-lg p-4 border-2 border-slate-300 overflow-hidden">
+                  <CardContent className="pt-0 bg-red-300 p-4 w-full">
+                    <div className="bg-white rounded-lg p-4 border-2 border-slate-300 w-full overflow-hidden">
                       <div 
                         className="text-slate-800 font-inter text-sm sm:text-base leading-relaxed font-medium break-words overflow-wrap-anywhere"
                         style={{
@@ -433,7 +433,7 @@ const JobGuide = () => {
                 </Card>
 
                 {/* Cover Letter Results */}
-                <Card className="bg-gradient-to-br from-blue-800 via-blue-700 to-blue-600 border-2 border-blue-400 shadow-2xl shadow-blue-500/20">
+                <Card className="bg-gradient-to-br from-blue-800 via-blue-700 to-blue-600 border-2 border-blue-400 shadow-2xl shadow-blue-500/20 w-full">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-white font-inter flex items-center gap-2 text-lg">
                       <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
@@ -446,19 +446,19 @@ const JobGuide = () => {
                       </Button>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-0 p-4">
+                  <CardContent className="pt-0 p-4 w-full">
                     <div 
-                      className="bg-white rounded-lg p-4 sm:p-6 border-2 border-blue-300 shadow-inner overflow-hidden"
+                      className="bg-white rounded-lg p-4 sm:p-6 border-2 border-blue-300 shadow-inner w-full overflow-hidden"
                       style={{
                         backgroundImage: `linear-gradient(to right, #e5e7eb 1px, transparent 1px)`,
                         backgroundSize: '24px 100%',
                         paddingLeft: '20px'
                       }}
                     >
-                      <div className="relative">
+                      <div className="relative w-full">
                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-300 rounded"></div>
                         <div 
-                          className="text-slate-800 font-inter text-sm sm:text-base leading-6 font-medium pl-4 break-words overflow-wrap-anywhere"
+                          className="text-slate-800 font-inter text-sm sm:text-base leading-6 font-medium pl-4 w-full break-words overflow-wrap-anywhere"
                           style={{
                             wordWrap: 'break-word',
                             overflowWrap: 'anywhere',
