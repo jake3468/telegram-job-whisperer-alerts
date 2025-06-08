@@ -122,8 +122,8 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
   if (loading) {
     return (
       <Card className="bg-gradient-to-br from-orange-500 via-red-500 to-pink-600 border-2 border-orange-400 shadow-2xl shadow-orange-500/20">
-        <CardContent className="p-6">
-          <div className="text-white">Loading...</div>
+        <CardContent className="p-4">
+          <div className="text-white text-xs">Loading...</div>
         </CardContent>
       </Card>
     );
@@ -131,30 +131,30 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
 
   return (
     <Card className="bg-gradient-to-br from-orange-500 via-red-500 to-pink-600 border-2 border-orange-400 shadow-2xl shadow-orange-500/20">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-white font-inter flex items-center gap-2">
-              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                <Bell className="w-4 h-4 text-white" />
+      <CardHeader className="pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="min-w-0">
+            <CardTitle className="text-white font-inter flex items-center gap-2 text-base">
+              <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                <Bell className="w-3 h-3 text-white" />
               </div>
               Job Alerts
             </CardTitle>
-            <CardDescription className="text-orange-100 font-inter">
+            <CardDescription className="text-orange-100 font-inter text-sm">
               Set up personalized job alerts based on your preferences
             </CardDescription>
           </div>
           {!showForm && (
-            <Button onClick={handleCreateAlert} className="font-inter bg-white text-orange-600 hover:bg-gray-100 font-medium">
-              <Plus className="w-4 h-4 mr-2" />
+            <Button onClick={handleCreateAlert} className="font-inter bg-white text-orange-600 hover:bg-gray-100 font-medium text-xs px-3 py-1 h-8 flex-shrink-0">
+              <Plus className="w-3 h-3 mr-1" />
               Add Alert
             </Button>
           )}
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0">
         {showForm && (
-          <div className="mb-8">
+          <div className="mb-6">
             <JobAlertForm
               userTimezone={userTimezone}
               editingAlert={editingAlert}
