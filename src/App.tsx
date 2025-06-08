@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +18,7 @@ const AppContent = () => {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
+      {/* Dashboard routes now use the Layout component internally */}
       <Route path="/dashboard" element={<Profile />} />
       <Route path="/job-alerts" element={<JobAlerts />} />
       <Route path="/job-guide" element={<JobGuide />} />
