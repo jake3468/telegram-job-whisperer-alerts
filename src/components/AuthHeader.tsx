@@ -1,9 +1,12 @@
-import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/clerk-react';
+
+import { SignedIn, SignedOut, SignInButton, SignUpButton } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+
 const AuthHeader = () => {
   const navigate = useNavigate();
-  return <header className="absolute top-0 right-0 p-6 z-10">
+  return (
+    <header className="absolute top-0 right-0 p-6 z-10">
       <SignedOut>
         <div className="flex space-x-4">
           <SignInButton mode="modal">
@@ -19,15 +22,10 @@ const AuthHeader = () => {
         </div>
       </SignedOut>
       <SignedIn>
-        <div className="flex items-center space-x-4">
-          
-          <UserButton appearance={{
-          elements: {
-            avatarBox: "w-8 h-8"
-          }
-        }} />
-        </div>
+        {/* Removed UserButton - it's now only in the sidebar */}
       </SignedIn>
-    </header>;
+    </header>
+  );
 };
+
 export default AuthHeader;
