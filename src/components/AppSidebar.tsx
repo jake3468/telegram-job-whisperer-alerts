@@ -30,12 +30,10 @@ export function AppSidebar() {
         <div className="flex items-center gap-3">
           
           {state === 'expanded' && <div className="flex-1 min-w-0">
-              <p className="text-white font-medium font-inter text-sm truncate">
+              <p className="font-inter truncate text-4xl font-medium text-sky-300">
                 Job AI
               </p>
-              <p className="text-gray-400 text-xs font-inter truncate">
-                {user?.firstName || 'Welcome back'}
-              </p>
+              
             </div>}
         </div>
       </SidebarHeader>
