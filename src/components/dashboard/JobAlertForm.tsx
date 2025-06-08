@@ -182,7 +182,7 @@ const JobAlertForm = ({
 
         <div>
           <Label htmlFor="max_alerts" className="text-white font-inter font-medium mb-2 block">Max Alerts Per Day</Label>
-          <Input id="max_alerts" type="number" min="1" max="50" value={formData.max_alerts_per_day} onChange={e => handleInputChange('max_alerts_per_day', parseInt(e.target.value) || 1)} className="border-2 border-gray-500 text-white font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-slate-950" />
+          <Input id="max_alerts" type="number" min="1" max="50" value={formData.max_alerts_per_day} onChange={e => handleInputChange('max_alerts_per_day', parseInt(e.target.value) || 1)} className="border-2 border-gray-500 text-white font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950" />
         </div>
 
         <div>
