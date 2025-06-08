@@ -32,7 +32,7 @@ const JobAlerts = () => {
         
         <div className="max-w-4xl mx-auto px-3 py-8 sm:px-4 sm:py-12">
           <div className="text-center mb-8">
-            <h1 className="sm:text-xl md:text-2xl font-medium text-white mb-2 font-inter text-3xl">
+            <h1 className="sm:text-xl font-medium text-white mb-2 font-inter text-3xl md:text-3xl">
               Job <span className="bg-gradient-to-r from-orange-500 to-pink-600 bg-clip-text text-transparent">Alerts</span>
             </h1>
             <p className="text-sm text-gray-300 font-inter font-light">
