@@ -132,7 +132,7 @@ const JobAlertForm = ({
 
         <div>
           <Label htmlFor="location" className="text-white font-inter font-medium mb-2 block">Location</Label>
-          <Input id="location" value={formData.location} onChange={e => handleInputChange('location', e.target.value)} placeholder="e.g., New York, NY" required className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-slate-950" />
+          <Input id="location" value={formData.location} onChange={e => handleInputChange('location', e.target.value)} placeholder="e.g., New York, NY" required className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950" />
         </div>
 
         <div>
