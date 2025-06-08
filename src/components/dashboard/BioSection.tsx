@@ -6,25 +6,24 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { User } from 'lucide-react';
-
 const BioSection = () => {
-  const { user } = useUser();
-  const { toast } = useToast();
+  const {
+    user
+  } = useUser();
+  const {
+    toast
+  } = useToast();
   const [bio, setBio] = useState('');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchUserBio = async () => {
       if (!user) return;
-
       try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('bio')
-          .eq('clerk_id', user.id)
-          .single();
-
+        const {
+          data,
+          error
+        } = await supabase.from('users').select('bio').eq('clerk_id', user.id).single();
         if (error && error.code !== 'PGRST116') {
           console.error('Error fetching bio:', error);
         } else if (data?.bio) {
@@ -36,50 +35,41 @@ const BioSection = () => {
         setLoading(false);
       }
     };
-
     fetchUserBio();
   }, [user]);
-
   const handleSaveBio = async () => {
     if (!user) return;
-
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from('users')
-        .update({ bio })
-        .eq('clerk_id', user.id);
-
+      const {
+        error
+      } = await supabase.from('users').update({
+        bio
+      }).eq('clerk_id', user.id);
       if (error) throw error;
-
       toast({
         title: "Bio updated",
-        description: "Your bio has been saved successfully.",
+        description: "Your bio has been saved successfully."
       });
     } catch (error) {
       console.error('Error saving bio:', error);
       toast({
         title: "Save failed",
         description: "There was an error saving your bio.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setSaving(false);
     }
   };
-
   if (loading) {
-    return (
-      <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
+    return <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
         <CardContent className="p-6">
           <div className="text-white">Loading...</div>
         </CardContent>
-      </Card>
-    );
+      </Card>;
   }
-
-  return (
-    <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
+  return <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
       <CardHeader>
         <CardTitle className="text-white font-inter flex items-center gap-2">
           <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
@@ -92,23 +82,11 @@ const BioSection = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Textarea
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
-          placeholder="Describe your experience, skills, career goals, and what kind of opportunities you're looking for..."
-          className="min-h-[120px] bg-white/10 border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30"
-          rows={6}
-        />
-        <Button
-          onClick={handleSaveBio}
-          disabled={saving}
-          className="font-inter bg-white text-green-600 hover:bg-gray-100 font-medium"
-        >
+        <Textarea value={bio} onChange={e => setBio(e.target.value)} placeholder="Describe your experience, skills, career goals, and what kind of opportunities you're looking for..." rows={6} className="min-h-[120px] border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-slate-950" />
+        <Button onClick={handleSaveBio} disabled={saving} className="font-inter bg-white text-green-600 hover:bg-gray-100 font-medium">
           {saving ? 'Saving...' : 'Save Bio'}
         </Button>
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
-
 export default BioSection;
