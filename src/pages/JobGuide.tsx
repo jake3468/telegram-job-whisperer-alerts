@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +11,6 @@ import AuthHeader from '@/components/AuthHeader';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import { supabase } from '@/integrations/supabase/client';
 import { Layout } from '@/components/Layout';
-
 const JobGuide = () => {
   const {
     user,
@@ -44,19 +42,12 @@ const JobGuide = () => {
   } | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('');
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const loadingMessages = [
-    "🔍 Carefully analyzing your profile against job requirements...",
-    "📝 Crafting your personalized cover letter...",
-    "🎯 Calculating your job match percentage...",
-    "✨ Putting the finishing touches on your analysis..."
-  ];
-
+  const loadingMessages = ["🔍 Carefully analyzing your profile against job requirements...", "📝 Crafting your personalized cover letter...", "🎯 Calculating your job match percentage...", "✨ Putting the finishing touches on your analysis..."];
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
-
   useEffect(() => {
     if (!isGenerating) return;
     let messageIndex = 0;
@@ -67,7 +58,6 @@ const JobGuide = () => {
     }, 3000);
     return () => clearInterval(messageInterval);
   }, [isGenerating]);
-
   useEffect(() => {
     if (!analysisId || !isGenerating) return;
     const pollForResults = async () => {
@@ -126,7 +116,6 @@ const JobGuide = () => {
       clearTimeout(timeout);
     };
   }, [analysisId, isGenerating, toast]);
-
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -140,7 +129,6 @@ const JobGuide = () => {
       setAnalysisId(null);
     }
   };
-
   const handleSubmit = async () => {
     if (!isComplete) {
       toast({
@@ -215,7 +203,6 @@ const JobGuide = () => {
       setIsLoading(false);
     }
   };
-
   const handleCopyToClipboard = async () => {
     if (!analysisResults?.coverLetter) return;
     try {
@@ -233,26 +220,20 @@ const JobGuide = () => {
       });
     }
   };
-
   const isFormValid = formData.companyName && formData.jobTitle && formData.jobDescription;
-  
   if (!isLoaded || !user) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+    return <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-xs">Loading...</div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <Layout>
+  return <Layout>
       <div className="min-h-screen bg-black">
         <AuthHeader />
         
         <div className="max-w-4xl mx-auto px-3 py-8 sm:px-4 sm:py-12">
           <div className="text-center mb-8">
             <h1 className="text-lg sm:text-xl md:text-2xl font-medium text-white mb-2 font-inter">
-              <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">Job Guide</span>
+              <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent text-3xl">Job Guide</span>
             </h1>
             <p className="text-sm text-gray-300 font-inter font-light">
               Get your personalized job match analysis and cover letter
@@ -261,14 +242,11 @@ const JobGuide = () => {
 
           <div className="space-y-6">
             {/* Profile Completion Status */}
-            {loading ? (
-              <Card className="bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border-2 border-gray-400 shadow-2xl shadow-gray-500/20">
+            {loading ? <Card className="bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border-2 border-gray-400 shadow-2xl shadow-gray-500/20">
                 <CardContent className="p-4">
                   <div className="text-white text-xs">Checking your profile...</div>
                 </CardContent>
-              </Card>
-            ) : !isComplete && (
-              <Card className="bg-gradient-to-br from-orange-600 via-red-600 to-pink-600 border-2 border-orange-400 shadow-2xl shadow-orange-500/20">
+              </Card> : !isComplete && <Card className="bg-gradient-to-br from-orange-600 via-red-600 to-pink-600 border-2 border-orange-400 shadow-2xl shadow-orange-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-sm">
                     <AlertCircle className="w-4 h-4" />
@@ -297,8 +275,7 @@ const JobGuide = () => {
                     Go to Home Page
                   </Button>
                 </CardContent>
-              </Card>
-            )}
+              </Card>}
 
             {/* Job Guide Form */}
             <Card className="bg-gradient-to-br from-emerald-600 via-green-600 to-teal-600 border-2 border-emerald-400 shadow-2xl shadow-emerald-500/20">
@@ -321,13 +298,7 @@ const JobGuide = () => {
                     </label>
                     <div className="relative">
                       <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 w-3 h-3" />
-                      <Input 
-                        value={formData.companyName} 
-                        onChange={e => handleInputChange('companyName', e.target.value)} 
-                        placeholder="Enter the company name for analysis" 
-                        disabled={isLoading || isGenerating} 
-                        className="pl-9 h-9 border-2 border-white/20 text-white placeholder-white/70 font-inter text-xs focus-visible:border-white/40 hover:border-white/30 bg-emerald-900" 
-                      />
+                      <Input value={formData.companyName} onChange={e => handleInputChange('companyName', e.target.value)} placeholder="Enter the company name for analysis" disabled={isLoading || isGenerating} className="pl-9 h-9 border-2 border-white/20 text-white placeholder-white/70 font-inter text-xs focus-visible:border-white/40 hover:border-white/30 bg-emerald-900" />
                     </div>
                   </div>
 
@@ -337,13 +308,7 @@ const JobGuide = () => {
                     </label>
                     <div className="relative">
                       <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 w-3 h-3" />
-                      <Input 
-                        value={formData.jobTitle} 
-                        onChange={e => handleInputChange('jobTitle', e.target.value)} 
-                        placeholder="Enter the job title for analysis" 
-                        disabled={isLoading || isGenerating} 
-                        className="pl-9 h-9 border-2 border-white/20 text-white placeholder-white/70 font-inter text-xs focus-visible:border-white/40 hover:border-white/30 bg-emerald-900" 
-                      />
+                      <Input value={formData.jobTitle} onChange={e => handleInputChange('jobTitle', e.target.value)} placeholder="Enter the job title for analysis" disabled={isLoading || isGenerating} className="pl-9 h-9 border-2 border-white/20 text-white placeholder-white/70 font-inter text-xs focus-visible:border-white/40 hover:border-white/30 bg-emerald-900" />
                     </div>
                   </div>
 
@@ -353,14 +318,7 @@ const JobGuide = () => {
                     </label>
                     <div className="relative">
                       <FileText className="absolute left-3 top-3 text-white/70 w-3 h-3" />
-                      <Textarea 
-                        value={formData.jobDescription} 
-                        onChange={e => handleInputChange('jobDescription', e.target.value)} 
-                        placeholder="Paste the complete job description here for detailed analysis including requirements, responsibilities, and qualifications..." 
-                        rows={4} 
-                        disabled={isLoading || isGenerating} 
-                        className="pl-9 min-h-[80px] border-2 border-white/20 text-white placeholder-white/70 font-inter text-xs focus-visible:border-white/40 hover:border-white/30 bg-emerald-900 resize-none" 
-                      />
+                      <Textarea value={formData.jobDescription} onChange={e => handleInputChange('jobDescription', e.target.value)} placeholder="Paste the complete job description here for detailed analysis including requirements, responsibilities, and qualifications..." rows={4} disabled={isLoading || isGenerating} className="pl-9 min-h-[80px] border-2 border-white/20 text-white placeholder-white/70 font-inter text-xs focus-visible:border-white/40 hover:border-white/30 bg-emerald-900 resize-none" />
                     </div>
                   </div>
                 </div>
@@ -392,18 +350,15 @@ const JobGuide = () => {
                     </div>
                   </Button>
 
-                  {(!isComplete || !isFormValid) && !isLoading && !isGenerating && (
-                    <p className="text-emerald-200 text-xs font-inter text-center">
+                  {(!isComplete || !isFormValid) && !isLoading && !isGenerating && <p className="text-emerald-200 text-xs font-inter text-center">
                       {!isComplete ? 'Complete your profile first to use this feature' : 'Fill in all fields to get your analysis'}
-                    </p>
-                  )}
+                    </p>}
                 </div>
               </CardContent>
             </Card>
 
             {/* Generating Status Display */}
-            {isGenerating && (
-              <Card className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 border-2 border-blue-400 shadow-2xl shadow-blue-500/20">
+            {isGenerating && <Card className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 border-2 border-blue-400 shadow-2xl shadow-blue-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-sm">
                     <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
@@ -422,12 +377,10 @@ const JobGuide = () => {
                     </p>
                   </div>
                 </CardContent>
-              </Card>
-            )}
+              </Card>}
 
             {/* Analysis Results Display */}
-            {analysisResults && (
-              <div className="space-y-4">
+            {analysisResults && <div className="space-y-4">
                 {/* Job Match Results */}
                 <Card className="bg-gradient-to-br from-blue-600 via-sky-600 to-cyan-600 border-2 border-blue-400 shadow-2xl shadow-blue-500/20">
                   <CardHeader className="pb-3">
@@ -469,12 +422,10 @@ const JobGuide = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </div>
-            )}
+              </div>}
 
             {/* Success Display */}
-            {isSuccess && !isGenerating && !analysisResults && (
-              <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
+            {isSuccess && !isGenerating && !analysisResults && <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-sm">
                     <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
@@ -489,12 +440,10 @@ const JobGuide = () => {
                     The n8n workflow will process your request and generate the job match percentage and cover letter automatically.
                   </p>
                 </CardContent>
-              </Card>
-            )}
+              </Card>}
 
             {/* Error Display */}
-            {error && (
-              <Card className="bg-gradient-to-br from-red-600 via-red-700 to-red-800 border-2 border-red-400 shadow-2xl shadow-red-500/20">
+            {error && <Card className="bg-gradient-to-br from-red-600 via-red-700 to-red-800 border-2 border-red-400 shadow-2xl shadow-red-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-sm">
                     <AlertCircle className="w-4 h-4" />
@@ -507,13 +456,10 @@ const JobGuide = () => {
                     Try Again
                   </Button>
                 </CardContent>
-              </Card>
-            )}
+              </Card>}
           </div>
         </div>
       </div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default JobGuide;
