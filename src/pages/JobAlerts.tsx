@@ -26,7 +26,7 @@ const JobAlerts = () => {
         <div className="text-white text-xs">Loading...</div>
       </div>;
   }
-  return <Layout>
+  return <Layout className="text-3xl">
       <div className="min-h-screen bg-black">
         <AuthHeader />
         
