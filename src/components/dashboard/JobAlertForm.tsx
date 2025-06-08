@@ -187,7 +187,7 @@ const JobAlertForm = ({
 
         <div>
           <Label htmlFor="timezone" className="text-white font-inter font-medium mb-2 block">Timezone</Label>
-          <Input id="timezone" value={formData.timezone} onChange={e => handleInputChange('timezone', e.target.value)} placeholder="Auto-detected" className="border-2 border-gray-500 text-white font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-zinc-950" />
+          <Input id="timezone" value={formData.timezone} onChange={e => handleInputChange('timezone', e.target.value)} placeholder="Auto-detected" className="border-2 border-gray-500 text-white font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950" />
         </div>
       </div>
 
