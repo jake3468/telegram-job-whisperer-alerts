@@ -195,7 +195,7 @@ const JobAlertForm = ({
         <Button type="submit" disabled={loading} className="font-inter bg-pastel-lavender hover:bg-pastel-lavender/80 text-black font-medium">
           {loading ? 'Saving...' : editingAlert ? 'Update Alert' : 'Create Alert'}
         </Button>
-        <Button type="button" variant="outline" onClick={onCancel} className="font-inter border-gray-500 bg-gray-700 text-white hover:bg-gray-600 hover:border-gray-400">
+        <Button type="button" variant="outline" onClick={onCancel} className="font-inter border-gray-500 hover:border-gray-400 text-slate-950 bg-red-400 hover:bg-red-300">
           Cancel
         </Button>
       </div>
