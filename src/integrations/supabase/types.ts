@@ -65,27 +65,33 @@ export type Database = {
       job_analyses: {
         Row: {
           company_name: string
+          cover_letter: string | null
           created_at: string
           id: string
           job_description: string
+          job_match: string | null
           job_title: string
           updated_at: string
           user_id: string
         }
         Insert: {
           company_name: string
+          cover_letter?: string | null
           created_at?: string
           id?: string
           job_description: string
+          job_match?: string | null
           job_title: string
           updated_at?: string
           user_id: string
         }
         Update: {
           company_name?: string
+          cover_letter?: string | null
           created_at?: string
           id?: string
           job_description?: string
+          job_match?: string | null
           job_title?: string
           updated_at?: string
           user_id?: string
@@ -142,6 +148,33 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_config: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          name: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          name: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          name?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -153,6 +186,15 @@ export type Database = {
       }
       get_current_user_id: {
         Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      insert_job_analysis: {
+        Args: {
+          p_user_id: string
+          p_company_name: string
+          p_job_title: string
+          p_job_description: string
+        }
         Returns: string
       }
     }

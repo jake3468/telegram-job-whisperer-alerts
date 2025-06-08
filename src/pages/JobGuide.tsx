@@ -85,42 +85,27 @@ const JobGuide = () => {
       console.log('User data found:', userData);
       console.log('Attempting to insert job analysis with user_id:', userData.id);
 
-      // Use RPC call to bypass RLS temporarily or insert directly with explicit user_id
-      const { data: insertData, error: insertError } = await supabase
-        .rpc('insert_job_analysis', {
-          p_user_id: userData.id,
-          p_company_name: formData.companyName,
-          p_job_title: formData.jobTitle,
-          p_job_description: formData.jobDescription
+      // Insert directly into job_analyses table (webhook will be triggered automatically)
+      const { error: insertError } = await supabase
+        .from('job_analyses')
+        .insert({
+          user_id: userData.id,
+          company_name: formData.companyName,
+          job_title: formData.jobTitle,
+          job_description: formData.jobDescription,
+          // job_match and cover_letter will be NULL initially
         });
 
-      // If RPC doesn't exist, fall back to direct insert
-      if (insertError && insertError.message?.includes('function')) {
-        console.log('RPC function not found, trying direct insert...');
-        
-        const { error: directInsertError } = await supabase
-          .from('job_analyses')
-          .insert({
-            user_id: userData.id,
-            company_name: formData.companyName,
-            job_title: formData.jobTitle,
-            job_description: formData.jobDescription,
-          });
-
-        if (directInsertError) {
-          console.error('Direct insert error:', directInsertError);
-          throw new Error(`Database insert failed: ${directInsertError.message}`);
-        }
-      } else if (insertError) {
-        console.error('RPC insert error:', insertError);
-        throw new Error(`RPC insert failed: ${insertError.message}`);
+      if (insertError) {
+        console.error('Insert error:', insertError);
+        throw new Error(`Database insert failed: ${insertError.message}`);
       }
 
       setIsSuccess(true);
       
       toast({
-        title: "Analysis Complete!",
-        description: "Your job match analysis has been generated successfully.",
+        title: "Analysis Started!",
+        description: "Your job analysis has been submitted and will be processed automatically. The webhook has been triggered.",
       });
 
       // Reset form after successful submission
@@ -285,14 +270,14 @@ const JobGuide = () => {
                     {isLoading ? (
                       <>
                         <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
-                        <span className="text-center text-sm sm:text-base">Analyzing...</span>
+                        <span className="text-center text-sm sm:text-base">Processing...</span>
                       </>
                     ) : (
                       <>
                         <Sparkles className="w-4 h-4 flex-shrink-0" />
                         <div className="text-center leading-tight text-sm sm:text-base">
                           <div>
-                            Get your{' '}
+                            Submit for{' '}
                             <span className="font-bold bg-gradient-to-r from-emerald-800 to-teal-800 bg-clip-text text-transparent">
                               Job match %
                             </span>
@@ -327,13 +312,13 @@ const JobGuide = () => {
                   <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                     <CheckCircle className="w-4 h-4 text-white" />
                   </div>
-                  Analysis Generated Successfully!
+                  Analysis Submitted Successfully!
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-green-100 font-inter">
-                  Your job match analysis and cover letter have been generated based on your profile. 
-                  The analysis has been saved and you can now track this job opportunity in your profile.
+                  Your job analysis has been submitted and the webhook has been triggered. 
+                  The n8n workflow will process your request and generate the job match percentage and cover letter automatically.
                 </p>
               </CardContent>
             </Card>
