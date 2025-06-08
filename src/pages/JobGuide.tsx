@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -24,7 +23,7 @@ const JobGuide = () => {
     jobTitle: '',
     jobDescription: ''
   });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [analysisId, setAnalysisId] = useState<string | null>(null);
@@ -36,8 +35,8 @@ const JobGuide = () => {
   const [loadingMessage, setLoadingMessage] = useState('');
   
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const submissionInProgressRef = useRef(false);
-  const hasTriggeredWebhookRef = useRef(false);
+  const isSubmissionInProgressRef = useRef(false);
+  const lastSubmissionDataRef = useRef<string>('');
 
   const loadingMessages = [
     "🔍 Carefully analyzing your profile against job requirements...",
@@ -141,7 +140,11 @@ const JobGuide = () => {
     setIsSuccess(false);
     setError(null);
     setIsGenerating(false);
-    hasTriggeredWebhookRef.current = false;
+    setIsSubmitting(false);
+    
+    // Reset refs
+    isSubmissionInProgressRef.current = false;
+    lastSubmissionDataRef.current = '';
     
     toast({
       title: "Data Cleared",
@@ -150,8 +153,22 @@ const JobGuide = () => {
   };
 
   const handleSubmit = async () => {
-    if (submissionInProgressRef.current || hasTriggeredWebhookRef.current) {
-      console.log('Submission already in progress or webhook already triggered, ignoring duplicate click');
+    // Create a unique identifier for this submission based on form data
+    const submissionData = JSON.stringify({
+      company: formData.companyName,
+      title: formData.jobTitle,
+      description: formData.jobDescription
+    });
+
+    // Prevent duplicate submissions
+    if (isSubmissionInProgressRef.current) {
+      console.log('Submission already in progress, ignoring duplicate click');
+      return;
+    }
+
+    // Check if this is the same data as the last submission
+    if (lastSubmissionDataRef.current === submissionData && (isSubmitting || isGenerating)) {
+      console.log('Same data already being processed, ignoring duplicate click');
       return;
     }
 
@@ -173,9 +190,10 @@ const JobGuide = () => {
       return;
     }
 
-    submissionInProgressRef.current = true;
-    hasTriggeredWebhookRef.current = true;
-    setIsLoading(true);
+    // Set all protection flags
+    isSubmissionInProgressRef.current = true;
+    lastSubmissionDataRef.current = submissionData;
+    setIsSubmitting(true);
     setError(null);
     setIsSuccess(false);
     setAnalysisResults(null);
@@ -212,15 +230,12 @@ const JobGuide = () => {
           coverLetter: existing.cover_letter
         });
         setAnalysisId(existing.id);
-        hasTriggeredWebhookRef.current = false; // Reset since we're not triggering webhook
         
         toast({
           title: "Previous Analysis Found",
           description: "Using your previous analysis for this job posting."
         });
         
-        setIsLoading(false);
-        submissionInProgressRef.current = false;
         return;
       }
 
@@ -240,7 +255,6 @@ const JobGuide = () => {
 
       if (insertError) {
         console.error('Insert error:', insertError);
-        hasTriggeredWebhookRef.current = false;
         throw new Error(`Database insert failed: ${insertError.message}`);
       }
 
@@ -256,7 +270,6 @@ const JobGuide = () => {
       }
     } catch (err) {
       console.error('Error generating job analysis:', err);
-      hasTriggeredWebhookRef.current = false;
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate job analysis';
       setError(errorMessage);
       toast({
@@ -265,8 +278,8 @@ const JobGuide = () => {
         variant: "destructive"
       });
     } finally {
-      setIsLoading(false);
-      submissionInProgressRef.current = false;
+      setIsSubmitting(false);
+      isSubmissionInProgressRef.current = false;
     }
   };
 
@@ -291,6 +304,7 @@ const JobGuide = () => {
 
   const isFormValid = formData.companyName && formData.jobTitle && formData.jobDescription;
   const hasAnyData = isFormValid || analysisResults;
+  const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating || isSubmissionInProgressRef.current;
 
   if (!isLoaded || !user) {
     return (
@@ -396,7 +410,7 @@ const JobGuide = () => {
                         value={formData.companyName}
                         onChange={(e) => handleInputChange('companyName', e.target.value)}
                         placeholder="Enter the company name for analysis"
-                        disabled={isLoading || isGenerating}
+                        disabled={isSubmitting || isGenerating}
                         className="pl-10 text-sm sm:text-base border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-emerald-900"
                       />
                     </div>
@@ -412,7 +426,7 @@ const JobGuide = () => {
                         value={formData.jobTitle}
                         onChange={(e) => handleInputChange('jobTitle', e.target.value)}
                         placeholder="Enter the job title for analysis"
-                        disabled={isLoading || isGenerating}
+                        disabled={isSubmitting || isGenerating}
                         className="pl-10 text-sm sm:text-base border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-emerald-900"
                       />
                     </div>
@@ -429,7 +443,7 @@ const JobGuide = () => {
                         onChange={(e) => handleInputChange('jobDescription', e.target.value)}
                         placeholder="Paste the complete job description here for detailed analysis including requirements, responsibilities, and qualifications..."
                         rows={4}
-                        disabled={isLoading || isGenerating}
+                        disabled={isSubmitting || isGenerating}
                         className="pl-10 text-sm sm:text-base border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-emerald-900 resize-none"
                       />
                     </div>
@@ -439,15 +453,15 @@ const JobGuide = () => {
                 <div className="space-y-3">
                   <Button 
                     onClick={handleSubmit}
-                    disabled={!isComplete || !isFormValid || isLoading || isGenerating || hasTriggeredWebhookRef.current}
+                    disabled={isButtonDisabled}
                     className={`w-full font-inter font-medium py-3 px-4 text-sm sm:text-base ${
-                      isComplete && isFormValid && !isLoading && !isGenerating && !hasTriggeredWebhookRef.current 
+                      !isButtonDisabled 
                         ? 'bg-white text-emerald-600 hover:bg-gray-100' 
                         : 'bg-white/50 text-gray-800 border-2 border-white/70 cursor-not-allowed hover:bg-white/50'
                     }`}
                   >
                     <div className="flex items-center justify-center gap-2 w-full">
-                      {isLoading ? (
+                      {isSubmitting ? (
                         <>
                           <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
                           <span className="text-center text-sm sm:text-base">Processing...</span>
@@ -477,7 +491,7 @@ const JobGuide = () => {
                     </div>
                   </Button>
 
-                  {(!isComplete || !isFormValid) && !isLoading && !isGenerating && (
+                  {(!isComplete || !isFormValid) && !isSubmitting && !isGenerating && (
                     <p className="text-emerald-200 text-sm sm:text-base font-inter text-center">
                       {!isComplete ? 'Complete your profile first to use this feature' : 'Fill in all fields to get your analysis'}
                     </p>
@@ -526,7 +540,7 @@ const JobGuide = () => {
                   <CardContent className="pt-0 bg-red-300 p-3 sm:p-4 w-full">
                     <div className="bg-white rounded-lg p-2 sm:p-3 border-2 border-slate-300 w-full">
                       <div 
-                        className="text-slate-800 font-inter leading-relaxed font-medium w-full text-xs sm:text-sm"
+                        className="text-slate-800 font-inter leading-relaxed font-medium w-full text-xs sm:text-xs"
                         style={{
                           wordWrap: 'break-word',
                           overflowWrap: 'break-word',
@@ -534,7 +548,7 @@ const JobGuide = () => {
                           whiteSpace: 'pre-wrap',
                           maxWidth: '100%',
                           hyphens: 'auto',
-                          lineHeight: '1.4'
+                          lineHeight: '1.3'
                         }}
                       >
                         {analysisResults.jobMatch}
@@ -573,7 +587,7 @@ const JobGuide = () => {
                       <div className="relative w-full">
                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-300 rounded"></div>
                         <div 
-                          className="text-slate-800 font-inter font-medium pl-2 sm:pl-3 w-full text-xs sm:text-sm"
+                          className="text-slate-800 font-inter font-medium pl-2 sm:pl-3 w-full text-xs sm:text-xs"
                           style={{
                             wordWrap: 'break-word',
                             overflowWrap: 'break-word',
@@ -581,7 +595,7 @@ const JobGuide = () => {
                             whiteSpace: 'pre-wrap',
                             maxWidth: '100%',
                             hyphens: 'auto',
-                            lineHeight: '1.4'
+                            lineHeight: '1.3'
                           }}
                         >
                           {analysisResults.coverLetter}
@@ -626,11 +640,12 @@ const JobGuide = () => {
                   <p className="text-red-100 font-inter text-sm sm:text-base break-words">{error}</p>
                   <Button 
                     onClick={() => {
-                      hasTriggeredWebhookRef.current = false;
-                      handleSubmit();
+                      setError(null);
+                      isSubmissionInProgressRef.current = false;
+                      lastSubmissionDataRef.current = '';
                     }}
                     className="mt-3 bg-white text-red-600 hover:bg-gray-100 font-inter font-medium text-sm sm:text-base px-4 py-2"
-                    disabled={isLoading || isGenerating || !isFormValid}
+                    disabled={isSubmitting || isGenerating || !isFormValid}
                   >
                     Try Again
                   </Button>
