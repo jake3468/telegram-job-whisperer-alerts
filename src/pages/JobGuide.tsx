@@ -11,6 +11,7 @@ import AuthHeader from '@/components/AuthHeader';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import { supabase } from '@/integrations/supabase/client';
 import { Layout } from '@/components/Layout';
+
 const JobGuide = () => {
   const {
     user,
@@ -43,9 +44,15 @@ const JobGuide = () => {
   const [loadingMessage, setLoadingMessage] = useState('');
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const submissionInProgressRef = useRef(false);
-  const hasTriggeredWebhookRef = useRef(false); // Track if webhook was triggered
+  const hasTriggeredWebhookRef = useRef(false);
 
-  const loadingMessages = ["🔍 Carefully analyzing your profile against job requirements...", "📝 Crafting your personalized cover letter...", "🎯 Calculating your job match percentage...", "✨ Putting the finishing touches on your analysis..."];
+  const loadingMessages = [
+    "🔍 Carefully analyzing your profile against job requirements...",
+    "📝 Crafting your personalized cover letter...",
+    "🎯 Calculating your job match percentage...",
+    "✨ Putting the finishing touches on your analysis..."
+  ];
+
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
@@ -130,7 +137,7 @@ const JobGuide = () => {
       setError(null);
       setAnalysisResults(null);
       setAnalysisId(null);
-      hasTriggeredWebhookRef.current = false; // Reset webhook trigger flag
+      hasTriggeredWebhookRef.current = false;
     }
   };
   const handleSubmit = async () => {
@@ -156,7 +163,7 @@ const JobGuide = () => {
       return;
     }
     submissionInProgressRef.current = true;
-    hasTriggeredWebhookRef.current = true; // Mark webhook as triggered
+    hasTriggeredWebhookRef.current = true;
     setIsLoading(true);
     setError(null);
     setIsSuccess(false);
@@ -183,7 +190,7 @@ const JobGuide = () => {
       }).select('id').single();
       if (insertError) {
         console.error('Insert error:', insertError);
-        hasTriggeredWebhookRef.current = false; // Reset on error
+        hasTriggeredWebhookRef.current = false;
         throw new Error(`Database insert failed: ${insertError.message}`);
       }
       if (insertedData?.id) {
@@ -204,7 +211,7 @@ const JobGuide = () => {
       }
     } catch (err) {
       console.error('Error generating job analysis:', err);
-      hasTriggeredWebhookRef.current = false; // Reset on error
+      hasTriggeredWebhookRef.current = false;
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate job analysis';
       setError(errorMessage);
       toast({
@@ -251,7 +258,7 @@ const JobGuide = () => {
                 Job Guide & Cover Letter
               </span>
             </h1>
-            <p className="text-sm text-gray-300 font-inter font-light">
+            <p className="text-base text-gray-300 font-inter font-light">
               Get your personalized job match analysis and cover letter
             </p>
           </div>
@@ -260,7 +267,7 @@ const JobGuide = () => {
             {/* Profile Completion Status */}
             {loading ? <Card className="bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border-2 border-gray-400 shadow-2xl shadow-gray-500/20">
                 <CardContent className="p-4">
-                  <div className="text-white text-sm">Checking your profile...</div>
+                  <div className="text-white text-base">Checking your profile...</div>
                 </CardContent>
               </Card> : !isComplete && <Card className="bg-gradient-to-br from-orange-600 via-red-600 to-pink-600 border-2 border-orange-400 shadow-2xl shadow-orange-500/20">
                 <CardHeader className="pb-3">
@@ -268,7 +275,7 @@ const JobGuide = () => {
                     <AlertCircle className="w-5 h-5" />
                     Complete Your Profile
                   </CardTitle>
-                  <CardDescription className="text-orange-100 font-inter text-sm">
+                  <CardDescription className="text-orange-100 font-inter text-base">
                     You need to complete your profile before using Job Guide
                   </CardDescription>
                 </CardHeader>
@@ -276,18 +283,18 @@ const JobGuide = () => {
                   <div className="space-y-2">
                     <div className={`flex items-center gap-2 ${hasResume ? 'text-green-200' : 'text-red-200'}`}>
                       <div className={`w-2 h-2 rounded-full ${hasResume ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                      <span className="font-inter text-sm">
+                      <span className="font-inter text-base">
                         {hasResume ? '✓ Resume uploaded' : '✗ Resume not uploaded'}
                       </span>
                     </div>
                     <div className={`flex items-center gap-2 ${hasBio ? 'text-green-200' : 'text-red-200'}`}>
                       <div className={`w-2 h-2 rounded-full ${hasBio ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                      <span className="font-inter text-sm">
+                      <span className="font-inter text-base">
                         {hasBio ? '✓ Bio completed' : '✗ Bio not completed'}
                       </span>
                     </div>
                   </div>
-                  <Button onClick={() => navigate('/dashboard')} className="font-inter bg-white text-orange-600 hover:bg-gray-100 font-medium text-sm px-4 py-2">
+                  <Button onClick={() => navigate('/dashboard')} className="font-inter bg-white text-orange-600 hover:bg-gray-100 font-medium text-base px-4 py-2">
                     Go to Home Page
                   </Button>
                 </CardContent>
@@ -302,55 +309,55 @@ const JobGuide = () => {
                   </div>
                   Job Guide
                 </CardTitle>
-                <CardDescription className="text-emerald-100 font-inter text-sm">
+                <CardDescription className="text-emerald-100 font-inter text-base">
                   Enter job details to get your personalized match analysis and cover letter
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 pt-0">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-white font-inter font-medium mb-2 text-sm">
+                    <label className="block text-white font-inter font-medium mb-2 text-base">
                       🏢 Company Name
                     </label>
                     <div className="relative">
                       <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 w-4 h-4" />
-                      <Input value={formData.companyName} onChange={e => handleInputChange('companyName', e.target.value)} placeholder="Enter the company name for analysis" disabled={isLoading || isGenerating} className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-emerald-900" />
+                      <Input value={formData.companyName} onChange={e => handleInputChange('companyName', e.target.value)} placeholder="Enter the company name for analysis" disabled={isLoading || isGenerating} className="pl-10 text-base border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-emerald-900" />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-white font-inter font-medium mb-2 text-sm">
+                    <label className="block text-white font-inter font-medium mb-2 text-base">
                       💼 Job Title
                     </label>
                     <div className="relative">
                       <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 w-4 h-4" />
-                      <Input value={formData.jobTitle} onChange={e => handleInputChange('jobTitle', e.target.value)} placeholder="Enter the job title for analysis" disabled={isLoading || isGenerating} className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-emerald-900" />
+                      <Input value={formData.jobTitle} onChange={e => handleInputChange('jobTitle', e.target.value)} placeholder="Enter the job title for analysis" disabled={isLoading || isGenerating} className="pl-10 text-base border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-emerald-900" />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-white font-inter font-medium mb-2 text-sm">
+                    <label className="block text-white font-inter font-medium mb-2 text-base">
                       📝 Job Description
                     </label>
                     <div className="relative">
                       <FileText className="absolute left-3 top-3 text-white/70 w-4 h-4" />
-                      <Textarea value={formData.jobDescription} onChange={e => handleInputChange('jobDescription', e.target.value)} placeholder="Paste the complete job description here for detailed analysis including requirements, responsibilities, and qualifications..." rows={4} disabled={isLoading || isGenerating} className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-emerald-900 resize-none" />
+                      <Textarea value={formData.jobDescription} onChange={e => handleInputChange('jobDescription', e.target.value)} placeholder="Paste the complete job description here for detailed analysis including requirements, responsibilities, and qualifications..." rows={4} disabled={isLoading || isGenerating} className="pl-10 text-base border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-emerald-900 resize-none" />
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <Button onClick={handleSubmit} disabled={!isComplete || !isFormValid || isLoading || isGenerating || hasTriggeredWebhookRef.current} className={`w-full font-inter font-medium py-3 px-4 text-sm ${isComplete && isFormValid && !isLoading && !isGenerating && !hasTriggeredWebhookRef.current ? 'bg-white text-emerald-600 hover:bg-gray-100' : 'bg-white/50 text-gray-800 border-2 border-white/70 cursor-not-allowed hover:bg-white/50'}`}>
+                  <Button onClick={handleSubmit} disabled={!isComplete || !isFormValid || isLoading || isGenerating || hasTriggeredWebhookRef.current} className={`w-full font-inter font-medium py-3 px-4 text-base ${isComplete && isFormValid && !isLoading && !isGenerating && !hasTriggeredWebhookRef.current ? 'bg-white text-emerald-600 hover:bg-gray-100' : 'bg-white/50 text-gray-800 border-2 border-white/70 cursor-not-allowed hover:bg-white/50'}`}>
                     <div className="flex items-center justify-center gap-2 w-full">
                       {isLoading ? <>
                           <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
-                          <span className="text-center text-sm">Processing...</span>
+                          <span className="text-center text-base">Processing...</span>
                         </> : isGenerating ? <>
                           <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
-                          <span className="text-center text-sm">Generating...</span>
+                          <span className="text-center text-base">Generating...</span>
                         </> : <>
                           <Sparkles className="w-4 h-4 flex-shrink-0" />
-                          <div className="text-center leading-tight text-sm">
+                          <div className="text-center leading-tight text-base">
                             <div>
                               Submit for{' '}
                               <span className="font-bold bg-gradient-to-r from-emerald-800 to-teal-800 bg-clip-text text-teal-950">
@@ -366,7 +373,7 @@ const JobGuide = () => {
                     </div>
                   </Button>
 
-                  {(!isComplete || !isFormValid) && !isLoading && !isGenerating && <p className="text-emerald-200 text-sm font-inter text-center">
+                  {(!isComplete || !isFormValid) && !isLoading && !isGenerating && <p className="text-emerald-200 text-base font-inter text-center">
                       {!isComplete ? 'Complete your profile first to use this feature' : 'Fill in all fields to get your analysis'}
                     </p>}
                 </div>
@@ -384,11 +391,11 @@ const JobGuide = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-blue-100 font-inter text-center text-sm break-words">
+                  <p className="text-blue-100 font-inter text-center text-base break-words">
                     {loadingMessage}
                   </p>
                   <div className="mt-3 text-center">
-                    <p className="text-blue-200 text-sm font-inter">
+                    <p className="text-blue-200 text-base font-inter">
                       This usually takes 1-2 minutes. Please don't close this page.
                     </p>
                   </div>
@@ -396,7 +403,7 @@ const JobGuide = () => {
               </Card>}
 
             {/* Analysis Results Display */}
-            {analysisResults && <div className="space-y-4">
+            {analysisResults && <div className="space-y-6">
                 {/* Job Match Results */}
                 <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20">
                   <CardHeader className="pb-3 bg-red-300">
@@ -407,9 +414,18 @@ const JobGuide = () => {
                       Job Match Analysis
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-0 bg-red-300">
-                    <div className="bg-white rounded-lg p-4 border-2 border-slate-300">
-                      <div className="text-slate-800 font-inter whitespace-pre-wrap text-sm sm:text-base leading-relaxed break-words font-medium">
+                  <CardContent className="pt-0 bg-red-300 p-4">
+                    <div className="bg-white rounded-lg p-4 border-2 border-slate-300 overflow-hidden">
+                      <div 
+                        className="text-slate-800 font-inter text-sm sm:text-base leading-relaxed font-medium break-words overflow-wrap-anywhere"
+                        style={{
+                          wordWrap: 'break-word',
+                          overflowWrap: 'anywhere',
+                          wordBreak: 'break-word',
+                          whiteSpace: 'pre-wrap',
+                          maxWidth: '100%'
+                        }}
+                      >
                         {analysisResults.jobMatch}
                       </div>
                     </div>
@@ -424,21 +440,33 @@ const JobGuide = () => {
                         <Trophy className="w-4 h-4 text-white" />
                       </div>
                       Your Cover Letter
-                      <Button onClick={handleCopyToClipboard} size="sm" className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm px-3 py-2">
+                      <Button onClick={handleCopyToClipboard} size="sm" className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-base px-3 py-2">
                         <Copy className="w-4 h-4 mr-1" />
                         Copy
                       </Button>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="bg-white rounded-lg p-4 sm:p-6 border-2 border-blue-300 shadow-inner" style={{
-                  backgroundImage: `linear-gradient(to right, #e5e7eb 1px, transparent 1px)`,
-                  backgroundSize: '24px 100%',
-                  paddingLeft: '20px'
-                }}>
+                  <CardContent className="pt-0 p-4">
+                    <div 
+                      className="bg-white rounded-lg p-4 sm:p-6 border-2 border-blue-300 shadow-inner overflow-hidden"
+                      style={{
+                        backgroundImage: `linear-gradient(to right, #e5e7eb 1px, transparent 1px)`,
+                        backgroundSize: '24px 100%',
+                        paddingLeft: '20px'
+                      }}
+                    >
                       <div className="relative">
                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-300 rounded"></div>
-                        <div className="text-slate-800 font-inter whitespace-pre-wrap text-sm sm:text-base leading-6 break-words pl-4 font-medium">
+                        <div 
+                          className="text-slate-800 font-inter text-sm sm:text-base leading-6 font-medium pl-4 break-words overflow-wrap-anywhere"
+                          style={{
+                            wordWrap: 'break-word',
+                            overflowWrap: 'anywhere',
+                            wordBreak: 'break-word',
+                            whiteSpace: 'pre-wrap',
+                            maxWidth: '100%'
+                          }}
+                        >
                           {analysisResults.coverLetter}
                         </div>
                       </div>
@@ -458,7 +486,7 @@ const JobGuide = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-green-100 font-inter text-sm break-words">
+                  <p className="text-green-100 font-inter text-base break-words">
                     Your job analysis has been submitted and the webhook has been triggered. 
                     The n8n workflow will process your request and generate the job match percentage and cover letter automatically.
                   </p>
@@ -474,11 +502,11 @@ const JobGuide = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-red-100 font-inter text-sm break-words">{error}</p>
+                  <p className="text-red-100 font-inter text-base break-words">{error}</p>
                   <Button onClick={() => {
                 hasTriggeredWebhookRef.current = false; // Reset webhook flag on retry
                 handleSubmit();
-              }} className="mt-3 bg-white text-red-600 hover:bg-gray-100 font-inter font-medium text-sm px-4 py-2" disabled={isLoading || isGenerating || !isFormValid}>
+              }} className="mt-3 bg-white text-red-600 hover:bg-gray-100 font-inter font-medium text-base px-4 py-2" disabled={isLoading || isGenerating || !isFormValid}>
                     Try Again
                   </Button>
                 </CardContent>
@@ -488,4 +516,5 @@ const JobGuide = () => {
       </div>
     </Layout>;
 };
+
 export default JobGuide;
