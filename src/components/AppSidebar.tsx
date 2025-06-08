@@ -13,7 +13,7 @@ const navigationItems = [{
   url: '/job-alerts',
   icon: Bell
 }, {
-  title: 'Job Match',
+  title: 'Job Guide & Cover Letter',
   url: '/job-guide',
   icon: FileSearch
 }];

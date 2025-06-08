@@ -11,21 +11,13 @@ import AuthHeader from '@/components/AuthHeader';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import { supabase } from '@/integrations/supabase/client';
 import { Layout } from '@/components/Layout';
+
 const JobGuide = () => {
-  const {
-    user,
-    isLoaded
-  } = useUser();
+  const { user, isLoaded } = useUser();
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
-  const {
-    hasResume,
-    hasBio,
-    isComplete,
-    loading
-  } = useUserCompletionStatus();
+  const { toast } = useToast();
+  const { hasResume, hasBio, isComplete, loading } = useUserCompletionStatus();
+  
   const [formData, setFormData] = useState({
     companyName: '',
     jobTitle: '',
@@ -42,12 +34,21 @@ const JobGuide = () => {
   } | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('');
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const loadingMessages = ["🔍 Carefully analyzing your profile against job requirements...", "📝 Crafting your personalized cover letter...", "🎯 Calculating your job match percentage...", "✨ Putting the finishing touches on your analysis..."];
+  const submissionInProgressRef = useRef(false); // Prevent double submissions
+  
+  const loadingMessages = [
+    "🔍 Carefully analyzing your profile against job requirements...",
+    "📝 Crafting your personalized cover letter...",
+    "🎯 Calculating your job match percentage...",
+    "✨ Putting the finishing touches on your analysis..."
+  ];
+
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
+  
   useEffect(() => {
     if (!isGenerating) return;
     let messageIndex = 0;
@@ -58,6 +59,7 @@ const JobGuide = () => {
     }, 3000);
     return () => clearInterval(messageInterval);
   }, [isGenerating]);
+  
   useEffect(() => {
     if (!analysisId || !isGenerating) return;
     const pollForResults = async () => {
@@ -116,6 +118,7 @@ const JobGuide = () => {
       clearTimeout(timeout);
     };
   }, [analysisId, isGenerating, toast]);
+  
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -129,7 +132,14 @@ const JobGuide = () => {
       setAnalysisId(null);
     }
   };
+  
   const handleSubmit = async () => {
+    // Prevent double submissions
+    if (submissionInProgressRef.current) {
+      console.log('Submission already in progress, ignoring duplicate click');
+      return;
+    }
+
     if (!isComplete) {
       toast({
         title: "Complete your profile first",
@@ -138,46 +148,58 @@ const JobGuide = () => {
       });
       return;
     }
+
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
         title: "Missing information",
-        description: "Please fill in all fields to get your job analysis.",
+        description: "Please fill in all fields to get your analysis.",
         variant: "destructive"
       });
       return;
     }
+
+    submissionInProgressRef.current = true;
     setIsLoading(true);
     setError(null);
     setIsSuccess(false);
     setAnalysisResults(null);
+
     try {
-      const {
-        data: userData,
-        error: userError
-      } = await supabase.from('users').select('id').eq('clerk_id', user?.id).single();
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('clerk_id', user?.id)
+        .single();
+
       if (userError || !userData) {
         throw new Error('User not found in database');
       }
+
       console.log('User data found:', userData);
       console.log('Attempting to insert job analysis with user_id:', userData.id);
-      const {
-        data: insertedData,
-        error: insertError
-      } = await supabase.from('job_analyses').insert({
-        user_id: userData.id,
-        company_name: formData.companyName,
-        job_title: formData.jobTitle,
-        job_description: formData.jobDescription
-        // job_match and cover_letter will be NULL initially
-      }).select('id').single();
+
+      const { data: insertedData, error: insertError } = await supabase
+        .from('job_analyses')
+        .insert({
+          user_id: userData.id,
+          company_name: formData.companyName,
+          job_title: formData.jobTitle,
+          job_description: formData.jobDescription
+          // job_match and cover_letter will be NULL initially
+        })
+        .select('id')
+        .single();
+
       if (insertError) {
         console.error('Insert error:', insertError);
         throw new Error(`Database insert failed: ${insertError.message}`);
       }
+
       if (insertedData?.id) {
         setAnalysisId(insertedData.id);
         setIsSuccess(true);
         setIsGenerating(true);
+        
         toast({
           title: "Analysis Started!",
           description: "Your job analysis is being processed. Please wait for the results."
@@ -201,10 +223,13 @@ const JobGuide = () => {
       });
     } finally {
       setIsLoading(false);
+      submissionInProgressRef.current = false;
     }
   };
+  
   const handleCopyToClipboard = async () => {
     if (!analysisResults?.coverLetter) return;
+    
     try {
       await navigator.clipboard.writeText(analysisResults.coverLetter);
       toast({
@@ -220,20 +245,28 @@ const JobGuide = () => {
       });
     }
   };
+  
   const isFormValid = formData.companyName && formData.jobTitle && formData.jobDescription;
+  
   if (!isLoaded || !user) {
-    return <div className="min-h-screen bg-black flex items-center justify-center">
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-xs">Loading...</div>
-      </div>;
+      </div>
+    );
   }
-  return <Layout>
+  
+  return (
+    <Layout>
       <div className="min-h-screen bg-black">
         <AuthHeader />
         
         <div className="max-w-4xl mx-auto px-3 py-8 sm:px-4 sm:py-12">
           <div className="text-center mb-8">
             <h1 className="text-lg sm:text-xl md:text-2xl font-medium text-white mb-2 font-inter">
-              <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent text-3xl">Job Guide</span>
+              <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent text-3xl">
+                Job Guide & Cover Letter
+              </span>
             </h1>
             <p className="text-sm text-gray-300 font-inter font-light">
               Get your personalized job match analysis and cover letter
@@ -242,11 +275,14 @@ const JobGuide = () => {
 
           <div className="space-y-6">
             {/* Profile Completion Status */}
-            {loading ? <Card className="bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border-2 border-gray-400 shadow-2xl shadow-gray-500/20">
+            {loading ? (
+              <Card className="bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border-2 border-gray-400 shadow-2xl shadow-gray-500/20">
                 <CardContent className="p-4">
                   <div className="text-white text-xs">Checking your profile...</div>
                 </CardContent>
-              </Card> : !isComplete && <Card className="bg-gradient-to-br from-orange-600 via-red-600 to-pink-600 border-2 border-orange-400 shadow-2xl shadow-orange-500/20">
+              </Card>
+            ) : !isComplete && (
+              <Card className="bg-gradient-to-br from-orange-600 via-red-600 to-pink-600 border-2 border-orange-400 shadow-2xl shadow-orange-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-sm">
                     <AlertCircle className="w-4 h-4" />
@@ -275,7 +311,8 @@ const JobGuide = () => {
                     Go to Home Page
                   </Button>
                 </CardContent>
-              </Card>}
+              </Card>
+            )}
 
             {/* Job Guide Form */}
             <Card className="bg-gradient-to-br from-emerald-600 via-green-600 to-teal-600 border-2 border-emerald-400 shadow-2xl shadow-emerald-500/20">
@@ -380,9 +417,10 @@ const JobGuide = () => {
               </Card>}
 
             {/* Analysis Results Display */}
-            {analysisResults && <div className="space-y-4">
+            {analysisResults && (
+              <div className="space-y-4">
                 {/* Job Match Results */}
-                <Card className="bg-gradient-to-br from-blue-600 via-sky-600 to-cyan-600 border-2 border-blue-400 shadow-2xl shadow-blue-500/20">
+                <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-white font-inter flex items-center gap-2 text-sm">
                       <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
@@ -392,8 +430,8 @@ const JobGuide = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <div className="bg-white/10 rounded-lg p-3">
-                      <pre className="text-blue-50 font-inter whitespace-pre-wrap text-xs leading-relaxed break-words">
+                    <div className="bg-white rounded-lg p-4 border-2 border-slate-300">
+                      <pre className="text-slate-800 font-inter whitespace-pre-wrap text-sm leading-relaxed break-words font-medium">
                         {analysisResults.jobMatch}
                       </pre>
                     </div>
@@ -401,31 +439,44 @@ const JobGuide = () => {
                 </Card>
 
                 {/* Cover Letter Results */}
-                <Card className="bg-gradient-to-br from-purple-600 via-violet-600 to-indigo-600 border-2 border-purple-400 shadow-2xl shadow-purple-500/20">
+                <Card className="bg-gradient-to-br from-blue-800 via-blue-700 to-blue-600 border-2 border-blue-400 shadow-2xl shadow-blue-500/20">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-white font-inter flex items-center gap-2 text-sm">
                       <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
                         <Trophy className="w-3 h-3 text-white" />
                       </div>
                       Your Cover Letter
-                      <Button onClick={handleCopyToClipboard} size="sm" className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-xs px-2 py-1 h-7">
+                      <Button 
+                        onClick={handleCopyToClipboard} 
+                        size="sm" 
+                        className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-xs px-2 py-1 h-7"
+                      >
                         <Copy className="w-3 h-3 mr-1" />
                         Copy
                       </Button>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <div className="bg-white/10 rounded-lg p-3">
-                      <pre className="text-purple-50 font-inter whitespace-pre-wrap text-xs leading-relaxed break-words">
-                        {analysisResults.coverLetter}
-                      </pre>
+                    <div className="bg-white rounded-lg p-6 border-2 border-blue-300 shadow-inner" style={{
+                      backgroundImage: `linear-gradient(to right, #e5e7eb 1px, transparent 1px)`,
+                      backgroundSize: '24px 100%',
+                      paddingLeft: '32px'
+                    }}>
+                      <div className="relative">
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-300 rounded"></div>
+                        <pre className="text-slate-800 font-inter whitespace-pre-wrap text-sm leading-6 break-words pl-4 font-medium">
+                          {analysisResults.coverLetter}
+                        </pre>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
-              </div>}
+              </div>
+            )}
 
             {/* Success Display */}
-            {isSuccess && !isGenerating && !analysisResults && <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
+            {isSuccess && !isGenerating && !analysisResults && (
+              <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-sm">
                     <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
@@ -440,10 +491,12 @@ const JobGuide = () => {
                     The n8n workflow will process your request and generate the job match percentage and cover letter automatically.
                   </p>
                 </CardContent>
-              </Card>}
+              </Card>
+            )}
 
             {/* Error Display */}
-            {error && <Card className="bg-gradient-to-br from-red-600 via-red-700 to-red-800 border-2 border-red-400 shadow-2xl shadow-red-500/20">
+            {error && (
+              <Card className="bg-gradient-to-br from-red-600 via-red-700 to-red-800 border-2 border-red-400 shadow-2xl shadow-red-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-sm">
                     <AlertCircle className="w-4 h-4" />
@@ -456,10 +509,13 @@ const JobGuide = () => {
                     Try Again
                   </Button>
                 </CardContent>
-              </Card>}
+              </Card>
+            )}
           </div>
         </div>
       </div>
-    </Layout>;
+    </Layout>
+  );
 };
+
 export default JobGuide;
