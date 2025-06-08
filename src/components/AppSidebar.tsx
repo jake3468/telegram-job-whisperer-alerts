@@ -2,7 +2,7 @@
 import { User, Bell, FileSearch } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, useSidebar } from '@/components/ui/sidebar';
-import { SignedIn, UserButton } from '@clerk/clerk-react';
+import { SignedIn, UserButton, useUser } from '@clerk/clerk-react';
 
 const navigationItems = [{
   title: 'Profile',
@@ -20,6 +20,7 @@ const navigationItems = [{
 
 export function AppSidebar() {
   const { state } = useSidebar();
+  const { user } = useUser();
   const location = useLocation();
   const currentPath = location.pathname;
   const isActive = (path: string) => currentPath === path;
@@ -51,7 +52,7 @@ export function AppSidebar() {
                     <NavLink 
                       to={item.url} 
                       className={({ isActive: navIsActive }) => 
-                        `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 ${
+                        `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${
                           navIsActive || isActive(item.url) 
                             ? 'bg-gradient-to-r from-sky-500/20 to-sky-300/20 text-white border border-sky-400/30' 
                             : 'text-gray-300 hover:text-white hover:bg-white/5 hover:border hover:border-white/10'
@@ -73,14 +74,21 @@ export function AppSidebar() {
 
       <SidebarFooter className="p-4 border-t border-white/10">
         <SignedIn>
-          <div className="flex items-center justify-center">
+          <div className="flex items-center gap-3">
             <UserButton 
               appearance={{
                 elements: {
-                  avatarBox: "w-10 h-10"
+                  avatarBox: "w-10 h-10 flex-shrink-0"
                 }
               }} 
             />
+            {state === 'expanded' && user && (
+              <div className="flex-1 min-w-0">
+                <p className="text-white text-sm font-medium truncate">
+                  {user.emailAddresses[0]?.emailAddress}
+                </p>
+              </div>
+            )}
           </div>
         </SignedIn>
       </SidebarFooter>
