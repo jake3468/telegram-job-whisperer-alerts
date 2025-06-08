@@ -311,7 +311,7 @@ const JobGuide = () => {
                   <label className="block text-white font-inter font-medium mb-2">
                     Job Description
                   </label>
-                  <Textarea value={formData.jobDescription} onChange={e => handleInputChange('jobDescription', e.target.value)} placeholder="Paste the complete job description here for detailed analysis including requirements, responsibilities, and qualifications..." rows={8} disabled={isLoading || isGenerating} className="min-h-[150px] border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-slate-950" />
+                  <Textarea value={formData.jobDescription} onChange={e => handleInputChange('jobDescription', e.target.value)} placeholder="Paste the complete job description here for detailed analysis including requirements, responsibilities, and qualifications..." rows={8} disabled={isLoading || isGenerating} className="min-h-[150px] border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-emerald-900" />
                 </div>
               </div>
 
