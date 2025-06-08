@@ -333,7 +333,7 @@ const JobGuide = () => {
                               Job match %
                             </span>
                             {' '}and{' '}
-                            <span className="font-bold bg-gradient-to-r from-emerald-800 to-teal-800 bg-clip-text text-transparent">
+                            <span className="font-bold bg-gradient-to-r from-emerald-800 to-teal-800 bg-clip-text text-orange-900">
                               Cover letter
                             </span>
                           </div>
