@@ -15,11 +15,8 @@ export function Layout({ children }: LayoutProps) {
         <AppSidebar />
         
         <div className="flex-1 flex flex-col">
-          {/* Mobile Header with Hamburger Menu */}
-          <header className="lg:hidden flex items-center justify-between p-4 border-b border-white/10 bg-black/95 backdrop-blur-sm">
-            <h1 className="text-white font-inter font-semibold text-lg">
-              Dashboard
-            </h1>
+          {/* Mobile Header with only Hamburger Menu */}
+          <header className="lg:hidden flex items-center justify-start p-4 border-b border-white/10 bg-black">
             <SidebarTrigger>
               <Button
                 variant="ghost"
