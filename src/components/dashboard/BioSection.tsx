@@ -82,7 +82,7 @@ const BioSection = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Textarea value={bio} onChange={e => setBio(e.target.value)} placeholder="Describe your experience, skills, career goals, and what kind of opportunities you're looking for..." rows={6} className="min-h-[120px] border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-slate-950" />
+        <Textarea value={bio} onChange={e => setBio(e.target.value)} placeholder="Describe your experience, skills, career goals, and what kind of opportunities you're looking for..." rows={6} className="min-h-[120px] border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-emerald-900" />
         <Button onClick={handleSaveBio} disabled={saving} className="font-inter bg-white text-green-600 hover:bg-gray-100 font-medium">
           {saving ? 'Saving...' : 'Save Bio'}
         </Button>
