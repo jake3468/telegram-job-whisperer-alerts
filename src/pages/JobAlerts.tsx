@@ -26,7 +26,7 @@ const JobAlerts = () => {
   if (!isLoaded || !user) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+        <div className="text-white text-sm">Loading...</div>
       </div>
     );
   }
@@ -38,10 +38,10 @@ const JobAlerts = () => {
         
         <div className="max-w-4xl mx-auto px-4 py-16">
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-semibold text-white mb-4 font-inter">
+            <h1 className="text-2xl md:text-3xl font-semibold text-white mb-3 font-inter">
               Job <span className="bg-gradient-to-r from-orange-500 to-pink-600 bg-clip-text text-transparent">Alerts</span>
             </h1>
-            <p className="text-xl text-gray-300 font-inter font-light">
+            <p className="text-base text-gray-300 font-inter font-light">
               Manage your personalized job alerts and preferences
             </p>
           </div>
