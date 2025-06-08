@@ -247,7 +247,7 @@ const JobGuide = () => {
         <div className="max-w-4xl mx-auto px-3 py-8 sm:px-4 sm:py-12">
           <div className="text-center mb-8">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-medium text-white mb-2 font-inter">
-              <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent text-3xl">
                 Job Guide & Cover Letter
               </span>
             </h1>
