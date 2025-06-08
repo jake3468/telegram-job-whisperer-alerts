@@ -248,10 +248,10 @@ const JobGuide = () => {
       </div>;
   }
   return <Layout>
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen bg-black overflow-x-hidden">
         <AuthHeader />
         
-        <div className="max-w-4xl mx-auto px-3 py-8 sm:px-4 sm:py-12">
+        <div className="max-w-4xl mx-auto px-3 py-8 sm:px-4 sm:py-12 overflow-x-hidden">
           <div className="text-center mb-8">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-medium text-white mb-2 font-inter">
               <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent text-3xl">
@@ -263,7 +263,7 @@ const JobGuide = () => {
             </p>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-6 overflow-x-hidden">
             {/* Profile Completion Status */}
             {loading ? <Card className="bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border-2 border-gray-400 shadow-2xl shadow-gray-500/20">
                 <CardContent className="p-4">
@@ -405,7 +405,7 @@ const JobGuide = () => {
             {/* Analysis Results Display */}
             {analysisResults && <div className="space-y-6 w-full max-w-full overflow-hidden">
                 {/* Job Match Results */}
-                <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20 w-full">
+                <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20 w-full overflow-hidden">
                   <CardHeader className="pb-3 bg-red-300">
                     <CardTitle className="font-inter flex items-center gap-2 text-lg text-gray-950">
                       <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-950">
@@ -414,16 +414,17 @@ const JobGuide = () => {
                       Job Match Analysis
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-0 bg-red-300 p-4 w-full">
-                    <div className="bg-white rounded-lg p-4 border-2 border-slate-300 w-full overflow-hidden">
+                  <CardContent className="pt-0 bg-red-300 p-4 w-full overflow-hidden">
+                    <div className="bg-white rounded-lg p-3 border-2 border-slate-300 w-full overflow-hidden">
                       <div 
-                        className="text-slate-800 font-inter text-sm sm:text-base leading-relaxed font-medium break-words overflow-wrap-anywhere"
+                        className="text-slate-800 font-inter text-xs sm:text-sm leading-relaxed font-medium w-full"
                         style={{
                           wordWrap: 'break-word',
                           overflowWrap: 'anywhere',
                           wordBreak: 'break-word',
                           whiteSpace: 'pre-wrap',
-                          maxWidth: '100%'
+                          maxWidth: '100%',
+                          hyphens: 'auto'
                         }}
                       >
                         {analysisResults.jobMatch}
@@ -433,38 +434,39 @@ const JobGuide = () => {
                 </Card>
 
                 {/* Cover Letter Results */}
-                <Card className="bg-gradient-to-br from-blue-800 via-blue-700 to-blue-600 border-2 border-blue-400 shadow-2xl shadow-blue-500/20 w-full">
+                <Card className="bg-gradient-to-br from-blue-800 via-blue-700 to-blue-600 border-2 border-blue-400 shadow-2xl shadow-blue-500/20 w-full overflow-hidden">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-white font-inter flex items-center gap-2 text-lg">
                       <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                         <Trophy className="w-4 h-4 text-white" />
                       </div>
                       Your Cover Letter
-                      <Button onClick={handleCopyToClipboard} size="sm" className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-base px-3 py-2">
-                        <Copy className="w-4 h-4 mr-1" />
+                      <Button onClick={handleCopyToClipboard} size="sm" className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm px-2 py-1">
+                        <Copy className="w-3 h-3 mr-1" />
                         Copy
                       </Button>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-0 p-4 w-full">
+                  <CardContent className="pt-0 p-4 w-full overflow-hidden">
                     <div 
-                      className="bg-white rounded-lg p-4 sm:p-6 border-2 border-blue-300 shadow-inner w-full overflow-hidden"
+                      className="bg-white rounded-lg p-3 sm:p-4 border-2 border-blue-300 shadow-inner w-full overflow-hidden"
                       style={{
                         backgroundImage: `linear-gradient(to right, #e5e7eb 1px, transparent 1px)`,
-                        backgroundSize: '24px 100%',
-                        paddingLeft: '20px'
+                        backgroundSize: '20px 100%',
+                        paddingLeft: '16px'
                       }}
                     >
-                      <div className="relative w-full">
+                      <div className="relative w-full overflow-hidden">
                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-300 rounded"></div>
                         <div 
-                          className="text-slate-800 font-inter text-sm sm:text-base leading-6 font-medium pl-4 w-full break-words overflow-wrap-anywhere"
+                          className="text-slate-800 font-inter text-xs sm:text-sm leading-5 font-medium pl-3 w-full"
                           style={{
                             wordWrap: 'break-word',
                             overflowWrap: 'anywhere',
                             wordBreak: 'break-word',
                             whiteSpace: 'pre-wrap',
-                            maxWidth: '100%'
+                            maxWidth: '100%',
+                            hyphens: 'auto'
                           }}
                         >
                           {analysisResults.coverLetter}
