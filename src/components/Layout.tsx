@@ -18,27 +18,25 @@ export function Layout({ children }: LayoutProps) {
         <div className="flex-1 flex flex-col">
           {/* Mobile Header with Hamburger and User Button */}
           <header className="lg:hidden flex items-center justify-between p-4 border-b border-white/10 bg-black h-16">
-            <SidebarTrigger>
+            <SidebarTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
                 className="text-white hover:bg-white/10 h-10 w-10 flex items-center justify-center"
               >
-                <Menu className="w-5 h-5 text-white" />
+                <Menu className="w-6 h-6 text-white" strokeWidth={2} />
                 <span className="sr-only">Toggle navigation menu</span>
               </Button>
             </SidebarTrigger>
             
             <SignedIn>
-              <div className="flex items-center">
-                <UserButton 
-                  appearance={{
-                    elements: {
-                      avatarBox: "w-10 h-10"
-                    }
-                  }} 
-                />
-              </div>
+              <UserButton 
+                appearance={{
+                  elements: {
+                    avatarBox: "w-10 h-10"
+                  }
+                }} 
+              />
             </SignedIn>
           </header>
 
