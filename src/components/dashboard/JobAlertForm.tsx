@@ -127,7 +127,7 @@ const JobAlertForm = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="country" className="text-white font-inter font-medium mb-2 block">Country</Label>
-          <Input id="country" value={formData.country} onChange={e => handleInputChange('country', e.target.value)} placeholder="e.g., United States" required className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-slate-950" />
+          <Input id="country" value={formData.country} onChange={e => handleInputChange('country', e.target.value)} placeholder="e.g., United States" required className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950" />
         </div>
 
         <div>
