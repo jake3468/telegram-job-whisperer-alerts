@@ -1,7 +1,8 @@
 
 import { User, Bell, FileSearch } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, useSidebar } from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, useSidebar } from '@/components/ui/sidebar';
+import { SignedIn, UserButton } from '@clerk/clerk-react';
 
 const navigationItems = [{
   title: 'Profile',
@@ -69,6 +70,20 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter className="p-4 border-t border-white/10">
+        <SignedIn>
+          <div className="flex items-center justify-center">
+            <UserButton 
+              appearance={{
+                elements: {
+                  avatarBox: "w-10 h-10"
+                }
+              }} 
+            />
+          </div>
+        </SignedIn>
+      </SidebarFooter>
     </Sidebar>
   );
 }
