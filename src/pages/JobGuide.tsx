@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -12,13 +11,21 @@ import AuthHeader from '@/components/AuthHeader';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import { supabase } from '@/integrations/supabase/client';
 import { Layout } from '@/components/Layout';
-
 const JobGuide = () => {
-  const { user, isLoaded } = useUser();
+  const {
+    user,
+    isLoaded
+  } = useUser();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const { hasResume, hasBio, isComplete, loading } = useUserCompletionStatus();
-  
+  const {
+    toast
+  } = useToast();
+  const {
+    hasResume,
+    hasBio,
+    isComplete,
+    loading
+  } = useUserCompletionStatus();
   const [formData, setFormData] = useState({
     companyName: '',
     jobTitle: '',
@@ -37,20 +44,13 @@ const JobGuide = () => {
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const submissionInProgressRef = useRef(false);
   const hasTriggeredWebhookRef = useRef(false); // Track if webhook was triggered
-  
-  const loadingMessages = [
-    "🔍 Carefully analyzing your profile against job requirements...",
-    "📝 Crafting your personalized cover letter...",
-    "🎯 Calculating your job match percentage...",
-    "✨ Putting the finishing touches on your analysis..."
-  ];
 
+  const loadingMessages = ["🔍 Carefully analyzing your profile against job requirements...", "📝 Crafting your personalized cover letter...", "🎯 Calculating your job match percentage...", "✨ Putting the finishing touches on your analysis..."];
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
-  
   useEffect(() => {
     if (!isGenerating) return;
     let messageIndex = 0;
@@ -61,7 +61,6 @@ const JobGuide = () => {
     }, 3000);
     return () => clearInterval(messageInterval);
   }, [isGenerating]);
-  
   useEffect(() => {
     if (!analysisId || !isGenerating) return;
     const pollForResults = async () => {
@@ -120,7 +119,6 @@ const JobGuide = () => {
       clearTimeout(timeout);
     };
   }, [analysisId, isGenerating, toast]);
-  
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -135,14 +133,12 @@ const JobGuide = () => {
       hasTriggeredWebhookRef.current = false; // Reset webhook trigger flag
     }
   };
-  
   const handleSubmit = async () => {
     // Prevent double submissions
     if (submissionInProgressRef.current || hasTriggeredWebhookRef.current) {
       console.log('Submission already in progress or webhook already triggered, ignoring duplicate click');
       return;
     }
-
     if (!isComplete) {
       toast({
         title: "Complete your profile first",
@@ -151,7 +147,6 @@ const JobGuide = () => {
       });
       return;
     }
-
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
         title: "Missing information",
@@ -160,51 +155,41 @@ const JobGuide = () => {
       });
       return;
     }
-
     submissionInProgressRef.current = true;
     hasTriggeredWebhookRef.current = true; // Mark webhook as triggered
     setIsLoading(true);
     setError(null);
     setIsSuccess(false);
     setAnalysisResults(null);
-
     try {
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('clerk_id', user?.id)
-        .single();
-
+      const {
+        data: userData,
+        error: userError
+      } = await supabase.from('users').select('id').eq('clerk_id', user?.id).single();
       if (userError || !userData) {
         throw new Error('User not found in database');
       }
-
       console.log('User data found:', userData);
       console.log('Attempting to insert job analysis with user_id:', userData.id);
-
-      const { data: insertedData, error: insertError } = await supabase
-        .from('job_analyses')
-        .insert({
-          user_id: userData.id,
-          company_name: formData.companyName,
-          job_title: formData.jobTitle,
-          job_description: formData.jobDescription
-          // job_match and cover_letter will be NULL initially
-        })
-        .select('id')
-        .single();
-
+      const {
+        data: insertedData,
+        error: insertError
+      } = await supabase.from('job_analyses').insert({
+        user_id: userData.id,
+        company_name: formData.companyName,
+        job_title: formData.jobTitle,
+        job_description: formData.jobDescription
+        // job_match and cover_letter will be NULL initially
+      }).select('id').single();
       if (insertError) {
         console.error('Insert error:', insertError);
         hasTriggeredWebhookRef.current = false; // Reset on error
         throw new Error(`Database insert failed: ${insertError.message}`);
       }
-
       if (insertedData?.id) {
         setAnalysisId(insertedData.id);
         setIsSuccess(true);
         setIsGenerating(true);
-        
         toast({
           title: "Analysis Started!",
           description: "Your job analysis is being processed. Please wait for the results."
@@ -232,10 +217,8 @@ const JobGuide = () => {
       submissionInProgressRef.current = false;
     }
   };
-  
   const handleCopyToClipboard = async () => {
     if (!analysisResults?.coverLetter) return;
-    
     try {
       await navigator.clipboard.writeText(analysisResults.coverLetter);
       toast({
@@ -251,19 +234,13 @@ const JobGuide = () => {
       });
     }
   };
-  
   const isFormValid = formData.companyName && formData.jobTitle && formData.jobDescription;
-  
   if (!isLoaded || !user) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+    return <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-sm">Loading...</div>
-      </div>
-    );
+      </div>;
   }
-  
-  return (
-    <Layout>
+  return <Layout>
       <div className="min-h-screen bg-black">
         <AuthHeader />
         
@@ -281,14 +258,11 @@ const JobGuide = () => {
 
           <div className="space-y-6">
             {/* Profile Completion Status */}
-            {loading ? (
-              <Card className="bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border-2 border-gray-400 shadow-2xl shadow-gray-500/20">
+            {loading ? <Card className="bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border-2 border-gray-400 shadow-2xl shadow-gray-500/20">
                 <CardContent className="p-4">
                   <div className="text-white text-sm">Checking your profile...</div>
                 </CardContent>
-              </Card>
-            ) : !isComplete && (
-              <Card className="bg-gradient-to-br from-orange-600 via-red-600 to-pink-600 border-2 border-orange-400 shadow-2xl shadow-orange-500/20">
+              </Card> : !isComplete && <Card className="bg-gradient-to-br from-orange-600 via-red-600 to-pink-600 border-2 border-orange-400 shadow-2xl shadow-orange-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-lg">
                     <AlertCircle className="w-5 h-5" />
@@ -317,8 +291,7 @@ const JobGuide = () => {
                     Go to Home Page
                   </Button>
                 </CardContent>
-              </Card>
-            )}
+              </Card>}
 
             {/* Job Guide Form */}
             <Card className="bg-gradient-to-br from-emerald-600 via-green-600 to-teal-600 border-2 border-emerald-400 shadow-2xl shadow-emerald-500/20">
@@ -341,13 +314,7 @@ const JobGuide = () => {
                     </label>
                     <div className="relative">
                       <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 w-4 h-4" />
-                      <Input 
-                        value={formData.companyName} 
-                        onChange={e => handleInputChange('companyName', e.target.value)} 
-                        placeholder="Enter the company name for analysis" 
-                        disabled={isLoading || isGenerating} 
-                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-emerald-900" 
-                      />
+                      <Input value={formData.companyName} onChange={e => handleInputChange('companyName', e.target.value)} placeholder="Enter the company name for analysis" disabled={isLoading || isGenerating} className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-emerald-900" />
                     </div>
                   </div>
 
@@ -357,13 +324,7 @@ const JobGuide = () => {
                     </label>
                     <div className="relative">
                       <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 w-4 h-4" />
-                      <Input 
-                        value={formData.jobTitle} 
-                        onChange={e => handleInputChange('jobTitle', e.target.value)} 
-                        placeholder="Enter the job title for analysis" 
-                        disabled={isLoading || isGenerating} 
-                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-emerald-900" 
-                      />
+                      <Input value={formData.jobTitle} onChange={e => handleInputChange('jobTitle', e.target.value)} placeholder="Enter the job title for analysis" disabled={isLoading || isGenerating} className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-emerald-900" />
                     </div>
                   </div>
 
@@ -373,24 +334,13 @@ const JobGuide = () => {
                     </label>
                     <div className="relative">
                       <FileText className="absolute left-3 top-3 text-white/70 w-4 h-4" />
-                      <Textarea 
-                        value={formData.jobDescription} 
-                        onChange={e => handleInputChange('jobDescription', e.target.value)} 
-                        placeholder="Paste the complete job description here for detailed analysis including requirements, responsibilities, and qualifications..." 
-                        rows={4} 
-                        disabled={isLoading || isGenerating} 
-                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-emerald-900 resize-none" 
-                      />
+                      <Textarea value={formData.jobDescription} onChange={e => handleInputChange('jobDescription', e.target.value)} placeholder="Paste the complete job description here for detailed analysis including requirements, responsibilities, and qualifications..." rows={4} disabled={isLoading || isGenerating} className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-emerald-900 resize-none" />
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <Button 
-                    onClick={handleSubmit} 
-                    disabled={!isComplete || !isFormValid || isLoading || isGenerating || hasTriggeredWebhookRef.current} 
-                    className={`w-full font-inter font-medium py-3 px-4 text-sm ${isComplete && isFormValid && !isLoading && !isGenerating && !hasTriggeredWebhookRef.current ? 'bg-white text-emerald-600 hover:bg-gray-100' : 'bg-white/50 text-gray-800 border-2 border-white/70 cursor-not-allowed hover:bg-white/50'}`}
-                  >
+                  <Button onClick={handleSubmit} disabled={!isComplete || !isFormValid || isLoading || isGenerating || hasTriggeredWebhookRef.current} className={`w-full font-inter font-medium py-3 px-4 text-sm ${isComplete && isFormValid && !isLoading && !isGenerating && !hasTriggeredWebhookRef.current ? 'bg-white text-emerald-600 hover:bg-gray-100' : 'bg-white/50 text-gray-800 border-2 border-white/70 cursor-not-allowed hover:bg-white/50'}`}>
                     <div className="flex items-center justify-center gap-2 w-full">
                       {isLoading ? <>
                           <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
@@ -446,11 +396,10 @@ const JobGuide = () => {
               </Card>}
 
             {/* Analysis Results Display */}
-            {analysisResults && (
-              <div className="space-y-4">
+            {analysisResults && <div className="space-y-4">
                 {/* Job Match Results */}
                 <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20">
-                  <CardHeader className="pb-3">
+                  <CardHeader className="pb-3 bg-red-300">
                     <CardTitle className="text-white font-inter flex items-center gap-2 text-lg">
                       <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                         <Target className="w-4 h-4 text-white" />
@@ -458,7 +407,7 @@ const JobGuide = () => {
                       Job Match Analysis
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-0">
+                  <CardContent className="pt-0 bg-red-300">
                     <div className="bg-white rounded-lg p-4 border-2 border-slate-300">
                       <div className="text-slate-800 font-inter whitespace-pre-wrap text-sm sm:text-base leading-relaxed break-words font-medium">
                         {analysisResults.jobMatch}
@@ -475,25 +424,18 @@ const JobGuide = () => {
                         <Trophy className="w-4 h-4 text-white" />
                       </div>
                       Your Cover Letter
-                      <Button 
-                        onClick={handleCopyToClipboard} 
-                        size="sm" 
-                        className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm px-3 py-2"
-                      >
+                      <Button onClick={handleCopyToClipboard} size="sm" className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm px-3 py-2">
                         <Copy className="w-4 h-4 mr-1" />
                         Copy
                       </Button>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <div 
-                      className="bg-white rounded-lg p-4 sm:p-6 border-2 border-blue-300 shadow-inner" 
-                      style={{
-                        backgroundImage: `linear-gradient(to right, #e5e7eb 1px, transparent 1px)`,
-                        backgroundSize: '24px 100%',
-                        paddingLeft: '20px',
-                      }}
-                    >
+                    <div className="bg-white rounded-lg p-4 sm:p-6 border-2 border-blue-300 shadow-inner" style={{
+                  backgroundImage: `linear-gradient(to right, #e5e7eb 1px, transparent 1px)`,
+                  backgroundSize: '24px 100%',
+                  paddingLeft: '20px'
+                }}>
                       <div className="relative">
                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-300 rounded"></div>
                         <div className="text-slate-800 font-inter whitespace-pre-wrap text-sm sm:text-base leading-6 break-words pl-4 font-medium">
@@ -503,12 +445,10 @@ const JobGuide = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </div>
-            )}
+              </div>}
 
             {/* Success Display */}
-            {isSuccess && !isGenerating && !analysisResults && (
-              <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
+            {isSuccess && !isGenerating && !analysisResults && <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-lg">
                     <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
@@ -523,12 +463,10 @@ const JobGuide = () => {
                     The n8n workflow will process your request and generate the job match percentage and cover letter automatically.
                   </p>
                 </CardContent>
-              </Card>
-            )}
+              </Card>}
 
             {/* Error Display */}
-            {error && (
-              <Card className="bg-gradient-to-br from-red-600 via-red-700 to-red-800 border-2 border-red-400 shadow-2xl shadow-red-500/20">
+            {error && <Card className="bg-gradient-to-br from-red-600 via-red-700 to-red-800 border-2 border-red-400 shadow-2xl shadow-red-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-lg">
                     <AlertCircle className="w-5 h-5" />
@@ -537,24 +475,17 @@ const JobGuide = () => {
                 </CardHeader>
                 <CardContent className="pt-0">
                   <p className="text-red-100 font-inter text-sm break-words">{error}</p>
-                  <Button 
-                    onClick={() => {
-                      hasTriggeredWebhookRef.current = false; // Reset webhook flag on retry
-                      handleSubmit();
-                    }} 
-                    className="mt-3 bg-white text-red-600 hover:bg-gray-100 font-inter font-medium text-sm px-4 py-2" 
-                    disabled={isLoading || isGenerating || !isFormValid}
-                  >
+                  <Button onClick={() => {
+                hasTriggeredWebhookRef.current = false; // Reset webhook flag on retry
+                handleSubmit();
+              }} className="mt-3 bg-white text-red-600 hover:bg-gray-100 font-inter font-medium text-sm px-4 py-2" disabled={isLoading || isGenerating || !isFormValid}>
                     Try Again
                   </Button>
                 </CardContent>
-              </Card>
-            )}
+              </Card>}
           </div>
         </div>
       </div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default JobGuide;
