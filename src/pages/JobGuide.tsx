@@ -11,6 +11,7 @@ import AuthHeader from '@/components/AuthHeader';
 import DashboardNav from '@/components/DashboardNav';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import { supabase } from '@/integrations/supabase/client';
+
 const JobGuide = () => {
   const {
     user,
@@ -42,12 +43,19 @@ const JobGuide = () => {
   } | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('');
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const loadingMessages = ["🔍 Carefully analyzing your profile against job requirements...", "📝 Crafting your personalized cover letter...", "🎯 Calculating your job match percentage...", "✨ Putting the finishing touches on your analysis..."];
+  const loadingMessages = [
+    "🔍 Carefully analyzing your profile against job requirements...",
+    "📝 Crafting your personalized cover letter...",
+    "🎯 Calculating your job match percentage...",
+    "✨ Putting the finishing touches on your analysis..."
+  ];
+
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
+
   useEffect(() => {
     if (!isGenerating) return;
     let messageIndex = 0;
@@ -58,6 +66,7 @@ const JobGuide = () => {
     }, 3000);
     return () => clearInterval(messageInterval);
   }, [isGenerating]);
+
   useEffect(() => {
     if (!analysisId || !isGenerating) return;
     const pollForResults = async () => {
@@ -116,6 +125,7 @@ const JobGuide = () => {
       clearTimeout(timeout);
     };
   }, [analysisId, isGenerating, toast]);
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -129,6 +139,7 @@ const JobGuide = () => {
       setAnalysisId(null);
     }
   };
+
   const handleSubmit = async () => {
     if (!isComplete) {
       toast({
@@ -203,6 +214,7 @@ const JobGuide = () => {
       setIsLoading(false);
     }
   };
+
   const handleCopyToClipboard = async () => {
     if (!analysisResults?.coverLetter) return;
     try {
@@ -220,6 +232,7 @@ const JobGuide = () => {
       });
     }
   };
+
   const isFormValid = formData.companyName && formData.jobTitle && formData.jobDescription;
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-black flex items-center justify-center">
@@ -453,4 +466,5 @@ const JobGuide = () => {
       </div>
     </div>;
 };
+
 export default JobGuide;
