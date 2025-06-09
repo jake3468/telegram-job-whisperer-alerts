@@ -56,10 +56,11 @@ export function AppSidebar() {
             <SidebarMenu>
               {profileItems.map(item => <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={({
-                  isActive: routeIsActive
-                }) => `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${routeIsActive || isActive(item.url) ? 'bg-gradient-to-r from-sky-500/30 to-sky-300/30 text-white border-2 border-sky-400/50 shadow-lg shadow-sky-500/20' : 'text-gray-300 hover:text-white hover:bg-white/5 hover:border hover:border-white/10'}`}>
-                      <item.icon className={`w-5 h-5 flex-shrink-0 ${routeIsActive || isActive(item.url) ? 'text-sky-300' : ''}`} />
+                    <NavLink to={item.url} className={({ isActive: routeIsActive }) => {
+                      const isCurrentlyActive = routeIsActive || isActive(item.url);
+                      return `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${isCurrentlyActive ? 'bg-gradient-to-r from-sky-500/30 to-sky-300/30 text-white border-2 border-sky-400/50 shadow-lg shadow-sky-500/20' : 'text-gray-300 hover:text-white hover:bg-white/5 hover:border hover:border-white/10'}`;
+                    }}>
+                      <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive(item.url) ? 'text-sky-300' : ''}`} />
                       {state === 'expanded' && <span className="font-medium truncate">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
@@ -77,10 +78,11 @@ export function AppSidebar() {
             <SidebarMenu>
               {toolItems.map(item => <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={({
-                  isActive: routeIsActive
-                }) => `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${routeIsActive || isActive(item.url) ? 'bg-gradient-to-r from-sky-500/30 to-sky-300/30 text-white border-2 border-sky-400/50 shadow-lg shadow-sky-500/20' : 'text-gray-300 hover:text-white hover:bg-white/5 hover:border hover:border-white/10'}`}>
-                      <item.icon className={`w-5 h-5 flex-shrink-0 ${routeIsActive || isActive(item.url) ? 'text-sky-300' : ''}`} />
+                    <NavLink to={item.url} className={({ isActive: routeIsActive }) => {
+                      const isCurrentlyActive = routeIsActive || isActive(item.url);
+                      return `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${isCurrentlyActive ? 'bg-gradient-to-r from-sky-500/30 to-sky-300/30 text-white border-2 border-sky-400/50 shadow-lg shadow-sky-500/20' : 'text-gray-300 hover:text-white hover:bg-white/5 hover:border hover:border-white/10'}`;
+                    }}>
+                      <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive(item.url) ? 'text-sky-300' : ''}`} />
                       {state === 'expanded' && <span className="font-medium truncate">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
