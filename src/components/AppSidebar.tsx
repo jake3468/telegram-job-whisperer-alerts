@@ -1,13 +1,16 @@
+
 import { User, Bell, Target, FileText } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, useSidebar } from '@/components/ui/sidebar';
 import { SignedIn, UserButton, useUser } from '@clerk/clerk-react';
 
-const navigationItems = [{
+const profileItems = [{
   title: 'Profile',
   url: '/dashboard',
   icon: User
-}, {
+}];
+
+const toolItems = [{
   title: 'Telegram Job Alerts',
   url: '/job-alerts',
   icon: Bell
@@ -44,13 +47,35 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
+        {/* Profile Section */}
         <SidebarGroup className="bg-zinc-900">
           <SidebarGroupLabel className="text-gray-300 font-inter font-medium text-xs px-3 py-2">
-            Navigation
+            Profile
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navigationItems.map(item => <SidebarMenuItem key={item.title}>
+              {profileItems.map(item => <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink to={item.url} className={({
+                  isActive: navIsActive
+                }) => `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${navIsActive || isActive(item.url) ? 'bg-gradient-to-r from-sky-500/20 to-sky-300/20 text-white border border-sky-400/30' : 'text-gray-300 hover:text-white hover:bg-white/5 hover:border hover:border-white/10'}`}>
+                      <item.icon className="w-5 h-5 flex-shrink-0" />
+                      {state === 'expanded' && <span className="font-medium truncate">{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>)}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Tools Section */}
+        <SidebarGroup className="bg-zinc-900">
+          <SidebarGroupLabel className="text-gray-300 font-inter font-medium text-xs px-3 py-2">
+            Tools
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {toolItems.map(item => <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} className={({
                   isActive: navIsActive
