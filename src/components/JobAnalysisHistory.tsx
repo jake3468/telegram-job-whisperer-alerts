@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { History, Trash2, Eye, Clock, Building, Briefcase } from 'lucide-react';
+import { History, Trash2, Eye, Clock, Building, Briefcase, Copy } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 
@@ -102,6 +102,23 @@ const JobAnalysisHistory = ({ type, gradientColors, borderColors }: JobAnalysisH
     }
   };
 
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({
+        title: "Copied!",
+        description: "Content has been copied to clipboard."
+      });
+    } catch (error) {
+      console.error('Failed to copy to clipboard:', error);
+      toast({
+        title: "Copy failed",
+        description: "Failed to copy content. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
   useEffect(() => {
     fetchHistory();
   }, [user]);
@@ -125,8 +142,8 @@ const JobAnalysisHistory = ({ type, gradientColors, borderColors }: JobAnalysisH
           View History
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-black border-2 border-white/20">
-        <DialogHeader>
+      <DialogContent className="w-[95vw] max-w-4xl h-[90vh] max-h-[90vh] bg-black border-2 border-white/20 p-0 overflow-hidden flex flex-col">
+        <DialogHeader className="p-4 pb-0 flex-shrink-0">
           <DialogTitle className="text-white font-inter text-lg">
             {getTitle()}
           </DialogTitle>
@@ -135,7 +152,7 @@ const JobAnalysisHistory = ({ type, gradientColors, borderColors }: JobAnalysisH
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-4 mt-4">
+        <div className="flex-1 overflow-y-auto p-4 pt-2">
           {loading ? (
             <div className="text-white text-center py-8">Loading history...</div>
           ) : history.length === 0 ? (
@@ -143,76 +160,90 @@ const JobAnalysisHistory = ({ type, gradientColors, borderColors }: JobAnalysisH
               No history found. Complete an analysis to see it here.
             </div>
           ) : (
-            history.map((analysis) => (
-              <Card key={analysis.id} className={`${gradientColors} ${borderColors} shadow-lg`}>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-white font-inter flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <Building className="w-4 h-4" />
-                      <span className="truncate">{analysis.company_name}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            size="sm"
-                            className="bg-white/20 hover:bg-white/30 text-white text-xs px-2 py-1"
-                            onClick={() => setSelectedAnalysis(analysis)}
-                          >
-                            <Eye className="w-3 h-3 mr-1" />
-                            View
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-black border-2 border-white/20">
-                          <DialogHeader>
-                            <DialogTitle className="text-white font-inter text-lg">
-                              {selectedAnalysis?.company_name} - {selectedAnalysis?.job_title}
-                            </DialogTitle>
-                          </DialogHeader>
-                          {selectedAnalysis && (
-                            <div className="space-y-4">
-                              <div className="bg-white/10 rounded-lg p-4">
-                                <h4 className="text-white font-medium mb-2">Job Description:</h4>
-                                <p className="text-gray-300 text-sm whitespace-pre-wrap">
-                                  {selectedAnalysis.job_description}
-                                </p>
-                              </div>
-                              <div className="bg-white rounded-lg p-4">
-                                <h4 className="text-gray-900 font-medium mb-2">
-                                  {type === 'job_guide' ? 'Job Match Analysis:' : 'Generated Cover Letter:'}
-                                </h4>
-                                <div className="text-gray-800 text-sm whitespace-pre-wrap">
-                                  {getResultContent(selectedAnalysis)}
+            <div className="space-y-4">
+              {history.map((analysis) => (
+                <Card key={analysis.id} className={`${gradientColors} ${borderColors} shadow-lg`}>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-white font-inter flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <Building className="w-4 h-4 flex-shrink-0" />
+                        <span className="truncate">{analysis.company_name}</span>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              size="sm"
+                              className="bg-white/20 hover:bg-white/30 text-white text-xs px-2 py-1 flex-shrink-0"
+                              onClick={() => setSelectedAnalysis(analysis)}
+                            >
+                              <Eye className="w-3 h-3 mr-1" />
+                              View
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="w-[95vw] max-w-4xl h-[90vh] max-h-[90vh] bg-black border-2 border-white/20 p-0 overflow-hidden flex flex-col">
+                            <DialogHeader className="p-4 pb-0 flex-shrink-0">
+                              <DialogTitle className="text-white font-inter text-lg break-words">
+                                {selectedAnalysis?.company_name} - {selectedAnalysis?.job_title}
+                              </DialogTitle>
+                            </DialogHeader>
+                            {selectedAnalysis && (
+                              <div className="flex-1 overflow-y-auto p-4 pt-2 space-y-4">
+                                <div className="bg-white/10 rounded-lg p-4">
+                                  <h4 className="text-white font-medium mb-2">Job Description:</h4>
+                                  <p className="text-gray-300 text-sm whitespace-pre-wrap break-words">
+                                    {selectedAnalysis.job_description}
+                                  </p>
+                                </div>
+                                <div className="bg-white rounded-lg p-4">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <h4 className="text-gray-900 font-medium">
+                                      {type === 'job_guide' ? 'Job Match Analysis:' : 'Generated Cover Letter:'}
+                                    </h4>
+                                    {type === 'cover_letter' && (
+                                      <Button
+                                        size="sm"
+                                        onClick={() => copyToClipboard(getResultContent(selectedAnalysis) || '')}
+                                        className="bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs px-2 py-1"
+                                      >
+                                        <Copy className="w-3 h-3 mr-1" />
+                                        Copy
+                                      </Button>
+                                    )}
+                                  </div>
+                                  <div className="text-gray-800 text-sm whitespace-pre-wrap break-words leading-relaxed">
+                                    {getResultContent(selectedAnalysis)}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          )}
-                        </DialogContent>
-                      </Dialog>
-                      <Button
-                        size="sm"
-                        onClick={() => deleteAnalysis(analysis.id)}
-                        className="bg-red-500/20 hover:bg-red-500/30 text-red-200 text-xs px-2 py-1"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </CardTitle>
-                  <CardDescription className="text-white/70 font-inter text-xs">
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-1">
-                        <Briefcase className="w-3 h-3" />
-                        <span className="truncate">{analysis.job_title}</span>
+                            )}
+                          </DialogContent>
+                        </Dialog>
+                        <Button
+                          size="sm"
+                          onClick={() => deleteAnalysis(analysis.id)}
+                          className="bg-red-500/20 hover:bg-red-500/30 text-red-200 text-xs px-2 py-1 flex-shrink-0"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        <span>{format(new Date(analysis.created_at), 'MMM dd, yyyy')}</span>
+                    </CardTitle>
+                    <CardDescription className="text-white/70 font-inter text-xs">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                        <div className="flex items-center gap-1 min-w-0">
+                          <Briefcase className="w-3 h-3 flex-shrink-0" />
+                          <span className="truncate">{analysis.job_title}</span>
+                        </div>
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <Clock className="w-3 h-3" />
+                          <span>{format(new Date(analysis.created_at), 'MMM dd, yyyy')}</span>
+                        </div>
                       </div>
-                    </div>
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-            ))
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
           )}
         </div>
       </DialogContent>
