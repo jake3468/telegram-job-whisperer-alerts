@@ -179,7 +179,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
                           handleInputChange('country', country.name);
                           setCountryOpen(false);
                         }}
-                        className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                        className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black"
                       >
                         <Check
                           className={cn(
@@ -228,9 +228,9 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-gray-800 border-gray-600 backdrop-blur-sm">
-              <SelectItem value="Remote" className="text-white hover:bg-gray-700 focus:bg-gray-700 text-sm">Remote</SelectItem>
-              <SelectItem value="On-site" className="text-white hover:bg-gray-700 focus:bg-gray-700 text-sm">On-site</SelectItem>
-              <SelectItem value="Hybrid" className="text-white hover:bg-gray-700 focus:bg-gray-700 text-sm">Hybrid</SelectItem>
+              <SelectItem value="Remote" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-sm">Remote</SelectItem>
+              <SelectItem value="On-site" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-sm">On-site</SelectItem>
+              <SelectItem value="Hybrid" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-sm">Hybrid</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -253,7 +253,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
             </SelectTrigger>
             <SelectContent className="bg-gray-800 border-gray-600 max-h-48 backdrop-blur-sm">
               {timeOptions.map((time) => (
-                <SelectItem key={time} value={time} className="text-white hover:bg-gray-700 focus:bg-gray-700 text-sm">
+                <SelectItem key={time} value={time} className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-sm">
                   {time}
                 </SelectItem>
               ))}
