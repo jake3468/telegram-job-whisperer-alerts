@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { AlertCircle, FileText, Sparkles, Loader2, CheckCircle, Trash2, Building, Briefcase, FileEdit } from 'lucide-react';
+import { AlertCircle, FileText, Sparkles, Loader2, CheckCircle, Trash2, Building, Briefcase, FileEdit, Copy } from 'lucide-react';
 import AuthHeader from '@/components/AuthHeader';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import { supabase } from '@/integrations/supabase/client';
@@ -145,6 +144,25 @@ const CoverLetter = () => {
       title: "Data Cleared",
       description: "All form data and results have been cleared."
     });
+  };
+
+  const handleCopyCoverLetter = async () => {
+    if (!coverLetterResult) return;
+    
+    try {
+      await navigator.clipboard.writeText(coverLetterResult);
+      toast({
+        title: "Copied!",
+        description: "Cover letter has been copied to your clipboard."
+      });
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      toast({
+        title: "Copy Failed",
+        description: "Failed to copy cover letter. Please try selecting and copying manually.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSubmit = async () => {
@@ -512,29 +530,53 @@ const CoverLetter = () => {
             {coverLetterResult && (
               <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20 w-full">
                 <CardHeader className="pb-3 bg-green-300">
-                  <CardTitle className="font-inter flex items-center gap-2 text-sm text-gray-950">
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gray-950">
-                      <FileText className="w-3 h-3 text-white" />
+                  <CardTitle className="font-inter flex items-center justify-between text-sm text-gray-950">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gray-950">
+                        <FileText className="w-3 h-3 text-white" />
+                      </div>
+                      Your Cover Letter
                     </div>
-                    Your Cover Letter
+                    <Button
+                      onClick={handleCopyCoverLetter}
+                      size="sm"
+                      className="bg-gray-950 hover:bg-gray-800 text-white border-gray-700 text-xs px-2 py-1"
+                    >
+                      <Copy className="w-3 h-3 mr-1" />
+                      Copy
+                    </Button>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0 bg-green-300 p-4 w-full">
-                  <div className="bg-white rounded-lg p-3 border-2 border-slate-300 w-full">
-                    <div 
-                      className="text-slate-800 font-inter leading-relaxed font-medium w-full text-xs"
-                      style={{
-                        wordWrap: 'break-word',
-                        overflowWrap: 'break-word',
-                        wordBreak: 'break-word',
-                        whiteSpace: 'pre-wrap',
-                        maxWidth: '100%',
-                        hyphens: 'auto',
-                        lineHeight: '1.4'
-                      }}
-                    >
-                      {coverLetterResult}
+                  {/* Letter-like styled container */}
+                  <div className="bg-white rounded-lg shadow-lg border border-gray-200 w-full relative">
+                    {/* Letter header decoration */}
+                    <div className="h-2 bg-gradient-to-r from-blue-100 to-blue-50 rounded-t-lg"></div>
+                    
+                    {/* Letter content area */}
+                    <div className="p-6 bg-gradient-to-b from-white to-gray-50">
+                      {/* Letter lines decoration */}
+                      <div className="absolute left-8 top-12 bottom-6 w-px bg-red-200 opacity-50"></div>
+                      
+                      <div 
+                        className="text-slate-800 font-inter leading-relaxed font-medium w-full text-sm pl-4"
+                        style={{
+                          wordWrap: 'break-word',
+                          overflowWrap: 'break-word',
+                          wordBreak: 'break-word',
+                          whiteSpace: 'pre-wrap',
+                          maxWidth: '100%',
+                          hyphens: 'auto',
+                          lineHeight: '1.6',
+                          fontFamily: 'Georgia, serif'
+                        }}
+                      >
+                        {coverLetterResult}
+                      </div>
                     </div>
+                    
+                    {/* Letter footer decoration */}
+                    <div className="h-2 bg-gradient-to-r from-blue-50 to-blue-100 rounded-b-lg"></div>
                   </div>
                 </CardContent>
               </Card>
