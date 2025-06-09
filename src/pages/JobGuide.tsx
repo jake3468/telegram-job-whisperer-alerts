@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,26 +12,19 @@ import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import { supabase } from '@/integrations/supabase/client';
 import { Layout } from '@/components/Layout';
 import JobAnalysisHistory from '@/components/JobAnalysisHistory';
+
 const JobGuide = () => {
-  const {
-    user,
-    isLoaded
-  } = useUser();
+  const { user, isLoaded } = useUser();
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
-  const {
-    hasResume,
-    hasBio,
-    isComplete,
-    loading
-  } = useUserCompletionStatus();
+  const { toast } = useToast();
+  const { hasResume, hasBio, isComplete, loading } = useUserCompletionStatus();
+
   const [formData, setFormData] = useState({
     companyName: '',
     jobTitle: '',
     jobDescription: ''
   });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,15 +32,30 @@ const JobGuide = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [jobMatchResult, setJobMatchResult] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('');
+
+  // Enhanced duplicate prevention
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const isSubmissionInProgressRef = useRef(false);
-  const lastSubmissionDataRef = useRef<string>('');
-  const loadingMessages = ["🔍 Analyzing job requirements against your profile...", "📊 Calculating compatibility percentage...", "🎯 Evaluating skill matches...", "✨ Finalizing your job match analysis..."];
+  const requestInFlightRef = useRef(false);
+  const lastClickTimeRef = useRef(0);
+  const currentRequestIdRef = useRef<string | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const DEBOUNCE_DELAY = 1000; // 1 second debounce
+  const MIN_CLICK_INTERVAL = 2000; // Minimum 2 seconds between clicks
+
+  const loadingMessages = [
+    "🔍 Analyzing job requirements against your profile...",
+    "📊 Calculating compatibility percentage...", 
+    "🎯 Evaluating skill matches...",
+    "✨ Finalizing your job match analysis..."
+  ];
+
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
+
   useEffect(() => {
     if (!isGenerating) return;
     let messageIndex = 0;
@@ -58,26 +66,34 @@ const JobGuide = () => {
     }, 3000);
     return () => clearInterval(messageInterval);
   }, [isGenerating]);
+
   useEffect(() => {
     if (!analysisId || !isGenerating) return;
+    
     const pollForResults = async () => {
       try {
-        const {
-          data,
-          error
-        } = await supabase.from('job_analyses').select('job_match').eq('id', analysisId).single();
+        const { data, error } = await supabase
+          .from('job_analyses')
+          .select('job_match')
+          .eq('id', analysisId)
+          .single();
+        
         if (error) {
           console.error('Error polling for results:', error);
           return;
         }
+        
         if (data?.job_match) {
           setJobMatchResult(data.job_match);
           setIsGenerating(false);
           setIsSuccess(false);
+          requestInFlightRef.current = false;
+          
           if (pollingIntervalRef.current) {
             clearInterval(pollingIntervalRef.current);
             pollingIntervalRef.current = null;
           }
+          
           toast({
             title: "Analysis Complete!",
             description: "Your job match analysis is ready."
@@ -87,13 +103,16 @@ const JobGuide = () => {
         console.error('Polling error:', err);
       }
     };
+
     pollingIntervalRef.current = setInterval(pollForResults, 3000);
+    
     const timeout = setTimeout(() => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
         pollingIntervalRef.current = null;
       }
       setIsGenerating(false);
+      requestInFlightRef.current = false;
       setError('Analysis timed out. Please try again.');
       toast({
         title: "Analysis Timeout",
@@ -101,6 +120,7 @@ const JobGuide = () => {
         variant: "destructive"
       });
     }, 300000);
+
     return () => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
@@ -108,13 +128,20 @@ const JobGuide = () => {
       clearTimeout(timeout);
     };
   }, [analysisId, isGenerating, toast]);
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
-  const handleClearData = () => {
+
+  const handleClearData = useCallback(() => {
+    // Cancel any ongoing request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
     setFormData({
       companyName: '',
       jobTitle: '',
@@ -126,28 +153,52 @@ const JobGuide = () => {
     setError(null);
     setIsGenerating(false);
     setIsSubmitting(false);
-    isSubmissionInProgressRef.current = false;
-    lastSubmissionDataRef.current = '';
+    requestInFlightRef.current = false;
+    currentRequestIdRef.current = null;
+    lastClickTimeRef.current = 0;
+    
     toast({
       title: "Data Cleared",
       description: "All form data and results have been cleared."
     });
-  };
-  const handleSubmit = async () => {
-    const submissionData = JSON.stringify({
-      company: formData.companyName,
-      title: formData.jobTitle,
-      description: formData.jobDescription
-    });
+  }, [toast]);
+
+  const handleSubmit = useCallback(async () => {
+    const now = Date.now();
+    const requestId = crypto.randomUUID();
     
-    // Enhanced duplicate submission prevention
-    if (isSubmissionInProgressRef.current) {
-      console.log('Submission already in progress, ignoring duplicate click');
+    console.log('Submit attempt:', {
+      requestId,
+      requestInFlight: requestInFlightRef.current,
+      timeSinceLastClick: now - lastClickTimeRef.current,
+      currentRequestId: currentRequestIdRef.current
+    });
+
+    // Enhanced duplicate prevention with debouncing
+    if (requestInFlightRef.current) {
+      console.log('Request already in flight, ignoring duplicate click:', requestId);
+      toast({
+        title: "Please wait",
+        description: "Your request is already being processed.",
+        variant: "destructive"
+      });
       return;
     }
-    
-    if (lastSubmissionDataRef.current === submissionData && (isSubmitting || isGenerating)) {
-      console.log('Same data already being processed, ignoring duplicate click');
+
+    // Debounce rapid clicks
+    if (now - lastClickTimeRef.current < DEBOUNCE_DELAY) {
+      console.log('Click too rapid, debouncing:', requestId);
+      return;
+    }
+
+    // Additional protection against rapid submissions
+    if (now - lastClickTimeRef.current < MIN_CLICK_INTERVAL && lastClickTimeRef.current > 0) {
+      console.log('Click too soon after last submission:', requestId);
+      toast({
+        title: "Please wait",
+        description: "Please wait a moment before submitting again.",
+        variant: "destructive"
+      });
       return;
     }
 
@@ -169,15 +220,21 @@ const JobGuide = () => {
       return;
     }
 
-    // Set flags immediately to prevent duplicates
-    isSubmissionInProgressRef.current = true;
-    lastSubmissionDataRef.current = submissionData;
+    // Set all protection flags immediately
+    requestInFlightRef.current = true;
+    lastClickTimeRef.current = now;
+    currentRequestIdRef.current = requestId;
     setIsSubmitting(true);
     setError(null);
     setIsSuccess(false);
     setJobMatchResult(null);
 
+    // Create abort controller for this request
+    abortControllerRef.current = new AbortController();
+
     try {
+      console.log('Starting job analysis submission:', requestId);
+
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('id')
@@ -202,10 +259,11 @@ const JobGuide = () => {
 
       if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
         const existing = existingAnalysis[0];
+        console.log('Found existing analysis:', requestId, existing.id);
         setJobMatchResult(existing.job_match);
         setAnalysisId(existing.id);
         setIsSubmitting(false);
-        isSubmissionInProgressRef.current = false;
+        requestInFlightRef.current = false;
         toast({
           title: "Previous Analysis Found",
           description: "Using your previous job match analysis for this job posting."
@@ -231,11 +289,12 @@ const JobGuide = () => {
       }
 
       if (insertedData?.id) {
+        console.log('Analysis inserted successfully:', requestId, insertedData.id);
         setAnalysisId(insertedData.id);
         setIsSuccess(true);
         setIsGenerating(true);
 
-        // Create webhook payload with unique identifiers
+        // Create webhook payload with enhanced tracking
         const webhookPayload = {
           user: {
             id: userData.id,
@@ -255,18 +314,33 @@ const JobGuide = () => {
           event_type: 'job_analysis_created',
           webhook_type: 'job_guide',
           timestamp: new Date().toISOString(),
-          submission_id: `${insertedData.id}-${Date.now()}` // Add unique submission ID
+          request_id: requestId,
+          submission_metadata: {
+            user_agent: navigator.userAgent,
+            source: 'job_guide_page',
+            form_data_hash: btoa(JSON.stringify({
+              company: formData.companyName,
+              title: formData.jobTitle,
+              description: formData.jobDescription.substring(0, 100)
+            }))
+          }
         };
 
-        // Call webhook only once
-        console.log('Calling webhook for analysis ID:', insertedData.id);
+        // Call webhook with abort signal
+        console.log('Calling webhook for analysis ID:', requestId, insertedData.id);
         const { error: webhookError } = await supabase.functions.invoke('job-analysis-webhook', {
-          body: webhookPayload
+          body: webhookPayload,
+          headers: {
+            'X-Request-ID': requestId,
+            'X-Source': 'job-guide-page'
+          }
         });
         
         if (webhookError) {
-          console.error('Webhook error:', webhookError);
+          console.error('Webhook error:', requestId, webhookError);
           // Don't throw here, let the polling handle retries
+        } else {
+          console.log('Webhook called successfully:', requestId);
         }
 
         toast({
@@ -275,9 +349,11 @@ const JobGuide = () => {
         });
       }
     } catch (err) {
-      console.error('Error generating job analysis:', err);
+      console.error('Error generating job analysis:', requestId, err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate job analysis';
       setError(errorMessage);
+      requestInFlightRef.current = false;
+      currentRequestIdRef.current = null;
       toast({
         title: "Analysis Failed",
         description: "There was an error generating your job analysis. Please try again.",
@@ -285,18 +361,23 @@ const JobGuide = () => {
       });
     } finally {
       setIsSubmitting(false);
-      isSubmissionInProgressRef.current = false;
     }
-  };
+  }, [formData, isComplete, user, toast]);
+
   const isFormValid = formData.companyName && formData.jobTitle && formData.jobDescription;
   const hasAnyData = isFormValid || jobMatchResult;
-  const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating || isSubmissionInProgressRef.current;
+  const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating || requestInFlightRef.current;
+
   if (!isLoaded || !user) {
-    return <div className="min-h-screen bg-black flex items-center justify-center">
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-xs">Loading...</div>
-      </div>;
+      </div>
+    );
   }
-  return <Layout>
+
+  return (
+    <Layout>
       <div className="min-h-screen bg-black">
         <AuthHeader />
         
@@ -312,11 +393,14 @@ const JobGuide = () => {
 
           <div className="space-y-6">
             {/* Profile Completion Status */}
-            {loading ? <Card className="bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border-2 border-gray-400 shadow-2xl shadow-gray-500/20">
+            {loading ? (
+              <Card className="bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border-2 border-gray-400 shadow-2xl shadow-gray-500/20">
                 <CardContent className="p-4">
                   <div className="text-white text-sm sm:text-base">Checking your profile...</div>
                 </CardContent>
-              </Card> : !isComplete && <Card className="bg-gradient-to-br from-orange-600 via-red-600 to-pink-600 border-2 border-orange-400 shadow-2xl shadow-orange-500/20">
+              </Card>
+            ) : !isComplete && (
+              <Card className="bg-gradient-to-br from-orange-600 via-red-600 to-pink-600 border-2 border-orange-400 shadow-2xl shadow-orange-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-sm sm:text-base">
                     <AlertCircle className="w-4 h-4 sm:w-4 sm:h-4" />
@@ -341,11 +425,15 @@ const JobGuide = () => {
                       </span>
                     </div>
                   </div>
-                  <Button onClick={() => navigate('/dashboard')} className="font-inter bg-white text-orange-600 hover:bg-gray-100 font-medium text-xs px-4 py-2">
+                  <Button 
+                    onClick={() => navigate('/dashboard')} 
+                    className="font-inter bg-white text-orange-600 hover:bg-gray-100 font-medium text-xs px-4 py-2"
+                  >
                     Go to Home Page
                   </Button>
                 </CardContent>
-              </Card>}
+              </Card>
+            )}
 
             {/* Job Input Form */}
             <Card className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 border-2 border-blue-400 shadow-2xl shadow-blue-500/20">
@@ -355,10 +443,16 @@ const JobGuide = () => {
                     <Target className="w-4 h-4 text-white" />
                   </div>
                   Job Information
-                  {hasAnyData && <Button onClick={handleClearData} size="sm" className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-xs px-2 py-1">
+                  {hasAnyData && (
+                    <Button 
+                      onClick={handleClearData} 
+                      size="sm" 
+                      className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-xs px-2 py-1"
+                    >
                       <Trash2 className="w-3 h-3 mr-1" />
                       Clear All
-                    </Button>}
+                    </Button>
+                  )}
                 </CardTitle>
                 <CardDescription className="text-blue-100 font-inter text-sm">
                   Enter job details to analyze if it's a good match for you
@@ -372,7 +466,13 @@ const JobGuide = () => {
                     </label>
                     <div className="relative">
                       <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 w-4 h-4" />
-                      <Input value={formData.companyName} onChange={e => handleInputChange('companyName', e.target.value)} placeholder="Enter the company name" disabled={isSubmitting || isGenerating} className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 placeholder:text-sm bg-gray-900" />
+                      <Input
+                        value={formData.companyName}
+                        onChange={(e) => handleInputChange('companyName', e.target.value)}
+                        placeholder="Enter the company name"
+                        disabled={isSubmitting || isGenerating}
+                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 placeholder:text-sm bg-gray-900"
+                      />
                     </div>
                   </div>
 
@@ -382,7 +482,13 @@ const JobGuide = () => {
                     </label>
                     <div className="relative">
                       <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 w-4 h-4" />
-                      <Input value={formData.jobTitle} onChange={e => handleInputChange('jobTitle', e.target.value)} placeholder="Enter the job title" disabled={isSubmitting || isGenerating} className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 placeholder:text-sm bg-gray-900" />
+                      <Input
+                        value={formData.jobTitle}
+                        onChange={(e) => handleInputChange('jobTitle', e.target.value)}
+                        placeholder="Enter the job title"
+                        disabled={isSubmitting || isGenerating}
+                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 placeholder:text-sm bg-gray-900"
+                      />
                     </div>
                   </div>
 
@@ -392,41 +498,69 @@ const JobGuide = () => {
                     </label>
                     <div className="relative">
                       <FileText className="absolute left-3 top-3 text-white/70 w-4 h-4" />
-                      <Textarea value={formData.jobDescription} onChange={e => handleInputChange('jobDescription', e.target.value)} placeholder="Paste the complete job description here..." rows={4} disabled={isSubmitting || isGenerating} className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 resize-none placeholder:text-sm bg-gray-900" />
+                      <Textarea
+                        value={formData.jobDescription}
+                        onChange={(e) => handleInputChange('jobDescription', e.target.value)}
+                        placeholder="Paste the complete job description here..."
+                        rows={4}
+                        disabled={isSubmitting || isGenerating}
+                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 resize-none placeholder:text-sm bg-gray-900"
+                      />
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <Button onClick={handleSubmit} disabled={isButtonDisabled} className={`w-full font-inter font-medium py-3 px-4 text-sm ${!isButtonDisabled ? 'bg-white text-blue-600 hover:bg-gray-100' : 'bg-white/50 text-gray-800 border-2 border-white/70 cursor-not-allowed hover:bg-white/50'}`}>
+                  <Button
+                    onClick={handleSubmit}
+                    disabled={isButtonDisabled}
+                    className={`w-full font-inter font-medium py-3 px-4 text-sm ${
+                      !isButtonDisabled 
+                        ? 'bg-white text-blue-600 hover:bg-gray-100' 
+                        : 'bg-white/50 text-gray-800 border-2 border-white/70 cursor-not-allowed hover:bg-white/50'
+                    }`}
+                  >
                     <div className="flex items-center justify-center gap-2 w-full">
-                      {isSubmitting ? <>
+                      {isSubmitting ? (
+                        <>
                           <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
                           <span className="text-center text-sm">Processing...</span>
-                        </> : isGenerating ? <>
+                        </>
+                      ) : isGenerating ? (
+                        <>
                           <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
                           <span className="text-center text-sm">Analyzing...</span>
-                        </> : <>
+                        </>
+                      ) : (
+                        <>
                           <Sparkles className="w-4 h-4 flex-shrink-0" />
                           <span className="text-center text-sm font-bold">
                             Is this a good Job for you?
                           </span>
-                        </>}
+                        </>
+                      )}
                     </div>
                   </Button>
 
                   {/* History Button */}
-                  <JobAnalysisHistory type="job_guide" gradientColors="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600" borderColors="border-2 border-blue-400" />
+                  <JobAnalysisHistory 
+                    type="job_guide" 
+                    gradientColors="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600" 
+                    borderColors="border-2 border-blue-400" 
+                  />
 
-                  {(!isComplete || !isFormValid) && !isSubmitting && !isGenerating && <p className="text-blue-200 text-sm font-inter text-center">
+                  {(!isComplete || !isFormValid) && !isSubmitting && !isGenerating && (
+                    <p className="text-blue-200 text-sm font-inter text-center">
                       {!isComplete ? 'Complete your profile first to use this feature' : 'Fill in all fields to get your analysis'}
-                    </p>}
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
 
             {/* Generating Status Display */}
-            {isGenerating && <Card className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 border-2 border-indigo-400 shadow-2xl shadow-indigo-500/20">
+            {isGenerating && (
+              <Card className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 border-2 border-indigo-400 shadow-2xl shadow-indigo-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-sm">
                     <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
@@ -445,10 +579,12 @@ const JobGuide = () => {
                     </p>
                   </div>
                 </CardContent>
-              </Card>}
+              </Card>
+            )}
 
             {/* Job Match Results Display */}
-            {jobMatchResult && <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20 w-full">
+            {jobMatchResult && (
+              <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20 w-full">
                 <CardHeader className="pb-3 bg-green-300">
                   <CardTitle className="font-inter flex items-center gap-2 text-sm text-gray-950">
                     <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gray-950">
@@ -459,23 +595,28 @@ const JobGuide = () => {
                 </CardHeader>
                 <CardContent className="pt-0 bg-green-300 p-4 w-full">
                   <div className="bg-white rounded-lg p-3 border-2 border-slate-300 w-full">
-                    <div className="text-slate-800 font-inter leading-relaxed font-medium w-full text-xs" style={{
-                  wordWrap: 'break-word',
-                  overflowWrap: 'break-word',
-                  wordBreak: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                  maxWidth: '100%',
-                  hyphens: 'auto',
-                  lineHeight: '1.4'
-                }}>
+                    <div 
+                      className="text-slate-800 font-inter leading-relaxed font-medium w-full text-xs" 
+                      style={{
+                        wordWrap: 'break-word',
+                        overflowWrap: 'break-word',
+                        wordBreak: 'break-word',
+                        whiteSpace: 'pre-wrap',
+                        maxWidth: '100%',
+                        hyphens: 'auto',
+                        lineHeight: '1.4'
+                      }}
+                    >
                       {jobMatchResult}
                     </div>
                   </div>
                 </CardContent>
-              </Card>}
+              </Card>
+            )}
 
             {/* Success Display */}
-            {isSuccess && !isGenerating && !jobMatchResult && <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
+            {isSuccess && !isGenerating && !jobMatchResult && (
+              <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-sm">
                     <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
@@ -490,10 +631,12 @@ const JobGuide = () => {
                     The analysis will appear below once completed.
                   </p>
                 </CardContent>
-              </Card>}
+              </Card>
+            )}
 
             {/* Error Display */}
-            {error && <Card className="bg-gradient-to-br from-red-600 via-red-700 to-red-800 border-2 border-red-400 shadow-2xl shadow-red-500/20">
+            {error && (
+              <Card className="bg-gradient-to-br from-red-600 via-red-700 to-red-800 border-2 border-red-400 shadow-2xl shadow-red-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-sm">
                     <AlertCircle className="w-4 h-4" />
@@ -502,18 +645,25 @@ const JobGuide = () => {
                 </CardHeader>
                 <CardContent className="pt-0">
                   <p className="text-red-100 font-inter text-xs break-words">{error}</p>
-                  <Button onClick={() => {
-                setError(null);
-                isSubmissionInProgressRef.current = false;
-                lastSubmissionDataRef.current = '';
-              }} className="mt-3 bg-white text-red-600 hover:bg-gray-100 font-inter font-medium text-xs px-4 py-2" disabled={isSubmitting || isGenerating || !isFormValid}>
+                  <Button 
+                    onClick={() => {
+                      setError(null);
+                      requestInFlightRef.current = false;
+                      currentRequestIdRef.current = null;
+                    }} 
+                    className="mt-3 bg-white text-red-600 hover:bg-gray-100 font-inter font-medium text-xs px-4 py-2" 
+                    disabled={isSubmitting || isGenerating || !isFormValid}
+                  >
                     Try Again
                   </Button>
                 </CardContent>
-              </Card>}
+              </Card>
+            )}
           </div>
         </div>
       </div>
-    </Layout>;
+    </Layout>
+  );
 };
+
 export default JobGuide;
