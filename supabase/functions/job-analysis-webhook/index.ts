@@ -17,13 +17,21 @@ serve(async (req) => {
   try {
     console.log('Job Analysis Webhook function called');
     
+    // Get the payload from the request
+    const payload = await req.json();
+    console.log('Received payload:', JSON.stringify(payload, null, 2));
+
+    // Determine which webhook to use based on the webhook_type in payload
+    const webhookType = payload.webhook_type || 'cover_letter'; // default to cover letter for backward compatibility
+    const webhookEnvVar = webhookType === 'job_guide' ? 'N8N_JG_WEBHOOK_URL' : 'N8N_CL_WEBHOOK_URL';
+    
     // Get the webhook URL from edge function secrets
-    const webhookUrl = Deno.env.get('N8N_WEBHOOK_URL');
+    const webhookUrl = Deno.env.get(webhookEnvVar);
     
     if (!webhookUrl) {
-      console.error('N8N_WEBHOOK_URL secret not configured');
+      console.error(`${webhookEnvVar} secret not configured`);
       return new Response(
-        JSON.stringify({ error: 'Webhook URL not configured' }), 
+        JSON.stringify({ error: `${webhookEnvVar} not configured` }), 
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -31,12 +39,8 @@ serve(async (req) => {
       );
     }
 
-    // Get the payload from the request
-    const payload = await req.json();
-    console.log('Received payload:', JSON.stringify(payload, null, 2));
-
     // Forward the payload to n8n webhook
-    console.log('Sending payload to n8n webhook:', webhookUrl);
+    console.log(`Sending payload to n8n webhook (${webhookType}):`, webhookUrl);
     
     const response = await fetch(webhookUrl, {
       method: 'POST',
@@ -47,7 +51,7 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
-      console.error('Failed to send webhook to n8n:', response.status, response.statusText);
+      console.error(`Failed to send webhook to n8n (${webhookType}):`, response.status, response.statusText);
       return new Response(
         JSON.stringify({ 
           error: 'Failed to send webhook', 
@@ -61,10 +65,10 @@ serve(async (req) => {
       );
     }
 
-    console.log('Successfully sent webhook to n8n');
+    console.log(`Successfully sent webhook to n8n (${webhookType})`);
     
     return new Response(
-      JSON.stringify({ success: true, message: 'Webhook sent successfully' }), 
+      JSON.stringify({ success: true, message: 'Webhook sent successfully', type: webhookType }), 
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }

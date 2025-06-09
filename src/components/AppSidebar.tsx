@@ -1,7 +1,9 @@
-import { User, Bell, FileSearch } from 'lucide-react';
+
+import { User, Bell, Target, FileText } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, useSidebar } from '@/components/ui/sidebar';
 import { SignedIn, UserButton, useUser } from '@clerk/clerk-react';
+
 const navigationItems = [{
   title: 'Profile',
   url: '/dashboard',
@@ -11,10 +13,15 @@ const navigationItems = [{
   url: '/job-alerts',
   icon: Bell
 }, {
-  title: 'Job Guide & Cover Letter',
+  title: 'Job Guide',
   url: '/job-guide',
-  icon: FileSearch
+  icon: Target
+}, {
+  title: 'Cover Letter',
+  url: '/cover-letter',
+  icon: FileText
 }];
+
 export function AppSidebar() {
   const {
     state
@@ -25,6 +32,7 @@ export function AppSidebar() {
   const location = useLocation();
   const currentPath = location.pathname;
   const isActive = (path: string) => currentPath === path;
+  
   return <Sidebar className="border-r border-white/20 bg-black">
       <SidebarHeader className="p-6 border-b border-white/10 bg-zinc-900">
         <div className="flex items-center gap-3">

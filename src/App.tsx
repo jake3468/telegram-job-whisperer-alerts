@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +9,7 @@ import Index from "./pages/Index";
 import Profile from "./pages/Profile";
 import JobAlerts from "./pages/JobAlerts";
 import JobGuide from "./pages/JobGuide";
+import CoverLetter from "./pages/CoverLetter";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +24,7 @@ const AppContent = () => {
       <Route path="/dashboard" element={<Profile />} />
       <Route path="/job-alerts" element={<JobAlerts />} />
       <Route path="/job-guide" element={<JobGuide />} />
+      <Route path="/cover-letter" element={<CoverLetter />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>

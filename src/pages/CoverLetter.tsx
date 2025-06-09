@@ -7,13 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { AlertCircle, Target, Sparkles, Loader2, CheckCircle, Trash2, Building, Briefcase, FileText } from 'lucide-react';
+import { AlertCircle, FileText, Sparkles, Loader2, CheckCircle, Copy, Trash2, Building, Briefcase } from 'lucide-react';
 import AuthHeader from '@/components/AuthHeader';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import { supabase } from '@/integrations/supabase/client';
 import { Layout } from '@/components/Layout';
 
-const JobGuide = () => {
+const CoverLetter = () => {
   const { user, isLoaded } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -29,7 +29,7 @@ const JobGuide = () => {
   const [error, setError] = useState<string | null>(null);
   const [analysisId, setAnalysisId] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [jobMatchResult, setJobMatchResult] = useState<string | null>(null);
+  const [coverLetterResult, setCoverLetterResult] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('');
   
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -37,10 +37,10 @@ const JobGuide = () => {
   const lastSubmissionDataRef = useRef<string>('');
 
   const loadingMessages = [
-    "🔍 Analyzing job requirements against your profile...",
-    "📊 Calculating compatibility percentage...",
-    "🎯 Evaluating skill matches...",
-    "✨ Finalizing your job match analysis..."
+    "✍️ Crafting your personalized cover letter...",
+    "🎨 Tailoring content to match the job requirements...",
+    "📝 Highlighting your relevant experience...",
+    "✨ Adding the perfect finishing touches..."
   ];
 
   useEffect(() => {
@@ -67,7 +67,7 @@ const JobGuide = () => {
       try {
         const { data, error } = await supabase
           .from('job_analyses')
-          .select('job_match')
+          .select('cover_letter')
           .eq('id', analysisId)
           .single();
         
@@ -76,8 +76,8 @@ const JobGuide = () => {
           return;
         }
         
-        if (data?.job_match) {
-          setJobMatchResult(data.job_match);
+        if (data?.cover_letter) {
+          setCoverLetterResult(data.cover_letter);
           setIsGenerating(false);
           setIsSuccess(false);
           
@@ -87,8 +87,8 @@ const JobGuide = () => {
           }
           
           toast({
-            title: "Analysis Complete!",
-            description: "Your job match analysis is ready."
+            title: "Cover Letter Complete!",
+            description: "Your personalized cover letter is ready."
           });
         }
       } catch (err) {
@@ -104,10 +104,10 @@ const JobGuide = () => {
         pollingIntervalRef.current = null;
       }
       setIsGenerating(false);
-      setError('Analysis timed out. Please try again.');
+      setError('Cover letter generation timed out. Please try again.');
       toast({
-        title: "Analysis Timeout",
-        description: "The analysis took too long. Please try submitting again.",
+        title: "Generation Timeout",
+        description: "The cover letter took too long to generate. Please try submitting again.",
         variant: "destructive"
       });
     }, 300000);
@@ -130,7 +130,7 @@ const JobGuide = () => {
       jobTitle: '',
       jobDescription: ''
     });
-    setJobMatchResult(null);
+    setCoverLetterResult(null);
     setAnalysisId(null);
     setIsSuccess(false);
     setError(null);
@@ -144,6 +144,25 @@ const JobGuide = () => {
       title: "Data Cleared",
       description: "All form data and results have been cleared."
     });
+  };
+
+  const handleCopyToClipboard = async () => {
+    if (!coverLetterResult) return;
+    
+    try {
+      await navigator.clipboard.writeText(coverLetterResult);
+      toast({
+        title: "Copied!",
+        description: "Cover letter copied to clipboard."
+      });
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      toast({
+        title: "Copy Failed",
+        description: "Failed to copy to clipboard. Please try selecting and copying manually.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSubmit = async () => {
@@ -166,7 +185,7 @@ const JobGuide = () => {
     if (!isComplete) {
       toast({
         title: "Complete your profile first",
-        description: "Please upload your resume and add your bio in the Home page before using Job Guide.",
+        description: "Please upload your resume and add your bio in the Home page before generating a cover letter.",
         variant: "destructive"
       });
       return;
@@ -175,7 +194,7 @@ const JobGuide = () => {
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
         title: "Missing information",
-        description: "Please fill in all fields to get your analysis.",
+        description: "Please fill in all fields to generate your cover letter.",
         variant: "destructive"
       });
       return;
@@ -186,7 +205,7 @@ const JobGuide = () => {
     setIsSubmitting(true);
     setError(null);
     setIsSuccess(false);
-    setJobMatchResult(null);
+    setCoverLetterResult(null);
 
     try {
       const { data: userData, error: userError } = await supabase
@@ -201,23 +220,23 @@ const JobGuide = () => {
 
       const { data: existingAnalysis, error: checkError } = await supabase
         .from('job_analyses')
-        .select('id, job_match')
+        .select('id, cover_letter')
         .eq('user_id', userData.id)
         .eq('company_name', formData.companyName)
         .eq('job_title', formData.jobTitle)
         .eq('job_description', formData.jobDescription)
-        .not('job_match', 'is', null)
+        .not('cover_letter', 'is', null)
         .order('created_at', { ascending: false })
         .limit(1);
 
       if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
         const existing = existingAnalysis[0];
-        setJobMatchResult(existing.job_match);
+        setCoverLetterResult(existing.cover_letter);
         setAnalysisId(existing.id);
         
         toast({
-          title: "Previous Analysis Found",
-          description: "Using your previous job match analysis for this job posting."
+          title: "Previous Cover Letter Found",
+          description: "Using your previous cover letter for this job posting."
         });
         
         return;
@@ -244,7 +263,7 @@ const JobGuide = () => {
         setIsSuccess(true);
         setIsGenerating(true);
         
-        // Call the webhook with job_guide type
+        // Call the webhook with cover_letter type
         const webhookPayload = {
           user: {
             id: userData.id,
@@ -262,7 +281,7 @@ const JobGuide = () => {
             created_at: new Date().toISOString()
           },
           event_type: 'job_analysis_created',
-          webhook_type: 'job_guide',
+          webhook_type: 'cover_letter',
           timestamp: new Date().toISOString()
         };
 
@@ -271,17 +290,17 @@ const JobGuide = () => {
         });
         
         toast({
-          title: "Analysis Started!",
-          description: "Your job match analysis is being processed. Please wait for the results."
+          title: "Generation Started!",
+          description: "Your cover letter is being generated. Please wait for the results."
         });
       }
     } catch (err) {
-      console.error('Error generating job analysis:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to generate job analysis';
+      console.error('Error generating cover letter:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to generate cover letter';
       setError(errorMessage);
       toast({
-        title: "Analysis Failed",
-        description: "There was an error generating your job analysis. Please try again.",
+        title: "Generation Failed",
+        description: "There was an error generating your cover letter. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -291,7 +310,7 @@ const JobGuide = () => {
   };
 
   const isFormValid = formData.companyName && formData.jobTitle && formData.jobDescription;
-  const hasAnyData = isFormValid || jobMatchResult;
+  const hasAnyData = isFormValid || coverLetterResult;
   const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating || isSubmissionInProgressRef.current;
 
   if (!isLoaded || !user) {
@@ -310,12 +329,12 @@ const JobGuide = () => {
         <div className="max-w-4xl mx-auto px-2 py-6 sm:px-4 sm:py-8">
           <div className="text-center mb-6">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-medium text-white mb-2 font-inter">
-              <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                Job Guide
+              <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+                Cover Letter Generator
               </span>
             </h1>
             <p className="text-sm sm:text-base text-gray-300 font-inter font-light">
-              Find out if this job is a good match for your skills and experience
+              Get a personalized cover letter tailored to your profile and the job
             </p>
           </div>
 
@@ -335,7 +354,7 @@ const JobGuide = () => {
                     Complete Your Profile
                   </CardTitle>
                   <CardDescription className="text-orange-100 font-inter text-sm sm:text-base">
-                    You need to complete your profile before using Job Guide
+                    You need to complete your profile before generating a cover letter
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3 pt-0">
@@ -364,11 +383,11 @@ const JobGuide = () => {
             )}
 
             {/* Job Input Form */}
-            <Card className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 border-2 border-blue-400 shadow-2xl shadow-blue-500/20">
+            <Card className="bg-gradient-to-br from-purple-600 via-pink-600 to-rose-600 border-2 border-purple-400 shadow-2xl shadow-purple-500/20">
               <CardHeader className="pb-3">
                 <CardTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
                   <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/20 rounded-full flex items-center justify-center">
-                    <Target className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                    <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </div>
                   Job Information
                   {hasAnyData && (
@@ -382,8 +401,8 @@ const JobGuide = () => {
                     </Button>
                   )}
                 </CardTitle>
-                <CardDescription className="text-blue-100 font-inter text-sm sm:text-base">
-                  Enter job details to analyze if it's a good match for you
+                <CardDescription className="text-purple-100 font-inter text-sm sm:text-base">
+                  Enter job details to generate your personalized cover letter
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 pt-0">
@@ -399,7 +418,7 @@ const JobGuide = () => {
                         onChange={(e) => handleInputChange('companyName', e.target.value)}
                         placeholder="Enter the company name"
                         disabled={isSubmitting || isGenerating}
-                        className="pl-10 text-sm sm:text-base border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-blue-900"
+                        className="pl-10 text-sm sm:text-base border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-purple-900"
                       />
                     </div>
                   </div>
@@ -415,7 +434,7 @@ const JobGuide = () => {
                         onChange={(e) => handleInputChange('jobTitle', e.target.value)}
                         placeholder="Enter the job title"
                         disabled={isSubmitting || isGenerating}
-                        className="pl-10 text-sm sm:text-base border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-blue-900"
+                        className="pl-10 text-sm sm:text-base border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-purple-900"
                       />
                     </div>
                   </div>
@@ -432,7 +451,7 @@ const JobGuide = () => {
                         placeholder="Paste the complete job description here..."
                         rows={4}
                         disabled={isSubmitting || isGenerating}
-                        className="pl-10 text-sm sm:text-base border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-blue-900 resize-none"
+                        className="pl-10 text-sm sm:text-base border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-purple-900 resize-none"
                       />
                     </div>
                   </div>
@@ -444,7 +463,7 @@ const JobGuide = () => {
                     disabled={isButtonDisabled}
                     className={`w-full font-inter font-medium py-3 px-4 text-sm sm:text-base ${
                       !isButtonDisabled 
-                        ? 'bg-white text-blue-600 hover:bg-gray-100' 
+                        ? 'bg-white text-purple-600 hover:bg-gray-100' 
                         : 'bg-white/50 text-gray-800 border-2 border-white/70 cursor-not-allowed hover:bg-white/50'
                     }`}
                   >
@@ -457,13 +476,13 @@ const JobGuide = () => {
                       ) : isGenerating ? (
                         <>
                           <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
-                          <span className="text-center text-sm sm:text-base">Analyzing...</span>
+                          <span className="text-center text-sm sm:text-base">Generating...</span>
                         </>
                       ) : (
                         <>
                           <Sparkles className="w-4 h-4 flex-shrink-0" />
                           <span className="text-center text-sm sm:text-base font-bold">
-                            Is this a good Job for you?
+                            Get your Cover Letter
                           </span>
                         </>
                       )}
@@ -471,8 +490,8 @@ const JobGuide = () => {
                   </Button>
 
                   {(!isComplete || !isFormValid) && !isSubmitting && !isGenerating && (
-                    <p className="text-blue-200 text-sm sm:text-base font-inter text-center">
-                      {!isComplete ? 'Complete your profile first to use this feature' : 'Fill in all fields to get your analysis'}
+                    <p className="text-purple-200 text-sm sm:text-base font-inter text-center">
+                      {!isComplete ? 'Complete your profile first to use this feature' : 'Fill in all fields to generate your cover letter'}
                     </p>
                   )}
                 </div>
@@ -481,21 +500,21 @@ const JobGuide = () => {
 
             {/* Generating Status Display */}
             {isGenerating && (
-              <Card className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 border-2 border-indigo-400 shadow-2xl shadow-indigo-500/20">
+              <Card className="bg-gradient-to-br from-pink-600 via-rose-600 to-orange-600 border-2 border-pink-400 shadow-2xl shadow-pink-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
                     <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/20 rounded-full flex items-center justify-center">
                       <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 text-white animate-spin" />
                     </div>
-                    Analyzing Job Match...
+                    Generating Your Cover Letter...
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-indigo-100 font-inter text-center text-sm sm:text-base break-words">
+                  <p className="text-pink-100 font-inter text-center text-sm sm:text-base break-words">
                     {loadingMessage}
                   </p>
                   <div className="mt-3 text-center">
-                    <p className="text-indigo-200 text-sm sm:text-base font-inter">
+                    <p className="text-pink-200 text-sm sm:text-base font-inter">
                       This usually takes 1-2 minutes. Please don't close this page.
                     </p>
                   </div>
@@ -503,32 +522,50 @@ const JobGuide = () => {
               </Card>
             )}
 
-            {/* Job Match Results Display */}
-            {jobMatchResult && (
-              <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20 w-full">
-                <CardHeader className="pb-3 bg-green-300">
-                  <CardTitle className="font-inter flex items-center gap-2 text-base sm:text-lg text-gray-950">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center bg-gray-950">
-                      <Target className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+            {/* Cover Letter Results Display */}
+            {coverLetterResult && (
+              <Card className="bg-gradient-to-br from-blue-800 via-blue-700 to-blue-600 border-2 border-blue-400 shadow-2xl shadow-blue-500/20 w-full">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/20 rounded-full flex items-center justify-center">
+                      <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                     </div>
-                    Job Match Analysis
+                    Your Cover Letter
+                    <Button 
+                      onClick={handleCopyToClipboard}
+                      size="sm" 
+                      className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-xs sm:text-sm px-2 py-1"
+                    >
+                      <Copy className="w-3 h-3 mr-1" />
+                      Copy
+                    </Button>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 bg-green-300 p-3 sm:p-4 w-full">
-                  <div className="bg-white rounded-lg p-2 sm:p-3 border-2 border-slate-300 w-full">
-                    <div 
-                      className="text-slate-800 font-inter leading-relaxed font-medium w-full text-xs sm:text-sm"
-                      style={{
-                        wordWrap: 'break-word',
-                        overflowWrap: 'break-word',
-                        wordBreak: 'break-word',
-                        whiteSpace: 'pre-wrap',
-                        maxWidth: '100%',
-                        hyphens: 'auto',
-                        lineHeight: '1.4'
-                      }}
-                    >
-                      {jobMatchResult}
+                <CardContent className="pt-0 p-3 sm:p-4 w-full">
+                  <div 
+                    className="bg-white rounded-lg p-2 sm:p-3 border-2 border-blue-300 shadow-inner w-full"
+                    style={{
+                      backgroundImage: `linear-gradient(to right, #e5e7eb 1px, transparent 1px)`,
+                      backgroundSize: '20px 100%',
+                      paddingLeft: '12px'
+                    }}
+                  >
+                    <div className="relative w-full">
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-300 rounded"></div>
+                      <div 
+                        className="text-slate-800 font-inter font-medium pl-2 sm:pl-3 w-full text-xs sm:text-sm"
+                        style={{
+                          wordWrap: 'break-word',
+                          overflowWrap: 'break-word',
+                          wordBreak: 'break-word',
+                          whiteSpace: 'pre-wrap',
+                          maxWidth: '100%',
+                          hyphens: 'auto',
+                          lineHeight: '1.4'
+                        }}
+                      >
+                        {coverLetterResult}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -536,20 +573,20 @@ const JobGuide = () => {
             )}
 
             {/* Success Display */}
-            {isSuccess && !isGenerating && !jobMatchResult && (
+            {isSuccess && !isGenerating && !coverLetterResult && (
               <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
                     <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/20 rounded-full flex items-center justify-center">
                       <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                     </div>
-                    Analysis Submitted Successfully!
+                    Generation Started Successfully!
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
                   <p className="text-green-100 font-inter text-sm sm:text-base break-words">
-                    Your job analysis has been submitted and is being processed. 
-                    The analysis will appear below once completed.
+                    Your cover letter generation has been submitted and is being processed. 
+                    The cover letter will appear below once completed.
                   </p>
                 </CardContent>
               </Card>
@@ -561,7 +598,7 @@ const JobGuide = () => {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
                     <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                    Analysis Error
+                    Generation Error
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
@@ -587,4 +624,4 @@ const JobGuide = () => {
   );
 };
 
-export default JobGuide;
+export default CoverLetter;
