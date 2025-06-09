@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -244,7 +243,6 @@ const JobGuide = () => {
         setIsSuccess(true);
         setIsGenerating(true);
         
-        // Call the webhook with job_guide type
         const webhookPayload = {
           user: {
             id: userData.id,
@@ -297,7 +295,7 @@ const JobGuide = () => {
   if (!isLoaded || !user) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white text-sm">Loading...</div>
+        <div className="text-white text-xs">Loading...</div>
       </div>
     );
   }
@@ -307,19 +305,17 @@ const JobGuide = () => {
       <div className="min-h-screen bg-black">
         <AuthHeader />
         
-        <div className="max-w-4xl mx-auto px-2 py-6 sm:px-4 sm:py-8">
-          <div className="text-center mb-6">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-medium text-white mb-2 font-inter">
-              <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                Job Guide
-              </span>
+        <div className="max-w-4xl mx-auto px-3 py-8 sm:px-4 sm:py-12">
+          <div className="text-center mb-8">
+            <h1 className="sm:text-xl font-medium text-white mb-2 font-inter text-3xl md:text-3xl">
+              Job <span className="bg-gradient-to-r from-green-500 to-teal-600 bg-clip-text text-transparent text-3xl">Guide</span>
             </h1>
-            <p className="text-sm sm:text-base text-gray-300 font-inter font-light">
+            <p className="text-sm text-gray-300 font-inter font-light">
               Find out if this job is a good match for your skills and experience
             </p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-6">
             {/* Profile Completion Status */}
             {loading ? (
               <Card className="bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border-2 border-gray-400 shadow-2xl shadow-gray-500/20">
@@ -342,20 +338,20 @@ const JobGuide = () => {
                   <div className="space-y-2">
                     <div className={`flex items-center gap-2 ${hasResume ? 'text-green-200' : 'text-red-200'}`}>
                       <div className={`w-2 h-2 rounded-full ${hasResume ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                      <span className="font-inter text-sm sm:text-base">
+                      <span className="font-inter text-sm">
                         {hasResume ? '✓ Resume uploaded' : '✗ Resume not uploaded'}
                       </span>
                     </div>
                     <div className={`flex items-center gap-2 ${hasBio ? 'text-green-200' : 'text-red-200'}`}>
                       <div className={`w-2 h-2 rounded-full ${hasBio ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                      <span className="font-inter text-sm sm:text-base">
+                      <span className="font-inter text-sm">
                         {hasBio ? '✓ Bio completed' : '✗ Bio not completed'}
                       </span>
                     </div>
                   </div>
                   <Button 
                     onClick={() => navigate('/dashboard')} 
-                    className="font-inter bg-white text-orange-600 hover:bg-gray-100 font-medium text-sm sm:text-base px-4 py-2"
+                    className="font-inter bg-white text-orange-600 hover:bg-gray-100 font-medium text-sm px-4 py-2"
                   >
                     Go to Home Page
                   </Button>
@@ -366,30 +362,30 @@ const JobGuide = () => {
             {/* Job Input Form */}
             <Card className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 border-2 border-blue-400 shadow-2xl shadow-blue-500/20">
               <CardHeader className="pb-3">
-                <CardTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
-                  <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/20 rounded-full flex items-center justify-center">
-                    <Target className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                <CardTitle className="text-white font-inter flex items-center gap-2 text-lg">
+                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                    <Target className="w-4 h-4 text-white" />
                   </div>
                   Job Information
                   {hasAnyData && (
                     <Button 
                       onClick={handleClearData}
                       size="sm" 
-                      className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-xs sm:text-sm px-2 py-1"
+                      className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm px-2 py-1"
                     >
                       <Trash2 className="w-3 h-3 mr-1" />
                       Clear All
                     </Button>
                   )}
                 </CardTitle>
-                <CardDescription className="text-blue-100 font-inter text-sm sm:text-base">
+                <CardDescription className="text-blue-100 font-inter text-sm">
                   Enter job details to analyze if it's a good match for you
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 pt-0">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-white font-inter font-medium mb-2 text-sm sm:text-base">
+                    <label className="block text-white font-inter font-medium mb-2 text-sm">
                       🏢 Company Name
                     </label>
                     <div className="relative">
@@ -399,13 +395,13 @@ const JobGuide = () => {
                         onChange={(e) => handleInputChange('companyName', e.target.value)}
                         placeholder="Enter the company name"
                         disabled={isSubmitting || isGenerating}
-                        className="pl-10 text-sm sm:text-base border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-blue-900"
+                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-blue-900"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-white font-inter font-medium mb-2 text-sm sm:text-base">
+                    <label className="block text-white font-inter font-medium mb-2 text-sm">
                       💼 Job Title
                     </label>
                     <div className="relative">
@@ -415,13 +411,13 @@ const JobGuide = () => {
                         onChange={(e) => handleInputChange('jobTitle', e.target.value)}
                         placeholder="Enter the job title"
                         disabled={isSubmitting || isGenerating}
-                        className="pl-10 text-sm sm:text-base border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-blue-900"
+                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-blue-900"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-white font-inter font-medium mb-2 text-sm sm:text-base">
+                    <label className="block text-white font-inter font-medium mb-2 text-sm">
                       📝 Job Description
                     </label>
                     <div className="relative">
@@ -432,7 +428,7 @@ const JobGuide = () => {
                         placeholder="Paste the complete job description here..."
                         rows={4}
                         disabled={isSubmitting || isGenerating}
-                        className="pl-10 text-sm sm:text-base border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-blue-900 resize-none"
+                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-blue-900 resize-none"
                       />
                     </div>
                   </div>
@@ -442,7 +438,7 @@ const JobGuide = () => {
                   <Button 
                     onClick={handleSubmit}
                     disabled={isButtonDisabled}
-                    className={`w-full font-inter font-medium py-3 px-4 text-sm sm:text-base ${
+                    className={`w-full font-inter font-medium py-3 px-4 text-sm ${
                       !isButtonDisabled 
                         ? 'bg-white text-blue-600 hover:bg-gray-100' 
                         : 'bg-white/50 text-gray-800 border-2 border-white/70 cursor-not-allowed hover:bg-white/50'
@@ -452,17 +448,17 @@ const JobGuide = () => {
                       {isSubmitting ? (
                         <>
                           <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
-                          <span className="text-center text-sm sm:text-base">Processing...</span>
+                          <span className="text-center text-sm">Processing...</span>
                         </>
                       ) : isGenerating ? (
                         <>
                           <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
-                          <span className="text-center text-sm sm:text-base">Analyzing...</span>
+                          <span className="text-center text-sm">Analyzing...</span>
                         </>
                       ) : (
                         <>
                           <Sparkles className="w-4 h-4 flex-shrink-0" />
-                          <span className="text-center text-sm sm:text-base font-bold">
+                          <span className="text-center text-sm font-bold">
                             Is this a good Job for you?
                           </span>
                         </>
@@ -471,7 +467,7 @@ const JobGuide = () => {
                   </Button>
 
                   {(!isComplete || !isFormValid) && !isSubmitting && !isGenerating && (
-                    <p className="text-blue-200 text-sm sm:text-base font-inter text-center">
+                    <p className="text-blue-200 text-sm font-inter text-center">
                       {!isComplete ? 'Complete your profile first to use this feature' : 'Fill in all fields to get your analysis'}
                     </p>
                   )}
@@ -483,19 +479,19 @@ const JobGuide = () => {
             {isGenerating && (
               <Card className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 border-2 border-indigo-400 shadow-2xl shadow-indigo-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/20 rounded-full flex items-center justify-center">
-                      <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 text-white animate-spin" />
+                  <CardTitle className="text-white font-inter flex items-center gap-2 text-lg">
+                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                      <Loader2 className="w-4 h-4 text-white animate-spin" />
                     </div>
                     Analyzing Job Match...
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-indigo-100 font-inter text-center text-sm sm:text-base break-words">
+                  <p className="text-indigo-100 font-inter text-center text-sm break-words">
                     {loadingMessage}
                   </p>
                   <div className="mt-3 text-center">
-                    <p className="text-indigo-200 text-sm sm:text-base font-inter">
+                    <p className="text-indigo-200 text-sm font-inter">
                       This usually takes 1-2 minutes. Please don't close this page.
                     </p>
                   </div>
@@ -507,17 +503,17 @@ const JobGuide = () => {
             {jobMatchResult && (
               <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20 w-full">
                 <CardHeader className="pb-3 bg-green-300">
-                  <CardTitle className="font-inter flex items-center gap-2 text-base sm:text-lg text-gray-950">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center bg-gray-950">
-                      <Target className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                  <CardTitle className="font-inter flex items-center gap-2 text-lg text-gray-950">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-950">
+                      <Target className="w-4 h-4 text-white" />
                     </div>
                     Job Match Analysis
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 bg-green-300 p-3 sm:p-4 w-full">
-                  <div className="bg-white rounded-lg p-2 sm:p-3 border-2 border-slate-300 w-full">
+                <CardContent className="pt-0 bg-green-300 p-4 w-full">
+                  <div className="bg-white rounded-lg p-3 border-2 border-slate-300 w-full">
                     <div 
-                      className="text-slate-800 font-inter leading-relaxed font-medium w-full text-xs sm:text-sm"
+                      className="text-slate-800 font-inter leading-relaxed font-medium w-full text-sm"
                       style={{
                         wordWrap: 'break-word',
                         overflowWrap: 'break-word',
@@ -539,15 +535,15 @@ const JobGuide = () => {
             {isSuccess && !isGenerating && !jobMatchResult && (
               <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/20 rounded-full flex items-center justify-center">
-                      <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                  <CardTitle className="text-white font-inter flex items-center gap-2 text-lg">
+                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4 text-white" />
                     </div>
                     Analysis Submitted Successfully!
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-green-100 font-inter text-sm sm:text-base break-words">
+                  <p className="text-green-100 font-inter text-sm break-words">
                     Your job analysis has been submitted and is being processed. 
                     The analysis will appear below once completed.
                   </p>
@@ -559,20 +555,20 @@ const JobGuide = () => {
             {error && (
               <Card className="bg-gradient-to-br from-red-600 via-red-700 to-red-800 border-2 border-red-400 shadow-2xl shadow-red-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
-                    <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <CardTitle className="text-white font-inter flex items-center gap-2 text-lg">
+                    <AlertCircle className="w-5 h-5" />
                     Analysis Error
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-red-100 font-inter text-sm sm:text-base break-words">{error}</p>
+                  <p className="text-red-100 font-inter text-sm break-words">{error}</p>
                   <Button 
                     onClick={() => {
                       setError(null);
                       isSubmissionInProgressRef.current = false;
                       lastSubmissionDataRef.current = '';
                     }}
-                    className="mt-3 bg-white text-red-600 hover:bg-gray-100 font-inter font-medium text-sm sm:text-base px-4 py-2"
+                    className="mt-3 bg-white text-red-600 hover:bg-gray-100 font-inter font-medium text-sm px-4 py-2"
                     disabled={isSubmitting || isGenerating || !isFormValid}
                   >
                     Try Again

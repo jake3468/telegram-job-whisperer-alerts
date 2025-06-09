@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { AlertCircle, FileText, Sparkles, Loader2, CheckCircle, Copy, Trash2, Building, Briefcase } from 'lucide-react';
+import { AlertCircle, FileText, Sparkles, Loader2, CheckCircle, Trash2, Building, Briefcase, FileEdit } from 'lucide-react';
 import AuthHeader from '@/components/AuthHeader';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import { supabase } from '@/integrations/supabase/client';
@@ -38,9 +37,9 @@ const CoverLetter = () => {
 
   const loadingMessages = [
     "✍️ Crafting your personalized cover letter...",
-    "🎨 Tailoring content to match the job requirements...",
-    "📝 Highlighting your relevant experience...",
-    "✨ Adding the perfect finishing touches..."
+    "📝 Tailoring content to match the job requirements...",
+    "🎯 Highlighting your relevant skills and experience...",
+    "✨ Finalizing your professional cover letter..."
   ];
 
   useEffect(() => {
@@ -87,8 +86,8 @@ const CoverLetter = () => {
           }
           
           toast({
-            title: "Cover Letter Complete!",
-            description: "Your personalized cover letter is ready."
+            title: "Cover Letter Ready!",
+            description: "Your personalized cover letter has been generated."
           });
         }
       } catch (err) {
@@ -107,7 +106,7 @@ const CoverLetter = () => {
       setError('Cover letter generation timed out. Please try again.');
       toast({
         title: "Generation Timeout",
-        description: "The cover letter took too long to generate. Please try submitting again.",
+        description: "The cover letter generation took too long. Please try submitting again.",
         variant: "destructive"
       });
     }, 300000);
@@ -144,25 +143,6 @@ const CoverLetter = () => {
       title: "Data Cleared",
       description: "All form data and results have been cleared."
     });
-  };
-
-  const handleCopyToClipboard = async () => {
-    if (!coverLetterResult) return;
-    
-    try {
-      await navigator.clipboard.writeText(coverLetterResult);
-      toast({
-        title: "Copied!",
-        description: "Cover letter copied to clipboard."
-      });
-    } catch (err) {
-      console.error('Failed to copy:', err);
-      toast({
-        title: "Copy Failed",
-        description: "Failed to copy to clipboard. Please try selecting and copying manually.",
-        variant: "destructive"
-      });
-    }
   };
 
   const handleSubmit = async () => {
@@ -263,7 +243,6 @@ const CoverLetter = () => {
         setIsSuccess(true);
         setIsGenerating(true);
         
-        // Call the webhook with cover_letter type
         const webhookPayload = {
           user: {
             id: userData.id,
@@ -290,8 +269,8 @@ const CoverLetter = () => {
         });
         
         toast({
-          title: "Generation Started!",
-          description: "Your cover letter is being generated. Please wait for the results."
+          title: "Cover Letter Generation Started!",
+          description: "Your personalized cover letter is being created. Please wait for the results."
         });
       }
     } catch (err) {
@@ -316,7 +295,7 @@ const CoverLetter = () => {
   if (!isLoaded || !user) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white text-sm">Loading...</div>
+        <div className="text-white text-xs">Loading...</div>
       </div>
     );
   }
@@ -326,34 +305,32 @@ const CoverLetter = () => {
       <div className="min-h-screen bg-black">
         <AuthHeader />
         
-        <div className="max-w-4xl mx-auto px-2 py-6 sm:px-4 sm:py-8">
-          <div className="text-center mb-6">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-medium text-white mb-2 font-inter">
-              <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-                Cover Letter Generator
-              </span>
+        <div className="max-w-4xl mx-auto px-3 py-8 sm:px-4 sm:py-12">
+          <div className="text-center mb-8">
+            <h1 className="sm:text-xl font-medium text-white mb-2 font-inter text-3xl md:text-3xl">
+              Cover <span className="bg-gradient-to-r from-purple-500 to-pink-600 bg-clip-text text-transparent text-3xl">Letter</span>
             </h1>
-            <p className="text-sm sm:text-base text-gray-300 font-inter font-light">
-              Get a personalized cover letter tailored to your profile and the job
+            <p className="text-sm text-gray-300 font-inter font-light">
+              Generate a personalized cover letter tailored to this job opportunity
             </p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-6">
             {/* Profile Completion Status */}
             {loading ? (
               <Card className="bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border-2 border-gray-400 shadow-2xl shadow-gray-500/20">
                 <CardContent className="p-4">
-                  <div className="text-white text-sm sm:text-base">Checking your profile...</div>
+                  <div className="text-white text-sm">Checking your profile...</div>
                 </CardContent>
               </Card>
             ) : !isComplete && (
               <Card className="bg-gradient-to-br from-orange-600 via-red-600 to-pink-600 border-2 border-orange-400 shadow-2xl shadow-orange-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
-                    <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <CardTitle className="text-white font-inter flex items-center gap-2 text-lg">
+                    <AlertCircle className="w-5 h-5" />
                     Complete Your Profile
                   </CardTitle>
-                  <CardDescription className="text-orange-100 font-inter text-sm sm:text-base">
+                  <CardDescription className="text-orange-100 font-inter text-sm">
                     You need to complete your profile before generating a cover letter
                   </CardDescription>
                 </CardHeader>
@@ -361,20 +338,20 @@ const CoverLetter = () => {
                   <div className="space-y-2">
                     <div className={`flex items-center gap-2 ${hasResume ? 'text-green-200' : 'text-red-200'}`}>
                       <div className={`w-2 h-2 rounded-full ${hasResume ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                      <span className="font-inter text-sm sm:text-base">
+                      <span className="font-inter text-sm">
                         {hasResume ? '✓ Resume uploaded' : '✗ Resume not uploaded'}
                       </span>
                     </div>
                     <div className={`flex items-center gap-2 ${hasBio ? 'text-green-200' : 'text-red-200'}`}>
                       <div className={`w-2 h-2 rounded-full ${hasBio ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                      <span className="font-inter text-sm sm:text-base">
+                      <span className="font-inter text-sm">
                         {hasBio ? '✓ Bio completed' : '✗ Bio not completed'}
                       </span>
                     </div>
                   </div>
                   <Button 
                     onClick={() => navigate('/dashboard')} 
-                    className="font-inter bg-white text-orange-600 hover:bg-gray-100 font-medium text-sm sm:text-base px-4 py-2"
+                    className="font-inter bg-white text-orange-600 hover:bg-gray-100 font-medium text-sm px-4 py-2"
                   >
                     Go to Home Page
                   </Button>
@@ -385,30 +362,30 @@ const CoverLetter = () => {
             {/* Job Input Form */}
             <Card className="bg-gradient-to-br from-purple-600 via-pink-600 to-rose-600 border-2 border-purple-400 shadow-2xl shadow-purple-500/20">
               <CardHeader className="pb-3">
-                <CardTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
-                  <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/20 rounded-full flex items-center justify-center">
-                    <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                <CardTitle className="text-white font-inter flex items-center gap-2 text-lg">
+                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                    <FileText className="w-4 h-4 text-white" />
                   </div>
                   Job Information
                   {hasAnyData && (
                     <Button 
                       onClick={handleClearData}
                       size="sm" 
-                      className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-xs sm:text-sm px-2 py-1"
+                      className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm px-2 py-1"
                     >
                       <Trash2 className="w-3 h-3 mr-1" />
                       Clear All
                     </Button>
                   )}
                 </CardTitle>
-                <CardDescription className="text-purple-100 font-inter text-sm sm:text-base">
-                  Enter job details to generate your personalized cover letter
+                <CardDescription className="text-purple-100 font-inter text-sm">
+                  Enter job details to generate a personalized cover letter
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 pt-0">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-white font-inter font-medium mb-2 text-sm sm:text-base">
+                    <label className="block text-white font-inter font-medium mb-2 text-sm">
                       🏢 Company Name
                     </label>
                     <div className="relative">
@@ -418,13 +395,13 @@ const CoverLetter = () => {
                         onChange={(e) => handleInputChange('companyName', e.target.value)}
                         placeholder="Enter the company name"
                         disabled={isSubmitting || isGenerating}
-                        className="pl-10 text-sm sm:text-base border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-purple-900"
+                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-purple-900"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-white font-inter font-medium mb-2 text-sm sm:text-base">
+                    <label className="block text-white font-inter font-medium mb-2 text-sm">
                       💼 Job Title
                     </label>
                     <div className="relative">
@@ -434,24 +411,24 @@ const CoverLetter = () => {
                         onChange={(e) => handleInputChange('jobTitle', e.target.value)}
                         placeholder="Enter the job title"
                         disabled={isSubmitting || isGenerating}
-                        className="pl-10 text-sm sm:text-base border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-purple-900"
+                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-purple-900"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-white font-inter font-medium mb-2 text-sm sm:text-base">
+                    <label className="block text-white font-inter font-medium mb-2 text-sm">
                       📝 Job Description
                     </label>
                     <div className="relative">
-                      <FileText className="absolute left-3 top-3 text-white/70 w-4 h-4" />
+                      <FileEdit className="absolute left-3 top-3 text-white/70 w-4 h-4" />
                       <Textarea 
                         value={formData.jobDescription}
                         onChange={(e) => handleInputChange('jobDescription', e.target.value)}
                         placeholder="Paste the complete job description here..."
                         rows={4}
                         disabled={isSubmitting || isGenerating}
-                        className="pl-10 text-sm sm:text-base border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-purple-900 resize-none"
+                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-purple-900 resize-none"
                       />
                     </div>
                   </div>
@@ -461,7 +438,7 @@ const CoverLetter = () => {
                   <Button 
                     onClick={handleSubmit}
                     disabled={isButtonDisabled}
-                    className={`w-full font-inter font-medium py-3 px-4 text-sm sm:text-base ${
+                    className={`w-full font-inter font-medium py-3 px-4 text-sm ${
                       !isButtonDisabled 
                         ? 'bg-white text-purple-600 hover:bg-gray-100' 
                         : 'bg-white/50 text-gray-800 border-2 border-white/70 cursor-not-allowed hover:bg-white/50'
@@ -471,17 +448,17 @@ const CoverLetter = () => {
                       {isSubmitting ? (
                         <>
                           <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
-                          <span className="text-center text-sm sm:text-base">Processing...</span>
+                          <span className="text-center text-sm">Processing...</span>
                         </>
                       ) : isGenerating ? (
                         <>
                           <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
-                          <span className="text-center text-sm sm:text-base">Generating...</span>
+                          <span className="text-center text-sm">Generating...</span>
                         </>
                       ) : (
                         <>
                           <Sparkles className="w-4 h-4 flex-shrink-0" />
-                          <span className="text-center text-sm sm:text-base font-bold">
+                          <span className="text-center text-sm font-bold">
                             Get your Cover Letter
                           </span>
                         </>
@@ -490,7 +467,7 @@ const CoverLetter = () => {
                   </Button>
 
                   {(!isComplete || !isFormValid) && !isSubmitting && !isGenerating && (
-                    <p className="text-purple-200 text-sm sm:text-base font-inter text-center">
+                    <p className="text-purple-200 text-sm font-inter text-center">
                       {!isComplete ? 'Complete your profile first to use this feature' : 'Fill in all fields to generate your cover letter'}
                     </p>
                   )}
@@ -500,21 +477,21 @@ const CoverLetter = () => {
 
             {/* Generating Status Display */}
             {isGenerating && (
-              <Card className="bg-gradient-to-br from-pink-600 via-rose-600 to-orange-600 border-2 border-pink-400 shadow-2xl shadow-pink-500/20">
+              <Card className="bg-gradient-to-br from-pink-600 via-rose-600 to-red-600 border-2 border-pink-400 shadow-2xl shadow-pink-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/20 rounded-full flex items-center justify-center">
-                      <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 text-white animate-spin" />
+                  <CardTitle className="text-white font-inter flex items-center gap-2 text-lg">
+                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                      <Loader2 className="w-4 h-4 text-white animate-spin" />
                     </div>
-                    Generating Your Cover Letter...
+                    Generating Cover Letter...
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-pink-100 font-inter text-center text-sm sm:text-base break-words">
+                  <p className="text-pink-100 font-inter text-center text-sm break-words">
                     {loadingMessage}
                   </p>
                   <div className="mt-3 text-center">
-                    <p className="text-pink-200 text-sm sm:text-base font-inter">
+                    <p className="text-pink-200 text-sm font-inter">
                       This usually takes 1-2 minutes. Please don't close this page.
                     </p>
                   </div>
@@ -522,50 +499,32 @@ const CoverLetter = () => {
               </Card>
             )}
 
-            {/* Cover Letter Results Display */}
+            {/* Job Match Results Display */}
             {coverLetterResult && (
-              <Card className="bg-gradient-to-br from-blue-800 via-blue-700 to-blue-600 border-2 border-blue-400 shadow-2xl shadow-blue-500/20 w-full">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/20 rounded-full flex items-center justify-center">
-                      <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+              <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20 w-full">
+                <CardHeader className="pb-3 bg-blue-300">
+                  <CardTitle className="font-inter flex items-center gap-2 text-lg text-gray-950">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-950">
+                      <FileText className="w-4 h-4 text-white" />
                     </div>
                     Your Cover Letter
-                    <Button 
-                      onClick={handleCopyToClipboard}
-                      size="sm" 
-                      className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-xs sm:text-sm px-2 py-1"
-                    >
-                      <Copy className="w-3 h-3 mr-1" />
-                      Copy
-                    </Button>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 p-3 sm:p-4 w-full">
-                  <div 
-                    className="bg-white rounded-lg p-2 sm:p-3 border-2 border-blue-300 shadow-inner w-full"
-                    style={{
-                      backgroundImage: `linear-gradient(to right, #e5e7eb 1px, transparent 1px)`,
-                      backgroundSize: '20px 100%',
-                      paddingLeft: '12px'
-                    }}
-                  >
-                    <div className="relative w-full">
-                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-300 rounded"></div>
-                      <div 
-                        className="text-slate-800 font-inter font-medium pl-2 sm:pl-3 w-full text-xs sm:text-sm"
-                        style={{
-                          wordWrap: 'break-word',
-                          overflowWrap: 'break-word',
-                          wordBreak: 'break-word',
-                          whiteSpace: 'pre-wrap',
-                          maxWidth: '100%',
-                          hyphens: 'auto',
-                          lineHeight: '1.4'
-                        }}
-                      >
-                        {coverLetterResult}
-                      </div>
+                <CardContent className="pt-0 bg-blue-300 p-4 w-full">
+                  <div className="bg-white rounded-lg p-3 border-2 border-slate-300 w-full">
+                    <div 
+                      className="text-slate-800 font-inter leading-relaxed font-medium w-full text-sm"
+                      style={{
+                        wordWrap: 'break-word',
+                        overflowWrap: 'break-word',
+                        wordBreak: 'break-word',
+                        whiteSpace: 'pre-wrap',
+                        maxWidth: '100%',
+                        hyphens: 'auto',
+                        lineHeight: '1.4'
+                      }}
+                    >
+                      {coverLetterResult}
                     </div>
                   </div>
                 </CardContent>
@@ -576,15 +535,15 @@ const CoverLetter = () => {
             {isSuccess && !isGenerating && !coverLetterResult && (
               <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/20 rounded-full flex items-center justify-center">
-                      <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                  <CardTitle className="text-white font-inter flex items-center gap-2 text-lg">
+                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4 text-white" />
                     </div>
-                    Generation Started Successfully!
+                    Cover Letter Generation Started!
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-green-100 font-inter text-sm sm:text-base break-words">
+                  <p className="text-green-100 font-inter text-sm break-words">
                     Your cover letter generation has been submitted and is being processed. 
                     The cover letter will appear below once completed.
                   </p>
@@ -596,20 +555,20 @@ const CoverLetter = () => {
             {error && (
               <Card className="bg-gradient-to-br from-red-600 via-red-700 to-red-800 border-2 border-red-400 shadow-2xl shadow-red-500/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
-                    <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <CardTitle className="text-white font-inter flex items-center gap-2 text-lg">
+                    <AlertCircle className="w-5 h-5" />
                     Generation Error
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-red-100 font-inter text-sm sm:text-base break-words">{error}</p>
+                  <p className="text-red-100 font-inter text-sm break-words">{error}</p>
                   <Button 
                     onClick={() => {
                       setError(null);
                       isSubmissionInProgressRef.current = false;
                       lastSubmissionDataRef.current = '';
                     }}
-                    className="mt-3 bg-white text-red-600 hover:bg-gray-100 font-inter font-medium text-sm sm:text-base px-4 py-2"
+                    className="mt-3 bg-white text-red-600 hover:bg-gray-100 font-inter font-medium text-sm px-4 py-2"
                     disabled={isSubmitting || isGenerating || !isFormValid}
                   >
                     Try Again

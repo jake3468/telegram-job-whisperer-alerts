@@ -1,4 +1,3 @@
-
 import { User, Bell, Target, FileText } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, useSidebar } from '@/components/ui/sidebar';
@@ -9,7 +8,7 @@ const navigationItems = [{
   url: '/dashboard',
   icon: User
 }, {
-  title: 'Job Alerts',
+  title: 'Telegram Job Alerts',
   url: '/job-alerts',
   icon: Bell
 }, {
