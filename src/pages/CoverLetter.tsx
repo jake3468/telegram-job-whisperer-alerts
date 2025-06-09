@@ -156,14 +156,18 @@ const CoverLetter = () => {
       title: formData.jobTitle,
       description: formData.jobDescription
     });
+    
+    // Enhanced duplicate submission prevention
     if (isSubmissionInProgressRef.current) {
       console.log('Submission already in progress, ignoring duplicate click');
       return;
     }
+    
     if (lastSubmissionDataRef.current === submissionData && (isSubmitting || isGenerating)) {
       console.log('Same data already being processed, ignoring duplicate click');
       return;
     }
+
     if (!isComplete) {
       toast({
         title: "Complete your profile first",
@@ -172,6 +176,7 @@ const CoverLetter = () => {
       });
       return;
     }
+
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
         title: "Missing information",
@@ -180,53 +185,74 @@ const CoverLetter = () => {
       });
       return;
     }
+
+    // Set flags immediately to prevent duplicates
     isSubmissionInProgressRef.current = true;
     lastSubmissionDataRef.current = submissionData;
     setIsSubmitting(true);
     setError(null);
     setIsSuccess(false);
     setCoverLetterResult(null);
+
     try {
-      const {
-        data: userData,
-        error: userError
-      } = await supabase.from('users').select('id').eq('clerk_id', user?.id).single();
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('clerk_id', user?.id)
+        .single();
+
       if (userError || !userData) {
         throw new Error('User not found in database');
       }
-      const {
-        data: existingAnalysis,
-        error: checkError
-      } = await supabase.from('job_analyses').select('id, cover_letter').eq('user_id', userData.id).eq('company_name', formData.companyName).eq('job_title', formData.jobTitle).eq('job_description', formData.jobDescription).not('cover_letter', 'is', null).order('created_at', {
-        ascending: false
-      }).limit(1);
+
+      // Check for existing analysis first to prevent duplicate webhook calls
+      const { data: existingAnalysis, error: checkError } = await supabase
+        .from('job_analyses')
+        .select('id, cover_letter')
+        .eq('user_id', userData.id)
+        .eq('company_name', formData.companyName)
+        .eq('job_title', formData.jobTitle)
+        .eq('job_description', formData.jobDescription)
+        .not('cover_letter', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
       if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
         const existing = existingAnalysis[0];
         setCoverLetterResult(existing.cover_letter);
         setAnalysisId(existing.id);
+        setIsSubmitting(false);
+        isSubmissionInProgressRef.current = false;
         toast({
           title: "Previous Cover Letter Found",
           description: "Using your previous cover letter for this job posting."
         });
         return;
       }
-      const {
-        data: insertedData,
-        error: insertError
-      } = await supabase.from('job_analyses').insert({
-        user_id: userData.id,
-        company_name: formData.companyName,
-        job_title: formData.jobTitle,
-        job_description: formData.jobDescription
-      }).select('id').single();
+
+      // Insert new analysis
+      const { data: insertedData, error: insertError } = await supabase
+        .from('job_analyses')
+        .insert({
+          user_id: userData.id,
+          company_name: formData.companyName,
+          job_title: formData.jobTitle,
+          job_description: formData.jobDescription
+        })
+        .select('id')
+        .single();
+
       if (insertError) {
         console.error('Insert error:', insertError);
         throw new Error(`Database insert failed: ${insertError.message}`);
       }
+
       if (insertedData?.id) {
         setAnalysisId(insertedData.id);
         setIsSuccess(true);
         setIsGenerating(true);
+
+        // Create webhook payload with unique identifiers
         const webhookPayload = {
           user: {
             id: userData.id,
@@ -245,11 +271,21 @@ const CoverLetter = () => {
           },
           event_type: 'job_analysis_created',
           webhook_type: 'cover_letter',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          submission_id: `${insertedData.id}-${Date.now()}` // Add unique submission ID
         };
-        await supabase.functions.invoke('job-analysis-webhook', {
+
+        // Call webhook only once
+        console.log('Calling webhook for analysis ID:', insertedData.id);
+        const { error: webhookError } = await supabase.functions.invoke('job-analysis-webhook', {
           body: webhookPayload
         });
+        
+        if (webhookError) {
+          console.error('Webhook error:', webhookError);
+          // Don't throw here, let the polling handle retries
+        }
+
         toast({
           title: "Cover Letter Generation Started!",
           description: "Your personalized cover letter is being created. Please wait for the results."

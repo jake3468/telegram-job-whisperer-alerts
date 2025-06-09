@@ -8,6 +8,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Track recent webhook executions to prevent duplicates
+const recentExecutions = new Map<string, number>();
+const EXECUTION_WINDOW = 30000; // 30 seconds window to prevent duplicates
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -25,6 +29,40 @@ serve(async (req) => {
     const webhookType = payload.webhook_type || 'cover_letter'; // default to cover letter for backward compatibility
     const webhookEnvVar = webhookType === 'job_guide' ? 'N8N_JG_WEBHOOK_URL' : 'N8N_CL_WEBHOOK_URL';
     
+    // Create a unique key for this execution
+    const executionKey = `${payload.job_analysis?.id}-${webhookType}-${payload.user?.id}`;
+    const now = Date.now();
+    
+    // Check if this exact request was made recently
+    if (recentExecutions.has(executionKey)) {
+      const lastExecution = recentExecutions.get(executionKey)!;
+      if (now - lastExecution < EXECUTION_WINDOW) {
+        console.log(`Duplicate webhook execution detected for key: ${executionKey}. Skipping.`);
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            message: 'Duplicate execution prevented', 
+            type: webhookType,
+            skipped: true 
+          }), 
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+    }
+    
+    // Record this execution
+    recentExecutions.set(executionKey, now);
+    
+    // Clean up old executions (older than 5 minutes)
+    const fiveMinutesAgo = now - 300000;
+    for (const [key, timestamp] of recentExecutions.entries()) {
+      if (timestamp < fiveMinutesAgo) {
+        recentExecutions.delete(key);
+      }
+    }
+    
     // Get the webhook URL from edge function secrets
     const webhookUrl = Deno.env.get(webhookEnvVar);
     
@@ -37,6 +75,39 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       );
+    }
+
+    // Initialize Supabase client to check for existing webhook executions
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    if (supabaseUrl && supabaseServiceKey) {
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      
+      // Check if this analysis already has the corresponding result field populated
+      const { data: existingAnalysis, error: checkError } = await supabase
+        .from('job_analyses')
+        .select(webhookType === 'job_guide' ? 'job_match' : 'cover_letter')
+        .eq('id', payload.job_analysis?.id)
+        .single();
+      
+      if (!checkError && existingAnalysis) {
+        const resultField = webhookType === 'job_guide' ? 'job_match' : 'cover_letter';
+        if (existingAnalysis[resultField]) {
+          console.log(`Analysis ${payload.job_analysis?.id} already has ${resultField} result. Skipping webhook.`);
+          return new Response(
+            JSON.stringify({ 
+              success: true, 
+              message: 'Analysis already processed', 
+              type: webhookType,
+              skipped: true 
+            }), 
+            { 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+            }
+          );
+        }
+      }
     }
 
     // Forward the payload to n8n webhook
@@ -52,6 +123,8 @@ serve(async (req) => {
 
     if (!response.ok) {
       console.error(`Failed to send webhook to n8n (${webhookType}):`, response.status, response.statusText);
+      // Remove from recent executions since it failed
+      recentExecutions.delete(executionKey);
       return new Response(
         JSON.stringify({ 
           error: 'Failed to send webhook', 
@@ -65,10 +138,15 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Successfully sent webhook to n8n (${webhookType})`);
+    console.log(`Successfully sent webhook to n8n (${webhookType}) for execution key: ${executionKey}`);
     
     return new Response(
-      JSON.stringify({ success: true, message: 'Webhook sent successfully', type: webhookType }), 
+      JSON.stringify({ 
+        success: true, 
+        message: 'Webhook sent successfully', 
+        type: webhookType,
+        executionKey: executionKey 
+      }), 
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
