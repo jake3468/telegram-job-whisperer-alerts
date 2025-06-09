@@ -356,7 +356,7 @@ const JobGuide = () => {
                     </label>
                     <div className="relative">
                       <FileText className="absolute left-3 top-3 text-white/70 w-4 h-4" />
-                      <Textarea value={formData.jobDescription} onChange={e => handleInputChange('jobDescription', e.target.value)} placeholder="Paste the complete job description here..." rows={4} disabled={isSubmitting || isGenerating} className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-blue-900 resize-none placeholder:text-sm" />
+                      <Textarea value={formData.jobDescription} onChange={e => handleInputChange('jobDescription', e.target.value)} placeholder="Paste the complete job description here..." rows={4} disabled={isSubmitting || isGenerating} className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 resize-none placeholder:text-sm bg-gray-900" />
                     </div>
                   </div>
                 </div>
