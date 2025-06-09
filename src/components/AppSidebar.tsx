@@ -1,8 +1,9 @@
 
-import { User, Bell, Target, FileText } from 'lucide-react';
+import { User, Bell, Target, FileText, X } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, useSidebar } from '@/components/ui/sidebar';
 import { SignedIn, UserButton, useUser } from '@clerk/clerk-react';
+import { Button } from '@/components/ui/button';
 
 const profileItems = [{
   title: 'Profile',
@@ -26,7 +27,9 @@ const toolItems = [{
 
 export function AppSidebar() {
   const {
-    state
+    state,
+    isMobile,
+    setOpenMobile
   } = useSidebar();
   const {
     user
@@ -43,6 +46,16 @@ export function AppSidebar() {
                 Job AI
               </p>
             </div>}
+          {isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setOpenMobile(false)}
+              className="h-8 w-8 text-white hover:bg-white/10"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </SidebarHeader>
 

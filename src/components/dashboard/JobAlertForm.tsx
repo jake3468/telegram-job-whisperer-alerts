@@ -83,12 +83,16 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
 
       if (userError) throw userError;
 
+      // Store only the country code instead of the full country name
+      const countryToStore = countries.find(c => c.name === formData.country)?.code || formData.country;
+
       if (editingAlert) {
         // Update existing alert
         const { error } = await supabase
           .from('job_alerts')
           .update({
             ...formData,
+            country: countryToStore,
             user_id: userData.id
           })
           .eq('id', editingAlert.id);
@@ -105,6 +109,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
           .from('job_alerts')
           .insert({
             ...formData,
+            country: countryToStore,
             user_id: userData.id
           });
 
@@ -137,7 +142,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
   };
 
   const getCountryDisplayValue = (countryValue: string) => {
-    const country = countries.find(c => c.name === countryValue);
+    const country = countries.find(c => c.name === countryValue || c.code === countryValue);
     return country ? `${country.name} (${country.code})` : countryValue;
   };
 
