@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Bell, Plus } from 'lucide-react';
 import JobAlertForm from './JobAlertForm';
 import JobAlertsList from './JobAlertsList';
+import BotStatus from './BotStatus';
 
 interface JobAlert {
   id: string;
@@ -33,6 +35,7 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingAlert, setEditingAlert] = useState<JobAlert | null>(null);
+  const [isActivated, setIsActivated] = useState<boolean>(false);
 
   useEffect(() => {
     fetchJobAlerts();
@@ -74,16 +77,41 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
   };
 
   const handleCreateAlert = () => {
+    if (!isActivated) {
+      toast({
+        title: "Bot not activated",
+        description: "Please activate your bot first to create job alerts.",
+        variant: "destructive",
+      });
+      return;
+    }
     setEditingAlert(null);
     setShowForm(true);
   };
 
   const handleEditAlert = (alert: JobAlert) => {
+    if (!isActivated) {
+      toast({
+        title: "Bot not activated",
+        description: "Please activate your bot first to edit job alerts.",
+        variant: "destructive",
+      });
+      return;
+    }
     setEditingAlert(alert);
     setShowForm(true);
   };
 
   const handleDeleteAlert = async (alertId: string) => {
+    if (!isActivated) {
+      toast({
+        title: "Bot not activated",
+        description: "Please activate your bot first to delete job alerts.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('job_alerts')
@@ -119,6 +147,10 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
     setEditingAlert(null);
   };
 
+  const handleActivationChange = (activated: boolean) => {
+    setIsActivated(activated);
+  };
+
   if (loading) {
     return (
       <Card className="bg-gradient-to-br from-orange-500 via-red-500 to-pink-600 border-2 border-orange-400 shadow-2xl shadow-orange-500/20">
@@ -144,7 +176,7 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
               Set up personalized job alerts based on your preferences
             </CardDescription>
           </div>
-          {!showForm && (
+          {!showForm && isActivated && (
             <Button onClick={handleCreateAlert} className="font-inter bg-white text-orange-600 hover:bg-gray-100 font-medium text-xs px-3 py-1 h-8 flex-shrink-0">
               <Plus className="w-3 h-3 mr-1" />
               Add Alert
@@ -153,21 +185,38 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        {showForm && (
-          <div className="mb-6">
-            <JobAlertForm
-              userTimezone={userTimezone}
-              editingAlert={editingAlert}
-              onSubmit={handleFormSubmit}
-              onCancel={handleFormCancel}
+        {/* Bot Status Component */}
+        <BotStatus onActivationChange={handleActivationChange} />
+
+        {/* Job Alerts Form and List - Only show when activated */}
+        {isActivated && (
+          <>
+            {showForm && (
+              <div className="mb-6">
+                <JobAlertForm
+                  userTimezone={userTimezone}
+                  editingAlert={editingAlert}
+                  onSubmit={handleFormSubmit}
+                  onCancel={handleFormCancel}
+                />
+              </div>
+            )}
+            <JobAlertsList
+              alerts={alerts}
+              onEdit={handleEditAlert}
+              onDelete={handleDeleteAlert}
             />
+          </>
+        )}
+
+        {/* Message when bot is not activated */}
+        {!isActivated && (
+          <div className="text-center py-6">
+            <Bell className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+            <p className="text-gray-300 font-inter text-base mb-1">Activate your bot to manage job alerts</p>
+            <p className="text-gray-400 font-inter text-sm">Follow the instructions above to get started</p>
           </div>
         )}
-        <JobAlertsList
-          alerts={alerts}
-          onEdit={handleEditAlert}
-          onDelete={handleDeleteAlert}
-        />
       </CardContent>
     </Card>
   );

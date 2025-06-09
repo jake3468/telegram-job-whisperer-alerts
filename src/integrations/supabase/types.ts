@@ -110,6 +110,7 @@ export type Database = {
         Row: {
           activated: boolean | null
           bio: string | null
+          bot_id: string
           chat_id: number | null
           clerk_id: string
           created_at: string
@@ -123,6 +124,7 @@ export type Database = {
         Insert: {
           activated?: boolean | null
           bio?: string | null
+          bot_id?: string
           chat_id?: number | null
           clerk_id: string
           created_at?: string
@@ -136,6 +138,7 @@ export type Database = {
         Update: {
           activated?: boolean | null
           bio?: string | null
+          bot_id?: string
           chat_id?: number | null
           clerk_id?: string
           created_at?: string
