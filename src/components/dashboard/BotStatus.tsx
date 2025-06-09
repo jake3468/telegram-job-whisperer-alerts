@@ -87,7 +87,7 @@ const BotStatus = ({ onActivationChange }: BotStatusProps) => {
     <div className="mb-6">
       {/* Bot ID Display */}
       <div className="bg-white/10 rounded-lg p-4 mb-4">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-3">
           <span className="text-white font-inter text-sm">Bot ID:</span>
           <div className="flex items-center gap-2">
             <code className="text-orange-200 font-mono text-sm bg-black/20 px-2 py-1 rounded">
@@ -103,10 +103,10 @@ const BotStatus = ({ onActivationChange }: BotStatusProps) => {
           </div>
         </div>
         
-        {/* Activation Status */}
-        <div className="flex items-center gap-2">
+        {/* Activation Status - Wrapped in white rectangle */}
+        <div className="bg-white/90 rounded-lg p-3 flex items-center gap-2">
           <div className={`w-2 h-2 rounded-full ${isActivated ? 'bg-green-500' : 'bg-red-500'}`}></div>
-          <span className={`text-sm font-inter ${isActivated ? 'text-green-400' : 'text-red-400'}`}>
+          <span className={`text-sm font-inter font-medium ${isActivated ? 'text-green-600' : 'text-red-600'}`}>
             {isActivated ? 'Bot Activated' : 'Bot not yet Activated'}
           </span>
         </div>
@@ -118,19 +118,22 @@ const BotStatus = ({ onActivationChange }: BotStatusProps) => {
           <div className="prose prose-invert max-w-none">
             <h3 className="text-lg font-medium text-white mb-4 font-inter">🤖 How to Activate the Job Bot on Telegram:</h3>
             
-            <ol className="text-sm space-y-2 font-inter text-gray-200">
+            <ol className="text-sm space-y-2 font-inter text-gray-200 list-decimal list-inside">
               <li>Open your 'Telegram' app</li>
-              <li className="flex items-center gap-2">
-                Copy the bot name: 
-                <div className="flex items-center gap-2 bg-black/30 px-2 py-1 rounded">
-                  <code className="text-orange-200">Job_AI_update_bot</code>
-                  <Button
-                    onClick={() => copyToClipboard('Job_AI_update_bot', 'botName')}
-                    className="h-4 w-4 p-0 bg-white/20 hover:bg-white/30 text-white"
-                    size="sm"
-                  >
-                    {copiedBotName ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                  </Button>
+              <li className="flex items-start gap-2">
+                <span className="flex-shrink-0">2.</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  Copy the bot name: 
+                  <div className="flex items-center gap-2 bg-black/30 px-2 py-1 rounded">
+                    <code className="text-orange-200">Job_AI_update_bot</code>
+                    <Button
+                      onClick={() => copyToClipboard('Job_AI_update_bot', 'botName')}
+                      className="h-4 w-4 p-0 bg-white/20 hover:bg-white/30 text-white"
+                      size="sm"
+                    >
+                      {copiedBotName ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                    </Button>
+                  </div>
                 </div>
               </li>
               <li>Paste it into Telegram's search bar 🔍 and open the bot.</li>
@@ -138,11 +141,12 @@ const BotStatus = ({ onActivationChange }: BotStatusProps) => {
               <li>The bot will ask for your "Bot ID" 🔑. Copy the Bot ID (given above) and send it to the bot.</li>
               <li>Once successful, you'll receive a message: "Bot successfully activated! ✅"</li>
               <li>🎯 You're all set! You can now set your Job Alerts below.</li>
+              <li>🔔 Make sure the Telegram bot is not muted, so you don't miss your daily job alerts.<br />🔄 Refresh this page now to check the bot activation status.</li>
             </ol>
 
             <h3 className="text-lg font-medium text-white mt-6 mb-3 font-inter">📩 What You'll Get from the Bot:</h3>
             
-            <ul className="text-sm space-y-2 font-inter text-gray-200">
+            <ul className="text-sm space-y-2 font-inter text-gray-200 list-disc list-inside">
               <li><strong>Daily job alerts tailored to your profile</strong>, with a detailed analysis for each job.</li>
               <li>Each job message includes a <strong>"Get Cover Letter"</strong> button for instant, personalized cover letters.</li>
               <li>You can also <strong>send any job post URL</strong>, and the bot will analyze whether the job is a good fit for you or not.</li>
