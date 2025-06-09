@@ -153,6 +153,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_old_job_analyses: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_clerk_user_id: {
         Args: Record<PropertyKey, never>
         Returns: string

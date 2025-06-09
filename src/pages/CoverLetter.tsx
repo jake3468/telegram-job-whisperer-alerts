@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +12,7 @@ import AuthHeader from '@/components/AuthHeader';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import { supabase } from '@/integrations/supabase/client';
 import { Layout } from '@/components/Layout';
+import JobAnalysisHistory from '@/components/JobAnalysisHistory';
 
 const CoverLetter = () => {
   const { user, isLoaded } = useUser();
@@ -362,9 +364,9 @@ const CoverLetter = () => {
             {/* Job Input Form */}
             <Card className="bg-gradient-to-br from-purple-600 via-pink-600 to-rose-600 border-2 border-purple-400 shadow-2xl shadow-purple-500/20">
               <CardHeader className="pb-3">
-                <CardTitle className="text-white font-inter flex items-center gap-2 text-sm">
+                <CardTitle className="text-white font-inter flex items-center gap-2 text-base">
                   <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-                    <FileText className="w-3 h-3 text-white" />
+                    <FileText className="w-4 h-4 text-white" />
                   </div>
                   Job Information
                   {hasAnyData && (
@@ -378,57 +380,57 @@ const CoverLetter = () => {
                     </Button>
                   )}
                 </CardTitle>
-                <CardDescription className="text-purple-100 font-inter text-xs">
+                <CardDescription className="text-purple-100 font-inter text-sm">
                   Enter job details to generate your personalized cover letter
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 pt-0">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-white font-inter font-medium mb-2 text-xs">
+                    <label className="block text-white font-inter font-medium mb-2 text-sm">
                       🏢 Company Name
                     </label>
                     <div className="relative">
-                      <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 w-3 h-3" />
+                      <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 w-4 h-4" />
                       <Input 
                         value={formData.companyName}
                         onChange={(e) => handleInputChange('companyName', e.target.value)}
                         placeholder="Enter the company name"
                         disabled={isSubmitting || isGenerating}
-                        className="pl-8 text-xs border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-purple-900"
+                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-purple-900 placeholder:text-sm"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-white font-inter font-medium mb-2 text-xs">
+                    <label className="block text-white font-inter font-medium mb-2 text-sm">
                       💼 Job Title
                     </label>
                     <div className="relative">
-                      <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 w-3 h-3" />
+                      <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 w-4 h-4" />
                       <Input 
                         value={formData.jobTitle}
                         onChange={(e) => handleInputChange('jobTitle', e.target.value)}
                         placeholder="Enter the job title"
                         disabled={isSubmitting || isGenerating}
-                        className="pl-8 text-xs border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-purple-900"
+                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-purple-900 placeholder:text-sm"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-white font-inter font-medium mb-2 text-xs">
+                    <label className="block text-white font-inter font-medium mb-2 text-sm">
                       📝 Job Description
                     </label>
                     <div className="relative">
-                      <FileText className="absolute left-3 top-3 text-white/70 w-3 h-3" />
+                      <FileText className="absolute left-3 top-3 text-white/70 w-4 h-4" />
                       <Textarea 
                         value={formData.jobDescription}
                         onChange={(e) => handleInputChange('jobDescription', e.target.value)}
                         placeholder="Paste the complete job description here..."
                         rows={4}
                         disabled={isSubmitting || isGenerating}
-                        className="pl-8 text-xs border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-purple-900 resize-none"
+                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 bg-purple-900 resize-none placeholder:text-sm"
                       />
                     </div>
                   </div>
@@ -438,7 +440,7 @@ const CoverLetter = () => {
                   <Button 
                     onClick={handleSubmit}
                     disabled={isButtonDisabled}
-                    className={`w-full font-inter font-medium py-3 px-4 text-xs ${
+                    className={`w-full font-inter font-medium py-3 px-4 text-sm ${
                       !isButtonDisabled 
                         ? 'bg-white text-purple-600 hover:bg-gray-100' 
                         : 'bg-white/50 text-gray-800 border-2 border-white/70 cursor-not-allowed hover:bg-white/50'
@@ -447,18 +449,18 @@ const CoverLetter = () => {
                     <div className="flex items-center justify-center gap-2 w-full">
                       {isSubmitting ? (
                         <>
-                          <Loader2 className="w-3 h-3 flex-shrink-0 animate-spin" />
-                          <span className="text-center text-xs">Processing...</span>
+                          <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
+                          <span className="text-center text-sm">Processing...</span>
                         </>
                       ) : isGenerating ? (
                         <>
-                          <Loader2 className="w-3 h-3 flex-shrink-0 animate-spin" />
-                          <span className="text-center text-xs">Generating...</span>
+                          <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
+                          <span className="text-center text-sm">Generating...</span>
                         </>
                       ) : (
                         <>
-                          <Sparkles className="w-3 h-3 flex-shrink-0" />
-                          <span className="text-center text-xs font-bold">
+                          <Sparkles className="w-4 h-4 flex-shrink-0" />
+                          <span className="text-center text-sm font-bold">
                             Get your Cover Letter
                           </span>
                         </>
@@ -466,8 +468,15 @@ const CoverLetter = () => {
                     </div>
                   </Button>
 
+                  {/* History Button */}
+                  <JobAnalysisHistory 
+                    type="cover_letter"
+                    gradientColors="bg-gradient-to-br from-purple-600 via-pink-600 to-rose-600"
+                    borderColors="border-2 border-purple-400"
+                  />
+
                   {(!isComplete || !isFormValid) && !isSubmitting && !isGenerating && (
-                    <p className="text-purple-200 text-xs font-inter text-center">
+                    <p className="text-purple-200 text-sm font-inter text-center">
                       {!isComplete ? 'Complete your profile first to use this feature' : 'Fill in all fields to get your cover letter'}
                     </p>
                   )}
