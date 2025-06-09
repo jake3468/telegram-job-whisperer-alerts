@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -303,21 +302,12 @@ const CoverLetter = () => {
   }
 
   return (
-    <Layout>
-      <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black text-white">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
         <AuthHeader />
         
-        <div className="max-w-4xl mx-auto px-3 py-8 sm:px-4 sm:py-12">
-          <div className="text-center mb-8">
-            <h1 className="sm:text-xl font-medium text-white mb-2 font-inter text-3xl md:text-3xl">
-              <span className="bg-gradient-to-r from-purple-500 to-pink-600 bg-clip-text text-transparent text-3xl">Cover Letter</span>
-            </h1>
-            <p className="text-sm text-gray-300 font-inter font-light">
-              Generate a personalized cover letter for your job application
-            </p>
-          </div>
-
-          <div className="space-y-6">
+        <div className="bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-xl p-8 shadow-2xl">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Profile Completion Status */}
             {loading ? (
               <Card className="bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border-2 border-gray-400 shadow-2xl shadow-gray-500/20">
@@ -585,10 +575,10 @@ const CoverLetter = () => {
                 </CardContent>
               </Card>
             )}
-          </div>
+          </form>
         </div>
       </div>
-    </Layout>
+    </div>
   );
 };
 
