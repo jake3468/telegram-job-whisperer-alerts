@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -141,32 +142,15 @@ const JobAnalysisHistory = ({ type, gradientColors, borderColors }: JobAnalysisH
           View History
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[95vw] max-w-4xl h-[90vh] max-h-[90vh] bg-black border-2 border-white/20 p-0 overflow-hidden flex flex-col relative">
-        {/* Custom close button with better visibility */}
-        <button 
-          className="absolute right-4 top-4 z-50 rounded-sm opacity-90 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none bg-white/20 hover:bg-white/30 p-2"
-          onClick={() => {
-            const closeButton = document.querySelector('[data-state="open"] button[aria-label="Close"]') as HTMLButtonElement;
-            if (closeButton) closeButton.click();
-          }}
-        >
-          <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-          <span className="sr-only">Close</span>
-        </button>
-
-        {/* Sticky header */}
-        <div className="sticky top-0 z-40 bg-black/95 backdrop-blur-sm border-b border-white/10">
-          <DialogHeader className="p-4 pb-4">
-            <DialogTitle className="text-white font-inter text-lg">
-              {getTitle()}
-            </DialogTitle>
-            <DialogDescription className="text-gray-300 font-inter text-sm">
-              View your past analyses from the last 60 days. Older records are automatically deleted.
-            </DialogDescription>
-          </DialogHeader>
-        </div>
+      <DialogContent className="w-[95vw] max-w-4xl h-[90vh] max-h-[90vh] bg-black border-2 border-white/20 p-0 overflow-hidden flex flex-col">
+        <DialogHeader className="p-4 pb-0 flex-shrink-0">
+          <DialogTitle className="text-white font-inter text-lg">
+            {getTitle()}
+          </DialogTitle>
+          <DialogDescription className="text-gray-300 font-inter text-sm">
+            View your past analyses from the last 60 days. Older records are automatically deleted.
+          </DialogDescription>
+        </DialogHeader>
         
         <div className="flex-1 overflow-y-auto p-4 pt-2">
           {loading ? (
@@ -197,30 +181,12 @@ const JobAnalysisHistory = ({ type, gradientColors, borderColors }: JobAnalysisH
                               View
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="w-[95vw] max-w-4xl h-[90vh] max-h-[90vh] bg-black border-2 border-white/20 p-0 overflow-hidden flex flex-col relative">
-                            {/* Custom close button for nested dialog */}
-                            <button 
-                              className="absolute right-4 top-4 z-50 rounded-sm opacity-90 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none bg-white/20 hover:bg-white/30 p-2"
-                              onClick={() => {
-                                const closeButtons = document.querySelectorAll('[data-state="open"] button[aria-label="Close"]') as NodeListOf<HTMLButtonElement>;
-                                if (closeButtons.length > 1) closeButtons[1].click();
-                              }}
-                            >
-                              <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                              <span className="sr-only">Close</span>
-                            </button>
-
-                            {/* Sticky header for detail view */}
-                            <div className="sticky top-0 z-40 bg-black/95 backdrop-blur-sm border-b border-white/10">
-                              <DialogHeader className="p-4 pb-4">
-                                <DialogTitle className="text-white font-inter text-lg break-words pr-8">
-                                  {selectedAnalysis?.company_name} - {selectedAnalysis?.job_title}
-                                </DialogTitle>
-                              </DialogHeader>
-                            </div>
-                            
+                          <DialogContent className="w-[95vw] max-w-4xl h-[90vh] max-h-[90vh] bg-black border-2 border-white/20 p-0 overflow-hidden flex flex-col">
+                            <DialogHeader className="p-4 pb-0 flex-shrink-0">
+                              <DialogTitle className="text-white font-inter text-lg break-words">
+                                {selectedAnalysis?.company_name} - {selectedAnalysis?.job_title}
+                              </DialogTitle>
+                            </DialogHeader>
                             {selectedAnalysis && (
                               <div className="flex-1 overflow-y-auto p-4 pt-2 space-y-4">
                                 <div className="bg-white/10 rounded-lg p-4">
