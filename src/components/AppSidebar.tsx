@@ -1,110 +1,126 @@
 
-import { User, Bell, Target, FileText } from 'lucide-react';
-import { NavLink, useLocation } from 'react-router-dom';
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, useSidebar } from '@/components/ui/sidebar';
-import { SignedIn, UserButton, useUser } from '@clerk/clerk-react';
+import { Home, Target, FileText, Bell, User, Headphones } from "lucide-react"
+import { NavLink, useLocation } from "react-router-dom"
 
-const profileItems = [{
-  title: 'Profile',
-  url: '/dashboard',
-  icon: User
-}];
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarTrigger,
+  useSidebar,
+} from "@/components/ui/sidebar"
 
-const toolItems = [{
-  title: 'Telegram Job Alerts',
-  url: '/job-alerts',
-  icon: Bell
-}, {
-  title: 'Job Guide',
-  url: '/job-guide',
-  icon: Target
-}, {
-  title: 'Cover Letter',
-  url: '/cover-letter',
-  icon: FileText
-}];
+const profileItems = [
+  {
+    title: "Profile",
+    url: "/profile",
+    icon: User,
+  },
+]
+
+const toolItems = [
+  {
+    title: "Home",
+    url: "/dashboard",
+    icon: Home,
+  },
+  {
+    title: "Job Guide",
+    url: "/job-guide",
+    icon: Target,
+  },
+  {
+    title: "Cover Letter",
+    url: "/cover-letter",
+    icon: FileText,
+  },
+  {
+    title: "Telegram Job Alerts",
+    url: "/job-alerts",
+    icon: Bell,
+  },
+]
 
 export function AppSidebar() {
-  const {
-    state
-  } = useSidebar();
-  const {
-    user
-  } = useUser();
-  const location = useLocation();
-  const currentPath = location.pathname;
-  const isActive = (path: string) => currentPath === path;
-  
-  return <Sidebar className="border-r border-white/20 bg-black">
-      <SidebarHeader className="p-6 border-b border-white/10 bg-zinc-900">
-        <div className="flex items-center gap-3">
-          {state === 'expanded' && <div className="flex-1 min-w-0">
-              <p className="font-inter truncate text-4xl font-medium text-sky-300">
-                Job AI
-              </p>
-            </div>}
-        </div>
-      </SidebarHeader>
+  const { state } = useSidebar()
+  const location = useLocation()
+  const currentPath = location.pathname
 
-      <SidebarContent>
-        {/* Profile Section */}
-        <SidebarGroup className="bg-zinc-900">
-          <SidebarGroupLabel className="text-gray-300 font-inter font-medium text-xs px-3 py-2">
-            Profile
-          </SidebarGroupLabel>
+  const isActive = (path: string) => currentPath === path
+  const isToolsExpanded = toolItems.some((item) => isActive(item.url))
+
+  return (
+    <Sidebar collapsible="icon" className="border-r border-white/10">
+      <SidebarContent className="bg-black">
+        {/* Profile Items - No subheading */}
+        <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {profileItems.map(item => <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={({
-                  isActive: navIsActive
-                }) => `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${navIsActive || isActive(item.url) ? 'bg-gradient-to-r from-sky-500/20 to-sky-300/20 text-white border border-sky-400/30' : 'text-gray-300 hover:text-white hover:bg-white/5 hover:border hover:border-white/10'}`}>
-                      <item.icon className="w-5 h-5 flex-shrink-0" />
-                      {state === 'expanded' && <span className="font-medium truncate">{item.title}</span>}
+              {profileItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
+                    <NavLink
+                      to={item.url}
+                      className={({ isActive }) =>
+                        isActive
+                          ? "flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 text-white font-medium"
+                          : "flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                      }
+                    >
+                      <item.icon className="h-4 w-4" />
+                      {state === "expanded" && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
-                </SidebarMenuItem>)}
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
         {/* Tools Section */}
-        <SidebarGroup className="bg-zinc-900">
-          <SidebarGroupLabel className="text-gray-300 font-inter font-medium text-xs px-3 py-2">
+        <SidebarGroup defaultOpen={isToolsExpanded}>
+          <SidebarGroupLabel className="text-gray-400 text-xs uppercase tracking-wide font-medium">
             Tools
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {toolItems.map(item => <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={({
-                  isActive: navIsActive
-                }) => `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${navIsActive || isActive(item.url) ? 'bg-gradient-to-r from-sky-500/20 to-sky-300/20 text-white border border-sky-400/30' : 'text-gray-300 hover:text-white hover:bg-white/5 hover:border hover:border-white/10'}`}>
-                      <item.icon className="w-5 h-5 flex-shrink-0" />
-                      {state === 'expanded' && <span className="font-medium truncate">{item.title}</span>}
+              {toolItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
+                    <NavLink
+                      to={item.url}
+                      className={({ isActive }) =>
+                        isActive
+                          ? "flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 text-white font-medium"
+                          : "flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                      }
+                    >
+                      <item.icon className="h-4 w-4" />
+                      {state === "expanded" && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
-                </SidebarMenuItem>)}
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-      </SidebarContent>
 
-      <SidebarFooter className="p-4 border-t border-white/10 bg-zinc-900">
-        <SignedIn>
-          <div className="flex items-center gap-3">
-            <UserButton appearance={{
-            elements: {
-              avatarBox: "w-10 h-10 flex-shrink-0"
-            }
-          }} />
-            {state === 'expanded' && user && <div className="flex-1 min-w-0">
-                <p className="text-white text-sm font-medium truncate">
-                  {user.emailAddresses[0]?.emailAddress}
-                </p>
-              </div>}
-          </div>
-        </SignedIn>
-      </SidebarFooter>
-    </Sidebar>;
+        {/* Support */}
+        <div className="mt-auto p-4">
+          <a
+            href="mailto:support@example.com"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors text-sm"
+          >
+            <Headphones className="h-4 w-4" />
+            {state === "expanded" && <span>Support</span>}
+          </a>
+        </div>
+      </SidebarContent>
+    </Sidebar>
+  )
 }
