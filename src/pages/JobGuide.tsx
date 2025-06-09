@@ -33,15 +33,27 @@ const JobGuide = () => {
   const [jobMatchResult, setJobMatchResult] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('');
 
-  // Enhanced duplicate prevention
+  // AGGRESSIVE duplicate prevention
+  const submissionTracker = useRef<{
+    lastSubmissionTime: number;
+    lastSubmissionHash: string;
+    isSubmissionInProgress: boolean;
+    currentRequestId: string | null;
+    debounceTimer: NodeJS.Timeout | null;
+  }>({
+    lastSubmissionTime: 0,
+    lastSubmissionHash: '',
+    isSubmissionInProgress: false,
+    currentRequestId: null,
+    debounceTimer: null
+  });
+
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const requestInFlightRef = useRef(false);
-  const lastClickTimeRef = useRef(0);
-  const currentRequestIdRef = useRef<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const DEBOUNCE_DELAY = 1000; // 1 second debounce
-  const MIN_CLICK_INTERVAL = 2000; // Minimum 2 seconds between clicks
+  // Minimum time between submissions - 3 seconds
+  const MIN_SUBMISSION_INTERVAL = 3000;
+  const DEBOUNCE_DELAY = 1000;
 
   const loadingMessages = [
     "🔍 Analyzing job requirements against your profile...",
@@ -137,11 +149,18 @@ const JobGuide = () => {
   };
 
   const handleClearData = useCallback(() => {
+    // Cancel any pending submission
+    if (submissionTracker.current.debounceTimer) {
+      clearTimeout(submissionTracker.current.debounceTimer);
+      submissionTracker.current.debounceTimer = null;
+    }
+    
     // Cancel any ongoing request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
     
+    // Reset all states
     setFormData({
       companyName: '',
       jobTitle: '',
@@ -153,9 +172,15 @@ const JobGuide = () => {
     setError(null);
     setIsGenerating(false);
     setIsSubmitting(false);
-    requestInFlightRef.current = false;
-    currentRequestIdRef.current = null;
-    lastClickTimeRef.current = 0;
+    
+    // Reset submission tracker
+    submissionTracker.current = {
+      lastSubmissionTime: 0,
+      lastSubmissionHash: '',
+      isSubmissionInProgress: false,
+      currentRequestId: null,
+      debounceTimer: null
+    };
     
     toast({
       title: "Data Cleared",
@@ -163,37 +188,44 @@ const JobGuide = () => {
     });
   }, [toast]);
 
+  const createSubmissionHash = useCallback((data: typeof formData) => {
+    return btoa(JSON.stringify({
+      company: data.companyName.trim(),
+      title: data.jobTitle.trim(),
+      description: data.jobDescription.trim().substring(0, 100)
+    })).replace(/[^a-zA-Z0-9]/g, '');
+  }, []);
+
   const handleSubmit = useCallback(async () => {
     const now = Date.now();
     const requestId = crypto.randomUUID();
+    const submissionHash = createSubmissionHash(formData);
     
-    console.log('Submit attempt:', {
+    console.log('🚀 SUBMIT ATTEMPT:', {
       requestId,
-      requestInFlight: requestInFlightRef.current,
-      timeSinceLastClick: now - lastClickTimeRef.current,
-      currentRequestId: currentRequestIdRef.current
+      isSubmissionInProgress: submissionTracker.current.isSubmissionInProgress,
+      timeSinceLastSubmission: now - submissionTracker.current.lastSubmissionTime,
+      lastSubmissionHash: submissionTracker.current.lastSubmissionHash,
+      currentSubmissionHash: submissionHash,
+      isHashSame: submissionTracker.current.lastSubmissionHash === submissionHash
     });
 
-    // Enhanced duplicate prevention with debouncing
-    if (requestInFlightRef.current) {
-      console.log('Request already in flight, ignoring duplicate click:', requestId);
+    // AGGRESSIVE duplicate prevention checks
+    
+    // Check 1: Is submission already in progress?
+    if (submissionTracker.current.isSubmissionInProgress) {
+      console.log('❌ BLOCKED: Submission already in progress');
       toast({
         title: "Please wait",
-        description: "Your request is already being processed.",
+        description: "Your analysis is already being processed.",
         variant: "destructive"
       });
       return;
     }
 
-    // Debounce rapid clicks
-    if (now - lastClickTimeRef.current < DEBOUNCE_DELAY) {
-      console.log('Click too rapid, debouncing:', requestId);
-      return;
-    }
-
-    // Additional protection against rapid submissions
-    if (now - lastClickTimeRef.current < MIN_CLICK_INTERVAL && lastClickTimeRef.current > 0) {
-      console.log('Click too soon after last submission:', requestId);
+    // Check 2: Too soon after last submission?
+    if (now - submissionTracker.current.lastSubmissionTime < MIN_SUBMISSION_INTERVAL) {
+      console.log('❌ BLOCKED: Too soon after last submission');
       toast({
         title: "Please wait",
         description: "Please wait a moment before submitting again.",
@@ -202,6 +234,19 @@ const JobGuide = () => {
       return;
     }
 
+    // Check 3: Exact same submission as before?
+    if (submissionTracker.current.lastSubmissionHash === submissionHash && 
+        now - submissionTracker.current.lastSubmissionTime < 300000) { // 5 minutes
+      console.log('❌ BLOCKED: Duplicate submission hash');
+      toast({
+        title: "Duplicate submission",
+        description: "You've already submitted this exact analysis recently.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check 4: Profile complete?
     if (!isComplete) {
       toast({
         title: "Complete your profile first",
@@ -211,6 +256,7 @@ const JobGuide = () => {
       return;
     }
 
+    // Check 5: Form valid?
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
         title: "Missing information", 
@@ -220,153 +266,170 @@ const JobGuide = () => {
       return;
     }
 
-    // Set all protection flags immediately
-    requestInFlightRef.current = true;
-    lastClickTimeRef.current = now;
-    currentRequestIdRef.current = requestId;
-    setIsSubmitting(true);
-    setError(null);
-    setIsSuccess(false);
-    setJobMatchResult(null);
+    // Clear any previous debounce timer
+    if (submissionTracker.current.debounceTimer) {
+      clearTimeout(submissionTracker.current.debounceTimer);
+    }
 
-    // Create abort controller for this request
-    abortControllerRef.current = new AbortController();
+    // Set debounce timer for additional protection
+    submissionTracker.current.debounceTimer = setTimeout(async () => {
+      try {
+        // Double-check we're not already submitting
+        if (submissionTracker.current.isSubmissionInProgress) {
+          console.log('❌ DEBOUNCE BLOCKED: Already submitting');
+          return;
+        }
 
-    try {
-      console.log('Starting job analysis submission:', requestId);
+        // Set all protection flags IMMEDIATELY
+        submissionTracker.current.isSubmissionInProgress = true;
+        submissionTracker.current.lastSubmissionTime = now;
+        submissionTracker.current.lastSubmissionHash = submissionHash;
+        submissionTracker.current.currentRequestId = requestId;
+        
+        setIsSubmitting(true);
+        setError(null);
+        setIsSuccess(false);
+        setJobMatchResult(null);
 
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('clerk_id', user?.id)
-        .single();
+        // Create abort controller
+        abortControllerRef.current = new AbortController();
 
-      if (userError || !userData) {
-        throw new Error('User not found in database');
-      }
+        console.log('✅ PROCEEDING with submission:', requestId);
 
-      // Check for existing analysis first to prevent duplicate webhook calls
-      const { data: existingAnalysis, error: checkError } = await supabase
-        .from('job_analyses')
-        .select('id, job_match')
-        .eq('user_id', userData.id)
-        .eq('company_name', formData.companyName)
-        .eq('job_title', formData.jobTitle)
-        .eq('job_description', formData.jobDescription)
-        .not('job_match', 'is', null)
-        .order('created_at', { ascending: false })
-        .limit(1);
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('clerk_id', user?.id)
+          .single();
 
-      if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
-        const existing = existingAnalysis[0];
-        console.log('Found existing analysis:', requestId, existing.id);
-        setJobMatchResult(existing.job_match);
-        setAnalysisId(existing.id);
-        setIsSubmitting(false);
-        requestInFlightRef.current = false;
-        toast({
-          title: "Previous Analysis Found",
-          description: "Using your previous job match analysis for this job posting."
-        });
-        return;
-      }
+        if (userError || !userData) {
+          throw new Error('User not found in database');
+        }
 
-      // Insert new analysis
-      const { data: insertedData, error: insertError } = await supabase
-        .from('job_analyses')
-        .insert({
-          user_id: userData.id,
-          company_name: formData.companyName,
-          job_title: formData.jobTitle,
-          job_description: formData.jobDescription
-        })
-        .select('id')
-        .single();
+        // Check for existing analysis first
+        const { data: existingAnalysis, error: checkError } = await supabase
+          .from('job_analyses')
+          .select('id, job_match')
+          .eq('user_id', userData.id)
+          .eq('company_name', formData.companyName)
+          .eq('job_title', formData.jobTitle)
+          .eq('job_description', formData.jobDescription)
+          .not('job_match', 'is', null)
+          .order('created_at', { ascending: false })
+          .limit(1);
 
-      if (insertError) {
-        console.error('Insert error:', insertError);
-        throw new Error(`Database insert failed: ${insertError.message}`);
-      }
+        if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
+          const existing = existingAnalysis[0];
+          console.log('✅ FOUND existing analysis:', existing.id);
+          setJobMatchResult(existing.job_match);
+          setAnalysisId(existing.id);
+          setIsSubmitting(false);
+          submissionTracker.current.isSubmissionInProgress = false;
+          toast({
+            title: "Previous Analysis Found",
+            description: "Using your previous job match analysis for this job posting."
+          });
+          return;
+        }
 
-      if (insertedData?.id) {
-        console.log('Analysis inserted successfully:', requestId, insertedData.id);
-        setAnalysisId(insertedData.id);
-        setIsSuccess(true);
-        setIsGenerating(true);
-
-        // Create webhook payload with enhanced tracking
-        const webhookPayload = {
-          user: {
-            id: userData.id,
-            clerk_id: user?.id,
-            email: user?.emailAddresses[0]?.emailAddress,
-            first_name: user?.firstName,
-            last_name: user?.lastName
-          },
-          job_analysis: {
-            id: insertedData.id,
+        // Insert new analysis
+        const { data: insertedData, error: insertError } = await supabase
+          .from('job_analyses')
+          .insert({
             user_id: userData.id,
             company_name: formData.companyName,
             job_title: formData.jobTitle,
-            job_description: formData.jobDescription,
-            created_at: new Date().toISOString()
-          },
-          event_type: 'job_analysis_created',
-          webhook_type: 'job_guide',
-          timestamp: new Date().toISOString(),
-          request_id: requestId,
-          submission_metadata: {
-            user_agent: navigator.userAgent,
-            source: 'job_guide_page',
-            form_data_hash: btoa(JSON.stringify({
-              company: formData.companyName,
-              title: formData.jobTitle,
-              description: formData.jobDescription.substring(0, 100)
-            }))
-          }
-        };
+            job_description: formData.jobDescription
+          })
+          .select('id')
+          .single();
 
-        // Call webhook with abort signal
-        console.log('Calling webhook for analysis ID:', requestId, insertedData.id);
-        const { error: webhookError } = await supabase.functions.invoke('job-analysis-webhook', {
-          body: webhookPayload,
-          headers: {
-            'X-Request-ID': requestId,
-            'X-Source': 'job-guide-page'
-          }
-        });
-        
-        if (webhookError) {
-          console.error('Webhook error:', requestId, webhookError);
-          // Don't throw here, let the polling handle retries
-        } else {
-          console.log('Webhook called successfully:', requestId);
+        if (insertError) {
+          console.error('❌ INSERT ERROR:', insertError);
+          throw new Error(`Database insert failed: ${insertError.message}`);
         }
 
+        if (insertedData?.id) {
+          console.log('✅ ANALYSIS INSERTED:', insertedData.id);
+          setAnalysisId(insertedData.id);
+          setIsSuccess(true);
+          setIsGenerating(true);
+
+          // Create webhook payload with anti-duplicate metadata
+          const webhookPayload = {
+            user: {
+              id: userData.id,
+              clerk_id: user?.id,
+              email: user?.emailAddresses[0]?.emailAddress,
+              first_name: user?.firstName,
+              last_name: user?.lastName
+            },
+            job_analysis: {
+              id: insertedData.id,
+              user_id: userData.id,
+              company_name: formData.companyName,
+              job_title: formData.jobTitle,
+              job_description: formData.jobDescription,
+              created_at: new Date().toISOString()
+            },
+            event_type: 'job_analysis_created',
+            webhook_type: 'job_guide',
+            timestamp: new Date().toISOString(),
+            request_id: requestId,
+            submission_hash: submissionHash,
+            anti_duplicate_metadata: {
+              user_agent: navigator.userAgent,
+              source: 'job_guide_page_v2',
+              submission_time: now,
+              form_fingerprint: submissionHash
+            }
+          };
+
+          // Call webhook with enhanced duplicate prevention
+          console.log('📡 CALLING WEBHOOK for:', insertedData.id);
+          const { error: webhookError } = await supabase.functions.invoke('job-analysis-webhook', {
+            body: webhookPayload,
+            headers: {
+              'X-Request-ID': requestId,
+              'X-Source': 'job-guide-page-v2',
+              'X-Submission-Hash': submissionHash,
+              'X-Anti-Duplicate': 'true'
+            }
+          });
+          
+          if (webhookError) {
+            console.error('❌ WEBHOOK ERROR:', webhookError);
+            // Don't throw here, let polling handle it
+          } else {
+            console.log('✅ WEBHOOK SUCCESS:', requestId);
+          }
+
+          toast({
+            title: "Analysis Started!",
+            description: "Your job match analysis is being processed. Please wait for the results."
+          });
+        }
+      } catch (err) {
+        console.error('❌ SUBMISSION ERROR:', err);
+        const errorMessage = err instanceof Error ? err.message : 'Failed to generate job analysis';
+        setError(errorMessage);
+        submissionTracker.current.isSubmissionInProgress = false;
+        submissionTracker.current.currentRequestId = null;
         toast({
-          title: "Analysis Started!",
-          description: "Your job match analysis is being processed. Please wait for the results."
+          title: "Analysis Failed",
+          description: "There was an error generating your job analysis. Please try again.",
+          variant: "destructive"
         });
+      } finally {
+        setIsSubmitting(false);
       }
-    } catch (err) {
-      console.error('Error generating job analysis:', requestId, err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to generate job analysis';
-      setError(errorMessage);
-      requestInFlightRef.current = false;
-      currentRequestIdRef.current = null;
-      toast({
-        title: "Analysis Failed",
-        description: "There was an error generating your job analysis. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [formData, isComplete, user, toast]);
+    }, DEBOUNCE_DELAY);
+
+  }, [formData, isComplete, user, toast, createSubmissionHash]);
 
   const isFormValid = formData.companyName && formData.jobTitle && formData.jobDescription;
   const hasAnyData = isFormValid || jobMatchResult;
-  const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating || requestInFlightRef.current;
+  const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating || submissionTracker.current.isSubmissionInProgress;
 
   if (!isLoaded || !user) {
     return (
@@ -648,8 +711,8 @@ const JobGuide = () => {
                   <Button 
                     onClick={() => {
                       setError(null);
-                      requestInFlightRef.current = false;
-                      currentRequestIdRef.current = null;
+                      submissionTracker.current.isSubmissionInProgress = false;
+                      submissionTracker.current.currentRequestId = null;
                     }} 
                     className="mt-3 bg-white text-red-600 hover:bg-gray-100 font-inter font-medium text-xs px-4 py-2" 
                     disabled={isSubmitting || isGenerating || !isFormValid}

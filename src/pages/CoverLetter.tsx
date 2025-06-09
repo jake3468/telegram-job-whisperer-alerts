@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { AlertCircle, FileText, Sparkles, Loader2, CheckCircle, Trash2, Building, Briefcase, FileEdit, Copy } from 'lucide-react';
+import { AlertCircle, FileText, Sparkles, Loader2, CheckCircle, Trash2, Building, Briefcase } from 'lucide-react';
 import AuthHeader from '@/components/AuthHeader';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,21 +33,33 @@ const CoverLetter = () => {
   const [coverLetterResult, setCoverLetterResult] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('');
 
-  // Enhanced duplicate prevention
+  // AGGRESSIVE duplicate prevention - same as JobGuide
+  const submissionTracker = useRef<{
+    lastSubmissionTime: number;
+    lastSubmissionHash: string;
+    isSubmissionInProgress: boolean;
+    currentRequestId: string | null;
+    debounceTimer: NodeJS.Timeout | null;
+  }>({
+    lastSubmissionTime: 0,
+    lastSubmissionHash: '',
+    isSubmissionInProgress: false,
+    currentRequestId: null,
+    debounceTimer: null
+  });
+
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const requestInFlightRef = useRef(false);
-  const lastClickTimeRef = useRef(0);
-  const currentRequestIdRef = useRef<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const DEBOUNCE_DELAY = 1000; // 1 second debounce
-  const MIN_CLICK_INTERVAL = 2000; // Minimum 2 seconds between clicks
+  // Minimum time between submissions - 3 seconds
+  const MIN_SUBMISSION_INTERVAL = 3000;
+  const DEBOUNCE_DELAY = 1000;
 
   const loadingMessages = [
     "✍️ Crafting your personalized cover letter...",
-    "📝 Tailoring content to match the job requirements...", 
-    "🎯 Highlighting your relevant skills and experience...",
-    "✨ Finalizing your professional cover letter..."
+    "✨ Adding a touch of magic to your application...",
+    "🚀 Tailoring your skills to the job description...",
+    "🎯 Highlighting your unique qualifications..."
   ];
 
   useEffect(() => {
@@ -87,7 +99,6 @@ const CoverLetter = () => {
           setCoverLetterResult(data.cover_letter);
           setIsGenerating(false);
           setIsSuccess(false);
-          requestInFlightRef.current = false;
           
           if (pollingIntervalRef.current) {
             clearInterval(pollingIntervalRef.current);
@@ -95,8 +106,8 @@ const CoverLetter = () => {
           }
           
           toast({
-            title: "Cover Letter Ready!",
-            description: "Your personalized cover letter has been generated."
+            title: "Cover Letter Generated!",
+            description: "Your personalized cover letter is ready."
           });
         }
       } catch (err) {
@@ -112,7 +123,6 @@ const CoverLetter = () => {
         pollingIntervalRef.current = null;
       }
       setIsGenerating(false);
-      requestInFlightRef.current = false;
       setError('Cover letter generation timed out. Please try again.');
       toast({
         title: "Generation Timeout",
@@ -137,11 +147,18 @@ const CoverLetter = () => {
   };
 
   const handleClearData = useCallback(() => {
+    // Cancel any pending submission
+    if (submissionTracker.current.debounceTimer) {
+      clearTimeout(submissionTracker.current.debounceTimer);
+      submissionTracker.current.debounceTimer = null;
+    }
+    
     // Cancel any ongoing request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
     
+    // Reset all states
     setFormData({
       companyName: '',
       jobTitle: '',
@@ -153,9 +170,15 @@ const CoverLetter = () => {
     setError(null);
     setIsGenerating(false);
     setIsSubmitting(false);
-    requestInFlightRef.current = false;
-    currentRequestIdRef.current = null;
-    lastClickTimeRef.current = 0;
+    
+    // Reset submission tracker
+    submissionTracker.current = {
+      lastSubmissionTime: 0,
+      lastSubmissionHash: '',
+      isSubmissionInProgress: false,
+      currentRequestId: null,
+      debounceTimer: null
+    };
     
     toast({
       title: "Data Cleared",
@@ -163,56 +186,44 @@ const CoverLetter = () => {
     });
   }, [toast]);
 
-  const handleCopyCoverLetter = async () => {
-    if (!coverLetterResult) return;
-    
-    try {
-      await navigator.clipboard.writeText(coverLetterResult);
-      toast({
-        title: "Copied!",
-        description: "Cover letter has been copied to your clipboard."
-      });
-    } catch (err) {
-      console.error('Failed to copy:', err);
-      toast({
-        title: "Copy Failed",
-        description: "Failed to copy cover letter. Please try selecting and copying manually.",
-        variant: "destructive"
-      });
-    }
-  };
+  const createSubmissionHash = useCallback((data: typeof formData) => {
+    return btoa(JSON.stringify({
+      company: data.companyName.trim(),
+      title: data.jobTitle.trim(),
+      description: data.jobDescription.trim().substring(0, 100)
+    })).replace(/[^a-zA-Z0-9]/g, '');
+  }, []);
 
   const handleSubmit = useCallback(async () => {
     const now = Date.now();
     const requestId = crypto.randomUUID();
+    const submissionHash = createSubmissionHash(formData);
     
-    console.log('Submit attempt:', {
+    console.log('🚀 COVER LETTER SUBMIT ATTEMPT:', {
       requestId,
-      requestInFlight: requestInFlightRef.current,
-      timeSinceLastClick: now - lastClickTimeRef.current,
-      currentRequestId: currentRequestIdRef.current
+      isSubmissionInProgress: submissionTracker.current.isSubmissionInProgress,
+      timeSinceLastSubmission: now - submissionTracker.current.lastSubmissionTime,
+      lastSubmissionHash: submissionTracker.current.lastSubmissionHash,
+      currentSubmissionHash: submissionHash,
+      isHashSame: submissionTracker.current.lastSubmissionHash === submissionHash
     });
 
-    // Enhanced duplicate prevention with debouncing
-    if (requestInFlightRef.current) {
-      console.log('Request already in flight, ignoring duplicate click:', requestId);
+    // AGGRESSIVE duplicate prevention checks - same as JobGuide
+    
+    // Check 1: Is submission already in progress?
+    if (submissionTracker.current.isSubmissionInProgress) {
+      console.log('❌ BLOCKED: Submission already in progress');
       toast({
         title: "Please wait",
-        description: "Your request is already being processed.",
+        description: "Your cover letter is already being generated.",
         variant: "destructive"
       });
       return;
     }
 
-    // Debounce rapid clicks
-    if (now - lastClickTimeRef.current < DEBOUNCE_DELAY) {
-      console.log('Click too rapid, debouncing:', requestId);
-      return;
-    }
-
-    // Additional protection against rapid submissions
-    if (now - lastClickTimeRef.current < MIN_CLICK_INTERVAL && lastClickTimeRef.current > 0) {
-      console.log('Click too soon after last submission:', requestId);
+    // Check 2: Too soon after last submission?
+    if (now - submissionTracker.current.lastSubmissionTime < MIN_SUBMISSION_INTERVAL) {
+      console.log('❌ BLOCKED: Too soon after last submission');
       toast({
         title: "Please wait",
         description: "Please wait a moment before submitting again.",
@@ -221,171 +232,202 @@ const CoverLetter = () => {
       return;
     }
 
-    if (!isComplete) {
+    // Check 3: Exact same submission as before?
+    if (submissionTracker.current.lastSubmissionHash === submissionHash && 
+        now - submissionTracker.current.lastSubmissionTime < 300000) { // 5 minutes
+      console.log('❌ BLOCKED: Duplicate submission hash');
       toast({
-        title: "Complete your profile first",
-        description: "Please upload your resume and add your bio in the Home page before generating a cover letter.",
+        title: "Duplicate submission",
+        description: "You've already submitted this exact request recently.",
         variant: "destructive"
       });
       return;
     }
 
+    // Check 4: Profile complete?
+    if (!isComplete) {
+      toast({
+        title: "Complete your profile first",
+        description: "Please upload your resume and add your bio in the Home page before using Cover Letter generator.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check 5: Form valid?
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
-        title: "Missing information",
+        title: "Missing information", 
         description: "Please fill in all fields to generate your cover letter.",
         variant: "destructive"
       });
       return;
     }
 
-    // Set all protection flags immediately
-    requestInFlightRef.current = true;
-    lastClickTimeRef.current = now;
-    currentRequestIdRef.current = requestId;
-    setIsSubmitting(true);
-    setError(null);
-    setIsSuccess(false);
-    setCoverLetterResult(null);
+    // Clear any previous debounce timer
+    if (submissionTracker.current.debounceTimer) {
+      clearTimeout(submissionTracker.current.debounceTimer);
+    }
 
-    // Create abort controller for this request
-    abortControllerRef.current = new AbortController();
+    // Set debounce timer for additional protection
+    submissionTracker.current.debounceTimer = setTimeout(async () => {
+      try {
+        // Double-check we're not already submitting
+        if (submissionTracker.current.isSubmissionInProgress) {
+          console.log('❌ DEBOUNCE BLOCKED: Already submitting');
+          return;
+        }
 
-    try {
-      console.log('Starting cover letter generation submission:', requestId);
+        // Set all protection flags IMMEDIATELY
+        submissionTracker.current.isSubmissionInProgress = true;
+        submissionTracker.current.lastSubmissionTime = now;
+        submissionTracker.current.lastSubmissionHash = submissionHash;
+        submissionTracker.current.currentRequestId = requestId;
+        
+        setIsSubmitting(true);
+        setError(null);
+        setIsSuccess(false);
+        setCoverLetterResult(null);
 
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('clerk_id', user?.id)
-        .single();
+        // Create abort controller
+        abortControllerRef.current = new AbortController();
 
-      if (userError || !userData) {
-        throw new Error('User not found in database');
-      }
+        console.log('✅ PROCEEDING with cover letter submission:', requestId);
 
-      // Check for existing analysis first to prevent duplicate webhook calls
-      const { data: existingAnalysis, error: checkError } = await supabase
-        .from('job_analyses')
-        .select('id, cover_letter')
-        .eq('user_id', userData.id)
-        .eq('company_name', formData.companyName)
-        .eq('job_title', formData.jobTitle)
-        .eq('job_description', formData.jobDescription)
-        .not('cover_letter', 'is', null)
-        .order('created_at', { ascending: false })
-        .limit(1);
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('clerk_id', user?.id)
+          .single();
 
-      if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
-        const existing = existingAnalysis[0];
-        console.log('Found existing cover letter:', requestId, existing.id);
-        setCoverLetterResult(existing.cover_letter);
-        setAnalysisId(existing.id);
-        setIsSubmitting(false);
-        requestInFlightRef.current = false;
-        toast({
-          title: "Previous Cover Letter Found",
-          description: "Using your previous cover letter for this job posting."
-        });
-        return;
-      }
+        if (userError || !userData) {
+          throw new Error('User not found in database');
+        }
 
-      // Insert new analysis
-      const { data: insertedData, error: insertError } = await supabase
-        .from('job_analyses')
-        .insert({
-          user_id: userData.id,
-          company_name: formData.companyName,
-          job_title: formData.jobTitle,
-          job_description: formData.jobDescription
-        })
-        .select('id')
-        .single();
+        // Check for existing analysis first
+        const { data: existingAnalysis, error: checkError } = await supabase
+          .from('job_analyses')
+          .select('id, cover_letter')
+          .eq('user_id', userData.id)
+          .eq('company_name', formData.companyName)
+          .eq('job_title', formData.jobTitle)
+          .eq('job_description', formData.jobDescription)
+          .not('cover_letter', 'is', null)
+          .order('created_at', { ascending: false })
+          .limit(1);
 
-      if (insertError) {
-        console.error('Insert error:', insertError);
-        throw new Error(`Database insert failed: ${insertError.message}`);
-      }
+        if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
+          const existing = existingAnalysis[0];
+          console.log('✅ FOUND existing cover letter:', existing.id);
+          setCoverLetterResult(existing.cover_letter);
+          setAnalysisId(existing.id);
+          setIsSubmitting(false);
+          submissionTracker.current.isSubmissionInProgress = false;
+          toast({
+            title: "Previous Cover Letter Found",
+            description: "Using your previous cover letter for this job posting."
+          });
+          return;
+        }
 
-      if (insertedData?.id) {
-        console.log('Analysis inserted successfully:', requestId, insertedData.id);
-        setAnalysisId(insertedData.id);
-        setIsSuccess(true);
-        setIsGenerating(true);
-
-        // Create webhook payload with enhanced tracking
-        const webhookPayload = {
-          user: {
-            id: userData.id,
-            clerk_id: user?.id,
-            email: user?.emailAddresses[0]?.emailAddress,
-            first_name: user?.firstName,
-            last_name: user?.lastName
-          },
-          job_analysis: {
-            id: insertedData.id,
+        // Insert new analysis
+        const { data: insertedData, error: insertError } = await supabase
+          .from('job_analyses')
+          .insert({
             user_id: userData.id,
             company_name: formData.companyName,
             job_title: formData.jobTitle,
-            job_description: formData.jobDescription,
-            created_at: new Date().toISOString()
-          },
-          event_type: 'job_analysis_created',
-          webhook_type: 'cover_letter',
-          timestamp: new Date().toISOString(),
-          request_id: requestId,
-          submission_metadata: {
-            user_agent: navigator.userAgent,
-            source: 'cover_letter_page',
-            form_data_hash: btoa(JSON.stringify({
-              company: formData.companyName,
-              title: formData.jobTitle,
-              description: formData.jobDescription.substring(0, 100)
-            }))
-          }
-        };
+            job_description: formData.jobDescription
+          })
+          .select('id')
+          .single();
 
-        // Call webhook with enhanced tracking
-        console.log('Calling webhook for analysis ID:', requestId, insertedData.id);
-        const { error: webhookError } = await supabase.functions.invoke('job-analysis-webhook', {
-          body: webhookPayload,
-          headers: {
-            'X-Request-ID': requestId,
-            'X-Source': 'cover-letter-page'
-          }
-        });
-        
-        if (webhookError) {
-          console.error('Webhook error:', requestId, webhookError);
-          // Don't throw here, let the polling handle retries
-        } else {
-          console.log('Webhook called successfully:', requestId);
+        if (insertError) {
+          console.error('❌ INSERT ERROR:', insertError);
+          throw new Error(`Database insert failed: ${insertError.message}`);
         }
 
+        if (insertedData?.id) {
+          console.log('✅ ANALYSIS INSERTED:', insertedData.id);
+          setAnalysisId(insertedData.id);
+          setIsSuccess(true);
+          setIsGenerating(true);
+
+          // Create webhook payload with anti-duplicate metadata
+          const webhookPayload = {
+            user: {
+              id: userData.id,
+              clerk_id: user?.id,
+              email: user?.emailAddresses[0]?.emailAddress,
+              first_name: user?.firstName,
+              last_name: user?.lastName
+            },
+            job_analysis: {
+              id: insertedData.id,
+              user_id: userData.id,
+              company_name: formData.companyName,
+              job_title: formData.jobTitle,
+              job_description: formData.jobDescription,
+              created_at: new Date().toISOString()
+            },
+            event_type: 'job_analysis_created',
+            webhook_type: 'cover_letter',
+            timestamp: new Date().toISOString(),
+            request_id: requestId,
+            submission_hash: submissionHash,
+            anti_duplicate_metadata: {
+              user_agent: navigator.userAgent,
+              source: 'cover_letter_page_v2',
+              submission_time: now,
+              form_fingerprint: submissionHash
+            }
+          };
+
+          // Call webhook with enhanced duplicate prevention
+          console.log('📡 CALLING WEBHOOK for cover letter:', insertedData.id);
+          const { error: webhookError } = await supabase.functions.invoke('job-analysis-webhook', {
+            body: webhookPayload,
+            headers: {
+              'X-Request-ID': requestId,
+              'X-Source': 'cover-letter-page-v2',
+              'X-Submission-Hash': submissionHash,
+              'X-Anti-Duplicate': 'true'
+            }
+          });
+          
+          if (webhookError) {
+            console.error('❌ WEBHOOK ERROR:', webhookError);
+            // Don't throw here, let polling handle it
+          } else {
+            console.log('✅ WEBHOOK SUCCESS:', requestId);
+          }
+
+          toast({
+            title: "Cover Letter Generation Started!",
+            description: "Your personalized cover letter is being created. Please wait for the results."
+          });
+        }
+      } catch (err) {
+        console.error('❌ SUBMISSION ERROR:', err);
+        const errorMessage = err instanceof Error ? err.message : 'Failed to generate cover letter';
+        setError(errorMessage);
+        submissionTracker.current.isSubmissionInProgress = false;
+        submissionTracker.current.currentRequestId = null;
         toast({
-          title: "Cover Letter Generation Started!",
-          description: "Your personalized cover letter is being created. Please wait for the results."
+          title: "Generation Failed",
+          description: "There was an error generating your cover letter. Please try again.",
+          variant: "destructive"
         });
+      } finally {
+        setIsSubmitting(false);
       }
-    } catch (err) {
-      console.error('Error generating cover letter:', requestId, err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to generate cover letter';
-      setError(errorMessage);
-      requestInFlightRef.current = false;
-      currentRequestIdRef.current = null;
-      toast({
-        title: "Generation Failed",
-        description: "There was an error generating your cover letter. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [formData, isComplete, user, toast]);
+    }, DEBOUNCE_DELAY);
+
+  }, [formData, isComplete, user, toast, createSubmissionHash]);
 
   const isFormValid = formData.companyName && formData.jobTitle && formData.jobDescription;
   const hasAnyData = isFormValid || coverLetterResult;
-  const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating || requestInFlightRef.current;
+  const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating || submissionTracker.current.isSubmissionInProgress;
 
   if (!isLoaded || !user) {
     return (
@@ -403,10 +445,10 @@ const CoverLetter = () => {
         <div className="max-w-4xl mx-auto px-3 py-8 sm:px-4 sm:py-12">
           <div className="text-center mb-8">
             <h1 className="sm:text-xl font-medium text-white mb-2 font-inter text-3xl md:text-3xl">
-              <span className="bg-gradient-to-r from-purple-500 to-pink-600 bg-clip-text text-transparent text-3xl">Cover Letter</span>
+              <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent text-3xl">Cover Letter</span>
             </h1>
             <p className="text-sm text-gray-300 font-inter font-light">
-              Generate a personalized cover letter for your job application
+              Generate a personalized cover letter to impress recruiters
             </p>
           </div>
 
@@ -426,7 +468,7 @@ const CoverLetter = () => {
                     Complete Your Profile
                   </CardTitle>
                   <CardDescription className="text-orange-100 font-inter text-xs sm:text-sm">
-                    You need to complete your profile before using Cover Letter
+                    You need to complete your profile before generating a cover letter
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3 pt-0">
@@ -454,14 +496,14 @@ const CoverLetter = () => {
               </Card>
             )}
 
-            {/* Job Input Form */}
-            <Card className="bg-gradient-to-br from-purple-600 via-pink-600 to-rose-600 border-2 border-purple-400 shadow-2xl shadow-purple-500/20">
+            {/* Cover Letter Input Form */}
+            <Card className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 border-2 border-blue-400 shadow-2xl shadow-blue-500/20">
               <CardHeader className="pb-3">
                 <CardTitle className="text-white font-inter flex items-center gap-2 text-base">
                   <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
                     <FileText className="w-4 h-4 text-white" />
                   </div>
-                  Job Information
+                  Cover Letter Information
                   {hasAnyData && (
                     <Button 
                       onClick={handleClearData} 
@@ -473,8 +515,8 @@ const CoverLetter = () => {
                     </Button>
                   )}
                 </CardTitle>
-                <CardDescription className="text-purple-100 font-inter text-sm">
-                  Enter job details to generate your personalized cover letter
+                <CardDescription className="text-blue-100 font-inter text-sm">
+                  Enter job details to generate a personalized cover letter
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 pt-0">
@@ -506,7 +548,7 @@ const CoverLetter = () => {
                         onChange={(e) => handleInputChange('jobTitle', e.target.value)}
                         placeholder="Enter the job title"
                         disabled={isSubmitting || isGenerating}
-                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/30 placeholder:text-sm bg-gray-900"
+                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 placeholder:text-sm bg-gray-900"
                       />
                     </div>
                   </div>
@@ -535,7 +577,7 @@ const CoverLetter = () => {
                     disabled={isButtonDisabled}
                     className={`w-full font-inter font-medium py-3 px-4 text-sm ${
                       !isButtonDisabled 
-                        ? 'bg-white text-purple-600 hover:bg-gray-100' 
+                        ? 'bg-white text-blue-600 hover:bg-gray-100' 
                         : 'bg-white/50 text-gray-800 border-2 border-white/70 cursor-not-allowed hover:bg-white/50'
                     }`}
                   >
@@ -554,7 +596,7 @@ const CoverLetter = () => {
                         <>
                           <Sparkles className="w-4 h-4 flex-shrink-0" />
                           <span className="text-center text-sm font-bold">
-                            Get your Cover Letter
+                            Generate Cover Letter
                           </span>
                         </>
                       )}
@@ -564,13 +606,13 @@ const CoverLetter = () => {
                   {/* History Button */}
                   <JobAnalysisHistory 
                     type="cover_letter" 
-                    gradientColors="bg-gradient-to-br from-purple-600 via-pink-600 to-rose-600" 
-                    borderColors="border-2 border-purple-400" 
+                    gradientColors="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600" 
+                    borderColors="border-2 border-blue-400" 
                   />
 
                   {(!isComplete || !isFormValid) && !isSubmitting && !isGenerating && (
-                    <p className="text-purple-200 text-sm font-inter text-center">
-                      {!isComplete ? 'Complete your profile first to use this feature' : 'Fill in all fields to get your cover letter'}
+                    <p className="text-blue-200 text-sm font-inter text-center">
+                      {!isComplete ? 'Complete your profile first to use this feature' : 'Fill in all fields to generate your cover letter'}
                     </p>
                   )}
                 </div>
@@ -579,7 +621,7 @@ const CoverLetter = () => {
 
             {/* Generating Status Display */}
             {isGenerating && (
-              <Card className="bg-gradient-to-br from-pink-600 via-rose-600 to-red-600 border-2 border-pink-400 shadow-2xl shadow-pink-500/20">
+              <Card className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 border-2 border-indigo-400 shadow-2xl shadow-indigo-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-sm">
                     <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
@@ -589,11 +631,11 @@ const CoverLetter = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-pink-100 font-inter text-center text-xs break-words">
+                  <p className="text-indigo-100 font-inter text-center text-xs break-words">
                     {loadingMessage}
                   </p>
                   <div className="mt-3 text-center">
-                    <p className="text-pink-200 text-xs font-inter">
+                    <p className="text-indigo-200 text-xs font-inter">
                       This usually takes 1-2 minutes. Please don't close this page.
                     </p>
                   </div>
@@ -605,53 +647,29 @@ const CoverLetter = () => {
             {coverLetterResult && (
               <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20 w-full">
                 <CardHeader className="pb-3 bg-green-300">
-                  <CardTitle className="font-inter flex items-center justify-between text-sm text-gray-950">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gray-950">
-                        <FileText className="w-3 h-3 text-white" />
-                      </div>
-                      Your Cover Letter
+                  <CardTitle className="font-inter flex items-center gap-2 text-sm text-gray-950">
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gray-950">
+                      <FileText className="w-3 h-3 text-white" />
                     </div>
-                    <Button 
-                      onClick={handleCopyCoverLetter} 
-                      size="sm" 
-                      className="bg-gray-950 hover:bg-gray-800 text-white border-gray-700 text-xs px-2 py-1"
-                    >
-                      <Copy className="w-3 h-3 mr-1" />
-                      Copy
-                    </Button>
+                    Your Cover Letter
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0 bg-green-300 p-4 w-full">
-                  {/* Letter-like styled container */}
-                  <div className="bg-white rounded-lg shadow-lg border border-gray-200 w-full relative">
-                    {/* Letter header decoration */}
-                    <div className="h-2 bg-gradient-to-r from-blue-100 to-blue-50 rounded-t-lg"></div>
-                    
-                    {/* Letter content area */}
-                    <div className="p-6 bg-gradient-to-b from-white to-gray-50">
-                      {/* Letter lines decoration */}
-                      <div className="absolute left-8 top-12 bottom-6 w-px bg-red-200 opacity-50"></div>
-                      
-                      <div 
-                        className="text-slate-800 font-inter leading-relaxed font-medium w-full text-sm pl-4" 
-                        style={{
-                          wordWrap: 'break-word',
-                          overflowWrap: 'break-word',
-                          wordBreak: 'break-word',
-                          whiteSpace: 'pre-wrap',
-                          maxWidth: '100%',
-                          hyphens: 'auto',
-                          lineHeight: '1.6',
-                          fontFamily: 'Georgia, serif'
-                        }}
-                      >
-                        {coverLetterResult}
-                      </div>
+                  <div className="bg-white rounded-lg p-3 border-2 border-slate-300 w-full">
+                    <div 
+                      className="text-slate-800 font-inter leading-relaxed font-medium w-full text-xs" 
+                      style={{
+                        wordWrap: 'break-word',
+                        overflowWrap: 'break-word',
+                        wordBreak: 'break-word',
+                        whiteSpace: 'pre-wrap',
+                        maxWidth: '100%',
+                        hyphens: 'auto',
+                        lineHeight: '1.4'
+                      }}
+                    >
+                      {coverLetterResult}
                     </div>
-                    
-                    {/* Letter footer decoration */}
-                    <div className="h-2 bg-gradient-to-r from-blue-50 to-blue-100 rounded-b-lg"></div>
                   </div>
                 </CardContent>
               </Card>
@@ -670,8 +688,8 @@ const CoverLetter = () => {
                 </CardHeader>
                 <CardContent className="pt-0">
                   <p className="text-green-100 font-inter text-xs break-words">
-                    Your cover letter request has been submitted and is being processed. 
-                    The cover letter will appear below once completed.
+                    Your cover letter has been submitted and is being generated. 
+                    The result will appear below once completed.
                   </p>
                 </CardContent>
               </Card>
@@ -691,8 +709,8 @@ const CoverLetter = () => {
                   <Button 
                     onClick={() => {
                       setError(null);
-                      requestInFlightRef.current = false;
-                      currentRequestIdRef.current = null;
+                      submissionTracker.current.isSubmissionInProgress = false;
+                      submissionTracker.current.currentRequestId = null;
                     }} 
                     className="mt-3 bg-white text-red-600 hover:bg-gray-100 font-inter font-medium text-xs px-4 py-2" 
                     disabled={isSubmitting || isGenerating || !isFormValid}
