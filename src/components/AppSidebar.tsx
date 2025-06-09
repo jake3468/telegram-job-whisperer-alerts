@@ -52,7 +52,6 @@ export function AppSidebar() {
   const currentPath = location.pathname
 
   const isActive = (path: string) => currentPath === path
-  const isToolsExpanded = toolItems.some((item) => isActive(item.url))
 
   return (
     <Sidebar collapsible="icon" className="border-r border-white/10">
@@ -83,7 +82,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         {/* Tools Section */}
-        <SidebarGroup defaultOpen={isToolsExpanded}>
+        <SidebarGroup>
           <SidebarGroupLabel className="text-gray-400 text-xs uppercase tracking-wide font-medium">
             Tools
           </SidebarGroupLabel>
