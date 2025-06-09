@@ -33,6 +33,9 @@ const JobGuide = () => {
   const [jobMatchResult, setJobMatchResult] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('');
 
+  // Add the missing requestInFlightRef
+  const requestInFlightRef = useRef(false);
+
   // AGGRESSIVE duplicate prevention
   const submissionTracker = useRef<{
     lastSubmissionTime: number;
