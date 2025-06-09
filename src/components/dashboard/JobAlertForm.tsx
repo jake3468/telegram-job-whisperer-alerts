@@ -1,11 +1,17 @@
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { countries } from '@/data/countries';
 
 interface JobAlert {
   id: string;
@@ -30,6 +36,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
   const { user } = useUser();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [countryOpen, setCountryOpen] = useState(false);
   const [formData, setFormData] = useState({
     country: '',
     location: '',
@@ -129,19 +136,60 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
     }));
   };
 
+  const getCountryDisplayValue = (countryValue: string) => {
+    const country = countries.find(c => c.name === countryValue);
+    return country ? `${country.name} (${country.code})` : countryValue;
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
         <div className="space-y-1">
           <Label htmlFor="country" className="text-white font-inter font-medium text-sm">Country</Label>
-          <Input 
-            id="country" 
-            value={formData.country} 
-            onChange={(e) => handleInputChange('country', e.target.value)} 
-            placeholder="e.g., United States" 
-            required 
-            className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-sm h-9"
-          />
+          <Popover open={countryOpen} onOpenChange={setCountryOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={countryOpen}
+                className="w-full justify-between border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-sm h-9"
+              >
+                {formData.country
+                  ? getCountryDisplayValue(formData.country)
+                  : "Select country..."}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0" align="start">
+              <Command className="bg-gray-800 border-gray-600">
+                <CommandInput placeholder="Search country..." className="text-white" />
+                <CommandList>
+                  <CommandEmpty className="text-gray-300">No country found.</CommandEmpty>
+                  <CommandGroup>
+                    {countries.map((country) => (
+                      <CommandItem
+                        key={country.code}
+                        value={country.name}
+                        onSelect={() => {
+                          handleInputChange('country', country.name);
+                          setCountryOpen(false);
+                        }}
+                        className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            formData.country === country.name ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {country.name} ({country.code})
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
 
         <div className="space-y-1">
@@ -171,7 +219,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
         <div className="space-y-1">
           <Label htmlFor="job_type" className="text-white font-inter font-medium text-sm">Job Type</Label>
           <Select value={formData.job_type} onValueChange={(value) => handleInputChange('job_type', value)}>
-            <SelectTrigger className="bg-gray-700/70 border-2 border-gray-500 text-white font-inter focus:border-pastel-blue hover:border-gray-400 h-9 text-sm">
+            <SelectTrigger className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-sm h-9">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-gray-800 border-gray-600 backdrop-blur-sm">
@@ -184,20 +232,18 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
 
         <div className="space-y-1">
           <Label htmlFor="alert_frequency" className="text-white font-inter font-medium text-sm">Alert Frequency</Label>
-          <Select value={formData.alert_frequency} onValueChange={(value) => handleInputChange('alert_frequency', value)}>
-            <SelectTrigger className="bg-gray-700/70 border-2 border-gray-500 text-white font-inter focus:border-pastel-blue hover:border-gray-400 h-9 text-sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-gray-800 border-gray-600 backdrop-blur-sm">
-              <SelectItem value="Daily" className="text-white hover:bg-gray-700 focus:bg-gray-700 text-sm">Daily</SelectItem>
-            </SelectContent>
-          </Select>
+          <Input 
+            id="alert_frequency" 
+            value="Daily"
+            readOnly
+            className="border-2 border-gray-500 text-white font-inter bg-orange-950 text-sm h-9 cursor-not-allowed opacity-75"
+          />
         </div>
 
         <div className="space-y-1">
           <Label htmlFor="preferred_time" className="text-white font-inter font-medium text-sm">Preferred Time</Label>
           <Select value={formData.preferred_time} onValueChange={(value) => handleInputChange('preferred_time', value)}>
-            <SelectTrigger className="bg-gray-700/70 border-2 border-gray-500 text-white font-inter focus:border-pastel-blue hover:border-gray-400 h-9 text-sm">
+            <SelectTrigger className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-sm h-9">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-gray-800 border-gray-600 max-h-48 backdrop-blur-sm">
@@ -216,7 +262,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
             id="max_alerts" 
             type="number" 
             min="1" 
-            max="50" 
+            max="10" 
             value={formData.max_alerts_per_day} 
             onChange={(e) => handleInputChange('max_alerts_per_day', parseInt(e.target.value) || 1)} 
             className="border-2 border-gray-500 text-white font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-sm h-9"
@@ -228,9 +274,9 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
           <Input 
             id="timezone" 
             value={formData.timezone} 
-            onChange={(e) => handleInputChange('timezone', e.target.value)} 
+            readOnly
             placeholder="Auto-detected" 
-            className="border-2 border-gray-500 text-white font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-sm h-9"
+            className="border-2 border-gray-500 text-white font-inter bg-orange-950 text-sm h-9 cursor-not-allowed opacity-75"
           />
         </div>
       </div>
