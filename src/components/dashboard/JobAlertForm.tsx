@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -74,7 +73,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
 
     setLoading(true);
     try {
-      // First, get the user's database ID
+      // Get the user's profile ID (not the users table ID)
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('id')
@@ -83,17 +82,26 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
 
       if (userError) throw userError;
 
+      // Get the user_profile record to use its ID as the foreign key
+      const { data: profileData, error: profileError } = await supabase
+        .from('user_profile')
+        .select('id')
+        .eq('user_id', userData.id)
+        .single();
+
+      if (profileError) throw profileError;
+
       // Store only the country code instead of the full country name
       const countryToStore = countries.find(c => c.name === formData.country)?.code || formData.country;
 
       if (editingAlert) {
-        // Update existing alert
+        // Update existing alert - use profile ID
         const { error } = await supabase
           .from('job_alerts')
           .update({
             ...formData,
             country: countryToStore,
-            user_id: userData.id
+            user_id: profileData.id // Use profile ID, not user ID
           })
           .eq('id', editingAlert.id);
 
@@ -104,13 +112,13 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
           description: "Job alert has been updated successfully.",
         });
       } else {
-        // Create new alert
+        // Create new alert - use profile ID
         const { error } = await supabase
           .from('job_alerts')
           .insert({
             ...formData,
             country: countryToStore,
-            user_id: userData.id
+            user_id: profileData.id // Use profile ID, not user ID
           });
 
         if (error) throw error;
