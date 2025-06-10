@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -143,18 +144,15 @@ const JobGuide = () => {
   };
 
   const handleClearData = useCallback(() => {
-    // Cancel any pending submission
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
       debounceTimerRef.current = null;
     }
     
-    // Cancel any ongoing request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
     
-    // Reset all states and refs
     setFormData({
       companyName: '',
       jobTitle: '',
@@ -167,7 +165,6 @@ const JobGuide = () => {
     setIsGenerating(false);
     setIsSubmitting(false);
     
-    // Reset all refs
     requestInFlightRef.current = false;
     submissionInProgressRef.current = false;
     lastSubmissionTimeRef.current = 0;
@@ -179,14 +176,13 @@ const JobGuide = () => {
     });
   }, [toast]);
 
-  // Enhanced hash generation for better duplicate detection
   const createSubmissionHash = useCallback((data: typeof formData, userId: string) => {
     const hashData = {
       company: data.companyName.trim().toLowerCase(),
       title: data.jobTitle.trim().toLowerCase(),
       description: data.jobDescription.trim().substring(0, 200).toLowerCase(),
       userId: userId,
-      timestamp: Date.now().toString().substring(0, -3) // Remove last 3 digits for some time tolerance
+      timestamp: Date.now().toString().substring(0, -3)
     };
     
     const encoder = new TextEncoder();
@@ -195,7 +191,7 @@ const JobGuide = () => {
     for (let i = 0; i < dataString.length; i++) {
       const char = dataString.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32-bit integer
+      hash = hash & hash;
     }
     return Math.abs(hash).toString(36);
   }, []);
@@ -212,9 +208,6 @@ const JobGuide = () => {
       minInterval: MIN_SUBMISSION_INTERVAL
     });
 
-    // Enhanced duplicate prevention checks
-    
-    // Check 1: Is submission already in progress?
     if (submissionInProgressRef.current || requestInFlightRef.current) {
       console.log('❌ BLOCKED: Submission already in progress');
       toast({
@@ -225,7 +218,6 @@ const JobGuide = () => {
       return;
     }
 
-    // Check 2: Too soon after last submission?
     if (now - lastSubmissionTimeRef.current < MIN_SUBMISSION_INTERVAL) {
       console.log('❌ BLOCKED: Too soon after last submission');
       toast({
@@ -236,7 +228,6 @@ const JobGuide = () => {
       return;
     }
 
-    // Check 3: Profile complete?
     if (!isComplete) {
       toast({
         title: "Complete your profile first",
@@ -246,7 +237,6 @@ const JobGuide = () => {
       return;
     }
 
-    // Check 4: Form valid?
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
         title: "Missing information", 
@@ -256,10 +246,9 @@ const JobGuide = () => {
       return;
     }
 
-    // Check 5: Duplicate data check
     const currentHash = createSubmissionHash(formData, user?.id || '');
     if (currentHash === lastSubmissionHashRef.current && 
-        now - lastSubmissionTimeRef.current < 300000) { // 5 minutes
+        now - lastSubmissionTimeRef.current < 300000) {
       console.log('❌ BLOCKED: Duplicate submission hash');
       toast({
         title: "Duplicate submission",
@@ -269,21 +258,17 @@ const JobGuide = () => {
       return;
     }
 
-    // Clear any previous debounce timer
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
 
-    // Set debounce timer with increased delay
     debounceTimerRef.current = setTimeout(async () => {
       try {
-        // Double-check we're not already submitting
         if (submissionInProgressRef.current || requestInFlightRef.current) {
           console.log('❌ DEBOUNCE BLOCKED: Already submitting');
           return;
         }
 
-        // Set all protection flags IMMEDIATELY
         submissionInProgressRef.current = true;
         requestInFlightRef.current = true;
         lastSubmissionTimeRef.current = now;
@@ -294,7 +279,6 @@ const JobGuide = () => {
         setIsSuccess(false);
         setJobMatchResult(null);
 
-        // Create abort controller
         abortControllerRef.current = new AbortController();
 
         console.log('✅ PROCEEDING with submission:', requestId);
@@ -309,7 +293,6 @@ const JobGuide = () => {
           throw new Error('User not found in database');
         }
 
-        // Enhanced existing analysis check with better error handling
         const { data: existingAnalysis, error: checkError } = await supabase
           .from('job_analyses')
           .select('id, job_match')
@@ -336,7 +319,6 @@ const JobGuide = () => {
           return;
         }
 
-        // Insert new analysis
         const { data: insertedData, error: insertError } = await supabase
           .from('job_analyses')
           .insert({
@@ -359,7 +341,6 @@ const JobGuide = () => {
           setIsSuccess(true);
           setIsGenerating(true);
 
-          // Enhanced webhook payload with comprehensive anti-duplicate metadata
           const webhookPayload = {
             user: {
               id: userData.id,
@@ -394,7 +375,6 @@ const JobGuide = () => {
             }
           };
 
-          // Call webhook with enhanced duplicate prevention headers
           console.log('📡 CALLING WEBHOOK for:', insertedData.id);
           const { error: webhookError } = await supabase.functions.invoke('job-analysis-webhook', {
             body: webhookPayload,
@@ -410,7 +390,6 @@ const JobGuide = () => {
           
           if (webhookError) {
             console.error('❌ WEBHOOK ERROR:', webhookError);
-            // Don't throw here, let polling handle it
           } else {
             console.log('✅ WEBHOOK SUCCESS:', requestId);
           }
@@ -426,7 +405,6 @@ const JobGuide = () => {
         setError(errorMessage);
         submissionInProgressRef.current = false;
         requestInFlightRef.current = false;
-        // Reset hash on error to allow retry
         lastSubmissionHashRef.current = '';
         toast({
           title: "Analysis Failed",
@@ -619,7 +597,6 @@ const JobGuide = () => {
                     </div>
                   </Button>
 
-                  {/* History Button */}
                   <JobAnalysisHistory 
                     type="job_guide" 
                     gradientColors="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600" 
@@ -745,5 +722,3 @@ const JobGuide = () => {
 };
 
 export default JobGuide;
-
-</edits_to_apply>
