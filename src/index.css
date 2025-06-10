@@ -93,6 +93,7 @@
   background-image: 
     linear-gradient(to bottom, #d0d0d0 1px, transparent 1px);
   background-size: 100% 25px;
+  background-attachment: scroll;
   padding: 16px;
   border-radius: 8px;
 }

@@ -71,10 +71,14 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} className={({ isActive: routeIsActive }) => {
                       const isCurrentlyActive = routeIsActive || isActive(item.url);
-                      return `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${isCurrentlyActive ? 'bg-sky-500 hover:bg-sky-600' : 'hover:bg-sky-500'} text-white`;
+                      return `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${
+                        isCurrentlyActive 
+                          ? 'bg-sky-500 text-white' 
+                          : 'text-white hover:bg-sky-500/80 hover:text-white'
+                      }`;
                     }}>
-                      <item.icon className="w-5 h-5 flex-shrink-0 text-white" />
-                      {state === 'expanded' && <span className="font-medium truncate text-white">{item.title}</span>}
+                      <item.icon className="w-5 h-5 flex-shrink-0" />
+                      {state === 'expanded' && <span className="font-medium truncate">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>)}
@@ -93,10 +97,14 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} className={({ isActive: routeIsActive }) => {
                       const isCurrentlyActive = routeIsActive || isActive(item.url);
-                      return `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${isCurrentlyActive ? 'bg-sky-500 hover:bg-sky-600' : 'hover:bg-sky-500'} text-white`;
+                      return `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${
+                        isCurrentlyActive 
+                          ? 'bg-sky-500 text-white' 
+                          : 'text-white hover:bg-sky-500/80 hover:text-white'
+                      }`;
                     }}>
-                      <item.icon className="w-5 h-5 flex-shrink-0 text-white" />
-                      {state === 'expanded' && <span className="font-medium truncate text-white">{item.title}</span>}
+                      <item.icon className="w-5 h-5 flex-shrink-0" />
+                      {state === 'expanded' && <span className="font-medium truncate">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>)}
