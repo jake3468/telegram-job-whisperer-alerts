@@ -47,6 +47,54 @@ const ResumeSection = () => {
     }
   };
 
+  const callResumeWebhook = async (fileUrl: string, fileName: string, fileSize: number) => {
+    try {
+      console.log('Calling resume PDF webhook...');
+      
+      // Get user data for the webhook payload
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('clerk_id', user?.id)
+        .single();
+
+      if (userError) {
+        console.error('Error fetching user data for webhook:', userError);
+        return;
+      }
+
+      const payload = {
+        event_type: 'resume_uploaded',
+        user: {
+          id: userData.id,
+          clerk_id: userData.clerk_id,
+          email: userData.email,
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+        },
+        resume: {
+          file_url: fileUrl,
+          file_name: fileName,
+          file_size: fileSize,
+          uploaded_at: new Date().toISOString(),
+        },
+        timestamp: new Date().toISOString(),
+      };
+
+      const { error: webhookError } = await supabase.functions.invoke('resume-pdf-webhook', {
+        body: payload,
+      });
+
+      if (webhookError) {
+        console.error('Error calling resume webhook:', webhookError);
+      } else {
+        console.log('Resume webhook called successfully');
+      }
+    } catch (error) {
+      console.error('Error in resume webhook call:', error);
+    }
+  };
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !user) return;
@@ -100,6 +148,9 @@ const ResumeSection = () => {
         .getPublicUrl(fileName);
 
       setResumeUrl(data.publicUrl);
+      
+      // Call the resume PDF webhook
+      await callResumeWebhook(data.publicUrl, file.name, file.size);
       
       toast({
         title: "Resume uploaded successfully",
