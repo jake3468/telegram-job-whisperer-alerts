@@ -71,7 +71,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} className={({ isActive: routeIsActive }) => {
                       const isCurrentlyActive = routeIsActive || isActive(item.url);
-                      return `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${isCurrentlyActive ? 'bg-gradient-to-r from-sky-500/30 to-sky-300/30 border-2 border-sky-400/50 shadow-lg shadow-sky-500/20' : 'hover:bg-white/5 hover:border hover:border-white/10'} text-white`;
+                      return `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${isCurrentlyActive ? 'bg-gradient-to-r from-sky-500/60 to-sky-400/60 border-2 border-sky-400/70 shadow-lg shadow-sky-500/20' : 'hover:bg-gradient-to-r hover:from-sky-500/60 hover:to-sky-400/60 hover:border-2 hover:border-sky-400/70'} text-white`;
                     }}>
                       <item.icon className="w-5 h-5 flex-shrink-0 text-white" />
                       {state === 'expanded' && <span className="font-medium truncate text-white">{item.title}</span>}
@@ -93,7 +93,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} className={({ isActive: routeIsActive }) => {
                       const isCurrentlyActive = routeIsActive || isActive(item.url);
-                      return `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${isCurrentlyActive ? 'bg-gradient-to-r from-sky-500/30 to-sky-300/30 border-2 border-sky-400/50 shadow-lg shadow-sky-500/20' : 'hover:bg-white/5 hover:border hover:border-white/10'} text-white`;
+                      return `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${isCurrentlyActive ? 'bg-gradient-to-r from-sky-500/60 to-sky-400/60 border-2 border-sky-400/70 shadow-lg shadow-sky-500/20' : 'hover:bg-gradient-to-r hover:from-sky-500/60 hover:to-sky-400/60 hover:border-2 hover:border-sky-400/70'} text-white`;
                     }}>
                       <item.icon className="w-5 h-5 flex-shrink-0 text-white" />
                       {state === 'expanded' && <span className="font-medium truncate text-white">{item.title}</span>}

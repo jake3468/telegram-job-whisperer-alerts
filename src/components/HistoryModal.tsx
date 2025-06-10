@@ -197,7 +197,6 @@ const HistoryModal = ({
                     <FileText className="w-4 h-4" />
                     {type === 'job_guide' ? 'Job Analysis Result' : 'Cover Letter'}
                   </div>
-                  {/* Add copy button for both job analysis and cover letter results in history */}
                   <Button 
                     onClick={() => handleCopyResult(selectedItem)} 
                     size="sm" 
