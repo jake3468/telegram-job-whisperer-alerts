@@ -307,6 +307,16 @@ export type Database = {
         }
         Returns: string
       }
+      check_and_insert_execution: {
+        Args: {
+          p_fingerprint: string
+          p_record_id: string
+          p_submission_id?: string
+          p_request_type?: string
+          p_check_minutes?: number
+        }
+        Returns: string
+      }
       cleanup_old_webhook_executions: {
         Args: Record<PropertyKey, never>
         Returns: undefined
