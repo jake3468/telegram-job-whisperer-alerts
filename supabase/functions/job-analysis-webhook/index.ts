@@ -27,21 +27,24 @@ const MAX_EXECUTION_TIME = 300000; // 5 minutes max execution time
 
 // Enhanced cryptographic fingerprint generation
 async function generateEnhancedFingerprint(payload: any): Promise<string> {
-  const { job_analysis, user, webhook_type, event_type, anti_duplicate_metadata } = payload;
+  const { job_analysis, job_cover_letter, user, webhook_type, event_type, anti_duplicate_metadata } = payload;
+  
+  // Handle both job analysis and cover letter payloads
+  const analysisData = job_analysis || job_cover_letter;
   
   const fingerprintData = {
     user_id: user?.id || user?.clerk_id || 'unknown',
-    job_analysis_id: job_analysis?.id || 'unknown',
+    record_id: analysisData?.id || 'unknown',
     webhook_type: webhook_type || event_type || 'job_analysis_created',
-    company_name: job_analysis?.company_name || '',
-    job_title: job_analysis?.job_title || '',
-    job_description_hash: job_analysis?.job_description ? 
-      btoa(job_analysis.job_description.substring(0, 500)).replace(/[^a-zA-Z0-9]/g, '') : 'no-desc',
+    company_name: analysisData?.company_name || '',
+    job_title: analysisData?.job_title || '',
+    job_description_hash: analysisData?.job_description ? 
+      btoa(analysisData.job_description.substring(0, 500)).replace(/[^a-zA-Z0-9]/g, '') : 'no-desc',
     submission_hash: payload.submission_hash || '',
     execution_id: anti_duplicate_metadata?.execution_id || '',
     trigger_source: anti_duplicate_metadata?.trigger_source || 'unknown',
-    created_at_epoch: job_analysis?.created_at ? 
-      Math.floor(new Date(job_analysis.created_at).getTime() / 60000) : 0 // Round to minute
+    created_at_epoch: analysisData?.created_at ? 
+      Math.floor(new Date(analysisData.created_at).getTime() / 60000) : 0 // Round to minute
   };
 
   const encoder = new TextEncoder();
@@ -159,12 +162,19 @@ serve(async (req) => {
       );
     }
 
+    // Determine webhook type from payload
+    const webhookType = payload.webhook_type || payload.event_type || 'job_analysis_created';
+    const isJobGuide = webhookType === 'job_guide' || webhookType === 'job_analysis_created';
+    const isCoverLetter = webhookType === 'cover_letter' || webhookType === 'cover_letter_created';
+
     if (supabase) {
       await logExecutionEnhanced(supabase, 'INFO', 'Enhanced payload received and parsed', { 
         payloadKeys: Object.keys(payload),
-        jobAnalysisId: payload.job_analysis?.id,
+        recordId: payload.job_analysis?.id || payload.job_cover_letter?.id,
         userId: payload.user?.id || payload.user?.clerk_id,
-        webhookType: payload.webhook_type || payload.event_type,
+        webhookType,
+        isJobGuide,
+        isCoverLetter,
         payloadSize: JSON.stringify(payload).length,
         hasAntiDuplicateMetadata: !!payload.anti_duplicate_metadata,
         executionId: payload.anti_duplicate_metadata?.execution_id,
@@ -174,7 +184,6 @@ serve(async (req) => {
 
     // Generate enhanced fingerprint
     fingerprint = await generateEnhancedFingerprint(payload);
-    const webhookType = payload.webhook_type || payload.event_type || 'job_analysis_created';
     const executionKey = `${fingerprint}-${webhookType}`;
     
     // Register abort controller
@@ -185,6 +194,8 @@ serve(async (req) => {
         fingerprint,
         executionKey,
         webhookType,
+        isJobGuide,
+        isCoverLetter,
         databaseExecutionId: payload.anti_duplicate_metadata?.execution_id
       }, requestId);
     }
@@ -235,69 +246,31 @@ serve(async (req) => {
       }
     }
     
-    // LAYER 2: Enhanced database-level duplicate check using atomic function
-    if (supabase) {
-      const { data: atomicResult, error: atomicError } = await supabase.rpc(
-        'check_and_insert_execution',
-        {
-          p_fingerprint: fingerprint,
-          p_record_id: payload.job_analysis?.id,
-          p_submission_id: payload.submission_id || payload.request_id,
-          p_request_type: webhookType,
-          p_check_minutes: 15 // Extended check window
-        }
-      );
-
-      if (atomicError) {
-        await logExecutionEnhanced(supabase, 'ERROR', 'Atomic function error', { error: atomicError }, requestId);
-      } else if (atomicResult === 'DUPLICATE') {
-        await logExecutionEnhanced(supabase, 'WARN', 'DUPLICATE DETECTED - Enhanced atomic database level', { 
-          fingerprint,
-          atomicResult
-        }, requestId);
-
-        return new Response(
-          JSON.stringify({ 
-            success: false, 
-            message: 'Duplicate request blocked - enhanced atomic database level', 
-            type: webhookType,
-            requestId,
-            blocked: true,
-            reason: 'enhanced_atomic_duplicate'
-          }), 
-          { 
-            status: 429,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-          }
-        );
-      } else {
-        await logExecutionEnhanced(supabase, 'INFO', 'Atomic execution registered successfully', { 
-          atomicResult,
-          fingerprint
-        }, requestId);
-      }
-    }
-    
-    // LAYER 3: Enhanced existing results check
-    if (supabase && payload.job_analysis?.id) {
+    // LAYER 2: Enhanced existing results check for both job guide and cover letter
+    if (supabase && (payload.job_analysis?.id || payload.job_cover_letter?.id)) {
+      const recordId = payload.job_analysis?.id || payload.job_cover_letter?.id;
+      const tableName = isJobGuide ? 'job_analyses' : 'job_cover_letters';
+      const resultField = isJobGuide ? 'job_match' : 'cover_letter';
+      
       await logExecutionEnhanced(supabase, 'INFO', 'Enhanced checking database for existing results', { 
-        jobAnalysisId: payload.job_analysis?.id,
+        recordId,
+        tableName,
+        resultField,
         webhookType
       }, requestId);
       
-      const { data: existingAnalysis, error: resultCheckError } = await supabase
-        .from('job_analyses')
-        .select(webhookType === 'job_guide' ? 'job_match' : 'cover_letter')
-        .eq('id', payload.job_analysis?.id)
+      const { data: existingRecord, error: resultCheckError } = await supabase
+        .from(tableName)
+        .select(resultField)
+        .eq('id', recordId)
         .single();
       
-      if (!resultCheckError && existingAnalysis) {
-        const resultField = webhookType === 'job_guide' ? 'job_match' : 'cover_letter';
-        if (existingAnalysis[resultField]) {
+      if (!resultCheckError && existingRecord) {
+        if (existingRecord[resultField]) {
           await logExecutionEnhanced(supabase, 'INFO', 'RESULT ALREADY EXISTS - Enhanced skipping webhook call', { 
-            jobAnalysisId: payload.job_analysis?.id,
+            recordId,
             resultField,
-            hasResult: !!existingAnalysis[resultField]
+            hasResult: !!existingRecord[resultField]
           }, requestId);
           
           // Record execution as completed (no webhook needed)
@@ -312,7 +285,7 @@ serve(async (req) => {
           return new Response(
             JSON.stringify({ 
               success: true, 
-              message: 'Enhanced analysis result already exists - skipped', 
+              message: 'Enhanced result already exists - skipped', 
               type: webhookType,
               requestId,
               skipped: true,
@@ -324,7 +297,7 @@ serve(async (req) => {
           );
         }
       } else if (resultCheckError) {
-        await logExecutionEnhanced(supabase, 'WARN', 'Error checking existing analysis', { error: resultCheckError }, requestId);
+        await logExecutionEnhanced(supabase, 'WARN', 'Error checking existing record', { error: resultCheckError }, requestId);
       }
     }
     
@@ -352,14 +325,26 @@ serve(async (req) => {
       await logExecutionEnhanced(supabase, 'INFO', 'Enhanced cleanup completed', cleanupStats, requestId);
     }
     
-    // Determine webhook URL with enhanced validation
-    const webhookEnvVar = webhookType === 'job_guide' ? 'N8N_JG_WEBHOOK_URL' : 'N8N_CL_WEBHOOK_URL';
-    const webhookUrl = Deno.env.get(webhookEnvVar);
+    // Determine webhook URL based on type
+    let webhookUrl: string | undefined;
+    let webhookEnvVar: string;
+    
+    if (isCoverLetter) {
+      webhookEnvVar = 'N8N_CL_WEBHOOK_URL';
+      webhookUrl = Deno.env.get(webhookEnvVar);
+    } else if (isJobGuide) {
+      webhookEnvVar = 'N8N_JG_WEBHOOK_URL';
+      webhookUrl = Deno.env.get(webhookEnvVar);
+    } else {
+      // Default to job guide webhook for unknown types
+      webhookEnvVar = 'N8N_JG_WEBHOOK_URL';
+      webhookUrl = Deno.env.get(webhookEnvVar);
+    }
     
     if (!webhookUrl) {
-      const errorMsg = `Enhanced ${webhookEnvVar} secret not configured`;
+      const errorMsg = `Enhanced ${webhookEnvVar} secret not configured for type ${webhookType}`;
       if (supabase) {
-        await logExecutionEnhanced(supabase, 'ERROR', errorMsg, {}, requestId);
+        await logExecutionEnhanced(supabase, 'ERROR', errorMsg, { webhookType, isCoverLetter, isJobGuide }, requestId);
       }
       
       // Mark as failed and remove from tracker
@@ -367,7 +352,7 @@ serve(async (req) => {
       activeExecutions.delete(executionKey);
       
       return new Response(
-        JSON.stringify({ error: errorMsg, requestId }), 
+        JSON.stringify({ error: errorMsg, requestId, webhookType }), 
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -384,24 +369,29 @@ serve(async (req) => {
         fingerprint,
         executionKey,
         webhookType,
-        source: 'supabase-edge-function-enhanced-v4',
+        source: 'supabase-edge-function-enhanced-v5',
         preventDuplicates: true,
         submissionId: payload.submission_id || payload.request_id,
         antiDuplicateMetadata: payload.anti_duplicate_metadata,
         enhancedDuplicatePrevention: true,
         executionWindow: EXECUTION_WINDOW,
         databaseExecutionId: payload.anti_duplicate_metadata?.execution_id,
-        triggerSource: payload.anti_duplicate_metadata?.trigger_source
+        triggerSource: payload.anti_duplicate_metadata?.trigger_source,
+        isCoverLetter,
+        isJobGuide
       }
     };
 
-    // Forward to N8N webhook with enhanced headers and timeout protection
+    // Forward to appropriate N8N webhook with enhanced headers and timeout protection
     if (supabase) {
       await logExecutionEnhanced(supabase, 'INFO', 'Sending to enhanced N8N webhook', { 
         webhookType, 
         webhookUrl: webhookUrl.substring(0, 50) + '...',
         payloadSize: JSON.stringify(enhancedPayload).length,
-        executionId: payload.anti_duplicate_metadata?.execution_id
+        executionId: payload.anti_duplicate_metadata?.execution_id,
+        isCoverLetter,
+        isJobGuide,
+        webhookEnvVar
       }, requestId);
     }
     
@@ -417,9 +407,11 @@ serve(async (req) => {
         'X-Webhook-Type': webhookType,
         'X-Prevent-Duplicates': 'true',
         'X-Fingerprint': fingerprint,
-        'X-Source': 'supabase-edge-function-enhanced-v4',
+        'X-Source': 'supabase-edge-function-enhanced-v5',
         'X-Database-Execution-ID': payload.anti_duplicate_metadata?.execution_id || '',
-        'X-Trigger-Source': payload.anti_duplicate_metadata?.trigger_source || ''
+        'X-Trigger-Source': payload.anti_duplicate_metadata?.trigger_source || '',
+        'X-Is-Cover-Letter': isCoverLetter.toString(),
+        'X-Is-Job-Guide': isJobGuide.toString()
       },
       body: JSON.stringify(enhancedPayload),
       signal: abortController.signal
@@ -434,17 +426,6 @@ serve(async (req) => {
     const webhookDuration = Date.now() - webhookStartTime;
     const responseText = await response.text();
 
-    // Update execution status in database with enhanced tracking
-    if (supabase) {
-      await supabase.from('webhook_executions')
-        .update({ 
-          status: response.ok ? 'completed' : 'failed',
-          webhook_response: responseText.substring(0, 1000),
-          completed_at: new Date().toISOString()
-        })
-        .eq('fingerprint', fingerprint);
-    }
-
     if (!response.ok) {
       const errorMsg = `Enhanced N8N webhook failed (${webhookType})`;
       if (supabase) {
@@ -453,7 +434,8 @@ serve(async (req) => {
           statusText: response.statusText,
           responseText: responseText.substring(0, 500),
           webhookDuration,
-          executionId: payload.anti_duplicate_metadata?.execution_id
+          executionId: payload.anti_duplicate_metadata?.execution_id,
+          webhookUrl: webhookUrl.substring(0, 50) + '...'
         }, requestId);
       }
       
@@ -473,7 +455,8 @@ serve(async (req) => {
           statusText: response.statusText,
           requestId,
           executionId: payload.anti_duplicate_metadata?.execution_id,
-          responseText: responseText.substring(0, 200)
+          responseText: responseText.substring(0, 200),
+          webhookType
         }), 
         { 
           status: 500, 
@@ -499,7 +482,10 @@ serve(async (req) => {
         totalDuration,
         executionKey,
         executionId: payload.anti_duplicate_metadata?.execution_id,
-        responsePreview: responseText.substring(0, 100)
+        responsePreview: responseText.substring(0, 100),
+        isCoverLetter,
+        isJobGuide,
+        webhookUrl: webhookUrl.substring(0, 50) + '...'
       }, requestId);
     }
     
@@ -511,7 +497,9 @@ serve(async (req) => {
         requestId,
         executionId: payload.anti_duplicate_metadata?.execution_id,
         duration: totalDuration,
-        fingerprint
+        fingerprint,
+        isCoverLetter,
+        isJobGuide
       }), 
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 

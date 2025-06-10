@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -28,12 +29,12 @@ const CoverLetter = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [analysisId, setAnalysisId] = useState<string | null>(null);
+  const [coverLetterId, setCoverLetterId] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [coverLetterResult, setCoverLetterResult] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('');
 
-  // AGGRESSIVE duplicate prevention - same as JobGuide
+  // AGGRESSIVE duplicate prevention
   const submissionTracker = useRef<{
     lastSubmissionTime: number;
     lastSubmissionHash: string;
@@ -49,7 +50,6 @@ const CoverLetter = () => {
   });
 
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Minimum time between submissions - 3 seconds
   const MIN_SUBMISSION_INTERVAL = 3000;
@@ -80,14 +80,14 @@ const CoverLetter = () => {
   }, [isGenerating]);
 
   useEffect(() => {
-    if (!analysisId || !isGenerating) return;
+    if (!coverLetterId || !isGenerating) return;
     
     const pollForResults = async () => {
       try {
         const { data, error } = await supabase
-          .from('job_analyses')
+          .from('job_cover_letters')
           .select('cover_letter')
-          .eq('id', analysisId)
+          .eq('id', coverLetterId)
           .single();
         
         if (error) {
@@ -137,7 +137,7 @@ const CoverLetter = () => {
       }
       clearTimeout(timeout);
     };
-  }, [analysisId, isGenerating, toast]);
+  }, [coverLetterId, isGenerating, toast]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -153,11 +153,6 @@ const CoverLetter = () => {
       submissionTracker.current.debounceTimer = null;
     }
     
-    // Cancel any ongoing request
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    
     // Reset all states
     setFormData({
       companyName: '',
@@ -165,7 +160,7 @@ const CoverLetter = () => {
       jobDescription: ''
     });
     setCoverLetterResult(null);
-    setAnalysisId(null);
+    setCoverLetterId(null);
     setIsSuccess(false);
     setError(null);
     setIsGenerating(false);
@@ -208,7 +203,7 @@ const CoverLetter = () => {
       isHashSame: submissionTracker.current.lastSubmissionHash === submissionHash
     });
 
-    // AGGRESSIVE duplicate prevention checks - same as JobGuide
+    // AGGRESSIVE duplicate prevention checks
     
     // Check 1: Is submission already in progress?
     if (submissionTracker.current.isSubmissionInProgress) {
@@ -289,9 +284,6 @@ const CoverLetter = () => {
         setIsSuccess(false);
         setCoverLetterResult(null);
 
-        // Create abort controller
-        abortControllerRef.current = new AbortController();
-
         console.log('✅ PROCEEDING with cover letter submission:', requestId);
 
         const { data: userData, error: userError } = await supabase
@@ -304,9 +296,9 @@ const CoverLetter = () => {
           throw new Error('User not found in database');
         }
 
-        // Check for existing analysis first
-        const { data: existingAnalysis, error: checkError } = await supabase
-          .from('job_analyses')
+        // Check for existing cover letter first
+        const { data: existingCoverLetter, error: checkError } = await supabase
+          .from('job_cover_letters')
           .select('id, cover_letter')
           .eq('user_id', userData.id)
           .eq('company_name', formData.companyName)
@@ -316,11 +308,11 @@ const CoverLetter = () => {
           .order('created_at', { ascending: false })
           .limit(1);
 
-        if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
-          const existing = existingAnalysis[0];
+        if (!checkError && existingCoverLetter && existingCoverLetter.length > 0) {
+          const existing = existingCoverLetter[0];
           console.log('✅ FOUND existing cover letter:', existing.id);
           setCoverLetterResult(existing.cover_letter);
-          setAnalysisId(existing.id);
+          setCoverLetterId(existing.id);
           setIsSubmitting(false);
           submissionTracker.current.isSubmissionInProgress = false;
           toast({
@@ -330,9 +322,9 @@ const CoverLetter = () => {
           return;
         }
 
-        // Insert new analysis
+        // Insert new cover letter record into job_cover_letters table
         const { data: insertedData, error: insertError } = await supabase
-          .from('job_analyses')
+          .from('job_cover_letters')
           .insert({
             user_id: userData.id,
             company_name: formData.companyName,
@@ -348,59 +340,10 @@ const CoverLetter = () => {
         }
 
         if (insertedData?.id) {
-          console.log('✅ ANALYSIS INSERTED:', insertedData.id);
-          setAnalysisId(insertedData.id);
+          console.log('✅ COVER LETTER RECORD INSERTED:', insertedData.id);
+          setCoverLetterId(insertedData.id);
           setIsSuccess(true);
           setIsGenerating(true);
-
-          // Create webhook payload with anti-duplicate metadata
-          const webhookPayload = {
-            user: {
-              id: userData.id,
-              clerk_id: user?.id,
-              email: user?.emailAddresses[0]?.emailAddress,
-              first_name: user?.firstName,
-              last_name: user?.lastName
-            },
-            job_analysis: {
-              id: insertedData.id,
-              user_id: userData.id,
-              company_name: formData.companyName,
-              job_title: formData.jobTitle,
-              job_description: formData.jobDescription,
-              created_at: new Date().toISOString()
-            },
-            event_type: 'job_analysis_created',
-            webhook_type: 'cover_letter',
-            timestamp: new Date().toISOString(),
-            request_id: requestId,
-            submission_hash: submissionHash,
-            anti_duplicate_metadata: {
-              user_agent: navigator.userAgent,
-              source: 'cover_letter_page_v2',
-              submission_time: now,
-              form_fingerprint: submissionHash
-            }
-          };
-
-          // Call webhook with enhanced duplicate prevention
-          console.log('📡 CALLING WEBHOOK for cover letter:', insertedData.id);
-          const { error: webhookError } = await supabase.functions.invoke('job-analysis-webhook', {
-            body: webhookPayload,
-            headers: {
-              'X-Request-ID': requestId,
-              'X-Source': 'cover-letter-page-v2',
-              'X-Submission-Hash': submissionHash,
-              'X-Anti-Duplicate': 'true'
-            }
-          });
-          
-          if (webhookError) {
-            console.error('❌ WEBHOOK ERROR:', webhookError);
-            // Don't throw here, let polling handle it
-          } else {
-            console.log('✅ WEBHOOK SUCCESS:', requestId);
-          }
 
           toast({
             title: "Cover Letter Generation Started!",
