@@ -29,6 +29,8 @@ export const useUserProfile = () => {
       }
 
       try {
+        console.log('Fetching user profile for clerk_id:', user.id);
+        
         // First get the user's database ID
         const { data: userData, error: userError } = await supabase
           .from('users')
@@ -37,10 +39,13 @@ export const useUserProfile = () => {
           .single();
 
         if (userError) {
+          console.error('User not found in database:', userError);
           setError('User not found in database');
           setLoading(false);
           return;
         }
+
+        console.log('Found user data:', userData);
 
         // Then get or create the user profile
         let { data: profileData, error: profileError } = await supabase
@@ -51,6 +56,7 @@ export const useUserProfile = () => {
 
         if (profileError && profileError.code === 'PGRST116') {
           // Profile doesn't exist, create it
+          console.log('Creating new user profile');
           const { data: newProfileData, error: createError } = await supabase
             .from('user_profile')
             .insert({
@@ -65,6 +71,7 @@ export const useUserProfile = () => {
             .single();
 
           if (createError) {
+            console.error('Failed to create user profile:', createError);
             setError('Failed to create user profile');
             setLoading(false);
             return;
@@ -72,11 +79,13 @@ export const useUserProfile = () => {
 
           profileData = newProfileData;
         } else if (profileError) {
+          console.error('User profile fetch error:', profileError);
           setError('User profile not found');
           setLoading(false);
           return;
         }
 
+        console.log('Profile data loaded:', profileData);
         setUserProfile(profileData);
         setError(null);
       } catch (err) {
@@ -91,9 +100,14 @@ export const useUserProfile = () => {
   }, [user]);
 
   const updateUserProfile = async (updates: Partial<UserProfile>) => {
-    if (!user) return { error: 'No user found' };
+    if (!user) {
+      console.error('No user found for update');
+      return { error: 'No user found' };
+    }
 
     try {
+      console.log('Updating user profile with:', updates);
+      
       // Get the user's database ID first
       const { data: userData, error: userError } = await supabase
         .from('users')
@@ -102,15 +116,24 @@ export const useUserProfile = () => {
         .single();
 
       if (userError) {
+        console.error('User lookup failed:', userError);
         return { error: 'User not found in database' };
       }
 
+      console.log('User found for update:', userData);
+
       // If no userProfile exists, create it first
       if (!userProfile) {
+        console.log('Creating new profile during update');
         const { data: newProfileData, error: createError } = await supabase
           .from('user_profile')
           .insert({
             user_id: userData.id,
+            bio: null,
+            resume: null,
+            bot_activated: false,
+            bot_id: null,
+            chat_id: null,
             ...updates
           })
           .select()
@@ -126,6 +149,7 @@ export const useUserProfile = () => {
       }
 
       // Update existing profile
+      console.log('Updating existing profile with ID:', userProfile.id);
       const { data, error } = await supabase
         .from('user_profile')
         .update(updates)
@@ -138,6 +162,7 @@ export const useUserProfile = () => {
         return { error: 'Failed to update user profile' };
       }
 
+      console.log('Profile updated successfully:', data);
       setUserProfile(data);
       return { data, error: null };
     } catch (err) {
