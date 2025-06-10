@@ -33,26 +33,7 @@ const CoverLetter = () => {
   const [coverLetterResult, setCoverLetterResult] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('');
 
-  // AGGRESSIVE duplicate prevention
-  const submissionTracker = useRef<{
-    lastSubmissionTime: number;
-    lastSubmissionHash: string;
-    isSubmissionInProgress: boolean;
-    currentRequestId: string | null;
-    debounceTimer: NodeJS.Timeout | null;
-  }>({
-    lastSubmissionTime: 0,
-    lastSubmissionHash: '',
-    isSubmissionInProgress: false,
-    currentRequestId: null,
-    debounceTimer: null
-  });
-
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Minimum time between submissions - 3 seconds
-  const MIN_SUBMISSION_INTERVAL = 3000;
-  const DEBOUNCE_DELAY = 1000;
 
   const loadingMessages = [
     "✍️ Crafting your personalized cover letter...",
@@ -146,13 +127,6 @@ const CoverLetter = () => {
   };
 
   const handleClearData = useCallback(() => {
-    // Cancel any pending submission
-    if (submissionTracker.current.debounceTimer) {
-      clearTimeout(submissionTracker.current.debounceTimer);
-      submissionTracker.current.debounceTimer = null;
-    }
-    
-    // Reset all states
     setFormData({
       companyName: '',
       jobTitle: '',
@@ -165,80 +139,16 @@ const CoverLetter = () => {
     setIsGenerating(false);
     setIsSubmitting(false);
     
-    // Reset submission tracker
-    submissionTracker.current = {
-      lastSubmissionTime: 0,
-      lastSubmissionHash: '',
-      isSubmissionInProgress: false,
-      currentRequestId: null,
-      debounceTimer: null
-    };
-    
     toast({
       title: "Data Cleared",
       description: "All form data and results have been cleared."
     });
   }, [toast]);
 
-  const createSubmissionHash = useCallback((data: typeof formData) => {
-    return btoa(JSON.stringify({
-      company: data.companyName.trim(),
-      title: data.jobTitle.trim(),
-      description: data.jobDescription.trim().substring(0, 100)
-    })).replace(/[^a-zA-Z0-9]/g, '');
-  }, []);
-
   const handleSubmit = useCallback(async () => {
-    const now = Date.now();
-    const requestId = crypto.randomUUID();
-    const submissionHash = createSubmissionHash(formData);
+    console.log('🚀 Cover Letter Submit Button Clicked');
     
-    console.log('🚀 COVER LETTER SUBMIT ATTEMPT:', {
-      requestId,
-      isSubmissionInProgress: submissionTracker.current.isSubmissionInProgress,
-      timeSinceLastSubmission: now - submissionTracker.current.lastSubmissionTime,
-      lastSubmissionHash: submissionTracker.current.lastSubmissionHash,
-      currentSubmissionHash: submissionHash,
-      isHashSame: submissionTracker.current.lastSubmissionHash === submissionHash
-    });
-
-    // AGGRESSIVE duplicate prevention checks
-    
-    // Check 1: Is submission already in progress?
-    if (submissionTracker.current.isSubmissionInProgress) {
-      console.log('❌ BLOCKED: Submission already in progress');
-      toast({
-        title: "Please wait",
-        description: "Your cover letter is already being generated.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Check 2: Too soon after last submission?
-    if (now - submissionTracker.current.lastSubmissionTime < MIN_SUBMISSION_INTERVAL) {
-      console.log('❌ BLOCKED: Too soon after last submission');
-      toast({
-        title: "Please wait",
-        description: "Please wait a moment before submitting again.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Check 3: Exact same submission as before?
-    if (submissionTracker.current.lastSubmissionHash === submissionHash && 
-        now - submissionTracker.current.lastSubmissionTime < 300000) { // 5 minutes
-      console.log('❌ BLOCKED: Duplicate submission hash');
-      toast({
-        title: "Duplicate submission",
-        description: "You've already submitted this exact request recently.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Check 4: Profile complete?
+    // Basic validation
     if (!isComplete) {
       toast({
         title: "Complete your profile first",
@@ -248,7 +158,6 @@ const CoverLetter = () => {
       return;
     }
 
-    // Check 5: Form valid?
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
         title: "Missing information", 
@@ -258,135 +167,120 @@ const CoverLetter = () => {
       return;
     }
 
-    // Clear any previous debounce timer
-    if (submissionTracker.current.debounceTimer) {
-      clearTimeout(submissionTracker.current.debounceTimer);
+    if (isSubmitting || isGenerating) {
+      toast({
+        title: "Please wait",
+        description: "Your cover letter is already being generated.",
+        variant: "destructive"
+      });
+      return;
     }
 
-    // Set debounce timer for additional protection
-    submissionTracker.current.debounceTimer = setTimeout(async () => {
-      try {
-        // Double-check we're not already submitting
-        if (submissionTracker.current.isSubmissionInProgress) {
-          console.log('❌ DEBOUNCE BLOCKED: Already submitting');
-          return;
-        }
+    try {
+      setIsSubmitting(true);
+      setError(null);
+      setIsSuccess(false);
+      setCoverLetterResult(null);
 
-        // Set all protection flags IMMEDIATELY
-        submissionTracker.current.isSubmissionInProgress = true;
-        submissionTracker.current.lastSubmissionTime = now;
-        submissionTracker.current.lastSubmissionHash = submissionHash;
-        submissionTracker.current.currentRequestId = requestId;
-        
-        setIsSubmitting(true);
-        setError(null);
-        setIsSuccess(false);
-        setCoverLetterResult(null);
+      console.log('✅ Starting cover letter submission process');
 
-        console.log('✅ PROCEEDING with cover letter submission:', requestId);
+      // Get the user's database ID from users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('clerk_id', user?.id)
+        .single();
 
-        // First get the user's database ID from users table
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('id')
-          .eq('clerk_id', user?.id)
-          .single();
-
-        if (userError || !userData) {
-          throw new Error('User not found in database');
-        }
-
-        console.log('✅ Found user in users table:', userData.id);
-
-        // Then get the user_profile ID (this is what we need for job_cover_letters.user_id)
-        const { data: profileData, error: profileError } = await supabase
-          .from('user_profile')
-          .select('id')
-          .eq('user_id', userData.id)
-          .single();
-
-        if (profileError || !profileData) {
-          console.error('❌ User profile not found:', profileError);
-          throw new Error('User profile not found. Please complete your profile first.');
-        }
-
-        console.log('✅ Found user profile:', profileData.id);
-
-        // Check for existing cover letter first (using profile ID)
-        const { data: existingCoverLetter, error: checkError } = await supabase
-          .from('job_cover_letters')
-          .select('id, cover_letter')
-          .eq('user_id', profileData.id)
-          .eq('company_name', formData.companyName)
-          .eq('job_title', formData.jobTitle)
-          .eq('job_description', formData.jobDescription)
-          .not('cover_letter', 'is', null)
-          .order('created_at', { ascending: false })
-          .limit(1);
-
-        if (!checkError && existingCoverLetter && existingCoverLetter.length > 0) {
-          const existing = existingCoverLetter[0];
-          console.log('✅ FOUND existing cover letter:', existing.id);
-          setCoverLetterResult(existing.cover_letter);
-          setCoverLetterId(existing.id);
-          setIsSubmitting(false);
-          submissionTracker.current.isSubmissionInProgress = false;
-          toast({
-            title: "Previous Cover Letter Found",
-            description: "Using your previous cover letter for this job posting."
-          });
-          return;
-        }
-
-        // Insert new cover letter record using user_profile.id
-        const { data: insertedData, error: insertError } = await supabase
-          .from('job_cover_letters')
-          .insert({
-            user_id: profileData.id, // Use user_profile.id instead of users.id
-            company_name: formData.companyName,
-            job_title: formData.jobTitle,
-            job_description: formData.jobDescription
-          })
-          .select('id')
-          .single();
-
-        if (insertError) {
-          console.error('❌ INSERT ERROR:', insertError);
-          throw new Error(`Database insert failed: ${insertError.message}`);
-        }
-
-        if (insertedData?.id) {
-          console.log('✅ COVER LETTER RECORD INSERTED:', insertedData.id);
-          setCoverLetterId(insertedData.id);
-          setIsSuccess(true);
-          setIsGenerating(true);
-
-          toast({
-            title: "Cover Letter Generation Started!",
-            description: "Your personalized cover letter is being created. Please wait for the results."
-          });
-        }
-      } catch (err) {
-        console.error('❌ SUBMISSION ERROR:', err);
-        const errorMessage = err instanceof Error ? err.message : 'Failed to generate cover letter';
-        setError(errorMessage);
-        submissionTracker.current.isSubmissionInProgress = false;
-        submissionTracker.current.currentRequestId = null;
-        toast({
-          title: "Generation Failed",
-          description: "There was an error generating your cover letter. Please try again.",
-          variant: "destructive"
-        });
-      } finally {
-        setIsSubmitting(false);
+      if (userError || !userData) {
+        throw new Error('User not found in database');
       }
-    }, DEBOUNCE_DELAY);
 
-  }, [formData, isComplete, user, toast, createSubmissionHash]);
+      console.log('✅ Found user in users table:', userData.id);
+
+      // Get the user_profile ID
+      const { data: profileData, error: profileError } = await supabase
+        .from('user_profile')
+        .select('id')
+        .eq('user_id', userData.id)
+        .single();
+
+      if (profileError || !profileData) {
+        console.error('❌ User profile not found:', profileError);
+        throw new Error('User profile not found. Please complete your profile first.');
+      }
+
+      console.log('✅ Found user profile:', profileData.id);
+
+      // Check for existing cover letter first
+      const { data: existingCoverLetter, error: checkError } = await supabase
+        .from('job_cover_letters')
+        .select('id, cover_letter')
+        .eq('user_id', profileData.id)
+        .eq('company_name', formData.companyName)
+        .eq('job_title', formData.jobTitle)
+        .eq('job_description', formData.jobDescription)
+        .not('cover_letter', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (!checkError && existingCoverLetter && existingCoverLetter.length > 0) {
+        const existing = existingCoverLetter[0];
+        console.log('✅ Found existing cover letter:', existing.id);
+        setCoverLetterResult(existing.cover_letter);
+        setCoverLetterId(existing.id);
+        setIsSubmitting(false);
+        toast({
+          title: "Previous Cover Letter Found",
+          description: "Using your previous cover letter for this job posting."
+        });
+        return;
+      }
+
+      // Insert new cover letter record
+      const { data: insertedData, error: insertError } = await supabase
+        .from('job_cover_letters')
+        .insert({
+          user_id: profileData.id,
+          company_name: formData.companyName,
+          job_title: formData.jobTitle,
+          job_description: formData.jobDescription
+        })
+        .select('id')
+        .single();
+
+      if (insertError) {
+        console.error('❌ INSERT ERROR:', insertError);
+        throw new Error(`Database insert failed: ${insertError.message}`);
+      }
+
+      if (insertedData?.id) {
+        console.log('✅ Cover letter record inserted:', insertedData.id);
+        setCoverLetterId(insertedData.id);
+        setIsSuccess(true);
+        setIsGenerating(true);
+
+        toast({
+          title: "Cover Letter Generation Started!",
+          description: "Your personalized cover letter is being created. Please wait for the results."
+        });
+      }
+    } catch (err) {
+      console.error('❌ SUBMISSION ERROR:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to generate cover letter';
+      setError(errorMessage);
+      toast({
+        title: "Generation Failed",
+        description: "There was an error generating your cover letter. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [formData, isComplete, user, toast, isSubmitting, isGenerating]);
 
   const isFormValid = formData.companyName && formData.jobTitle && formData.jobDescription;
   const hasAnyData = isFormValid || coverLetterResult;
-  const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating || submissionTracker.current.isSubmissionInProgress;
+  const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating;
 
   if (!isLoaded || !user) {
     return (
@@ -668,8 +562,6 @@ const CoverLetter = () => {
                   <Button 
                     onClick={() => {
                       setError(null);
-                      submissionTracker.current.isSubmissionInProgress = false;
-                      submissionTracker.current.currentRequestId = null;
                     }} 
                     className="mt-3 bg-white text-red-600 hover:bg-gray-100 font-inter font-medium text-xs px-4 py-2" 
                     disabled={isSubmitting || isGenerating || !isFormValid}
