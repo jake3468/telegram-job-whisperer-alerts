@@ -464,9 +464,7 @@ const JobGuide = () => {
                       Clear All
                     </Button>}
                 </CardTitle>
-                <CardDescription className="text-blue-100 font-inter text-sm">
-                  Enter job details for comprehensive analysis with advanced duplicate prevention
-                </CardDescription>
+                <CardDescription className="text-blue-100 font-inter text-sm">Enter job details for a comprehensive analysis</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 pt-0">
                 <div className="space-y-4">
