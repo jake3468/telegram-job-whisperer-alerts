@@ -220,7 +220,7 @@ const HistoryModal = ({
                 <p className="text-sm">No {type === 'job_guide' ? 'job analyses' : 'cover letters'} found.</p>
               </div>
             </div> : <div className="space-y-2 sm:space-y-3">
-              {historyData.map(item => <div key={item.id} className="bg-white/5 hover:bg-white/10 rounded-lg p-3 sm:p-4 border border-white/10 transition-colors">
+              {historyData.map(item => <div key={item.id} className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-indigo-800">
                   {/* Mobile Layout - Stacked */}
                   <div className="block sm:hidden space-y-2">
                     <div className="flex items-start justify-between gap-2">
