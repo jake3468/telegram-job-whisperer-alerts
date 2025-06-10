@@ -47,15 +47,22 @@ export const useUserProfile = () => {
 
         console.log('Found user data:', userData);
 
-        // Then get or create the user profile
+        // Then get the user profile - use maybeSingle() to avoid errors when no profile exists
         let { data: profileData, error: profileError } = await supabase
           .from('user_profile')
           .select('*')
           .eq('user_id', userData.id)
-          .single();
+          .maybeSingle();
 
-        if (profileError && profileError.code === 'PGRST116') {
-          // Profile doesn't exist, create it
+        if (profileError) {
+          console.error('Error fetching user profile:', profileError);
+          setError('Error fetching user profile');
+          setLoading(false);
+          return;
+        }
+
+        // If no profile exists, create one
+        if (!profileData) {
           console.log('Creating new user profile');
           const { data: newProfileData, error: createError } = await supabase
             .from('user_profile')
@@ -78,11 +85,6 @@ export const useUserProfile = () => {
           }
 
           profileData = newProfileData;
-        } else if (profileError) {
-          console.error('User profile fetch error:', profileError);
-          setError('User profile not found');
-          setLoading(false);
-          return;
         }
 
         console.log('Profile data loaded:', profileData);
@@ -122,8 +124,26 @@ export const useUserProfile = () => {
 
       console.log('User found for update:', userData);
 
-      // If no userProfile exists, create it first
-      if (!userProfile) {
+      // Check if userProfile exists in state, if not, fetch it first
+      let currentProfile = userProfile;
+      if (!currentProfile) {
+        console.log('No profile in state, fetching from database');
+        const { data: fetchedProfile, error: fetchError } = await supabase
+          .from('user_profile')
+          .select('*')
+          .eq('user_id', userData.id)
+          .maybeSingle();
+
+        if (fetchError) {
+          console.error('Error fetching profile for update:', fetchError);
+          return { error: 'Failed to fetch profile for update' };
+        }
+
+        currentProfile = fetchedProfile;
+      }
+
+      // If no profile exists, create it
+      if (!currentProfile) {
         console.log('Creating new profile during update');
         const { data: newProfileData, error: createError } = await supabase
           .from('user_profile')
@@ -148,13 +168,12 @@ export const useUserProfile = () => {
         return { data: newProfileData, error: null };
       }
 
-      // Update existing profile
-      console.log('Updating existing profile with ID:', userProfile.id);
+      // Update existing profile using the profile ID
+      console.log('Updating existing profile with ID:', currentProfile.id);
       const { data, error } = await supabase
         .from('user_profile')
         .update(updates)
-        .eq('id', userProfile.id)
-        .eq('user_id', userData.id)
+        .eq('id', currentProfile.id)
         .select()
         .single();
 
