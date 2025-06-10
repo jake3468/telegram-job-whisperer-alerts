@@ -3,7 +3,7 @@ import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle } from 'lucide-react';
+import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 interface HistoryItem {
   id: string;
@@ -91,6 +91,25 @@ const HistoryModal = ({
       setIsLoading(false);
     }
   };
+  const handleCopyResult = async (item: HistoryItem) => {
+    const result = getResult(item);
+    if (!result) return;
+    
+    try {
+      await navigator.clipboard.writeText(result);
+      toast({
+        title: "Copied!",
+        description: `${type === 'job_guide' ? 'Job analysis' : 'Cover letter'} copied to clipboard successfully.`
+      });
+    } catch (err) {
+      console.error('Failed to copy text:', err);
+      toast({
+        title: "Error",
+        description: "Failed to copy text to clipboard.",
+        variant: "destructive"
+      });
+    }
+  };
   const handleDelete = async (itemId: string) => {
     try {
       const tableName = type === 'job_guide' ? 'job_analyses' : 'job_cover_letters';
@@ -173,12 +192,23 @@ const HistoryModal = ({
 
             {/* Result Section */}
             {hasResult(selectedItem) && <div className="rounded-lg p-4 border border-white/10 bg-purple-800">
-                <h3 className="text-white font-medium mb-4 flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  {type === 'job_guide' ? 'Job Analysis Result' : 'Cover Letter'}
+                <h3 className="text-white font-medium mb-4 flex items-center gap-2 justify-between">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    {type === 'job_guide' ? 'Job Analysis Result' : 'Cover Letter'}
+                  </div>
+                  {/* Add copy button for both job analysis and cover letter results in history */}
+                  <Button 
+                    onClick={() => handleCopyResult(selectedItem)} 
+                    size="sm" 
+                    className="bg-gray-950 hover:bg-gray-800 text-white flex items-center gap-1"
+                  >
+                    <Copy className="w-3 h-3" />
+                    <span className="hidden sm:inline">Copy</span>
+                  </Button>
                 </h3>
-                <div className={`p-4 rounded-lg border-2 max-h-96 overflow-y-auto ${type === 'cover_letter' ? 'bg-white notebook-paper border-blue-200' : 'bg-gray-50 notebook-paper border-gray-300'}`}>
-                  <div className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap" style={{
+                <div className="notebook-paper border-2 border-blue-200 max-h-96 overflow-y-auto">
+                  <div className="notebook-content text-gray-800 text-sm leading-relaxed whitespace-pre-wrap" style={{
                 fontFamily: 'serif'
               }}>
                     {getResult(selectedItem)}

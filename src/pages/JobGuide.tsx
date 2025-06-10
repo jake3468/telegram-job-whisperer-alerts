@@ -520,9 +520,9 @@ const JobGuide = () => {
                     <PercentageMeter percentage={matchScore} />
                   </div>
 
-                  {/* Job Match Analysis */}
-                  <div className="bg-white rounded-lg p-3 border-2 border-slate-300 w-full">
-                    <div className="text-slate-800 font-inter leading-relaxed font-medium w-full text-xs" style={{
+                  {/* Job Match Analysis with notebook background */}
+                  <div className="notebook-paper border-2 border-slate-300 w-full">
+                    <div className="notebook-content text-slate-800 font-inter leading-relaxed font-medium w-full text-xs" style={{
                   wordWrap: 'break-word',
                   overflowWrap: 'break-word',
                   wordBreak: 'break-word',
