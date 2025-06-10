@@ -320,8 +320,8 @@ const CoverLetter = () => {
         
         <div className="max-w-4xl mx-auto px-3 py-8 sm:px-4 sm:py-12">
           <div className="text-center mb-8">
-            <h1 className="text-6xl font-black bg-gradient-to-br from-pink-600 via-rose-600 to-red-700 bg-clip-text text-transparent">
-              <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent text-3xl">Cover Letter</span>
+            <h1 className="sm:text-xl font-medium text-white mb-2 font-inter text-3xl md:text-3xl">
+              <span className="bg-gradient-to-br from-pink-500 via-rose-500 to-red-600 border-2 border-pink-400 shadow-2xl shadow-rose-500/30">Cover Letter</span>
             </h1>
             <p className="text-sm text-gray-300 font-inter font-light">
               Generate a personalized cover letter to impress recruiters
