@@ -252,22 +252,37 @@ const JobGuide = () => {
         
         console.log('✅ PROCEEDING with submission:', requestId);
 
+        // Get the user_profile ID instead of users ID
         const {
-          data: userData,
-          error: userError
-        } = await supabase.from('users').select('id').eq('clerk_id', user?.id).single();
+          data: userProfileData,
+          error: userProfileError
+        } = await supabase
+          .from('user_profile')
+          .select('id')
+          .eq('user_id', (await supabase.from('users').select('id').eq('clerk_id', user?.id).single()).data?.id)
+          .single();
         
-        if (userError || !userData) {
-          throw new Error('User not found in database');
+        if (userProfileError || !userProfileData) {
+          throw new Error('User profile not found in database');
         }
 
-        // Check for existing analysis
+        // Check for existing analysis using user_profile ID
         const {
           data: existingAnalysis,
           error: checkError
-        } = await supabase.from('job_analyses').select('id, job_match, match_score').eq('user_id', userData.id).eq('company_name', formData.companyName).eq('job_title', formData.jobTitle).eq('job_description', formData.jobDescription).not('job_match', 'is', null).not('match_score', 'is', null).order('created_at', {
-          ascending: false
-        }).limit(1);
+        } = await supabase
+          .from('job_analyses')
+          .select('id, job_match, match_score')
+          .eq('user_id', userProfileData.id)
+          .eq('company_name', formData.companyName)
+          .eq('job_title', formData.jobTitle)
+          .eq('job_description', formData.jobDescription)
+          .not('job_match', 'is', null)
+          .not('match_score', 'is', null)
+          .order('created_at', {
+            ascending: false
+          })
+          .limit(1);
         
         if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
           const existing = existingAnalysis[0];
@@ -285,15 +300,20 @@ const JobGuide = () => {
           return;
         }
         
+        // Insert new analysis using user_profile ID
         const {
           data: insertedData,
           error: insertError
-        } = await supabase.from('job_analyses').insert({
-          user_id: userData.id,
-          company_name: formData.companyName,
-          job_title: formData.jobTitle,
-          job_description: formData.jobDescription
-        }).select('id').single();
+        } = await supabase
+          .from('job_analyses')
+          .insert({
+            user_id: userProfileData.id,
+            company_name: formData.companyName,
+            job_title: formData.jobTitle,
+            job_description: formData.jobDescription
+          })
+          .select('id')
+          .single();
         
         if (insertError) {
           console.error('❌ INSERT ERROR:', insertError);
