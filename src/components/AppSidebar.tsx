@@ -77,10 +77,10 @@ export function AppSidebar() {
                         className={`flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${
                           isCurrentlyActive 
                             ? 'bg-blue-600 text-white' 
-                            : 'text-white hover:bg-blue-500 hover:text-white'
+                            : 'text-white hover:bg-blue-500 hover:text-black'
                         }`}
                       >
-                        <item.icon className={`w-5 h-5 flex-shrink-0 text-white`} />
+                        <item.icon className={`w-5 h-5 flex-shrink-0 ${isCurrentlyActive ? 'text-white' : 'text-white hover:text-black'}`} />
                         {state === 'expanded' && <span className="font-medium truncate">{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>
@@ -108,10 +108,10 @@ export function AppSidebar() {
                         className={`flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${
                           isCurrentlyActive 
                             ? 'bg-blue-600 text-white' 
-                            : 'text-white hover:bg-blue-500 hover:text-white'
+                            : 'text-white hover:bg-blue-500 hover:text-black'
                         }`}
                       >
-                        <item.icon className={`w-5 h-5 flex-shrink-0 text-white`} />
+                        <item.icon className={`w-5 h-5 flex-shrink-0 ${isCurrentlyActive ? 'text-white' : 'text-white hover:text-black'}`} />
                         {state === 'expanded' && <span className="font-medium truncate">{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>
