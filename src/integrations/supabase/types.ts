@@ -9,6 +9,27 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      execution_logs: {
+        Row: {
+          data: Json | null
+          id: string
+          log_type: string
+          timestamp: string | null
+        }
+        Insert: {
+          data?: Json | null
+          id?: string
+          log_type: string
+          timestamp?: string | null
+        }
+        Update: {
+          data?: Json | null
+          id?: string
+          log_type?: string
+          timestamp?: string | null
+        }
+        Relationships: []
+      }
       job_alerts: {
         Row: {
           alert_frequency: string
@@ -151,11 +172,54 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_executions: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          executed_at: string | null
+          fingerprint: string
+          id: string
+          record_id: string | null
+          request_type: string | null
+          status: string | null
+          submission_id: string | null
+          webhook_response: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          executed_at?: string | null
+          fingerprint: string
+          id?: string
+          record_id?: string | null
+          request_type?: string | null
+          status?: string | null
+          submission_id?: string | null
+          webhook_response?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          executed_at?: string | null
+          fingerprint?: string
+          id?: string
+          record_id?: string | null
+          request_type?: string | null
+          status?: string | null
+          submission_id?: string | null
+          webhook_response?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      cleanup_old_webhook_executions: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       delete_old_job_analyses: {
         Args: Record<PropertyKey, never>
         Returns: undefined
