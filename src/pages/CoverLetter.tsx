@@ -197,7 +197,7 @@ const CoverLetter = () => {
 
       console.log('✅ Found user in users table:', userData.id);
 
-      // Get the user_profile ID
+      // Get the user_profile ID - this is the correct foreign key for job_cover_letters
       const { data: profileData, error: profileError } = await supabase
         .from('user_profile')
         .select('id')
@@ -236,11 +236,11 @@ const CoverLetter = () => {
         return;
       }
 
-      // Insert new cover letter record
+      // Insert new cover letter record with the correct user_id (profile ID)
       const { data: insertedData, error: insertError } = await supabase
         .from('job_cover_letters')
         .insert({
-          user_id: profileData.id,
+          user_id: profileData.id, // Use profile ID, not user ID
           company_name: formData.companyName,
           job_title: formData.jobTitle,
           job_description: formData.jobDescription
