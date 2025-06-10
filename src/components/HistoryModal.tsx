@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useToast } from '@/hooks/use-toast';
 import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+
 interface HistoryItem {
   id: string;
   company_name: string;
@@ -15,12 +16,14 @@ interface HistoryItem {
   match_score?: string;
   cover_letter?: string;
 }
+
 interface HistoryModalProps {
   type: 'job_guide' | 'cover_letter';
   isOpen: boolean;
   onClose: () => void;
   gradientColors: string;
 }
+
 const HistoryModal = ({
   type,
   isOpen,
@@ -37,11 +40,13 @@ const HistoryModal = ({
   const [isLoading, setIsLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+
   useEffect(() => {
     if (isOpen && user) {
       fetchHistory();
     }
   }, [isOpen, user]);
+
   const fetchHistory = async () => {
     if (!user) return;
     setIsLoading(true);
@@ -91,6 +96,7 @@ const HistoryModal = ({
       setIsLoading(false);
     }
   };
+
   const handleCopyResult = async (item: HistoryItem) => {
     const result = getResult(item);
     if (!result) return;
@@ -110,6 +116,7 @@ const HistoryModal = ({
       });
     }
   };
+
   const handleDelete = async (itemId: string) => {
     try {
       const tableName = type === 'job_guide' ? 'job_analyses' : 'job_cover_letters';
@@ -131,6 +138,7 @@ const HistoryModal = ({
       });
     }
   };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -140,13 +148,16 @@ const HistoryModal = ({
       minute: '2-digit'
     });
   };
+
   const getResult = (item: HistoryItem) => {
     return type === 'job_guide' ? item.job_match : item.cover_letter;
   };
+
   const hasResult = (item: HistoryItem) => {
     const result = getResult(item);
     return result && result.trim().length > 0;
   };
+
   if (showDetails && selectedItem) {
     return <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-black border-white/20">
@@ -190,7 +201,7 @@ const HistoryModal = ({
               </div>
             </div>
 
-            {/* Result Section */}
+            {/* Result Section with scrolling notebook background */}
             {hasResult(selectedItem) && <div className="rounded-lg p-4 border border-white/10 bg-purple-800">
                 <h3 className="text-white font-medium mb-4 flex items-center gap-2 justify-between">
                   <div className="flex items-center gap-2">
@@ -206,8 +217,8 @@ const HistoryModal = ({
                     <span className="hidden sm:inline">Copy</span>
                   </Button>
                 </h3>
-                <div className="notebook-paper border-2 border-blue-200 max-h-96 overflow-y-auto">
-                  <div className="notebook-content text-gray-800 text-sm leading-relaxed whitespace-pre-wrap" style={{
+                <div className="history-notebook-paper border-2 border-blue-200 max-h-96">
+                  <div className="history-notebook-content text-gray-800 text-sm leading-relaxed whitespace-pre-wrap" style={{
                 fontFamily: 'serif'
               }}>
                     {getResult(selectedItem)}
@@ -218,6 +229,7 @@ const HistoryModal = ({
         </DialogContent>
       </Dialog>;
   }
+
   return <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] max-w-5xl max-h-[90vh] overflow-hidden bg-black border-white/20">
         <DialogHeader>
@@ -230,7 +242,6 @@ const HistoryModal = ({
           </DialogDescription>
         </DialogHeader>
         
-        {/* 60-day retention notice */}
         <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg p-2 sm:p-3 mb-4">
           <div className="flex items-center gap-2 text-orange-200">
             <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
@@ -250,7 +261,6 @@ const HistoryModal = ({
               </div>
             </div> : <div className="space-y-2 sm:space-y-3">
               {historyData.map(item => <div key={item.id} className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-indigo-800">
-                  {/* Mobile Layout - Stacked */}
                   <div className="block sm:hidden space-y-2">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
@@ -269,7 +279,6 @@ const HistoryModal = ({
                       </div>
                     </div>
                     
-                    {/* Mobile Action buttons */}
                     <div className="flex items-center gap-1 pt-2">
                       <Button onClick={() => {
                   setSelectedItem(item);
@@ -286,7 +295,6 @@ const HistoryModal = ({
                     </div>
                   </div>
 
-                  {/* Desktop Layout - Single Line */}
                   <div className="hidden sm:flex items-center justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-4">
@@ -305,7 +313,6 @@ const HistoryModal = ({
                       </div>
                     </div>
 
-                    {/* Desktop Action buttons */}
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <Button onClick={() => {
                   setSelectedItem(item);
@@ -327,4 +334,5 @@ const HistoryModal = ({
       </DialogContent>
     </Dialog>;
 };
+
 export default HistoryModal;
