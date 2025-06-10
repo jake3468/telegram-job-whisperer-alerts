@@ -86,6 +86,7 @@ export type Database = {
       job_analyses: {
         Row: {
           company_name: string
+          cover_letter: string | null
           created_at: string
           id: string
           job_description: string
@@ -96,6 +97,7 @@ export type Database = {
         }
         Insert: {
           company_name: string
+          cover_letter?: string | null
           created_at?: string
           id?: string
           job_description: string
@@ -106,6 +108,7 @@ export type Database = {
         }
         Update: {
           company_name?: string
+          cover_letter?: string | null
           created_at?: string
           id?: string
           job_description?: string
@@ -117,47 +120,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "job_analyses_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      job_cover_letters: {
-        Row: {
-          company_name: string
-          cover_letter: string | null
-          created_at: string
-          id: string
-          job_description: string
-          job_title: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          company_name: string
-          cover_letter?: string | null
-          created_at?: string
-          id?: string
-          job_description: string
-          job_title: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          company_name?: string
-          cover_letter?: string | null
-          created_at?: string
-          id?: string
-          job_description?: string
-          job_title?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "job_cover_letters_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -251,30 +213,9 @@ export type Database = {
       }
     }
     Views: {
-      webhook_execution_monitoring: {
-        Row: {
-          execution_count: number | null
-          execution_ids: string[] | null
-          execution_times: string[] | null
-          fingerprint: string | null
-          request_type: string | null
-          statuses: string[] | null
-          time_diff_between_first_last: unknown | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
-      check_and_insert_cover_letter_execution: {
-        Args: {
-          p_fingerprint: string
-          p_record_id: string
-          p_submission_id?: string
-          p_request_type?: string
-          p_check_minutes?: number
-        }
-        Returns: string
-      }
       cleanup_old_webhook_executions: {
         Args: Record<PropertyKey, never>
         Returns: undefined
