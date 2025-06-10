@@ -135,7 +135,7 @@ const HistoryModal = ({
             <DialogTitle className="text-white font-inter flex items-center gap-2 text-lg">
               <FileText className="w-5 h-5" />
               {type === 'job_guide' ? 'Job Analysis Details' : 'Cover Letter Details'}
-              <Button onClick={() => setShowDetails(false)} size="sm" className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm">
+              <Button onClick={() => setShowDetails(false)} size="sm" className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm mx-[15px]">
                 <X className="w-4 h-4 mr-1" />
                 Back to List
               </Button>
