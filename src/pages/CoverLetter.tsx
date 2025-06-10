@@ -602,5 +602,3 @@ const CoverLetter = () => {
 };
 
 export default CoverLetter;
-
-</edits_to_apply>
