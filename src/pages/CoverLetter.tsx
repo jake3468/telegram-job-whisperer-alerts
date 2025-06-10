@@ -461,7 +461,7 @@ const CoverLetter = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0 p-4 w-full bg-emerald-600">
-                  <div className="bg-white rounded-lg p-4 border-2 border-blue-200 w-full notebook-paper">
+                  <div className="bg-white rounded-lg p-4 border-2 border-blue-200 w-full">
                     <div className="text-slate-800 font-inter leading-relaxed font-medium w-full text-sm" style={{
                   wordWrap: 'break-word',
                   overflowWrap: 'break-word',

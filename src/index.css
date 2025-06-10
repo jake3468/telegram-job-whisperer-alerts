@@ -1,4 +1,5 @@
 
+
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
 @tailwind base;
 @tailwind components;
@@ -86,49 +87,3 @@
   }
 }
 
-/* Notebook paper effect with texture that scrolls with content */
-.notebook-paper {
-  position: relative;
-  background: #f8f8f8;
-  background-image: 
-    linear-gradient(to bottom, #d0d0d0 1px, transparent 1px);
-  background-size: 100% 25px;
-  background-attachment: scroll;
-  padding: 16px;
-  border-radius: 8px;
-}
-
-/* Ensure text content scrolls normally with background */
-.notebook-content {
-  position: relative;
-  z-index: 2;
-  background: transparent;
-}
-
-/* History section notebook - ensure background scrolls with content */
-.history-notebook-paper {
-  position: relative;
-  background: #f8f8f8;
-  background-image: 
-    linear-gradient(to bottom, #d0d0d0 1px, transparent 1px);
-  background-size: 100% 25px;
-  background-attachment: scroll;
-  padding: 16px;
-  border-radius: 8px;
-  overflow-y: auto;
-}
-
-.history-notebook-content {
-  position: relative;
-  z-index: 2;
-  background: transparent;
-}
-
-/* Responsive adjustments for mobile */
-@media (max-width: 640px) {
-  .notebook-paper,
-  .history-notebook-paper {
-    padding: 12px !important;
-    background-size: 100% 20px;
-  }
-}

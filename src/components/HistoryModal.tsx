@@ -201,7 +201,7 @@ const HistoryModal = ({
               </div>
             </div>
 
-            {/* Result Section with scrolling notebook background */}
+            {/* Result Section without notebook background */}
             {hasResult(selectedItem) && <div className="rounded-lg p-4 border border-white/10 bg-purple-800">
                 <h3 className="text-white font-medium mb-4 flex items-center gap-2 justify-between">
                   <div className="flex items-center gap-2">
@@ -217,8 +217,8 @@ const HistoryModal = ({
                     <span className="hidden sm:inline">Copy</span>
                   </Button>
                 </h3>
-                <div className="history-notebook-paper border-2 border-blue-200 max-h-96">
-                  <div className="history-notebook-content text-gray-800 text-sm leading-relaxed whitespace-pre-wrap" style={{
+                <div className="bg-white rounded-lg p-4 border-2 border-blue-200 max-h-96 overflow-y-auto">
+                  <div className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap" style={{
                 fontFamily: 'serif'
               }}>
                     {getResult(selectedItem)}
