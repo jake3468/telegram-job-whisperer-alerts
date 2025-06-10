@@ -25,7 +25,7 @@ const EXECUTION_WINDOW = 900000; // 15 minutes for extra safety
 const CLEANUP_INTERVAL = 1800000; // 30 minutes cleanup
 const MAX_EXECUTION_TIME = 300000; // 5 minutes max execution time
 
-// Enhanced cryptographic fingerprint generation
+// Fixed cryptographic fingerprint generation - handles UTF-8 properly
 async function generateEnhancedFingerprint(payload: any): Promise<string> {
   const { job_analysis, job_cover_letter, user, webhook_type, event_type, anti_duplicate_metadata } = payload;
   
@@ -38,8 +38,9 @@ async function generateEnhancedFingerprint(payload: any): Promise<string> {
     webhook_type: webhook_type || event_type || 'job_analysis_created',
     company_name: analysisData?.company_name || '',
     job_title: analysisData?.job_title || '',
+    // Fixed: Use proper UTF-8 encoding instead of btoa
     job_description_hash: analysisData?.job_description ? 
-      btoa(analysisData.job_description.substring(0, 500)).replace(/[^a-zA-Z0-9]/g, '') : 'no-desc',
+      (await crypto.subtle.digest('SHA-256', new TextEncoder().encode(analysisData.job_description.substring(0, 500)))).toString() : 'no-desc',
     submission_hash: payload.submission_hash || '',
     execution_id: anti_duplicate_metadata?.execution_id || '',
     trigger_source: anti_duplicate_metadata?.trigger_source || 'unknown',
@@ -369,7 +370,7 @@ serve(async (req) => {
         fingerprint,
         executionKey,
         webhookType,
-        source: 'supabase-edge-function-enhanced-v5',
+        source: 'supabase-edge-function-enhanced-v6',
         preventDuplicates: true,
         submissionId: payload.submission_id || payload.request_id,
         antiDuplicateMetadata: payload.anti_duplicate_metadata,
@@ -407,7 +408,7 @@ serve(async (req) => {
         'X-Webhook-Type': webhookType,
         'X-Prevent-Duplicates': 'true',
         'X-Fingerprint': fingerprint,
-        'X-Source': 'supabase-edge-function-enhanced-v5',
+        'X-Source': 'supabase-edge-function-enhanced-v6',
         'X-Database-Execution-ID': payload.anti_duplicate_metadata?.execution_id || '',
         'X-Trigger-Source': payload.anti_duplicate_metadata?.trigger_source || '',
         'X-Is-Cover-Letter': isCoverLetter.toString(),
