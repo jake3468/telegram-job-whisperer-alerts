@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -286,6 +285,7 @@ const CoverLetter = () => {
 
         console.log('✅ PROCEEDING with cover letter submission:', requestId);
 
+        // First get the user's database ID from users table
         const { data: userData, error: userError } = await supabase
           .from('users')
           .select('id')
@@ -296,11 +296,27 @@ const CoverLetter = () => {
           throw new Error('User not found in database');
         }
 
-        // Check for existing cover letter first
+        console.log('✅ Found user in users table:', userData.id);
+
+        // Then get the user_profile ID (this is what we need for job_cover_letters.user_id)
+        const { data: profileData, error: profileError } = await supabase
+          .from('user_profile')
+          .select('id')
+          .eq('user_id', userData.id)
+          .single();
+
+        if (profileError || !profileData) {
+          console.error('❌ User profile not found:', profileError);
+          throw new Error('User profile not found. Please complete your profile first.');
+        }
+
+        console.log('✅ Found user profile:', profileData.id);
+
+        // Check for existing cover letter first (using profile ID)
         const { data: existingCoverLetter, error: checkError } = await supabase
           .from('job_cover_letters')
           .select('id, cover_letter')
-          .eq('user_id', userData.id)
+          .eq('user_id', profileData.id)
           .eq('company_name', formData.companyName)
           .eq('job_title', formData.jobTitle)
           .eq('job_description', formData.jobDescription)
@@ -322,11 +338,11 @@ const CoverLetter = () => {
           return;
         }
 
-        // Insert new cover letter record into job_cover_letters table
+        // Insert new cover letter record using user_profile.id
         const { data: insertedData, error: insertError } = await supabase
           .from('job_cover_letters')
           .insert({
-            user_id: userData.id,
+            user_id: profileData.id, // Use user_profile.id instead of users.id
             company_name: formData.companyName,
             job_title: formData.jobTitle,
             job_description: formData.jobDescription
