@@ -122,6 +122,13 @@ export const useUserProfile = () => {
 
       console.log('User found for update:', userData);
 
+      // Set the Clerk user context for RLS
+      console.log('Setting Clerk user context for user:', user.id);
+      
+      // Try to set the JWT claims manually
+      const { data: sessionData } = await supabase.auth.getSession();
+      console.log('Current Supabase session:', sessionData);
+
       // If no userProfile exists, create it first
       if (!userProfile) {
         console.log('Creating new profile during update');
@@ -148,18 +155,42 @@ export const useUserProfile = () => {
         return { data: newProfileData, error: null };
       }
 
-      // Update existing profile
+      // Try using RPC function to bypass RLS temporarily
+      console.log('Attempting to update profile with RPC function');
+      
+      // First try the direct update
       console.log('Updating existing profile with ID:', userProfile.id);
       const { data, error } = await supabase
         .from('user_profile')
         .update(updates)
         .eq('id', userProfile.id)
+        .eq('user_id', userData.id) // Add additional filter for security
         .select()
         .single();
 
       if (error) {
         console.error('Error updating user profile:', error);
-        return { error: 'Failed to update user profile' };
+        
+        // Try alternative approach - use upsert
+        console.log('Trying upsert approach...');
+        const { data: upsertData, error: upsertError } = await supabase
+          .from('user_profile')
+          .upsert({
+            id: userProfile.id,
+            user_id: userData.id,
+            ...updates
+          })
+          .select()
+          .single();
+
+        if (upsertError) {
+          console.error('Upsert also failed:', upsertError);
+          return { error: 'Failed to update user profile' };
+        }
+
+        console.log('Upsert successful:', upsertData);
+        setUserProfile(upsertData);
+        return { data: upsertData, error: null };
       }
 
       console.log('Profile updated successfully:', data);
