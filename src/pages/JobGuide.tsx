@@ -12,6 +12,8 @@ import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import { supabase } from '@/integrations/supabase/client';
 import { Layout } from '@/components/Layout';
 import JobAnalysisHistory from '@/components/JobAnalysisHistory';
+import PercentageMeter from '@/components/PercentageMeter';
+
 const JobGuide = () => {
   const {
     user,
@@ -38,6 +40,7 @@ const JobGuide = () => {
   const [analysisId, setAnalysisId] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [jobMatchResult, setJobMatchResult] = useState<string | null>(null);
+  const [matchScore, setMatchScore] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('');
 
   // Enhanced duplicate prevention with stronger safeguards
@@ -79,13 +82,14 @@ const JobGuide = () => {
         const {
           data,
           error
-        } = await supabase.from('job_analyses').select('job_match').eq('id', analysisId).single();
+        } = await supabase.from('job_analyses').select('job_match, match_score').eq('id', analysisId).single();
         if (error) {
           console.error('Error polling for results:', error);
           return;
         }
-        if (data?.job_match) {
+        if (data?.job_match && data?.match_score) {
           setJobMatchResult(data.job_match);
+          setMatchScore(data.match_score);
           setIsGenerating(false);
           setIsSuccess(false);
           requestInFlightRef.current = false;
@@ -170,6 +174,7 @@ const JobGuide = () => {
       jobDescription: ''
     });
     setJobMatchResult(null);
+    setMatchScore(null);
     setAnalysisId(null);
     setIsSuccess(false);
     setError(null);
@@ -308,6 +313,7 @@ const JobGuide = () => {
         setError(null);
         setIsSuccess(false);
         setJobMatchResult(null);
+        setMatchScore(null);
         abortControllerRef.current = new AbortController();
         console.log('✅ PROCEEDING with enhanced submission:', requestId);
 
@@ -327,13 +333,14 @@ const JobGuide = () => {
         const {
           data: existingAnalysis,
           error: checkError
-        } = await supabase.from('job_analyses').select('id, job_match').eq('user_id', userData.id).eq('company_name', formData.companyName).eq('job_title', formData.jobTitle).eq('job_description', formData.jobDescription).not('job_match', 'is', null).order('created_at', {
+        } = await supabase.from('job_analyses').select('id, job_match, match_score').eq('user_id', userData.id).eq('company_name', formData.companyName).eq('job_title', formData.jobTitle).eq('job_description', formData.jobDescription).not('job_match', 'is', null).not('match_score', 'is', null).order('created_at', {
           ascending: false
         }).limit(1);
         if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
           const existing = existingAnalysis[0];
           console.log('✅ FOUND existing enhanced analysis:', existing.id);
           setJobMatchResult(existing.job_match);
+          setMatchScore(existing.match_score);
           setAnalysisId(existing.id);
           setIsSubmitting(false);
           submissionInProgressRef.current = false;
@@ -393,7 +400,7 @@ const JobGuide = () => {
     }, DEBOUNCE_DELAY);
   }, [formData, isComplete, user, toast, createEnhancedSubmissionHash]);
   const isFormValid = formData.companyName && formData.jobTitle && formData.jobDescription;
-  const hasAnyData = isFormValid || jobMatchResult;
+  const hasAnyData = isFormValid || jobMatchResult || matchScore;
   const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating || submissionInProgressRef.current || requestInFlightRef.current || formLockRef.current;
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-black flex items-center justify-center">
@@ -548,8 +555,8 @@ const JobGuide = () => {
                 </CardContent>
               </Card>}
 
-            {/* Enhanced Job Match Results Display */}
-            {jobMatchResult && <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20 w-full">
+            {/* Enhanced Job Match Results Display with Match Score */}
+            {jobMatchResult && matchScore && <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20 w-full">
                 <CardHeader className="pb-3 bg-green-300">
                   <CardTitle className="font-inter flex items-center gap-2 text-sm text-gray-950">
                     <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gray-950">
@@ -558,7 +565,13 @@ const JobGuide = () => {
                     Enhanced Job Match Analysis
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 bg-green-300 p-4 w-full">
+                <CardContent className="pt-0 bg-green-300 p-4 w-full space-y-4">
+                  {/* Match Score Meter */}
+                  <div className="bg-gray-900 rounded-lg p-4 border-2 border-slate-300">
+                    <PercentageMeter percentage={matchScore} />
+                  </div>
+
+                  {/* Job Match Analysis */}
                   <div className="bg-white rounded-lg p-3 border-2 border-slate-300 w-full">
                     <div className="text-slate-800 font-inter leading-relaxed font-medium w-full text-xs" style={{
                   wordWrap: 'break-word',
@@ -576,7 +589,7 @@ const JobGuide = () => {
               </Card>}
 
             {/* Enhanced Success Display */}
-            {isSuccess && !isGenerating && !jobMatchResult && <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
+            {isSuccess && !isGenerating && !jobMatchResult && !matchScore && <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-sm">
                     <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">

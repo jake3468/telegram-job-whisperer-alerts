@@ -91,6 +91,7 @@ export type Database = {
           job_description: string
           job_match: string | null
           job_title: string
+          match_score: string | null
           updated_at: string
           user_id: string
         }
@@ -101,6 +102,7 @@ export type Database = {
           job_description: string
           job_match?: string | null
           job_title: string
+          match_score?: string | null
           updated_at?: string
           user_id: string
         }
@@ -111,6 +113,7 @@ export type Database = {
           job_description?: string
           job_match?: string | null
           job_title?: string
+          match_score?: string | null
           updated_at?: string
           user_id?: string
         }
