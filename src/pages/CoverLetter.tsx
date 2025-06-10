@@ -192,6 +192,7 @@ const CoverLetter = () => {
         .single();
 
       if (userError || !userData) {
+        console.error('❌ User not found:', userError);
         throw new Error('User not found in database');
       }
 
@@ -236,15 +237,19 @@ const CoverLetter = () => {
         return;
       }
 
-      // Insert new cover letter record with the correct user_id (profile ID)
+      // Insert new cover letter record with ONLY the required fields
+      const insertData = {
+        user_id: profileData.id,
+        company_name: formData.companyName,
+        job_title: formData.jobTitle,
+        job_description: formData.jobDescription
+      };
+
+      console.log('📝 Inserting cover letter data:', insertData);
+
       const { data: insertedData, error: insertError } = await supabase
         .from('job_cover_letters')
-        .insert({
-          user_id: profileData.id, // Use profile ID, not user ID
-          company_name: formData.companyName,
-          job_title: formData.jobTitle,
-          job_description: formData.jobDescription
-        })
+        .insert(insertData)
         .select('id')
         .single();
 
@@ -277,6 +282,24 @@ const CoverLetter = () => {
       setIsSubmitting(false);
     }
   }, [formData, isComplete, user, toast, isSubmitting, isGenerating]);
+
+  // Listen for history data events
+  useEffect(() => {
+    const handleHistoryData = (event: any) => {
+      const { companyName, jobTitle, jobDescription, result, type } = event.detail;
+      if (type === 'cover_letter') {
+        setFormData({
+          companyName,
+          jobTitle,
+          jobDescription
+        });
+        setCoverLetterResult(result);
+      }
+    };
+
+    window.addEventListener('useHistoryData', handleHistoryData);
+    return () => window.removeEventListener('useHistoryData', handleHistoryData);
+  }, []);
 
   const isFormValid = formData.companyName && formData.jobTitle && formData.jobDescription;
   const hasAnyData = isFormValid || coverLetterResult;
@@ -579,3 +602,5 @@ const CoverLetter = () => {
 };
 
 export default CoverLetter;
+
+</edits_to_apply>
