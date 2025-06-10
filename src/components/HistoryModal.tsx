@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -65,19 +64,24 @@ const HistoryModal = ({ type, isOpen, onClose, gradientColors }: HistoryModalPro
 
       const tableName = type === 'job_guide' ? 'job_analyses' : 'job_cover_letters';
       
-      let selectFields = 'id, company_name, job_title, job_description, created_at';
+      let query;
       if (type === 'job_guide') {
-        selectFields += ', job_match, match_score';
+        query = supabase
+          .from(tableName)
+          .select('id, company_name, job_title, job_description, created_at, job_match, match_score')
+          .eq('user_id', profileData.id)
+          .order('created_at', { ascending: false })
+          .limit(20);
       } else {
-        selectFields += ', cover_letter';
+        query = supabase
+          .from(tableName)
+          .select('id, company_name, job_title, job_description, created_at, cover_letter')
+          .eq('user_id', profileData.id)
+          .order('created_at', { ascending: false })
+          .limit(20);
       }
       
-      const { data, error } = await supabase
-        .from(tableName)
-        .select(selectFields)
-        .eq('user_id', profileData.id)
-        .order('created_at', { ascending: false })
-        .limit(20);
+      const { data, error } = await query;
 
       if (error) {
         console.error('Error fetching history:', error);
