@@ -15,6 +15,7 @@ const globalExecutionTracker = new Map<string, {
   status: 'processing' | 'completed' | 'failed';
   payload: any;
   executionId: string;
+  webhookType: string;
 }>();
 
 // Execution tracking with abort controllers for cleanup
@@ -25,23 +26,25 @@ const EXECUTION_WINDOW = 900000; // 15 minutes for extra safety
 const CLEANUP_INTERVAL = 1800000; // 30 minutes cleanup
 const MAX_EXECUTION_TIME = 300000; // 5 minutes max execution time
 
-// Enhanced cryptographic fingerprint generation
+// Enhanced cryptographic fingerprint generation for both types
 async function generateEnhancedFingerprint(payload: any): Promise<string> {
-  const { job_analysis, user, webhook_type, event_type, anti_duplicate_metadata } = payload;
+  const { job_analysis, job_cover_letter, user, webhook_type, event_type, anti_duplicate_metadata } = payload;
+  
+  // Handle both job analysis and cover letter payloads
+  const analysisData = job_analysis || job_cover_letter;
   
   const fingerprintData = {
     user_id: user?.id || user?.clerk_id || 'unknown',
-    job_analysis_id: job_analysis?.id || 'unknown',
-    webhook_type: webhook_type || event_type || 'job_analysis_created',
-    company_name: job_analysis?.company_name || '',
-    job_title: job_analysis?.job_title || '',
-    job_description_hash: job_analysis?.job_description ? 
-      btoa(job_analysis.job_description.substring(0, 500)).replace(/[^a-zA-Z0-9]/g, '') : 'no-desc',
-    submission_hash: payload.submission_hash || '',
+    record_id: analysisData?.id || 'unknown',
+    webhook_type: webhook_type || event_type || 'unknown',
+    company_name: analysisData?.company_name || '',
+    job_title: analysisData?.job_title || '',
+    job_description_hash: analysisData?.job_description ? 
+      await crypto.subtle.digest('SHA-256', new TextEncoder().encode(analysisData.job_description.substring(0, 500))) : 'no-desc',
     execution_id: anti_duplicate_metadata?.execution_id || '',
     trigger_source: anti_duplicate_metadata?.trigger_source || 'unknown',
-    created_at_epoch: job_analysis?.created_at ? 
-      Math.floor(new Date(job_analysis.created_at).getTime() / 60000) : 0 // Round to minute
+    created_at_epoch: analysisData?.created_at ? 
+      Math.floor(new Date(analysisData.created_at).getTime() / 60000) : 0 // Round to minute
   };
 
   const encoder = new TextEncoder();
@@ -119,13 +122,14 @@ serve(async (req) => {
     createClient(supabaseUrl, supabaseServiceKey) : null;
 
   if (supabase) {
-    await logExecutionEnhanced(supabase, 'INFO', 'FUNCTION START - Enhanced Job Analysis Webhook called', {
+    await logExecutionEnhanced(supabase, 'INFO', 'FUNCTION START - Enhanced Webhook called for both Job Analysis and Cover Letter', {
       method: req.method,
       userAgent: req.headers.get('user-agent'),
       clientInfo: req.headers.get('x-client-info'),
       contentType: req.headers.get('content-type'),
       executionId: req.headers.get('x-execution-id'),
-      fingerprint: req.headers.get('x-fingerprint')
+      fingerprint: req.headers.get('x-fingerprint'),
+      webhookType: req.headers.get('x-webhook-type')
     }, requestId);
   }
 
@@ -159,12 +163,19 @@ serve(async (req) => {
       );
     }
 
+    // Determine webhook type and table
+    const webhookType = payload.webhook_type || payload.event_type || 'unknown';
+    const isJobAnalysis = webhookType === 'job_guide' || payload.job_analysis;
+    const isCoverLetter = webhookType === 'cover_letter' || payload.job_cover_letter;
+
     if (supabase) {
       await logExecutionEnhanced(supabase, 'INFO', 'Enhanced payload received and parsed', { 
         payloadKeys: Object.keys(payload),
-        jobAnalysisId: payload.job_analysis?.id,
+        isJobAnalysis,
+        isCoverLetter,
+        webhookType,
+        recordId: payload.job_analysis?.id || payload.job_cover_letter?.id,
         userId: payload.user?.id || payload.user?.clerk_id,
-        webhookType: payload.webhook_type || payload.event_type,
         payloadSize: JSON.stringify(payload).length,
         hasAntiDuplicateMetadata: !!payload.anti_duplicate_metadata,
         executionId: payload.anti_duplicate_metadata?.execution_id,
@@ -174,7 +185,6 @@ serve(async (req) => {
 
     // Generate enhanced fingerprint
     fingerprint = await generateEnhancedFingerprint(payload);
-    const webhookType = payload.webhook_type || payload.event_type || 'job_analysis_created';
     const executionKey = `${fingerprint}-${webhookType}`;
     
     // Register abort controller
@@ -185,6 +195,8 @@ serve(async (req) => {
         fingerprint,
         executionKey,
         webhookType,
+        isJobAnalysis,
+        isCoverLetter,
         databaseExecutionId: payload.anti_duplicate_metadata?.execution_id
       }, requestId);
     }
@@ -203,7 +215,8 @@ serve(async (req) => {
           lastExecutionStatus: lastExecution.status,
           lastRequestId: lastExecution.requestId,
           lastExecutionId: lastExecution.executionId,
-          currentRequestId: requestId
+          currentRequestId: requestId,
+          webhookType: lastExecution.webhookType
         }, requestId);
       }
       
@@ -211,7 +224,8 @@ serve(async (req) => {
         if (supabase) {
           await logExecutionEnhanced(supabase, 'WARN', 'BLOCKING DUPLICATE - Within enhanced execution window', { 
             timeDiff,
-            windowSize: EXECUTION_WINDOW
+            windowSize: EXECUTION_WINDOW,
+            webhookType
           }, requestId);
         }
         
@@ -237,23 +251,33 @@ serve(async (req) => {
     
     // LAYER 2: Enhanced database-level duplicate check using atomic function
     if (supabase) {
+      const recordId = payload.job_analysis?.id || payload.job_cover_letter?.id;
+      const functionName = isCoverLetter ? 'check_and_insert_cover_letter_execution' : 'check_and_insert_execution';
+      const requestType = isCoverLetter ? 'cover_letter_created' : 'job_analysis_created';
+      
       const { data: atomicResult, error: atomicError } = await supabase.rpc(
-        'check_and_insert_execution',
+        functionName,
         {
           p_fingerprint: fingerprint,
-          p_record_id: payload.job_analysis?.id,
+          p_record_id: recordId,
           p_submission_id: payload.submission_id || payload.request_id,
-          p_request_type: webhookType,
+          p_request_type: requestType,
           p_check_minutes: 15 // Extended check window
         }
       );
 
       if (atomicError) {
-        await logExecutionEnhanced(supabase, 'ERROR', 'Atomic function error', { error: atomicError }, requestId);
+        await logExecutionEnhanced(supabase, 'ERROR', 'Atomic function error', { 
+          error: atomicError,
+          functionName,
+          webhookType
+        }, requestId);
       } else if (atomicResult === 'DUPLICATE') {
         await logExecutionEnhanced(supabase, 'WARN', 'DUPLICATE DETECTED - Enhanced atomic database level', { 
           fingerprint,
-          atomicResult
+          atomicResult,
+          webhookType,
+          functionName
         }, requestId);
 
         return new Response(
@@ -273,31 +297,40 @@ serve(async (req) => {
       } else {
         await logExecutionEnhanced(supabase, 'INFO', 'Atomic execution registered successfully', { 
           atomicResult,
-          fingerprint
+          fingerprint,
+          webhookType,
+          functionName
         }, requestId);
       }
     }
     
     // LAYER 3: Enhanced existing results check
-    if (supabase && payload.job_analysis?.id) {
+    if (supabase && (payload.job_analysis?.id || payload.job_cover_letter?.id)) {
+      const tableName = isJobAnalysis ? 'job_analyses' : 'job_cover_letters';
+      const resultField = isJobAnalysis ? 'job_match' : 'cover_letter';
+      const recordId = payload.job_analysis?.id || payload.job_cover_letter?.id;
+      
       await logExecutionEnhanced(supabase, 'INFO', 'Enhanced checking database for existing results', { 
-        jobAnalysisId: payload.job_analysis?.id,
-        webhookType
+        recordId,
+        webhookType,
+        tableName,
+        resultField
       }, requestId);
       
-      const { data: existingAnalysis, error: resultCheckError } = await supabase
-        .from('job_analyses')
-        .select(webhookType === 'job_guide' ? 'job_match' : 'cover_letter')
-        .eq('id', payload.job_analysis?.id)
+      const { data: existingRecord, error: resultCheckError } = await supabase
+        .from(tableName)
+        .select(resultField)
+        .eq('id', recordId)
         .single();
       
-      if (!resultCheckError && existingAnalysis) {
-        const resultField = webhookType === 'job_guide' ? 'job_match' : 'cover_letter';
-        if (existingAnalysis[resultField]) {
+      if (!resultCheckError && existingRecord) {
+        if (existingRecord[resultField]) {
           await logExecutionEnhanced(supabase, 'INFO', 'RESULT ALREADY EXISTS - Enhanced skipping webhook call', { 
-            jobAnalysisId: payload.job_analysis?.id,
+            recordId,
             resultField,
-            hasResult: !!existingAnalysis[resultField]
+            hasResult: !!existingRecord[resultField],
+            webhookType,
+            tableName
           }, requestId);
           
           // Record execution as completed (no webhook needed)
@@ -306,13 +339,14 @@ serve(async (req) => {
             requestId,
             status: 'completed',
             payload: payload,
-            executionId: payload.anti_duplicate_metadata?.execution_id || 'result-exists'
+            executionId: payload.anti_duplicate_metadata?.execution_id || 'result-exists',
+            webhookType
           });
 
           return new Response(
             JSON.stringify({ 
               success: true, 
-              message: 'Enhanced analysis result already exists - skipped', 
+              message: `Enhanced ${webhookType} result already exists - skipped`, 
               type: webhookType,
               requestId,
               skipped: true,
@@ -324,7 +358,11 @@ serve(async (req) => {
           );
         }
       } else if (resultCheckError) {
-        await logExecutionEnhanced(supabase, 'WARN', 'Error checking existing analysis', { error: resultCheckError }, requestId);
+        await logExecutionEnhanced(supabase, 'WARN', 'Error checking existing record', { 
+          error: resultCheckError,
+          tableName,
+          webhookType
+        }, requestId);
       }
     }
     
@@ -334,7 +372,8 @@ serve(async (req) => {
       requestId,
       status: 'processing',
       payload: payload,
-      executionId: payload.anti_duplicate_metadata?.execution_id || requestId
+      executionId: payload.anti_duplicate_metadata?.execution_id || requestId,
+      webhookType
     });
 
     if (supabase) {
@@ -342,7 +381,8 @@ serve(async (req) => {
         executionKey,
         totalTrackedExecutions: globalExecutionTracker.size,
         activeExecutions: activeExecutions.size,
-        executionId: payload.anti_duplicate_metadata?.execution_id
+        executionId: payload.anti_duplicate_metadata?.execution_id,
+        webhookType
       }, requestId);
     }
     
@@ -353,13 +393,13 @@ serve(async (req) => {
     }
     
     // Determine webhook URL with enhanced validation
-    const webhookEnvVar = webhookType === 'job_guide' ? 'N8N_JG_WEBHOOK_URL' : 'N8N_CL_WEBHOOK_URL';
+    const webhookEnvVar = isJobAnalysis ? 'N8N_JG_WEBHOOK_URL' : 'N8N_CL_WEBHOOK_URL';
     const webhookUrl = Deno.env.get(webhookEnvVar);
     
     if (!webhookUrl) {
       const errorMsg = `Enhanced ${webhookEnvVar} secret not configured`;
       if (supabase) {
-        await logExecutionEnhanced(supabase, 'ERROR', errorMsg, {}, requestId);
+        await logExecutionEnhanced(supabase, 'ERROR', errorMsg, { webhookType }, requestId);
       }
       
       // Mark as failed and remove from tracker
@@ -367,7 +407,7 @@ serve(async (req) => {
       activeExecutions.delete(executionKey);
       
       return new Response(
-        JSON.stringify({ error: errorMsg, requestId }), 
+        JSON.stringify({ error: errorMsg, requestId, webhookType }), 
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -384,14 +424,16 @@ serve(async (req) => {
         fingerprint,
         executionKey,
         webhookType,
-        source: 'supabase-edge-function-enhanced-v4',
+        source: 'supabase-edge-function-separated-v1',
         preventDuplicates: true,
         submissionId: payload.submission_id || payload.request_id,
         antiDuplicateMetadata: payload.anti_duplicate_metadata,
         enhancedDuplicatePrevention: true,
         executionWindow: EXECUTION_WINDOW,
         databaseExecutionId: payload.anti_duplicate_metadata?.execution_id,
-        triggerSource: payload.anti_duplicate_metadata?.trigger_source
+        triggerSource: payload.anti_duplicate_metadata?.trigger_source,
+        isJobAnalysis,
+        isCoverLetter
       }
     };
 
@@ -401,7 +443,9 @@ serve(async (req) => {
         webhookType, 
         webhookUrl: webhookUrl.substring(0, 50) + '...',
         payloadSize: JSON.stringify(enhancedPayload).length,
-        executionId: payload.anti_duplicate_metadata?.execution_id
+        executionId: payload.anti_duplicate_metadata?.execution_id,
+        isJobAnalysis,
+        isCoverLetter
       }, requestId);
     }
     
@@ -417,9 +461,11 @@ serve(async (req) => {
         'X-Webhook-Type': webhookType,
         'X-Prevent-Duplicates': 'true',
         'X-Fingerprint': fingerprint,
-        'X-Source': 'supabase-edge-function-enhanced-v4',
+        'X-Source': 'supabase-edge-function-separated-v1',
         'X-Database-Execution-ID': payload.anti_duplicate_metadata?.execution_id || '',
-        'X-Trigger-Source': payload.anti_duplicate_metadata?.trigger_source || ''
+        'X-Trigger-Source': payload.anti_duplicate_metadata?.trigger_source || '',
+        'X-Is-Job-Analysis': isJobAnalysis.toString(),
+        'X-Is-Cover-Letter': isCoverLetter.toString()
       },
       body: JSON.stringify(enhancedPayload),
       signal: abortController.signal
@@ -453,7 +499,8 @@ serve(async (req) => {
           statusText: response.statusText,
           responseText: responseText.substring(0, 500),
           webhookDuration,
-          executionId: payload.anti_duplicate_metadata?.execution_id
+          executionId: payload.anti_duplicate_metadata?.execution_id,
+          webhookType
         }, requestId);
       }
       
@@ -463,7 +510,8 @@ serve(async (req) => {
         requestId,
         status: 'failed',
         payload: payload,
-        executionId: payload.anti_duplicate_metadata?.execution_id || requestId
+        executionId: payload.anti_duplicate_metadata?.execution_id || requestId,
+        webhookType
       });
       
       return new Response(
@@ -473,7 +521,8 @@ serve(async (req) => {
           statusText: response.statusText,
           requestId,
           executionId: payload.anti_duplicate_metadata?.execution_id,
-          responseText: responseText.substring(0, 200)
+          responseText: responseText.substring(0, 200),
+          webhookType
         }), 
         { 
           status: 500, 
@@ -488,7 +537,8 @@ serve(async (req) => {
       requestId,
       status: 'completed',
       payload: payload,
-      executionId: payload.anti_duplicate_metadata?.execution_id || requestId
+      executionId: payload.anti_duplicate_metadata?.execution_id || requestId,
+      webhookType
     });
 
     const totalDuration = Date.now() - requestStartTime;
@@ -499,7 +549,9 @@ serve(async (req) => {
         totalDuration,
         executionKey,
         executionId: payload.anti_duplicate_metadata?.execution_id,
-        responsePreview: responseText.substring(0, 100)
+        responsePreview: responseText.substring(0, 100),
+        isJobAnalysis,
+        isCoverLetter
       }, requestId);
     }
     
@@ -511,7 +563,9 @@ serve(async (req) => {
         requestId,
         executionId: payload.anti_duplicate_metadata?.execution_id,
         duration: totalDuration,
-        fingerprint
+        fingerprint,
+        isJobAnalysis,
+        isCoverLetter
       }), 
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
