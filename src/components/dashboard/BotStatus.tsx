@@ -54,7 +54,8 @@ const BotStatus = ({ onActivationChange }: BotStatusProps) => {
     );
   }
 
-  const botId = userProfile?.bot_id || '';
+  // Use the user_profile.id as the Bot ID
+  const botId = userProfile?.id || '';
   const isActivated = userProfile?.bot_activated || false;
 
   return (
