@@ -1,5 +1,5 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -25,12 +25,12 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -83,34 +83,33 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, sans-serif;
   }
 }
 
-/* Custom styles for better text wrapping and preventing horizontal scroll */
-.break-words-strict {
-  word-wrap: break-word;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  hyphens: auto;
-  white-space: pre-wrap;
-  max-width: 100%;
+/* Notebook paper effect styles */
+.notebook-paper {
+  position: relative;
 }
 
-/* Ensure no content can overflow horizontally */
-.overflow-safe {
-  overflow-x: hidden;
-  max-width: 100%;
-  box-sizing: border-box;
+.notebook-paper::before {
+  content: '';
+  position: absolute;
+  left: 30px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #ff69b4;
+  z-index: 1;
 }
 
-/* Mobile-specific text wrapping */
-@media (max-width: 768px) {
-  .mobile-text-wrap {
-    word-break: break-word;
-    overflow-wrap: anywhere;
-    hyphens: auto;
-    font-size: 14px;
-    line-height: 1.5;
+/* Responsive adjustments for mobile */
+@media (max-width: 640px) {
+  .notebook-paper {
+    background-size: 25px 22px !important;
+    padding-left: 30px !important;
+  }
+  
+  .notebook-paper::before {
+    left: 25px;
   }
 }

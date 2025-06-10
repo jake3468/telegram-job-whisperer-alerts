@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { AlertCircle, FileText, Sparkles, Loader2, CheckCircle, Trash2, Building, Briefcase } from 'lucide-react';
+import { AlertCircle, FileText, Sparkles, Loader2, CheckCircle, Trash2, Building, Briefcase, Copy } from 'lucide-react';
 import AuthHeader from '@/components/AuthHeader';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import { supabase } from '@/integrations/supabase/client';
@@ -301,6 +301,24 @@ const CoverLetter = () => {
     return () => window.removeEventListener('useHistoryData', handleHistoryData);
   }, []);
 
+  const handleCopyResult = async () => {
+    if (!coverLetterResult) return;
+    try {
+      await navigator.clipboard.writeText(coverLetterResult);
+      toast({
+        title: "Copied!",
+        description: "Cover letter copied to clipboard successfully."
+      });
+    } catch (err) {
+      console.error('Failed to copy text:', err);
+      toast({
+        title: "Error",
+        description: "Failed to copy text to clipboard.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const isFormValid = formData.companyName && formData.jobTitle && formData.jobDescription;
   const hasAnyData = isFormValid || coverLetterResult;
   const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating;
@@ -523,17 +541,35 @@ const CoverLetter = () => {
             {coverLetterResult && (
               <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20 w-full">
                 <CardHeader className="pb-3 bg-green-300">
-                  <CardTitle className="font-inter flex items-center gap-2 text-sm text-gray-950">
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gray-950">
-                      <FileText className="w-3 h-3 text-white" />
+                  <CardTitle className="font-inter flex items-center gap-2 text-sm text-gray-950 justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gray-950">
+                        <FileText className="w-3 h-3 text-white" />
+                      </div>
+                      Your Cover Letter
                     </div>
-                    Your Cover Letter
+                    <Button
+                      onClick={handleCopyResult}
+                      size="sm"
+                      className="bg-gray-950 hover:bg-gray-800 text-white"
+                    >
+                      <Copy className="w-3 h-3 mr-1" />
+                      Copy
+                    </Button>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0 bg-green-300 p-4 w-full">
-                  <div className="bg-white rounded-lg p-3 border-2 border-slate-300 w-full">
+                  <div 
+                    className="bg-white rounded-lg p-4 border-2 border-blue-200 w-full notebook-paper"
+                    style={{
+                      backgroundImage: `linear-gradient(to right, #ff69b4 1px, transparent 1px),
+                                       linear-gradient(to bottom, transparent 24px, #e0e0e0 24px, #e0e0e0 26px, transparent 26px)`,
+                      backgroundSize: '30px 26px',
+                      paddingLeft: '40px'
+                    }}
+                  >
                     <div 
-                      className="text-slate-800 font-inter leading-relaxed font-medium w-full text-xs" 
+                      className="text-slate-800 font-inter leading-relaxed font-medium w-full text-sm" 
                       style={{
                         wordWrap: 'break-word',
                         overflowWrap: 'break-word',
@@ -541,7 +577,8 @@ const CoverLetter = () => {
                         whiteSpace: 'pre-wrap',
                         maxWidth: '100%',
                         hyphens: 'auto',
-                        lineHeight: '1.4'
+                        lineHeight: '1.6',
+                        fontFamily: 'serif'
                       }}
                     >
                       {coverLetterResult}
