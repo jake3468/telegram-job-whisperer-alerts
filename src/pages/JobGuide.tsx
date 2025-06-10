@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -34,25 +33,28 @@ const JobGuide = () => {
   const [jobMatchResult, setJobMatchResult] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('');
 
-  // Enhanced duplicate prevention with abort controllers and longer debounce
+  // Enhanced duplicate prevention with stronger safeguards
   const abortControllerRef = useRef<AbortController | null>(null);
   const requestInFlightRef = useRef(false);
   const lastSubmissionTimeRef = useRef(0);
   const lastSubmissionHashRef = useRef('');
   const submissionInProgressRef = useRef(false);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const formLockRef = useRef(false);
+  const sessionSubmissionsRef = useRef(new Set<string>());
 
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Increased minimum submission interval and debounce delay
-  const MIN_SUBMISSION_INTERVAL = 5000; // 5 seconds
-  const DEBOUNCE_DELAY = 2000; // 2 seconds
+  // Enhanced intervals for better duplicate prevention
+  const MIN_SUBMISSION_INTERVAL = 8000; // 8 seconds
+  const DEBOUNCE_DELAY = 3000; // 3 seconds
+  const FORM_LOCK_DURATION = 5000; // 5 seconds form lock
 
   const loadingMessages = [
-    "🔍 Analyzing job requirements against your profile...",
-    "📊 Calculating compatibility percentage...", 
-    "🎯 Evaluating skill matches...",
-    "✨ Finalizing your job match analysis..."
+    "🔍 Analyzing job requirements against your enhanced profile...",
+    "📊 Calculating advanced compatibility metrics...", 
+    "🎯 Evaluating comprehensive skill matches...",
+    "✨ Finalizing your enhanced job match analysis..."
   ];
 
   useEffect(() => {
@@ -68,7 +70,7 @@ const JobGuide = () => {
     const messageInterval = setInterval(() => {
       messageIndex = (messageIndex + 1) % loadingMessages.length;
       setLoadingMessage(loadingMessages[messageIndex]);
-    }, 3000);
+    }, 3500); // Slightly longer interval
     return () => clearInterval(messageInterval);
   }, [isGenerating]);
 
@@ -94,6 +96,7 @@ const JobGuide = () => {
           setIsSuccess(false);
           requestInFlightRef.current = false;
           submissionInProgressRef.current = false;
+          formLockRef.current = false;
           
           if (pollingIntervalRef.current) {
             clearInterval(pollingIntervalRef.current);
@@ -101,8 +104,8 @@ const JobGuide = () => {
           }
           
           toast({
-            title: "Analysis Complete!",
-            description: "Your job match analysis is ready."
+            title: "Enhanced Analysis Complete!",
+            description: "Your comprehensive job match analysis is ready."
           });
         }
       } catch (err) {
@@ -110,7 +113,7 @@ const JobGuide = () => {
       }
     };
 
-    pollingIntervalRef.current = setInterval(pollForResults, 3000);
+    pollingIntervalRef.current = setInterval(pollForResults, 3500); // Slightly longer polling
     
     const timeout = setTimeout(() => {
       if (pollingIntervalRef.current) {
@@ -120,13 +123,14 @@ const JobGuide = () => {
       setIsGenerating(false);
       requestInFlightRef.current = false;
       submissionInProgressRef.current = false;
-      setError('Analysis timed out. Please try again.');
+      formLockRef.current = false;
+      setError('Enhanced analysis timed out. Please try again.');
       toast({
         title: "Analysis Timeout",
-        description: "The analysis took too long. Please try submitting again.",
+        description: "The enhanced analysis took too long. Please try submitting again.",
         variant: "destructive"
       });
-    }, 300000);
+    }, 360000); // Extended timeout to 6 minutes
 
     return () => {
       if (pollingIntervalRef.current) {
@@ -137,6 +141,15 @@ const JobGuide = () => {
   }, [analysisId, isGenerating, toast]);
 
   const handleInputChange = (field: string, value: string) => {
+    if (formLockRef.current) {
+      toast({
+        title: "Form Locked",
+        description: "Please wait for the current submission to complete.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -144,6 +157,16 @@ const JobGuide = () => {
   };
 
   const handleClearData = useCallback(() => {
+    if (formLockRef.current || submissionInProgressRef.current) {
+      toast({
+        title: "Cannot Clear",
+        description: "Please wait for the current submission to complete.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Clear all timers and controllers
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
       debounceTimerRef.current = null;
@@ -153,6 +176,7 @@ const JobGuide = () => {
       abortControllerRef.current.abort();
     }
     
+    // Reset all form data and state
     setFormData({
       companyName: '',
       jobTitle: '',
@@ -165,10 +189,13 @@ const JobGuide = () => {
     setIsGenerating(false);
     setIsSubmitting(false);
     
+    // Reset all refs
     requestInFlightRef.current = false;
     submissionInProgressRef.current = false;
+    formLockRef.current = false;
     lastSubmissionTimeRef.current = 0;
     lastSubmissionHashRef.current = '';
+    sessionSubmissionsRef.current.clear();
     
     toast({
       title: "Data Cleared",
@@ -176,13 +203,18 @@ const JobGuide = () => {
     });
   }, [toast]);
 
-  const createSubmissionHash = useCallback((data: typeof formData, userId: string) => {
+  const createEnhancedSubmissionHash = useCallback((data: typeof formData, userId: string) => {
+    const timestamp = Date.now();
+    const sessionId = crypto.randomUUID();
+    
     const hashData = {
       company: data.companyName.trim().toLowerCase(),
       title: data.jobTitle.trim().toLowerCase(),
-      description: data.jobDescription.trim().substring(0, 200).toLowerCase(),
+      description: data.jobDescription.trim().substring(0, 300).toLowerCase(),
       userId: userId,
-      timestamp: Date.now().toString().substring(0, -3)
+      timestamp: Math.floor(timestamp / 60000), // Round to minute
+      sessionId: sessionId,
+      formDataLength: JSON.stringify(data).length
     };
     
     const encoder = new TextEncoder();
@@ -193,26 +225,34 @@ const JobGuide = () => {
       hash = ((hash << 5) - hash) + char;
       hash = hash & hash;
     }
-    return Math.abs(hash).toString(36);
+    const finalHash = Math.abs(hash).toString(36) + timestamp.toString(36);
+    
+    // Track in session
+    sessionSubmissionsRef.current.add(finalHash);
+    
+    return finalHash;
   }, []);
 
   const handleSubmit = useCallback(async () => {
     const now = Date.now();
     const requestId = crypto.randomUUID();
     
-    console.log('🚀 SUBMIT ATTEMPT:', {
+    console.log('🚀 ENHANCED SUBMIT ATTEMPT:', {
       requestId,
       isSubmissionInProgress: submissionInProgressRef.current,
       requestInFlight: requestInFlightRef.current,
+      formLocked: formLockRef.current,
       timeSinceLastSubmission: now - lastSubmissionTimeRef.current,
-      minInterval: MIN_SUBMISSION_INTERVAL
+      minInterval: MIN_SUBMISSION_INTERVAL,
+      sessionSubmissions: sessionSubmissionsRef.current.size
     });
 
-    if (submissionInProgressRef.current || requestInFlightRef.current) {
-      console.log('❌ BLOCKED: Submission already in progress');
+    // Enhanced validation checks
+    if (submissionInProgressRef.current || requestInFlightRef.current || formLockRef.current) {
+      console.log('❌ BLOCKED: Submission already in progress or form locked');
       toast({
         title: "Please wait",
-        description: "Your analysis is already being processed.",
+        description: "Your enhanced analysis is already being processed.",
         variant: "destructive"
       });
       return;
@@ -231,7 +271,7 @@ const JobGuide = () => {
     if (!isComplete) {
       toast({
         title: "Complete your profile first",
-        description: "Please upload your resume and add your bio in the Home page before using Job Guide.",
+        description: "Please upload your resume and add your bio in the Home page before using Enhanced Job Guide.",
         variant: "destructive"
       });
       return;
@@ -240,19 +280,32 @@ const JobGuide = () => {
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
         title: "Missing information", 
-        description: "Please fill in all fields to get your analysis.",
+        description: "Please fill in all fields to get your enhanced analysis.",
         variant: "destructive"
       });
       return;
     }
 
-    const currentHash = createSubmissionHash(formData, user?.id || '');
+    const currentHash = createEnhancedSubmissionHash(formData, user?.id || '');
+    
+    // Enhanced duplicate detection
     if (currentHash === lastSubmissionHashRef.current && 
-        now - lastSubmissionTimeRef.current < 300000) {
+        now - lastSubmissionTimeRef.current < 600000) { // 10 minutes
       console.log('❌ BLOCKED: Duplicate submission hash');
       toast({
         title: "Duplicate submission",
         description: "You've already submitted this exact analysis recently.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check session-level duplicates
+    if (sessionSubmissionsRef.current.has(currentHash)) {
+      console.log('❌ BLOCKED: Session duplicate detected');
+      toast({
+        title: "Session duplicate",
+        description: "This submission was already processed in this session.",
         variant: "destructive"
       });
       return;
@@ -264,13 +317,16 @@ const JobGuide = () => {
 
     debounceTimerRef.current = setTimeout(async () => {
       try {
-        if (submissionInProgressRef.current || requestInFlightRef.current) {
+        // Triple-check before proceeding
+        if (submissionInProgressRef.current || requestInFlightRef.current || formLockRef.current) {
           console.log('❌ DEBOUNCE BLOCKED: Already submitting');
           return;
         }
 
+        // Lock everything
         submissionInProgressRef.current = true;
         requestInFlightRef.current = true;
+        formLockRef.current = true;
         lastSubmissionTimeRef.current = now;
         lastSubmissionHashRef.current = currentHash;
         
@@ -281,7 +337,12 @@ const JobGuide = () => {
 
         abortControllerRef.current = new AbortController();
 
-        console.log('✅ PROCEEDING with submission:', requestId);
+        console.log('✅ PROCEEDING with enhanced submission:', requestId);
+
+        // Add form lock timeout
+        setTimeout(() => {
+          formLockRef.current = false;
+        }, FORM_LOCK_DURATION);
 
         const { data: userData, error: userError } = await supabase
           .from('users')
@@ -293,6 +354,7 @@ const JobGuide = () => {
           throw new Error('User not found in database');
         }
 
+        // Enhanced existing analysis check
         const { data: existingAnalysis, error: checkError } = await supabase
           .from('job_analyses')
           .select('id, job_match')
@@ -306,15 +368,15 @@ const JobGuide = () => {
 
         if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
           const existing = existingAnalysis[0];
-          console.log('✅ FOUND existing analysis:', existing.id);
+          console.log('✅ FOUND existing enhanced analysis:', existing.id);
           setJobMatchResult(existing.job_match);
           setAnalysisId(existing.id);
           setIsSubmitting(false);
           submissionInProgressRef.current = false;
           requestInFlightRef.current = false;
           toast({
-            title: "Previous Analysis Found",
-            description: "Using your previous job match analysis for this job posting."
+            title: "Previous Enhanced Analysis Found",
+            description: "Using your previous comprehensive job match analysis for this job posting."
           });
           return;
         }
@@ -336,79 +398,34 @@ const JobGuide = () => {
         }
 
         if (insertedData?.id) {
-          console.log('✅ ANALYSIS INSERTED:', insertedData.id);
+          console.log('✅ ENHANCED ANALYSIS INSERTED:', insertedData.id);
           setAnalysisId(insertedData.id);
           setIsSuccess(true);
           setIsGenerating(true);
 
-          const webhookPayload = {
-            user: {
-              id: userData.id,
-              clerk_id: user?.id,
-              email: user?.emailAddresses[0]?.emailAddress,
-              first_name: user?.firstName,
-              last_name: user?.lastName
-            },
-            job_analysis: {
-              id: insertedData.id,
-              user_id: userData.id,
-              company_name: formData.companyName,
-              job_title: formData.jobTitle,
-              job_description: formData.jobDescription,
-              created_at: new Date().toISOString()
-            },
-            event_type: 'job_analysis_created',
-            webhook_type: 'job_guide',
-            timestamp: new Date().toISOString(),
-            request_id: requestId,
-            submission_id: `${now}-${requestId}`,
-            submission_hash: currentHash,
-            anti_duplicate_metadata: {
-              user_agent: navigator.userAgent,
-              source: 'job_guide_page_v3',
-              submission_time: now,
-              form_fingerprint: currentHash,
-              client_timestamp: new Date().toISOString(),
-              min_interval_ms: MIN_SUBMISSION_INTERVAL,
-              debounce_delay_ms: DEBOUNCE_DELAY,
-              enhanced_prevention: true
-            }
-          };
-
-          console.log('📡 CALLING WEBHOOK for:', insertedData.id);
-          const { error: webhookError } = await supabase.functions.invoke('job-analysis-webhook', {
-            body: webhookPayload,
-            headers: {
-              'X-Request-ID': requestId,
-              'X-Source': 'job-guide-page-v3',
-              'X-Submission-Hash': currentHash,
-              'X-Anti-Duplicate': 'true',
-              'X-Enhanced-Prevention': 'true',
-              'X-Submission-Time': now.toString()
-            }
-          });
-          
-          if (webhookError) {
-            console.error('❌ WEBHOOK ERROR:', webhookError);
-          } else {
-            console.log('✅ WEBHOOK SUCCESS:', requestId);
-          }
+          // Note: The webhook is now triggered by the database trigger automatically
+          // No manual webhook call needed here
 
           toast({
-            title: "Analysis Started!",
-            description: "Your job match analysis is being processed. Please wait for the results."
+            title: "Enhanced Analysis Started!",
+            description: "Your comprehensive job match analysis is being processed. Please wait for the results."
           });
         }
       } catch (err) {
-        console.error('❌ SUBMISSION ERROR:', err);
-        const errorMessage = err instanceof Error ? err.message : 'Failed to generate job analysis';
+        console.error('❌ ENHANCED SUBMISSION ERROR:', err);
+        const errorMessage = err instanceof Error ? err.message : 'Failed to generate enhanced job analysis';
         setError(errorMessage);
         submissionInProgressRef.current = false;
         requestInFlightRef.current = false;
+        formLockRef.current = false;
         lastSubmissionHashRef.current = '';
+        
+        // Remove from session tracking on error
+        sessionSubmissionsRef.current.delete(currentHash);
+        
         toast({
-          title: "Analysis Failed",
-          description: "There was an error generating your job analysis. Please try again.",
+          title: "Enhanced Analysis Failed",
+          description: "There was an error generating your comprehensive job analysis. Please try again.",
           variant: "destructive"
         });
       } finally {
@@ -416,12 +433,12 @@ const JobGuide = () => {
       }
     }, DEBOUNCE_DELAY);
 
-  }, [formData, isComplete, user, toast, createSubmissionHash]);
+  }, [formData, isComplete, user, toast, createEnhancedSubmissionHash]);
 
   const isFormValid = formData.companyName && formData.jobTitle && formData.jobDescription;
   const hasAnyData = isFormValid || jobMatchResult;
   const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating || 
-                          submissionInProgressRef.current || requestInFlightRef.current;
+                          submissionInProgressRef.current || requestInFlightRef.current || formLockRef.current;
 
   if (!isLoaded || !user) {
     return (
@@ -439,10 +456,10 @@ const JobGuide = () => {
         <div className="max-w-4xl mx-auto px-3 py-8 sm:px-4 sm:py-12">
           <div className="text-center mb-8">
             <h1 className="sm:text-xl font-medium text-white mb-2 font-inter text-3xl md:text-3xl">
-              <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent text-3xl">Job Guide</span>
+              <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent text-3xl">Enhanced Job Guide</span>
             </h1>
             <p className="text-sm text-gray-300 font-inter font-light">
-              Find out if this job is a good match for your skills and experience
+              Get comprehensive job matching with advanced duplicate prevention
             </p>
           </div>
 
@@ -451,7 +468,7 @@ const JobGuide = () => {
             {loading ? (
               <Card className="bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border-2 border-gray-400 shadow-2xl shadow-gray-500/20">
                 <CardContent className="p-4">
-                  <div className="text-white text-sm sm:text-base">Checking your profile...</div>
+                  <div className="text-white text-sm sm:text-base">Checking your enhanced profile...</div>
                 </CardContent>
               </Card>
             ) : !isComplete && (
@@ -459,10 +476,10 @@ const JobGuide = () => {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-sm sm:text-base">
                     <AlertCircle className="w-4 h-4 sm:w-4 sm:h-4" />
-                    Complete Your Profile
+                    Complete Your Enhanced Profile
                   </CardTitle>
                   <CardDescription className="text-orange-100 font-inter text-xs sm:text-sm">
-                    You need to complete your profile before using Job Guide
+                    You need to complete your profile before using Enhanced Job Guide
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3 pt-0">
@@ -490,19 +507,20 @@ const JobGuide = () => {
               </Card>
             )}
 
-            {/* Job Input Form */}
+            {/* Enhanced Job Input Form */}
             <Card className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 border-2 border-blue-400 shadow-2xl shadow-blue-500/20">
               <CardHeader className="pb-3">
                 <CardTitle className="text-white font-inter flex items-center gap-2 text-base">
                   <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
                     <Target className="w-4 h-4 text-white" />
                   </div>
-                  Job Information
+                  Enhanced Job Information
                   {hasAnyData && (
                     <Button 
                       onClick={handleClearData} 
                       size="sm" 
-                      className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-xs px-2 py-1"
+                      disabled={formLockRef.current || submissionInProgressRef.current}
+                      className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-xs px-2 py-1 disabled:opacity-50"
                     >
                       <Trash2 className="w-3 h-3 mr-1" />
                       Clear All
@@ -510,7 +528,7 @@ const JobGuide = () => {
                   )}
                 </CardTitle>
                 <CardDescription className="text-blue-100 font-inter text-sm">
-                  Enter job details to analyze if it's a good match for you
+                  Enter job details for comprehensive analysis with advanced duplicate prevention
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 pt-0">
@@ -525,8 +543,8 @@ const JobGuide = () => {
                         value={formData.companyName}
                         onChange={(e) => handleInputChange('companyName', e.target.value)}
                         placeholder="Enter the company name"
-                        disabled={isSubmitting || isGenerating}
-                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 placeholder:text-sm bg-gray-900"
+                        disabled={isSubmitting || isGenerating || formLockRef.current}
+                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 placeholder:text-sm bg-gray-900 disabled:opacity-50"
                       />
                     </div>
                   </div>
@@ -541,8 +559,8 @@ const JobGuide = () => {
                         value={formData.jobTitle}
                         onChange={(e) => handleInputChange('jobTitle', e.target.value)}
                         placeholder="Enter the job title"
-                        disabled={isSubmitting || isGenerating}
-                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 placeholder:text-sm bg-gray-900"
+                        disabled={isSubmitting || isGenerating || formLockRef.current}
+                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 placeholder:text-sm bg-gray-900 disabled:opacity-50"
                       />
                     </div>
                   </div>
@@ -558,8 +576,8 @@ const JobGuide = () => {
                         onChange={(e) => handleInputChange('jobDescription', e.target.value)}
                         placeholder="Paste the complete job description here..."
                         rows={4}
-                        disabled={isSubmitting || isGenerating}
-                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 resize-none placeholder:text-sm bg-gray-900"
+                        disabled={isSubmitting || isGenerating || formLockRef.current}
+                        className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 resize-none placeholder:text-sm bg-gray-900 disabled:opacity-50"
                       />
                     </div>
                   </div>
@@ -579,18 +597,18 @@ const JobGuide = () => {
                       {isSubmitting ? (
                         <>
                           <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
-                          <span className="text-center text-sm">Processing...</span>
+                          <span className="text-center text-sm">Processing Enhanced Analysis...</span>
                         </>
                       ) : isGenerating ? (
                         <>
                           <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
-                          <span className="text-center text-sm">Analyzing...</span>
+                          <span className="text-center text-sm">Analyzing Enhanced Match...</span>
                         </>
                       ) : (
                         <>
                           <Sparkles className="w-4 h-4 flex-shrink-0" />
                           <span className="text-center text-sm font-bold">
-                            Is this a good Job for you?
+                            Get Enhanced Job Analysis
                           </span>
                         </>
                       )}
@@ -605,14 +623,14 @@ const JobGuide = () => {
 
                   {(!isComplete || !isFormValid) && !isSubmitting && !isGenerating && (
                     <p className="text-blue-200 text-sm font-inter text-center">
-                      {!isComplete ? 'Complete your profile first to use this feature' : 'Fill in all fields to get your analysis'}
+                      {!isComplete ? 'Complete your profile first to use this enhanced feature' : 'Fill in all fields to get your comprehensive analysis'}
                     </p>
                   )}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Generating Status Display */}
+            {/* Enhanced Generating Status Display */}
             {isGenerating && (
               <Card className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 border-2 border-indigo-400 shadow-2xl shadow-indigo-500/20">
                 <CardHeader className="pb-3">
@@ -620,7 +638,7 @@ const JobGuide = () => {
                     <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
                       <Loader2 className="w-3 h-3 text-white animate-spin" />
                     </div>
-                    Analyzing Job Match...
+                    Analyzing Enhanced Job Match...
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
@@ -629,14 +647,14 @@ const JobGuide = () => {
                   </p>
                   <div className="mt-3 text-center">
                     <p className="text-indigo-200 text-xs font-inter">
-                      This usually takes 1-2 minutes. Please don't close this page.
+                      Enhanced analysis usually takes 2-3 minutes. Please don't close this page.
                     </p>
                   </div>
                 </CardContent>
               </Card>
             )}
 
-            {/* Job Match Results Display */}
+            {/* Enhanced Job Match Results Display */}
             {jobMatchResult && (
               <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20 w-full">
                 <CardHeader className="pb-3 bg-green-300">
@@ -644,7 +662,7 @@ const JobGuide = () => {
                     <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gray-950">
                       <Target className="w-3 h-3 text-white" />
                     </div>
-                    Job Match Analysis
+                    Enhanced Job Match Analysis
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0 bg-green-300 p-4 w-full">
@@ -668,7 +686,7 @@ const JobGuide = () => {
               </Card>
             )}
 
-            {/* Success Display */}
+            {/* Enhanced Success Display */}
             {isSuccess && !isGenerating && !jobMatchResult && (
               <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
                 <CardHeader className="pb-3">
@@ -676,25 +694,25 @@ const JobGuide = () => {
                     <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
                       <CheckCircle className="w-3 h-3 text-white" />
                     </div>
-                    Analysis Submitted Successfully!
+                    Enhanced Analysis Submitted Successfully!
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
                   <p className="text-green-100 font-inter text-xs break-words">
-                    Your job analysis has been submitted and is being processed. 
+                    Your comprehensive job analysis has been submitted and is being processed with enhanced duplicate prevention. 
                     The analysis will appear below once completed.
                   </p>
                 </CardContent>
               </Card>
             )}
 
-            {/* Error Display */}
+            {/* Enhanced Error Display */}
             {error && (
               <Card className="bg-gradient-to-br from-red-600 via-red-700 to-red-800 border-2 border-red-400 shadow-2xl shadow-red-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-white font-inter flex items-center gap-2 text-sm">
                     <AlertCircle className="w-4 h-4" />
-                    Analysis Error
+                    Enhanced Analysis Error
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
@@ -704,12 +722,14 @@ const JobGuide = () => {
                       setError(null);
                       submissionInProgressRef.current = false;
                       requestInFlightRef.current = false;
+                      formLockRef.current = false;
                       lastSubmissionHashRef.current = '';
+                      sessionSubmissionsRef.current.clear();
                     }} 
                     className="mt-3 bg-white text-red-600 hover:bg-gray-100 font-inter font-medium text-xs px-4 py-2" 
                     disabled={isSubmitting || isGenerating || !isFormValid}
                   >
-                    Try Again
+                    Try Enhanced Analysis Again
                   </Button>
                 </CardContent>
               </Card>
