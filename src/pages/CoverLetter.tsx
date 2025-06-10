@@ -551,10 +551,10 @@ const CoverLetter = () => {
                     <Button
                       onClick={handleCopyResult}
                       size="sm"
-                      className="bg-gray-950 hover:bg-gray-800 text-white"
+                      className="bg-gray-950 hover:bg-gray-800 text-white flex items-center gap-1"
                     >
-                      <Copy className="w-3 h-3 mr-1" />
-                      Copy
+                      <Copy className="w-3 h-3" />
+                      <span className="hidden sm:inline">Copy</span>
                     </Button>
                   </CardTitle>
                 </CardHeader>

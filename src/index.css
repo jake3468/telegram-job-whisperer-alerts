@@ -86,18 +86,16 @@
   }
 }
 
-/* Notebook paper effect styles - horizontal lines only */
+/* Clean notebook paper effect - no lines, just clean background */
 .notebook-paper {
   position: relative;
-  background-image: linear-gradient(to bottom, transparent 24px, #e0e0e0 24px, #e0e0e0 26px, transparent 26px);
-  background-size: 100% 26px;
+  background: white;
   padding: 16px;
 }
 
 /* Responsive adjustments for mobile */
 @media (max-width: 640px) {
   .notebook-paper {
-    background-size: 100% 22px !important;
     padding: 12px !important;
   }
 }
