@@ -446,9 +446,9 @@ const CoverLetter = () => {
 
             {/* Cover Letter Results Display */}
             {coverLetterResult && <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20 w-full">
-                <CardHeader className="pb-3 bg-purple-800">
+                <CardHeader className="pb-3 bg-emerald-600">
                   <CardTitle className="font-inter flex items-center gap-2 text-sm text-gray-950 justify-between">
-                    <div className="flex items-center gap-2 bg-gray-200">
+                    <div className="flex items-center gap-2 bg-emerald-600">
                       <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gray-950">
                         <FileText className="w-3 h-3 text-white" />
                       </div>
@@ -460,7 +460,7 @@ const CoverLetter = () => {
                     </Button>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 p-4 w-full bg-purple-800">
+                <CardContent className="pt-0 p-4 w-full bg-emerald-600">
                   <div className="bg-white rounded-lg p-4 border-2 border-blue-200 w-full notebook-paper">
                     <div className="text-slate-800 font-inter leading-relaxed font-medium w-full text-sm" style={{
                   wordWrap: 'break-word',
