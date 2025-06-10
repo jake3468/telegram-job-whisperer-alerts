@@ -25,6 +25,7 @@ const JobAnalysisHistory = ({ type, gradientColors, borderColors }: JobAnalysisH
     
     setIsLoading(true);
     try {
+      // Get user's database ID first
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('id')
@@ -33,6 +34,17 @@ const JobAnalysisHistory = ({ type, gradientColors, borderColors }: JobAnalysisH
 
       if (userError || !userData) {
         throw new Error('User not found in database');
+      }
+
+      // Get user profile ID
+      const { data: profileData, error: profileError } = await supabase
+        .from('user_profile')
+        .select('id')
+        .eq('user_id', userData.id)
+        .single();
+
+      if (profileError || !profileData) {
+        throw new Error('User profile not found');
       }
 
       // Determine which table to query based on type
@@ -49,7 +61,7 @@ const JobAnalysisHistory = ({ type, gradientColors, borderColors }: JobAnalysisH
           ${resultField},
           created_at
         `)
-        .eq('user_id', userData.id)
+        .eq('user_id', profileData.id)
         .not(resultField, 'is', null)
         .order('created_at', { ascending: false })
         .limit(10);

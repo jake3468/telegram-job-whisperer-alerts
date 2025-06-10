@@ -36,12 +36,13 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
   const [showForm, setShowForm] = useState(false);
   const [editingAlert, setEditingAlert] = useState<JobAlert | null>(null);
   const [isActivated, setIsActivated] = useState<boolean>(false);
+  const [userProfileId, setUserProfileId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchJobAlerts();
+    fetchUserProfileAndAlerts();
   }, [user]);
 
-  const fetchJobAlerts = async () => {
+  const fetchUserProfileAndAlerts = async () => {
     if (!user) return;
 
     try {
@@ -58,10 +59,26 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
         return;
       }
 
+      // Get user profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('user_profile')
+        .select('id')
+        .eq('user_id', userData.id)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching user profile:', profileError);
+        setLoading(false);
+        return;
+      }
+
+      setUserProfileId(profileData.id);
+
+      // Fetch job alerts using user_profile.id
       const { data, error } = await supabase
         .from('job_alerts')
         .select('*')
-        .eq('user_id', userData.id)
+        .eq('user_id', profileData.id)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -70,7 +87,7 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
         setAlerts(data || []);
       }
     } catch (error) {
-      console.error('Error fetching job alerts:', error);
+      console.error('Error fetching user profile and alerts:', error);
     } finally {
       setLoading(false);
     }
@@ -139,7 +156,7 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
   const handleFormSubmit = () => {
     setShowForm(false);
     setEditingAlert(null);
-    fetchJobAlerts();
+    fetchUserProfileAndAlerts();
   };
 
   const handleFormCancel = () => {

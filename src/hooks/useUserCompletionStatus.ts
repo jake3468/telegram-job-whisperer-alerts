@@ -27,6 +27,18 @@ export const useUserCompletionStatus = (): CompletionStatus => {
       }
 
       try {
+        // Get user's database ID
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('clerk_id', user.id)
+          .single();
+
+        if (userError) {
+          setStatus({ hasResume: false, hasBio: false, isComplete: false, loading: false });
+          return;
+        }
+
         // Check for resume
         const { data: resumeData, error: resumeError } = await supabase.storage
           .from('resumes')
@@ -37,14 +49,14 @@ export const useUserCompletionStatus = (): CompletionStatus => {
 
         const hasResume = !resumeError && resumeData && resumeData.length > 0;
 
-        // Check for bio
-        const { data: bioData, error: bioError } = await supabase
-          .from('users')
+        // Check for bio in user_profile table
+        const { data: profileData, error: profileError } = await supabase
+          .from('user_profile')
           .select('bio')
-          .eq('clerk_id', user.id)
+          .eq('user_id', userData.id)
           .single();
 
-        const hasBio = !bioError && bioData?.bio && bioData.bio.trim().length > 0;
+        const hasBio = !profileError && profileData?.bio && profileData.bio.trim().length > 0;
 
         const isComplete = hasResume && hasBio;
 

@@ -78,7 +78,7 @@ export type Database = {
             foreignKeyName: "job_alerts_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "user_profile"
             referencedColumns: ["id"]
           },
         ]
@@ -119,7 +119,7 @@ export type Database = {
             foreignKeyName: "job_analyses_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "user_profile"
             referencedColumns: ["id"]
           },
         ]
@@ -160,7 +160,7 @@ export type Database = {
             foreignKeyName: "job_cover_letters_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "user_profile"
             referencedColumns: ["id"]
           },
         ]
@@ -208,10 +208,6 @@ export type Database = {
       }
       users: {
         Row: {
-          activated: boolean | null
-          bio: string | null
-          bot_id: string
-          chat_id: number | null
           clerk_id: string
           created_at: string
           credits: number | null
@@ -222,10 +218,6 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          activated?: boolean | null
-          bio?: string | null
-          bot_id?: string
-          chat_id?: number | null
           clerk_id: string
           created_at?: string
           credits?: number | null
@@ -236,10 +228,6 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          activated?: boolean | null
-          bio?: string | null
-          bot_id?: string
-          chat_id?: number | null
           clerk_id?: string
           created_at?: string
           credits?: number | null

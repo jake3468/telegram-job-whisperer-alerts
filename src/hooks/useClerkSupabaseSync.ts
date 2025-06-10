@@ -30,6 +30,8 @@ export const useClerkSupabaseSync = () => {
           last_name: user.lastName || null,
         };
 
+        let userId = existingUser?.id;
+
         if (existingUser) {
           // Update existing user
           const { error: updateError } = await supabase
@@ -44,14 +46,40 @@ export const useClerkSupabaseSync = () => {
           }
         } else {
           // Create new user
-          const { error: insertError } = await supabase
+          const { data: newUser, error: insertError } = await supabase
             .from('users')
-            .insert([userData]);
+            .insert([userData])
+            .select()
+            .single();
 
           if (insertError) {
             console.error('Error creating user:', insertError);
+            return;
           } else {
             console.log('User created successfully in Supabase');
+            userId = newUser.id;
+          }
+        }
+
+        // Ensure user_profile exists
+        if (userId) {
+          const { data: existingProfile, error: profileFetchError } = await supabase
+            .from('user_profile')
+            .select('*')
+            .eq('user_id', userId)
+            .single();
+
+          if (profileFetchError && profileFetchError.code === 'PGRST116') {
+            // Create user profile if it doesn't exist
+            const { error: profileCreateError } = await supabase
+              .from('user_profile')
+              .insert([{ user_id: userId }]);
+
+            if (profileCreateError) {
+              console.error('Error creating user profile:', profileCreateError);
+            } else {
+              console.log('User profile created successfully');
+            }
           }
         }
       } catch (error) {
