@@ -86,30 +86,18 @@
   }
 }
 
-/* Notebook paper effect styles */
+/* Notebook paper effect styles - horizontal lines only */
 .notebook-paper {
   position: relative;
-}
-
-.notebook-paper::before {
-  content: '';
-  position: absolute;
-  left: 30px;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: #ff69b4;
-  z-index: 1;
+  background-image: linear-gradient(to bottom, transparent 24px, #e0e0e0 24px, #e0e0e0 26px, transparent 26px);
+  background-size: 100% 26px;
+  padding: 16px;
 }
 
 /* Responsive adjustments for mobile */
 @media (max-width: 640px) {
   .notebook-paper {
-    background-size: 25px 22px !important;
-    padding-left: 30px !important;
-  }
-  
-  .notebook-paper::before {
-    left: 25px;
+    background-size: 100% 22px !important;
+    padding: 12px !important;
   }
 }

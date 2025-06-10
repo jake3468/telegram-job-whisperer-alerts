@@ -561,12 +561,6 @@ const CoverLetter = () => {
                 <CardContent className="pt-0 bg-green-300 p-4 w-full">
                   <div 
                     className="bg-white rounded-lg p-4 border-2 border-blue-200 w-full notebook-paper"
-                    style={{
-                      backgroundImage: `linear-gradient(to right, #ff69b4 1px, transparent 1px),
-                                       linear-gradient(to bottom, transparent 24px, #e0e0e0 24px, #e0e0e0 26px, transparent 26px)`,
-                      backgroundSize: '30px 26px',
-                      paddingLeft: '40px'
-                    }}
                   >
                     <div 
                       className="text-slate-800 font-inter leading-relaxed font-medium w-full text-sm" 

@@ -1,9 +1,10 @@
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, Copy, X, AlertCircle } from 'lucide-react';
+import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface HistoryItem {
@@ -127,23 +128,6 @@ const HistoryModal = ({ type, isOpen, onClose, gradientColors }: HistoryModalPro
     }
   };
 
-  const handleCopy = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      toast({
-        title: "Copied!",
-        description: "Text copied to clipboard successfully."
-      });
-    } catch (err) {
-      console.error('Failed to copy text:', err);
-      toast({
-        title: "Error",
-        description: "Failed to copy text to clipboard.",
-        variant: "destructive"
-      });
-    }
-  };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -214,21 +198,9 @@ const HistoryModal = ({ type, isOpen, onClose, gradientColors }: HistoryModalPro
             {/* Result Section */}
             {hasResult(selectedItem) && (
               <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                <h3 className="text-white font-medium mb-4 flex items-center gap-2 justify-between">
-                  <span className="flex items-center gap-2">
-                    <FileText className="w-4 h-4" />
-                    {type === 'job_guide' ? 'Job Analysis Result' : 'Cover Letter'}
-                  </span>
-                  {type === 'cover_letter' && (
-                    <Button
-                      onClick={() => handleCopy(getResult(selectedItem) || '')}
-                      size="sm"
-                      className="bg-white/20 hover:bg-white/30 text-white border-white/20"
-                    >
-                      <Copy className="w-3 h-3 mr-1" />
-                      Copy
-                    </Button>
-                  )}
+                <h3 className="text-white font-medium mb-4 flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  {type === 'job_guide' ? 'Job Analysis Result' : 'Cover Letter'}
                 </h3>
                 <div 
                   className={`p-4 rounded-lg border-2 max-h-96 overflow-y-auto ${
@@ -236,14 +208,6 @@ const HistoryModal = ({ type, isOpen, onClose, gradientColors }: HistoryModalPro
                       ? 'bg-white notebook-paper border-blue-200' 
                       : 'bg-gray-50 notebook-paper border-gray-300'
                   }`}
-                  style={{
-                    backgroundImage: type === 'cover_letter' || type === 'job_guide' 
-                      ? `linear-gradient(to right, #ff69b4 1px, transparent 1px),
-                         linear-gradient(to bottom, transparent 24px, #e0e0e0 24px, #e0e0e0 26px, transparent 26px)`
-                      : 'none',
-                    backgroundSize: type === 'cover_letter' || type === 'job_guide' ? '30px 26px' : 'auto',
-                    paddingLeft: type === 'cover_letter' || type === 'job_guide' ? '40px' : '16px'
-                  }}
                 >
                   <div 
                     className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap"
@@ -262,22 +226,22 @@ const HistoryModal = ({ type, isOpen, onClose, gradientColors }: HistoryModalPro
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden bg-black border-white/20">
+      <DialogContent className="w-[95vw] max-w-5xl max-h-[90vh] overflow-hidden bg-black border-white/20">
         <DialogHeader>
-          <DialogTitle className="text-white font-inter flex items-center gap-2 text-lg">
-            <History className="w-5 h-5" />
+          <DialogTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
+            <History className="w-4 h-4 sm:w-5 sm:h-5" />
             {type === 'job_guide' ? 'Job Analysis History' : 'Cover Letter History'}
           </DialogTitle>
-          <DialogDescription className="text-white/70 font-inter text-sm">
+          <DialogDescription className="text-white/70 font-inter text-xs sm:text-sm">
             Your history is automatically deleted after 60 days. Found {historyData.length} items.
           </DialogDescription>
         </DialogHeader>
         
         {/* 60-day retention notice */}
-        <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg p-3 mb-4">
+        <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg p-2 sm:p-3 mb-4">
           <div className="flex items-center gap-2 text-orange-200">
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
-            <p className="text-sm">
+            <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+            <p className="text-xs sm:text-sm">
               Your history is automatically deleted after 60 days for privacy and storage optimization.
             </p>
           </div>
@@ -286,26 +250,70 @@ const HistoryModal = ({ type, isOpen, onClose, gradientColors }: HistoryModalPro
         <div className="flex-1 overflow-y-auto">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="text-white/70">Loading history...</div>
+              <div className="text-white/70 text-sm">Loading history...</div>
             </div>
           ) : historyData.length === 0 ? (
             <div className="flex items-center justify-center py-8">
               <div className="text-white/70 text-center">
-                <History className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                <p>No {type === 'job_guide' ? 'job analyses' : 'cover letters'} found.</p>
+                <History className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No {type === 'job_guide' ? 'job analyses' : 'cover letters'} found.</p>
               </div>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2 sm:space-y-3">
               {historyData.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white/5 hover:bg-white/10 rounded-lg p-3 border border-white/10 transition-colors"
+                  className="bg-white/5 hover:bg-white/10 rounded-lg p-3 sm:p-4 border border-white/10 transition-colors"
                 >
-                  <div className="flex items-center justify-between gap-4">
-                    {/* Main content - single line on desktop, stacked on mobile */}
+                  {/* Mobile Layout - Stacked */}
+                  <div className="block sm:hidden space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 text-white font-medium text-sm">
+                          <Building className="w-3 h-3 flex-shrink-0" />
+                          <span className="truncate">{item.company_name}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-white/80 text-sm mt-1">
+                          <Briefcase className="w-3 h-3 flex-shrink-0" />
+                          <span className="truncate">{item.job_title}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-white/60 text-xs mt-1">
+                          <Calendar className="w-3 h-3 flex-shrink-0" />
+                          <span>{formatDate(item.created_at)}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Mobile Action buttons */}
+                    <div className="flex items-center gap-1 pt-2">
+                      <Button
+                        onClick={() => {
+                          setSelectedItem(item);
+                          setShowDetails(true);
+                        }}
+                        size="sm"
+                        className="flex-1 bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-2 py-1"
+                      >
+                        <Eye className="w-3 h-3 mr-1" />
+                        View
+                      </Button>
+                      
+                      <Button
+                        onClick={() => handleDelete(item.id)}
+                        size="sm"
+                        className="flex-1 bg-red-600/80 hover:bg-red-600 text-white text-xs px-2 py-1"
+                      >
+                        <Trash2 className="w-3 h-3 mr-1" />
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Desktop Layout - Single Line */}
+                  <div className="hidden sm:flex items-center justify-between gap-4">
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                      <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2 text-white font-medium truncate">
                           <Building className="w-4 h-4 flex-shrink-0" />
                           <span className="truncate">{item.company_name}</span>
@@ -321,7 +329,7 @@ const HistoryModal = ({ type, isOpen, onClose, gradientColors }: HistoryModalPro
                       </div>
                     </div>
 
-                    {/* Action buttons */}
+                    {/* Desktop Action buttons */}
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <Button
                         onClick={() => {
@@ -334,17 +342,6 @@ const HistoryModal = ({ type, isOpen, onClose, gradientColors }: HistoryModalPro
                         <Eye className="w-3 h-3 mr-1" />
                         View
                       </Button>
-                      
-                      {type === 'cover_letter' && hasResult(item) && (
-                        <Button
-                          onClick={() => handleCopy(getResult(item) || '')}
-                          size="sm"
-                          className="bg-green-600/80 hover:bg-green-600 text-white text-xs px-3 py-1"
-                        >
-                          <Copy className="w-3 h-3 mr-1" />
-                          Copy
-                        </Button>
-                      )}
                       
                       <Button
                         onClick={() => handleDelete(item.id)}
