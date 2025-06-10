@@ -24,8 +24,13 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
 // Function to set Clerk JWT token for Supabase requests
 export const setClerkToken = (token: string | null) => {
   if (token) {
-    supabase.rest.headers['Authorization'] = `Bearer ${token}`;
-  } else {
-    supabase.rest.headers['Authorization'] = `Bearer ${SUPABASE_PUBLISHABLE_KEY}`;
+    // Use the global headers configuration instead of accessing protected rest property
+    supabase.auth.setSession({
+      access_token: token,
+      refresh_token: '',
+      expires_in: 3600,
+      token_type: 'bearer',
+      user: null as any
+    });
   }
 };

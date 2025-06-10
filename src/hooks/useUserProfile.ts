@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import { supabase, setClerkToken } from '@/integrations/supabase/client';
 
 interface UserProfile {
@@ -16,6 +16,7 @@ interface UserProfile {
 
 export const useUserProfile = () => {
   const { user } = useUser();
+  const { getToken } = useAuth();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +33,7 @@ export const useUserProfile = () => {
         console.log('Fetching user profile for clerk_id:', user.id);
         
         // Get Clerk session token and set it for Supabase
-        const token = await user.getToken({ template: 'supabase' });
+        const token = await getToken({ template: 'supabase' });
         if (token) {
           setClerkToken(token);
         }
@@ -103,7 +104,7 @@ export const useUserProfile = () => {
     };
 
     fetchUserProfile();
-  }, [user]);
+  }, [user, getToken]);
 
   const updateUserProfile = async (updates: Partial<UserProfile>) => {
     if (!user) {
@@ -115,7 +116,7 @@ export const useUserProfile = () => {
       console.log('Updating user profile with:', updates);
       
       // Get Clerk session token and set it for Supabase
-      const token = await user.getToken({ template: 'supabase' });
+      const token = await getToken({ template: 'supabase' });
       if (token) {
         setClerkToken(token);
         console.log('Set Clerk token for Supabase');
