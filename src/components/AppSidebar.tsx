@@ -67,24 +67,26 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {profileItems.map(item => <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={({ isActive: routeIsActive }) => {
-                      const isCurrentlyActive = routeIsActive || isActive(item.url);
-                      return `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${
-                        isCurrentlyActive 
-                          ? 'bg-blue-600 text-white' 
-                          : 'text-white hover:bg-blue-500 hover:text-white'
-                      }`;
-                    }}>
-                      <item.icon className={({ isActive: routeIsActive }) => {
-                        const isCurrentlyActive = routeIsActive || isActive(item.url);
-                        return `w-5 h-5 flex-shrink-0 ${isCurrentlyActive ? 'text-white' : 'text-white'}`;
-                      }} />
-                      {state === 'expanded' && <span className="font-medium truncate">{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>)}
+              {profileItems.map(item => {
+                const isCurrentlyActive = isActive(item.url);
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink 
+                        to={item.url} 
+                        className={`flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${
+                          isCurrentlyActive 
+                            ? 'bg-blue-600 text-white' 
+                            : 'text-white hover:bg-blue-500 hover:text-white'
+                        }`}
+                      >
+                        <item.icon className={`w-5 h-5 flex-shrink-0 text-white`} />
+                        {state === 'expanded' && <span className="font-medium truncate">{item.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -96,21 +98,26 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {toolItems.map(item => <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={({ isActive: routeIsActive }) => {
-                      const isCurrentlyActive = routeIsActive || isActive(item.url);
-                      return `flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${
-                        isCurrentlyActive 
-                          ? 'bg-blue-600 text-white' 
-                          : 'text-white hover:bg-blue-500 hover:text-white'
-                      }`;
-                    }}>
-                      <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive(item.url) ? 'text-white' : 'text-white'}`} />
-                      {state === 'expanded' && <span className="font-medium truncate">{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>)}
+              {toolItems.map(item => {
+                const isCurrentlyActive = isActive(item.url);
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink 
+                        to={item.url} 
+                        className={`flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${
+                          isCurrentlyActive 
+                            ? 'bg-blue-600 text-white' 
+                            : 'text-white hover:bg-blue-500 hover:text-white'
+                        }`}
+                      >
+                        <item.icon className={`w-5 h-5 flex-shrink-0 text-white`} />
+                        {state === 'expanded' && <span className="font-medium truncate">{item.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
