@@ -64,18 +64,17 @@ const HistoryModal = ({ type, isOpen, onClose, gradientColors }: HistoryModalPro
       }
 
       const tableName = type === 'job_guide' ? 'job_analyses' : 'job_cover_letters';
-      const resultField = type === 'job_guide' ? 'job_match, match_score' : 'cover_letter';
+      
+      let selectFields = 'id, company_name, job_title, job_description, created_at';
+      if (type === 'job_guide') {
+        selectFields += ', job_match, match_score';
+      } else {
+        selectFields += ', cover_letter';
+      }
       
       const { data, error } = await supabase
         .from(tableName)
-        .select(`
-          id,
-          company_name,
-          job_title,
-          job_description,
-          ${resultField},
-          created_at
-        `)
+        .select(selectFields)
         .eq('user_id', profileData.id)
         .order('created_at', { ascending: false })
         .limit(20);
