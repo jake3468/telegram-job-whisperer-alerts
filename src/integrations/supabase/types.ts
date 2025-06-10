@@ -320,6 +320,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_current_user_id_from_clerk: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_current_user_uuid: {
         Args: Record<PropertyKey, never>
         Returns: string
