@@ -1,52 +1,34 @@
-import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
+
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { User } from 'lucide-react';
+import { useUserProfile } from '@/hooks/useUserProfile';
+
 const BioSection = () => {
-  const {
-    user
-  } = useUser();
-  const {
-    toast
-  } = useToast();
-  const [bio, setBio] = useState('');
+  const { toast } = useToast();
+  const { userProfile, loading, updateUserProfile } = useUserProfile();
+  const [bio, setBio] = useState(userProfile?.bio || '');
   const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    const fetchUserBio = async () => {
-      if (!user) return;
-      try {
-        const {
-          data,
-          error
-        } = await supabase.from('users').select('bio').eq('clerk_id', user.id).single();
-        if (error && error.code !== 'PGRST116') {
-          console.error('Error fetching bio:', error);
-        } else if (data?.bio) {
-          setBio(data.bio);
-        }
-      } catch (error) {
-        console.error('Error fetching user bio:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUserBio();
-  }, [user]);
+
+  // Update local bio state when userProfile changes
+  React.useEffect(() => {
+    if (userProfile?.bio) {
+      setBio(userProfile.bio);
+    }
+  }, [userProfile]);
+
   const handleSaveBio = async () => {
-    if (!user) return;
     setSaving(true);
     try {
-      const {
-        error
-      } = await supabase.from('users').update({
-        bio
-      }).eq('clerk_id', user.id);
-      if (error) throw error;
+      const { error } = await updateUserProfile({ bio });
+      
+      if (error) {
+        throw new Error(error);
+      }
+      
       toast({
         title: "Bio updated",
         description: "Your bio has been saved successfully."
@@ -62,6 +44,7 @@ const BioSection = () => {
       setSaving(false);
     }
   };
+
   if (loading) {
     return <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
         <CardContent className="p-4">
@@ -69,6 +52,7 @@ const BioSection = () => {
         </CardContent>
       </Card>;
   }
+
   return <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
       <CardHeader className="pb-3">
         <CardTitle className="text-white font-inter flex items-center gap-2 text-base">
@@ -89,4 +73,5 @@ const BioSection = () => {
       </CardContent>
     </Card>;
 };
+
 export default BioSection;

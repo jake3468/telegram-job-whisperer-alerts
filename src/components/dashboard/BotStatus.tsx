@@ -1,54 +1,25 @@
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
 import { Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 interface BotStatusProps {
   onActivationChange?: (isActivated: boolean) => void;
 }
 
 const BotStatus = ({ onActivationChange }: BotStatusProps) => {
-  const { user } = useUser();
   const { toast } = useToast();
-  const [botId, setBotId] = useState<string>('');
-  const [isActivated, setIsActivated] = useState<boolean>(false);
-  const [loading, setLoading] = useState(true);
+  const { userProfile, loading } = useUserProfile();
   const [copiedBotId, setCopiedBotId] = useState(false);
   const [copiedBotName, setCopiedBotName] = useState(false);
 
   useEffect(() => {
-    fetchUserData();
-  }, [user]);
-
-  const fetchUserData = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('bot_id, activated')
-        .eq('clerk_id', user.id)
-        .single();
-
-      if (error) {
-        console.error('Error fetching user data:', error);
-        return;
-      }
-
-      if (data) {
-        setBotId(data.bot_id || '');
-        setIsActivated(data.activated || false);
-        onActivationChange?.(data.activated || false);
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    } finally {
-      setLoading(false);
+    if (userProfile) {
+      onActivationChange?.(userProfile.bot_activated || false);
     }
-  };
+  }, [userProfile, onActivationChange]);
 
   const copyToClipboard = async (text: string, type: 'botId' | 'botName') => {
     try {
@@ -82,6 +53,9 @@ const BotStatus = ({ onActivationChange }: BotStatusProps) => {
       </div>
     );
   }
+
+  const botId = userProfile?.bot_id || '';
+  const isActivated = userProfile?.bot_activated || false;
 
   return (
     <div className="mb-6">
