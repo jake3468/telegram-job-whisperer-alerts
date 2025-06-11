@@ -38,6 +38,7 @@ export type Database = {
           id: string
           job_title: string
           job_type: Database["public"]["Enums"]["job_type"]
+          last_run: string | null
           location: string
           max_alerts_per_day: number
           preferred_time: string
@@ -52,6 +53,7 @@ export type Database = {
           id?: string
           job_title: string
           job_type: Database["public"]["Enums"]["job_type"]
+          last_run?: string | null
           location: string
           max_alerts_per_day?: number
           preferred_time: string
@@ -66,6 +68,7 @@ export type Database = {
           id?: string
           job_title?: string
           job_type?: Database["public"]["Enums"]["job_type"]
+          last_run?: string | null
           location?: string
           max_alerts_per_day?: number
           preferred_time?: string

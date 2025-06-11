@@ -300,7 +300,7 @@ const CoverLetter = () => {
         <div className="max-w-4xl mx-auto px-3 py-8 sm:px-4 sm:py-12">
           <div className="text-center mb-8">
             <h1 className="sm:text-xl font-medium text-white mb-2 font-inter text-3xl md:text-3xl">
-              <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent text-3xl">Cover Letter</span>
+              <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-3xl">Cover Letter</span>
             </h1>
             <p className="text-sm text-gray-300 font-inter font-light">
               Generate a personalized cover letter to impress recruiters
@@ -345,7 +345,7 @@ const CoverLetter = () => {
               </Card>}
 
             {/* Cover Letter Input Form */}
-            <Card className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 border-2 border-blue-400 shadow-2xl shadow-blue-500/20">
+            <Card className="bg-gradient-to-br from-pink-600 via-rose-600 to-purple-600 border-2 border-pink-400 shadow-2xl shadow-pink-500/20">
               <CardHeader className="pb-3">
                 <CardTitle className="text-white font-inter flex items-center gap-2 text-base">
                   <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
@@ -357,7 +357,7 @@ const CoverLetter = () => {
                       Clear All
                     </Button>}
                 </CardTitle>
-                <CardDescription className="text-blue-100 font-inter text-sm">
+                <CardDescription className="text-pink-100 font-inter text-sm">
                   Enter job details to generate a personalized cover letter
                 </CardDescription>
               </CardHeader>
@@ -395,7 +395,7 @@ const CoverLetter = () => {
                 </div>
 
                 <div className="space-y-3">
-                  <Button onClick={handleSubmit} disabled={isButtonDisabled} className={`w-full font-inter font-medium py-3 px-4 text-sm ${!isButtonDisabled ? 'bg-white text-blue-600 hover:bg-gray-100' : 'bg-white/50 text-gray-800 border-2 border-white/70 cursor-not-allowed hover:bg-white/50'}`}>
+                  <Button onClick={handleSubmit} disabled={isButtonDisabled} className={`w-full font-inter font-medium py-3 px-4 text-sm ${!isButtonDisabled ? 'bg-white text-pink-600 hover:bg-gray-100' : 'bg-white/50 text-gray-800 border-2 border-white/70 cursor-not-allowed hover:bg-white/50'}`}>
                     <div className="flex items-center justify-center gap-2 w-full">
                       {isSubmitting ? <>
                           <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
@@ -413,9 +413,9 @@ const CoverLetter = () => {
                   </Button>
 
                   {/* History Button */}
-                  <JobAnalysisHistory type="cover_letter" gradientColors="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600" borderColors="border-2 border-blue-400" />
+                  <JobAnalysisHistory type="cover_letter" gradientColors="bg-gradient-to-br from-pink-600 via-rose-600 to-purple-600" borderColors="border-2 border-pink-400" />
 
-                  {(!isComplete || !isFormValid) && !isSubmitting && !isGenerating && <p className="text-blue-200 text-sm font-inter text-center">
+                  {(!isComplete || !isFormValid) && !isSubmitting && !isGenerating && <p className="text-pink-200 text-sm font-inter text-center">
                       {!isComplete ? 'Complete your profile first to use this feature' : 'Fill in all fields to generate your cover letter'}
                     </p>}
                 </div>
