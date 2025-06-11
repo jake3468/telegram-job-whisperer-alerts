@@ -336,5 +336,3 @@ const HistoryModal = ({
 };
 
 export default HistoryModal;
-
-}
