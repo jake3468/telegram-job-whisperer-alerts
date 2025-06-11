@@ -160,8 +160,8 @@ const HistoryModal = ({
 
   if (showDetails && selectedItem) {
     return <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-black border-white/20">
-          <DialogHeader>
+        <DialogContent className="max-w-4xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-white font-inter flex items-center gap-2 text-lg">
               <FileText className="w-5 h-5" />
               {type === 'job_guide' ? 'Job Analysis Details' : 'Cover Letter Details'}
@@ -172,7 +172,7 @@ const HistoryModal = ({
             </DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-6 mt-4">
+          <div className="flex-1 overflow-y-auto space-y-6 mt-4">
             {/* Input Details Section */}
             <div className="rounded-lg p-4 border border-white/10 bg-blue-800">
               <h3 className="text-white font-medium mb-4 flex items-center gap-2">
@@ -201,7 +201,7 @@ const HistoryModal = ({
               </div>
             </div>
 
-            {/* Result Section without notebook background */}
+            {/* Result Section */}
             {hasResult(selectedItem) && <div className="rounded-lg p-4 border border-white/10 bg-purple-800">
                 <h3 className="text-white font-medium mb-4 flex items-center gap-2 justify-between">
                   <div className="flex items-center gap-2">
@@ -231,8 +231,8 @@ const HistoryModal = ({
   }
 
   return <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-5xl max-h-[90vh] overflow-hidden bg-black border-white/20">
-        <DialogHeader>
+      <DialogContent className="w-[95vw] max-w-5xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
             <History className="w-4 h-4 sm:w-5 sm:h-5" />
             {type === 'job_guide' ? 'Job Analysis History' : 'Cover Letter History'}
@@ -242,7 +242,7 @@ const HistoryModal = ({
           </DialogDescription>
         </DialogHeader>
         
-        <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg p-2 sm:p-3 mb-4">
+        <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg p-2 sm:p-3 mb-4 flex-shrink-0">
           <div className="flex items-center gap-2 text-orange-200">
             <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
             <p className="text-xs sm:text-sm">
@@ -251,7 +251,7 @@ const HistoryModal = ({
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto min-h-0">
           {isLoading ? <div className="flex items-center justify-center py-8">
               <div className="text-white/70 text-sm">Loading history...</div>
             </div> : historyData.length === 0 ? <div className="flex items-center justify-center py-8">
@@ -259,7 +259,7 @@ const HistoryModal = ({
                 <History className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No {type === 'job_guide' ? 'job analyses' : 'cover letters'} found.</p>
               </div>
-            </div> : <div className="space-y-2 sm:space-y-3">
+            </div> : <div className="space-y-2 sm:space-y-3 pb-4">
               {historyData.map(item => <div key={item.id} className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-indigo-800">
                   <div className="block sm:hidden space-y-2">
                     <div className="flex items-start justify-between gap-2">
@@ -336,3 +336,5 @@ const HistoryModal = ({
 };
 
 export default HistoryModal;
+
+}
