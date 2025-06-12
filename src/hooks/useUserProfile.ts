@@ -9,7 +9,6 @@ interface UserProfile {
   bio: string | null;
   resume: string | null;
   bot_activated: boolean | null;
-  bot_id: string | null;
   chat_id: string | null;
   created_at: string | null;
 }
@@ -71,7 +70,6 @@ export const useUserProfile = () => {
               bio: null,
               resume: null,
               bot_activated: false,
-              bot_id: null,
               chat_id: null
             })
             .select()
@@ -88,12 +86,7 @@ export const useUserProfile = () => {
         }
 
         console.log('Profile data loaded:', profileData);
-        // Ensure bot_id is included in the profile data
-        const completeProfileData: UserProfile = {
-          ...profileData,
-          bot_id: profileData.bot_id || null
-        };
-        setUserProfile(completeProfileData);
+        setUserProfile(profileData);
         setError(null);
       } catch (err) {
         console.error('Error fetching user profile:', err);
@@ -157,7 +150,6 @@ export const useUserProfile = () => {
             bio: null,
             resume: null,
             bot_activated: false,
-            bot_id: null,
             chat_id: null,
             ...updates
           })
@@ -169,12 +161,8 @@ export const useUserProfile = () => {
           return { error: 'Failed to create user profile' };
         }
 
-        const completeNewProfile: UserProfile = {
-          ...newProfileData,
-          bot_id: newProfileData.bot_id || null
-        };
-        setUserProfile(completeNewProfile);
-        return { data: completeNewProfile, error: null };
+        setUserProfile(newProfileData);
+        return { data: newProfileData, error: null };
       }
 
       // Update existing profile using the profile ID
@@ -192,12 +180,8 @@ export const useUserProfile = () => {
       }
 
       console.log('Profile updated successfully:', data);
-      const completeUpdatedProfile: UserProfile = {
-        ...data,
-        bot_id: data.bot_id || null
-      };
-      setUserProfile(completeUpdatedProfile);
-      return { data: completeUpdatedProfile, error: null };
+      setUserProfile(data);
+      return { data, error: null };
     } catch (err) {
       console.error('Error updating user profile:', err);
       return { error: 'Failed to update user profile' };
