@@ -17,8 +17,8 @@ import HistoryModal from '@/components/HistoryModal';
 const LinkedInPosts = () => {
   const { user } = useUser();
   const { toast } = useToast();
-  const { data: userProfile } = useUserProfile();
-  const { hasCompletedProfile } = useUserCompletionStatus();
+  const { userProfile } = useUserProfile();
+  const { isComplete } = useUserCompletionStatus();
 
   const [formData, setFormData] = useState({
     topic: '',
@@ -57,7 +57,7 @@ const LinkedInPosts = () => {
       return;
     }
 
-    if (!hasCompletedProfile) {
+    if (!isComplete) {
       toast({
         title: "Profile Incomplete",
         description: "Please complete your profile before creating LinkedIn posts.",
