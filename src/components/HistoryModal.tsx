@@ -3,22 +3,28 @@ import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy } from 'lucide-react';
+import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy, Share2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface HistoryItem {
   id: string;
-  company_name: string;
-  job_title: string;
-  job_description: string;
+  company_name?: string;
+  job_title?: string;
+  job_description?: string;
+  topic?: string;
+  opinion?: string;
+  personal_story?: string;
+  audience?: string;
+  tone?: string;
   created_at: string;
   job_match?: string;
   match_score?: string;
   cover_letter?: string;
+  linkedin_post?: string;
 }
 
 interface HistoryModalProps {
-  type: 'job_guide' | 'cover_letter';
+  type: 'job_guide' | 'cover_letter' | 'linkedin_posts';
   isOpen: boolean;
   onClose: () => void;
   gradientColors: string;
@@ -65,17 +71,27 @@ const HistoryModal = ({
       if (profileError || !profileData) {
         throw new Error('User profile not found');
       }
-      const tableName = type === 'job_guide' ? 'job_analyses' : 'job_cover_letters';
+      
+      let tableName: string;
       let query;
+      
       if (type === 'job_guide') {
+        tableName = 'job_analyses';
         query = supabase.from(tableName).select('id, company_name, job_title, job_description, created_at, job_match, match_score').eq('user_id', profileData.id).order('created_at', {
           ascending: false
         }).limit(20);
-      } else {
+      } else if (type === 'cover_letter') {
+        tableName = 'job_cover_letters';
         query = supabase.from(tableName).select('id, company_name, job_title, job_description, created_at, cover_letter').eq('user_id', profileData.id).order('created_at', {
           ascending: false
         }).limit(20);
+      } else {
+        tableName = 'job_linkedin';
+        query = supabase.from(tableName).select('id, topic, opinion, personal_story, audience, tone, created_at, linkedin_post').eq('user_id', profileData.id).order('created_at', {
+          ascending: false
+        }).limit(20);
       }
+      
       const {
         data,
         error
@@ -119,15 +135,33 @@ const HistoryModal = ({
 
   const handleDelete = async (itemId: string) => {
     try {
-      const tableName = type === 'job_guide' ? 'job_analyses' : 'job_cover_letters';
+      let tableName: string;
+      if (type === 'job_guide') {
+        tableName = 'job_analyses';
+      } else if (type === 'cover_letter') {
+        tableName = 'job_cover_letters';
+      } else {
+        tableName = 'job_linkedin';
+      }
+      
       const {
         error
       } = await supabase.from(tableName).delete().eq('id', itemId);
       if (error) throw error;
       setHistoryData(prev => prev.filter(item => item.id !== itemId));
+      
+      let itemType: string;
+      if (type === 'job_guide') {
+        itemType = 'Job analysis';
+      } else if (type === 'cover_letter') {
+        itemType = 'Cover letter';
+      } else {
+        itemType = 'LinkedIn post';
+      }
+      
       toast({
         title: "Deleted",
-        description: `${type === 'job_guide' ? 'Job analysis' : 'Cover letter'} deleted successfully.`
+        description: `${itemType} deleted successfully.`
       });
     } catch (err) {
       console.error('Failed to delete item:', err);
@@ -150,7 +184,13 @@ const HistoryModal = ({
   };
 
   const getResult = (item: HistoryItem) => {
-    return type === 'job_guide' ? item.job_match : item.cover_letter;
+    if (type === 'job_guide') {
+      return item.job_match;
+    } else if (type === 'cover_letter') {
+      return item.cover_letter;
+    } else {
+      return item.linkedin_post;
+    }
   };
 
   const hasResult = (item: HistoryItem) => {
@@ -158,13 +198,67 @@ const HistoryModal = ({
     return result && result.trim().length > 0;
   };
 
+  const getItemTitle = (item: HistoryItem) => {
+    if (type === 'linkedin_posts') {
+      return item.topic || 'LinkedIn Post';
+    }
+    return item.company_name || 'Unknown Company';
+  };
+
+  const getItemSubtitle = (item: HistoryItem) => {
+    if (type === 'linkedin_posts') {
+      return item.tone || 'No tone specified';
+    }
+    return item.job_title || 'Unknown Position';
+  };
+
+  const getHistoryTitle = () => {
+    if (type === 'job_guide') {
+      return 'Job Analysis History';
+    } else if (type === 'cover_letter') {
+      return 'Cover Letter History';
+    } else {
+      return 'LinkedIn Posts History';
+    }
+  };
+
+  const getHistoryDescription = () => {
+    if (type === 'job_guide') {
+      return 'job analyses';
+    } else if (type === 'cover_letter') {
+      return 'cover letters';
+    } else {
+      return 'LinkedIn posts';
+    }
+  };
+
+  const getDetailTitle = () => {
+    if (type === 'job_guide') {
+      return 'Job Analysis Details';
+    } else if (type === 'cover_letter') {
+      return 'Cover Letter Details';
+    } else {
+      return 'LinkedIn Post Details';
+    }
+  };
+
+  const getResultTitle = () => {
+    if (type === 'job_guide') {
+      return 'Job Analysis Result';
+    } else if (type === 'cover_letter') {
+      return 'Cover Letter';
+    } else {
+      return 'LinkedIn Post';
+    }
+  };
+
   if (showDetails && selectedItem) {
     return <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-4xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-white font-inter flex items-center gap-2 text-lg">
-              <FileText className="w-5 h-5" />
-              {type === 'job_guide' ? 'Job Analysis Details' : 'Cover Letter Details'}
+              {type === 'linkedin_posts' ? <Share2 className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
+              {getDetailTitle()}
               <Button onClick={() => setShowDetails(false)} size="sm" className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm mx-[15px]">
                 <X className="w-4 h-4 mr-1" />
                 Back to List
@@ -180,20 +274,55 @@ const HistoryModal = ({
                 Input Details
               </h3>
               <div className="space-y-3">
-                <div>
-                  <label className="text-white/70 text-sm">Company Name:</label>
-                  <p className="text-white">{selectedItem.company_name}</p>
-                </div>
-                <div>
-                  <label className="text-white/70 text-sm">Job Title:</label>
-                  <p className="text-white">{selectedItem.job_title}</p>
-                </div>
-                <div>
-                  <label className="text-white/70 text-sm">Job Description:</label>
-                  <div className="bg-white/5 rounded p-3 max-h-32 overflow-y-auto">
-                    <p className="text-white text-sm">{selectedItem.job_description}</p>
-                  </div>
-                </div>
+                {type === 'linkedin_posts' ? (
+                  <>
+                    <div>
+                      <label className="text-white/70 text-sm">Topic:</label>
+                      <p className="text-white">{selectedItem.topic}</p>
+                    </div>
+                    {selectedItem.opinion && (
+                      <div>
+                        <label className="text-white/70 text-sm">Opinion:</label>
+                        <p className="text-white">{selectedItem.opinion}</p>
+                      </div>
+                    )}
+                    {selectedItem.personal_story && (
+                      <div>
+                        <label className="text-white/70 text-sm">Personal Story:</label>
+                        <p className="text-white">{selectedItem.personal_story}</p>
+                      </div>
+                    )}
+                    {selectedItem.audience && (
+                      <div>
+                        <label className="text-white/70 text-sm">Audience:</label>
+                        <p className="text-white">{selectedItem.audience}</p>
+                      </div>
+                    )}
+                    {selectedItem.tone && (
+                      <div>
+                        <label className="text-white/70 text-sm">Tone:</label>
+                        <p className="text-white">{selectedItem.tone}</p>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <label className="text-white/70 text-sm">Company Name:</label>
+                      <p className="text-white">{selectedItem.company_name}</p>
+                    </div>
+                    <div>
+                      <label className="text-white/70 text-sm">Job Title:</label>
+                      <p className="text-white">{selectedItem.job_title}</p>
+                    </div>
+                    <div>
+                      <label className="text-white/70 text-sm">Job Description:</label>
+                      <div className="bg-white/5 rounded p-3 max-h-32 overflow-y-auto">
+                        <p className="text-white text-sm">{selectedItem.job_description}</p>
+                      </div>
+                    </div>
+                  </>
+                )}
                 <div>
                   <label className="text-white/70 text-sm">Created:</label>
                   <p className="text-white">{formatDate(selectedItem.created_at)}</p>
@@ -205,8 +334,8 @@ const HistoryModal = ({
             {hasResult(selectedItem) && <div className="rounded-lg p-4 border border-white/10 bg-purple-800">
                 <h3 className="text-white font-medium mb-4 flex items-center gap-2 justify-between">
                   <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4" />
-                    {type === 'job_guide' ? 'Job Analysis Result' : 'Cover Letter'}
+                    {type === 'linkedin_posts' ? <Share2 className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
+                    {getResultTitle()}
                   </div>
                   <Button 
                     onClick={() => handleCopyResult(selectedItem)} 
@@ -234,8 +363,8 @@ const HistoryModal = ({
       <DialogContent className="w-[95vw] max-w-5xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
-            <History className="w-4 h-4 sm:w-5 sm:h-5" />
-            {type === 'job_guide' ? 'Job Analysis History' : 'Cover Letter History'}
+            {type === 'linkedin_posts' ? <Share2 className="w-4 h-4 sm:w-5 sm:h-5" /> : <History className="w-4 h-4 sm:w-5 sm:h-5" />}
+            {getHistoryTitle()}
           </DialogTitle>
           <DialogDescription className="text-white/70 font-inter text-xs sm:text-sm">
             Your history is automatically deleted after 60 days. Found {historyData.length} items.
@@ -256,8 +385,8 @@ const HistoryModal = ({
               <div className="text-white/70 text-sm">Loading history...</div>
             </div> : historyData.length === 0 ? <div className="flex items-center justify-center py-8">
               <div className="text-white/70 text-center">
-                <History className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No {type === 'job_guide' ? 'job analyses' : 'cover letters'} found.</p>
+                {type === 'linkedin_posts' ? <Share2 className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" /> : <History className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />}
+                <p className="text-sm">No {getHistoryDescription()} found.</p>
               </div>
             </div> : <div className="space-y-2 sm:space-y-3 pb-4">
               {historyData.map(item => <div key={item.id} className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-indigo-800">
@@ -265,12 +394,12 @@ const HistoryModal = ({
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 text-white font-medium text-sm">
-                          <Building className="w-3 h-3 flex-shrink-0" />
-                          <span className="truncate">{item.company_name}</span>
+                          {type === 'linkedin_posts' ? <Share2 className="w-3 h-3 flex-shrink-0" /> : <Building className="w-3 h-3 flex-shrink-0" />}
+                          <span className="truncate">{getItemTitle(item)}</span>
                         </div>
                         <div className="flex items-center gap-2 text-white/80 text-sm mt-1">
-                          <Briefcase className="w-3 h-3 flex-shrink-0" />
-                          <span className="truncate">{item.job_title}</span>
+                          {type === 'linkedin_posts' ? <FileText className="w-3 h-3 flex-shrink-0" /> : <Briefcase className="w-3 h-3 flex-shrink-0" />}
+                          <span className="truncate">{getItemSubtitle(item)}</span>
                         </div>
                         <div className="flex items-center gap-2 text-white/60 text-xs mt-1">
                           <Calendar className="w-3 h-3 flex-shrink-0" />
@@ -299,12 +428,12 @@ const HistoryModal = ({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2 text-white font-medium truncate">
-                          <Building className="w-4 h-4 flex-shrink-0" />
-                          <span className="truncate">{item.company_name}</span>
+                          {type === 'linkedin_posts' ? <Share2 className="w-4 h-4 flex-shrink-0" /> : <Building className="w-4 h-4 flex-shrink-0" />}
+                          <span className="truncate">{getItemTitle(item)}</span>
                         </div>
                         <div className="flex items-center gap-2 text-white/80 truncate">
-                          <Briefcase className="w-4 h-4 flex-shrink-0" />
-                          <span className="truncate">{item.job_title}</span>
+                          {type === 'linkedin_posts' ? <FileText className="w-4 h-4 flex-shrink-0" /> : <Briefcase className="w-4 h-4 flex-shrink-0" />}
+                          <span className="truncate">{getItemSubtitle(item)}</span>
                         </div>
                         <div className="flex items-center gap-2 text-white/60 text-sm">
                           <Calendar className="w-4 h-4 flex-shrink-0" />

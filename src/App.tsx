@@ -10,6 +10,7 @@ import Profile from "./pages/Profile";
 import JobAlerts from "./pages/JobAlerts";
 import JobGuide from "./pages/JobGuide";
 import CoverLetter from "./pages/CoverLetter";
+import LinkedInPosts from "./pages/LinkedInPosts";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const AppContent = () => {
       <Route path="/job-alerts" element={<JobAlerts />} />
       <Route path="/job-guide" element={<JobGuide />} />
       <Route path="/cover-letter" element={<CoverLetter />} />
+      <Route path="/linkedin-posts" element={<LinkedInPosts />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>

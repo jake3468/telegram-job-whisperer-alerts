@@ -171,11 +171,57 @@ export type Database = {
           },
         ]
       }
+      job_linkedin: {
+        Row: {
+          audience: string | null
+          created_at: string
+          id: string
+          linkedin_post: string | null
+          opinion: string | null
+          personal_story: string | null
+          tone: string | null
+          topic: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          audience?: string | null
+          created_at?: string
+          id?: string
+          linkedin_post?: string | null
+          opinion?: string | null
+          personal_story?: string | null
+          tone?: string | null
+          topic: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          audience?: string | null
+          created_at?: string
+          id?: string
+          linkedin_post?: string | null
+          opinion?: string | null
+          personal_story?: string | null
+          tone?: string | null
+          topic?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_linkedin_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_profile: {
         Row: {
           bio: string | null
           bot_activated: boolean | null
-          bot_id: string | null
           chat_id: string | null
           created_at: string | null
           id: string
@@ -185,7 +231,6 @@ export type Database = {
         Insert: {
           bio?: string | null
           bot_activated?: boolean | null
-          bot_id?: string | null
           chat_id?: string | null
           created_at?: string | null
           id?: string
@@ -195,7 +240,6 @@ export type Database = {
         Update: {
           bio?: string | null
           bot_activated?: boolean | null
-          bot_id?: string | null
           chat_id?: string | null
           created_at?: string | null
           id?: string

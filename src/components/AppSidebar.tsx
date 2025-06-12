@@ -1,5 +1,5 @@
 
-import { User, Bell, Target, FileText, X } from 'lucide-react';
+import { User, Bell, Target, FileText, X, Share2 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, useSidebar } from '@/components/ui/sidebar';
 import { SignedIn, UserButton, useUser } from '@clerk/clerk-react';
@@ -23,6 +23,10 @@ const toolItems = [{
   title: 'Cover Letter',
   url: '/cover-letter',
   icon: FileText
+}, {
+  title: 'LinkedIn Posts',
+  url: '/linkedin-posts',
+  icon: Share2
 }];
 
 export function AppSidebar() {
