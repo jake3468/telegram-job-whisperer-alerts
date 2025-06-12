@@ -88,7 +88,12 @@ export const useUserProfile = () => {
         }
 
         console.log('Profile data loaded:', profileData);
-        setUserProfile(profileData);
+        // Ensure bot_id is included in the profile data
+        const completeProfileData: UserProfile = {
+          ...profileData,
+          bot_id: profileData.bot_id || null
+        };
+        setUserProfile(completeProfileData);
         setError(null);
       } catch (err) {
         console.error('Error fetching user profile:', err);
@@ -164,8 +169,12 @@ export const useUserProfile = () => {
           return { error: 'Failed to create user profile' };
         }
 
-        setUserProfile(newProfileData);
-        return { data: newProfileData, error: null };
+        const completeNewProfile: UserProfile = {
+          ...newProfileData,
+          bot_id: newProfileData.bot_id || null
+        };
+        setUserProfile(completeNewProfile);
+        return { data: completeNewProfile, error: null };
       }
 
       // Update existing profile using the profile ID
@@ -183,8 +192,12 @@ export const useUserProfile = () => {
       }
 
       console.log('Profile updated successfully:', data);
-      setUserProfile(data);
-      return { data, error: null };
+      const completeUpdatedProfile: UserProfile = {
+        ...data,
+        bot_id: data.bot_id || null
+      };
+      setUserProfile(completeUpdatedProfile);
+      return { data: completeUpdatedProfile, error: null };
     } catch (err) {
       console.error('Error updating user profile:', err);
       return { error: 'Failed to update user profile' };
