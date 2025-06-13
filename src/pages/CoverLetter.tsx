@@ -360,7 +360,7 @@ const CoverLetter = () => {
                       <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
                         <FileText className="w-4 h-4 text-white" />
                       </div>
-                      Cover Letter Information
+                      Cover Letter Info
                     </CardTitle>
                     <CardDescription className="text-pink-100 font-inter text-sm">
                       Enter job details to generate a personalized cover letter
