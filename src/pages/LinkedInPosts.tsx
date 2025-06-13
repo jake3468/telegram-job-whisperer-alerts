@@ -152,7 +152,7 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
           {/* Header Section */}
           <div className="text-center mb-12">
             
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-200 via-gray-300 to-zinc-400 bg-clip-text text-transparent mb-4 font-inter">
+            <h1 className="text-4xl bg-gradient-to-r from-slate-200 via-gray-300 to-zinc-400 bg-clip-text text-transparent mb-4 font-inter md:text-4xl font-semibold">
               LinkedIn Posts
             </h1>
             <p className="text-gray-300 max-w-2xl mx-auto font-inter text-sm font-light">
