@@ -1,38 +1,43 @@
+
 import { useUser } from '@clerk/clerk-react';
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthHeader from '@/components/AuthHeader';
 import JobAlertsSection from '@/components/dashboard/JobAlertsSection';
 import { Layout } from '@/components/Layout';
-const JobAlerts = () => {
-  const {
-    user,
-    isLoaded
-  } = useUser();
-  const navigate = useNavigate();
 
+const JobAlerts = () => {
+  const { user, isLoaded } = useUser();
+  const navigate = useNavigate();
+  
   // Memoize timezone to prevent unnecessary re-renders
   const userTimezone = useMemo(() => {
     return Intl.DateTimeFormat().resolvedOptions().timeZone;
   }, []);
+
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
+
   if (!isLoaded || !user) {
-    return <div className="min-h-screen bg-black flex items-center justify-center">
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-xs">Loading...</div>
-      </div>;
+      </div>
+    );
   }
-  return <Layout>
+
+  return (
+    <Layout>
       <div className="min-h-screen bg-black">
         <AuthHeader />
         
         <div className="max-w-4xl mx-auto px-3 py-8 sm:px-4 sm:py-12">
           <div className="text-center mb-8">
             <h1 className="sm:text-xl font-medium text-white mb-2 font-inter text-3xl md:text-3xl">
-              <span className="bg-gradient-to-r from-orange-500 to-pink-600 bg-clip-text text-transparent text-4xl font-semibold">
+              <span className="bg-gradient-to-r from-orange-500 to-pink-600 bg-clip-text text-transparent text-3xl">
                 Telegram Job Alerts
               </span>
             </h1>
@@ -46,6 +51,8 @@ const JobAlerts = () => {
           </div>
         </div>
       </div>
-    </Layout>;
+    </Layout>
+  );
 };
+
 export default JobAlerts;
