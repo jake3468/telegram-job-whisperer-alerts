@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Layout } from '@/components/Layout';
@@ -64,7 +65,7 @@ const JobGuide = () => {
     setIsSubmitting(true);
     try {
       const { data, error } = await supabase
-        .from('job_guide')
+        .from('job_analyses')
         .insert({
           user_id: userProfile.id,
           job_title: formData.job_title,
@@ -131,7 +132,7 @@ const JobGuide = () => {
     toast({
       title: "Download Not Available",
       description: "PDF download feature is not implemented yet.",
-      variant: "warning",
+      variant: "destructive",
     });
   };
 

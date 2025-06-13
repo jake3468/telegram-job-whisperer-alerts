@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Layout } from '@/components/Layout';
@@ -65,7 +66,7 @@ const CoverLetter = () => {
     try {
       // Insert into database
       const { data, error } = await supabase
-        .from('job_cover_letter')
+        .from('job_cover_letters')
         .insert({
           user_id: userProfile.id,
           job_title: formData.job_title,
@@ -120,7 +121,7 @@ const CoverLetter = () => {
     toast({
       title: "Download Not Available",
       description: "PDF download functionality is not implemented yet.",
-      variant: "warning",
+      variant: "destructive",
     });
   };
 
