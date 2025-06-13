@@ -161,8 +161,8 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
             </p>
           </div>
 
-          {/* Centered Form Layout */}
-          <div className="max-w-2xl mx-auto">
+          {/* Widened Form Layout - Changed from max-w-2xl to max-w-4xl to match Cover Letter page */}
+          <div className="max-w-4xl mx-auto">
             {/* Input Form */}
             <Card className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 border-white/20 backdrop-blur-sm mb-8">
               <CardHeader className="pb-6">
