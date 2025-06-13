@@ -151,10 +151,8 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
         <div className="container mx-auto px-4 py-8 bg-zinc-950">
           {/* Header Section */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-slate-400 to-gray-500 rounded-full mb-6">
-              <Share2 className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-200 via-gray-300 to-zinc-400 bg-clip-text text-transparent mb-4 font-inter">
+            
+            <h1 className="text-4xl bg-gradient-to-r from-slate-200 via-gray-300 to-zinc-400 bg-clip-text text-transparent mb-4 font-inter md:text-4xl font-medium">
               LinkedIn Posts
             </h1>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto font-inter">
