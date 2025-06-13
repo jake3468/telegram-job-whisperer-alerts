@@ -6,12 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { AlertCircle, FileText, Sparkles, Loader2, CheckCircle, Trash2, Building, Briefcase, Copy } from 'lucide-react';
+import { AlertCircle, FileText, Sparkles, Loader2, CheckCircle, Trash2, Building, Briefcase, Copy, History } from 'lucide-react';
 import AuthHeader from '@/components/AuthHeader';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import { supabase } from '@/integrations/supabase/client';
 import { Layout } from '@/components/Layout';
 import JobAnalysisHistory from '@/components/JobAnalysisHistory';
+
 const CoverLetter = () => {
   const {
     user,
@@ -40,7 +41,13 @@ const CoverLetter = () => {
   const [coverLetterResult, setCoverLetterResult] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('');
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const loadingMessages = ["✍️ Crafting your personalized cover letter...", "✨ Adding a touch of magic to your application...", "🚀 Tailoring your skills to the job description...", "🎯 Highlighting your unique qualifications..."];
+  const loadingMessages = [
+    "✍️ Crafting your personalized cover letter...",
+    "✨ Adding a touch of magic to your application...",
+    "🚀 Tailoring your skills to the job description...",
+    "🎯 Highlighting your unique qualifications..."
+  ];
+
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
@@ -347,19 +354,38 @@ const CoverLetter = () => {
             {/* Cover Letter Input Form */}
             <Card className="bg-gradient-to-br from-pink-600 via-rose-600 to-purple-600 border-2 border-pink-400 shadow-2xl shadow-pink-500/20">
               <CardHeader className="pb-3">
-                <CardTitle className="text-white font-inter flex items-center gap-2 text-base">
-                  <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-                    <FileText className="w-4 h-4 text-white" />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-white font-inter flex items-center gap-2 text-base">
+                      <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                        <FileText className="w-4 h-4 text-white" />
+                      </div>
+                      Cover Letter Information
+                    </CardTitle>
+                    <CardDescription className="text-pink-100 font-inter text-sm">
+                      Enter job details to generate a personalized cover letter
+                    </CardDescription>
                   </div>
-                  Cover Letter Information
-                  {hasAnyData && <Button onClick={handleClearData} size="sm" className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-xs px-2 py-1">
-                      <Trash2 className="w-3 h-3 mr-1" />
-                      Clear All
-                    </Button>}
-                </CardTitle>
-                <CardDescription className="text-pink-100 font-inter text-sm">
-                  Enter job details to generate a personalized cover letter
-                </CardDescription>
+                  <Button 
+                    onClick={() => {/* Handle history click */}} 
+                    variant="outline" 
+                    size="sm" 
+                    className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                  >
+                    <History className="w-4 h-4 mr-2" />
+                    History
+                  </Button>
+                </div>
+                {hasAnyData && (
+                  <Button 
+                    onClick={handleClearData} 
+                    size="sm" 
+                    className="mt-2 bg-white/20 hover:bg-white/30 text-white border-white/20 text-xs px-2 py-1 self-start"
+                  >
+                    <Trash2 className="w-3 h-3 mr-1" />
+                    Clear All
+                  </Button>
+                )}
               </CardHeader>
               <CardContent className="space-y-4 pt-0">
                 <div className="space-y-4">
@@ -395,22 +421,43 @@ const CoverLetter = () => {
                 </div>
 
                 <div className="space-y-3">
-                  <Button onClick={handleSubmit} disabled={isButtonDisabled} className={`w-full font-inter font-medium py-3 px-4 text-sm ${!isButtonDisabled ? 'bg-white text-pink-600 hover:bg-gray-100' : 'bg-white/50 text-gray-800 border-2 border-white/70 cursor-not-allowed hover:bg-white/50'}`}>
-                    <div className="flex items-center justify-center gap-2 w-full">
-                      {isSubmitting ? <>
-                          <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
-                          <span className="text-center text-sm">Processing...</span>
-                        </> : isGenerating ? <>
-                          <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
-                          <span className="text-center text-sm">Generating...</span>
-                        </> : <>
-                          <Sparkles className="w-4 h-4 flex-shrink-0" />
-                          <span className="text-center text-sm font-bold">
-                            Generate Cover Letter
-                          </span>
-                        </>}
-                    </div>
-                  </Button>
+                  <div className="flex gap-3">
+                    <Button 
+                      onClick={handleSubmit} 
+                      disabled={isButtonDisabled} 
+                      className={`flex-1 font-inter font-medium py-3 px-4 text-sm ${!isButtonDisabled ? 'bg-white text-pink-600 hover:bg-gray-100' : 'bg-white/50 text-gray-800 border-2 border-white/70 cursor-not-allowed hover:bg-white/50'}`}
+                    >
+                      <div className="flex items-center justify-center gap-2 w-full">
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
+                            <span className="text-center text-sm">Processing...</span>
+                          </>
+                        ) : isGenerating ? (
+                          <>
+                            <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
+                            <span className="text-center text-sm">Generating...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-center text-sm font-bold">
+                              Generate Cover Letter
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </Button>
+
+                    <Button 
+                      type="button" 
+                      onClick={handleClearData} 
+                      variant="outline" 
+                      className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-sm h-12 px-6"
+                    >
+                      Reset
+                    </Button>
+                  </div>
 
                   {/* History Button */}
                   <JobAnalysisHistory type="cover_letter" gradientColors="bg-gradient-to-br from-pink-600 via-rose-600 to-purple-600" borderColors="border-2 border-pink-400" />
@@ -518,4 +565,5 @@ const CoverLetter = () => {
       </div>
     </Layout>;
 };
+
 export default CoverLetter;
