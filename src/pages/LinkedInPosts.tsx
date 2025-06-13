@@ -171,7 +171,7 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
           <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Input Form */}
-              <Card className="bg-white/5 border-white/20 backdrop-blur-sm">
+              <Card className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 border-white/20 backdrop-blur-sm">
                 <CardHeader className="pb-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -197,23 +197,29 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
                 <CardContent className="space-y-6">
                   <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Topic */}
-                    <div className="space-y-2">
-                      <Label htmlFor="topic" className="text-white font-medium">
-                        What is the main topic you want to write about? *
+                    <div className="space-y-3">
+                      <Label htmlFor="topic" className="text-white font-medium text-base">
+                        Topic or Theme *
+                      </Label>
+                      <Label htmlFor="topic" className="text-gray-300 font-normal text-sm block">
+                        What is the main topic you want to write about?
                       </Label>
                       <Textarea
                         id="topic"
                         placeholder="e.g. AI in customer service, Layoffs in tech, Remote work trends"
                         value={formData.topic}
                         onChange={(e) => handleInputChange('topic', e.target.value)}
-                        className="min-h-[60px] resize-none"
+                        className="min-h-[60px] resize-none text-base"
                         required
                       />
                     </div>
 
                     {/* Opinion */}
-                    <div className="space-y-2">
-                      <Label htmlFor="opinion" className="text-white font-medium">
+                    <div className="space-y-3">
+                      <Label htmlFor="opinion" className="text-white font-medium text-base">
+                        Your Key Point or Opinion
+                      </Label>
+                      <Label htmlFor="opinion" className="text-gray-300 font-normal text-sm block">
                         What is your main insight, opinion, or message?
                       </Label>
                       <Textarea
@@ -221,13 +227,16 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
                         placeholder="I believe hybrid AI + human support is the future."
                         value={formData.opinion}
                         onChange={(e) => handleInputChange('opinion', e.target.value)}
-                        className="min-h-[80px] resize-none"
+                        className="min-h-[80px] resize-none text-base"
                       />
                     </div>
 
                     {/* Personal Story */}
-                    <div className="space-y-2">
-                      <Label htmlFor="personal_story" className="text-white font-medium">
+                    <div className="space-y-3">
+                      <Label htmlFor="personal_story" className="text-white font-medium text-base">
+                        Personal Experience or Story
+                      </Label>
+                      <Label htmlFor="personal_story" className="text-gray-300 font-normal text-sm block">
                         Do you have a story, data point, or personal experience to include?
                       </Label>
                       <Textarea
@@ -235,13 +244,16 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
                         placeholder="We reduced response time by 40% after implementing AI chat."
                         value={formData.personal_story}
                         onChange={(e) => handleInputChange('personal_story', e.target.value)}
-                        className="min-h-[80px] resize-none"
+                        className="min-h-[80px] resize-none text-base"
                       />
                     </div>
 
                     {/* Audience */}
-                    <div className="space-y-2">
-                      <Label htmlFor="audience" className="text-white font-medium">
+                    <div className="space-y-3">
+                      <Label htmlFor="audience" className="text-white font-medium text-base">
+                        Target Audience
+                      </Label>
+                      <Label htmlFor="audience" className="text-gray-300 font-normal text-sm block">
                         Who are you writing this for?
                       </Label>
                       <Textarea
@@ -249,17 +261,20 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
                         placeholder="Startup founders, product managers, working moms, new grads…"
                         value={formData.audience}
                         onChange={(e) => handleInputChange('audience', e.target.value)}
-                        className="min-h-[60px] resize-none"
+                        className="min-h-[60px] resize-none text-base"
                       />
                     </div>
 
                     {/* Tone */}
-                    <div className="space-y-2">
-                      <Label htmlFor="tone" className="text-white font-medium">
+                    <div className="space-y-3">
+                      <Label htmlFor="tone" className="text-white font-medium text-base">
+                        Tone/Style Preference
+                      </Label>
+                      <Label htmlFor="tone" className="text-gray-300 font-normal text-sm block">
                         What tone do you prefer?
                       </Label>
                       <Select onValueChange={(value) => handleInputChange('tone', value)}>
-                        <SelectTrigger>
+                        <SelectTrigger className="text-base">
                           <SelectValue placeholder="Select a tone..." />
                         </SelectTrigger>
                         <SelectContent>
@@ -276,7 +291,7 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
                       <Button
                         type="submit"
                         disabled={isSubmitting || !formData.topic.trim()}
-                        className="flex-1 bg-gradient-to-r from-slate-500 to-gray-600 hover:from-slate-600 hover:to-gray-700 text-white font-medium"
+                        className="flex-1 bg-gradient-to-r from-slate-500 to-gray-600 hover:from-slate-600 hover:to-gray-700 text-white font-medium text-base h-12"
                       >
                         {isSubmitting ? 'Creating Post...' : 'Generate LinkedIn Post'}
                       </Button>
@@ -285,7 +300,7 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
                         type="button"
                         onClick={resetForm}
                         variant="outline"
-                        className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                        className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-base h-12 px-6"
                       >
                         Reset
                       </Button>
@@ -294,44 +309,37 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
                 </CardContent>
               </Card>
 
-              {/* Result Display */}
-              <Card className="bg-white/5 border-white/20 backdrop-blur-sm">
-                <CardHeader className="pb-6">
-                  <CardTitle className="text-white font-inter text-xl flex items-center gap-2">
-                    <Share2 className="w-5 h-5 text-slate-400" />
-                    Your LinkedIn Post
-                  </CardTitle>
-                  <CardDescription className="text-gray-300 font-inter">
-                    {result ? 'Your generated LinkedIn post is ready!' : 'Your post will appear here once generated'}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {result ? (
+              {/* Result Display - Only show when there's a result */}
+              {result && (
+                <Card className="bg-white/5 border-white/20 backdrop-blur-sm">
+                  <CardHeader className="pb-6">
+                    <CardTitle className="text-white font-inter text-xl flex items-center gap-2">
+                      <Share2 className="w-5 h-5 text-slate-400" />
+                      Your LinkedIn Post
+                    </CardTitle>
+                    <CardDescription className="text-gray-300 font-inter">
+                      Your generated LinkedIn post is ready!
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
                     <div className="space-y-4">
                       <div className="bg-white rounded-lg p-6 border-2 border-slate-200">
-                        <div className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap font-serif">
+                        <div className="text-gray-800 text-base leading-relaxed whitespace-pre-wrap font-serif">
                           {result}
                         </div>
                       </div>
                       
                       <Button
                         onClick={handleCopyResult}
-                        className="w-full bg-slate-700 hover:bg-slate-600 text-white flex items-center gap-2"
+                        className="w-full bg-slate-700 hover:bg-slate-600 text-white flex items-center gap-2 text-base h-12"
                       >
                         <Copy className="w-4 h-4" />
                         Copy LinkedIn Post
                       </Button>
                     </div>
-                  ) : (
-                    <div className="bg-white/5 rounded-lg p-8 text-center border-2 border-dashed border-white/20">
-                      <Share2 className="w-12 h-12 text-gray-500 mx-auto mb-4 opacity-50" />
-                      <p className="text-gray-400 text-sm">
-                        Fill out the form and click "Generate LinkedIn Post" to see your post here
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         </div>
