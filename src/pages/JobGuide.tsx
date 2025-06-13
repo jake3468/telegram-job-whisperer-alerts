@@ -13,7 +13,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { Layout } from '@/components/Layout';
 import JobAnalysisHistory from '@/components/JobAnalysisHistory';
 import PercentageMeter from '@/components/PercentageMeter';
-
 const JobGuide = () => {
   const {
     user,
@@ -104,7 +103,6 @@ const JobGuide = () => {
       }
     };
     pollingIntervalRef.current = setInterval(pollForResults, 3500);
-
     const timeout = setTimeout(() => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
@@ -120,7 +118,6 @@ const JobGuide = () => {
         variant: "destructive"
       });
     }, 360000);
-
     return () => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
@@ -171,7 +168,6 @@ const JobGuide = () => {
     requestInFlightRef.current = false;
     submissionInProgressRef.current = false;
     lastSubmissionTimeRef.current = 0;
-    
     toast({
       title: "Data Cleared",
       description: "All form data and results have been cleared."
@@ -198,7 +194,6 @@ const JobGuide = () => {
       });
       return;
     }
-    
     if (now - lastSubmissionTimeRef.current < MIN_SUBMISSION_INTERVAL) {
       console.log('❌ BLOCKED: Too soon after last submission');
       toast({
@@ -208,7 +203,6 @@ const JobGuide = () => {
       });
       return;
     }
-    
     if (!isComplete) {
       toast({
         title: "Complete your profile first",
@@ -217,7 +211,6 @@ const JobGuide = () => {
       });
       return;
     }
-    
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
         title: "Missing information",
@@ -226,11 +219,9 @@ const JobGuide = () => {
       });
       return;
     }
-
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
-    
     debounceTimerRef.current = setTimeout(async () => {
       try {
         // Final check before proceeding
@@ -249,19 +240,13 @@ const JobGuide = () => {
         setJobMatchResult(null);
         setMatchScore(null);
         abortControllerRef.current = new AbortController();
-        
         console.log('✅ PROCEEDING with submission:', requestId);
 
         // Get the user_profile ID instead of users ID
         const {
           data: userProfileData,
           error: userProfileError
-        } = await supabase
-          .from('user_profile')
-          .select('id')
-          .eq('user_id', (await supabase.from('users').select('id').eq('clerk_id', user?.id).single()).data?.id)
-          .single();
-        
+        } = await supabase.from('user_profile').select('id').eq('user_id', (await supabase.from('users').select('id').eq('clerk_id', user?.id).single()).data?.id).single();
         if (userProfileError || !userProfileData) {
           throw new Error('User profile not found in database');
         }
@@ -270,20 +255,9 @@ const JobGuide = () => {
         const {
           data: existingAnalysis,
           error: checkError
-        } = await supabase
-          .from('job_analyses')
-          .select('id, job_match, match_score')
-          .eq('user_id', userProfileData.id)
-          .eq('company_name', formData.companyName)
-          .eq('job_title', formData.jobTitle)
-          .eq('job_description', formData.jobDescription)
-          .not('job_match', 'is', null)
-          .not('match_score', 'is', null)
-          .order('created_at', {
-            ascending: false
-          })
-          .limit(1);
-        
+        } = await supabase.from('job_analyses').select('id, job_match, match_score').eq('user_id', userProfileData.id).eq('company_name', formData.companyName).eq('job_title', formData.jobTitle).eq('job_description', formData.jobDescription).not('job_match', 'is', null).not('match_score', 'is', null).order('created_at', {
+          ascending: false
+        }).limit(1);
         if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
           const existing = existingAnalysis[0];
           console.log('✅ FOUND existing analysis:', existing.id);
@@ -299,33 +273,26 @@ const JobGuide = () => {
           });
           return;
         }
-        
+
         // Insert new analysis using user_profile ID
         const {
           data: insertedData,
           error: insertError
-        } = await supabase
-          .from('job_analyses')
-          .insert({
-            user_id: userProfileData.id,
-            company_name: formData.companyName,
-            job_title: formData.jobTitle,
-            job_description: formData.jobDescription
-          })
-          .select('id')
-          .single();
-        
+        } = await supabase.from('job_analyses').insert({
+          user_id: userProfileData.id,
+          company_name: formData.companyName,
+          job_title: formData.jobTitle,
+          job_description: formData.jobDescription
+        }).select('id').single();
         if (insertError) {
           console.error('❌ INSERT ERROR:', insertError);
           throw new Error(`Database insert failed: ${insertError.message}`);
         }
-        
         if (insertedData?.id) {
           console.log('✅ ANALYSIS INSERTED:', insertedData.id);
           setAnalysisId(insertedData.id);
           setIsSuccess(true);
           setIsGenerating(true);
-
           toast({
             title: "Analysis Started!",
             description: "Your job match analysis is being processed. Please wait for the results."
@@ -337,7 +304,6 @@ const JobGuide = () => {
         setError(errorMessage);
         submissionInProgressRef.current = false;
         requestInFlightRef.current = false;
-
         toast({
           title: "Analysis Failed",
           description: "There was an error generating your job analysis. Please try again.",
@@ -363,7 +329,7 @@ const JobGuide = () => {
         <div className="max-w-4xl mx-auto px-3 py-8 sm:px-4 sm:py-12">
           <div className="text-center mb-8">
             <h1 className="sm:text-xl font-medium text-white mb-2 font-inter text-3xl md:text-3xl">
-              <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent text-3xl">Job Guide</span>
+              <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent font-semibold text-4xl">Job Guide</span>
             </h1>
             <p className="text-sm text-gray-300 font-inter font-light">
               Get comprehensive job matching analysis
