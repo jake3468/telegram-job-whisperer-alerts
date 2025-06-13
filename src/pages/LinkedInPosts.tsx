@@ -196,9 +196,7 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
 
                     {/* Opinion */}
                     <div className="space-y-3">
-                      <Label htmlFor="opinion" className="text-white font-medium text-base">
-                        Your Key Point or Opinion
-                      </Label>
+                      <Label htmlFor="opinion" className="text-white font-medium text-base">Key Point or Opinion</Label>
                       <Label htmlFor="opinion" className="text-gray-300 font-normal text-sm block">
                         What is your main insight, opinion, or message?
                       </Label>
