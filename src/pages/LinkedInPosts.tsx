@@ -167,7 +167,7 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
                 <CardHeader className="pb-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle className="text-white font-inter text-xl flex items-center gap-2">
+                      <CardTitle className="text-white font-inter flex items-center gap-2 text-base">
                         <Sparkles className="w-5 h-5 text-slate-400" />
                         Create Your Post
                       </CardTitle>
@@ -175,7 +175,7 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
                         Fill in the details to generate your LinkedIn post
                       </CardDescription>
                     </div>
-                    <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                    <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-sm">
                       <History className="w-4 h-4 mr-2" />
                       History
                     </Button>
