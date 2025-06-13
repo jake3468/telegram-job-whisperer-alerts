@@ -191,7 +191,7 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
                       <Label htmlFor="topic" className="text-gray-300 font-normal text-sm block">
                         What is the main topic you want to write about?
                       </Label>
-                      <Textarea id="topic" placeholder="e.g. AI in customer service, Layoffs in tech, Remote work trends" value={formData.topic} onChange={e => handleInputChange('topic', e.target.value)} className="min-h-[60px] resize-none text-base" required />
+                      <Textarea id="topic" placeholder="e.g. AI in customer service, Layoffs in tech, Remote work trends" value={formData.topic} onChange={e => handleInputChange('topic', e.target.value)} required className="min-h-[60px] resize-none text-base bg-gray-900" />
                     </div>
 
                     {/* Opinion */}
