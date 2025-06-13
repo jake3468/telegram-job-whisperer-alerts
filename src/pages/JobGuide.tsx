@@ -145,9 +145,7 @@ const JobGuide = () => {
         <div className="container mx-auto px-4 py-8 bg-zinc-950">
           {/* Header Section */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl bg-gradient-to-r from-blue-200 via-indigo-300 to-purple-400 bg-clip-text text-transparent mb-4 font-inter md:text-4xl font-semibold">
-              Job Analysis & Guide
-            </h1>
+            <h1 className="text-4xl bg-gradient-to-r from-blue-200 via-indigo-300 to-purple-400 bg-clip-text text-transparent mb-4 font-inter md:text-4xl font-semibold">Job Guide</h1>
             <p className="text-gray-300 max-w-2xl mx-auto font-inter text-sm font-light">
               Get detailed analysis of job requirements and personalized guidance for your application
             </p>
