@@ -177,7 +177,7 @@ const CoverLetter = () => {
                         <Label htmlFor="company_name" className="text-white font-medium text-base">
                           Company Name *
                         </Label>
-                        <Textarea id="company_name" placeholder="e.g., Google, Microsoft, Tesla, StartupXYZ" value={formData.company_name} onChange={e => handleInputChange('company_name', e.target.value)} required className="min-h-[60px] resize-none text-base bg-emerald-900/50 border-emerald-700/50 text-white placeholder:text-emerald-200/70" />
+                        <Textarea id="company_name" placeholder="e.g., Google, Microsoft, Tesla, StartupXYZ" value={formData.company_name} onChange={e => handleInputChange('company_name', e.target.value)} required className="min-h-[60px] resize-none text-base border-emerald-700/50 text-white placeholder:text-emerald-200/70 bg-gray-900" />
                       </div>
 
                       {/* Job Description */}
@@ -185,7 +185,7 @@ const CoverLetter = () => {
                         <Label htmlFor="job_description" className="text-white font-medium text-base">
                           Job Description *
                         </Label>
-                        <Textarea id="job_description" placeholder="Paste the complete job description here..." value={formData.job_description} onChange={e => handleInputChange('job_description', e.target.value)} required className="min-h-[200px] resize-none text-base bg-emerald-900/50 border-emerald-700/50 text-white placeholder:text-emerald-200/70" />
+                        <Textarea id="job_description" placeholder="Paste the complete job description here..." value={formData.job_description} onChange={e => handleInputChange('job_description', e.target.value)} required className="min-h-[200px] resize-none text-base border-emerald-700/50 text-white placeholder:text-emerald-200/70 bg-gray-900" />
                       </div>
 
                       <div className="flex gap-3 pt-4">
