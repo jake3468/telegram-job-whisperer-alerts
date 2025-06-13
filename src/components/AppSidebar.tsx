@@ -1,4 +1,3 @@
-
 import { User, Bell, Target, FileText, X, Share2 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, useSidebar } from '@/components/ui/sidebar';
@@ -16,7 +15,7 @@ const toolItems = [{
   url: '/job-alerts',
   icon: Bell
 }, {
-  title: 'Job Guide',
+  title: 'Job Analysis',
   url: '/job-guide',
   icon: Target
 }, {

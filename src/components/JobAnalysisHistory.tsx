@@ -30,23 +30,21 @@ const JobAnalysisHistory = ({
       <Button 
         onClick={handleOpenModal} 
         disabled={isLoading} 
-        className="w-full bg-white/20 hover:bg-white/30 text-white border-white/20 text-xs px-4 py-2"
+        variant="outline" 
+        size="sm" 
+        className="bg-white/10 border-white/20 text-white hover:bg-white/20"
       >
-        <div className="flex items-center justify-center gap-2 w-full">
-          {isLoading ? (
-            <>
-              <Loader2 className="w-3 h-3 flex-shrink-0 animate-spin" />
-              <span className="text-center text-xs">Loading...</span>
-            </>
-          ) : (
-            <>
-              <History className="w-3 h-3 flex-shrink-0" />
-              <span className="text-center text-xs">
-                View {type === 'job_guide' ? 'Job Analysis' : 'Cover Letter'} History
-              </span>
-            </>
-          )}
-        </div>
+        {isLoading ? (
+          <>
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            Loading...
+          </>
+        ) : (
+          <>
+            <History className="w-4 h-4 mr-2" />
+            History
+          </>
+        )}
       </Button>
 
       <HistoryModal

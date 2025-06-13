@@ -75,7 +75,7 @@ const JobGuide = () => {
       try {
         const { data, error } = await supabase
           .from('job_analyses')
-          .select('job_analysis')
+          .select('job_match')
           .eq('id', jobAnalysisId)
           .single();
 
@@ -84,8 +84,8 @@ const JobGuide = () => {
           return;
         }
 
-        if (data?.job_analysis) {
-          setJobAnalysisResult(data.job_analysis);
+        if (data?.job_match) {
+          setJobAnalysisResult(data.job_match);
           setIsGenerating(false);
           setIsSuccess(false);
           
@@ -213,19 +213,19 @@ const JobGuide = () => {
 
       const { data: existingAnalysis, error: checkError } = await supabase
         .from('job_analyses')
-        .select('id, job_analysis')
+        .select('id, job_match')
         .eq('user_id', profileData.id)
         .eq('company_name', formData.companyName)
         .eq('job_title', formData.jobTitle)
         .eq('job_description', formData.jobDescription)
-        .not('job_analysis', 'is', null)
+        .not('job_match', 'is', null)
         .order('created_at', { ascending: false })
         .limit(1);
 
       if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
         const existing = existingAnalysis[0];
         console.log('✅ Found existing job analysis:', existing.id);
-        setJobAnalysisResult(existing.job_analysis);
+        setJobAnalysisResult(existing.job_match);
         setJobAnalysisId(existing.id);
         setIsSubmitting(false);
         toast({
@@ -393,15 +393,11 @@ const JobGuide = () => {
                       Enter job details to get personalized analysis and tips
                     </CardDescription>
                   </div>
-                  <Button 
-                    onClick={() => {/* Handle history click */}} 
-                    variant="outline" 
-                    size="sm" 
-                    className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                  >
-                    <History className="w-4 h-4 mr-2" />
-                    History
-                  </Button>
+                  <JobAnalysisHistory 
+                    type="job_guide" 
+                    gradientColors="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600" 
+                    borderColors="border-2 border-blue-400"
+                  />
                 </div>
                 {hasAnyData && (
                   <Button 
@@ -415,7 +411,6 @@ const JobGuide = () => {
                 )}
               </CardHeader>
               <CardContent className="space-y-4 pt-0">
-                {/* ... keep existing form fields code */}
                 <div className="space-y-4">
                   <div>
                     <label className="block text-white font-inter font-medium mb-2 text-sm">
@@ -503,13 +498,6 @@ const JobGuide = () => {
                       Reset
                     </Button>
                   </div>
-
-                  {/* History Button */}
-                  <JobAnalysisHistory 
-                    type="job_guide" 
-                    gradientColors="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600" 
-                    borderColors="border-2 border-blue-400" 
-                  />
 
                   {(!isComplete || !isFormValid) && !isSubmitting && !isGenerating && (
                     <p className="text-blue-200 text-sm font-inter text-center">

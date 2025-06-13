@@ -295,11 +295,13 @@ const CoverLetter = () => {
   const isFormValid = formData.companyName && formData.jobTitle && formData.jobDescription;
   const hasAnyData = isFormValid || coverLetterResult;
   const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating;
+  
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-xs">Loading...</div>
       </div>;
   }
+  
   return <Layout>
       <div className="min-h-screen bg-black">
         <AuthHeader />
@@ -366,15 +368,11 @@ const CoverLetter = () => {
                       Enter job details to generate a personalized cover letter
                     </CardDescription>
                   </div>
-                  <Button 
-                    onClick={() => {/* Handle history click */}} 
-                    variant="outline" 
-                    size="sm" 
-                    className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                  >
-                    <History className="w-4 h-4 mr-2" />
-                    History
-                  </Button>
+                  <JobAnalysisHistory 
+                    type="cover_letter" 
+                    gradientColors="bg-gradient-to-br from-pink-600 via-rose-600 to-purple-600" 
+                    borderColors="border-2 border-pink-400"
+                  />
                 </div>
                 {hasAnyData && (
                   <Button 
@@ -458,9 +456,6 @@ const CoverLetter = () => {
                       Reset
                     </Button>
                   </div>
-
-                  {/* History Button */}
-                  <JobAnalysisHistory type="cover_letter" gradientColors="bg-gradient-to-br from-pink-600 via-rose-600 to-purple-600" borderColors="border-2 border-pink-400" />
 
                   {(!isComplete || !isFormValid) && !isSubmitting && !isGenerating && <p className="text-pink-200 text-sm font-inter text-center">
                       {!isComplete ? 'Complete your profile first to use this feature' : 'Fill in all fields to generate your cover letter'}
