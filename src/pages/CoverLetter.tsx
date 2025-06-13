@@ -169,7 +169,7 @@ const CoverLetter = () => {
                         <Label htmlFor="job_title" className="text-white font-medium text-base">
                           Job Title *
                         </Label>
-                        <Textarea id="job_title" placeholder="e.g., Senior Software Engineer, Product Manager, Data Scientist" value={formData.job_title} onChange={e => handleInputChange('job_title', e.target.value)} required className="min-h-[60px] resize-none text-base bg-emerald-900/50 border-emerald-700/50 text-white placeholder:text-emerald-200/70" />
+                        <Textarea id="job_title" placeholder="e.g., Senior Software Engineer, Product Manager, Data Scientist" value={formData.job_title} onChange={e => handleInputChange('job_title', e.target.value)} required className="min-h-[60px] resize-none text-base border-emerald-700/50 text-white placeholder:text-emerald-200/70 bg-gray-900" />
                       </div>
 
                       {/* Company Name */}
