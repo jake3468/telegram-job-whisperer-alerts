@@ -202,7 +202,7 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
                       <Label htmlFor="opinion" className="text-gray-300 font-normal text-sm block">
                         What is your main insight, opinion, or message?
                       </Label>
-                      <Textarea id="opinion" placeholder="I believe hybrid AI + human support is the future." value={formData.opinion} onChange={e => handleInputChange('opinion', e.target.value)} className="min-h-[80px] resize-none text-base" />
+                      <Textarea id="opinion" placeholder="I believe hybrid AI + human support is the future." value={formData.opinion} onChange={e => handleInputChange('opinion', e.target.value)} className="min-h-[80px] resize-none text-base bg-gray-900" />
                     </div>
 
                     {/* Personal Story */}
@@ -213,7 +213,7 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
                       <Label htmlFor="personal_story" className="text-gray-300 font-normal text-sm block">
                         Do you have a story, data point, or personal experience to include?
                       </Label>
-                      <Textarea id="personal_story" placeholder="We reduced response time by 40% after implementing AI chat." value={formData.personal_story} onChange={e => handleInputChange('personal_story', e.target.value)} className="min-h-[80px] resize-none text-base" />
+                      <Textarea id="personal_story" placeholder="We reduced response time by 40% after implementing AI chat." value={formData.personal_story} onChange={e => handleInputChange('personal_story', e.target.value)} className="min-h-[80px] resize-none text-base bg-gray-900" />
                     </div>
 
                     {/* Audience */}
@@ -224,7 +224,7 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
                       <Label htmlFor="audience" className="text-gray-300 font-normal text-sm block">
                         Who are you writing this for?
                       </Label>
-                      <Textarea id="audience" placeholder="Startup founders, product managers, working moms, new grads…" value={formData.audience} onChange={e => handleInputChange('audience', e.target.value)} className="min-h-[60px] resize-none text-base" />
+                      <Textarea id="audience" placeholder="Startup founders, product managers, working moms, new grads…" value={formData.audience} onChange={e => handleInputChange('audience', e.target.value)} className="min-h-[60px] resize-none text-base bg-gray-900" />
                     </div>
 
                     {/* Tone */}
