@@ -280,7 +280,7 @@ const JobGuide = () => {
   useEffect(() => {
     const handleHistoryData = (event: any) => {
       const { companyName, jobTitle, jobDescription, result, type } = event.detail;
-      if (type === 'job_analyses') {
+      if (type === 'job_guide') {
         setFormData({ companyName, jobTitle, jobDescription });
         setJobAnalysisResult(result);
       }
@@ -394,7 +394,7 @@ const JobGuide = () => {
                     </CardDescription>
                   </div>
                   <JobAnalysisHistory 
-                    type="job_analyses" 
+                    type="job_guide" 
                     gradientColors="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600" 
                     borderColors="border-2 border-blue-400"
                   />

@@ -263,7 +263,7 @@ const CoverLetter = () => {
         result,
         type
       } = event.detail;
-      if (type === 'cover_letters') {
+      if (type === 'cover_letter') {
         setFormData({
           companyName,
           jobTitle,
@@ -369,7 +369,7 @@ const CoverLetter = () => {
                     </CardDescription>
                   </div>
                   <JobAnalysisHistory 
-                    type="cover_letters" 
+                    type="cover_letter" 
                     gradientColors="bg-gradient-to-br from-pink-600 via-rose-600 to-purple-600" 
                     borderColors="border-2 border-pink-400"
                   />

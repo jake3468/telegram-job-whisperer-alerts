@@ -27,10 +27,10 @@ const MAX_EXECUTION_TIME = 300000; // 5 minutes max execution time
 
 // Fixed cryptographic fingerprint generation - handles UTF-8 properly
 async function generateEnhancedFingerprint(payload: any): Promise<string> {
-  const { job_analysis, job_cover_letter, job_linkedin, user, webhook_type, event_type, anti_duplicate_metadata } = payload;
+  const { job_analysis, job_cover_letter, user, webhook_type, event_type, anti_duplicate_metadata } = payload;
   
-  // Handle job analysis, cover letter, and LinkedIn post payloads
-  const analysisData = job_analysis || job_cover_letter || job_linkedin;
+  // Handle both job analysis and cover letter payloads
+  const analysisData = job_analysis || job_cover_letter;
   
   const fingerprintData = {
     user_id: user?.id || user?.clerk_id || 'unknown',
@@ -38,7 +38,6 @@ async function generateEnhancedFingerprint(payload: any): Promise<string> {
     webhook_type: webhook_type || event_type || 'job_analysis_created',
     company_name: analysisData?.company_name || '',
     job_title: analysisData?.job_title || '',
-    topic: analysisData?.topic || '', // For LinkedIn posts
     // Fixed: Use proper UTF-8 encoding instead of btoa
     job_description_hash: analysisData?.job_description ? 
       (await crypto.subtle.digest('SHA-256', new TextEncoder().encode(analysisData.job_description.substring(0, 500)))).toString() : 'no-desc',
@@ -168,17 +167,15 @@ serve(async (req) => {
     const webhookType = payload.webhook_type || payload.event_type || 'job_analysis_created';
     const isJobGuide = webhookType === 'job_guide' || webhookType === 'job_analysis_created';
     const isCoverLetter = webhookType === 'cover_letter' || webhookType === 'cover_letter_created';
-    const isLinkedInPost = webhookType === 'linkedin_post' || webhookType === 'linkedin_post_created';
 
     if (supabase) {
       await logExecutionEnhanced(supabase, 'INFO', 'Enhanced payload received and parsed', { 
         payloadKeys: Object.keys(payload),
-        recordId: payload.job_analysis?.id || payload.job_cover_letter?.id || payload.job_linkedin?.id,
+        recordId: payload.job_analysis?.id || payload.job_cover_letter?.id,
         userId: payload.user?.id || payload.user?.clerk_id,
         webhookType,
         isJobGuide,
         isCoverLetter,
-        isLinkedInPost,
         payloadSize: JSON.stringify(payload).length,
         hasAntiDuplicateMetadata: !!payload.anti_duplicate_metadata,
         executionId: payload.anti_duplicate_metadata?.execution_id,
@@ -200,7 +197,6 @@ serve(async (req) => {
         webhookType,
         isJobGuide,
         isCoverLetter,
-        isLinkedInPost,
         databaseExecutionId: payload.anti_duplicate_metadata?.execution_id
       }, requestId);
     }
@@ -251,25 +247,11 @@ serve(async (req) => {
       }
     }
     
-    // LAYER 2: Enhanced existing results check for job guide, cover letter, and LinkedIn posts
-    if (supabase && (payload.job_analysis?.id || payload.job_cover_letter?.id || payload.job_linkedin?.id)) {
-      const recordId = payload.job_analysis?.id || payload.job_cover_letter?.id || payload.job_linkedin?.id;
-      let tableName: string;
-      let resultField: string;
-      
-      if (isJobGuide) {
-        tableName = 'job_analyses';
-        resultField = 'job_match';
-      } else if (isCoverLetter) {
-        tableName = 'job_cover_letters';
-        resultField = 'cover_letter';
-      } else if (isLinkedInPost) {
-        tableName = 'job_linkedin';
-        resultField = 'linkedin_post';
-      } else {
-        tableName = 'job_analyses';
-        resultField = 'job_match';
-      }
+    // LAYER 2: Enhanced existing results check for both job guide and cover letter
+    if (supabase && (payload.job_analysis?.id || payload.job_cover_letter?.id)) {
+      const recordId = payload.job_analysis?.id || payload.job_cover_letter?.id;
+      const tableName = isJobGuide ? 'job_analyses' : 'job_cover_letters';
+      const resultField = isJobGuide ? 'job_match' : 'cover_letter';
       
       await logExecutionEnhanced(supabase, 'INFO', 'Enhanced checking database for existing results', { 
         recordId,
@@ -351,9 +333,6 @@ serve(async (req) => {
     if (isCoverLetter) {
       webhookEnvVar = 'N8N_CL_WEBHOOK_URL';
       webhookUrl = Deno.env.get(webhookEnvVar);
-    } else if (isLinkedInPost) {
-      webhookEnvVar = 'N8N_LINKEDIN_WEBHOOK_URL';
-      webhookUrl = Deno.env.get(webhookEnvVar);
     } else if (isJobGuide) {
       webhookEnvVar = 'N8N_JG_WEBHOOK_URL';
       webhookUrl = Deno.env.get(webhookEnvVar);
@@ -366,7 +345,7 @@ serve(async (req) => {
     if (!webhookUrl) {
       const errorMsg = `Enhanced ${webhookEnvVar} secret not configured for type ${webhookType}`;
       if (supabase) {
-        await logExecutionEnhanced(supabase, 'ERROR', errorMsg, { webhookType, isCoverLetter, isJobGuide, isLinkedInPost }, requestId);
+        await logExecutionEnhanced(supabase, 'ERROR', errorMsg, { webhookType, isCoverLetter, isJobGuide }, requestId);
       }
       
       // Mark as failed and remove from tracker
@@ -391,7 +370,7 @@ serve(async (req) => {
         fingerprint,
         executionKey,
         webhookType,
-        source: 'supabase-edge-function-enhanced-v7',
+        source: 'supabase-edge-function-enhanced-v6',
         preventDuplicates: true,
         submissionId: payload.submission_id || payload.request_id,
         antiDuplicateMetadata: payload.anti_duplicate_metadata,
@@ -400,8 +379,7 @@ serve(async (req) => {
         databaseExecutionId: payload.anti_duplicate_metadata?.execution_id,
         triggerSource: payload.anti_duplicate_metadata?.trigger_source,
         isCoverLetter,
-        isJobGuide,
-        isLinkedInPost
+        isJobGuide
       }
     };
 
@@ -414,7 +392,6 @@ serve(async (req) => {
         executionId: payload.anti_duplicate_metadata?.execution_id,
         isCoverLetter,
         isJobGuide,
-        isLinkedInPost,
         webhookEnvVar
       }, requestId);
     }
@@ -431,12 +408,11 @@ serve(async (req) => {
         'X-Webhook-Type': webhookType,
         'X-Prevent-Duplicates': 'true',
         'X-Fingerprint': fingerprint,
-        'X-Source': 'supabase-edge-function-enhanced-v7',
+        'X-Source': 'supabase-edge-function-enhanced-v6',
         'X-Database-Execution-ID': payload.anti_duplicate_metadata?.execution_id || '',
         'X-Trigger-Source': payload.anti_duplicate_metadata?.trigger_source || '',
         'X-Is-Cover-Letter': isCoverLetter.toString(),
-        'X-Is-Job-Guide': isJobGuide.toString(),
-        'X-Is-LinkedIn-Post': isLinkedInPost.toString()
+        'X-Is-Job-Guide': isJobGuide.toString()
       },
       body: JSON.stringify(enhancedPayload),
       signal: abortController.signal
@@ -510,7 +486,6 @@ serve(async (req) => {
         responsePreview: responseText.substring(0, 100),
         isCoverLetter,
         isJobGuide,
-        isLinkedInPost,
         webhookUrl: webhookUrl.substring(0, 50) + '...'
       }, requestId);
     }
@@ -525,8 +500,7 @@ serve(async (req) => {
         duration: totalDuration,
         fingerprint,
         isCoverLetter,
-        isJobGuide,
-        isLinkedInPost
+        isJobGuide
       }), 
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
