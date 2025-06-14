@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -68,16 +67,17 @@ const BioSection = () => {
             className="
               min-h-[100px]
               border-2 border-white/30
-              placeholder-white/70 font-inter text-white
+              placeholder-white/85 font-inter text-white
               focus-visible:border-emerald-200 hover:border-emerald-300
               text-base resize-none
-              bg-gradient-to-br from-green-900 via-green-800 to-green-950
+              bg-black
               shadow-inner
               transition-all
             "
             style={{
-              backgroundImage: "linear-gradient(135deg, #14532d 40%, #134e36 80%, #052e16 100%)"
-              // consistent dark green throughout, no white region
+              backgroundColor: "#101113", // A very dark, near-black (almost pure black)
+              backgroundImage: "none",     // No gradients, just black/dark
+              color: "#fff",
             }}
           />
           <Button
