@@ -1,14 +1,15 @@
+
 import { BellRing, ScanSearch, FileText, Linkedin, LayoutDashboard, ArrowRight } from "lucide-react";
 import { SignUpButton } from "@clerk/clerk-react";
 
-// Define background and button colors for visual clarity and contrast
+// Pastel but darker/desaturated variants for softer appearance
 const tools = [
   {
     icon: BellRing,
     title: "Telegram Job Alerts",
     description: "Get instant job notifications tailored to your profile, directly on Telegram.",
-    cardBg: "bg-[#B8C5FF]", // pastel blue
-    buttonBg: "bg-[#2F3AFF] hover:bg-[#2226b2] focus:bg-[#2226b2]", // Strong blue
+    cardBg: "bg-[#aab5e3]", // softened blue
+    buttonBg: "bg-[#2530c2] hover:bg-[#181e7f] focus:bg-[#181e7f]", // muted blue
     buttonText: "text-white",
     iconColor: "text-blue-700 bg-white",
   },
@@ -16,8 +17,8 @@ const tools = [
     icon: ScanSearch,
     title: "AI Job Analysis",
     description: "Analyze job descriptions against your resume to identify key skills and gaps.",
-    cardBg: "bg-[#A5FBCB]", // pastel mint
-    buttonBg: "bg-[#11A157] hover:bg-[#078c43] focus:bg-[#078c43]", // Strong green
+    cardBg: "bg-[#90dbc1]", // softened mint
+    buttonBg: "bg-[#148e56] hover:bg-[#0f7041] focus:bg-[#0f7041]", // muted green
     buttonText: "text-white",
     iconColor: "text-green-700 bg-white",
   },
@@ -25,8 +26,8 @@ const tools = [
     icon: FileText,
     title: "AI Cover Letters",
     description: "Generate personalized cover letters in seconds for any job application.",
-    cardBg: "bg-[#FFD2B5]", // pastel peach
-    buttonBg: "bg-[#FF6F2C] hover:bg-[#b24400] focus:bg-[#b24400]", // Strong orange
+    cardBg: "bg-[#ffb88b]", // softened peach
+    buttonBg: "bg-[#d25b15] hover:bg-[#a14609] focus:bg-[#a14609]", // muted orange
     buttonText: "text-white",
     iconColor: "text-orange-600 bg-white",
   },
@@ -34,8 +35,8 @@ const tools = [
     icon: Linkedin,
     title: "AI LinkedIn Posts",
     description: "Create engaging LinkedIn posts to boost your professional presence.",
-    cardBg: "bg-[#E5D4FF]", // pastel lavender
-    buttonBg: "bg-[#C384F7] hover:bg-[#a75ee0] focus:bg-[#a75ee0]", // Strong purple
+    cardBg: "bg-[#cbb5e3]", // softened lavender
+    buttonBg: "bg-[#a072d6] hover:bg-[#7f57af] focus:bg-[#7f57af]", // muted purple
     buttonText: "text-white",
     iconColor: "text-purple-600 bg-white",
   },
@@ -43,8 +44,8 @@ const tools = [
     icon: LayoutDashboard,
     title: "AI Interview Prep",
     description: "Know the Company. Nail the Interview. Ask Like a Pro.",
-    cardBg: "bg-[#aee4fa]", // light sky blue
-    buttonBg: "bg-[#1e9cd7] hover:bg-[#1479a3] focus:bg-[#1479a3]", // Strong sky blue
+    cardBg: "bg-[#93c5d5]", // softened sky blue
+    buttonBg: "bg-[#1e7fbc] hover:bg-[#115784] focus:bg-[#115784]", // muted sky blue
     buttonText: "text-white",
     iconColor: "text-sky-800 bg-white",
   },
@@ -90,7 +91,7 @@ const ToolsSection = () => {
                 border border-black/10
               `}
               style={{
-                boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.15)",
+                boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.10)", // minify shadow vibrance for softer effect
               }}
             >
               <div className="flex items-center gap-4 mb-6">
