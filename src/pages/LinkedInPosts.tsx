@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Share2, History, Copy, Sparkles } from 'lucide-react';
+import { Share2, History, Copy, Sparkles, Loader2, Users, MessageCircle, Heart, Repeat2, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
@@ -30,6 +30,8 @@ const LinkedInPosts = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState('');
   const [showHistory, setShowHistory] = useState(false);
+  const [currentPostId, setCurrentPostId] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const toneOptions = [
     { value: 'professional', label: 'Professional & Insightful' },
@@ -37,6 +39,60 @@ const LinkedInPosts = () => {
     { value: 'bold', label: 'Bold & Opinionated' },
     { value: 'thoughtful', label: 'Thoughtful & Reflective' }
   ];
+
+  const loadingMessages = [
+    "🚀 Generating your LinkedIn post...",
+    "💡 Analyzing trending topics...",
+    "✨ Crafting engaging content...",
+    "📈 Optimizing for maximum engagement...",
+    "🎯 Tailoring to your audience...",
+    "⚡ Adding the perfect finishing touches..."
+  ];
+
+  const [currentLoadingMessage, setCurrentLoadingMessage] = useState(0);
+
+  // Rotate loading messages
+  useEffect(() => {
+    if (isGenerating) {
+      const interval = setInterval(() => {
+        setCurrentLoadingMessage((prev) => (prev + 1) % loadingMessages.length);
+      }, 2000);
+      return () => clearInterval(interval);
+    }
+  }, [isGenerating]);
+
+  // Set up real-time subscription for LinkedIn post updates
+  useEffect(() => {
+    if (!currentPostId || !userProfile) return;
+
+    const channel = supabase
+      .channel('linkedin-post-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'job_linkedin',
+          filter: `id=eq.${currentPostId}`
+        },
+        (payload) => {
+          console.log('LinkedIn post updated:', payload);
+          if (payload.new.linkedin_post && payload.new.linkedin_post !== payload.old?.linkedin_post) {
+            setResult(payload.new.linkedin_post);
+            setIsGenerating(false);
+            toast({
+              title: "LinkedIn Post Generated!",
+              description: "Your LinkedIn post has been generated successfully."
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentPostId, userProfile, toast]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -73,9 +129,12 @@ const LinkedInPosts = () => {
     }
 
     setIsSubmitting(true);
+    setIsGenerating(true);
+    setResult('');
+    setCurrentLoadingMessage(0);
 
     try {
-      // Insert into database
+      // Insert into database - this will trigger the webhook
       const { data, error } = await supabase
         .from('job_linkedin')
         .insert({
@@ -91,22 +150,16 @@ const LinkedInPosts = () => {
 
       if (error) throw error;
 
-      // For now, we'll just show a placeholder result
-      // In a real implementation, this would trigger the AI generation
-      const mockResult = `🚀 ${formData.topic}
-
-${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? '📊 ' + formData.personal_story + '\n\n' : ''}What are your thoughts? Drop a comment below! 👇
-
-#LinkedIn #${formData.topic.replace(/\s+/g, '')} #Professional`;
-
-      setResult(mockResult);
+      setCurrentPostId(data.id);
+      console.log('LinkedIn post created with ID:', data.id);
 
       toast({
-        title: "LinkedIn Post Created!",
-        description: "Your LinkedIn post has been generated successfully."
+        title: "Request Submitted!",
+        description: "We're generating your LinkedIn post. This may take a few moments."
       });
     } catch (err) {
       console.error('Error creating LinkedIn post:', err);
+      setIsGenerating(false);
       toast({
         title: "Error",
         description: "Failed to create LinkedIn post. Please try again.",
@@ -145,6 +198,8 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
       tone: ''
     });
     setResult('');
+    setCurrentPostId(null);
+    setIsGenerating(false);
   };
 
   return (
@@ -290,7 +345,14 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
                       disabled={isSubmitting || !formData.topic.trim()} 
                       className="flex-1 bg-gradient-to-r from-slate-500 to-gray-600 hover:from-slate-600 hover:to-gray-700 text-white font-medium text-base h-12"
                     >
-                      {isSubmitting ? 'Creating Post...' : 'Generate LinkedIn Post'}
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Creating Post...
+                        </>
+                      ) : (
+                        'Generate LinkedIn Post'
+                      )}
                     </Button>
                     
                     <Button 
@@ -306,8 +368,32 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
               </CardContent>
             </Card>
 
-            {/* Result Display - Only show when there's a result */}
-            {result && (
+            {/* Loading State */}
+            {isGenerating && (
+              <Card className="bg-white/5 border-white/20 backdrop-blur-sm mb-8">
+                <CardContent className="py-12">
+                  <div className="flex flex-col items-center justify-center space-y-4">
+                    <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+                    <p className="text-slate-300 text-lg font-medium">
+                      {loadingMessages[currentLoadingMessage]}
+                    </p>
+                    <div className="flex space-x-1">
+                      {loadingMessages.map((_, index) => (
+                        <div
+                          key={index}
+                          className={`h-2 w-2 rounded-full transition-colors duration-300 ${
+                            index === currentLoadingMessage ? 'bg-slate-400' : 'bg-slate-600'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Result Display - LinkedIn Style Post */}
+            {result && !isGenerating && (
               <Card className="bg-white/5 border-white/20 backdrop-blur-sm">
                 <CardHeader className="pb-6">
                   <CardTitle className="text-white font-inter text-xl flex items-center gap-2">
@@ -320,9 +406,50 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="bg-white rounded-lg p-6 border-2 border-slate-200">
-                      <div className="text-gray-800 text-base leading-relaxed whitespace-pre-wrap font-serif">
+                    {/* LinkedIn-style post container */}
+                    <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+                      {/* LinkedIn post header */}
+                      <div className="flex items-center space-x-3 mb-4">
+                        <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                          <Users className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-gray-900">
+                            {user?.firstName} {user?.lastName}
+                          </h3>
+                          <p className="text-sm text-gray-500">Professional</p>
+                          <p className="text-xs text-gray-400">1h • 🌐</p>
+                        </div>
+                      </div>
+                      
+                      {/* Post content */}
+                      <div className="text-gray-800 text-base leading-relaxed whitespace-pre-wrap mb-4">
                         {result}
+                      </div>
+                      
+                      {/* LinkedIn engagement buttons */}
+                      <div className="border-t border-gray-200 pt-3">
+                        <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+                          <span>12 reactions • 3 comments</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <button className="flex items-center space-x-2 px-4 py-2 rounded hover:bg-gray-50 transition-colors">
+                            <Heart className="w-4 h-4" />
+                            <span>Like</span>
+                          </button>
+                          <button className="flex items-center space-x-2 px-4 py-2 rounded hover:bg-gray-50 transition-colors">
+                            <MessageCircle className="w-4 h-4" />
+                            <span>Comment</span>
+                          </button>
+                          <button className="flex items-center space-x-2 px-4 py-2 rounded hover:bg-gray-50 transition-colors">
+                            <Repeat2 className="w-4 h-4" />
+                            <span>Repost</span>
+                          </button>
+                          <button className="flex items-center space-x-2 px-4 py-2 rounded hover:bg-gray-50 transition-colors">
+                            <Send className="w-4 h-4" />
+                            <span>Send</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                     
