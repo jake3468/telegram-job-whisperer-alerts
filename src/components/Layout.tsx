@@ -10,7 +10,7 @@ export function Layout({ children }: LayoutProps) {
   return (
     <SidebarProvider defaultOpen={true}>
       {/* Header for mobile - glassy vibrant with no content overlap */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/80 via-fuchsia-900/80 to-indigo-900/80 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
         <div className="flex items-center justify-between p-3">
           <SidebarTrigger className="h-12 w-12 bg-white/10 border-fuchsia-400/30 ring-2 ring-fuchsia-400/10 text-fuchsia-200 rounded-2xl shadow-lg hover:bg-fuchsia-700/30 transition-all flex items-center justify-center">
             <Menu className="w-7 h-7" strokeWidth={2.4} />
@@ -28,7 +28,12 @@ export function Layout({ children }: LayoutProps) {
           </div>
         </div>
       </header>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-[#1e293b] via-gray-950 to-[#282048] lg:pt-0 pt-20">
+      <div className="
+        min-h-screen flex w-full 
+        bg-gradient-to-br from-[#0e1122] via-[#181526] to-[#21203a]
+        lg:pt-0 pt-20
+        "
+      >
         <AppSidebar />
         <div className="flex-1 flex flex-col min-h-screen">
           {/* Main Content */}
