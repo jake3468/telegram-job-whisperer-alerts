@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -54,7 +55,9 @@ const BioSection = () => {
       </Card>;
   }
   return <section className="p-0 rounded-none bg-transparent shadow-none">
-      <Card className="rounded-3xl border-2 border-emerald-400 bg-gradient-to-b from-[#21c37d]/95 via-[#14825f]/90 to-[#105340]/96 shadow-md transition-all">
+      <Card
+        className="rounded-3xl border-2 border-emerald-400 bg-gradient-to-br from-green-500 via-green-400 to-green-600 shadow-md transition-all"
+      >
         <CardHeader className="pb-3">
           <CardTitle className="text-white font-orbitron flex items-center gap-2 text-lg drop-shadow-[0_2px_10px_rgba(67,232,161,0.30)]">
             <div className="w-7 h-7 bg-emerald-400/50 rounded-full flex items-center justify-center">
@@ -67,8 +70,31 @@ const BioSection = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 pt-0">
-          <Textarea value={bio} onChange={e => setBio(e.target.value)} placeholder="Describe your experience, skills, career goals, and what kind of opportunities you're looking for..." rows={4} className="min-h-[100px] border-2 border-white/30 text-white placeholder-white/70 font-inter focus-visible:border-emerald-200 hover:border-emerald-300 text-base resize-none bg-black/80 shadow-inner" />
-          <Button onClick={handleSaveBio} disabled={saving} className="font-inter font-bold text-xs px-4 py-2 h-9 rounded-lg shadow focus-visible:ring-2 focus-visible:ring-emerald-300 transition-colors bg-emerald-400 hover:bg-emerald-300 text-slate-950">
+          <Textarea
+            value={bio}
+            onChange={e => setBio(e.target.value)}
+            placeholder="Describe your experience, skills, career goals, and what kind of opportunities you're looking for..."
+            rows={4}
+            className="
+              min-h-[100px]
+              border-2 border-white/30
+              placeholder-white/70 font-inter text-white
+              focus-visible:border-emerald-200 hover:border-emerald-300
+              text-base resize-none
+              bg-gradient-to-br from-green-900 via-green-700 to-green-700
+              shadow-inner
+              transition-all
+            "
+            style={{
+              backgroundImage: "linear-gradient(135deg, #14532d 0%, #22c55e 70%, #16a34a 100%)",
+              // Rich, deep green - stays green at bottom!
+            }}
+          />
+          <Button
+            onClick={handleSaveBio}
+            disabled={saving}
+            className="font-inter font-bold text-xs px-4 py-2 h-9 rounded-lg shadow focus-visible:ring-2 focus-visible:ring-emerald-300 transition-colors bg-emerald-400 hover:bg-emerald-300 text-slate-950"
+          >
             {saving ? 'Saving...' : 'Save Bio'}
           </Button>
         </CardContent>
