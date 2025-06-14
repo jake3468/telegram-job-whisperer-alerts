@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -168,27 +169,29 @@ const JobAlertsSection = ({ userTimezone }: { userTimezone: string }) => {
   };
 
   if (loading) {
+    // Loading indicator: adjusted for new dark theme
     return (
       <div className="max-w-2xl mx-auto w-full">
-        <div className="rounded-3xl bg-gradient-to-br from-orange-400/50 via-orange-700/40 to-fuchsia-700/40 border-2 border-orange-400/50 shadow-xl shadow-orange-500/10 backdrop-blur-lg p-6 mt-3 min-h-[160px] flex items-center justify-center">
-          <div className="text-orange-50 text-xs">Loading...</div>
+        <div className="rounded-3xl bg-black/95 border-2 border-emerald-400 shadow-none p-6 mt-3 min-h-[160px] flex items-center justify-center">
+          <div className="text-emerald-100 text-xs">Loading...</div>
         </div>
       </div>
     );
   }
+
   return (
-    <section className="rounded-3xl bg-gradient-to-br from-pastel-lavender/90 via-pastel-peach/90 to-pastel-blue/90 shadow-xl shadow-pastel-lavender/30 p-6 md:p-8">
+    <section className="rounded-3xl bg-gradient-to-b from-black/90 via-[#16181e]/95 to-[#21223A]/98 border-2 border-emerald-400 shadow-none p-0">
       <div className="pt-4 px-2 sm:px-6">
         {/* Bot Status, Add Alert, List */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <div className="min-w-0">
-            <span className="text-2xl font-orbitron bg-gradient-to-r from-yellow-200 via-orange-300 to-pink-400 bg-clip-text text-transparent font-extrabold flex items-center gap-2">
-              <span className="w-6 h-6 bg-orange-600/70 rounded-full flex items-center justify-center shadow-lg ring-2 ring-pink-400/30">
+            <span className="text-2xl font-orbitron bg-gradient-to-r from-emerald-200 via-emerald-400 to-fuchsia-400 bg-clip-text text-transparent font-extrabold flex items-center gap-2">
+              <span className="w-6 h-6 bg-emerald-400/70 rounded-full flex items-center justify-center shadow-lg ring-2 ring-emerald-400/40">
                 <svg viewBox="0 0 24 24" width={18} height={18}><path fill="none" stroke="#fff" strokeWidth="2" d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z"/></svg>
               </span>
               <span>Job Alerts</span>
             </span>
-            <p className="text-orange-200 font-inter text-sm font-semibold drop-shadow-sm">
+            <p className="text-emerald-100 font-inter text-sm font-semibold drop-shadow-none">
               Set up personalized job alerts based on your preferences
             </p>
           </div>
@@ -221,7 +224,7 @@ const JobAlertsSection = ({ userTimezone }: { userTimezone: string }) => {
           {/* Message when bot is not activated */}
           {!isActivated && (
             <div className="text-center py-6">
-              <Bell className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+              <Bell className="w-10 h-10 text-gray-600 mx-auto mb-3" />
               <p className="text-gray-300 font-inter text-base mb-1">Activate your bot to manage job alerts</p>
               <p className="text-gray-400 font-inter text-sm">Follow the instructions above to get started</p>
             </div>
