@@ -1,3 +1,4 @@
+
 import { useUser } from '@clerk/clerk-react';
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -27,8 +28,8 @@ const JobAlerts = () => {
   }
   return (
     <Layout>
-      <div className="min-h-screen w-full bg-gradient-to-br from-pastel-blue/50 via-pastel-mint/60 to-pastel-peach/80 flex flex-col">
-        <div className="max-w-4xl mx-auto w-full px-3 py-8 sm:px-6 sm:py-12 backdrop-blur-2xl rounded-3xl bg-black/85 shadow-2xl shadow-orange-200/20 mt-4">
+      <div className="min-h-screen w-full bg-gradient-to-br from-[#15151C] via-[#1a1830] to-[#23223a] flex flex-col">
+        <div className="max-w-4xl mx-auto w-full px-3 py-8 sm:px-6 sm:py-12 mt-6">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-orange-400 via-pastel-mint to-fuchsia-400 bg-clip-text text-transparent mb-2 drop-shadow">
               Telegram <span className="italic">Job</span> Alerts
