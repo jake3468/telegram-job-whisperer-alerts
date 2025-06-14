@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -321,11 +322,11 @@ const JobGuide = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
-        <div className="max-w-4xl mx-auto w-full px-3 py-8 sm:px-6 sm:py-12 backdrop-blur-xl rounded-3xl bg-slate-800/90 shadow-2xl shadow-slate-900/50 mt-4 border border-slate-700/50">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200 bg-clip-text text-transparent mb-2 drop-shadow">
-              Job <span className="italic">Analysis</span>
+      <div className="min-h-screen w-full bg-gradient-to-br from-slate-950 via-slate-900/90 to-slate-950 flex flex-col">
+        <div className="max-w-4xl mx-auto w-full px-2 py-8 sm:px-6 sm:py-12 rounded-3xl bg-transparent mt-4">
+          <div className="text-center mb-8 px-2">
+            <h1 className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-slate-200 via-slate-200 to-slate-100 bg-clip-text text-transparent mb-2 drop-shadow">
+              Job <span className="italic text-slate-300">Analysis</span>
             </h1>
             <p className="text-lg text-slate-300 font-inter font-light">
               In-depth breakdown and <span className="italic text-slate-400">insights</span> for your ideal jobs
@@ -335,9 +336,9 @@ const JobGuide = () => {
           {/* MAIN RESTORED FUNCTIONALITY BELOW */}
           <div className="space-y-8">
             {/* Input Form */}
-            <Card className="bg-gradient-to-br from-slate-700/80 via-slate-600/60 to-slate-700/80 border border-slate-600/40 shadow-xl">
+            <Card className="bg-gradient-to-br from-slate-800/95 via-slate-800/85 to-slate-700/80 border border-slate-700/70 shadow-xl drop-shadow-2xl">
               <CardHeader>
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
                   <div>
                     <CardTitle className="text-slate-100 font-inter text-xl flex items-center gap-2">
                       <Sparkles className="w-5 h-5 text-slate-400" />
@@ -347,18 +348,20 @@ const JobGuide = () => {
                       Fill in job details to get your personalized job fit analysis
                     </CardDescription>
                   </div>
-                  <JobAnalysisHistory
-                    type="job_guide"
-                    gradientColors="from-slate-200 via-slate-300 to-slate-200"
-                    borderColors="border-slate-600/30"
-                  />
+                  <div>
+                    <JobAnalysisHistory
+                      type="job_guide"
+                      gradientColors="from-slate-200 via-slate-300 to-slate-200"
+                      borderColors="border-slate-600/30"
+                    />
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-5">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Company Name */}
                   <div className="space-y-2">
-                    <label htmlFor="companyName" className="text-slate-200 font-medium text-base">
+                    <label htmlFor="companyName" className="text-slate-200 font-semibold text-base">
                       Company Name *
                     </label>
                     <Input
@@ -367,12 +370,12 @@ const JobGuide = () => {
                       value={formData.companyName}
                       onChange={e => handleInputChange('companyName', e.target.value)}
                       required
-                      className="bg-slate-800/90 text-slate-100 border-slate-600 focus:border-slate-500 placeholder:text-slate-400"
+                      className="bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-slate-400 placeholder:text-slate-400"
                     />
                   </div>
                   {/* Job Title */}
                   <div className="space-y-2">
-                    <label htmlFor="jobTitle" className="text-slate-200 font-medium text-base">
+                    <label htmlFor="jobTitle" className="text-slate-200 font-semibold text-base">
                       Job Title *
                     </label>
                     <Input
@@ -381,13 +384,13 @@ const JobGuide = () => {
                       value={formData.jobTitle}
                       onChange={e => handleInputChange('jobTitle', e.target.value)}
                       required
-                      className="bg-slate-800/90 text-slate-100 border-slate-600 focus:border-slate-500 placeholder:text-slate-400"
+                      className="bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-slate-400 placeholder:text-slate-400"
                     />
                   </div>
                 </div>
                 {/* Job Description */}
                 <div className="space-y-2">
-                  <label htmlFor="jobDescription" className="text-slate-200 font-medium text-base">
+                  <label htmlFor="jobDescription" className="text-slate-200 font-semibold text-base">
                     Job Description *
                   </label>
                   <span className="text-slate-400 font-normal text-xs block mb-2">
@@ -399,7 +402,7 @@ const JobGuide = () => {
                     value={formData.jobDescription}
                     onChange={e => handleInputChange('jobDescription', e.target.value)}
                     required
-                    className="min-h-[100px] bg-slate-800/90 text-slate-100 border-slate-600 focus:border-slate-500 placeholder:text-slate-400"
+                    className="min-h-[100px] bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-slate-400 placeholder:text-slate-400"
                   />
                 </div>
                 {/* Action Buttons */}
@@ -407,7 +410,7 @@ const JobGuide = () => {
                   <Button
                     onClick={handleSubmit}
                     disabled={isButtonDisabled}
-                    className="flex-1 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-600 text-slate-100 font-medium text-base h-12 shadow hover:scale-[1.03] border border-slate-500/50"
+                    className="flex-1 bg-gradient-to-r from-slate-700 via-slate-600 to-slate-700 hover:from-slate-600 hover:to-slate-800 text-slate-100 font-semibold text-base h-12 shadow-none border border-slate-600"
                   >
                     {isGenerating ? (
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -421,7 +424,7 @@ const JobGuide = () => {
                   <Button
                     onClick={handleClearData}
                     variant="outline"
-                    className="bg-slate-800/80 border-slate-600 text-slate-300 hover:bg-slate-700/80 hover:text-slate-200 h-12 px-6 shadow"
+                    className="flex-1 bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-slate-200 h-12 px-6"
                     disabled={!hasAnyData}
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
@@ -435,7 +438,7 @@ const JobGuide = () => {
                   </div>
                 )}
                 {isSuccess && (
-                  <div className="flex items-center rounded-lg p-3 bg-green-900/30 border border-green-700/50 mt-2 text-green-300 gap-2">
+                  <div className="flex items-center rounded-lg p-3 bg-green-900/20 border border-green-700/40 mt-2 text-green-300 gap-2">
                     <CheckCircle className="w-4 h-4" />
                     <span>Job analysis submitted successfully!</span>
                   </div>
@@ -445,11 +448,11 @@ const JobGuide = () => {
 
             {/* Loading State */}
             {isGenerating && (
-              <Card className="bg-gradient-to-br from-slate-700/60 via-slate-600/40 to-slate-700/60 border border-slate-600/40 mb-6 animate-fade-in shadow">
+              <Card className="bg-slate-800 border border-slate-700 mb-6 animate-fade-in shadow">
                 <CardContent className="py-8">
                   <div className="flex flex-col items-center">
                     <Loader2 className="w-10 h-10 text-slate-400 animate-spin mb-4" />
-                    <div className="text-slate-200 text-lg font-semibold mb-1 animate-pulse">
+                    <div className="text-slate-100 text-lg font-semibold mb-1 animate-pulse">
                       {loadingMessage || "Generating your job analysis..."}
                     </div>
                     <div className="text-slate-400 text-sm">
@@ -462,7 +465,7 @@ const JobGuide = () => {
 
             {/* Result Display */}
             {jobAnalysisResult && (
-              <Card className="bg-gradient-to-br from-slate-700/60 via-slate-600/40 to-slate-700/60 border border-slate-600/40 shadow">
+              <Card className="bg-slate-800 border border-slate-700 shadow">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-slate-200 font-orbitron text-xl flex items-center gap-2">
                     <FileText className="w-5 h-5 text-slate-400" />
@@ -473,13 +476,13 @@ const JobGuide = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="whitespace-pre-wrap font-inter text-slate-100 bg-slate-800/90 rounded-lg p-5 shadow-inner mb-3 border border-slate-600/40">
+                  <div className="whitespace-pre-wrap font-inter text-slate-100 bg-slate-900 rounded-lg p-5 shadow-inner mb-3 border border-slate-700">
                     {jobAnalysisResult}
                   </div>
                   <div className="flex flex-col md:flex-row gap-2">
                     <Button
                       onClick={handleCopyResult}
-                      className="flex-1 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-600 text-slate-100 font-medium text-base h-12 border border-slate-500/50"
+                      className="flex-1 bg-gradient-to-r from-slate-700 via-slate-600 to-slate-700 hover:from-slate-600 hover:to-slate-800 text-slate-100 font-medium text-base h-12 border border-slate-600"
                     >
                       <Copy className="w-4 h-4 mr-2" />
                       Copy Job Analysis
