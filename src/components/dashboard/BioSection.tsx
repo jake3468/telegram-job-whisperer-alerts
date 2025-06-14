@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -55,16 +54,15 @@ const BioSection = () => {
 
   return (
     <section className="p-0 rounded-none bg-transparent shadow-none">
-      {/* Vibrant emerald gradient card with crisp border and shadow */}
-      <Card className="rounded-3xl border-2 border-emerald-400 bg-gradient-to-b from-[#30e894]/90 via-[#0fab73]/85 to-[#124c41]/85 shadow-[0_4px_40px_-8px_rgba(63,232,161,0.13)] transition-all">
+      <Card className="rounded-3xl border-2 border-emerald-400 bg-gradient-to-b from-[#21c37d]/95 via-[#14825f]/90 to-[#105340]/96 shadow-md transition-all">
         <CardHeader className="pb-3">
-          <CardTitle className="text-white font-orbitron flex items-center gap-2 text-lg drop-shadow-md">
-            <div className="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center">
-              <User className="w-4 h-4 text-emerald-100" />
+          <CardTitle className="text-white font-orbitron flex items-center gap-2 text-lg drop-shadow-[0_2px_10px_rgba(67,232,161,0.30)]">
+            <div className="w-7 h-7 bg-emerald-400/50 rounded-full flex items-center justify-center">
+              <User className="w-4 h-4 text-white drop-shadow-[0_2px_8px_rgba(255,255,255,0.6)]" />
             </div>
-            <span className="bg-gradient-to-r from-emerald-200 to-pastel-mint bg-clip-text text-transparent">About You</span>
+            <span className="text-white font-bold">About You</span>
           </CardTitle>
-          <CardDescription className="text-emerald-100 text-base font-inter font-normal drop-shadow-sm">
+          <CardDescription className="text-white/90 text-base font-inter font-normal drop-shadow-[0_2px_10px_rgba(67,232,161,0.35)]">
             Tell us about yourself to get better job recommendations
           </CardDescription>
         </CardHeader>
@@ -74,7 +72,7 @@ const BioSection = () => {
             onChange={e => setBio(e.target.value)}
             placeholder="Describe your experience, skills, career goals, and what kind of opportunities you're looking for..."
             rows={4}
-            className="min-h-[100px] border-2 border-white/30 text-white placeholder-white/70 font-inter focus-visible:border-emerald-200 hover:border-emerald-300 text-base resize-none bg-black/70 shadow-inner"
+            className="min-h-[100px] border-2 border-white/30 text-white placeholder-white/70 font-inter focus-visible:border-emerald-200 hover:border-emerald-300 text-base resize-none bg-black/80 shadow-inner"
           />
           <Button onClick={handleSaveBio} disabled={saving} className="font-inter bg-white text-emerald-700 hover:bg-gray-100 font-bold text-xs px-4 py-2 h-9 rounded-lg shadow">
             {saving ? 'Saving...' : 'Save Bio'}
