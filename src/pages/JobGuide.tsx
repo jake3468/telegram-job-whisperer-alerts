@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -325,15 +324,15 @@ const JobGuide = () => {
       <div className="min-h-screen w-full bg-gradient-to-br from-slate-950 via-slate-900/90 to-slate-950 flex flex-col">
         <div className="max-w-4xl mx-auto w-full px-2 py-8 sm:px-6 sm:py-12 rounded-3xl bg-transparent mt-4">
           <div className="text-center mb-8 px-2">
-            <h1 className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-slate-200 via-slate-200 to-slate-100 bg-clip-text text-transparent mb-2 drop-shadow">
-              Job <span className="italic text-slate-300">Analysis</span>
+            <h1
+              className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 bg-clip-text text-transparent mb-2 drop-shadow"
+            >
+              Job Analysis
             </h1>
             <p className="text-lg text-slate-300 font-inter font-light">
               In-depth breakdown and <span className="italic text-slate-400">insights</span> for your ideal jobs
             </p>
           </div>
-
-          {/* MAIN RESTORED FUNCTIONALITY BELOW */}
           <div className="space-y-8">
             {/* Input Form */}
             <Card className="bg-gradient-to-br from-slate-800/95 via-slate-800/85 to-slate-700/80 border border-slate-700/70 shadow-xl drop-shadow-2xl">
@@ -341,7 +340,7 @@ const JobGuide = () => {
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <div>
                     <CardTitle className="text-slate-100 font-inter text-xl flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-slate-400" />
+                      <Sparkles className="w-5 h-5 text-sky-400" />
                       Analyze a Job Posting
                     </CardTitle>
                     <CardDescription className="text-slate-300 font-inter">
@@ -370,7 +369,8 @@ const JobGuide = () => {
                       value={formData.companyName}
                       onChange={e => handleInputChange('companyName', e.target.value)}
                       required
-                      className="bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-slate-400 placeholder:text-slate-400"
+                      className="bg-gradient-to-r from-sky-50 via-blue-100 to-sky-200 text-slate-900 border border-blue-200 shadow-inner focus:border-sky-400 placeholder:text-blue-600 font-semibold"
+                      // blue gradient, dark readable text
                     />
                   </div>
                   {/* Job Title */}
@@ -384,7 +384,7 @@ const JobGuide = () => {
                       value={formData.jobTitle}
                       onChange={e => handleInputChange('jobTitle', e.target.value)}
                       required
-                      className="bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-slate-400 placeholder:text-slate-400"
+                      className="bg-gradient-to-r from-sky-50 via-blue-100 to-sky-200 text-slate-900 border border-blue-200 shadow-inner focus:border-sky-400 placeholder:text-blue-600 font-semibold"
                     />
                   </div>
                 </div>
@@ -402,7 +402,7 @@ const JobGuide = () => {
                     value={formData.jobDescription}
                     onChange={e => handleInputChange('jobDescription', e.target.value)}
                     required
-                    className="min-h-[100px] bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-slate-400 placeholder:text-slate-400"
+                    className="min-h-[100px] bg-gradient-to-r from-sky-50 via-blue-100 to-sky-200 text-slate-900 border border-blue-200 shadow-inner focus:border-sky-400 placeholder:text-blue-600 font-semibold"
                   />
                 </div>
                 {/* Action Buttons */}
