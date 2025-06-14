@@ -1,4 +1,3 @@
-
 import { BellRing, ScanSearch, FileText, Linkedin, LayoutDashboard, ArrowRight } from "lucide-react";
 import { SignUpButton } from "@clerk/clerk-react";
 
@@ -9,7 +8,7 @@ const tools = [
     title: "Telegram Job Alerts",
     description: "Get instant job notifications tailored to your profile, directly on Telegram.",
     cardBg: "bg-[#B8C5FF]", // pastel blue
-    buttonBg: "bg-[#5D6DFF] hover:bg-[#4652cc]",
+    buttonBg: "bg-[#2F3AFF] hover:bg-[#2226b2] focus:bg-[#2226b2]", // Strong blue
     buttonText: "text-white",
     iconColor: "text-blue-700 bg-white",
   },
@@ -18,7 +17,7 @@ const tools = [
     title: "AI Job Analysis",
     description: "Analyze job descriptions against your resume to identify key skills and gaps.",
     cardBg: "bg-[#A5FBCB]", // pastel mint
-    buttonBg: "bg-[#16b15b] hover:bg-[#108944]",
+    buttonBg: "bg-[#11A157] hover:bg-[#078c43] focus:bg-[#078c43]", // Strong green
     buttonText: "text-white",
     iconColor: "text-green-700 bg-white",
   },
@@ -27,7 +26,7 @@ const tools = [
     title: "AI Cover Letters",
     description: "Generate personalized cover letters in seconds for any job application.",
     cardBg: "bg-[#FFD2B5]", // pastel peach
-    buttonBg: "bg-[#FF8A3C] hover:bg-[#cc6c30]",
+    buttonBg: "bg-[#FF6F2C] hover:bg-[#b24400] focus:bg-[#b24400]", // Strong orange
     buttonText: "text-white",
     iconColor: "text-orange-600 bg-white",
   },
@@ -36,8 +35,8 @@ const tools = [
     title: "AI LinkedIn Posts",
     description: "Create engaging LinkedIn posts to boost your professional presence.",
     cardBg: "bg-[#E5D4FF]", // pastel lavender
-    buttonBg: "bg-[#BF92F7] hover:bg-[#9e78c5]",
-    buttonText: "text-black",
+    buttonBg: "bg-[#C384F7] hover:bg-[#a75ee0] focus:bg-[#a75ee0]", // Strong purple
+    buttonText: "text-white",
     iconColor: "text-purple-600 bg-white",
   },
   {
@@ -45,7 +44,7 @@ const tools = [
     title: "AI Interview Prep",
     description: "Know the Company. Nail the Interview. Ask Like a Pro.",
     cardBg: "bg-[#aee4fa]", // light sky blue
-    buttonBg: "bg-[#1e9cd7] hover:bg-[#156d99]",
+    buttonBg: "bg-[#1e9cd7] hover:bg-[#1479a3] focus:bg-[#1479a3]", // Strong sky blue
     buttonText: "text-white",
     iconColor: "text-sky-800 bg-white",
   },
@@ -53,7 +52,7 @@ const tools = [
 
 const ToolsSection = () => {
   return (
-    <section className="bg-black py-20 px-4">
+    <section className="relative bg-black py-20 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-semibold text-white mb-4 font-inter">
@@ -110,7 +109,7 @@ const ToolsSection = () => {
               <SignUpButton mode="modal">
                 <button
                   type="button"
-                  className={`mt-auto rounded-full w-full py-3 px-6 flex items-center justify-center gap-2 font-inter text-base font-bold shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 ${tool.buttonBg} ${tool.buttonText}`}
+                  className={`mt-auto rounded-full w-full py-3 px-6 flex items-center justify-center gap-2 font-inter text-base font-bold shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 ${tool.buttonBg} ${tool.buttonText} z-20`}
                   style={{
                     letterSpacing: "0.03em",
                   }}
