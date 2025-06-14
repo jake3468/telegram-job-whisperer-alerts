@@ -397,7 +397,7 @@ const CoverLetter = () => {
 
         {/* History Modal */}
         <HistoryModal 
-          type="cover_letters" 
+          type="cover_letter" 
           isOpen={showHistory} 
           onClose={() => setShowHistory(false)} 
           gradientColors="from-pastel-mint to-pastel-blue" 
