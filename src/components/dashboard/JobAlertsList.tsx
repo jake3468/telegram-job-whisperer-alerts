@@ -1,8 +1,6 @@
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Edit, Trash2, MapPin, Clock, Bell } from 'lucide-react';
-
 interface JobAlert {
   id: string;
   country: string;
@@ -16,24 +14,23 @@ interface JobAlert {
   created_at: string;
   updated_at: string;
 }
-
 interface JobAlertsListProps {
   alerts: JobAlert[];
   onEdit: (alert: JobAlert) => void;
   onDelete: (alertId: string) => void;
 }
-
-const JobAlertsList = ({ alerts, onEdit, onDelete }: JobAlertsListProps) => {
+const JobAlertsList = ({
+  alerts,
+  onEdit,
+  onDelete
+}: JobAlertsListProps) => {
   if (alerts.length === 0) {
-    return (
-      <div className="text-center py-6">
+    return <div className="text-center py-6">
         <Bell className="w-10 h-10 text-gray-500 mx-auto mb-3" />
         <p className="text-gray-400 font-inter text-base mb-1">No job alerts yet</p>
         <p className="text-gray-500 font-inter text-sm">Create your first alert to get started</p>
-      </div>
-    );
+      </div>;
   }
-
   const getJobTypeColor = (type: string) => {
     switch (type) {
       case 'Remote':
@@ -46,12 +43,9 @@ const JobAlertsList = ({ alerts, onEdit, onDelete }: JobAlertsListProps) => {
         return 'bg-gray-600 text-white';
     }
   };
-
-  return (
-    <div className="space-y-3">
-      {alerts.map((alert) => (
-        <Card key={alert.id} className="bg-gray-800 border-gray-700">
-          <CardContent className="p-4">
+  return <div className="space-y-3">
+      {alerts.map(alert => <Card key={alert.id} className="bg-gray-800 border-gray-700">
+          <CardContent className="p-4 bg-amber-700">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3">
@@ -86,29 +80,16 @@ const JobAlertsList = ({ alerts, onEdit, onDelete }: JobAlertsListProps) => {
               </div>
               
               <div className="flex gap-2 justify-end lg:justify-start flex-shrink-0">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onEdit(alert)}
-                  className="font-inter h-8 px-3 text-xs"
-                >
+                <Button variant="outline" size="sm" onClick={() => onEdit(alert)} className="font-inter h-8 px-3 text-xs">
                   <Edit className="w-3 h-3" />
                 </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => onDelete(alert.id)}
-                  className="font-inter h-8 px-3 text-xs"
-                >
+                <Button variant="destructive" size="sm" onClick={() => onDelete(alert.id)} className="font-inter h-8 px-3 text-xs">
                   <Trash2 className="w-3 h-3" />
                 </Button>
               </div>
             </div>
           </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
+        </Card>)}
+    </div>;
 };
-
 export default JobAlertsList;
