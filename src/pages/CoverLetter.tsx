@@ -1,10 +1,9 @@
 
 import { useUser } from '@clerk/clerk-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthHeader from '@/components/AuthHeader';
 import { Layout } from '@/components/Layout';
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -47,8 +46,6 @@ const CoverLetter = () => {
   useEffect(() => {
     if (!currentCoverLetterId) return;
 
-    console.log('Setting up real-time subscription for cover letter ID:', currentCoverLetterId);
-
     const channel = supabase
       .channel('cover-letter-updates')
       .on(
@@ -60,14 +57,10 @@ const CoverLetter = () => {
           filter: `id=eq.${currentCoverLetterId}`
         },
         (payload) => {
-          console.log('Cover letter updated via real-time:', payload);
-          
-          // Check if the cover_letter field has been populated
           if (payload.new && payload.new.cover_letter && payload.new.cover_letter.trim().length > 0) {
-            console.log('Setting result and stopping generation state');
             setResult(payload.new.cover_letter);
             setIsGenerating(false);
-            
+
             toast({
               title: "Cover Letter Generated!",
               description: "Your cover letter has been created successfully."
@@ -78,7 +71,6 @@ const CoverLetter = () => {
       .subscribe();
 
     return () => {
-      console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
   }, [currentCoverLetterId, toast]);
@@ -122,8 +114,6 @@ const CoverLetter = () => {
     setResult('');
 
     try {
-      console.log('Inserting new cover letter record...');
-      
       // Insert into database
       const { data, error } = await supabase
         .from('job_cover_letters')
@@ -137,11 +127,9 @@ const CoverLetter = () => {
         .single();
 
       if (error) {
-        console.error('Supabase error:', error);
         throw error;
       }
 
-      console.log('Cover letter created successfully:', data);
       setCurrentCoverLetterId(data.id);
 
       toast({
@@ -149,9 +137,8 @@ const CoverLetter = () => {
         description: "Your cover letter is being generated. Please wait..."
       });
     } catch (err: any) {
-      console.error('Error creating cover letter:', err);
       setIsGenerating(false);
-      
+
       toast({
         title: "Error",
         description: "Failed to create cover letter. Please try again.",
@@ -172,7 +159,6 @@ const CoverLetter = () => {
         description: "Cover letter copied to clipboard successfully."
       });
     } catch (err) {
-      console.error('Failed to copy text:', err);
       toast({
         title: "Error",
         description: "Failed to copy text to clipboard.",
@@ -194,7 +180,7 @@ const CoverLetter = () => {
 
   if (!isLoaded || !user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pastel-lavender via-pastel-peach to-pastel-mint flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-black via-neutral-900 to-black flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading...</div>
       </div>
     );
@@ -202,27 +188,38 @@ const CoverLetter = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen w-full bg-gradient-to-br from-pastel-mint/70 via-pastel-peach/80 to-pastel-blue/50 flex flex-col">
-        <div className="max-w-4xl mx-auto w-full px-3 py-8 sm:px-6 sm:py-12 backdrop-blur-xl rounded-3xl bg-black/85 shadow-2xl shadow-fuchsia-200/20 mt-4">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-pastel-blue via-fuchsia-400 to-pastel-peach bg-clip-text text-transparent mb-2 drop-shadow">
-              AI <span className="italic">Cover Letter</span> Generator
+      <div className="min-h-screen w-full bg-gradient-to-br from-[#180F18] via-[#1b1421] to-[#221828] flex flex-col">
+        {/* Header Section */}
+        <div className="max-w-4xl mx-auto w-full px-3 py-8 sm:px-6 sm:py-12 rounded-3xl mt-4">
+          <div
+            className="rounded-t-3xl rounded-b-xl mb-8 py-8 px-6 text-center shadow-2xl overflow-hidden select-none relative"
+            style={{
+              background: 'linear-gradient(90deg, #E75480 0%, #BE53ED 70%, #9661FF 100%)'
+            }}
+          >
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-pink-400 via-fuchsia-300 to-fuchsia-500 bg-clip-text text-transparent mb-2 drop-shadow font-orbitron">
+              Cover Letter
             </h1>
-            <p className="text-lg text-fuchsia-100 font-inter font-light">
-              Instantly create stunning <span className="italic text-pastel-mint">Cover Letters</span> for every job
+            <p className="text-lg font-inter font-light text-white/90">
+              Instantly create stunning <span className="italic text-white/85">Cover Letters</span> for every job
             </p>
           </div>
           <div className="space-y-8">
             {/* Input Form */}
-            <Card className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 border-white/20 backdrop-blur-sm mb-8">
+            <Card
+              className="bg-gradient-to-br from-[#33203a] via-[#2b1a30] to-[#41253f] border-0 shadow-xl mb-8"
+              style={{
+                boxShadow: '0 2px 32px 0 rgba(150,97,255,0.15)'
+              }}
+            >
               <CardHeader className="pb-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-white font-inter text-xl flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-slate-400" />
+                      <Sparkles className="w-5 h-5 text-fuchsia-300" />
                       Create Your Cover Letter
                     </CardTitle>
-                    <CardDescription className="text-gray-300 font-inter">
+                    <CardDescription className="text-gray-200 font-inter">
                       Fill in the details to generate your personalized cover letter
                     </CardDescription>
                   </div>
@@ -250,7 +247,7 @@ const CoverLetter = () => {
                       value={formData.job_title}
                       onChange={(e) => handleInputChange('job_title', e.target.value)}
                       required
-                      className="text-base bg-gray-900"
+                      className="text-base bg-black text-white placeholder:text-white/60 border-white/15"
                     />
                   </div>
 
@@ -265,7 +262,7 @@ const CoverLetter = () => {
                       value={formData.company_name}
                       onChange={(e) => handleInputChange('company_name', e.target.value)}
                       required
-                      className="text-base bg-gray-900"
+                      className="text-base bg-black text-white placeholder:text-white/60 border-white/15"
                     />
                   </div>
 
@@ -283,7 +280,7 @@ const CoverLetter = () => {
                       value={formData.job_description}
                       onChange={(e) => handleInputChange('job_description', e.target.value)}
                       required
-                      className="min-h-[150px] resize-none text-base bg-gray-900"
+                      className="min-h-[150px] resize-none text-base bg-black text-white placeholder:text-white/60 border-white/15"
                     />
                   </div>
 
@@ -291,7 +288,7 @@ const CoverLetter = () => {
                     <Button 
                       type="submit" 
                       disabled={isSubmitting || !formData.job_title.trim() || !formData.company_name.trim() || !formData.job_description.trim() || isGenerating} 
-                      className="flex-1 bg-gradient-to-r from-pastel-blue to-pastel-mint hover:from-pastel-blue/80 hover:to-pastel-mint/80 text-black font-medium text-base h-12"
+                      className="flex-1 bg-gradient-to-r from-pink-400 to-fuchsia-500 hover:from-pink-400/80 hover:to-fuchsia-500/80 text-white font-semibold text-base h-12 rounded-lg"
                     >
                       {isSubmitting ? 'Submitting...' : 'Generate Cover Letter'}
                     </Button>
@@ -311,7 +308,7 @@ const CoverLetter = () => {
 
             {/* Loading State */}
             {isGenerating && !result && (
-              <Card className="bg-white/5 border-white/20 backdrop-blur-sm mb-8">
+              <Card className="bg-[#33203a]/80 border-0 shadow mb-8">
                 <CardContent className="py-8">
                   <LoadingMessages type="cover_letter" />
                 </CardContent>
@@ -320,10 +317,10 @@ const CoverLetter = () => {
 
             {/* Result Display */}
             {result && (
-              <Card className="bg-white/5 border-white/20 backdrop-blur-sm">
+              <Card className="bg-[#33203a]/80 border-0 shadow">
                 <CardHeader className="pb-6">
                   <CardTitle className="text-white font-inter text-xl flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-slate-400" />
+                    <FileText className="w-5 h-5 text-fuchsia-300" />
                     Your Cover Letter
                   </CardTitle>
                   <CardDescription className="text-gray-300 font-inter">
@@ -332,9 +329,9 @@ const CoverLetter = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <Card className="bg-white/10 border-white/30 p-6">
+                    <Card className="bg-black border-white/20 p-6">
                       <ScrollArea className="h-[400px] w-full pr-4">
-                        <div className="whitespace-pre-wrap font-inter text-white">
+                        <div className="whitespace-pre-wrap font-inter text-white text-base">
                           {result}
                         </div>
                       </ScrollArea>
@@ -342,7 +339,7 @@ const CoverLetter = () => {
                     
                     <Button 
                       onClick={handleCopyResult} 
-                      className="w-full bg-gradient-to-r from-pastel-mint to-pastel-blue hover:from-pastel-mint/80 hover:to-pastel-blue/80 text-black flex items-center gap-2 text-base h-12"
+                      className="w-full bg-gradient-to-r from-pink-400 to-fuchsia-500 hover:from-pink-400/80 hover:to-fuchsia-500/80 text-white flex items-center gap-2 text-base h-12"
                     >
                       <Copy className="w-4 h-4" />
                       Copy Cover Letter
@@ -359,7 +356,7 @@ const CoverLetter = () => {
           type="cover_letter" 
           isOpen={showHistory} 
           onClose={() => setShowHistory(false)} 
-          gradientColors="from-pastel-mint to-pastel-blue" 
+          gradientColors="from-pink-400 to-fuchsia-400" 
         />
       </div>
     </Layout>
