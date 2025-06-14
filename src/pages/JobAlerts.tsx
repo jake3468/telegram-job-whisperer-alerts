@@ -28,8 +28,8 @@ const JobAlerts = () => {
   }
   return (
     <Layout>
-      {/* Remove mt-6 and let Layout handle content spacing! */}
-      <div className="flex flex-col min-h-screen w-full bg-transparent">
+      {/* Only flex-column and w-full. Do NOT add min-h-screen here */}
+      <div className="flex flex-col w-full bg-transparent">
         <div>
           <div className="text-center mb-8">
             <h1 className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-orange-400 via-pastel-mint to-fuchsia-400 bg-clip-text text-transparent mb-2 drop-shadow">
