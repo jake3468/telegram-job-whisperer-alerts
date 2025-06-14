@@ -243,7 +243,8 @@ const HistoryModal = ({
     }
   };
   if (showDetails && selectedItem) {
-    return <Dialog open={isOpen} onOpenChange={onClose}>
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-4xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-white font-inter flex items-center gap-2 text-lg">
@@ -255,7 +256,6 @@ const HistoryModal = ({
               </Button>
             </DialogTitle>
           </DialogHeader>
-
           <div className="flex-1 overflow-y-auto space-y-6 mt-4">
             {/* Input Details Section */}
             <div className="rounded-lg p-4 border border-white/10 bg-blue-800">
@@ -266,27 +266,37 @@ const HistoryModal = ({
               <div className="space-y-3">
                 {type === 'linkedin_posts'
                   ? (
+                    <>
                       <div>
                         <label className="text-white/70 text-sm">Topic:</label>
                         <p className="text-white">{selectedItem.topic}</p>
                       </div>
-                      {selectedItem.opinion && <div>
-                        <label className="text-white/70 text-sm">Opinion:</label>
-                        <p className="text-white">{selectedItem.opinion}</p>
-                      </div>}
-                      {selectedItem.personal_story && <div>
-                        <label className="text-white/70 text-sm">Personal Story:</label>
-                        <p className="text-white">{selectedItem.personal_story}</p>
-                      </div>}
-                      {selectedItem.audience && <div>
-                        <label className="text-white/70 text-sm">Audience:</label>
-                        <p className="text-white">{selectedItem.audience}</p>
-                      </div>}
-                      {selectedItem.tone && <div>
-                        <label className="text-white/70 text-sm">Tone:</label>
-                        <p className="text-white">{selectedItem.tone}</p>
-                      </div>}
-                    )
+                      {selectedItem.opinion && (
+                        <div>
+                          <label className="text-white/70 text-sm">Opinion:</label>
+                          <p className="text-white">{selectedItem.opinion}</p>
+                        </div>
+                      )}
+                      {selectedItem.personal_story && (
+                        <div>
+                          <label className="text-white/70 text-sm">Personal Story:</label>
+                          <p className="text-white">{selectedItem.personal_story}</p>
+                        </div>
+                      )}
+                      {selectedItem.audience && (
+                        <div>
+                          <label className="text-white/70 text-sm">Audience:</label>
+                          <p className="text-white">{selectedItem.audience}</p>
+                        </div>
+                      )}
+                      {selectedItem.tone && (
+                        <div>
+                          <label className="text-white/70 text-sm">Tone:</label>
+                          <p className="text-white">{selectedItem.tone}</p>
+                        </div>
+                      )}
+                    </>
+                  )
                   : (
                     <>
                       <div>
@@ -311,7 +321,6 @@ const HistoryModal = ({
                 </div>
               </div>
             </div>
-
             {/* --- Result Section --- */}
             {hasResult(selectedItem) && (
               <div className="rounded-lg p-4 border border-white/10 bg-black shadow-inner">
@@ -352,7 +361,8 @@ const HistoryModal = ({
             )}
           </div>
         </DialogContent>
-      </Dialog>;
+      </Dialog>
+    );
   }
   return <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] max-w-5xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
