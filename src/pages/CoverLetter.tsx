@@ -1,5 +1,4 @@
 
-
 import { useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -314,7 +313,7 @@ const CoverLetter = () => {
             {isGenerating && !result && (
               <Card className="bg-white/5 border-white/20 backdrop-blur-sm mb-8">
                 <CardContent className="py-8">
-                  <LoadingMessages />
+                  <LoadingMessages type="cover_letter" />
                 </CardContent>
               </Card>
             )}
@@ -368,4 +367,3 @@ const CoverLetter = () => {
 };
 
 export default CoverLetter;
-

@@ -360,7 +360,7 @@ const LinkedInPosts = () => {
             {isGenerating && !result && (
               <Card className="bg-white/5 border-white/20 backdrop-blur-sm mb-8">
                 <CardContent className="py-8">
-                  <LoadingMessages />
+                  <LoadingMessages type="linkedin" />
                 </CardContent>
               </Card>
             )}
