@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,6 @@ import { useToast } from '@/hooks/use-toast';
 import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy, Share2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
-
 interface HistoryItem {
   id: string;
   company_name?: string;
@@ -24,71 +22,62 @@ interface HistoryItem {
   cover_letter?: string;
   linkedin_post?: string;
 }
-
 interface HistoryModalProps {
   type: 'job_guide' | 'cover_letter' | 'linkedin_posts';
   isOpen: boolean;
   onClose: () => void;
   gradientColors: string;
 }
-
 const HistoryModal = ({
   type,
   isOpen,
   onClose,
   gradientColors
 }: HistoryModalProps) => {
-  const { user } = useUser();
-  const { toast } = useToast();
-  const { userProfile } = useUserProfile();
+  const {
+    user
+  } = useUser();
+  const {
+    toast
+  } = useToast();
+  const {
+    userProfile
+  } = useUserProfile();
   const [historyData, setHistoryData] = useState<HistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
-
   useEffect(() => {
     if (isOpen && user && userProfile) {
       fetchHistory();
     }
   }, [isOpen, user, userProfile]);
-
   const fetchHistory = async () => {
     if (!user || !userProfile) return;
-
     setIsLoading(true);
     try {
       let query;
-      
       if (type === 'job_guide') {
-        query = supabase
-          .from('job_analyses')
-          .select('id, company_name, job_title, job_description, created_at, job_match, match_score')
-          .eq('user_id', userProfile.id)
-          .order('created_at', { ascending: false })
-          .limit(20);
+        query = supabase.from('job_analyses').select('id, company_name, job_title, job_description, created_at, job_match, match_score').eq('user_id', userProfile.id).order('created_at', {
+          ascending: false
+        }).limit(20);
       } else if (type === 'cover_letter') {
-        query = supabase
-          .from('job_cover_letters')
-          .select('id, company_name, job_title, job_description, created_at, cover_letter')
-          .eq('user_id', userProfile.id)
-          .order('created_at', { ascending: false })
-          .limit(20);
+        query = supabase.from('job_cover_letters').select('id, company_name, job_title, job_description, created_at, cover_letter').eq('user_id', userProfile.id).order('created_at', {
+          ascending: false
+        }).limit(20);
       } else {
-        query = supabase
-          .from('job_linkedin')
-          .select('id, topic, opinion, personal_story, audience, tone, created_at, linkedin_post')
-          .eq('user_id', userProfile.id)
-          .order('created_at', { ascending: false })
-          .limit(20);
+        query = supabase.from('job_linkedin').select('id, topic, opinion, personal_story, audience, tone, created_at, linkedin_post').eq('user_id', userProfile.id).order('created_at', {
+          ascending: false
+        }).limit(20);
       }
-      
-      const { data, error } = await query;
-      
+      const {
+        data,
+        error
+      } = await query;
       if (error) {
         console.error('Error fetching history:', error);
         throw error;
       }
-
       setHistoryData(data || []);
     } catch (err) {
       console.error('Failed to fetch history:', err);
@@ -101,11 +90,9 @@ const HistoryModal = ({
       setIsLoading(false);
     }
   };
-
   const handleCopyResult = async (item: HistoryItem) => {
     const result = getResult(item);
     if (!result) return;
-    
     try {
       await navigator.clipboard.writeText(result);
       toast({
@@ -121,7 +108,6 @@ const HistoryModal = ({
       });
     }
   };
-
   const handleDelete = async (itemId: string) => {
     if (!userProfile) {
       toast({
@@ -131,50 +117,33 @@ const HistoryModal = ({
       });
       return;
     }
-
     try {
       console.log(`Attempting to delete ${type} item with ID: ${itemId} for user profile: ${userProfile.id}`);
-      
       let query;
       let tableName;
-      
       if (type === 'job_guide') {
         tableName = 'job_analyses';
-        query = supabase
-          .from('job_analyses')
-          .delete()
-          .eq('id', itemId)
-          .eq('user_id', userProfile.id);
+        query = supabase.from('job_analyses').delete().eq('id', itemId).eq('user_id', userProfile.id);
       } else if (type === 'cover_letter') {
         tableName = 'job_cover_letters';
-        query = supabase
-          .from('job_cover_letters')
-          .delete()
-          .eq('id', itemId)
-          .eq('user_id', userProfile.id);
+        query = supabase.from('job_cover_letters').delete().eq('id', itemId).eq('user_id', userProfile.id);
       } else {
         tableName = 'job_linkedin';
-        query = supabase
-          .from('job_linkedin')
-          .delete()
-          .eq('id', itemId)
-          .eq('user_id', userProfile.id);
+        query = supabase.from('job_linkedin').delete().eq('id', itemId).eq('user_id', userProfile.id);
       }
-      
       console.log(`Deleting from table: ${tableName}, item ID: ${itemId}, user_id: ${userProfile.id}`);
-      
-      const { error, data } = await query;
-      
+      const {
+        error,
+        data
+      } = await query;
       if (error) {
         console.error('Supabase delete error:', error);
         throw error;
       }
-
       console.log('Delete operation completed successfully');
 
       // Remove from local state
       setHistoryData(prev => prev.filter(item => item.id !== itemId));
-      
       let itemType: string;
       if (type === 'job_guide') {
         itemType = 'Job analysis';
@@ -183,7 +152,6 @@ const HistoryModal = ({
       } else {
         itemType = 'LinkedIn post';
       }
-      
       toast({
         title: "Deleted",
         description: `${itemType} deleted successfully.`
@@ -203,7 +171,6 @@ const HistoryModal = ({
       });
     }
   };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -213,7 +180,6 @@ const HistoryModal = ({
       minute: '2-digit'
     });
   };
-
   const getResult = (item: HistoryItem) => {
     if (type === 'job_guide') {
       return item.job_match;
@@ -223,26 +189,22 @@ const HistoryModal = ({
       return item.linkedin_post;
     }
   };
-
   const hasResult = (item: HistoryItem) => {
     const result = getResult(item);
     return result && result.trim().length > 0;
   };
-
   const getItemTitle = (item: HistoryItem) => {
     if (type === 'linkedin_posts') {
       return item.topic || 'LinkedIn Post';
     }
     return item.company_name || 'Unknown Company';
   };
-
   const getItemSubtitle = (item: HistoryItem) => {
     if (type === 'linkedin_posts') {
       return item.tone || 'No tone specified';
     }
     return item.job_title || 'Unknown Position';
   };
-
   const getHistoryTitle = () => {
     if (type === 'job_guide') {
       return 'Job Analysis History';
@@ -252,7 +214,6 @@ const HistoryModal = ({
       return 'LinkedIn Posts History';
     }
   };
-
   const getHistoryDescription = () => {
     if (type === 'job_guide') {
       return 'job analyses';
@@ -262,7 +223,6 @@ const HistoryModal = ({
       return 'LinkedIn posts';
     }
   };
-
   const getDetailTitle = () => {
     if (type === 'job_guide') {
       return 'Job Analysis Details';
@@ -272,7 +232,6 @@ const HistoryModal = ({
       return 'LinkedIn Post Details';
     }
   };
-
   const getResultTitle = () => {
     if (type === 'job_guide') {
       return 'Job Analysis Result';
@@ -282,20 +241,14 @@ const HistoryModal = ({
       return 'LinkedIn Post';
     }
   };
-
   if (showDetails && selectedItem) {
-    return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
+    return <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-4xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-white font-inter flex items-center gap-2 text-lg">
               {type === 'linkedin_posts' ? <Share2 className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
               {getDetailTitle()}
-              <Button
-                onClick={() => setShowDetails(false)}
-                size="sm"
-                className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm mx-[15px]"
-              >
+              <Button onClick={() => setShowDetails(false)} size="sm" className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm mx-[15px]">
                 <X className="w-4 h-4 mr-1" />
                 Back to List
               </Button>
@@ -310,39 +263,28 @@ const HistoryModal = ({
                 Input Details
               </h3>
               <div className="space-y-3">
-                {type === 'linkedin_posts' ? (
-                  <>
+                {type === 'linkedin_posts' ? <>
                     <div>
                       <label className="text-white/70 text-sm">Topic:</label>
                       <p className="text-white">{selectedItem.topic}</p>
                     </div>
-                    {selectedItem.opinion && (
-                      <div>
+                    {selectedItem.opinion && <div>
                         <label className="text-white/70 text-sm">Opinion:</label>
                         <p className="text-white">{selectedItem.opinion}</p>
-                      </div>
-                    )}
-                    {selectedItem.personal_story && (
-                      <div>
+                      </div>}
+                    {selectedItem.personal_story && <div>
                         <label className="text-white/70 text-sm">Personal Story:</label>
                         <p className="text-white">{selectedItem.personal_story}</p>
-                      </div>
-                    )}
-                    {selectedItem.audience && (
-                      <div>
+                      </div>}
+                    {selectedItem.audience && <div>
                         <label className="text-white/70 text-sm">Audience:</label>
                         <p className="text-white">{selectedItem.audience}</p>
-                      </div>
-                    )}
-                    {selectedItem.tone && (
-                      <div>
+                      </div>}
+                    {selectedItem.tone && <div>
                         <label className="text-white/70 text-sm">Tone:</label>
                         <p className="text-white">{selectedItem.tone}</p>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <>
+                      </div>}
+                  </> : <>
                     <div>
                       <label className="text-white/70 text-sm">Company Name:</label>
                       <p className="text-white">{selectedItem.company_name}</p>
@@ -353,12 +295,11 @@ const HistoryModal = ({
                     </div>
                     <div>
                       <label className="text-white/70 text-sm">Job Description:</label>
-                      <div className="bg-white/5 rounded p-3 max-h-32 overflow-y-auto">
+                      <div className="rounded p-3 max-h-32 overflow-y-auto bg-gray-800">
                         <p className="text-white text-sm">{selectedItem.job_description}</p>
                       </div>
                     </div>
-                  </>
-                )}
+                  </>}
                 <div>
                   <label className="text-white/70 text-sm">Created:</label>
                   <p className="text-white">{formatDate(selectedItem.created_at)}</p>
@@ -367,37 +308,30 @@ const HistoryModal = ({
             </div>
 
             {/* Result Section */}
-            {hasResult(selectedItem) && (
-              <div className="rounded-lg p-4 border border-white/10 bg-purple-800">
+            {hasResult(selectedItem) && <div className="rounded-lg p-4 border border-white/10 bg-purple-800">
                 <h3 className="text-white font-medium mb-4 flex items-center gap-2 justify-between">
                   <div className="flex items-center gap-2">
                     {type === 'linkedin_posts' ? <Share2 className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
                     {getResultTitle()}
                   </div>
-                  <Button 
-                    onClick={() => handleCopyResult(selectedItem)} 
-                    size="sm" 
-                    className="bg-gray-950 hover:bg-gray-800 text-white flex items-center gap-1"
-                  >
+                  <Button onClick={() => handleCopyResult(selectedItem)} size="sm" className="bg-gray-950 hover:bg-gray-800 text-white flex items-center gap-1">
                     <Copy className="w-3 h-3" />
                     <span className="hidden sm:inline">Copy</span>
                   </Button>
                 </h3>
                 <div className="bg-white rounded-lg p-4 border-2 border-blue-200 max-h-96 overflow-y-auto">
-                  <div className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap" style={{ fontFamily: 'serif' }}>
+                  <div className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap" style={{
+                fontFamily: 'serif'
+              }}>
                     {getResult(selectedItem)}
                   </div>
                 </div>
-              </div>
-            )}
+              </div>}
           </div>
         </DialogContent>
-      </Dialog>
-    );
+      </Dialog>;
   }
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+  return <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] max-w-5xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
@@ -419,21 +353,15 @@ const HistoryModal = ({
         </div>
 
         <div className="flex-1 overflow-y-auto min-h-0">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
+          {isLoading ? <div className="flex items-center justify-center py-8">
               <div className="text-white/70 text-sm">Loading history...</div>
-            </div>
-          ) : historyData.length === 0 ? (
-            <div className="flex items-center justify-center py-8">
+            </div> : historyData.length === 0 ? <div className="flex items-center justify-center py-8">
               <div className="text-white/70 text-center">
                 {type === 'linkedin_posts' ? <Share2 className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" /> : <History className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />}
                 <p className="text-sm">No {getHistoryDescription()} found.</p>
               </div>
-            </div>
-          ) : (
-            <div className="space-y-2 sm:space-y-3 pb-4">
-              {historyData.map((item) => (
-                <div key={item.id} className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-indigo-800">
+            </div> : <div className="space-y-2 sm:space-y-3 pb-4">
+              {historyData.map(item => <div key={item.id} className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-indigo-800">
                   {/* Mobile Layout */}
                   <div className="block sm:hidden space-y-2">
                     <div className="flex items-start justify-between gap-2">
@@ -454,23 +382,15 @@ const HistoryModal = ({
                     </div>
                     
                     <div className="flex items-center gap-1 pt-2">
-                      <Button
-                        onClick={() => {
-                          setSelectedItem(item);
-                          setShowDetails(true);
-                        }}
-                        size="sm"
-                        className="flex-1 bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-2 py-1"
-                      >
+                      <Button onClick={() => {
+                  setSelectedItem(item);
+                  setShowDetails(true);
+                }} size="sm" className="flex-1 bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-2 py-1">
                         <Eye className="w-3 h-3 mr-1" />
                         View
                       </Button>
                       
-                      <Button
-                        onClick={() => handleDelete(item.id)}
-                        size="sm"
-                        className="flex-1 bg-red-600/80 hover:bg-red-600 text-white text-xs px-2 py-1"
-                      >
+                      <Button onClick={() => handleDelete(item.id)} size="sm" className="flex-1 bg-red-600/80 hover:bg-red-600 text-white text-xs px-2 py-1">
                         <Trash2 className="w-3 h-3 mr-1" />
                         Delete
                       </Button>
@@ -497,36 +417,24 @@ const HistoryModal = ({
                     </div>
 
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <Button
-                        onClick={() => {
-                          setSelectedItem(item);
-                          setShowDetails(true);
-                        }}
-                        size="sm"
-                        className="bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-3 py-1"
-                      >
+                      <Button onClick={() => {
+                  setSelectedItem(item);
+                  setShowDetails(true);
+                }} size="sm" className="bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-3 py-1">
                         <Eye className="w-3 h-3 mr-1" />
                         View
                       </Button>
                       
-                      <Button
-                        onClick={() => handleDelete(item.id)}
-                        size="sm"
-                        className="bg-red-600/80 hover:bg-red-600 text-white text-xs px-3 py-1"
-                      >
+                      <Button onClick={() => handleDelete(item.id)} size="sm" className="bg-red-600/80 hover:bg-red-600 text-white text-xs px-3 py-1">
                         <Trash2 className="w-3 h-3 mr-1" />
                         Delete
                       </Button>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                </div>)}
+            </div>}
         </div>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 };
-
 export default HistoryModal;
