@@ -204,7 +204,7 @@ const CoverLetter = () => {
           <div className="space-y-8">
             {/* Input Form in Gradient Box */}
             <Card
-              className="rounded-2xl border-0 bg-gradient-to-br from-rose-950/70 via-fuchsia-950/60 to-pink-950/70 shadow-xl mb-8"
+              className="rounded-2xl border-0 bg-gradient-to-br from-rose-800/80 via-fuchsia-900/70 to-pink-800/80 shadow-xl mb-8"
               style={{
                 boxShadow: '0 2px 32px 0 rgba(150,97,255,0.12)'
               }}
