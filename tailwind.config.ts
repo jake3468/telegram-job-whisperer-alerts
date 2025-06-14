@@ -67,7 +67,14 @@ export default {
 					mint: '#A5FBCB', 
 					peach: '#FFD2B5',
 					lavender: '#E5D4FF'
-				}
+				},
+        sky: { // Ensure sky colors are defined if used for highlighting or buttons
+          '400': '#38bdf8', // Example, adjust if you have specific sky shades
+          '500': '#0ea5e9',
+          '600': '#0284c7',
+          '700': '#0369a1',
+        },
+        highlight: 'hsl(196, 88%, 55%)', // Sky-blue like color for highlighting
 			},
 			backgroundImage: {
         'hero-glow': 'radial-gradient(ellipse_80%_60%_at_50%_120%,rgba(239,68,68,0.1),transparent)',
