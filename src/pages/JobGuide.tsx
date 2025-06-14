@@ -12,6 +12,7 @@ import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import { supabase } from '@/integrations/supabase/client';
 import { Layout } from '@/components/Layout';
 import JobAnalysisHistory from '@/components/JobAnalysisHistory';
+import PercentageMeter from '@/components/PercentageMeter';
 const JobGuide = () => {
   const {
     user,
@@ -39,6 +40,7 @@ const JobGuide = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [jobAnalysisResult, setJobAnalysisResult] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('');
+  const [matchScore, setMatchScore] = useState<string | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const loadingMessages = ["🔍 Analyzing job requirements...", "✨ Crafting personalized insights...", "🚀 Tailoring advice to your profile...", "🎯 Generating strategic recommendations..."];
   useEffect(() => {
@@ -63,7 +65,9 @@ const JobGuide = () => {
         const {
           data,
           error
-        } = await supabase.from('job_analyses').select('job_match').eq('id', jobAnalysisId).single();
+        } = await supabase.from('job_analyses')
+          .select('job_match, match_score')
+          .eq('id', jobAnalysisId).single();
         if (error) {
           console.error('Error polling for results:', error);
           return;
@@ -72,6 +76,7 @@ const JobGuide = () => {
           setJobAnalysisResult(data.job_match);
           setIsGenerating(false);
           setIsSuccess(false);
+          setMatchScore(data.match_score || null);
           if (pollingIntervalRef.current) {
             clearInterval(pollingIntervalRef.current);
             pollingIntervalRef.current = null;
@@ -179,16 +184,24 @@ const JobGuide = () => {
         throw new Error('User profile not found. Please complete your profile first.');
       }
       console.log('✅ Found user profile:', profileData.id);
+      // Check for existing analysis (now fetch match_score as well)
       const {
         data: existingAnalysis,
         error: checkError
-      } = await supabase.from('job_analyses').select('id, job_match').eq('user_id', profileData.id).eq('company_name', formData.companyName).eq('job_title', formData.jobTitle).eq('job_description', formData.jobDescription).not('job_match', 'is', null).order('created_at', {
-        ascending: false
-      }).limit(1);
+      } = await supabase.from('job_analyses')
+        .select('id, job_match, match_score')
+        .eq('user_id', profileData.id)
+        .eq('company_name', formData.companyName)
+        .eq('job_title', formData.jobTitle)
+        .eq('job_description', formData.jobDescription)
+        .not('job_match', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(1);
       if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
         const existing = existingAnalysis[0];
         console.log('✅ Found existing job analysis:', existing.id);
         setJobAnalysisResult(existing.job_match);
+        setMatchScore(existing.match_score || null);
         setJobAnalysisId(existing.id);
         setIsSubmitting(false);
         toast({
@@ -197,6 +210,9 @@ const JobGuide = () => {
         });
         return;
       }
+      // Insert new, clear matchScore (will be fetched when ready)
+      setMatchScore(null);
+
       const insertData = {
         user_id: profileData.id,
         company_name: formData.companyName,
@@ -242,6 +258,7 @@ const JobGuide = () => {
         jobTitle,
         jobDescription,
         result,
+        matchScore, // expect this from history events if supported
         type
       } = event.detail;
       if (type === 'job_guide') {
@@ -251,6 +268,7 @@ const JobGuide = () => {
           jobDescription
         });
         setJobAnalysisResult(result);
+        setMatchScore(matchScore || null);
       }
     };
     window.addEventListener('useHistoryData', handleHistoryData);
@@ -392,21 +410,30 @@ const JobGuide = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {/* Percentage Meter (Match Score) */}
+                  {matchScore && (
+                    <div className="mb-4 max-w-full">
+                      <div className="w-full sm:max-w-[350px] md:max-w-[280px] mx-auto">
+                        {/* slight shadow and rounded for clearer separation */}
+                        <div className="shadow-md rounded-xl bg-slate-900/90 p-3 border border-slate-700">
+                          <PercentageMeter percentage={matchScore} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div
-                    className="whitespace-pre-wrap font-inter text-slate-100 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-blue-900/90 rounded-xl p-5 shadow-inner mb-3 border border-slate-700 max-w-full overflow-x-auto break-words"
+                    className="whitespace-pre-wrap font-inter text-slate-100 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-blue-900/90 rounded-xl p-4 sm:p-5 shadow-inner mb-3 border border-slate-700 max-w-full overflow-x-hidden break-words"
                     style={{
-                      minHeight: '180px',
-                      wordBreak: 'break-word',
-                      overflowX: 'auto',
+                      minHeight: '140px',
+                      wordBreak: 'break-word'
                     }}
                   >
-                    <div className="text-base sm:text-base md:text-lg leading-relaxed break-words">
+                    <div className="text-sm sm:text-base md:text-base leading-normal md:leading-relaxed break-words">
                       {jobAnalysisResult}
                     </div>
                   </div>
-                  <div className="flex flex-col md:flex-row gap-2">
-                    
-                  </div>
+                  <div className="flex flex-col md:flex-row gap-2"></div>
                 </CardContent>
               </Card>
             )}
