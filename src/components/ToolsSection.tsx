@@ -8,17 +8,17 @@ const tools = [
     icon: BellRing,
     title: "Telegram Job Alerts",
     description: "Get instant job notifications tailored to your profile, directly on Telegram.",
-    cardBg: "bg-[#9aa2be]", // more muted blue
-    buttonBg: "bg-[#2a3474] hover:bg-[#181e40] focus:bg-[#181e40]", // even less vibrant blue
+    cardBg: "bg-[#e8b6c6]", // soft, muted pink (was blue)
+    buttonBg: "bg-[#a4687a] hover:bg-[#7e4f60] focus:bg-[#7e4f60]", // muted pink for button
     buttonText: "text-white",
-    iconColor: "text-blue-800 bg-white/90",
+    iconColor: "text-pink-800 bg-white/90", // muted pink icon
   },
   {
     icon: ScanSearch,
     title: "AI Job Analysis",
     description: "Analyze job descriptions against your resume to identify key skills and gaps.",
-    cardBg: "bg-[#7fbfa9]", // more muted mint
-    buttonBg: "bg-[#12714a] hover:bg-[#0b4d34] focus:bg-[#0b4d34]", // even less vibrant green
+    cardBg: "bg-[#aecfc1]",
+    buttonBg: "bg-[#12714a] hover:bg-[#0b4d34] focus:bg-[#0b4d34]",
     buttonText: "text-white",
     iconColor: "text-green-800 bg-white/90",
   },
@@ -26,8 +26,8 @@ const tools = [
     icon: FileText,
     title: "AI Cover Letters",
     description: "Generate personalized cover letters in seconds for any job application.",
-    cardBg: "bg-[#e7b891]", // more muted peach
-    buttonBg: "bg-[#a4501e] hover:bg-[#74360e] focus:bg-[#74360e]", // less vibrant orange
+    cardBg: "bg-[#e7b891]",
+    buttonBg: "bg-[#a4501e] hover:bg-[#74360e] focus:bg-[#74360e]",
     buttonText: "text-white",
     iconColor: "text-orange-800 bg-white/90",
   },
@@ -35,8 +35,8 @@ const tools = [
     icon: Linkedin,
     title: "AI LinkedIn Posts",
     description: "Create engaging LinkedIn posts to boost your professional presence.",
-    cardBg: "bg-[#b6a4c9]", // more muted lavender
-    buttonBg: "bg-[#765696] hover:bg-[#543a6a] focus:bg-[#543a6a]", // muted purple
+    cardBg: "bg-[#b6a4c9]",
+    buttonBg: "bg-[#765696] hover:bg-[#543a6a] focus:bg-[#543a6a]",
     buttonText: "text-white",
     iconColor: "text-purple-800 bg-white/90",
   },
@@ -44,8 +44,8 @@ const tools = [
     icon: LayoutDashboard,
     title: "AI Interview Prep",
     description: "Know the Company. Nail the Interview. Ask Like a Pro.",
-    cardBg: "bg-[#7daab8]", // muted sky blue
-    buttonBg: "bg-[#145671] hover:bg-[#0a3544] focus:bg-[#0a3544]", // muted sky blue
+    cardBg: "bg-[#7daab8]",
+    buttonBg: "bg-[#145671] hover:bg-[#0a3544] focus:bg-[#0a3544]",
     buttonText: "text-white",
     iconColor: "text-sky-900 bg-white/90",
   },
@@ -84,7 +84,7 @@ const ToolsSection = () => {
                 items-start
                 justify-between
                 p-4 sm:p-5 md:p-6
-                min-h-[240px] sm:min-h-[260px] md:min-h-[320px]
+                min-h-[180px] sm:min-h-[200px] md:min-h-[250px]
                 relative
                 group
                 transition-all
@@ -92,7 +92,7 @@ const ToolsSection = () => {
                 border border-black/10
               `}
               style={{
-                boxShadow: "0 4px 16px 0 rgba(31,38,135,0.08)", // much softer shadow
+                boxShadow: "0 4px 16px 0 rgba(31,38,135,0.08)",
               }}
             >
               <div className="flex items-center gap-3 mb-4">
