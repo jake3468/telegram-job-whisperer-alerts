@@ -45,10 +45,10 @@ const LoadingMessages = ({ type = 'linkedin' }: LoadingMessagesProps) => {
   return (
     <div className="flex items-center justify-center gap-3 py-8">
       <div className="relative">
-        <Loader2 className="w-6 h-6 text-slate-400 animate-spin" />
-        <CurrentIcon className="w-4 h-4 text-slate-600 absolute top-1 left-1" />
+        <Loader2 className="w-6 h-6 text-fuchsia-300 animate-spin" />
+        <CurrentIcon className="w-4 h-4 text-fuchsia-400 absolute top-1 left-1" />
       </div>
-      <span className="text-slate-600 text-lg font-medium animate-pulse">
+      <span className="text-fuchsia-100 text-lg font-semibold animate-pulse drop-shadow">
         {messages[currentIndex].text}
       </span>
     </div>
@@ -56,3 +56,4 @@ const LoadingMessages = ({ type = 'linkedin' }: LoadingMessagesProps) => {
 };
 
 export default LoadingMessages;
+

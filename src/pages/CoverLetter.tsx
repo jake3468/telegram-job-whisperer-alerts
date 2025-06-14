@@ -280,11 +280,26 @@ const CoverLetter = () => {
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                    <Button type="submit" disabled={isSubmitting || !formData.job_title.trim() || !formData.company_name.trim() || !formData.job_description.trim() || isGenerating} className="flex-1 bg-gradient-to-r from-pink-400 to-fuchsia-500 hover:from-pink-400/80 hover:to-fuchsia-500/80 text-white font-semibold text-base h-12 rounded-lg">
-                      {isSubmitting ? 'Submitting...' : isGenerating ? 'Generating...' : 'Generate Cover Letter'}
+                    {/* Generate Cover Letter - takes up majority of the width, Reset is smaller */}
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting || !formData.job_title.trim() || !formData.company_name.trim() || !formData.job_description.trim() || isGenerating}
+                      className="flex-[3] bg-gradient-to-r from-pink-400 to-fuchsia-500 hover:from-pink-400/80 hover:to-fuchsia-500/80 text-white font-semibold text-base h-12 rounded-lg"
+                    >
+                      {isSubmitting
+                        ? "Submitting..."
+                        : isGenerating
+                        ? "Generating..."
+                        : "Generate Cover Letter"}
                     </Button>
-                    
-                    <Button type="button" onClick={resetForm} variant="outline" className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 text-base h-12 px-6" disabled={isGenerating}>
+
+                    <Button
+                      type="button"
+                      onClick={resetForm}
+                      variant="outline"
+                      className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 text-base h-12 px-6 max-sm:w-full"
+                      disabled={isGenerating}
+                    >
                       Reset
                     </Button>
                   </div>
