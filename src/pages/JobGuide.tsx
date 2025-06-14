@@ -313,44 +313,44 @@ const JobGuide = () => {
 
   if (!isLoaded || !user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pastel-peach via-pastel-blue to-pastel-lavender flex items-center justify-center">
-        <div className="text-indigo-900 text-xs">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="text-slate-400 text-xs">Loading...</div>
       </div>
     );
   }
 
   return (
     <Layout>
-      <div className="min-h-screen w-full bg-gradient-to-br from-pastel-peach/60 via-pastel-mint/50 to-pastel-lavender/70 flex flex-col">
-        <div className="max-w-4xl mx-auto w-full px-3 py-8 sm:px-6 sm:py-12 backdrop-blur-xl rounded-3xl bg-black/80 shadow-2xl shadow-fuchsia-300/12 mt-4">
+      <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
+        <div className="max-w-4xl mx-auto w-full px-3 py-8 sm:px-6 sm:py-12 backdrop-blur-xl rounded-3xl bg-slate-800/90 shadow-2xl shadow-slate-900/50 mt-4 border border-slate-700/50">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-pastel-blue via-fuchsia-400 to-pastel-peach bg-clip-text text-transparent mb-2 drop-shadow">
-              Job <span className="italic">Analysis</span> Guide
+            <h1 className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200 bg-clip-text text-transparent mb-2 drop-shadow">
+              Job <span className="italic">Analysis</span>
             </h1>
-            <p className="text-lg text-fuchsia-100 font-inter font-light">
-              In-depth breakdown and <span className="italic text-pastel-lavender">insights</span> for your ideal jobs
+            <p className="text-lg text-slate-300 font-inter font-light">
+              In-depth breakdown and <span className="italic text-slate-400">insights</span> for your ideal jobs
             </p>
           </div>
 
           {/* MAIN RESTORED FUNCTIONALITY BELOW */}
           <div className="space-y-8">
             {/* Input Form */}
-            <Card className="bg-gradient-to-br from-pastel-blue/90 via-pastel-mint/80 to-pastel-peach/90 border border-fuchsia-400/20 shadow-xl">
+            <Card className="bg-gradient-to-br from-slate-700/80 via-slate-600/60 to-slate-700/80 border border-slate-600/40 shadow-xl">
               <CardHeader>
                 <div className="flex items-center justify-between gap-2">
                   <div>
-                    <CardTitle className="text-black font-inter text-xl flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-fuchsia-500" />
+                    <CardTitle className="text-slate-100 font-inter text-xl flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-slate-400" />
                       Analyze a Job Posting
                     </CardTitle>
-                    <CardDescription className="text-gray-800 font-inter">
+                    <CardDescription className="text-slate-300 font-inter">
                       Fill in job details to get your personalized job fit analysis
                     </CardDescription>
                   </div>
                   <JobAnalysisHistory
                     type="job_guide"
-                    gradientColors="from-pastel-blue via-fuchsia-400 to-pastel-peach"
-                    borderColors="border-pastel-blue/30"
+                    gradientColors="from-slate-200 via-slate-300 to-slate-200"
+                    borderColors="border-slate-600/30"
                   />
                 </div>
               </CardHeader>
@@ -358,7 +358,7 @@ const JobGuide = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {/* Company Name */}
                   <div className="space-y-2">
-                    <label htmlFor="companyName" className="text-black font-medium text-base">
+                    <label htmlFor="companyName" className="text-slate-200 font-medium text-base">
                       Company Name *
                     </label>
                     <Input
@@ -367,12 +367,12 @@ const JobGuide = () => {
                       value={formData.companyName}
                       onChange={e => handleInputChange('companyName', e.target.value)}
                       required
-                      className="bg-white/90 text-black border-fuchsia-300 focus:border-fuchsia-500"
+                      className="bg-slate-800/90 text-slate-100 border-slate-600 focus:border-slate-500 placeholder:text-slate-400"
                     />
                   </div>
                   {/* Job Title */}
                   <div className="space-y-2">
-                    <label htmlFor="jobTitle" className="text-black font-medium text-base">
+                    <label htmlFor="jobTitle" className="text-slate-200 font-medium text-base">
                       Job Title *
                     </label>
                     <Input
@@ -381,16 +381,16 @@ const JobGuide = () => {
                       value={formData.jobTitle}
                       onChange={e => handleInputChange('jobTitle', e.target.value)}
                       required
-                      className="bg-white/90 text-black border-fuchsia-300 focus:border-fuchsia-500"
+                      className="bg-slate-800/90 text-slate-100 border-slate-600 focus:border-slate-500 placeholder:text-slate-400"
                     />
                   </div>
                 </div>
                 {/* Job Description */}
                 <div className="space-y-2">
-                  <label htmlFor="jobDescription" className="text-black font-medium text-base">
+                  <label htmlFor="jobDescription" className="text-slate-200 font-medium text-base">
                     Job Description *
                   </label>
-                  <span className="text-gray-700 font-normal text-xs block mb-2">
+                  <span className="text-slate-400 font-normal text-xs block mb-2">
                     Paste in the job description or key requirements
                   </span>
                   <Textarea
@@ -399,7 +399,7 @@ const JobGuide = () => {
                     value={formData.jobDescription}
                     onChange={e => handleInputChange('jobDescription', e.target.value)}
                     required
-                    className="min-h-[100px] bg-white/90 text-black border-fuchsia-200 focus:border-fuchsia-500"
+                    className="min-h-[100px] bg-slate-800/90 text-slate-100 border-slate-600 focus:border-slate-500 placeholder:text-slate-400"
                   />
                 </div>
                 {/* Action Buttons */}
@@ -407,7 +407,7 @@ const JobGuide = () => {
                   <Button
                     onClick={handleSubmit}
                     disabled={isButtonDisabled}
-                    className="flex-1 bg-gradient-to-r from-pastel-blue to-pastel-mint hover:from-pastel-blue/80 hover:to-pastel-mint/80 text-black font-medium text-base h-12 shadow hover:scale-[1.03]"
+                    className="flex-1 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-600 text-slate-100 font-medium text-base h-12 shadow hover:scale-[1.03] border border-slate-500/50"
                   >
                     {isGenerating ? (
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -421,7 +421,7 @@ const JobGuide = () => {
                   <Button
                     onClick={handleClearData}
                     variant="outline"
-                    className="bg-white/80 border-fuchsia-300 text-fuchsia-700 hover:bg-fuchsia-100 h-12 px-6 shadow"
+                    className="bg-slate-800/80 border-slate-600 text-slate-300 hover:bg-slate-700/80 hover:text-slate-200 h-12 px-6 shadow"
                     disabled={!hasAnyData}
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
@@ -429,13 +429,13 @@ const JobGuide = () => {
                   </Button>
                 </div>
                 {error && (
-                  <div className="flex items-center rounded-lg p-3 bg-red-100 border border-red-300 mt-2 text-red-700 gap-2">
+                  <div className="flex items-center rounded-lg p-3 bg-red-900/30 border border-red-700/50 mt-2 text-red-300 gap-2">
                     <AlertCircle className="w-4 h-4" />
                     <span>{error}</span>
                   </div>
                 )}
                 {isSuccess && (
-                  <div className="flex items-center rounded-lg p-3 bg-green-50 border border-green-300 mt-2 text-green-900 gap-2">
+                  <div className="flex items-center rounded-lg p-3 bg-green-900/30 border border-green-700/50 mt-2 text-green-300 gap-2">
                     <CheckCircle className="w-4 h-4" />
                     <span>Job analysis submitted successfully!</span>
                   </div>
@@ -445,14 +445,14 @@ const JobGuide = () => {
 
             {/* Loading State */}
             {isGenerating && (
-              <Card className="bg-gradient-to-br from-pastel-blue/60 via-fuchsia-200/30 to-pastel-peach/60 border border-fuchsia-200 mb-6 animate-fade-in shadow">
+              <Card className="bg-gradient-to-br from-slate-700/60 via-slate-600/40 to-slate-700/60 border border-slate-600/40 mb-6 animate-fade-in shadow">
                 <CardContent className="py-8">
                   <div className="flex flex-col items-center">
-                    <Loader2 className="w-10 h-10 text-fuchsia-600 animate-spin mb-4" />
-                    <div className="text-fuchsia-900 text-lg font-semibold mb-1 animate-pulse">
+                    <Loader2 className="w-10 h-10 text-slate-400 animate-spin mb-4" />
+                    <div className="text-slate-200 text-lg font-semibold mb-1 animate-pulse">
                       {loadingMessage || "Generating your job analysis..."}
                     </div>
-                    <div className="text-fuchsia-800/60 text-sm">
+                    <div className="text-slate-400 text-sm">
                       Please wait, this may take up to a minute for AI to process the job
                     </div>
                   </div>
@@ -462,24 +462,24 @@ const JobGuide = () => {
 
             {/* Result Display */}
             {jobAnalysisResult && (
-              <Card className="bg-gradient-to-br from-pastel-blue/60 via-fuchsia-100/40 to-pastel-peach/60 border border-pastel-mint/30 shadow">
+              <Card className="bg-gradient-to-br from-slate-700/60 via-slate-600/40 to-slate-700/60 border border-slate-600/40 shadow">
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-fuchsia-800 font-orbitron text-xl flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-fuchsia-400" />
+                  <CardTitle className="text-slate-200 font-orbitron text-xl flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-slate-400" />
                     Your Job Analysis
                   </CardTitle>
-                  <CardDescription className="text-gray-700 font-inter">
-                    Personalized result for <span className="font-bold">{formData.jobTitle}</span> at <span className="font-bold">{formData.companyName}</span>
+                  <CardDescription className="text-slate-300 font-inter">
+                    Personalized result for <span className="font-bold text-slate-200">{formData.jobTitle}</span> at <span className="font-bold text-slate-200">{formData.companyName}</span>
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="whitespace-pre-wrap font-inter text-black bg-white/90 rounded-lg p-5 shadow-inner mb-3">
+                  <div className="whitespace-pre-wrap font-inter text-slate-100 bg-slate-800/90 rounded-lg p-5 shadow-inner mb-3 border border-slate-600/40">
                     {jobAnalysisResult}
                   </div>
                   <div className="flex flex-col md:flex-row gap-2">
                     <Button
                       onClick={handleCopyResult}
-                      className="flex-1 bg-gradient-to-r from-pastel-mint to-pastel-blue hover:from-pastel-mint/80 hover:to-pastel-blue/80 text-black font-medium text-base h-12"
+                      className="flex-1 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-600 text-slate-100 font-medium text-base h-12 border border-slate-500/50"
                     >
                       <Copy className="w-4 h-4 mr-2" />
                       Copy Job Analysis
