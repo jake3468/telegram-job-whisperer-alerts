@@ -331,8 +331,163 @@ const JobGuide = () => {
               In-depth breakdown and <span className="italic text-pastel-lavender">insights</span> for your ideal jobs
             </p>
           </div>
+
+          {/* MAIN RESTORED FUNCTIONALITY BELOW */}
           <div className="space-y-8">
-            {/* Presume page-specific guide sections/components here */}
+            {/* Input Form */}
+            <Card className="bg-gradient-to-br from-pastel-blue/90 via-pastel-mint/80 to-pastel-peach/90 border border-fuchsia-400/20 shadow-xl">
+              <CardHeader>
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <CardTitle className="text-black font-inter text-xl flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-fuchsia-500" />
+                      Analyze a Job Posting
+                    </CardTitle>
+                    <CardDescription className="text-gray-800 font-inter">
+                      Fill in job details to get your personalized job fit analysis
+                    </CardDescription>
+                  </div>
+                  <JobAnalysisHistory
+                    type="job_guide"
+                    gradientColors="from-pastel-blue via-fuchsia-400 to-pastel-peach"
+                    borderColors="border-pastel-blue/30"
+                  />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {/* Company Name */}
+                  <div className="space-y-2">
+                    <label htmlFor="companyName" className="text-black font-medium text-base">
+                      Company Name *
+                    </label>
+                    <Input
+                      id="companyName"
+                      placeholder="Google, Microsoft"
+                      value={formData.companyName}
+                      onChange={e => handleInputChange('companyName', e.target.value)}
+                      required
+                      className="bg-white/90 text-black border-fuchsia-300 focus:border-fuchsia-500"
+                    />
+                  </div>
+                  {/* Job Title */}
+                  <div className="space-y-2">
+                    <label htmlFor="jobTitle" className="text-black font-medium text-base">
+                      Job Title *
+                    </label>
+                    <Input
+                      id="jobTitle"
+                      placeholder="Software Engineer, Marketing Manager"
+                      value={formData.jobTitle}
+                      onChange={e => handleInputChange('jobTitle', e.target.value)}
+                      required
+                      className="bg-white/90 text-black border-fuchsia-300 focus:border-fuchsia-500"
+                    />
+                  </div>
+                </div>
+                {/* Job Description */}
+                <div className="space-y-2">
+                  <label htmlFor="jobDescription" className="text-black font-medium text-base">
+                    Job Description *
+                  </label>
+                  <span className="text-gray-700 font-normal text-xs block mb-2">
+                    Paste in the job description or key requirements
+                  </span>
+                  <Textarea
+                    id="jobDescription"
+                    placeholder="Paste the job description here..."
+                    value={formData.jobDescription}
+                    onChange={e => handleInputChange('jobDescription', e.target.value)}
+                    required
+                    className="min-h-[100px] bg-white/90 text-black border-fuchsia-200 focus:border-fuchsia-500"
+                  />
+                </div>
+                {/* Action Buttons */}
+                <div className="flex flex-col md:flex-row gap-3 pt-4">
+                  <Button
+                    onClick={handleSubmit}
+                    disabled={isButtonDisabled}
+                    className="flex-1 bg-gradient-to-r from-pastel-blue to-pastel-mint hover:from-pastel-blue/80 hover:to-pastel-mint/80 text-black font-medium text-base h-12 shadow hover:scale-[1.03]"
+                  >
+                    {isGenerating ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Sparkles className="w-4 h-4 mr-2" />
+                    )}
+                    {isGenerating
+                      ? loadingMessage || 'Analyzing...'
+                      : 'Generate Job Analysis'}
+                  </Button>
+                  <Button
+                    onClick={handleClearData}
+                    variant="outline"
+                    className="bg-white/80 border-fuchsia-300 text-fuchsia-700 hover:bg-fuchsia-100 h-12 px-6 shadow"
+                    disabled={!hasAnyData}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Clear All
+                  </Button>
+                </div>
+                {error && (
+                  <div className="flex items-center rounded-lg p-3 bg-red-100 border border-red-300 mt-2 text-red-700 gap-2">
+                    <AlertCircle className="w-4 h-4" />
+                    <span>{error}</span>
+                  </div>
+                )}
+                {isSuccess && (
+                  <div className="flex items-center rounded-lg p-3 bg-green-50 border border-green-300 mt-2 text-green-900 gap-2">
+                    <CheckCircle className="w-4 h-4" />
+                    <span>Job analysis submitted successfully!</span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Loading State */}
+            {isGenerating && (
+              <Card className="bg-gradient-to-br from-pastel-blue/60 via-fuchsia-200/30 to-pastel-peach/60 border border-fuchsia-200 mb-6 animate-fade-in shadow">
+                <CardContent className="py-8">
+                  <div className="flex flex-col items-center">
+                    <Loader2 className="w-10 h-10 text-fuchsia-600 animate-spin mb-4" />
+                    <div className="text-fuchsia-900 text-lg font-semibold mb-1 animate-pulse">
+                      {loadingMessage || "Generating your job analysis..."}
+                    </div>
+                    <div className="text-fuchsia-800/60 text-sm">
+                      Please wait, this may take up to a minute for AI to process the job
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Result Display */}
+            {jobAnalysisResult && (
+              <Card className="bg-gradient-to-br from-pastel-blue/60 via-fuchsia-100/40 to-pastel-peach/60 border border-pastel-mint/30 shadow">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-fuchsia-800 font-orbitron text-xl flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-fuchsia-400" />
+                    Your Job Analysis
+                  </CardTitle>
+                  <CardDescription className="text-gray-700 font-inter">
+                    Personalized result for <span className="font-bold">{formData.jobTitle}</span> at <span className="font-bold">{formData.companyName}</span>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="whitespace-pre-wrap font-inter text-black bg-white/90 rounded-lg p-5 shadow-inner mb-3">
+                    {jobAnalysisResult}
+                  </div>
+                  <div className="flex flex-col md:flex-row gap-2">
+                    <Button
+                      onClick={handleCopyResult}
+                      className="flex-1 bg-gradient-to-r from-pastel-mint to-pastel-blue hover:from-pastel-mint/80 hover:to-pastel-blue/80 text-black font-medium text-base h-12"
+                    >
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copy Job Analysis
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </div>
