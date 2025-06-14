@@ -1,4 +1,3 @@
-
 import { User, Bell, Target, FileText, X, Share2 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
@@ -110,20 +109,30 @@ export function AppSidebar() {
                       <NavLink
                         to={item.url}
                         className={`
-                          flex items-center gap-2 px-2 py-3 mx-1 
-                          rounded-2xl font-orbitron transition-all duration-300 
+                          flex items-center gap-2 py-3 
+                          mx-2                         /* Ensure margin on left+right for highlight space */
+                          px-3                         /* Sufficient space on text+icon sides */
+                          rounded-2xl                   /* Perfectly rounded for highlight bg */
+                          font-orbitron transition-all duration-300 
                           text-base font-bold w-full
-                          ${isCurrentlyActive
-                            ? 'bg-gradient-to-r from-pastel-peach via-pastel-blue to-pastel-lavender text-black dark:text-white shadow-2xl shadow-fuchsia-300/20 border border-pastel-peach/30'
-                            : 'text-white hover:bg-gradient-to-r hover:from-fuchsia-800 hover:via-fuchsia-600 hover:to-indigo-800 hover:text-white hover:shadow-lg'
+                          ${
+                            isCurrentlyActive
+                              ? 'bg-gradient-to-r from-pastel-peach via-pastel-blue to-pastel-lavender text-black dark:text-white shadow-xl border border-pastel-peach/30'
+                              : 'text-white hover:bg-gradient-to-r hover:from-fuchsia-800 hover:via-fuchsia-600 hover:to-indigo-800 hover:text-white hover:shadow-lg'
                           }
-                          `}
+                        `}
                         style={{
                           overflow: 'hidden',
-                          borderRadius: '1.1rem'
+                          borderRadius: '1.5rem', // fuller rounding for highlight
                         }}
                       >
-                        <item.icon className={`w-5 h-5 flex-shrink-0 ${isCurrentlyActive ? 'text-black dark:text-white' : 'text-white'}`} />
+                        <item.icon
+                          className={`w-5 h-5 flex-shrink-0 ${
+                            isCurrentlyActive
+                              ? 'text-black dark:text-white'
+                              : 'text-white'
+                          }`}
+                        />
                         {state === 'expanded' && <span className="truncate">{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>
@@ -149,20 +158,30 @@ export function AppSidebar() {
                       <NavLink
                         to={item.url}
                         className={`
-                          flex items-center gap-2 px-2 py-3 mx-1 
-                          rounded-2xl font-orbitron transition-all duration-300 
+                          flex items-center gap-2 py-3 
+                          mx-2
+                          px-3 
+                          rounded-2xl
+                          font-orbitron transition-all duration-300 
                           text-base font-bold w-full
-                          ${isCurrentlyActive
-                            ? 'bg-gradient-to-r from-pastel-lavender via-pastel-mint to-pastel-peach text-black dark:text-white shadow-xl shadow-fuchsia-400/20 border border-pastel-lavender/30'
-                            : 'text-white hover:bg-gradient-to-r hover:from-fuchsia-700 hover:to-indigo-800 hover:text-white'
+                          ${
+                            isCurrentlyActive
+                              ? 'bg-gradient-to-r from-pastel-lavender via-pastel-mint to-pastel-peach text-black dark:text-white shadow-xl border border-pastel-lavender/30'
+                              : 'text-white hover:bg-gradient-to-r hover:from-fuchsia-700 hover:to-indigo-800 hover:text-white'
                           }
-                          `}
+                        `}
                         style={{
                           overflow: 'hidden',
-                          borderRadius: '1.1rem'
+                          borderRadius: '1.5rem',
                         }}
                       >
-                        <item.icon className={`w-5 h-5 flex-shrink-0 ${isCurrentlyActive ? 'text-black dark:text-white' : 'text-white'}`} />
+                        <item.icon
+                          className={`w-5 h-5 flex-shrink-0 ${
+                            isCurrentlyActive
+                              ? 'text-black dark:text-white'
+                              : 'text-white'
+                          }`}
+                        />
                         {state === 'expanded' && <span className="truncate">{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>
@@ -186,6 +205,7 @@ export function AppSidebar() {
             />
             {state === 'expanded' && user && (
               <div className="flex-1 min-w-0">
+                {/* Show display name (not email), kept very responsive */}
                 <p className="text-fuchsia-100 text-base font-orbitron truncate break-all">
                   {getDisplayName()}
                 </p>
@@ -197,4 +217,3 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
-
