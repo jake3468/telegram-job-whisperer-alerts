@@ -205,63 +205,65 @@ const ResumeSection = () => {
   };
 
   return (
-    <Card className="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700 border-2 border-blue-400 shadow-2xl shadow-blue-500/20">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-white font-inter flex items-center gap-2 text-base">
-          <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-            <FileText className="w-3 h-3 text-white" />
-          </div>
-          Resume
-        </CardTitle>
-        <CardDescription className="text-blue-100 font-inter text-sm">
-          Upload your resume (PDF only, max 5MB) for better job matching
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3 pt-0">
-        {resumeUrl ? (
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-white/10 rounded-lg border border-white/20 backdrop-blur-sm gap-3">
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-                <FileText className="w-4 h-4 text-white" />
+    <section className="rounded-3xl bg-gradient-to-br from-pastel-blue/90 via-pastel-lavender/80 to-pastel-peach/90 shadow-xl shadow-pastel-lavender/30 p-6 md:p-8">
+      <Card className="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700 border-2 border-blue-400 shadow-2xl shadow-blue-500/20">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-white font-inter flex items-center gap-2 text-base">
+            <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+              <FileText className="w-3 h-3 text-white" />
+            </div>
+            Resume
+          </CardTitle>
+          <CardDescription className="text-blue-100 font-inter text-sm">
+            Upload your resume (PDF only, max 5MB) for better job matching
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3 pt-0">
+          {resumeUrl ? (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-white/10 rounded-lg border border-white/20 backdrop-blur-sm gap-3">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <FileText className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-white font-inter font-medium text-sm truncate">resume.pdf</span>
               </div>
-              <span className="text-white font-inter font-medium text-sm truncate">resume.pdf</span>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleDeleteResume}
+                className="font-inter hover:bg-red-600 transition-colors text-xs px-3 py-1 h-8 flex-shrink-0"
+              >
+                <Trash2 className="w-3 h-3 mr-1" />
+                Delete
+              </Button>
             </div>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleDeleteResume}
-              className="font-inter hover:bg-red-600 transition-colors text-xs px-3 py-1 h-8 flex-shrink-0"
+          ) : (
+            <div 
+              className="border-2 border-dashed border-white/40 rounded-lg p-4 sm:p-6 text-center cursor-pointer hover:border-white/60 hover:bg-white/5 transition-all duration-300 backdrop-blur-sm"
+              onClick={triggerFileInput}
             >
-              <Trash2 className="w-3 h-3 mr-1" />
-              Delete
-            </Button>
-          </div>
-        ) : (
-          <div 
-            className="border-2 border-dashed border-white/40 rounded-lg p-4 sm:p-6 text-center cursor-pointer hover:border-white/60 hover:bg-white/5 transition-all duration-300 backdrop-blur-sm"
-            onClick={triggerFileInput}
-          >
-            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-              <Upload className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Upload className="w-6 h-6 text-white" />
+              </div>
+              <p className="text-white font-inter mb-3 font-medium text-sm">
+                Click to upload or drag and drop your resume
+              </p>
+              <Button disabled={uploading} className="font-inter bg-white text-blue-600 hover:bg-gray-100 font-medium text-xs px-3 py-1 h-8">
+                {uploading ? 'Uploading...' : 'Upload Resume'}
+              </Button>
+              <input
+                id="resume-upload"
+                type="file"
+                accept=".pdf"
+                onChange={handleFileUpload}
+                className="hidden"
+                disabled={uploading}
+              />
             </div>
-            <p className="text-white font-inter mb-3 font-medium text-sm">
-              Click to upload or drag and drop your resume
-            </p>
-            <Button disabled={uploading} className="font-inter bg-white text-blue-600 hover:bg-gray-100 font-medium text-xs px-3 py-1 h-8">
-              {uploading ? 'Uploading...' : 'Upload Resume'}
-            </Button>
-            <input
-              id="resume-upload"
-              type="file"
-              accept=".pdf"
-              onChange={handleFileUpload}
-              className="hidden"
-              disabled={uploading}
-            />
-          </div>
-        )}
-      </CardContent>
-    </Card>
+          )}
+        </CardContent>
+      </Card>
+    </section>
   );
 };
 

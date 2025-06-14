@@ -27,7 +27,7 @@ interface JobAlertsSectionProps {
   userTimezone: string;
 }
 
-const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
+const JobAlertsSection = ({ userTimezone }: { userTimezone: string }) => {
   const { user } = useUser();
   const { toast } = useToast();
   const [alerts, setAlerts] = useState<JobAlert[]>([]);
@@ -177,7 +177,7 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
     );
   }
   return (
-    <div className="rounded-3xl bg-gradient-to-br from-orange-400/70 via-orange-700/50 to-fuchsia-700/70 border-2 border-orange-400/60 shadow-2xl shadow-orange-400/5 backdrop-blur-xl px-1 sm:px-3 pt-2 pb-6 mt-3">
+    <section className="rounded-3xl bg-gradient-to-br from-pastel-lavender/90 via-pastel-peach/90 to-pastel-blue/90 shadow-xl shadow-pastel-lavender/30 p-6 md:p-8">
       <div className="pt-4 px-2 sm:px-6">
         {/* Bot Status, Add Alert, List */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
@@ -228,7 +228,7 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
           )}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

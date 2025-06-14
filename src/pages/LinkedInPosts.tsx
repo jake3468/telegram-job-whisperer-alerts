@@ -201,14 +201,14 @@ const LinkedInPosts = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-sky-900 via-zinc-900 to-fuchsia-900 pt-0 flex flex-col">
-        <div className="container mx-auto px-4 py-8 bg-gradient-to-br from-black/90 via-zinc-900/80 to-fuchsia-950/60 rounded-3xl shadow-2xl shadow-fuchsia-800/10 backdrop-blur-lg mt-4 mb-8 max-w-4xl w-full">
+      <div className="min-h-screen bg-gradient-to-br from-pastel-blue via-pastel-peach to-pastel-mint pt-0 flex flex-col">
+        <div className="container mx-auto px-4 py-8 bg-gradient-to-br from-black/90 via-pastel-peach/15 to-pastel-blue/10 rounded-3xl shadow-2xl shadow-fuchsia-800/10 backdrop-blur-lg mt-4 mb-8 max-w-4xl w-full">
           {/* Header Section */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl bg-gradient-to-r from-sky-300 via-fuchsia-400 to-indigo-200 bg-clip-text text-transparent mb-4 font-orbitron font-extrabold font-inter md:text-4xl drop-shadow">
+            <h1 className="text-4xl bg-gradient-to-r from-pastel-blue via-fuchsia-400 to-pastel-mint bg-clip-text text-transparent mb-4 font-orbitron font-extrabold font-inter md:text-4xl drop-shadow">
               LinkedIn <span className="italic">Posts</span>
             </h1>
-            <p className="text-fuchsia-200 max-w-2xl mx-auto font-inter text-base font-light shadow-sm">
+            <p className="text-fuchsia-200 max-w-2xl mx-auto font-inter text-lg font-light shadow-sm">
               Create engaging LinkedIn posts that showcase your expertise and connect with your professional network
             </p>
           </div>

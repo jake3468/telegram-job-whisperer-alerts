@@ -1,51 +1,48 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
-import { AlertCircle, FileText, Sparkles, Loader2, CheckCircle, Trash2, Building, Briefcase, Copy, History } from 'lucide-react';
 import AuthHeader from '@/components/AuthHeader';
-import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
-import { supabase } from '@/integrations/supabase/client';
 import { Layout } from '@/components/Layout';
-import JobAnalysisHistory from '@/components/JobAnalysisHistory';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
+import { FileText, History, Copy, Sparkles } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
+import HistoryModal from '@/components/HistoryModal';
+import LoadingMessages from '@/components/LoadingMessages';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const CoverLetter = () => {
-  const {
-    user,
-    isLoaded
-  } = useUser();
+  const { user, isLoaded } = useUser();
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
-  const {
-    hasResume,
-    hasBio,
-    isComplete,
-    loading
-  } = useUserCompletionStatus();
+  const { toast } = useToast();
+  const { userProfile } = useUserProfile();
+  const { isComplete } = useUserCompletionStatus();
+
   const [formData, setFormData] = useState({
-    companyName: '',
-    jobTitle: '',
-    jobDescription: ''
+    job_title: '',
+    company_name: '',
+    job_description: '',
+    specific_skills: '',
+    tone: 'professional'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [coverLetterId, setCoverLetterId] = useState<string | null>(null);
+  const [result, setResult] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [coverLetterResult, setCoverLetterResult] = useState<string | null>(null);
-  const [loadingMessage, setLoadingMessage] = useState('');
-  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const loadingMessages = [
-    "✍️ Crafting your personalized cover letter...",
-    "✨ Adding a touch of magic to your application...",
-    "🚀 Tailoring your skills to the job description...",
-    "🎯 Highlighting your unique qualifications..."
+  const [currentCoverLetterId, setCurrentCoverLetterId] = useState<string | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
+
+  const toneOptions = [
+    { value: 'professional', label: 'Professional & Formal' },
+    { value: 'conversational', label: 'Conversational & Friendly' },
+    { value: 'enthusiastic', label: 'Enthusiastic & Passionate' },
+    { value: 'concise', label: 'Concise & Direct' }
   ];
 
   useEffect(() => {
@@ -53,232 +50,124 @@ const CoverLetter = () => {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
+
+  // Real-time subscription for cover letter updates
   useEffect(() => {
-    if (!isGenerating) return;
-    let messageIndex = 0;
-    setLoadingMessage(loadingMessages[0]);
-    const messageInterval = setInterval(() => {
-      messageIndex = (messageIndex + 1) % loadingMessages.length;
-      setLoadingMessage(loadingMessages[messageIndex]);
-    }, 3000);
-    return () => clearInterval(messageInterval);
-  }, [isGenerating]);
-  useEffect(() => {
-    if (!coverLetterId || !isGenerating) return;
-    const pollForResults = async () => {
-      try {
-        const {
-          data,
-          error
-        } = await supabase.from('job_cover_letters').select('cover_letter').eq('id', coverLetterId).single();
-        if (error) {
-          console.error('Error polling for results:', error);
-          return;
-        }
-        if (data?.cover_letter) {
-          setCoverLetterResult(data.cover_letter);
-          setIsGenerating(false);
-          setIsSuccess(false);
-          if (pollingIntervalRef.current) {
-            clearInterval(pollingIntervalRef.current);
-            pollingIntervalRef.current = null;
+    if (!currentCoverLetterId) return;
+
+    const channel = supabase
+      .channel('cover-letter-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'job_cover_letters',
+          filter: `id=eq.${currentCoverLetterId}`
+        },
+        (payload) => {
+          console.log('Cover letter updated:', payload);
+          if (payload.new.cover_letter) {
+            setResult(payload.new.cover_letter);
+            setIsGenerating(false);
+            toast({
+              title: "Cover Letter Generated!",
+              description: "Your cover letter has been created successfully."
+            });
           }
-          toast({
-            title: "Cover Letter Generated!",
-            description: "Your personalized cover letter is ready."
-          });
         }
-      } catch (err) {
-        console.error('Polling error:', err);
-      }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
     };
-    pollingIntervalRef.current = setInterval(pollForResults, 3000);
-    const timeout = setTimeout(() => {
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-        pollingIntervalRef.current = null;
-      }
-      setIsGenerating(false);
-      setError('Cover letter generation timed out. Please try again.');
+  }, [currentCoverLetterId, toast]);
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!user || !userProfile) {
       toast({
-        title: "Generation Timeout",
-        description: "The cover letter generation took too long. Please try submitting again.",
+        title: "Authentication Required",
+        description: "Please sign in to create a cover letter.",
         variant: "destructive"
       });
-    }, 300000);
-    return () => {
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-      }
-      clearTimeout(timeout);
-    };
-  }, [coverLetterId, isGenerating, toast]);
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-  const handleClearData = useCallback(() => {
-    setFormData({
-      companyName: '',
-      jobTitle: '',
-      jobDescription: ''
-    });
-    setCoverLetterResult(null);
-    setCoverLetterId(null);
-    setIsSuccess(false);
-    setError(null);
-    setIsGenerating(false);
-    setIsSubmitting(false);
-    toast({
-      title: "Data Cleared",
-      description: "All form data and results have been cleared."
-    });
-  }, [toast]);
-  const handleSubmit = useCallback(async () => {
-    console.log('🚀 Cover Letter Submit Button Clicked');
+      return;
+    }
 
-    // Basic validation
     if (!isComplete) {
       toast({
-        title: "Complete your profile first",
-        description: "Please upload your resume and add your bio in the Home page before using Cover Letter generator.",
+        title: "Profile Incomplete",
+        description: "Please complete your profile before creating a cover letter.",
         variant: "destructive"
       });
       return;
     }
-    if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
+
+    if (!formData.job_title.trim() || !formData.company_name.trim() || !formData.job_description.trim()) {
       toast({
-        title: "Missing information",
-        description: "Please fill in all fields to generate your cover letter.",
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
         variant: "destructive"
       });
       return;
     }
-    if (isSubmitting || isGenerating) {
-      toast({
-        title: "Please wait",
-        description: "Your cover letter is already being generated.",
-        variant: "destructive"
-      });
-      return;
-    }
+
+    setIsSubmitting(true);
+    setIsGenerating(true);
+    setResult('');
+
     try {
-      setIsSubmitting(true);
-      setError(null);
-      setIsSuccess(false);
-      setCoverLetterResult(null);
-      console.log('✅ Starting cover letter submission process');
+      // Insert into database
+      const { data, error } = await supabase
+        .from('job_cover_letters')
+        .insert({
+          user_id: userProfile.id,
+          job_title: formData.job_title,
+          company_name: formData.company_name,
+          job_description: formData.job_description,
+          specific_skills: formData.specific_skills || null,
+          tone: formData.tone
+        })
+        .select()
+        .single();
 
-      // Get the user's database ID from users table
-      const {
-        data: userData,
-        error: userError
-      } = await supabase.from('users').select('id').eq('clerk_id', user?.id).single();
-      if (userError || !userData) {
-        console.error('❌ User not found:', userError);
-        throw new Error('User not found in database');
-      }
-      console.log('✅ Found user in users table:', userData.id);
-
-      // Get the user_profile ID - this is the correct foreign key for job_cover_letters
-      const {
-        data: profileData,
-        error: profileError
-      } = await supabase.from('user_profile').select('id').eq('user_id', userData.id).single();
-      if (profileError || !profileData) {
-        console.error('❌ User profile not found:', profileError);
-        throw new Error('User profile not found. Please complete your profile first.');
-      }
-      console.log('✅ Found user profile:', profileData.id);
-
-      // Check for existing cover letter first
-      const {
-        data: existingCoverLetter,
-        error: checkError
-      } = await supabase.from('job_cover_letters').select('id, cover_letter').eq('user_id', profileData.id).eq('company_name', formData.companyName).eq('job_title', formData.jobTitle).eq('job_description', formData.jobDescription).not('cover_letter', 'is', null).order('created_at', {
-        ascending: false
-      }).limit(1);
-      if (!checkError && existingCoverLetter && existingCoverLetter.length > 0) {
-        const existing = existingCoverLetter[0];
-        console.log('✅ Found existing cover letter:', existing.id);
-        setCoverLetterResult(existing.cover_letter);
-        setCoverLetterId(existing.id);
-        setIsSubmitting(false);
-        toast({
-          title: "Previous Cover Letter Found",
-          description: "Using your previous cover letter for this job posting."
-        });
-        return;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
       }
 
-      // Insert new cover letter record with ONLY the required fields
-      const insertData = {
-        user_id: profileData.id,
-        company_name: formData.companyName,
-        job_title: formData.jobTitle,
-        job_description: formData.jobDescription
-      };
-      console.log('📝 Inserting cover letter data:', insertData);
-      const {
-        data: insertedData,
-        error: insertError
-      } = await supabase.from('job_cover_letters').insert(insertData).select('id').single();
-      if (insertError) {
-        console.error('❌ INSERT ERROR:', insertError);
-        throw new Error(`Database insert failed: ${insertError.message}`);
-      }
-      if (insertedData?.id) {
-        console.log('✅ Cover letter record inserted:', insertedData.id);
-        setCoverLetterId(insertedData.id);
-        setIsSuccess(true);
-        setIsGenerating(true);
-        toast({
-          title: "Cover Letter Generation Started!",
-          description: "Your personalized cover letter is being created. Please wait for the results."
-        });
-      }
-    } catch (err) {
-      console.error('❌ SUBMISSION ERROR:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to generate cover letter';
-      setError(errorMessage);
+      console.log('Cover letter created successfully:', data);
+      setCurrentCoverLetterId(data.id);
+
       toast({
-        title: "Generation Failed",
-        description: "There was an error generating your cover letter. Please try again.",
+        title: "Request Submitted!",
+        description: "Your cover letter is being generated. Please wait..."
+      });
+    } catch (err: any) {
+      console.error('Error creating cover letter:', err);
+      setIsGenerating(false);
+      
+      toast({
+        title: "Error",
+        description: "Failed to create cover letter. Please try again.",
         variant: "destructive"
       });
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, isComplete, user, toast, isSubmitting, isGenerating]);
+  };
 
-  // Listen for history data events
-  useEffect(() => {
-    const handleHistoryData = (event: any) => {
-      const {
-        companyName,
-        jobTitle,
-        jobDescription,
-        result,
-        type
-      } = event.detail;
-      if (type === 'cover_letter') {
-        setFormData({
-          companyName,
-          jobTitle,
-          jobDescription
-        });
-        setCoverLetterResult(result);
-      }
-    };
-    window.addEventListener('useHistoryData', handleHistoryData);
-    return () => window.removeEventListener('useHistoryData', handleHistoryData);
-  }, []);
   const handleCopyResult = async () => {
-    if (!coverLetterResult) return;
+    if (!result) return;
+
     try {
-      await navigator.clipboard.writeText(coverLetterResult);
+      await navigator.clipboard.writeText(result);
       toast({
         title: "Copied!",
         description: "Cover letter copied to clipboard successfully."
@@ -292,273 +181,230 @@ const CoverLetter = () => {
       });
     }
   };
-  const isFormValid = formData.companyName && formData.jobTitle && formData.jobDescription;
-  const hasAnyData = isFormValid || coverLetterResult;
-  const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating;
-  
+
+  const resetForm = () => {
+    setFormData({
+      job_title: '',
+      company_name: '',
+      job_description: '',
+      specific_skills: '',
+      tone: 'professional'
+    });
+    setResult('');
+    setIsGenerating(false);
+    setCurrentCoverLetterId(null);
+  };
+
   if (!isLoaded || !user) {
-    return <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white text-xs">Loading...</div>
-      </div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pastel-lavender via-pastel-peach to-pastel-mint flex items-center justify-center">
+        <div className="text-fuchsia-900 text-xs">Loading...</div>
+      </div>
+    );
   }
-  
-  return <Layout>
-      <div className="min-h-screen bg-black">
-        <AuthHeader />
-        
-        <div className="max-w-4xl mx-auto px-3 py-8 sm:px-4 sm:py-12">
+
+  return (
+    <Layout>
+      <div className="min-h-screen w-full bg-gradient-to-br from-pastel-mint/70 via-pastel-peach/80 to-pastel-blue/50 flex flex-col">
+        <div className="max-w-4xl mx-auto w-full px-3 py-8 sm:px-6 sm:py-12 backdrop-blur-xl rounded-3xl bg-black/85 shadow-2xl shadow-fuchsia-200/20 mt-4">
           <div className="text-center mb-8">
-            <h1 className="sm:text-xl font-medium text-white mb-2 font-inter text-3xl md:text-3xl">
-              <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent text-4xl font-medium">Cover Letter</span>
+            <h1 className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-pastel-blue via-fuchsia-400 to-pastel-peach bg-clip-text text-transparent mb-2 drop-shadow">
+              AI <span className="italic">Cover Letter</span> Generator
             </h1>
-            <p className="text-sm text-gray-300 font-inter font-light">
-              Generate a personalized cover letter to impress recruiters
+            <p className="text-lg text-fuchsia-100 font-inter font-light">
+              Instantly create stunning <span className="italic text-pastel-mint">Cover Letters</span> for every job
             </p>
           </div>
-
-          <div className="space-y-6">
-            {/* Profile Completion Status */}
-            {loading ? <Card className="bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 border-2 border-gray-400 shadow-2xl shadow-gray-500/20">
-                <CardContent className="p-4">
-                  <div className="text-white text-sm sm:text-base">Checking your profile...</div>
-                </CardContent>
-              </Card> : !isComplete && <Card className="bg-gradient-to-br from-orange-600 via-red-600 to-pink-600 border-2 border-orange-400 shadow-2xl shadow-orange-500/20">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-white font-inter flex items-center gap-2 text-sm sm:text-base">
-                    <AlertCircle className="w-4 h-4 sm:w-4 sm:h-4" />
-                    Complete Your Profile
-                  </CardTitle>
-                  <CardDescription className="text-orange-100 font-inter text-xs sm:text-sm">
-                    You need to complete your profile before generating a cover letter
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3 pt-0">
-                  <div className="space-y-2">
-                    <div className={`flex items-center gap-2 ${hasResume ? 'text-green-200' : 'text-red-200'}`}>
-                      <div className={`w-2 h-2 rounded-full ${hasResume ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                      <span className="font-inter text-xs">
-                        {hasResume ? '✓ Resume uploaded' : '✗ Resume not uploaded'}
-                      </span>
-                    </div>
-                    <div className={`flex items-center gap-2 ${hasBio ? 'text-green-200' : 'text-red-200'}`}>
-                      <div className={`w-2 h-2 rounded-full ${hasBio ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                      <span className="font-inter text-xs">
-                        {hasBio ? '✓ Bio completed' : '✗ Bio not completed'}
-                      </span>
-                    </div>
-                  </div>
-                  <Button onClick={() => navigate('/dashboard')} className="font-inter bg-white text-orange-600 hover:bg-gray-100 font-medium text-xs px-4 py-2">
-                    Go to Home Page
-                  </Button>
-                </CardContent>
-              </Card>}
-
-            {/* Cover Letter Input Form */}
-            <Card className="bg-gradient-to-br from-pink-600 via-rose-600 to-purple-600 border-2 border-pink-400 shadow-2xl shadow-pink-500/20">
-              <CardHeader className="pb-3">
+          <div className="space-y-8">
+            {/* Input Form */}
+            <Card className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 border-white/20 backdrop-blur-sm mb-8">
+              <CardHeader className="pb-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-white font-inter flex items-center gap-2 text-base">
-                      <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-                        <FileText className="w-4 h-4 text-white" />
-                      </div>
-                      Cover Letter Info
+                    <CardTitle className="text-white font-inter text-xl flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-slate-400" />
+                      Create Your Cover Letter
                     </CardTitle>
-                    <CardDescription className="text-pink-100 font-inter text-sm">
-                      Enter job details to generate a personalized cover letter
+                    <CardDescription className="text-gray-300 font-inter">
+                      Fill in the details to generate your personalized cover letter
                     </CardDescription>
                   </div>
-                  <JobAnalysisHistory 
-                    type="cover_letter" 
-                    gradientColors="bg-gradient-to-br from-pink-600 via-rose-600 to-purple-600" 
-                    borderColors="border-2 border-pink-400"
-                  />
-                </div>
-                {hasAnyData && (
                   <Button 
-                    onClick={handleClearData} 
+                    onClick={() => setShowHistory(true)} 
+                    variant="outline" 
                     size="sm" 
-                    className="mt-2 bg-white/20 hover:bg-white/30 text-white border-white/20 text-xs px-2 py-1 self-start"
+                    className="bg-white/10 border-white/20 text-white hover:bg-white/20"
                   >
-                    <Trash2 className="w-3 h-3 mr-1" />
-                    Clear All
+                    <History className="w-4 h-4 mr-2" />
+                    History
                   </Button>
-                )}
-              </CardHeader>
-              <CardContent className="space-y-4 pt-0">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-white font-inter font-medium mb-2 text-sm">
-                      🏢 Company Name
-                    </label>
-                    <div className="relative">
-                      <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 w-4 h-4" />
-                      <Input value={formData.companyName} onChange={e => handleInputChange('companyName', e.target.value)} placeholder="Enter the company name" disabled={isSubmitting || isGenerating} className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 placeholder:text-sm bg-gray-900" />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-white font-inter font-medium mb-2 text-sm">
-                      💼 Job Title
-                    </label>
-                    <div className="relative">
-                      <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 w-4 h-4" />
-                      <Input value={formData.jobTitle} onChange={e => handleInputChange('jobTitle', e.target.value)} placeholder="Enter the job title" disabled={isSubmitting || isGenerating} className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 placeholder:text-sm bg-gray-900" />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-white font-inter font-medium mb-2 text-sm">
-                      📝 Job Description
-                    </label>
-                    <div className="relative">
-                      <FileText className="absolute left-3 top-3 text-white/70 w-4 h-4" />
-                      <Textarea value={formData.jobDescription} onChange={e => handleInputChange('jobDescription', e.target.value)} placeholder="Paste the complete job description here..." rows={4} disabled={isSubmitting || isGenerating} className="pl-10 text-sm border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 resize-none placeholder:text-sm bg-gray-900" />
-                    </div>
-                  </div>
                 </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Job Title */}
+                  <div className="space-y-2">
+                    <Label htmlFor="job_title" className="text-white font-medium text-base">
+                      Job Title *
+                    </Label>
+                    <Input 
+                      id="job_title"
+                      placeholder="e.g. Software Engineer, Marketing Manager"
+                      value={formData.job_title}
+                      onChange={(e) => handleInputChange('job_title', e.target.value)}
+                      required
+                      className="text-base bg-gray-900"
+                    />
+                  </div>
 
-                <div className="space-y-3">
-                  <div className="flex gap-3">
+                  {/* Company Name */}
+                  <div className="space-y-2">
+                    <Label htmlFor="company_name" className="text-white font-medium text-base">
+                      Company Name *
+                    </Label>
+                    <Input 
+                      id="company_name"
+                      placeholder="e.g. Google, Microsoft"
+                      value={formData.company_name}
+                      onChange={(e) => handleInputChange('company_name', e.target.value)}
+                      required
+                      className="text-base bg-gray-900"
+                    />
+                  </div>
+
+                  {/* Job Description */}
+                  <div className="space-y-2">
+                    <Label htmlFor="job_description" className="text-white font-medium text-base">
+                      Job Description *
+                    </Label>
+                    <Label htmlFor="job_description" className="text-gray-300 font-normal text-sm block">
+                      Paste the job description or key requirements
+                    </Label>
+                    <Textarea 
+                      id="job_description"
+                      placeholder="Paste the job description here..."
+                      value={formData.job_description}
+                      onChange={(e) => handleInputChange('job_description', e.target.value)}
+                      required
+                      className="min-h-[150px] resize-none text-base bg-gray-900"
+                    />
+                  </div>
+
+                  {/* Specific Skills */}
+                  <div className="space-y-2">
+                    <Label htmlFor="specific_skills" className="text-white font-medium text-base">
+                      Specific Skills or Experiences to Highlight
+                    </Label>
+                    <Textarea 
+                      id="specific_skills"
+                      placeholder="e.g. Project management, React.js, Team leadership"
+                      value={formData.specific_skills}
+                      onChange={(e) => handleInputChange('specific_skills', e.target.value)}
+                      className="min-h-[80px] resize-none text-base bg-gray-900"
+                    />
+                  </div>
+
+                  {/* Tone Selection */}
+                  <div className="space-y-2">
+                    <Label htmlFor="tone" className="text-white font-medium text-base">
+                      Tone
+                    </Label>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      {toneOptions.map((option) => (
+                        <Button
+                          key={option.value}
+                          type="button"
+                          variant={formData.tone === option.value ? "default" : "outline"}
+                          onClick={() => handleInputChange('tone', option.value)}
+                          className={`h-auto py-3 ${
+                            formData.tone === option.value 
+                              ? "bg-gradient-to-r from-pastel-blue to-pastel-mint border-pastel-blue/50" 
+                              : "bg-white/10 border-white/20 hover:bg-white/20"
+                          }`}
+                        >
+                          {option.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 pt-4">
                     <Button 
-                      onClick={handleSubmit} 
-                      disabled={isButtonDisabled} 
-                      className={`flex-1 font-inter font-medium py-3 px-4 text-sm ${!isButtonDisabled ? 'bg-white text-pink-600 hover:bg-gray-100' : 'bg-white/50 text-gray-800 border-2 border-white/70 cursor-not-allowed hover:bg-white/50'}`}
+                      type="submit" 
+                      disabled={isSubmitting || !formData.job_title.trim() || !formData.company_name.trim() || !formData.job_description.trim() || isGenerating} 
+                      className="flex-1 bg-gradient-to-r from-pastel-blue to-pastel-mint hover:from-pastel-blue/80 hover:to-pastel-mint/80 text-black font-medium text-base h-12"
                     >
-                      <div className="flex items-center justify-center gap-2 w-full">
-                        {isSubmitting ? (
-                          <>
-                            <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
-                            <span className="text-center text-sm">Processing...</span>
-                          </>
-                        ) : isGenerating ? (
-                          <>
-                            <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin" />
-                            <span className="text-center text-sm">Generating...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles className="w-4 h-4 flex-shrink-0" />
-                            <span className="text-center text-sm font-bold">
-                              Generate Cover Letter
-                            </span>
-                          </>
-                        )}
-                      </div>
+                      {isSubmitting ? 'Submitting...' : 'Generate Cover Letter'}
                     </Button>
-
+                    
                     <Button 
                       type="button" 
-                      onClick={handleClearData} 
+                      onClick={resetForm} 
                       variant="outline" 
-                      className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-sm h-12 px-6"
+                      className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-base h-12 px-6"
                     >
                       Reset
                     </Button>
                   </div>
-
-                  {(!isComplete || !isFormValid) && !isSubmitting && !isGenerating && <p className="text-pink-200 text-sm font-inter text-center">
-                      {!isComplete ? 'Complete your profile first to use this feature' : 'Fill in all fields to generate your cover letter'}
-                    </p>}
-                </div>
+                </form>
               </CardContent>
             </Card>
 
-            {/* Generating Status Display */}
-            {isGenerating && <Card className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 border-2 border-indigo-400 shadow-2xl shadow-indigo-500/20">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-white font-inter flex items-center gap-2 text-sm">
-                    <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-                      <Loader2 className="w-3 h-3 text-white animate-spin" />
-                    </div>
-                    Generating Cover Letter...
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <p className="text-indigo-100 font-inter text-center text-xs break-words">
-                    {loadingMessage}
-                  </p>
-                  <div className="mt-3 text-center">
-                    <p className="text-indigo-200 text-xs font-inter">
-                      This usually takes 1-2 minutes. Please don't close this page.
-                    </p>
-                  </div>
+            {/* Loading State */}
+            {isGenerating && !result && (
+              <Card className="bg-white/5 border-white/20 backdrop-blur-sm mb-8">
+                <CardContent className="py-8">
+                  <LoadingMessages />
                 </CardContent>
-              </Card>}
+              </Card>
+            )}
 
-            {/* Cover Letter Results Display */}
-            {coverLetterResult && <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600 border-2 border-slate-400 shadow-2xl shadow-slate-500/20 w-full">
-                <CardHeader className="pb-3 bg-emerald-600">
-                  <CardTitle className="font-inter flex items-center gap-2 text-sm text-gray-950 justify-between">
-                    <div className="flex items-center gap-2 bg-emerald-600">
-                      <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gray-950">
-                        <FileText className="w-3 h-3 text-white" />
-                      </div>
-                      Your Cover Letter
-                    </div>
-                    <Button onClick={handleCopyResult} size="sm" className="bg-gray-950 hover:bg-gray-800 text-white flex items-center gap-1">
-                      <Copy className="w-3 h-3" />
-                      <span className="hidden sm:inline">Copy</span>
+            {/* Result Display */}
+            {result && (
+              <Card className="bg-white/5 border-white/20 backdrop-blur-sm">
+                <CardHeader className="pb-6">
+                  <CardTitle className="text-white font-inter text-xl flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-slate-400" />
+                    Your Cover Letter
+                  </CardTitle>
+                  <CardDescription className="text-gray-300 font-inter">
+                    Your generated cover letter for {formData.job_title} at {formData.company_name}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <Card className="bg-white/10 border-white/30 p-6">
+                      <ScrollArea className="h-[400px] w-full pr-4">
+                        <div className="whitespace-pre-wrap font-inter text-white">
+                          {result}
+                        </div>
+                      </ScrollArea>
+                    </Card>
+                    
+                    <Button 
+                      onClick={handleCopyResult} 
+                      className="w-full bg-gradient-to-r from-pastel-mint to-pastel-blue hover:from-pastel-mint/80 hover:to-pastel-blue/80 text-black flex items-center gap-2 text-base h-12"
+                    >
+                      <Copy className="w-4 h-4" />
+                      Copy Cover Letter
                     </Button>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0 p-4 w-full bg-emerald-600">
-                  <div className="bg-white rounded-lg p-4 border-2 border-blue-200 w-full">
-                    <div className="text-slate-800 font-inter leading-relaxed font-medium w-full text-sm" style={{
-                  wordWrap: 'break-word',
-                  overflowWrap: 'break-word',
-                  wordBreak: 'break-word',
-                  whiteSpace: 'pre-wrap',
-                  maxWidth: '100%',
-                  hyphens: 'auto',
-                  lineHeight: '1.6',
-                  fontFamily: 'serif'
-                }}>
-                      {coverLetterResult}
-                    </div>
                   </div>
                 </CardContent>
-              </Card>}
-
-            {/* Success Display */}
-            {isSuccess && !isGenerating && !coverLetterResult && <Card className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 border-2 border-green-400 shadow-2xl shadow-green-500/20">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-white font-inter flex items-center gap-2 text-sm">
-                    <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-                      <CheckCircle className="w-3 h-3 text-white" />
-                    </div>
-                    Cover Letter Submitted Successfully!
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <p className="text-green-100 font-inter text-xs break-words">
-                    Your cover letter has been submitted and is being generated. 
-                    The result will appear below once completed.
-                  </p>
-                </CardContent>
-              </Card>}
-
-            {/* Error Display */}
-            {error && <Card className="bg-gradient-to-br from-red-600 via-red-700 to-red-800 border-2 border-red-400 shadow-2xl shadow-red-500/20">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-white font-inter flex items-center gap-2 text-sm">
-                    <AlertCircle className="w-4 h-4" />
-                    Generation Error
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <p className="text-red-100 font-inter text-xs break-words">{error}</p>
-                  <Button onClick={() => {
-                setError(null);
-              }} className="mt-3 bg-white text-red-600 hover:bg-gray-100 font-inter font-medium text-xs px-4 py-2" disabled={isSubmitting || isGenerating || !isFormValid}>
-                    Try Again
-                  </Button>
-                </CardContent>
-              </Card>}
+              </Card>
+            )}
           </div>
         </div>
+
+        {/* History Modal */}
+        <HistoryModal 
+          type="cover_letters" 
+          isOpen={showHistory} 
+          onClose={() => setShowHistory(false)} 
+          gradientColors="from-pastel-mint to-pastel-blue" 
+        />
       </div>
-    </Layout>;
+    </Layout>
+  );
 };
 
 export default CoverLetter;
