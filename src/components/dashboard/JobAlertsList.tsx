@@ -45,7 +45,7 @@ const JobAlertsList = ({
   };
   return <div className="space-y-3">
       {alerts.map(alert => <Card key={alert.id} className="bg-gray-800 border-gray-700">
-          <CardContent className="p-4 bg-red-600">
+          <CardContent className="p-4 bg-sky-700">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3">
