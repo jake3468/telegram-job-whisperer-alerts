@@ -192,7 +192,7 @@ const CoverLetter = () => {
         <div className="max-w-4xl mx-auto w-full px-3 py-8 sm:px-6 sm:py-12 rounded-3xl mt-4">
           {/* Gradient Heading */}
           <div
-            className="mb-8 py-8 px-6 text-center"
+            className="mb-8 px-6 text-center"
           >
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-pink-400 via-fuchsia-400 to-fuchsia-600 bg-clip-text text-transparent mb-2 drop-shadow font-orbitron animate-fade-in">
               Cover Letter
