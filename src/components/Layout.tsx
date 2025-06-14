@@ -1,3 +1,4 @@
+
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Menu } from 'lucide-react';
@@ -28,10 +29,11 @@ export function Layout({ children }: LayoutProps) {
           </div>
         </div>
       </header>
+      {/* The following div ensures no header overlap on mobile by ALWAYS adding pt-20 when header is fixed */}
       <div className={`
         min-h-screen flex w-full 
         bg-gradient-to-br from-[#0e1122] via-[#181526] to-[#21203a]
-        lg:pt-0 pt-20
+        ${'lg:pt-0 pt-20'}  /* Force padding top on mobile for all pages */
       `}
         style={{
           margin: 0,
