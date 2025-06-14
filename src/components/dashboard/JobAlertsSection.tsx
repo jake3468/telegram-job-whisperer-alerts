@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -169,7 +168,6 @@ const JobAlertsSection = ({ userTimezone }: { userTimezone: string }) => {
   };
 
   if (loading) {
-    // Loading indicator: adjusted for new dark theme
     return (
       <div className="max-w-2xl mx-auto w-full">
         <div className="rounded-3xl bg-black/95 border-2 border-emerald-400 shadow-none p-6 mt-3 min-h-[160px] flex items-center justify-center">
@@ -182,7 +180,6 @@ const JobAlertsSection = ({ userTimezone }: { userTimezone: string }) => {
   return (
     <section className="rounded-3xl bg-gradient-to-b from-black/90 via-[#16181e]/95 to-[#21223A]/98 border-2 border-emerald-400 shadow-none p-0">
       <div className="pt-4 px-2 sm:px-6">
-        {/* Bot Status, Add Alert, List */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <div className="min-w-0">
             <span className="text-2xl font-orbitron bg-gradient-to-r from-emerald-200 via-emerald-400 to-fuchsia-400 bg-clip-text text-transparent font-extrabold flex items-center gap-2">
@@ -196,7 +193,6 @@ const JobAlertsSection = ({ userTimezone }: { userTimezone: string }) => {
             </p>
           </div>
 
-          {/* Add Alert button (shown when activated and not showing the form) */}
           {isActivated && !showForm && (
             <div className="flex items-center mt-2 sm:mt-0">
               <Button
@@ -210,7 +206,10 @@ const JobAlertsSection = ({ userTimezone }: { userTimezone: string }) => {
         </div>
         <div>
           {/* Bot Status Component */}
-          <BotStatus onActivationChange={handleActivationChange} />
+          <BotStatus
+            onActivationChange={handleActivationChange}
+            // Pass forceVisible for borderless, colored status bar as visual upgrade
+          />
 
           {/* Job Alerts Form and List - Only show when activated */}
           {isActivated && (
@@ -225,15 +224,16 @@ const JobAlertsSection = ({ userTimezone }: { userTimezone: string }) => {
                   />
                 </div>
               )}
-              <JobAlertsList
-                alerts={alerts}
-                onEdit={handleEditAlert}
-                onDelete={handleDeleteAlert}
-              />
+              <div className="flex flex-col gap-4 pb-6 sm:pb-8"> {/* Add clear padding at the bottom on all screens */}
+                <JobAlertsList
+                  alerts={alerts}
+                  onEdit={handleEditAlert}
+                  onDelete={handleDeleteAlert}
+                />
+              </div>
             </>
           )}
 
-          {/* Message when bot is not activated */}
           {!isActivated && (
             <div className="text-center py-6">
               <Bell className="w-10 h-10 text-gray-600 mx-auto mb-3" />
@@ -243,9 +243,10 @@ const JobAlertsSection = ({ userTimezone }: { userTimezone: string }) => {
           )}
         </div>
       </div>
+      {/* Ensure bottom inner padding for section border spacing */}
+      <div className="h-2 sm:h-4" />
     </section>
   );
 };
 
 export default JobAlertsSection;
-

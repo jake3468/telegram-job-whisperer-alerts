@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -48,7 +47,7 @@ const BotStatus = ({ onActivationChange }: BotStatusProps) => {
 
   if (loading) {
     return (
-      <div className="mb-6 p-4 bg-white/10 rounded-lg">
+      <div className="mb-6 p-4 bg-black/90 rounded-xl">
         <div className="text-white text-sm">Loading bot status...</div>
       </div>
     );
@@ -61,11 +60,11 @@ const BotStatus = ({ onActivationChange }: BotStatusProps) => {
   return (
     <div className="mb-6">
       {/* Bot ID Display */}
-      <div className="bg-white/10 rounded-lg p-4 mb-4">
-        <div className="flex items-center justify-between mb-3">
+      <div className="bg-neutral-900 rounded-xl p-4 mb-4 border border-emerald-400 transition-all">
+        <div className="flex items-center justify-between mb-2">
           <span className="text-white font-inter text-sm">Bot ID:</span>
           <div className="flex items-center gap-2">
-            <code className="text-orange-200 font-mono text-sm bg-black/20 px-2 py-1 rounded">
+            <code className="text-orange-200 font-mono text-sm bg-black/40 px-2 py-1 rounded">
               {botId}
             </code>
             <Button
@@ -77,11 +76,19 @@ const BotStatus = ({ onActivationChange }: BotStatusProps) => {
             </Button>
           </div>
         </div>
-        
-        {/* Activation Status - Wrapped in white rectangle */}
-        <div className="bg-white/90 rounded-lg p-3 flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${isActivated ? 'bg-green-500' : 'bg-red-500'}`}></div>
-          <span className={`text-sm font-inter font-medium ${isActivated ? 'text-green-600' : 'text-red-600'}`}>
+
+        {/* Strong Visibility Status Bar */}
+        <div
+          className={[
+            "rounded-lg px-4 py-2 flex items-center gap-3 font-inter text-base font-semibold border-2 mt-2",
+            isActivated
+              ? "bg-emerald-600/95 border-emerald-400 text-white"
+              : "bg-red-600/90 border-red-400 text-white"
+          ].join(' ')}
+          style={{ minHeight: '40px', transition: 'background 0.2s' }}
+        >
+          <div className={`w-3 h-3 rounded-full ${isActivated ? 'bg-green-300' : 'bg-red-300'} shadow-lg`} />
+          <span className={isActivated ? "text-white" : "text-white"}>
             {isActivated ? 'Bot Activated' : 'Bot not yet Activated'}
           </span>
         </div>
@@ -89,7 +96,7 @@ const BotStatus = ({ onActivationChange }: BotStatusProps) => {
 
       {/* Activation Instructions - Only show when not activated */}
       {!isActivated && (
-        <div className="bg-black/20 rounded-lg p-4 text-white">
+        <div className="bg-black/40 rounded-lg p-4 text-white border border-red-800">
           <div className="prose prose-invert max-w-none">
             <h3 className="text-lg font-medium text-white mb-4 font-inter">🤖 How to Activate the Job Bot on Telegram:</h3>
             
