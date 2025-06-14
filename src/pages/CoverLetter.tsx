@@ -252,20 +252,38 @@ const CoverLetter = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Job Title */}
-                  <div className="space-y-2">
-                    <Label htmlFor="job_title" className="text-white font-medium text-base">
-                      Job Title *
-                    </Label>
-                    <Input id="job_title" placeholder="e.g. Software Engineer, Marketing Manager" value={formData.job_title} onChange={e => handleInputChange('job_title', e.target.value)} required className="text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
-                  </div>
-
-                  {/* Company Name */}
-                  <div className="space-y-2">
-                    <Label htmlFor="company_name" className="text-white font-medium text-base">
-                      Company Name *
-                    </Label>
-                    <Input id="company_name" placeholder="e.g. Google, Microsoft" value={formData.company_name} onChange={e => handleInputChange('company_name', e.target.value)} required className="text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
+                  {/* Inputs Row: Company Name and Job Title in one line for desktop, stacked on mobile */}
+                  <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
+                    {/* Company Name */}
+                    <div className="flex-1 space-y-2">
+                      <Label htmlFor="company_name" className="text-white font-medium text-base">
+                        Company Name *
+                      </Label>
+                      <Input
+                        id="company_name"
+                        placeholder="e.g. Google, Microsoft"
+                        value={formData.company_name}
+                        onChange={e => handleInputChange('company_name', e.target.value)}
+                        required
+                        className="text-base bg-black text-white placeholder:text-white/60 border-white/15"
+                        disabled={isGenerating}
+                      />
+                    </div>
+                    {/* Job Title */}
+                    <div className="flex-1 space-y-2">
+                      <Label htmlFor="job_title" className="text-white font-medium text-base">
+                        Job Title *
+                      </Label>
+                      <Input
+                        id="job_title"
+                        placeholder="e.g. Software Engineer, Marketing Manager"
+                        value={formData.job_title}
+                        onChange={e => handleInputChange('job_title', e.target.value)}
+                        required
+                        className="text-base bg-black text-white placeholder:text-white/60 border-white/15"
+                        disabled={isGenerating}
+                      />
+                    </div>
                   </div>
 
                   {/* Job Description */}
@@ -276,7 +294,15 @@ const CoverLetter = () => {
                     <Label htmlFor="job_description" className="text-gray-300 font-normal text-sm block">
                       Paste the job description or key requirements
                     </Label>
-                    <Textarea id="job_description" placeholder="Paste the job description here..." value={formData.job_description} onChange={e => handleInputChange('job_description', e.target.value)} required className="min-h-[150px] resize-none text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
+                    <Textarea
+                      id="job_description"
+                      placeholder="Paste the job description here..."
+                      value={formData.job_description}
+                      onChange={e => handleInputChange('job_description', e.target.value)}
+                      required
+                      className="min-h-[150px] resize-none text-base bg-black text-white placeholder:text-white/60 border-white/15"
+                      disabled={isGenerating}
+                    />
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3 pt-4">
@@ -292,7 +318,6 @@ const CoverLetter = () => {
                         ? "Generating..."
                         : "Generate Cover Letter"}
                     </Button>
-
                     <Button
                       type="button"
                       onClick={resetForm}
