@@ -116,10 +116,18 @@ const LinkedInPosts = () => {
 
     try {
       console.log('Creating LinkedIn post with user_profile.id:', userProfile.id);
+      console.log('Clerk user ID:', user.id);
 
-      // Get Clerk token and set it for Supabase
+      // Get Clerk token and set it for Supabase BEFORE any database operations
       const token = await getToken({ template: 'supabase' });
-      setClerkToken(token);
+      console.log('Got Clerk token:', token ? 'Token received' : 'No token');
+      
+      if (token) {
+        setClerkToken(token);
+        console.log('Clerk token set for Supabase');
+      } else {
+        throw new Error('Failed to get authentication token');
+      }
 
       // Insert into database with proper authentication
       const { data, error } = await supabase
@@ -137,6 +145,12 @@ const LinkedInPosts = () => {
 
       if (error) {
         console.error('Supabase error:', error);
+        console.error('Error details:', {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint
+        });
         throw error;
       }
 
@@ -147,12 +161,18 @@ const LinkedInPosts = () => {
         title: "Request Submitted!",
         description: "Your LinkedIn post is being generated. Please wait..."
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error creating LinkedIn post:', err);
       setIsGenerating(false);
+      
+      let errorMessage = "Failed to create LinkedIn post. Please try again.";
+      if (err.message) {
+        errorMessage = `Error: ${err.message}`;
+      }
+      
       toast({
         title: "Error",
-        description: "Failed to create LinkedIn post. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
