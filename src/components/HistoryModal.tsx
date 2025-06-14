@@ -64,32 +64,38 @@ const HistoryModal = ({ type, isOpen, onClose, gradientColors }: HistoryModalPro
 
     setIsLoading(true);
     try {
-      let tableName: string;
-      let selectFields: string;
+      let query;
 
       switch (type) {
         case 'job_analyses':
-          tableName = 'job_analyses';
-          selectFields = 'id, company_name, job_title, job_description, job_match, match_score, created_at';
+          query = supabase
+            .from('job_analyses')
+            .select('id, company_name, job_title, job_description, job_match, match_score, created_at')
+            .eq('user_id', userProfile.id)
+            .order('created_at', { ascending: false })
+            .limit(50);
           break;
         case 'cover_letters':
-          tableName = 'job_cover_letters';
-          selectFields = 'id, company_name, job_title, job_description, cover_letter, created_at';
+          query = supabase
+            .from('job_cover_letters')
+            .select('id, company_name, job_title, job_description, cover_letter, created_at')
+            .eq('user_id', userProfile.id)
+            .order('created_at', { ascending: false })
+            .limit(50);
           break;
         case 'linkedin_posts':
-          tableName = 'job_linkedin';
-          selectFields = 'id, topic, opinion, personal_story, audience, tone, linkedin_post, created_at';
+          query = supabase
+            .from('job_linkedin')
+            .select('id, topic, opinion, personal_story, audience, tone, linkedin_post, created_at')
+            .eq('user_id', userProfile.id)
+            .order('created_at', { ascending: false })
+            .limit(50);
           break;
         default:
           throw new Error('Invalid type');
       }
 
-      const { data: historyData, error } = await supabase
-        .from(tableName)
-        .select(selectFields)
-        .eq('user_id', userProfile.id)
-        .order('created_at', { ascending: false })
-        .limit(50);
+      const { data: historyData, error } = await query;
 
       if (error) throw error;
 
@@ -108,25 +114,23 @@ const HistoryModal = ({ type, isOpen, onClose, gradientColors }: HistoryModalPro
 
   const handleDelete = async (id: string) => {
     try {
-      let tableName: string;
+      let deleteQuery;
+
       switch (type) {
         case 'job_analyses':
-          tableName = 'job_analyses';
+          deleteQuery = supabase.from('job_analyses').delete().eq('id', id);
           break;
         case 'cover_letters':
-          tableName = 'job_cover_letters';
+          deleteQuery = supabase.from('job_cover_letters').delete().eq('id', id);
           break;
         case 'linkedin_posts':
-          tableName = 'job_linkedin';
+          deleteQuery = supabase.from('job_linkedin').delete().eq('id', id);
           break;
         default:
           throw new Error('Invalid type');
       }
 
-      const { error } = await supabase
-        .from(tableName)
-        .delete()
-        .eq('id', id);
+      const { error } = await deleteQuery;
 
       if (error) throw error;
 
