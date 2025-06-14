@@ -335,7 +335,7 @@ const JobGuide = () => {
           </div>
           <div className="space-y-8">
             {/* Input Form */}
-            <Card className="bg-gradient-to-br from-slate-800/95 via-slate-800/85 to-slate-700/80 border border-slate-700/70 shadow-xl drop-shadow-2xl">
+            <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-sky-900 border border-blue-700/70 shadow-xl drop-shadow-2xl">
               <CardHeader>
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <div>
@@ -369,8 +369,7 @@ const JobGuide = () => {
                       value={formData.companyName}
                       onChange={e => handleInputChange('companyName', e.target.value)}
                       required
-                      className="bg-gradient-to-r from-sky-50 via-blue-100 to-sky-200 text-slate-900 border border-blue-200 shadow-inner focus:border-sky-400 placeholder:text-blue-600 font-semibold"
-                      // blue gradient, dark readable text
+                      className="bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold"
                     />
                   </div>
                   {/* Job Title */}
@@ -384,7 +383,7 @@ const JobGuide = () => {
                       value={formData.jobTitle}
                       onChange={e => handleInputChange('jobTitle', e.target.value)}
                       required
-                      className="bg-gradient-to-r from-sky-50 via-blue-100 to-sky-200 text-slate-900 border border-blue-200 shadow-inner focus:border-sky-400 placeholder:text-blue-600 font-semibold"
+                      className="bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold"
                     />
                   </div>
                 </div>
@@ -402,7 +401,7 @@ const JobGuide = () => {
                     value={formData.jobDescription}
                     onChange={e => handleInputChange('jobDescription', e.target.value)}
                     required
-                    className="min-h-[100px] bg-gradient-to-r from-sky-50 via-blue-100 to-sky-200 text-slate-900 border border-blue-200 shadow-inner focus:border-sky-400 placeholder:text-blue-600 font-semibold"
+                    className="min-h-[100px] bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold"
                   />
                 </div>
                 {/* Action Buttons */}
