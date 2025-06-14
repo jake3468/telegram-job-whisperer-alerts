@@ -1,3 +1,4 @@
+
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Menu } from 'lucide-react';
@@ -33,11 +34,13 @@ export function Layout({ children }: LayoutProps) {
         bg-gradient-to-br from-[#0e1122] via-[#181526] to-[#21203a]
         lg:pt-0 pt-20
         "
+        style={{margin: 0, padding: 0, boxShadow: "none"}} // Ensure no unwanted gap/shadow/border
       >
+        {/* Make sure AppSidebar and content are flush */}
         <AppSidebar />
-        <div className="flex-1 flex flex-col min-h-screen">
+        <div className="flex-1 flex flex-col min-h-screen bg-transparent"> {/* Ensure transparent background */}
           {/* Main Content */}
-          <main className="flex-1 w-full px-0 py-0">
+          <main className="flex-1 w-full px-0 py-0 bg-transparent">
             {children}
           </main>
         </div>
@@ -45,3 +48,4 @@ export function Layout({ children }: LayoutProps) {
     </SidebarProvider>
   );
 }
+
