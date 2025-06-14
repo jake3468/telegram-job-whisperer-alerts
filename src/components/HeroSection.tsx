@@ -22,13 +22,13 @@ const HeroSection = () => {
     <section className="min-h-screen bg-black bg-hero-glow bg-no-repeat bg-bottom flex flex-col items-center justify-center px-4 relative overflow-hidden pt-16 sm:pt-20">
       {/* Logo and Site Name - Top Left */}
       <div className="absolute top-6 left-6 sm:top-8 sm:left-8 flex items-center space-x-3 z-20">
-        <img src="/lovable-uploads/00756136-40e8-4357-b19a-582e8625b09d.png" alt="JobBots Logo" className="h-10 w-10 sm:h-12 sm:w-12" />
-        <span className="text-2xl sm:text-3xl font-semibold text-white font-inter">JobBots</span>
+        <img src="/lovable-uploads/6239b4a7-4f3c-4902-a936-4216ae26d9af.png" alt="JobBots Logo" className="h-10 w-10 sm:h-12 sm:w-12" />
+        <span className="text-2xl sm:text-3xl font-semibold text-white font-orbitron">JobBots</span>
       </div>
 
       <div className="text-center max-w-4xl mx-auto z-10 mt-10 sm:mt-0">
         <h1 className="text-4xl md:text-6xl font-semibold text-white mb-6 leading-tight font-inter">
-          <span className="text-highlight">AI</span> does the boring stuff.
+          <span className="text-highlight">AI</span> does the <span className="text-highlight">boring</span> stuff.
           <br className="hidden sm:block" /> You get the <span className="text-highlight">Job</span>.
         </h1>
         
@@ -61,3 +61,4 @@ const HeroSection = () => {
   );
 };
 export default HeroSection;
+

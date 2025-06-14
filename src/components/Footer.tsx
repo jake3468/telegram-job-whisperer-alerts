@@ -4,8 +4,8 @@ const Footer = () => {
     <footer className="bg-black py-12 px-4 border-t border-gray-800">
       <div className="max-w-6xl mx-auto text-center">
         <div className="flex justify-center items-center mb-8 space-x-3">
-          <img src="/lovable-uploads/00756136-40e8-4357-b19a-582e8625b09d.png" alt="JobBots Logo" className="h-8 w-8" />
-          <span className="text-xl font-semibold text-white font-inter">JobBots</span>
+          <img src="/lovable-uploads/6239b4a7-4f3c-4902-a936-4216ae26d9af.png" alt="JobBots Logo" className="h-8 w-8" />
+          <span className="text-xl font-semibold text-white font-orbitron">JobBots</span>
         </div>
 
         <div className="flex flex-wrap justify-center items-center space-x-4 sm:space-x-6 mb-6">
@@ -40,3 +40,4 @@ const Footer = () => {
 };
 
 export default Footer;
+

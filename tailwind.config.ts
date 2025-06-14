@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -113,8 +114,10 @@ export default {
 			},
 			fontFamily: {
 				'inter': ['Inter', 'system-ui', 'sans-serif'],
+        'orbitron': ['Orbitron', 'sans-serif'], // Added Orbitron font
 			}
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
 } satisfies Config;
+
