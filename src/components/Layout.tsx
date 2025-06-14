@@ -29,12 +29,12 @@ export function Layout({ children }: LayoutProps) {
           </div>
         </div>
       </header>
-      {/* ALWAYS apply pt-20 for mobile screens to avoid navbar overlap */}
+      {/* ALWAYS apply sufficient pt-20 for mobile screens to avoid navbar overlap */}
       <div
         className={`
           min-h-screen flex w-full 
           bg-gradient-to-br from-[#0e1122] via-[#181526] to-[#21203a]
-          ${'lg:pt-0 pt-20'}
+          ${'lg:pt-0 pt-24'} /* Was pt-20, now pt-24 to create extra space for headings */
         `}
         style={{
           margin: 0,
@@ -45,6 +45,7 @@ export function Layout({ children }: LayoutProps) {
         <AppSidebar />
         {/* DO NOT use min-h-screen on this container! Only flex-1 to allow normal page scroll */}
         <div className="flex-1 flex flex-col bg-transparent">
+          {/* Extra top padding on small screens for heading visibility */}
           <main className="flex-1 w-full px-0 py-0 bg-transparent">
             <div className="w-full max-w-4xl mx-auto px-3 sm:px-6 pt-3 sm:pt-8">
               {children}

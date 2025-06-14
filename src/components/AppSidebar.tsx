@@ -1,3 +1,4 @@
+
 import { User, Bell, Target, FileText, X, Share2 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
@@ -61,11 +62,12 @@ export function AppSidebar() {
     <Sidebar className="
       bg-gradient-to-br from-black via-gray-950 to-fuchsia-950
       border-r border-fuchsia-400/10 shadow-2xl shadow-fuchsia-600/10 
-      backdrop-blur-2xl rounded-tr-3xl rounded-br-3xl
+      backdrop-blur-2xl
       min-w-[220px] max-w-[295px] w-[clamp(220px,20vw,295px)]
       h-full
       overflow-y-auto overflow-x-hidden
       scrollbar-none
+      /* No rounded corners for a squared sidebar */
     ">
       {/* Logo & Name section: always visible */}
       <SidebarHeader className="py-8 px-3 border-b border-fuchsia-400/15 bg-black/95 relative flex flex-col items-center gap-2">
@@ -94,7 +96,7 @@ export function AppSidebar() {
 
       <SidebarContent className="overflow-x-hidden w-full px-0 !pr-0">
         {/* Profile Section */}
-        <SidebarGroup className="bg-black/60 rounded-2xl mb-2 mx-2 mt-6 shadow-md">
+        <SidebarGroup className="bg-black/60 mb-2 mx-2 mt-6 shadow-md rounded-none">
           <SidebarGroupLabel className="text-fuchsia-200 font-orbitron text-xs px-3 py-2">
             Profile
           </SidebarGroupLabel>
@@ -109,20 +111,20 @@ export function AppSidebar() {
                         to={item.url}
                         className={`
                           flex items-center gap-2 py-3 
-                          mx-2                          /* constant margin on both sides for highlight containment */
+                          mx-0                          /* remove horizontal margin for full-width highlight */
                           px-3
-                          rounded-2xl
+                          rounded-none                   /* squared corners */
                           font-orbitron transition-all duration-300 
                           text-base font-bold w-full
                           ${
                             isCurrentlyActive
-                              ? 'bg-gradient-to-r from-pastel-peach via-pastel-blue to-pastel-lavender text-black dark:text-white shadow-xl border border-pastel-peach/30'
+                              ? 'bg-gradient-to-r from-pastel-peach via-pastel-blue to-pastel-lavender text-black dark:text-white shadow-xl border-y border-pastel-peach/30'
                               : 'text-white hover:bg-gradient-to-r hover:from-fuchsia-800 hover:via-fuchsia-600 hover:to-indigo-800 hover:text-white hover:shadow-lg'
                           }
                         `}
                         style={{
                           overflow: 'hidden',
-                          borderRadius: '1.5rem',
+                          borderRadius: 0, // Ensures squared corners
                         }}
                       >
                         <item.icon
@@ -143,7 +145,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         {/* Tools Section */}
-        <SidebarGroup className="bg-black/60 rounded-2xl mt-5 mx-2 shadow-md">
+        <SidebarGroup className="bg-black/60 mt-5 mx-2 shadow-md rounded-none">
           <SidebarGroupLabel className="text-fuchsia-200 font-orbitron text-xs px-3 py-2">
             Tools
           </SidebarGroupLabel>
@@ -158,20 +160,20 @@ export function AppSidebar() {
                         to={item.url}
                         className={`
                           flex items-center gap-2 py-3 
-                          mx-2                          /* constant margin on both sides for highlight containment */
+                          mx-0                          /* remove horizontal margin for full-width highlight */
                           px-3
-                          rounded-2xl
+                          rounded-none
                           font-orbitron transition-all duration-300 
                           text-base font-bold w-full
                           ${
                             isCurrentlyActive
-                              ? 'bg-gradient-to-r from-pastel-lavender via-pastel-mint to-pastel-peach text-black dark:text-white shadow-xl border border-pastel-lavender/30'
+                              ? 'bg-gradient-to-r from-pastel-lavender via-pastel-mint to-pastel-peach text-black dark:text-white shadow-xl border-y border-pastel-lavender/30'
                               : 'text-white hover:bg-gradient-to-r hover:from-fuchsia-700 hover:to-indigo-800 hover:text-white'
                           }
                         `}
                         style={{
                           overflow: 'hidden',
-                          borderRadius: '1.5rem',
+                          borderRadius: 0
                         }}
                       >
                         <item.icon
@@ -192,7 +194,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-5 border-t border-fuchsia-400/10 bg-gradient-to-r from-black/90 to-fuchsia-950/80 rounded-b-2xl mt-2">
+      <SidebarFooter className="p-5 border-t border-fuchsia-400/10 bg-gradient-to-r from-black/90 to-fuchsia-950/80 mt-2 rounded-none">
         <SignedIn>
           <div className="flex items-center gap-3 w-full overflow-hidden">
             <UserButton
@@ -216,3 +218,5 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
+
+// no export default, just named export
