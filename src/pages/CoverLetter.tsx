@@ -1,4 +1,3 @@
-
 import { useUser } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -191,13 +190,14 @@ const CoverLetter = () => {
       <div className="min-h-screen w-full bg-gradient-to-br from-[#180F18] via-[#1b1421] to-[#221828] flex flex-col">
         {/* Header Section */}
         <div className="max-w-4xl mx-auto w-full px-3 py-8 sm:px-6 sm:py-12 rounded-3xl mt-4">
+          {/* Gradient Heading */}
           <div
             className="rounded-t-3xl rounded-b-xl mb-8 py-8 px-6 text-center shadow-2xl overflow-hidden select-none relative"
             style={{
-              background: 'linear-gradient(90deg, #E75480 0%, #BE53ED 70%, #9661FF 100%)'
+              background: "linear-gradient(90deg, #e75480 0%, #be53ed 70%, #9661ff 100%)"
             }}
           >
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-pink-400 via-fuchsia-300 to-fuchsia-500 bg-clip-text text-transparent mb-2 drop-shadow font-orbitron">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-pink-400 via-fuchsia-400 to-fuchsia-600 bg-clip-text text-transparent mb-2 drop-shadow font-orbitron animate-fade-in">
               Cover Letter
             </h1>
             <p className="text-lg font-inter font-light text-white/90">
@@ -205,106 +205,113 @@ const CoverLetter = () => {
             </p>
           </div>
           <div className="space-y-8">
-            {/* Input Form */}
-            <Card
-              className="bg-gradient-to-br from-[#33203a] via-[#2b1a30] to-[#41253f] border-0 shadow-xl mb-8"
+            {/* Input Form in Gradient Box */}
+            <div
+              className="bg-gradient-to-br from-pink-400 via-fuchsia-400 to-fuchsia-600 p-[2px] rounded-2xl shadow-xl mb-8"
               style={{
-                boxShadow: '0 2px 32px 0 rgba(150,97,255,0.15)'
+                boxShadow: '0 2px 32px 0 rgba(150,97,255,0.12)'
               }}
             >
-              <CardHeader className="pb-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-white font-inter text-xl flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-fuchsia-300" />
-                      Create Your Cover Letter
-                    </CardTitle>
-                    <CardDescription className="text-gray-200 font-inter">
-                      Fill in the details to generate your personalized cover letter
-                    </CardDescription>
-                  </div>
-                  <Button 
-                    onClick={() => setShowHistory(true)} 
-                    variant="outline" 
-                    size="sm" 
-                    className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                  >
-                    <History className="w-4 h-4 mr-2" />
-                    History
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Job Title */}
-                  <div className="space-y-2">
-                    <Label htmlFor="job_title" className="text-white font-medium text-base">
-                      Job Title *
-                    </Label>
-                    <Input 
-                      id="job_title"
-                      placeholder="e.g. Software Engineer, Marketing Manager"
-                      value={formData.job_title}
-                      onChange={(e) => handleInputChange('job_title', e.target.value)}
-                      required
-                      className="text-base bg-black text-white placeholder:text-white/60 border-white/15"
-                    />
-                  </div>
-
-                  {/* Company Name */}
-                  <div className="space-y-2">
-                    <Label htmlFor="company_name" className="text-white font-medium text-base">
-                      Company Name *
-                    </Label>
-                    <Input 
-                      id="company_name"
-                      placeholder="e.g. Google, Microsoft"
-                      value={formData.company_name}
-                      onChange={(e) => handleInputChange('company_name', e.target.value)}
-                      required
-                      className="text-base bg-black text-white placeholder:text-white/60 border-white/15"
-                    />
-                  </div>
-
-                  {/* Job Description */}
-                  <div className="space-y-2">
-                    <Label htmlFor="job_description" className="text-white font-medium text-base">
-                      Job Description *
-                    </Label>
-                    <Label htmlFor="job_description" className="text-gray-300 font-normal text-sm block">
-                      Paste the job description or key requirements
-                    </Label>
-                    <Textarea 
-                      id="job_description"
-                      placeholder="Paste the job description here..."
-                      value={formData.job_description}
-                      onChange={(e) => handleInputChange('job_description', e.target.value)}
-                      required
-                      className="min-h-[150px] resize-none text-base bg-black text-white placeholder:text-white/60 border-white/15"
-                    />
-                  </div>
-
-                  <div className="flex gap-3 pt-4">
+              <Card
+                className="rounded-2xl border-0 bg-[#270a21] bg-opacity-90 shadow-xl"
+                style={{
+                  background: "rgba(23, 9, 21, 0.96)"
+                }}
+              >
+                <CardHeader className="pb-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-white font-inter text-xl flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-fuchsia-200" />
+                        Create Your Cover Letter
+                      </CardTitle>
+                      <CardDescription className="text-gray-200 font-inter">
+                        Fill in the details to generate your personalized cover letter
+                      </CardDescription>
+                    </div>
                     <Button 
-                      type="submit" 
-                      disabled={isSubmitting || !formData.job_title.trim() || !formData.company_name.trim() || !formData.job_description.trim() || isGenerating} 
-                      className="flex-1 bg-gradient-to-r from-pink-400 to-fuchsia-500 hover:from-pink-400/80 hover:to-fuchsia-500/80 text-white font-semibold text-base h-12 rounded-lg"
-                    >
-                      {isSubmitting ? 'Submitting...' : 'Generate Cover Letter'}
-                    </Button>
-                    
-                    <Button 
-                      type="button" 
-                      onClick={resetForm} 
+                      onClick={() => setShowHistory(true)} 
                       variant="outline" 
-                      className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-base h-12 px-6"
+                      size="sm" 
+                      className="bg-white/10 border-white/20 text-white hover:bg-white/20"
                     >
-                      Reset
+                      <History className="w-4 h-4 mr-2" />
+                      History
                     </Button>
                   </div>
-                </form>
-              </CardContent>
-            </Card>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Job Title */}
+                    <div className="space-y-2">
+                      <Label htmlFor="job_title" className="text-white font-medium text-base">
+                        Job Title *
+                      </Label>
+                      <Input 
+                        id="job_title"
+                        placeholder="e.g. Software Engineer, Marketing Manager"
+                        value={formData.job_title}
+                        onChange={(e) => handleInputChange('job_title', e.target.value)}
+                        required
+                        className="text-base bg-black text-white placeholder:text-white/60 border-white/15"
+                      />
+                    </div>
+
+                    {/* Company Name */}
+                    <div className="space-y-2">
+                      <Label htmlFor="company_name" className="text-white font-medium text-base">
+                        Company Name *
+                      </Label>
+                      <Input 
+                        id="company_name"
+                        placeholder="e.g. Google, Microsoft"
+                        value={formData.company_name}
+                        onChange={(e) => handleInputChange('company_name', e.target.value)}
+                        required
+                        className="text-base bg-black text-white placeholder:text-white/60 border-white/15"
+                      />
+                    </div>
+
+                    {/* Job Description */}
+                    <div className="space-y-2">
+                      <Label htmlFor="job_description" className="text-white font-medium text-base">
+                        Job Description *
+                      </Label>
+                      <Label htmlFor="job_description" className="text-gray-300 font-normal text-sm block">
+                        Paste the job description or key requirements
+                      </Label>
+                      <Textarea 
+                        id="job_description"
+                        placeholder="Paste the job description here..."
+                        value={formData.job_description}
+                        onChange={(e) => handleInputChange('job_description', e.target.value)}
+                        required
+                        className="min-h-[150px] resize-none text-base bg-black text-white placeholder:text-white/60 border-white/15"
+                      />
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                      <Button 
+                        type="submit" 
+                        disabled={isSubmitting || !formData.job_title.trim() || !formData.company_name.trim() || !formData.job_description.trim() || isGenerating} 
+                        className="flex-1 bg-gradient-to-r from-pink-400 to-fuchsia-500 hover:from-pink-400/80 hover:to-fuchsia-500/80 text-white font-semibold text-base h-12 rounded-lg"
+                      >
+                        {isSubmitting ? 'Submitting...' : 'Generate Cover Letter'}
+                      </Button>
+                      
+                      <Button 
+                        type="button" 
+                        onClick={resetForm} 
+                        variant="outline" 
+                        className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 text-base h-12 px-6"
+                      >
+                        Reset
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+            </div>
 
             {/* Loading State */}
             {isGenerating && !result && (
@@ -336,7 +343,6 @@ const CoverLetter = () => {
                         </div>
                       </ScrollArea>
                     </Card>
-                    
                     <Button 
                       onClick={handleCopyResult} 
                       className="w-full bg-gradient-to-r from-pink-400 to-fuchsia-500 hover:from-pink-400/80 hover:to-fuchsia-500/80 text-white flex items-center gap-2 text-base h-12"
