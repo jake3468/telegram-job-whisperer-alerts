@@ -175,7 +175,7 @@ const JobAlertsSection = ({
           </div>
 
           {isActivated && !showForm && <div className="flex items-center mt-2 sm:mt-0">
-              <Button onClick={handleCreateAlert} className="font-bold px-4 py-2 rounded-lg shadow-sm transition text-slate-950 bg-red-300 hover:bg-red-200">
+              <Button onClick={handleCreateAlert} className="font-bold px-4 py-2 rounded-lg shadow-sm transition text-slate-950 bg-cyan-200 hover:bg-cyan-100">
                 <Plus className="w-4 h-4 mr-2" /> Add Alert
               </Button>
             </div>}
