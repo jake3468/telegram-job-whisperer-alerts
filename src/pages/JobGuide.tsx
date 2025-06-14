@@ -408,8 +408,11 @@ const JobGuide = () => {
                 <div className="flex flex-col md:flex-row gap-3 pt-4">
                   <Button
                     onClick={handleSubmit}
+                    // Use prominent visual style, never dulled out unless disabled
                     disabled={isButtonDisabled}
-                    className="flex-1 bg-gradient-to-r from-slate-700 via-slate-600 to-slate-700 hover:from-slate-600 hover:to-slate-800 text-slate-100 font-semibold text-base h-12 shadow-none border border-slate-600"
+                    className={`flex-1 bg-gradient-to-r from-sky-700 via-blue-600 to-blue-800 hover:from-blue-500 hover:to-sky-700 text-white font-semibold text-base h-12 shadow-none border border-blue-600 transition-all duration-150
+                      ${isButtonDisabled ? 'opacity-50 cursor-not-allowed' : 'opacity-100'}
+                    `}
                   >
                     {isGenerating ? (
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -423,7 +426,8 @@ const JobGuide = () => {
                   <Button
                     onClick={handleClearData}
                     variant="outline"
-                    className="flex-1 bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-slate-200 h-12 px-6"
+                    size="sm"
+                    className="flex-none min-w-[120px] bg-slate-900/70 border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-slate-200 h-10 px-4 ml-0 md:ml-2"
                     disabled={!hasAnyData}
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
