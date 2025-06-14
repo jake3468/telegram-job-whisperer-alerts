@@ -367,35 +367,5 @@ const CoverLetter = () => {
   );
 };
 
-const handleCopyResult = async () => {
-  if (!result) return;
-
-  try {
-    await navigator.clipboard.writeText(result);
-    toast({
-      title: "Copied!",
-      description: "Cover letter copied to clipboard successfully."
-    });
-  } catch (err) {
-    console.error('Failed to copy text:', err);
-    toast({
-      title: "Error",
-      description: "Failed to copy text to clipboard.",
-      variant: "destructive"
-    });
-  }
-};
-
-const resetForm = () => {
-  setFormData({
-    job_title: '',
-    company_name: '',
-    job_description: ''
-  });
-  setResult('');
-  setIsGenerating(false);
-  setCurrentCoverLetterId(null);
-};
-
 export default CoverLetter;
 
