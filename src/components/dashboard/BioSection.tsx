@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { User } from 'lucide-react';
 import { useUserProfile } from '@/hooks/useUserProfile';
-
 const BioSection = () => {
   const {
     toast
@@ -70,12 +68,7 @@ const BioSection = () => {
         </CardHeader>
         <CardContent className="space-y-3 pt-0">
           <Textarea value={bio} onChange={e => setBio(e.target.value)} placeholder="Describe your experience, skills, career goals, and what kind of opportunities you're looking for..." rows={4} className="min-h-[100px] border-2 border-white/30 text-white placeholder-white/70 font-inter focus-visible:border-emerald-200 hover:border-emerald-300 text-base resize-none bg-black/80 shadow-inner" />
-          <Button
-            onClick={handleSaveBio}
-            disabled={saving}
-            className="font-inter font-bold text-xs px-4 py-2 h-9 rounded-lg shadow 
-              bg-emerald-500 hover:bg-emerald-600 focus-visible:ring-2 focus-visible:ring-emerald-300 text-white transition-colors"
-          >
+          <Button onClick={handleSaveBio} disabled={saving} className="font-inter font-bold text-xs px-4 py-2 h-9 rounded-lg shadow focus-visible:ring-2 focus-visible:ring-emerald-300 transition-colors bg-emerald-400 hover:bg-emerald-300 text-slate-950">
             {saving ? 'Saving...' : 'Save Bio'}
           </Button>
         </CardContent>
