@@ -110,9 +110,11 @@ export function AppSidebar() {
                         to={item.url}
                         className={`
                           flex items-center gap-2 py-3 
-                          mx-2                         /* Ensure margin on left+right for highlight space */
-                          px-3                         /* Sufficient space on text+icon sides */
-                          rounded-2xl                   /* Perfectly rounded for highlight bg */
+                          mx-2 
+                          pr-3                           /* Padding right for general state */
+                          ${isCurrentlyActive ? 'mr-2' : ''}  /* Margin right for active to preserve border radius */
+                          pl-3
+                          rounded-2xl
                           font-orbitron transition-all duration-300 
                           text-base font-bold w-full
                           ${
@@ -123,7 +125,7 @@ export function AppSidebar() {
                         `}
                         style={{
                           overflow: 'hidden',
-                          borderRadius: '1.5rem', // fuller rounding for highlight
+                          borderRadius: '1.5rem',
                         }}
                       >
                         <item.icon
@@ -159,8 +161,10 @@ export function AppSidebar() {
                         to={item.url}
                         className={`
                           flex items-center gap-2 py-3 
-                          mx-2
-                          px-3 
+                          mx-2 
+                          pr-3                           
+                          ${isCurrentlyActive ? 'mr-2' : ''}
+                          pl-3
                           rounded-2xl
                           font-orbitron transition-all duration-300 
                           text-base font-bold w-full
