@@ -1,3 +1,4 @@
+
 import { useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -28,22 +29,13 @@ const CoverLetter = () => {
   const [formData, setFormData] = useState({
     job_title: '',
     company_name: '',
-    job_description: '',
-    specific_skills: '',
-    tone: 'professional'
+    job_description: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentCoverLetterId, setCurrentCoverLetterId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
-
-  const toneOptions = [
-    { value: 'professional', label: 'Professional & Formal' },
-    { value: 'conversational', label: 'Conversational & Friendly' },
-    { value: 'enthusiastic', label: 'Enthusiastic & Passionate' },
-    { value: 'concise', label: 'Concise & Direct' }
-  ];
 
   useEffect(() => {
     if (isLoaded && !user) {
@@ -130,9 +122,7 @@ const CoverLetter = () => {
           user_id: userProfile.id,
           job_title: formData.job_title,
           company_name: formData.company_name,
-          job_description: formData.job_description,
-          specific_skills: formData.specific_skills || null,
-          tone: formData.tone
+          job_description: formData.job_description
         })
         .select()
         .single();
@@ -186,9 +176,7 @@ const CoverLetter = () => {
     setFormData({
       job_title: '',
       company_name: '',
-      job_description: '',
-      specific_skills: '',
-      tone: 'professional'
+      job_description: ''
     });
     setResult('');
     setIsGenerating(false);
@@ -290,44 +278,6 @@ const CoverLetter = () => {
                     />
                   </div>
 
-                  {/* Specific Skills */}
-                  <div className="space-y-2">
-                    <Label htmlFor="specific_skills" className="text-white font-medium text-base">
-                      Specific Skills or Experiences to Highlight
-                    </Label>
-                    <Textarea 
-                      id="specific_skills"
-                      placeholder="e.g. Project management, React.js, Team leadership"
-                      value={formData.specific_skills}
-                      onChange={(e) => handleInputChange('specific_skills', e.target.value)}
-                      className="min-h-[80px] resize-none text-base bg-gray-900"
-                    />
-                  </div>
-
-                  {/* Tone Selection */}
-                  <div className="space-y-2">
-                    <Label htmlFor="tone" className="text-white font-medium text-base">
-                      Tone
-                    </Label>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      {toneOptions.map((option) => (
-                        <Button
-                          key={option.value}
-                          type="button"
-                          variant={formData.tone === option.value ? "default" : "outline"}
-                          onClick={() => handleInputChange('tone', option.value)}
-                          className={`h-auto py-3 ${
-                            formData.tone === option.value 
-                              ? "bg-gradient-to-r from-pastel-blue to-pastel-mint border-pastel-blue/50" 
-                              : "bg-white/10 border-white/20 hover:bg-white/20"
-                          }`}
-                        >
-                          {option.label}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-
                   <div className="flex gap-3 pt-4">
                     <Button 
                       type="submit" 
@@ -408,3 +358,4 @@ const CoverLetter = () => {
 };
 
 export default CoverLetter;
+
