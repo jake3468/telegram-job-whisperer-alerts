@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy, Share2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import PercentageMeter from '@/components/PercentageMeter';
 interface HistoryItem {
   id: string;
   company_name?: string;
@@ -254,7 +255,7 @@ const HistoryModal = ({
               </Button>
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="flex-1 overflow-y-auto space-y-6 mt-4">
             {/* Input Details Section */}
             <div className="rounded-lg p-4 border border-white/10 bg-blue-800">
@@ -263,43 +264,47 @@ const HistoryModal = ({
                 Input Details
               </h3>
               <div className="space-y-3">
-                {type === 'linkedin_posts' ? <>
-                    <div>
-                      <label className="text-white/70 text-sm">Topic:</label>
-                      <p className="text-white">{selectedItem.topic}</p>
-                    </div>
-                    {selectedItem.opinion && <div>
+                {type === 'linkedin_posts'
+                  ? (
+                      <div>
+                        <label className="text-white/70 text-sm">Topic:</label>
+                        <p className="text-white">{selectedItem.topic}</p>
+                      </div>
+                      {selectedItem.opinion && <div>
                         <label className="text-white/70 text-sm">Opinion:</label>
                         <p className="text-white">{selectedItem.opinion}</p>
                       </div>}
-                    {selectedItem.personal_story && <div>
+                      {selectedItem.personal_story && <div>
                         <label className="text-white/70 text-sm">Personal Story:</label>
                         <p className="text-white">{selectedItem.personal_story}</p>
                       </div>}
-                    {selectedItem.audience && <div>
+                      {selectedItem.audience && <div>
                         <label className="text-white/70 text-sm">Audience:</label>
                         <p className="text-white">{selectedItem.audience}</p>
                       </div>}
-                    {selectedItem.tone && <div>
+                      {selectedItem.tone && <div>
                         <label className="text-white/70 text-sm">Tone:</label>
                         <p className="text-white">{selectedItem.tone}</p>
                       </div>}
-                  </> : <>
-                    <div>
-                      <label className="text-white/70 text-sm">Company Name:</label>
-                      <p className="text-white">{selectedItem.company_name}</p>
-                    </div>
-                    <div>
-                      <label className="text-white/70 text-sm">Job Title:</label>
-                      <p className="text-white">{selectedItem.job_title}</p>
-                    </div>
-                    <div>
-                      <label className="text-white/70 text-sm">Job Description:</label>
-                      <div className="rounded p-3 max-h-32 overflow-y-auto bg-gray-800">
-                        <p className="text-white text-sm">{selectedItem.job_description}</p>
+                    )
+                  : (
+                    <>
+                      <div>
+                        <label className="text-white/70 text-sm">Company Name:</label>
+                        <p className="text-white">{selectedItem.company_name}</p>
                       </div>
-                    </div>
-                  </>}
+                      <div>
+                        <label className="text-white/70 text-sm">Job Title:</label>
+                        <p className="text-white">{selectedItem.job_title}</p>
+                      </div>
+                      <div>
+                        <label className="text-white/70 text-sm">Job Description:</label>
+                        <div className="rounded p-3 max-h-32 overflow-y-auto bg-gray-800">
+                          <p className="text-white text-sm">{selectedItem.job_description}</p>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 <div>
                   <label className="text-white/70 text-sm">Created:</label>
                   <p className="text-white">{formatDate(selectedItem.created_at)}</p>
@@ -307,26 +312,44 @@ const HistoryModal = ({
               </div>
             </div>
 
-            {/* Result Section */}
-            {hasResult(selectedItem) && <div className="rounded-lg p-4 border border-white/10 bg-purple-800">
-                <h3 className="text-white font-medium mb-4 flex items-center gap-2 justify-between">
+            {/* --- Result Section --- */}
+            {hasResult(selectedItem) && (
+              <div className="rounded-lg p-4 border border-white/10 bg-black shadow-inner">
+                <h3 className="text-white font-medium mb-3 flex items-center gap-2 justify-between">
                   <div className="flex items-center gap-2">
                     {type === 'linkedin_posts' ? <Share2 className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
                     {getResultTitle()}
                   </div>
-                  <Button onClick={() => handleCopyResult(selectedItem)} size="sm" className="bg-gray-950 hover:bg-gray-800 text-white flex items-center gap-1">
-                    <Copy className="w-3 h-3" />
-                    <span className="hidden sm:inline">Copy</span>
-                  </Button>
+                  {/* Copy button removed for 'job_guide' type */}
+                  {type !== 'job_guide' && (
+                    <Button onClick={() => handleCopyResult(selectedItem)} size="sm" className="bg-gray-950 hover:bg-gray-800 text-white flex items-center gap-1">
+                      <Copy className="w-3 h-3" />
+                      <span className="hidden sm:inline">Copy</span>
+                    </Button>
+                  )}
                 </h3>
-                <div className="bg-white rounded-lg p-4 border-2 border-blue-200 max-h-96 overflow-y-auto">
-                  <div className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap" style={{
-                fontFamily: 'serif'
-              }}>
-                    {getResult(selectedItem)}
+                {/* MATCH SCORE shown for job_guide */}
+                {type === 'job_guide' && selectedItem.match_score && (
+                  <div className="mb-4 max-w-full">
+                    <div className="w-full sm:max-w-[350px] md:max-w-[280px] mx-auto">
+                      <div className="shadow-md rounded-xl bg-gray-900/90 p-3 border border-gray-700">
+                        <PercentageMeter percentage={selectedItem.match_score} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div className="bg-black rounded-lg p-4 border-2 border-blue-200 max-h-96 overflow-y-auto mt-1">
+                  <div className="text-gray-100 text-sm md:text-base leading-relaxed whitespace-pre-wrap break-words" style={{
+                    fontFamily: 'serif'
+                  }}>
+                    {/* Only use job_match for job_guide, but fallback to existing for other types */}
+                    {type === 'job_guide'
+                      ? selectedItem.job_match
+                      : getResult(selectedItem)}
                   </div>
                 </div>
-              </div>}
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>;
