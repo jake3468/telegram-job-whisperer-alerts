@@ -201,19 +201,17 @@ const LinkedInPosts = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-zinc-900">
-        <div className="container mx-auto px-4 py-8 bg-zinc-950">
+      <div className="min-h-screen bg-gradient-to-br from-sky-900 via-zinc-900 to-fuchsia-900 pt-0 flex flex-col">
+        <div className="container mx-auto px-4 py-8 bg-gradient-to-br from-black/90 via-zinc-900/80 to-fuchsia-950/60 rounded-3xl shadow-2xl shadow-fuchsia-800/10 backdrop-blur-lg mt-4 mb-8 max-w-4xl w-full">
           {/* Header Section */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl bg-gradient-to-r from-slate-200 via-gray-300 to-zinc-400 bg-clip-text text-transparent mb-4 font-inter md:text-4xl font-medium">
-              LinkedIn Posts
+            <h1 className="text-4xl bg-gradient-to-r from-sky-300 via-fuchsia-400 to-indigo-200 bg-clip-text text-transparent mb-4 font-orbitron font-extrabold font-inter md:text-4xl drop-shadow">
+              LinkedIn <span className="italic">Posts</span>
             </h1>
-            <p className="text-gray-300 max-w-2xl mx-auto font-inter text-sm font-light">
+            <p className="text-fuchsia-200 max-w-2xl mx-auto font-inter text-base font-light shadow-sm">
               Create engaging LinkedIn posts that showcase your expertise and connect with your professional network
             </p>
           </div>
-
-          {/* Widened Form Layout */}
           <div className="max-w-4xl mx-auto">
             {/* Input Form */}
             <Card className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 border-white/20 backdrop-blur-sm mb-8">

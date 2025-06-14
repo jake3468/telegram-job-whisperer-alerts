@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -170,72 +169,66 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
 
   if (loading) {
     return (
-      <Card className="bg-gradient-to-br from-orange-500 via-red-500 to-pink-600 border-2 border-orange-400 shadow-2xl shadow-orange-500/20">
-        <CardContent className="p-4">
-          <div className="text-white text-xs">Loading...</div>
-        </CardContent>
-      </Card>
+      <div className="max-w-2xl mx-auto w-full">
+        <div className="rounded-3xl bg-gradient-to-br from-orange-400/50 via-orange-700/40 to-fuchsia-700/40 border-2 border-orange-400/50 shadow-xl shadow-orange-500/10 backdrop-blur-lg p-6 mt-3 min-h-[160px] flex items-center justify-center">
+          <div className="text-orange-50 text-xs">Loading...</div>
+        </div>
+      </div>
     );
   }
-
   return (
-    <Card className="bg-gradient-to-br from-orange-500 via-red-500 to-pink-600 border-2 border-orange-400 shadow-2xl shadow-orange-500/20">
-      <CardHeader className="pb-3">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div className="rounded-3xl bg-gradient-to-br from-orange-400/70 via-orange-700/50 to-fuchsia-700/70 border-2 border-orange-400/60 shadow-2xl shadow-orange-400/5 backdrop-blur-xl px-1 sm:px-3 pt-2 pb-6 mt-3">
+      <div className="pt-4 px-2 sm:px-6">
+        {/* Bot Status, Add Alert, List */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <div className="min-w-0">
-            <CardTitle className="text-white font-inter flex items-center gap-2 text-base">
-              <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-                <Bell className="w-3 h-3 text-white" />
-              </div>
-              Job Alerts
-            </CardTitle>
-            <CardDescription className="text-orange-100 font-inter text-sm">
+            <span className="text-2xl font-orbitron bg-gradient-to-r from-yellow-200 via-orange-300 to-pink-400 bg-clip-text text-transparent font-extrabold flex items-center gap-2">
+              <span className="w-6 h-6 bg-orange-600/70 rounded-full flex items-center justify-center shadow-lg ring-2 ring-pink-400/30">
+                <svg viewBox="0 0 24 24" width={18} height={18}><path fill="none" stroke="#fff" strokeWidth="2" d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z"/></svg>
+              </span>
+              <span>Job Alerts</span>
+            </span>
+            <p className="text-orange-200 font-inter text-sm font-semibold drop-shadow-sm">
               Set up personalized job alerts based on your preferences
-            </CardDescription>
+            </p>
           </div>
-          {!showForm && isActivated && (
-            <Button onClick={handleCreateAlert} className="font-inter bg-white text-orange-600 hover:bg-gray-100 font-medium text-xs px-3 py-1 h-8 flex-shrink-0">
-              <Plus className="w-3 h-3 mr-1" />
-              Add Alert
-            </Button>
+        </div>
+        <div>
+          {/* Bot Status Component */}
+          <BotStatus onActivationChange={handleActivationChange} />
+
+          {/* Job Alerts Form and List - Only show when activated */}
+          {isActivated && (
+            <>
+              {showForm && (
+                <div className="mb-6">
+                  <JobAlertForm
+                    userTimezone={userTimezone}
+                    editingAlert={editingAlert}
+                    onSubmit={handleFormSubmit}
+                    onCancel={handleFormCancel}
+                  />
+                </div>
+              )}
+              <JobAlertsList
+                alerts={alerts}
+                onEdit={handleEditAlert}
+                onDelete={handleDeleteAlert}
+              />
+            </>
+          )}
+
+          {/* Message when bot is not activated */}
+          {!isActivated && (
+            <div className="text-center py-6">
+              <Bell className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+              <p className="text-gray-300 font-inter text-base mb-1">Activate your bot to manage job alerts</p>
+              <p className="text-gray-400 font-inter text-sm">Follow the instructions above to get started</p>
+            </div>
           )}
         </div>
-      </CardHeader>
-      <CardContent className="pt-0">
-        {/* Bot Status Component */}
-        <BotStatus onActivationChange={handleActivationChange} />
-
-        {/* Job Alerts Form and List - Only show when activated */}
-        {isActivated && (
-          <>
-            {showForm && (
-              <div className="mb-6">
-                <JobAlertForm
-                  userTimezone={userTimezone}
-                  editingAlert={editingAlert}
-                  onSubmit={handleFormSubmit}
-                  onCancel={handleFormCancel}
-                />
-              </div>
-            )}
-            <JobAlertsList
-              alerts={alerts}
-              onEdit={handleEditAlert}
-              onDelete={handleDeleteAlert}
-            />
-          </>
-        )}
-
-        {/* Message when bot is not activated */}
-        {!isActivated && (
-          <div className="text-center py-6">
-            <Bell className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-            <p className="text-gray-300 font-inter text-base mb-1">Activate your bot to manage job alerts</p>
-            <p className="text-gray-400 font-inter text-sm">Follow the instructions above to get started</p>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

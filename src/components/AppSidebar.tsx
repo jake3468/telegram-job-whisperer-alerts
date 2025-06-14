@@ -1,6 +1,20 @@
+
 import { User, Bell, Target, FileText, X, Share2 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, useSidebar } from '@/components/ui/sidebar';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarHeader,
+  SidebarFooter,
+  SidebarTrigger,
+  useSidebar,
+} from '@/components/ui/sidebar';
 import { SignedIn, UserButton, useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 
@@ -29,43 +43,38 @@ const toolItems = [{
 }];
 
 export function AppSidebar() {
-  const {
-    state,
-    isMobile,
-    setOpenMobile
-  } = useSidebar();
-  const {
-    user
-  } = useUser();
+  const { state, isMobile, setOpenMobile } = useSidebar();
+  const { user } = useUser();
   const location = useLocation();
   const currentPath = location.pathname;
   const isActive = (path: string) => currentPath === path;
-  
-  return <Sidebar className="border-r border-white/20 bg-black">
-      <SidebarHeader className="p-6 border-b border-white/10 bg-zinc-900">
-        <div className="flex items-center gap-3">
-          {state === 'expanded' && <div className="flex-1 min-w-0">
-              <p className="font-inter truncate text-4xl font-medium text-sky-300">
-                Job AI
-              </p>
-            </div>}
-          {isMobile && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setOpenMobile(false)}
-              className="h-8 w-8 text-white hover:bg-white/10"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
+
+  return (
+    <Sidebar className="bg-gradient-to-br from-sky-900/70 via-black/90 to-fuchsia-900/80 border-r border-fuchsia-400/20 shadow-2xl shadow-fuchsia-600/10 backdrop-blur-xl rounded-tr-2xl rounded-br-3xl">
+      <SidebarHeader className="py-6 px-4 border-b border-fuchsia-400/10 bg-black/80 relative flex justify-between items-center gap-3">
+        {state === 'expanded' && (
+          <span className="font-orbitron drop-shadow text-2xl font-extrabold text-transparent bg-gradient-to-r from-sky-300 via-fuchsia-400 to-indigo-300 bg-clip-text select-none tracking-wider">
+            JobBots
+          </span>
+        )}
+        {isMobile && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setOpenMobile(false)}
+            className="h-10 w-10 text-fuchsia-300 hover:bg-fuchsia-800/40 border border-fuchsia-400/20 bg-black/40 rounded-xl transition-all"
+          >
+            <X className="h-6 w-6" />
+          </Button>
+        )}
+        {/* Always visible mini hamburger (desktop mini mode) */}
+        <SidebarTrigger className="lg:hidden absolute top-5 right-4 bg-fuchsia-700/20 rounded-lg p-1 hover:bg-fuchsia-500/40 transition-all border border-fuchsia-400/10" />
       </SidebarHeader>
 
       <SidebarContent>
         {/* Profile Section */}
-        <SidebarGroup className="bg-zinc-900">
-          <SidebarGroupLabel className="text-gray-300 font-inter font-medium text-xs px-3 py-2">
+        <SidebarGroup className="bg-black/50 rounded-2xl mb-2 mx-2 shadow-sm">
+          <SidebarGroupLabel className="text-fuchsia-200 font-orbitron text-xs px-3 py-2">
             Profile
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -75,16 +84,16 @@ export function AppSidebar() {
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
-                      <NavLink 
-                        to={item.url} 
-                        className={`flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${
-                          isCurrentlyActive 
-                            ? 'bg-blue-600 text-white' 
-                            : 'text-white hover:bg-blue-500 hover:text-black'
-                        }`}
+                      <NavLink
+                        to={item.url}
+                        className={`flex items-center gap-3 px-3 py-3 mx-2 rounded-xl font-orbitron transition-all duration-300 text-sm font-semibold 
+                          ${isCurrentlyActive
+                            ? 'bg-gradient-to-l from-sky-400 via-fuchsia-500 to-indigo-400 text-white shadow-lg shadow-fuchsia-400/20'
+                            : 'text-fuchsia-200 hover:bg-fuchsia-800/70 hover:text-white hover:shadow-md'}`
+                        }
                       >
-                        <item.icon className={`w-5 h-5 flex-shrink-0 ${isCurrentlyActive ? 'text-white' : 'text-white hover:text-black'}`} />
-                        {state === 'expanded' && <span className="font-medium truncate">{item.title}</span>}
+                        <item.icon className={`w-5 h-5 flex-shrink-0 ${isCurrentlyActive ? 'text-white' : 'text-fuchsia-200'}`} />
+                        {state === 'expanded' && <span>{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -95,8 +104,8 @@ export function AppSidebar() {
         </SidebarGroup>
 
         {/* Tools Section */}
-        <SidebarGroup className="bg-zinc-900">
-          <SidebarGroupLabel className="text-gray-300 font-inter font-medium text-xs px-3 py-2">
+        <SidebarGroup className="bg-black/50 rounded-2xl mt-4 mx-2 shadow-sm">
+          <SidebarGroupLabel className="text-fuchsia-200 font-orbitron text-xs px-3 py-2">
             Tools
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -106,16 +115,16 @@ export function AppSidebar() {
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
-                      <NavLink 
-                        to={item.url} 
-                        className={`flex items-center gap-3 px-3 py-3 mx-2 rounded-lg transition-all duration-300 font-inter text-sm transform hover:scale-105 hover:translate-x-1 max-w-[calc(100%-1rem)] ${
-                          isCurrentlyActive 
-                            ? 'bg-blue-600 text-white' 
-                            : 'text-white hover:bg-blue-500 hover:text-black'
-                        }`}
+                      <NavLink
+                        to={item.url}
+                        className={`flex items-center gap-3 px-3 py-3 mx-2 rounded-xl font-orbitron transition-all duration-300 text-sm font-semibold 
+                          ${isCurrentlyActive
+                            ? 'bg-gradient-to-l from-sky-400 via-fuchsia-500 to-indigo-400 text-white shadow-lg shadow-fuchsia-400/20'
+                            : 'text-fuchsia-200 hover:bg-fuchsia-800/70 hover:text-white hover:shadow-md'}`
+                        }
                       >
-                        <item.icon className={`w-5 h-5 flex-shrink-0 ${isCurrentlyActive ? 'text-white' : 'text-white hover:text-black'}`} />
-                        {state === 'expanded' && <span className="font-medium truncate">{item.title}</span>}
+                        <item.icon className={`w-5 h-5 flex-shrink-0 ${isCurrentlyActive ? 'text-white' : 'text-fuchsia-200'}`} />
+                        {state === 'expanded' && <span>{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -126,21 +135,26 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 border-t border-white/10 bg-zinc-900">
+      <SidebarFooter className="p-5 border-t border-fuchsia-400/10 bg-gradient-to-r from-black/90 to-fuchsia-950/60 rounded-b-2xl mt-2">
         <SignedIn>
           <div className="flex items-center gap-3">
-            <UserButton appearance={{
-            elements: {
-              avatarBox: "w-10 h-10 flex-shrink-0"
-            }
-          }} />
-            {state === 'expanded' && user && <div className="flex-1 min-w-0">
-                <p className="text-white text-sm font-medium truncate">
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "w-10 h-10 flex-shrink-0"
+                }
+              }}
+            />
+            {state === 'expanded' && user && (
+              <div className="flex-1 min-w-0">
+                <p className="text-fuchsia-100 text-sm font-orbitron truncate">
                   {user.emailAddresses[0]?.emailAddress}
                 </p>
-              </div>}
+              </div>
+            )}
           </div>
         </SignedIn>
       </SidebarFooter>
-    </Sidebar>;
+    </Sidebar>
+  );
 }
