@@ -327,10 +327,10 @@ const HistoryModal = ({
                       </div>
                     </div>
                   </div>}
-                <div className="rounded-lg p-4 border-2 border-blue-200 max-h-96 overflow-y-auto mt-1 bg-teal-800">
+                <div className="rounded-lg p-4 border-2 border-blue-200 max-h-96 overflow-y-auto mt-1 bg-slate-900">
                   <div style={{
                 fontFamily: 'serif'
-              }} className="text-gray-100 text-sm md:text-base leading-relaxed whitespace-pre-wrap break-words bg-teal-800">
+              }} className="text-gray-100 text-sm md:text-base leading-relaxed whitespace-pre-wrap break-words bg-gray-900">
                     {/* Only use job_match for job_guide, but fallback to existing for other types */}
                     {type === 'job_guide' ? selectedItem.job_match : getResult(selectedItem)}
                   </div>
