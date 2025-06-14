@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { Layout } from '@/components/Layout';
@@ -9,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Share2, History, Copy, Sparkles } from 'lucide-react';
-import { supabase, setClerkToken } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import HistoryModal from '@/components/HistoryModal';
@@ -18,7 +17,6 @@ import LoadingMessages from '@/components/LoadingMessages';
 
 const LinkedInPosts = () => {
   const { user } = useUser();
-  const { getToken } = useAuth();
   const { toast } = useToast();
   const { userProfile } = useUserProfile();
   const { isComplete } = useUserCompletionStatus();
@@ -118,18 +116,7 @@ const LinkedInPosts = () => {
       console.log('Creating LinkedIn post with user_profile.id:', userProfile.id);
       console.log('Clerk user ID:', user.id);
 
-      // Get Clerk token and set it for Supabase BEFORE any database operations
-      const token = await getToken({ template: 'supabase' });
-      console.log('Got Clerk token:', token ? 'Token received' : 'No token');
-      
-      if (token) {
-        setClerkToken(token);
-        console.log('Clerk token set for Supabase');
-      } else {
-        throw new Error('Failed to get authentication token');
-      }
-
-      // Insert into database with proper authentication
+      // Insert into database - RLS policies are permissive so no special auth needed
       const { data, error } = await supabase
         .from('job_linkedin')
         .insert({
