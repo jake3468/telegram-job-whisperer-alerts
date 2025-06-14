@@ -1,8 +1,6 @@
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Edit, Trash2, MapPin, Clock, Bell } from 'lucide-react';
-
 interface JobAlert {
   id: string;
   country: string;
@@ -21,7 +19,6 @@ interface JobAlertsListProps {
   onEdit: (alert: JobAlert) => void;
   onDelete: (alertId: string) => void;
 }
-
 const JobAlertsList = ({
   alerts,
   onEdit,
@@ -47,31 +44,19 @@ const JobAlertsList = ({
         return 'bg-gray-200 text-gray-700';
     }
   };
-
-  return (
-    <div className="space-y-3">
-      {alerts.map(alert =>
-        <Card
-          key={alert.id}
-          // Less bright, compact, pastel orange-brown gradient
-          className="
+  return <div className="space-y-3">
+      {alerts.map(alert => <Card key={alert.id}
+    // Less bright, compact, pastel orange-brown gradient
+    className="
             bg-gradient-to-br from-[#fec89a] via-[#f77f00]/50 to-[#bc6c25]/20
             border border-orange-300/60 shadow
             rounded-xl sm:rounded-2xl
             p-0
-          "
-        >
-          <CardContent
-            className="
-              flex flex-col
-              p-3 sm:p-4
-              rounded-xl
-              text-orange-950
-              gap-2
-              sm:gap-3
-            "
-            style={{ minHeight: 0 }} // Remove forced height
-          >
+          ">
+          <CardContent style={{
+        minHeight: 0
+      }} // Remove forced height
+      className="flex flex-col p-3 sm:p-4 rounded-xl text-orange-950 gap-2 sm:gap-3 bg-rose-300">
             <div className="flex flex-row gap-2 justify-between items-start w-full">
               {/* MAIN (info) */}
               <div className="flex-1 min-w-0">
@@ -101,31 +86,16 @@ const JobAlertsList = ({
               </div>
               {/* Action Buttons, tight spacing and size */}
               <div className="flex flex-col sm:flex-row gap-2 mt-1">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => onEdit(alert)}
-                  className="h-8 w-8 p-0 border-orange-300 text-orange-700 hover:bg-orange-50 transition"
-                  aria-label="Edit Alert"
-                >
+                <Button variant="outline" size="icon" onClick={() => onEdit(alert)} className="h-8 w-8 p-0 border-orange-300 text-orange-700 hover:bg-orange-50 transition" aria-label="Edit Alert">
                   <Edit className="w-4 h-4" />
                 </Button>
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  onClick={() => onDelete(alert.id)}
-                  className="h-8 w-8 p-0"
-                  aria-label="Delete Alert"
-                >
+                <Button variant="destructive" size="icon" onClick={() => onDelete(alert.id)} className="h-8 w-8 p-0" aria-label="Delete Alert">
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
             </div>
           </CardContent>
-        </Card>
-      )}
-    </div>
-  );
+        </Card>)}
+    </div>;
 };
-
 export default JobAlertsList;
