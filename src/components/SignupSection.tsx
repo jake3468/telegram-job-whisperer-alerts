@@ -28,19 +28,19 @@ const SignupSection = () => {
   return (
     <section id="signup-section" className="bg-black py-20 px-4">
       <div className="max-w-md mx-auto">
-        <div className="bg-pastel-blue rounded-2xl p-8 shadow-xl">
+        <div className="bg-slate-800/70 border border-slate-700 rounded-xl p-8 shadow-2xl backdrop-blur-md">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-semibold text-black mb-2 font-inter">
-              Get Started
+            <h2 className="text-3xl font-semibold text-white mb-2 font-inter">
+              Ready to Get Started?
             </h2>
-            <p className="text-black/80 font-inter font-light">
-              Create your account to start receiving personalized job alerts
+            <p className="text-gray-300 font-inter font-light">
+              Create your account and let Jobbots assist your job search.
             </p>
           </div>
           
           <form onSubmit={handleSignup} className="space-y-6">
             <div>
-              <Label htmlFor="email" className="text-black font-inter font-medium">
+              <Label htmlFor="email" className="text-gray-200 font-inter font-medium">
                 Email Address
               </Label>
               <Input
@@ -50,20 +50,20 @@ const SignupSection = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
                 required
-                className="mt-2 bg-white/50 border-black/20 text-black placeholder:text-black/60 font-inter"
+                className="mt-2 bg-slate-700/80 border-slate-600 text-white placeholder:text-slate-400 font-inter h-12 text-base focus:border-sky-500 focus:ring-sky-500"
               />
             </div>
             
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-black text-white hover:bg-black/80 py-3 rounded-xl font-inter font-medium transition-all duration-200"
+              className="w-full bg-sky-600 hover:bg-sky-700 text-white py-3 rounded-lg font-inter font-medium transition-all duration-200 h-12 text-base shadow-md hover:shadow-sky-500/30"
             >
-              {loading ? "Creating Account..." : "Create Account"}
+              {loading ? "Creating Account..." : "Create Free Account"}
             </Button>
           </form>
           
-          <p className="text-xs text-black/60 text-center mt-4 font-inter">
+          <p className="text-xs text-gray-500 text-center mt-6 font-inter">
             By signing up, you agree to our Terms of Service and Privacy Policy
           </p>
         </div>

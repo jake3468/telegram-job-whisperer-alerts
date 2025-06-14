@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -70,6 +69,9 @@ export default {
 					lavender: '#E5D4FF'
 				}
 			},
+			backgroundImage: {
+        'hero-glow': 'radial-gradient(ellipse_80%_60%_at_50%_120%,rgba(239,68,68,0.1),transparent)',
+      },
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
