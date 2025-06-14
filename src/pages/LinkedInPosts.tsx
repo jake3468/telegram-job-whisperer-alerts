@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import HistoryModal from '@/components/HistoryModal';
+import LinkedInPostDisplay from '@/components/LinkedInPostDisplay';
+import LoadingMessages from '@/components/LoadingMessages';
 
 const LinkedInPosts = () => {
   const { user } = useUser();
@@ -29,6 +31,8 @@ const LinkedInPosts = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
 
   const toneOptions = [
@@ -37,6 +41,39 @@ const LinkedInPosts = () => {
     { value: 'bold', label: 'Bold & Opinionated' },
     { value: 'thoughtful', label: 'Thoughtful & Reflective' }
   ];
+
+  // Real-time subscription for LinkedIn post updates
+  useEffect(() => {
+    if (!currentPostId) return;
+
+    const channel = supabase
+      .channel('linkedin-post-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'job_linkedin',
+          filter: `id=eq.${currentPostId}`
+        },
+        (payload) => {
+          console.log('LinkedIn post updated:', payload);
+          if (payload.new.linkedin_post) {
+            setResult(payload.new.linkedin_post);
+            setIsGenerating(false);
+            toast({
+              title: "LinkedIn Post Generated!",
+              description: "Your LinkedIn post has been created successfully."
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentPostId, toast]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -73,9 +110,11 @@ const LinkedInPosts = () => {
     }
 
     setIsSubmitting(true);
+    setIsGenerating(true);
+    setResult('');
 
     try {
-      // Insert into database
+      // Insert into database (this will trigger the webhook)
       const { data, error } = await supabase
         .from('job_linkedin')
         .insert({
@@ -91,22 +130,15 @@ const LinkedInPosts = () => {
 
       if (error) throw error;
 
-      // For now, we'll just show a placeholder result
-      // In a real implementation, this would trigger the AI generation
-      const mockResult = `🚀 ${formData.topic}
-
-${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? '📊 ' + formData.personal_story + '\n\n' : ''}What are your thoughts? Drop a comment below! 👇
-
-#LinkedIn #${formData.topic.replace(/\s+/g, '')} #Professional`;
-
-      setResult(mockResult);
+      setCurrentPostId(data.id);
 
       toast({
-        title: "LinkedIn Post Created!",
-        description: "Your LinkedIn post has been generated successfully."
+        title: "Request Submitted!",
+        description: "Your LinkedIn post is being generated. Please wait..."
       });
     } catch (err) {
       console.error('Error creating LinkedIn post:', err);
+      setIsGenerating(false);
       toast({
         title: "Error",
         description: "Failed to create LinkedIn post. Please try again.",
@@ -145,6 +177,8 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
       tone: ''
     });
     setResult('');
+    setIsGenerating(false);
+    setCurrentPostId(null);
   };
 
   return (
@@ -161,7 +195,7 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
             </p>
           </div>
 
-          {/* Widened Form Layout - Changed from max-w-2xl to max-w-4xl to match Cover Letter page */}
+          {/* Widened Form Layout */}
           <div className="max-w-4xl mx-auto">
             {/* Input Form */}
             <Card className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 border-white/20 backdrop-blur-sm mb-8">
@@ -287,10 +321,10 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
                   <div className="flex gap-3 pt-4">
                     <Button 
                       type="submit" 
-                      disabled={isSubmitting || !formData.topic.trim()} 
+                      disabled={isSubmitting || !formData.topic.trim() || isGenerating} 
                       className="flex-1 bg-gradient-to-r from-slate-500 to-gray-600 hover:from-slate-600 hover:to-gray-700 text-white font-medium text-base h-12"
                     >
-                      {isSubmitting ? 'Creating Post...' : 'Generate LinkedIn Post'}
+                      {isSubmitting ? 'Submitting...' : 'Generate LinkedIn Post'}
                     </Button>
                     
                     <Button 
@@ -306,7 +340,16 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
               </CardContent>
             </Card>
 
-            {/* Result Display - Only show when there's a result */}
+            {/* Loading State */}
+            {isGenerating && !result && (
+              <Card className="bg-white/5 border-white/20 backdrop-blur-sm mb-8">
+                <CardContent className="py-8">
+                  <LoadingMessages />
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Result Display */}
             {result && (
               <Card className="bg-white/5 border-white/20 backdrop-blur-sm">
                 <CardHeader className="pb-6">
@@ -320,11 +363,10 @@ ${formData.opinion ? formData.opinion + '\n\n' : ''}${formData.personal_story ? 
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="bg-white rounded-lg p-6 border-2 border-slate-200">
-                      <div className="text-gray-800 text-base leading-relaxed whitespace-pre-wrap font-serif">
-                        {result}
-                      </div>
-                    </div>
+                    <LinkedInPostDisplay 
+                      content={result} 
+                      userProfile={userProfile}
+                    />
                     
                     <Button 
                       onClick={handleCopyResult} 
