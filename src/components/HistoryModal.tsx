@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -132,29 +133,35 @@ const HistoryModal = ({
     }
 
     try {
-      console.log(`Attempting to delete ${type} item with ID: ${itemId} for user: ${userProfile.id}`);
+      console.log(`Attempting to delete ${type} item with ID: ${itemId} for user profile: ${userProfile.id}`);
       
       let query;
+      let tableName;
       
       if (type === 'job_guide') {
+        tableName = 'job_analyses';
         query = supabase
           .from('job_analyses')
           .delete()
           .eq('id', itemId)
           .eq('user_id', userProfile.id);
       } else if (type === 'cover_letter') {
+        tableName = 'job_cover_letters';
         query = supabase
           .from('job_cover_letters')
           .delete()
           .eq('id', itemId)
           .eq('user_id', userProfile.id);
       } else {
+        tableName = 'job_linkedin';
         query = supabase
           .from('job_linkedin')
           .delete()
           .eq('id', itemId)
           .eq('user_id', userProfile.id);
       }
+      
+      console.log(`Deleting from table: ${tableName}, item ID: ${itemId}, user_id: ${userProfile.id}`);
       
       const { error, data } = await query;
       
@@ -163,7 +170,7 @@ const HistoryModal = ({
         throw error;
       }
 
-      console.log('Delete operation completed:', data);
+      console.log('Delete operation completed successfully');
 
       // Remove from local state
       setHistoryData(prev => prev.filter(item => item.id !== itemId));
