@@ -12,7 +12,6 @@ import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import { supabase } from '@/integrations/supabase/client';
 import { Layout } from '@/components/Layout';
 import JobAnalysisHistory from '@/components/JobAnalysisHistory';
-
 const JobGuide = () => {
   const {
     user,
@@ -28,7 +27,6 @@ const JobGuide = () => {
     isComplete,
     loading
   } = useUserCompletionStatus();
-
   const [formData, setFormData] = useState({
     companyName: '',
     jobTitle: '',
@@ -42,14 +40,7 @@ const JobGuide = () => {
   const [jobAnalysisResult, setJobAnalysisResult] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('');
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  const loadingMessages = [
-    "🔍 Analyzing job requirements...",
-    "✨ Crafting personalized insights...",
-    "🚀 Tailoring advice to your profile...",
-    "🎯 Generating strategic recommendations..."
-  ];
-
+  const loadingMessages = ["🔍 Analyzing job requirements...", "✨ Crafting personalized insights...", "🚀 Tailoring advice to your profile...", "🎯 Generating strategic recommendations..."];
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
@@ -57,43 +48,34 @@ const JobGuide = () => {
   }, [user, isLoaded, navigate]);
   useEffect(() => {
     if (!isGenerating) return;
-
     let messageIndex = 0;
     setLoadingMessage(loadingMessages[0]);
-
     const messageInterval = setInterval(() => {
       messageIndex = (messageIndex + 1) % loadingMessages.length;
       setLoadingMessage(loadingMessages[messageIndex]);
     }, 3000);
-
     return () => clearInterval(messageInterval);
   }, [isGenerating]);
   useEffect(() => {
     if (!jobAnalysisId || !isGenerating) return;
-
     const pollForResults = async () => {
       try {
-        const { data, error } = await supabase
-          .from('job_analyses')
-          .select('job_match')
-          .eq('id', jobAnalysisId)
-          .single();
-
+        const {
+          data,
+          error
+        } = await supabase.from('job_analyses').select('job_match').eq('id', jobAnalysisId).single();
         if (error) {
           console.error('Error polling for results:', error);
           return;
         }
-
         if (data?.job_match) {
           setJobAnalysisResult(data.job_match);
           setIsGenerating(false);
           setIsSuccess(false);
-          
           if (pollingIntervalRef.current) {
             clearInterval(pollingIntervalRef.current);
             pollingIntervalRef.current = null;
           }
-
           toast({
             title: "Job Analysis Generated!",
             description: "Your personalized job analysis is ready."
@@ -103,9 +85,7 @@ const JobGuide = () => {
         console.error('Polling error:', err);
       }
     };
-
     pollingIntervalRef.current = setInterval(pollForResults, 3000);
-
     const timeout = setTimeout(() => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
@@ -119,7 +99,6 @@ const JobGuide = () => {
         variant: "destructive"
       });
     }, 300000);
-
     return () => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
@@ -152,7 +131,6 @@ const JobGuide = () => {
   }, [toast]);
   const handleSubmit = useCallback(async () => {
     console.log('🚀 Job Guide Submit Button Clicked');
-
     if (!isComplete) {
       toast({
         title: "Complete your profile first",
@@ -161,7 +139,6 @@ const JobGuide = () => {
       });
       return;
     }
-
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
         title: "Missing information",
@@ -170,7 +147,6 @@ const JobGuide = () => {
       });
       return;
     }
-
     if (isSubmitting || isGenerating) {
       toast({
         title: "Please wait",
@@ -179,49 +155,36 @@ const JobGuide = () => {
       });
       return;
     }
-
     try {
       setIsSubmitting(true);
       setError(null);
       setIsSuccess(false);
       setJobAnalysisResult(null);
       console.log('✅ Starting job analysis submission process');
-
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('clerk_id', user?.id)
-        .single();
-
+      const {
+        data: userData,
+        error: userError
+      } = await supabase.from('users').select('id').eq('clerk_id', user?.id).single();
       if (userError || !userData) {
         console.error('❌ User not found:', userError);
         throw new Error('User not found in database');
       }
       console.log('✅ Found user in users table:', userData.id);
-
-      const { data: profileData, error: profileError } = await supabase
-        .from('user_profile')
-        .select('id')
-        .eq('user_id', userData.id)
-        .single();
-
+      const {
+        data: profileData,
+        error: profileError
+      } = await supabase.from('user_profile').select('id').eq('user_id', userData.id).single();
       if (profileError || !profileData) {
         console.error('❌ User profile not found:', profileError);
         throw new Error('User profile not found. Please complete your profile first.');
       }
       console.log('✅ Found user profile:', profileData.id);
-
-      const { data: existingAnalysis, error: checkError } = await supabase
-        .from('job_analyses')
-        .select('id, job_match')
-        .eq('user_id', profileData.id)
-        .eq('company_name', formData.companyName)
-        .eq('job_title', formData.jobTitle)
-        .eq('job_description', formData.jobDescription)
-        .not('job_match', 'is', null)
-        .order('created_at', { ascending: false })
-        .limit(1);
-
+      const {
+        data: existingAnalysis,
+        error: checkError
+      } = await supabase.from('job_analyses').select('id, job_match').eq('user_id', profileData.id).eq('company_name', formData.companyName).eq('job_title', formData.jobTitle).eq('job_description', formData.jobDescription).not('job_match', 'is', null).order('created_at', {
+        ascending: false
+      }).limit(1);
       if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
         const existing = existingAnalysis[0];
         console.log('✅ Found existing job analysis:', existing.id);
@@ -234,7 +197,6 @@ const JobGuide = () => {
         });
         return;
       }
-
       const insertData = {
         user_id: profileData.id,
         company_name: formData.companyName,
@@ -242,18 +204,14 @@ const JobGuide = () => {
         job_description: formData.jobDescription
       };
       console.log('📝 Inserting job analysis data:', insertData);
-
-      const { data: insertedData, error: insertError } = await supabase
-        .from('job_analyses')
-        .insert(insertData)
-        .select('id')
-        .single();
-
+      const {
+        data: insertedData,
+        error: insertError
+      } = await supabase.from('job_analyses').insert(insertData).select('id').single();
       if (insertError) {
         console.error('❌ INSERT ERROR:', insertError);
         throw new Error(`Database insert failed: ${insertError.message}`);
       }
-
       if (insertedData?.id) {
         console.log('✅ Job analysis record inserted:', insertedData.id);
         setJobAnalysisId(insertedData.id);
@@ -279,19 +237,27 @@ const JobGuide = () => {
   }, [formData, isComplete, user, toast, isSubmitting, isGenerating]);
   useEffect(() => {
     const handleHistoryData = (event: any) => {
-      const { companyName, jobTitle, jobDescription, result, type } = event.detail;
+      const {
+        companyName,
+        jobTitle,
+        jobDescription,
+        result,
+        type
+      } = event.detail;
       if (type === 'job_guide') {
-        setFormData({ companyName, jobTitle, jobDescription });
+        setFormData({
+          companyName,
+          jobTitle,
+          jobDescription
+        });
         setJobAnalysisResult(result);
       }
     };
-
     window.addEventListener('useHistoryData', handleHistoryData);
     return () => window.removeEventListener('useHistoryData', handleHistoryData);
   }, []);
   const handleCopyResult = async () => {
     if (!jobAnalysisResult) return;
-
     try {
       await navigator.clipboard.writeText(jobAnalysisResult);
       toast({
@@ -310,23 +276,16 @@ const JobGuide = () => {
   const isFormValid = formData.companyName && formData.jobTitle && formData.jobDescription;
   const hasAnyData = isFormValid || jobAnalysisResult;
   const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating;
-
   if (!isLoaded || !user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+    return <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <div className="text-slate-400 text-xs">Loading...</div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <Layout>
+  return <Layout>
       <div className="min-h-screen w-full bg-gradient-to-br from-slate-950 via-slate-900/90 to-slate-950 flex flex-col">
         <div className="max-w-4xl mx-auto w-full px-2 py-8 sm:px-6 sm:py-12 rounded-3xl bg-transparent mt-4">
           <div className="text-center mb-8 px-2">
-            <h1
-              className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 bg-clip-text text-transparent mb-2 drop-shadow"
-            >
+            <h1 className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 bg-clip-text text-transparent mb-2 drop-shadow">
               Job Analysis
             </h1>
             <p className="text-lg text-slate-300 font-inter font-light">
@@ -348,11 +307,7 @@ const JobGuide = () => {
                     </CardDescription>
                   </div>
                   <div>
-                    <JobAnalysisHistory
-                      type="job_guide"
-                      gradientColors="from-slate-200 via-slate-300 to-slate-200"
-                      borderColors="border-slate-600/30"
-                    />
+                    <JobAnalysisHistory type="job_guide" gradientColors="from-slate-200 via-slate-300 to-slate-200" borderColors="border-slate-600/30" />
                   </div>
                 </div>
               </CardHeader>
@@ -363,28 +318,14 @@ const JobGuide = () => {
                     <label htmlFor="companyName" className="text-slate-200 font-semibold text-base">
                       Company Name *
                     </label>
-                    <Input
-                      id="companyName"
-                      placeholder="Google, Microsoft"
-                      value={formData.companyName}
-                      onChange={e => handleInputChange('companyName', e.target.value)}
-                      required
-                      className="bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold"
-                    />
+                    <Input id="companyName" placeholder="Google, Microsoft" value={formData.companyName} onChange={e => handleInputChange('companyName', e.target.value)} required className="bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold" />
                   </div>
                   {/* Job Title */}
                   <div className="space-y-2">
                     <label htmlFor="jobTitle" className="text-slate-200 font-semibold text-base">
                       Job Title *
                     </label>
-                    <Input
-                      id="jobTitle"
-                      placeholder="Software Engineer, Marketing Manager"
-                      value={formData.jobTitle}
-                      onChange={e => handleInputChange('jobTitle', e.target.value)}
-                      required
-                      className="bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold"
-                    />
+                    <Input id="jobTitle" placeholder="Software Engineer, Marketing Manager" value={formData.jobTitle} onChange={e => handleInputChange('jobTitle', e.target.value)} required className="bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold" />
                   </div>
                 </div>
                 {/* Job Description */}
@@ -395,63 +336,36 @@ const JobGuide = () => {
                   <span className="text-slate-400 font-normal text-xs block mb-2">
                     Paste in the job description or key requirements
                   </span>
-                  <Textarea
-                    id="jobDescription"
-                    placeholder="Paste the job description here..."
-                    value={formData.jobDescription}
-                    onChange={e => handleInputChange('jobDescription', e.target.value)}
-                    required
-                    className="min-h-[100px] bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold"
-                  />
+                  <Textarea id="jobDescription" placeholder="Paste the job description here..." value={formData.jobDescription} onChange={e => handleInputChange('jobDescription', e.target.value)} required className="min-h-[100px] bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold" />
                 </div>
                 {/* Action Buttons */}
                 <div className="flex flex-col md:flex-row gap-3 pt-4">
-                  <Button
-                    onClick={handleSubmit}
-                    // Use prominent visual style, never dulled out unless disabled
-                    disabled={isButtonDisabled}
-                    className={`flex-1 bg-gradient-to-r from-sky-700 via-blue-600 to-blue-800 hover:from-blue-500 hover:to-sky-700 text-white font-semibold text-base h-12 shadow-none border border-blue-600 transition-all duration-150
+                  <Button onClick={handleSubmit}
+                // Use prominent visual style, never dulled out unless disabled
+                disabled={isButtonDisabled} className={`flex-1 bg-gradient-to-r from-sky-700 via-blue-600 to-blue-800 hover:from-blue-500 hover:to-sky-700 text-white font-semibold text-base h-12 shadow-none border border-blue-600 transition-all duration-150
                       ${isButtonDisabled ? 'opacity-50 cursor-not-allowed' : 'opacity-100'}
-                    `}
-                  >
-                    {isGenerating ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    ) : (
-                      <Sparkles className="w-4 h-4 mr-2" />
-                    )}
-                    {isGenerating
-                      ? loadingMessage || 'Analyzing...'
-                      : 'Generate Job Analysis'}
+                    `}>
+                    {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                    {isGenerating ? loadingMessage || 'Analyzing...' : 'Generate Job Analysis'}
                   </Button>
-                  <Button
-                    onClick={handleClearData}
-                    variant="outline"
-                    size="sm"
-                    className="flex-none min-w-[120px] bg-slate-900/70 border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-slate-200 h-10 px-4 ml-0 md:ml-2"
-                    disabled={!hasAnyData}
-                  >
+                  <Button onClick={handleClearData} variant="outline" size="sm" className="flex-none min-w-[120px] bg-slate-900/70 border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-slate-200 h-10 px-4 ml-0 md:ml-2" disabled={!hasAnyData}>
                     <Trash2 className="w-4 h-4 mr-2" />
                     Clear All
                   </Button>
                 </div>
-                {error && (
-                  <div className="flex items-center rounded-lg p-3 bg-red-900/30 border border-red-700/50 mt-2 text-red-300 gap-2">
+                {error && <div className="flex items-center rounded-lg p-3 bg-red-900/30 border border-red-700/50 mt-2 text-red-300 gap-2">
                     <AlertCircle className="w-4 h-4" />
                     <span>{error}</span>
-                  </div>
-                )}
-                {isSuccess && (
-                  <div className="flex items-center rounded-lg p-3 bg-green-900/20 border border-green-700/40 mt-2 text-green-300 gap-2">
+                  </div>}
+                {isSuccess && <div className="flex items-center rounded-lg p-3 bg-green-900/20 border border-green-700/40 mt-2 text-green-300 gap-2">
                     <CheckCircle className="w-4 h-4" />
                     <span>Job analysis submitted successfully!</span>
-                  </div>
-                )}
+                  </div>}
               </CardContent>
             </Card>
 
             {/* Loading State */}
-            {isGenerating && (
-              <Card className="bg-slate-800 border border-slate-700 mb-6 animate-fade-in shadow">
+            {isGenerating && <Card className="bg-slate-800 border border-slate-700 mb-6 animate-fade-in shadow">
                 <CardContent className="py-8">
                   <div className="flex flex-col items-center">
                     <Loader2 className="w-10 h-10 text-slate-400 animate-spin mb-4" />
@@ -463,12 +377,10 @@ const JobGuide = () => {
                     </div>
                   </div>
                 </CardContent>
-              </Card>
-            )}
+              </Card>}
 
             {/* Result Display */}
-            {jobAnalysisResult && (
-              <Card className="bg-slate-800 border border-slate-700 shadow">
+            {jobAnalysisResult && <Card className="bg-slate-800 border border-slate-700 shadow">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-slate-200 font-orbitron text-xl flex items-center gap-2">
                     <FileText className="w-5 h-5 text-slate-400" />
@@ -483,22 +395,13 @@ const JobGuide = () => {
                     {jobAnalysisResult}
                   </div>
                   <div className="flex flex-col md:flex-row gap-2">
-                    <Button
-                      onClick={handleCopyResult}
-                      className="flex-1 bg-gradient-to-r from-slate-700 via-slate-600 to-slate-700 hover:from-slate-600 hover:to-slate-800 text-slate-100 font-medium text-base h-12 border border-slate-600"
-                    >
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copy Job Analysis
-                    </Button>
+                    
                   </div>
                 </CardContent>
-              </Card>
-            )}
+              </Card>}
           </div>
         </div>
       </div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default JobGuide;
