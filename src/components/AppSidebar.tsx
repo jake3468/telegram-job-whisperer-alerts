@@ -53,7 +53,6 @@ export function AppSidebar() {
     if (!user) return "User";
     if (user.firstName && user.lastName) return `${user.firstName} ${user.lastName}`;
     if (user.firstName) return user.firstName;
-    // Clerk fallback for username/displayname if available
     if ((user as any).username) return (user as any).username;
     return "User";
   };
@@ -110,10 +109,8 @@ export function AppSidebar() {
                         to={item.url}
                         className={`
                           flex items-center gap-2 py-3 
-                          mx-2 
-                          pr-3                           /* Padding right for general state */
-                          ${isCurrentlyActive ? 'mr-2' : ''}  /* Margin right for active to preserve border radius */
-                          pl-3
+                          mx-2                          /* constant margin on both sides for highlight containment */
+                          px-3
                           rounded-2xl
                           font-orbitron transition-all duration-300 
                           text-base font-bold w-full
@@ -161,10 +158,8 @@ export function AppSidebar() {
                         to={item.url}
                         className={`
                           flex items-center gap-2 py-3 
-                          mx-2 
-                          pr-3                           
-                          ${isCurrentlyActive ? 'mr-2' : ''}
-                          pl-3
+                          mx-2                          /* constant margin on both sides for highlight containment */
+                          px-3
                           rounded-2xl
                           font-orbitron transition-all duration-300 
                           text-base font-bold w-full
