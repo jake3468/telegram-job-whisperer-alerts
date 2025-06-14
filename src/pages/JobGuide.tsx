@@ -380,7 +380,8 @@ const JobGuide = () => {
               </Card>}
 
             {/* Result Display */}
-            {jobAnalysisResult && <Card className="bg-slate-800 border border-slate-700 shadow">
+            {jobAnalysisResult && (
+              <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-cyan-900 border border-blue-700 shadow-lg">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-slate-200 font-orbitron text-xl flex items-center gap-2">
                     <FileText className="w-5 h-5 text-slate-400" />
@@ -391,14 +392,24 @@ const JobGuide = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="whitespace-pre-wrap font-inter text-slate-100 bg-slate-900 rounded-lg p-5 shadow-inner mb-3 border border-slate-700">
-                    {jobAnalysisResult}
+                  <div
+                    className="whitespace-pre-wrap font-inter text-slate-100 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-blue-900/90 rounded-xl p-5 shadow-inner mb-3 border border-slate-700 max-w-full overflow-x-auto break-words"
+                    style={{
+                      minHeight: '180px',
+                      wordBreak: 'break-word',
+                      overflowX: 'auto',
+                    }}
+                  >
+                    <div className="text-base sm:text-base md:text-lg leading-relaxed break-words">
+                      {jobAnalysisResult}
+                    </div>
                   </div>
                   <div className="flex flex-col md:flex-row gap-2">
                     
                   </div>
                 </CardContent>
-              </Card>}
+              </Card>
+            )}
           </div>
         </div>
       </div>
