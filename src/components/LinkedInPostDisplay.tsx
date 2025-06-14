@@ -3,18 +3,23 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Repeat2, Send, MoreHorizontal, User } from 'lucide-react';
 
+interface UserProfile {
+  id: string;
+  user_id: string;
+  bio: string | null;
+  resume: string | null;
+  bot_activated: boolean | null;
+  chat_id: string | null;
+  created_at: string | null;
+}
+
 interface LinkedInPostDisplayProps {
   content: string;
-  userProfile?: {
-    first_name?: string;
-    last_name?: string;
-  };
+  userProfile?: UserProfile | null;
 }
 
 const LinkedInPostDisplay = ({ content, userProfile }: LinkedInPostDisplayProps) => {
-  const userName = userProfile?.first_name && userProfile?.last_name 
-    ? `${userProfile.first_name} ${userProfile.last_name}`
-    : 'Professional User';
+  const userName = userProfile ? 'Professional User' : 'Professional User';
 
   return (
     <Card className="bg-white border border-slate-200 shadow-sm max-w-2xl mx-auto">
