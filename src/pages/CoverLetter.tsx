@@ -192,7 +192,7 @@ const CoverLetter = () => {
         <div className="max-w-4xl mx-auto w-full px-3 py-8 sm:px-6 sm:py-12 rounded-3xl mt-4">
           {/* Gradient Heading */}
           <div
-            className="mb-8 px-6 text-center"
+            className="mb-8 text-center"
           >
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-pink-400 via-fuchsia-400 to-fuchsia-600 bg-clip-text text-transparent mb-2 drop-shadow font-orbitron animate-fade-in">
               Cover Letter
@@ -204,7 +204,7 @@ const CoverLetter = () => {
           <div className="space-y-8">
             {/* Input Form in Gradient Box */}
             <Card
-              className="rounded-2xl border-0 bg-gradient-to-br from-rose-800/80 via-fuchsia-900/70 to-pink-800/80 shadow-xl mb-8"
+              className="rounded-2xl border-0 bg-gradient-to-br from-rose-800/80 via-fuchsia-900/70 to-pink-800/80 shadow-xl"
               style={{
                 boxShadow: '0 2px 32px 0 rgba(150,97,255,0.12)'
               }}
