@@ -45,7 +45,7 @@ const BioSection = () => {
 
   if (loading) {
     return (
-      <Card className="border-2 border-green-400 shadow-none">
+      <Card className="border-2 border-emerald-400 shadow-none">
         <CardContent className="p-4">
           <div className="text-white text-xs">Loading...</div>
         </CardContent>
@@ -55,15 +55,16 @@ const BioSection = () => {
 
   return (
     <section className="p-0 rounded-none bg-transparent shadow-none">
-      <Card className="border-2 border-emerald-400/60 shadow-sm rounded-2xl bg-gradient-to-br from-[#23694a]/90 via-[#1e8457]/90 to-[#151b1e]/90">
+      {/* Vibrant emerald gradient card with crisp border and shadow */}
+      <Card className="rounded-3xl border-2 border-emerald-400 bg-gradient-to-b from-[#30e894]/90 via-[#0fab73]/85 to-[#124c41]/85 shadow-[0_4px_40px_-8px_rgba(63,232,161,0.13)] transition-all">
         <CardHeader className="pb-3">
-          <CardTitle className="text-white font-inter flex items-center gap-2 text-base">
-            <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-              <User className="w-3 h-3 text-white" />
+          <CardTitle className="text-white font-orbitron flex items-center gap-2 text-lg drop-shadow-md">
+            <div className="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center">
+              <User className="w-4 h-4 text-emerald-100" />
             </div>
-            About You
+            <span className="bg-gradient-to-r from-emerald-200 to-pastel-mint bg-clip-text text-transparent">About You</span>
           </CardTitle>
-          <CardDescription className="text-emerald-100 font-inter text-sm">
+          <CardDescription className="text-emerald-100 text-base font-inter font-normal drop-shadow-sm">
             Tell us about yourself to get better job recommendations
           </CardDescription>
         </CardHeader>
@@ -73,9 +74,9 @@ const BioSection = () => {
             onChange={e => setBio(e.target.value)}
             placeholder="Describe your experience, skills, career goals, and what kind of opportunities you're looking for..."
             rows={4}
-            className="min-h-[100px] border-2 border-white/20 text-white placeholder-white/70 font-inter focus-visible:border-white/40 hover:border-white/30 text-sm resize-none bg-[#11181c]"
+            className="min-h-[100px] border-2 border-white/30 text-white placeholder-white/70 font-inter focus-visible:border-emerald-200 hover:border-emerald-300 text-base resize-none bg-black/70 shadow-inner"
           />
-          <Button onClick={handleSaveBio} disabled={saving} className="font-inter bg-white text-emerald-700 hover:bg-gray-100 font-medium text-xs px-3 py-1 h-8">
+          <Button onClick={handleSaveBio} disabled={saving} className="font-inter bg-white text-emerald-700 hover:bg-gray-100 font-bold text-xs px-4 py-2 h-9 rounded-lg shadow">
             {saving ? 'Saving...' : 'Save Bio'}
           </Button>
         </CardContent>

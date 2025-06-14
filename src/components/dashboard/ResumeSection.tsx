@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -159,44 +160,45 @@ const ResumeSection = () => {
 
   return (
     <section className="p-0 rounded-none bg-transparent shadow-none">
-      <Card className="border-2 border-fuchsia-400/60 shadow-sm rounded-2xl bg-gradient-to-br from-[#26224b]/90 via-[#2a2740]/100 to-[#191726]/90">
+      {/* Vibrant gradient with accent border and strong visual hierarchy */}
+      <Card className="rounded-3xl border-2 border-fuchsia-400 bg-gradient-to-b from-[#7c39f7]/80 via-[#665fec]/80 to-[#3e285b]/90 shadow-[0_4px_40px_-8px_rgba(168,72,255,0.18)] transition-all">
         <CardHeader className="pb-3">
-          <CardTitle className="text-white font-inter flex items-center gap-2 text-base">
-            <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-              <FileText className="w-3 h-3 text-white" />
+          <CardTitle className="text-white font-orbitron flex items-center gap-2 text-lg drop-shadow-md">
+            <div className="w-7 h-7 bg-white/25 rounded-full flex items-center justify-center">
+              <FileText className="w-4 h-4 text-fuchsia-100" />
             </div>
-            Resume
+            <span className="bg-gradient-to-r from-fuchsia-300 to-pastel-lavender bg-clip-text text-transparent">Resume</span>
           </CardTitle>
-          <CardDescription className="text-fuchsia-100 font-inter text-sm">
+          <CardDescription className="text-fuchsia-100 text-base font-inter font-normal drop-shadow-sm">
             Upload your resume (PDF only, max 5MB) for better job matching
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 pt-0">
           {resumeUrl ? (
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-lg border border-white/20 bg-[#171628]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-xl border border-white/20 bg-black/60 shadow-inner">
               <div className="flex items-center gap-2 min-w-0">
-                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-fuchsia-600/25 rounded-full flex items-center justify-center flex-shrink-0">
                   <FileText className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-white font-inter font-medium text-sm truncate">resume.pdf</span>
+                <span className="text-white font-inter font-semibold text-base truncate">resume.pdf</span>
               </div>
-              <Button variant="destructive" size="sm" onClick={handleDeleteResume} className="font-inter hover:bg-red-600 transition-colors text-xs px-3 py-1 h-8 flex-shrink-0">
+              <Button variant="destructive" size="sm" onClick={handleDeleteResume} className="font-inter bg-red-500 hover:bg-red-600 transition-all text-xs px-4 py-1 h-8 flex-shrink-0 rounded-lg">
                 <Trash2 className="w-3 h-3 mr-1" />
                 Delete
               </Button>
             </div>
           ) : (
             <div
-              className="border-2 border-dashed border-white/40 rounded-lg p-4 sm:p-6 text-center cursor-pointer hover:border-white/60 hover:bg-white/5 transition-all duration-300 bg-[#171628]"
+              className="border-2 border-dashed border-white/60 rounded-xl p-5 sm:p-8 text-center cursor-pointer hover:border-fuchsia-300 hover:bg-fuchsia-300/10 transition-all duration-300 bg-black/50 shadow-inner"
               onClick={triggerFileInput}
             >
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Upload className="w-6 h-6 text-white" />
+              <div className="w-14 h-14 bg-fuchsia-600/25 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Upload className="w-7 h-7 text-fuchsia-200" />
               </div>
-              <p className="text-white font-inter mb-3 font-medium text-sm">
+              <p className="text-fuchsia-100 font-inter mb-4 font-semibold text-base">
                 Click to upload or drag and drop your resume
               </p>
-              <Button disabled={uploading} className="font-inter bg-white text-fuchsia-700 hover:bg-gray-100 font-medium text-xs px-3 py-1 h-8">
+              <Button disabled={uploading} className="font-inter bg-white text-fuchsia-700 hover:bg-gray-100 font-bold text-xs px-4 py-2 h-9 rounded-lg shadow-md">
                 {uploading ? 'Uploading...' : 'Upload Resume'}
               </Button>
               <input id="resume-upload" type="file" accept=".pdf" onChange={handleFileUpload} className="hidden" disabled={uploading} />
@@ -209,3 +211,4 @@ const ResumeSection = () => {
 };
 
 export default ResumeSection;
+
