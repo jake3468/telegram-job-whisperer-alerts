@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Share2, History, Copy, Sparkles } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, setClerkToken } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import HistoryModal from '@/components/HistoryModal';
@@ -117,7 +117,11 @@ const LinkedInPosts = () => {
     try {
       console.log('Creating LinkedIn post with user_profile.id:', userProfile.id);
 
-      // Insert into database without trying to set Clerk token
+      // Get Clerk token and set it for Supabase
+      const token = await getToken({ template: 'supabase' });
+      setClerkToken(token);
+
+      // Insert into database with proper authentication
       const { data, error } = await supabase
         .from('job_linkedin')
         .insert({
