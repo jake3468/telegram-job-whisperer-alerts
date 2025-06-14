@@ -32,7 +32,27 @@ const JobAlerts = () => {
       <div className="flex flex-col w-full bg-transparent">
         <div>
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-orange-400 via-pastel-mint to-fuchsia-400 bg-clip-text text-transparent mb-2 drop-shadow">
+            <h1
+              className="
+                text-4xl
+                font-orbitron
+                font-extrabold
+                bg-gradient-to-r
+                from-orange-400
+                via-yellow-400
+                to-pink-500
+                bg-clip-text
+                text-transparent
+                mb-2
+                drop-shadow
+                tracking-tight
+              "
+              style={{
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                color: 'transparent'
+              }}
+            >
               Telegram <span className="italic">Job</span> Alerts
             </h1>
             <p className="text-md text-orange-100 font-inter font-light">
@@ -49,3 +69,4 @@ const JobAlerts = () => {
 };
 
 export default JobAlerts;
+

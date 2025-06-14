@@ -159,52 +159,64 @@ const JobAlertsSection = ({
         </div>
       </div>;
   }
-  return <section className="rounded-3xl bg-gradient-to-b from-black/90 via-[#16181e]/95 to-[#21223A]/98 border-2 border-emerald-400 shadow-none p-0">
+  return (
+    <section className="rounded-3xl border-2 border-orange-400 bg-gradient-to-b from-orange-900/90 via-[#2b1605]/90 to-[#2b1605]/98 shadow-none p-0">
       <div className="pt-4 px-2 sm:px-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <div className="min-w-0">
-            <span className="text-2xl font-orbitron bg-gradient-to-r from-emerald-200 via-emerald-400 to-fuchsia-400 bg-clip-text text-transparent font-extrabold flex items-center gap-2">
-              <span className="w-6 h-6 bg-emerald-400/70 rounded-full flex items-center justify-center shadow-lg ring-2 ring-emerald-400/40">
+            <span className="text-2xl font-orbitron bg-gradient-to-r from-orange-300 via-yellow-300 to-pink-400 bg-clip-text text-transparent font-extrabold flex items-center gap-2 drop-shadow">
+              <span className="w-6 h-6 bg-orange-400/70 rounded-full flex items-center justify-center shadow-lg ring-2 ring-orange-300/40">
                 <svg viewBox="0 0 24 24" width={18} height={18}><path fill="none" stroke="#fff" strokeWidth="2" d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z" /></svg>
               </span>
               <span>Job Alerts</span>
             </span>
-            <p className="text-emerald-100 font-inter text-sm font-semibold drop-shadow-none">
+            <p className="text-orange-100 font-inter text-sm font-semibold drop-shadow-none">
               Set up personalized job alerts based on your preferences
             </p>
           </div>
 
           {isActivated && !showForm && <div className="flex items-center mt-2 sm:mt-0">
-              <Button onClick={handleCreateAlert} className="font-bold px-4 py-2 rounded-lg shadow-sm transition text-slate-950 bg-cyan-200 hover:bg-cyan-100">
+              <Button onClick={handleCreateAlert}
+                className="font-bold px-4 py-2 rounded-lg shadow-sm transition text-orange-950 bg-gradient-to-tr from-orange-200 via-yellow-100 to-orange-300 hover:bg-orange-100 hover:from-yellow-200"
+              >
                 <Plus className="w-4 h-4 mr-2" /> Add Alert
               </Button>
             </div>}
         </div>
         <div>
           {/* Bot Status Component */}
-          <BotStatus onActivationChange={handleActivationChange}
-        // Pass forceVisible for borderless, colored status bar as visual upgrade
-        />
+          <BotStatus onActivationChange={handleActivationChange} />
 
           {/* Job Alerts Form and List - Only show when activated */}
           {isActivated && <>
-              {showForm && <div className="mb-6">
-                  <JobAlertForm userTimezone={userTimezone} editingAlert={editingAlert} onSubmit={handleFormSubmit} onCancel={handleFormCancel} />
-                </div>}
-              <div className="flex flex-col gap-4 pb-6 sm:pb-8"> {/* Add clear padding at the bottom on all screens */}
-                <JobAlertsList alerts={alerts} onEdit={handleEditAlert} onDelete={handleDeleteAlert} />
+              {showForm && <div
+                className="mb-6 rounded-2xl bg-gradient-to-br from-orange-900/95 via-[#3c1c01]/90 to-[#2b1605]/95 border border-orange-500/70 shadow-lg p-2 sm:p-4"
+              >
+                <JobAlertForm
+                  userTimezone={userTimezone}
+                  editingAlert={editingAlert}
+                  onSubmit={handleFormSubmit}
+                  onCancel={handleFormCancel}
+                />
+              </div>}
+              <div className="flex flex-col gap-4 pb-6 sm:pb-8">
+                <JobAlertsList
+                  alerts={alerts}
+                  onEdit={handleEditAlert}
+                  onDelete={handleDeleteAlert}
+                />
               </div>
             </>}
 
           {!isActivated && <div className="text-center py-6">
-              <Bell className="w-10 h-10 text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-300 font-inter text-base mb-1">Activate your bot to manage job alerts</p>
-              <p className="text-gray-400 font-inter text-sm">Follow the instructions above to get started</p>
+              <Bell className="w-10 h-10 text-orange-400 mx-auto mb-3" />
+              <p className="text-orange-100 font-inter text-base mb-1">Activate your bot to manage job alerts</p>
+              <p className="text-orange-200 font-inter text-sm">Follow the instructions above to get started</p>
             </div>}
         </div>
       </div>
-      {/* Ensure bottom inner padding for section border spacing */}
       <div className="h-2 sm:h-4" />
-    </section>;
+    </section>
+  );
 };
 export default JobAlertsSection;
