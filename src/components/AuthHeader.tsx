@@ -33,7 +33,10 @@ const AuthHeader = () => {
           <SignedOut>
             <div className="flex flex-col items-end space-y-1 sm:space-y-0 sm:space-x-4 sm:flex-row sm:items-center">
               <SignInButton mode="modal">
-                <button className="text-white hover:text-sky-400 transition-colors duration-200 font-inter text-base font-medium px-1 py-1 sm:px-0 sm:py-0 z-50">
+                <button 
+                  className="bg-black/90 border border-gray-600 text-white hover:border-sky-500 transition-colors duration-200 font-inter text-base font-medium px-5 py-2 rounded-lg shadow-sm hover:text-sky-400 z-50"
+                  style={{ minWidth: '90px' }}
+                >
                   <span className="text-sm sm:text-base">Sign In</span>
                 </button>
               </SignInButton>
@@ -54,3 +57,4 @@ const AuthHeader = () => {
 };
 
 export default AuthHeader;
+
