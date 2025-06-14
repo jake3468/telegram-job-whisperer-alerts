@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useToast } from '@/hooks/use-toast';
 import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy, Share2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 interface HistoryItem {
   id: string;
@@ -39,63 +39,44 @@ const HistoryModal = ({
 }: HistoryModalProps) => {
   const { user } = useUser();
   const { toast } = useToast();
+  const { userProfile } = useUserProfile();
   const [historyData, setHistoryData] = useState<HistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
-    if (isOpen && user) {
+    if (isOpen && user && userProfile) {
       fetchHistory();
     }
-  }, [isOpen, user]);
+  }, [isOpen, user, userProfile]);
 
   const fetchHistory = async () => {
-    if (!user) return;
+    if (!user || !userProfile) return;
 
     setIsLoading(true);
     try {
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('clerk_id', user.id)
-        .single();
-
-      if (userError || !userData) {
-        throw new Error('User not found in database');
-      }
-
-      const { data: profileData, error: profileError } = await supabase
-        .from('user_profile')
-        .select('id')
-        .eq('user_id', userData.id)
-        .single();
-
-      if (profileError || !profileData) {
-        throw new Error('User profile not found');
-      }
-
       let query;
       
       if (type === 'job_guide') {
         query = supabase
           .from('job_analyses')
           .select('id, company_name, job_title, job_description, created_at, job_match, match_score')
-          .eq('user_id', profileData.id)
+          .eq('user_id', userProfile.id)
           .order('created_at', { ascending: false })
           .limit(20);
       } else if (type === 'cover_letter') {
         query = supabase
           .from('job_cover_letters')
           .select('id, company_name, job_title, job_description, created_at, cover_letter')
-          .eq('user_id', profileData.id)
+          .eq('user_id', userProfile.id)
           .order('created_at', { ascending: false })
           .limit(20);
       } else {
         query = supabase
           .from('job_linkedin')
           .select('id, topic, opinion, personal_story, audience, tone, created_at, linkedin_post')
-          .eq('user_id', profileData.id)
+          .eq('user_id', userProfile.id)
           .order('created_at', { ascending: false })
           .limit(20);
       }
@@ -141,20 +122,50 @@ const HistoryModal = ({
   };
 
   const handleDelete = async (itemId: string) => {
+    if (!userProfile) {
+      toast({
+        title: "Error",
+        description: "User profile not found. Please try again.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
+      console.log(`Attempting to delete ${type} item with ID: ${itemId} for user: ${userProfile.id}`);
+      
       let query;
       
       if (type === 'job_guide') {
-        query = supabase.from('job_analyses').delete().eq('id', itemId);
+        query = supabase
+          .from('job_analyses')
+          .delete()
+          .eq('id', itemId)
+          .eq('user_id', userProfile.id);
       } else if (type === 'cover_letter') {
-        query = supabase.from('job_cover_letters').delete().eq('id', itemId);
+        query = supabase
+          .from('job_cover_letters')
+          .delete()
+          .eq('id', itemId)
+          .eq('user_id', userProfile.id);
       } else {
-        query = supabase.from('job_linkedin').delete().eq('id', itemId);
+        query = supabase
+          .from('job_linkedin')
+          .delete()
+          .eq('id', itemId)
+          .eq('user_id', userProfile.id);
       }
       
-      const { error } = await query;
-      if (error) throw error;
+      const { error, data } = await query;
+      
+      if (error) {
+        console.error('Supabase delete error:', error);
+        throw error;
+      }
 
+      console.log('Delete operation completed:', data);
+
+      // Remove from local state
       setHistoryData(prev => prev.filter(item => item.id !== itemId));
       
       let itemType: string;
@@ -170,6 +181,12 @@ const HistoryModal = ({
         title: "Deleted",
         description: `${itemType} deleted successfully.`
       });
+
+      // Close details view if we deleted the currently viewed item
+      if (selectedItem && selectedItem.id === itemId) {
+        setShowDetails(false);
+        setSelectedItem(null);
+      }
     } catch (err) {
       console.error('Failed to delete item:', err);
       toast({
