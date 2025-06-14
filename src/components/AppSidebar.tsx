@@ -49,6 +49,16 @@ export function AppSidebar() {
   const currentPath = location.pathname;
   const isActive = (path: string) => currentPath === path;
 
+  // Helper to pick best name string
+  const getDisplayName = () => {
+    if (!user) return "User";
+    if (user.firstName && user.lastName) return `${user.firstName} ${user.lastName}`;
+    if (user.firstName) return user.firstName;
+    // Clerk fallback for username/displayname if available
+    if ((user as any).username) return (user as any).username;
+    return "User";
+  };
+
   return (
     <Sidebar className="
       bg-gradient-to-br from-black via-gray-950 to-fuchsia-950
@@ -58,8 +68,7 @@ export function AppSidebar() {
       h-full
       overflow-y-auto overflow-x-hidden
       scrollbar-none
-      "
-    >
+    ">
       {/* Logo & Name section: always visible */}
       <SidebarHeader className="py-8 px-3 border-b border-fuchsia-400/15 bg-black/95 relative flex flex-col items-center gap-2">
         <img
@@ -85,7 +94,7 @@ export function AppSidebar() {
         <SidebarTrigger className="lg:hidden absolute top-5 left-3 bg-fuchsia-700/20 rounded-lg p-2 hover:bg-fuchsia-500/40 border border-fuchsia-400/10" />
       </SidebarHeader>
 
-      <SidebarContent className="overflow-x-hidden w-full">
+      <SidebarContent className="overflow-x-hidden w-full px-0 !pr-0">
         {/* Profile Section */}
         <SidebarGroup className="bg-black/60 rounded-2xl mb-2 mx-2 mt-6 shadow-md">
           <SidebarGroupLabel className="text-fuchsia-200 font-orbitron text-xs px-3 py-2">
@@ -100,14 +109,19 @@ export function AppSidebar() {
                     <SidebarMenuButton asChild className="w-full px-0">
                       <NavLink
                         to={item.url}
-                        className={`flex items-center gap-2 px-2 py-3 mx-1 rounded-xl font-orbitron transition-all duration-300 text-base font-bold w-full
-                          ${
-                            isCurrentlyActive
-                              ? 'bg-gradient-to-r from-pastel-peach via-pastel-blue to-pastel-lavender text-black dark:text-white shadow-2xl shadow-fuchsia-300/20 border border-pastel-peach/30'
-                              : 'text-white hover:bg-gradient-to-r hover:from-fuchsia-800 hover:via-fuchsia-600 hover:to-indigo-800 hover:text-white hover:shadow-lg'
-                          }`
-                        }
-                        style={{overflow: 'hidden'}}
+                        className={`
+                          flex items-center gap-2 px-2 py-3 mx-1 
+                          rounded-2xl font-orbitron transition-all duration-300 
+                          text-base font-bold w-full
+                          ${isCurrentlyActive
+                            ? 'bg-gradient-to-r from-pastel-peach via-pastel-blue to-pastel-lavender text-black dark:text-white shadow-2xl shadow-fuchsia-300/20 border border-pastel-peach/30'
+                            : 'text-white hover:bg-gradient-to-r hover:from-fuchsia-800 hover:via-fuchsia-600 hover:to-indigo-800 hover:text-white hover:shadow-lg'
+                          }
+                          `}
+                        style={{
+                          overflow: 'hidden',
+                          borderRadius: '1.1rem'
+                        }}
                       >
                         <item.icon className={`w-5 h-5 flex-shrink-0 ${isCurrentlyActive ? 'text-black dark:text-white' : 'text-white'}`} />
                         {state === 'expanded' && <span className="truncate">{item.title}</span>}
@@ -134,14 +148,19 @@ export function AppSidebar() {
                     <SidebarMenuButton asChild className="w-full px-0">
                       <NavLink
                         to={item.url}
-                        className={`flex items-center gap-2 px-2 py-3 mx-1 rounded-xl font-orbitron transition-all duration-300 text-base font-bold w-full
-                          ${
-                            isCurrentlyActive
-                              ? 'bg-gradient-to-r from-pastel-lavender via-pastel-mint to-pastel-peach text-black dark:text-white shadow-xl shadow-fuchsia-400/20 border border-pastel-lavender/30'
-                              : 'text-white hover:bg-gradient-to-r hover:from-fuchsia-700 hover:to-indigo-800 hover:text-white'
-                          }`
-                        }
-                        style={{overflow: 'hidden'}}
+                        className={`
+                          flex items-center gap-2 px-2 py-3 mx-1 
+                          rounded-2xl font-orbitron transition-all duration-300 
+                          text-base font-bold w-full
+                          ${isCurrentlyActive
+                            ? 'bg-gradient-to-r from-pastel-lavender via-pastel-mint to-pastel-peach text-black dark:text-white shadow-xl shadow-fuchsia-400/20 border border-pastel-lavender/30'
+                            : 'text-white hover:bg-gradient-to-r hover:from-fuchsia-700 hover:to-indigo-800 hover:text-white'
+                          }
+                          `}
+                        style={{
+                          overflow: 'hidden',
+                          borderRadius: '1.1rem'
+                        }}
                       >
                         <item.icon className={`w-5 h-5 flex-shrink-0 ${isCurrentlyActive ? 'text-black dark:text-white' : 'text-white'}`} />
                         {state === 'expanded' && <span className="truncate">{item.title}</span>}
@@ -167,8 +186,8 @@ export function AppSidebar() {
             />
             {state === 'expanded' && user && (
               <div className="flex-1 min-w-0">
-                <p className="text-fuchsia-100 text-base font-orbitron truncate">
-                  {user.emailAddresses[0]?.emailAddress}
+                <p className="text-fuchsia-100 text-base font-orbitron truncate break-all">
+                  {getDisplayName()}
                 </p>
               </div>
             )}
@@ -178,3 +197,4 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
+
