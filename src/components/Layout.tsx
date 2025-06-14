@@ -29,12 +29,12 @@ export function Layout({ children }: LayoutProps) {
           </div>
         </div>
       </header>
-      {/* ALWAYS apply sufficient pt-20 for mobile screens to avoid navbar overlap */}
+      {/* Increased pt-28 on mobile to provide more space for headings */}
       <div
         className={`
           min-h-screen flex w-full 
           bg-gradient-to-br from-[#0e1122] via-[#181526] to-[#21203a]
-          ${'lg:pt-0 pt-24'} /* Was pt-20, now pt-24 to create extra space for headings */
+          ${'lg:pt-0 pt-28'} /* Increased from pt-24 to pt-28 for better heading visibility */
         `}
         style={{
           margin: 0,
