@@ -1,4 +1,3 @@
-
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Menu } from 'lucide-react';
@@ -29,24 +28,27 @@ export function Layout({ children }: LayoutProps) {
           </div>
         </div>
       </header>
-      {/* The following div ensures no header overlap on mobile by ALWAYS adding pt-20 when header is fixed */}
-      <div className={`
-        min-h-screen flex w-full 
-        bg-gradient-to-br from-[#0e1122] via-[#181526] to-[#21203a]
-        ${'lg:pt-0 pt-20'}  /* Force padding top on mobile for all pages */
-      `}
+      {/* ALWAYS apply pt-20 for mobile screens to avoid navbar overlap */}
+      <div
+        className={`
+          min-h-screen flex w-full 
+          bg-gradient-to-br from-[#0e1122] via-[#181526] to-[#21203a]
+          ${'lg:pt-0 pt-20'}  /* Padding top to clear fixed mobile header for all screens */
+        `}
         style={{
           margin: 0,
           padding: 0,
-          boxShadow: "none"
+          boxShadow: "none",
         }}
       >
-        {/* Make sure AppSidebar and content are flush */}
         <AppSidebar />
         <div className="flex-1 flex flex-col min-h-screen bg-transparent">
-          {/* Main Content */}
+          {/* Main Content -- ensures inner spacing for all screens */}
           <main className="flex-1 w-full px-0 py-0 bg-transparent">
-            {children}
+            {/* Give all screens their own consistent horizontal and vertical padding/container! */}
+            <div className="w-full max-w-4xl mx-auto px-3 sm:px-6 pt-3 sm:pt-8">
+              {children}
+            </div>
           </main>
         </div>
       </div>
