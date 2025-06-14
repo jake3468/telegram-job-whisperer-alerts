@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Share2, History, Copy, Sparkles } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, setClerkToken } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import HistoryModal from '@/components/HistoryModal';
@@ -18,6 +17,7 @@ import LoadingMessages from '@/components/LoadingMessages';
 
 const LinkedInPosts = () => {
   const { user } = useUser();
+  const { getToken } = useAuth();
   const { toast } = useToast();
   const { userProfile } = useUserProfile();
   const { isComplete } = useUserCompletionStatus();
@@ -41,6 +41,21 @@ const LinkedInPosts = () => {
     { value: 'bold', label: 'Bold & Opinionated' },
     { value: 'thoughtful', label: 'Thoughtful & Reflective' }
   ];
+
+  // Set up Clerk token for Supabase authentication
+  useEffect(() => {
+    const setupAuth = async () => {
+      if (user) {
+        try {
+          const token = await getToken({ template: 'supabase' });
+          setClerkToken(token);
+        } catch (error) {
+          console.error('Error setting up Supabase auth:', error);
+        }
+      }
+    };
+    setupAuth();
+  }, [user, getToken]);
 
   // Real-time subscription for LinkedIn post updates
   useEffect(() => {
@@ -114,6 +129,10 @@ const LinkedInPosts = () => {
     setResult('');
 
     try {
+      // Ensure we have the latest auth token
+      const token = await getToken({ template: 'supabase' });
+      setClerkToken(token);
+
       // Insert into database (this will trigger the webhook)
       const { data, error } = await supabase
         .from('job_linkedin')
@@ -128,7 +147,10 @@ const LinkedInPosts = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
 
       setCurrentPostId(data.id);
 
