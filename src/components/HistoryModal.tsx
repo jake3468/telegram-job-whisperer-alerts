@@ -307,7 +307,7 @@ const HistoryModal = ({
               </div>
             </div>
             {/* --- Result Section --- */}
-            {hasResult(selectedItem) && <div className="rounded-lg p-4 border border-white/10 bg-black shadow-inner">
+            {hasResult(selectedItem) && <div className="rounded-lg p-4 border border-white/10 shadow-inner bg-red-700">
                 <h3 className="text-white font-medium mb-3 flex items-center gap-2 justify-between">
                   <div className="flex items-center gap-2">
                     {type === 'linkedin_posts' ? <Share2 className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
@@ -327,10 +327,10 @@ const HistoryModal = ({
                       </div>
                     </div>
                   </div>}
-                <div className="bg-black rounded-lg p-4 border-2 border-blue-200 max-h-96 overflow-y-auto mt-1">
+                <div className="rounded-lg p-4 border-2 border-blue-200 max-h-96 overflow-y-auto mt-1 bg-teal-800">
                   <div style={{
                 fontFamily: 'serif'
-              }} className="text-gray-100 text-sm md:text-base leading-relaxed whitespace-pre-wrap break-words bg-orange-900">
+              }} className="text-gray-100 text-sm md:text-base leading-relaxed whitespace-pre-wrap break-words bg-teal-800">
                     {/* Only use job_match for job_guide, but fallback to existing for other types */}
                     {type === 'job_guide' ? selectedItem.job_match : getResult(selectedItem)}
                   </div>
