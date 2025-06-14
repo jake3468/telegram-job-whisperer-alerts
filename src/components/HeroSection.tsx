@@ -1,3 +1,4 @@
+
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
@@ -18,10 +19,9 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative min-h-[80vh] sm:min-h-screen flex flex-col items-center justify-center px-4 pt-28 sm:pt-32 overflow-hidden bg-black"> 
-      {/* Changed pt-16 sm:pt-20 to pt-28 sm:pt-32 to make room for fixed navbar */}
+    <section className="relative min-h-[80vh] sm:min-h-screen flex flex-col items-center justify-center px-4 pt-28 sm:pt-32 overflow-hidden bg-black">
       {/* Background Gradient Image */}
-      <div 
+      <div
         className="absolute inset-0 z-0 pointer-events-none"
         aria-hidden="true"
         style={{
@@ -31,11 +31,7 @@ const HeroSection = () => {
         }}
       />
       <div className="absolute inset-0 z-10 bg-black/60" aria-hidden="true" />
-      {/* Logo and Site Name - Top Left */}
-      <div className="absolute top-10 left-6 sm:top-12 sm:left-8 flex items-center space-x-3 z-20">
-        <img src="/lovable-uploads/6239b4a7-4f3c-4902-a936-4216ae26d9af.png" alt="JobBots Logo" className="h-10 w-10 sm:h-12 sm:w-12" />
-        <span className="text-2xl sm:text-3xl font-semibold text-white font-orbitron">JobBots</span>
-      </div>
+      {/* (Logo & Site Name REMOVED from here, now only in header) */}
       <div className="text-center max-w-4xl mx-auto z-20 mt-10 sm:mt-0 relative">
         <h1 className="text-4xl md:text-6xl font-semibold text-white mb-6 leading-tight font-inter drop-shadow-md">
           <span className="text-highlight">AI</span> does the <span className="text-highlight">boring</span> stuff.
@@ -52,8 +48,8 @@ const HeroSection = () => {
           </SignUpButton>
         </SignedOut>
         <SignedIn>
-          <button 
-            onClick={goToDashboard} 
+          <button
+            onClick={goToDashboard}
             className="bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white px-10 py-4 text-lg rounded-lg transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-sky-500/40 transform hover:scale-105 z-30 relative"
           >
             Go to Dashboard
