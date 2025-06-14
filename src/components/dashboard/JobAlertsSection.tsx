@@ -195,6 +195,18 @@ const JobAlertsSection = ({ userTimezone }: { userTimezone: string }) => {
               Set up personalized job alerts based on your preferences
             </p>
           </div>
+
+          {/* Add Alert button (shown when activated and not showing the form) */}
+          {isActivated && !showForm && (
+            <div className="flex items-center mt-2 sm:mt-0">
+              <Button
+                onClick={handleCreateAlert}
+                className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-4 py-2 rounded-lg shadow-sm transition"
+              >
+                <Plus className="w-4 h-4 mr-2" /> Add Alert
+              </Button>
+            </div>
+          )}
         </div>
         <div>
           {/* Bot Status Component */}
@@ -236,3 +248,4 @@ const JobAlertsSection = ({ userTimezone }: { userTimezone: string }) => {
 };
 
 export default JobAlertsSection;
+
