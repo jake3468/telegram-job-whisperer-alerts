@@ -1,4 +1,5 @@
 
+
 import { useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -47,6 +48,8 @@ const CoverLetter = () => {
   useEffect(() => {
     if (!currentCoverLetterId) return;
 
+    console.log('Setting up real-time subscription for cover letter ID:', currentCoverLetterId);
+
     const channel = supabase
       .channel('cover-letter-updates')
       .on(
@@ -58,10 +61,14 @@ const CoverLetter = () => {
           filter: `id=eq.${currentCoverLetterId}`
         },
         (payload) => {
-          console.log('Cover letter updated:', payload);
-          if (payload.new.cover_letter) {
+          console.log('Cover letter updated via real-time:', payload);
+          
+          // Check if the cover_letter field has been populated
+          if (payload.new && payload.new.cover_letter && payload.new.cover_letter.trim().length > 0) {
+            console.log('Setting result and stopping generation state');
             setResult(payload.new.cover_letter);
             setIsGenerating(false);
+            
             toast({
               title: "Cover Letter Generated!",
               description: "Your cover letter has been created successfully."
@@ -72,6 +79,7 @@ const CoverLetter = () => {
       .subscribe();
 
     return () => {
+      console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
   }, [currentCoverLetterId, toast]);
@@ -115,6 +123,8 @@ const CoverLetter = () => {
     setResult('');
 
     try {
+      console.log('Inserting new cover letter record...');
+      
       // Insert into database
       const { data, error } = await supabase
         .from('job_cover_letters')
@@ -355,6 +365,36 @@ const CoverLetter = () => {
       </div>
     </Layout>
   );
+};
+
+const handleCopyResult = async () => {
+  if (!result) return;
+
+  try {
+    await navigator.clipboard.writeText(result);
+    toast({
+      title: "Copied!",
+      description: "Cover letter copied to clipboard successfully."
+    });
+  } catch (err) {
+    console.error('Failed to copy text:', err);
+    toast({
+      title: "Error",
+      description: "Failed to copy text to clipboard.",
+      variant: "destructive"
+    });
+  }
+};
+
+const resetForm = () => {
+  setFormData({
+    job_title: '',
+    company_name: '',
+    job_description: ''
+  });
+  setResult('');
+  setIsGenerating(false);
+  setCurrentCoverLetterId(null);
 };
 
 export default CoverLetter;
