@@ -25,7 +25,7 @@ const planTextColor = {
 export default function GetMoreCredits() {
   const { user, isLoaded } = useUser();
   const navigate = useNavigate();
-  const { data: credits } = useUserCredits();
+  const { data: credits, isLoading, error } = useUserCredits();
 
   useEffect(() => {
     if (isLoaded && !user) {
@@ -87,7 +87,16 @@ export default function GetMoreCredits() {
                     Pay only for what you use. Get started with free monthly credits, and upgrade anytime with our credit packs.
                   </p>
                   <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in">
-                    Current Balance: <span className="font-bold text-cyan-100">{Number(credits?.current_balance || 0).toLocaleString()} credits</span>
+                    Current Balance:{" "}
+                    {isLoading ? (
+                      <span className="font-bold text-cyan-100">Loading...</span>
+                    ) : error ? (
+                      <span className="font-bold text-rose-300">Error loading</span>
+                    ) : credits ? (
+                      <span className="font-bold text-cyan-100">{Number(credits.current_balance).toLocaleString()} credits</span>
+                    ) : (
+                      <span className="font-bold text-yellow-300">No credits found</span>
+                    )}
                   </p>
                 </div>
               </div>
