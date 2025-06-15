@@ -24,20 +24,19 @@ export const useUserCredits = () => {
         .from('user_credits')
         .select('*')
         .eq('user_profile_id', userProfile.id)
-        .single(); // Use single() instead of maybeSingle() since we expect exactly one record
+        .maybeSingle(); // Use maybeSingle() instead of single() to handle cases where no record exists
         
       if (error) {
         console.error('[useUserCredits] Error from Supabase:', error);
-        // If no record found, that's actually expected for some users
-        if (error.code === 'PGRST116') {
-          console.log('[useUserCredits] No user_credits record found for user_profile_id:', userProfile.id);
-          return null;
-        }
         throw error;
       }
       
       console.log('[useUserCredits] Fetched user_credits:', data);
-      console.log('[useUserCredits] Current balance:', data?.current_balance);
+      if (data) {
+        console.log('[useUserCredits] Current balance:', data.current_balance);
+      } else {
+        console.log('[useUserCredits] No user_credits record found for user_profile_id:', userProfile.id);
+      }
       
       return data;
     },
