@@ -346,8 +346,8 @@ const LinkedInPosts = () => {
             {/* Loading State */}
             {isGenerating && !result && (
               <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm mb-8">
-                <CardContent className="py-8">
-                  <LoadingMessages type="linkedin" overrideBg="bg-cyan-100 text-black font-bold" />
+                <CardContent className="py-8 flex items-center justify-center">
+                  <LoadingMessages type="linkedin" />
                 </CardContent>
               </Card>
             )}
