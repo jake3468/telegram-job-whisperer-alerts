@@ -1,4 +1,3 @@
-
 import { User, Bell, Target, FileText, X, Share2 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
@@ -206,6 +205,9 @@ export function AppSidebar() {
                     avatarBox: "w-10 h-10 flex-shrink-0",
                     userButtonPopoverCard: isMobile ? "z-[60]" : ""
                   }
+                }}
+                userButtonPopoverProps={{
+                  modal: true,
                 }}
               />
             </div>
