@@ -93,7 +93,14 @@ export default function GetMoreCredits() {
                     ) : error ? (
                       <span className="font-bold text-rose-300">Error loading</span>
                     ) : credits ? (
-                      <span className="font-bold text-cyan-100">{Number(credits.current_balance).toLocaleString()} credits</span>
+                      <>
+                        <span className="font-bold text-cyan-100">
+                          {Number(credits.current_balance).toLocaleString()} credits
+                        </span>
+                        <span className="ml-2 text-[10px] text-blue-200 font-mono">
+                          Debug user_profile_id: {credits.user_profile_id}
+                        </span>
+                      </>
                     ) : (
                       <span className="font-bold text-yellow-300">No credits found</span>
                     )}
