@@ -36,18 +36,7 @@ export const useUserCredits = () => {
 
       console.log('[useUserCredits][debug] Starting query for user_profile_id:', userProfile.id);
 
-      // Test if we can access the user_credits table at all
-      console.log('[useUserCredits][debug] Testing direct access to user_credits table...');
-      
       try {
-        // First, try to get any credits record (this will help us see if RLS is blocking everything)
-        const { data: allCredits, error: allError } = await supabase
-          .from('user_credits')
-          .select('*')
-          .limit(5);
-        
-        console.log('[useUserCredits][debug] All credits test:', allCredits, 'error:', allError);
-        
         // Query user_credits for this user_profile_id
         const { data, error } = await supabase
           .from('user_credits')
@@ -58,24 +47,44 @@ export const useUserCredits = () => {
         console.log('[useUserCredits][debug] SQL Query for user_profile_id:', userProfile.id);
         console.log('[useUserCredits][debug] Supabase returned:', data, 'error:', error);
 
-        // Error or nothing found
+        // Error occurred
         if (error) {
           console.error('[useUserCredits] Error from Supabase:', error);
           return { __error: error };
         }
+
+        // No credit record found - let's create one using the database function
         if (!data) {
           console.warn('[useUserCredits] No row found in user_credits for user_profile_id:', userProfile.id);
+          console.log('[useUserCredits] Attempting to initialize credits for user...');
           
-          // Let's also check if the user_profile_id exists in the user_credits table at all
-          const { data: allUserCredits, error: allUserCreditsError } = await supabase
+          // Use the database function to initialize credits
+          const { data: initResult, error: initError } = await supabase
+            .rpc('initialize_user_credits', { p_user_profile_id: userProfile.id });
+          
+          console.log('[useUserCredits][debug] Initialize credits result:', initResult, 'error:', initError);
+          
+          if (initError) {
+            console.error('[useUserCredits] Failed to initialize credits:', initError);
+            return { __error: initError };
+          }
+          
+          // Now query again to get the newly created record
+          const { data: newData, error: newError } = await supabase
             .from('user_credits')
-            .select('user_profile_id')
-            .eq('user_profile_id', userProfile.id);
+            .select('*')
+            .eq('user_profile_id', userProfile.id)
+            .single();
           
-          console.log('[useUserCredits][debug] Checking if user_profile_id exists:', allUserCredits, 'error:', allUserCreditsError);
+          if (newError) {
+            console.error('[useUserCredits] Error fetching newly created credits:', newError);
+            return { __error: newError };
+          }
           
-          return null;
+          console.log('[useUserCredits] Successfully initialized and retrieved credits:', newData);
+          return newData;
         }
+
         // Success!
         console.log('[useUserCredits] Successfully found credits:', data);
         return data;

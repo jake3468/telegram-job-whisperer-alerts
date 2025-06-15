@@ -54,7 +54,7 @@ const CreditBalanceDisplay = () => {
       <div className="flex flex-col text-yellow-400 font-orbitron text-xs">
         <div className="flex items-center gap-2">
           <BadgeDollarSign className="w-5 h-5" />
-          No credits found
+          Initializing credits...
         </div>
         {/* Debug info for troubleshooting */}
         <div className="text-[10px] text-yellow-300 mt-1">
