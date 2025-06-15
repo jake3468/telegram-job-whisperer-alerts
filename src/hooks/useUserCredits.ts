@@ -24,10 +24,15 @@ export const useUserCredits = () => {
         .from('user_credits')
         .select('*')
         .eq('user_profile_id', userProfile.id)
-        .maybeSingle(); // safer in case no row exists
+        .single(); // Use single() instead of maybeSingle() since we expect exactly one record
         
       if (error) {
         console.error('[useUserCredits] Error from Supabase:', error);
+        // If no record found, that's actually expected for some users
+        if (error.code === 'PGRST116') {
+          console.log('[useUserCredits] No user_credits record found for user_profile_id:', userProfile.id);
+          return null;
+        }
         throw error;
       }
       
@@ -39,11 +44,13 @@ export const useUserCredits = () => {
     enabled: !!userProfile?.id && !userProfileLoading,
     staleTime: 30000,
     refetchInterval: 15000,
-    // Add onSettled to log whatever happens
-    meta: {
-      onSettled: (data: any, error: unknown) => {
-        console.log('[useUserCredits] onSettled - data:', data, 'error:', error);
+    // Add retry configuration
+    retry: (failureCount, error: any) => {
+      // Don't retry if it's a "no data found" error
+      if (error?.code === 'PGRST116') {
+        return false;
       }
-    }
+      return failureCount < 3;
+    },
   });
 };
