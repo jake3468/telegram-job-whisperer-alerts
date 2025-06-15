@@ -327,6 +327,7 @@ const HistoryModal = ({
                         coverLetter={selectedItem.cover_letter}
                         jobTitle={selectedItem.job_title || 'Unknown Position'}
                         companyName={selectedItem.company_name || 'Unknown Company'}
+                        contrast // highlight with black/white
                       />
                     )}
                   </div>
