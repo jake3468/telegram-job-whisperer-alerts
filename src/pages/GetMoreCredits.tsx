@@ -67,7 +67,7 @@ export default function GetMoreCredits() {
           </div>
         </div>
       </header>
-      {/* Main flex layout, REMOVE extra bg-gradient here */}
+      {/* Main flex layout */}
       <div
         className={`
           min-h-screen flex w-full
@@ -80,35 +80,33 @@ export default function GetMoreCredits() {
       >
         <AppSidebar />
         <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0">
-          <main className="flex-1 w-full bg-transparent">
-            {/* Only the main content area has gradient bg */}
-            <div className="min-h-[80vh] w-full bg-gradient-to-b from-[#162650] via-[#214072] to-[#2b4f88] py-5 sm:py-8 flex flex-col">
-              <div className="w-full max-w-7xl mx-auto px-2 sm:px-4">
-                <div className="text-center mb-5 sm:mb-12">
-                  <h1 className="text-2xl xs:text-3xl sm:text-5xl font-orbitron font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-1 sm:mb-2 drop-shadow tracking-tight animate-fade-in">
-                    Flexible Pricing for All Users
-                  </h1>
-                  <p className="text-sm sm:text-lg text-blue-100 font-inter font-light mb-1 sm:mb-2 animate-fade-in">
-                    Pay only for what you use. Get started with free monthly credits, and upgrade anytime with our credit packs.
-                  </p>
-                  <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in">
-                    Current Balance:{" "}
-                    {isLoading || userProfileLoading ? (
-                      <span className="font-bold text-cyan-100">Loading...</span>
-                    ) : error ? (
-                      <span className="font-bold text-rose-300">Error loading</span>
-                    ) : credits && !("__error" in credits) ? (
-                      <span className="font-bold text-cyan-100">
-                        {Number(credits.current_balance).toLocaleString()} credits
-                      </span>
-                    ) : (
-                      <span className="font-bold text-yellow-300">No credits found</span>
-                    )}
-                  </p>
-                </div>
+          <main className="flex-1 w-full bg-gradient-to-b from-[#162650] via-[#214072] to-[#2b4f88]">
+            {/* Remove max-w-7xl/max-w-6xl containers so gradient stretches fully */}
+            <div className="min-h-[80vh] w-full py-5 sm:py-8 flex flex-col">
+              <div className="text-center mb-5 sm:mb-12 px-2 sm:px-4">
+                <h1 className="text-2xl xs:text-3xl sm:text-5xl font-orbitron font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-1 sm:mb-2 drop-shadow tracking-tight animate-fade-in">
+                  Flexible Pricing for All Users
+                </h1>
+                <p className="text-sm sm:text-lg text-blue-100 font-inter font-light mb-1 sm:mb-2 animate-fade-in">
+                  Pay only for what you use. Get started with free monthly credits, and upgrade anytime with our credit packs.
+                </p>
+                <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in">
+                  Current Balance:{" "}
+                  {isLoading || userProfileLoading ? (
+                    <span className="font-bold text-cyan-100">Loading...</span>
+                  ) : error ? (
+                    <span className="font-bold text-rose-300">Error loading</span>
+                  ) : credits && !("__error" in credits) ? (
+                    <span className="font-bold text-cyan-100">
+                      {Number(credits.current_balance).toLocaleString()} credits
+                    </span>
+                  ) : (
+                    <span className="font-bold text-yellow-300">No credits found</span>
+                  )}
+                </p>
               </div>
-              {/* Responsive grid area with tighter spacing for mobile */}
-              <div className="w-full max-w-6xl mx-auto flex-grow flex flex-col items-center justify-center px-2 sm:px-4">
+              {/* Responsive grid area with tight spacing for mobile; px for interior gap only */}
+              <div className="flex-1 flex flex-col items-center justify-center w-full px-2 sm:px-4">
                 <div
                   className={`
                     grid gap-3 sm:gap-4 
