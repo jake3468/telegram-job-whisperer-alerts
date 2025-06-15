@@ -35,7 +35,6 @@ export const useUserCredits = () => {
       }
 
       console.log('[useUserCredits][debug] Starting query for user_profile_id:', userProfile.id);
-      console.log('[useUserCredits][debug] Current Supabase headers:', supabase.rest.headers);
 
       // Query user_credits for this user_profile_id
       const { data, error } = await supabase
