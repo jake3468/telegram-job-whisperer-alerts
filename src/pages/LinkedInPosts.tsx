@@ -224,7 +224,7 @@ const LinkedInPosts = () => {
               <CardContent className="space-y-8">
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Inputs Row: Topic + Opinion */}
-                  <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+                  <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
                     {/* Topic */}
                     <div className="flex-1 space-y-2">
                       <Label htmlFor="topic" className="text-black font-semibold text-base">Topic or Theme *</Label>
@@ -251,7 +251,7 @@ const LinkedInPosts = () => {
                   </div>
 
                   {/* Inputs Row: Personal Story + Audience */}
-                  <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+                  <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
                     {/* Personal Story */}
                     <div className="flex-1 space-y-2">
                       <Label htmlFor="personal_story" className="text-black font-semibold text-base">Personal Experience or Story</Label>
