@@ -1,4 +1,5 @@
-import { User, Bell, Target, FileText, X, Share2 } from 'lucide-react';
+
+import { User, Bell, Target, FileText, X, Share2, CreditCard } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -22,6 +23,10 @@ const profileItems = [{
   title: 'Profile',
   url: '/dashboard',
   icon: User
+}, {
+  title: 'Get More Credits',
+  url: '/get-more-credits',
+  icon: CreditCard
 }];
 
 const toolItems = [{
