@@ -1,10 +1,11 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from './useUserProfile';
 
 // Fetches current user credit info from Supabase
 export const useUserCredits = () => {
-  const { userProfile, isLoading: userProfileLoading } = useUserProfile();
+  const { userProfile, loading: userProfileLoading } = useUserProfile();
 
   // Debug log: Show userProfile loading and ID
   console.log('[useUserCredits] userProfile:', userProfile, 'loading:', userProfileLoading);
@@ -16,19 +17,26 @@ export const useUserCredits = () => {
         console.warn('[useUserCredits] No userProfile.id, returning null');
         return null;
       }
+      
+      console.log('[useUserCredits] Querying user_credits for user_profile_id:', userProfile.id);
+      
       const { data, error } = await supabase
         .from('user_credits')
         .select('*')
         .eq('user_profile_id', userProfile.id)
         .maybeSingle(); // safer in case no row exists
+        
       if (error) {
         console.error('[useUserCredits] Error from Supabase:', error);
         throw error;
       }
+      
       console.log('[useUserCredits] Fetched user_credits:', data);
+      console.log('[useUserCredits] Current balance:', data?.current_balance);
+      
       return data;
     },
-    enabled: !!userProfile?.id,
+    enabled: !!userProfile?.id && !userProfileLoading,
     staleTime: 30000,
     refetchInterval: 15000,
     // Add onSettled to log whatever happens

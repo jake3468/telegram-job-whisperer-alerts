@@ -9,6 +9,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Menu } from 'lucide-react';
 import { useUserCredits } from '@/hooks/useUserCredits';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 const planGradientBg = {
   free: "bg-black border border-blue-400/30",
@@ -26,6 +27,10 @@ export default function GetMoreCredits() {
   const { user, isLoaded } = useUser();
   const navigate = useNavigate();
   const { data: credits, isLoading, error } = useUserCredits();
+  const { userProfile, loading: userProfileLoading } = useUserProfile();
+
+  console.log('[GetMoreCredits] Render - credits:', credits, 'isLoading:', isLoading, 'error:', error);
+  console.log('[GetMoreCredits] UserProfile:', userProfile, 'userProfileLoading:', userProfileLoading);
 
   useEffect(() => {
     if (isLoaded && !user) {
@@ -88,7 +93,7 @@ export default function GetMoreCredits() {
                   </p>
                   <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in">
                     Current Balance:{" "}
-                    {isLoading ? (
+                    {isLoading || userProfileLoading ? (
                       <span className="font-bold text-cyan-100">Loading...</span>
                     ) : error ? (
                       <span className="font-bold text-rose-300">Error loading</span>
@@ -102,7 +107,14 @@ export default function GetMoreCredits() {
                         </span>
                       </>
                     ) : (
-                      <span className="font-bold text-yellow-300">No credits found</span>
+                      <>
+                        <span className="font-bold text-yellow-300">No credits found</span>
+                        {userProfile?.id && (
+                          <span className="ml-2 text-[10px] text-blue-200 font-mono">
+                            Profile ID: {userProfile.id}
+                          </span>
+                        )}
+                      </>
                     )}
                   </p>
                 </div>
