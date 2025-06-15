@@ -12,6 +12,7 @@ import JobAlerts from "./pages/JobAlerts";
 import JobGuide from "./pages/JobGuide";
 import CoverLetter from "./pages/CoverLetter";
 import LinkedInPosts from "./pages/LinkedInPosts";
+import ResumeBuilder from "./pages/ResumeBuilder";
 import GetMoreCredits from "./pages/GetMoreCredits";
 import Upgrade from "./pages/Upgrade";
 import NotFound from "./pages/NotFound";
@@ -37,6 +38,7 @@ const AppContent = () => {
         <Route path="/job-guide" element={<JobGuide />} />
         <Route path="/cover-letter" element={<CoverLetter />} />
         <Route path="/linkedin-posts" element={<LinkedInPosts />} />
+        <Route path="/resume-builder" element={<ResumeBuilder />} />
         <Route path="/get-more-credits" element={<GetMoreCredits />} />
         <Route path="/upgrade" element={<Upgrade />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -1,4 +1,4 @@
-import { User, Bell, Target, FileText, X, Share2, CreditCard } from 'lucide-react';
+import { User, Bell, Target, FileText, X, Share2, CreditCard, FileUser } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -44,6 +44,10 @@ const toolItems = [{
   title: 'LinkedIn Posts',
   url: '/linkedin-posts',
   icon: Share2
+}, {
+  title: 'Resume Builder',
+  url: '/resume-builder',
+  icon: FileUser
 }];
 
 export function AppSidebar() {
