@@ -409,7 +409,6 @@ export type Database = {
           publications: Json | null
           section_order: Json | null
           skills_summary: string | null
-          social_profiles: Json | null
           soft_skills: Json | null
           speaking_engagements: Json | null
           technical_skills: Json | null
@@ -448,7 +447,6 @@ export type Database = {
           publications?: Json | null
           section_order?: Json | null
           skills_summary?: string | null
-          social_profiles?: Json | null
           soft_skills?: Json | null
           speaking_engagements?: Json | null
           technical_skills?: Json | null
@@ -487,7 +485,6 @@ export type Database = {
           publications?: Json | null
           section_order?: Json | null
           skills_summary?: string | null
-          social_profiles?: Json | null
           soft_skills?: Json | null
           speaking_engagements?: Json | null
           technical_skills?: Json | null
