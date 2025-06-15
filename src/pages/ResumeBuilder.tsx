@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -58,6 +57,36 @@ const steps = [
   }
 ];
 
+function normalizeResumeData(formData: any) {
+  // user_resumes expects these fields as arrays (jsonb):
+  const jsonbArrayFields = [
+    "work_experience",
+    "education",
+    "technical_skills",
+    "soft_skills",
+    "languages",
+    "certifications",
+    "projects",
+    "publications",
+    "speaking_engagements",
+    "volunteer_work",
+    "memberships",
+    "awards",
+    "patents",
+    "section_order"
+  ];
+
+  const normalized: any = { ...formData };
+
+  for (const key of jsonbArrayFields) {
+    if (!Array.isArray(normalized[key])) {
+      normalized[key] = [];
+    }
+  }
+
+  return normalized;
+}
+
 const ResumeBuilder = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const { resumeData, saveResume, isSaving } = useUserResume();
@@ -80,7 +109,9 @@ const ResumeBuilder = () => {
   };
 
   const handleSave = () => {
-    saveResume(formData);
+    // Normalize formData before saving
+    const normalized = normalizeResumeData(formData);
+    saveResume(normalized);
   };
 
   const handleDataChange = (stepData: any) => {
