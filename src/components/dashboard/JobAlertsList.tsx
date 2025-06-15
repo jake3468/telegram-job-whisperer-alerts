@@ -56,7 +56,7 @@ const JobAlertsList = ({
           <CardContent style={{
         minHeight: 0
       }} // Remove forced height
-      className="flex flex-col p-3 sm:p-4 rounded-xl text-orange-950 gap-2 sm:gap-3 bg-rose-300">
+      className="flex flex-col p-3 sm:p-4 rounded-xl text-orange-950 gap-2 sm:gap-3 bg-pastel-peach">
             <div className="flex flex-row gap-2 justify-between items-start w-full">
               {/* MAIN (info) */}
               <div className="flex-1 min-w-0">
