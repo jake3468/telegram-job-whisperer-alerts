@@ -9,13 +9,17 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { FileText, History, Copy, Sparkles } from 'lucide-react';
+import { FileText, History, Copy, Sparkles, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import HistoryModal from '@/components/HistoryModal';
 import LoadingMessages from '@/components/LoadingMessages';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import jsPDF from 'jspdf';
+import { Document, Packer, Paragraph, TextRun } from 'docx';
+import { saveAs } from 'file-saver';
+
 const CoverLetter = () => {
   const {
     user,
@@ -41,6 +45,7 @@ const CoverLetter = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentCoverLetterId, setCurrentCoverLetterId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
@@ -113,12 +118,14 @@ const CoverLetter = () => {
       clearInterval(pollInterval);
     };
   }, [isGenerating, currentCoverLetterId, toast]);
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !userProfile) {
@@ -184,6 +191,7 @@ const CoverLetter = () => {
       setIsSubmitting(false);
     }
   };
+
   const handleCopyResult = async () => {
     if (!result) return;
     try {
@@ -200,6 +208,106 @@ const CoverLetter = () => {
       });
     }
   };
+
+  const handleDownloadPDF = () => {
+    if (!result) return;
+    
+    try {
+      const doc = new jsPDF();
+      
+      // Set font and size
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(12);
+      
+      // Add title
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Cover Letter', 20, 20);
+      
+      // Add subtitle with job details
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`${formData.job_title} at ${formData.company_name}`, 20, 35);
+      
+      // Add cover letter content
+      doc.setFontSize(11);
+      const splitText = doc.splitTextToSize(result, 170);
+      doc.text(splitText, 20, 50);
+      
+      // Save the PDF
+      doc.save(`Cover_Letter_${formData.company_name}_${formData.job_title}.pdf`);
+      
+      toast({
+        title: "Downloaded!",
+        description: "Cover letter downloaded as PDF successfully."
+      });
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to download PDF. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDownloadDOCX = async () => {
+    if (!result) return;
+    
+    try {
+      const doc = new Document({
+        sections: [{
+          properties: {},
+          children: [
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "Cover Letter",
+                  bold: true,
+                  size: 32
+                })
+              ]
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `${formData.job_title} at ${formData.company_name}`,
+                  size: 24
+                })
+              ]
+            }),
+            new Paragraph({
+              children: [new TextRun({ text: "" })] // Empty line
+            }),
+            ...result.split('\n').map(line => 
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: line,
+                    size: 22
+                  })
+                ]
+              })
+            )
+          ]
+        }]
+      });
+      
+      const blob = await Packer.toBlob(doc);
+      saveAs(blob, `Cover_Letter_${formData.company_name}_${formData.job_title}.docx`);
+      
+      toast({
+        title: "Downloaded!",
+        description: "Cover letter downloaded as DOCX successfully."
+      });
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to download DOCX. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       job_title: '',
@@ -210,11 +318,13 @@ const CoverLetter = () => {
     setIsGenerating(false);
     setCurrentCoverLetterId(null);
   };
+
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-gradient-to-br from-black via-neutral-900 to-black flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading...</div>
       </div>;
   }
+
   return <Layout>
       <div className="min-h-screen w-full bg-gradient-to-br from-[#180F18] via-[#1b1421] to-[#221828] flex flex-col">
         {/* Header Section */}
@@ -321,10 +431,20 @@ const CoverLetter = () => {
                         </div>
                       </ScrollArea>
                     </Card>
-                    <Button onClick={handleCopyResult} className="w-full bg-gradient-to-r from-pink-400 to-fuchsia-500 hover:from-pink-400/80 hover:to-fuchsia-500/80 text-white flex items-center gap-2 text-base h-12">
-                      <Copy className="w-4 h-4" />
-                      Copy Cover Letter
-                    </Button>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Button onClick={handleCopyResult} className="flex-1 bg-gradient-to-r from-pink-400 to-fuchsia-500 hover:from-pink-400/80 hover:to-fuchsia-500/80 text-white flex items-center gap-2 text-base h-12">
+                        <Copy className="w-4 h-4" />
+                        Copy Cover Letter
+                      </Button>
+                      <Button onClick={handleDownloadPDF} variant="outline" className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 flex items-center gap-2 text-base h-12">
+                        <Download className="w-4 h-4" />
+                        Download PDF
+                      </Button>
+                      <Button onClick={handleDownloadDOCX} variant="outline" className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 flex items-center gap-2 text-base h-12">
+                        <Download className="w-4 h-4" />
+                        Download DOCX
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>}
