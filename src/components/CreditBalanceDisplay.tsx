@@ -30,6 +30,8 @@ const CreditBalanceDisplay = () => {
       msg += " (Not authorized by Row Level Security. Please check that you are logged in with the correct user.)";
     } else if (detailError.code === "PGRST116") {
       msg = "No credits found for this user.";
+    } else if (detailError.code === "23505") {
+      msg = "Credit record exists but access is blocked. Please contact support.";
     } else if (detailError.message) {
       msg += ` (${detailError.message})`;
     }
