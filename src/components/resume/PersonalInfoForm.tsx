@@ -82,7 +82,7 @@ const PersonalInfoForm = ({
 
       <div>
         <div className="flex items-center justify-between mb-4">
-          <Label>Social Media Profiles</Label>
+          
           <Button type="button" onClick={handleSocialProfileAdd} size="sm" className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
             Add Profile
