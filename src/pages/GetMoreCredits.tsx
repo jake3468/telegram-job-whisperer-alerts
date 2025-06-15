@@ -1,4 +1,3 @@
-
 import { useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -42,8 +41,8 @@ export default function GetMoreCredits() {
 
   return (
     <Layout>
-      <div className="min-h-[80vh] w-full bg-gradient-to-b from-[#162650] via-[#214072] to-[#2b4f88] px-2 sm:px-0 py-8 flex flex-col">
-        <div className="max-w-full mx-auto w-full">
+      <div className="min-h-[80vh] w-full bg-gradient-to-b from-[#162650] via-[#214072] to-[#2b4f88] px-0 py-8 flex flex-col">
+        <div className="w-full mx-auto">
           <div className="text-center mb-8 sm:mb-12 px-2">
             <h1 className="text-3xl sm:text-5xl font-orbitron font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-2 drop-shadow tracking-tight animate-fade-in">
               Flexible Pricing for All Users
@@ -56,40 +55,33 @@ export default function GetMoreCredits() {
             </p>
           </div>
         </div>
-        <div
-          className="
-            w-full flex-grow
-            flex flex-col
-            items-center justify-center
-          "
-        >
-          {/* Plans Grid */}
+
+        {/* Responsive grid area taking almost full width with max constraints */}
+        <div className="w-full flex-grow flex flex-col items-center justify-center">
           <div
             className="
-              grid gap-8
+              grid gap-6
               w-full
-              px-2
-              sm:px-4
-              md:px-8
-              lg:px-16
-              xl:px-24
-              2xl:px-40
+              px-1
+              md:px-6
+              xl:px-12
+              2xl:px-24
               mx-auto
               grid-cols-1
               md:grid-cols-3
               items-stretch
-              transition-all
-              duration-300
+              duration-500
               "
             style={{
-              maxWidth: '1680px'
+              maxWidth: '1800px' // Increased maxWidth to cover almost full width on big screens
             }}
           >
             {/* Free Plan */}
             <Card
-              className={`flex flex-col rounded-2xl shadow-2xl border-0 ${planGradientBg.free} transition-all duration-500 ease-[cubic-bezier(.27,.54,.56,1.11)] hover:scale-[1.03] hover:shadow-blue-400/30`}
+              className={`flex flex-col rounded-2xl shadow-2xl border-0 ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-blue-400/30`}
               style={{
-                minHeight: '480px',
+                minHeight: '460px',
+                width: '100%',
               }}
             >
               <CardHeader className="text-center pb-6 pt-7">
@@ -129,9 +121,10 @@ export default function GetMoreCredits() {
 
             {/* Monthly Subscription */}
             <Card
-              className={`flex flex-col rounded-2xl shadow-2xl border-0 ${planGradientBg.subscription} relative transition-all duration-500 ease-[cubic-bezier(.27,.54,.56,1.11)] hover:scale-[1.05] hover:shadow-cyan-400/30`}
+              className={`flex flex-col rounded-2xl shadow-2xl border-0 ${planGradientBg.subscription} relative transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-cyan-400/30`}
               style={{
-                minHeight: '520px',
+                minHeight: '510px',
+                width: '100%',
                 zIndex: 2,
               }}
             >
@@ -181,9 +174,10 @@ export default function GetMoreCredits() {
 
             {/* Credit Packs */}
             <Card
-              className={`flex flex-col rounded-2xl shadow-2xl border-0 ${planGradientBg.pack} transition-all duration-500 ease-[cubic-bezier(.27,.54,.56,1.11)] hover:scale-[1.03] hover:shadow-indigo-400/30`}
+              className={`flex flex-col rounded-2xl shadow-2xl border-0 ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-indigo-400/30`}
               style={{
-                minHeight: '480px',
+                minHeight: '460px',
+                width: '100%',
               }}
             >
               <CardHeader className="text-center pb-6 pt-7">
@@ -252,5 +246,3 @@ export default function GetMoreCredits() {
     </Layout>
   );
 }
-
-// ... end of file ...
