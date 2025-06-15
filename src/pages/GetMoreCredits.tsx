@@ -75,8 +75,8 @@ export default function GetMoreCredits() {
         }}
       >
         <AppSidebar />
-        {/* Main content area with proper spacing to avoid sidebar overlap */}
-        <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0 lg:pl-6">
+        {/* Main content area with increased left padding to prevent overlap */}
+        <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0 lg:pl-12">
           <main className="flex-1 w-full bg-transparent">
             <div className="min-h-[80vh] w-full bg-gradient-to-b from-[#162650] via-[#214072] to-[#2b4f88] py-8 flex flex-col">
               <div className="w-full max-w-7xl mx-auto px-4">

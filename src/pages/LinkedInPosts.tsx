@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
-import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea as TTextarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Share2, History, Copy, Sparkles } from 'lucide-react';
+import { Share2, History, Copy, Sparkles, Menu } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
@@ -15,6 +14,8 @@ import HistoryModal from '@/components/HistoryModal';
 import LinkedInPostDisplay from '@/components/LinkedInPostDisplay';
 import LoadingMessages from '@/components/LoadingMessages';
 import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/AppSidebar';
 
 const LinkedInPosts = () => {
   const {
@@ -191,158 +192,187 @@ const LinkedInPosts = () => {
     setIsGenerating(false);
     setCurrentPostId(null);
   };
-  return <Layout>
-      {/* Consistent dark background */}
-      <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-slate-800 pt-0 flex flex-col">
-        <div className="container mx-auto px-2 sm:px-4 py-8 bg-transparent rounded-3xl mt-4 mb-8 max-w-3xl w-full">
-          {/* Header Section */}
-          <div className="text-center mb-10">
-            <h1 className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-teal-300 via-teal-400 to-cyan-400 bg-clip-text text-transparent drop-shadow mb-4 tracking-tight">
-              LinkedIn <span className="italic">Posts</span>
-            </h1>
-            <p className="text-cyan-200 max-w-2xl mx-auto font-inter text-lg font-light shadow-sm">
-              Create engaging LinkedIn posts that showcase your expertise and connect with your professional network
-            </p>
-          </div>
-          <div className="max-w-3xl mx-auto">
-            {/* Input Form */}
-            <Card className="bg-gradient-to-br from-cyan-400 via-teal-300 to-teal-500 border-white/10 backdrop-blur-md mb-8 shadow-xl">
-              <CardHeader className="pb-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="font-inter text-xl flex items-center gap-2 text-black font-bold drop-shadow">
-                      <Sparkles className="w-5 h-5 text-black drop-shadow" />
-                      <span>Create Your Post</span>
-                    </CardTitle>
-                    <CardDescription className="text-black/80 font-inter mb-0">
-                      Fill in the details to generate your LinkedIn post
-                    </CardDescription>
-                  </div>
-                  <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 text-black bg-teal-200 hover:bg-teal-100">
-                    <History className="w-4 h-4 mr-2 text-black" />
-                    History
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-8">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Inputs Row: Topic + Opinion */}
-                  <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
-                    {/* Topic */}
-                    <div className="flex-1 space-y-2">
-                      <Label htmlFor="topic" className="text-black font-semibold text-base">Topic or Theme *</Label>
-                      <Label htmlFor="topic" className="text-black/70 font-normal text-sm block">What is the main topic you want to write about?</Label>
-                      <TTextarea
-                        id="topic"
-                        placeholder="e.g. AI in customer service, Layoffs in tech, Remote work trends"
-                        value={formData.topic}
-                        onChange={e => handleInputChange('topic', e.target.value)}
-                        required
-                        className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
-                    </div>
-                    {/* Opinion */}
-                    <div className="flex-1 space-y-2">
-                      <Label htmlFor="opinion" className="text-black font-semibold text-base">Your Key Point or Opinion</Label>
-                      <Label htmlFor="opinion" className="text-black/70 font-normal text-sm block">What is your main insight, opinion, or message?</Label>
-                      <TTextarea
-                        id="opinion"
-                        placeholder="I believe hybrid AI + human support is the future."
-                        value={formData.opinion}
-                        onChange={e => handleInputChange('opinion', e.target.value)}
-                        className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
-                    </div>
-                  </div>
-
-                  {/* Inputs Row: Personal Story + Audience */}
-                  <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
-                    {/* Personal Story */}
-                    <div className="flex-1 space-y-2">
-                      <Label htmlFor="personal_story" className="text-black font-semibold text-base">Personal Experience or Story</Label>
-                      <Label htmlFor="personal_story" className="text-black/70 font-normal text-sm block">Do you have a story, data point, or personal experience to include?</Label>
-                      <TTextarea
-                        id="personal_story"
-                        placeholder="We reduced response time by 40% after implementing AI chat."
-                        value={formData.personal_story}
-                        onChange={e => handleInputChange('personal_story', e.target.value)}
-                        className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
-                    </div>
-                    {/* Audience */}
-                    <div className="flex-1 space-y-2">
-                      <Label htmlFor="audience" className="text-black font-semibold text-base">Target Audience</Label>
-                      <Label htmlFor="audience" className="text-black/70 font-normal text-sm block">Who are you writing this for?</Label>
-                      <TTextarea
-                        id="audience"
-                        placeholder="Startup founders, product managers, working moms, new grads…"
-                        value={formData.audience}
-                        onChange={e => handleInputChange('audience', e.target.value)}
-                        className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
-                    </div>
-                  </div>
-
-                  {/* Tone: full width */}
-                  <div className="space-y-2">
-                    <Label htmlFor="tone" className="text-black font-semibold text-base">Tone/Style Preference</Label>
-                    <Label htmlFor="tone" className="text-black/70 font-normal text-sm block">What tone do you prefer?</Label>
-                    <Select onValueChange={value => handleInputChange('tone', value)}>
-                      <SelectTrigger className="text-base bg-black/80 text-white border-teal-300/30 font-medium [&>span[data-placeholder]]:text-white/80">
-                        <SelectValue placeholder="Select a tone..." />
-                      </SelectTrigger>
-                      <SelectContent className="bg-black/80 border-teal-200/30 text-white">
-                        {toneOptions.map(option => <SelectItem key={option.value} value={option.value} className="font-medium data-[highlighted]:bg-teal-200 data-[highlighted]:text-black">
-                            {option.label}
-                          </SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Button row */}
-                  <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                    <Button type="submit" disabled={isSubmitting || !formData.topic.trim() || isGenerating} className="flex-1 bg-gradient-to-r from-teal-400 via-cyan-400 to-teal-500 hover:from-teal-500 hover:via-cyan-500 hover:to-teal-600 text-black font-semibold text-base h-12 shadow-md">
-                      {isSubmitting ? 'Submitting...' : 'Generate LinkedIn Post'}
-                    </Button>
-                    
-                    <Button type="button" onClick={resetForm} variant="outline" className="bg-white/10 border-teal-400/25 text-black hover:bg-white/20 text-base h-12 px-6">
-                      Reset
-                    </Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-
-            {/* Loading State, Result Display, HistoryModal */}
-            {isGenerating && !result && <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm mb-8">
-                <CardContent className="py-8 flex items-center justify-center">
-                  <LoadingMessages type="linkedin" />
-                </CardContent>
-              </Card>}
-
-            {result && <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm">
-                <CardHeader className="pb-6">
-                  <CardTitle className="font-inter text-xl flex items-center gap-2 bg-gradient-to-r from-teal-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent drop-shadow font-bold">
-                    <Share2 className="w-5 h-5 text-teal-400 drop-shadow" />
-                    <span>Your LinkedIn Post</span>
-                  </CardTitle>
-                  <CardDescription className="text-cyan-300/90 font-inter">
-                    Your generated LinkedIn post is ready!
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <LinkedInPostDisplay content={result} userProfile={userProfile} />
-                    
-                    <Button onClick={handleCopyResult} className="w-full bg-teal-700 hover:bg-teal-600 text-black flex items-center gap-2 text-base h-12 font-semibold">
-                      <Copy className="w-4 h-4" />
-                      Copy LinkedIn Post
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>}
+  return (
+    <SidebarProvider defaultOpen={true}>
+      {/* Header for mobile */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
+        <div className="flex items-center justify-between p-3">
+          <SidebarTrigger className="h-12 w-12 bg-white/10 border-fuchsia-400/30 ring-2 ring-fuchsia-400/10 text-fuchsia-200 rounded-2xl shadow-lg hover:bg-fuchsia-700/30 transition-all flex items-center justify-center">
+            <Menu className="w-7 h-7" strokeWidth={2.4} />
+            <span className="sr-only">Toggle navigation menu</span>
+          </SidebarTrigger>
+          <div className="flex items-center gap-2">
+            <img
+              src="/lovable-uploads/6239b4a7-4f3c-4902-a936-4216ae26d9af.png"
+              alt="JobBots Logo"
+              className="h-8 w-8 drop-shadow-lg"
+            />
+            <span className="font-orbitron font-extrabold text-2xl bg-gradient-to-r from-sky-300 via-fuchsia-400 to-indigo-300 bg-clip-text text-transparent drop-shadow-sm tracking-wider select-none relative whitespace-nowrap">
+              JobBots
+            </span>
           </div>
         </div>
+      </header>
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-[#0e1122] via-[#181526] to-[#21203a]">
+        <AppSidebar />
+        <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0 lg:pl-6">
+          <main className="flex-1 w-full bg-transparent">
+            {/* Consistent dark background */}
+            <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-slate-800 pt-0 flex flex-col">
+              <div className="container mx-auto px-2 sm:px-4 py-8 bg-transparent rounded-3xl mt-4 mb-8 max-w-3xl w-full">
+                {/* Header Section */}
+                <div className="text-center mb-10">
+                  <h1 className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-teal-300 via-teal-400 to-cyan-400 bg-clip-text text-transparent drop-shadow mb-4 tracking-tight">
+                    LinkedIn <span className="italic">Posts</span>
+                  </h1>
+                  <p className="text-cyan-200 max-w-2xl mx-auto font-inter text-lg font-light shadow-sm">
+                    Create engaging LinkedIn posts that showcase your expertise and connect with your professional network
+                  </p>
+                </div>
+                <div className="max-w-3xl mx-auto">
+                  {/* Input Form */}
+                  <Card className="bg-gradient-to-br from-cyan-400 via-teal-300 to-teal-500 border-white/10 backdrop-blur-md mb-8 shadow-xl">
+                    <CardHeader className="pb-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <CardTitle className="font-inter text-xl flex items-center gap-2 text-black font-bold drop-shadow">
+                            <Sparkles className="w-5 h-5 text-black drop-shadow" />
+                            <span>Create Your Post</span>
+                          </CardTitle>
+                          <CardDescription className="text-black/80 font-inter mb-0">
+                            Fill in the details to generate your LinkedIn post
+                          </CardDescription>
+                        </div>
+                        <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 text-black bg-teal-200 hover:bg-teal-100">
+                          <History className="w-4 h-4 mr-2 text-black" />
+                          History
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-8">
+                      <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Inputs Row: Topic + Opinion */}
+                        <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
+                          {/* Topic */}
+                          <div className="flex-1 space-y-2">
+                            <Label htmlFor="topic" className="text-black font-semibold text-base">Topic or Theme *</Label>
+                            <Label htmlFor="topic" className="text-black/70 font-normal text-sm block">What is the main topic you want to write about?</Label>
+                            <TTextarea
+                              id="topic"
+                              placeholder="e.g. AI in customer service, Layoffs in tech, Remote work trends"
+                              value={formData.topic}
+                              onChange={e => handleInputChange('topic', e.target.value)}
+                              required
+                              className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
+                          </div>
+                          {/* Opinion */}
+                          <div className="flex-1 space-y-2">
+                            <Label htmlFor="opinion" className="text-black font-semibold text-base">Your Key Point or Opinion</Label>
+                            <Label htmlFor="opinion" className="text-black/70 font-normal text-sm block">What is your main insight, opinion, or message?</Label>
+                            <TTextarea
+                              id="opinion"
+                              placeholder="I believe hybrid AI + human support is the future."
+                              value={formData.opinion}
+                              onChange={e => handleInputChange('opinion', e.target.value)}
+                              className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
+                          </div>
+                        </div>
 
-        {/* History Modal */}
-        <HistoryModal type="linkedin_posts" isOpen={showHistory} onClose={() => setShowHistory(false)} gradientColors="from-cyan-400 to-teal-400" />
+                        {/* Inputs Row: Personal Story + Audience */}
+                        <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
+                          {/* Personal Story */}
+                          <div className="flex-1 space-y-2">
+                            <Label htmlFor="personal_story" className="text-black font-semibold text-base">Personal Experience or Story</Label>
+                            <Label htmlFor="personal_story" className="text-black/70 font-normal text-sm block">Do you have a story, data point, or personal experience to include?</Label>
+                            <TTextarea
+                              id="personal_story"
+                              placeholder="We reduced response time by 40% after implementing AI chat."
+                              value={formData.personal_story}
+                              onChange={e => handleInputChange('personal_story', e.target.value)}
+                              className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
+                          </div>
+                          {/* Audience */}
+                          <div className="flex-1 space-y-2">
+                            <Label htmlFor="audience" className="text-black font-semibold text-base">Target Audience</Label>
+                            <Label htmlFor="audience" className="text-black/70 font-normal text-sm block">Who are you writing this for?</Label>
+                            <TTextarea
+                              id="audience"
+                              placeholder="Startup founders, product managers, working moms, new grads…"
+                              value={formData.audience}
+                              onChange={e => handleInputChange('audience', e.target.value)}
+                              className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
+                          </div>
+                        </div>
+
+                        {/* Tone: full width */}
+                        <div className="space-y-2">
+                          <Label htmlFor="tone" className="text-black font-semibold text-base">Tone/Style Preference</Label>
+                          <Label htmlFor="tone" className="text-black/70 font-normal text-sm block">What tone do you prefer?</Label>
+                          <Select onValueChange={value => handleInputChange('tone', value)}>
+                            <SelectTrigger className="text-base bg-black/80 text-white border-teal-300/30 font-medium [&>span[data-placeholder]]:text-white/80">
+                              <SelectValue placeholder="Select a tone..." />
+                            </SelectTrigger>
+                            <SelectContent className="bg-black/80 border-teal-200/30 text-white">
+                              {toneOptions.map(option => <SelectItem key={option.value} value={option.value} className="font-medium data-[highlighted]:bg-teal-200 data-[highlighted]:text-black">
+                                  {option.label}
+                                </SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Button row */}
+                        <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                          <Button type="submit" disabled={isSubmitting || !formData.topic.trim() || isGenerating} className="flex-1 bg-gradient-to-r from-teal-400 via-cyan-400 to-teal-500 hover:from-teal-500 hover:via-cyan-500 hover:to-teal-600 text-black font-semibold text-base h-12 shadow-md">
+                            {isSubmitting ? 'Submitting...' : 'Generate LinkedIn Post'}
+                          </Button>
+                          
+                          <Button type="button" onClick={resetForm} variant="outline" className="bg-white/10 border-teal-400/25 text-black hover:bg-white/20 text-base h-12 px-6">
+                            Reset
+                          </Button>
+                        </div>
+                      </form>
+                    </CardContent>
+                  </Card>
+
+                  {/* Loading State, Result Display, HistoryModal */}
+                  {isGenerating && !result && <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm mb-8">
+                      <CardContent className="py-8 flex items-center justify-center">
+                        <LoadingMessages type="linkedin" />
+                      </CardContent>
+                    </Card>}
+
+                  {result && <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm">
+                      <CardHeader className="pb-6">
+                        <CardTitle className="font-inter text-xl flex items-center gap-2 bg-gradient-to-r from-teal-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent drop-shadow font-bold">
+                          <Share2 className="w-5 h-5 text-teal-400 drop-shadow" />
+                          <span>Your LinkedIn Post</span>
+                        </CardTitle>
+                        <CardDescription className="text-cyan-300/90 font-inter">
+                          Your generated LinkedIn post is ready!
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <LinkedInPostDisplay content={result} userProfile={userProfile} />
+                          
+                          <Button onClick={handleCopyResult} className="w-full bg-teal-700 hover:bg-teal-600 text-black flex items-center gap-2 text-base h-12 font-semibold">
+                            <Copy className="w-4 h-4" />
+                            Copy LinkedIn Post
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>}
+                </div>
+              </div>
+
+              {/* History Modal */}
+              <HistoryModal type="linkedin_posts" isOpen={showHistory} onClose={() => setShowHistory(false)} gradientColors="from-cyan-400 to-teal-400" />
+            </div>
+          </main>
+        </div>
       </div>
-    </Layout>;
+    </SidebarProvider>
+  );
 };
+
 export default LinkedInPosts;
