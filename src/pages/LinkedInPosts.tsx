@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { Layout } from '@/components/Layout';
@@ -201,28 +202,29 @@ const LinkedInPosts = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-pastel-blue via-pastel-peach to-pastel-mint pt-0 flex flex-col">
-        <div className="container mx-auto px-4 py-8 bg-gradient-to-br from-black/90 via-pastel-peach/15 to-pastel-blue/10 rounded-3xl shadow-2xl shadow-fuchsia-800/10 backdrop-blur-lg mt-4 mb-8 max-w-4xl w-full">
+      {/* Consistent dark background */}
+      <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-slate-800 pt-0 flex flex-col">
+        <div className="container mx-auto px-2 sm:px-4 py-8 bg-transparent rounded-3xl mt-4 mb-8 max-w-3xl w-full">
           {/* Header Section */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl bg-gradient-to-r from-pastel-blue via-fuchsia-400 to-pastel-mint bg-clip-text text-transparent mb-4 font-orbitron font-extrabold font-inter md:text-4xl drop-shadow">
+          <div className="text-center mb-10">
+            <h1 className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-teal-300 via-teal-400 to-cyan-400 bg-clip-text text-transparent drop-shadow mb-4 tracking-tight">
               LinkedIn <span className="italic">Posts</span>
             </h1>
-            <p className="text-fuchsia-200 max-w-2xl mx-auto font-inter text-lg font-light shadow-sm">
+            <p className="text-cyan-200 max-w-2xl mx-auto font-inter text-lg font-light shadow-sm">
               Create engaging LinkedIn posts that showcase your expertise and connect with your professional network
             </p>
           </div>
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-3xl mx-auto">
             {/* Input Form */}
-            <Card className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 border-white/20 backdrop-blur-sm mb-8">
+            <Card className="bg-gradient-to-br from-gray-900/95 to-gray-900/90 border-white/10 backdrop-blur-sm mb-8 shadow-xl">
               <CardHeader className="pb-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-white font-inter text-xl flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-slate-400" />
-                      Create Your Post
+                    <CardTitle className="font-inter text-xl flex items-center gap-2 bg-gradient-to-r from-teal-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent drop-shadow font-bold">
+                      <Sparkles className="w-5 h-5 text-teal-400 drop-shadow" />
+                      <span>Create Your Post</span>
                     </CardTitle>
-                    <CardDescription className="text-gray-300 font-inter">
+                    <CardDescription className="text-cyan-300/90 font-inter mb-0">
                       Fill in the details to generate your LinkedIn post
                     </CardDescription>
                   </div>
@@ -230,102 +232,86 @@ const LinkedInPosts = () => {
                     onClick={() => setShowHistory(true)} 
                     variant="outline" 
                     size="sm" 
-                    className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                    className="bg-teal-600/10 border-teal-400/30 text-teal-200 hover:bg-teal-700/20"
                   >
                     <History className="w-4 h-4 mr-2" />
                     History
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-8">
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Topic */}
-                  <div className="space-y-3">
-                    <Label htmlFor="topic" className="text-white font-medium text-base">
-                      Topic or Theme *
-                    </Label>
-                    <Label htmlFor="topic" className="text-gray-300 font-normal text-sm block">
-                      What is the main topic you want to write about?
-                    </Label>
-                    <Textarea 
-                      id="topic"
-                      placeholder="e.g. AI in customer service, Layoffs in tech, Remote work trends"
-                      value={formData.topic}
-                      onChange={(e) => handleInputChange('topic', e.target.value)}
-                      required
-                      className="min-h-[60px] resize-none text-base bg-gray-900"
-                    />
+                  {/* Inputs Row: Topic + Opinion (side-by-side on desktop) */}
+                  <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+                    {/* Topic (left) */}
+                    <div className="flex-1 space-y-2">
+                      <Label htmlFor="topic" className="bg-gradient-to-r from-teal-300 via-cyan-300 to-teal-400 bg-clip-text text-transparent font-semibold text-base">Topic or Theme *</Label>
+                      <Label htmlFor="topic" className="text-cyan-300/80 font-normal text-sm block">What is the main topic you want to write about?</Label>
+                      <Textarea 
+                        id="topic"
+                        placeholder="e.g. AI in customer service, Layoffs in tech, Remote work trends"
+                        value={formData.topic}
+                        onChange={(e) => handleInputChange('topic', e.target.value)}
+                        required
+                        className="min-h-[60px] resize-none text-base bg-gray-950 border-teal-400/25 text-black placeholder:text-slate-700 font-medium"
+                      />
+                    </div>
+                    {/* Opinion (right) */}
+                    <div className="flex-1 space-y-2">
+                      <Label htmlFor="opinion" className="bg-gradient-to-r from-teal-300 via-cyan-300 to-teal-400 bg-clip-text text-transparent font-semibold text-base">Your Key Point or Opinion</Label>
+                      <Label htmlFor="opinion" className="text-cyan-300/80 font-normal text-sm block">What is your main insight, opinion, or message?</Label>
+                      <Textarea 
+                        id="opinion"
+                        placeholder="I believe hybrid AI + human support is the future."
+                        value={formData.opinion}
+                        onChange={(e) => handleInputChange('opinion', e.target.value)}
+                        className="min-h-[60px] resize-none text-base bg-gray-950 border-teal-400/25 text-black placeholder:text-slate-700 font-medium"
+                      />
+                    </div>
                   </div>
 
-                  {/* Opinion */}
-                  <div className="space-y-3">
-                    <Label htmlFor="opinion" className="text-white font-medium text-base">
-                      Your Key Point or Opinion
-                    </Label>
-                    <Label htmlFor="opinion" className="text-gray-300 font-normal text-sm block">
-                      What is your main insight, opinion, or message?
-                    </Label>
-                    <Textarea 
-                      id="opinion"
-                      placeholder="I believe hybrid AI + human support is the future."
-                      value={formData.opinion}
-                      onChange={(e) => handleInputChange('opinion', e.target.value)}
-                      className="min-h-[80px] resize-none text-base bg-gray-900"
-                    />
+                  {/* Inputs Row: Personal Story + Audience */}
+                  <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+                    {/* Personal Story (left) */}
+                    <div className="flex-1 space-y-2">
+                      <Label htmlFor="personal_story" className="bg-gradient-to-r from-teal-300 via-cyan-300 to-teal-400 bg-clip-text text-transparent font-semibold text-base">Personal Experience or Story</Label>
+                      <Label htmlFor="personal_story" className="text-cyan-300/80 font-normal text-sm block">Do you have a story, data point, or personal experience to include?</Label>
+                      <Textarea 
+                        id="personal_story"
+                        placeholder="We reduced response time by 40% after implementing AI chat."
+                        value={formData.personal_story}
+                        onChange={(e) => handleInputChange('personal_story', e.target.value)}
+                        className="min-h-[60px] resize-none text-base bg-gray-950 border-teal-400/25 text-black placeholder:text-slate-700 font-medium"
+                      />
+                    </div>
+                    {/* Audience (right) */}
+                    <div className="flex-1 space-y-2">
+                      <Label htmlFor="audience" className="bg-gradient-to-r from-teal-300 via-cyan-300 to-teal-400 bg-clip-text text-transparent font-semibold text-base">Target Audience</Label>
+                      <Label htmlFor="audience" className="text-cyan-300/80 font-normal text-sm block">Who are you writing this for?</Label>
+                      <Textarea 
+                        id="audience"
+                        placeholder="Startup founders, product managers, working moms, new grads…"
+                        value={formData.audience}
+                        onChange={(e) => handleInputChange('audience', e.target.value)}
+                        className="min-h-[60px] resize-none text-base bg-gray-950 border-teal-400/25 text-black placeholder:text-slate-700 font-medium"
+                      />
+                    </div>
                   </div>
 
-                  {/* Personal Story */}
-                  <div className="space-y-3">
-                    <Label htmlFor="personal_story" className="text-white font-medium text-base">
-                      Personal Experience or Story
-                    </Label>
-                    <Label htmlFor="personal_story" className="text-gray-300 font-normal text-sm block">
-                      Do you have a story, data point, or personal experience to include?
-                    </Label>
-                    <Textarea 
-                      id="personal_story"
-                      placeholder="We reduced response time by 40% after implementing AI chat."
-                      value={formData.personal_story}
-                      onChange={(e) => handleInputChange('personal_story', e.target.value)}
-                      className="min-h-[80px] resize-none text-base bg-gray-900"
-                    />
-                  </div>
-
-                  {/* Audience */}
-                  <div className="space-y-3">
-                    <Label htmlFor="audience" className="text-white font-medium text-base">
-                      Target Audience
-                    </Label>
-                    <Label htmlFor="audience" className="text-gray-300 font-normal text-sm block">
-                      Who are you writing this for?
-                    </Label>
-                    <Textarea 
-                      id="audience"
-                      placeholder="Startup founders, product managers, working moms, new grads…"
-                      value={formData.audience}
-                      onChange={(e) => handleInputChange('audience', e.target.value)}
-                      className="min-h-[60px] resize-none text-base bg-gray-900"
-                    />
-                  </div>
-
-                  {/* Tone */}
-                  <div className="space-y-3">
-                    <Label htmlFor="tone" className="text-white font-medium text-base">
-                      Tone/Style Preference
-                    </Label>
-                    <Label htmlFor="tone" className="text-gray-300 font-normal text-sm block">
-                      What tone do you prefer?
-                    </Label>
+                  {/* Tone: full width */}
+                  <div className="space-y-2">
+                    <Label htmlFor="tone" className="bg-gradient-to-r from-teal-300 via-cyan-300 to-teal-400 bg-clip-text text-transparent font-semibold text-base">Tone/Style Preference</Label>
+                    <Label htmlFor="tone" className="text-cyan-300/80 font-normal text-sm block">What tone do you prefer?</Label>
                     <Select onValueChange={(value) => handleInputChange('tone', value)}>
-                      <SelectTrigger className="text-base bg-gray-900 text-white border-white/20">
+                      <SelectTrigger className="text-base bg-gray-950 text-black border-teal-400/25 font-medium">
                         <SelectValue placeholder="Select a tone..." />
                       </SelectTrigger>
-                      <SelectContent className="bg-gray-900 border-white/20">
+                      <SelectContent className="bg-gray-950 border-teal-400/25 text-black">
                         {toneOptions.map((option) => (
                           <SelectItem 
                             key={option.value} 
                             value={option.value}
-                            className="text-white hover:bg-white/20 focus:bg-white/20 data-[highlighted]:bg-white/20"
+                            className="text-black font-medium hover:bg-cyan-100 focus:bg-cyan-200 data-[highlighted]:bg-cyan-100"
                           >
                             {option.label}
                           </SelectItem>
@@ -334,11 +320,12 @@ const LinkedInPosts = () => {
                     </Select>
                   </div>
 
-                  <div className="flex gap-3 pt-4">
+                  {/* Button row: Generate (flex-1, more prominent), Reset (smaller) */}
+                  <div className="flex flex-col sm:flex-row gap-3 pt-4">
                     <Button 
                       type="submit" 
                       disabled={isSubmitting || !formData.topic.trim() || isGenerating} 
-                      className="flex-1 bg-gradient-to-r from-slate-500 to-gray-600 hover:from-slate-600 hover:to-gray-700 text-white font-medium text-base h-12"
+                      className="flex-1 bg-gradient-to-r from-teal-500 via-cyan-400 to-teal-500 hover:from-teal-600 hover:via-cyan-500 hover:to-teal-600 text-black font-semibold text-base h-12 shadow-md"
                     >
                       {isSubmitting ? 'Submitting...' : 'Generate LinkedIn Post'}
                     </Button>
@@ -347,7 +334,7 @@ const LinkedInPosts = () => {
                       type="button" 
                       onClick={resetForm} 
                       variant="outline" 
-                      className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-base h-12 px-6"
+                      className="bg-white/10 border-teal-400/25 text-black hover:bg-white/20 text-base h-12 px-6"
                     >
                       Reset
                     </Button>
@@ -358,22 +345,22 @@ const LinkedInPosts = () => {
 
             {/* Loading State */}
             {isGenerating && !result && (
-              <Card className="bg-white/5 border-white/20 backdrop-blur-sm mb-8">
+              <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm mb-8">
                 <CardContent className="py-8">
-                  <LoadingMessages type="linkedin" />
+                  <LoadingMessages type="linkedin" overrideBg="bg-cyan-100 text-black font-bold" />
                 </CardContent>
               </Card>
             )}
 
             {/* Result Display */}
             {result && (
-              <Card className="bg-white/5 border-white/20 backdrop-blur-sm">
+              <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm">
                 <CardHeader className="pb-6">
-                  <CardTitle className="text-white font-inter text-xl flex items-center gap-2">
-                    <Share2 className="w-5 h-5 text-slate-400" />
-                    Your LinkedIn Post
+                  <CardTitle className="font-inter text-xl flex items-center gap-2 bg-gradient-to-r from-teal-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent drop-shadow font-bold">
+                    <Share2 className="w-5 h-5 text-teal-400 drop-shadow" />
+                    <span>Your LinkedIn Post</span>
                   </CardTitle>
-                  <CardDescription className="text-gray-300 font-inter">
+                  <CardDescription className="text-cyan-300/90 font-inter">
                     Your generated LinkedIn post is ready!
                   </CardDescription>
                 </CardHeader>
@@ -386,7 +373,7 @@ const LinkedInPosts = () => {
                     
                     <Button 
                       onClick={handleCopyResult} 
-                      className="w-full bg-slate-700 hover:bg-slate-600 text-white flex items-center gap-2 text-base h-12"
+                      className="w-full bg-teal-700 hover:bg-teal-600 text-black flex items-center gap-2 text-base h-12 font-semibold"
                     >
                       <Copy className="w-4 h-4" />
                       Copy LinkedIn Post
@@ -403,7 +390,7 @@ const LinkedInPosts = () => {
           type="linkedin_posts" 
           isOpen={showHistory} 
           onClose={() => setShowHistory(false)} 
-          gradientColors="from-slate-400 to-gray-500" 
+          gradientColors="from-cyan-400 to-teal-400" 
         />
       </div>
     </Layout>
@@ -411,3 +398,4 @@ const LinkedInPosts = () => {
 };
 
 export default LinkedInPosts;
+
