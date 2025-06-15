@@ -22,7 +22,7 @@ export function useClerkSupabaseSync() {
           } else {
             // Only show the first/last 5 chars, do NOT log the full JWT!
             const masked = jwt.length > 10 ? jwt.substring(0,5) + "..." + jwt.substring(jwt.length-5) : "[short]";
-            setClerkToken(jwt);
+            await setClerkToken(jwt);
             console.log(`[useClerkSupabaseSync] Clerk JWT was set (masked): ${masked} for Clerk user ID: ${userId}`);
           }
         } catch (err) {
@@ -30,6 +30,7 @@ export function useClerkSupabaseSync() {
         }
       } else {
         console.warn("[useClerkSupabaseSync] Not signed in or getToken missing. Using Supabase ANON key only.");
+        await setClerkToken(null);
       }
     }
     setToken();
