@@ -10,16 +10,6 @@ export const useUserCredits = () => {
   // Debug log: Show userProfile loading and ID
   console.log('[useUserCredits] userProfile:', userProfile, 'loading:', userProfileLoading);
 
-  // Extra debug: Output the actual supabase headers to ensure the JWT is used
-  try {
-    // This cast may print headers info for deeper debugging
-    // @ts-ignore
-    const headers = (supabase as any).headers;
-    console.log('[useUserCredits] Supabase client headers:', headers);
-  } catch (e) {
-    console.log('[useUserCredits] Unable to read Supabase headers:', e);
-  }
-
   return useQuery({
     queryKey: ['user_credits', userProfile?.id],
     queryFn: async () => {
@@ -30,6 +20,7 @@ export const useUserCredits = () => {
       
       console.log('[useUserCredits] Querying user_credits for user_profile_id:', userProfile.id);
       
+      // First, try to get existing credits
       const { data, error } = await supabase
         .from('user_credits')
         .select('*')
@@ -41,14 +32,48 @@ export const useUserCredits = () => {
         return { __error: error }; // Allow UI to show error details
       }
       
-      console.log('[useUserCredits] Fetched user_credits:', data);
+      // If credits exist, return them
       if (data) {
+        console.log('[useUserCredits] Fetched user_credits:', data);
         console.log('[useUserCredits] Current balance:', data.current_balance);
-      } else {
-        console.log('[useUserCredits] No user_credits record found for user_profile_id:', userProfile.id);
+        return data;
       }
       
-      return data;
+      // If no credits found, initialize them
+      console.log('[useUserCredits] No user_credits record found, initializing...');
+      
+      try {
+        // Call the initialize_user_credits function
+        const { data: initResult, error: initError } = await supabase.rpc('initialize_user_credits', {
+          p_user_profile_id: userProfile.id
+        });
+        
+        if (initError) {
+          console.error('[useUserCredits] Error initializing credits:', initError);
+          return { __error: initError };
+        }
+        
+        console.log('[useUserCredits] Credits initialized successfully:', initResult);
+        
+        // Now fetch the newly created credits
+        const { data: newCredits, error: fetchError } = await supabase
+          .from('user_credits')
+          .select('*')
+          .eq('user_profile_id', userProfile.id)
+          .single();
+          
+        if (fetchError) {
+          console.error('[useUserCredits] Error fetching newly created credits:', fetchError);
+          return { __error: fetchError };
+        }
+        
+        console.log('[useUserCredits] Fetched newly created credits:', newCredits);
+        return newCredits;
+        
+      } catch (initError) {
+        console.error('[useUserCredits] Exception during initialization:', initError);
+        return { __error: initError };
+      }
     },
     enabled: !!userProfile?.id && !userProfileLoading,
     staleTime: 30000,
