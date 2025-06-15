@@ -7,6 +7,8 @@ import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, Alert
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import PercentageMeter from '@/components/PercentageMeter';
+import CoverLetterDownloadActions from '@/components/CoverLetterDownloadActions';
+
 interface HistoryItem {
   id: string;
   company_name?: string;
@@ -313,11 +315,21 @@ const HistoryModal = ({
                     {type === 'linkedin_posts' ? <Share2 className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
                     {getResultTitle()}
                   </div>
-                  {/* Copy button removed for 'job_guide' type */}
-                  {type !== 'job_guide' && <Button onClick={() => handleCopyResult(selectedItem)} size="sm" className="bg-gray-950 hover:bg-gray-800 text-white flex items-center gap-1">
-                      <Copy className="w-3 h-3" />
-                      <span className="hidden sm:inline">Copy</span>
-                    </Button>}
+                  <div className="flex items-center gap-2">
+                    {/* Copy button removed for 'job_guide' type */}
+                    {type !== 'job_guide' && <Button onClick={() => handleCopyResult(selectedItem)} size="sm" className="bg-gray-950 hover:bg-gray-800 text-white flex items-center gap-1">
+                        <Copy className="w-3 h-3" />
+                        <span className="hidden sm:inline">Copy</span>
+                      </Button>}
+                    {/* Download buttons for cover letter type */}
+                    {type === 'cover_letter' && selectedItem.cover_letter && (
+                      <CoverLetterDownloadActions 
+                        coverLetter={selectedItem.cover_letter}
+                        jobTitle={selectedItem.job_title || 'Unknown Position'}
+                        companyName={selectedItem.company_name || 'Unknown Company'}
+                      />
+                    )}
+                  </div>
                 </h3>
                 {/* MATCH SCORE shown for job_guide */}
                 {type === 'job_guide' && selectedItem.match_score && <div className="mb-4 max-w-full">
