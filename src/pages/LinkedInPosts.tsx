@@ -235,7 +235,7 @@ const LinkedInPosts = () => {
                         value={formData.topic}
                         onChange={e => handleInputChange('topic', e.target.value)}
                         required
-                        className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-black placeholder:text-black/70 placeholder:text-xs font-medium" />
+                        className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                     </div>
                     {/* Opinion */}
                     <div className="flex-1 space-y-2">
@@ -246,7 +246,7 @@ const LinkedInPosts = () => {
                         placeholder="I believe hybrid AI + human support is the future."
                         value={formData.opinion}
                         onChange={e => handleInputChange('opinion', e.target.value)}
-                        className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-black placeholder:text-black/70 placeholder:text-xs font-medium" />
+                        className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                     </div>
                   </div>
 
@@ -261,7 +261,7 @@ const LinkedInPosts = () => {
                         placeholder="We reduced response time by 40% after implementing AI chat."
                         value={formData.personal_story}
                         onChange={e => handleInputChange('personal_story', e.target.value)}
-                        className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-black placeholder:text-black/70 placeholder:text-xs font-medium" />
+                        className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                     </div>
                     {/* Audience */}
                     <div className="flex-1 space-y-2">
@@ -272,7 +272,7 @@ const LinkedInPosts = () => {
                         placeholder="Startup founders, product managers, working moms, new grads…"
                         value={formData.audience}
                         onChange={e => handleInputChange('audience', e.target.value)}
-                        className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-black placeholder:text-black/70 placeholder:text-xs font-medium" />
+                        className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                     </div>
                   </div>
 
@@ -281,11 +281,11 @@ const LinkedInPosts = () => {
                     <Label htmlFor="tone" className="text-black font-semibold text-base">Tone/Style Preference</Label>
                     <Label htmlFor="tone" className="text-black/70 font-normal text-sm block">What tone do you prefer?</Label>
                     <Select onValueChange={value => handleInputChange('tone', value)}>
-                      <SelectTrigger className="text-base bg-black/80 text-white border-teal-300/30 font-medium">
+                      <SelectTrigger className="text-base bg-black/80 text-white border-teal-300/30 font-medium [&>span[data-placeholder]]:text-white/80">
                         <SelectValue placeholder="Select a tone..." />
                       </SelectTrigger>
                       <SelectContent className="bg-black/80 border-teal-200/30 text-white">
-                        {toneOptions.map(option => <SelectItem key={option.value} value={option.value} className="text-white font-medium hover:bg-cyan-100/10 focus:bg-cyan-200/10 data-[highlighted]:bg-cyan-100/10">
+                        {toneOptions.map(option => <SelectItem key={option.value} value={option.value} className="font-medium data-[highlighted]:bg-teal-200 data-[highlighted]:text-black">
                             {option.label}
                           </SelectItem>)}
                       </SelectContent>
