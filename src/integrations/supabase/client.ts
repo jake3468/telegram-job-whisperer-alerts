@@ -28,11 +28,12 @@ export const setClerkToken = (token: string | null) => {
     // Update the global headers to include the Clerk JWT token
     supabase.realtime.setAuth(token);
     // Also set it in the global headers for REST API calls
-    (supabase as any).supabaseKey = token;
+    // The following line was incorrect, as it overwrote the API key with the user's JWT,
+    // causing authentication to fail. It has been removed.
+    // (supabase as any).supabaseKey = token;
     (supabase as any).headers = {
       ...(supabase as any).headers,
       'Authorization': `Bearer ${token}`,
     };
   }
 };
-
