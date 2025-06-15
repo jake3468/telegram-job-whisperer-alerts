@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,11 +20,13 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   // Only sync Supabase/Clerk JWT after Clerk auth context is loaded
-  // SignedIn ensures user is loaded; SignedOut keeps things safe for guests  
+  // Call the hook here for signed-in users—DO NOT render it in JSX.
+  // So when user is signed in, it runs the hook, else not.
   return (
     <>
       <SignedIn>
-        {useClerkSupabaseSync()}
+        {/* Call the hook at the top of the signed-in content. */}
+        {(() => { useClerkSupabaseSync(); return null; })()}
       </SignedIn>
       {/* Main app routing */}
       <Routes>
