@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { Layout } from '@/components/Layout';
@@ -216,11 +215,11 @@ const LinkedInPosts = () => {
           </div>
           <div className="max-w-3xl mx-auto">
             {/* Input Form */}
-            <Card className="bg-gradient-to-br from-gray-900/95 to-gray-900/90 border-white/10 backdrop-blur-sm mb-8 shadow-xl">
+            <Card className="bg-gradient-to-br from-teal-900 via-cyan-900 to-gray-900 border-white/10 backdrop-blur-md mb-8 shadow-xl">
               <CardHeader className="pb-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="font-inter text-xl flex items-center gap-2 bg-gradient-to-r from-teal-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent drop-shadow font-bold">
+                    <CardTitle className="font-inter text-xl flex items-center gap-2 text-white font-bold">
                       <Sparkles className="w-5 h-5 text-teal-400 drop-shadow" />
                       <span>Create Your Post</span>
                     </CardTitle>
@@ -245,7 +244,7 @@ const LinkedInPosts = () => {
                   <div className="flex flex-col md:flex-row gap-4 md:gap-6">
                     {/* Topic (left) */}
                     <div className="flex-1 space-y-2">
-                      <Label htmlFor="topic" className="bg-gradient-to-r from-teal-300 via-cyan-300 to-teal-400 bg-clip-text text-transparent font-semibold text-base">Topic or Theme *</Label>
+                      <Label htmlFor="topic" className="text-cyan-200 font-semibold text-base">Topic or Theme *</Label>
                       <Label htmlFor="topic" className="text-cyan-300/80 font-normal text-sm block">What is the main topic you want to write about?</Label>
                       <Textarea 
                         id="topic"
@@ -253,19 +252,19 @@ const LinkedInPosts = () => {
                         value={formData.topic}
                         onChange={(e) => handleInputChange('topic', e.target.value)}
                         required
-                        className="min-h-[60px] resize-none text-base bg-gray-950 border-teal-400/25 text-black placeholder:text-slate-700 font-medium"
+                        className="min-h-[60px] resize-none text-base bg-gray-950 border-teal-400/25 text-white placeholder:text-white/60 font-medium"
                       />
                     </div>
                     {/* Opinion (right) */}
                     <div className="flex-1 space-y-2">
-                      <Label htmlFor="opinion" className="bg-gradient-to-r from-teal-300 via-cyan-300 to-teal-400 bg-clip-text text-transparent font-semibold text-base">Your Key Point or Opinion</Label>
+                      <Label htmlFor="opinion" className="text-cyan-200 font-semibold text-base">Your Key Point or Opinion</Label>
                       <Label htmlFor="opinion" className="text-cyan-300/80 font-normal text-sm block">What is your main insight, opinion, or message?</Label>
                       <Textarea 
                         id="opinion"
                         placeholder="I believe hybrid AI + human support is the future."
                         value={formData.opinion}
                         onChange={(e) => handleInputChange('opinion', e.target.value)}
-                        className="min-h-[60px] resize-none text-base bg-gray-950 border-teal-400/25 text-black placeholder:text-slate-700 font-medium"
+                        className="min-h-[60px] resize-none text-base bg-gray-950 border-teal-400/25 text-white placeholder:text-white/60 font-medium"
                       />
                     </div>
                   </div>
@@ -274,44 +273,44 @@ const LinkedInPosts = () => {
                   <div className="flex flex-col md:flex-row gap-4 md:gap-6">
                     {/* Personal Story (left) */}
                     <div className="flex-1 space-y-2">
-                      <Label htmlFor="personal_story" className="bg-gradient-to-r from-teal-300 via-cyan-300 to-teal-400 bg-clip-text text-transparent font-semibold text-base">Personal Experience or Story</Label>
+                      <Label htmlFor="personal_story" className="text-cyan-200 font-semibold text-base">Personal Experience or Story</Label>
                       <Label htmlFor="personal_story" className="text-cyan-300/80 font-normal text-sm block">Do you have a story, data point, or personal experience to include?</Label>
                       <Textarea 
                         id="personal_story"
                         placeholder="We reduced response time by 40% after implementing AI chat."
                         value={formData.personal_story}
                         onChange={(e) => handleInputChange('personal_story', e.target.value)}
-                        className="min-h-[60px] resize-none text-base bg-gray-950 border-teal-400/25 text-black placeholder:text-slate-700 font-medium"
+                        className="min-h-[60px] resize-none text-base bg-gray-950 border-teal-400/25 text-white placeholder:text-white/60 font-medium"
                       />
                     </div>
                     {/* Audience (right) */}
                     <div className="flex-1 space-y-2">
-                      <Label htmlFor="audience" className="bg-gradient-to-r from-teal-300 via-cyan-300 to-teal-400 bg-clip-text text-transparent font-semibold text-base">Target Audience</Label>
+                      <Label htmlFor="audience" className="text-cyan-200 font-semibold text-base">Target Audience</Label>
                       <Label htmlFor="audience" className="text-cyan-300/80 font-normal text-sm block">Who are you writing this for?</Label>
                       <Textarea 
                         id="audience"
                         placeholder="Startup founders, product managers, working moms, new grads…"
                         value={formData.audience}
                         onChange={(e) => handleInputChange('audience', e.target.value)}
-                        className="min-h-[60px] resize-none text-base bg-gray-950 border-teal-400/25 text-black placeholder:text-slate-700 font-medium"
+                        className="min-h-[60px] resize-none text-base bg-gray-950 border-teal-400/25 text-white placeholder:text-white/60 font-medium"
                       />
                     </div>
                   </div>
 
                   {/* Tone: full width */}
                   <div className="space-y-2">
-                    <Label htmlFor="tone" className="bg-gradient-to-r from-teal-300 via-cyan-300 to-teal-400 bg-clip-text text-transparent font-semibold text-base">Tone/Style Preference</Label>
+                    <Label htmlFor="tone" className="text-cyan-200 font-semibold text-base">Tone/Style Preference</Label>
                     <Label htmlFor="tone" className="text-cyan-300/80 font-normal text-sm block">What tone do you prefer?</Label>
                     <Select onValueChange={(value) => handleInputChange('tone', value)}>
-                      <SelectTrigger className="text-base bg-gray-950 text-black border-teal-400/25 font-medium">
+                      <SelectTrigger className="text-base bg-gray-950 text-white border-teal-400/25 font-medium">
                         <SelectValue placeholder="Select a tone..." />
                       </SelectTrigger>
-                      <SelectContent className="bg-gray-950 border-teal-400/25 text-black">
+                      <SelectContent className="bg-gray-950 border-teal-400/25 text-white">
                         {toneOptions.map((option) => (
                           <SelectItem 
                             key={option.value} 
                             value={option.value}
-                            className="text-black font-medium hover:bg-cyan-100 focus:bg-cyan-200 data-[highlighted]:bg-cyan-100"
+                            className="text-white font-medium hover:bg-cyan-100/10 focus:bg-cyan-200/10 data-[highlighted]:bg-cyan-100/10"
                           >
                             {option.label}
                           </SelectItem>
@@ -398,4 +397,3 @@ const LinkedInPosts = () => {
 };
 
 export default LinkedInPosts;
-
