@@ -83,10 +83,7 @@ const PersonalInfoForm = ({
       <div>
         <div className="flex items-center justify-between mb-4">
           
-          <Button type="button" onClick={handleSocialProfileAdd} size="sm" className="flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            Add Profile
-          </Button>
+          
         </div>
         
         {(data.social_profiles || []).map((profile: any, index: number) => <div key={index} className="flex gap-2 mb-2">
