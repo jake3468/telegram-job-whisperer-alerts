@@ -62,8 +62,6 @@ export default function GetMoreCredits() {
             className="
               grid gap-6
               w-full
-              px-4 sm:px-6 lg:px-8
-              mx-auto
               grid-cols-1
               md:grid-cols-3
               items-stretch
