@@ -9,21 +9,14 @@ export const useUserCredits = () => {
   const { user } = useUser();
   const { userProfile, loading: userProfileLoading } = useUserProfile();
 
-  // Extra: log all related IDs and JWT for debugging
   console.log('[useUserCredits][debug] Clerk user:', user?.id);
   console.log('[useUserCredits][debug] UserProfile:', userProfile, 'loading:', userProfileLoading);
 
-  // Added: Detect and warn if JWT is not present/invalid mapping
-  // (for debugging issues with user_credits table RLS)
   if (!user) {
-    console.warn(
-      '[useUserCredits][warn] Clerk user not found! You must be signed in for credits RLS to work. No credits will load until Clerk JWT is attached.'
-    );
+    console.warn('[useUserCredits][warn] Clerk user not found! You must be signed in for credits RLS to work.');
   }
   if (userProfile && !userProfile.id) {
-    console.warn(
-      '[useUserCredits][warn] User profile exists but has no id. Credits will not show.'
-    );
+    console.warn('[useUserCredits][warn] User profile exists but has no id. Credits will not show.');
   }
 
   return useQuery({
@@ -53,69 +46,35 @@ export const useUserCredits = () => {
           return { __error: error };
         }
 
-        // No credit record found - but first check if it might be a duplicate key error scenario
+        // No credit record found - initialize credits
         if (!data) {
-          console.warn('[useUserCredits] No row found in user_credits for user_profile_id:', userProfile.id);
+          console.log('[useUserCredits] No credit record found, initializing credits...');
           
-          // Try to query again with a different approach to see if record exists but RLS is blocking
-          const { data: testData, error: testError } = await supabase
-            .from('user_credits')
-            .select('id, current_balance')
-            .eq('user_profile_id', userProfile.id)
-            .maybeSingle();
+          // Use the database function to initialize credits
+          const { data: initResult, error: initError } = await supabase
+            .rpc('initialize_user_credits', { p_user_profile_id: userProfile.id });
           
-          console.log('[useUserCredits][debug] Test query result:', testData, 'error:', testError);
+          console.log('[useUserCredits][debug] Initialize credits result:', initResult, 'error:', initError);
           
-          // If we still get nothing, try to initialize
-          if (!testData && !testError) {
-            console.log('[useUserCredits] Attempting to initialize credits for user...');
-            
-            // Use the database function to initialize credits
-            const { data: initResult, error: initError } = await supabase
-              .rpc('initialize_user_credits', { p_user_profile_id: userProfile.id });
-            
-            console.log('[useUserCredits][debug] Initialize credits result:', initResult, 'error:', initError);
-            
-            // If we get a duplicate key error, it means the record exists but we can't see it
-            if (initError && initError.code === '23505') {
-              console.warn('[useUserCredits] Duplicate key error - record exists but RLS may be blocking access');
-              // Return a special error object to indicate this scenario
-              return { 
-                __error: { 
-                  ...initError, 
-                  message: "Credit record exists but may not be accessible. Please check Row Level Security policies." 
-                } 
-              };
-            }
-            
-            if (initError) {
-              console.error('[useUserCredits] Failed to initialize credits:', initError);
-              return { __error: initError };
-            }
-            
-            // Now query again to get the newly created record
-            const { data: newData, error: newError } = await supabase
-              .from('user_credits')
-              .select('*')
-              .eq('user_profile_id', userProfile.id)
-              .single();
-            
-            if (newError) {
-              console.error('[useUserCredits] Error fetching newly created credits:', newError);
-              return { __error: newError };
-            }
-            
-            console.log('[useUserCredits] Successfully initialized and retrieved credits:', newData);
-            return newData;
-          } else if (testData) {
-            // We found data with the test query, return it
-            console.log('[useUserCredits] Found credits with test query:', testData);
-            return testData;
-          } else {
-            // Test query also failed
-            console.error('[useUserCredits] Test query also failed:', testError);
-            return { __error: testError };
+          if (initError) {
+            console.error('[useUserCredits] Failed to initialize credits:', initError);
+            return { __error: initError };
           }
+          
+          // Now query again to get the newly created record
+          const { data: newData, error: newError } = await supabase
+            .from('user_credits')
+            .select('*')
+            .eq('user_profile_id', userProfile.id)
+            .single();
+          
+          if (newError) {
+            console.error('[useUserCredits] Error fetching newly created credits:', newError);
+            return { __error: newError };
+          }
+          
+          console.log('[useUserCredits] Successfully initialized and retrieved credits:', newData);
+          return newData;
         }
 
         // Success!
@@ -130,8 +89,8 @@ export const useUserCredits = () => {
     staleTime: 30000,
     refetchInterval: 15000,
     retry: (failureCount, error: any) => {
-      // Don't retry if it's a "no data found" error or duplicate key error
-      if (error?.code === 'PGRST116' || error?.code === '23505') {
+      // Don't retry if it's a "no data found" error
+      if (error?.code === 'PGRST116') {
         return false;
       }
       return failureCount < 3;
