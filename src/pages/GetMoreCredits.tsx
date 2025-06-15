@@ -67,10 +67,10 @@ export default function GetMoreCredits() {
           </div>
         </div>
       </header>
+      {/* Main flex layout, REMOVE extra bg-gradient here */}
       <div
         className={`
-          min-h-screen flex w-full 
-          bg-gradient-to-br from-[#0e1122] via-[#181526] to-[#21203a]
+          min-h-screen flex w-full
         `}
         style={{
           margin: 0,
@@ -79,9 +79,9 @@ export default function GetMoreCredits() {
         }}
       >
         <AppSidebar />
-        {/* Main content area - removed lg:pl-20 to be flush with sidebar */}
         <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0">
           <main className="flex-1 w-full bg-transparent">
+            {/* Only the main content area has gradient bg */}
             <div className="min-h-[80vh] w-full bg-gradient-to-b from-[#162650] via-[#214072] to-[#2b4f88] py-5 sm:py-8 flex flex-col">
               <div className="w-full max-w-7xl mx-auto px-2 sm:px-4">
                 <div className="text-center mb-5 sm:mb-12">
