@@ -2,6 +2,7 @@
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Menu } from 'lucide-react';
+import React from 'react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -9,7 +10,10 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   return (
-    <SidebarProvider defaultOpen={true}>
+    <SidebarProvider
+      defaultOpen={true}
+      style={{ "--sidebar-width": "clamp(220px, 20vw, 295px)" } as React.CSSProperties}
+    >
       {/* Header for mobile - glassy vibrant with no content overlap */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
         <div className="flex items-center justify-between p-3">
@@ -44,7 +48,7 @@ export function Layout({ children }: LayoutProps) {
         {/* Main content area now has padding-top to avoid the fixed mobile header */}
         <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0">
           <main className="flex-1 w-full px-0 py-0 bg-transparent">
-            <div className="w-full max-w-4xl mx-auto px-3 sm:px-6 pt-3 sm:pt-8">
+            <div className="w-full px-3 sm:px-6 pt-3 sm:pt-8">
               {children}
             </div>
           </main>

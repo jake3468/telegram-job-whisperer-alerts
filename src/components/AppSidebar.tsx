@@ -1,4 +1,3 @@
-
 import { User, Bell, Target, FileText, X, Share2, CreditCard } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
@@ -68,7 +67,6 @@ export function AppSidebar() {
       bg-gradient-to-br from-black via-gray-950 to-fuchsia-950
       border-r border-fuchsia-400/10 shadow-2xl shadow-fuchsia-600/10 
       backdrop-blur-2xl
-      min-w-[220px] max-w-[295px] w-[clamp(220px,20vw,295px)]
       h-full
       overflow-y-auto overflow-x-hidden
       scrollbar-none
