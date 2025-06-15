@@ -28,6 +28,8 @@ const CreditBalanceDisplay = () => {
     let msg = "Error loading credits.";
     if (detailError.code === "PGRST301") {
       msg += " (Not authorized by Row Level Security. Please check that you are logged in with the correct user.)";
+    } else if (detailError.code === "PGRST116") {
+      msg = "No credits found for this user.";
     } else if (detailError.message) {
       msg += ` (${detailError.message})`;
     }
@@ -36,6 +38,10 @@ const CreditBalanceDisplay = () => {
         <div className="flex items-center gap-2">
           <BadgeDollarSign className="w-5 h-5" />
           {msg}
+        </div>
+        {/* Debug info for troubleshooting */}
+        <div className="text-[10px] text-rose-300 mt-1">
+          Debug: Profile ID {userProfile?.id}, Error: {detailError.code || 'Unknown'}
         </div>
       </div>
     );
@@ -49,6 +55,10 @@ const CreditBalanceDisplay = () => {
         <div className="flex items-center gap-2">
           <BadgeDollarSign className="w-5 h-5" />
           No credits found
+        </div>
+        {/* Debug info for troubleshooting */}
+        <div className="text-[10px] text-yellow-300 mt-1">
+          Debug: Profile ID {userProfile?.id}
         </div>
       </div>
     );
