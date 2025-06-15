@@ -13,6 +13,19 @@ export const useUserCredits = () => {
   console.log('[useUserCredits][debug] Clerk user:', user?.id);
   console.log('[useUserCredits][debug] UserProfile:', userProfile, 'loading:', userProfileLoading);
 
+  // Added: Detect and warn if JWT is not present/invalid mapping
+  // (for debugging issues with user_credits table RLS)
+  if (!user) {
+    console.warn(
+      '[useUserCredits][warn] Clerk user not found! You must be signed in for credits RLS to work. No credits will load until Clerk JWT is attached.'
+    );
+  }
+  if (userProfile && !userProfile.id) {
+    console.warn(
+      '[useUserCredits][warn] User profile exists but has no id. Credits will not show.'
+    );
+  }
+
   return useQuery({
     queryKey: ['user_credits', userProfile?.id],
     queryFn: async () => {
