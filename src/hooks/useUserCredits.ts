@@ -2,13 +2,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from './useUserProfile';
+import { useUser } from '@clerk/clerk-react';
 
 // Fetches current user credit info from Supabase
 export const useUserCredits = () => {
+  const { user } = useUser();
   const { userProfile, loading: userProfileLoading } = useUserProfile();
 
-  // Debug log: Show userProfile loading and ID
-  console.log('[useUserCredits] userProfile:', userProfile, 'loading:', userProfileLoading);
+  // Extra: log all related IDs and JWT for debugging
+  console.log('[useUserCredits][debug] Clerk user:', user?.id);
+  console.log('[useUserCredits][debug] UserProfile:', userProfile, 'loading:', userProfileLoading);
 
   return useQuery({
     queryKey: ['user_credits', userProfile?.id],
@@ -17,33 +20,31 @@ export const useUserCredits = () => {
         console.warn('[useUserCredits] No userProfile.id, returning null');
         return null;
       }
-      
-      console.log('[useUserCredits] Querying user_credits for user_profile_id:', userProfile.id);
-      
-      // Try to get existing credits
+
+      // LOG headers to ensure JWT is present
+      console.log('[useUserCredits][debug] Supabase client headers:', (supabase as any).headers);
+
+      // Query user_credits for this user_profile_id
       const { data, error } = await supabase
         .from('user_credits')
         .select('*')
         .eq('user_profile_id', userProfile.id)
         .maybeSingle();
-        
+
+      console.log('[useUserCredits][debug] SQL Query for user_profile_id:', userProfile.id);
+      console.log('[useUserCredits][debug] Supabase returned:', data, 'error:', error);
+
+      // Error or nothing found
       if (error) {
         console.error('[useUserCredits] Error from Supabase:', error);
-        return { __error: error }; // Allow UI to show error details
+        return { __error: error };
       }
-      
-      // If credits exist, return them
-      if (data) {
-        console.log('[useUserCredits] Fetched user_credits:', data);
-        console.log('[useUserCredits] Current balance:', data.current_balance);
-        return data;
+      if (!data) {
+        console.warn('[useUserCredits] No row found in user_credits for user_profile_id:', userProfile.id);
+        return null;
       }
-      
-      // If no credits found, log it but don't auto-initialize to avoid duplicate key errors
-      console.log('[useUserCredits] No user_credits record found for user_profile_id:', userProfile.id);
-      console.log('[useUserCredits] Credits should be initialized when user profile is created');
-      
-      return null;
+      // Success!
+      return data;
     },
     enabled: !!userProfile?.id && !userProfileLoading,
     staleTime: 30000,
