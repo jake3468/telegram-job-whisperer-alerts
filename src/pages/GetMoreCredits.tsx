@@ -1,3 +1,4 @@
+
 import { useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -41,9 +42,9 @@ export default function GetMoreCredits() {
 
   return (
     <Layout>
-      <div className="min-h-[80vh] w-full bg-gradient-to-b from-[#162650] via-[#214072] to-[#2b4f88] px-0 py-8 flex flex-col">
-        <div className="w-full mx-auto">
-          <div className="text-center mb-8 sm:mb-12 px-2">
+      <div className="min-h-[80vh] w-full bg-gradient-to-b from-[#162650] via-[#214072] to-[#2b4f88] px-4 py-8 flex flex-col">
+        <div className="w-full max-w-7xl mx-auto">
+          <div className="text-center mb-8 sm:mb-12">
             <h1 className="text-3xl sm:text-5xl font-orbitron font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-2 drop-shadow tracking-tight animate-fade-in">
               Flexible Pricing for All Users
             </h1>
@@ -57,7 +58,7 @@ export default function GetMoreCredits() {
         </div>
 
         {/* Responsive grid area taking almost full width with max constraints */}
-        <div className="w-full flex-grow flex flex-col items-center justify-center">
+        <div className="w-full max-w-7xl mx-auto flex-grow flex flex-col items-center justify-center px-4">
           <div
             className="
               grid gap-6
