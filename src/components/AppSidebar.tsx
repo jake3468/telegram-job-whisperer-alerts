@@ -1,3 +1,4 @@
+
 import { User, Bell, Target, FileText, X, Share2 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
@@ -88,10 +89,6 @@ export function AppSidebar() {
           >
             <X className="h-6 w-6" />
           </Button>
-        )}
-        {/* Hamburger only for desktop mini-state */}
-        {!isMobile && (
-          <SidebarTrigger className="lg:hidden absolute top-5 left-3 bg-fuchsia-700/20 rounded-lg p-2 hover:bg-fuchsia-500/40 border border-fuchsia-400/10" />
         )}
       </SidebarHeader>
 
@@ -198,12 +195,27 @@ export function AppSidebar() {
       <SidebarFooter className="p-5 border-t border-fuchsia-400/10 bg-gradient-to-r from-black/90 to-fuchsia-950/80 mt-2 rounded-none relative">
         <SignedIn>
           <div className="flex items-center gap-3 w-full">
-            <div>
+            <div 
+              className={isMobile ? "relative z-[70]" : ""}
+              style={isMobile ? { isolation: 'isolate' } : {}}
+              onPointerDown={(e) => {
+                if (isMobile) {
+                  e.stopPropagation();
+                }
+              }}
+              onClick={(e) => {
+                if (isMobile) {
+                  e.stopPropagation();
+                }
+              }}
+            >
               <UserButton
                 appearance={{
                   elements: {
                     avatarBox: "w-10 h-10 flex-shrink-0",
-                    userButtonPopoverCard: isMobile ? "z-[60]" : ""
+                    userButtonPopoverCard: isMobile ? "!z-[80] !important" : "",
+                    userButtonPopoverActionButton: isMobile ? "!z-[80] pointer-events-auto" : "",
+                    userButtonPopoverFooter: isMobile ? "!z-[80]" : ""
                   }
                 }}
               />
