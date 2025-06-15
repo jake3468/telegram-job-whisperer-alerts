@@ -310,41 +310,65 @@ const HistoryModal = ({
             </div>
             {/* --- Result Section --- */}
             {hasResult(selectedItem) && <div className="rounded-lg p-4 border border-white/10 shadow-inner bg-red-700">
-                <h3 className="text-white font-medium mb-3 flex items-center gap-2 justify-between">
+                <h3
+                  className="text-white font-medium mb-3 flex flex-wrap gap-2 justify-between items-center"
+                  style={{ rowGap: "0.5rem" }}
+                >
                   <div className="flex items-center gap-2">
                     {type === 'linkedin_posts' ? <Share2 className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
                     {getResultTitle()}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2 min-w-0">
                     {/* Copy button removed for 'job_guide' type */}
-                    {type !== 'job_guide' && <Button onClick={() => handleCopyResult(selectedItem)} size="sm" className="bg-gray-950 hover:bg-gray-800 text-white flex items-center gap-1">
+                    {type !== 'job_guide' && (
+                      <Button
+                        onClick={() => handleCopyResult(selectedItem)}
+                        size="sm"
+                        className="bg-gray-950 hover:bg-gray-800 text-white flex items-center gap-1"
+                      >
                         <Copy className="w-3 h-3" />
                         <span className="hidden sm:inline">Copy</span>
-                      </Button>}
+                      </Button>
+                    )}
                     {/* Download buttons for cover letter type */}
                     {type === 'cover_letter' && selectedItem.cover_letter && (
-                      <CoverLetterDownloadActions 
-                        coverLetter={selectedItem.cover_letter}
-                        jobTitle={selectedItem.job_title || 'Unknown Position'}
-                        companyName={selectedItem.company_name || 'Unknown Company'}
-                        contrast // highlight with black/white
-                      />
+                      <div className="flex flex-wrap gap-2">
+                        <CoverLetterDownloadActions 
+                          coverLetter={selectedItem.cover_letter}
+                          jobTitle={selectedItem.job_title || 'Unknown Position'}
+                          companyName={selectedItem.company_name || 'Unknown Company'}
+                          contrast // highlight with black/white
+                        />
+                      </div>
                     )}
                   </div>
                 </h3>
                 {/* MATCH SCORE shown for job_guide */}
-                {type === 'job_guide' && selectedItem.match_score && <div className="mb-4 max-w-full">
+                {type === 'job_guide' && selectedItem.match_score && (
+                  <div className="mb-4 max-w-full">
                     <div className="w-full sm:max-w-[350px] md:max-w-[280px] mx-auto">
                       <div className="shadow-md rounded-xl bg-gray-900/90 p-3 border border-gray-700">
                         <PercentageMeter percentage={selectedItem.match_score} />
                       </div>
                     </div>
-                  </div>}
-                <div className="rounded-lg p-4 border-2 border-blue-200 max-h-96 overflow-y-auto mt-1 bg-slate-900">
-                  <div style={{
-                fontFamily: 'serif'
-              }} className="text-gray-100 text-sm md:text-base leading-relaxed whitespace-pre-wrap break-words bg-gray-900">
-                    {/* Only use job_match for job_guide, but fallback to existing for other types */}
+                  </div>
+                )}
+                <div
+                  className="rounded-lg p-4 border-2 border-blue-200 max-h-96 overflow-y-auto mt-1 bg-slate-900"
+                  style={{
+                    maxWidth: "100%",
+                    overflowX: "auto"
+                  }}
+                >
+                  <div
+                    style={{
+                      fontFamily: 'serif',
+                      wordBreak: 'break-word',
+                      whiteSpace: 'pre-wrap',
+                      minWidth: 0,
+                    }}
+                    className="text-gray-100 text-sm md:text-base leading-relaxed break-words bg-gray-900"
+                  >
                     {type === 'job_guide' ? selectedItem.job_match : getResult(selectedItem)}
                   </div>
                 </div>
