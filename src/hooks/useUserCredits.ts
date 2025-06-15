@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from './useUserProfile';
@@ -35,7 +34,7 @@ export const useUserCredits = () => {
       }
 
       // LOG headers to ensure JWT is present
-      console.log('[useUserCredits][debug] Supabase client headers:', (supabase as any).headers);
+      // Was: console.log('[useUserCredits][debug] Supabase client headers:', (supabase as any).headers);
 
       // Query user_credits for this user_profile_id
       const { data, error } = await supabase
