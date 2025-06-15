@@ -195,16 +195,11 @@ export function AppSidebar() {
 
       <SidebarFooter className="p-5 border-t border-fuchsia-400/10 bg-gradient-to-r from-black/90 to-fuchsia-950/80 mt-2 rounded-none">
         <SignedIn>
-          <div className="flex items-center gap-3 w-full overflow-hidden">
+          <div className="flex items-center gap-3 w-full">
             <UserButton
               appearance={{
                 elements: {
                   avatarBox: "w-10 h-10 flex-shrink-0"
-                }
-              }}
-              userButtonPopoverProps={{
-                style: {
-                  zIndex: 99999
                 }
               }}
             />
