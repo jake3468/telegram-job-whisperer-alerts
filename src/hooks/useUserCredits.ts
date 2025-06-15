@@ -10,6 +10,16 @@ export const useUserCredits = () => {
   // Debug log: Show userProfile loading and ID
   console.log('[useUserCredits] userProfile:', userProfile, 'loading:', userProfileLoading);
 
+  // Extra debug: Output the actual supabase headers to ensure the JWT is used
+  try {
+    // This cast may print headers info for deeper debugging
+    // @ts-ignore
+    const headers = (supabase as any).headers;
+    console.log('[useUserCredits] Supabase client headers:', headers);
+  } catch (e) {
+    console.log('[useUserCredits] Unable to read Supabase headers:', e);
+  }
+
   return useQuery({
     queryKey: ['user_credits', userProfile?.id],
     queryFn: async () => {
@@ -24,11 +34,11 @@ export const useUserCredits = () => {
         .from('user_credits')
         .select('*')
         .eq('user_profile_id', userProfile.id)
-        .maybeSingle(); // Use maybeSingle() instead of single() to handle cases where no record exists
+        .maybeSingle();
         
       if (error) {
         console.error('[useUserCredits] Error from Supabase:', error);
-        throw error;
+        return { __error: error }; // Allow UI to show error details
       }
       
       console.log('[useUserCredits] Fetched user_credits:', data);
@@ -43,7 +53,6 @@ export const useUserCredits = () => {
     enabled: !!userProfile?.id && !userProfileLoading,
     staleTime: 30000,
     refetchInterval: 15000,
-    // Add retry configuration
     retry: (failureCount, error: any) => {
       // Don't retry if it's a "no data found" error
       if (error?.code === 'PGRST116') {

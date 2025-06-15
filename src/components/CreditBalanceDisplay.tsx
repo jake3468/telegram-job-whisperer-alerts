@@ -21,20 +21,28 @@ const CreditBalanceDisplay = () => {
     );
   }
 
-  if (error) {
-    console.error("Error loading credits:", error);
+  // Fall-through error detection for detailed errors
+  const detailError = (credits as any)?.__error ?? error;
+  if (detailError) {
+    console.error("Error loading credits:", detailError);
+    let msg = "Error loading credits.";
+    if (detailError.code === "PGRST301") {
+      msg += " (Not authorized by Row Level Security. Please check that you are logged in with the correct user.)";
+    } else if (detailError.message) {
+      msg += ` (${detailError.message})`;
+    }
     return (
       <div className="flex flex-col text-rose-400 font-orbitron text-xs">
         <div className="flex items-center gap-2">
           <BadgeDollarSign className="w-5 h-5" />
-          Error loading credits
+          {msg}
         </div>
       </div>
     );
   }
 
-  if (!credits) {
-    // This could mean no credit row exists for this profile
+  if (!credits || (credits && (credits as any).__error)) {
+    // Note: __error key checked above, so don't duplicate message here
     console.warn("No credit balance found for user profile.");
     return (
       <div className="flex flex-col text-yellow-400 font-orbitron text-xs">
@@ -51,7 +59,7 @@ const CreditBalanceDisplay = () => {
       <div className="flex items-center gap-2">
         <BadgeDollarSign className="w-5 h-5" />
         <span>
-          {Number(credits.current_balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} credits
+          {Number((credits as any).current_balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} credits
         </span>
       </div>
     </div>
