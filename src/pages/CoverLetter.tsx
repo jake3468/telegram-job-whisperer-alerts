@@ -1,7 +1,6 @@
 import { useUser } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AuthHeader from '@/components/AuthHeader';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,32 +8,21 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { FileText, History, Copy, Sparkles, Download } from 'lucide-react';
+import { FileText, History, Copy, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import HistoryModal from '@/components/HistoryModal';
 import LoadingMessages from '@/components/LoadingMessages';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import jsPDF from 'jspdf';
-import { Document, Packer, Paragraph, TextRun } from 'docx';
-import { saveAs } from 'file-saver';
+import CoverLetterDownloadActions from '@/components/CoverLetterDownloadActions';
 
 const CoverLetter = () => {
-  const {
-    user,
-    isLoaded
-  } = useUser();
+  const { user, isLoaded } = useUser();
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
-  const {
-    userProfile
-  } = useUserProfile();
-  const {
-    isComplete
-  } = useUserCompletionStatus();
+  const { toast } = useToast();
+  const { userProfile } = useUserProfile();
+  const { isComplete } = useUserCompletionStatus();
   const [formData, setFormData] = useState({
     job_title: '',
     company_name: '',
@@ -92,10 +80,7 @@ const CoverLetter = () => {
     const pollInterval = setInterval(async () => {
       console.log('Polling for cover letter updates...');
       try {
-        const {
-          data,
-          error
-        } = await supabase.from('job_cover_letters').select('cover_letter').eq('id', currentCoverLetterId).single();
+        const { data, error } = await supabase.from('job_cover_letters').select('cover_letter').eq('id', currentCoverLetterId).single();
         if (error) {
           console.error('Error polling for updates:', error);
           return;
@@ -160,10 +145,7 @@ const CoverLetter = () => {
       console.log('Submitting cover letter request...');
 
       // Insert into database
-      const {
-        data,
-        error
-      } = await supabase.from('job_cover_letters').insert({
+      const { data, error } = await supabase.from('job_cover_letters').insert({
         user_id: userProfile.id,
         job_title: formData.job_title,
         company_name: formData.company_name,
@@ -204,105 +186,6 @@ const CoverLetter = () => {
       toast({
         title: "Error",
         description: "Failed to copy text to clipboard.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleDownloadPDF = () => {
-    if (!result) return;
-    
-    try {
-      const doc = new jsPDF();
-      
-      // Set font and size
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(12);
-      
-      // Add title
-      doc.setFontSize(16);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Cover Letter', 20, 20);
-      
-      // Add subtitle with job details
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'normal');
-      doc.text(`${formData.job_title} at ${formData.company_name}`, 20, 35);
-      
-      // Add cover letter content
-      doc.setFontSize(11);
-      const splitText = doc.splitTextToSize(result, 170);
-      doc.text(splitText, 20, 50);
-      
-      // Save the PDF
-      doc.save(`Cover_Letter_${formData.company_name}_${formData.job_title}.pdf`);
-      
-      toast({
-        title: "Downloaded!",
-        description: "Cover letter downloaded as PDF successfully."
-      });
-    } catch (err) {
-      toast({
-        title: "Error",
-        description: "Failed to download PDF. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleDownloadDOCX = async () => {
-    if (!result) return;
-    
-    try {
-      const doc = new Document({
-        sections: [{
-          properties: {},
-          children: [
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: "Cover Letter",
-                  bold: true,
-                  size: 32
-                })
-              ]
-            }),
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: `${formData.job_title} at ${formData.company_name}`,
-                  size: 24
-                })
-              ]
-            }),
-            new Paragraph({
-              children: [new TextRun({ text: "" })] // Empty line
-            }),
-            ...result.split('\n').map(line => 
-              new Paragraph({
-                children: [
-                  new TextRun({
-                    text: line,
-                    size: 22
-                  })
-                ]
-              })
-            )
-          ]
-        }]
-      });
-      
-      const blob = await Packer.toBlob(doc);
-      saveAs(blob, `Cover_Letter_${formData.company_name}_${formData.job_title}.docx`);
-      
-      toast({
-        title: "Downloaded!",
-        description: "Cover letter downloaded as DOCX successfully."
-      });
-    } catch (err) {
-      toast({
-        title: "Error",
-        description: "Failed to download DOCX. Please try again.",
         variant: "destructive"
       });
     }
@@ -436,14 +319,11 @@ const CoverLetter = () => {
                         <Copy className="w-4 h-4" />
                         Copy Cover Letter
                       </Button>
-                      <Button onClick={handleDownloadPDF} variant="outline" className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 flex items-center gap-2 text-base h-12">
-                        <Download className="w-4 h-4" />
-                        Download PDF
-                      </Button>
-                      <Button onClick={handleDownloadDOCX} variant="outline" className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 flex items-center gap-2 text-base h-12">
-                        <Download className="w-4 h-4" />
-                        Download DOCX
-                      </Button>
+                      <CoverLetterDownloadActions 
+                        coverLetter={result}
+                        jobTitle={formData.job_title}
+                        companyName={formData.company_name}
+                      />
                     </div>
                   </div>
                 </CardContent>
@@ -456,4 +336,5 @@ const CoverLetter = () => {
       </div>
     </Layout>;
 };
+
 export default CoverLetter;
