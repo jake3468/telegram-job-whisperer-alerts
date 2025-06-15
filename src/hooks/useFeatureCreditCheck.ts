@@ -6,12 +6,18 @@ import { useUserCredits } from "./useUserCredits";
 // Custom hook to check for sufficient credits before using a feature
 export function useFeatureCreditCheck(requiredCredits: number) {
   const navigate = useNavigate();
-  const { data, isLoading } = useUserCredits();
+  const { data: credits, isLoading } = useUserCredits();
 
   useEffect(() => {
-    if (!isLoading && data && Number(data.current_balance) < requiredCredits) {
+    // Guard: only check balance if credits exist, no error.
+    if (
+      !isLoading &&
+      credits &&
+      !("__error" in credits) &&
+      Number(credits.current_balance) < requiredCredits
+    ) {
       // Redirect to upgrade page if not enough credits
       navigate('/upgrade');
     }
-  }, [isLoading, data, requiredCredits, navigate]);
+  }, [isLoading, credits, requiredCredits, navigate]);
 }

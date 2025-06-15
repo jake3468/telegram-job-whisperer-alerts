@@ -97,7 +97,7 @@ export default function GetMoreCredits() {
                       <span className="font-bold text-cyan-100">Loading...</span>
                     ) : error ? (
                       <span className="font-bold text-rose-300">Error loading</span>
-                    ) : credits ? (
+                    ) : credits && !("__error" in credits) ? (
                       <span className="font-bold text-cyan-100">
                         {Number(credits.current_balance).toLocaleString()} credits
                       </span>
@@ -107,7 +107,6 @@ export default function GetMoreCredits() {
                   </p>
                 </div>
               </div>
-
               {/* Responsive grid area with tighter spacing for mobile */}
               <div className="w-full max-w-6xl mx-auto flex-grow flex flex-col items-center justify-center px-2 sm:px-4">
                 <div
