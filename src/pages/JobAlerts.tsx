@@ -1,3 +1,4 @@
+
 import { useUser } from '@clerk/clerk-react';
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -29,12 +30,9 @@ const JobAlerts = () => {
   }
   return (
     <Layout>
-      {/* Only flex-column and w-full. Do NOT add min-h-screen here */}
-      <div className="flex flex-col w-full bg-transparent">
-        <div>
-          <div className="text-center mb-8">
-            <h1
-              className="
+      <div className="text-center mb-8">
+        <h1
+          className="
                 text-4xl
                 font-orbitron
                 font-extrabold
@@ -48,22 +46,20 @@ const JobAlerts = () => {
                 drop-shadow
                 tracking-tight
               "
-              style={{
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                color: 'transparent'
-              }}
-            >
-              Telegram <span className="italic">Job</span> Alerts
-            </h1>
-            <p className="text-md text-orange-100 font-inter font-light">
-              Manage your personalized <span className="italic text-pastel-peach">job alerts</span> and preferences
-            </p>
-          </div>
-          <div className="space-y-8">
-            <JobAlertsSection userTimezone={userTimezone} />
-          </div>
-        </div>
+          style={{
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            color: 'transparent'
+          }}
+        >
+          Telegram <span className="italic">Job</span> Alerts
+        </h1>
+        <p className="text-md text-orange-100 font-inter font-light">
+          Manage your personalized <span className="italic text-pastel-peach">job alerts</span> and preferences
+        </p>
+      </div>
+      <div className="space-y-8">
+        <JobAlertsSection userTimezone={userTimezone} />
       </div>
     </Layout>
   );

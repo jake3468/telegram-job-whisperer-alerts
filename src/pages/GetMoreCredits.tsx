@@ -1,3 +1,4 @@
+
 import { useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -71,6 +72,7 @@ export default function GetMoreCredits() {
       <div
         className={`
           min-h-screen flex w-full
+          bg-gradient-to-br from-[#0e1122] via-[#181526] to-[#21203a]
         `}
         style={{
           margin: 0,
@@ -79,7 +81,7 @@ export default function GetMoreCredits() {
         }}
       >
         <AppSidebar />
-        <div className="flex-1 flex flex-col bg-gradient-to-b from-[#162650] via-[#214072] to-[#2b4f88] pt-28 lg:pt-0">
+        <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0">
           <main className="flex-1 w-full bg-transparent">
             {/* The gradient was here, now moved to the parent div to fill the whole content area */}
             <div className="min-h-[80vh] w-full py-5 sm:py-8 flex flex-col">
