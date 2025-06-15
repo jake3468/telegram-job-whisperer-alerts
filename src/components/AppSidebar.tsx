@@ -1,3 +1,4 @@
+
 import { User, Bell, Target, FileText, X, Share2 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
@@ -78,7 +79,7 @@ export function AppSidebar() {
         <span className="font-orbitron drop-shadow text-3xl font-extrabold text-transparent bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-400 bg-clip-text select-none tracking-widest whitespace-nowrap">
           JobBots
         </span>
-        {/* X button for mobile */}
+        {/* X button for mobile - only close button, no hamburger */}
         {isMobile && (
           <Button
             variant="ghost"
@@ -89,8 +90,10 @@ export function AppSidebar() {
             <X className="h-6 w-6" />
           </Button>
         )}
-        {/* Hamburger in mini-state only (for mobile) */}
-        <SidebarTrigger className="lg:hidden absolute top-5 left-3 bg-fuchsia-700/20 rounded-lg p-2 hover:bg-fuchsia-500/40 border border-fuchsia-400/10" />
+        {/* Hamburger only for desktop mini-state */}
+        {!isMobile && (
+          <SidebarTrigger className="lg:hidden absolute top-5 left-3 bg-fuchsia-700/20 rounded-lg p-2 hover:bg-fuchsia-500/40 border border-fuchsia-400/10" />
+        )}
       </SidebarHeader>
 
       <SidebarContent className="overflow-x-hidden w-full px-0 !pr-0">
@@ -193,16 +196,19 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-5 border-t border-fuchsia-400/10 bg-gradient-to-r from-black/90 to-fuchsia-950/80 mt-2 rounded-none">
+      <SidebarFooter className="p-5 border-t border-fuchsia-400/10 bg-gradient-to-r from-black/90 to-fuchsia-950/80 mt-2 rounded-none relative">
         <SignedIn>
           <div className="flex items-center gap-3 w-full">
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox: "w-10 h-10 flex-shrink-0"
-                }
-              }}
-            />
+            <div className={isMobile ? "relative z-[60]" : ""}>
+              <UserButton
+                appearance={{
+                  elements: {
+                    avatarBox: "w-10 h-10 flex-shrink-0",
+                    userButtonPopoverCard: isMobile ? "z-[60]" : ""
+                  }
+                }}
+              />
+            </div>
             {state === 'expanded' && user && (
               <div className="flex-1 min-w-0">
                 {/* Show display name (not email), kept very responsive */}
