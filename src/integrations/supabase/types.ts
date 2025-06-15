@@ -9,6 +9,50 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      credit_transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          balance_before: number
+          created_at: string
+          description: string | null
+          feature_used: string | null
+          id: string
+          transaction_type: string
+          user_profile_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          balance_before: number
+          created_at?: string
+          description?: string | null
+          feature_used?: string | null
+          id?: string
+          transaction_type: string
+          user_profile_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          balance_before?: number
+          created_at?: string
+          description?: string | null
+          feature_used?: string | null
+          id?: string
+          transaction_type?: string
+          user_profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_transactions_user_profile_id_fkey"
+            columns: ["user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "user_profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       execution_logs: {
         Row: {
           data: Json | null
@@ -218,6 +262,86 @@ export type Database = {
           },
         ]
       }
+      subscription_plans: {
+        Row: {
+          billing_cycle: string | null
+          created_at: string
+          credits_amount: number
+          description: string | null
+          id: string
+          is_active: boolean
+          plan_name: string
+          plan_type: string
+          price_amount: number | null
+        }
+        Insert: {
+          billing_cycle?: string | null
+          created_at?: string
+          credits_amount: number
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          plan_name: string
+          plan_type: string
+          price_amount?: number | null
+        }
+        Update: {
+          billing_cycle?: string | null
+          created_at?: string
+          credits_amount?: number
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          plan_name?: string
+          plan_type?: string
+          price_amount?: number | null
+        }
+        Relationships: []
+      }
+      user_credits: {
+        Row: {
+          created_at: string
+          current_balance: number
+          free_credits: number
+          id: string
+          next_reset_date: string
+          paid_credits: number
+          subscription_plan: string
+          updated_at: string
+          user_profile_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_balance?: number
+          free_credits?: number
+          id?: string
+          next_reset_date?: string
+          paid_credits?: number
+          subscription_plan?: string
+          updated_at?: string
+          user_profile_id: string
+        }
+        Update: {
+          created_at?: string
+          current_balance?: number
+          free_credits?: number
+          id?: string
+          next_reset_date?: string
+          paid_credits?: number
+          subscription_plan?: string
+          updated_at?: string
+          user_profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_credits_user_profile_id_fkey"
+            columns: ["user_profile_id"]
+            isOneToOne: true
+            referencedRelation: "user_profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_profile: {
         Row: {
           bio: string | null
@@ -260,7 +384,6 @@ export type Database = {
         Row: {
           clerk_id: string
           created_at: string
-          credits: number | null
           email: string
           first_name: string | null
           id: string
@@ -270,7 +393,6 @@ export type Database = {
         Insert: {
           clerk_id: string
           created_at?: string
-          credits?: number | null
           email: string
           first_name?: string | null
           id?: string
@@ -280,7 +402,6 @@ export type Database = {
         Update: {
           clerk_id?: string
           created_at?: string
-          credits?: number | null
           email?: string
           first_name?: string | null
           id?: string
@@ -344,6 +465,16 @@ export type Database = {
       }
     }
     Functions: {
+      add_credits: {
+        Args: {
+          p_user_profile_id: string
+          p_amount: number
+          p_transaction_type: string
+          p_description?: string
+          p_is_paid?: boolean
+        }
+        Returns: boolean
+      }
       check_and_insert_cover_letter_execution: {
         Args: {
           p_fingerprint: string
@@ -364,9 +495,22 @@ export type Database = {
         }
         Returns: string
       }
+      check_sufficient_credits: {
+        Args: { p_user_profile_id: string; p_required_credits: number }
+        Returns: boolean
+      }
       cleanup_old_webhook_executions: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      deduct_credits: {
+        Args: {
+          p_user_profile_id: string
+          p_amount: number
+          p_feature_used: string
+          p_description?: string
+        }
+        Returns: boolean
       }
       delete_old_job_analyses: {
         Args: Record<PropertyKey, never>
@@ -388,6 +532,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      initialize_user_credits: {
+        Args: { p_user_profile_id: string }
+        Returns: string
+      }
       insert_job_analysis: {
         Args: {
           p_user_id: string
@@ -396,6 +544,10 @@ export type Database = {
           p_job_description: string
         }
         Returns: string
+      }
+      reset_monthly_credits: {
+        Args: Record<PropertyKey, never>
+        Returns: number
       }
     }
     Enums: {

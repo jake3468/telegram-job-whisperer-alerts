@@ -1,4 +1,3 @@
-
 import { useUser } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -17,6 +16,7 @@ import HistoryModal from '@/components/HistoryModal';
 import LoadingMessages from '@/components/LoadingMessages';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import CoverLetterDownloadActions from '@/components/CoverLetterDownloadActions';
+import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
 
 const CoverLetter = () => {
   const { user, isLoaded } = useUser();
@@ -34,6 +34,8 @@ const CoverLetter = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentCoverLetterId, setCurrentCoverLetterId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+
+  useFeatureCreditCheck(1.5);
 
   useEffect(() => {
     if (isLoaded && !user) {

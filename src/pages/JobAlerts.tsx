@@ -1,10 +1,10 @@
-
 import { useUser } from '@clerk/clerk-react';
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthHeader from '@/components/AuthHeader';
 import JobAlertsSection from '@/components/dashboard/JobAlertsSection';
 import { Layout } from '@/components/Layout';
+import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
 
 const JobAlerts = () => {
   const { user, isLoaded } = useUser();
@@ -19,6 +19,7 @@ const JobAlerts = () => {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
+  useFeatureCreditCheck(1.5);
   if (!isLoaded || !user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pastel-mint via-pastel-lavender to-pastel-peach flex items-center justify-center">
@@ -69,4 +70,3 @@ const JobAlerts = () => {
 };
 
 export default JobAlerts;
-

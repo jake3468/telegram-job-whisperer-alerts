@@ -13,6 +13,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Layout } from '@/components/Layout';
 import JobAnalysisHistory from '@/components/JobAnalysisHistory';
 import PercentageMeter from '@/components/PercentageMeter';
+import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
+
 const JobGuide = () => {
   const {
     user,
@@ -43,6 +45,7 @@ const JobGuide = () => {
   const [matchScore, setMatchScore] = useState<string | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const loadingMessages = ["🔍 Analyzing job requirements...", "✨ Crafting personalized insights...", "🚀 Tailoring advice to your profile...", "🎯 Generating strategic recommendations..."];
+  useFeatureCreditCheck(1.5);
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');

@@ -14,6 +14,8 @@ import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import HistoryModal from '@/components/HistoryModal';
 import LinkedInPostDisplay from '@/components/LinkedInPostDisplay';
 import LoadingMessages from '@/components/LoadingMessages';
+import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
+
 const LinkedInPosts = () => {
   const {
     user
@@ -27,6 +29,7 @@ const LinkedInPosts = () => {
   const {
     isComplete
   } = useUserCompletionStatus();
+  useFeatureCreditCheck(1.5);
   const [formData, setFormData] = useState({
     topic: '',
     opinion: '',

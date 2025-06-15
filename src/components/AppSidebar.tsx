@@ -1,4 +1,3 @@
-
 import { User, Bell, Target, FileText, X, Share2 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
@@ -17,6 +16,7 @@ import {
 } from '@/components/ui/sidebar';
 import { SignedIn, UserButton, useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
+import CreditBalanceDisplay from './CreditBalanceDisplay';
 
 const profileItems = [{
   title: 'Profile',
@@ -194,40 +194,44 @@ export function AppSidebar() {
 
       <SidebarFooter className="p-5 border-t border-fuchsia-400/10 bg-gradient-to-r from-black/90 to-fuchsia-950/80 mt-2 rounded-none relative">
         <SignedIn>
-          <div className="flex items-center gap-3 w-full">
-            <div 
-              className={isMobile ? "relative z-[70]" : ""}
-              style={isMobile ? { isolation: 'isolate' } : {}}
-              onPointerDown={(e) => {
-                if (isMobile) {
-                  e.stopPropagation();
-                }
-              }}
-              onClick={(e) => {
-                if (isMobile) {
-                  e.stopPropagation();
-                }
-              }}
-            >
-              <UserButton
-                appearance={{
-                  elements: {
-                    avatarBox: "w-10 h-10 flex-shrink-0",
-                    userButtonPopoverCard: isMobile ? "!z-[80] !important" : "",
-                    userButtonPopoverActionButton: isMobile ? "!z-[80] pointer-events-auto" : "",
-                    userButtonPopoverFooter: isMobile ? "!z-[80]" : ""
+          <div className="flex flex-col gap-2 w-full">
+            <div className="flex items-center gap-3 w-full">
+              <div 
+                className={isMobile ? "relative z-[70]" : ""}
+                style={isMobile ? { isolation: 'isolate' } : {}}
+                onPointerDown={(e) => {
+                  if (isMobile) {
+                    e.stopPropagation();
                   }
                 }}
-              />
-            </div>
-            {state === 'expanded' && user && (
-              <div className="flex-1 min-w-0">
-                {/* Show display name (not email), kept very responsive */}
-                <p className="text-fuchsia-100 text-base font-orbitron truncate break-all">
-                  {getDisplayName()}
-                </p>
+                onClick={(e) => {
+                  if (isMobile) {
+                    e.stopPropagation();
+                  }
+                }}
+              >
+                <UserButton
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-10 h-10 flex-shrink-0",
+                      userButtonPopoverCard: isMobile ? "!z-[80] !important" : "",
+                      userButtonPopoverActionButton: isMobile ? "!z-[80] pointer-events-auto" : "",
+                      userButtonPopoverFooter: isMobile ? "!z-[80]" : ""
+                    }
+                  }}
+                />
               </div>
-            )}
+              {state === 'expanded' && user && (
+                <div className="flex-1 min-w-0">
+                  {/* Show display name (not email), kept very responsive */}
+                  <p className="text-fuchsia-100 text-base font-orbitron truncate break-all">
+                    {getDisplayName()}
+                  </p>
+                </div>
+              )}
+            </div>
+            {/* Show credit balance */}
+            <CreditBalanceDisplay />
           </div>
         </SignedIn>
       </SidebarFooter>
