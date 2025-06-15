@@ -215,15 +215,15 @@ const LinkedInPosts = () => {
           </div>
           <div className="max-w-3xl mx-auto">
             {/* Input Form */}
-            <Card className="bg-gradient-to-br from-teal-900 via-cyan-900 to-gray-900 border-white/10 backdrop-blur-md mb-8 shadow-xl">
+            <Card className="bg-gradient-to-br from-teal-400 via-cyan-400 to-teal-600 border-white/10 backdrop-blur-md mb-8 shadow-xl">
               <CardHeader className="pb-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="font-inter text-xl flex items-center gap-2 text-white font-bold">
-                      <Sparkles className="w-5 h-5 text-teal-400 drop-shadow" />
+                    <CardTitle className="font-inter text-xl flex items-center gap-2 text-white font-bold drop-shadow">
+                      <Sparkles className="w-5 h-5 text-white drop-shadow" />
                       <span>Create Your Post</span>
                     </CardTitle>
-                    <CardDescription className="text-cyan-300/90 font-inter mb-0">
+                    <CardDescription className="text-teal-50/90 font-inter mb-0">
                       Fill in the details to generate your LinkedIn post
                     </CardDescription>
                   </div>
@@ -231,7 +231,7 @@ const LinkedInPosts = () => {
                     onClick={() => setShowHistory(true)} 
                     variant="outline" 
                     size="sm" 
-                    className="bg-teal-600/10 border-teal-400/30 text-teal-200 hover:bg-teal-700/20"
+                    className="bg-white/10 border-white/20 text-white hover:bg-white/20"
                   >
                     <History className="w-4 h-4 mr-2" />
                     History
@@ -244,27 +244,27 @@ const LinkedInPosts = () => {
                   <div className="flex flex-col md:flex-row gap-4 md:gap-6">
                     {/* Topic (left) */}
                     <div className="flex-1 space-y-2">
-                      <Label htmlFor="topic" className="text-cyan-200 font-semibold text-base">Topic or Theme *</Label>
-                      <Label htmlFor="topic" className="text-cyan-300/80 font-normal text-sm block">What is the main topic you want to write about?</Label>
+                      <Label htmlFor="topic" className="text-white font-semibold text-base">Topic or Theme *</Label>
+                      <Label htmlFor="topic" className="text-teal-50 font-normal text-sm block">What is the main topic you want to write about?</Label>
                       <Textarea 
                         id="topic"
                         placeholder="e.g. AI in customer service, Layoffs in tech, Remote work trends"
                         value={formData.topic}
                         onChange={(e) => handleInputChange('topic', e.target.value)}
                         required
-                        className="min-h-[60px] resize-none text-base bg-gray-950 border-teal-400/25 text-white placeholder:text-white/60 font-medium"
+                        className="min-h-[60px] resize-none text-base bg-gray-900/80 border-teal-300/30 text-white placeholder:text-white/80 font-medium"
                       />
                     </div>
                     {/* Opinion (right) */}
                     <div className="flex-1 space-y-2">
-                      <Label htmlFor="opinion" className="text-cyan-200 font-semibold text-base">Your Key Point or Opinion</Label>
-                      <Label htmlFor="opinion" className="text-cyan-300/80 font-normal text-sm block">What is your main insight, opinion, or message?</Label>
+                      <Label htmlFor="opinion" className="text-white font-semibold text-base">Your Key Point or Opinion</Label>
+                      <Label htmlFor="opinion" className="text-teal-50 font-normal text-sm block">What is your main insight, opinion, or message?</Label>
                       <Textarea 
                         id="opinion"
                         placeholder="I believe hybrid AI + human support is the future."
                         value={formData.opinion}
                         onChange={(e) => handleInputChange('opinion', e.target.value)}
-                        className="min-h-[60px] resize-none text-base bg-gray-950 border-teal-400/25 text-white placeholder:text-white/60 font-medium"
+                        className="min-h-[60px] resize-none text-base bg-gray-900/80 border-teal-300/30 text-white placeholder:text-white/80 font-medium"
                       />
                     </div>
                   </div>
@@ -273,39 +273,39 @@ const LinkedInPosts = () => {
                   <div className="flex flex-col md:flex-row gap-4 md:gap-6">
                     {/* Personal Story (left) */}
                     <div className="flex-1 space-y-2">
-                      <Label htmlFor="personal_story" className="text-cyan-200 font-semibold text-base">Personal Experience or Story</Label>
-                      <Label htmlFor="personal_story" className="text-cyan-300/80 font-normal text-sm block">Do you have a story, data point, or personal experience to include?</Label>
+                      <Label htmlFor="personal_story" className="text-white font-semibold text-base">Personal Experience or Story</Label>
+                      <Label htmlFor="personal_story" className="text-teal-50 font-normal text-sm block">Do you have a story, data point, or personal experience to include?</Label>
                       <Textarea 
                         id="personal_story"
                         placeholder="We reduced response time by 40% after implementing AI chat."
                         value={formData.personal_story}
                         onChange={(e) => handleInputChange('personal_story', e.target.value)}
-                        className="min-h-[60px] resize-none text-base bg-gray-950 border-teal-400/25 text-white placeholder:text-white/60 font-medium"
+                        className="min-h-[60px] resize-none text-base bg-gray-900/80 border-teal-300/30 text-white placeholder:text-white/80 font-medium"
                       />
                     </div>
                     {/* Audience (right) */}
                     <div className="flex-1 space-y-2">
-                      <Label htmlFor="audience" className="text-cyan-200 font-semibold text-base">Target Audience</Label>
-                      <Label htmlFor="audience" className="text-cyan-300/80 font-normal text-sm block">Who are you writing this for?</Label>
+                      <Label htmlFor="audience" className="text-white font-semibold text-base">Target Audience</Label>
+                      <Label htmlFor="audience" className="text-teal-50 font-normal text-sm block">Who are you writing this for?</Label>
                       <Textarea 
                         id="audience"
                         placeholder="Startup founders, product managers, working moms, new grads…"
                         value={formData.audience}
                         onChange={(e) => handleInputChange('audience', e.target.value)}
-                        className="min-h-[60px] resize-none text-base bg-gray-950 border-teal-400/25 text-white placeholder:text-white/60 font-medium"
+                        className="min-h-[60px] resize-none text-base bg-gray-900/80 border-teal-300/30 text-white placeholder:text-white/80 font-medium"
                       />
                     </div>
                   </div>
 
                   {/* Tone: full width */}
                   <div className="space-y-2">
-                    <Label htmlFor="tone" className="text-cyan-200 font-semibold text-base">Tone/Style Preference</Label>
-                    <Label htmlFor="tone" className="text-cyan-300/80 font-normal text-sm block">What tone do you prefer?</Label>
+                    <Label htmlFor="tone" className="text-white font-semibold text-base">Tone/Style Preference</Label>
+                    <Label htmlFor="tone" className="text-teal-50 font-normal text-sm block">What tone do you prefer?</Label>
                     <Select onValueChange={(value) => handleInputChange('tone', value)}>
-                      <SelectTrigger className="text-base bg-gray-950 text-white border-teal-400/25 font-medium">
+                      <SelectTrigger className="text-base bg-gray-900/80 text-white border-teal-300/30 font-medium">
                         <SelectValue placeholder="Select a tone..." />
                       </SelectTrigger>
-                      <SelectContent className="bg-gray-950 border-teal-400/25 text-white">
+                      <SelectContent className="bg-gray-900/80 border-teal-200/30 text-white">
                         {toneOptions.map((option) => (
                           <SelectItem 
                             key={option.value} 
@@ -324,7 +324,7 @@ const LinkedInPosts = () => {
                     <Button 
                       type="submit" 
                       disabled={isSubmitting || !formData.topic.trim() || isGenerating} 
-                      className="flex-1 bg-gradient-to-r from-teal-500 via-cyan-400 to-teal-500 hover:from-teal-600 hover:via-cyan-500 hover:to-teal-600 text-black font-semibold text-base h-12 shadow-md"
+                      className="flex-1 bg-gradient-to-r from-teal-400 via-cyan-400 to-teal-500 hover:from-teal-500 hover:via-cyan-500 hover:to-teal-600 text-black font-semibold text-base h-12 shadow-md"
                     >
                       {isSubmitting ? 'Submitting...' : 'Generate LinkedIn Post'}
                     </Button>
