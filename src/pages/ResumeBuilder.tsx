@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,78 +14,92 @@ import SkillsForm from '@/components/resume/SkillsForm';
 import ProjectsForm from '@/components/resume/ProjectsForm';
 import AdditionalSectionsForm from '@/components/resume/AdditionalSectionsForm';
 import FormattingPreferencesForm from '@/components/resume/FormattingPreferencesForm';
-const steps = [{
-  id: 1,
-  title: 'Personal Information',
-  component: PersonalInfoForm
-}, {
-  id: 2,
-  title: 'Professional Summary',
-  component: ProfessionalSummaryForm
-}, {
-  id: 3,
-  title: 'Work Experience',
-  component: WorkExperienceForm
-}, {
-  id: 4,
-  title: 'Education',
-  component: EducationForm
-}, {
-  id: 5,
-  title: 'Skills',
-  component: SkillsForm
-}, {
-  id: 6,
-  title: 'Projects',
-  component: ProjectsForm
-}, {
-  id: 7,
-  title: 'Additional Sections',
-  component: AdditionalSectionsForm
-}, {
-  id: 8,
-  title: 'Formatting Preferences',
-  component: FormattingPreferencesForm
-}];
+
+const steps = [
+  {
+    id: 1,
+    title: 'Personal Information',
+    component: PersonalInfoForm
+  },
+  {
+    id: 2,
+    title: 'Professional Summary',
+    component: ProfessionalSummaryForm
+  },
+  {
+    id: 3,
+    title: 'Work Experience',
+    component: WorkExperienceForm
+  },
+  {
+    id: 4,
+    title: 'Education',
+    component: EducationForm
+  },
+  {
+    id: 5,
+    title: 'Skills',
+    component: SkillsForm
+  },
+  {
+    id: 6,
+    title: 'Projects',
+    component: ProjectsForm
+  },
+  {
+    id: 7,
+    title: 'Additional Sections',
+    component: AdditionalSectionsForm
+  },
+  {
+    id: 8,
+    title: 'Formatting Preferences',
+    component: FormattingPreferencesForm
+  }
+];
+
 const ResumeBuilder = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const {
-    resumeData,
-    saveResume,
-    isSaving
-  } = useUserResume();
+  const { resumeData, saveResume, isSaving } = useUserResume();
   const [formData, setFormData] = useState(resumeData || {});
+
   const currentStepData = steps.find(step => step.id === currentStep);
   const CurrentComponent = currentStepData?.component;
-  const progress = currentStep / steps.length * 100;
+  const progress = (currentStep / steps.length) * 100;
+
   const handleNext = () => {
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
     }
   };
+
   const handlePrevious = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
   };
+
   const handleSave = () => {
     saveResume(formData);
   };
+
   const handleDataChange = (stepData: any) => {
     setFormData(prev => ({
       ...prev,
       ...stepData
     }));
   };
-  return <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-4">
+
+  return (
+    <Layout>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-2 sm:p-4">
         <div className="max-w-4xl mx-auto">
           <Card className="bg-white/95 backdrop-blur-sm shadow-2xl border-0">
-            <CardHeader className="text-center bg-indigo-400">
-              <CardTitle className="text-3xl font-bold text-gray-800">
+            <CardHeader className="text-center bg-indigo-400 px-4 py-6">
+              <CardTitle className="text-2xl sm:text-3xl font-bold text-gray-800">
                 Resume Builder
               </CardTitle>
-              <CardDescription className="text-lg text-teal-950">
+              <CardDescription className="text-base sm:text-lg text-teal-950">
                 Step {currentStep} of {steps.length}: {currentStepData?.title}
               </CardDescription>
               <div className="mt-4">
@@ -93,22 +108,43 @@ const ResumeBuilder = () => {
               </div>
             </CardHeader>
 
-            <CardContent className="p-6">
-              {CurrentComponent && <CurrentComponent data={formData} onChange={handleDataChange} />}
+            <CardContent className="p-3 sm:p-6">
+              <div className="overflow-hidden">
+                {CurrentComponent && (
+                  <CurrentComponent 
+                    data={formData} 
+                    onChange={handleDataChange} 
+                  />
+                )}
+              </div>
 
-              <div className="flex justify-between items-center mt-8 pt-6 border-t">
-                <Button onClick={handlePrevious} disabled={currentStep === 1} variant="outline" className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row justify-between items-center mt-6 pt-4 border-t gap-4">
+                <Button 
+                  onClick={handlePrevious} 
+                  disabled={currentStep === 1} 
+                  variant="outline" 
+                  className="flex items-center gap-2 w-full sm:w-auto order-2 sm:order-1"
+                >
                   <ChevronLeft className="w-4 h-4" />
                   Previous
                 </Button>
 
-                <div className="flex gap-2">
-                  <Button onClick={handleSave} disabled={isSaving} variant="outline" className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto order-1 sm:order-2">
+                  <Button 
+                    onClick={handleSave} 
+                    disabled={isSaving} 
+                    variant="outline" 
+                    className="flex items-center gap-2 w-full sm:w-auto"
+                  >
                     <Save className="w-4 h-4" />
                     {isSaving ? 'Saving...' : 'Save Progress'}
                   </Button>
 
-                  <Button onClick={handleNext} disabled={currentStep === steps.length} className="flex items-center gap-2">
+                  <Button 
+                    onClick={handleNext} 
+                    disabled={currentStep === steps.length} 
+                    className="flex items-center gap-2 w-full sm:w-auto"
+                  >
                     Next
                     <ChevronRight className="w-4 h-4" />
                   </Button>
@@ -118,6 +154,8 @@ const ResumeBuilder = () => {
           </Card>
         </div>
       </div>
-    </Layout>;
+    </Layout>
+  );
 };
+
 export default ResumeBuilder;
