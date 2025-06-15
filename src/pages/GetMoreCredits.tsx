@@ -10,24 +10,15 @@ import { Layout } from '@/components/Layout';
 import { useUserCredits } from '@/hooks/useUserCredits';
 
 const planGradientBg = {
-  free:
-    "bg-gradient-to-br from-[#334155] via-[#1e293b] to-[#2d6cdf] dark:from-[#233363] dark:via-[#162128] dark:to-[#214eb7]",
-  subscription:
-    "bg-gradient-to-br from-[#2c44bd] via-[#338de2] to-[#175cb7] dark:from-[#224179] dark:via-[#2b7ad3] dark:to-[#15316e]",
-  pack:
-    "bg-gradient-to-br from-[#38366a] via-[#4567b5] to-[#344862] dark:from-[#1b1e3a] dark:via-[#353f6b] dark:to-[#162d50]",
+  free: "bg-gradient-to-br from-[#23304a] via-[#264e7c] to-[#20345a] dark:from-[#233363] dark:via-[#162128] dark:to-[#214eb7]",
+  subscription: "bg-gradient-to-br from-[#2563eb] via-[#3893ec] to-[#1872ba] dark:from-[#274299] dark:via-[#3177c7] dark:to-[#1b466c]",
+  pack: "bg-gradient-to-br from-[#314e8c] via-[#517fd0] to-[#315b8b] dark:from-[#223450] dark:via-[#355a9c] dark:to-[#364e6b]",
 };
 
 const planTextColor = {
-  free: "text-[#9fd3fc]",
-  subscription: "text-[#90e0ff]",
-  pack: "text-[#c9dfff]",
-};
-
-const planAccentColor = {
-  free: "bg-blue-500",
-  subscription: "bg-cyan-400",
-  pack: "bg-indigo-400",
+  free: "text-blue-100",
+  subscription: "text-cyan-100",
+  pack: "text-indigo-100",
 };
 
 export default function GetMoreCredits() {
@@ -51,168 +42,215 @@ export default function GetMoreCredits() {
 
   return (
     <Layout>
-      <div className="min-h-[80vh] flex flex-col w-full bg-gradient-to-b from-[#151d33] via-[#19275a] to-[#284275] px-2 sm:px-6 py-6">
-        <div className="text-center mb-8 sm:mb-12">
-          <h1 className="text-3xl sm:text-5xl font-orbitron font-extrabold bg-gradient-to-r from-blue-400 via-blue-300 to-indigo-300 bg-clip-text text-transparent mb-2 drop-shadow tracking-tight animate-fade-in">
-            Flexible Pricing for All Users
-          </h1>
-          <p className="text-base sm:text-lg text-blue-100 font-inter font-light mb-2 animate-fade-in">
-            Pay only for what you use. Get started with free monthly credits, and upgrade anytime with our credit packs.
-          </p>
-          <p className="text-sm sm:text-base text-cyan-200 font-inter animate-fade-in">
-            Current Balance: <span className="font-bold text-cyan-200">{Number(credits?.current_balance || 0).toLocaleString()} credits</span>
-          </p>
+      <div className="min-h-[80vh] w-full bg-gradient-to-b from-[#162650] via-[#214072] to-[#2b4f88] px-2 sm:px-0 py-8 flex flex-col">
+        <div className="max-w-full mx-auto w-full">
+          <div className="text-center mb-8 sm:mb-12 px-2">
+            <h1 className="text-3xl sm:text-5xl font-orbitron font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-2 drop-shadow tracking-tight animate-fade-in">
+              Flexible Pricing for All Users
+            </h1>
+            <p className="text-base sm:text-lg text-blue-100 font-inter font-light mb-2 animate-fade-in">
+              Pay only for what you use. Get started with free monthly credits, and upgrade anytime with our credit packs.
+            </p>
+            <p className="text-sm sm:text-base text-cyan-200 font-inter animate-fade-in">
+              Current Balance: <span className="font-bold text-cyan-100">{Number(credits?.current_balance || 0).toLocaleString()} credits</span>
+            </p>
+          </div>
         </div>
+        <div
+          className="
+            w-full flex-grow
+            flex flex-col
+            items-center justify-center
+          "
+        >
+          {/* Plans Grid */}
+          <div
+            className="
+              grid gap-8
+              w-full
+              px-2
+              sm:px-4
+              md:px-8
+              lg:px-16
+              xl:px-24
+              2xl:px-40
+              mx-auto
+              grid-cols-1
+              md:grid-cols-3
+              items-stretch
+              transition-all
+              duration-300
+              "
+            style={{
+              maxWidth: '1680px'
+            }}
+          >
+            {/* Free Plan */}
+            <Card
+              className={`flex flex-col rounded-2xl shadow-2xl border-0 ${planGradientBg.free} transition-all duration-500 ease-[cubic-bezier(.27,.54,.56,1.11)] hover:scale-[1.03] hover:shadow-blue-400/30`}
+              style={{
+                minHeight: '480px',
+              }}
+            >
+              <CardHeader className="text-center pb-6 pt-7">
+                <CardTitle className={`text-2xl font-orbitron font-bold mb-2 ${planTextColor.free}`}>Free Plan</CardTitle>
+                <div className="text-4xl font-extrabold text-blue-100 mt-0.5 mb-1.5">Free</div>
+                <div className="mt-0 text-base font-semibold text-blue-300">15 credits/month</div>
+              </CardHeader>
+              <CardContent className="grow flex flex-col px-2 sm:px-4">
+                <ul className="space-y-3 my-7">
+                  <li className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-green-400" />
+                    <span className="text-base text-blue-100">Access to all features</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-green-400" />
+                    <span className="text-base text-blue-100">15 credits every month</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-green-400" />
+                    <span className="text-base text-blue-100">Auto-renewal</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-green-400" />
+                    <span className="text-base text-blue-100">Perfect for occasional use</span>
+                  </li>
+                </ul>
+                <div className="flex-1 flex items-end">
+                  <Button
+                    className="w-full py-3 mt-auto bg-blue-500/90 hover:bg-blue-700 text-white rounded-xl font-orbitron text-base shadow border-0"
+                    disabled
+                  >
+                    Current Plan
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
-        {/* Plans Grid */}
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 mx-auto w-full max-w-6xl justify-center items-stretch animate-scale-in">
-          {/* Free Plan */}
-          <Card className={`flex-1 rounded-2xl shadow-xl border-none ${planGradientBg.free} relative flex flex-col transition-transform hover:scale-105`}>
-            <CardHeader className="text-center pb-6 pt-6">
-              <CardTitle className={`text-xl sm:text-2xl font-orbitron font-bold mb-2 ${planTextColor.free}`}>Free Plan</CardTitle>
-              <div className={`text-3xl sm:text-4xl font-extrabold ${planTextColor.free}`}>Free</div>
-              <div className="mt-1 text-sm text-blue-200">15 credits/month</div>
-            </CardHeader>
-            <CardContent className="grow flex flex-col">
-              <ul className="space-y-4 my-6 sm:my-10 px-1 sm:px-0">
-                <li className="flex items-center gap-2 sm:gap-3">
-                  <Check className="w-5 h-5 text-green-400" />
-                  <span className="text-sm sm:text-base text-blue-100">Access to all features</span>
-                </li>
-                <li className="flex items-center gap-2 sm:gap-3">
-                  <Check className="w-5 h-5 text-green-400" />
-                  <span className="text-sm sm:text-base text-blue-100">15 credits every month</span>
-                </li>
-                <li className="flex items-center gap-2 sm:gap-3">
-                  <Check className="w-5 h-5 text-green-400" />
-                  <span className="text-sm sm:text-base text-blue-100">Auto-renewal</span>
-                </li>
-                <li className="flex items-center gap-2 sm:gap-3">
-                  <Check className="w-5 h-5 text-green-400" />
-                  <span className="text-sm sm:text-base text-blue-100">Perfect for occasional use</span>
-                </li>
-              </ul>
-              <div className="flex flex-1 items-end">
-                <Button
-                  className="w-full py-3 mt-auto bg-blue-500/90 hover:bg-blue-700 text-white rounded-xl font-orbitron text-base shadow border-0"
-                  disabled
-                >
-                  Current Plan
-                </Button>
+            {/* Monthly Subscription */}
+            <Card
+              className={`flex flex-col rounded-2xl shadow-2xl border-0 ${planGradientBg.subscription} relative transition-all duration-500 ease-[cubic-bezier(.27,.54,.56,1.11)] hover:scale-[1.05] hover:shadow-cyan-400/30`}
+              style={{
+                minHeight: '520px',
+                zIndex: 2,
+              }}
+            >
+              <div className="absolute -top-7 left-1/2 -translate-x-1/2 z-10">
+                <Badge className="bg-gradient-to-r from-blue-400 to-cyan-400 text-white font-orbitron text-xs px-5 py-1 shadow-xl border-0 tracking-wide">
+                  MOST POPULAR
+                </Badge>
               </div>
-            </CardContent>
-          </Card>
+              <CardHeader className="text-center pb-6 pt-10">
+                <CardTitle className={`text-2xl font-orbitron font-bold mb-2 ${planTextColor.subscription}`}>Monthly Subscription</CardTitle>
+                <div className="text-4xl font-extrabold text-cyan-100 mb-1 mt-0.5">₹199<span className="text-lg font-bold align-super">/month</span></div>
+                <div className="mt-0 text-base font-semibold text-cyan-200">200 credits/month</div>
+              </CardHeader>
+              <CardContent className="grow flex flex-col px-2 sm:px-4">
+                <ul className="space-y-3 my-7">
+                  <li className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-green-400" />
+                    <span className="text-base text-cyan-100">200 credits every month</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-green-400" />
+                    <span className="text-base text-cyan-100">Auto-renewal</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-green-400" />
+                    <span className="text-base text-cyan-100">Cancel anytime</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-green-400" />
+                    <span className="text-base text-cyan-100">Best value for regular users</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-green-400" />
+                    <span className="text-base text-cyan-100">Priority support</span>
+                  </li>
+                </ul>
+                <div className="flex-1 flex items-end">
+                  <Button
+                    className="w-full py-3 mt-auto bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 hover:from-cyan-700 hover:to-blue-800 text-white font-orbitron text-base rounded-xl shadow border-0"
+                    disabled
+                  >
+                    Coming Soon
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
-          {/* Monthly Subscription */}
-          <Card className={`flex-1 rounded-2xl shadow-2xl border-none ${planGradientBg.subscription} relative flex flex-col transition-transform hover:scale-105`}>
-            <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-10">
-              <Badge className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white font-orbitron text-xs px-5 py-1 shadow-xl border-0">
-                MOST POPULAR
-              </Badge>
-            </div>
-            <CardHeader className="text-center pb-6 pt-8">
-              <CardTitle className={`text-xl sm:text-2xl font-orbitron font-bold mb-2 ${planTextColor.subscription}`}>Monthly Subscription</CardTitle>
-              <div className="text-3xl sm:text-4xl font-extrabold text-cyan-200 mb-1">₹199<span className="text-lg font-bold align-super">/month</span></div>
-              <div className="mt-1 text-sm text-cyan-100">200 credits/month</div>
-            </CardHeader>
-            <CardContent className="grow flex flex-col">
-              <ul className="space-y-4 my-6 sm:my-10 px-1 sm:px-0">
-                <li className="flex items-center gap-2 sm:gap-3">
-                  <Check className="w-5 h-5 text-green-400" />
-                  <span className="text-sm sm:text-base text-cyan-100">200 credits every month</span>
-                </li>
-                <li className="flex items-center gap-2 sm:gap-3">
-                  <Check className="w-5 h-5 text-green-400" />
-                  <span className="text-sm sm:text-base text-cyan-100">Auto-renewal</span>
-                </li>
-                <li className="flex items-center gap-2 sm:gap-3">
-                  <Check className="w-5 h-5 text-green-400" />
-                  <span className="text-sm sm:text-base text-cyan-100">Cancel anytime</span>
-                </li>
-                <li className="flex items-center gap-2 sm:gap-3">
-                  <Check className="w-5 h-5 text-green-400" />
-                  <span className="text-sm sm:text-base text-cyan-100">Best value for regular users</span>
-                </li>
-                <li className="flex items-center gap-2 sm:gap-3">
-                  <Check className="w-5 h-5 text-green-400" />
-                  <span className="text-sm sm:text-base text-cyan-100">Priority support</span>
-                </li>
-              </ul>
-              <div className="flex flex-1 items-end">
-                <Button
-                  className="w-full py-3 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 hover:from-cyan-700 hover:to-blue-800 text-white font-orbitron text-base rounded-xl mt-auto shadow border-0"
-                  disabled
-                >
-                  Coming Soon
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Credit Packs */}
-          <Card className={`flex-1 rounded-2xl shadow-xl border-none ${planGradientBg.pack} flex flex-col transition-transform hover:scale-105`}>
-            <CardHeader className="text-center pb-6 pt-6">
-              <CardTitle className={`text-xl sm:text-2xl font-orbitron font-bold mb-2 ${planTextColor.pack}`}>Credit Packs</CardTitle>
-              <div className="text-3xl sm:text-4xl font-extrabold text-[#8bafff] mb-1">₹99</div>
-              <div className="mt-1 text-sm text-indigo-100">Select your desired amount:</div>
-            </CardHeader>
-            <CardContent className="grow flex flex-col">
-              <div className="flex flex-col gap-3 my-6 sm:my-10">
-                <div className="bg-indigo-800/40 rounded-lg p-3 border border-indigo-400 flex flex-col sm:flex-row justify-between items-center text-left shadow hover:shadow-blue-400/20 transition-colors">
-                  <span className="text-indigo-100 font-medium text-base">50 credits</span>
-                  <span>
-                    <span className="text-indigo-300 font-bold mr-3">₹99</span>
-                    <span className="text-xs text-indigo-300">₹2 per credit</span>
-                  </span>
+            {/* Credit Packs */}
+            <Card
+              className={`flex flex-col rounded-2xl shadow-2xl border-0 ${planGradientBg.pack} transition-all duration-500 ease-[cubic-bezier(.27,.54,.56,1.11)] hover:scale-[1.03] hover:shadow-indigo-400/30`}
+              style={{
+                minHeight: '480px',
+              }}
+            >
+              <CardHeader className="text-center pb-6 pt-7">
+                <CardTitle className={`text-2xl font-orbitron font-bold mb-2 ${planTextColor.pack}`}>Credit Packs</CardTitle>
+                <div className="text-4xl font-extrabold text-[#badbff] mb-1">₹99</div>
+                <div className="mt-0 text-base font-semibold text-indigo-200">Select your desired amount:</div>
+              </CardHeader>
+              <CardContent className="grow flex flex-col px-2 sm:px-4">
+                <div className="flex flex-col gap-3 my-4">
+                  <div className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-3 border border-indigo-400 flex flex-col sm:flex-row justify-between items-center text-left shadow hover:shadow-indigo-400/15 transition duration-300">
+                    <span className="text-indigo-100 font-medium text-base">50 credits</span>
+                    <span>
+                      <span className="text-indigo-50 font-bold mr-3">₹99</span>
+                      <span className="text-xs text-indigo-200">₹2 per credit</span>
+                    </span>
+                  </div>
+                  <div className="bg-gradient-to-r from-[#385494] via-[#4481db] to-[#4478d6] rounded-lg p-3 border border-indigo-400 flex flex-col sm:flex-row justify-between items-center text-left shadow hover:shadow-indigo-400/15 transition duration-300">
+                    <span className="text-indigo-100 font-medium text-base">100 credits</span>
+                    <span>
+                      <span className="text-indigo-50 font-bold mr-3">₹189</span>
+                      <span className="text-xs text-indigo-200">₹1.89 per credit</span>
+                    </span>
+                  </div>
+                  <div className="bg-gradient-to-r from-[#385494] via-[#4481db] to-[#528bfd] rounded-lg p-3 border border-indigo-400 flex flex-col sm:flex-row justify-between items-center text-left shadow hover:shadow-indigo-400/15 transition duration-300">
+                    <span className="text-indigo-100 font-medium text-base">200 credits</span>
+                    <span>
+                      <span className="text-indigo-50 font-bold mr-3">₹349</span>
+                      <span className="text-xs text-indigo-200">₹1.75 per credit</span>
+                    </span>
+                  </div>
+                  <div className="bg-gradient-to-r from-[#385494] via-[#4481db] to-[#789cfb] rounded-lg p-3 border border-indigo-400 flex flex-col sm:flex-row justify-between items-center text-left shadow hover:shadow-indigo-400/15 transition duration-300">
+                    <span className="text-indigo-100 font-medium text-base">500 credits</span>
+                    <span>
+                      <span className="text-indigo-50 font-bold mr-3">₹799</span>
+                      <span className="text-xs text-indigo-200">₹1.60 per credit</span>
+                    </span>
+                  </div>
                 </div>
-                <div className="bg-indigo-800/40 rounded-lg p-3 border border-indigo-400 flex flex-col sm:flex-row justify-between items-center text-left shadow hover:shadow-blue-400/20 transition-colors">
-                  <span className="text-indigo-100 font-medium text-base">100 credits</span>
-                  <span>
-                    <span className="text-indigo-300 font-bold mr-3">₹189</span>
-                    <span className="text-xs text-indigo-300">₹1.89 per credit</span>
-                  </span>
+                <ul className="space-y-2 mb-4">
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-400" />
+                    <span className="text-indigo-100 text-sm">No expiration</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-400" />
+                    <span className="text-indigo-100 text-sm">Instant activation</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-green-400" />
+                    <span className="text-indigo-100 text-sm">Secure payment</span>
+                  </li>
+                </ul>
+                <div className="flex-1 flex items-end">
+                  <Button
+                    className="w-full py-3 bg-gradient-to-r from-indigo-500 via-blue-500 to-sky-600 hover:from-indigo-600 hover:to-purple-800 text-white font-orbitron text-base rounded-xl mt-auto shadow border-0"
+                    disabled
+                  >
+                    Coming Soon
+                  </Button>
                 </div>
-                <div className="bg-indigo-800/40 rounded-lg p-3 border border-indigo-400 flex flex-col sm:flex-row justify-between items-center text-left shadow hover:shadow-blue-400/20 transition-colors">
-                  <span className="text-indigo-100 font-medium text-base">200 credits</span>
-                  <span>
-                    <span className="text-indigo-300 font-bold mr-3">₹349</span>
-                    <span className="text-xs text-indigo-300">₹1.75 per credit</span>
-                  </span>
-                </div>
-                <div className="bg-indigo-800/40 rounded-lg p-3 border border-indigo-400 flex flex-col sm:flex-row justify-between items-center text-left shadow hover:shadow-blue-400/20 transition-colors">
-                  <span className="text-indigo-100 font-medium text-base">500 credits</span>
-                  <span>
-                    <span className="text-indigo-300 font-bold mr-3">₹799</span>
-                    <span className="text-xs text-indigo-300">₹1.60 per credit</span>
-                  </span>
-                </div>
-              </div>
-              <ul className="space-y-3 mb-4 px-1 sm:px-0">
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400" />
-                  <span className="text-indigo-100 text-sm">No expiration</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400" />
-                  <span className="text-indigo-100 text-sm">Instant activation</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400" />
-                  <span className="text-indigo-100 text-sm">Secure payment</span>
-                </li>
-              </ul>
-              <div className="flex flex-1 items-end">
-                <Button
-                  className="w-full py-3 bg-gradient-to-r from-indigo-500 via-blue-500 to-sky-600 hover:from-indigo-600 hover:to-purple-800 text-white font-orbitron text-base rounded-xl mt-auto shadow border-0"
-                  disabled
-                >
-                  Coming Soon
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </Layout>
   );
 }
+
+// ... end of file ...
