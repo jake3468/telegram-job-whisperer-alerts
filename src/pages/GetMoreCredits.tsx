@@ -79,9 +79,9 @@ export default function GetMoreCredits() {
         }}
       >
         <AppSidebar />
-        <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0">
-          <main className="flex-1 w-full bg-gradient-to-b from-[#162650] via-[#214072] to-[#2b4f88]">
-            {/* Remove max-w-7xl/max-w-6xl containers so gradient stretches fully */}
+        <div className="flex-1 flex flex-col bg-gradient-to-b from-[#162650] via-[#214072] to-[#2b4f88] pt-28 lg:pt-0">
+          <main className="flex-1 w-full bg-transparent">
+            {/* The gradient was here, now moved to the parent div to fill the whole content area */}
             <div className="min-h-[80vh] w-full py-5 sm:py-8 flex flex-col">
               <div className="text-center mb-5 sm:mb-12 px-2 sm:px-4">
                 <h1 className="text-2xl xs:text-3xl sm:text-5xl font-orbitron font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-1 sm:mb-2 drop-shadow tracking-tight animate-fade-in">
