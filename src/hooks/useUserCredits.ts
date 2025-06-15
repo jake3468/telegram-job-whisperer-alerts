@@ -20,7 +20,7 @@ export const useUserCredits = () => {
       
       console.log('[useUserCredits] Querying user_credits for user_profile_id:', userProfile.id);
       
-      // First, try to get existing credits
+      // Try to get existing credits
       const { data, error } = await supabase
         .from('user_credits')
         .select('*')
@@ -39,41 +39,11 @@ export const useUserCredits = () => {
         return data;
       }
       
-      // If no credits found, initialize them
-      console.log('[useUserCredits] No user_credits record found, initializing...');
+      // If no credits found, log it but don't auto-initialize to avoid duplicate key errors
+      console.log('[useUserCredits] No user_credits record found for user_profile_id:', userProfile.id);
+      console.log('[useUserCredits] Credits should be initialized when user profile is created');
       
-      try {
-        // Call the initialize_user_credits function
-        const { data: initResult, error: initError } = await supabase.rpc('initialize_user_credits', {
-          p_user_profile_id: userProfile.id
-        });
-        
-        if (initError) {
-          console.error('[useUserCredits] Error initializing credits:', initError);
-          return { __error: initError };
-        }
-        
-        console.log('[useUserCredits] Credits initialized successfully:', initResult);
-        
-        // Now fetch the newly created credits
-        const { data: newCredits, error: fetchError } = await supabase
-          .from('user_credits')
-          .select('*')
-          .eq('user_profile_id', userProfile.id)
-          .single();
-          
-        if (fetchError) {
-          console.error('[useUserCredits] Error fetching newly created credits:', fetchError);
-          return { __error: fetchError };
-        }
-        
-        console.log('[useUserCredits] Fetched newly created credits:', newCredits);
-        return newCredits;
-        
-      } catch (initError) {
-        console.error('[useUserCredits] Exception during initialization:', initError);
-        return { __error: initError };
-      }
+      return null;
     },
     enabled: !!userProfile?.id && !userProfileLoading,
     staleTime: 30000,
