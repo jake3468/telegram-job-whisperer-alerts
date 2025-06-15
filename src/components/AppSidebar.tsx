@@ -1,4 +1,3 @@
-
 import { User, Bell, Target, FileText, X, Share2 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
@@ -201,6 +200,11 @@ export function AppSidebar() {
               appearance={{
                 elements: {
                   avatarBox: "w-10 h-10 flex-shrink-0"
+                }
+              }}
+              userButtonPopoverProps={{
+                style: {
+                  zIndex: 99999
                 }
               }}
             />
