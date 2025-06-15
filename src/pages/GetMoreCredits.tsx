@@ -1,5 +1,4 @@
 
-
 import { useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -13,9 +12,9 @@ import { Menu } from 'lucide-react';
 import { useUserCredits } from '@/hooks/useUserCredits';
 
 const planGradientBg = {
-  free: "bg-gradient-to-br from-[#23304a] via-[#264e7c] to-[#20345a] dark:from-[#233363] dark:via-[#162128] dark:to-[#214eb7]",
+  free: "bg-black border border-blue-400/30",
   subscription: "bg-gradient-to-br from-[#2563eb] via-[#3893ec] to-[#1872ba] dark:from-[#274299] dark:via-[#3177c7] dark:to-[#1b466c]",
-  pack: "bg-gradient-to-br from-[#314e8c] via-[#517fd0] to-[#315b8b] dark:from-[#223450] dark:via-[#355a9c] dark:to-[#364e6b]",
+  pack: "bg-black border border-indigo-400/30",
 };
 
 const planTextColor = {
@@ -76,8 +75,8 @@ export default function GetMoreCredits() {
         }}
       >
         <AppSidebar />
-        {/* Main content area now takes full width without Layout constraints */}
-        <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0">
+        {/* Main content area with proper spacing to avoid sidebar overlap */}
+        <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0 lg:pl-6">
           <main className="flex-1 w-full bg-transparent">
             <div className="min-h-[80vh] w-full bg-gradient-to-b from-[#162650] via-[#214072] to-[#2b4f88] py-8 flex flex-col">
               <div className="w-full max-w-7xl mx-auto px-4">
@@ -94,7 +93,7 @@ export default function GetMoreCredits() {
                 </div>
               </div>
 
-              {/* Responsive grid area taking full width */}
+              {/* Responsive grid area with proper spacing */}
               <div className="w-full max-w-7xl mx-auto flex-grow flex flex-col items-center justify-center px-4">
                 <div
                   className="
@@ -108,7 +107,7 @@ export default function GetMoreCredits() {
                 >
                   {/* Free Plan */}
                   <Card
-                    className={`flex flex-col rounded-2xl shadow-2xl border-0 ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-blue-400/30`}
+                    className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-blue-400/30`}
                     style={{
                       minHeight: '460px',
                       width: '100%',
@@ -204,7 +203,7 @@ export default function GetMoreCredits() {
 
                   {/* Credit Packs */}
                   <Card
-                    className={`flex flex-col rounded-2xl shadow-2xl border-0 ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-indigo-400/30`}
+                    className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-indigo-400/30`}
                     style={{
                       minHeight: '460px',
                       width: '100%',
@@ -279,4 +278,3 @@ export default function GetMoreCredits() {
     </SidebarProvider>
   );
 }
-
