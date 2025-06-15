@@ -244,7 +244,7 @@ const CoverLetter = () => {
                       Fill in the details to generate your personalized cover letter
                     </CardDescription>
                   </div>
-                  <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                  <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 text-white bg-pink-700 hover:bg-pink-600">
                     <History className="w-4 h-4 mr-2" />
                     History
                   </Button>
@@ -259,30 +259,14 @@ const CoverLetter = () => {
                       <Label htmlFor="company_name" className="text-white font-medium text-base">
                         Company Name *
                       </Label>
-                      <Input
-                        id="company_name"
-                        placeholder="e.g. Google, Microsoft"
-                        value={formData.company_name}
-                        onChange={e => handleInputChange('company_name', e.target.value)}
-                        required
-                        className="text-base bg-black text-white placeholder:text-white/60 border-white/15"
-                        disabled={isGenerating}
-                      />
+                      <Input id="company_name" placeholder="e.g. Google, Microsoft" value={formData.company_name} onChange={e => handleInputChange('company_name', e.target.value)} required className="text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
                     </div>
                     {/* Job Title */}
                     <div className="flex-1 space-y-2">
                       <Label htmlFor="job_title" className="text-white font-medium text-base">
                         Job Title *
                       </Label>
-                      <Input
-                        id="job_title"
-                        placeholder="e.g. Software Engineer, Marketing Manager"
-                        value={formData.job_title}
-                        onChange={e => handleInputChange('job_title', e.target.value)}
-                        required
-                        className="text-base bg-black text-white placeholder:text-white/60 border-white/15"
-                        disabled={isGenerating}
-                      />
+                      <Input id="job_title" placeholder="e.g. Software Engineer, Marketing Manager" value={formData.job_title} onChange={e => handleInputChange('job_title', e.target.value)} required className="text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
                     </div>
                   </div>
 
@@ -294,37 +278,15 @@ const CoverLetter = () => {
                     <Label htmlFor="job_description" className="text-gray-300 font-normal text-sm block">
                       Paste the job description or key requirements
                     </Label>
-                    <Textarea
-                      id="job_description"
-                      placeholder="Paste the job description here..."
-                      value={formData.job_description}
-                      onChange={e => handleInputChange('job_description', e.target.value)}
-                      required
-                      className="min-h-[150px] resize-none text-base bg-black text-white placeholder:text-white/60 border-white/15"
-                      disabled={isGenerating}
-                    />
+                    <Textarea id="job_description" placeholder="Paste the job description here..." value={formData.job_description} onChange={e => handleInputChange('job_description', e.target.value)} required className="min-h-[150px] resize-none text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3 pt-4">
                     {/* Generate Cover Letter - takes up majority of the width, Reset is smaller */}
-                    <Button
-                      type="submit"
-                      disabled={isSubmitting || !formData.job_title.trim() || !formData.company_name.trim() || !formData.job_description.trim() || isGenerating}
-                      className="flex-[3] bg-gradient-to-r from-pink-400 to-fuchsia-500 hover:from-pink-400/80 hover:to-fuchsia-500/80 text-white font-semibold text-base h-12 rounded-lg"
-                    >
-                      {isSubmitting
-                        ? "Submitting..."
-                        : isGenerating
-                        ? "Generating..."
-                        : "Generate Cover Letter"}
+                    <Button type="submit" disabled={isSubmitting || !formData.job_title.trim() || !formData.company_name.trim() || !formData.job_description.trim() || isGenerating} className="flex-[3] bg-gradient-to-r from-pink-400 to-fuchsia-500 hover:from-pink-400/80 hover:to-fuchsia-500/80 text-white font-semibold text-base h-12 rounded-lg">
+                      {isSubmitting ? "Submitting..." : isGenerating ? "Generating..." : "Generate Cover Letter"}
                     </Button>
-                    <Button
-                      type="button"
-                      onClick={resetForm}
-                      variant="outline"
-                      className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 text-base h-12 px-6 max-sm:w-full"
-                      disabled={isGenerating}
-                    >
+                    <Button type="button" onClick={resetForm} variant="outline" className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 text-base h-12 px-6 max-sm:w-full" disabled={isGenerating}>
                       Reset
                     </Button>
                   </div>
