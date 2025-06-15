@@ -79,8 +79,8 @@ export default function GetMoreCredits() {
         }}
       >
         <AppSidebar />
-        {/* Main content area with extra spacing for mobile */}
-        <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0 lg:pl-20">
+        {/* Main content area - removed lg:pl-20 to be flush with sidebar */}
+        <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0">
           <main className="flex-1 w-full bg-transparent">
             <div className="min-h-[80vh] w-full bg-gradient-to-b from-[#162650] via-[#214072] to-[#2b4f88] py-5 sm:py-8 flex flex-col">
               <div className="w-full max-w-7xl mx-auto px-2 sm:px-4">
