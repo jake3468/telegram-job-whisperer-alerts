@@ -76,14 +76,49 @@ function normalizeResumeData(formData: any) {
     "section_order"
   ];
 
-  const normalized: any = { ...formData };
+  // Fields that should be a number or null
+  const numberFields = ["years_experience"];
 
-  for (const key of jsonbArrayFields) {
-    if (!Array.isArray(normalized[key])) {
-      normalized[key] = [];
+  // The keys of the resume table:
+  const allowedKeys = [
+    "id", "user_profile_id", "full_name", "email", "phone", "location",
+    "linkedin_url", "portfolio_url", "github_url", "social_profiles",
+    "career_level", "years_experience", "skills_summary", "career_objective", "industry_focus",
+    "work_experience", "education",
+    "technical_skills", "soft_skills", "languages", "certifications",
+    "projects",
+    "publications", "speaking_engagements", "volunteer_work", "memberships", "awards", "patents", "hobbies",
+    "template_style", "color_scheme", "font_preference", "section_order", "length_preference", "output_format",
+    "created_at", "updated_at"
+  ];
+
+  // Only keep allowed keys, convert undefined to null, handle numbers & arrays
+  const normalized: any = {};
+  for (const key of allowedKeys) {
+    let value = formData[key];
+    // Convert undefined to null
+    if (value === undefined) {
+      value = null;
     }
-  }
+    // For array fields, always assign array (never null/undefined)
+    if (jsonbArrayFields.includes(key)) {
+      value = Array.isArray(value) ? value : [];
+    }
 
+    // Convert number fields (empty string or NaN)
+    if (numberFields.includes(key)) {
+      if (typeof value === "string" && value.trim() === "") {
+        value = null;
+      } else if (typeof value === "number" && isNaN(value)) {
+        value = null;
+      } else if (typeof value !== "number" && typeof value !== "undefined" && value !== null) {
+        let numeric = Number(value);
+        value = isNaN(numeric) ? null : numeric;
+      }
+    }
+
+    normalized[key] = value;
+  }
   return normalized;
 }
 
@@ -109,7 +144,6 @@ const ResumeBuilder = () => {
   };
 
   const handleSave = () => {
-    // Normalize formData before saving
     const normalized = normalizeResumeData(formData);
     saveResume(normalized);
   };
