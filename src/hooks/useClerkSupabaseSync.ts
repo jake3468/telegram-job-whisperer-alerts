@@ -17,22 +17,22 @@ export function useClerkSupabaseSync() {
       if (isSignedIn && getToken) {
         try {
           const jwt = await getToken({ template: 'supabase' }).catch(() => null);
-          console.log("[useClerkSupabaseSync] getToken({template:'supabase'}) returned:", jwt, "for Clerk user ID:", userId);
           if (!jwt) {
-            console.warn("[useClerkSupabaseSync] No Clerk JWT. Supabase RLS will fail.");
+            console.warn("[useClerkSupabaseSync] No Clerk JWT was returned. Supabase RLS will fail. This means requests are unauthenticated.");
           } else {
+            // Only show the first/last 5 chars, do NOT log the full JWT!
+            const masked = jwt.length > 10 ? jwt.substring(0,5) + "..." + jwt.substring(jwt.length-5) : "[short]";
             setClerkToken(jwt);
-            console.log("[useClerkSupabaseSync] Setting Clerk JWT in Supabase client headers:", jwt);
+            console.log(`[useClerkSupabaseSync] Clerk JWT was set (masked): ${masked} for Clerk user ID: ${userId}`);
           }
         } catch (err) {
           console.error("[useClerkSupabaseSync] Error setting Clerk token:", err);
         }
       } else {
-        console.warn("[useClerkSupabaseSync] Not signed in or getToken missing.");
+        console.warn("[useClerkSupabaseSync] Not signed in or getToken missing. Using Supabase ANON key only.");
       }
     }
     setToken();
     return () => { stop = true; };
   }, [getToken, isSignedIn, userId]);
 }
-
