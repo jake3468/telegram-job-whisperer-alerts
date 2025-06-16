@@ -56,23 +56,35 @@ export const useUserCredits = () => {
 
         console.log('[useUserCredits][debug] Found user ID:', userData.id);
 
-        // Now fetch the credits using the user's ID (after migration, this should be user_id, not user_profile_id)
+        // Get user_profile_id from user_profile table
+        const { data: profileData, error: profileError } = await supabase
+          .from('user_profile')
+          .select('id')
+          .eq('user_id', userData.id)
+          .single();
+
+        if (profileError || !profileData) {
+          console.error('[useUserCredits] Error fetching user profile:', profileError);
+          return { __error: profileError || { message: 'User profile not found' }, __debug: { action: 'profile_lookup_failed', user_id: userData.id } };
+        }
+
+        // Now fetch the credits using the user_profile_id
         const { data: credits, error } = await supabase
           .from('user_credits')
           .select('*')
-          .eq('user_id', userData.id)
+          .eq('user_profile_id', profileData.id)
           .maybeSingle();
 
         console.log('[useUserCredits][debug] Credits query result:', credits, 'error:', error);
 
         if (error) {
           console.error('[useUserCredits] Error fetching credits:', error);
-          return { __error: error, __debug: { action: 'fetch_failed', user_id: userData.id } };
+          return { __error: error, __debug: { action: 'fetch_failed', user_profile_id: profileData.id } };
         }
 
         if (!credits) {
-          console.warn('[useUserCredits] No credits found for user_id:', userData.id);
-          return { __error: { message: 'No credits found' }, __debug: { action: 'no_credits_found', user_id: userData.id } };
+          console.warn('[useUserCredits] No credits found for user_profile_id:', profileData.id);
+          return { __error: { message: 'No credits found' }, __debug: { action: 'no_credits_found', user_profile_id: profileData.id } };
         }
 
         console.log('[useUserCredits] Successfully fetched credits:', credits);
