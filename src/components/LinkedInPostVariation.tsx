@@ -138,7 +138,7 @@ const LinkedInPostVariation = ({
           Copy Post {variationNumber}
         </Button>
         
-        <Button onClick={handleGetImage} variant="outline" className="flex-1 border-teal-400/25 text-teal-300 hover:bg-teal-400/10 text-sm h-10">
+        <Button onClick={handleGetImage} variant="outline" className="flex-1 border-teal-400/25 text-sm h-10 bg-amber-500 hover:bg-amber-400 text-gray-950">
           <ImageIcon className="w-4 h-4 mr-2" />
           Get Image for Post
         </Button>
