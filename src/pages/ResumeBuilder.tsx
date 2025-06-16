@@ -13,84 +13,48 @@ import SkillsForm from '@/components/resume/SkillsForm';
 import ProjectsForm from '@/components/resume/ProjectsForm';
 import AdditionalSectionsForm from '@/components/resume/AdditionalSectionsForm';
 import FormattingPreferencesForm from '@/components/resume/FormattingPreferencesForm';
-
-const steps = [
-  {
-    id: 1,
-    title: 'Personal Information',
-    component: PersonalInfoForm
-  },
-  {
-    id: 2,
-    title: 'Professional Summary',
-    component: ProfessionalSummaryForm
-  },
-  {
-    id: 3,
-    title: 'Work Experience',
-    component: WorkExperienceForm
-  },
-  {
-    id: 4,
-    title: 'Education',
-    component: EducationForm
-  },
-  {
-    id: 5,
-    title: 'Skills',
-    component: SkillsForm
-  },
-  {
-    id: 6,
-    title: 'Projects',
-    component: ProjectsForm
-  },
-  {
-    id: 7,
-    title: 'Additional Sections',
-    component: AdditionalSectionsForm
-  },
-  {
-    id: 8,
-    title: 'Formatting Preferences',
-    component: FormattingPreferencesForm
-  }
-];
-
+const steps = [{
+  id: 1,
+  title: 'Personal Information',
+  component: PersonalInfoForm
+}, {
+  id: 2,
+  title: 'Professional Summary',
+  component: ProfessionalSummaryForm
+}, {
+  id: 3,
+  title: 'Work Experience',
+  component: WorkExperienceForm
+}, {
+  id: 4,
+  title: 'Education',
+  component: EducationForm
+}, {
+  id: 5,
+  title: 'Skills',
+  component: SkillsForm
+}, {
+  id: 6,
+  title: 'Projects',
+  component: ProjectsForm
+}, {
+  id: 7,
+  title: 'Additional Sections',
+  component: AdditionalSectionsForm
+}, {
+  id: 8,
+  title: 'Formatting Preferences',
+  component: FormattingPreferencesForm
+}];
 function normalizeResumeData(formData: any) {
   // user_resumes expects these fields as arrays (jsonb):
-  const jsonbArrayFields = [
-    "work_experience",
-    "education",
-    "technical_skills",
-    "soft_skills",
-    "languages",
-    "certifications",
-    "projects",
-    "publications",
-    "speaking_engagements",
-    "volunteer_work",
-    "memberships",
-    "awards",
-    "patents",
-    "section_order"
-  ];
+  const jsonbArrayFields = ["work_experience", "education", "technical_skills", "soft_skills", "languages", "certifications", "projects", "publications", "speaking_engagements", "volunteer_work", "memberships", "awards", "patents", "section_order"];
 
   // Fields that should be a number or null
   const numberFields = ["years_experience"];
 
   // The keys of the resume table:
-  const allowedKeys = [
-    "id", "user_profile_id", "full_name", "email", "phone", "location",
-    "linkedin_url", "portfolio_url", "github_url", "social_profiles",
-    "career_level", "years_experience", "skills_summary", "career_objective", "industry_focus",
-    "work_experience", "education",
-    "technical_skills", "soft_skills", "languages", "certifications",
-    "projects",
-    "publications", "speaking_engagements", "volunteer_work", "memberships", "awards", "patents", "hobbies",
-    "template_style", "color_scheme", "font_preference", "section_order", "length_preference", "output_format",
-    "created_at", "updated_at"
-  ];
+  const allowedKeys = ["id", "user_profile_id", "full_name", "email", "phone", "location", "linkedin_url", "portfolio_url", "github_url", "social_profiles", "career_level", "years_experience", "skills_summary", "career_objective", "industry_focus", "work_experience", "education", "technical_skills", "soft_skills", "languages", "certifications", "projects", "publications", "speaking_engagements", "volunteer_work", "memberships", "awards", "patents", "hobbies", "template_style", "color_scheme", "font_preference", "section_order", "length_preference", "output_format", "created_at", "updated_at"];
 
   // Only keep allowed keys, convert undefined to null, handle numbers & arrays
   const normalized: any = {};
@@ -116,47 +80,42 @@ function normalizeResumeData(formData: any) {
         value = isNaN(numeric) ? null : numeric;
       }
     }
-
     normalized[key] = value;
   }
   return normalized;
 }
-
 const ResumeBuilder = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const { resumeData, saveResume, isSaving } = useUserResume();
+  const {
+    resumeData,
+    saveResume,
+    isSaving
+  } = useUserResume();
   const [formData, setFormData] = useState(resumeData || {});
-
   const currentStepData = steps.find(step => step.id === currentStep);
   const CurrentComponent = currentStepData?.component;
-  const progress = (currentStep / steps.length) * 100;
-
+  const progress = currentStep / steps.length * 100;
   const handleNext = () => {
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
     }
   };
-
   const handlePrevious = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
   };
-
   const handleSave = () => {
     const normalized = normalizeResumeData(formData);
     saveResume(normalized);
   };
-
   const handleDataChange = (stepData: any) => {
     setFormData(prev => ({
       ...prev,
       ...stepData
     }));
   };
-
-  return (
-    <Layout>
+  return <Layout>
       <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-2 sm:p-4">
         <div className="max-w-4xl mx-auto">
           <Card className="bg-white/95 backdrop-blur-sm shadow-2xl border-0">
@@ -173,43 +132,24 @@ const ResumeBuilder = () => {
               </div>
             </CardHeader>
 
-            <CardContent className="p-3 sm:p-6">
+            <CardContent className="p-3 sm:p-6 bg-cyan-400">
               <div className="overflow-hidden">
-                {CurrentComponent && (
-                  <CurrentComponent 
-                    data={formData} 
-                    onChange={handleDataChange} 
-                  />
-                )}
+                {CurrentComponent && <CurrentComponent data={formData} onChange={handleDataChange} />}
               </div>
 
               <div className="flex flex-col sm:flex-row justify-between items-center mt-6 pt-4 border-t gap-4">
-                <Button 
-                  onClick={handlePrevious} 
-                  disabled={currentStep === 1} 
-                  variant="outline" 
-                  className="flex items-center gap-2 w-full sm:w-auto order-2 sm:order-1"
-                >
+                <Button onClick={handlePrevious} disabled={currentStep === 1} variant="outline" className="flex items-center gap-2 w-full sm:w-auto order-2 sm:order-1">
                   <ChevronLeft className="w-4 h-4" />
                   Previous
                 </Button>
 
                 <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto order-1 sm:order-2">
-                  <Button 
-                    onClick={handleSave} 
-                    disabled={isSaving} 
-                    variant="outline" 
-                    className="flex items-center gap-2 w-full sm:w-auto"
-                  >
+                  <Button onClick={handleSave} disabled={isSaving} variant="outline" className="flex items-center gap-2 w-full sm:w-auto">
                     <Save className="w-4 h-4" />
                     {isSaving ? 'Saving...' : 'Save Progress'}
                   </Button>
 
-                  <Button 
-                    onClick={handleNext} 
-                    disabled={currentStep === steps.length} 
-                    className="flex items-center gap-2 w-full sm:w-auto"
-                  >
+                  <Button onClick={handleNext} disabled={currentStep === steps.length} className="flex items-center gap-2 w-full sm:w-auto">
                     Next
                     <ChevronRight className="w-4 h-4" />
                   </Button>
@@ -219,8 +159,6 @@ const ResumeBuilder = () => {
           </Card>
         </div>
       </div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default ResumeBuilder;
