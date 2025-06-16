@@ -29,46 +29,17 @@ export const useUserCredits = () => {
         return null;
       }
       
-      console.log('[useUserCredits][debug] Fetching credits for user_id:', userProfile.user_id);
-      console.log('[useUserCredits][debug] Clerk user ID:', user?.id);
+      console.log('[useUserCredits] Fetching credits for user_id:', userProfile.user_id);
       
       try {
-        // First, try the regular query with RLS
-        let { data: credits, error } = await supabase
+        // Query the user_credits table directly using the user_id
+        const { data: credits, error } = await supabase
           .from('user_credits')
           .select('current_balance, free_credits, paid_credits, subscription_plan, next_reset_date, created_at, updated_at, id, user_id')
           .eq('user_id', userProfile.user_id)
           .maybeSingle();
 
-        console.log('[useUserCredits][debug] Credits query result:', credits, 'error:', error);
-
-        // If RLS is blocking us, try a more direct approach
-        if (error && error.message?.includes('row-level security')) {
-          console.warn('[useUserCredits] RLS policy blocking access, trying alternative approach');
-          
-          // Try querying without RLS constraints by using a function
-          try {
-            const { data: userCheck } = await supabase
-              .from('users')
-              .select('id')
-              .eq('clerk_id', user?.id)
-              .maybeSingle();
-
-            if (userCheck) {
-              const { data: creditsAlt, error: creditsAltError } = await supabase
-                .from('user_credits')
-                .select('*')
-                .eq('user_id', userCheck.id)
-                .maybeSingle();
-
-              console.log('[useUserCredits][debug] Alternative query result:', creditsAlt);
-              credits = creditsAlt;
-              error = creditsAltError;
-            }
-          } catch (altError) {
-            console.error('[useUserCredits] Alternative approach failed:', altError);
-          }
-        }
+        console.log('[useUserCredits] Credits query result:', credits, 'error:', error);
 
         if (error) {
           console.error('[useUserCredits] Error fetching credits:', error);
@@ -81,20 +52,25 @@ export const useUserCredits = () => {
           // Try to initialize credits if none exist
           try {
             console.log('[useUserCredits] Attempting to initialize credits...');
-            const { data: initResult } = await supabase.rpc('initialize_user_credits', {
+            const { data: initResult, error: initError } = await supabase.rpc('initialize_user_credits', {
               p_user_id: userProfile.user_id
             });
             
-            console.log('[useUserCredits] Initialize result:', initResult);
+            console.log('[useUserCredits] Initialize result:', initResult, 'error:', initError);
             
-            // Retry the query after initialization
-            const { data: retryCredits } = await supabase
-              .from('user_credits')
-              .select('current_balance, free_credits, paid_credits, subscription_plan, next_reset_date, created_at, updated_at, id, user_id')
-              .eq('user_id', userProfile.user_id)
-              .maybeSingle();
-              
-            credits = retryCredits;
+            if (!initError) {
+              // Retry the query after initialization
+              const { data: retryCredits, error: retryError } = await supabase
+                .from('user_credits')
+                .select('current_balance, free_credits, paid_credits, subscription_plan, next_reset_date, created_at, updated_at, id, user_id')
+                .eq('user_id', userProfile.user_id)
+                .maybeSingle();
+                
+              if (!retryError && retryCredits) {
+                console.log('[useUserCredits] Successfully fetched credits after initialization:', retryCredits);
+                return retryCredits as UserCreditsData;
+              }
+            }
           } catch (initError) {
             console.error('[useUserCredits] Failed to initialize credits:', initError);
           }

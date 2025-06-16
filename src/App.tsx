@@ -20,7 +20,6 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  // Call the hook directly for signed-in users to sync Clerk JWT with Supabase
   return (
     <>
       <SignedIn>
