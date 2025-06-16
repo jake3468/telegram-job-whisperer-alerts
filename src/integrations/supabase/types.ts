@@ -19,7 +19,7 @@ export type Database = {
           feature_used: string | null
           id: string
           transaction_type: string
-          user_profile_id: string
+          user_id: string
         }
         Insert: {
           amount: number
@@ -30,7 +30,7 @@ export type Database = {
           feature_used?: string | null
           id?: string
           transaction_type: string
-          user_profile_id: string
+          user_id: string
         }
         Update: {
           amount?: number
@@ -41,14 +41,14 @@ export type Database = {
           feature_used?: string | null
           id?: string
           transaction_type?: string
-          user_profile_id?: string
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "credit_transactions_user_profile_id_fkey"
-            columns: ["user_profile_id"]
+            foreignKeyName: "credit_transactions_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "user_profile"
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -308,7 +308,7 @@ export type Database = {
           paid_credits: number
           subscription_plan: string
           updated_at: string
-          user_profile_id: string
+          user_id: string
         }
         Insert: {
           created_at?: string
@@ -319,7 +319,7 @@ export type Database = {
           paid_credits?: number
           subscription_plan?: string
           updated_at?: string
-          user_profile_id: string
+          user_id: string
         }
         Update: {
           created_at?: string
@@ -330,14 +330,14 @@ export type Database = {
           paid_credits?: number
           subscription_plan?: string
           updated_at?: string
-          user_profile_id?: string
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "user_credits_user_profile_id_fkey"
-            columns: ["user_profile_id"]
-            isOneToOne: true
-            referencedRelation: "user_profile"
+            foreignKeyName: "user_credits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -592,7 +592,7 @@ export type Database = {
     Functions: {
       add_credits: {
         Args: {
-          p_user_profile_id: string
+          p_user_id: string
           p_amount: number
           p_transaction_type: string
           p_description?: string
@@ -621,7 +621,7 @@ export type Database = {
         Returns: string
       }
       check_sufficient_credits: {
-        Args: { p_user_profile_id: string; p_required_credits: number }
+        Args: { p_user_id: string; p_required_credits: number }
         Returns: boolean
       }
       cleanup_old_webhook_executions: {
@@ -630,7 +630,7 @@ export type Database = {
       }
       deduct_credits: {
         Args: {
-          p_user_profile_id: string
+          p_user_id: string
           p_amount: number
           p_feature_used: string
           p_description?: string
@@ -658,7 +658,7 @@ export type Database = {
         Returns: string
       }
       initialize_user_credits: {
-        Args: { p_user_profile_id: string }
+        Args: { p_user_id: string }
         Returns: string
       }
       insert_job_analysis: {
