@@ -1,9 +1,7 @@
-
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Repeat2, Send, MoreHorizontal, User, Copy, Image as ImageIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
 interface UserProfile {
   id: string;
   user_id: string;
@@ -13,12 +11,10 @@ interface UserProfile {
   chat_id: string | null;
   created_at: string | null;
 }
-
 interface UserData {
   first_name: string | null;
   last_name: string | null;
 }
-
 interface LinkedInPostVariationProps {
   heading: string;
   content: string;
@@ -26,20 +22,21 @@ interface LinkedInPostVariationProps {
   userData?: UserData | null;
   variationNumber: number;
 }
+const LinkedInPostVariation = ({
+  heading,
+  content,
+  userProfile,
+  userData,
+  variationNumber
+}: LinkedInPostVariationProps) => {
+  const {
+    toast
+  } = useToast();
 
-const LinkedInPostVariation = ({ heading, content, userProfile, userData, variationNumber }: LinkedInPostVariationProps) => {
-  const { toast } = useToast();
-  
   // Create display name from user data
-  const displayName = userData?.first_name && userData?.last_name 
-    ? `${userData.first_name} ${userData.last_name}`
-    : userData?.first_name 
-    ? userData.first_name
-    : 'Professional User';
-
+  const displayName = userData?.first_name && userData?.last_name ? `${userData.first_name} ${userData.last_name}` : userData?.first_name ? userData.first_name : 'Professional User';
   const handleCopyContent = async () => {
     if (!content) return;
-    
     try {
       await navigator.clipboard.writeText(content);
       toast({
@@ -55,19 +52,16 @@ const LinkedInPostVariation = ({ heading, content, userProfile, userData, variat
       });
     }
   };
-
   const handleGetImage = () => {
     toast({
       title: "Coming Soon!",
       description: "Image generation feature will be available soon."
     });
   };
-
-  return (
-    <div className="space-y-4">
+  return <div className="space-y-4">
       {/* Heading */}
       <div className="text-center">
-        <h3 className="text-lg font-semibold text-cyan-300 mb-2">{heading}</h3>
+        <h3 className="text-lg font-semibold mb-2 text-lime-400">{heading}</h3>
       </div>
 
       {/* LinkedIn Post Preview */}
@@ -139,25 +133,16 @@ const LinkedInPostVariation = ({ heading, content, userProfile, userData, variat
 
       {/* Action Buttons */}
       <div className="flex gap-3">
-        <Button 
-          onClick={handleCopyContent} 
-          className="flex-1 bg-teal-700 hover:bg-teal-600 text-white flex items-center gap-2 text-sm h-10 font-semibold"
-        >
+        <Button onClick={handleCopyContent} className="flex-1 bg-teal-700 hover:bg-teal-600 text-white flex items-center gap-2 text-sm h-10 font-semibold">
           <Copy className="w-4 h-4" />
           Copy Post {variationNumber}
         </Button>
         
-        <Button 
-          onClick={handleGetImage}
-          variant="outline" 
-          className="flex-1 border-teal-400/25 text-teal-300 hover:bg-teal-400/10 text-sm h-10"
-        >
+        <Button onClick={handleGetImage} variant="outline" className="flex-1 border-teal-400/25 text-teal-300 hover:bg-teal-400/10 text-sm h-10">
           <ImageIcon className="w-4 h-4 mr-2" />
           Get Image for Post
         </Button>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default LinkedInPostVariation;
