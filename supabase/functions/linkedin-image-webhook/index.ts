@@ -1,6 +1,5 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -15,22 +14,15 @@ serve(async (req) => {
   try {
     const { post_heading, post_content, variation_number, user_name, post_id, source } = await req.json()
 
-    // Get the N8N webhook URL from secrets
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+    // Get the N8N webhook URL from environment variables (Supabase secrets are available as env vars)
+    const n8nWebhookUrl = Deno.env.get('N8N_LINKEDIN_IMAGE_WEBHOOK_URL')
 
-    const { data: secretData, error: secretError } = await supabase
-      .from('vault.decrypted_secrets')
-      .select('decrypted_secret')
-      .eq('name', 'N8N_LINKEDIN_IMAGE_WEBHOOK_URL')
-      .single()
-
-    if (secretError || !secretData) {
-      throw new Error('N8N_LINKEDIN_IMAGE_WEBHOOK_URL secret not found')
+    if (!n8nWebhookUrl) {
+      console.error('N8N_LINKEDIN_IMAGE_WEBHOOK_URL environment variable not found')
+      throw new Error('N8N webhook URL not configured')
     }
 
-    const n8nWebhookUrl = secretData.decrypted_secret
+    console.log('Using N8N webhook URL:', n8nWebhookUrl.substring(0, 50) + '...')
 
     // Call the N8N webhook
     const response = await fetch(n8nWebhookUrl, {
@@ -51,10 +43,13 @@ serve(async (req) => {
     })
 
     if (!response.ok) {
+      const errorText = await response.text()
+      console.error(`N8N webhook failed: ${response.status} ${response.statusText}`, errorText)
       throw new Error(`N8N webhook failed: ${response.statusText}`)
     }
 
     const result = await response.json()
+    console.log('N8N webhook response:', result)
 
     return new Response(
       JSON.stringify({ 
