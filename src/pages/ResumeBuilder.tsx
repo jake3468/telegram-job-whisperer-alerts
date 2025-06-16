@@ -120,9 +120,7 @@ const ResumeBuilder = () => {
         <div className="max-w-4xl mx-auto">
           <Card className="bg-white/95 backdrop-blur-sm shadow-2xl border-0">
             <CardHeader className="text-center bg-indigo-400 px-4 py-6">
-              <CardTitle className="text-2xl sm:text-3xl font-bold text-gray-800">
-                Resume Builder
-              </CardTitle>
+              <CardTitle className="text-2xl sm:text-3xl font-bold text-gray-800">📝 Resume Builder</CardTitle>
               <CardDescription className="text-base sm:text-lg text-teal-950">
                 Step {currentStep} of {steps.length}: {currentStepData?.title}
               </CardDescription>
