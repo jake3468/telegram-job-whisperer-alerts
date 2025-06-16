@@ -133,7 +133,7 @@ const LinkedInPostVariation = ({
 
       {/* Action Buttons */}
       <div className="flex gap-3">
-        <Button onClick={handleCopyContent} className="flex-1 bg-teal-700 hover:bg-teal-600 text-white flex items-center gap-2 text-sm h-10 font-semibold">
+        <Button onClick={handleCopyContent} className="flex-1 flex items-center gap-2 text-sm h-10 font-semibold bg-emerald-300 hover:bg-emerald-200 text-gray-950">
           <Copy className="w-4 h-4" />
           Copy Post {variationNumber}
         </Button>
