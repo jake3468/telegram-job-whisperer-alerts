@@ -158,9 +158,7 @@ const HistoryModal = ({
           post_heading: heading,
           post_content: content,
           variation_number: postNumber,
-          user_name: userData?.first_name && userData?.last_name 
-            ? `${userData.first_name} ${userData.last_name}` 
-            : userData?.first_name || 'Professional User',
+          user_name: 'Professional User',
           timestamp: new Date().toISOString(),
           triggered_from: window.location.origin,
           source: 'history'
