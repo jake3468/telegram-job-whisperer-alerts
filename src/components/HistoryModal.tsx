@@ -162,9 +162,32 @@ const HistoryModal = ({
         }),
       });
 
-      const result = await response.json();
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Response not ok:', response.status, errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText || 'Failed to trigger image generation'}`);
+      }
+
+      // Check if response has content before parsing JSON
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+      
+      if (!responseText) {
+        throw new Error('Empty response from server');
+      }
+
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        throw new Error('Invalid JSON response from server');
+      }
+
+      if (!result.success) {
         throw new Error(result.error || 'Failed to trigger image generation');
       }
 
@@ -176,7 +199,7 @@ const HistoryModal = ({
       console.error('Error triggering image generation webhook:', error);
       toast({
         title: "Error",
-        description: "Failed to trigger image generation. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to trigger image generation. Please try again.",
         variant: "destructive"
       });
     }
