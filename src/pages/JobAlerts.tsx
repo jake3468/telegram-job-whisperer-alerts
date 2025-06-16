@@ -11,16 +11,33 @@ const JobAlerts = () => {
   const { user, isLoaded } = useUser();
   const navigate = useNavigate();
 
-  // Memoize timezone to prevent unnecessary re-renders
+  // Memoize timezone to prevent unnecessary re-renders and ensure IANA format
   const userTimezone = useMemo(() => {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    try {
+      // Get IANA timezone using Intl.DateTimeFormat
+      const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      
+      // Validate that it's a proper IANA timezone format
+      if (detectedTimezone && detectedTimezone.includes('/')) {
+        return detectedTimezone;
+      }
+      
+      // Fallback to UTC if detection fails
+      return 'UTC';
+    } catch (error) {
+      console.warn('Timezone detection failed, using UTC as fallback:', error);
+      return 'UTC';
+    }
   }, []);
+
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
+
   useFeatureCreditCheck(1.5);
+
   if (!isLoaded || !user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pastel-mint via-pastel-lavender to-pastel-peach flex items-center justify-center">
@@ -28,6 +45,7 @@ const JobAlerts = () => {
       </div>
     );
   }
+
   return (
     <Layout>
       <div className="text-center mb-8">
