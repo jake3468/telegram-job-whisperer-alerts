@@ -17,53 +17,59 @@ type UserCreditsData = {
   updated_at: string;
 };
 
-// Fetches current user credit info from Supabase using the user_id from profile
 export const useUserCredits = () => {
-  const { user } = useUser();
-  const { userProfile } = useUserProfile();
-
-  console.log('[useUserCredits][debug] Clerk user:', user?.id);
-  console.log('[useUserCredits][debug] User profile user_id:', userProfile?.user_id);
-
+  const { userProfile } = useUserProfile(); // This should contain the UUID from users table
+  
   return useQuery({
-    queryKey: ['user_credits', userProfile?.user_id],
+    queryKey: ['user_credits', userProfile?.id], // assuming userProfile.id is the UUID
     queryFn: async () => {
-      if (!userProfile?.user_id) {
-        console.warn('[useUserCredits] No userProfile.user_id available');
+      if (!userProfile?.id) {
+        console.warn('[useUserCredits] No user UUID available');
         return null;
       }
-
-      console.log('[useUserCredits][debug] Fetching credits for user_id:', userProfile.user_id);
-
+      
+      console.log('[useUserCredits][debug] Fetching credits for user UUID:', userProfile.id);
+      
       try {
-        // Simple query using the user_id from user profile
-        const { data: credits, error } = await supabase
+        // Direct join query - exactly like your SQL
+        const { data: result, error } = await supabase
           .from('user_credits')
-          .select('current_balance, free_credits, paid_credits, subscription_plan, next_reset_date, created_at, updated_at, id, user_id')
-          .eq('user_id', userProfile.user_id)
-          .maybeSingle();
+          .select(`
+            current_balance,
+            free_credits,
+            paid_credits,
+            subscription_plan,
+            next_reset_date,
+            created_at,
+            updated_at,
+            id,
+            user_id,
+            users!inner(id)
+          `)
+          .eq('users.id', userProfile.id)
+          .single();
 
-        console.log('[useUserCredits][debug] Credits query result:', credits, 'error:', error);
+        console.log('[useUserCredits][debug] Query result:', result, 'error:', error);
 
         if (error) {
           console.error('[useUserCredits] Error fetching credits:', error);
           return null;
         }
 
-        if (!credits) {
-          console.warn('[useUserCredits] No credits found for user_id:', userProfile.user_id);
+        if (!result) {
+          console.warn('[useUserCredits] No credits found for user UUID:', userProfile.id);
           return null;
         }
 
-        console.log('[useUserCredits] Successfully fetched credits:', credits);
-        return credits as UserCreditsData;
-        
+        console.log('[useUserCredits] Successfully fetched credits:', result);
+        return result as UserCreditsData;
+
       } catch (err) {
         console.error('[useUserCredits] Exception during fetch:', err);
         return null;
       }
     },
-    enabled: !!userProfile?.user_id,
+    enabled: !!userProfile?.id,
     staleTime: 30000,
     refetchInterval: 60000,
     retry: 2,
