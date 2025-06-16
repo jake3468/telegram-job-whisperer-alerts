@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Repeat2, Send, MoreHorizontal, User, Copy, Image as ImageIcon } from 'lucide-react';
@@ -25,6 +26,7 @@ interface LinkedInPostVariationProps {
   userProfile?: UserProfile | null;
   userData?: UserData | null;
   variationNumber: number;
+  postId?: string;
 }
 
 const LinkedInPostVariation = ({
@@ -32,9 +34,12 @@ const LinkedInPostVariation = ({
   content,
   userProfile,
   userData,
-  variationNumber
+  variationNumber,
+  postId
 }: LinkedInPostVariationProps) => {
   const { toast } = useToast();
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
   // Create display name from user data
   const displayName = userData?.first_name && userData?.last_name 
@@ -61,39 +66,84 @@ const LinkedInPostVariation = ({
     }
   };
 
-  const handleGetImage = async () => {
-    const webhookUrl = "https://n8n.srv834502.hstgr.cloud/webhook-test/f660f913-42ca-41bd-8fa1-038c201261e4";
+  const handleCopyImage = async () => {
+    if (!generatedImage) return;
     
     try {
-      console.log("Triggering image generation webhook for post", variationNumber);
+      // Convert base64 to blob
+      const response = await fetch(generatedImage);
+      const blob = await response.blob();
       
-      const response = await fetch(webhookUrl, {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          [blob.type]: blob
+        })
+      ]);
+      
+      toast({
+        title: "Image Copied!",
+        description: "Image copied to clipboard successfully."
+      });
+    } catch (err) {
+      console.error('Failed to copy image:', err);
+      toast({
+        title: "Error",
+        description: "Failed to copy image to clipboard.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleGetImage = async () => {
+    setIsGeneratingImage(true);
+    
+    try {
+      console.log("Triggering image generation via edge function for post", variationNumber);
+      
+      const response = await fetch('/functions/v1/linkedin-image-webhook', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
         },
-        mode: "no-cors",
         body: JSON.stringify({
           post_heading: heading,
           post_content: content,
           variation_number: variationNumber,
           user_name: displayName,
-          timestamp: new Date().toISOString(),
-          triggered_from: window.location.origin,
+          post_id: postId,
+          source: 'result_page'
         }),
       });
 
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to trigger image generation');
+      }
+
       toast({
         title: "Image Generation Started",
-        description: `Image generation for Post ${variationNumber} has been triggered. Please check your workflow for updates.`
+        description: `Image generation for Post ${variationNumber} has been triggered. The image will appear here once ready.`
       });
+
+      // Set up polling to check for the generated image
+      // You'll need to implement a way for N8N to send the image back
+      // For now, we'll simulate receiving the image after some time
+      setTimeout(() => {
+        // This would be replaced with actual image data from N8N
+        // setGeneratedImage('data:image/png;base64,...');
+      }, 5000);
+
     } catch (error) {
-      console.error('Error triggering image generation webhook:', error);
+      console.error('Error triggering image generation:', error);
       toast({
         title: "Error",
         description: "Failed to trigger image generation. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setIsGeneratingImage(false);
     }
   };
 
@@ -130,6 +180,33 @@ const LinkedInPostVariation = ({
               {content}
             </div>
           </div>
+
+          {/* Generated Image Display */}
+          {generatedImage && (
+            <div className="mb-4">
+              <div className="relative">
+                <img 
+                  src={generatedImage} 
+                  alt={`Generated image for ${heading}`}
+                  className="w-full rounded-lg shadow-sm"
+                />
+                <Button
+                  onClick={handleCopyImage}
+                  size="sm"
+                  className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white"
+                >
+                  <Copy className="w-3 h-3" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Loading indicator for image generation */}
+          {isGeneratingImage && (
+            <div className="mb-4 p-4 bg-gray-50 rounded-lg text-center">
+              <div className="text-sm text-gray-600">Generating image...</div>
+            </div>
+          )}
 
           {/* Engagement Stats */}
           <div className="flex items-center justify-between py-2 border-t border-b border-slate-100 mb-2">
@@ -186,12 +263,17 @@ const LinkedInPostVariation = ({
         
         <Button 
           onClick={handleGetImage} 
+          disabled={isGeneratingImage}
           variant="outline" 
-          className="flex-1 border-teal-400/25 text-sm h-10 bg-amber-500 hover:bg-amber-400 text-gray-950"
+          className="flex-1 border-teal-400/25 text-sm h-10 bg-amber-500 hover:bg-amber-400 text-gray-950 disabled:opacity-50"
         >
           <ImageIcon className="w-4 h-4 mr-2" />
-          <span className="hidden sm:inline">Get Image for Post</span>
-          <span className="sm:hidden">Get Image</span>
+          <span className="hidden sm:inline">
+            {isGeneratingImage ? 'Generating...' : 'Get Image for Post'}
+          </span>
+          <span className="sm:hidden">
+            {isGeneratingImage ? 'Generating...' : 'Get Image'}
+          </span>
         </Button>
       </div>
     </div>

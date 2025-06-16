@@ -481,6 +481,7 @@ const LinkedInPosts = () => {
                             userProfile={userProfile}
                             userData={userData}
                             variationNumber={1}
+                            postId={currentPostId || undefined}
                           />
                           
                           <LinkedInPostVariation
@@ -489,6 +490,7 @@ const LinkedInPosts = () => {
                             userProfile={userProfile}
                             userData={userData}
                             variationNumber={2}
+                            postId={currentPostId || undefined}
                           />
                           
                           <LinkedInPostVariation
@@ -497,6 +499,7 @@ const LinkedInPosts = () => {
                             userProfile={userProfile}
                             userData={userData}
                             variationNumber={3}
+                            postId={currentPostId || undefined}
                           />
                         </div>
                       </CardContent>

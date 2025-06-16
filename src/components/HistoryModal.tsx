@@ -140,30 +140,33 @@ const HistoryModal = ({
   };
 
   const handleGetImageForPost = async (item: HistoryItem, postNumber: number) => {
-    const webhookUrl = "https://n8n.srv834502.hstgr.cloud/webhook-test/f660f913-42ca-41bd-8fa1-038c201261e4";
-    
     const heading = item[`post_heading_${postNumber}` as keyof HistoryItem] as string;
     const content = item[`post_content_${postNumber}` as keyof HistoryItem] as string;
     
     try {
-      console.log(`Triggering image generation webhook for post ${postNumber} from history`);
+      console.log(`Triggering image generation via edge function for post ${postNumber} from history`);
       
-      const response = await fetch(webhookUrl, {
+      const response = await fetch('/functions/v1/linkedin-image-webhook', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
         },
-        mode: "no-cors",
         body: JSON.stringify({
           post_heading: heading,
           post_content: content,
           variation_number: postNumber,
           user_name: 'Professional User',
-          timestamp: new Date().toISOString(),
-          triggered_from: window.location.origin,
+          post_id: item.id,
           source: 'history'
         }),
       });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to trigger image generation');
+      }
 
       toast({
         title: "Image Generation Started",
