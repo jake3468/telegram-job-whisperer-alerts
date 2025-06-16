@@ -18,36 +18,25 @@ type UserCreditsData = {
 };
 
 export const useUserCredits = () => {
-  const { userProfile } = useUserProfile(); // This should contain the UUID from users table
+  const { userProfile } = useUserProfile();
   
   return useQuery({
-    queryKey: ['user_credits', userProfile?.id], // assuming userProfile.id is the UUID
+    queryKey: ['user_credits', userProfile?.user_id], // Use user_id not id
     queryFn: async () => {
-      if (!userProfile?.id) {
-        console.warn('[useUserCredits] No user UUID available');
+      if (!userProfile?.user_id) {
+        console.warn('[useUserCredits] No user_id available');
         return null;
       }
       
-      console.log('[useUserCredits][debug] Fetching credits for user UUID:', userProfile.id);
+      console.log('[useUserCredits][debug] Fetching credits for user_id:', userProfile.user_id);
       
       try {
-        // Direct join query - exactly like your SQL
+        // Simple direct query to user_credits table
         const { data: result, error } = await supabase
           .from('user_credits')
-          .select(`
-            current_balance,
-            free_credits,
-            paid_credits,
-            subscription_plan,
-            next_reset_date,
-            created_at,
-            updated_at,
-            id,
-            user_id,
-            users!inner(id)
-          `)
-          .eq('users.id', userProfile.id)
-          .single();
+          .select('*')
+          .eq('user_id', userProfile.user_id)
+          .maybeSingle();
 
         console.log('[useUserCredits][debug] Query result:', result, 'error:', error);
 
@@ -57,7 +46,7 @@ export const useUserCredits = () => {
         }
 
         if (!result) {
-          console.warn('[useUserCredits] No credits found for user UUID:', userProfile.id);
+          console.warn('[useUserCredits] No credits found for user_id:', userProfile.user_id);
           return null;
         }
 
@@ -69,7 +58,7 @@ export const useUserCredits = () => {
         return null;
       }
     },
-    enabled: !!userProfile?.id,
+    enabled: !!userProfile?.user_id, // Enable when user_id is available
     staleTime: 30000,
     refetchInterval: 60000,
     retry: 2,
