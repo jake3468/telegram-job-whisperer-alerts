@@ -21,7 +21,7 @@ export const useUserCredits = () => {
   const { userProfile } = useUserProfile();
   
   return useQuery({
-    queryKey: ['user_credits', userProfile?.user_id], // Use user_id not id
+    queryKey: ['user_credits', userProfile?.user_id],
     queryFn: async () => {
       if (!userProfile?.user_id) {
         console.warn('[useUserCredits] No user_id available');
@@ -31,34 +31,33 @@ export const useUserCredits = () => {
       console.log('[useUserCredits][debug] Fetching credits for user_id:', userProfile.user_id);
       
       try {
-        // Simple direct query to user_credits table
-        const { data: result, error } = await supabase
+        const { data: credits, error } = await supabase
           .from('user_credits')
-          .select('*')
+          .select('current_balance, free_credits, paid_credits, subscription_plan, next_reset_date, created_at, updated_at, id, user_id')
           .eq('user_id', userProfile.user_id)
           .maybeSingle();
 
-        console.log('[useUserCredits][debug] Query result:', result, 'error:', error);
+        console.log('[useUserCredits][debug] Credits query result:', credits, 'error:', error);
 
         if (error) {
           console.error('[useUserCredits] Error fetching credits:', error);
           return null;
         }
 
-        if (!result) {
+        if (!credits) {
           console.warn('[useUserCredits] No credits found for user_id:', userProfile.user_id);
           return null;
         }
 
-        console.log('[useUserCredits] Successfully fetched credits:', result);
-        return result as UserCreditsData;
+        console.log('[useUserCredits] Successfully fetched credits:', credits);
+        return credits as UserCreditsData;
 
       } catch (err) {
         console.error('[useUserCredits] Exception during fetch:', err);
         return null;
       }
     },
-    enabled: !!userProfile?.user_id, // Enable when user_id is available
+    enabled: !!userProfile?.user_id,
     staleTime: 30000,
     refetchInterval: 60000,
     retry: 2,
