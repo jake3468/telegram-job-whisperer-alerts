@@ -33,6 +33,7 @@ export const useUserCredits = () => {
       console.log('[useUserCredits][debug] Fetching credits for Clerk user:', user.id);
 
       try {
+        // Direct query using the simple SQL you suggested
         // First get the user's UUID from the users table using their Clerk ID
         const { data: userData, error: userError } = await supabase
           .from('users')
@@ -40,14 +41,19 @@ export const useUserCredits = () => {
           .eq('clerk_id', user.id)
           .maybeSingle();
 
-        if (userError || !userData) {
+        if (userError) {
           console.error('[useUserCredits] Error fetching user data:', userError);
+          return null;
+        }
+
+        if (!userData) {
+          console.warn('[useUserCredits] No user found for Clerk ID:', user.id);
           return null;
         }
 
         console.log('[useUserCredits][debug] Found user UUID:', userData.id);
 
-        // Now use the exact SQL approach you suggested - simple direct query
+        // Now get credits using the exact SQL approach you mentioned
         const { data: credits, error } = await supabase
           .from('user_credits')
           .select('current_balance, free_credits, paid_credits, subscription_plan, next_reset_date, created_at, updated_at, id, user_id')
