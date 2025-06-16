@@ -29,6 +29,20 @@ export function useClerkSupabaseSync() {
             const masked = jwt.length > 10 ? jwt.substring(0,5) + "..." + jwt.substring(jwt.length-5) : "[short]";
             await setClerkToken(jwt);
             console.log(`[useClerkSupabaseSync] Clerk JWT was set (masked): ${masked} for Clerk user ID: ${userId}`);
+            
+            // Debug: Log JWT claims structure (safely)
+            try {
+              const payload = JSON.parse(atob(jwt.split('.')[1]));
+              console.log('[useClerkSupabaseSync] JWT claims structure:', {
+                sub: payload.sub ? 'present' : 'missing',
+                iss: payload.iss ? 'present' : 'missing',
+                aud: payload.aud ? 'present' : 'missing',
+                exp: payload.exp ? 'present' : 'missing',
+                iat: payload.iat ? 'present' : 'missing'
+              });
+            } catch (parseError) {
+              console.warn('[useClerkSupabaseSync] Could not parse JWT for debugging');
+            }
           }
         } else {
           console.warn("[useClerkSupabaseSync] Not signed in or getToken missing. Using Supabase ANON key only.");

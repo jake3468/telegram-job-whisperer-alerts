@@ -1,13 +1,20 @@
 
 import { BadgeDollarSign } from "lucide-react";
 import { useUserCredits } from "@/hooks/useUserCredits";
+import { useClerkSupabaseDebug } from "@/hooks/useClerkSupabaseDebug";
 import { useUser } from '@clerk/clerk-react';
+import { Button } from "@/components/ui/button";
 
 const CreditBalanceDisplay = () => {
   const { data: credits, isLoading, error } = useUserCredits();
   const { user } = useUser();
+  const { debugClerkSupabaseIntegration } = useClerkSupabaseDebug();
 
   console.log('[CreditBalanceDisplay] Render - credits:', credits, 'isLoading:', isLoading, 'error:', error);
+
+  const handleDebug = () => {
+    debugClerkSupabaseIntegration();
+  };
 
   if (isLoading) {
     return (
@@ -28,6 +35,14 @@ const CreditBalanceDisplay = () => {
           <BadgeDollarSign className="w-5 h-5" />
           <span className="text-xs">Error loading credits</span>
         </div>
+        <Button 
+          onClick={handleDebug} 
+          variant="ghost" 
+          size="sm" 
+          className="text-xs mt-1 text-rose-400 hover:text-rose-300"
+        >
+          Debug Connection
+        </Button>
       </div>
     );
   }
@@ -39,6 +54,14 @@ const CreditBalanceDisplay = () => {
           <BadgeDollarSign className="w-5 h-5" />
           No credits data available
         </div>
+        <Button 
+          onClick={handleDebug} 
+          variant="ghost" 
+          size="sm" 
+          className="text-xs mt-1 text-yellow-400 hover:text-yellow-300"
+        >
+          Debug Connection
+        </Button>
       </div>
     );
   }
