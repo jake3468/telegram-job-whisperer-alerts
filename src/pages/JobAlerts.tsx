@@ -17,9 +17,18 @@ const JobAlerts = () => {
       // Get IANA timezone using Intl.DateTimeFormat
       const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       
+      // Map legacy timezone names to modern IANA standard
+      const timezoneMapping: { [key: string]: string } = {
+        'Asia/Calcutta': 'Asia/Kolkata',
+        // Add other legacy mappings if needed in the future
+      };
+      
+      // Check if we have a mapping for the detected timezone
+      const modernTimezone = timezoneMapping[detectedTimezone] || detectedTimezone;
+      
       // Validate that it's a proper IANA timezone format
-      if (detectedTimezone && detectedTimezone.includes('/')) {
-        return detectedTimezone;
+      if (modernTimezone && modernTimezone.includes('/')) {
+        return modernTimezone;
       }
       
       // Fallback to UTC if detection fails
