@@ -27,89 +27,46 @@ export const useUserCredits = () => {
         return null;
       }
 
-      console.log('[useUserCredits][debug] Starting query for user_profile_id:', userProfile.id);
+      console.log('[useUserCredits][debug] Fetching credits for user_profile_id:', userProfile.id);
 
       try {
-        // First, let's check if the user_profile_id exists in user_credits table
-        const { data: existingCredits, error: checkError } = await supabase
+        // Simply fetch the existing credits record - no initialization needed
+        const { data: credits, error } = await supabase
           .from('user_credits')
           .select('*')
           .eq('user_profile_id', userProfile.id)
           .maybeSingle();
 
-        console.log('[useUserCredits][debug] Existing credits check:', existingCredits, 'error:', checkError);
+        console.log('[useUserCredits][debug] Credits query result:', credits, 'error:', error);
 
-        // If there's an RLS error, log it specifically
-        if (checkError) {
-          console.error('[useUserCredits] RLS or other error:', checkError);
-          
-          // Try to get more debugging info
-          const debugInfo = {
-            error_code: checkError.code,
-            error_message: checkError.message,
-            user_profile_id: userProfile.id,
-            clerk_user_id: user?.id,
-          };
-          
-          console.error('[useUserCredits] Debug info:', debugInfo);
-          return { __error: checkError, __debug: debugInfo };
+        if (error) {
+          console.error('[useUserCredits] Error fetching credits:', error);
+          return { __error: error, __debug: { action: 'fetch_failed', user_profile_id: userProfile.id } };
         }
 
-        // If no credit record found, try to initialize
-        if (!existingCredits) {
-          console.log('[useUserCredits] No credit record found, attempting to initialize...');
-          
-          try {
-            // Use the database function to initialize credits
-            const { data: initResult, error: initError } = await supabase
-              .rpc('initialize_user_credits', { p_user_profile_id: userProfile.id });
-            
-            console.log('[useUserCredits][debug] Initialize credits result:', initResult, 'error:', initError);
-            
-            if (initError) {
-              console.error('[useUserCredits] Failed to initialize credits:', initError);
-              return { __error: initError, __debug: { action: 'initialize_failed', user_profile_id: userProfile.id } };
-            }
-            
-            // Now query again to get the newly created record
-            const { data: newData, error: newError } = await supabase
-              .from('user_credits')
-              .select('*')
-              .eq('user_profile_id', userProfile.id)
-              .maybeSingle();
-            
-            if (newError) {
-              console.error('[useUserCredits] Error fetching newly created credits:', newError);
-              return { __error: newError, __debug: { action: 'fetch_after_init_failed', user_profile_id: userProfile.id } };
-            }
-            
-            console.log('[useUserCredits] Successfully initialized and retrieved credits:', newData);
-            return newData;
-          } catch (initErr) {
-            console.error('[useUserCredits] Exception during initialization:', initErr);
-            return { __error: initErr, __debug: { action: 'init_exception', user_profile_id: userProfile.id } };
-          }
+        if (!credits) {
+          console.warn('[useUserCredits] No credits found for user_profile_id:', userProfile.id);
+          return { __error: { message: 'No credits found' }, __debug: { action: 'no_credits_found', user_profile_id: userProfile.id } };
         }
 
-        // Success - credits found!
-        console.log('[useUserCredits] Successfully found credits:', existingCredits);
-        return existingCredits;
+        console.log('[useUserCredits] Successfully fetched credits:', credits);
+        return credits;
         
       } catch (err) {
-        console.error('[useUserCredits] Caught exception in main try block:', err);
-        return { __error: err, __debug: { action: 'main_exception', user_profile_id: userProfile.id } };
+        console.error('[useUserCredits] Exception during fetch:', err);
+        return { __error: err, __debug: { action: 'fetch_exception', user_profile_id: userProfile.id } };
       }
     },
     enabled: !!userProfile?.id && !userProfileLoading && !!user,
     staleTime: 30000,
-    refetchInterval: 60000, // Increased interval to reduce spam
+    refetchInterval: 60000,
     retry: (failureCount, error: any) => {
       console.log('[useUserCredits] Retry attempt:', failureCount, 'error:', error);
       // Don't retry RLS errors
       if (error?.code === 'PGRST301' || error?.code === 'PGRST116') {
         return false;
       }
-      return failureCount < 2; // Reduced retry attempts
+      return failureCount < 2;
     },
   });
 };

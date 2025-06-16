@@ -33,15 +33,10 @@ const CreditBalanceDisplay = () => {
     
     if (detailError.code === "PGRST301") {
       msg = "Not authorized to view credits. Please check authentication.";
-    } else if (detailError.code === "PGRST116") {
-      msg = "No credits found. Initializing...";
+    } else if (detailError.message === "No credits found") {
+      msg = "Credits not found. Please contact support.";
     } else if (detailError.message) {
       msg = `Error: ${detailError.message}`;
-    }
-    
-    // Add debug info for development
-    if (debugInfo) {
-      msg += ` (Debug: ${debugInfo.action || 'unknown'})`;
     }
     
     return (
@@ -50,7 +45,6 @@ const CreditBalanceDisplay = () => {
           <BadgeDollarSign className="w-5 h-5" />
           <span className="text-xs">{msg}</span>
         </div>
-        {/* Show profile ID for debugging */}
         {userProfile?.id && (
           <div className="text-xs opacity-60 mt-1">
             Profile ID: {userProfile.id.substring(0, 8)}...
@@ -65,7 +59,7 @@ const CreditBalanceDisplay = () => {
       <div className="flex flex-col text-yellow-400 font-orbitron text-xs">
         <div className="flex items-center gap-2">
           <BadgeDollarSign className="w-5 h-5" />
-          Initializing credits...
+          No credits data available
         </div>
       </div>
     );
