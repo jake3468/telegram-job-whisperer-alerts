@@ -3,8 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@clerk/clerk-react';
 
-// Define a simple type for the credits response
-type UserCreditsResponse = {
+// Simple type for credits response
+type UserCreditsData = {
   id: string;
   user_id: string;
   current_balance: number;
@@ -14,7 +14,12 @@ type UserCreditsResponse = {
   next_reset_date: string;
   created_at: string;
   updated_at: string;
-} | null;
+};
+
+type ErrorResponse = {
+  __error: any;
+  __debug: any;
+};
 
 // Fetches current user credit info from Supabase
 export const useUserCredits = () => {
@@ -28,7 +33,7 @@ export const useUserCredits = () => {
 
   return useQuery({
     queryKey: ['user_credits', user?.id],
-    queryFn: async (): Promise<UserCreditsResponse | { __error: any; __debug: any }> => {
+    queryFn: async (): Promise<UserCreditsData | null | ErrorResponse> => {
       if (!user?.id) {
         console.warn('[useUserCredits] No user.id, returning null');
         return null;
@@ -51,7 +56,7 @@ export const useUserCredits = () => {
 
         console.log('[useUserCredits][debug] Found user ID:', userData.id);
 
-        // Now fetch the credits using the user's ID
+        // Now fetch the credits using the user's ID (after migration, this should be user_id, not user_profile_id)
         const { data: credits, error } = await supabase
           .from('user_credits')
           .select('*')
@@ -71,7 +76,7 @@ export const useUserCredits = () => {
         }
 
         console.log('[useUserCredits] Successfully fetched credits:', credits);
-        return credits as UserCreditsResponse;
+        return credits as UserCreditsData;
         
       } catch (err) {
         console.error('[useUserCredits] Exception during fetch:', err);
