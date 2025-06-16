@@ -220,9 +220,14 @@ export type Database = {
           audience: string | null
           created_at: string
           id: string
-          linkedin_post: string | null
           opinion: string | null
           personal_story: string | null
+          post_content_1: string | null
+          post_content_2: string | null
+          post_content_3: string | null
+          post_heading_1: string | null
+          post_heading_2: string | null
+          post_heading_3: string | null
           tone: string | null
           topic: string
           updated_at: string
@@ -232,9 +237,14 @@ export type Database = {
           audience?: string | null
           created_at?: string
           id?: string
-          linkedin_post?: string | null
           opinion?: string | null
           personal_story?: string | null
+          post_content_1?: string | null
+          post_content_2?: string | null
+          post_content_3?: string | null
+          post_heading_1?: string | null
+          post_heading_2?: string | null
+          post_heading_3?: string | null
           tone?: string | null
           topic: string
           updated_at?: string
@@ -244,9 +254,14 @@ export type Database = {
           audience?: string | null
           created_at?: string
           id?: string
-          linkedin_post?: string | null
           opinion?: string | null
           personal_story?: string | null
+          post_content_1?: string | null
+          post_content_2?: string | null
+          post_content_3?: string | null
+          post_heading_1?: string | null
+          post_heading_2?: string | null
+          post_heading_3?: string | null
           tone?: string | null
           topic?: string
           updated_at?: string
