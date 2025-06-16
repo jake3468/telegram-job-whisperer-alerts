@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,11 @@ interface LinkedInPostData {
   post_content_3: string | null;
 }
 
+interface UserData {
+  first_name: string | null;
+  last_name: string | null;
+}
+
 const LinkedInPosts = () => {
   const { user } = useUser();
   const { toast } = useToast();
@@ -42,6 +48,7 @@ const LinkedInPosts = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [postsData, setPostsData] = useState<LinkedInPostData | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
@@ -52,6 +59,32 @@ const LinkedInPosts = () => {
     { value: 'bold', label: 'Bold & Opinionated' },
     { value: 'thoughtful', label: 'Thoughtful & Reflective' }
   ];
+
+  // Fetch user data when component mounts
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!user?.id) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('first_name, last_name')
+          .eq('clerk_id', user.id)
+          .single();
+        
+        if (error) {
+          console.error('Error fetching user data:', error);
+          return;
+        }
+        
+        setUserData(data);
+      } catch (err) {
+        console.error('Error fetching user data:', err);
+      }
+    };
+
+    fetchUserData();
+  }, [user?.id]);
 
   // Check if all posts are ready (all 6 columns have non-null values)
   const areAllPostsReady = (data: LinkedInPostData) => {
@@ -64,6 +97,8 @@ const LinkedInPosts = () => {
   useEffect(() => {
     if (!currentPostId) return;
 
+    console.log('Setting up real-time subscription for post ID:', currentPostId);
+
     const channel = supabase
       .channel('linkedin-post-updates')
       .on('postgres_changes', {
@@ -72,22 +107,37 @@ const LinkedInPosts = () => {
         table: 'job_linkedin',
         filter: `id=eq.${currentPostId}`
       }, (payload) => {
-        console.log('LinkedIn post updated:', payload);
+        console.log('LinkedIn post updated via real-time:', payload);
         
         const newData = payload.new as LinkedInPostData;
+        console.log('New data received:', {
+          post_heading_1: newData.post_heading_1,
+          post_content_1: !!newData.post_content_1,
+          post_heading_2: newData.post_heading_2,
+          post_content_2: !!newData.post_content_2,
+          post_heading_3: newData.post_heading_3,
+          post_content_3: !!newData.post_content_3,
+        });
+        
         setPostsData(newData);
 
         if (areAllPostsReady(newData)) {
+          console.log('All posts are ready, stopping loading state');
           setIsGenerating(false);
           toast({
             title: "LinkedIn Posts Generated!",
             description: "Your 3 LinkedIn post variations have been created successfully."
           });
+        } else {
+          console.log('Not all posts ready yet, continuing to wait...');
         }
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Real-time subscription status:', status);
+      });
 
     return () => {
+      console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
   }, [currentPostId, toast]);
@@ -382,6 +432,7 @@ const LinkedInPosts = () => {
                             heading={postsData.post_heading_1!}
                             content={postsData.post_content_1!}
                             userProfile={userProfile}
+                            userData={userData}
                             variationNumber={1}
                           />
                           
@@ -389,6 +440,7 @@ const LinkedInPosts = () => {
                             heading={postsData.post_heading_2!}
                             content={postsData.post_content_2!}
                             userProfile={userProfile}
+                            userData={userData}
                             variationNumber={2}
                           />
                           
@@ -396,6 +448,7 @@ const LinkedInPosts = () => {
                             heading={postsData.post_heading_3!}
                             content={postsData.post_content_3!}
                             userProfile={userProfile}
+                            userData={userData}
                             variationNumber={3}
                           />
                         </div>

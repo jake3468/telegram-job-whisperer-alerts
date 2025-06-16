@@ -1,7 +1,7 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, MessageCircle, Repeat2, Send, MoreHorizontal, User, Copy } from 'lucide-react';
+import { Heart, MessageCircle, Repeat2, Send, MoreHorizontal, User, Copy, Image as ImageIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface UserProfile {
@@ -14,16 +14,28 @@ interface UserProfile {
   created_at: string | null;
 }
 
+interface UserData {
+  first_name: string | null;
+  last_name: string | null;
+}
+
 interface LinkedInPostVariationProps {
   heading: string;
   content: string;
   userProfile?: UserProfile | null;
+  userData?: UserData | null;
   variationNumber: number;
 }
 
-const LinkedInPostVariation = ({ heading, content, userProfile, variationNumber }: LinkedInPostVariationProps) => {
+const LinkedInPostVariation = ({ heading, content, userProfile, userData, variationNumber }: LinkedInPostVariationProps) => {
   const { toast } = useToast();
-  const userName = userProfile ? 'Professional User' : 'Professional User';
+  
+  // Create display name from user data
+  const displayName = userData?.first_name && userData?.last_name 
+    ? `${userData.first_name} ${userData.last_name}`
+    : userData?.first_name 
+    ? userData.first_name
+    : 'Professional User';
 
   const handleCopyContent = async () => {
     if (!content) return;
@@ -64,11 +76,11 @@ const LinkedInPostVariation = ({ heading, content, userProfile, variationNumber 
           {/* Header */}
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-slate-300 rounded-full flex items-center justify-center">
-                <User className="w-6 h-6 text-slate-600" />
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                <User className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h4 className="font-semibold text-slate-900 text-sm">{userName}</h4>
+                <h4 className="font-semibold text-slate-900 text-sm">{displayName}</h4>
                 <p className="text-xs text-slate-500">Professional • 1st</p>
                 <p className="text-xs text-slate-500">2m • 🌐</p>
               </div>
@@ -140,6 +152,7 @@ const LinkedInPostVariation = ({ heading, content, userProfile, variationNumber 
           variant="outline" 
           className="flex-1 border-teal-400/25 text-teal-300 hover:bg-teal-400/10 text-sm h-10"
         >
+          <ImageIcon className="w-4 h-4 mr-2" />
           Get Image for Post
         </Button>
       </div>
