@@ -8,7 +8,6 @@ const CreditBalanceDisplay = () => {
   const { user } = useUser();
 
   console.log('[CreditBalanceDisplay] Render - credits:', credits, 'isLoading:', isLoading, 'error:', error);
-  console.log('[CreditBalanceDisplay] Clerk user:', user?.id);
 
   if (isLoading) {
     return (
@@ -21,35 +20,14 @@ const CreditBalanceDisplay = () => {
     );
   }
 
-  // Handle errors with more detailed messaging
-  const detailError = (credits as any)?.__error ?? error;
-  const debugInfo = (credits as any)?.__debug;
-  
-  if (detailError) {
-    console.error("Error loading credits:", detailError);
-    console.error("Debug info:", debugInfo);
-    
-    let msg = "Error loading credits.";
-    
-    if (detailError.code === "PGRST301") {
-      msg = "Not authorized to view credits. Please check authentication.";
-    } else if (detailError.message === "No credits found") {
-      msg = "Credits not found. Please contact support.";
-    } else if (detailError.message) {
-      msg = `Error: ${detailError.message}`;
-    }
-    
+  if (error) {
+    console.error("Error loading credits:", error);
     return (
       <div className="flex flex-col text-rose-400 font-orbitron text-xs">
         <div className="flex items-center gap-2">
           <BadgeDollarSign className="w-5 h-5" />
-          <span className="text-xs">{msg}</span>
+          <span className="text-xs">Error loading credits</span>
         </div>
-        {user?.id && (
-          <div className="text-xs opacity-60 mt-1">
-            Clerk ID: {user.id.substring(0, 8)}...
-          </div>
-        )}
       </div>
     );
   }
@@ -65,8 +43,7 @@ const CreditBalanceDisplay = () => {
     );
   }
 
-  // Ensure we have a valid credits object with current_balance
-  const balance = (credits as any)?.current_balance ?? 0;
+  const balance = credits.current_balance ?? 0;
 
   return (
     <div className="flex flex-col gap-0.5 text-fuchsia-200 font-orbitron text-sm px-2">

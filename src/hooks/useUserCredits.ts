@@ -16,20 +16,11 @@ type UserCreditsData = {
   updated_at: string;
 };
 
-type ErrorResponse = {
-  __error: any;
-  __debug: any;
-};
-
-// Fetches current user credit info from Supabase using only user UUID
+// Fetches current user credit info from Supabase using direct SQL approach
 export const useUserCredits = () => {
   const { user } = useUser();
 
   console.log('[useUserCredits][debug] Clerk user:', user?.id);
-
-  if (!user) {
-    console.warn('[useUserCredits][warn] Clerk user not found! You must be signed in for credits to work.');
-  }
 
   return useQuery({
     queryKey: ['user_credits', user?.id],
@@ -47,52 +38,45 @@ export const useUserCredits = () => {
           .from('users')
           .select('id')
           .eq('clerk_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (userError || !userData) {
           console.error('[useUserCredits] Error fetching user data:', userError);
-          return { __error: userError || { message: 'User not found' }, __debug: { action: 'user_lookup_failed', clerk_id: user.id } };
+          return null;
         }
 
         console.log('[useUserCredits][debug] Found user UUID:', userData.id);
 
-        // Now fetch credits using ONLY the user UUID - exactly as you suggested
+        // Now use the exact SQL approach you suggested - simple direct query
         const { data: credits, error } = await supabase
           .from('user_credits')
-          .select('*')
+          .select('current_balance, free_credits, paid_credits, subscription_plan, next_reset_date, created_at, updated_at, id, user_id')
           .eq('user_id', userData.id)
-          .single();
+          .maybeSingle();
 
         console.log('[useUserCredits][debug] Credits query result:', credits, 'error:', error);
 
         if (error) {
           console.error('[useUserCredits] Error fetching credits:', error);
-          return { __error: error, __debug: { action: 'fetch_failed', user_uuid: userData.id } };
+          return null;
         }
 
         if (!credits) {
           console.warn('[useUserCredits] No credits found for user UUID:', userData.id);
-          return { __error: { message: 'No credits found' }, __debug: { action: 'no_credits_found', user_uuid: userData.id } };
+          return null;
         }
 
         console.log('[useUserCredits] Successfully fetched credits:', credits);
-        return credits;
+        return credits as UserCreditsData;
         
       } catch (err) {
         console.error('[useUserCredits] Exception during fetch:', err);
-        return { __error: err, __debug: { action: 'fetch_exception', clerk_id: user.id } };
+        return null;
       }
     },
     enabled: !!user?.id,
     staleTime: 30000,
     refetchInterval: 60000,
-    retry: (failureCount, error: any) => {
-      console.log('[useUserCredits] Retry attempt:', failureCount, 'error:', error);
-      // Don't retry RLS errors
-      if (error?.code === 'PGRST301' || error?.code === 'PGRST116') {
-        return false;
-      }
-      return failureCount < 2;
-    },
+    retry: 2,
   });
 };
