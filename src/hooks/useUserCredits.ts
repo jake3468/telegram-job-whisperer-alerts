@@ -37,43 +37,43 @@ export const useUserCredits = () => {
           .from('user_credits')
           .select('current_balance, free_credits, paid_credits, subscription_plan, next_reset_date, created_at, updated_at, id, user_id')
           .eq('user_id', userProfile.user_id)
-          .maybeSingle();
+          .single();
 
         console.log('[useUserCredits] Credits query result:', credits, 'error:', error);
 
         if (error) {
           console.error('[useUserCredits] Error fetching credits:', error);
-          return null;
-        }
-
-        if (!credits) {
-          console.warn('[useUserCredits] No credits found for user_id:', userProfile.user_id);
           
-          // Try to initialize credits if none exist
-          try {
-            console.log('[useUserCredits] Attempting to initialize credits...');
-            const { data: initResult, error: initError } = await supabase.rpc('initialize_user_credits', {
-              p_user_id: userProfile.user_id
-            });
+          // If no record found, try to initialize credits
+          if (error.code === 'PGRST116') {
+            console.log('[useUserCredits] No credits found, attempting to initialize...');
             
-            console.log('[useUserCredits] Initialize result:', initResult, 'error:', initError);
-            
-            if (!initError) {
-              // Retry the query after initialization
-              const { data: retryCredits, error: retryError } = await supabase
-                .from('user_credits')
-                .select('current_balance, free_credits, paid_credits, subscription_plan, next_reset_date, created_at, updated_at, id, user_id')
-                .eq('user_id', userProfile.user_id)
-                .maybeSingle();
-                
-              if (!retryError && retryCredits) {
-                console.log('[useUserCredits] Successfully fetched credits after initialization:', retryCredits);
-                return retryCredits as UserCreditsData;
+            try {
+              const { data: initResult, error: initError } = await supabase.rpc('initialize_user_credits', {
+                p_user_id: userProfile.user_id
+              });
+              
+              console.log('[useUserCredits] Initialize result:', initResult, 'error:', initError);
+              
+              if (!initError) {
+                // Retry the query after initialization
+                const { data: retryCredits, error: retryError } = await supabase
+                  .from('user_credits')
+                  .select('current_balance, free_credits, paid_credits, subscription_plan, next_reset_date, created_at, updated_at, id, user_id')
+                  .eq('user_id', userProfile.user_id)
+                  .single();
+                  
+                if (!retryError && retryCredits) {
+                  console.log('[useUserCredits] Successfully fetched credits after initialization:', retryCredits);
+                  return retryCredits as UserCreditsData;
+                }
               }
+            } catch (initError) {
+              console.error('[useUserCredits] Failed to initialize credits:', initError);
             }
-          } catch (initError) {
-            console.error('[useUserCredits] Failed to initialize credits:', initError);
           }
+          
+          return null;
         }
 
         if (credits) {
