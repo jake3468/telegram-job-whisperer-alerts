@@ -1,9 +1,9 @@
-
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Repeat2, Send, MoreHorizontal, User, Copy, Image as ImageIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UserProfile {
   id: string;
@@ -100,26 +100,26 @@ const LinkedInPostVariation = ({
     try {
       console.log("Triggering image generation via edge function for post", variationNumber);
       
-      const response = await fetch('/functions/v1/linkedin-image-webhook', {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('linkedin-image-webhook', {
+        body: {
           post_heading: heading,
           post_content: content,
           variation_number: variationNumber,
           user_name: displayName,
           post_id: postId,
           source: 'result_page'
-        }),
+        }
       });
 
-      const result = await response.json();
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw new Error(error.message || 'Failed to trigger image generation');
+      }
 
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to trigger image generation');
+      console.log('Edge function response:', data);
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to trigger image generation');
       }
 
       toast({
@@ -139,7 +139,7 @@ const LinkedInPostVariation = ({
       console.error('Error triggering image generation:', error);
       toast({
         title: "Error",
-        description: "Failed to trigger image generation. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to trigger image generation. Please try again.",
         variant: "destructive"
       });
     } finally {

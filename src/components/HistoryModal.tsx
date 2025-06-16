@@ -146,49 +146,26 @@ const HistoryModal = ({
     try {
       console.log(`Triggering image generation via edge function for post ${postNumber} from history`);
       
-      const response = await fetch('/functions/v1/linkedin-image-webhook', {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('linkedin-image-webhook', {
+        body: {
           post_heading: heading,
           post_content: content,
           variation_number: postNumber,
           user_name: 'Professional User',
           post_id: item.id,
           source: 'history'
-        }),
+        }
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Response not ok:', response.status, errorText);
-        throw new Error(`HTTP ${response.status}: ${errorText || 'Failed to trigger image generation'}`);
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw new Error(error.message || 'Failed to trigger image generation');
       }
 
-      // Check if response has content before parsing JSON
-      const responseText = await response.text();
-      console.log('Response text:', responseText);
-      
-      if (!responseText) {
-        throw new Error('Empty response from server');
-      }
+      console.log('Edge function response:', data);
 
-      let result;
-      try {
-        result = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error('JSON parse error:', parseError);
-        throw new Error('Invalid JSON response from server');
-      }
-
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to trigger image generation');
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to trigger image generation');
       }
 
       toast({
