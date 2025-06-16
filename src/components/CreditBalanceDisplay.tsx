@@ -1,80 +1,59 @@
 
 import { BadgeDollarSign } from "lucide-react";
 import { useUserCredits } from "@/hooks/useUserCredits";
-import { useClerkSupabaseDebug } from "@/hooks/useClerkSupabaseDebug";
-import { useUser } from '@clerk/clerk-react';
-import { Button } from "@/components/ui/button";
 
 const CreditBalanceDisplay = () => {
-  const { data: credits, isLoading, error } = useUserCredits();
-  const { user } = useUser();
-  const { debugClerkSupabaseIntegration } = useClerkSupabaseDebug();
+  const { data: credits, isLoading, error, isFetching } = useUserCredits();
 
   console.log('[CreditBalanceDisplay] Render - credits:', credits, 'isLoading:', isLoading, 'error:', error);
 
-  const handleDebug = () => {
-    debugClerkSupabaseIntegration();
-  };
-
-  if (isLoading) {
+  // Show a subtle loading state only when initially loading (no previous data)
+  if (isLoading && !credits) {
     return (
       <div className="flex flex-col gap-2 text-fuchsia-200 font-orbitron text-xs">
         <div className="flex items-center gap-2">
-          <BadgeDollarSign className="w-5 h-5 animate-pulse" />
-          Loading credits...
+          <BadgeDollarSign className="w-5 h-5 animate-pulse opacity-70" />
+          <span className="opacity-70">Loading...</span>
         </div>
       </div>
     );
   }
 
-  if (error) {
+  // If we have credits data, always show it (even during background refetching)
+  if (credits) {
+    const balance = credits.current_balance ?? 0;
+
+    return (
+      <div className="flex flex-col gap-0.5 text-fuchsia-200 font-orbitron text-sm px-2">
+        <div className="flex items-center gap-2">
+          <BadgeDollarSign className={`w-5 h-5 ${isFetching ? 'opacity-70' : ''}`} />
+          <span className={isFetching ? 'opacity-70' : ''}>
+            {Number(balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} credits
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // Only show error state if there's actually an error and no cached data
+  if (error && !credits) {
     console.error("Error loading credits:", error);
     return (
-      <div className="flex flex-col text-rose-400 font-orbitron text-xs">
+      <div className="flex flex-col text-fuchsia-200 font-orbitron text-xs opacity-70">
         <div className="flex items-center gap-2">
           <BadgeDollarSign className="w-5 h-5" />
-          <span className="text-xs">Error loading credits</span>
+          <span className="text-xs">Credits</span>
         </div>
-        <Button 
-          onClick={handleDebug} 
-          variant="ghost" 
-          size="sm" 
-          className="text-xs mt-1 text-rose-400 hover:text-rose-300"
-        >
-          Debug Connection
-        </Button>
       </div>
     );
   }
 
-  if (!credits) {
-    return (
-      <div className="flex flex-col text-yellow-400 font-orbitron text-xs">
-        <div className="flex items-center gap-2">
-          <BadgeDollarSign className="w-5 h-5" />
-          No credits data available
-        </div>
-        <Button 
-          onClick={handleDebug} 
-          variant="ghost" 
-          size="sm" 
-          className="text-xs mt-1 text-yellow-400 hover:text-yellow-300"
-        >
-          Debug Connection
-        </Button>
-      </div>
-    );
-  }
-
-  const balance = credits.current_balance ?? 0;
-
+  // Fallback - should rarely be shown
   return (
-    <div className="flex flex-col gap-0.5 text-fuchsia-200 font-orbitron text-sm px-2">
+    <div className="flex flex-col text-fuchsia-200 font-orbitron text-xs opacity-70">
       <div className="flex items-center gap-2">
         <BadgeDollarSign className="w-5 h-5" />
-        <span>
-          {Number(balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} credits
-        </span>
+        <span className="text-xs">Credits</span>
       </div>
     </div>
   );

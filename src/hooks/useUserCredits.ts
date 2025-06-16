@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@clerk/clerk-react';
@@ -92,5 +91,9 @@ export const useUserCredits = () => {
     staleTime: 30000,
     refetchInterval: 60000,
     retry: 2,
+    // Keep previous data during refetch to avoid showing empty states
+    placeholderData: (previousData) => previousData,
+    // Cache data for longer to avoid refetching during navigation
+    gcTime: 5 * 60 * 1000, // 5 minutes
   });
 };
