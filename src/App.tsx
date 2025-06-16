@@ -20,14 +20,11 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  // Only sync Supabase/Clerk JWT after Clerk auth context is loaded
-  // Call the hook here for signed-in users—DO NOT render it in JSX.
-  // So when user is signed in, it runs the hook, else not.
+  // Call the hook directly for signed-in users to sync Clerk JWT with Supabase
   return (
     <>
       <SignedIn>
-        {/* Call the hook at the top of the signed-in content. */}
-        {(() => { useClerkSupabaseSync(); return null; })()}
+        <ClerkSupabaseSync />
       </SignedIn>
       {/* Main app routing */}
       <Routes>
@@ -46,6 +43,12 @@ const AppContent = () => {
       </Routes>
     </>
   );
+};
+
+// Component that properly calls the useClerkSupabaseSync hook
+const ClerkSupabaseSync = () => {
+  useClerkSupabaseSync();
+  return null;
 };
 
 const App = () => (
