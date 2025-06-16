@@ -1,7 +1,9 @@
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Repeat2, Send, MoreHorizontal, User, Copy, Image as ImageIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+
 interface UserProfile {
   id: string;
   user_id: string;
@@ -11,10 +13,12 @@ interface UserProfile {
   chat_id: string | null;
   created_at: string | null;
 }
+
 interface UserData {
   first_name: string | null;
   last_name: string | null;
 }
+
 interface LinkedInPostVariationProps {
   heading: string;
   content: string;
@@ -22,6 +26,7 @@ interface LinkedInPostVariationProps {
   userData?: UserData | null;
   variationNumber: number;
 }
+
 const LinkedInPostVariation = ({
   heading,
   content,
@@ -29,12 +34,15 @@ const LinkedInPostVariation = ({
   userData,
   variationNumber
 }: LinkedInPostVariationProps) => {
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
 
   // Create display name from user data
-  const displayName = userData?.first_name && userData?.last_name ? `${userData.first_name} ${userData.last_name}` : userData?.first_name ? userData.first_name : 'Professional User';
+  const displayName = userData?.first_name && userData?.last_name 
+    ? `${userData.first_name} ${userData.last_name}` 
+    : userData?.first_name 
+    ? userData.first_name 
+    : 'Professional User';
+
   const handleCopyContent = async () => {
     if (!content) return;
     try {
@@ -52,41 +60,73 @@ const LinkedInPostVariation = ({
       });
     }
   };
-  const handleGetImage = () => {
-    toast({
-      title: "Coming Soon!",
-      description: "Image generation feature will be available soon."
-    });
+
+  const handleGetImage = async () => {
+    const webhookUrl = "https://n8n.srv834502.hstgr.cloud/webhook-test/f660f913-42ca-41bd-8fa1-038c201261e4";
+    
+    try {
+      console.log("Triggering image generation webhook for post", variationNumber);
+      
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        mode: "no-cors",
+        body: JSON.stringify({
+          post_heading: heading,
+          post_content: content,
+          variation_number: variationNumber,
+          user_name: displayName,
+          timestamp: new Date().toISOString(),
+          triggered_from: window.location.origin,
+        }),
+      });
+
+      toast({
+        title: "Image Generation Started",
+        description: `Image generation for Post ${variationNumber} has been triggered. Please check your workflow for updates.`
+      });
+    } catch (error) {
+      console.error('Error triggering image generation webhook:', error);
+      toast({
+        title: "Error",
+        description: "Failed to trigger image generation. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
-  return <div className="space-y-4">
+
+  return (
+    <div className="space-y-4 w-full">
       {/* Heading */}
       <div className="text-center">
-        <h3 className="text-lg font-semibold mb-2 text-lime-400">{heading}</h3>
+        <h3 className="text-base sm:text-lg font-semibold mb-2 text-lime-400">{heading}</h3>
       </div>
 
       {/* LinkedIn Post Preview */}
-      <Card className="bg-white border border-slate-200 shadow-sm">
-        <CardContent className="p-4">
+      <Card className="bg-white border border-slate-200 shadow-sm w-full max-w-none">
+        <CardContent className="p-3 sm:p-4">
           {/* Header */}
           <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                <User className="w-6 h-6 text-white" />
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                <User className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
               </div>
-              <div>
-                <h4 className="font-semibold text-slate-900 text-sm">{displayName}</h4>
+              <div className="min-w-0 flex-1">
+                <h4 className="font-semibold text-slate-900 text-sm truncate">{displayName}</h4>
                 <p className="text-xs text-slate-500">Professional • 1st</p>
                 <p className="text-xs text-slate-500">2m • 🌐</p>
               </div>
             </div>
-            <Button variant="ghost" size="sm" className="text-slate-500 p-1">
+            <Button variant="ghost" size="sm" className="text-slate-500 p-1 flex-shrink-0">
               <MoreHorizontal className="w-4 h-4" />
             </Button>
           </div>
 
           {/* Post Content */}
           <div className="mb-4">
-            <div className="text-slate-800 text-sm leading-relaxed whitespace-pre-wrap">
+            <div className="text-slate-800 text-sm leading-relaxed whitespace-pre-wrap break-words">
               {content}
             </div>
           </div>
@@ -102,47 +142,60 @@ const LinkedInPostVariation = ({
                   <span className="text-xs text-white">👏</span>
                 </div>
               </div>
-              <span>12 reactions</span>
+              <span className="hidden sm:inline">12 reactions</span>
+              <span className="sm:hidden">12</span>
             </div>
             <div className="text-xs text-slate-500">
-              3 comments • 1 repost
+              <span className="hidden sm:inline">3 comments • 1 repost</span>
+              <span className="sm:hidden">3 • 1</span>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-between">
-            <Button variant="ghost" size="sm" className="flex items-center gap-2 text-slate-600 hover:bg-slate-50 flex-1">
-              <Heart className="w-4 h-4" />
-              <span className="text-sm font-medium">Like</span>
+          <div className="grid grid-cols-4 gap-1">
+            <Button variant="ghost" size="sm" className="flex items-center justify-center gap-1 sm:gap-2 text-slate-600 hover:bg-slate-50 text-xs sm:text-sm py-2">
+              <Heart className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline font-medium">Like</span>
             </Button>
-            <Button variant="ghost" size="sm" className="flex items-center gap-2 text-slate-600 hover:bg-slate-50 flex-1">
-              <MessageCircle className="w-4 h-4" />
-              <span className="text-sm font-medium">Comment</span>
+            <Button variant="ghost" size="sm" className="flex items-center justify-center gap-1 sm:gap-2 text-slate-600 hover:bg-slate-50 text-xs sm:text-sm py-2">
+              <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline font-medium">Comment</span>
             </Button>
-            <Button variant="ghost" size="sm" className="flex items-center gap-2 text-slate-600 hover:bg-slate-50 flex-1">
-              <Repeat2 className="w-4 h-4" />
-              <span className="text-sm font-medium">Repost</span>
+            <Button variant="ghost" size="sm" className="flex items-center justify-center gap-1 sm:gap-2 text-slate-600 hover:bg-slate-50 text-xs sm:text-sm py-2">
+              <Repeat2 className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline font-medium">Repost</span>
             </Button>
-            <Button variant="ghost" size="sm" className="flex items-center gap-2 text-slate-600 hover:bg-slate-50 flex-1">
-              <Send className="w-4 h-4" />
-              <span className="text-sm font-medium">Send</span>
+            <Button variant="ghost" size="sm" className="flex items-center justify-center gap-1 sm:gap-2 text-slate-600 hover:bg-slate-50 text-xs sm:text-sm py-2">
+              <Send className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline font-medium">Send</span>
             </Button>
           </div>
         </CardContent>
       </Card>
 
       {/* Action Buttons */}
-      <div className="flex gap-3">
-        <Button onClick={handleCopyContent} className="flex-1 flex items-center gap-2 text-sm h-10 font-semibold bg-emerald-300 hover:bg-emerald-200 text-gray-950">
+      <div className="flex flex-col sm:flex-row gap-3">
+        <Button 
+          onClick={handleCopyContent} 
+          className="flex-1 flex items-center justify-center gap-2 text-sm h-10 font-semibold bg-emerald-300 hover:bg-emerald-200 text-gray-950"
+        >
           <Copy className="w-4 h-4" />
-          Copy Post {variationNumber}
+          <span className="hidden sm:inline">Copy Post {variationNumber}</span>
+          <span className="sm:hidden">Copy</span>
         </Button>
         
-        <Button onClick={handleGetImage} variant="outline" className="flex-1 border-teal-400/25 text-sm h-10 bg-amber-500 hover:bg-amber-400 text-gray-950">
+        <Button 
+          onClick={handleGetImage} 
+          variant="outline" 
+          className="flex-1 border-teal-400/25 text-sm h-10 bg-amber-500 hover:bg-amber-400 text-gray-950"
+        >
           <ImageIcon className="w-4 h-4 mr-2" />
-          Get Image for Post
+          <span className="hidden sm:inline">Get Image for Post</span>
+          <span className="sm:hidden">Get Image</span>
         </Button>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default LinkedInPostVariation;

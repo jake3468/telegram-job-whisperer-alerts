@@ -3,7 +3,7 @@ import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy, Share2 } from 'lucide-react';
+import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy, Share2, ImageIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import PercentageMeter from '@/components/PercentageMeter';
@@ -24,6 +24,12 @@ interface HistoryItem {
   match_score?: string;
   cover_letter?: string;
   linkedin_post?: string;
+  post_heading_1?: string;
+  post_content_1?: string;
+  post_heading_2?: string;
+  post_content_2?: string;
+  post_heading_3?: string;
+  post_content_3?: string;
 }
 interface HistoryModalProps {
   type: 'job_guide' | 'cover_letter' | 'linkedin_posts';
@@ -61,26 +67,35 @@ const HistoryModal = ({
     try {
       let query;
       if (type === 'job_guide') {
-        query = supabase.from('job_analyses').select('id, company_name, job_title, job_description, created_at, job_match, match_score').eq('user_id', userProfile.id).order('created_at', {
-          ascending: false
-        }).limit(20);
+        query = supabase
+          .from('job_analyses')
+          .select('id, company_name, job_title, job_description, created_at, job_match, match_score')
+          .eq('user_id', userProfile.id)
+          .order('created_at', { ascending: false })
+          .limit(20);
       } else if (type === 'cover_letter') {
-        query = supabase.from('job_cover_letters').select('id, company_name, job_title, job_description, created_at, cover_letter').eq('user_id', userProfile.id).order('created_at', {
-          ascending: false
-        }).limit(20);
+        query = supabase
+          .from('job_cover_letters')
+          .select('id, company_name, job_title, job_description, created_at, cover_letter')
+          .eq('user_id', userProfile.id)
+          .order('created_at', { ascending: false })
+          .limit(20);
       } else {
-        query = supabase.from('job_linkedin').select('id, topic, opinion, personal_story, audience, tone, created_at, linkedin_post').eq('user_id', userProfile.id).order('created_at', {
-          ascending: false
-        }).limit(20);
+        query = supabase
+          .from('job_linkedin')
+          .select('id, topic, opinion, personal_story, audience, tone, created_at, post_heading_1, post_content_1, post_heading_2, post_content_2, post_heading_3, post_content_3')
+          .eq('user_id', userProfile.id)
+          .order('created_at', { ascending: false })
+          .limit(20);
       }
-      const {
-        data,
-        error
-      } = await query;
+
+      const { data, error } = await query;
+
       if (error) {
         console.error('Error fetching history:', error);
         throw error;
       }
+
       setHistoryData(data || []);
     } catch (err) {
       console.error('Failed to fetch history:', err);
@@ -93,14 +108,26 @@ const HistoryModal = ({
       setIsLoading(false);
     }
   };
-  const handleCopyResult = async (item: HistoryItem) => {
-    const result = getResult(item);
+  const handleCopyResult = async (item: HistoryItem, postNumber?: number) => {
+    let result;
+    
+    if (type === 'linkedin_posts' && postNumber) {
+      // For LinkedIn posts, copy specific post content
+      result = item[`post_content_${postNumber}` as keyof HistoryItem] as string;
+    } else {
+      result = getResult(item);
+    }
+    
     if (!result) return;
+    
     try {
       await navigator.clipboard.writeText(result);
+      const itemType = type === 'job_guide' ? 'Job analysis' : 
+                      type === 'cover_letter' ? 'Cover letter' : 
+                      `LinkedIn post ${postNumber || ''}`;
       toast({
         title: "Copied!",
-        description: `${type === 'job_guide' ? 'Job analysis' : type === 'cover_letter' ? 'Cover letter' : 'LinkedIn post'} copied to clipboard successfully.`
+        description: `${itemType} copied to clipboard successfully.`
       });
     } catch (err) {
       console.error('Failed to copy text:', err);
@@ -111,6 +138,49 @@ const HistoryModal = ({
       });
     }
   };
+
+  const handleGetImageForPost = async (item: HistoryItem, postNumber: number) => {
+    const webhookUrl = "https://n8n.srv834502.hstgr.cloud/webhook-test/f660f913-42ca-41bd-8fa1-038c201261e4";
+    
+    const heading = item[`post_heading_${postNumber}` as keyof HistoryItem] as string;
+    const content = item[`post_content_${postNumber}` as keyof HistoryItem] as string;
+    
+    try {
+      console.log(`Triggering image generation webhook for post ${postNumber} from history`);
+      
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        mode: "no-cors",
+        body: JSON.stringify({
+          post_heading: heading,
+          post_content: content,
+          variation_number: postNumber,
+          user_name: userData?.first_name && userData?.last_name 
+            ? `${userData.first_name} ${userData.last_name}` 
+            : userData?.first_name || 'Professional User',
+          timestamp: new Date().toISOString(),
+          triggered_from: window.location.origin,
+          source: 'history'
+        }),
+      });
+
+      toast({
+        title: "Image Generation Started",
+        description: `Image generation for Post ${postNumber} has been triggered from history.`
+      });
+    } catch (error) {
+      console.error('Error triggering image generation webhook:', error);
+      toast({
+        title: "Error",
+        description: "Failed to trigger image generation. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleDelete = async (itemId: string) => {
     if (!userProfile) {
       toast({
@@ -189,10 +259,14 @@ const HistoryModal = ({
     } else if (type === 'cover_letter') {
       return item.cover_letter;
     } else {
-      return item.linkedin_post;
+      // For LinkedIn posts, we'll handle this differently in the detail view
+      return null;
     }
   };
   const hasResult = (item: HistoryItem) => {
+    if (type === 'linkedin_posts') {
+      return item.post_content_1 && item.post_content_2 && item.post_content_3;
+    }
     const result = getResult(item);
     return result && result.trim().length > 0;
   };
@@ -245,18 +319,24 @@ const HistoryModal = ({
     }
   };
   if (showDetails && selectedItem) {
-    return <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-6xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-white font-inter flex items-center gap-2 text-lg">
               {type === 'linkedin_posts' ? <Share2 className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
               {getDetailTitle()}
-              <Button onClick={() => setShowDetails(false)} size="sm" className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm mx-[15px]">
+              <Button 
+                onClick={() => setShowDetails(false)} 
+                size="sm" 
+                className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm mx-[15px]"
+              >
                 <X className="w-4 h-4 mr-1" />
                 Back to List
               </Button>
             </DialogTitle>
           </DialogHeader>
+          
           <div className="flex-1 overflow-y-auto space-y-6 mt-4">
             {/* Input Details Section */}
             <div className="rounded-lg p-4 border border-white/10 bg-blue-800">
@@ -265,119 +345,216 @@ const HistoryModal = ({
                 Input Details
               </h3>
               <div className="space-y-3">
-                {type === 'linkedin_posts' ? <>
+                {type === 'linkedin_posts' ? (
+                  <>
+                    <div>
+                      <label className="text-white/70 text-sm">Topic:</label>
+                      <p className="text-white">{selectedItem.topic}</p>
+                    </div>
+                    {selectedItem.opinion && (
                       <div>
-                        <label className="text-white/70 text-sm">Topic:</label>
-                        <p className="text-white">{selectedItem.topic}</p>
+                        <label className="text-white/70 text-sm">Opinion:</label>
+                        <p className="text-white">{selectedItem.opinion}</p>
                       </div>
-                      {selectedItem.opinion && <div>
-                          <label className="text-white/70 text-sm">Opinion:</label>
-                          <p className="text-white">{selectedItem.opinion}</p>
-                        </div>}
-                      {selectedItem.personal_story && <div>
-                          <label className="text-white/70 text-sm">Personal Story:</label>
-                          <p className="text-white">{selectedItem.personal_story}</p>
-                        </div>}
-                      {selectedItem.audience && <div>
-                          <label className="text-white/70 text-sm">Audience:</label>
-                          <p className="text-white">{selectedItem.audience}</p>
-                        </div>}
-                      {selectedItem.tone && <div>
-                          <label className="text-white/70 text-sm">Tone:</label>
-                          <p className="text-white">{selectedItem.tone}</p>
-                        </div>}
-                    </> : <>
+                    )}
+                    {selectedItem.personal_story && (
                       <div>
-                        <label className="text-white/70 text-sm">Company Name:</label>
-                        <p className="text-white">{selectedItem.company_name}</p>
+                        <label className="text-white/70 text-sm">Personal Story:</label>
+                        <p className="text-white">{selectedItem.personal_story}</p>
                       </div>
+                    )}
+                    {selectedItem.audience && (
                       <div>
-                        <label className="text-white/70 text-sm">Job Title:</label>
-                        <p className="text-white">{selectedItem.job_title}</p>
+                        <label className="text-white/70 text-sm">Audience:</label>
+                        <p className="text-white">{selectedItem.audience}</p>
                       </div>
+                    )}
+                    {selectedItem.tone && (
                       <div>
-                        <label className="text-white/70 text-sm">Job Description:</label>
-                        <div className="rounded p-3 max-h-32 overflow-y-auto bg-gray-800">
-                          <p className="text-white text-sm">{selectedItem.job_description}</p>
-                        </div>
+                        <label className="text-white/70 text-sm">Tone:</label>
+                        <p className="text-white">{selectedItem.tone}</p>
                       </div>
-                    </>}
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <label className="text-white/70 text-sm">Company Name:</label>
+                      <p className="text-white">{selectedItem.company_name}</p>
+                    </div>
+                    <div>
+                      <label className="text-white/70 text-sm">Job Title:</label>
+                      <p className="text-white">{selectedItem.job_title}</p>
+                    </div>
+                    <div>
+                      <label className="text-white/70 text-sm">Job Description:</label>
+                      <div className="rounded p-3 max-h-32 overflow-y-auto bg-gray-800">
+                        <p className="text-white text-sm">{selectedItem.job_description}</p>
+                      </div>
+                    </div>
+                  </>
+                )}
                 <div>
                   <label className="text-white/70 text-sm">Created:</label>
                   <p className="text-white">{formatDate(selectedItem.created_at)}</p>
                 </div>
               </div>
             </div>
-            {/* --- Result Section --- */}
-            {hasResult(selectedItem) && <div className="rounded-lg p-4 border border-white/10 shadow-inner bg-red-700">
-                <h3
-                  className="text-white font-medium mb-3 flex flex-wrap gap-2 justify-between items-center"
-                  style={{ rowGap: "0.5rem" }}
-                >
+
+            {/* Result Section */}
+            {hasResult(selectedItem) && (
+              <div className="rounded-lg p-4 border border-white/10 shadow-inner bg-red-700">
+                <h3 className="text-white font-medium mb-3 flex flex-wrap gap-2 justify-between items-center">
                   <div className="flex items-center gap-2">
                     {type === 'linkedin_posts' ? <Share2 className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
                     {getResultTitle()}
                   </div>
-                  <div className="flex flex-wrap items-center gap-2 min-w-0">
-                    {/* Copy button removed for 'job_guide' type */}
-                    {type !== 'job_guide' && (
-                      <Button
-                        onClick={() => handleCopyResult(selectedItem)}
-                        size="sm"
-                        className="bg-gray-950 hover:bg-gray-800 text-white flex items-center gap-1"
-                      >
-                        <Copy className="w-3 h-3" />
-                        <span className="hidden sm:inline">Copy</span>
-                      </Button>
+                </h3>
+
+                {type === 'linkedin_posts' ? (
+                  <div className="space-y-6">
+                    {/* Post 1 */}
+                    {selectedItem.post_content_1 && (
+                      <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                        <div className="flex justify-between items-start mb-3">
+                          <h4 className="text-lime-400 font-semibold">{selectedItem.post_heading_1}</h4>
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={() => handleCopyResult(selectedItem, 1)}
+                              size="sm"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                            >
+                              <Copy className="w-3 h-3 mr-1" />
+                              Copy
+                            </Button>
+                            <Button
+                              onClick={() => handleGetImageForPost(selectedItem, 1)}
+                              size="sm"
+                              className="bg-amber-600 hover:bg-amber-700 text-white"
+                            >
+                              <ImageIcon className="w-3 h-3 mr-1" />
+                              Get Image
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="text-gray-100 text-sm whitespace-pre-wrap break-words">
+                          {selectedItem.post_content_1}
+                        </div>
+                      </div>
                     )}
-                    {/* Download buttons for cover letter type */}
-                    {type === 'cover_letter' && selectedItem.cover_letter && (
-                      <div className="flex flex-wrap gap-2">
-                        <CoverLetterDownloadActions 
-                          coverLetter={selectedItem.cover_letter}
-                          jobTitle={selectedItem.job_title || 'Unknown Position'}
-                          companyName={selectedItem.company_name || 'Unknown Company'}
-                          contrast // highlight with black/white
-                        />
+
+                    {/* Post 2 */}
+                    {selectedItem.post_content_2 && (
+                      <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                        <div className="flex justify-between items-start mb-3">
+                          <h4 className="text-lime-400 font-semibold">{selectedItem.post_heading_2}</h4>
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={() => handleCopyResult(selectedItem, 2)}
+                              size="sm"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                            >
+                              <Copy className="w-3 h-3 mr-1" />
+                              Copy
+                            </Button>
+                            <Button
+                              onClick={() => handleGetImageForPost(selectedItem, 2)}
+                              size="sm"
+                              className="bg-amber-600 hover:bg-amber-700 text-white"
+                            >
+                              <ImageIcon className="w-3 h-3 mr-1" />
+                              Get Image
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="text-gray-100 text-sm whitespace-pre-wrap break-words">
+                          {selectedItem.post_content_2}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Post 3 */}
+                    {selectedItem.post_content_3 && (
+                      <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                        <div className="flex justify-between items-start mb-3">
+                          <h4 className="text-lime-400 font-semibold">{selectedItem.post_heading_3}</h4>
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={() => handleCopyResult(selectedItem, 3)}
+                              size="sm"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                            >
+                              <Copy className="w-3 h-3 mr-1" />
+                              Copy
+                            </Button>
+                            <Button
+                              onClick={() => handleGetImageForPost(selectedItem, 3)}
+                              size="sm"
+                              className="bg-amber-600 hover:bg-amber-700 text-white"
+                            >
+                              <ImageIcon className="w-3 h-3 mr-1" />
+                              Get Image
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="text-gray-100 text-sm whitespace-pre-wrap break-words">
+                          {selectedItem.post_content_3}
+                        </div>
                       </div>
                     )}
                   </div>
-                </h3>
-                {/* MATCH SCORE shown for job_guide */}
-                {type === 'job_guide' && selectedItem.match_score && (
-                  <div className="mb-4 max-w-full">
-                    <div className="w-full sm:max-w-[350px] md:max-w-[280px] mx-auto">
-                      <div className="shadow-md rounded-xl bg-gray-900/90 p-3 border border-gray-700">
-                        <PercentageMeter percentage={selectedItem.match_score} />
+                ) : (
+                  <>
+                    {/* Match Score for job_guide */}
+                    {type === 'job_guide' && selectedItem.match_score && (
+                      <div className="mb-4 max-w-full">
+                        <div className="w-full sm:max-w-[350px] md:max-w-[280px] mx-auto">
+                          <div className="shadow-md rounded-xl bg-gray-900/90 p-3 border border-gray-700">
+                            <PercentageMeter percentage={selectedItem.match_score} />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {type !== 'job_guide' && (
+                        <Button
+                          onClick={() => handleCopyResult(selectedItem)}
+                          size="sm"
+                          className="bg-gray-950 hover:bg-gray-800 text-white flex items-center gap-1"
+                        >
+                          <Copy className="w-3 h-3" />
+                          <span className="hidden sm:inline">Copy</span>
+                        </Button>
+                      )}
+                      {type === 'cover_letter' && selectedItem.cover_letter && (
+                        <div className="flex flex-wrap gap-2">
+                          <CoverLetterDownloadActions 
+                            coverLetter={selectedItem.cover_letter}
+                            jobTitle={selectedItem.job_title || 'Unknown Position'}
+                            companyName={selectedItem.company_name || 'Unknown Company'}
+                            contrast
+                          />
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="rounded-lg p-4 border-2 border-blue-200 max-h-96 overflow-y-auto mt-1 bg-slate-900">
+                      <div className="text-gray-100 text-sm md:text-base leading-relaxed break-words whitespace-pre-wrap">
+                        {type === 'job_guide' ? selectedItem.job_match : getResult(selectedItem)}
                       </div>
                     </div>
-                  </div>
+                  </>
                 )}
-                <div
-                  className="rounded-lg p-4 border-2 border-blue-200 max-h-96 overflow-y-auto mt-1 bg-slate-900"
-                  style={{
-                    maxWidth: "100%",
-                    overflowX: "auto"
-                  }}
-                >
-                  <div
-                    style={{
-                      fontFamily: 'serif',
-                      wordBreak: 'break-word',
-                      whiteSpace: 'pre-wrap',
-                      minWidth: 0,
-                    }}
-                    className="text-gray-100 text-sm md:text-base leading-relaxed break-words bg-gray-900"
-                  >
-                    {type === 'job_guide' ? selectedItem.job_match : getResult(selectedItem)}
-                  </div>
-                </div>
-              </div>}
+              </div>
+            )}
           </div>
         </DialogContent>
-      </Dialog>;
+      </Dialog>
+    );
   }
-  return <Dialog open={isOpen} onOpenChange={onClose}>
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] max-w-5xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
@@ -481,6 +658,7 @@ const HistoryModal = ({
             </div>}
         </div>
       </DialogContent>
-    </Dialog>;
+    </Dialog>
+  );
 };
 export default HistoryModal;

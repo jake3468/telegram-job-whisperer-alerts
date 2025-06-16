@@ -322,31 +322,31 @@ const LinkedInPosts = () => {
       <div className="min-h-screen flex w-full bg-gradient-to-br from-[#0e1122] via-[#181526] to-[#21203a]">
         <AppSidebar />
         
-        <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0 lg:pl-6">
-          <main className="flex-1 w-full bg-transparent">
+        <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0 lg:pl-6 min-w-0">
+          <main className="flex-1 w-full bg-transparent min-w-0">
             <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-slate-800 pt-0 flex flex-col">
-              <div className="container mx-auto px-2 sm:px-4 py-8 bg-transparent rounded-3xl mt-4 mb-8 max-w-6xl w-full">
+              <div className="container mx-auto px-2 sm:px-4 py-8 bg-transparent rounded-3xl mt-4 mb-8 max-w-6xl w-full min-w-0">
                 {/* Header Section */}
                 <div className="text-center mb-10">
-                  <h1 className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-teal-300 via-teal-400 to-cyan-400 bg-clip-text text-transparent drop-shadow mb-4 tracking-tight">
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-orbitron font-extrabold bg-gradient-to-r from-teal-300 via-teal-400 to-cyan-400 bg-clip-text text-transparent drop-shadow mb-4 tracking-tight">
                     LinkedIn <span className="italic">Posts</span>
                   </h1>
-                  <p className="text-cyan-200 max-w-2xl mx-auto font-inter text-lg font-light shadow-sm">
+                  <p className="text-cyan-200 max-w-2xl mx-auto font-inter text-sm sm:text-base lg:text-lg font-light shadow-sm px-4">
                     Create engaging LinkedIn posts that showcase your expertise and connect with your professional network
                   </p>
                 </div>
 
-                <div className="max-w-3xl mx-auto">
+                <div className="max-w-5xl mx-auto min-w-0">
                   {/* Input Form */}
                   <Card className="bg-gradient-to-br from-cyan-400 via-teal-300 to-teal-500 border-white/10 backdrop-blur-md mb-8 shadow-xl">
                     <CardHeader className="pb-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <CardTitle className="font-inter text-xl flex items-center gap-2 text-black font-bold drop-shadow">
-                            <Sparkles className="w-5 h-5 text-black drop-shadow" />
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="min-w-0">
+                          <CardTitle className="font-inter text-lg sm:text-xl flex items-center gap-2 text-black font-bold drop-shadow">
+                            <Sparkles className="w-5 h-5 text-black drop-shadow flex-shrink-0" />
                             <span>Create Your Posts</span>
                           </CardTitle>
-                          <CardDescription className="text-black/80 font-inter mb-0">
+                          <CardDescription className="text-black/80 font-inter mb-0 text-sm sm:text-base">
                             Fill in the details to generate 3 LinkedIn post variations
                           </CardDescription>
                         </div>
@@ -354,7 +354,7 @@ const LinkedInPosts = () => {
                           onClick={() => setShowHistory(true)} 
                           variant="outline" 
                           size="sm" 
-                          className="border-white/20 text-black bg-teal-200 hover:bg-teal-100"
+                          className="border-white/20 text-black bg-teal-200 hover:bg-teal-100 flex-shrink-0"
                         >
                           <History className="w-4 h-4 mr-2 text-black" />
                           History
@@ -362,11 +362,11 @@ const LinkedInPosts = () => {
                       </div>
                     </CardHeader>
 
-                    <CardContent className="space-y-8">
+                    <CardContent className="space-y-6 sm:space-y-8">
                       <form onSubmit={handleSubmit} className="space-y-6">
                         
-                        <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
-                          <div className="flex-1 space-y-2">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+                          <div className="space-y-2">
                             <Label htmlFor="topic" className="text-black font-semibold text-base">Topic or Theme *</Label>
                             <Label htmlFor="topic" className="text-black/70 font-normal text-sm block">What is the main topic you want to write about?</Label>
                             <TTextarea
@@ -377,7 +377,7 @@ const LinkedInPosts = () => {
                               required
                               className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                           </div>
-                          <div className="flex-1 space-y-2">
+                          <div className="space-y-2">
                             <Label htmlFor="opinion" className="text-black font-semibold text-base">Your Key Point or Opinion</Label>
                             <Label htmlFor="opinion" className="text-black/70 font-normal text-sm block">What is your main insight, opinion, or message?</Label>
                             <TTextarea
@@ -389,8 +389,8 @@ const LinkedInPosts = () => {
                           </div>
                         </div>
 
-                        <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
-                          <div className="flex-1 space-y-2">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+                          <div className="space-y-2">
                             <Label htmlFor="personal_story" className="text-black font-semibold text-base">Personal Experience or Story</Label>
                             <Label htmlFor="personal_story" className="text-black/70 font-normal text-sm block">Do you have a story, data point, or personal experience to include?</Label>
                             <TTextarea
@@ -400,7 +400,7 @@ const LinkedInPosts = () => {
                               onChange={e => handleInputChange('personal_story', e.target.value)}
                               className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                           </div>
-                          <div className="flex-1 space-y-2">
+                          <div className="space-y-2">
                             <Label htmlFor="audience" className="text-black font-semibold text-base">Target Audience</Label>
                             <Label htmlFor="audience" className="text-black/70 font-normal text-sm block">Who are you writing this for?</Label>
                             <TTextarea
@@ -464,17 +464,17 @@ const LinkedInPosts = () => {
                   {postsData && areAllPostsReady(postsData) && (
                     <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm">
                       <CardHeader className="pb-6">
-                        <CardTitle className="font-inter text-xl flex items-center gap-2 bg-gradient-to-r from-teal-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent drop-shadow font-bold">
-                          <Share2 className="w-5 h-5 text-teal-400 drop-shadow" />
+                        <CardTitle className="font-inter text-lg sm:text-xl flex items-center gap-2 bg-gradient-to-r from-teal-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent drop-shadow font-bold">
+                          <Share2 className="w-5 h-5 text-teal-400 drop-shadow flex-shrink-0" />
                           <span>Your LinkedIn Post Variations</span>
                         </CardTitle>
-                        <CardDescription className="text-cyan-300/90 font-inter">
+                        <CardDescription className="text-cyan-300/90 font-inter text-sm sm:text-base">
                           Choose from 3 different LinkedIn post styles and copy your favorite!
                         </CardDescription>
                       </CardHeader>
                       
                       <CardContent>
-                        <div className="grid gap-8 md:grid-cols-1 lg:grid-cols-1">
+                        <div className="space-y-8">
                           <LinkedInPostVariation
                             heading={postsData.post_heading_1!}
                             content={postsData.post_content_1!}
