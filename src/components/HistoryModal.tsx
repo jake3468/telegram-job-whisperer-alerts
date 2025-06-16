@@ -454,7 +454,7 @@ const HistoryModal = ({
                             </Button>
                           </div>
                         </div>
-                        <div className="text-gray-100 text-sm whitespace-pre-wrap break-words">
+                        <div className="text-black bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words">
                           {selectedItem.post_content_1}
                         </div>
                       </div>
@@ -484,7 +484,7 @@ const HistoryModal = ({
                             </Button>
                           </div>
                         </div>
-                        <div className="text-gray-100 text-sm whitespace-pre-wrap break-words">
+                        <div className="text-black bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words">
                           {selectedItem.post_content_2}
                         </div>
                       </div>
@@ -514,7 +514,7 @@ const HistoryModal = ({
                             </Button>
                           </div>
                         </div>
-                        <div className="text-gray-100 text-sm whitespace-pre-wrap break-words">
+                        <div className="text-black bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words">
                           {selectedItem.post_content_3}
                         </div>
                       </div>
@@ -556,8 +556,8 @@ const HistoryModal = ({
                       )}
                     </div>
                     
-                    <div className="rounded-lg p-4 border-2 border-blue-200 max-h-96 overflow-y-auto mt-1 bg-slate-900">
-                      <div className="text-gray-100 text-sm md:text-base leading-relaxed break-words whitespace-pre-wrap">
+                    <div className="rounded-lg p-4 border-2 border-blue-200 max-h-96 overflow-y-auto mt-1 bg-white">
+                      <div className="text-black font-inter text-sm md:text-base leading-relaxed break-words whitespace-pre-wrap">
                         {type === 'job_guide' ? selectedItem.job_match : getResult(selectedItem)}
                       </div>
                     </div>
