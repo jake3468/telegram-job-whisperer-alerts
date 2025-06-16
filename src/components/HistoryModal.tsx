@@ -349,55 +349,71 @@ const HistoryModal = ({
                 {type === 'linkedin_posts' ? (
                   <>
                     <div>
-                      <label className="text-white/70 text-sm">Topic:</label>
-                      <p className="text-white">{selectedItem.topic}</p>
+                      <label className="text-cyan-200 text-sm font-semibold">Topic:</label>
+                      <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
+                        <p className="text-white text-sm">{selectedItem.topic}</p>
+                      </div>
                     </div>
                     {selectedItem.opinion && (
                       <div>
-                        <label className="text-white/70 text-sm">Opinion:</label>
-                        <p className="text-white">{selectedItem.opinion}</p>
+                        <label className="text-cyan-200 text-sm font-semibold">Opinion:</label>
+                        <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
+                          <p className="text-white text-sm">{selectedItem.opinion}</p>
+                        </div>
                       </div>
                     )}
                     {selectedItem.personal_story && (
                       <div>
-                        <label className="text-white/70 text-sm">Personal Story:</label>
-                        <p className="text-white">{selectedItem.personal_story}</p>
+                        <label className="text-cyan-200 text-sm font-semibold">Personal Story:</label>
+                        <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
+                          <p className="text-white text-sm">{selectedItem.personal_story}</p>
+                        </div>
                       </div>
                     )}
                     {selectedItem.audience && (
                       <div>
-                        <label className="text-white/70 text-sm">Audience:</label>
-                        <p className="text-white">{selectedItem.audience}</p>
+                        <label className="text-cyan-200 text-sm font-semibold">Audience:</label>
+                        <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
+                          <p className="text-white text-sm">{selectedItem.audience}</p>
+                        </div>
                       </div>
                     )}
                     {selectedItem.tone && (
                       <div>
-                        <label className="text-white/70 text-sm">Tone:</label>
-                        <p className="text-white">{selectedItem.tone}</p>
+                        <label className="text-cyan-200 text-sm font-semibold">Tone:</label>
+                        <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
+                          <p className="text-white text-sm">{selectedItem.tone}</p>
+                        </div>
                       </div>
                     )}
                   </>
                 ) : (
                   <>
                     <div>
-                      <label className="text-white/70 text-sm">Company Name:</label>
-                      <p className="text-white">{selectedItem.company_name}</p>
+                      <label className="text-cyan-200 text-sm font-semibold">Company Name:</label>
+                      <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
+                        <p className="text-white text-sm">{selectedItem.company_name}</p>
+                      </div>
                     </div>
                     <div>
-                      <label className="text-white/70 text-sm">Job Title:</label>
-                      <p className="text-white">{selectedItem.job_title}</p>
+                      <label className="text-cyan-200 text-sm font-semibold">Job Title:</label>
+                      <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
+                        <p className="text-white text-sm">{selectedItem.job_title}</p>
+                      </div>
                     </div>
                     <div>
-                      <label className="text-white/70 text-sm">Job Description:</label>
-                      <div className="rounded p-3 max-h-32 overflow-y-auto bg-gray-800">
+                      <label className="text-cyan-200 text-sm font-semibold">Job Description:</label>
+                      <div className="rounded p-3 mt-1 max-h-32 overflow-y-auto bg-black/80 border border-cyan-300/20">
                         <p className="text-white text-sm">{selectedItem.job_description}</p>
                       </div>
                     </div>
                   </>
                 )}
                 <div>
-                  <label className="text-white/70 text-sm">Created:</label>
-                  <p className="text-white">{formatDate(selectedItem.created_at)}</p>
+                  <label className="text-cyan-200 text-sm font-semibold">Created:</label>
+                  <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
+                    <p className="text-white text-sm">{formatDate(selectedItem.created_at)}</p>
+                  </div>
                 </div>
               </div>
             </div>
