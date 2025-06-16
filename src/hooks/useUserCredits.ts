@@ -1,52 +1,60 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useUserProfile } from './useUserProfile';
 import { useUser } from '@clerk/clerk-react';
 
 // Fetches current user credit info from Supabase
 export const useUserCredits = () => {
   const { user } = useUser();
-  const { userProfile, loading: userProfileLoading } = useUserProfile();
 
   console.log('[useUserCredits][debug] Clerk user:', user?.id);
-  console.log('[useUserCredits][debug] UserProfile:', userProfile, 'loading:', userProfileLoading);
 
   if (!user) {
     console.warn('[useUserCredits][warn] Clerk user not found! You must be signed in for credits RLS to work.');
   }
-  if (userProfile && !userProfile.id) {
-    console.warn('[useUserCredits][warn] User profile exists but has no id. Credits will not show.');
-  }
 
   return useQuery({
-    queryKey: ['user_credits', userProfile?.id],
+    queryKey: ['user_credits', user?.id],
     queryFn: async () => {
-      if (!userProfile?.id) {
-        console.warn('[useUserCredits] No userProfile.id, returning null');
+      if (!user?.id) {
+        console.warn('[useUserCredits] No user.id, returning null');
         return null;
       }
 
-      console.log('[useUserCredits][debug] Fetching credits for user_profile_id:', userProfile.id);
+      console.log('[useUserCredits][debug] Fetching credits for Clerk user:', user.id);
 
       try {
-        // Simply fetch the existing credits record - no initialization needed
+        // Fetch user_credits directly using the user's ID from the users table
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('clerk_id', user.id)
+          .single();
+
+        if (userError || !userData) {
+          console.error('[useUserCredits] Error fetching user data:', userError);
+          return { __error: userError || { message: 'User not found' }, __debug: { action: 'user_lookup_failed', clerk_id: user.id } };
+        }
+
+        console.log('[useUserCredits][debug] Found user ID:', userData.id);
+
+        // Now fetch the credits using the user's ID
         const { data: credits, error } = await supabase
           .from('user_credits')
           .select('*')
-          .eq('user_profile_id', userProfile.id)
+          .eq('user_id', userData.id)
           .maybeSingle();
 
         console.log('[useUserCredits][debug] Credits query result:', credits, 'error:', error);
 
         if (error) {
           console.error('[useUserCredits] Error fetching credits:', error);
-          return { __error: error, __debug: { action: 'fetch_failed', user_profile_id: userProfile.id } };
+          return { __error: error, __debug: { action: 'fetch_failed', user_id: userData.id } };
         }
 
         if (!credits) {
-          console.warn('[useUserCredits] No credits found for user_profile_id:', userProfile.id);
-          return { __error: { message: 'No credits found' }, __debug: { action: 'no_credits_found', user_profile_id: userProfile.id } };
+          console.warn('[useUserCredits] No credits found for user_id:', userData.id);
+          return { __error: { message: 'No credits found' }, __debug: { action: 'no_credits_found', user_id: userData.id } };
         }
 
         console.log('[useUserCredits] Successfully fetched credits:', credits);
@@ -54,10 +62,10 @@ export const useUserCredits = () => {
         
       } catch (err) {
         console.error('[useUserCredits] Exception during fetch:', err);
-        return { __error: err, __debug: { action: 'fetch_exception', user_profile_id: userProfile.id } };
+        return { __error: err, __debug: { action: 'fetch_exception', clerk_id: user.id } };
       }
     },
-    enabled: !!userProfile?.id && !userProfileLoading && !!user,
+    enabled: !!user?.id,
     staleTime: 30000,
     refetchInterval: 60000,
     retry: (failureCount, error: any) => {

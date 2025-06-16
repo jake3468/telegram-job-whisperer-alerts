@@ -1,16 +1,16 @@
 
 import { BadgeDollarSign } from "lucide-react";
 import { useUserCredits } from "@/hooks/useUserCredits";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUser } from '@clerk/clerk-react';
 
 const CreditBalanceDisplay = () => {
   const { data: credits, isLoading, error } = useUserCredits();
-  const { userProfile, loading: userProfileLoading } = useUserProfile();
+  const { user } = useUser();
 
   console.log('[CreditBalanceDisplay] Render - credits:', credits, 'isLoading:', isLoading, 'error:', error);
-  console.log('[CreditBalanceDisplay] UserProfile:', userProfile, 'userProfileLoading:', userProfileLoading);
+  console.log('[CreditBalanceDisplay] Clerk user:', user?.id);
 
-  if (isLoading || userProfileLoading) {
+  if (isLoading) {
     return (
       <div className="flex flex-col gap-2 text-fuchsia-200 font-orbitron text-xs">
         <div className="flex items-center gap-2">
@@ -45,9 +45,9 @@ const CreditBalanceDisplay = () => {
           <BadgeDollarSign className="w-5 h-5" />
           <span className="text-xs">{msg}</span>
         </div>
-        {userProfile?.id && (
+        {user?.id && (
           <div className="text-xs opacity-60 mt-1">
-            Profile ID: {userProfile.id.substring(0, 8)}...
+            Clerk ID: {user.id.substring(0, 8)}...
           </div>
         )}
       </div>
