@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -88,9 +87,21 @@ const LinkedInPosts = () => {
 
   // Check if all posts are ready (all 6 columns have non-null values)
   const areAllPostsReady = (data: LinkedInPostData) => {
-    return data.post_heading_1 && data.post_content_1 &&
+    const allFieldsPresent = data.post_heading_1 && data.post_content_1 &&
            data.post_heading_2 && data.post_content_2 &&
            data.post_heading_3 && data.post_content_3;
+    
+    console.log('Checking if all posts ready:', {
+      post_heading_1: !!data.post_heading_1,
+      post_content_1: !!data.post_content_1,
+      post_heading_2: !!data.post_heading_2,
+      post_content_2: !!data.post_content_2,
+      post_heading_3: !!data.post_heading_3,
+      post_content_3: !!data.post_content_3,
+      allReady: allFieldsPresent
+    });
+    
+    return allFieldsPresent;
   };
 
   // Real-time subscription for LinkedIn post updates
@@ -136,12 +147,46 @@ const LinkedInPosts = () => {
         console.log('Real-time subscription status:', status);
       });
 
+    // Also check immediately for existing data
+    const checkExistingData = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('job_linkedin')
+          .select('post_heading_1, post_content_1, post_heading_2, post_content_2, post_heading_3, post_content_3')
+          .eq('id', currentPostId)
+          .single();
+
+        if (error) {
+          console.error('Error checking existing data:', error);
+          return;
+        }
+
+        if (data) {
+          console.log('Found existing data:', data);
+          setPostsData(data);
+          
+          if (areAllPostsReady(data)) {
+            console.log('Existing data is complete, stopping loading');
+            setIsGenerating(false);
+          }
+        }
+      } catch (err) {
+        console.error('Error checking existing data:', err);
+      }
+    };
+
+    // Check immediately, then every 3 seconds as fallback
+    checkExistingData();
+    const interval = setInterval(checkExistingData, 3000);
+
     return () => {
-      console.log('Cleaning up real-time subscription');
+      console.log('Cleaning up real-time subscription and interval');
       supabase.removeChannel(channel);
+      clearInterval(interval);
     };
   }, [currentPostId, toast]);
 
+  // Handle input changes
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -149,6 +194,7 @@ const LinkedInPosts = () => {
     }));
   };
 
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -237,6 +283,7 @@ const LinkedInPosts = () => {
     }
   };
 
+  // Reset form
   const resetForm = () => {
     setFormData({
       topic: '',
