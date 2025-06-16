@@ -6,7 +6,7 @@ import { useUser } from '@clerk/clerk-react';
 // Simple type for credits response - matching actual database schema
 type UserCreditsData = {
   id: string;
-  user_id: string; // Now references users.id directly
+  user_id: string;
   current_balance: number;
   free_credits: number;
   paid_credits: number;
@@ -21,14 +21,14 @@ type ErrorResponse = {
   __debug: any;
 };
 
-// Fetches current user credit info from Supabase
+// Fetches current user credit info from Supabase using only user UUID
 export const useUserCredits = () => {
   const { user } = useUser();
 
   console.log('[useUserCredits][debug] Clerk user:', user?.id);
 
   if (!user) {
-    console.warn('[useUserCredits][warn] Clerk user not found! You must be signed in for credits RLS to work.');
+    console.warn('[useUserCredits][warn] Clerk user not found! You must be signed in for credits to work.');
   }
 
   return useQuery({
@@ -42,7 +42,7 @@ export const useUserCredits = () => {
       console.log('[useUserCredits][debug] Fetching credits for Clerk user:', user.id);
 
       try {
-        // Fetch user_credits directly using the user's ID from the users table
+        // First get the user's UUID from the users table using their Clerk ID
         const { data: userData, error: userError } = await supabase
           .from('users')
           .select('id')
@@ -54,25 +54,25 @@ export const useUserCredits = () => {
           return { __error: userError || { message: 'User not found' }, __debug: { action: 'user_lookup_failed', clerk_id: user.id } };
         }
 
-        console.log('[useUserCredits][debug] Found user ID:', userData.id);
+        console.log('[useUserCredits][debug] Found user UUID:', userData.id);
 
-        // Now fetch the credits using the user's ID directly (simplified structure)
+        // Now fetch credits using ONLY the user UUID - exactly as you suggested
         const { data: credits, error } = await supabase
           .from('user_credits')
           .select('*')
           .eq('user_id', userData.id)
-          .maybeSingle();
+          .single();
 
         console.log('[useUserCredits][debug] Credits query result:', credits, 'error:', error);
 
         if (error) {
           console.error('[useUserCredits] Error fetching credits:', error);
-          return { __error: error, __debug: { action: 'fetch_failed', user_id: userData.id } };
+          return { __error: error, __debug: { action: 'fetch_failed', user_uuid: userData.id } };
         }
 
         if (!credits) {
-          console.warn('[useUserCredits] No credits found for user_id:', userData.id);
-          return { __error: { message: 'No credits found' }, __debug: { action: 'no_credits_found', user_id: userData.id } };
+          console.warn('[useUserCredits] No credits found for user UUID:', userData.id);
+          return { __error: { message: 'No credits found' }, __debug: { action: 'no_credits_found', user_uuid: userData.id } };
         }
 
         console.log('[useUserCredits] Successfully fetched credits:', credits);
