@@ -21,24 +21,41 @@ const CreditBalanceDisplay = () => {
     );
   }
 
-  // Handle errors
+  // Handle errors with more detailed messaging
   const detailError = (credits as any)?.__error ?? error;
+  const debugInfo = (credits as any)?.__debug;
+  
   if (detailError) {
     console.error("Error loading credits:", detailError);
+    console.error("Debug info:", debugInfo);
+    
     let msg = "Error loading credits.";
+    
     if (detailError.code === "PGRST301") {
-      msg += " (Not authorized by Row Level Security. Please check that you are logged in with the correct user.)";
+      msg = "Not authorized to view credits. Please check authentication.";
     } else if (detailError.code === "PGRST116") {
-      msg = "No credits found for this user.";
+      msg = "No credits found. Initializing...";
     } else if (detailError.message) {
-      msg += ` (${detailError.message})`;
+      msg = `Error: ${detailError.message}`;
     }
+    
+    // Add debug info for development
+    if (debugInfo) {
+      msg += ` (Debug: ${debugInfo.action || 'unknown'})`;
+    }
+    
     return (
       <div className="flex flex-col text-rose-400 font-orbitron text-xs">
         <div className="flex items-center gap-2">
           <BadgeDollarSign className="w-5 h-5" />
-          {msg}
+          <span className="text-xs">{msg}</span>
         </div>
+        {/* Show profile ID for debugging */}
+        {userProfile?.id && (
+          <div className="text-xs opacity-60 mt-1">
+            Profile ID: {userProfile.id.substring(0, 8)}...
+          </div>
+        )}
       </div>
     );
   }
@@ -54,12 +71,15 @@ const CreditBalanceDisplay = () => {
     );
   }
 
+  // Ensure we have a valid credits object with current_balance
+  const balance = (credits as any)?.current_balance ?? 0;
+
   return (
     <div className="flex flex-col gap-0.5 text-fuchsia-200 font-orbitron text-sm px-2">
       <div className="flex items-center gap-2">
         <BadgeDollarSign className="w-5 h-5" />
         <span>
-          {Number((credits as any).current_balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} credits
+          {Number(balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} credits
         </span>
       </div>
     </div>
