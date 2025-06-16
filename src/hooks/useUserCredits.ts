@@ -16,7 +16,7 @@ type UserCreditsData = {
   updated_at: string;
 };
 
-// Fetches current user credit info from Supabase using direct SQL approach
+// Fetches current user credit info from Supabase using the exact SQL approach that works
 export const useUserCredits = () => {
   const { user } = useUser();
 
@@ -33,31 +33,22 @@ export const useUserCredits = () => {
       console.log('[useUserCredits][debug] Fetching credits for Clerk user:', user.id);
 
       try {
-        // Direct query using the simple SQL you suggested
-        // First get the user's UUID from the users table using their Clerk ID
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('id')
-          .eq('clerk_id', user.id)
-          .maybeSingle();
-
-        if (userError) {
-          console.error('[useUserCredits] Error fetching user data:', userError);
-          return null;
-        }
-
-        if (!userData) {
-          console.warn('[useUserCredits] No user found for Clerk ID:', user.id);
-          return null;
-        }
-
-        console.log('[useUserCredits][debug] Found user UUID:', userData.id);
-
-        // Now get credits using the exact SQL approach you mentioned
+        // Use the exact same SQL approach you showed me that works
         const { data: credits, error } = await supabase
           .from('user_credits')
-          .select('current_balance, free_credits, paid_credits, subscription_plan, next_reset_date, created_at, updated_at, id, user_id')
-          .eq('user_id', userData.id)
+          .select(`
+            current_balance,
+            free_credits,
+            paid_credits,
+            subscription_plan,
+            next_reset_date,
+            created_at,
+            updated_at,
+            id,
+            user_id,
+            users!inner(clerk_id)
+          `)
+          .eq('users.clerk_id', user.id)
           .maybeSingle();
 
         console.log('[useUserCredits][debug] Credits query result:', credits, 'error:', error);
@@ -68,7 +59,7 @@ export const useUserCredits = () => {
         }
 
         if (!credits) {
-          console.warn('[useUserCredits] No credits found for user UUID:', userData.id);
+          console.warn('[useUserCredits] No credits found for Clerk user:', user.id);
           return null;
         }
 
