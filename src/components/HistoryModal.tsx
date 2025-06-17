@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -45,15 +46,9 @@ const HistoryModal = ({
   onClose,
   gradientColors
 }: HistoryModalProps) => {
-  const {
-    user
-  } = useUser();
-  const {
-    toast
-  } = useToast();
-  const {
-    userProfile
-  } = useUserProfile();
+  const { user } = useUser();
+  const { toast } = useToast();
+  const { userProfile } = useUserProfile();
   const [historyData, setHistoryData] = useState<HistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
@@ -387,10 +382,7 @@ const HistoryModal = ({
       }
       
       console.log(`Deleting from table: ${tableName}, item ID: ${itemId}, user_id: ${userProfile.id}`);
-      const {
-        error,
-        data
-      } = await query;
+      const { error, data } = await query;
       
       if (error) {
         console.error('Supabase delete error:', error);
@@ -631,22 +623,22 @@ const HistoryModal = ({
                             <Button
                               onClick={() => handleCopyResult(selectedItem, 1)}
                               size="sm"
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white h-7 sm:h-8 text-xs px-2 sm:px-3 flex items-center justify-center gap-1"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white h-6 sm:h-7 text-xs px-2 flex items-center justify-center gap-1"
                             >
                               <Copy className="w-3 h-3 flex-shrink-0" />
-                              <span className="truncate">Copy Post 1</span>
+                              <span className="truncate text-xs">Copy</span>
                             </Button>
                             <Button
                               onClick={() => handleGetImageForPost(selectedItem, 1)}
                               size="sm"
                               disabled={loadingImages[`${selectedItem.id}-1`] || (imageCounts[`${selectedItem.id}-1`] || 0) >= 3}
-                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-7 sm:h-8 text-xs px-2 sm:px-3 flex items-center justify-center gap-1"
+                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-6 sm:h-7 text-xs px-2 flex items-center justify-center gap-1"
                             >
                               <ImageIcon className="w-3 h-3 flex-shrink-0" />
-                              <span className="truncate">
-                                {(imageCounts[`${selectedItem.id}-1`] || 0) >= 3 ? 'Limit' :
-                                 loadingImages[`${selectedItem.id}-1`] ? 'Generating...' : 
-                                 `Get Image (${imageCounts[`${selectedItem.id}-1`] || 0}/3)`}
+                              <span className="truncate text-xs">
+                                {(imageCounts[`${selectedItem.id}-1`] || 0) >= 3 ? 'Max' :
+                                 loadingImages[`${selectedItem.id}-1`] ? 'Gen...' : 
+                                 `Img (${imageCounts[`${selectedItem.id}-1`] || 0}/3)`}
                               </span>
                             </Button>
                           </div>
@@ -708,22 +700,22 @@ const HistoryModal = ({
                             <Button
                               onClick={() => handleCopyResult(selectedItem, 2)}
                               size="sm"
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white h-7 sm:h-8 text-xs px-2 sm:px-3 flex items-center justify-center gap-1"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white h-6 sm:h-7 text-xs px-2 flex items-center justify-center gap-1"
                             >
                               <Copy className="w-3 h-3 flex-shrink-0" />
-                              <span className="truncate">Copy Post 2</span>
+                              <span className="truncate text-xs">Copy</span>
                             </Button>
                             <Button
                               onClick={() => handleGetImageForPost(selectedItem, 2)}
                               size="sm"
                               disabled={loadingImages[`${selectedItem.id}-2`] || (imageCounts[`${selectedItem.id}-2`] || 0) >= 3}
-                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-7 sm:h-8 text-xs px-2 sm:px-3 flex items-center justify-center gap-1"
+                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-6 sm:h-7 text-xs px-2 flex items-center justify-center gap-1"
                             >
                               <ImageIcon className="w-3 h-3 flex-shrink-0" />
-                              <span className="truncate">
-                                {(imageCounts[`${selectedItem.id}-2`] || 0) >= 3 ? 'Limit' :
-                                 loadingImages[`${selectedItem.id}-2`] ? 'Generating...' : 
-                                 `Get Image (${imageCounts[`${selectedItem.id}-2`] || 0}/3)`}
+                              <span className="truncate text-xs">
+                                {(imageCounts[`${selectedItem.id}-2`] || 0) >= 3 ? 'Max' :
+                                 loadingImages[`${selectedItem.id}-2`] ? 'Gen...' : 
+                                 `Img (${imageCounts[`${selectedItem.id}-2`] || 0}/3)`}
                               </span>
                             </Button>
                           </div>
@@ -785,22 +777,22 @@ const HistoryModal = ({
                             <Button
                               onClick={() => handleCopyResult(selectedItem, 3)}
                               size="sm"
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white h-7 sm:h-8 text-xs px-2 sm:px-3 flex items-center justify-center gap-1"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white h-6 sm:h-7 text-xs px-2 flex items-center justify-center gap-1"
                             >
                               <Copy className="w-3 h-3 flex-shrink-0" />
-                              <span className="truncate">Copy Post 3</span>
+                              <span className="truncate text-xs">Copy</span>
                             </Button>
                             <Button
                               onClick={() => handleGetImageForPost(selectedItem, 3)}
                               size="sm"
                               disabled={loadingImages[`${selectedItem.id}-3`] || (imageCounts[`${selectedItem.id}-3`] || 0) >= 3}
-                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-7 sm:h-8 text-xs px-2 sm:px-3 flex items-center justify-center gap-1"
+                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-6 sm:h-7 text-xs px-2 flex items-center justify-center gap-1"
                             >
                               <ImageIcon className="w-3 h-3 flex-shrink-0" />
-                              <span className="truncate">
-                                {(imageCounts[`${selectedItem.id}-3`] || 0) >= 3 ? 'Limit' :
-                                 loadingImages[`${selectedItem.id}-3`] ? 'Generating...' : 
-                                 `Get Image (${imageCounts[`${selectedItem.id}-3`] || 0}/3)`}
+                              <span className="truncate text-xs">
+                                {(imageCounts[`${selectedItem.id}-3`] || 0) >= 3 ? 'Max' :
+                                 loadingImages[`${selectedItem.id}-3`] ? 'Gen...' : 
+                                 `Img (${imageCounts[`${selectedItem.id}-3`] || 0}/3)`}
                               </span>
                             </Button>
                           </div>
@@ -854,7 +846,41 @@ const HistoryModal = ({
                     )}
                   </div>
                 ) : (
-                  // ... keep existing code (non-LinkedIn posts result section)
+                  <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                    <div className="flex justify-between items-start mb-3">
+                      <h4 className="text-lime-400 font-semibold">{getResultTitle()}</h4>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => handleCopyResult(selectedItem)}
+                          size="sm"
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        >
+                          <Copy className="w-4 h-4 mr-2" />
+                          Copy Result
+                        </Button>
+                        {type === 'cover_letters' && selectedItem.cover_letter && (
+                          <CoverLetterDownloadActions 
+                            content={selectedItem.cover_letter}
+                            companyName={selectedItem.company_name || 'Company'}
+                            jobTitle={selectedItem.job_title || 'Position'}
+                          />
+                        )}
+                      </div>
+                    </div>
+                    
+                    {type === 'job_analyses' && selectedItem.match_score && (
+                      <div className="mb-4">
+                        <PercentageMeter 
+                          percentage={parseInt(selectedItem.match_score)} 
+                          label="Match Score"
+                        />
+                      </div>
+                    )}
+                    
+                    <div className="text-black bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words">
+                      {getResult(selectedItem)}
+                    </div>
+                  </div>
                 )}
               </div>
             )}
@@ -887,15 +913,21 @@ const HistoryModal = ({
         </div>
 
         <div className="flex-1 overflow-y-auto min-h-0">
-          {isLoading ? <div className="flex items-center justify-center py-8">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
               <div className="text-white/70 text-sm">Loading history...</div>
-            </div> : historyData.length === 0 ? <div className="flex items-center justify-center py-8">
+            </div>
+          ) : historyData.length === 0 ? (
+            <div className="flex items-center justify-center py-8">
               <div className="text-white/70 text-center">
                 {type === 'linkedin_posts' ? <Share2 className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" /> : <History className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />}
                 <p className="text-sm">No {getHistoryDescription()} found.</p>
               </div>
-            </div> : <div className="space-y-2 sm:space-y-3 pb-4">
-              {historyData.map(item => <div key={item.id} className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-indigo-800">
+            </div>
+          ) : (
+            <div className="space-y-2 sm:space-y-3 pb-4">
+              {historyData.map(item => (
+                <div key={item.id} className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-indigo-800">
                   {/* Mobile Layout */}
                   <div className="block sm:hidden space-y-2">
                     <div className="flex items-start justify-between gap-2">
@@ -916,15 +948,23 @@ const HistoryModal = ({
                     </div>
                     
                     <div className="flex items-center gap-1 pt-2">
-                      <Button onClick={() => {
-                  setSelectedItem(item);
-                  setShowDetails(true);
-                }} size="sm" className="flex-1 bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-2 py-1">
+                      <Button 
+                        onClick={() => {
+                          setSelectedItem(item);
+                          setShowDetails(true);
+                        }} 
+                        size="sm" 
+                        className="flex-1 bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-2 py-1"
+                      >
                         <Eye className="w-3 h-3 mr-1" />
                         View
                       </Button>
                       
-                      <Button onClick={() => handleDelete(item.id)} size="sm" className="flex-1 bg-red-600/80 hover:bg-red-600 text-white text-xs px-2 py-1">
+                      <Button 
+                        onClick={() => handleDelete(item.id)} 
+                        size="sm" 
+                        className="flex-1 bg-red-600/80 hover:bg-red-600 text-white text-xs px-2 py-1"
+                      >
                         <Trash2 className="w-3 h-3 mr-1" />
                         Delete
                       </Button>
@@ -951,22 +991,32 @@ const HistoryModal = ({
                     </div>
 
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <Button onClick={() => {
-                  setSelectedItem(item);
-                  setShowDetails(true);
-                }} size="sm" className="bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-3 py-1">
+                      <Button 
+                        onClick={() => {
+                          setSelectedItem(item);
+                          setShowDetails(true);
+                        }} 
+                        size="sm" 
+                        className="bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-3 py-1"
+                      >
                         <Eye className="w-3 h-3 mr-1" />
                         View
                       </Button>
                       
-                      <Button onClick={() => handleDelete(item.id)} size="sm" className="bg-red-600/80 hover:bg-red-600 text-white text-xs px-3 py-1">
+                      <Button 
+                        onClick={() => handleDelete(item.id)} 
+                        size="sm" 
+                        className="bg-red-600/80 hover:bg-red-600 text-white text-xs px-3 py-1"
+                      >
                         <Trash2 className="w-3 h-3 mr-1" />
                         Delete
                       </Button>
                     </div>
                   </div>
-                </div>)}
-            </div>}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
