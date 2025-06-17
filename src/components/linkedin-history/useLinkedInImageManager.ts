@@ -31,26 +31,61 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
       return;
     }
 
-    console.log('=== DEBUGGING IMAGE COUNT LOADING ===');
-    console.log('selectedItem.id:', selectedItem.id);
-    console.log('selectedItem:', selectedItem);
+    console.log('🔍 DEBUGGING ISSUE - Selected item details:');
+    console.log('📝 Post ID from selectedItem:', selectedItem.id);
+    console.log('📝 Full selectedItem object:', selectedItem);
 
     const loadExistingImagesAndCounts = async () => {
       try {
         console.log(`🔍 Loading data for post ID: ${selectedItem.id}`);
         
-        // First, let's verify what's in the database
+        // First, let's verify what's actually in the database with a broader search
+        console.log('🔍 STEP 1: Checking what exists in linkedin_post_image_counts table...');
+        const { data: allCounts, error: allCountsError } = await supabase
+          .from('linkedin_post_image_counts')
+          .select('*')
+          .limit(10);
+
+        console.log('📊 All count records in database (first 10):', allCounts);
+        if (allCountsError) {
+          console.error('❌ Error getting all counts:', allCountsError);
+        }
+
+        // Now search for our specific post ID
+        console.log(`🔍 STEP 2: Searching for post_id = "${selectedItem.id}"`);
         const { data: debugCounts, error: debugError } = await supabase
           .from('linkedin_post_image_counts')
           .select('*')
           .eq('post_id', selectedItem.id);
 
-        console.log('🔍 Raw database counts query result:', { debugCounts, debugError });
+        console.log('📊 Specific post search result:', { debugCounts, debugError });
 
-        if (debugCounts && debugCounts.length > 0) {
-          console.log('✅ Found count records in database:', debugCounts);
+        // Also check if there's a similar post ID (in case of ID mismatch)
+        console.log('🔍 STEP 3: Checking for similar post IDs...');
+        const { data: similarCounts, error: similarError } = await supabase
+          .from('linkedin_post_image_counts')
+          .select('*')
+          .ilike('post_id', `${selectedItem.id.substring(0, 20)}%`);
+
+        console.log('📊 Similar post IDs found:', similarCounts);
+
+        if (!debugCounts || debugCounts.length === 0) {
+          console.log('❌ No exact count records found for this post_id');
+          console.log('🔍 Let me check linkedin_post_images table directly...');
+          
+          const { data: imageRecords, error: imageError } = await supabase
+            .from('linkedin_post_images')
+            .select('*')
+            .eq('post_id', selectedItem.id);
+          
+          console.log('📊 Direct image records for this post:', imageRecords);
+          
+          if (imageRecords && imageRecords.length > 0) {
+            console.log('✅ Found images in linkedin_post_images but no count record!');
+            console.log('🔧 This suggests the count table is out of sync with the images table');
+          }
         } else {
-          console.log('❌ No count records found for this post_id');
+          console.log('✅ Found count records in database:', debugCounts);
         }
 
         // Process each variation (1, 2, 3)
@@ -71,7 +106,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
               ...prev,
               [variationKey]: count
             };
-            console.log(`📊 Updated imageCounts state:`, newCounts);
+            console.log(`📊 Updated imageCounts state for ${variationKey}:`, newCounts);
             return newCounts;
           });
 
