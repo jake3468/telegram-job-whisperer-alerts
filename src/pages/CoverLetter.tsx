@@ -360,7 +360,7 @@ const CoverLetter = () => {
               </div>
 
               {/* History Modal */}
-              <HistoryModal type="cover_letter" isOpen={showHistory} onClose={() => setShowHistory(false)} gradientColors="from-pink-400 to-fuchsia-400" />
+              <HistoryModal type="cover_letters" isOpen={showHistory} onClose={() => setShowHistory(false)} gradientColors="from-pink-400 to-fuchsia-400" />
             </div>
           </main>
         </div>
