@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -452,7 +451,7 @@ const LinkedInPosts = () => {
                     </CardContent>
                   </Card>
 
-                  {/* Loading State - Fixed to show proper loading message */}
+                  {/* Loading State */}
                   {isGenerating && !postsData && (
                     <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm mb-8">
                       <CardContent className="py-8 flex items-center justify-center">
