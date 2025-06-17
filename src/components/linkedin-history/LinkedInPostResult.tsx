@@ -16,10 +16,10 @@ interface LinkedInPostItem {
 interface LinkedInPostResultProps {
   item: LinkedInPostItem;
   postNumber: number;
-  generatedImage: string | null;
+  generatedImages: string[];
   loadingImage: boolean;
   imageGenerationFailed: boolean;
-  hasImage: boolean;
+  hasImages: boolean;
   onCopyResult: (item: LinkedInPostItem, postNumber: number) => void;
   onGetImage: (item: LinkedInPostItem, postNumber: number) => void;
   onCopyImage: (imageData: string) => void;
@@ -28,10 +28,10 @@ interface LinkedInPostResultProps {
 const LinkedInPostResult = ({
   item,
   postNumber,
-  generatedImage,
+  generatedImages,
   loadingImage,
   imageGenerationFailed,
-  hasImage,
+  hasImages,
   onCopyResult,
   onGetImage,
   onCopyImage
@@ -59,19 +59,15 @@ const LinkedInPostResult = ({
           <Button
             onClick={() => onGetImage(item, postNumber)}
             size="sm"
-            disabled={loadingImage || hasImage}
+            disabled={loadingImage}
             className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-6 text-xs px-2 flex items-center gap-1"
           >
             <ImageIcon className="w-3 h-3" />
             <span className="hidden xs:inline">
-              {hasImage ? 'Generated' :
-               loadingImage ? 'Gen...' : 
-               'Get Image'}
+              {loadingImage ? 'Gen...' : 'Get Image'}
             </span>
             <span className="xs:hidden">
-              {hasImage ? 'Done' :
-               loadingImage ? '...' : 
-               'Img'}
+              {loadingImage ? '...' : 'Img'}
             </span>
           </Button>
         </div>
@@ -93,22 +89,27 @@ const LinkedInPostResult = ({
         </div>
       )}
 
-      {/* Generated Image */}
-      {generatedImage && (
+      {/* Generated Images */}
+      {generatedImages.length > 0 && (
         <div className="mb-4 space-y-3">
-          <div className="relative">
-            <img 
-              src={generatedImage} 
-              alt={`Generated LinkedIn post image`}
-              className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto rounded-lg shadow-sm object-contain max-h-96"
-            />
-            <Button
-              onClick={() => onCopyImage(generatedImage)}
-              size="sm"
-              className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white p-1 h-auto min-h-0"
-            >
-              <Copy className="w-3 h-3" />
-            </Button>
+          <h5 className="text-cyan-300 font-medium text-sm">Generated Images ({generatedImages.length}):</h5>
+          <div className="space-y-3">
+            {generatedImages.map((imageData, index) => (
+              <div key={index} className="relative">
+                <img 
+                  src={imageData} 
+                  alt={`Generated LinkedIn post image ${index + 1}`}
+                  className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto rounded-lg shadow-sm object-contain max-h-96"
+                />
+                <Button
+                  onClick={() => onCopyImage(imageData)}
+                  size="sm"
+                  className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white p-1 h-auto min-h-0"
+                >
+                  <Copy className="w-3 h-3" />
+                </Button>
+              </div>
+            ))}
           </div>
         </div>
       )}

@@ -23,33 +23,6 @@ serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Check if an image already exists for this post
-    const { data: existingImage, error: checkError } = await supabase
-      .from('linkedin_post_images')
-      .select('id')
-      .eq('post_id', post_id)
-      .maybeSingle()
-
-    if (checkError) {
-      console.error('Error checking existing image:', checkError)
-    }
-
-    // Check if limit is reached (one image per post)
-    if (existingImage) {
-      console.log('Image already exists for this post, returning success response')
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: 'Image already exists for this post',
-          image_exists: true
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200
-        }
-      )
-    }
-
     // Get the N8N webhook URL from environment variables
     const n8nWebhookUrl = Deno.env.get('N8N_LINKEDIN_IMAGE_WEBHOOK_URL')
 
@@ -143,7 +116,7 @@ serve(async (req) => {
     if (result && result.success && result.image_data) {
       console.log('Image data found, storing in database...')
       
-      // Store the image in the database (without user_id since we removed it)
+      // Store the image in the database (create a new row for each request)
       const { data: storedImage, error: storeError } = await supabase
         .from('linkedin_post_images')
         .insert({

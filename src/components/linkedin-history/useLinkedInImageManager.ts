@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
@@ -19,54 +20,50 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
   const { toast } = useToast();
   const navigate = useNavigate();
   const { hasCredits, creditBalance, showInsufficientCreditsPopup } = useCreditCheck(0.5);
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [loadingImage, setLoadingImage] = useState(false);
   const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
-  const [hasImage, setHasImage] = useState(false);
   
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
   const isTimeoutActiveRef = useRef(false);
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load existing image when selectedItem changes
+  // Load existing images when selectedItem changes
   useEffect(() => {
     if (!selectedItem?.id) {
-      setGeneratedImage(null);
-      setHasImage(false);
+      setGeneratedImages([]);
       return;
     }
 
-    const loadExistingImage = async () => {
+    const loadExistingImages = async () => {
       try {
-        console.log(`Loading image for post ${selectedItem.id}`);
+        console.log(`Loading images for post ${selectedItem.id}`);
         
-        const { data: image, error } = await supabase
+        const { data: images, error } = await supabase
           .from('linkedin_post_images')
           .select('image_data')
           .eq('post_id', selectedItem.id)
-          .maybeSingle();
+          .order('created_at', { ascending: false });
 
         if (error) {
-          console.error('Error loading existing image:', error);
+          console.error('Error loading existing images:', error);
           return;
         }
 
-        if (image) {
-          console.log(`Found existing image for post ${selectedItem.id}`);
-          setGeneratedImage(image.image_data);
-          setHasImage(true);
+        if (images && images.length > 0) {
+          console.log(`Found ${images.length} existing images for post ${selectedItem.id}`);
+          setGeneratedImages(images.map(img => img.image_data));
         } else {
-          console.log(`No existing image found for post ${selectedItem.id}`);
-          setGeneratedImage(null);
-          setHasImage(false);
+          console.log(`No existing images found for post ${selectedItem.id}`);
+          setGeneratedImages([]);
         }
 
       } catch (error) {
-        console.error('Error loading existing image:', error);
+        console.error('Error loading existing images:', error);
       }
     };
 
-    loadExistingImage();
+    loadExistingImages();
   }, [selectedItem?.id]);
 
   // Set up real-time subscription
@@ -99,8 +96,8 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
             }
             isTimeoutActiveRef.current = false;
             
-            setGeneratedImage(payload.payload.image_data);
-            setHasImage(true);
+            // Add new image to the list
+            setGeneratedImages(prev => [payload.payload.image_data, ...prev]);
             setLoadingImage(false);
             setImageGenerationFailed(false);
             
@@ -132,15 +129,6 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
   }, [selectedItem?.id, toast]);
 
   const handleGetImageForPost = async (item: LinkedInPostItem, postNumber: number) => {
-    if (hasImage) {
-      toast({
-        title: "Image Already Generated",
-        description: "This LinkedIn post already has an image.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     // Check if user has sufficient credits
     if (!hasCredits) {
       showInsufficientCreditsPopup();
@@ -201,25 +189,6 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
         throw new Error(data.error || 'Failed to trigger image generation');
       }
 
-      // Handle the case where image already exists
-      if (data.image_exists) {
-        setHasImage(true);
-        toast({
-          title: "Image Already Exists",
-          description: "This post already has an image generated.",
-          variant: "destructive"
-        });
-        
-        // Clear timeout and reset state
-        if (timeoutIdRef.current) {
-          clearTimeout(timeoutIdRef.current);
-          timeoutIdRef.current = null;
-          isTimeoutActiveRef.current = false;
-        }
-        setLoadingImage(false);
-        return;
-      }
-
       // If the response already contains image data (immediate response)
       if (data.data && data.data.image_data) {
         console.log('Received immediate image data from edge function');
@@ -231,8 +200,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
           isTimeoutActiveRef.current = false;
         }
         
-        setGeneratedImage(data.data.image_data);
-        setHasImage(true);
+        setGeneratedImages(prev => [data.data.image_data, ...prev]);
         setLoadingImage(false);
         
         toast({
@@ -252,36 +220,41 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
           }
           
           try {
-            console.log(`Polling for new image for post ${item.id}`);
-            const { data: image, error } = await supabase
+            console.log(`Polling for new images for post ${item.id}`);
+            const { data: images, error } = await supabase
               .from('linkedin_post_images')
               .select('image_data')
               .eq('post_id', item.id)
-              .maybeSingle();
+              .order('created_at', { ascending: false })
+              .limit(1);
 
-            if (!error && image) {
-              console.log('Found new image via polling for post', item.id);
+            if (!error && images && images.length > 0) {
+              const latestImage = images[0].image_data;
               
-              // Clear timeout and interval
-              if (timeoutIdRef.current) {
-                clearTimeout(timeoutIdRef.current);
-                timeoutIdRef.current = null;
-                isTimeoutActiveRef.current = false;
+              // Check if this is a new image (not already in our list)
+              if (!generatedImages.includes(latestImage)) {
+                console.log('Found new image via polling for post', item.id);
+                
+                // Clear timeout and interval
+                if (timeoutIdRef.current) {
+                  clearTimeout(timeoutIdRef.current);
+                  timeoutIdRef.current = null;
+                  isTimeoutActiveRef.current = false;
+                }
+                if (pollIntervalRef.current) {
+                  clearInterval(pollIntervalRef.current);
+                  pollIntervalRef.current = null;
+                }
+                
+                setGeneratedImages(prev => [latestImage, ...prev]);
+                setLoadingImage(false);
+                setImageGenerationFailed(false);
+                
+                toast({
+                  title: "Image Generated!",
+                  description: "LinkedIn post image is ready."
+                });
               }
-              if (pollIntervalRef.current) {
-                clearInterval(pollIntervalRef.current);
-                pollIntervalRef.current = null;
-              }
-              
-              setGeneratedImage(image.image_data);
-              setHasImage(true);
-              setLoadingImage(false);
-              setImageGenerationFailed(false);
-              
-              toast({
-                title: "Image Generated!",
-                description: "LinkedIn post image is ready."
-              });
             }
           } catch (err) {
             console.error('Polling error:', err);
@@ -310,10 +283,10 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
   };
 
   return {
-    generatedImage,
+    generatedImages, // Changed from generatedImage to generatedImages array
     loadingImage,
     imageGenerationFailed,
-    hasImage,
+    hasImages: generatedImages.length > 0, // Changed from hasImage to hasImages
     handleGetImageForPost
   };
 };

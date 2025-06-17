@@ -48,10 +48,10 @@ const LinkedInPostsHistoryModal = ({
   const [showDetails, setShowDetails] = useState(false);
 
   const {
-    generatedImage,
+    generatedImages,
     loadingImage,
     imageGenerationFailed,
-    hasImage,
+    hasImages,
     handleGetImageForPost
   } = useLinkedInImageManager(selectedItem);
 
@@ -231,10 +231,10 @@ const LinkedInPostsHistoryModal = ({
                       key={postNumber}
                       item={selectedItem}
                       postNumber={postNumber}
-                      generatedImage={generatedImage}
+                      generatedImages={generatedImages}
                       loadingImage={loadingImage}
                       imageGenerationFailed={imageGenerationFailed}
-                      hasImage={hasImage}
+                      hasImages={hasImages}
                       onCopyResult={handleCopyResult}
                       onGetImage={handleGetImageForPost}
                       onCopyImage={handleCopyImage}

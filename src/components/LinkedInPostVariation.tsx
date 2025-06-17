@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -43,10 +44,9 @@ const LinkedInPostVariation = ({
   const { toast } = useToast();
   const navigate = useNavigate();
   const { hasCredits, creditBalance, showInsufficientCreditsPopup } = useCreditCheck(0.5);
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
-  const [hasImage, setHasImage] = useState(false);
   
   // Use refs to track timeout state independently of React state
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
@@ -60,42 +60,41 @@ const LinkedInPostVariation = ({
     ? userData.first_name 
     : 'Professional User';
 
-  // Load existing image from database
+  // Load existing images from database
   useEffect(() => {
     if (!postId) return;
 
-    const loadExistingImage = async () => {
+    const loadExistingImages = async () => {
       try {
-        console.log(`🔍 DEBUG: Loading image for post ${postId}`);
+        console.log(`🔍 DEBUG: Loading images for post ${postId}`);
         
-        const { data: image, error } = await supabase
+        const { data: images, error } = await supabase
           .from('linkedin_post_images')
           .select('image_data')
           .eq('post_id', postId)
-          .maybeSingle();
+          .order('created_at', { ascending: false });
 
-        console.log(`🔍 DEBUG: Image query result:`, { image, error });
+        console.log(`🔍 DEBUG: Images query result:`, { images, error });
 
         if (error) {
-          console.error('Error loading existing image:', error);
+          console.error('Error loading existing images:', error);
           return;
         }
 
-        if (image) {
-          console.log(`🔍 DEBUG: Found existing image for post ${postId}`);
-          setGeneratedImage(image.image_data);
-          setHasImage(true);
+        if (images && images.length > 0) {
+          console.log(`🔍 DEBUG: Found ${images.length} existing images for post ${postId}`);
+          setGeneratedImages(images.map(img => img.image_data));
         } else {
-          console.log(`🔍 DEBUG: No existing image found for post ${postId}`);
-          setHasImage(false);
+          console.log(`🔍 DEBUG: No existing images found for post ${postId}`);
+          setGeneratedImages([]);
         }
 
       } catch (error) {
-        console.error('Error loading existing image:', error);
+        console.error('Error loading existing images:', error);
       }
     };
 
-    loadExistingImage();
+    loadExistingImages();
   }, [postId]);
 
   // Set up real-time subscription for image updates
@@ -128,8 +127,8 @@ const LinkedInPostVariation = ({
             }
             isTimeoutActiveRef.current = false;
             
-            setGeneratedImage(payload.payload.image_data);
-            setHasImage(true);
+            // Add new image to the list
+            setGeneratedImages(prev => [payload.payload.image_data, ...prev]);
             setIsGeneratingImage(false);
             setImageGenerationFailed(false);
             
@@ -205,15 +204,6 @@ const LinkedInPostVariation = ({
   };
 
   const handleGetImage = async () => {
-    if (hasImage) {
-      toast({
-        title: "Image Already Generated",
-        description: "This LinkedIn post already has an image.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     // Check if user has sufficient credits
     if (!hasCredits) {
       showInsufficientCreditsPopup();
@@ -271,25 +261,6 @@ const LinkedInPostVariation = ({
         throw new Error(data.error || 'Failed to trigger image generation');
       }
 
-      // Handle the case where image already exists
-      if (data.image_exists) {
-        setHasImage(true);
-        toast({
-          title: "Image Already Exists",
-          description: "This post already has an image generated.",
-          variant: "destructive"
-        });
-        
-        // Clear timeout and reset state
-        if (timeoutIdRef.current) {
-          clearTimeout(timeoutIdRef.current);
-          timeoutIdRef.current = null;
-          isTimeoutActiveRef.current = false;
-        }
-        setIsGeneratingImage(false);
-        return;
-      }
-
       // If the response already contains image data (immediate response)
       if (data.data && data.data.image_data) {
         console.log('Received immediate image data from edge function');
@@ -301,8 +272,7 @@ const LinkedInPostVariation = ({
           isTimeoutActiveRef.current = false;
         }
         
-        setGeneratedImage(data.data.image_data);
-        setHasImage(true);
+        setGeneratedImages(prev => [data.data.image_data, ...prev]);
         setIsGeneratingImage(false);
         
         toast({
@@ -322,36 +292,41 @@ const LinkedInPostVariation = ({
           }
           
           try {
-            console.log(`Polling for new image for post ${postId}`);
-            const { data: image, error } = await supabase
+            console.log(`Polling for new images for post ${postId}`);
+            const { data: images, error } = await supabase
               .from('linkedin_post_images')
               .select('image_data')
               .eq('post_id', postId)
-              .maybeSingle();
+              .order('created_at', { ascending: false })
+              .limit(1);
 
-            if (!error && image) {
-              console.log('Found new image via polling for post', postId);
+            if (!error && images && images.length > 0) {
+              const latestImage = images[0].image_data;
               
-              // Clear timeout and interval
-              if (timeoutIdRef.current) {
-                clearTimeout(timeoutIdRef.current);
-                timeoutIdRef.current = null;
-                isTimeoutActiveRef.current = false;
+              // Check if this is a new image (not already in our list)
+              if (!generatedImages.includes(latestImage)) {
+                console.log('Found new image via polling for post', postId);
+                
+                // Clear timeout and interval
+                if (timeoutIdRef.current) {
+                  clearTimeout(timeoutIdRef.current);
+                  timeoutIdRef.current = null;
+                  isTimeoutActiveRef.current = false;
+                }
+                if (pollIntervalRef.current) {
+                  clearInterval(pollIntervalRef.current);
+                  pollIntervalRef.current = null;
+                }
+                
+                setGeneratedImages(prev => [latestImage, ...prev]);
+                setIsGeneratingImage(false);
+                setImageGenerationFailed(false);
+                
+                toast({
+                  title: "Image Generated!",
+                  description: "LinkedIn post image is ready."
+                });
               }
-              if (pollIntervalRef.current) {
-                clearInterval(pollIntervalRef.current);
-                pollIntervalRef.current = null;
-              }
-              
-              setGeneratedImage(image.image_data);
-              setHasImage(true);
-              setIsGeneratingImage(false);
-              setImageGenerationFailed(false);
-              
-              toast({
-                title: "Image Generated!",
-                description: "LinkedIn post image is ready."
-              });
             }
           } catch (err) {
             console.error('Polling error:', err);
@@ -378,8 +353,6 @@ const LinkedInPostVariation = ({
       });
     }
   };
-
-  const isImageGenerationDisabled = hasImage || isGeneratingImage;
 
   return (
     <div className="space-y-4 w-full">
@@ -470,15 +443,13 @@ const LinkedInPostVariation = ({
           
           <Button 
             onClick={handleGetImage} 
-            disabled={isImageGenerationDisabled}
+            disabled={isGeneratingImage}
             variant="outline" 
             className="flex items-center justify-center gap-1 h-8 sm:h-10 text-xs sm:text-sm border-teal-400/25 bg-amber-500 hover:bg-amber-400 text-gray-950 disabled:opacity-50 disabled:cursor-not-allowed px-2 sm:px-4"
           >
             <ImageIcon className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
             <span className="truncate">
-              {hasImage ? 'Image Generated' : 
-               isGeneratingImage ? 'Generating...' : 
-               'Get Image'}
+              {isGeneratingImage ? 'Generating...' : 'Get Image'}
             </span>
           </Button>
         </div>
@@ -500,23 +471,27 @@ const LinkedInPostVariation = ({
         </div>
       )}
 
-      {/* Generated Image Display */}
-      {generatedImage && (
+      {/* Generated Images Display */}
+      {generatedImages.length > 0 && (
         <div className="space-y-3">
-          <h4 className="text-sm font-medium text-cyan-300 px-1">Generated Image:</h4>
-          <div className="relative">
-            <img 
-              src={generatedImage} 
-              alt={`Generated image for ${heading}`}
-              className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto rounded-lg shadow-sm object-contain max-h-96"
-            />
-            <Button
-              onClick={() => handleCopyImage(generatedImage)}
-              size="sm"
-              className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white p-1 h-auto min-h-0"
-            >
-              <Copy className="w-3 h-3" />
-            </Button>
+          <h4 className="text-sm font-medium text-cyan-300 px-1">Generated Images ({generatedImages.length}):</h4>
+          <div className="space-y-4">
+            {generatedImages.map((imageData, index) => (
+              <div key={index} className="relative">
+                <img 
+                  src={imageData} 
+                  alt={`Generated image ${index + 1} for ${heading}`}
+                  className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto rounded-lg shadow-sm object-contain max-h-96"
+                />
+                <Button
+                  onClick={() => handleCopyImage(imageData)}
+                  size="sm"
+                  className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white p-1 h-auto min-h-0"
+                >
+                  <Copy className="w-3 h-3" />
+                </Button>
+              </div>
+            ))}
           </div>
         </div>
       )}
