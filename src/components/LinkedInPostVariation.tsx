@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Repeat2, Send, MoreHorizontal, User, Copy, Image as ImageIcon } from 'lucide-react';
@@ -42,6 +43,10 @@ const LinkedInPostVariation = ({
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
   const [imageCount, setImageCount] = useState(0);
+  
+  // Use refs to track timeout state independently of React state
+  const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
+  const isTimeoutActiveRef = useRef(false);
 
   // Create display name from user data
   const displayName = userData?.first_name && userData?.last_name 
@@ -103,6 +108,13 @@ const LinkedInPostVariation = ({
             
             console.log(`Image received for variation ${variationNumber}`);
             
+            // Clear timeout when image is received
+            if (timeoutIdRef.current) {
+              clearTimeout(timeoutIdRef.current);
+              timeoutIdRef.current = null;
+              isTimeoutActiveRef.current = false;
+            }
+            
             // Add the new image to the list
             setGeneratedImages(prev => {
               // Check if this image is already in the list to avoid duplicates
@@ -129,6 +141,12 @@ const LinkedInPostVariation = ({
 
     return () => {
       console.log(`Cleaning up image subscription for variation ${variationNumber}`);
+      // Clear any active timeout on cleanup
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+        timeoutIdRef.current = null;
+        isTimeoutActiveRef.current = false;
+      }
       supabase.removeChannel(channel);
     };
   }, [postId, variationNumber, toast]);
@@ -189,12 +207,15 @@ const LinkedInPostVariation = ({
 
     setIsGeneratingImage(true);
     setImageGenerationFailed(false);
+    isTimeoutActiveRef.current = true;
     
-    // Set timeout for 2 minutes
-    const timeoutId = setTimeout(() => {
-      if (isGeneratingImage) {
+    // Set timeout for 2 minutes using useRef
+    timeoutIdRef.current = setTimeout(() => {
+      if (isTimeoutActiveRef.current) {
+        console.log(`Image generation timeout for variation ${variationNumber}`);
         setIsGeneratingImage(false);
         setImageGenerationFailed(true);
+        isTimeoutActiveRef.current = false;
         toast({
           title: "Image Generation Failed",
           description: "Image generation timed out after 2 minutes. Please try again.",
@@ -217,8 +238,6 @@ const LinkedInPostVariation = ({
         }
       });
 
-      clearTimeout(timeoutId);
-
       if (error) {
         console.error('Supabase function error:', error);
         throw new Error(error.message || 'Failed to trigger image generation');
@@ -237,6 +256,13 @@ const LinkedInPostVariation = ({
         } else {
           throw new Error(data.error || 'Failed to trigger image generation');
         }
+        
+        // Clear timeout and reset state
+        if (timeoutIdRef.current) {
+          clearTimeout(timeoutIdRef.current);
+          timeoutIdRef.current = null;
+          isTimeoutActiveRef.current = false;
+        }
         setIsGeneratingImage(false);
         return;
       }
@@ -244,6 +270,14 @@ const LinkedInPostVariation = ({
       // If the response already contains image data (immediate response)
       if (data.data && data.data.image_data) {
         console.log('Received immediate image data from edge function');
+        
+        // Clear timeout since we got immediate response
+        if (timeoutIdRef.current) {
+          clearTimeout(timeoutIdRef.current);
+          timeoutIdRef.current = null;
+          isTimeoutActiveRef.current = false;
+        }
+        
         setGeneratedImages(prev => [...prev, data.data.image_data]);
         setImageCount(data.current_image_count || (imageCount + 1));
         setIsGeneratingImage(false);
@@ -258,11 +292,83 @@ const LinkedInPostVariation = ({
           title: "Image Generation Started",
           description: `LinkedIn post image for Post ${variationNumber} is being generated...`
         });
+        
+        // Start fallback polling as backup to real-time
+        const pollInterval = setInterval(async () => {
+          if (!isTimeoutActiveRef.current) {
+            clearInterval(pollInterval);
+            return;
+          }
+          
+          try {
+            const { data: images, error } = await supabase
+              .from('linkedin_post_images')
+              .select('image_data')
+              .eq('post_id', postId)
+              .eq('variation_number', variationNumber)
+              .order('created_at', { ascending: false })
+              .limit(1);
+
+            if (!error && images && images.length > 0) {
+              const latestImage = images[0].image_data;
+              
+              // Check if this is a new image
+              if (!generatedImages.includes(latestImage)) {
+                console.log('Found new image via polling');
+                
+                // Clear timeout and interval
+                if (timeoutIdRef.current) {
+                  clearTimeout(timeoutIdRef.current);
+                  timeoutIdRef.current = null;
+                  isTimeoutActiveRef.current = false;
+                }
+                clearInterval(pollInterval);
+                
+                setGeneratedImages(prev => [...prev, latestImage]);
+                setImageCount(prev => prev + 1);
+                setIsGeneratingImage(false);
+                
+                toast({
+                  title: "Image Generated!",
+                  description: `LinkedIn post image for Post ${variationNumber} is ready.`
+                });
+              }
+            }
+          } catch (err) {
+            console.error('Polling error:', err);
+          }
+        }, 5000); // Poll every 5 seconds
+        
+        // Clear polling when timeout occurs
+        if (timeoutIdRef.current) {
+          const originalTimeout = timeoutIdRef.current;
+          timeoutIdRef.current = setTimeout(() => {
+            clearInterval(pollInterval);
+            clearTimeout(originalTimeout);
+            if (isTimeoutActiveRef.current) {
+              setIsGeneratingImage(false);
+              setImageGenerationFailed(true);
+              isTimeoutActiveRef.current = false;
+              toast({
+                title: "Image Generation Failed",
+                description: "Image generation timed out after 2 minutes. Please try again.",
+                variant: "destructive"
+              });
+            }
+          }, 120000);
+        }
       }
 
     } catch (error) {
       console.error('Error triggering image generation:', error);
-      clearTimeout(timeoutId);
+      
+      // Clear timeout on error
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+        timeoutIdRef.current = null;
+        isTimeoutActiveRef.current = false;
+      }
+      
       setIsGeneratingImage(false);
       setImageGenerationFailed(true);
       toast({
@@ -351,56 +457,32 @@ const LinkedInPostVariation = ({
         </CardContent>
       </Card>
 
-      {/* Action Buttons - Moved here to be close to post content */}
-      <div className="flex flex-col xs:flex-row gap-2 px-1">
-        <Button 
-          onClick={handleCopyContent} 
-          className="flex-1 flex items-center justify-center gap-1 text-xs h-8 font-semibold bg-emerald-300 hover:bg-emerald-200 text-gray-950 min-w-0 max-w-full"
-        >
-          <Copy className="w-3 h-3 flex-shrink-0" />
-          <span className="truncate text-xs">Copy Post {variationNumber}</span>
-        </Button>
-        
-        <Button 
-          onClick={handleGetImage} 
-          disabled={isImageGenerationDisabled}
-          variant="outline" 
-          className="flex-1 border-teal-400/25 text-xs h-8 bg-amber-500 hover:bg-amber-400 text-gray-950 disabled:opacity-50 disabled:cursor-not-allowed min-w-0 max-w-full"
-        >
-          <ImageIcon className="w-3 h-3 mr-1 flex-shrink-0" />
-          <span className="truncate text-xs">
-            {imageCount >= 3 ? 'Limit Exceeded' : 
-             isGeneratingImage ? 'Generating...' : 
-             `Get Image (${imageCount}/3)`}
-          </span>
-        </Button>
-      </div>
-
-      {/* Generated Images Display */}
-      {generatedImages.length > 0 && (
-        <div className="space-y-3">
-          <h4 className="text-sm font-medium text-cyan-300 px-1">Generated Images:</h4>
-          {generatedImages.map((imageData, index) => (
-            <div key={index} className="relative">
-              <img 
-                src={imageData} 
-                alt={`Generated image ${index + 1} for ${heading}`}
-                className="w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto rounded-lg shadow-sm object-contain"
-              />
-              <Button
-                onClick={() => handleCopyImage(imageData, index)}
-                size="sm"
-                className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white p-1 h-auto min-h-0"
-              >
-                <Copy className="w-3 h-3" />
-              </Button>
-              <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                Image {index + 1}
-              </div>
-            </div>
-          ))}
+      {/* Action Buttons - Fixed responsive sizing and positioning */}
+      <div className="flex flex-col gap-2 px-1">
+        <div className="grid grid-cols-1 xs:grid-cols-2 gap-2">
+          <Button 
+            onClick={handleCopyContent} 
+            className="flex items-center justify-center gap-1 h-8 sm:h-10 text-xs sm:text-sm font-semibold bg-emerald-300 hover:bg-emerald-200 text-gray-950 px-2 sm:px-4"
+          >
+            <Copy className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+            <span className="truncate">Copy Post {variationNumber}</span>
+          </Button>
+          
+          <Button 
+            onClick={handleGetImage} 
+            disabled={isImageGenerationDisabled}
+            variant="outline" 
+            className="flex items-center justify-center gap-1 h-8 sm:h-10 text-xs sm:text-sm border-teal-400/25 bg-amber-500 hover:bg-amber-400 text-gray-950 disabled:opacity-50 disabled:cursor-not-allowed px-2 sm:px-4"
+          >
+            <ImageIcon className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+            <span className="truncate">
+              {imageCount >= 3 ? 'Limit Exceeded' : 
+               isGeneratingImage ? 'Generating...' : 
+               `Get Image (${imageCount}/3)`}
+            </span>
+          </Button>
         </div>
-      )}
+      </div>
 
       {/* Loading indicator for image generation */}
       {isGeneratingImage && (
@@ -415,6 +497,32 @@ const LinkedInPostVariation = ({
         <div className="p-4 bg-red-50 rounded-lg text-center border border-red-200">
           <div className="text-sm text-red-600 font-medium">Image generation failed</div>
           <div className="text-xs text-red-500 mt-1">Please try again</div>
+        </div>
+      )}
+
+      {/* Generated Images Display */}
+      {generatedImages.length > 0 && (
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium text-cyan-300 px-1">Generated Images:</h4>
+          {generatedImages.map((imageData, index) => (
+            <div key={index} className="relative">
+              <img 
+                src={imageData} 
+                alt={`Generated image ${index + 1} for ${heading}`}
+                className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto rounded-lg shadow-sm object-contain max-h-96"
+              />
+              <Button
+                onClick={() => handleCopyImage(imageData, index)}
+                size="sm"
+                className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white p-1 h-auto min-h-0"
+              >
+                <Copy className="w-3 h-3" />
+              </Button>
+              <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                Image {index + 1}
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

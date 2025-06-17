@@ -299,7 +299,15 @@ export type Database = {
           post_id?: string
           variation_number?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_linkedin_post_images_post_id"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "job_linkedin"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscription_plans: {
         Row: {
@@ -662,6 +670,13 @@ export type Database = {
       check_sufficient_credits: {
         Args: { p_user_id: string; p_required_credits: number }
         Returns: boolean
+      }
+      cleanup_old_linkedin_data: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          deleted_posts: number
+          deleted_images: number
+        }[]
       }
       cleanup_old_webhook_executions: {
         Args: Record<PropertyKey, never>
