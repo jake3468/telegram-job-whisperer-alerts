@@ -1,7 +1,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useCreditCheck } from '@/hooks/useCreditCheck';
 
 interface LinkedInPostItem {
   id: string;
@@ -15,6 +18,8 @@ interface LinkedInPostItem {
 
 export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { hasCredits, creditBalance, showInsufficientCreditsPopup } = useCreditCheck(0.5);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [loadingImage, setLoadingImage] = useState(false);
   const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
@@ -134,6 +139,12 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
         description: "This LinkedIn post already has an image.",
         variant: "destructive"
       });
+      return;
+    }
+
+    // Check if user has sufficient credits
+    if (!hasCredits) {
+      showInsufficientCreditsPopup();
       return;
     }
 

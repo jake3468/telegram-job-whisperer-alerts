@@ -143,7 +143,7 @@ serve(async (req) => {
     if (result && result.success && result.image_data) {
       console.log('Image data found, storing in database...')
       
-      // Store the image in the database (without variation_number)
+      // Store the image in the database (without user_id since we removed it)
       const { data: storedImage, error: storeError } = await supabase
         .from('linkedin_post_images')
         .insert({

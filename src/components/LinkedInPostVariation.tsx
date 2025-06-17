@@ -1,10 +1,12 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Repeat2, Send, MoreHorizontal, User, Copy, Image as ImageIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useCreditCheck } from '@/hooks/useCreditCheck';
 
 interface UserProfile {
   id: string;
@@ -39,6 +41,8 @@ const LinkedInPostVariation = ({
   postId
 }: LinkedInPostVariationProps) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { hasCredits, creditBalance, showInsufficientCreditsPopup } = useCreditCheck(0.5);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
@@ -207,6 +211,12 @@ const LinkedInPostVariation = ({
         description: "This LinkedIn post already has an image.",
         variant: "destructive"
       });
+      return;
+    }
+
+    // Check if user has sufficient credits
+    if (!hasCredits) {
+      showInsufficientCreditsPopup();
       return;
     }
 
