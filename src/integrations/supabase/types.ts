@@ -300,7 +300,7 @@ export type Database = {
           {
             foreignKeyName: "fk_linkedin_post_images_post_id"
             columns: ["post_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "job_linkedin"
             referencedColumns: ["id"]
           },
