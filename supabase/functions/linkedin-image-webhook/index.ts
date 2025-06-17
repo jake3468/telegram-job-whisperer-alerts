@@ -23,31 +23,25 @@ serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Check the current image count from the counts table first
-    const { data: countData, error: countError } = await supabase
-      .from('linkedin_post_image_counts')
-      .select('image_count')
+    // Check if an image already exists for this post
+    const { data: existingImage, error: checkError } = await supabase
+      .from('linkedin_post_images')
+      .select('id')
       .eq('post_id', post_id)
-      .eq('variation_number', variation_number)
       .maybeSingle()
 
-    if (countError) {
-      console.error('Error checking image count:', countError)
+    if (checkError) {
+      console.error('Error checking existing image:', checkError)
     }
 
-    // Get the current count, defaulting to 0 if no record exists
-    const currentCount = countData?.image_count || 0
-    console.log(`Current image count for post ${post_id}, variation ${variation_number}: ${currentCount}`)
-
-    // Check if limit is reached
-    if (currentCount >= 3) {
-      console.log('Image limit exceeded, returning error')
+    // Check if limit is reached (one image per post)
+    if (existingImage) {
+      console.log('Image already exists for this post, returning error')
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Maximum 3 images allowed per post variation',
-          limit_exceeded: true,
-          current_count: currentCount
+          error: 'Image already exists for this post',
+          limit_exceeded: true
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -70,8 +64,7 @@ serve(async (req) => {
       variation_number,
       user_name,
       post_id,
-      source,
-      current_image_count: currentCount
+      source
     })
 
     // Call the N8N webhook
@@ -88,8 +81,7 @@ serve(async (req) => {
         post_id,
         source,
         timestamp: new Date().toISOString(),
-        triggered_from: req.headers.get('origin') || 'unknown',
-        current_image_count: currentCount
+        triggered_from: req.headers.get('origin') || 'unknown'
       }),
     })
 
@@ -122,8 +114,7 @@ serve(async (req) => {
         JSON.stringify({ 
           success: true, 
           message: 'Image generation triggered successfully',
-          triggered: true,
-          current_image_count: currentCount
+          triggered: true
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -137,12 +128,11 @@ serve(async (req) => {
     if (result && result.success && result.image_data) {
       console.log('Image data found, storing in database...')
       
-      // Store the image in the database
+      // Store the image in the database (without variation_number)
       const { data: storedImage, error: storeError } = await supabase
         .from('linkedin_post_images')
         .insert({
           post_id: post_id,
-          variation_number: variation_number,
           image_data: result.image_data
         })
         .select()
@@ -156,7 +146,7 @@ serve(async (req) => {
       }
       
       // Broadcast the image data to all listening clients
-      const channelName = `linkedin-image-${post_id}-${variation_number}`
+      const channelName = `linkedin-image-${post_id}`
       console.log(`Broadcasting to channel: ${channelName}`)
       
       const { error: broadcastError } = await supabase.channel(channelName)
@@ -166,10 +156,8 @@ serve(async (req) => {
           payload: {
             success: true,
             image_data: result.image_data,
-            variation_number: result.variation_number || variation_number,
             post_id: result.post_id || post_id,
             source: source,
-            image_count: currentCount + 1,
             stored_image_id: storedImage.id
           }
         })
@@ -189,10 +177,8 @@ serve(async (req) => {
           payload: {
             success: true,
             image_data: result.image_data,
-            variation_number: result.variation_number || variation_number,
             post_id: result.post_id || post_id,
             source: source,
-            image_count: currentCount + 1,
             stored_image_id: storedImage.id
           }
         })
@@ -208,7 +194,6 @@ serve(async (req) => {
           success: true, 
           message: 'Image generated and stored successfully',
           data: result,
-          current_image_count: currentCount + 1,
           stored_image_id: storedImage.id
         }),
         { 
@@ -222,8 +207,7 @@ serve(async (req) => {
         JSON.stringify({ 
           success: true, 
           message: 'Image generation triggered successfully',
-          triggered: true,
-          current_image_count: currentCount
+          triggered: true
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
