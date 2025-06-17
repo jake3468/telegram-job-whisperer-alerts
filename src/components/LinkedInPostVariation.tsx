@@ -47,6 +47,7 @@ const LinkedInPostVariation = ({
   // Use refs to track timeout state independently of React state
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
   const isTimeoutActiveRef = useRef(false);
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Create display name from user data
   const displayName = userData?.first_name && userData?.last_name 
@@ -108,12 +109,16 @@ const LinkedInPostVariation = ({
             
             console.log(`Image received for variation ${variationNumber}`);
             
-            // Clear timeout when image is received
+            // Clear all timeouts and intervals when image is received
             if (timeoutIdRef.current) {
               clearTimeout(timeoutIdRef.current);
               timeoutIdRef.current = null;
-              isTimeoutActiveRef.current = false;
             }
+            if (pollIntervalRef.current) {
+              clearTimeout(pollIntervalRef.current);
+              pollIntervalRef.current = null;
+            }
+            isTimeoutActiveRef.current = false;
             
             // Add the new image to the list
             setGeneratedImages(prev => {
@@ -141,12 +146,16 @@ const LinkedInPostVariation = ({
 
     return () => {
       console.log(`Cleaning up image subscription for variation ${variationNumber}`);
-      // Clear any active timeout on cleanup
+      // Clear any active timeouts on cleanup
       if (timeoutIdRef.current) {
         clearTimeout(timeoutIdRef.current);
         timeoutIdRef.current = null;
-        isTimeoutActiveRef.current = false;
       }
+      if (pollIntervalRef.current) {
+        clearTimeout(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
+      isTimeoutActiveRef.current = false;
       supabase.removeChannel(channel);
     };
   }, [postId, variationNumber, toast]);
@@ -216,6 +225,13 @@ const LinkedInPostVariation = ({
         setIsGeneratingImage(false);
         setImageGenerationFailed(true);
         isTimeoutActiveRef.current = false;
+        
+        // Clear polling interval on timeout
+        if (pollIntervalRef.current) {
+          clearTimeout(pollIntervalRef.current);
+          pollIntervalRef.current = null;
+        }
+        
         toast({
           title: "Image Generation Failed",
           description: "Image generation timed out after 2 minutes. Please try again.",
@@ -287,23 +303,22 @@ const LinkedInPostVariation = ({
           description: `LinkedIn post image for Post ${variationNumber} is ready.`
         });
       } else {
-        // Otherwise, wait for real-time update
-        toast({
-          title: "Image Generation Started",
-          description: `LinkedIn post image for Post ${variationNumber} is being generated...`
-        });
-        
         // Start fallback polling as backup to real-time
-        const pollInterval = setInterval(async () => {
+        console.log('Starting fallback polling for image generation');
+        pollIntervalRef.current = setInterval(async () => {
           if (!isTimeoutActiveRef.current) {
-            clearInterval(pollInterval);
+            if (pollIntervalRef.current) {
+              clearInterval(pollIntervalRef.current);
+              pollIntervalRef.current = null;
+            }
             return;
           }
           
           try {
+            console.log(`Polling for new images for variation ${variationNumber}`);
             const { data: images, error } = await supabase
               .from('linkedin_post_images')
-              .select('image_data')
+              .select('image_data, created_at')
               .eq('post_id', postId)
               .eq('variation_number', variationNumber)
               .order('created_at', { ascending: false })
@@ -314,7 +329,7 @@ const LinkedInPostVariation = ({
               
               // Check if this is a new image
               if (!generatedImages.includes(latestImage)) {
-                console.log('Found new image via polling');
+                console.log('Found new image via polling for variation', variationNumber);
                 
                 // Clear timeout and interval
                 if (timeoutIdRef.current) {
@@ -322,11 +337,15 @@ const LinkedInPostVariation = ({
                   timeoutIdRef.current = null;
                   isTimeoutActiveRef.current = false;
                 }
-                clearInterval(pollInterval);
+                if (pollIntervalRef.current) {
+                  clearInterval(pollIntervalRef.current);
+                  pollIntervalRef.current = null;
+                }
                 
                 setGeneratedImages(prev => [...prev, latestImage]);
                 setImageCount(prev => prev + 1);
                 setIsGeneratingImage(false);
+                setImageGenerationFailed(false);
                 
                 toast({
                   title: "Image Generated!",
@@ -337,26 +356,7 @@ const LinkedInPostVariation = ({
           } catch (err) {
             console.error('Polling error:', err);
           }
-        }, 5000); // Poll every 5 seconds
-        
-        // Clear polling when timeout occurs
-        if (timeoutIdRef.current) {
-          const originalTimeout = timeoutIdRef.current;
-          timeoutIdRef.current = setTimeout(() => {
-            clearInterval(pollInterval);
-            clearTimeout(originalTimeout);
-            if (isTimeoutActiveRef.current) {
-              setIsGeneratingImage(false);
-              setImageGenerationFailed(true);
-              isTimeoutActiveRef.current = false;
-              toast({
-                title: "Image Generation Failed",
-                description: "Image generation timed out after 2 minutes. Please try again.",
-                variant: "destructive"
-              });
-            }
-          }, 120000);
-        }
+        }, 3000); // Poll every 3 seconds
       }
 
     } catch (error) {
