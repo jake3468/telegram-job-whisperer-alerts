@@ -277,6 +277,41 @@ export type Database = {
           },
         ]
       }
+      linkedin_post_image_counts: {
+        Row: {
+          created_at: string
+          id: string
+          image_count: number
+          post_id: string
+          updated_at: string
+          variation_number: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_count?: number
+          post_id: string
+          updated_at?: string
+          variation_number: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_count?: number
+          post_id?: string
+          updated_at?: string
+          variation_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "linkedin_post_image_counts_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "job_linkedin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       linkedin_post_images: {
         Row: {
           created_at: string
