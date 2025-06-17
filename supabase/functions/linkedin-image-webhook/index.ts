@@ -81,12 +81,30 @@ serve(async (req) => {
       throw new Error(`N8N webhook failed: ${response.statusText}`)
     }
 
-    const result = await response.json()
-    console.log('N8N webhook response:', result)
+    const responseText = await response.text()
+    console.log('N8N webhook raw response:', responseText)
 
-    // If the response contains image data, store it in database and broadcast
-    if (result.success && result.image_data) {
-      console.log('Storing image data in database...')
+    let result
+    try {
+      // First try to parse as JSON
+      result = JSON.parse(responseText)
+      
+      // If the result itself is a string, try to parse it again
+      if (typeof result === 'string') {
+        console.log('Response is stringified JSON, parsing again...')
+        result = JSON.parse(result)
+      }
+    } catch (parseError) {
+      console.error('Failed to parse N8N response:', parseError)
+      console.error('Raw response was:', responseText)
+      throw new Error('Invalid JSON response from N8N webhook')
+    }
+
+    console.log('N8N webhook parsed response:', result)
+
+    // Check if the response contains image data
+    if (result && result.success && result.image_data) {
+      console.log('Image data found, storing in database...')
       
       // Store the image in the database
       const { data: storedImage, error: storeError } = await supabase
@@ -101,8 +119,9 @@ serve(async (req) => {
 
       if (storeError) {
         console.error('Failed to store image in database:', storeError)
+        throw new Error('Failed to store image in database')
       } else {
-        console.log('Image stored successfully in database')
+        console.log('Image stored successfully in database with ID:', storedImage.id)
       }
       
       // Broadcast the image data to all listening clients
@@ -119,7 +138,8 @@ serve(async (req) => {
             variation_number: result.variation_number || variation_number,
             post_id: result.post_id || post_id,
             source: source,
-            image_count: imageCount + 1
+            image_count: imageCount + 1,
+            stored_image_id: storedImage.id
           }
         })
 
@@ -141,7 +161,8 @@ serve(async (req) => {
             variation_number: result.variation_number || variation_number,
             post_id: result.post_id || post_id,
             source: source,
-            image_count: imageCount + 1
+            image_count: imageCount + 1,
+            stored_image_id: storedImage.id
           }
         })
 
@@ -150,19 +171,35 @@ serve(async (req) => {
       } else {
         console.log('Image data broadcasted to history channel successfully')
       }
-    }
 
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: 'Image generation triggered successfully',
-        data: result,
-        current_image_count: imageCount + 1
-      }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
-    )
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'Image generated and stored successfully',
+          data: result,
+          current_image_count: imageCount + 1,
+          stored_image_id: storedImage.id
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    } else {
+      console.log('No image data in response or unsuccessful generation')
+      console.log('Result structure:', JSON.stringify(result, null, 2))
+      
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          message: 'No image data received from N8N',
+          data: result,
+          current_image_count: imageCount
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
 
   } catch (error) {
     console.error('Error in linkedin-image-webhook:', error)

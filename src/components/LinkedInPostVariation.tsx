@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -70,6 +69,7 @@ const LinkedInPostVariation = ({
         }
 
         if (images && images.length > 0) {
+          console.log(`Loaded ${images.length} existing images for variation ${variationNumber}`);
           setGeneratedImages(images.map(img => img.image_data));
           setImageCount(images.length);
         }
@@ -102,8 +102,17 @@ const LinkedInPostVariation = ({
               payload.payload?.image_data) {
             
             console.log(`Image received for variation ${variationNumber}`);
-            setGeneratedImages(prev => [...prev, payload.payload.image_data]);
-            setImageCount(payload.payload.image_count || (prev => prev + 1));
+            
+            // Add the new image to the list
+            setGeneratedImages(prev => {
+              // Check if this image is already in the list to avoid duplicates
+              if (prev.includes(payload.payload.image_data)) {
+                return prev;
+              }
+              return [...prev, payload.payload.image_data];
+            });
+            
+            setImageCount(payload.payload.image_count || (prevCount => prevCount + 1));
             setIsGeneratingImage(false);
             setImageGenerationFailed(false);
             
@@ -208,16 +217,16 @@ const LinkedInPostVariation = ({
         }
       });
 
+      clearTimeout(timeoutId);
+
       if (error) {
         console.error('Supabase function error:', error);
-        clearTimeout(timeoutId);
         throw new Error(error.message || 'Failed to trigger image generation');
       }
 
       console.log('Edge function response:', data);
 
       if (!data.success) {
-        clearTimeout(timeoutId);
         if (data.limit_exceeded) {
           setImageCount(3); // Set to max to disable further attempts
           toast({
@@ -232,10 +241,24 @@ const LinkedInPostVariation = ({
         return;
       }
 
-      toast({
-        title: "Image Generation Started",
-        description: `LinkedIn post image for Post ${variationNumber} is being generated...`
-      });
+      // If the response already contains image data (immediate response)
+      if (data.data && data.data.image_data) {
+        console.log('Received immediate image data from edge function');
+        setGeneratedImages(prev => [...prev, data.data.image_data]);
+        setImageCount(data.current_image_count || (imageCount + 1));
+        setIsGeneratingImage(false);
+        
+        toast({
+          title: "Image Generated!",
+          description: `LinkedIn post image for Post ${variationNumber} is ready.`
+        });
+      } else {
+        // Otherwise, wait for real-time update
+        toast({
+          title: "Image Generation Started",
+          description: `LinkedIn post image for Post ${variationNumber} is being generated...`
+        });
+      }
 
     } catch (error) {
       console.error('Error triggering image generation:', error);
