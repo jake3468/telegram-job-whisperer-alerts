@@ -48,6 +48,7 @@ const LinkedInPostVariation = ({
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
   const isTimeoutActiveRef = useRef(false);
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const lastImageCountRef = useRef(0);
 
   // Create display name from user data
   const displayName = userData?.first_name && userData?.last_name 
@@ -76,8 +77,17 @@ const LinkedInPostVariation = ({
 
         if (images && images.length > 0) {
           console.log(`Loaded ${images.length} existing images for variation ${variationNumber}`);
-          setGeneratedImages(images.map(img => img.image_data));
-          setImageCount(images.length);
+          // Remove duplicates based on image data
+          const uniqueImages = images.reduce((acc: string[], img) => {
+            if (!acc.includes(img.image_data)) {
+              acc.push(img.image_data);
+            }
+            return acc;
+          }, []);
+          
+          setGeneratedImages(uniqueImages);
+          setImageCount(uniqueImages.length);
+          lastImageCountRef.current = uniqueImages.length;
         }
       } catch (error) {
         console.error('Error loading existing images:', error);
@@ -120,16 +130,23 @@ const LinkedInPostVariation = ({
             }
             isTimeoutActiveRef.current = false;
             
-            // Add the new image to the list
+            // Add the new image to the list with deduplication
             setGeneratedImages(prev => {
-              // Check if this image is already in the list to avoid duplicates
               if (prev.includes(payload.payload.image_data)) {
+                console.log('Duplicate image detected, skipping');
                 return prev;
               }
-              return [...prev, payload.payload.image_data];
+              const newImages = [...prev, payload.payload.image_data];
+              console.log(`Adding new image, total count: ${newImages.length}`);
+              return newImages;
             });
             
-            setImageCount(payload.payload.image_count || (prevCount => prevCount + 1));
+            setImageCount(prev => {
+              const newCount = payload.payload.image_count || (prev + 1);
+              lastImageCountRef.current = newCount;
+              return newCount;
+            });
+            
             setIsGeneratingImage(false);
             setImageGenerationFailed(false);
             
@@ -159,6 +176,61 @@ const LinkedInPostVariation = ({
       supabase.removeChannel(channel);
     };
   }, [postId, variationNumber, toast]);
+
+  // Enhanced polling to detect new images more reliably
+  useEffect(() => {
+    if (!postId || !isGeneratingImage) return;
+
+    const enhancedPolling = setInterval(async () => {
+      try {
+        console.log(`Enhanced polling for variation ${variationNumber}`);
+        const { data: images, error } = await supabase
+          .from('linkedin_post_images')
+          .select('image_data, created_at')
+          .eq('post_id', postId)
+          .eq('variation_number', variationNumber)
+          .order('created_at', { ascending: true });
+
+        if (!error && images && images.length > lastImageCountRef.current) {
+          console.log(`New images detected via polling for variation ${variationNumber}: ${images.length} vs ${lastImageCountRef.current}`);
+          
+          // Remove duplicates and update state
+          const uniqueImages = images.reduce((acc: string[], img) => {
+            if (!acc.includes(img.image_data)) {
+              acc.push(img.image_data);
+            }
+            return acc;
+          }, []);
+          
+          setGeneratedImages(uniqueImages);
+          setImageCount(uniqueImages.length);
+          lastImageCountRef.current = uniqueImages.length;
+          
+          // Clear generation state
+          setIsGeneratingImage(false);
+          setImageGenerationFailed(false);
+          
+          // Clear timeouts
+          if (timeoutIdRef.current) {
+            clearTimeout(timeoutIdRef.current);
+            timeoutIdRef.current = null;
+          }
+          isTimeoutActiveRef.current = false;
+          
+          toast({
+            title: "Image Generated!",
+            description: `LinkedIn post image for Post ${variationNumber} is ready.`
+          });
+        }
+      } catch (err) {
+        console.error('Enhanced polling error:', err);
+      }
+    }, 2000); // Poll every 2 seconds during generation
+
+    return () => {
+      clearInterval(enhancedPolling);
+    };
+  }, [postId, variationNumber, isGeneratingImage, toast]);
 
   const handleCopyContent = async () => {
     if (!content) return;
@@ -264,6 +336,7 @@ const LinkedInPostVariation = ({
       if (!data.success) {
         if (data.limit_exceeded) {
           setImageCount(3); // Set to max to disable further attempts
+          lastImageCountRef.current = 3;
           toast({
             title: "Generation Limit Exceeded",
             description: "Maximum 3 images allowed per post variation.",
@@ -294,8 +367,17 @@ const LinkedInPostVariation = ({
           isTimeoutActiveRef.current = false;
         }
         
-        setGeneratedImages(prev => [...prev, data.data.image_data]);
-        setImageCount(data.current_image_count || (imageCount + 1));
+        // Add with deduplication
+        setGeneratedImages(prev => {
+          if (prev.includes(data.data.image_data)) {
+            return prev;
+          }
+          return [...prev, data.data.image_data];
+        });
+        
+        const newCount = data.current_image_count || (imageCount + 1);
+        setImageCount(newCount);
+        lastImageCountRef.current = newCount;
         setIsGeneratingImage(false);
         
         toast({
@@ -343,7 +425,11 @@ const LinkedInPostVariation = ({
                 }
                 
                 setGeneratedImages(prev => [...prev, latestImage]);
-                setImageCount(prev => prev + 1);
+                setImageCount(prev => {
+                  const newCount = prev + 1;
+                  lastImageCountRef.current = newCount;
+                  return newCount;
+                });
                 setIsGeneratingImage(false);
                 setImageGenerationFailed(false);
                 

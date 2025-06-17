@@ -229,6 +229,7 @@ const LinkedInPosts = () => {
     setIsSubmitting(true);
     setIsGenerating(true);
     setPostsData(null);
+    setCurrentPostId(null);
 
     try {
       console.log('Creating LinkedIn post with user_profile.id:', userProfile.id);
@@ -452,7 +453,7 @@ const LinkedInPosts = () => {
                     </CardContent>
                   </Card>
 
-                  {/* Loading State */}
+                  {/* Loading State for Post Generation */}
                   {isGenerating && !postsData && (
                     <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm mb-8">
                       <CardContent className="py-8 flex items-center justify-center">

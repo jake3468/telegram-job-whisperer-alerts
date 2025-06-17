@@ -74,13 +74,21 @@ const LinkedInPostsHistoryModal = ({
 
           if (images && images.length > 0) {
             const variationKey = `${selectedItem.id}-${variation}`;
+            // Remove duplicates
+            const uniqueImages = images.reduce((acc: string[], img) => {
+              if (!acc.includes(img.image_data)) {
+                acc.push(img.image_data);
+              }
+              return acc;
+            }, []);
+            
             setGeneratedImages(prev => ({
               ...prev,
-              [variationKey]: images.map(img => img.image_data)
+              [variationKey]: uniqueImages
             }));
             setImageCounts(prev => ({
               ...prev,
-              [variationKey]: images.length
+              [variationKey]: uniqueImages.length
             }));
           }
         }
@@ -111,10 +119,18 @@ const LinkedInPostsHistoryModal = ({
           if (payload.payload?.post_id === selectedItem.id && payload.payload?.image_data) {
             const variationKey = `${selectedItem.id}-${payload.payload.variation_number}`;
             
-            setGeneratedImages(prev => ({
-              ...prev,
-              [variationKey]: [...(prev[variationKey] || []), payload.payload.image_data]
-            }));
+            // Add with deduplication
+            setGeneratedImages(prev => {
+              const existingImages = prev[variationKey] || [];
+              if (existingImages.includes(payload.payload.image_data)) {
+                console.log('Duplicate image in history, skipping');
+                return prev;
+              }
+              return {
+                ...prev,
+                [variationKey]: [...existingImages, payload.payload.image_data]
+              };
+            });
 
             setImageCounts(prev => ({
               ...prev,
@@ -147,6 +163,68 @@ const LinkedInPostsHistoryModal = ({
       supabase.removeChannel(channel);
     };
   }, [selectedItem, toast]);
+
+  // Enhanced polling for history images
+  useEffect(() => {
+    if (!selectedItem) return;
+
+    const pollForImages = setInterval(async () => {
+      try {
+        for (let variation = 1; variation <= 3; variation++) {
+          const variationKey = `${selectedItem.id}-${variation}`;
+          
+          if (loadingImages[variationKey]) {
+            const { data: images, error } = await supabase
+              .from('linkedin_post_images')
+              .select('image_data')
+              .eq('post_id', selectedItem.id)
+              .eq('variation_number', variation)
+              .order('created_at', { ascending: true });
+
+            if (!error && images) {
+              const uniqueImages = images.reduce((acc: string[], img) => {
+                if (!acc.includes(img.image_data)) {
+                  acc.push(img.image_data);
+                }
+                return acc;
+              }, []);
+
+              const currentImages = generatedImages[variationKey] || [];
+              if (uniqueImages.length > currentImages.length) {
+                console.log(`New images detected for ${variationKey}: ${uniqueImages.length} vs ${currentImages.length}`);
+                
+                setGeneratedImages(prev => ({
+                  ...prev,
+                  [variationKey]: uniqueImages
+                }));
+                
+                setImageCounts(prev => ({
+                  ...prev,
+                  [variationKey]: uniqueImages.length
+                }));
+                
+                setLoadingImages(prev => ({
+                  ...prev,
+                  [variationKey]: false
+                }));
+                
+                toast({
+                  title: "Image Generated!",
+                  description: `LinkedIn post image for Post ${variation} is ready.`
+                });
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('History polling error:', error);
+      }
+    }, 3000);
+
+    return () => {
+      clearInterval(pollForImages);
+    };
+  }, [selectedItem, loadingImages, generatedImages, toast]);
 
   const fetchHistory = async () => {
     if (!user || !userProfile) return;
@@ -587,7 +665,6 @@ const LinkedInPostsHistoryModal = ({
                         </div>
                       )}
 
-                      {/* Failed generation indicator */}
                       {imageGenerationFailed[`${selectedItem.id}-2`] && (
                         <div className="mb-4 p-3 bg-red-50 rounded-lg text-center border border-red-200">
                           <div className="text-sm text-red-600 font-medium">Image generation failed</div>
@@ -595,7 +672,6 @@ const LinkedInPostsHistoryModal = ({
                         </div>
                       )}
 
-                      {/* Generated Images */}
                       {generatedImages[`${selectedItem.id}-2`] && generatedImages[`${selectedItem.id}-2`].length > 0 && (
                         <div className="mb-4 space-y-3">
                           {generatedImages[`${selectedItem.id}-2`].map((imageData, imageIndex) => (
@@ -669,7 +745,6 @@ const LinkedInPostsHistoryModal = ({
                         </div>
                       )}
 
-                      {/* Failed generation indicator */}
                       {imageGenerationFailed[`${selectedItem.id}-3`] && (
                         <div className="mb-4 p-3 bg-red-50 rounded-lg text-center border border-red-200">
                           <div className="text-sm text-red-600 font-medium">Image generation failed</div>
@@ -677,7 +752,6 @@ const LinkedInPostsHistoryModal = ({
                         </div>
                       )}
 
-                      {/* Generated Images */}
                       {generatedImages[`${selectedItem.id}-3`] && generatedImages[`${selectedItem.id}-3`].length > 0 && (
                         <div className="mb-4 space-y-3">
                           {generatedImages[`${selectedItem.id}-3`].map((imageData, imageIndex) => (
