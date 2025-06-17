@@ -279,7 +279,7 @@ const LinkedInPostVariation = ({
     <div className="space-y-4 w-full">
       {/* Heading */}
       <div className="text-center">
-        <h3 className="text-base sm:text-lg font-semibold mb-2 text-lime-400 px-2">{heading}</h3>
+        <h3 className="text-sm sm:text-base lg:text-lg font-semibold mb-2 text-lime-400 px-1">{heading}</h3>
       </div>
 
       {/* LinkedIn Post Preview */}
@@ -308,47 +308,6 @@ const LinkedInPostVariation = ({
               {content}
             </div>
           </div>
-
-          {/* Generated Images Display */}
-          {generatedImages.length > 0 && (
-            <div className="mb-4 space-y-3">
-              {generatedImages.map((imageData, index) => (
-                <div key={index} className="relative">
-                  <img 
-                    src={imageData} 
-                    alt={`Generated image ${index + 1} for ${heading}`}
-                    className="w-full max-w-md lg:max-w-lg xl:max-w-xl mx-auto rounded-lg shadow-sm object-contain"
-                  />
-                  <Button
-                    onClick={() => handleCopyImage(imageData, index)}
-                    size="sm"
-                    className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white p-1 h-auto min-h-0"
-                  >
-                    <Copy className="w-3 h-3" />
-                  </Button>
-                  <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                    Image {index + 1}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Loading indicator for image generation */}
-          {isGeneratingImage && (
-            <div className="mb-4 p-4 bg-blue-50 rounded-lg text-center border border-blue-200">
-              <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading...</div>
-              <div className="text-xs text-blue-500 mt-1">This may take up to 2 minutes</div>
-            </div>
-          )}
-
-          {/* Failed generation indicator */}
-          {imageGenerationFailed && (
-            <div className="mb-4 p-4 bg-red-50 rounded-lg text-center border border-red-200">
-              <div className="text-sm text-red-600 font-medium">Image generation failed</div>
-              <div className="text-xs text-red-500 mt-1">Please try again</div>
-            </div>
-          )}
 
           {/* Engagement Stats */}
           <div className="flex items-center justify-between py-2 border-t border-b border-slate-100 mb-2">
@@ -392,30 +351,72 @@ const LinkedInPostVariation = ({
         </CardContent>
       </Card>
 
-      {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 px-2 sm:px-0">
+      {/* Action Buttons - Moved here to be close to post content */}
+      <div className="flex flex-col xs:flex-row gap-2 px-1">
         <Button 
           onClick={handleCopyContent} 
-          className="flex-1 flex items-center justify-center gap-2 text-xs sm:text-sm h-9 sm:h-10 font-semibold bg-emerald-300 hover:bg-emerald-200 text-gray-950 min-w-0"
+          className="flex-1 flex items-center justify-center gap-1 text-xs h-8 font-semibold bg-emerald-300 hover:bg-emerald-200 text-gray-950 min-w-0 max-w-full"
         >
-          <Copy className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-          <span className="truncate">Copy Post {variationNumber}</span>
+          <Copy className="w-3 h-3 flex-shrink-0" />
+          <span className="truncate text-xs">Copy Post {variationNumber}</span>
         </Button>
         
         <Button 
           onClick={handleGetImage} 
           disabled={isImageGenerationDisabled}
           variant="outline" 
-          className="flex-1 border-teal-400/25 text-xs sm:text-sm h-9 sm:h-10 bg-amber-500 hover:bg-amber-400 text-gray-950 disabled:opacity-50 disabled:cursor-not-allowed min-w-0"
+          className="flex-1 border-teal-400/25 text-xs h-8 bg-amber-500 hover:bg-amber-400 text-gray-950 disabled:opacity-50 disabled:cursor-not-allowed min-w-0 max-w-full"
         >
-          <ImageIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
-          <span className="truncate">
+          <ImageIcon className="w-3 h-3 mr-1 flex-shrink-0" />
+          <span className="truncate text-xs">
             {imageCount >= 3 ? 'Limit Exceeded' : 
              isGeneratingImage ? 'Generating...' : 
              `Get Image (${imageCount}/3)`}
           </span>
         </Button>
       </div>
+
+      {/* Generated Images Display */}
+      {generatedImages.length > 0 && (
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium text-cyan-300 px-1">Generated Images:</h4>
+          {generatedImages.map((imageData, index) => (
+            <div key={index} className="relative">
+              <img 
+                src={imageData} 
+                alt={`Generated image ${index + 1} for ${heading}`}
+                className="w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto rounded-lg shadow-sm object-contain"
+              />
+              <Button
+                onClick={() => handleCopyImage(imageData, index)}
+                size="sm"
+                className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white p-1 h-auto min-h-0"
+              >
+                <Copy className="w-3 h-3" />
+              </Button>
+              <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                Image {index + 1}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Loading indicator for image generation */}
+      {isGeneratingImage && (
+        <div className="p-4 bg-blue-50 rounded-lg text-center border border-blue-200">
+          <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading...</div>
+          <div className="text-xs text-blue-500 mt-1">This may take up to 2 minutes</div>
+        </div>
+      )}
+
+      {/* Failed generation indicator */}
+      {imageGenerationFailed && (
+        <div className="p-4 bg-red-50 rounded-lg text-center border border-red-200">
+          <div className="text-sm text-red-600 font-medium">Image generation failed</div>
+          <div className="text-xs text-red-500 mt-1">Please try again</div>
+        </div>
+      )}
     </div>
   );
 };
