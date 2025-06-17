@@ -23,28 +23,31 @@ serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Check existing image count for this post variation
-    const { data: existingImages, error: countError } = await supabase
-      .from('linkedin_post_images')
-      .select('id')
+    // Check the current image count from the counts table first
+    const { data: countData, error: countError } = await supabase
+      .from('linkedin_post_image_counts')
+      .select('image_count')
       .eq('post_id', post_id)
       .eq('variation_number', variation_number)
+      .maybeSingle()
 
     if (countError) {
-      console.error('Error checking existing images:', countError)
+      console.error('Error checking image count:', countError)
     }
 
-    const imageCount = existingImages?.length || 0
-    console.log(`Current image count for post ${post_id}, variation ${variation_number}: ${imageCount}`)
+    // Get the current count, defaulting to 0 if no record exists
+    const currentCount = countData?.image_count || 0
+    console.log(`Current image count for post ${post_id}, variation ${variation_number}: ${currentCount}`)
 
-    if (imageCount >= 3) {
+    // Check if limit is reached
+    if (currentCount >= 3) {
       console.log('Image limit exceeded, returning error')
       return new Response(
         JSON.stringify({ 
           success: false, 
           error: 'Maximum 3 images allowed per post variation',
           limit_exceeded: true,
-          current_count: imageCount
+          current_count: currentCount
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -68,7 +71,7 @@ serve(async (req) => {
       user_name,
       post_id,
       source,
-      current_image_count: imageCount
+      current_image_count: currentCount
     })
 
     // Call the N8N webhook
@@ -86,7 +89,7 @@ serve(async (req) => {
         source,
         timestamp: new Date().toISOString(),
         triggered_from: req.headers.get('origin') || 'unknown',
-        current_image_count: imageCount
+        current_image_count: currentCount
       }),
     })
 
@@ -120,7 +123,7 @@ serve(async (req) => {
           success: true, 
           message: 'Image generation triggered successfully',
           triggered: true,
-          current_image_count: imageCount
+          current_image_count: currentCount
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -166,7 +169,7 @@ serve(async (req) => {
             variation_number: result.variation_number || variation_number,
             post_id: result.post_id || post_id,
             source: source,
-            image_count: imageCount + 1,
+            image_count: currentCount + 1,
             stored_image_id: storedImage.id
           }
         })
@@ -189,7 +192,7 @@ serve(async (req) => {
             variation_number: result.variation_number || variation_number,
             post_id: result.post_id || post_id,
             source: source,
-            image_count: imageCount + 1,
+            image_count: currentCount + 1,
             stored_image_id: storedImage.id
           }
         })
@@ -205,7 +208,7 @@ serve(async (req) => {
           success: true, 
           message: 'Image generated and stored successfully',
           data: result,
-          current_image_count: imageCount + 1,
+          current_image_count: currentCount + 1,
           stored_image_id: storedImage.id
         }),
         { 
@@ -220,7 +223,7 @@ serve(async (req) => {
           success: true, 
           message: 'Image generation triggered successfully',
           triggered: true,
-          current_image_count: imageCount
+          current_image_count: currentCount
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
