@@ -52,34 +52,15 @@ serve(async (req) => {
     const result = await response.json()
     console.log('N8N webhook response:', result)
 
-    // If the response contains image data, store it and broadcast it via Supabase realtime
+    // If the response contains image data, broadcast it via Supabase realtime
     if (result.success && result.image_data) {
-      console.log('Storing and broadcasting image data via Supabase...')
+      console.log('Broadcasting image data via Supabase realtime...')
       
       // Initialize Supabase client
       const supabaseUrl = Deno.env.get('SUPABASE_URL')!
       const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
       
       const supabase = createClient(supabaseUrl, supabaseServiceKey)
-      
-      // Store the image in the database
-      try {
-        const { error: insertError } = await supabase
-          .from('linkedin_post_images')
-          .insert({
-            post_id: result.post_id || post_id,
-            variation_number: result.variation_number || variation_number,
-            image_data: result.image_data
-          })
-
-        if (insertError) {
-          console.error('Failed to store image in database:', insertError)
-        } else {
-          console.log('Image stored successfully in database')
-        }
-      } catch (dbError) {
-        console.error('Database storage error:', dbError)
-      }
       
       // Broadcast the image data to all listening clients
       const channelName = `linkedin-image-${post_id}-${variation_number}`
@@ -105,7 +86,7 @@ serve(async (req) => {
       }
       
       // Also broadcast to history channel
-      const historyChannelName = `linkedin-image-history`
+      const historyChannelName = `linkedin-image-history-${post_id}`
       const { error: historyBroadcastError } = await supabase.channel(historyChannelName)
         .send({
           type: 'broadcast',

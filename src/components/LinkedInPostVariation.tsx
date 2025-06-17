@@ -39,10 +39,8 @@ const LinkedInPostVariation = ({
   postId
 }: LinkedInPostVariationProps) => {
   const { toast } = useToast();
-  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
-  const [imageGenerationCount, setImageGenerationCount] = useState(0);
-  const [generationTimeout, setGenerationTimeout] = useState<NodeJS.Timeout | null>(null);
 
   // Create display name from user data
   const displayName = userData?.first_name && userData?.last_name 
@@ -50,36 +48,6 @@ const LinkedInPostVariation = ({
     : userData?.first_name 
     ? userData.first_name 
     : 'Professional User';
-
-  // Load existing images from database on component mount
-  useEffect(() => {
-    const loadExistingImages = async () => {
-      if (!postId) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('linkedin_post_images')
-          .select('image_data')
-          .eq('post_id', postId)
-          .eq('variation_number', variationNumber)
-          .order('created_at', { ascending: true });
-
-        if (error) {
-          console.error('Error loading existing images:', error);
-          return;
-        }
-
-        if (data && data.length > 0) {
-          setGeneratedImages(data.map(item => item.image_data));
-          setImageGenerationCount(data.length);
-        }
-      } catch (err) {
-        console.error('Error loading existing images:', err);
-      }
-    };
-
-    loadExistingImages();
-  }, [postId, variationNumber]);
 
   // Set up real-time subscription for image updates
   useEffect(() => {
@@ -102,15 +70,7 @@ const LinkedInPostVariation = ({
               payload.payload?.image_data) {
             
             console.log(`Image received for variation ${variationNumber}`);
-            
-            // Clear timeout if image received successfully
-            if (generationTimeout) {
-              clearTimeout(generationTimeout);
-              setGenerationTimeout(null);
-            }
-            
-            setGeneratedImages(prev => [...prev, payload.payload.image_data]);
-            setImageGenerationCount(prev => prev + 1);
+            setGeneratedImage(payload.payload.image_data);
             setIsGeneratingImage(false);
             
             toast({
@@ -126,12 +86,9 @@ const LinkedInPostVariation = ({
 
     return () => {
       console.log(`Cleaning up image subscription for variation ${variationNumber}`);
-      if (generationTimeout) {
-        clearTimeout(generationTimeout);
-      }
       supabase.removeChannel(channel);
     };
-  }, [postId, variationNumber, toast, generationTimeout]);
+  }, [postId, variationNumber, toast]);
 
   const handleCopyContent = async () => {
     if (!content) return;
@@ -151,10 +108,12 @@ const LinkedInPostVariation = ({
     }
   };
 
-  const handleCopyImage = async (imageData: string) => {
+  const handleCopyImage = async () => {
+    if (!generatedImage) return;
+    
     try {
       // Convert base64 to blob
-      const response = await fetch(imageData);
+      const response = await fetch(generatedImage);
       const blob = await response.blob();
       
       await navigator.clipboard.write([
@@ -178,28 +137,8 @@ const LinkedInPostVariation = ({
   };
 
   const handleGetImage = async () => {
-    if (imageGenerationCount >= 3) {
-      toast({
-        title: "Generation Limit Reached",
-        description: "You can only generate up to 3 images per post.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     setIsGeneratingImage(true);
-    
-    // Set timeout for 2 minutes
-    const timeout = setTimeout(() => {
-      setIsGeneratingImage(false);
-      toast({
-        title: "Image Generation Failed",
-        description: "Image generation timed out. Please try again.",
-        variant: "destructive"
-      });
-    }, 2 * 60 * 1000); // 2 minutes
-    
-    setGenerationTimeout(timeout);
+    setGeneratedImage(null); // Clear any existing image
     
     try {
       console.log("Triggering image generation via edge function for post", variationNumber);
@@ -217,16 +156,12 @@ const LinkedInPostVariation = ({
 
       if (error) {
         console.error('Supabase function error:', error);
-        clearTimeout(timeout);
-        setIsGeneratingImage(false);
         throw new Error(error.message || 'Failed to trigger image generation');
       }
 
       console.log('Edge function response:', data);
 
       if (!data.success) {
-        clearTimeout(timeout);
-        setIsGeneratingImage(false);
         throw new Error(data.error || 'Failed to trigger image generation');
       }
 
@@ -237,10 +172,6 @@ const LinkedInPostVariation = ({
 
     } catch (error) {
       console.error('Error triggering image generation:', error);
-      if (generationTimeout) {
-        clearTimeout(generationTimeout);
-        setGenerationTimeout(null);
-      }
       setIsGeneratingImage(false);
       toast({
         title: "Error",
@@ -249,8 +180,6 @@ const LinkedInPostVariation = ({
       });
     }
   };
-
-  const canGenerateMore = imageGenerationCount < 3;
 
   return (
     <div className="space-y-4 w-full">
@@ -286,25 +215,23 @@ const LinkedInPostVariation = ({
             </div>
           </div>
 
-          {/* Generated Images Display */}
-          {generatedImages.length > 0 && (
-            <div className="mb-4 space-y-3">
-              {generatedImages.map((imageData, index) => (
-                <div key={index} className="relative">
-                  <img 
-                    src={imageData} 
-                    alt={`Generated image ${index + 1} for ${heading}`}
-                    className="w-full rounded-lg shadow-sm"
-                  />
-                  <Button
-                    onClick={() => handleCopyImage(imageData)}
-                    size="sm"
-                    className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white"
-                  >
-                    <Copy className="w-3 h-3" />
-                  </Button>
-                </div>
-              ))}
+          {/* Generated Image Display */}
+          {generatedImage && (
+            <div className="mb-4">
+              <div className="relative">
+                <img 
+                  src={generatedImage} 
+                  alt={`Generated image for ${heading}`}
+                  className="w-full rounded-lg shadow-sm"
+                />
+                <Button
+                  onClick={handleCopyImage}
+                  size="sm"
+                  className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white"
+                >
+                  <Copy className="w-3 h-3" />
+                </Button>
+              </div>
             </div>
           )}
 
@@ -312,7 +239,7 @@ const LinkedInPostVariation = ({
           {isGeneratingImage && (
             <div className="mb-4 p-4 bg-blue-50 rounded-lg text-center border border-blue-200">
               <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading...</div>
-              <div className="text-xs text-blue-500 mt-1">This may take up to 2 minutes</div>
+              <div className="text-xs text-blue-500 mt-1">This may take a few moments</div>
             </div>
           )}
 
@@ -371,24 +298,16 @@ const LinkedInPostVariation = ({
         
         <Button 
           onClick={handleGetImage} 
-          disabled={isGeneratingImage || !canGenerateMore}
+          disabled={isGeneratingImage}
           variant="outline" 
-          className="flex-1 border-teal-400/25 text-sm h-10 bg-amber-500 hover:bg-amber-400 text-gray-950 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 border-teal-400/25 text-sm h-10 bg-amber-500 hover:bg-amber-400 text-gray-950 disabled:opacity-50"
         >
           <ImageIcon className="w-4 h-4 mr-2" />
           <span className="hidden sm:inline">
-            {!canGenerateMore 
-              ? 'Image limit reached' 
-              : isGeneratingImage 
-              ? 'Generating...' 
-              : `Get Image (${imageGenerationCount}/3)`}
+            {isGeneratingImage ? 'Generating...' : 'Get Image for Post'}
           </span>
           <span className="sm:hidden">
-            {!canGenerateMore 
-              ? 'Limit reached' 
-              : isGeneratingImage 
-              ? 'Generating...' 
-              : `Image (${imageGenerationCount}/3)`}
+            {isGeneratingImage ? 'Generating...' : 'Get Image'}
           </span>
         </Button>
       </div>
