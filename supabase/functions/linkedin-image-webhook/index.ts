@@ -112,11 +112,11 @@ serve(async (req) => {
 
     console.log('N8N webhook parsed response:', result)
 
-    // Check if the response contains image data
+    // Check if the response contains image data - fix the property access
     if (result && result.success && result.image_data) {
       console.log('Image data found, storing in database...')
       
-      // Store the image in the database (create a new row for each request)
+      // Store the image in the database (always create a new row for each request)
       const { data: storedImage, error: storeError } = await supabase
         .from('linkedin_post_images')
         .insert({
@@ -128,7 +128,7 @@ serve(async (req) => {
 
       if (storeError) {
         console.error('Failed to store image in database:', storeError)
-        throw new Error('Failed to store image in database')
+        throw new Error('Failed to store image in database: ' + storeError.message)
       } else {
         console.log('Image stored successfully in database with ID:', storedImage.id)
       }
