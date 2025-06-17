@@ -23,7 +23,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
   // Load existing images and counts when item is selected
   useEffect(() => {
     if (!selectedItem) {
-      // Clear state when no item is selected
+      console.log('No selectedItem, clearing all state');
       setGeneratedImages({});
       setLoadingImages({});
       setImageGenerationFailed({});
@@ -31,48 +31,65 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
       return;
     }
 
+    console.log('=== DEBUGGING IMAGE COUNT LOADING ===');
+    console.log('selectedItem.id:', selectedItem.id);
+    console.log('selectedItem:', selectedItem);
+
     const loadExistingImagesAndCounts = async () => {
       try {
-        console.log(`Loading existing images and counts for post ${selectedItem.id}`);
+        console.log(`🔍 Loading data for post ID: ${selectedItem.id}`);
         
-        // Get all counts for this post in one query
-        const { data: allCounts, error: countsError } = await supabase
+        // First, let's verify what's in the database
+        const { data: debugCounts, error: debugError } = await supabase
           .from('linkedin_post_image_counts')
-          .select('variation_number, image_count')
+          .select('*')
           .eq('post_id', selectedItem.id);
 
-        if (countsError) {
-          console.error('Error loading counts:', countsError);
-        }
+        console.log('🔍 Raw database counts query result:', { debugCounts, debugError });
 
-        // Get all images for this post in one query
-        const { data: allImages, error: imagesError } = await supabase
-          .from('linkedin_post_images')
-          .select('variation_number, image_data, created_at')
-          .eq('post_id', selectedItem.id)
-          .order('created_at', { ascending: true });
-
-        if (imagesError) {
-          console.error('Error loading images:', imagesError);
+        if (debugCounts && debugCounts.length > 0) {
+          console.log('✅ Found count records in database:', debugCounts);
+        } else {
+          console.log('❌ No count records found for this post_id');
         }
 
         // Process each variation (1, 2, 3)
         for (let variation = 1; variation <= 3; variation++) {
           const variationKey = `${selectedItem.id}-${variation}`;
+          console.log(`🔍 Processing variation ${variation}, key: ${variationKey}`);
           
-          // Get count for this variation from the results
-          const countRecord = allCounts?.find(c => c.variation_number === variation);
+          // Get count for this specific variation
+          const countRecord = debugCounts?.find(c => c.variation_number === variation);
           const count = countRecord?.image_count || 0;
           
-          console.log(`Setting count for variation ${variation}: ${count}`);
-          setImageCounts(prev => ({
-            ...prev,
-            [variationKey]: count
-          }));
+          console.log(`📊 Variation ${variation} - countRecord:`, countRecord);
+          console.log(`📊 Variation ${variation} - final count: ${count}`);
+          
+          // Set the count in state
+          setImageCounts(prev => {
+            const newCounts = {
+              ...prev,
+              [variationKey]: count
+            };
+            console.log(`📊 Updated imageCounts state:`, newCounts);
+            return newCounts;
+          });
 
           // Get images for this variation
-          const variationImages = allImages?.filter(img => img.variation_number === variation) || [];
-          const uniqueImages = variationImages.reduce((acc: string[], img) => {
+          const { data: variationImages, error: imagesError } = await supabase
+            .from('linkedin_post_images')
+            .select('variation_number, image_data, created_at')
+            .eq('post_id', selectedItem.id)
+            .eq('variation_number', variation)
+            .order('created_at', { ascending: true });
+
+          if (imagesError) {
+            console.error(`❌ Error loading images for variation ${variation}:`, imagesError);
+          } else {
+            console.log(`🖼️ Images for variation ${variation}:`, variationImages);
+          }
+
+          const uniqueImages = (variationImages || []).reduce((acc: string[], img) => {
             if (!acc.includes(img.image_data)) {
               acc.push(img.image_data);
             }
@@ -83,9 +100,21 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
             ...prev,
             [variationKey]: uniqueImages
           }));
+
+          console.log(`✅ Set ${uniqueImages.length} images for ${variationKey}`);
         }
+
+        // Final state check
+        setTimeout(() => {
+          console.log('🔍 Final state check after 100ms:');
+          setImageCounts(current => {
+            console.log('📊 Current imageCounts state:', current);
+            return current;
+          });
+        }, 100);
+
       } catch (error) {
-        console.error('Error loading existing images and counts:', error);
+        console.error('❌ Error in loadExistingImagesAndCounts:', error);
       }
     };
 
@@ -96,7 +125,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
   useEffect(() => {
     if (!selectedItem) return;
 
-    console.log(`Setting up real-time subscription for post ${selectedItem.id}`);
+    console.log(`🔔 Setting up real-time subscription for post ${selectedItem.id}`);
 
     const channels = [];
     
@@ -112,7 +141,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
           filter: `post_id=eq.${selectedItem.id}`
         },
         (payload) => {
-          console.log('Image table change detected:', payload);
+          console.log('🔔 Image table change detected:', payload);
           handleImageTableChange(payload);
         }
       )
@@ -132,7 +161,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
           filter: `post_id=eq.${selectedItem.id}`
         },
         (payload) => {
-          console.log('Count table change detected:', payload);
+          console.log('🔔 Count table change detected:', payload);
           handleCountTableChange(payload);
         }
       )
@@ -150,7 +179,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
             event: 'linkedin_image_generated'
           },
           (payload) => {
-            console.log(`Received image broadcast for variation ${variation}:`, payload);
+            console.log(`🔔 Received image broadcast for variation ${variation}:`, payload);
             handleImageBroadcast(payload.payload, variation);
           }
         )
@@ -160,7 +189,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
     }
 
     return () => {
-      console.log(`Cleaning up real-time subscriptions for post ${selectedItem.id}`);
+      console.log(`🔔 Cleaning up real-time subscriptions for post ${selectedItem.id}`);
       channels.forEach(channel => {
         supabase.removeChannel(channel);
       });
@@ -171,6 +200,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
     if (!selectedItem) return;
     
     const { eventType, new: newRecord, old: oldRecord } = payload;
+    console.log('🔔 Processing image table change:', { eventType, newRecord, oldRecord });
     
     if (eventType === 'INSERT' && newRecord) {
       const variationKey = `${selectedItem.id}-${newRecord.variation_number}`;
@@ -206,21 +236,28 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
     if (!selectedItem) return;
     
     const { eventType, new: newRecord } = payload;
+    console.log('🔔 Processing count table change:', { eventType, newRecord });
     
     if ((eventType === 'INSERT' || eventType === 'UPDATE') && newRecord) {
       const variationKey = `${selectedItem.id}-${newRecord.variation_number}`;
       
-      console.log(`Count updated for ${variationKey}: ${newRecord.image_count}`);
+      console.log(`🔔 Count updated for ${variationKey}: ${newRecord.image_count}`);
       
-      setImageCounts(prev => ({
-        ...prev,
-        [variationKey]: newRecord.image_count
-      }));
+      setImageCounts(prev => {
+        const newCounts = {
+          ...prev,
+          [variationKey]: newRecord.image_count
+        };
+        console.log('🔔 Updated counts via real-time:', newCounts);
+        return newCounts;
+      });
     }
   };
 
   const refreshCountFromDatabase = async (postId: string, variationNumber: number) => {
     try {
+      console.log(`🔄 Refreshing count for post ${postId}, variation ${variationNumber}`);
+      
       const { data, error } = await supabase
         .from('linkedin_post_image_counts')
         .select('image_count')
@@ -230,14 +267,16 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
 
       if (!error && data) {
         const variationKey = `${postId}-${variationNumber}`;
-        console.log(`Refreshed count for ${variationKey}: ${data.image_count}`);
+        console.log(`🔄 Refreshed count for ${variationKey}: ${data.image_count}`);
         setImageCounts(prev => ({
           ...prev,
           [variationKey]: data.image_count
         }));
+      } else {
+        console.log(`🔄 No count record found or error:`, { error, data });
       }
     } catch (error) {
-      console.error('Error refreshing count:', error);
+      console.error('❌ Error refreshing count:', error);
     }
   };
 
@@ -247,7 +286,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
     if (payload.post_id === selectedItem.id && payload.image_data) {
       const variationKey = `${selectedItem.id}-${variation}`;
       
-      console.log(`Processing image broadcast for ${variationKey}`);
+      console.log(`🔔 Processing image broadcast for ${variationKey}`);
       
       // Add with deduplication
       setGeneratedImages(prev => {
@@ -286,6 +325,8 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
     const variationKey = `${item.id}-${postNumber}`;
     const currentCount = imageCounts[variationKey] || 0;
 
+    console.log(`🚀 Attempting to generate image for ${variationKey}, current count: ${currentCount}`);
+
     if (currentCount >= 3) {
       toast({
         title: "Limit Reached",
@@ -318,7 +359,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
     }, 120000); // 2 minutes
     
     try {
-      console.log(`Triggering image generation for post ${postNumber} from history`);
+      console.log(`🚀 Triggering image generation for post ${postNumber} from history`);
       
       const { data, error } = await supabase.functions.invoke('linkedin-image-webhook', {
         body: {
@@ -332,12 +373,12 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
       });
 
       if (error) {
-        console.error('Supabase function error:', error);
+        console.error('❌ Supabase function error:', error);
         clearTimeout(timeoutId);
         throw new Error(error.message || 'Failed to trigger image generation');
       }
 
-      console.log('Edge function response:', data);
+      console.log('✅ Edge function response:', data);
 
       if (!data.success) {
         clearTimeout(timeoutId);
@@ -360,7 +401,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
         description: `LinkedIn post image for Post ${postNumber} is being generated...`
       });
     } catch (error) {
-      console.error('Error triggering image generation webhook:', error);
+      console.error('❌ Error triggering image generation webhook:', error);
       clearTimeout(timeoutId);
       setLoadingImages(prev => ({ ...prev, [variationKey]: false }));
       setImageGenerationFailed(prev => ({ ...prev, [variationKey]: true }));
