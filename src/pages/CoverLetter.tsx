@@ -1,4 +1,3 @@
-
 import { useUser } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +15,8 @@ import CoverLetterHistoryModal from '@/components/CoverLetterHistoryModal';
 import LoadingMessages from '@/components/LoadingMessages';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import CoverLetterDownloadActions from '@/components/CoverLetterDownloadActions';
-import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
+import { useCreditCheck } from '@/hooks/useCreditCheck';
+import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 
@@ -26,6 +26,11 @@ const CoverLetter = () => {
   const { toast } = useToast();
   const { userProfile } = useUserProfile();
   const { isComplete } = useUserCompletionStatus();
+  
+  // Replace useFeatureCreditCheck with the new system
+  const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(1.5);
+  useCreditWarnings(); // This shows the warning popups
+
   const [formData, setFormData] = useState({
     job_title: '',
     company_name: '',
@@ -36,8 +41,6 @@ const CoverLetter = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentCoverLetterId, setCurrentCoverLetterId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
-
-  useFeatureCreditCheck(1.5);
 
   useEffect(() => {
     if (isLoaded && !user) {
@@ -116,8 +119,16 @@ const CoverLetter = () => {
     }));
   };
 
+  // Updated handleSubmit to check credits first
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check credits first
+    if (!hasCredits) {
+      showInsufficientCreditsPopup();
+      return;
+    }
+
     if (!user || !userProfile) {
       toast({
         title: "Authentication Required",

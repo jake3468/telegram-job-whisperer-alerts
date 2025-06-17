@@ -5,11 +5,14 @@ import { useNavigate } from 'react-router-dom';
 import AuthHeader from '@/components/AuthHeader';
 import JobAlertsSection from '@/components/dashboard/JobAlertsSection';
 import { Layout } from '@/components/Layout';
-import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
+import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 
 const JobAlerts = () => {
   const { user, isLoaded } = useUser();
   const navigate = useNavigate();
+
+  // Replace useFeatureCreditCheck with the new system
+  useCreditWarnings(); // This shows the warning popups
 
   // Memoize timezone to prevent unnecessary re-renders and ensure IANA format
   const userTimezone = useMemo(() => {
@@ -44,8 +47,6 @@ const JobAlerts = () => {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
-
-  useFeatureCreditCheck(1.5);
 
   if (!isLoaded || !user) {
     return (

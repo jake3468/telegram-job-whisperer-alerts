@@ -1,23 +1,15 @@
 
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useUserCredits } from "./useUserCredits";
+import { useCreditWarnings } from "./useCreditWarnings";
 
-// Custom hook to check for sufficient credits before using a feature
+// Updated hook that only shows warnings, no redirects
 export function useFeatureCreditCheck(requiredCredits: number) {
-  const navigate = useNavigate();
-  const { data: credits, isLoading } = useUserCredits();
-
-  useEffect(() => {
-    // Guard: only check balance if credits exist, no error.
-    if (
-      !isLoading &&
-      credits &&
-      !("__error" in credits) &&
-      Number(credits.current_balance) < requiredCredits
-    ) {
-      // Redirect to upgrade page if not enough credits
-      navigate('/upgrade');
-    }
-  }, [isLoading, credits, requiredCredits, navigate]);
+  // This now just triggers the warning system without redirecting
+  const creditWarnings = useCreditWarnings();
+  
+  // Return the credit status for components that need it
+  return {
+    hasCredits: creditWarnings.hasCredits,
+    creditBalance: creditWarnings.creditBalance,
+    isLoading: creditWarnings.isLoading
+  };
 }

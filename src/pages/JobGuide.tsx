@@ -13,7 +13,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Layout } from '@/components/Layout';
 import JobAnalysisHistory from '@/components/JobAnalysisHistory';
 import PercentageMeter from '@/components/PercentageMeter';
-import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
+import { useCreditCheck } from '@/hooks/useCreditCheck';
+import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 
 const JobGuide = () => {
   const {
@@ -45,7 +46,9 @@ const JobGuide = () => {
   const [matchScore, setMatchScore] = useState<string | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const loadingMessages = ["🔍 Analyzing job requirements...", "✨ Crafting personalized insights...", "🚀 Tailoring advice to your profile...", "🎯 Generating strategic recommendations..."];
-  useFeatureCreditCheck(1.5);
+  const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(1.5);
+  useCreditWarnings(); // This shows the warning popups
+
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
@@ -139,6 +142,13 @@ const JobGuide = () => {
   }, [toast]);
   const handleSubmit = useCallback(async () => {
     console.log('🚀 Job Guide Submit Button Clicked');
+    
+    // Check credits first
+    if (!hasCredits) {
+      showInsufficientCreditsPopup();
+      return;
+    }
+
     if (!isComplete) {
       toast({
         title: "Complete your profile first",
@@ -163,6 +173,7 @@ const JobGuide = () => {
       });
       return;
     }
+
     try {
       setIsSubmitting(true);
       setError(null);
@@ -253,7 +264,7 @@ const JobGuide = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, isComplete, user, toast, isSubmitting, isGenerating]);
+  }, [formData, isComplete, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup]);
   useEffect(() => {
     const handleHistoryData = (event: any) => {
       const {
@@ -362,8 +373,8 @@ const JobGuide = () => {
                 {/* Action Buttons */}
                 <div className="flex flex-col md:flex-row gap-3 pt-4">
                   <Button onClick={handleSubmit}
-                // Use prominent visual style, never dulled out unless disabled
-                disabled={isButtonDisabled} className={`flex-1 bg-gradient-to-r from-sky-700 via-blue-600 to-blue-800 hover:from-blue-500 hover:to-sky-700 text-white font-semibold text-base h-12 shadow-none border border-blue-600 transition-all duration-150
+                    disabled={isButtonDisabled} 
+                    className={`flex-1 bg-gradient-to-r from-sky-700 via-blue-600 to-blue-800 hover:from-blue-500 hover:to-sky-700 text-white font-semibold text-base h-12 shadow-none border border-blue-600 transition-all duration-150
                       ${isButtonDisabled ? 'opacity-50 cursor-not-allowed' : 'opacity-100'}
                     `}>
                     {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
