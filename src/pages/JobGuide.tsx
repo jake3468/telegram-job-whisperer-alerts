@@ -328,7 +328,7 @@ const JobGuide = () => {
                     </CardDescription>
                   </div>
                   <div>
-                    <JobAnalysisHistory type="job_guide" gradientColors="from-slate-200 via-slate-300 to-slate-200" borderColors="border-slate-600/30" />
+                    <JobAnalysisHistory />
                   </div>
                 </div>
               </CardHeader>
