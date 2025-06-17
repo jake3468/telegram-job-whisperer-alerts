@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,7 @@ import { Share2, History, Sparkles, Menu } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
-import HistoryModal from '@/components/HistoryModal';
+import LinkedInPostsHistoryModal from '@/components/LinkedInPostsHistoryModal';
 import LinkedInPostVariation from '@/components/LinkedInPostVariation';
 import LoadingMessages from '@/components/LoadingMessages';
 import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
@@ -509,8 +510,7 @@ const LinkedInPosts = () => {
               </div>
 
               {/* History Modal */}
-              <HistoryModal 
-                type="linkedin_posts" 
+              <LinkedInPostsHistoryModal 
                 isOpen={showHistory} 
                 onClose={() => setShowHistory(false)} 
                 gradientColors="from-cyan-400 to-teal-400" 

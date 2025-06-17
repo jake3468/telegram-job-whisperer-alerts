@@ -2,10 +2,10 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { History, Loader2 } from 'lucide-react';
-import HistoryModal from './HistoryModal';
+import JobAnalysisHistoryModal from './JobAnalysisHistoryModal';
 
 interface JobAnalysisHistoryProps {
-  type: 'job_analyses' | 'cover_letters';
+  type: 'job_analysis' | 'cover_letters';
   gradientColors: string;
   borderColors: string;
 }
@@ -47,8 +47,7 @@ const JobAnalysisHistory = ({
         )}
       </Button>
 
-      <HistoryModal
-        type={type}
+      <JobAnalysisHistoryModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         gradientColors={gradientColors}
