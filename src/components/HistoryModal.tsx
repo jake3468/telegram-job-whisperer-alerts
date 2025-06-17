@@ -885,7 +885,7 @@ const HistoryModal = ({
                     {type === 'job_analyses' && selectedItem.match_score && (
                       <div className="mb-4">
                         <PercentageMeter 
-                          percentage={parseInt(selectedItem.match_score)} 
+                          percentage={selectedItem.match_score} 
                           label="Match Score"
                         />
                       </div>
