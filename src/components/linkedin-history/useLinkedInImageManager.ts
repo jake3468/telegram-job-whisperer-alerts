@@ -31,100 +31,56 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
       return;
     }
 
-    console.log('🔍 DEBUGGING ISSUE - Selected item details:');
-    console.log('📝 Post ID from selectedItem:', selectedItem.id);
-    console.log('📝 Full selectedItem object:', selectedItem);
+    console.log('🔍 Loading data for post ID:', selectedItem.id);
 
     const loadExistingImagesAndCounts = async () => {
       try {
-        console.log(`🔍 Loading data for post ID: ${selectedItem.id}`);
-        
-        // First, let's verify what's actually in the database with a broader search
-        console.log('🔍 STEP 1: Checking what exists in linkedin_post_image_counts table...');
-        const { data: allCounts, error: allCountsError } = await supabase
-          .from('linkedin_post_image_counts')
-          .select('*')
-          .limit(10);
-
-        console.log('📊 All count records in database (first 10):', allCounts);
-        if (allCountsError) {
-          console.error('❌ Error getting all counts:', allCountsError);
-        }
-
-        // Now search for our specific post ID
-        console.log(`🔍 STEP 2: Searching for post_id = "${selectedItem.id}"`);
-        const { data: debugCounts, error: debugError } = await supabase
+        // Get image counts - now with simplified query using direct user_id
+        console.log('🔍 Fetching image counts for post:', selectedItem.id);
+        const { data: countData, error: countError } = await supabase
           .from('linkedin_post_image_counts')
           .select('*')
           .eq('post_id', selectedItem.id);
 
-        console.log('📊 Specific post search result:', { debugCounts, debugError });
-
-        // Also check if there's a similar post ID (in case of ID mismatch)
-        console.log('🔍 STEP 3: Checking for similar post IDs...');
-        const { data: similarCounts, error: similarError } = await supabase
-          .from('linkedin_post_image_counts')
-          .select('*')
-          .ilike('post_id', `${selectedItem.id.substring(0, 20)}%`);
-
-        console.log('📊 Similar post IDs found:', similarCounts);
-
-        if (!debugCounts || debugCounts.length === 0) {
-          console.log('❌ No exact count records found for this post_id');
-          console.log('🔍 Let me check linkedin_post_images table directly...');
-          
-          const { data: imageRecords, error: imageError } = await supabase
-            .from('linkedin_post_images')
-            .select('*')
-            .eq('post_id', selectedItem.id);
-          
-          console.log('📊 Direct image records for this post:', imageRecords);
-          
-          if (imageRecords && imageRecords.length > 0) {
-            console.log('✅ Found images in linkedin_post_images but no count record!');
-            console.log('🔧 This suggests the count table is out of sync with the images table');
-          }
+        if (countError) {
+          console.error('❌ Error loading image counts:', countError);
         } else {
-          console.log('✅ Found count records in database:', debugCounts);
+          console.log('✅ Loaded image counts:', countData);
+        }
+
+        // Get images - now with simplified query using direct user_id
+        console.log('🔍 Fetching images for post:', selectedItem.id);
+        const { data: imageData, error: imageError } = await supabase
+          .from('linkedin_post_images')
+          .select('*')
+          .eq('post_id', selectedItem.id)
+          .order('created_at', { ascending: true });
+
+        if (imageError) {
+          console.error('❌ Error loading images:', imageError);
+        } else {
+          console.log('✅ Loaded images:', imageData);
         }
 
         // Process each variation (1, 2, 3)
         for (let variation = 1; variation <= 3; variation++) {
           const variationKey = `${selectedItem.id}-${variation}`;
-          console.log(`🔍 Processing variation ${variation}, key: ${variationKey}`);
           
           // Get count for this specific variation
-          const countRecord = debugCounts?.find(c => c.variation_number === variation);
+          const countRecord = countData?.find(c => c.variation_number === variation);
           const count = countRecord?.image_count || 0;
           
-          console.log(`📊 Variation ${variation} - countRecord:`, countRecord);
-          console.log(`📊 Variation ${variation} - final count: ${count}`);
+          console.log(`📊 Variation ${variation} count: ${count}`);
           
-          // Set the count in state
-          setImageCounts(prev => {
-            const newCounts = {
-              ...prev,
-              [variationKey]: count
-            };
-            console.log(`📊 Updated imageCounts state for ${variationKey}:`, newCounts);
-            return newCounts;
-          });
+          setImageCounts(prev => ({
+            ...prev,
+            [variationKey]: count
+          }));
 
           // Get images for this variation
-          const { data: variationImages, error: imagesError } = await supabase
-            .from('linkedin_post_images')
-            .select('variation_number, image_data, created_at')
-            .eq('post_id', selectedItem.id)
-            .eq('variation_number', variation)
-            .order('created_at', { ascending: true });
-
-          if (imagesError) {
-            console.error(`❌ Error loading images for variation ${variation}:`, imagesError);
-          } else {
-            console.log(`🖼️ Images for variation ${variation}:`, variationImages);
-          }
-
-          const uniqueImages = (variationImages || []).reduce((acc: string[], img) => {
+          const variationImages = imageData?.filter(img => img.variation_number === variation) || [];
+          
+          const uniqueImages = variationImages.reduce((acc: string[], img) => {
             if (!acc.includes(img.image_data)) {
               acc.push(img.image_data);
             }
@@ -136,17 +92,8 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
             [variationKey]: uniqueImages
           }));
 
-          console.log(`✅ Set ${uniqueImages.length} images for ${variationKey}`);
+          console.log(`✅ Set ${uniqueImages.length} images for variation ${variation}`);
         }
-
-        // Final state check
-        setTimeout(() => {
-          console.log('🔍 Final state check after 100ms:');
-          setImageCounts(current => {
-            console.log('📊 Current imageCounts state:', current);
-            return current;
-          });
-        }, 100);
 
       } catch (error) {
         console.error('❌ Error in loadExistingImagesAndCounts:', error);

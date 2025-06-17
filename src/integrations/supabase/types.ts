@@ -284,6 +284,7 @@ export type Database = {
           image_count: number
           post_id: string
           updated_at: string
+          user_id: string | null
           variation_number: number
         }
         Insert: {
@@ -292,6 +293,7 @@ export type Database = {
           image_count?: number
           post_id: string
           updated_at?: string
+          user_id?: string | null
           variation_number: number
         }
         Update: {
@@ -300,6 +302,7 @@ export type Database = {
           image_count?: number
           post_id?: string
           updated_at?: string
+          user_id?: string | null
           variation_number?: number
         }
         Relationships: [
@@ -310,6 +313,13 @@ export type Database = {
             referencedRelation: "job_linkedin"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "linkedin_post_image_counts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
         ]
       }
       linkedin_post_images: {
@@ -318,6 +328,7 @@ export type Database = {
           id: string
           image_data: string
           post_id: string
+          user_id: string | null
           variation_number: number
         }
         Insert: {
@@ -325,6 +336,7 @@ export type Database = {
           id?: string
           image_data: string
           post_id: string
+          user_id?: string | null
           variation_number: number
         }
         Update: {
@@ -332,6 +344,7 @@ export type Database = {
           id?: string
           image_data?: string
           post_id?: string
+          user_id?: string | null
           variation_number?: number
         }
         Relationships: [
@@ -340,6 +353,13 @@ export type Database = {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "job_linkedin"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "linkedin_post_images_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
