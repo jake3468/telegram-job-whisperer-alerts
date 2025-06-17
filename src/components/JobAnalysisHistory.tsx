@@ -5,7 +5,7 @@ import { History, Loader2 } from 'lucide-react';
 import HistoryModal from './HistoryModal';
 
 interface JobAnalysisHistoryProps {
-  type: 'job_analyses' | 'cover_letters';
+  type: 'job_analysis' | 'cover_letters';
   gradientColors: string;
   borderColors: string;
 }
