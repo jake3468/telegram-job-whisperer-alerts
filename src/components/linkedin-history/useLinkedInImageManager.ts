@@ -27,6 +27,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
   const isTimeoutActiveRef = useRef(false);
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const channelRef = useRef<any>(null);
 
   // Helper function to add image without duplicates
   const addImageIfNotExists = (newImageData: string) => {
@@ -83,12 +84,27 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
 
   // Set up real-time subscription
   useEffect(() => {
-    if (!selectedItem?.id) return;
+    if (!selectedItem?.id) {
+      // Clean up existing channel if no selected item
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+      return;
+    }
+
+    // Clean up existing channel before creating new one
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
 
     console.log(`Setting up image subscription for post ${selectedItem.id}`);
 
-    const channel = supabase
-      .channel(`linkedin-image-history-${selectedItem.id}`)
+    const channelName = `linkedin-image-history-${selectedItem.id}`;
+    const channel = supabase.channel(channelName);
+    
+    channel
       .on(
         'broadcast',
         {
@@ -127,6 +143,9 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
         console.log(`Image subscription status for post ${selectedItem.id}:`, status);
       });
 
+    // Store the channel reference
+    channelRef.current = channel;
+
     return () => {
       console.log(`Cleaning up image subscription for post ${selectedItem.id}`);
       // Clear any active timeouts on cleanup
@@ -139,7 +158,12 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
         pollIntervalRef.current = null;
       }
       isTimeoutActiveRef.current = false;
-      supabase.removeChannel(channel);
+      
+      // Clean up channel
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
     };
   }, [selectedItem?.id, toast]);
 

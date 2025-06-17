@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -52,6 +51,7 @@ const LinkedInPostVariation = ({
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
   const isTimeoutActiveRef = useRef(false);
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const channelRef = useRef<any>(null);
 
   // Create display name from user data
   const displayName = userData?.first_name && userData?.last_name 
@@ -114,12 +114,27 @@ const LinkedInPostVariation = ({
 
   // Set up real-time subscription for image updates
   useEffect(() => {
-    if (!postId) return;
+    if (!postId) {
+      // Clean up existing channel if no postId
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+      return;
+    }
+
+    // Clean up existing channel before creating new one
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
 
     console.log(`Setting up image subscription for post ${postId}`);
 
-    const channel = supabase
-      .channel(`linkedin-image-${postId}`)
+    const channelName = `linkedin-image-${postId}`;
+    const channel = supabase.channel(channelName);
+    
+    channel
       .on(
         'broadcast',
         {
@@ -158,6 +173,9 @@ const LinkedInPostVariation = ({
         console.log(`Image subscription status for post ${postId}:`, status);
       });
 
+    // Store the channel reference
+    channelRef.current = channel;
+
     return () => {
       console.log(`Cleaning up image subscription for post ${postId}`);
       // Clear any active timeouts on cleanup
@@ -170,7 +188,12 @@ const LinkedInPostVariation = ({
         pollIntervalRef.current = null;
       }
       isTimeoutActiveRef.current = false;
-      supabase.removeChannel(channel);
+      
+      // Clean up channel
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
     };
   }, [postId, toast]);
 
