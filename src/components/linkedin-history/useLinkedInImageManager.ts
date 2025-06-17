@@ -28,6 +28,19 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
   const isTimeoutActiveRef = useRef(false);
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Helper function to add image without duplicates
+  const addImageIfNotExists = (newImageData: string) => {
+    setGeneratedImages(prev => {
+      // Check if this exact image data already exists
+      if (prev.includes(newImageData)) {
+        console.log('Image already exists, skipping duplicate');
+        return prev;
+      }
+      console.log('Adding new unique image to list');
+      return [newImageData, ...prev];
+    });
+  };
+
   // Load existing images when selectedItem changes
   useEffect(() => {
     if (!selectedItem?.id) {
@@ -52,7 +65,9 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
 
         if (images && images.length > 0) {
           console.log(`Found ${images.length} existing images for post ${selectedItem.id}`);
-          setGeneratedImages(images.map(img => img.image_data));
+          // Remove duplicates using Set to ensure unique images
+          const uniqueImages = Array.from(new Set(images.map(img => img.image_data)));
+          setGeneratedImages(uniqueImages);
         } else {
           console.log(`No existing images found for post ${selectedItem.id}`);
           setGeneratedImages([]);
@@ -96,8 +111,8 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
             }
             isTimeoutActiveRef.current = false;
             
-            // Add new image to the list
-            setGeneratedImages(prev => [payload.payload.image_data, ...prev]);
+            // Add new image using the helper function to avoid duplicates
+            addImageIfNotExists(payload.payload.image_data);
             setLoadingImage(false);
             setImageGenerationFailed(false);
             
@@ -200,7 +215,8 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
           isTimeoutActiveRef.current = false;
         }
         
-        setGeneratedImages(prev => [data.data.image_data, ...prev]);
+        // Add image using helper function to avoid duplicates
+        addImageIfNotExists(data.data.image_data);
         setLoadingImage(false);
         
         toast({
@@ -246,7 +262,8 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
                   pollIntervalRef.current = null;
                 }
                 
-                setGeneratedImages(prev => [latestImage, ...prev]);
+                // Add image using helper function to avoid duplicates
+                addImageIfNotExists(latestImage);
                 setLoadingImage(false);
                 setImageGenerationFailed(false);
                 
@@ -283,10 +300,10 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
   };
 
   return {
-    generatedImages, // Changed from generatedImage to generatedImages array
+    generatedImages,
     loadingImage,
     imageGenerationFailed,
-    hasImages: generatedImages.length > 0, // Changed from hasImage to hasImages
+    hasImages: generatedImages.length > 0,
     handleGetImageForPost
   };
 };

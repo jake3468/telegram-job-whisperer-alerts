@@ -60,6 +60,19 @@ const LinkedInPostVariation = ({
     ? userData.first_name 
     : 'Professional User';
 
+  // Helper function to add image without duplicates
+  const addImageIfNotExists = (newImageData: string) => {
+    setGeneratedImages(prev => {
+      // Check if this exact image data already exists
+      if (prev.includes(newImageData)) {
+        console.log('Image already exists, skipping duplicate');
+        return prev;
+      }
+      console.log('Adding new unique image to list');
+      return [newImageData, ...prev];
+    });
+  };
+
   // Load existing images from database
   useEffect(() => {
     if (!postId) return;
@@ -83,7 +96,9 @@ const LinkedInPostVariation = ({
 
         if (images && images.length > 0) {
           console.log(`🔍 DEBUG: Found ${images.length} existing images for post ${postId}`);
-          setGeneratedImages(images.map(img => img.image_data));
+          // Remove duplicates using Set to ensure unique images
+          const uniqueImages = Array.from(new Set(images.map(img => img.image_data)));
+          setGeneratedImages(uniqueImages);
         } else {
           console.log(`🔍 DEBUG: No existing images found for post ${postId}`);
           setGeneratedImages([]);
@@ -127,8 +142,8 @@ const LinkedInPostVariation = ({
             }
             isTimeoutActiveRef.current = false;
             
-            // Add new image to the list
-            setGeneratedImages(prev => [payload.payload.image_data, ...prev]);
+            // Add new image using helper function to avoid duplicates
+            addImageIfNotExists(payload.payload.image_data);
             setIsGeneratingImage(false);
             setImageGenerationFailed(false);
             
@@ -272,7 +287,8 @@ const LinkedInPostVariation = ({
           isTimeoutActiveRef.current = false;
         }
         
-        setGeneratedImages(prev => [data.data.image_data, ...prev]);
+        // Add image using helper function to avoid duplicates
+        addImageIfNotExists(data.data.image_data);
         setIsGeneratingImage(false);
         
         toast({
@@ -318,7 +334,8 @@ const LinkedInPostVariation = ({
                   pollIntervalRef.current = null;
                 }
                 
-                setGeneratedImages(prev => [latestImage, ...prev]);
+                // Add image using helper function to avoid duplicates
+                addImageIfNotExists(latestImage);
                 setIsGeneratingImage(false);
                 setImageGenerationFailed(false);
                 
