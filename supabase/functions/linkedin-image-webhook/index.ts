@@ -94,9 +94,24 @@ serve(async (req) => {
     const responseText = await response.text()
     console.log('N8N webhook raw response:', responseText)
 
+    // Handle empty response
+    if (!responseText || responseText.trim() === '') {
+      console.log('N8N webhook returned empty response, treating as async trigger')
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'Image generation triggered successfully',
+          triggered: true
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
     let result
     try {
-      // First try to parse as JSON
+      // Try to parse as JSON
       result = JSON.parse(responseText)
       
       // If the result itself is a string, try to parse it again
@@ -132,7 +147,7 @@ serve(async (req) => {
       const { data: storedImage, error: storeError } = await supabase
         .from('linkedin_post_images')
         .insert({
-          post_id: post_id,
+          post_id: result.post_id || post_id,
           image_data: result.image_data
         })
         .select()
@@ -146,7 +161,7 @@ serve(async (req) => {
       }
       
       // Broadcast the image data to all listening clients
-      const channelName = `linkedin-image-${post_id}`
+      const channelName = `linkedin-image-${result.post_id || post_id}`
       console.log(`Broadcasting to channel: ${channelName}`)
       
       const { error: broadcastError } = await supabase.channel(channelName)
@@ -169,7 +184,7 @@ serve(async (req) => {
       }
       
       // Also broadcast to history channel
-      const historyChannelName = `linkedin-image-history-${post_id}`
+      const historyChannelName = `linkedin-image-history-${result.post_id || post_id}`
       const { error: historyBroadcastError } = await supabase.channel(historyChannelName)
         .send({
           type: 'broadcast',
