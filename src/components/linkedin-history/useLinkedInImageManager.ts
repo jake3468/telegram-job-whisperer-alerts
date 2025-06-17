@@ -35,71 +35,54 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
       try {
         console.log(`Loading existing images and counts for post ${selectedItem.id}`);
         
+        // Get all counts for this post in one query
+        const { data: allCounts, error: countsError } = await supabase
+          .from('linkedin_post_image_counts')
+          .select('variation_number, image_count')
+          .eq('post_id', selectedItem.id);
+
+        if (countsError) {
+          console.error('Error loading counts:', countsError);
+        }
+
+        // Get all images for this post in one query
+        const { data: allImages, error: imagesError } = await supabase
+          .from('linkedin_post_images')
+          .select('variation_number, image_data, created_at')
+          .eq('post_id', selectedItem.id)
+          .order('created_at', { ascending: true });
+
+        if (imagesError) {
+          console.error('Error loading images:', imagesError);
+        }
+
+        // Process each variation (1, 2, 3)
         for (let variation = 1; variation <= 3; variation++) {
           const variationKey = `${selectedItem.id}-${variation}`;
           
-          // Get the count directly from linkedin_post_image_counts table
-          const { data: countData, error: countError } = await supabase
-            .from('linkedin_post_image_counts')
-            .select('image_count')
-            .eq('post_id', selectedItem.id)
-            .eq('variation_number', variation)
-            .maybeSingle();
+          // Get count for this variation from the results
+          const countRecord = allCounts?.find(c => c.variation_number === variation);
+          const count = countRecord?.image_count || 0;
+          
+          console.log(`Setting count for variation ${variation}: ${count}`);
+          setImageCounts(prev => ({
+            ...prev,
+            [variationKey]: count
+          }));
 
-          if (countError) {
-            console.error(`Error loading count for variation ${variation}:`, countError);
-            // Default to 0 if there's an error
-            setImageCounts(prev => ({
-              ...prev,
-              [variationKey]: 0
-            }));
-          } else {
-            // Use the count from the database, or 0 if no record exists
-            const count = countData?.image_count || 0;
-            console.log(`Loaded count for variation ${variation}: ${count}`);
-            
-            setImageCounts(prev => ({
-              ...prev,
-              [variationKey]: count
-            }));
-          }
-
-          // Get the actual images from the database
-          const { data: images, error: imagesError } = await supabase
-            .from('linkedin_post_images')
-            .select('image_data, created_at')
-            .eq('post_id', selectedItem.id)
-            .eq('variation_number', variation)
-            .order('created_at', { ascending: true });
-
-          if (imagesError) {
-            console.error(`Error loading images for variation ${variation}:`, imagesError);
-            setGeneratedImages(prev => ({
-              ...prev,
-              [variationKey]: []
-            }));
-          } else {
-            // Set the images if any exist
-            if (images && images.length > 0) {
-              const uniqueImages = images.reduce((acc: string[], img) => {
-                if (!acc.includes(img.image_data)) {
-                  acc.push(img.image_data);
-                }
-                return acc;
-              }, []);
-              
-              setGeneratedImages(prev => ({
-                ...prev,
-                [variationKey]: uniqueImages
-              }));
-            } else {
-              // Ensure empty array if no images
-              setGeneratedImages(prev => ({
-                ...prev,
-                [variationKey]: []
-              }));
+          // Get images for this variation
+          const variationImages = allImages?.filter(img => img.variation_number === variation) || [];
+          const uniqueImages = variationImages.reduce((acc: string[], img) => {
+            if (!acc.includes(img.image_data)) {
+              acc.push(img.image_data);
             }
-          }
+            return acc;
+          }, []);
+          
+          setGeneratedImages(prev => ({
+            ...prev,
+            [variationKey]: uniqueImages
+          }));
         }
       } catch (error) {
         console.error('Error loading existing images and counts:', error);
@@ -247,6 +230,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
 
       if (!error && data) {
         const variationKey = `${postId}-${variationNumber}`;
+        console.log(`Refreshed count for ${variationKey}: ${data.image_count}`);
         setImageCounts(prev => ({
           ...prev,
           [variationKey]: data.image_count
