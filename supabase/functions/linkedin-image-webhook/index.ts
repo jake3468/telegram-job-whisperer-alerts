@@ -15,6 +15,38 @@ serve(async (req) => {
   try {
     const { post_heading, post_content, variation_number, user_name, post_id, source } = await req.json()
 
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+    // Check existing image count for this post variation
+    const { data: existingImages, error: countError } = await supabase
+      .from('linkedin_post_images')
+      .select('id')
+      .eq('post_id', post_id)
+      .eq('variation_number', variation_number)
+
+    if (countError) {
+      console.error('Error checking existing images:', countError)
+    }
+
+    const imageCount = existingImages?.length || 0
+    if (imageCount >= 3) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Maximum 3 images allowed per post variation',
+          limit_exceeded: true
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400
+        }
+      )
+    }
+
     // Get the N8N webhook URL from environment variables
     const n8nWebhookUrl = Deno.env.get('N8N_LINKEDIN_IMAGE_WEBHOOK_URL')
 
@@ -52,15 +84,26 @@ serve(async (req) => {
     const result = await response.json()
     console.log('N8N webhook response:', result)
 
-    // If the response contains image data, broadcast it via Supabase realtime
+    // If the response contains image data, store it in database and broadcast
     if (result.success && result.image_data) {
-      console.log('Broadcasting image data via Supabase realtime...')
+      console.log('Storing image data in database...')
       
-      // Initialize Supabase client
-      const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-      const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-      
-      const supabase = createClient(supabaseUrl, supabaseServiceKey)
+      // Store the image in the database
+      const { data: storedImage, error: storeError } = await supabase
+        .from('linkedin_post_images')
+        .insert({
+          post_id: post_id,
+          variation_number: variation_number,
+          image_data: result.image_data
+        })
+        .select()
+        .single()
+
+      if (storeError) {
+        console.error('Failed to store image in database:', storeError)
+      } else {
+        console.log('Image stored successfully in database')
+      }
       
       // Broadcast the image data to all listening clients
       const channelName = `linkedin-image-${post_id}-${variation_number}`
@@ -75,7 +118,8 @@ serve(async (req) => {
             image_data: result.image_data,
             variation_number: result.variation_number || variation_number,
             post_id: result.post_id || post_id,
-            source: source
+            source: source,
+            image_count: imageCount + 1
           }
         })
 
@@ -96,7 +140,8 @@ serve(async (req) => {
             image_data: result.image_data,
             variation_number: result.variation_number || variation_number,
             post_id: result.post_id || post_id,
-            source: source
+            source: source,
+            image_count: imageCount + 1
           }
         })
 
@@ -111,7 +156,8 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         message: 'Image generation triggered successfully',
-        data: result 
+        data: result,
+        current_image_count: imageCount + 1
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

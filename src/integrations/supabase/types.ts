@@ -277,6 +277,30 @@ export type Database = {
           },
         ]
       }
+      linkedin_post_images: {
+        Row: {
+          created_at: string
+          id: string
+          image_data: string
+          post_id: string
+          variation_number: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_data: string
+          post_id: string
+          variation_number: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_data?: string
+          post_id?: string
+          variation_number?: number
+        }
+        Relationships: []
+      }
       subscription_plans: {
         Row: {
           billing_cycle: string | null
