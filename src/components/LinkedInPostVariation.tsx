@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -57,21 +56,38 @@ const LinkedInPostVariation = ({
     ? userData.first_name 
     : 'Professional User';
 
-  // Load existing images from database
+  // Load existing image count and images from database
   useEffect(() => {
     if (!postId) return;
 
-    const loadExistingImages = async () => {
+    const loadExistingData = async () => {
       try {
-        const { data: images, error } = await supabase
+        // First, load the current image count from linkedin_post_image_counts
+        const { data: countData, error: countError } = await supabase
+          .from('linkedin_post_image_counts')
+          .select('image_count')
+          .eq('post_id', postId)
+          .eq('variation_number', variationNumber)
+          .maybeSingle();
+
+        if (countError) {
+          console.error('Error loading existing image count:', countError);
+        } else if (countData) {
+          console.log(`Loaded existing image count for variation ${variationNumber}: ${countData.image_count}`);
+          setImageCount(countData.image_count);
+          lastImageCountRef.current = countData.image_count;
+        }
+
+        // Then load the actual images
+        const { data: images, error: imagesError } = await supabase
           .from('linkedin_post_images')
           .select('image_data')
           .eq('post_id', postId)
           .eq('variation_number', variationNumber)
           .order('created_at', { ascending: true });
 
-        if (error) {
-          console.error('Error loading existing images:', error);
+        if (imagesError) {
+          console.error('Error loading existing images:', imagesError);
           return;
         }
 
@@ -86,15 +102,19 @@ const LinkedInPostVariation = ({
           }, []);
           
           setGeneratedImages(uniqueImages);
-          setImageCount(uniqueImages.length);
-          lastImageCountRef.current = uniqueImages.length;
+          
+          // If we didn't get a count from the counts table, use the image array length
+          if (!countData) {
+            setImageCount(uniqueImages.length);
+            lastImageCountRef.current = uniqueImages.length;
+          }
         }
       } catch (error) {
-        console.error('Error loading existing images:', error);
+        console.error('Error loading existing data:', error);
       }
     };
 
-    loadExistingImages();
+    loadExistingData();
   }, [postId, variationNumber]);
 
   // Set up real-time subscription for image updates
@@ -176,61 +196,6 @@ const LinkedInPostVariation = ({
       supabase.removeChannel(channel);
     };
   }, [postId, variationNumber, toast]);
-
-  // Enhanced polling to detect new images more reliably
-  useEffect(() => {
-    if (!postId || !isGeneratingImage) return;
-
-    const enhancedPolling = setInterval(async () => {
-      try {
-        console.log(`Enhanced polling for variation ${variationNumber}`);
-        const { data: images, error } = await supabase
-          .from('linkedin_post_images')
-          .select('image_data, created_at')
-          .eq('post_id', postId)
-          .eq('variation_number', variationNumber)
-          .order('created_at', { ascending: true });
-
-        if (!error && images && images.length > lastImageCountRef.current) {
-          console.log(`New images detected via polling for variation ${variationNumber}: ${images.length} vs ${lastImageCountRef.current}`);
-          
-          // Remove duplicates and update state
-          const uniqueImages = images.reduce((acc: string[], img) => {
-            if (!acc.includes(img.image_data)) {
-              acc.push(img.image_data);
-            }
-            return acc;
-          }, []);
-          
-          setGeneratedImages(uniqueImages);
-          setImageCount(uniqueImages.length);
-          lastImageCountRef.current = uniqueImages.length;
-          
-          // Clear generation state
-          setIsGeneratingImage(false);
-          setImageGenerationFailed(false);
-          
-          // Clear timeouts
-          if (timeoutIdRef.current) {
-            clearTimeout(timeoutIdRef.current);
-            timeoutIdRef.current = null;
-          }
-          isTimeoutActiveRef.current = false;
-          
-          toast({
-            title: "Image Generated!",
-            description: `LinkedIn post image for Post ${variationNumber} is ready.`
-          });
-        }
-      } catch (err) {
-        console.error('Enhanced polling error:', err);
-      }
-    }, 2000); // Poll every 2 seconds during generation
-
-    return () => {
-      clearInterval(enhancedPolling);
-    };
-  }, [postId, variationNumber, isGeneratingImage, toast]);
 
   const handleCopyContent = async () => {
     if (!content) return;
