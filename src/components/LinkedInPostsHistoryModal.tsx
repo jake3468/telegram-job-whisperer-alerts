@@ -59,6 +59,30 @@ const LinkedInPostsHistoryModal = ({
     const loadExistingImagesAndCounts = async () => {
       try {
         for (let variation = 1; variation <= 3; variation++) {
+          const variationKey = `${selectedItem.id}-${variation}`;
+          
+          // Get the actual count of images from the database
+          const { count, error: countError } = await supabase
+            .from('linkedin_post_images')
+            .select('*', { count: 'exact', head: true })
+            .eq('post_id', selectedItem.id)
+            .eq('variation_number', variation);
+
+          if (countError) {
+            console.error(`Error getting count for variation ${variation}:`, countError);
+            continue;
+          }
+
+          const actualCount = count || 0;
+          console.log(`Variation ${variation} has ${actualCount} images in database`);
+
+          // Set the actual count from database
+          setImageCounts(prev => ({
+            ...prev,
+            [variationKey]: actualCount
+          }));
+
+          // Now load the actual images
           const { data: images, error } = await supabase
             .from('linkedin_post_images')
             .select('image_data')
@@ -72,7 +96,6 @@ const LinkedInPostsHistoryModal = ({
           }
 
           if (images && images.length > 0) {
-            const variationKey = `${selectedItem.id}-${variation}`;
             // Remove duplicates
             const uniqueImages = images.reduce((acc: string[], img) => {
               if (!acc.includes(img.image_data)) {
@@ -84,19 +107,6 @@ const LinkedInPostsHistoryModal = ({
             setGeneratedImages(prev => ({
               ...prev,
               [variationKey]: uniqueImages
-            }));
-            
-            // Set the actual count from database
-            setImageCounts(prev => ({
-              ...prev,
-              [variationKey]: uniqueImages.length
-            }));
-          } else {
-            // No images found, set count to 0
-            const variationKey = `${selectedItem.id}-${variation}`;
-            setImageCounts(prev => ({
-              ...prev,
-              [variationKey]: 0
             }));
           }
         }
@@ -140,9 +150,11 @@ const LinkedInPostsHistoryModal = ({
               };
             });
 
+            // Update count based on actual database count or increment
+            const newCount = payload.payload.image_count || ((imageCounts[variationKey] || 0) + 1);
             setImageCounts(prev => ({
               ...prev,
-              [variationKey]: payload.payload.image_count || ((prev[variationKey] || 0) + 1)
+              [variationKey]: newCount
             }));
             
             setLoadingImages(prev => ({
@@ -170,7 +182,7 @@ const LinkedInPostsHistoryModal = ({
       console.log(`Cleaning up history image subscription`);
       supabase.removeChannel(channel);
     };
-  }, [selectedItem, toast]);
+  }, [selectedItem, toast, imageCounts]);
 
   // Enhanced polling for history images
   useEffect(() => {
@@ -182,44 +194,55 @@ const LinkedInPostsHistoryModal = ({
           const variationKey = `${selectedItem.id}-${variation}`;
           
           if (loadingImages[variationKey]) {
-            const { data: images, error } = await supabase
+            // Check the actual count in database
+            const { count, error: countError } = await supabase
               .from('linkedin_post_images')
-              .select('image_data')
+              .select('*', { count: 'exact', head: true })
               .eq('post_id', selectedItem.id)
-              .eq('variation_number', variation)
-              .order('created_at', { ascending: true });
+              .eq('variation_number', variation);
 
-            if (!error && images) {
-              const uniqueImages = images.reduce((acc: string[], img) => {
-                if (!acc.includes(img.image_data)) {
-                  acc.push(img.image_data);
+            if (!countError && count !== null) {
+              const currentCount = imageCounts[variationKey] || 0;
+              
+              if (count > currentCount) {
+                console.log(`New images detected for ${variationKey}: ${count} vs ${currentCount}`);
+                
+                // Load the latest images
+                const { data: images, error } = await supabase
+                  .from('linkedin_post_images')
+                  .select('image_data')
+                  .eq('post_id', selectedItem.id)
+                  .eq('variation_number', variation)
+                  .order('created_at', { ascending: true });
+
+                if (!error && images) {
+                  const uniqueImages = images.reduce((acc: string[], img) => {
+                    if (!acc.includes(img.image_data)) {
+                      acc.push(img.image_data);
+                    }
+                    return acc;
+                  }, []);
+
+                  setGeneratedImages(prev => ({
+                    ...prev,
+                    [variationKey]: uniqueImages
+                  }));
+                  
+                  setImageCounts(prev => ({
+                    ...prev,
+                    [variationKey]: count
+                  }));
+                  
+                  setLoadingImages(prev => ({
+                    ...prev,
+                    [variationKey]: false
+                  }));
+                  
+                  toast({
+                    title: "Image Generated!",
+                    description: `LinkedIn post image for Post ${variation} is ready.`
+                  });
                 }
-                return acc;
-              }, []);
-
-              const currentImages = generatedImages[variationKey] || [];
-              if (uniqueImages.length > currentImages.length) {
-                console.log(`New images detected for ${variationKey}: ${uniqueImages.length} vs ${currentImages.length}`);
-                
-                setGeneratedImages(prev => ({
-                  ...prev,
-                  [variationKey]: uniqueImages
-                }));
-                
-                setImageCounts(prev => ({
-                  ...prev,
-                  [variationKey]: uniqueImages.length
-                }));
-                
-                setLoadingImages(prev => ({
-                  ...prev,
-                  [variationKey]: false
-                }));
-                
-                toast({
-                  title: "Image Generated!",
-                  description: `LinkedIn post image for Post ${variation} is ready.`
-                });
               }
             }
           }
@@ -232,7 +255,7 @@ const LinkedInPostsHistoryModal = ({
     return () => {
       clearInterval(pollForImages);
     };
-  }, [selectedItem, loadingImages, generatedImages, toast]);
+  }, [selectedItem, loadingImages, imageCounts, toast]);
 
   const fetchHistory = async () => {
     if (!user || !userProfile) return;
