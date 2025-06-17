@@ -31,12 +31,14 @@ interface HistoryItem {
   post_heading_3?: string;
   post_content_3?: string;
 }
+
 interface HistoryModalProps {
   type: 'job_guide' | 'cover_letter' | 'linkedin_posts';
   isOpen: boolean;
   onClose: () => void;
   gradientColors: string;
 }
+
 const HistoryModal = ({
   type,
   isOpen,
@@ -56,11 +58,58 @@ const HistoryModal = ({
   const [isLoading, setIsLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [generatedImages, setGeneratedImages] = useState<{[key: string]: string}>({});
+  const [loadingImages, setLoadingImages] = useState<{[key: string]: boolean}>({});
+
   useEffect(() => {
     if (isOpen && user && userProfile) {
       fetchHistory();
     }
   }, [isOpen, user, userProfile]);
+
+  // Set up real-time subscription for image updates in history
+  useEffect(() => {
+    if (!selectedItem || type !== 'linkedin_posts') return;
+
+    console.log(`Setting up history image subscription for post ${selectedItem.id}`);
+
+    const channel = supabase
+      .channel(`linkedin-image-history-${selectedItem.id}`)
+      .on('broadcast', {
+        event: 'linkedin_image_generated',
+        filter: `post_id=eq.${selectedItem.id}`
+      }, (payload) => {
+        console.log('Received history image broadcast:', payload);
+        
+        if (payload.payload?.post_id === selectedItem.id && payload.payload?.image_data) {
+          const variationKey = `${selectedItem.id}-${payload.payload.variation_number}`;
+          
+          setGeneratedImages(prev => ({
+            ...prev,
+            [variationKey]: payload.payload.image_data
+          }));
+          
+          setLoadingImages(prev => ({
+            ...prev,
+            [variationKey]: false
+          }));
+          
+          toast({
+            title: "Image Generated!",
+            description: `LinkedIn post image for Post ${payload.payload.variation_number} is ready.`
+          });
+        }
+      })
+      .subscribe((status) => {
+        console.log(`History image subscription status:`, status);
+      });
+
+    return () => {
+      console.log(`Cleaning up history image subscription`);
+      supabase.removeChannel(channel);
+    };
+  }, [selectedItem, type, toast]);
+
   const fetchHistory = async () => {
     if (!user || !userProfile) return;
     setIsLoading(true);
@@ -108,6 +157,7 @@ const HistoryModal = ({
       setIsLoading(false);
     }
   };
+
   const handleCopyResult = async (item: HistoryItem, postNumber?: number) => {
     let result;
     
@@ -139,9 +189,39 @@ const HistoryModal = ({
     }
   };
 
+  const handleCopyImage = async (imageData: string) => {
+    try {
+      // Convert base64 to blob
+      const response = await fetch(imageData);
+      const blob = await response.blob();
+      
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          [blob.type]: blob
+        })
+      ]);
+      
+      toast({
+        title: "Image Copied!",
+        description: "Image copied to clipboard successfully."
+      });
+    } catch (err) {
+      console.error('Failed to copy image:', err);
+      toast({
+        title: "Error",
+        description: "Failed to copy image to clipboard.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleGetImageForPost = async (item: HistoryItem, postNumber: number) => {
     const heading = item[`post_heading_${postNumber}` as keyof HistoryItem] as string;
     const content = item[`post_content_${postNumber}` as keyof HistoryItem] as string;
+    const variationKey = `${item.id}-${postNumber}`;
+    
+    setLoadingImages(prev => ({ ...prev, [variationKey]: true }));
+    setGeneratedImages(prev => ({ ...prev, [variationKey]: '' })); // Clear existing image
     
     try {
       console.log(`Triggering image generation via edge function for post ${postNumber} from history`);
@@ -170,10 +250,11 @@ const HistoryModal = ({
 
       toast({
         title: "Image Generation Started",
-        description: `Image generation for Post ${postNumber} has been triggered from history.`
+        description: `LinkedIn post image for Post ${postNumber} is being generated...`
       });
     } catch (error) {
       console.error('Error triggering image generation webhook:', error);
+      setLoadingImages(prev => ({ ...prev, [variationKey]: false }));
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to trigger image generation. Please try again.",
@@ -245,6 +326,7 @@ const HistoryModal = ({
       });
     }
   };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -254,6 +336,7 @@ const HistoryModal = ({
       minute: '2-digit'
     });
   };
+
   const getResult = (item: HistoryItem) => {
     if (type === 'job_guide') {
       return item.job_match;
@@ -264,6 +347,7 @@ const HistoryModal = ({
       return null;
     }
   };
+
   const hasResult = (item: HistoryItem) => {
     if (type === 'linkedin_posts') {
       return item.post_content_1 && item.post_content_2 && item.post_content_3;
@@ -271,18 +355,21 @@ const HistoryModal = ({
     const result = getResult(item);
     return result && result.trim().length > 0;
   };
+
   const getItemTitle = (item: HistoryItem) => {
     if (type === 'linkedin_posts') {
       return item.topic || 'LinkedIn Post';
     }
     return item.company_name || 'Unknown Company';
   };
+
   const getItemSubtitle = (item: HistoryItem) => {
     if (type === 'linkedin_posts') {
       return item.tone || 'No tone specified';
     }
     return item.job_title || 'Unknown Position';
   };
+
   const getHistoryTitle = () => {
     if (type === 'job_guide') {
       return 'Job Analysis History';
@@ -292,6 +379,7 @@ const HistoryModal = ({
       return 'LinkedIn Posts History';
     }
   };
+
   const getHistoryDescription = () => {
     if (type === 'job_guide') {
       return 'job analyses';
@@ -301,6 +389,7 @@ const HistoryModal = ({
       return 'LinkedIn posts';
     }
   };
+
   const getDetailTitle = () => {
     if (type === 'job_guide') {
       return 'Job Analysis Details';
@@ -310,6 +399,7 @@ const HistoryModal = ({
       return 'LinkedIn Post Details';
     }
   };
+
   const getResultTitle = () => {
     if (type === 'job_guide') {
       return 'Job Analysis Result';
@@ -319,6 +409,7 @@ const HistoryModal = ({
       return 'LinkedIn Post';
     }
   };
+
   if (showDetails && selectedItem) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
@@ -447,13 +538,43 @@ const HistoryModal = ({
                             <Button
                               onClick={() => handleGetImageForPost(selectedItem, 1)}
                               size="sm"
-                              className="bg-amber-600 hover:bg-amber-700 text-white"
+                              disabled={loadingImages[`${selectedItem.id}-1`]}
+                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
                             >
                               <ImageIcon className="w-3 h-3 mr-1" />
-                              Get Image
+                              {loadingImages[`${selectedItem.id}-1`] ? 'Generating...' : 'Get Image'}
                             </Button>
                           </div>
                         </div>
+
+                        {/* Loading indicator */}
+                        {loadingImages[`${selectedItem.id}-1`] && (
+                          <div className="mb-4 p-3 bg-blue-50 rounded-lg text-center border border-blue-200">
+                            <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading...</div>
+                            <div className="text-xs text-blue-500 mt-1">This may take a few moments</div>
+                          </div>
+                        )}
+
+                        {/* Generated Image */}
+                        {generatedImages[`${selectedItem.id}-1`] && (
+                          <div className="mb-4">
+                            <div className="relative">
+                              <img 
+                                src={generatedImages[`${selectedItem.id}-1`]} 
+                                alt="Generated LinkedIn post image"
+                                className="w-full rounded-lg shadow-sm"
+                              />
+                              <Button
+                                onClick={() => handleCopyImage(generatedImages[`${selectedItem.id}-1`])}
+                                size="sm"
+                                className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white"
+                              >
+                                <Copy className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+
                         <div className="text-black bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words">
                           {selectedItem.post_content_1}
                         </div>
@@ -477,13 +598,43 @@ const HistoryModal = ({
                             <Button
                               onClick={() => handleGetImageForPost(selectedItem, 2)}
                               size="sm"
-                              className="bg-amber-600 hover:bg-amber-700 text-white"
+                              disabled={loadingImages[`${selectedItem.id}-2`]}
+                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
                             >
                               <ImageIcon className="w-3 h-3 mr-1" />
-                              Get Image
+                              {loadingImages[`${selectedItem.id}-2`] ? 'Generating...' : 'Get Image'}
                             </Button>
                           </div>
                         </div>
+
+                        {/* Loading indicator */}
+                        {loadingImages[`${selectedItem.id}-2`] && (
+                          <div className="mb-4 p-3 bg-blue-50 rounded-lg text-center border border-blue-200">
+                            <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading...</div>
+                            <div className="text-xs text-blue-500 mt-1">This may take a few moments</div>
+                          </div>
+                        )}
+
+                        {/* Generated Image */}
+                        {generatedImages[`${selectedItem.id}-2`] && (
+                          <div className="mb-4">
+                            <div className="relative">
+                              <img 
+                                src={generatedImages[`${selectedItem.id}-2`]} 
+                                alt="Generated LinkedIn post image"
+                                className="w-full rounded-lg shadow-sm"
+                              />
+                              <Button
+                                onClick={() => handleCopyImage(generatedImages[`${selectedItem.id}-2`])}
+                                size="sm"
+                                className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white"
+                              >
+                                <Copy className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+
                         <div className="text-black bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words">
                           {selectedItem.post_content_2}
                         </div>
@@ -507,13 +658,43 @@ const HistoryModal = ({
                             <Button
                               onClick={() => handleGetImageForPost(selectedItem, 3)}
                               size="sm"
-                              className="bg-amber-600 hover:bg-amber-700 text-white"
+                              disabled={loadingImages[`${selectedItem.id}-3`]}
+                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
                             >
                               <ImageIcon className="w-3 h-3 mr-1" />
-                              Get Image
+                              {loadingImages[`${selectedItem.id}-3`] ? 'Generating...' : 'Get Image'}
                             </Button>
                           </div>
                         </div>
+
+                        {/* Loading indicator */}
+                        {loadingImages[`${selectedItem.id}-3`] && (
+                          <div className="mb-4 p-3 bg-blue-50 rounded-lg text-center border border-blue-200">
+                            <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading...</div>
+                            <div className="text-xs text-blue-500 mt-1">This may take a few moments</div>
+                          </div>
+                        )}
+
+                        {/* Generated Image */}
+                        {generatedImages[`${selectedItem.id}-3`] && (
+                          <div className="mb-4">
+                            <div className="relative">
+                              <img 
+                                src={generatedImages[`${selectedItem.id}-3`]} 
+                                alt="Generated LinkedIn post image"
+                                className="w-full rounded-lg shadow-sm"
+                              />
+                              <Button
+                                onClick={() => handleCopyImage(generatedImages[`${selectedItem.id}-3`])}
+                                size="sm"
+                                className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white"
+                              >
+                                <Copy className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+
                         <div className="text-black bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words">
                           {selectedItem.post_content_3}
                         </div>
@@ -570,6 +751,7 @@ const HistoryModal = ({
       </Dialog>
     );
   }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] max-w-5xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
@@ -678,4 +860,5 @@ const HistoryModal = ({
     </Dialog>
   );
 };
+
 export default HistoryModal;

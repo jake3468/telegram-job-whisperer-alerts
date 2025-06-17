@@ -1,4 +1,5 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Repeat2, Send, MoreHorizontal, User, Copy, Image as ImageIcon } from 'lucide-react';
@@ -48,6 +49,44 @@ const LinkedInPostVariation = ({
     ? userData.first_name 
     : 'Professional User';
 
+  // Set up real-time subscription for image updates
+  useEffect(() => {
+    if (!postId) return;
+
+    console.log(`Setting up image subscription for post ${postId}, variation ${variationNumber}`);
+
+    const channel = supabase
+      .channel(`linkedin-image-${postId}-${variationNumber}`)
+      .on('broadcast', {
+        event: 'linkedin_image_generated',
+        filter: `post_id=eq.${postId}`
+      }, (payload) => {
+        console.log('Received image broadcast:', payload);
+        
+        if (payload.payload?.variation_number === variationNumber && 
+            payload.payload?.post_id === postId &&
+            payload.payload?.image_data) {
+          
+          console.log(`Image received for variation ${variationNumber}`);
+          setGeneratedImage(payload.payload.image_data);
+          setIsGeneratingImage(false);
+          
+          toast({
+            title: "Image Generated!",
+            description: `LinkedIn post image for Post ${variationNumber} is ready.`
+          });
+        }
+      })
+      .subscribe((status) => {
+        console.log(`Image subscription status for variation ${variationNumber}:`, status);
+      });
+
+    return () => {
+      console.log(`Cleaning up image subscription for variation ${variationNumber}`);
+      supabase.removeChannel(channel);
+    };
+  }, [postId, variationNumber, toast]);
+
   const handleCopyContent = async () => {
     if (!content) return;
     try {
@@ -96,6 +135,7 @@ const LinkedInPostVariation = ({
 
   const handleGetImage = async () => {
     setIsGeneratingImage(true);
+    setGeneratedImage(null); // Clear any existing image
     
     try {
       console.log("Triggering image generation via edge function for post", variationNumber);
@@ -124,26 +164,17 @@ const LinkedInPostVariation = ({
 
       toast({
         title: "Image Generation Started",
-        description: `Image generation for Post ${variationNumber} has been triggered. The image will appear here once ready.`
+        description: `LinkedIn post image for Post ${variationNumber} is being generated...`
       });
-
-      // Set up polling to check for the generated image
-      // You'll need to implement a way for N8N to send the image back
-      // For now, we'll simulate receiving the image after some time
-      setTimeout(() => {
-        // This would be replaced with actual image data from N8N
-        // setGeneratedImage('data:image/png;base64,...');
-      }, 5000);
 
     } catch (error) {
       console.error('Error triggering image generation:', error);
+      setIsGeneratingImage(false);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to trigger image generation. Please try again.",
         variant: "destructive"
       });
-    } finally {
-      setIsGeneratingImage(false);
     }
   };
 
@@ -203,8 +234,9 @@ const LinkedInPostVariation = ({
 
           {/* Loading indicator for image generation */}
           {isGeneratingImage && (
-            <div className="mb-4 p-4 bg-gray-50 rounded-lg text-center">
-              <div className="text-sm text-gray-600">Generating image...</div>
+            <div className="mb-4 p-4 bg-blue-50 rounded-lg text-center border border-blue-200">
+              <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading...</div>
+              <div className="text-xs text-blue-500 mt-1">This may take a few moments</div>
             </div>
           )}
 

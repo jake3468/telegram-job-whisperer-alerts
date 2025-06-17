@@ -1,5 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,7 +15,7 @@ serve(async (req) => {
   try {
     const { post_heading, post_content, variation_number, user_name, post_id, source } = await req.json()
 
-    // Get the N8N webhook URL from environment variables (Supabase secrets are available as env vars)
+    // Get the N8N webhook URL from environment variables
     const n8nWebhookUrl = Deno.env.get('N8N_LINKEDIN_IMAGE_WEBHOOK_URL')
 
     if (!n8nWebhookUrl) {
@@ -50,6 +51,37 @@ serve(async (req) => {
 
     const result = await response.json()
     console.log('N8N webhook response:', result)
+
+    // If the response contains image data, broadcast it via Supabase realtime
+    if (result.success && result.image_data) {
+      console.log('Broadcasting image data via Supabase realtime...')
+      
+      // Initialize Supabase client
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+      const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      
+      const supabase = createClient(supabaseUrl, supabaseServiceKey)
+      
+      // Broadcast the image data to all listening clients
+      const { error: broadcastError } = await supabase.channel('linkedin-image-updates')
+        .send({
+          type: 'broadcast',
+          event: 'linkedin_image_generated',
+          payload: {
+            success: true,
+            image_data: result.image_data,
+            variation_number: result.variation_number || variation_number,
+            post_id: result.post_id || post_id,
+            source: source
+          }
+        })
+
+      if (broadcastError) {
+        console.error('Failed to broadcast image data:', broadcastError)
+      } else {
+        console.log('Image data broadcasted successfully')
+      }
+    }
 
     return new Response(
       JSON.stringify({ 
