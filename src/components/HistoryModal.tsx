@@ -1,30 +1,34 @@
-
 import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Copy, Calendar, Image as ImageIcon, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy, Share2, ImageIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import PercentageMeter from '@/components/PercentageMeter';
-import CoverLetterDownloadActions from '@/components/CoverLetterDownloadActions';
+import LinkedInPostDisplay from '@/components/LinkedInPostDisplay';
+
+interface HistoryModalProps {
+  type: 'job_analyses' | 'cover_letters' | 'linkedin_posts';
+  isOpen: boolean;
+  onClose: () => void;
+  gradientColors: string;
+}
 
 interface HistoryItem {
   id: string;
+  created_at: string;
   company_name?: string;
   job_title?: string;
   job_description?: string;
+  job_match?: string;
+  match_score?: string;
+  cover_letter?: string;
   topic?: string;
   opinion?: string;
   personal_story?: string;
   audience?: string;
   tone?: string;
-  created_at: string;
-  job_match?: string;
-  match_score?: string;
-  cover_letter?: string;
-  linkedin_post?: string;
   post_heading_1?: string;
   post_content_1?: string;
   post_heading_2?: string;
@@ -33,128 +37,85 @@ interface HistoryItem {
   post_content_3?: string;
 }
 
-interface HistoryModalProps {
-  type: 'job_guide' | 'cover_letter' | 'linkedin_posts';
-  isOpen: boolean;
-  onClose: () => void;
-  gradientColors: string;
+interface LinkedInImage {
+  id: string;
+  image_data: string;
+  variation_number: number;
+  created_at: string;
 }
 
-const HistoryModal = ({
-  type,
-  isOpen,
-  onClose,
-  gradientColors
-}: HistoryModalProps) => {
-  const {
-    user
-  } = useUser();
-  const {
-    toast
-  } = useToast();
-  const {
-    userProfile
-  } = useUserProfile();
-  const [historyData, setHistoryData] = useState<HistoryItem[]>([]);
+const HistoryModal = ({ type, isOpen, onClose, gradientColors }: HistoryModalProps) => {
+  const { toast } = useToast();
+  const { userProfile } = useUserProfile();
+  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
-  const [generatedImages, setGeneratedImages] = useState<{[key: string]: string}>({});
-  const [loadingImages, setLoadingImages] = useState<{[key: string]: boolean}>({});
-
-  useEffect(() => {
-    if (isOpen && user && userProfile) {
-      fetchHistory();
-    }
-  }, [isOpen, user, userProfile]);
-
-  // Set up real-time subscription for image updates in history
-  useEffect(() => {
-    if (!selectedItem || type !== 'linkedin_posts') return;
-
-    console.log(`Setting up history image subscription for post ${selectedItem.id}`);
-
-    const channel = supabase
-      .channel(`linkedin-image-history-${selectedItem.id}`)
-      .on(
-        'broadcast',
-        {
-          event: 'linkedin_image_generated'
-        },
-        (payload) => {
-          console.log('Received history image broadcast:', payload);
-          
-          if (payload.payload?.post_id === selectedItem.id && payload.payload?.image_data) {
-            const variationKey = `${selectedItem.id}-${payload.payload.variation_number}`;
-            
-            setGeneratedImages(prev => ({
-              ...prev,
-              [variationKey]: payload.payload.image_data
-            }));
-            
-            setLoadingImages(prev => ({
-              ...prev,
-              [variationKey]: false
-            }));
-            
-            toast({
-              title: "Image Generated!",
-              description: `LinkedIn post image for Post ${payload.payload.variation_number} is ready.`
-            });
-          }
-        }
-      )
-      .subscribe((status) => {
-        console.log(`History image subscription status:`, status);
-      });
-
-    return () => {
-      console.log(`Cleaning up history image subscription`);
-      supabase.removeChannel(channel);
-    };
-  }, [selectedItem, type, toast]);
+  const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  const [linkedinImages, setLinkedinImages] = useState<{[postId: string]: LinkedInImage[]}>({});
+  const [isGeneratingImage, setIsGeneratingImage] = useState<{[key: string]: boolean}>({});
+  const [imageGenerationCounts, setImageGenerationCounts] = useState<{[key: string]: number}>({});
 
   const fetchHistory = async () => {
-    if (!user || !userProfile) return;
+    if (!userProfile?.id) return;
+
     setIsLoading(true);
     try {
-      let query;
-      if (type === 'job_guide') {
-        query = supabase
-          .from('job_analyses')
-          .select('id, company_name, job_title, job_description, created_at, job_match, match_score')
-          .eq('user_id', userProfile.id)
-          .order('created_at', { ascending: false })
-          .limit(20);
-      } else if (type === 'cover_letter') {
-        query = supabase
-          .from('job_cover_letters')
-          .select('id, company_name, job_title, job_description, created_at, cover_letter')
-          .eq('user_id', userProfile.id)
-          .order('created_at', { ascending: false })
-          .limit(20);
-      } else {
-        query = supabase
-          .from('job_linkedin')
-          .select('id, topic, opinion, personal_story, audience, tone, created_at, post_heading_1, post_content_1, post_heading_2, post_content_2, post_heading_3, post_content_3')
-          .eq('user_id', userProfile.id)
-          .order('created_at', { ascending: false })
-          .limit(20);
-      }
-
-      const { data, error } = await query;
+      const tableConfig = getTableConfig();
+      
+      const { data, error } = await supabase
+        .from(tableConfig.table)
+        .select(tableConfig.select)
+        .eq('user_id', userProfile.id)
+        .order('created_at', { ascending: false })
+        .limit(50);
 
       if (error) {
         console.error('Error fetching history:', error);
-        throw error;
+        toast({
+          title: "Error",
+          description: "Failed to load history",
+          variant: "destructive"
+        });
+        return;
       }
 
-      setHistoryData(data || []);
+      setHistoryItems(data || []);
+
+      // If LinkedIn posts, fetch images for each post
+      if (type === 'linkedin_posts' && data) {
+        const imagePromises = data.map(async (post) => {
+          const { data: images, error: imageError } = await supabase
+            .from('linkedin_post_images')
+            .select('*')
+            .eq('post_id', post.id)
+            .order('created_at', { ascending: true });
+
+          if (!imageError && images) {
+            return { postId: post.id, images };
+          }
+          return { postId: post.id, images: [] };
+        });
+
+        const imageResults = await Promise.all(imagePromises);
+        const imageMap: {[postId: string]: LinkedInImage[]} = {};
+        const countMap: {[key: string]: number} = {};
+
+        imageResults.forEach(({ postId, images }) => {
+          imageMap[postId] = images;
+          // Count images per variation
+          [1, 2, 3].forEach(variation => {
+            const variationImages = images.filter(img => img.variation_number === variation);
+            countMap[`${postId}-${variation}`] = variationImages.length;
+          });
+        });
+
+        setLinkedinImages(imageMap);
+        setImageGenerationCounts(countMap);
+      }
     } catch (err) {
-      console.error('Failed to fetch history:', err);
+      console.error('Error fetching history:', err);
       toast({
         title: "Error",
-        description: "Failed to load history. Please try again.",
+        description: "Failed to load history",
         variant: "destructive"
       });
     } finally {
@@ -162,26 +123,98 @@ const HistoryModal = ({
     }
   };
 
-  const handleCopyResult = async (item: HistoryItem, postNumber?: number) => {
-    let result;
-    
-    if (type === 'linkedin_posts' && postNumber) {
-      // For LinkedIn posts, copy specific post content
-      result = item[`post_content_${postNumber}` as keyof HistoryItem] as string;
-    } else {
-      result = getResult(item);
+  // Set up real-time subscription for LinkedIn images
+  useEffect(() => {
+    if (type !== 'linkedin_posts' || !isOpen) return;
+
+    console.log('Setting up LinkedIn image history subscription');
+
+    const channel = supabase
+      .channel('linkedin-image-history')
+      .on(
+        'broadcast',
+        {
+          event: 'linkedin_image_generated'
+        },
+        (payload) => {
+          console.log('Received image broadcast in history:', payload);
+          
+          if (payload.payload?.post_id && payload.payload?.image_data) {
+            const { post_id, variation_number, image_data } = payload.payload;
+            
+            // Update images
+            setLinkedinImages(prev => ({
+              ...prev,
+              [post_id]: [
+                ...(prev[post_id] || []),
+                {
+                  id: `temp-${Date.now()}`,
+                  image_data,
+                  variation_number,
+                  created_at: new Date().toISOString()
+                }
+              ]
+            }));
+
+            // Update generation counts
+            const countKey = `${post_id}-${variation_number}`;
+            setImageGenerationCounts(prev => ({
+              ...prev,
+              [countKey]: (prev[countKey] || 0) + 1
+            }));
+
+            // Clear generating state
+            setIsGeneratingImage(prev => ({
+              ...prev,
+              [countKey]: false
+            }));
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log('LinkedIn image history subscription status:', status);
+      });
+
+    return () => {
+      console.log('Cleaning up LinkedIn image history subscription');
+      supabase.removeChannel(channel);
+    };
+  }, [type, isOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchHistory();
     }
-    
-    if (!result) return;
-    
+  }, [isOpen, userProfile?.id, type]);
+
+  const getTableConfig = () => {
+    switch (type) {
+      case 'job_analyses':
+        return {
+          table: 'job_analyses',
+          select: 'id, created_at, company_name, job_title, job_description, job_match, match_score'
+        };
+      case 'cover_letters':
+        return {
+          table: 'job_cover_letters',
+          select: 'id, created_at, company_name, job_title, job_description, cover_letter'
+        };
+      case 'linkedin_posts':
+        return {
+          table: 'job_linkedin',
+          select: 'id, created_at, topic, opinion, personal_story, audience, tone, post_heading_1, post_content_1, post_heading_2, post_content_2, post_heading_3, post_content_3'
+        };
+      default:
+        return { table: '', select: '' };
+    }
+  };
+
+  const handleCopyText = async (text: string, label: string) => {
     try {
-      await navigator.clipboard.writeText(result);
-      const itemType = type === 'job_guide' ? 'Job analysis' : 
-                      type === 'cover_letter' ? 'Cover letter' : 
-                      `LinkedIn post ${postNumber || ''}`;
+      await navigator.clipboard.writeText(text);
       toast({
         title: "Copied!",
-        description: `${itemType} copied to clipboard successfully.`
+        description: `${label} copied to clipboard successfully.`
       });
     } catch (err) {
       console.error('Failed to copy text:', err);
@@ -195,7 +228,6 @@ const HistoryModal = ({
 
   const handleCopyImage = async (imageData: string) => {
     try {
-      // Convert base64 to blob
       const response = await fetch(imageData);
       const blob = await response.blob();
       
@@ -219,113 +251,67 @@ const HistoryModal = ({
     }
   };
 
-  const handleGetImageForPost = async (item: HistoryItem, postNumber: number) => {
-    const heading = item[`post_heading_${postNumber}` as keyof HistoryItem] as string;
-    const content = item[`post_content_${postNumber}` as keyof HistoryItem] as string;
-    const variationKey = `${item.id}-${postNumber}`;
-    
-    setLoadingImages(prev => ({ ...prev, [variationKey]: true }));
-    setGeneratedImages(prev => ({ ...prev, [variationKey]: '' })); // Clear existing image
-    
+  const handleGenerateImage = async (postId: string, variationNumber: number, heading: string, content: string) => {
+    const countKey = `${postId}-${variationNumber}`;
+    const currentCount = imageGenerationCounts[countKey] || 0;
+
+    if (currentCount >= 3) {
+      toast({
+        title: "Generation Limit Reached",
+        description: "You can only generate up to 3 images per post variation.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsGeneratingImage(prev => ({ ...prev, [countKey]: true }));
+
+    // Set timeout for 2 minutes
+    const timeout = setTimeout(() => {
+      setIsGeneratingImage(prev => ({ ...prev, [countKey]: false }));
+      toast({
+        title: "Image Generation Failed",
+        description: "Image generation timed out. Please try again.",
+        variant: "destructive"
+      });
+    }, 2 * 60 * 1000);
+
     try {
-      console.log(`Triggering image generation via edge function for post ${postNumber} from history`);
-      
       const { data, error } = await supabase.functions.invoke('linkedin-image-webhook', {
         body: {
           post_heading: heading,
           post_content: content,
-          variation_number: postNumber,
+          variation_number: variationNumber,
           user_name: 'Professional User',
-          post_id: item.id,
-          source: 'history'
+          post_id: postId,
+          source: 'history_page'
         }
       });
 
       if (error) {
-        console.error('Supabase function error:', error);
+        clearTimeout(timeout);
+        setIsGeneratingImage(prev => ({ ...prev, [countKey]: false }));
         throw new Error(error.message || 'Failed to trigger image generation');
       }
 
-      console.log('Edge function response:', data);
-
       if (!data.success) {
+        clearTimeout(timeout);
+        setIsGeneratingImage(prev => ({ ...prev, [countKey]: false }));
         throw new Error(data.error || 'Failed to trigger image generation');
       }
 
       toast({
         title: "Image Generation Started",
-        description: `LinkedIn post image for Post ${postNumber} is being generated...`
+        description: `LinkedIn post image is being generated...`
       });
+
     } catch (error) {
-      console.error('Error triggering image generation webhook:', error);
-      setLoadingImages(prev => ({ ...prev, [variationKey]: false }));
+      clearTimeout(timeout);
+      setIsGeneratingImage(prev => ({ ...prev, [countKey]: false }));
+      console.error('Error triggering image generation:', error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to trigger image generation. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleDelete = async (itemId: string) => {
-    if (!userProfile) {
-      toast({
-        title: "Error",
-        description: "User profile not found. Please try again.",
-        variant: "destructive"
-      });
-      return;
-    }
-    try {
-      console.log(`Attempting to delete ${type} item with ID: ${itemId} for user profile: ${userProfile.id}`);
-      let query;
-      let tableName;
-      if (type === 'job_guide') {
-        tableName = 'job_analyses';
-        query = supabase.from('job_analyses').delete().eq('id', itemId).eq('user_id', userProfile.id);
-      } else if (type === 'cover_letter') {
-        tableName = 'job_cover_letters';
-        query = supabase.from('job_cover_letters').delete().eq('id', itemId).eq('user_id', userProfile.id);
-      } else {
-        tableName = 'job_linkedin';
-        query = supabase.from('job_linkedin').delete().eq('id', itemId).eq('user_id', userProfile.id);
-      }
-      console.log(`Deleting from table: ${tableName}, item ID: ${itemId}, user_id: ${userProfile.id}`);
-      const {
-        error,
-        data
-      } = await query;
-      if (error) {
-        console.error('Supabase delete error:', error);
-        throw error;
-      }
-      console.log('Delete operation completed successfully');
-
-      // Remove from local state
-      setHistoryData(prev => prev.filter(item => item.id !== itemId));
-      let itemType: string;
-      if (type === 'job_guide') {
-        itemType = 'Job analysis';
-      } else if (type === 'cover_letter') {
-        itemType = 'Cover letter';
-      } else {
-        itemType = 'LinkedIn post';
-      }
-      toast({
-        title: "Deleted",
-        description: `${itemType} deleted successfully.`
-      });
-
-      // Close details view if we deleted the currently viewed item
-      if (selectedItem && selectedItem.id === itemId) {
-        setShowDetails(false);
-        setSelectedItem(null);
-      }
-    } catch (err) {
-      console.error('Failed to delete item:', err);
-      toast({
-        title: "Error",
-        description: "Failed to delete item. Please try again.",
         variant: "destructive"
       });
     }
@@ -341,525 +327,283 @@ const HistoryModal = ({
     });
   };
 
-  const getResult = (item: HistoryItem) => {
-    if (type === 'job_guide') {
-      return item.job_match;
-    } else if (type === 'cover_letter') {
-      return item.cover_letter;
-    } else {
-      // For LinkedIn posts, we'll handle this differently in the detail view
-      return null;
+  const getTitle = () => {
+    switch (type) {
+      case 'job_analyses':
+        return 'Job Analysis History';
+      case 'cover_letters':
+        return 'Cover Letter History';
+      case 'linkedin_posts':
+        return 'LinkedIn Posts History';
+      default:
+        return 'History';
     }
   };
 
-  const hasResult = (item: HistoryItem) => {
-    if (type === 'linkedin_posts') {
-      return item.post_content_1 && item.post_content_2 && item.post_content_3;
-    }
-    const result = getResult(item);
-    return result && result.trim().length > 0;
-  };
+  const renderLinkedInPost = (item: HistoryItem, variationNumber: number) => {
+    const heading = item[`post_heading_${variationNumber}` as keyof HistoryItem] as string;
+    const content = item[`post_content_${variationNumber}` as keyof HistoryItem] as string;
+    
+    if (!heading || !content) return null;
 
-  const getItemTitle = (item: HistoryItem) => {
-    if (type === 'linkedin_posts') {
-      return item.topic || 'LinkedIn Post';
-    }
-    return item.company_name || 'Unknown Company';
-  };
+    const countKey = `${item.id}-${variationNumber}`;
+    const currentCount = imageGenerationCounts[countKey] || 0;
+    const canGenerateMore = currentCount < 3;
+    const isGenerating = isGeneratingImage[countKey] || false;
+    const postImages = linkedinImages[item.id]?.filter(img => img.variation_number === variationNumber) || [];
 
-  const getItemSubtitle = (item: HistoryItem) => {
-    if (type === 'linkedin_posts') {
-      return item.tone || 'No tone specified';
-    }
-    return item.job_title || 'Unknown Position';
-  };
-
-  const getHistoryTitle = () => {
-    if (type === 'job_guide') {
-      return 'Job Analysis History';
-    } else if (type === 'cover_letter') {
-      return 'Cover Letter History';
-    } else {
-      return 'LinkedIn Posts History';
-    }
-  };
-
-  const getHistoryDescription = () => {
-    if (type === 'job_guide') {
-      return 'job analyses';
-    } else if (type === 'cover_letter') {
-      return 'cover letters';
-    } else {
-      return 'LinkedIn posts';
-    }
-  };
-
-  const getDetailTitle = () => {
-    if (type === 'job_guide') {
-      return 'Job Analysis Details';
-    } else if (type === 'cover_letter') {
-      return 'Cover Letter Details';
-    } else {
-      return 'LinkedIn Post Details';
-    }
-  };
-
-  const getResultTitle = () => {
-    if (type === 'job_guide') {
-      return 'Job Analysis Result';
-    } else if (type === 'cover_letter') {
-      return 'Cover Letter';
-    } else {
-      return 'LinkedIn Post';
-    }
-  };
-
-  if (showDetails && selectedItem) {
     return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-6xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
-          <DialogHeader className="flex-shrink-0">
-            <DialogTitle className="text-white font-inter flex items-center gap-2 text-lg">
-              {type === 'linkedin_posts' ? <Share2 className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
-              {getDetailTitle()}
-              <Button 
-                onClick={() => setShowDetails(false)} 
-                size="sm" 
-                className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm mx-[15px]"
-              >
-                <X className="w-4 h-4 mr-1" />
-                Back to List
-              </Button>
-            </DialogTitle>
-          </DialogHeader>
-          
-          <div className="flex-1 overflow-y-auto space-y-6 mt-4">
-            {/* Input Details Section */}
-            <div className="rounded-lg p-4 border border-white/10 bg-blue-800">
-              <h3 className="text-white font-medium mb-4 flex items-center gap-2">
-                <Building className="w-4 h-4" />
-                Input Details
-              </h3>
-              <div className="space-y-3">
-                {type === 'linkedin_posts' ? (
-                  <>
-                    <div>
-                      <label className="text-cyan-200 text-sm font-semibold">Topic:</label>
-                      <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
-                        <p className="text-white text-sm">{selectedItem.topic}</p>
-                      </div>
-                    </div>
-                    {selectedItem.opinion && (
-                      <div>
-                        <label className="text-cyan-200 text-sm font-semibold">Opinion:</label>
-                        <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
-                          <p className="text-white text-sm">{selectedItem.opinion}</p>
-                        </div>
-                      </div>
-                    )}
-                    {selectedItem.personal_story && (
-                      <div>
-                        <label className="text-cyan-200 text-sm font-semibold">Personal Story:</label>
-                        <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
-                          <p className="text-white text-sm">{selectedItem.personal_story}</p>
-                        </div>
-                      </div>
-                    )}
-                    {selectedItem.audience && (
-                      <div>
-                        <label className="text-cyan-200 text-sm font-semibold">Audience:</label>
-                        <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
-                          <p className="text-white text-sm">{selectedItem.audience}</p>
-                        </div>
-                      </div>
-                    )}
-                    {selectedItem.tone && (
-                      <div>
-                        <label className="text-cyan-200 text-sm font-semibold">Tone:</label>
-                        <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
-                          <p className="text-white text-sm">{selectedItem.tone}</p>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <div>
-                      <label className="text-cyan-200 text-sm font-semibold">Company Name:</label>
-                      <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
-                        <p className="text-white text-sm">{selectedItem.company_name}</p>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-cyan-200 text-sm font-semibold">Job Title:</label>
-                      <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
-                        <p className="text-white text-sm">{selectedItem.job_title}</p>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-cyan-200 text-sm font-semibold">Job Description:</label>
-                      <div className="rounded p-3 mt-1 max-h-32 overflow-y-auto bg-black/80 border border-cyan-300/20">
-                        <p className="text-white text-sm">{selectedItem.job_description}</p>
-                      </div>
-                    </div>
-                  </>
-                )}
-                <div>
-                  <label className="text-cyan-200 text-sm font-semibold">Created:</label>
-                  <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
-                    <p className="text-white text-sm">{formatDate(selectedItem.created_at)}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Result Section */}
-            {hasResult(selectedItem) && (
-              <div className="rounded-lg p-4 border border-white/10 shadow-inner bg-red-700">
-                <h3 className="text-white font-medium mb-3 flex flex-wrap gap-2 justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    {type === 'linkedin_posts' ? <Share2 className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
-                    {getResultTitle()}
-                  </div>
-                </h3>
-
-                {type === 'linkedin_posts' ? (
-                  <div className="space-y-6">
-                    {/* Post 1 */}
-                    {selectedItem.post_content_1 && (
-                      <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                        <div className="flex justify-between items-start mb-3">
-                          <h4 className="text-lime-400 font-semibold">{selectedItem.post_heading_1}</h4>
-                          <div className="flex gap-2">
-                            <Button
-                              onClick={() => handleCopyResult(selectedItem, 1)}
-                              size="sm"
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                            >
-                              <Copy className="w-3 h-3 mr-1" />
-                              Copy
-                            </Button>
-                            <Button
-                              onClick={() => handleGetImageForPost(selectedItem, 1)}
-                              size="sm"
-                              disabled={loadingImages[`${selectedItem.id}-1`]}
-                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
-                            >
-                              <ImageIcon className="w-3 h-3 mr-1" />
-                              {loadingImages[`${selectedItem.id}-1`] ? 'Generating...' : 'Get Image'}
-                            </Button>
-                          </div>
-                        </div>
-
-                        {/* Loading indicator */}
-                        {loadingImages[`${selectedItem.id}-1`] && (
-                          <div className="mb-4 p-3 bg-blue-50 rounded-lg text-center border border-blue-200">
-                            <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading...</div>
-                            <div className="text-xs text-blue-500 mt-1">This may take a few moments</div>
-                          </div>
-                        )}
-
-                        {/* Generated Image */}
-                        {generatedImages[`${selectedItem.id}-1`] && (
-                          <div className="mb-4">
-                            <div className="relative">
-                              <img 
-                                src={generatedImages[`${selectedItem.id}-1`]} 
-                                alt="Generated LinkedIn post image"
-                                className="w-full rounded-lg shadow-sm"
-                              />
-                              <Button
-                                onClick={() => handleCopyImage(generatedImages[`${selectedItem.id}-1`])}
-                                size="sm"
-                                className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white"
-                              >
-                                <Copy className="w-3 h-3" />
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="text-black bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words">
-                          {selectedItem.post_content_1}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Post 2 */}
-                    {selectedItem.post_content_2 && (
-                      <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                        <div className="flex justify-between items-start mb-3">
-                          <h4 className="text-lime-400 font-semibold">{selectedItem.post_heading_2}</h4>
-                          <div className="flex gap-2">
-                            <Button
-                              onClick={() => handleCopyResult(selectedItem, 2)}
-                              size="sm"
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                            >
-                              <Copy className="w-3 h-3 mr-1" />
-                              Copy
-                            </Button>
-                            <Button
-                              onClick={() => handleGetImageForPost(selectedItem, 2)}
-                              size="sm"
-                              disabled={loadingImages[`${selectedItem.id}-2`]}
-                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
-                            >
-                              <ImageIcon className="w-3 h-3 mr-1" />
-                              {loadingImages[`${selectedItem.id}-2`] ? 'Generating...' : 'Get Image'}
-                            </Button>
-                          </div>
-                        </div>
-
-                        {/* Loading indicator */}
-                        {loadingImages[`${selectedItem.id}-2`] && (
-                          <div className="mb-4 p-3 bg-blue-50 rounded-lg text-center border border-blue-200">
-                            <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading...</div>
-                            <div className="text-xs text-blue-500 mt-1">This may take a few moments</div>
-                          </div>
-                        )}
-
-                        {/* Generated Image */}
-                        {generatedImages[`${selectedItem.id}-2`] && (
-                          <div className="mb-4">
-                            <div className="relative">
-                              <img 
-                                src={generatedImages[`${selectedItem.id}-2`]} 
-                                alt="Generated LinkedIn post image"
-                                className="w-full rounded-lg shadow-sm"
-                              />
-                              <Button
-                                onClick={() => handleCopyImage(generatedImages[`${selectedItem.id}-2`])}
-                                size="sm"
-                                className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white"
-                              >
-                                <Copy className="w-3 h-3" />
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="text-black bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words">
-                          {selectedItem.post_content_2}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Post 3 */}
-                    {selectedItem.post_content_3 && (
-                      <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                        <div className="flex justify-between items-start mb-3">
-                          <h4 className="text-lime-400 font-semibold">{selectedItem.post_heading_3}</h4>
-                          <div className="flex gap-2">
-                            <Button
-                              onClick={() => handleCopyResult(selectedItem, 3)}
-                              size="sm"
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                            >
-                              <Copy className="w-3 h-3 mr-1" />
-                              Copy
-                            </Button>
-                            <Button
-                              onClick={() => handleGetImageForPost(selectedItem, 3)}
-                              size="sm"
-                              disabled={loadingImages[`${selectedItem.id}-3`]}
-                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
-                            >
-                              <ImageIcon className="w-3 h-3 mr-1" />
-                              {loadingImages[`${selectedItem.id}-3`] ? 'Generating...' : 'Get Image'}
-                            </Button>
-                          </div>
-                        </div>
-
-                        {/* Loading indicator */}
-                        {loadingImages[`${selectedItem.id}-3`] && (
-                          <div className="mb-4 p-3 bg-blue-50 rounded-lg text-center border border-blue-200">
-                            <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading...</div>
-                            <div className="text-xs text-blue-500 mt-1">This may take a few moments</div>
-                          </div>
-                        )}
-
-                        {/* Generated Image */}
-                        {generatedImages[`${selectedItem.id}-3`] && (
-                          <div className="mb-4">
-                            <div className="relative">
-                              <img 
-                                src={generatedImages[`${selectedItem.id}-3`]} 
-                                alt="Generated LinkedIn post image"
-                                className="w-full rounded-lg shadow-sm"
-                              />
-                              <Button
-                                onClick={() => handleCopyImage(generatedImages[`${selectedItem.id}-3`])}
-                                size="sm"
-                                className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white"
-                              >
-                                <Copy className="w-3 h-3" />
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="text-black bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words">
-                          {selectedItem.post_content_3}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <>
-                    {/* Match Score for job_guide */}
-                    {type === 'job_guide' && selectedItem.match_score && (
-                      <div className="mb-4 max-w-full">
-                        <div className="w-full sm:max-w-[350px] md:max-w-[280px] mx-auto">
-                          <div className="shadow-md rounded-xl bg-gray-900/90 p-3 border border-gray-700">
-                            <PercentageMeter percentage={selectedItem.match_score} />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {type !== 'job_guide' && (
-                        <Button
-                          onClick={() => handleCopyResult(selectedItem)}
-                          size="sm"
-                          className="bg-gray-950 hover:bg-gray-800 text-white flex items-center gap-1"
-                        >
-                          <Copy className="w-3 h-3" />
-                          <span className="hidden sm:inline">Copy</span>
-                        </Button>
-                      )}
-                      {type === 'cover_letter' && selectedItem.cover_letter && (
-                        <div className="flex flex-wrap gap-2">
-                          <CoverLetterDownloadActions 
-                            coverLetter={selectedItem.cover_letter}
-                            jobTitle={selectedItem.job_title || 'Unknown Position'}
-                            companyName={selectedItem.company_name || 'Unknown Company'}
-                            contrast
-                          />
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="rounded-lg p-4 border-2 border-blue-200 max-h-96 overflow-y-auto mt-1 bg-white">
-                      <div className="text-black font-inter text-sm md:text-base leading-relaxed break-words whitespace-pre-wrap">
-                        {type === 'job_guide' ? selectedItem.job_match : getResult(selectedItem)}
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
+      <div key={`${item.id}-${variationNumber}`} className="border border-gray-200 rounded-lg p-4 space-y-4">
+        <div className="flex items-center justify-between">
+          <h4 className="font-semibold text-teal-600">Post {variationNumber}: {heading}</h4>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => handleCopyText(content, `Post ${variationNumber}`)}
+              size="sm"
+              variant="outline"
+              className="flex items-center gap-1"
+            >
+              <Copy className="w-3 h-3" />
+              Copy
+            </Button>
+            <Button
+              onClick={() => handleGenerateImage(item.id, variationNumber, heading, content)}
+              disabled={isGenerating || !canGenerateMore}
+              size="sm"
+              variant="outline"
+              className="flex items-center gap-1 disabled:opacity-50"
+            >
+              <ImageIcon className="w-3 h-3" />
+              {!canGenerateMore 
+                ? 'Limit reached'
+                : isGenerating 
+                ? 'Generating...' 
+                : `Image (${currentCount}/3)`}
+            </Button>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+        
+        <LinkedInPostDisplay content={content} />
+
+        {/* Show generated images */}
+        {postImages.length > 0 && (
+          <div className="space-y-2">
+            <h5 className="font-medium text-gray-700">Generated Images:</h5>
+            <div className="grid gap-2">
+              {postImages.map((image, index) => (
+                <div key={image.id} className="relative">
+                  <img 
+                    src={image.image_data} 
+                    alt={`Generated image ${index + 1} for ${heading}`}
+                    className="w-full max-w-md rounded-lg shadow-sm"
+                  />
+                  <Button
+                    onClick={() => handleCopyImage(image.image_data)}
+                    size="sm"
+                    className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white"
+                  >
+                    <Copy className="w-3 h-3" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Loading indicator */}
+        {isGenerating && (
+          <div className="p-3 bg-blue-50 rounded-lg text-center border border-blue-200">
+            <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading...</div>
+            <div className="text-xs text-blue-500 mt-1">This may take up to 2 minutes</div>
+          </div>
+        )}
+      </div>
     );
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-5xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
-        <DialogHeader className="flex-shrink-0">
-          <DialogTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
-            {type === 'linkedin_posts' ? <Share2 className="w-4 h-4 sm:w-5 sm:h-5" /> : <History className="w-4 h-4 sm:w-5 sm:h-5" />}
-            {getHistoryTitle()}
+      <DialogContent className="max-w-4xl max-h-[90vh] bg-gray-900 text-white border-gray-700">
+        <DialogHeader className="pb-4 border-b border-gray-700">
+          <DialogTitle className={`text-xl font-bold bg-gradient-to-r ${gradientColors} bg-clip-text text-transparent flex items-center gap-2`}>
+            <Calendar className="w-5 h-5 text-teal-400" />
+            {getTitle()}
           </DialogTitle>
-          <DialogDescription className="text-white/70 font-inter text-xs sm:text-sm">
-            Your history is automatically deleted after 60 days. Found {historyData.length} items.
-          </DialogDescription>
         </DialogHeader>
-        
-        <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg p-2 sm:p-3 mb-4 flex-shrink-0">
-          <div className="flex items-center gap-2 text-orange-200">
-            <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-            <p className="text-xs sm:text-sm">
-              Your history is automatically deleted after 60 days for privacy and storage optimization.
-            </p>
-          </div>
-        </div>
 
-        <div className="flex-1 overflow-y-auto min-h-0">
-          {isLoading ? <div className="flex items-center justify-center py-8">
-              <div className="text-white/70 text-sm">Loading history...</div>
-            </div> : historyData.length === 0 ? <div className="flex items-center justify-center py-8">
-              <div className="text-white/70 text-center">
-                {type === 'linkedin_posts' ? <Share2 className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" /> : <History className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />}
-                <p className="text-sm">No {getHistoryDescription()} found.</p>
-              </div>
-            </div> : <div className="space-y-2 sm:space-y-3 pb-4">
-              {historyData.map(item => <div key={item.id} className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-indigo-800">
-                  {/* Mobile Layout */}
-                  <div className="block sm:hidden space-y-2">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 text-white font-medium text-sm">
-                          {type === 'linkedin_posts' ? <Share2 className="w-3 h-3 flex-shrink-0" /> : <Building className="w-3 h-3 flex-shrink-0" />}
-                          <span className="truncate">{getItemTitle(item)}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-white/80 text-sm mt-1">
-                          {type === 'linkedin_posts' ? <FileText className="w-3 h-3 flex-shrink-0" /> : <Briefcase className="w-3 h-3 flex-shrink-0" />}
-                          <span className="truncate">{getItemSubtitle(item)}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-white/60 text-xs mt-1">
-                          <Calendar className="w-3 h-3 flex-shrink-0" />
-                          <span>{formatDate(item.created_at)}</span>
-                        </div>
-                      </div>
+        <ScrollArea className="max-h-[70vh] pr-4">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-gray-400">Loading history...</div>
+            </div>
+          ) : historyItems.length === 0 ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-gray-400">No history found</div>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {historyItems.map((item) => (
+                <div key={item.id} className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                  {/* Date header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2 text-gray-400 text-sm">
+                      <Calendar className="w-4 h-4" />
+                      {formatDate(item.created_at)}
                     </div>
-                    
-                    <div className="flex items-center gap-1 pt-2">
-                      <Button onClick={() => {
-                  setSelectedItem(item);
-                  setShowDetails(true);
-                }} size="sm" className="flex-1 bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-2 py-1">
-                        <Eye className="w-3 h-3 mr-1" />
-                        View
-                      </Button>
-                      
-                      <Button onClick={() => handleDelete(item.id)} size="sm" className="flex-1 bg-red-600/80 hover:bg-red-600 text-white text-xs px-2 py-1">
-                        <Trash2 className="w-3 h-3 mr-1" />
-                        Delete
-                      </Button>
-                    </div>
+                    <Button
+                      onClick={() => setExpandedItem(expandedItem === item.id ? null : item.id)}
+                      variant="ghost"
+                      size="sm"
+                      className="text-gray-400 hover:text-white"
+                    >
+                      {expandedItem === item.id ? 'Collapse' : 'Expand'}
+                    </Button>
                   </div>
 
-                  {/* Desktop Layout */}
-                  <div className="hidden sm:flex items-center justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 text-white font-medium truncate">
-                          {type === 'linkedin_posts' ? <Share2 className="w-4 h-4 flex-shrink-0" /> : <Building className="w-4 h-4 flex-shrink-0" />}
-                          <span className="truncate">{getItemTitle(item)}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-white/80 truncate">
-                          {type === 'linkedin_posts' ? <FileText className="w-4 h-4 flex-shrink-0" /> : <Briefcase className="w-4 h-4 flex-shrink-0" />}
-                          <span className="truncate">{getItemSubtitle(item)}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-white/60 text-sm">
-                          <Calendar className="w-4 h-4 flex-shrink-0" />
-                          <span className="whitespace-nowrap">{formatDate(item.created_at)}</span>
-                        </div>
+                  {/* Content based on type */}
+                  {type === 'job_analyses' && (
+                    <div className="space-y-3">
+                      <div className="flex flex-wrap gap-4 text-sm">
+                        <span className="text-teal-400 font-medium">{item.company_name}</span>
+                        <span className="text-gray-300">{item.job_title}</span>
+                        {item.match_score && (
+                          <span className="bg-teal-600 text-white px-2 py-1 rounded text-xs">
+                            {item.match_score}% Match
+                          </span>
+                        )}
                       </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <Button onClick={() => {
-                  setSelectedItem(item);
-                  setShowDetails(true);
-                }} size="sm" className="bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-3 py-1">
-                        <Eye className="w-3 h-3 mr-1" />
-                        View
-                      </Button>
                       
-                      <Button onClick={() => handleDelete(item.id)} size="sm" className="bg-red-600/80 hover:bg-red-600 text-white text-xs px-3 py-1">
-                        <Trash2 className="w-3 h-3 mr-1" />
-                        Delete
-                      </Button>
+                      {expandedItem === item.id && (
+                        <div className="space-y-4">
+                          {item.job_description && (
+                            <div>
+                              <div className="flex items-center justify-between mb-2">
+                                <h4 className="font-semibold text-gray-300">Job Description</h4>
+                                <Button
+                                  onClick={() => handleCopyText(item.job_description!, 'Job Description')}
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex items-center gap-1"
+                                >
+                                  <Copy className="w-3 h-3" />
+                                  Copy
+                                </Button>
+                              </div>
+                              <div className="bg-gray-700 p-3 rounded text-sm whitespace-pre-wrap">
+                                {item.job_description}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {item.job_match && (
+                            <div>
+                              <div className="flex items-center justify-between mb-2">
+                                <h4 className="font-semibold text-gray-300">Analysis Result</h4>
+                                <Button
+                                  onClick={() => handleCopyText(item.job_match!, 'Analysis Result')}
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex items-center gap-1"
+                                >
+                                  <Copy className="w-3 h-3" />
+                                  Copy
+                                </Button>
+                              </div>
+                              <div className="bg-gray-700 p-3 rounded text-sm whitespace-pre-wrap">
+                                {item.job_match}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </div>)}
-            </div>}
-        </div>
+                  )}
+
+                  {type === 'cover_letters' && (
+                    <div className="space-y-3">
+                      <div className="flex flex-wrap gap-4 text-sm">
+                        <span className="text-teal-400 font-medium">{item.company_name}</span>
+                        <span className="text-gray-300">{item.job_title}</span>
+                      </div>
+                      
+                      {expandedItem === item.id && (
+                        <div className="space-y-4">
+                          {item.job_description && (
+                            <div>
+                              <div className="flex items-center justify-between mb-2">
+                                <h4 className="font-semibold text-gray-300">Job Description</h4>
+                                <Button
+                                  onClick={() => handleCopyText(item.job_description!, 'Job Description')}
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex items-center gap-1"
+                                >
+                                  <Copy className="w-3 h-3" />
+                                  Copy
+                                </Button>
+                              </div>
+                              <div className="bg-gray-700 p-3 rounded text-sm whitespace-pre-wrap">
+                                {item.job_description}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {item.cover_letter && (
+                            <div>
+                              <div className="flex items-center justify-between mb-2">
+                                <h4 className="font-semibold text-gray-300">Cover Letter</h4>
+                                <Button
+                                  onClick={() => handleCopyText(item.cover_letter!, 'Cover Letter')}
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex items-center gap-1"
+                                >
+                                  <Copy className="w-3 h-3" />
+                                  Copy
+                                </Button>
+                              </div>
+                              <div className="bg-gray-700 p-3 rounded text-sm whitespace-pre-wrap">
+                                {item.cover_letter}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {type === 'linkedin_posts' && (
+                    <div className="space-y-3">
+                      <div className="flex flex-wrap gap-4 text-sm">
+                        <span className="text-teal-400 font-medium">Topic: {item.topic}</span>
+                        {item.tone && <span className="text-gray-300">Tone: {item.tone}</span>}
+                      </div>
+                      
+                      {expandedItem === item.id && (
+                        <div className="space-y-6">
+                          {/* Input details */}
+                          <div className="bg-gray-700 p-3 rounded space-y-2">
+                            <h4 className="font-semibold text-gray-300">Post Details</h4>
+                            <div className="text-sm space-y-1">
+                              {item.opinion && <div><span className="text-teal-400">Opinion:</span> {item.opinion}</div>}
+                              {item.personal_story && <div><span className="text-teal-400">Story:</span> {item.personal_story}</div>}
+                              {item.audience && <div><span className="text-teal-400">Audience:</span> {item.audience}</div>}
+                            </div>
+                          </div>
+                          
+                          {/* Post variations */}
+                          <div className="space-y-4">
+                            {[1, 2, 3].map(num => renderLinkedInPost(item, num)).filter(Boolean)}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
