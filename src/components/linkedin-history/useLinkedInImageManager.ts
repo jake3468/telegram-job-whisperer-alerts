@@ -22,9 +22,9 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
   const [imageGenerationFailed, setImageGenerationFailed] = useState<{[key: string]: boolean}>({});
   const [imageCounts, setImageCounts] = useState<{[key: string]: number}>({});
 
-  // Debug function to check authentication and RLS setup
+  // Enhanced debug function to check authentication and RLS setup
   const debugAuthAndRLS = async () => {
-    console.log('🔍 DEBUG: Starting authentication and RLS debugging');
+    console.log('🔍 DEBUG: Starting enhanced authentication and RLS debugging');
     console.log('🔍 DEBUG: Clerk User ID:', clerkUserId);
     
     try {
@@ -35,13 +35,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
         try {
           const payload = JSON.parse(atob(token.split('.')[1]));
           console.log('🔍 DEBUG: JWT payload sub (should match Clerk ID):', payload.sub);
-          console.log('🔍 DEBUG: JWT payload structure:', {
-            sub: !!payload.sub,
-            iss: !!payload.iss,
-            aud: !!payload.aud,
-            exp: !!payload.exp,
-            iat: !!payload.iat
-          });
+          console.log('🔍 DEBUG: JWT payload full:', payload);
         } catch (e) {
           console.error('🔍 DEBUG: Failed to parse JWT payload:', e);
         }
@@ -52,41 +46,26 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
       const { data: clerkIdTest, error: clerkIdError } = await supabase
         .rpc('get_clerk_user_id');
       
-      if (clerkIdError) {
-        console.error('🔍 DEBUG: get_clerk_user_id() error:', clerkIdError);
-      } else {
-        console.log('🔍 DEBUG: get_clerk_user_id() returned:', clerkIdTest);
-        console.log('🔍 DEBUG: Does it match Clerk user ID?', clerkIdTest === clerkUserId);
-      }
+      console.log('🔍 DEBUG: get_clerk_user_id() result:', { data: clerkIdTest, error: clerkIdError });
 
       // Check user record in users table
       console.log('🔍 DEBUG: Checking user record in users table...');
       const { data: userRecord, error: userError } = await supabase
         .from('users')
         .select('*')
-        .eq('clerk_id', clerkUserId)
-        .maybeSingle();
+        .eq('clerk_id', clerkUserId);
       
-      if (userError) {
-        console.error('🔍 DEBUG: Error fetching user record:', userError);
-      } else {
-        console.log('🔍 DEBUG: User record:', userRecord);
-      }
+      console.log('🔍 DEBUG: User record query result:', { data: userRecord, error: userError });
 
       // Check user_profile record
-      if (userRecord) {
+      if (userRecord && userRecord.length > 0) {
         console.log('🔍 DEBUG: Checking user_profile record...');
         const { data: profileRecord, error: profileError } = await supabase
           .from('user_profile')
           .select('*')
-          .eq('user_id', userRecord.id)
-          .maybeSingle();
+          .eq('user_id', userRecord[0].id);
         
-        if (profileError) {
-          console.error('🔍 DEBUG: Error fetching user_profile record:', profileError);
-        } else {
-          console.log('🔍 DEBUG: User profile record:', profileRecord);
-        }
+        console.log('🔍 DEBUG: User profile query result:', { data: profileRecord, error: profileError });
       }
 
     } catch (error) {
@@ -94,62 +73,72 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
     }
   };
 
-  // Debug function to check table permissions and data
+  // Enhanced debug function to check table permissions and data
   const debugTableAccess = async (postId: string) => {
-    console.log('🔍 DEBUG: Testing table access for post ID:', postId);
+    console.log('🔍 DEBUG: Testing enhanced table access for post ID:', postId);
     
     try {
-      // Test direct access to linkedin_post_image_counts
+      // Test direct access to linkedin_post_image_counts with full error details
       console.log('🔍 DEBUG: Testing linkedin_post_image_counts access...');
-      const { data: countData, error: countError } = await supabase
+      const { data: countData, error: countError, count: countTotal } = await supabase
         .from('linkedin_post_image_counts')
         .select('*', { count: 'exact' });
       
-      console.log('🔍 DEBUG: linkedin_post_image_counts query result:', {
+      console.log('🔍 DEBUG: linkedin_post_image_counts query full result:', {
         data: countData,
         error: countError,
-        totalCount: countData?.length || 0
+        count: countTotal,
+        dataLength: countData?.length || 0
       });
 
-      // Test access with post_id filter
+      // Test access with post_id filter with detailed error logging
       console.log('🔍 DEBUG: Testing linkedin_post_image_counts with post_id filter...');
       const { data: countFilteredData, error: countFilteredError } = await supabase
         .from('linkedin_post_image_counts')
         .select('*')
         .eq('post_id', postId);
       
-      console.log('🔍 DEBUG: linkedin_post_image_counts filtered query result:', {
+      console.log('🔍 DEBUG: linkedin_post_image_counts filtered query full result:', {
         data: countFilteredData,
         error: countFilteredError,
-        count: countFilteredData?.length || 0
+        errorMessage: countFilteredError?.message,
+        errorCode: countFilteredError?.code,
+        errorDetails: countFilteredError?.details,
+        dataLength: countFilteredData?.length || 0,
+        actualData: countFilteredData
       });
 
-      // Test direct access to linkedin_post_images
+      // Test direct access to linkedin_post_images with full error details
       console.log('🔍 DEBUG: Testing linkedin_post_images access...');
-      const { data: imageData, error: imageError } = await supabase
+      const { data: imageData, error: imageError, count: imageTotal } = await supabase
         .from('linkedin_post_images')
         .select('*', { count: 'exact' });
       
-      console.log('🔍 DEBUG: linkedin_post_images query result:', {
+      console.log('🔍 DEBUG: linkedin_post_images query full result:', {
         data: imageData,
         error: imageError,
-        totalCount: imageData?.length || 0
+        count: imageTotal,
+        dataLength: imageData?.length || 0
       });
 
-      // Test access with post_id filter
+      // Test access with post_id filter with detailed error logging
       console.log('🔍 DEBUG: Testing linkedin_post_images with post_id filter...');
       const { data: imageFilteredData, error: imageFilteredError } = await supabase
         .from('linkedin_post_images')
         .select('*')
         .eq('post_id', postId);
       
-      console.log('🔍 DEBUG: linkedin_post_images filtered query result:', {
+      console.log('🔍 DEBUG: linkedin_post_images filtered query full result:', {
         data: imageFilteredData,
         error: imageFilteredError,
-        count: imageFilteredData?.length || 0
+        errorMessage: imageFilteredError?.message,
+        errorCode: imageFilteredError?.code,
+        errorDetails: imageFilteredError?.details,
+        dataLength: imageFilteredData?.length || 0,
+        actualData: imageFilteredData
       });
 
-      // Test job_linkedin access
+      // Test job_linkedin access with detailed error logging
       console.log('🔍 DEBUG: Testing job_linkedin access for post:', postId);
       const { data: jobLinkedinData, error: jobLinkedinError } = await supabase
         .from('job_linkedin')
@@ -157,13 +146,41 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
         .eq('id', postId)
         .maybeSingle();
       
-      console.log('🔍 DEBUG: job_linkedin query result:', {
+      console.log('🔍 DEBUG: job_linkedin query full result:', {
         data: jobLinkedinData,
-        error: jobLinkedinError
+        error: jobLinkedinError,
+        errorMessage: jobLinkedinError?.message,
+        errorCode: jobLinkedinError?.code,
+        errorDetails: jobLinkedinError?.details
+      });
+
+      // Test if there are ANY records in these tables at all
+      console.log('🔍 DEBUG: Testing if ANY records exist in linkedin_post_image_counts...');
+      const { data: anyCountData, error: anyCountError } = await supabase
+        .from('linkedin_post_image_counts')
+        .select('id, post_id, variation_number, image_count, user_id, created_at')
+        .limit(5);
+      
+      console.log('🔍 DEBUG: Any counts data:', {
+        data: anyCountData,
+        error: anyCountError,
+        count: anyCountData?.length || 0
+      });
+
+      console.log('🔍 DEBUG: Testing if ANY records exist in linkedin_post_images...');
+      const { data: anyImageData, error: anyImageError } = await supabase
+        .from('linkedin_post_images')
+        .select('id, post_id, variation_number, user_id, created_at')
+        .limit(5);
+      
+      console.log('🔍 DEBUG: Any images data:', {
+        data: anyImageData,
+        error: anyImageError,
+        count: anyImageData?.length || 0
       });
 
     } catch (error) {
-      console.error('🔍 DEBUG: Error in table access debugging:', error);
+      console.error('🔍 DEBUG: Error in enhanced table access debugging:', error);
     }
   };
 
@@ -182,40 +199,28 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
 
     const loadExistingImagesAndCounts = async () => {
       try {
-        // Run debugging functions
+        // Run enhanced debugging functions
         await debugAuthAndRLS();
         await debugTableAccess(selectedItem.id);
 
-        // Get image counts with detailed logging
+        // Get image counts with enhanced logging
         console.log('🔍 DEBUG: Fetching image counts for post:', selectedItem.id);
         const { data: countData, error: countError } = await supabase
           .from('linkedin_post_image_counts')
           .select('*')
           .eq('post_id', selectedItem.id);
 
-        if (countError) {
-          console.error('❌ DEBUG: Error loading image counts:', countError);
-          console.error('❌ DEBUG: Count error details:', {
-            message: countError.message,
-            code: countError.code,
-            details: countError.details,
-            hint: countError.hint
-          });
-        } else {
-          console.log('✅ DEBUG: Loaded image counts successfully:', countData);
-          console.log('✅ DEBUG: Count data details:', {
-            totalRecords: countData?.length || 0,
-            records: countData?.map(record => ({
-              id: record.id,
-              post_id: record.post_id,
-              variation_number: record.variation_number,
-              image_count: record.image_count,
-              user_id: record.user_id
-            }))
-          });
-        }
+        console.log('✅ DEBUG: Image counts query complete:', {
+          data: countData,
+          error: countError,
+          errorMessage: countError?.message,
+          errorCode: countError?.code,
+          errorDetails: countError?.details,
+          dataLength: countData?.length || 0,
+          fullData: JSON.stringify(countData, null, 2)
+        });
 
-        // Get images with detailed logging
+        // Get images with enhanced logging
         console.log('🔍 DEBUG: Fetching images for post:', selectedItem.id);
         const { data: imageData, error: imageError } = await supabase
           .from('linkedin_post_images')
@@ -223,29 +228,17 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
           .eq('post_id', selectedItem.id)
           .order('created_at', { ascending: true });
 
-        if (imageError) {
-          console.error('❌ DEBUG: Error loading images:', imageError);
-          console.error('❌ DEBUG: Image error details:', {
-            message: imageError.message,
-            code: imageError.code,
-            details: imageError.details,
-            hint: imageError.hint
-          });
-        } else {
-          console.log('✅ DEBUG: Loaded images successfully:', imageData);
-          console.log('✅ DEBUG: Image data details:', {
-            totalRecords: imageData?.length || 0,
-            records: imageData?.map(record => ({
-              id: record.id,
-              post_id: record.post_id,
-              variation_number: record.variation_number,
-              user_id: record.user_id,
-              hasImageData: !!record.image_data
-            }))
-          });
-        }
+        console.log('✅ DEBUG: Images query complete:', {
+          data: imageData,
+          error: imageError,
+          errorMessage: imageError?.message,
+          errorCode: imageError?.code,
+          errorDetails: imageError?.details,
+          dataLength: imageData?.length || 0,
+          fullData: JSON.stringify(imageData, null, 2)
+        });
 
-        // Process each variation (1, 2, 3)
+        // Process each variation (1, 2, 3) with enhanced logging
         for (let variation = 1; variation <= 3; variation++) {
           const variationKey = `${selectedItem.id}-${variation}`;
           
@@ -253,10 +246,11 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
           const countRecord = countData?.find(c => c.variation_number === variation);
           const count = countRecord?.image_count || 0;
           
-          console.log(`📊 DEBUG: Variation ${variation} count:`, {
+          console.log(`📊 DEBUG: Processing variation ${variation}:`, {
             variationKey,
-            countRecord,
-            finalCount: count
+            countRecord: JSON.stringify(countRecord, null, 2),
+            finalCount: count,
+            countData: countData?.map(c => ({ var: c.variation_number, count: c.image_count }))
           });
           
           setImageCounts(prev => {
@@ -264,7 +258,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
               ...prev,
               [variationKey]: count
             };
-            console.log('📊 DEBUG: Updated image counts state:', newCounts);
+            console.log('📊 DEBUG: Updated image counts state for variation', variation, ':', newCounts);
             return newCounts;
           });
 
@@ -278,15 +272,22 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
             return acc;
           }, []);
           
+          console.log(`✅ DEBUG: Processing images for variation ${variation}:`, {
+            variationKey,
+            variationImagesCount: variationImages.length,
+            uniqueImagesCount: uniqueImages.length,
+            variationImages: variationImages.map(img => ({ id: img.id, var: img.variation_number }))
+          });
+          
           setGeneratedImages(prev => {
             const newImages = {
               ...prev,
               [variationKey]: uniqueImages
             };
-            console.log(`✅ DEBUG: Set ${uniqueImages.length} images for variation ${variation}:`, {
+            console.log(`✅ DEBUG: Updated images state for variation ${variation}:`, {
               variationKey,
               imageCount: uniqueImages.length,
-              totalState: Object.keys(newImages).reduce((acc, key) => {
+              totalImagesByVariation: Object.keys(newImages).reduce((acc, key) => {
                 acc[key] = newImages[key].length;
                 return acc;
               }, {} as Record<string, number>)
@@ -404,7 +405,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
           ...prev,
           [variationKey]: [...existingImages, newRecord.image_data]
         };
-        console.log('🔔 DEBUG: Updated images state:', {
+        console.log('🔔 DEBUG: Updated images state via real-time:', {
           variationKey,
           newCount: newImages[variationKey].length,
           totalState: Object.keys(newImages).reduce((acc, key) => {
@@ -462,6 +463,13 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
         .eq('post_id', postId)
         .eq('variation_number', variationNumber)
         .maybeSingle();
+
+      console.log('🔄 DEBUG: Refresh count query result:', {
+        data,
+        error,
+        errorMessage: error?.message,
+        errorCode: error?.code
+      });
 
       if (error) {
         console.error('🔄 DEBUG: Error refreshing count:', error);
