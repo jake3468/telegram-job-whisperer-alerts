@@ -279,7 +279,7 @@ const LinkedInPostVariation = ({
     <div className="space-y-4 w-full">
       {/* Heading */}
       <div className="text-center">
-        <h3 className="text-base sm:text-lg font-semibold mb-2 text-lime-400">{heading}</h3>
+        <h3 className="text-base sm:text-lg font-semibold mb-2 text-lime-400 px-2">{heading}</h3>
       </div>
 
       {/* LinkedIn Post Preview */}
@@ -317,12 +317,12 @@ const LinkedInPostVariation = ({
                   <img 
                     src={imageData} 
                     alt={`Generated image ${index + 1} for ${heading}`}
-                    className="w-full rounded-lg shadow-sm"
+                    className="w-full max-w-md lg:max-w-lg xl:max-w-xl mx-auto rounded-lg shadow-sm object-contain"
                   />
                   <Button
                     onClick={() => handleCopyImage(imageData, index)}
                     size="sm"
-                    className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white"
+                    className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white p-1 h-auto min-h-0"
                   >
                     <Copy className="w-3 h-3" />
                   </Button>
@@ -393,32 +393,26 @@ const LinkedInPostVariation = ({
       </Card>
 
       {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 px-2 sm:px-0">
         <Button 
           onClick={handleCopyContent} 
-          className="flex-1 flex items-center justify-center gap-2 text-sm h-10 font-semibold bg-emerald-300 hover:bg-emerald-200 text-gray-950"
+          className="flex-1 flex items-center justify-center gap-2 text-xs sm:text-sm h-9 sm:h-10 font-semibold bg-emerald-300 hover:bg-emerald-200 text-gray-950 min-w-0"
         >
-          <Copy className="w-4 h-4" />
-          <span className="hidden sm:inline">Copy Post {variationNumber}</span>
-          <span className="sm:hidden">Copy</span>
+          <Copy className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+          <span className="truncate">Copy Post {variationNumber}</span>
         </Button>
         
         <Button 
           onClick={handleGetImage} 
           disabled={isImageGenerationDisabled}
           variant="outline" 
-          className="flex-1 border-teal-400/25 text-sm h-10 bg-amber-500 hover:bg-amber-400 text-gray-950 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 border-teal-400/25 text-xs sm:text-sm h-9 sm:h-10 bg-amber-500 hover:bg-amber-400 text-gray-950 disabled:opacity-50 disabled:cursor-not-allowed min-w-0"
         >
-          <ImageIcon className="w-4 h-4 mr-2" />
-          <span className="hidden sm:inline">
+          <ImageIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+          <span className="truncate">
             {imageCount >= 3 ? 'Limit Exceeded' : 
              isGeneratingImage ? 'Generating...' : 
              `Get Image (${imageCount}/3)`}
-          </span>
-          <span className="sm:hidden">
-            {imageCount >= 3 ? 'Limit' : 
-             isGeneratingImage ? 'Gen...' : 
-             `Image (${imageCount}/3)`}
           </span>
         </Button>
       </div>
