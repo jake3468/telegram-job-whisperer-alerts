@@ -53,18 +53,12 @@ export function useCreditWarnings() {
   const showGetMoreCreditsToast = () => {
     toast({
       title: "Get More Credits",
-      description: (
-        <div className="space-y-2">
-          <p>You can purchase credit packs or subscribe to a monthly plan.</p>
-          <button
-            onClick={() => navigate('/get-more-credits')}
-            className="text-blue-400 underline hover:text-blue-300"
-          >
-            Visit Get More Credits page
-          </button>
-        </div>
-      ),
+      description: "You can purchase credit packs or subscribe to a monthly plan. Click here to visit the Get More Credits page.",
       duration: 8000,
+      action: {
+        label: "Get More Credits",
+        onClick: () => navigate('/get-more-credits')
+      }
     });
   };
 
@@ -79,20 +73,12 @@ export function useCreditWarnings() {
       
       toast({
         title: "Low Credits Warning",
-        description: (
-          <div className="space-y-2">
-            <p>You have {balance} credits remaining.</p>
-            <p>Your next 15 free credits will reset on {resetDate}.</p>
-            <p>Need more credits now?</p>
-            <button
-              onClick={() => navigate('/get-more-credits')}
-              className="text-blue-400 underline hover:text-blue-300"
-            >
-              Get More Credits
-            </button>
-          </div>
-        ),
+        description: `You have ${balance} credits remaining. Your next 15 free credits will reset on ${resetDate}. Need more credits now? Click here to get more credits.`,
         duration: 10000,
+        action: {
+          label: "Get More Credits",
+          onClick: () => navigate('/get-more-credits')
+        }
       });
       
       updateWarningState({ hasShownLowCreditWarning: true });
@@ -104,19 +90,12 @@ export function useCreditWarnings() {
       
       toast({
         title: "No Credits Remaining",
-        description: (
-          <div className="space-y-2">
-            <p>You have no credits left. Features are temporarily unavailable.</p>
-            <p>Your next 15 free credits will reset on {resetDate}.</p>
-            <button
-              onClick={() => navigate('/get-more-credits')}
-              className="text-blue-400 underline hover:text-blue-300"
-            >
-              Get More Credits Now
-            </button>
-          </div>
-        ),
+        description: `You have no credits left. Features are temporarily unavailable. Your next 15 free credits will reset on ${resetDate}. Click here to get more credits now.`,
         duration: 12000,
+        action: {
+          label: "Get More Credits",
+          onClick: () => navigate('/get-more-credits')
+        }
       });
       
       updateWarningState({ hasShownZeroCreditWarning: true });

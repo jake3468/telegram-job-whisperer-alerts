@@ -22,20 +22,12 @@ export function useCreditCheck(requiredCredits: number = 1.5) {
 
     toast({
       title: "Insufficient Credits",
-      description: (
-        <div className="space-y-2">
-          <p>You need {requiredCredits} credits to use this feature.</p>
-          <p>You currently have {creditBalance} credits.</p>
-          <p>Your next 15 free credits will reset on {resetDate}.</p>
-          <button
-            onClick={() => navigate('/get-more-credits')}
-            className="text-blue-400 underline hover:text-blue-300"
-          >
-            Get More Credits
-          </button>
-        </div>
-      ),
+      description: `You need ${requiredCredits} credits to use this feature. You currently have ${creditBalance} credits. Your next 15 free credits will reset on ${resetDate}. Click here to get more credits.`,
       duration: 8000,
+      action: {
+        label: "Get More Credits",
+        onClick: () => navigate('/get-more-credits')
+      }
     });
   };
 
