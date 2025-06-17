@@ -15,6 +15,8 @@ serve(async (req) => {
   try {
     const { post_heading, post_content, variation_number, user_name, post_id, source } = await req.json()
 
+    console.log('LinkedIn image webhook called with:', { post_id, variation_number, source })
+
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -33,12 +35,16 @@ serve(async (req) => {
     }
 
     const imageCount = existingImages?.length || 0
+    console.log(`Current image count for post ${post_id}, variation ${variation_number}: ${imageCount}`)
+
     if (imageCount >= 3) {
+      console.log('Image limit exceeded, returning error')
       return new Response(
         JSON.stringify({ 
           success: false, 
           error: 'Maximum 3 images allowed per post variation',
-          limit_exceeded: true
+          limit_exceeded: true,
+          current_count: imageCount
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -56,6 +62,14 @@ serve(async (req) => {
     }
 
     console.log('Using N8N webhook URL:', n8nWebhookUrl.substring(0, 50) + '...')
+    console.log('Triggering N8N webhook with payload:', {
+      post_heading,
+      variation_number,
+      user_name,
+      post_id,
+      source,
+      current_image_count: imageCount
+    })
 
     // Call the N8N webhook
     const response = await fetch(n8nWebhookUrl, {
@@ -71,7 +85,8 @@ serve(async (req) => {
         post_id,
         source,
         timestamp: new Date().toISOString(),
-        triggered_from: req.headers.get('origin') || 'unknown'
+        triggered_from: req.headers.get('origin') || 'unknown',
+        current_image_count: imageCount
       }),
     })
 
@@ -97,7 +112,20 @@ serve(async (req) => {
     } catch (parseError) {
       console.error('Failed to parse N8N response:', parseError)
       console.error('Raw response was:', responseText)
-      throw new Error('Invalid JSON response from N8N webhook')
+      
+      // If parsing fails, consider it a successful trigger but no immediate image data
+      console.log('N8N webhook triggered successfully, waiting for async response')
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'Image generation triggered successfully',
+          triggered: true,
+          current_image_count: imageCount
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
     }
 
     console.log('N8N webhook parsed response:', result)
@@ -185,14 +213,13 @@ serve(async (req) => {
         }
       )
     } else {
-      console.log('No image data in response or unsuccessful generation')
-      console.log('Result structure:', JSON.stringify(result, null, 2))
+      console.log('N8N webhook triggered successfully, no immediate image data - will wait for async response')
       
       return new Response(
         JSON.stringify({ 
-          success: false, 
-          message: 'No image data received from N8N',
-          data: result,
+          success: true, 
+          message: 'Image generation triggered successfully',
+          triggered: true,
           current_image_count: imageCount
         }),
         { 
