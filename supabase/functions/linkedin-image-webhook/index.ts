@@ -36,16 +36,16 @@ serve(async (req) => {
 
     // Check if limit is reached (one image per post)
     if (existingImage) {
-      console.log('Image already exists for this post, returning error')
+      console.log('Image already exists for this post, returning success response')
       return new Response(
         JSON.stringify({ 
-          success: false, 
-          error: 'Image already exists for this post',
-          limit_exceeded: true
+          success: true, 
+          message: 'Image already exists for this post',
+          image_exists: true
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400
+          status: 200
         }
       )
     }

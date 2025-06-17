@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
@@ -199,16 +198,17 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
       console.log('Edge function response:', data);
 
       if (!data.success) {
-        if (data.limit_exceeded) {
-          setHasImage(true); // Mark as having image to disable button
-          toast({
-            title: "Generation Limit Exceeded",
-            description: "This post already has an image generated.",
-            variant: "destructive"
-          });
-        } else {
-          throw new Error(data.error || 'Failed to trigger image generation');
-        }
+        throw new Error(data.error || 'Failed to trigger image generation');
+      }
+
+      // Handle the case where image already exists
+      if (data.image_exists) {
+        setHasImage(true);
+        toast({
+          title: "Image Already Exists",
+          description: "This post already has an image generated.",
+          variant: "destructive"
+        });
         
         // Clear timeout and reset state
         if (timeoutIdRef.current) {
