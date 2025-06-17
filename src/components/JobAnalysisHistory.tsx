@@ -1,61 +1,57 @@
 
 import { useState } from 'react';
-import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
-import { History, Trash2, Eye, Building, Briefcase, Calendar, AlertCircle } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useUserProfile } from '@/hooks/useUserProfile';
-import HistoryModal from '@/components/HistoryModal';
+import { History, Loader2 } from 'lucide-react';
+import HistoryModal from './HistoryModal';
 
-const JobAnalysisHistory = () => {
-  const { user } = useUser();
-  const { toast } = useToast();
-  const { userProfile } = useUserProfile();
-  const [showHistory, setShowHistory] = useState(false);
+interface JobAnalysisHistoryProps {
+  type: 'job_guide' | 'cover_letter';
+  gradientColors: string;
+  borderColors: string;
+}
 
-  const handleShowHistory = () => {
-    if (!user || !userProfile) {
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in to view your job analysis history.",
-        variant: "destructive"
-      });
-      return;
-    }
-    setShowHistory(true);
+const JobAnalysisHistory = ({
+  type,
+  gradientColors,
+  borderColors
+}: JobAnalysisHistoryProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleOpenModal = () => {
+    setIsLoading(true);
+    setIsModalOpen(true);
+    // Small delay to show loading state
+    setTimeout(() => setIsLoading(false), 300);
   };
 
   return (
     <>
-      <Card className="bg-gradient-to-br from-cyan-400 via-teal-300 to-teal-500 border-white/10 backdrop-blur-md shadow-xl">
-        <CardHeader className="pb-6">
-          <CardTitle className="font-inter text-lg sm:text-xl flex items-center gap-2 text-black font-bold drop-shadow">
-            <History className="w-5 h-5 text-black drop-shadow flex-shrink-0" />
-            <span>Job Analysis History</span>
-          </CardTitle>
-          <CardDescription className="text-black/80 font-inter mb-0 text-sm sm:text-base">
-            View and manage your previous job analyses
-          </CardDescription>
-        </CardHeader>
+      <Button 
+        onClick={handleOpenModal} 
+        disabled={isLoading} 
+        variant="outline" 
+        size="sm" 
+        className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+      >
+        {isLoading ? (
+          <>
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            Loading...
+          </>
+        ) : (
+          <>
+            <History className="w-4 h-4 mr-2" />
+            History
+          </>
+        )}
+      </Button>
 
-        <CardContent>
-          <Button 
-            onClick={handleShowHistory} 
-            className="w-full bg-gradient-to-r from-teal-400 via-cyan-400 to-teal-500 hover:from-teal-500 hover:via-cyan-500 hover:to-teal-600 text-black font-semibold text-base h-12 shadow-md"
-          >
-            <History className="w-5 h-5 mr-2" />
-            View History
-          </Button>
-        </CardContent>
-      </Card>
-
-      <HistoryModal 
-        type="job_analyses" 
-        isOpen={showHistory} 
-        onClose={() => setShowHistory(false)} 
-        gradientColors="from-cyan-400 to-teal-400" 
+      <HistoryModal
+        type={type}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        gradientColors={gradientColors}
       />
     </>
   );

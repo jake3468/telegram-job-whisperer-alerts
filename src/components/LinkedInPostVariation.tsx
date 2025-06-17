@@ -72,7 +72,6 @@ const LinkedInPostVariation = ({
         if (images && images.length > 0) {
           setGeneratedImages(images.map(img => img.image_data));
           setImageCount(images.length);
-          console.log(`Loaded ${images.length} existing images for post ${postId}, variation ${variationNumber}`);
         }
       } catch (error) {
         console.error('Error loading existing images:', error);
@@ -184,14 +183,15 @@ const LinkedInPostVariation = ({
     
     // Set timeout for 2 minutes
     const timeoutId = setTimeout(() => {
-      console.log('Image generation timeout reached for variation', variationNumber);
-      setIsGeneratingImage(false);
-      setImageGenerationFailed(true);
-      toast({
-        title: "Image Generation Failed",
-        description: "Image generation timed out after 2 minutes. Please try again.",
-        variant: "destructive"
-      });
+      if (isGeneratingImage) {
+        setIsGeneratingImage(false);
+        setImageGenerationFailed(true);
+        toast({
+          title: "Image Generation Failed",
+          description: "Image generation timed out after 2 minutes. Please try again.",
+          variant: "destructive"
+        });
+      }
     }, 120000); // 2 minutes
 
     try {
@@ -232,26 +232,10 @@ const LinkedInPostVariation = ({
         return;
       }
 
-      // If image was generated immediately and returned in the response
-      if (data.data?.image_data) {
-        console.log('Image data received immediately in response');
-        clearTimeout(timeoutId);
-        setGeneratedImages(prev => [...prev, data.data.image_data]);
-        setImageCount(data.current_image_count || (imageCount + 1));
-        setIsGeneratingImage(false);
-        setImageGenerationFailed(false);
-        
-        toast({
-          title: "Image Generated!",
-          description: `LinkedIn post image for Post ${variationNumber} is ready.`
-        });
-      } else {
-        // Image generation is in progress, wait for real-time update
-        toast({
-          title: "Image Generation Started",
-          description: `LinkedIn post image for Post ${variationNumber} is being generated...`
-        });
-      }
+      toast({
+        title: "Image Generation Started",
+        description: `LinkedIn post image for Post ${variationNumber} is being generated...`
+      });
 
     } catch (error) {
       console.error('Error triggering image generation:', error);

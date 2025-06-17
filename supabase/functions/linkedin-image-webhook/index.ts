@@ -81,43 +81,8 @@ serve(async (req) => {
       throw new Error(`N8N webhook failed: ${response.statusText}`)
     }
 
-    const responseText = await response.text()
-    console.log('N8N webhook raw response:', responseText.substring(0, 200) + '...')
-
-    let result
-    try {
-      // First try to parse as JSON directly
-      result = JSON.parse(responseText)
-    } catch (parseError) {
-      console.error('Failed to parse N8N response as JSON:', parseError)
-      throw new Error('Invalid JSON response from N8N webhook')
-    }
-
-    // Check if the result contains a stringified JSON in any of its properties
-    if (typeof result === 'object' && result !== null) {
-      // Look for stringified JSON in top-level properties
-      for (const [key, value] of Object.entries(result)) {
-        if (typeof value === 'string' && value.trim().startsWith('{')) {
-          try {
-            const parsed = JSON.parse(value)
-            if (parsed.success !== undefined && parsed.image_data) {
-              console.log(`Found parsed data in property ${key}:`, { success: parsed.success, has_image: !!parsed.image_data })
-              result = parsed
-              break
-            }
-          } catch (e) {
-            console.log(`Property ${key} is not valid JSON, continuing...`)
-          }
-        }
-      }
-    }
-
-    console.log('Processed N8N response:', { 
-      success: result.success, 
-      has_image_data: !!result.image_data,
-      variation_number: result.variation_number || variation_number,
-      post_id: result.post_id || post_id
-    })
+    const result = await response.json()
+    console.log('N8N webhook response:', result)
 
     // If the response contains image data, store it in database and broadcast
     if (result.success && result.image_data) {
@@ -136,9 +101,8 @@ serve(async (req) => {
 
       if (storeError) {
         console.error('Failed to store image in database:', storeError)
-        throw new Error('Failed to store image in database')
       } else {
-        console.log('Image stored successfully in database with ID:', storedImage.id)
+        console.log('Image stored successfully in database')
       }
       
       // Broadcast the image data to all listening clients
@@ -186,33 +150,19 @@ serve(async (req) => {
       } else {
         console.log('Image data broadcasted to history channel successfully')
       }
-
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: 'Image generated and stored successfully',
-          data: result,
-          current_image_count: imageCount + 1,
-          stored_image_id: storedImage.id
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      )
-    } else {
-      console.log('No image data found in N8N response, returning trigger confirmation')
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: 'Image generation triggered successfully',
-          data: result,
-          current_image_count: imageCount + 1
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      )
     }
+
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        message: 'Image generation triggered successfully',
+        data: result,
+        current_image_count: imageCount + 1
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    )
 
   } catch (error) {
     console.error('Error in linkedin-image-webhook:', error)

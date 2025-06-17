@@ -98,7 +98,6 @@ const HistoryModal = ({
               ...prev,
               [variationKey]: images.length
             }));
-            console.log(`Loaded ${images.length} images for post ${selectedItem.id}, variation ${variation}`);
           }
         }
       } catch (error) {
@@ -296,14 +295,15 @@ const HistoryModal = ({
 
     // Set timeout for 2 minutes
     const timeoutId = setTimeout(() => {
-      console.log(`Image generation timeout reached for post ${item.id}, variation ${postNumber}`);
-      setLoadingImages(prev => ({ ...prev, [variationKey]: false }));
-      setImageGenerationFailed(prev => ({ ...prev, [variationKey]: true }));
-      toast({
-        title: "Image Generation Failed",
-        description: "Image generation timed out after 2 minutes. Please try again.",
-        variant: "destructive"
-      });
+      if (loadingImages[variationKey]) {
+        setLoadingImages(prev => ({ ...prev, [variationKey]: false }));
+        setImageGenerationFailed(prev => ({ ...prev, [variationKey]: true }));
+        toast({
+          title: "Image Generation Failed",
+          description: "Image generation timed out after 2 minutes. Please try again.",
+          variant: "destructive"
+        });
+      }
     }, 120000); // 2 minutes
     
     try {
@@ -344,32 +344,10 @@ const HistoryModal = ({
         return;
       }
 
-      // If image was generated immediately and returned in the response
-      if (data.data?.image_data) {
-        console.log('Image data received immediately in response');
-        clearTimeout(timeoutId);
-        setGeneratedImages(prev => ({
-          ...prev,
-          [variationKey]: [...(prev[variationKey] || []), data.data.image_data]
-        }));
-        setImageCounts(prev => ({
-          ...prev,
-          [variationKey]: data.current_image_count || ((prev[variationKey] || 0) + 1)
-        }));
-        setLoadingImages(prev => ({ ...prev, [variationKey]: false }));
-        setImageGenerationFailed(prev => ({ ...prev, [variationKey]: false }));
-        
-        toast({
-          title: "Image Generated!",
-          description: `LinkedIn post image for Post ${postNumber} is ready.`
-        });
-      } else {
-        // Image generation is in progress, wait for real-time update
-        toast({
-          title: "Image Generation Started",
-          description: `LinkedIn post image for Post ${postNumber} is being generated...`
-        });
-      }
+      toast({
+        title: "Image Generation Started",
+        description: `LinkedIn post image for Post ${postNumber} is being generated...`
+      });
     } catch (error) {
       console.error('Error triggering image generation webhook:', error);
       clearTimeout(timeoutId);
