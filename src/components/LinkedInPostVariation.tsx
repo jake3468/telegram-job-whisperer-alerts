@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -62,23 +63,9 @@ const LinkedInPostVariation = ({
 
     const loadExistingData = async () => {
       try {
-        // First, load the current image count from linkedin_post_image_counts
-        const { data: countData, error: countError } = await supabase
-          .from('linkedin_post_image_counts')
-          .select('image_count')
-          .eq('post_id', postId)
-          .eq('variation_number', variationNumber)
-          .maybeSingle();
-
-        if (countError) {
-          console.error('Error loading existing image count:', countError);
-        } else if (countData) {
-          console.log(`Loaded existing image count for variation ${variationNumber}: ${countData.image_count}`);
-          setImageCount(countData.image_count);
-          lastImageCountRef.current = countData.image_count;
-        }
-
-        // Then load the actual images
+        console.log(`🔍 DEBUG: Loading data for post ${postId}, variation ${variationNumber}`);
+        
+        // First, load the actual images to get the real count
         const { data: images, error: imagesError } = await supabase
           .from('linkedin_post_images')
           .select('image_data')
@@ -86,29 +73,58 @@ const LinkedInPostVariation = ({
           .eq('variation_number', variationNumber)
           .order('created_at', { ascending: true });
 
+        console.log(`🔍 DEBUG: Images query result:`, { images, error: imagesError });
+
         if (imagesError) {
           console.error('Error loading existing images:', imagesError);
           return;
         }
 
+        let actualImageCount = 0;
+        let uniqueImages: string[] = [];
+
         if (images && images.length > 0) {
-          console.log(`Loaded ${images.length} existing images for variation ${variationNumber}`);
+          console.log(`🔍 DEBUG: Found ${images.length} images for variation ${variationNumber}`);
           // Remove duplicates based on image data
-          const uniqueImages = images.reduce((acc: string[], img) => {
+          uniqueImages = images.reduce((acc: string[], img) => {
             if (!acc.includes(img.image_data)) {
               acc.push(img.image_data);
             }
             return acc;
           }, []);
           
+          actualImageCount = uniqueImages.length;
           setGeneratedImages(uniqueImages);
-          
-          // If we didn't get a count from the counts table, use the image array length
-          if (!countData) {
-            setImageCount(uniqueImages.length);
-            lastImageCountRef.current = uniqueImages.length;
-          }
         }
+
+        // Now check the count table
+        const { data: countData, error: countError } = await supabase
+          .from('linkedin_post_image_counts')
+          .select('image_count')
+          .eq('post_id', postId)
+          .eq('variation_number', variationNumber)
+          .maybeSingle();
+
+        console.log(`🔍 DEBUG: Count query result:`, { countData, error: countError });
+
+        // Use the actual image count as the source of truth
+        const finalCount = Math.max(actualImageCount, countData?.image_count || 0);
+        
+        console.log(`🔍 DEBUG: Setting image count for variation ${variationNumber} to: ${finalCount}`);
+        setImageCount(finalCount);
+        lastImageCountRef.current = finalCount;
+
+        // If there's a mismatch between actual images and count record, sync them
+        if (countData && countData.image_count !== actualImageCount && actualImageCount > 0) {
+          console.log(`🔍 DEBUG: Syncing count record - actual: ${actualImageCount}, recorded: ${countData.image_count}`);
+          // Update the count record to match reality
+          await supabase
+            .from('linkedin_post_image_counts')
+            .update({ image_count: actualImageCount })
+            .eq('post_id', postId)
+            .eq('variation_number', variationNumber);
+        }
+
       } catch (error) {
         console.error('Error loading existing data:', error);
       }
