@@ -35,7 +35,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
 
     const loadExistingImagesAndCounts = async () => {
       try {
-        // Get image counts - now with simplified query using direct user_id
+        // Get image counts - back to the original approach that should work with RLS
         console.log('🔍 Fetching image counts for post:', selectedItem.id);
         const { data: countData, error: countError } = await supabase
           .from('linkedin_post_image_counts')
@@ -48,7 +48,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
           console.log('✅ Loaded image counts:', countData);
         }
 
-        // Get images - now with simplified query using direct user_id
+        // Get images - back to the original approach that should work with RLS
         console.log('🔍 Fetching images for post:', selectedItem.id);
         const { data: imageData, error: imageError } = await supabase
           .from('linkedin_post_images')
