@@ -2,6 +2,7 @@
 import { useUserCredits } from './useUserCredits';
 import { useToast } from './use-toast';
 import { useNavigate } from 'react-router-dom';
+import { ToastAction } from '@/components/ui/toast';
 
 export function useCreditCheck(requiredCredits: number = 1.5) {
   const { data: credits, isLoading } = useUserCredits();
@@ -24,10 +25,11 @@ export function useCreditCheck(requiredCredits: number = 1.5) {
       title: "Insufficient Credits",
       description: `You need ${requiredCredits} credits to use this feature. You currently have ${creditBalance} credits. Your next 15 free credits will reset on ${resetDate}. Click here to get more credits.`,
       duration: 8000,
-      action: {
-        label: "Get More Credits",
-        onClick: () => navigate('/get-more-credits')
-      }
+      action: (
+        <ToastAction altText="Get More Credits" onClick={() => navigate('/get-more-credits')}>
+          Get More Credits
+        </ToastAction>
+      )
     });
   };
 

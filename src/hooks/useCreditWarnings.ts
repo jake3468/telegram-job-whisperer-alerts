@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useUserCredits } from './useUserCredits';
 import { useToast } from './use-toast';
 import { useNavigate } from 'react-router-dom';
+import { ToastAction } from '@/components/ui/toast';
 
 interface CreditWarningState {
   hasShownLowCreditWarning: boolean;
@@ -55,10 +56,11 @@ export function useCreditWarnings() {
       title: "Get More Credits",
       description: "You can purchase credit packs or subscribe to a monthly plan. Click here to visit the Get More Credits page.",
       duration: 8000,
-      action: {
-        label: "Get More Credits",
-        onClick: () => navigate('/get-more-credits')
-      }
+      action: (
+        <ToastAction altText="Get More Credits" onClick={() => navigate('/get-more-credits')}>
+          Get More Credits
+        </ToastAction>
+      )
     });
   };
 
@@ -75,10 +77,11 @@ export function useCreditWarnings() {
         title: "Low Credits Warning",
         description: `You have ${balance} credits remaining. Your next 15 free credits will reset on ${resetDate}. Need more credits now? Click here to get more credits.`,
         duration: 10000,
-        action: {
-          label: "Get More Credits",
-          onClick: () => navigate('/get-more-credits')
-        }
+        action: (
+          <ToastAction altText="Get More Credits" onClick={() => navigate('/get-more-credits')}>
+            Get More Credits
+          </ToastAction>
+        )
       });
       
       updateWarningState({ hasShownLowCreditWarning: true });
@@ -92,10 +95,11 @@ export function useCreditWarnings() {
         title: "No Credits Remaining",
         description: `You have no credits left. Features are temporarily unavailable. Your next 15 free credits will reset on ${resetDate}. Click here to get more credits now.`,
         duration: 12000,
-        action: {
-          label: "Get More Credits",
-          onClick: () => navigate('/get-more-credits')
-        }
+        action: (
+          <ToastAction altText="Get More Credits" onClick={() => navigate('/get-more-credits')}>
+            Get More Credits
+          </ToastAction>
+        )
       });
       
       updateWarningState({ hasShownZeroCreditWarning: true });
