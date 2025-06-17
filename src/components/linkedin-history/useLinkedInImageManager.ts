@@ -1,8 +1,7 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@clerk/clerk-react';
 
 interface LinkedInPostItem {
   id: string;
@@ -16,540 +15,123 @@ interface LinkedInPostItem {
 
 export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) => {
   const { toast } = useToast();
-  const { getToken, userId: clerkUserId } = useAuth();
-  const [generatedImages, setGeneratedImages] = useState<{[key: string]: string[]}>({});
-  const [loadingImages, setLoadingImages] = useState<{[key: string]: boolean}>({});
-  const [imageGenerationFailed, setImageGenerationFailed] = useState<{[key: string]: boolean}>({});
-  const [imageCounts, setImageCounts] = useState<{[key: string]: number}>({});
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [loadingImage, setLoadingImage] = useState(false);
+  const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
+  const [hasImage, setHasImage] = useState(false);
+  
+  const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
+  const isTimeoutActiveRef = useRef(false);
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Enhanced debug function to check authentication and RLS setup
-  const debugAuthAndRLS = async () => {
-    console.log('🔍 DEBUG: Starting enhanced authentication and RLS debugging');
-    console.log('🔍 DEBUG: Clerk User ID:', clerkUserId);
-    
-    try {
-      // Check if JWT token is properly set
-      const token = await getToken({ template: 'supabase' });
-      console.log('🔍 DEBUG: Supabase JWT token exists:', !!token);
-      if (token) {
-        try {
-          const payload = JSON.parse(atob(token.split('.')[1]));
-          console.log('🔍 DEBUG: JWT payload sub (should match Clerk ID):', payload.sub);
-          console.log('🔍 DEBUG: JWT payload full:', payload);
-        } catch (e) {
-          console.error('🔍 DEBUG: Failed to parse JWT payload:', e);
-        }
-      }
-
-      // Test get_clerk_user_id function directly
-      console.log('🔍 DEBUG: Testing get_clerk_user_id() function...');
-      const { data: clerkIdTest, error: clerkIdError } = await supabase
-        .rpc('get_clerk_user_id');
-      
-      console.log('🔍 DEBUG: get_clerk_user_id() result:', { data: clerkIdTest, error: clerkIdError });
-
-      // Check user record in users table
-      console.log('🔍 DEBUG: Checking user record in users table...');
-      const { data: userRecord, error: userError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('clerk_id', clerkUserId);
-      
-      console.log('🔍 DEBUG: User record query result:', { data: userRecord, error: userError });
-
-      // Check user_profile record
-      if (userRecord && userRecord.length > 0) {
-        console.log('🔍 DEBUG: Checking user_profile record...');
-        const { data: profileRecord, error: profileError } = await supabase
-          .from('user_profile')
-          .select('*')
-          .eq('user_id', userRecord[0].id);
-        
-        console.log('🔍 DEBUG: User profile query result:', { data: profileRecord, error: profileError });
-      }
-
-    } catch (error) {
-      console.error('🔍 DEBUG: Error in auth debugging:', error);
-    }
-  };
-
-  // Enhanced debug function to check table permissions and data
-  const debugTableAccess = async (postId: string) => {
-    console.log('🔍 DEBUG: Testing enhanced table access for post ID:', postId);
-    
-    try {
-      // Test direct access to linkedin_post_image_counts with full error details
-      console.log('🔍 DEBUG: Testing linkedin_post_image_counts access...');
-      const { data: countData, error: countError, count: countTotal } = await supabase
-        .from('linkedin_post_image_counts')
-        .select('*', { count: 'exact' });
-      
-      console.log('🔍 DEBUG: linkedin_post_image_counts query full result:', {
-        data: countData,
-        error: countError,
-        count: countTotal,
-        dataLength: countData?.length || 0
-      });
-
-      // Test access with post_id filter with detailed error logging
-      console.log('🔍 DEBUG: Testing linkedin_post_image_counts with post_id filter...');
-      const { data: countFilteredData, error: countFilteredError } = await supabase
-        .from('linkedin_post_image_counts')
-        .select('*')
-        .eq('post_id', postId);
-      
-      console.log('🔍 DEBUG: linkedin_post_image_counts filtered query full result:', {
-        data: countFilteredData,
-        error: countFilteredError,
-        errorMessage: countFilteredError?.message,
-        errorCode: countFilteredError?.code,
-        errorDetails: countFilteredError?.details,
-        dataLength: countFilteredData?.length || 0,
-        actualData: countFilteredData
-      });
-
-      // Test direct access to linkedin_post_images with full error details
-      console.log('🔍 DEBUG: Testing linkedin_post_images access...');
-      const { data: imageData, error: imageError, count: imageTotal } = await supabase
-        .from('linkedin_post_images')
-        .select('*', { count: 'exact' });
-      
-      console.log('🔍 DEBUG: linkedin_post_images query full result:', {
-        data: imageData,
-        error: imageError,
-        count: imageTotal,
-        dataLength: imageData?.length || 0
-      });
-
-      // Test access with post_id filter with detailed error logging
-      console.log('🔍 DEBUG: Testing linkedin_post_images with post_id filter...');
-      const { data: imageFilteredData, error: imageFilteredError } = await supabase
-        .from('linkedin_post_images')
-        .select('*')
-        .eq('post_id', postId);
-      
-      console.log('🔍 DEBUG: linkedin_post_images filtered query full result:', {
-        data: imageFilteredData,
-        error: imageFilteredError,
-        errorMessage: imageFilteredError?.message,
-        errorCode: imageFilteredError?.code,
-        errorDetails: imageFilteredError?.details,
-        dataLength: imageFilteredData?.length || 0,
-        actualData: imageFilteredData
-      });
-
-      // Test job_linkedin access with detailed error logging
-      console.log('🔍 DEBUG: Testing job_linkedin access for post:', postId);
-      const { data: jobLinkedinData, error: jobLinkedinError } = await supabase
-        .from('job_linkedin')
-        .select('*')
-        .eq('id', postId)
-        .maybeSingle();
-      
-      console.log('🔍 DEBUG: job_linkedin query full result:', {
-        data: jobLinkedinData,
-        error: jobLinkedinError,
-        errorMessage: jobLinkedinError?.message,
-        errorCode: jobLinkedinError?.code,
-        errorDetails: jobLinkedinError?.details
-      });
-
-      // Test if there are ANY records in these tables at all
-      console.log('🔍 DEBUG: Testing if ANY records exist in linkedin_post_image_counts...');
-      const { data: anyCountData, error: anyCountError } = await supabase
-        .from('linkedin_post_image_counts')
-        .select('id, post_id, variation_number, image_count, user_id, created_at')
-        .limit(5);
-      
-      console.log('🔍 DEBUG: Any counts data:', {
-        data: anyCountData,
-        error: anyCountError,
-        count: anyCountData?.length || 0
-      });
-
-      console.log('🔍 DEBUG: Testing if ANY records exist in linkedin_post_images...');
-      const { data: anyImageData, error: anyImageError } = await supabase
-        .from('linkedin_post_images')
-        .select('id, post_id, variation_number, user_id, created_at')
-        .limit(5);
-      
-      console.log('🔍 DEBUG: Any images data:', {
-        data: anyImageData,
-        error: anyImageError,
-        count: anyImageData?.length || 0
-      });
-
-    } catch (error) {
-      console.error('🔍 DEBUG: Error in enhanced table access debugging:', error);
-    }
-  };
-
-  // Load existing images and counts when item is selected
+  // Load existing image when selectedItem changes
   useEffect(() => {
-    if (!selectedItem) {
-      console.log('🔍 DEBUG: No selectedItem, clearing all state');
-      setGeneratedImages({});
-      setLoadingImages({});
-      setImageGenerationFailed({});
-      setImageCounts({});
+    if (!selectedItem?.id) {
+      setGeneratedImage(null);
+      setHasImage(false);
       return;
     }
 
-    console.log('🔍 DEBUG: Loading data for post ID:', selectedItem.id);
-
-    const loadExistingImagesAndCounts = async () => {
+    const loadExistingImage = async () => {
       try {
-        // Run enhanced debugging functions
-        await debugAuthAndRLS();
-        await debugTableAccess(selectedItem.id);
-
-        // Get image counts with enhanced logging
-        console.log('🔍 DEBUG: Fetching image counts for post:', selectedItem.id);
-        const { data: countData, error: countError } = await supabase
-          .from('linkedin_post_image_counts')
-          .select('*')
-          .eq('post_id', selectedItem.id);
-
-        console.log('✅ DEBUG: Image counts query complete:', {
-          data: countData,
-          error: countError,
-          errorMessage: countError?.message,
-          errorCode: countError?.code,
-          errorDetails: countError?.details,
-          dataLength: countData?.length || 0,
-          fullData: JSON.stringify(countData, null, 2)
-        });
-
-        // Get images with enhanced logging
-        console.log('🔍 DEBUG: Fetching images for post:', selectedItem.id);
-        const { data: imageData, error: imageError } = await supabase
+        console.log(`Loading image for post ${selectedItem.id}`);
+        
+        const { data: image, error } = await supabase
           .from('linkedin_post_images')
-          .select('*')
+          .select('image_data')
           .eq('post_id', selectedItem.id)
-          .order('created_at', { ascending: true });
+          .maybeSingle();
 
-        console.log('✅ DEBUG: Images query complete:', {
-          data: imageData,
-          error: imageError,
-          errorMessage: imageError?.message,
-          errorCode: imageError?.code,
-          errorDetails: imageError?.details,
-          dataLength: imageData?.length || 0,
-          fullData: JSON.stringify(imageData, null, 2)
-        });
+        if (error) {
+          console.error('Error loading existing image:', error);
+          return;
+        }
 
-        // Process each variation (1, 2, 3) with enhanced logging
-        for (let variation = 1; variation <= 3; variation++) {
-          const variationKey = `${selectedItem.id}-${variation}`;
-          
-          // Get count for this specific variation
-          const countRecord = countData?.find(c => c.variation_number === variation);
-          const count = countRecord?.image_count || 0;
-          
-          console.log(`📊 DEBUG: Processing variation ${variation}:`, {
-            variationKey,
-            countRecord: JSON.stringify(countRecord, null, 2),
-            finalCount: count,
-            countData: countData?.map(c => ({ var: c.variation_number, count: c.image_count }))
-          });
-          
-          setImageCounts(prev => {
-            const newCounts = {
-              ...prev,
-              [variationKey]: count
-            };
-            console.log('📊 DEBUG: Updated image counts state for variation', variation, ':', newCounts);
-            return newCounts;
-          });
-
-          // Get images for this variation
-          const variationImages = imageData?.filter(img => img.variation_number === variation) || [];
-          
-          const uniqueImages = variationImages.reduce((acc: string[], img) => {
-            if (!acc.includes(img.image_data)) {
-              acc.push(img.image_data);
-            }
-            return acc;
-          }, []);
-          
-          console.log(`✅ DEBUG: Processing images for variation ${variation}:`, {
-            variationKey,
-            variationImagesCount: variationImages.length,
-            uniqueImagesCount: uniqueImages.length,
-            variationImages: variationImages.map(img => ({ id: img.id, var: img.variation_number }))
-          });
-          
-          setGeneratedImages(prev => {
-            const newImages = {
-              ...prev,
-              [variationKey]: uniqueImages
-            };
-            console.log(`✅ DEBUG: Updated images state for variation ${variation}:`, {
-              variationKey,
-              imageCount: uniqueImages.length,
-              totalImagesByVariation: Object.keys(newImages).reduce((acc, key) => {
-                acc[key] = newImages[key].length;
-                return acc;
-              }, {} as Record<string, number>)
-            });
-            return newImages;
-          });
+        if (image) {
+          console.log(`Found existing image for post ${selectedItem.id}`);
+          setGeneratedImage(image.image_data);
+          setHasImage(true);
+        } else {
+          console.log(`No existing image found for post ${selectedItem.id}`);
+          setGeneratedImage(null);
+          setHasImage(false);
         }
 
       } catch (error) {
-        console.error('❌ DEBUG: Error in loadExistingImagesAndCounts:', error);
+        console.error('Error loading existing image:', error);
       }
     };
 
-    loadExistingImagesAndCounts();
-  }, [selectedItem, getToken, clerkUserId]);
+    loadExistingImage();
+  }, [selectedItem?.id]);
 
-  // Real-time subscription for image updates and count changes
+  // Set up real-time subscription
   useEffect(() => {
-    if (!selectedItem) return;
+    if (!selectedItem?.id) return;
 
-    console.log(`🔔 DEBUG: Setting up real-time subscription for post ${selectedItem.id}`);
+    console.log(`Setting up image subscription for post ${selectedItem.id}`);
 
-    const channels = [];
-    
-    // Subscribe to image updates
-    const imageChannel = supabase
-      .channel(`linkedin-images-${selectedItem.id}`)
+    const channel = supabase
+      .channel(`linkedin-image-history-${selectedItem.id}`)
       .on(
-        'postgres_changes',
+        'broadcast',
         {
-          event: '*',
-          schema: 'public',
-          table: 'linkedin_post_images',
-          filter: `post_id=eq.${selectedItem.id}`
+          event: 'linkedin_image_generated'
         },
         (payload) => {
-          console.log('🔔 DEBUG: Image table change detected:', payload);
-          handleImageTableChange(payload);
-        }
-      )
-      .subscribe();
-    
-    channels.push(imageChannel);
-
-    // Subscribe to count updates
-    const countChannel = supabase
-      .channel(`linkedin-counts-${selectedItem.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'linkedin_post_image_counts',
-          filter: `post_id=eq.${selectedItem.id}`
-        },
-        (payload) => {
-          console.log('🔔 DEBUG: Count table change detected:', payload);
-          handleCountTableChange(payload);
-        }
-      )
-      .subscribe();
-    
-    channels.push(countChannel);
-
-    // Subscribe to broadcast events as backup
-    for (let variation = 1; variation <= 3; variation++) {
-      const broadcastChannel = supabase
-        .channel(`linkedin-image-${selectedItem.id}-${variation}`)
-        .on(
-          'broadcast',
-          {
-            event: 'linkedin_image_generated'
-          },
-          (payload) => {
-            console.log(`🔔 DEBUG: Received image broadcast for variation ${variation}:`, payload);
-            handleImageBroadcast(payload.payload, variation);
+          console.log('Received image broadcast in history:', payload);
+          
+          if (payload.payload?.post_id === selectedItem.id && payload.payload?.image_data) {
+            console.log(`Image received for post ${selectedItem.id} in history`);
+            
+            // Clear all timeouts and intervals when image is received
+            if (timeoutIdRef.current) {
+              clearTimeout(timeoutIdRef.current);
+              timeoutIdRef.current = null;
+            }
+            if (pollIntervalRef.current) {
+              clearTimeout(pollIntervalRef.current);
+              pollIntervalRef.current = null;
+            }
+            isTimeoutActiveRef.current = false;
+            
+            setGeneratedImage(payload.payload.image_data);
+            setHasImage(true);
+            setLoadingImage(false);
+            setImageGenerationFailed(false);
+            
+            toast({
+              title: "Image Generated!",
+              description: "LinkedIn post image is ready."
+            });
           }
-        )
-        .subscribe();
-      
-      channels.push(broadcastChannel);
-    }
+        }
+      )
+      .subscribe((status) => {
+        console.log(`Image subscription status for post ${selectedItem.id}:`, status);
+      });
 
     return () => {
-      console.log(`🔔 DEBUG: Cleaning up real-time subscriptions for post ${selectedItem.id}`);
-      channels.forEach(channel => {
-        supabase.removeChannel(channel);
-      });
-    };
-  }, [selectedItem]);
-
-  const handleImageTableChange = async (payload: any) => {
-    if (!selectedItem) return;
-    
-    const { eventType, new: newRecord, old: oldRecord } = payload;
-    console.log('🔔 DEBUG: Processing image table change:', { eventType, newRecord, oldRecord });
-    
-    if (eventType === 'INSERT' && newRecord) {
-      const variationKey = `${selectedItem.id}-${newRecord.variation_number}`;
-      
-      console.log('🔔 DEBUG: Adding new image to state:', {
-        variationKey,
-        imageData: newRecord.image_data ? 'present' : 'missing',
-        recordId: newRecord.id
-      });
-      
-      // Add the new image
-      setGeneratedImages(prev => {
-        const existingImages = prev[variationKey] || [];
-        if (existingImages.includes(newRecord.image_data)) {
-          console.log('🔔 DEBUG: Duplicate image detected, skipping');
-          return prev;
-        }
-        const newImages = {
-          ...prev,
-          [variationKey]: [...existingImages, newRecord.image_data]
-        };
-        console.log('🔔 DEBUG: Updated images state via real-time:', {
-          variationKey,
-          newCount: newImages[variationKey].length,
-          totalState: Object.keys(newImages).reduce((acc, key) => {
-            acc[key] = newImages[key].length;
-            return acc;
-          }, {} as Record<string, number>)
-        });
-        return newImages;
-      });
-
-      // Refresh the count from database
-      await refreshCountFromDatabase(selectedItem.id, newRecord.variation_number);
-      
-      setLoadingImages(prev => ({
-        ...prev,
-        [variationKey]: false
-      }));
-
-      toast({
-        title: "Image Generated!",
-        description: `LinkedIn post image for Post ${newRecord.variation_number} is ready.`
-      });
-    }
-  };
-
-  const handleCountTableChange = (payload: any) => {
-    if (!selectedItem) return;
-    
-    const { eventType, new: newRecord } = payload;
-    console.log('🔔 DEBUG: Processing count table change:', { eventType, newRecord });
-    
-    if ((eventType === 'INSERT' || eventType === 'UPDATE') && newRecord) {
-      const variationKey = `${selectedItem.id}-${newRecord.variation_number}`;
-      
-      console.log(`🔔 DEBUG: Count updated for ${variationKey}: ${newRecord.image_count}`);
-      
-      setImageCounts(prev => {
-        const newCounts = {
-          ...prev,
-          [variationKey]: newRecord.image_count
-        };
-        console.log('🔔 DEBUG: Updated counts via real-time:', newCounts);
-        return newCounts;
-      });
-    }
-  };
-
-  const refreshCountFromDatabase = async (postId: string, variationNumber: number) => {
-    try {
-      console.log(`🔄 DEBUG: Refreshing count for post ${postId}, variation ${variationNumber}`);
-      
-      const { data, error } = await supabase
-        .from('linkedin_post_image_counts')
-        .select('image_count')
-        .eq('post_id', postId)
-        .eq('variation_number', variationNumber)
-        .maybeSingle();
-
-      console.log('🔄 DEBUG: Refresh count query result:', {
-        data,
-        error,
-        errorMessage: error?.message,
-        errorCode: error?.code
-      });
-
-      if (error) {
-        console.error('🔄 DEBUG: Error refreshing count:', error);
-      } else if (data) {
-        const variationKey = `${postId}-${variationNumber}`;
-        console.log(`🔄 DEBUG: Refreshed count for ${variationKey}: ${data.image_count}`);
-        setImageCounts(prev => {
-          const newCounts = {
-            ...prev,
-            [variationKey]: data.image_count
-          };
-          console.log('🔄 DEBUG: Updated counts after refresh:', newCounts);
-          return newCounts;
-        });
-      } else {
-        console.log(`🔄 DEBUG: No count record found for post ${postId}, variation ${variationNumber}`);
+      console.log(`Cleaning up image subscription for post ${selectedItem.id}`);
+      // Clear any active timeouts on cleanup
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+        timeoutIdRef.current = null;
       }
-    } catch (error) {
-      console.error('❌ DEBUG: Error refreshing count:', error);
-    }
-  };
-
-  const handleImageBroadcast = (payload: any, variation: number) => {
-    if (!selectedItem || !payload) return;
-    
-    if (payload.post_id === selectedItem.id && payload.image_data) {
-      const variationKey = `${selectedItem.id}-${variation}`;
-      
-      console.log(`🔔 DEBUG: Processing image broadcast for ${variationKey}:`, {
-        hasImageData: !!payload.image_data,
-        payloadKeys: Object.keys(payload)
-      });
-      
-      // Add with deduplication
-      setGeneratedImages(prev => {
-        const existingImages = prev[variationKey] || [];
-        if (existingImages.includes(payload.image_data)) {
-          console.log('🔔 DEBUG: Duplicate image detected via broadcast, skipping');
-          return prev;
-        }
-        const newImages = {
-          ...prev,
-          [variationKey]: [...existingImages, payload.image_data]
-        };
-        console.log(`🔔 DEBUG: Added new image via broadcast, total: ${newImages[variationKey].length}`);
-        return newImages;
-      });
-
-      // The count will be updated via the database trigger and real-time subscription
-      setLoadingImages(prev => ({
-        ...prev,
-        [variationKey]: false
-      }));
-
-      setImageGenerationFailed(prev => ({
-        ...prev,
-        [variationKey]: false
-      }));
-      
-      toast({
-        title: "Image Generated!",
-        description: `LinkedIn post image for Post ${variation} is ready.`
-      });
-    }
-  };
+      if (pollIntervalRef.current) {
+        clearTimeout(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
+      isTimeoutActiveRef.current = false;
+      supabase.removeChannel(channel);
+    };
+  }, [selectedItem?.id, toast]);
 
   const handleGetImageForPost = async (item: LinkedInPostItem, postNumber: number) => {
-    const variationKey = `${item.id}-${postNumber}`;
-    const currentCount = imageCounts[variationKey] || 0;
-
-    console.log(`🚀 DEBUG: Attempting to generate image for ${variationKey}:`, {
-      currentCount,
-      limit: 3,
-      canGenerate: currentCount < 3
-    });
-
-    if (currentCount >= 3) {
+    if (hasImage) {
       toast({
-        title: "Limit Reached",
-        description: "Maximum 3 images allowed per post variation.",
+        title: "Image Already Generated",
+        description: "This LinkedIn post already has an image.",
         variant: "destructive"
       });
       return;
@@ -557,34 +139,35 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
 
     const heading = item[`post_heading_${postNumber}` as keyof LinkedInPostItem] as string;
     const content = item[`post_content_${postNumber}` as keyof LinkedInPostItem] as string;
-    
-    setLoadingImages(prev => ({ ...prev, [variationKey]: true }));
-    setImageGenerationFailed(prev => ({ ...prev, [variationKey]: false }));
 
-    // Set timeout for 2 minutes
-    const timeoutId = setTimeout(() => {
-      setLoadingImages(prev => {
-        if (prev[variationKey]) {
-          setImageGenerationFailed(prevFailed => ({ ...prevFailed, [variationKey]: true }));
-          toast({
-            title: "Image Generation Failed",
-            description: "Image generation timed out after 2 minutes. Please try again.",
-            variant: "destructive"
-          });
-          return { ...prev, [variationKey]: false };
-        }
-        return prev;
-      });
-    }, 120000); // 2 minutes
+    setLoadingImage(true);
+    setImageGenerationFailed(false);
+    isTimeoutActiveRef.current = true;
     
+    // Set timeout for 2 minutes
+    timeoutIdRef.current = setTimeout(() => {
+      if (isTimeoutActiveRef.current) {
+        console.log(`Image generation timeout for post ${item.id}`);
+        setLoadingImage(false);
+        setImageGenerationFailed(true);
+        isTimeoutActiveRef.current = false;
+        
+        // Clear polling interval on timeout
+        if (pollIntervalRef.current) {
+          clearTimeout(pollIntervalRef.current);
+          pollIntervalRef.current = null;
+        }
+        
+        toast({
+          title: "Image Generation Failed",
+          description: "Image generation timed out after 2 minutes. Please try again.",
+          variant: "destructive"
+        });
+      }
+    }, 120000); // 2 minutes
+
     try {
-      console.log(`🚀 DEBUG: Triggering image generation webhook:`, {
-        postId: item.id,
-        postNumber,
-        heading: heading ? 'present' : 'missing',
-        content: content ? 'present' : 'missing',
-        source: 'history'
-      });
+      console.log("Triggering image generation via edge function for post", item.id);
       
       const { data, error } = await supabase.functions.invoke('linkedin-image-webhook', {
         body: {
@@ -593,43 +176,120 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
           variation_number: postNumber,
           user_name: 'Professional User',
           post_id: item.id,
-          source: 'history'
+          source: 'history_page'
         }
       });
 
       if (error) {
-        console.error('❌ DEBUG: Supabase function error:', error);
-        clearTimeout(timeoutId);
+        console.error('Supabase function error:', error);
         throw new Error(error.message || 'Failed to trigger image generation');
       }
 
-      console.log('✅ DEBUG: Edge function response:', data);
+      console.log('Edge function response:', data);
 
       if (!data.success) {
-        clearTimeout(timeoutId);
         if (data.limit_exceeded) {
-          setImageCounts(prev => ({ ...prev, [variationKey]: 3 }));
+          setHasImage(true); // Mark as having image to disable button
           toast({
             title: "Generation Limit Exceeded",
-            description: "Maximum 3 images allowed per post variation.",
+            description: "This post already has an image generated.",
             variant: "destructive"
           });
         } else {
           throw new Error(data.error || 'Failed to trigger image generation');
         }
-        setLoadingImages(prev => ({ ...prev, [variationKey]: false }));
+        
+        // Clear timeout and reset state
+        if (timeoutIdRef.current) {
+          clearTimeout(timeoutIdRef.current);
+          timeoutIdRef.current = null;
+          isTimeoutActiveRef.current = false;
+        }
+        setLoadingImage(false);
         return;
       }
 
-      toast({
-        title: "Image Generation Started",
-        description: `LinkedIn post image for Post ${postNumber} is being generated...`
-      });
+      // If the response already contains image data (immediate response)
+      if (data.data && data.data.image_data) {
+        console.log('Received immediate image data from edge function');
+        
+        // Clear timeout since we got immediate response
+        if (timeoutIdRef.current) {
+          clearTimeout(timeoutIdRef.current);
+          timeoutIdRef.current = null;
+          isTimeoutActiveRef.current = false;
+        }
+        
+        setGeneratedImage(data.data.image_data);
+        setHasImage(true);
+        setLoadingImage(false);
+        
+        toast({
+          title: "Image Generated!",
+          description: "LinkedIn post image is ready."
+        });
+      } else {
+        // Start fallback polling as backup to real-time
+        console.log('Starting fallback polling for image generation');
+        pollIntervalRef.current = setInterval(async () => {
+          if (!isTimeoutActiveRef.current) {
+            if (pollIntervalRef.current) {
+              clearInterval(pollIntervalRef.current);
+              pollIntervalRef.current = null;
+            }
+            return;
+          }
+          
+          try {
+            console.log(`Polling for new image for post ${item.id}`);
+            const { data: image, error } = await supabase
+              .from('linkedin_post_images')
+              .select('image_data')
+              .eq('post_id', item.id)
+              .maybeSingle();
+
+            if (!error && image) {
+              console.log('Found new image via polling for post', item.id);
+              
+              // Clear timeout and interval
+              if (timeoutIdRef.current) {
+                clearTimeout(timeoutIdRef.current);
+                timeoutIdRef.current = null;
+                isTimeoutActiveRef.current = false;
+              }
+              if (pollIntervalRef.current) {
+                clearInterval(pollIntervalRef.current);
+                pollIntervalRef.current = null;
+              }
+              
+              setGeneratedImage(image.image_data);
+              setHasImage(true);
+              setLoadingImage(false);
+              setImageGenerationFailed(false);
+              
+              toast({
+                title: "Image Generated!",
+                description: "LinkedIn post image is ready."
+              });
+            }
+          } catch (err) {
+            console.error('Polling error:', err);
+          }
+        }, 3000); // Poll every 3 seconds
+      }
+
     } catch (error) {
-      console.error('❌ DEBUG: Error triggering image generation webhook:', error);
-      clearTimeout(timeoutId);
-      setLoadingImages(prev => ({ ...prev, [variationKey]: false }));
-      setImageGenerationFailed(prev => ({ ...prev, [variationKey]: true }));
+      console.error('Error triggering image generation:', error);
+      
+      // Clear timeout on error
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+        timeoutIdRef.current = null;
+        isTimeoutActiveRef.current = false;
+      }
+      
+      setLoadingImage(false);
+      setImageGenerationFailed(true);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to trigger image generation. Please try again.",
@@ -639,10 +299,10 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
   };
 
   return {
-    generatedImages,
-    loadingImages,
+    generatedImage,
+    loadingImage,
     imageGenerationFailed,
-    imageCounts,
+    hasImage,
     handleGetImageForPost
   };
 };

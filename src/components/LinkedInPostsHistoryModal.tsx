@@ -48,10 +48,10 @@ const LinkedInPostsHistoryModal = ({
   const [showDetails, setShowDetails] = useState(false);
 
   const {
-    generatedImages,
-    loadingImages,
+    generatedImage,
+    loadingImage,
     imageGenerationFailed,
-    imageCounts,
+    hasImage,
     handleGetImageForPost
   } = useLinkedInImageManager(selectedItem);
 
@@ -116,7 +116,7 @@ const LinkedInPostsHistoryModal = ({
     }
   };
 
-  const handleCopyImage = async (imageData: string, imageIndex: number) => {
+  const handleCopyImage = async (imageData: string) => {
     try {
       const response = await fetch(imageData);
       const blob = await response.blob();
@@ -129,7 +129,7 @@ const LinkedInPostsHistoryModal = ({
       
       toast({
         title: "Image Copied!",
-        description: `Image ${imageIndex + 1} copied to clipboard successfully.`
+        description: "Image copied to clipboard successfully."
       });
     } catch (err) {
       console.error('Failed to copy image:', err);
@@ -226,23 +226,20 @@ const LinkedInPostsHistoryModal = ({
                 </h3>
 
                 <div className="space-y-6">
-                  {[1, 2, 3].map(postNumber => {
-                    const variationKey = `${selectedItem.id}-${postNumber}`;
-                    return (
-                      <LinkedInPostResult
-                        key={postNumber}
-                        item={selectedItem}
-                        postNumber={postNumber}
-                        generatedImages={generatedImages[variationKey] || []}
-                        loadingImages={loadingImages[variationKey] || false}
-                        imageGenerationFailed={imageGenerationFailed[variationKey] || false}
-                        imageCount={imageCounts[variationKey] || 0}
-                        onCopyResult={handleCopyResult}
-                        onGetImage={handleGetImageForPost}
-                        onCopyImage={handleCopyImage}
-                      />
-                    );
-                  })}
+                  {[1, 2, 3].map(postNumber => (
+                    <LinkedInPostResult
+                      key={postNumber}
+                      item={selectedItem}
+                      postNumber={postNumber}
+                      generatedImage={generatedImage}
+                      loadingImage={loadingImage}
+                      imageGenerationFailed={imageGenerationFailed}
+                      hasImage={hasImage}
+                      onCopyResult={handleCopyResult}
+                      onGetImage={handleGetImageForPost}
+                      onCopyImage={handleCopyImage}
+                    />
+                  ))}
                 </div>
               </div>
             )}

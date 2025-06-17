@@ -16,22 +16,22 @@ interface LinkedInPostItem {
 interface LinkedInPostResultProps {
   item: LinkedInPostItem;
   postNumber: number;
-  generatedImages: string[];
-  loadingImages: boolean;
+  generatedImage: string | null;
+  loadingImage: boolean;
   imageGenerationFailed: boolean;
-  imageCount: number;
+  hasImage: boolean;
   onCopyResult: (item: LinkedInPostItem, postNumber: number) => void;
   onGetImage: (item: LinkedInPostItem, postNumber: number) => void;
-  onCopyImage: (imageData: string, imageIndex: number) => void;
+  onCopyImage: (imageData: string) => void;
 }
 
 const LinkedInPostResult = ({
   item,
   postNumber,
-  generatedImages,
-  loadingImages,
+  generatedImage,
+  loadingImage,
   imageGenerationFailed,
-  imageCount,
+  hasImage,
   onCopyResult,
   onGetImage,
   onCopyImage
@@ -59,26 +59,26 @@ const LinkedInPostResult = ({
           <Button
             onClick={() => onGetImage(item, postNumber)}
             size="sm"
-            disabled={loadingImages || imageCount >= 3}
+            disabled={loadingImage || hasImage}
             className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-6 text-xs px-2 flex items-center gap-1"
           >
             <ImageIcon className="w-3 h-3" />
             <span className="hidden xs:inline">
-              {imageCount >= 3 ? 'Max' :
-               loadingImages ? 'Gen...' : 
-               `Img (${imageCount}/3)`}
+              {hasImage ? 'Generated' :
+               loadingImage ? 'Gen...' : 
+               'Get Image'}
             </span>
             <span className="xs:hidden">
-              {imageCount >= 3 ? 'Max' :
-               loadingImages ? '...' : 
-               `${imageCount}/3`}
+              {hasImage ? 'Done' :
+               loadingImage ? '...' : 
+               'Img'}
             </span>
           </Button>
         </div>
       </div>
 
       {/* Loading indicator */}
-      {loadingImages && (
+      {loadingImage && (
         <div className="mb-4 p-3 bg-blue-50 rounded-lg text-center border border-blue-200">
           <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading...</div>
           <div className="text-xs text-blue-500 mt-1">This may take up to 2 minutes</div>
@@ -93,28 +93,23 @@ const LinkedInPostResult = ({
         </div>
       )}
 
-      {/* Generated Images */}
-      {generatedImages && generatedImages.length > 0 && (
+      {/* Generated Image */}
+      {generatedImage && (
         <div className="mb-4 space-y-3">
-          {generatedImages.map((imageData, imageIndex) => (
-            <div key={imageIndex} className="relative">
-              <img 
-                src={imageData} 
-                alt={`Generated LinkedIn post image ${imageIndex + 1}`}
-                className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto rounded-lg shadow-sm object-contain max-h-96"
-              />
-              <Button
-                onClick={() => onCopyImage(imageData, imageIndex)}
-                size="sm"
-                className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white p-1 h-auto min-h-0"
-              >
-                <Copy className="w-3 h-3" />
-              </Button>
-              <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                Image {imageIndex + 1}
-              </div>
-            </div>
-          ))}
+          <div className="relative">
+            <img 
+              src={generatedImage} 
+              alt={`Generated LinkedIn post image`}
+              className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto rounded-lg shadow-sm object-contain max-h-96"
+            />
+            <Button
+              onClick={() => onCopyImage(generatedImage)}
+              size="sm"
+              className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white p-1 h-auto min-h-0"
+            >
+              <Copy className="w-3 h-3" />
+            </Button>
+          </div>
         </div>
       )}
 
