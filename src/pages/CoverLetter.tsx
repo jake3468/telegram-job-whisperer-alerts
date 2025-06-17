@@ -1,113 +1,116 @@
-import { useUser } from '@clerk/clerk-react';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
+import { Textarea as TTextarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { FileText, History, Copy, Sparkles, Menu } from 'lucide-react';
+import { FileText, History, Sparkles, Menu } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import HistoryModal from '@/components/HistoryModal';
 import LoadingMessages from '@/components/LoadingMessages';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import CoverLetterDownloadActions from '@/components/CoverLetterDownloadActions';
 import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 
+interface CoverLetterData {
+  cover_letter: string | null;
+}
+
 const CoverLetter = () => {
-  const { user, isLoaded } = useUser();
-  const navigate = useNavigate();
+  const { user } = useUser();
   const { toast } = useToast();
   const { userProfile } = useUserProfile();
   const { isComplete } = useUserCompletionStatus();
+  useFeatureCreditCheck(1.5);
+
   const [formData, setFormData] = useState({
-    job_title: '',
     company_name: '',
+    job_title: '',
     job_description: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [result, setResult] = useState('');
+  const [coverLetterData, setCoverLetterData] = useState<CoverLetterData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [currentCoverLetterId, setCurrentCoverLetterId] = useState<string | null>(null);
+  const [currentRequestId, setCurrentRequestId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
 
-  useFeatureCreditCheck(1.5);
-
+  // Real-time subscription for cover letter updates
   useEffect(() => {
-    if (isLoaded && !user) {
-      navigate('/');
-    }
-  }, [user, isLoaded, navigate]);
+    if (!currentRequestId) return;
 
-  // Enhanced real-time subscription for cover letter updates
-  useEffect(() => {
-    if (!currentCoverLetterId) return;
-    console.log('Setting up real-time subscription for cover letter ID:', currentCoverLetterId);
-    const channel = supabase.channel(`cover-letter-${currentCoverLetterId}`).on('postgres_changes', {
-      event: 'UPDATE',
-      schema: 'public',
-      table: 'job_cover_letters',
-      filter: `id=eq.${currentCoverLetterId}`
-    }, payload => {
-      console.log('Real-time update received:', payload);
-      if (payload.new && payload.new.cover_letter) {
-        const coverLetterContent = payload.new.cover_letter.trim();
-        if (coverLetterContent.length > 0) {
-          console.log('Cover letter content received, updating UI');
-          setResult(coverLetterContent);
+    console.log('Setting up real-time subscription for request ID:', currentRequestId);
+
+    const channel = supabase
+      .channel('cover-letter-updates')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'job_cover_letters',
+        filter: `id=eq.${currentRequestId}`
+      }, (payload) => {
+        console.log('Cover letter updated via real-time:', payload);
+        
+        const newData = payload.new as CoverLetterData;
+        console.log('New cover letter data received:', {
+          cover_letter_length: newData.cover_letter?.length || 0,
+          has_cover_letter: !!newData.cover_letter
+        });
+        
+        setCoverLetterData(newData);
+
+        if (newData.cover_letter) {
+          console.log('Cover letter is ready, stopping loading state');
           setIsGenerating(false);
           toast({
             title: "Cover Letter Generated!",
             description: "Your cover letter has been created successfully."
           });
         }
-      }
-    }).subscribe(status => {
-      console.log('Subscription status:', status);
-    });
+      })
+      .subscribe((status) => {
+        console.log('Real-time subscription status:', status);
+      });
 
-    // Cleanup function
-    return () => {
-      console.log('Cleaning up real-time subscription');
-      supabase.removeChannel(channel);
-    };
-  }, [currentCoverLetterId, toast]);
-
-  // Polling fallback - check for updates every 5 seconds when generating
-  useEffect(() => {
-    if (!isGenerating || !currentCoverLetterId) return;
-    const pollInterval = setInterval(async () => {
-      console.log('Polling for cover letter updates...');
+    // Also check immediately for existing data
+    const checkExistingData = async () => {
       try {
-        const { data, error } = await supabase.from('job_cover_letters').select('cover_letter').eq('id', currentCoverLetterId).single();
+        const { data, error } = await supabase
+          .from('job_cover_letters')
+          .select('cover_letter')
+          .eq('id', currentRequestId)
+          .single();
+
         if (error) {
-          console.error('Error polling for updates:', error);
+          console.error('Error checking existing data:', error);
           return;
         }
-        if (data?.cover_letter && data.cover_letter.trim().length > 0) {
-          console.log('Cover letter found via polling, updating UI');
-          setResult(data.cover_letter);
-          setIsGenerating(false);
-          toast({
-            title: "Cover Letter Generated!",
-            description: "Your cover letter has been created successfully."
-          });
-        }
-      } catch (error) {
-        console.error('Polling error:', error);
-      }
-    }, 5000);
-    return () => {
-      console.log('Cleaning up polling interval');
-      clearInterval(pollInterval);
-    };
-  }, [isGenerating, currentCoverLetterId, toast]);
 
+        if (data?.cover_letter) {
+          console.log('Found existing cover letter, stopping loading');
+          setCoverLetterData(data);
+          setIsGenerating(false);
+        }
+      } catch (err) {
+        console.error('Error checking existing data:', err);
+      }
+    };
+
+    // Check immediately, then every 3 seconds as fallback
+    checkExistingData();
+    const interval = setInterval(checkExistingData, 3000);
+
+    return () => {
+      console.log('Cleaning up real-time subscription and interval');
+      supabase.removeChannel(channel);
+      clearInterval(interval);
+    };
+  }, [currentRequestId, toast]);
+
+  // Handle input changes
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -115,25 +118,29 @@ const CoverLetter = () => {
     }));
   };
 
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!user || !userProfile) {
       toast({
         title: "Authentication Required",
-        description: "Please sign in to create a cover letter.",
+        description: "Please sign in to generate a cover letter.",
         variant: "destructive"
       });
       return;
     }
+
     if (!isComplete) {
       toast({
         title: "Profile Incomplete",
-        description: "Please complete your profile before creating a cover letter.",
+        description: "Please complete your profile before generating cover letters.",
         variant: "destructive"
       });
       return;
     }
-    if (!formData.job_title.trim() || !formData.company_name.trim() || !formData.job_description.trim()) {
+
+    if (!formData.company_name.trim() || !formData.job_title.trim() || !formData.job_description.trim()) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
@@ -141,25 +148,40 @@ const CoverLetter = () => {
       });
       return;
     }
+
     setIsSubmitting(true);
     setIsGenerating(true);
-    setResult('');
-    setCurrentCoverLetterId(null);
-    try {
-      console.log('Submitting cover letter request...');
+    setCoverLetterData(null);
 
-      // Insert into database
-      const { data, error } = await supabase.from('job_cover_letters').insert({
-        user_id: userProfile.id,
-        job_title: formData.job_title,
-        company_name: formData.company_name,
-        job_description: formData.job_description
-      }).select().single();
+    try {
+      console.log('Creating cover letter with user_profile.id:', userProfile.id);
+      console.log('Clerk user ID:', user.id);
+
+      const { data, error } = await supabase
+        .from('job_cover_letters')
+        .insert({
+          user_id: userProfile.id,
+          company_name: formData.company_name,
+          job_title: formData.job_title,
+          job_description: formData.job_description
+        })
+        .select()
+        .single();
+
       if (error) {
+        console.error('Supabase error:', error);
+        console.error('Error details:', {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint
+        });
         throw error;
       }
-      console.log('Cover letter record created with ID:', data.id);
-      setCurrentCoverLetterId(data.id);
+
+      console.log('Cover letter request created successfully:', data);
+      setCurrentRequestId(data.id);
+      
       toast({
         title: "Request Submitted!",
         description: "Your cover letter is being generated. Please wait..."
@@ -167,10 +189,15 @@ const CoverLetter = () => {
     } catch (err: any) {
       console.error('Error creating cover letter:', err);
       setIsGenerating(false);
-      setCurrentCoverLetterId(null);
+      
+      let errorMessage = "Failed to generate cover letter. Please try again.";
+      if (err.message) {
+        errorMessage = `Error: ${err.message}`;
+      }
+      
       toast({
         title: "Error",
-        description: "Failed to create cover letter. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -178,39 +205,17 @@ const CoverLetter = () => {
     }
   };
 
-  const handleCopyResult = async () => {
-    if (!result) return;
-    try {
-      await navigator.clipboard.writeText(result);
-      toast({
-        title: "Copied!",
-        description: "Cover letter copied to clipboard successfully."
-      });
-    } catch (err) {
-      toast({
-        title: "Error",
-        description: "Failed to copy text to clipboard.",
-        variant: "destructive"
-      });
-    }
-  };
-
+  // Reset form
   const resetForm = () => {
     setFormData({
-      job_title: '',
       company_name: '',
+      job_title: '',
       job_description: ''
     });
-    setResult('');
+    setCoverLetterData(null);
     setIsGenerating(false);
-    setCurrentCoverLetterId(null);
+    setCurrentRequestId(null);
   };
-
-  if (!isLoaded || !user) {
-    return <div className="min-h-screen bg-gradient-to-br from-black via-neutral-900 to-black flex items-center justify-center">
-        <div className="text-fuchsia-900 text-xs">Loading...</div>
-      </div>;
-  }
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -233,81 +238,104 @@ const CoverLetter = () => {
           </div>
         </div>
       </header>
+
       <div className="min-h-screen flex w-full bg-gradient-to-br from-[#0e1122] via-[#181526] to-[#21203a]">
         <AppSidebar />
-        <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0 lg:pl-6">
-          <main className="flex-1 w-full bg-transparent">
-            <div className="min-h-screen w-full bg-gradient-to-br from-[#180F18] via-[#1b1421] to-[#221828] flex flex-col">
-              {/* Header Section */}
-              <div className="max-w-4xl mx-auto w-full px-3 py-4 sm:px-6 sm:py-6 rounded-3xl mt-4">
-                {/* Gradient Heading */}
-                <div className="mb-8 text-center">
-                  <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-pink-400 via-fuchsia-400 to-fuchsia-600 bg-clip-text text-transparent mb-2 drop-shadow font-orbitron animate-fade-in">
-                    Cover Letter
+        
+        <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0 lg:pl-6 min-w-0">
+          <main className="flex-1 w-full bg-transparent min-w-0">
+            <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-slate-800 pt-0 flex flex-col">
+              <div className="container mx-auto px-2 sm:px-4 py-8 bg-transparent rounded-3xl mt-4 mb-8 max-w-6xl w-full min-w-0">
+                {/* Header Section */}
+                <div className="text-center mb-10">
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-orbitron font-extrabold bg-gradient-to-r from-teal-300 via-teal-400 to-cyan-400 bg-clip-text text-transparent drop-shadow mb-4 tracking-tight">
+                    Cover <span className="italic">Letter</span>
                   </h1>
-                  <p className="text-lg font-inter font-light text-white/90">
-                    Instantly create stunning <span className="italic text-white/85">Cover Letters</span> for every job
+                  <p className="text-cyan-200 max-w-2xl mx-auto font-inter text-sm sm:text-base lg:text-lg font-light shadow-sm px-4">
+                    Generate personalized cover letters that highlight your skills and match the job requirements
                   </p>
                 </div>
-                <div className="space-y-8">
-                  {/* Input Form in Gradient Box */}
-                  <Card className="rounded-2xl border-0 bg-gradient-to-br from-rose-700/90 via-fuchsia-800/80 to-pink-700/90 shadow-xl" style={{
-                  boxShadow: '0 2px 32px 0 rgba(150,97,255,0.12)'
-                }}>
+
+                <div className="max-w-5xl mx-auto min-w-0">
+                  {/* Input Form */}
+                  <Card className="bg-gradient-to-br from-cyan-400 via-teal-300 to-teal-500 border-white/10 backdrop-blur-md mb-8 shadow-xl">
                     <CardHeader className="pb-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <CardTitle className="text-white font-inter text-xl flex items-center gap-2">
-                            <Sparkles className="w-5 h-5 text-fuchsia-200" />
-                            Create Your Cover Letter
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="min-w-0">
+                          <CardTitle className="font-inter text-lg sm:text-xl flex items-center gap-2 text-black font-bold drop-shadow">
+                            <Sparkles className="w-5 h-5 text-black drop-shadow flex-shrink-0" />
+                            <span>Generate Cover Letter</span>
                           </CardTitle>
-                          <CardDescription className="text-gray-200 font-inter">
-                            Fill in the details to generate your personalized cover letter
+                          <CardDescription className="text-black/80 font-inter mb-0 text-sm sm:text-base">
+                            Fill in the job details to create a personalized cover letter
                           </CardDescription>
                         </div>
-                        <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 text-white bg-pink-700 hover:bg-pink-600">
-                          <History className="w-4 h-4 mr-2" />
+                        <Button 
+                          onClick={() => setShowHistory(true)} 
+                          variant="outline" 
+                          size="sm" 
+                          className="border-white/20 text-black bg-teal-200 hover:bg-teal-100 flex-shrink-0"
+                        >
+                          <History className="w-4 h-4 mr-2 text-black" />
                           History
                         </Button>
                       </div>
                     </CardHeader>
-                    <CardContent className="space-y-6">
+
+                    <CardContent className="space-y-6 sm:space-y-8">
                       <form onSubmit={handleSubmit} className="space-y-6">
-                        {/* Inputs Row: Company Name and Job Title in one line for desktop, stacked on mobile */}
-                        <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
-                          {/* Company Name */}
-                          <div className="flex-1 space-y-2">
-                            <Label htmlFor="company_name" className="text-white font-medium text-base">
-                              Company Name *
-                            </Label>
-                            <Input id="company_name" placeholder="e.g. Google, Microsoft" value={formData.company_name} onChange={e => handleInputChange('company_name', e.target.value)} required className="text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
+                        
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+                          <div className="space-y-2">
+                            <Label htmlFor="company_name" className="text-black font-semibold text-base">Company Name *</Label>
+                            <TTextarea
+                              id="company_name"
+                              placeholder="e.g., Google, Microsoft, OpenAI"
+                              value={formData.company_name}
+                              onChange={e => handleInputChange('company_name', e.target.value)}
+                              required
+                              className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                           </div>
-                          {/* Job Title */}
-                          <div className="flex-1 space-y-2">
-                            <Label htmlFor="job_title" className="text-white font-medium text-base">
-                              Job Title *
-                            </Label>
-                            <Input id="job_title" placeholder="e.g. Software Engineer, Marketing Manager" value={formData.job_title} onChange={e => handleInputChange('job_title', e.target.value)} required className="text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="job_title" className="text-black font-semibold text-base">Job Title *</Label>
+                            <TTextarea
+                              id="job_title"
+                              placeholder="e.g., Software Engineer, Product Manager, Data Scientist"
+                              value={formData.job_title}
+                              onChange={e => handleInputChange('job_title', e.target.value)}
+                              required
+                              className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                           </div>
                         </div>
 
-                        {/* Job Description */}
                         <div className="space-y-2">
-                          <Label htmlFor="job_description" className="text-white font-medium text-base">
-                            Job Description *
-                          </Label>
-                          <Label htmlFor="job_description" className="text-gray-300 font-normal text-sm block">
-                            Paste the job description or key requirements
-                          </Label>
-                          <Textarea id="job_description" placeholder="Paste the job description here..." value={formData.job_description} onChange={e => handleInputChange('job_description', e.target.value)} required className="min-h-[150px] resize-none text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
+                          <Label htmlFor="job_description" className="text-black font-semibold text-base">Job Description *</Label>
+                          <TTextarea
+                            id="job_description"
+                            placeholder="Paste the full job description here..."
+                            value={formData.job_description}
+                            onChange={e => handleInputChange('job_description', e.target.value)}
+                            required
+                            rows={8}
+                            className="resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                          {/* Generate Cover Letter - takes up majority of the width, Reset is smaller */}
-                          <Button type="submit" disabled={isSubmitting || !formData.job_title.trim() || !formData.company_name.trim() || !formData.job_description.trim() || isGenerating} className="flex-[3] bg-gradient-to-r from-pink-400 to-fuchsia-500 hover:from-pink-400/80 hover:to-fuchsia-500/80 text-white font-semibold text-base h-12 rounded-lg">
-                            {isSubmitting ? "Submitting..." : isGenerating ? "Generating..." : "Generate Cover Letter"}
+                          <Button 
+                            type="submit" 
+                            disabled={isSubmitting || !formData.company_name.trim() || !formData.job_title.trim() || !formData.job_description.trim() || isGenerating} 
+                            className="flex-1 bg-gradient-to-r from-teal-400 via-cyan-400 to-teal-500 hover:from-teal-500 hover:via-cyan-500 hover:to-teal-600 text-black font-semibold text-base h-12 shadow-md"
+                          >
+                            {isSubmitting ? 'Submitting...' : 'Generate Cover Letter'}
                           </Button>
-                          <Button type="button" onClick={resetForm} variant="outline" className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 text-base h-12 px-6 max-sm:w-full" disabled={isGenerating}>
+                          
+                          <Button 
+                            type="button" 
+                            onClick={resetForm} 
+                            variant="outline" 
+                            className="bg-white/10 border-teal-400/25 text-black hover:bg-white/20 text-base h-12 px-6"
+                          >
                             Reset
                           </Button>
                         </div>
@@ -316,51 +344,55 @@ const CoverLetter = () => {
                   </Card>
 
                   {/* Loading State */}
-                  {isGenerating && !result && <Card className="bg-[#33203a]/80 border-0 shadow">
-                      <CardContent className="py-8">
+                  {isGenerating && !coverLetterData?.cover_letter && (
+                    <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm mb-8">
+                      <CardContent className="py-8 flex items-center justify-center">
                         <LoadingMessages type="cover_letter" />
                       </CardContent>
-                    </Card>}
+                    </Card>
+                  )}
 
-                  {/* Result Display */}
-                  {result && <Card className="bg-[#33203a]/80 border-0 shadow">
-                      <CardHeader className="pb-6 bg-pink-800">
-                        <CardTitle className="text-white font-inter text-xl flex items-center gap-2">
-                          <FileText className="w-5 h-5 text-fuchsia-300" />
-                          Your Cover Letter
-                        </CardTitle>
-                        <CardDescription className="text-gray-300 font-inter">
-                          Your generated cover letter for {formData.job_title} at {formData.company_name}
-                        </CardDescription>
+                  {/* Results Display */}
+                  {coverLetterData?.cover_letter && (
+                    <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm">
+                      <CardHeader className="pb-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="min-w-0">
+                            <CardTitle className="font-inter text-lg sm:text-xl flex items-center gap-2 bg-gradient-to-r from-teal-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent drop-shadow font-bold">
+                              <FileText className="w-5 h-5 text-teal-400 drop-shadow flex-shrink-0" />
+                              <span>Your Cover Letter</span>
+                            </CardTitle>
+                            <CardDescription className="text-cyan-300/90 font-inter text-sm sm:text-base">
+                              Customized for {formData.company_name} - {formData.job_title}
+                            </CardDescription>
+                          </div>
+                          <CoverLetterDownloadActions 
+                            coverLetter={coverLetterData.cover_letter}
+                            jobTitle={formData.job_title}
+                            companyName={formData.company_name}
+                          />
+                        </div>
                       </CardHeader>
-                      <CardContent className="bg-pink-800">
-                        <div className="space-y-4">
-                          <Card className="bg-black border-white/20 p-6">
-                            <ScrollArea className="h-[400px] w-full pr-4">
-                              <div className="whitespace-pre-wrap font-inter text-white text-base">
-                                {result}
-                              </div>
-                            </ScrollArea>
-                          </Card>
-                          <div className="flex flex-col sm:flex-row gap-3">
-                            <Button onClick={handleCopyResult} className="flex-1 bg-gradient-to-r from-pink-400 to-fuchsia-500 hover:from-pink-400/80 hover:to-fuchsia-500/80 text-white flex items-center gap-2 text-base h-12">
-                              <Copy className="w-4 h-4" />
-                              Copy Cover Letter
-                            </Button>
-                            <CoverLetterDownloadActions 
-                              coverLetter={result}
-                              jobTitle={formData.job_title}
-                              companyName={formData.company_name}
-                            />
+                      
+                      <CardContent>
+                        <div className="rounded-lg p-6 border-2 border-blue-200 bg-white min-h-96">
+                          <div className="text-black font-inter text-sm md:text-base leading-relaxed break-words whitespace-pre-wrap">
+                            {coverLetterData.cover_letter}
                           </div>
                         </div>
                       </CardContent>
-                    </Card>}
+                    </Card>
+                  )}
                 </div>
               </div>
 
               {/* History Modal */}
-              <HistoryModal type="cover_letter" isOpen={showHistory} onClose={() => setShowHistory(false)} gradientColors="from-pink-400 to-fuchsia-400" />
+              <HistoryModal 
+                type="cover_letters" 
+                isOpen={showHistory} 
+                onClose={() => setShowHistory(false)} 
+                gradientColors="from-cyan-400 to-teal-400" 
+              />
             </div>
           </main>
         </div>
