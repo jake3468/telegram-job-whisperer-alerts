@@ -38,7 +38,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
         for (let variation = 1; variation <= 3; variation++) {
           const variationKey = `${selectedItem.id}-${variation}`;
           
-          // First get the persistent count from the new table
+          // Get the count directly from linkedin_post_image_counts table
           const { data: countData, error: countError } = await supabase
             .from('linkedin_post_image_counts')
             .select('image_count')
@@ -48,10 +48,21 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
 
           if (countError) {
             console.error(`Error loading count for variation ${variation}:`, countError);
+            // Default to 0 if there's an error
+            setImageCounts(prev => ({
+              ...prev,
+              [variationKey]: 0
+            }));
+          } else {
+            // Use the count from the database, or 0 if no record exists
+            const count = countData?.image_count || 0;
+            console.log(`Loaded count for variation ${variation}: ${count}`);
+            
+            setImageCounts(prev => ({
+              ...prev,
+              [variationKey]: count
+            }));
           }
-
-          // Use the persistent count if available, otherwise fallback to actual images count
-          let persistentCount = countData?.image_count || 0;
 
           // Get the actual images from the database
           const { data: images, error: imagesError } = await supabase
@@ -63,41 +74,31 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
 
           if (imagesError) {
             console.error(`Error loading images for variation ${variation}:`, imagesError);
-            continue;
-          }
-
-          const actualImageCount = images?.length || 0;
-          
-          // Use the higher of persistent count or actual image count for accuracy
-          const finalCount = Math.max(persistentCount, actualImageCount);
-          
-          console.log(`Loaded variation ${variation}: persistent count ${persistentCount}, actual images ${actualImageCount}, final count ${finalCount}`);
-
-          // Set the final count
-          setImageCounts(prev => ({
-            ...prev,
-            [variationKey]: finalCount
-          }));
-
-          // Set the images if any exist
-          if (images && images.length > 0) {
-            const uniqueImages = images.reduce((acc: string[], img) => {
-              if (!acc.includes(img.image_data)) {
-                acc.push(img.image_data);
-              }
-              return acc;
-            }, []);
-            
-            setGeneratedImages(prev => ({
-              ...prev,
-              [variationKey]: uniqueImages
-            }));
-          } else {
-            // Ensure empty array if no images
             setGeneratedImages(prev => ({
               ...prev,
               [variationKey]: []
             }));
+          } else {
+            // Set the images if any exist
+            if (images && images.length > 0) {
+              const uniqueImages = images.reduce((acc: string[], img) => {
+                if (!acc.includes(img.image_data)) {
+                  acc.push(img.image_data);
+                }
+                return acc;
+              }, []);
+              
+              setGeneratedImages(prev => ({
+                ...prev,
+                [variationKey]: uniqueImages
+              }));
+            } else {
+              // Ensure empty array if no images
+              setGeneratedImages(prev => ({
+                ...prev,
+                [variationKey]: []
+              }));
+            }
           }
         }
       } catch (error) {
