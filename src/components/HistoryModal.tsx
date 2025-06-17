@@ -625,27 +625,29 @@ const HistoryModal = ({
                     {/* Post 1 */}
                     {selectedItem.post_content_1 && (
                       <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                        <div className="flex justify-between items-start mb-3">
-                          <h4 className="text-lime-400 font-semibold">{selectedItem.post_heading_1}</h4>
-                          <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-2">
+                          <h4 className="text-lime-400 font-semibold text-sm sm:text-base">{selectedItem.post_heading_1}</h4>
+                          <div className="flex flex-col xs:flex-row gap-1 xs:gap-2 w-full sm:w-auto">
                             <Button
                               onClick={() => handleCopyResult(selectedItem, 1)}
                               size="sm"
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white h-7 sm:h-8 text-xs px-2 sm:px-3 flex items-center justify-center gap-1"
                             >
-                              <Copy className="w-3 h-3 mr-1" />
-                              Copy
+                              <Copy className="w-3 h-3 flex-shrink-0" />
+                              <span className="truncate">Copy Post 1</span>
                             </Button>
                             <Button
                               onClick={() => handleGetImageForPost(selectedItem, 1)}
                               size="sm"
                               disabled={loadingImages[`${selectedItem.id}-1`] || (imageCounts[`${selectedItem.id}-1`] || 0) >= 3}
-                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
+                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-7 sm:h-8 text-xs px-2 sm:px-3 flex items-center justify-center gap-1"
                             >
-                              <ImageIcon className="w-3 h-3 mr-1" />
-                              {(imageCounts[`${selectedItem.id}-1`] || 0) >= 3 ? 'Limit' :
-                               loadingImages[`${selectedItem.id}-1`] ? 'Generating...' : 
-                               `Get Image (${imageCounts[`${selectedItem.id}-1`] || 0}/3)`}
+                              <ImageIcon className="w-3 h-3 flex-shrink-0" />
+                              <span className="truncate">
+                                {(imageCounts[`${selectedItem.id}-1`] || 0) >= 3 ? 'Limit' :
+                                 loadingImages[`${selectedItem.id}-1`] ? 'Generating...' : 
+                                 `Get Image (${imageCounts[`${selectedItem.id}-1`] || 0}/3)`}
+                              </span>
                             </Button>
                           </div>
                         </div>
@@ -674,12 +676,12 @@ const HistoryModal = ({
                                 <img 
                                   src={imageData} 
                                   alt={`Generated LinkedIn post image ${imageIndex + 1}`}
-                                  className="w-full rounded-lg shadow-sm"
+                                  className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto rounded-lg shadow-sm object-contain max-h-96"
                                 />
                                 <Button
                                   onClick={() => handleCopyImage(imageData, imageIndex)}
                                   size="sm"
-                                  className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white"
+                                  className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white p-1 h-auto min-h-0"
                                 >
                                   <Copy className="w-3 h-3" />
                                 </Button>
@@ -700,27 +702,29 @@ const HistoryModal = ({
                     {/* Post 2 */}
                     {selectedItem.post_content_2 && (
                       <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                        <div className="flex justify-between items-start mb-3">
-                          <h4 className="text-lime-400 font-semibold">{selectedItem.post_heading_2}</h4>
-                          <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-2">
+                          <h4 className="text-lime-400 font-semibold text-sm sm:text-base">{selectedItem.post_heading_2}</h4>
+                          <div className="flex flex-col xs:flex-row gap-1 xs:gap-2 w-full sm:w-auto">
                             <Button
                               onClick={() => handleCopyResult(selectedItem, 2)}
                               size="sm"
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white h-7 sm:h-8 text-xs px-2 sm:px-3 flex items-center justify-center gap-1"
                             >
-                              <Copy className="w-3 h-3 mr-1" />
-                              Copy
+                              <Copy className="w-3 h-3 flex-shrink-0" />
+                              <span className="truncate">Copy Post 2</span>
                             </Button>
                             <Button
                               onClick={() => handleGetImageForPost(selectedItem, 2)}
                               size="sm"
                               disabled={loadingImages[`${selectedItem.id}-2`] || (imageCounts[`${selectedItem.id}-2`] || 0) >= 3}
-                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
+                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-7 sm:h-8 text-xs px-2 sm:px-3 flex items-center justify-center gap-1"
                             >
-                              <ImageIcon className="w-3 h-3 mr-1" />
-                              {(imageCounts[`${selectedItem.id}-2`] || 0) >= 3 ? 'Limit' :
-                               loadingImages[`${selectedItem.id}-2`] ? 'Generating...' : 
-                               `Get Image (${imageCounts[`${selectedItem.id}-2`] || 0}/3)`}
+                              <ImageIcon className="w-3 h-3 flex-shrink-0" />
+                              <span className="truncate">
+                                {(imageCounts[`${selectedItem.id}-2`] || 0) >= 3 ? 'Limit' :
+                                 loadingImages[`${selectedItem.id}-2`] ? 'Generating...' : 
+                                 `Get Image (${imageCounts[`${selectedItem.id}-2`] || 0}/3)`}
+                              </span>
                             </Button>
                           </div>
                         </div>
@@ -749,12 +753,12 @@ const HistoryModal = ({
                                 <img 
                                   src={imageData} 
                                   alt={`Generated LinkedIn post image ${imageIndex + 1}`}
-                                  className="w-full rounded-lg shadow-sm"
+                                  className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto rounded-lg shadow-sm object-contain max-h-96"
                                 />
                                 <Button
                                   onClick={() => handleCopyImage(imageData, imageIndex)}
                                   size="sm"
-                                  className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white"
+                                  className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white p-1 h-auto min-h-0"
                                 >
                                   <Copy className="w-3 h-3" />
                                 </Button>
@@ -775,27 +779,29 @@ const HistoryModal = ({
                     {/* Post 3 */}
                     {selectedItem.post_content_3 && (
                       <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                        <div className="flex justify-between items-start mb-3">
-                          <h4 className="text-lime-400 font-semibold">{selectedItem.post_heading_3}</h4>
-                          <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-2">
+                          <h4 className="text-lime-400 font-semibold text-sm sm:text-base">{selectedItem.post_heading_3}</h4>
+                          <div className="flex flex-col xs:flex-row gap-1 xs:gap-2 w-full sm:w-auto">
                             <Button
                               onClick={() => handleCopyResult(selectedItem, 3)}
                               size="sm"
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white h-7 sm:h-8 text-xs px-2 sm:px-3 flex items-center justify-center gap-1"
                             >
-                              <Copy className="w-3 h-3 mr-1" />
-                              Copy
+                              <Copy className="w-3 h-3 flex-shrink-0" />
+                              <span className="truncate">Copy Post 3</span>
                             </Button>
                             <Button
                               onClick={() => handleGetImageForPost(selectedItem, 3)}
                               size="sm"
                               disabled={loadingImages[`${selectedItem.id}-3`] || (imageCounts[`${selectedItem.id}-3`] || 0) >= 3}
-                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
+                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-7 sm:h-8 text-xs px-2 sm:px-3 flex items-center justify-center gap-1"
                             >
-                              <ImageIcon className="w-3 h-3 mr-1" />
-                              {(imageCounts[`${selectedItem.id}-3`] || 0) >= 3 ? 'Limit' :
-                               loadingImages[`${selectedItem.id}-3`] ? 'Generating...' : 
-                               `Get Image (${imageCounts[`${selectedItem.id}-3`] || 0}/3)`}
+                              <ImageIcon className="w-3 h-3 flex-shrink-0" />
+                              <span className="truncate">
+                                {(imageCounts[`${selectedItem.id}-3`] || 0) >= 3 ? 'Limit' :
+                                 loadingImages[`${selectedItem.id}-3`] ? 'Generating...' : 
+                                 `Get Image (${imageCounts[`${selectedItem.id}-3`] || 0}/3)`}
+                              </span>
                             </Button>
                           </div>
                         </div>
@@ -824,12 +830,12 @@ const HistoryModal = ({
                                 <img 
                                   src={imageData} 
                                   alt={`Generated LinkedIn post image ${imageIndex + 1}`}
-                                  className="w-full rounded-lg shadow-sm"
+                                  className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto rounded-lg shadow-sm object-contain max-h-96"
                                 />
                                 <Button
                                   onClick={() => handleCopyImage(imageData, imageIndex)}
                                   size="sm"
-                                  className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white"
+                                  className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white p-1 h-auto min-h-0"
                                 >
                                   <Copy className="w-3 h-3" />
                                 </Button>
@@ -848,47 +854,7 @@ const HistoryModal = ({
                     )}
                   </div>
                 ) : (
-                  <>
-                    {/* Match Score for job_analyses */}
-                    {type === 'job_analyses' && selectedItem.match_score && (
-                      <div className="mb-4 max-w-full">
-                        <div className="w-full sm:max-w-[350px] md:max-w-[280px] mx-auto">
-                          <div className="shadow-md rounded-xl bg-gray-900/90 p-3 border border-gray-700">
-                            <PercentageMeter percentage={selectedItem.match_score} />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {type !== 'job_analyses' && (
-                        <Button
-                          onClick={() => handleCopyResult(selectedItem)}
-                          size="sm"
-                          className="bg-gray-950 hover:bg-gray-800 text-white flex items-center gap-1"
-                        >
-                          <Copy className="w-3 h-3" />
-                          <span className="hidden sm:inline">Copy</span>
-                        </Button>
-                      )}
-                      {type === 'cover_letters' && selectedItem.cover_letter && (
-                        <div className="flex flex-wrap gap-2">
-                          <CoverLetterDownloadActions 
-                            coverLetter={selectedItem.cover_letter}
-                            jobTitle={selectedItem.job_title || 'Unknown Position'}
-                            companyName={selectedItem.company_name || 'Unknown Company'}
-                            contrast
-                          />
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="rounded-lg p-4 border-2 border-blue-200 max-h-96 overflow-y-auto mt-1 bg-white">
-                      <div className="text-black font-inter text-sm md:text-base leading-relaxed break-words whitespace-pre-wrap">
-                        {type === 'job_analyses' ? selectedItem.job_match : getResult(selectedItem)}
-                      </div>
-                    </div>
-                  </>
+                  // ... keep existing code (non-LinkedIn posts result section)
                 )}
               </div>
             )}
