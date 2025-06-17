@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -617,28 +616,33 @@ const HistoryModal = ({
                     {/* Post 1 */}
                     {selectedItem.post_content_1 && (
                       <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-2">
-                          <h4 className="text-lime-400 font-semibold text-sm sm:text-base">{selectedItem.post_heading_1}</h4>
-                          <div className="flex flex-col xs:flex-row gap-1 xs:gap-2 w-full sm:w-auto">
+                        <div className="flex flex-col gap-2 mb-3">
+                          <h4 className="text-lime-400 font-semibold text-sm">{selectedItem.post_heading_1}</h4>
+                          <div className="flex flex-wrap gap-1">
                             <Button
                               onClick={() => handleCopyResult(selectedItem, 1)}
                               size="sm"
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white h-6 sm:h-7 text-xs px-2 flex items-center justify-center gap-1"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white h-6 text-xs px-2 flex items-center gap-1"
                             >
-                              <Copy className="w-3 h-3 flex-shrink-0" />
-                              <span className="truncate text-xs">Copy</span>
+                              <Copy className="w-3 h-3" />
+                              <span className="hidden xs:inline">Copy</span>
                             </Button>
                             <Button
                               onClick={() => handleGetImageForPost(selectedItem, 1)}
                               size="sm"
                               disabled={loadingImages[`${selectedItem.id}-1`] || (imageCounts[`${selectedItem.id}-1`] || 0) >= 3}
-                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-6 sm:h-7 text-xs px-2 flex items-center justify-center gap-1"
+                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-6 text-xs px-2 flex items-center gap-1"
                             >
-                              <ImageIcon className="w-3 h-3 flex-shrink-0" />
-                              <span className="truncate text-xs">
+                              <ImageIcon className="w-3 h-3" />
+                              <span className="hidden xs:inline">
                                 {(imageCounts[`${selectedItem.id}-1`] || 0) >= 3 ? 'Max' :
                                  loadingImages[`${selectedItem.id}-1`] ? 'Gen...' : 
                                  `Img (${imageCounts[`${selectedItem.id}-1`] || 0}/3)`}
+                              </span>
+                              <span className="xs:hidden">
+                                {(imageCounts[`${selectedItem.id}-1`] || 0) >= 3 ? 'Max' :
+                                 loadingImages[`${selectedItem.id}-1`] ? '...' : 
+                                 `${imageCounts[`${selectedItem.id}-1`] || 0}/3`}
                               </span>
                             </Button>
                           </div>
@@ -694,28 +698,33 @@ const HistoryModal = ({
                     {/* Post 2 */}
                     {selectedItem.post_content_2 && (
                       <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-2">
-                          <h4 className="text-lime-400 font-semibold text-sm sm:text-base">{selectedItem.post_heading_2}</h4>
-                          <div className="flex flex-col xs:flex-row gap-1 xs:gap-2 w-full sm:w-auto">
+                        <div className="flex flex-col gap-2 mb-3">
+                          <h4 className="text-lime-400 font-semibold text-sm">{selectedItem.post_heading_2}</h4>
+                          <div className="flex flex-wrap gap-1">
                             <Button
                               onClick={() => handleCopyResult(selectedItem, 2)}
                               size="sm"
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white h-6 sm:h-7 text-xs px-2 flex items-center justify-center gap-1"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white h-6 text-xs px-2 flex items-center gap-1"
                             >
-                              <Copy className="w-3 h-3 flex-shrink-0" />
-                              <span className="truncate text-xs">Copy</span>
+                              <Copy className="w-3 h-3" />
+                              <span className="hidden xs:inline">Copy</span>
                             </Button>
                             <Button
                               onClick={() => handleGetImageForPost(selectedItem, 2)}
                               size="sm"
                               disabled={loadingImages[`${selectedItem.id}-2`] || (imageCounts[`${selectedItem.id}-2`] || 0) >= 3}
-                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-6 sm:h-7 text-xs px-2 flex items-center justify-center gap-1"
+                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-6 text-xs px-2 flex items-center gap-1"
                             >
-                              <ImageIcon className="w-3 h-3 flex-shrink-0" />
-                              <span className="truncate text-xs">
+                              <ImageIcon className="w-3 h-3" />
+                              <span className="hidden xs:inline">
                                 {(imageCounts[`${selectedItem.id}-2`] || 0) >= 3 ? 'Max' :
                                  loadingImages[`${selectedItem.id}-2`] ? 'Gen...' : 
                                  `Img (${imageCounts[`${selectedItem.id}-2`] || 0}/3)`}
+                              </span>
+                              <span className="xs:hidden">
+                                {(imageCounts[`${selectedItem.id}-2`] || 0) >= 3 ? 'Max' :
+                                 loadingImages[`${selectedItem.id}-2`] ? '...' : 
+                                 `${imageCounts[`${selectedItem.id}-2`] || 0}/3`}
                               </span>
                             </Button>
                           </div>
@@ -771,28 +780,33 @@ const HistoryModal = ({
                     {/* Post 3 */}
                     {selectedItem.post_content_3 && (
                       <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-2">
-                          <h4 className="text-lime-400 font-semibold text-sm sm:text-base">{selectedItem.post_heading_3}</h4>
-                          <div className="flex flex-col xs:flex-row gap-1 xs:gap-2 w-full sm:w-auto">
+                        <div className="flex flex-col gap-2 mb-3">
+                          <h4 className="text-lime-400 font-semibold text-sm">{selectedItem.post_heading_3}</h4>
+                          <div className="flex flex-wrap gap-1">
                             <Button
                               onClick={() => handleCopyResult(selectedItem, 3)}
                               size="sm"
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white h-6 sm:h-7 text-xs px-2 flex items-center justify-center gap-1"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white h-6 text-xs px-2 flex items-center gap-1"
                             >
-                              <Copy className="w-3 h-3 flex-shrink-0" />
-                              <span className="truncate text-xs">Copy</span>
+                              <Copy className="w-3 h-3" />
+                              <span className="hidden xs:inline">Copy</span>
                             </Button>
                             <Button
                               onClick={() => handleGetImageForPost(selectedItem, 3)}
                               size="sm"
                               disabled={loadingImages[`${selectedItem.id}-3`] || (imageCounts[`${selectedItem.id}-3`] || 0) >= 3}
-                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-6 sm:h-7 text-xs px-2 flex items-center justify-center gap-1"
+                              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-6 text-xs px-2 flex items-center gap-1"
                             >
-                              <ImageIcon className="w-3 h-3 flex-shrink-0" />
-                              <span className="truncate text-xs">
+                              <ImageIcon className="w-3 h-3" />
+                              <span className="hidden xs:inline">
                                 {(imageCounts[`${selectedItem.id}-3`] || 0) >= 3 ? 'Max' :
                                  loadingImages[`${selectedItem.id}-3`] ? 'Gen...' : 
                                  `Img (${imageCounts[`${selectedItem.id}-3`] || 0}/3)`}
+                              </span>
+                              <span className="xs:hidden">
+                                {(imageCounts[`${selectedItem.id}-3`] || 0) >= 3 ? 'Max' :
+                                 loadingImages[`${selectedItem.id}-3`] ? '...' : 
+                                 `${imageCounts[`${selectedItem.id}-3`] || 0}/3`}
                               </span>
                             </Button>
                           </div>
@@ -860,7 +874,7 @@ const HistoryModal = ({
                         </Button>
                         {type === 'cover_letters' && selectedItem.cover_letter && (
                           <CoverLetterDownloadActions 
-                            content={selectedItem.cover_letter}
+                            coverLetter={selectedItem.cover_letter}
                             companyName={selectedItem.company_name || 'Company'}
                             jobTitle={selectedItem.job_title || 'Position'}
                           />
