@@ -886,7 +886,6 @@ const HistoryModal = ({
                       <div className="mb-4">
                         <PercentageMeter 
                           percentage={selectedItem.match_score} 
-                          label="Match Score"
                         />
                       </div>
                     )}
