@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -75,31 +76,34 @@ const HistoryModal = ({
 
     const channel = supabase
       .channel(`linkedin-image-history-${selectedItem.id}`)
-      .on('broadcast', {
-        event: 'linkedin_image_generated',
-        filter: `post_id=eq.${selectedItem.id}`
-      }, (payload) => {
-        console.log('Received history image broadcast:', payload);
-        
-        if (payload.payload?.post_id === selectedItem.id && payload.payload?.image_data) {
-          const variationKey = `${selectedItem.id}-${payload.payload.variation_number}`;
+      .on(
+        'broadcast',
+        {
+          event: 'linkedin_image_generated'
+        },
+        (payload) => {
+          console.log('Received history image broadcast:', payload);
           
-          setGeneratedImages(prev => ({
-            ...prev,
-            [variationKey]: payload.payload.image_data
-          }));
-          
-          setLoadingImages(prev => ({
-            ...prev,
-            [variationKey]: false
-          }));
-          
-          toast({
-            title: "Image Generated!",
-            description: `LinkedIn post image for Post ${payload.payload.variation_number} is ready.`
-          });
+          if (payload.payload?.post_id === selectedItem.id && payload.payload?.image_data) {
+            const variationKey = `${selectedItem.id}-${payload.payload.variation_number}`;
+            
+            setGeneratedImages(prev => ({
+              ...prev,
+              [variationKey]: payload.payload.image_data
+            }));
+            
+            setLoadingImages(prev => ({
+              ...prev,
+              [variationKey]: false
+            }));
+            
+            toast({
+              title: "Image Generated!",
+              description: `LinkedIn post image for Post ${payload.payload.variation_number} is ready.`
+            });
+          }
         }
-      })
+      )
       .subscribe((status) => {
         console.log(`History image subscription status:`, status);
       });

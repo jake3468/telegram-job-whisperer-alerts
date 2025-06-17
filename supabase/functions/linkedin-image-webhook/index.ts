@@ -63,7 +63,10 @@ serve(async (req) => {
       const supabase = createClient(supabaseUrl, supabaseServiceKey)
       
       // Broadcast the image data to all listening clients
-      const { error: broadcastError } = await supabase.channel('linkedin-image-updates')
+      const channelName = `linkedin-image-${post_id}-${variation_number}`
+      console.log(`Broadcasting to channel: ${channelName}`)
+      
+      const { error: broadcastError } = await supabase.channel(channelName)
         .send({
           type: 'broadcast',
           event: 'linkedin_image_generated',
@@ -80,6 +83,27 @@ serve(async (req) => {
         console.error('Failed to broadcast image data:', broadcastError)
       } else {
         console.log('Image data broadcasted successfully')
+      }
+      
+      // Also broadcast to history channel
+      const historyChannelName = `linkedin-image-history-${post_id}`
+      const { error: historyBroadcastError } = await supabase.channel(historyChannelName)
+        .send({
+          type: 'broadcast',
+          event: 'linkedin_image_generated',
+          payload: {
+            success: true,
+            image_data: result.image_data,
+            variation_number: result.variation_number || variation_number,
+            post_id: result.post_id || post_id,
+            source: source
+          }
+        })
+
+      if (historyBroadcastError) {
+        console.error('Failed to broadcast to history channel:', historyBroadcastError)
+      } else {
+        console.log('Image data broadcasted to history channel successfully')
       }
     }
 

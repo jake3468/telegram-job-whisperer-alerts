@@ -57,26 +57,29 @@ const LinkedInPostVariation = ({
 
     const channel = supabase
       .channel(`linkedin-image-${postId}-${variationNumber}`)
-      .on('broadcast', {
-        event: 'linkedin_image_generated',
-        filter: `post_id=eq.${postId}`
-      }, (payload) => {
-        console.log('Received image broadcast:', payload);
-        
-        if (payload.payload?.variation_number === variationNumber && 
-            payload.payload?.post_id === postId &&
-            payload.payload?.image_data) {
+      .on(
+        'broadcast',
+        {
+          event: 'linkedin_image_generated'
+        },
+        (payload) => {
+          console.log('Received image broadcast:', payload);
           
-          console.log(`Image received for variation ${variationNumber}`);
-          setGeneratedImage(payload.payload.image_data);
-          setIsGeneratingImage(false);
-          
-          toast({
-            title: "Image Generated!",
-            description: `LinkedIn post image for Post ${variationNumber} is ready.`
-          });
+          if (payload.payload?.variation_number === variationNumber && 
+              payload.payload?.post_id === postId &&
+              payload.payload?.image_data) {
+            
+            console.log(`Image received for variation ${variationNumber}`);
+            setGeneratedImage(payload.payload.image_data);
+            setIsGeneratingImage(false);
+            
+            toast({
+              title: "Image Generated!",
+              description: `LinkedIn post image for Post ${variationNumber} is ready.`
+            });
+          }
         }
-      })
+      )
       .subscribe((status) => {
         console.log(`Image subscription status for variation ${variationNumber}:`, status);
       });
