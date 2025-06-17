@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -453,8 +452,8 @@ const LinkedInPosts = () => {
                     </CardContent>
                   </Card>
 
-                  {/* Loading State for Post Generation */}
-                  {isGenerating && !postsData && (
+                  {/* Loading State for Post Generation - Show immediately when isGenerating is true */}
+                  {isGenerating && (
                     <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm mb-8">
                       <CardContent className="py-8 flex items-center justify-center">
                         <LoadingMessages type="linkedin" />
@@ -462,8 +461,8 @@ const LinkedInPosts = () => {
                     </Card>
                   )}
 
-                  {/* Results Display */}
-                  {postsData && areAllPostsReady(postsData) && (
+                  {/* Results Display - Only show when posts are ready AND not generating */}
+                  {postsData && areAllPostsReady(postsData) && !isGenerating && (
                     <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm">
                       <CardHeader className="pb-6">
                         <CardTitle className="font-inter text-lg sm:text-xl flex items-center gap-2 bg-gradient-to-r from-teal-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent drop-shadow font-bold">
