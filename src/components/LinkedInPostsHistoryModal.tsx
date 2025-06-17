@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -53,11 +52,11 @@ const LinkedInPostsHistoryModal = ({
     }
   }, [isOpen, user, userProfile]);
 
-  // Load existing images for LinkedIn posts when item is selected
+  // Load existing images and counts for LinkedIn posts when item is selected
   useEffect(() => {
     if (!selectedItem) return;
 
-    const loadExistingImages = async () => {
+    const loadExistingImagesAndCounts = async () => {
       try {
         for (let variation = 1; variation <= 3; variation++) {
           const { data: images, error } = await supabase
@@ -86,18 +85,27 @@ const LinkedInPostsHistoryModal = ({
               ...prev,
               [variationKey]: uniqueImages
             }));
+            
+            // Set the actual count from database
             setImageCounts(prev => ({
               ...prev,
               [variationKey]: uniqueImages.length
             }));
+          } else {
+            // No images found, set count to 0
+            const variationKey = `${selectedItem.id}-${variation}`;
+            setImageCounts(prev => ({
+              ...prev,
+              [variationKey]: 0
+            }));
           }
         }
       } catch (error) {
-        console.error('Error loading existing images:', error);
+        console.error('Error loading existing images and counts:', error);
       }
     };
 
-    loadExistingImages();
+    loadExistingImagesAndCounts();
   }, [selectedItem]);
 
   // Set up real-time subscription for image updates in history
