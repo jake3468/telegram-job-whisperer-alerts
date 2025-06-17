@@ -1,3 +1,4 @@
+
 import { useUser } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +12,7 @@ import { FileText, History, Copy, Sparkles, Menu } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
-import HistoryModal from '@/components/HistoryModal';
+import CoverLetterHistoryModal from '@/components/CoverLetterHistoryModal';
 import LoadingMessages from '@/components/LoadingMessages';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import CoverLetterDownloadActions from '@/components/CoverLetterDownloadActions';
@@ -360,7 +361,11 @@ const CoverLetter = () => {
               </div>
 
               {/* History Modal */}
-              <HistoryModal type="cover_letters" isOpen={showHistory} onClose={() => setShowHistory(false)} gradientColors="from-pink-400 to-fuchsia-400" />
+              <CoverLetterHistoryModal 
+                isOpen={showHistory} 
+                onClose={() => setShowHistory(false)} 
+                gradientColors="from-pink-400 to-fuchsia-400" 
+              />
             </div>
           </main>
         </div>
