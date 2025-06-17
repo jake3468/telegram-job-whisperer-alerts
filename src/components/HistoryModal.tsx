@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -59,12 +60,28 @@ const HistoryModal = ({ type, isOpen, onClose, gradientColors }: HistoryModalPro
 
     setIsLoading(true);
     try {
-      const tableConfig = getTableConfig();
+      let query;
       
-      const { data, error } = await supabase
-        .from(tableConfig.table)
-        .select(tableConfig.select)
-        .eq('user_id', userProfile.id)
+      if (type === 'job_analyses') {
+        query = supabase
+          .from('job_analyses')
+          .select('id, created_at, company_name, job_title, job_description, job_match, match_score')
+          .eq('user_id', userProfile.id);
+      } else if (type === 'cover_letters') {
+        query = supabase
+          .from('job_cover_letters')
+          .select('id, created_at, company_name, job_title, job_description, cover_letter')
+          .eq('user_id', userProfile.id);
+      } else if (type === 'linkedin_posts') {
+        query = supabase
+          .from('job_linkedin')
+          .select('id, created_at, topic, opinion, personal_story, audience, tone, post_heading_1, post_content_1, post_heading_2, post_content_2, post_heading_3, post_content_3')
+          .eq('user_id', userProfile.id);
+      } else {
+        return;
+      }
+
+      const { data, error } = await query
         .order('created_at', { ascending: false })
         .limit(50);
 
@@ -186,28 +203,6 @@ const HistoryModal = ({ type, isOpen, onClose, gradientColors }: HistoryModalPro
       fetchHistory();
     }
   }, [isOpen, userProfile?.id, type]);
-
-  const getTableConfig = () => {
-    switch (type) {
-      case 'job_analyses':
-        return {
-          table: 'job_analyses',
-          select: 'id, created_at, company_name, job_title, job_description, job_match, match_score'
-        };
-      case 'cover_letters':
-        return {
-          table: 'job_cover_letters',
-          select: 'id, created_at, company_name, job_title, job_description, cover_letter'
-        };
-      case 'linkedin_posts':
-        return {
-          table: 'job_linkedin',
-          select: 'id, created_at, topic, opinion, personal_story, audience, tone, post_heading_1, post_content_1, post_heading_2, post_content_2, post_heading_3, post_content_3'
-        };
-      default:
-        return { table: '', select: '' };
-    }
-  };
 
   const handleCopyText = async (text: string, label: string) => {
     try {
