@@ -56,15 +56,16 @@ const LinkedInPostVariation = ({
     ? userData.first_name 
     : 'Professional User';
 
-  // Load existing images from database
+  // Load existing images from database on mount and when postId changes
   useEffect(() => {
     if (!postId) return;
 
     const loadExistingImages = async () => {
       try {
+        console.log(`Loading existing images for post ${postId}, variation ${variationNumber}`);
         const { data: images, error } = await supabase
           .from('linkedin_post_images')
-          .select('image_data')
+          .select('image_data, created_at')
           .eq('post_id', postId)
           .eq('variation_number', variationNumber)
           .order('created_at', { ascending: true });
@@ -76,8 +77,13 @@ const LinkedInPostVariation = ({
 
         if (images && images.length > 0) {
           console.log(`Loaded ${images.length} existing images for variation ${variationNumber}`);
-          setGeneratedImages(images.map(img => img.image_data));
+          const imageDataArray = images.map(img => img.image_data);
+          setGeneratedImages(imageDataArray);
           setImageCount(images.length);
+        } else {
+          console.log(`No existing images found for post ${postId}, variation ${variationNumber}`);
+          setGeneratedImages([]);
+          setImageCount(0);
         }
       } catch (error) {
         console.error('Error loading existing images:', error);
@@ -87,14 +93,15 @@ const LinkedInPostVariation = ({
     loadExistingImages();
   }, [postId, variationNumber]);
 
-  // Set up real-time subscription for image updates
+  // Set up real-time subscription for new images
   useEffect(() => {
     if (!postId) return;
 
-    console.log(`Setting up image subscription for post ${postId}, variation ${variationNumber}`);
+    const channelName = `linkedin-image-${postId}-${variationNumber}`;
+    console.log(`Setting up image subscription for ${channelName}`);
 
     const channel = supabase
-      .channel(`linkedin-image-${postId}-${variationNumber}`)
+      .channel(channelName)
       .on(
         'broadcast',
         {
@@ -107,7 +114,7 @@ const LinkedInPostVariation = ({
               payload.payload?.post_id === postId &&
               payload.payload?.image_data) {
             
-            console.log(`Image received for variation ${variationNumber}`);
+            console.log(`New image received for variation ${variationNumber}`);
             
             // Clear all timeouts and intervals when image is received
             if (timeoutIdRef.current) {
@@ -120,12 +127,13 @@ const LinkedInPostVariation = ({
             }
             isTimeoutActiveRef.current = false;
             
-            // Add the new image to the list
+            // Add the new image to the list (avoiding duplicates)
             setGeneratedImages(prev => {
-              // Check if this image is already in the list to avoid duplicates
               if (prev.includes(payload.payload.image_data)) {
+                console.log('Image already exists, skipping duplicate');
                 return prev;
               }
+              console.log('Adding new image to list');
               return [...prev, payload.payload.image_data];
             });
             
@@ -294,7 +302,12 @@ const LinkedInPostVariation = ({
           isTimeoutActiveRef.current = false;
         }
         
-        setGeneratedImages(prev => [...prev, data.data.image_data]);
+        setGeneratedImages(prev => {
+          if (prev.includes(data.data.image_data)) {
+            return prev;
+          }
+          return [...prev, data.data.image_data];
+        });
         setImageCount(data.current_image_count || (imageCount + 1));
         setIsGeneratingImage(false);
         
@@ -505,7 +518,7 @@ const LinkedInPostVariation = ({
         <div className="space-y-3">
           <h4 className="text-sm font-medium text-cyan-300 px-1">Generated Images:</h4>
           {generatedImages.map((imageData, index) => (
-            <div key={index} className="relative">
+            <div key={`${variationNumber}-${index}-${imageData.substring(0, 50)}`} className="relative">
               <img 
                 src={imageData} 
                 alt={`Generated image ${index + 1} for ${heading}`}
