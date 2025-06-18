@@ -20,32 +20,36 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
   const { toast } = useToast();
   const navigate = useNavigate();
   const { hasCredits, creditBalance, showInsufficientCreditsPopup } = useCreditCheck(0.5);
-  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
-  const [loadingImage, setLoadingImage] = useState(false);
-  const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
+  const [generatedImages, setGeneratedImages] = useState<{ [key: number]: string[] }>({});
+  const [loadingImage, setLoadingImage] = useState<{ [key: number]: boolean }>({});
+  const [imageGenerationFailed, setImageGenerationFailed] = useState<{ [key: number]: boolean }>({});
   
-  const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
-  const isTimeoutActiveRef = useRef(false);
-  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const channelRef = useRef<any>(null);
+  const timeoutIdRef = useRef<{ [key: number]: NodeJS.Timeout | null }>({});
+  const isTimeoutActiveRef = useRef<{ [key: number]: boolean }>({});
+  const pollIntervalRef = useRef<{ [key: number]: NodeJS.Timeout | null }>({});
+  const channelRef = useRef<{ [key: number]: any }>({});
 
-  // Helper function to add image without duplicates
-  const addImageIfNotExists = (newImageData: string) => {
+  // Helper function to add image without duplicates for specific variation
+  const addImageIfNotExists = (newImageData: string, variationNumber: number) => {
     setGeneratedImages(prev => {
-      // Check if this exact image data already exists
-      if (prev.includes(newImageData)) {
-        console.log('Image already exists, skipping duplicate');
+      const existingImages = prev[variationNumber] || [];
+      // Check if this exact image data already exists for this variation
+      if (existingImages.includes(newImageData)) {
+        console.log(`Image already exists for variation ${variationNumber}, skipping duplicate`);
         return prev;
       }
-      console.log('Adding new unique image to list');
-      return [newImageData, ...prev];
+      console.log(`Adding new unique image to variation ${variationNumber} list`);
+      return {
+        ...prev,
+        [variationNumber]: [newImageData, ...existingImages]
+      };
     });
   };
 
   // Load existing images when selectedItem changes
   useEffect(() => {
     if (!selectedItem?.id) {
-      setGeneratedImages([]);
+      setGeneratedImages({});
       return;
     }
 
@@ -55,7 +59,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
         
         const { data: images, error } = await supabase
           .from('linkedin_post_images')
-          .select('image_data')
+          .select('image_data, variation_number')
           .eq('post_id', selectedItem.id)
           .order('created_at', { ascending: false });
 
@@ -66,12 +70,23 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
 
         if (images && images.length > 0) {
           console.log(`Found ${images.length} existing images for post ${selectedItem.id}`);
-          // Remove duplicates using Set to ensure unique images
-          const uniqueImages = Array.from(new Set(images.map(img => img.image_data)));
-          setGeneratedImages(uniqueImages);
+          // Group images by variation number
+          const imagesByVariation: { [key: number]: string[] } = {};
+          
+          images.forEach(img => {
+            const variation = img.variation_number || 1; // Default to variation 1 if not set
+            if (!imagesByVariation[variation]) {
+              imagesByVariation[variation] = [];
+            }
+            if (!imagesByVariation[variation].includes(img.image_data)) {
+              imagesByVariation[variation].push(img.image_data);
+            }
+          });
+          
+          setGeneratedImages(imagesByVariation);
         } else {
           console.log(`No existing images found for post ${selectedItem.id}`);
-          setGeneratedImages([]);
+          setGeneratedImages({});
         }
 
       } catch (error) {
@@ -82,29 +97,34 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
     loadExistingImages();
   }, [selectedItem?.id]);
 
-  // Set up real-time subscription
+  // Set up real-time subscription for all variations
   useEffect(() => {
     if (!selectedItem?.id) {
-      // Clean up existing channel if no selected item
-      if (channelRef.current) {
-        supabase.removeChannel(channelRef.current);
-        channelRef.current = null;
-      }
+      // Clean up existing channels if no selected item
+      Object.values(channelRef.current).forEach(channel => {
+        if (channel) {
+          supabase.removeChannel(channel);
+        }
+      });
+      channelRef.current = {};
       return;
     }
 
-    // Clean up existing channel before creating new one
-    if (channelRef.current) {
-      supabase.removeChannel(channelRef.current);
-      channelRef.current = null;
-    }
+    // Clean up existing channels before creating new ones
+    Object.values(channelRef.current).forEach(channel => {
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    });
+    channelRef.current = {};
 
     console.log(`Setting up image subscription for post ${selectedItem.id}`);
 
-    const channelName = `linkedin-image-history-${selectedItem.id}`;
-    const channel = supabase.channel(channelName);
+    // Set up subscription for general history channel (for backward compatibility)
+    const historyChannelName = `linkedin-image-history-${selectedItem.id}`;
+    const historyChannel = supabase.channel(historyChannelName);
     
-    channel
+    historyChannel
       .on(
         'broadcast',
         {
@@ -114,27 +134,28 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
           console.log('Received image broadcast in history:', payload);
           
           if (payload.payload?.post_id === selectedItem.id && payload.payload?.image_data) {
-            console.log(`Image received for post ${selectedItem.id} in history`);
+            const variationNumber = payload.payload.variation_number || 1;
+            console.log(`Image received for post ${selectedItem.id} variation ${variationNumber} in history`);
             
-            // Clear all timeouts and intervals when image is received
-            if (timeoutIdRef.current) {
-              clearTimeout(timeoutIdRef.current);
-              timeoutIdRef.current = null;
+            // Clear timeouts and intervals for this variation
+            if (timeoutIdRef.current[variationNumber]) {
+              clearTimeout(timeoutIdRef.current[variationNumber]);
+              timeoutIdRef.current[variationNumber] = null;
             }
-            if (pollIntervalRef.current) {
-              clearTimeout(pollIntervalRef.current);
-              pollIntervalRef.current = null;
+            if (pollIntervalRef.current[variationNumber]) {
+              clearTimeout(pollIntervalRef.current[variationNumber]);
+              pollIntervalRef.current[variationNumber] = null;
             }
-            isTimeoutActiveRef.current = false;
+            isTimeoutActiveRef.current[variationNumber] = false;
             
             // Add new image using the helper function to avoid duplicates
-            addImageIfNotExists(payload.payload.image_data);
-            setLoadingImage(false);
-            setImageGenerationFailed(false);
+            addImageIfNotExists(payload.payload.image_data, variationNumber);
+            setLoadingImage(prev => ({ ...prev, [variationNumber]: false }));
+            setImageGenerationFailed(prev => ({ ...prev, [variationNumber]: false }));
             
             toast({
               title: "Image Generated!",
-              description: "LinkedIn post image is ready."
+              description: `LinkedIn post image is ready for variation ${variationNumber}.`
             });
           }
         }
@@ -144,26 +165,34 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
       });
 
     // Store the channel reference
-    channelRef.current = channel;
+    channelRef.current['history'] = historyChannel;
 
     return () => {
       console.log(`Cleaning up image subscription for post ${selectedItem.id}`);
       // Clear any active timeouts on cleanup
-      if (timeoutIdRef.current) {
-        clearTimeout(timeoutIdRef.current);
-        timeoutIdRef.current = null;
-      }
-      if (pollIntervalRef.current) {
-        clearTimeout(pollIntervalRef.current);
-        pollIntervalRef.current = null;
-      }
-      isTimeoutActiveRef.current = false;
+      Object.entries(timeoutIdRef.current).forEach(([variation, timeoutId]) => {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          timeoutIdRef.current[parseInt(variation)] = null;
+        }
+      });
+      Object.entries(pollIntervalRef.current).forEach(([variation, intervalId]) => {
+        if (intervalId) {
+          clearTimeout(intervalId);
+          pollIntervalRef.current[parseInt(variation)] = null;
+        }
+      });
+      Object.keys(isTimeoutActiveRef.current).forEach(variation => {
+        isTimeoutActiveRef.current[parseInt(variation)] = false;
+      });
       
-      // Clean up channel
-      if (channelRef.current) {
-        supabase.removeChannel(channelRef.current);
-        channelRef.current = null;
-      }
+      // Clean up channels
+      Object.values(channelRef.current).forEach(channel => {
+        if (channel) {
+          supabase.removeChannel(channel);
+        }
+      });
+      channelRef.current = {};
     };
   }, [selectedItem?.id, toast]);
 
@@ -177,34 +206,34 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
     const heading = item[`post_heading_${postNumber}` as keyof LinkedInPostItem] as string;
     const content = item[`post_content_${postNumber}` as keyof LinkedInPostItem] as string;
 
-    setLoadingImage(true);
-    setImageGenerationFailed(false);
-    isTimeoutActiveRef.current = true;
+    setLoadingImage(prev => ({ ...prev, [postNumber]: true }));
+    setImageGenerationFailed(prev => ({ ...prev, [postNumber]: false }));
+    isTimeoutActiveRef.current[postNumber] = true;
     
     // Set timeout for 2 minutes
-    timeoutIdRef.current = setTimeout(() => {
-      if (isTimeoutActiveRef.current) {
-        console.log(`Image generation timeout for post ${item.id}`);
-        setLoadingImage(false);
-        setImageGenerationFailed(true);
-        isTimeoutActiveRef.current = false;
+    timeoutIdRef.current[postNumber] = setTimeout(() => {
+      if (isTimeoutActiveRef.current[postNumber]) {
+        console.log(`Image generation timeout for post ${item.id} variation ${postNumber}`);
+        setLoadingImage(prev => ({ ...prev, [postNumber]: false }));
+        setImageGenerationFailed(prev => ({ ...prev, [postNumber]: true }));
+        isTimeoutActiveRef.current[postNumber] = false;
         
         // Clear polling interval on timeout
-        if (pollIntervalRef.current) {
-          clearTimeout(pollIntervalRef.current);
-          pollIntervalRef.current = null;
+        if (pollIntervalRef.current[postNumber]) {
+          clearTimeout(pollIntervalRef.current[postNumber]);
+          pollIntervalRef.current[postNumber] = null;
         }
         
         toast({
           title: "Image Generation Failed",
-          description: "Image generation timed out after 2 minutes. Please try again.",
+          description: `Image generation timed out after 2 minutes for variation ${postNumber}. Please try again.`,
           variant: "destructive"
         });
       }
     }, 120000); // 2 minutes
 
     try {
-      console.log("Triggering image generation via edge function for post", item.id);
+      console.log(`Triggering image generation via edge function for post ${item.id} variation ${postNumber}`);
       
       const { data, error } = await supabase.functions.invoke('linkedin-image-webhook', {
         body: {
@@ -230,70 +259,72 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
 
       // If the response already contains image data (immediate response)
       if (data.data && data.data.image_data) {
-        console.log('Received immediate image data from edge function');
+        console.log(`Received immediate image data from edge function for variation ${postNumber}`);
         
         // Clear timeout since we got immediate response
-        if (timeoutIdRef.current) {
-          clearTimeout(timeoutIdRef.current);
-          timeoutIdRef.current = null;
-          isTimeoutActiveRef.current = false;
+        if (timeoutIdRef.current[postNumber]) {
+          clearTimeout(timeoutIdRef.current[postNumber]);
+          timeoutIdRef.current[postNumber] = null;
+          isTimeoutActiveRef.current[postNumber] = false;
         }
         
         // Add image using helper function to avoid duplicates
-        addImageIfNotExists(data.data.image_data);
-        setLoadingImage(false);
+        addImageIfNotExists(data.data.image_data, postNumber);
+        setLoadingImage(prev => ({ ...prev, [postNumber]: false }));
         
         toast({
           title: "Image Generated!",
-          description: "LinkedIn post image is ready."
+          description: `LinkedIn post image is ready for variation ${postNumber}.`
         });
       } else {
         // Start fallback polling as backup to real-time
-        console.log('Starting fallback polling for image generation');
-        pollIntervalRef.current = setInterval(async () => {
-          if (!isTimeoutActiveRef.current) {
-            if (pollIntervalRef.current) {
-              clearInterval(pollIntervalRef.current);
-              pollIntervalRef.current = null;
+        console.log(`Starting fallback polling for image generation for variation ${postNumber}`);
+        pollIntervalRef.current[postNumber] = setInterval(async () => {
+          if (!isTimeoutActiveRef.current[postNumber]) {
+            if (pollIntervalRef.current[postNumber]) {
+              clearInterval(pollIntervalRef.current[postNumber]);
+              pollIntervalRef.current[postNumber] = null;
             }
             return;
           }
           
           try {
-            console.log(`Polling for new images for post ${item.id}`);
+            console.log(`Polling for new images for post ${item.id} variation ${postNumber}`);
             const { data: images, error } = await supabase
               .from('linkedin_post_images')
               .select('image_data')
               .eq('post_id', item.id)
+              .eq('variation_number', postNumber)
               .order('created_at', { ascending: false })
               .limit(1);
 
             if (!error && images && images.length > 0) {
               const latestImage = images[0].image_data;
+              const existingImages = generatedImages[postNumber] || [];
               
               // Check if this is a new image (not already in our list)
-              if (!generatedImages.includes(latestImage)) {
-                console.log('Found new image via polling for post', item.id);
+              if (!existingImages.includes(latestImage)) {
+                console.log(`Found new image via polling for post ${item.id} variation ${postNumber}`);
                 
                 // Clear timeout and interval
-                if (timeoutIdRef.current) {
-                  clearTimeout(timeoutIdRef.current);
-                  timeoutIdRef.current = null;
-                  isTimeoutActiveRef.current = false;
+                if (timeoutIdRef.current[postNumber]) {
+                  clearTimeout(timeoutIdRef.current[postNumber]);
+                  timeoutIdRef.current[postNumber] = null;
+                  isTimeoutActiveRef.current[postNumber] = false;
                 }
-                if (pollIntervalRef.current) {
-                  clearInterval(pollIntervalRef.current);
-                  pollIntervalRef.current = null;
+                if (pollIntervalRef.current[postNumber]) {
+                  clearInterval(pollIntervalRef.current[postNumber]);
+                  pollIntervalRef.current[postNumber] = null;
                 }
                 
                 // Add image using helper function to avoid duplicates
-                addImageIfNotExists(latestImage);
-                setLoadingImage(false);
-                setImageGenerationFailed(false);
+                addImageIfNotExists(latestImage, postNumber);
+                setLoadingImage(prev => ({ ...prev, [postNumber]: false }));
+                setImageGenerationFailed(prev => ({ ...prev, [postNumber]: false }));
                 
                 toast({
                   title: "Image Generated!",
-                  description: "LinkedIn post image is ready."
+                  description: `LinkedIn post image is ready for variation ${postNumber}.`
                 });
               }
             }
@@ -307,14 +338,14 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
       console.error('Error triggering image generation:', error);
       
       // Clear timeout on error
-      if (timeoutIdRef.current) {
-        clearTimeout(timeoutIdRef.current);
-        timeoutIdRef.current = null;
-        isTimeoutActiveRef.current = false;
+      if (timeoutIdRef.current[postNumber]) {
+        clearTimeout(timeoutIdRef.current[postNumber]);
+        timeoutIdRef.current[postNumber] = null;
+        isTimeoutActiveRef.current[postNumber] = false;
       }
       
-      setLoadingImage(false);
-      setImageGenerationFailed(true);
+      setLoadingImage(prev => ({ ...prev, [postNumber]: false }));
+      setImageGenerationFailed(prev => ({ ...prev, [postNumber]: true }));
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to trigger image generation. Please try again.",
@@ -327,7 +358,7 @@ export const useLinkedInImageManager = (selectedItem: LinkedInPostItem | null) =
     generatedImages,
     loadingImage,
     imageGenerationFailed,
-    hasImages: generatedImages.length > 0,
+    hasImages: Object.values(generatedImages).some(images => images.length > 0),
     handleGetImageForPost
   };
 };

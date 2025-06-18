@@ -283,18 +283,21 @@ export type Database = {
           id: string
           image_data: string
           post_id: string
+          variation_number: number | null
         }
         Insert: {
           created_at?: string
           id?: string
           image_data: string
           post_id: string
+          variation_number?: number | null
         }
         Update: {
           created_at?: string
           id?: string
           image_data?: string
           post_id?: string
+          variation_number?: number | null
         }
         Relationships: [
           {

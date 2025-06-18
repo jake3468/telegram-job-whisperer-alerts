@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -73,21 +74,22 @@ const LinkedInPostVariation = ({
     });
   };
 
-  // Load existing images from database
+  // Load existing images from database for this specific variation
   useEffect(() => {
     if (!postId) return;
 
     const loadExistingImages = async () => {
       try {
-        console.log(`🔍 DEBUG: Loading images for post ${postId}`);
+        console.log(`🔍 DEBUG: Loading images for post ${postId} variation ${variationNumber}`);
         
         const { data: images, error } = await supabase
           .from('linkedin_post_images')
           .select('image_data')
           .eq('post_id', postId)
+          .eq('variation_number', variationNumber)
           .order('created_at', { ascending: false });
 
-        console.log(`🔍 DEBUG: Images query result:`, { images, error });
+        console.log(`🔍 DEBUG: Images query result for variation ${variationNumber}:`, { images, error });
 
         if (error) {
           console.error('Error loading existing images:', error);
@@ -95,12 +97,12 @@ const LinkedInPostVariation = ({
         }
 
         if (images && images.length > 0) {
-          console.log(`🔍 DEBUG: Found ${images.length} existing images for post ${postId}`);
+          console.log(`🔍 DEBUG: Found ${images.length} existing images for post ${postId} variation ${variationNumber}`);
           // Remove duplicates using Set to ensure unique images
           const uniqueImages = Array.from(new Set(images.map(img => img.image_data)));
           setGeneratedImages(uniqueImages);
         } else {
-          console.log(`🔍 DEBUG: No existing images found for post ${postId}`);
+          console.log(`🔍 DEBUG: No existing images found for post ${postId} variation ${variationNumber}`);
           setGeneratedImages([]);
         }
 
@@ -110,9 +112,9 @@ const LinkedInPostVariation = ({
     };
 
     loadExistingImages();
-  }, [postId]);
+  }, [postId, variationNumber]);
 
-  // Set up real-time subscription for image updates
+  // Set up real-time subscription for image updates - variation-specific
   useEffect(() => {
     if (!postId) {
       // Clean up existing channel if no postId
@@ -129,9 +131,10 @@ const LinkedInPostVariation = ({
       channelRef.current = null;
     }
 
-    console.log(`Setting up image subscription for post ${postId}`);
+    console.log(`Setting up variation-specific image subscription for post ${postId} variation ${variationNumber}`);
 
-    const channelName = `linkedin-image-${postId}`;
+    // Use variation-specific channel name
+    const channelName = `linkedin-image-${postId}-v${variationNumber}`;
     const channel = supabase.channel(channelName);
     
     channel
@@ -141,10 +144,13 @@ const LinkedInPostVariation = ({
           event: 'linkedin_image_generated'
         },
         (payload) => {
-          console.log('Received image broadcast:', payload);
+          console.log(`Received image broadcast for variation ${variationNumber}:`, payload);
           
-          if (payload.payload?.post_id === postId && payload.payload?.image_data) {
-            console.log(`Image received for post ${postId}`);
+          // Only process if it's for this specific variation
+          if (payload.payload?.post_id === postId && 
+              payload.payload?.variation_number === variationNumber && 
+              payload.payload?.image_data) {
+            console.log(`Image received for post ${postId} variation ${variationNumber}`);
             
             // Clear all timeouts and intervals when image is received
             if (timeoutIdRef.current) {
@@ -164,20 +170,20 @@ const LinkedInPostVariation = ({
             
             toast({
               title: "Image Generated!",
-              description: `LinkedIn post image is ready.`
+              description: `LinkedIn post image is ready for variation ${variationNumber}.`
             });
           }
         }
       )
       .subscribe((status) => {
-        console.log(`Image subscription status for post ${postId}:`, status);
+        console.log(`Image subscription status for post ${postId} variation ${variationNumber}:`, status);
       });
 
     // Store the channel reference
     channelRef.current = channel;
 
     return () => {
-      console.log(`Cleaning up image subscription for post ${postId}`);
+      console.log(`Cleaning up image subscription for post ${postId} variation ${variationNumber}`);
       // Clear any active timeouts on cleanup
       if (timeoutIdRef.current) {
         clearTimeout(timeoutIdRef.current);
@@ -195,7 +201,7 @@ const LinkedInPostVariation = ({
         channelRef.current = null;
       }
     };
-  }, [postId, toast]);
+  }, [postId, variationNumber, toast]);
 
   const handleCopyContent = async () => {
     if (!content) return;
@@ -255,7 +261,7 @@ const LinkedInPostVariation = ({
     // Set timeout for 2 minutes using useRef
     timeoutIdRef.current = setTimeout(() => {
       if (isTimeoutActiveRef.current) {
-        console.log(`Image generation timeout for post ${postId}`);
+        console.log(`Image generation timeout for post ${postId} variation ${variationNumber}`);
         setIsGeneratingImage(false);
         setImageGenerationFailed(true);
         isTimeoutActiveRef.current = false;
@@ -275,7 +281,7 @@ const LinkedInPostVariation = ({
     }, 120000); // 2 minutes
 
     try {
-      console.log("Triggering image generation via edge function for post", postId);
+      console.log(`Triggering image generation via edge function for post ${postId} variation ${variationNumber}`);
       
       const { data, error } = await supabase.functions.invoke('linkedin-image-webhook', {
         body: {
@@ -301,7 +307,7 @@ const LinkedInPostVariation = ({
 
       // If the response already contains image data (immediate response)
       if (data.data && data.data.image_data) {
-        console.log('Received immediate image data from edge function');
+        console.log(`Received immediate image data from edge function for variation ${variationNumber}`);
         
         // Clear timeout since we got immediate response
         if (timeoutIdRef.current) {
@@ -316,11 +322,11 @@ const LinkedInPostVariation = ({
         
         toast({
           title: "Image Generated!",
-          description: "LinkedIn post image is ready."
+          description: `LinkedIn post image is ready for variation ${variationNumber}.`
         });
       } else {
         // Start fallback polling as backup to real-time
-        console.log('Starting fallback polling for image generation');
+        console.log(`Starting fallback polling for image generation for variation ${variationNumber}`);
         pollIntervalRef.current = setInterval(async () => {
           if (!isTimeoutActiveRef.current) {
             if (pollIntervalRef.current) {
@@ -331,11 +337,12 @@ const LinkedInPostVariation = ({
           }
           
           try {
-            console.log(`Polling for new images for post ${postId}`);
+            console.log(`Polling for new images for post ${postId} variation ${variationNumber}`);
             const { data: images, error } = await supabase
               .from('linkedin_post_images')
               .select('image_data')
               .eq('post_id', postId)
+              .eq('variation_number', variationNumber)
               .order('created_at', { ascending: false })
               .limit(1);
 
@@ -344,7 +351,7 @@ const LinkedInPostVariation = ({
               
               // Check if this is a new image (not already in our list)
               if (!generatedImages.includes(latestImage)) {
-                console.log('Found new image via polling for post', postId);
+                console.log(`Found new image via polling for post ${postId} variation ${variationNumber}`);
                 
                 // Clear timeout and interval
                 if (timeoutIdRef.current) {
@@ -364,7 +371,7 @@ const LinkedInPostVariation = ({
                 
                 toast({
                   title: "Image Generated!",
-                  description: "LinkedIn post image is ready."
+                  description: `LinkedIn post image is ready for variation ${variationNumber}.`
                 });
               }
             }
@@ -498,7 +505,7 @@ const LinkedInPostVariation = ({
       {/* Loading indicator for image generation */}
       {isGeneratingImage && (
         <div className="p-4 bg-blue-50 rounded-lg text-center border border-blue-200">
-          <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading...</div>
+          <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading for variation {variationNumber}...</div>
           <div className="text-xs text-blue-500 mt-1">This may take up to 2 minutes</div>
         </div>
       )}
@@ -506,7 +513,7 @@ const LinkedInPostVariation = ({
       {/* Failed generation indicator */}
       {imageGenerationFailed && (
         <div className="p-4 bg-red-50 rounded-lg text-center border border-red-200">
-          <div className="text-sm text-red-600 font-medium">Image generation failed</div>
+          <div className="text-sm text-red-600 font-medium">Image generation failed for variation {variationNumber}</div>
           <div className="text-xs text-red-500 mt-1">Please try again</div>
         </div>
       )}
@@ -514,13 +521,13 @@ const LinkedInPostVariation = ({
       {/* Generated Images Display */}
       {generatedImages.length > 0 && (
         <div className="space-y-3">
-          <h4 className="text-sm font-medium text-cyan-300 px-1">Generated Images ({generatedImages.length}):</h4>
+          <h4 className="text-sm font-medium text-cyan-300 px-1">Generated Images for Variation {variationNumber} ({generatedImages.length}):</h4>
           <div className="space-y-4">
             {generatedImages.map((imageData, index) => (
               <div key={index} className="relative">
                 <img 
                   src={imageData} 
-                  alt={`Generated image ${index + 1} for ${heading}`}
+                  alt={`Generated image ${index + 1} for ${heading} variation ${variationNumber}`}
                   className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto rounded-lg shadow-sm object-contain max-h-96"
                 />
                 <Button

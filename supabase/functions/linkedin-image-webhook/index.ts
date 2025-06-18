@@ -17,6 +17,12 @@ serve(async (req) => {
 
     console.log('LinkedIn image webhook called with:', { post_id, variation_number, source })
 
+    // Validate required parameters
+    if (!post_id || !variation_number) {
+      console.error('Missing required parameters: post_id or variation_number')
+      throw new Error('post_id and variation_number are required')
+    }
+
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -74,7 +80,8 @@ serve(async (req) => {
         JSON.stringify({ 
           success: true, 
           message: 'Image generation triggered successfully',
-          triggered: true
+          triggered: true,
+          variation_number: variation_number
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -102,7 +109,8 @@ serve(async (req) => {
         JSON.stringify({ 
           success: true, 
           message: 'Image generation triggered successfully',
-          triggered: true
+          triggered: true,
+          variation_number: variation_number
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -112,16 +120,17 @@ serve(async (req) => {
 
     console.log('N8N webhook parsed response:', result)
 
-    // Check if the response contains image data - fix the property access
+    // Check if the response contains image data
     if (result && result.success && result.image_data) {
-      console.log('Image data found, storing in database...')
+      console.log(`Image data found for variation ${variation_number}, storing in database...`)
       
-      // Store the image in the database (always create a new row for each request)
+      // Store the image in the database with variation_number
       const { data: storedImage, error: storeError } = await supabase
         .from('linkedin_post_images')
         .insert({
           post_id: result.post_id || post_id,
-          image_data: result.image_data
+          image_data: result.image_data,
+          variation_number: variation_number
         })
         .select()
         .single()
@@ -130,14 +139,14 @@ serve(async (req) => {
         console.error('Failed to store image in database:', storeError)
         throw new Error('Failed to store image in database: ' + storeError.message)
       } else {
-        console.log('Image stored successfully in database with ID:', storedImage.id)
+        console.log(`Image stored successfully in database with ID: ${storedImage.id} for variation ${variation_number}`)
       }
       
-      // Broadcast the image data to all listening clients
-      const channelName = `linkedin-image-${result.post_id || post_id}`
-      console.log(`Broadcasting to channel: ${channelName}`)
+      // Broadcast to variation-specific channel
+      const variationChannelName = `linkedin-image-${result.post_id || post_id}-v${variation_number}`
+      console.log(`Broadcasting to variation-specific channel: ${variationChannelName}`)
       
-      const { error: broadcastError } = await supabase.channel(channelName)
+      const { error: broadcastError } = await supabase.channel(variationChannelName)
         .send({
           type: 'broadcast',
           event: 'linkedin_image_generated',
@@ -145,18 +154,41 @@ serve(async (req) => {
             success: true,
             image_data: result.image_data,
             post_id: result.post_id || post_id,
+            variation_number: variation_number,
             source: source,
             stored_image_id: storedImage.id
           }
         })
 
       if (broadcastError) {
-        console.error('Failed to broadcast image data:', broadcastError)
+        console.error('Failed to broadcast image data to variation channel:', broadcastError)
       } else {
-        console.log('Image data broadcasted successfully')
+        console.log(`Image data broadcasted successfully to variation ${variation_number} channel`)
       }
       
-      // Also broadcast to history channel
+      // Also broadcast to general post channel for backward compatibility
+      const generalChannelName = `linkedin-image-${result.post_id || post_id}`
+      const { error: generalBroadcastError } = await supabase.channel(generalChannelName)
+        .send({
+          type: 'broadcast',
+          event: 'linkedin_image_generated',
+          payload: {
+            success: true,
+            image_data: result.image_data,
+            post_id: result.post_id || post_id,
+            variation_number: variation_number,
+            source: source,
+            stored_image_id: storedImage.id
+          }
+        })
+
+      if (generalBroadcastError) {
+        console.error('Failed to broadcast to general channel:', generalBroadcastError)
+      } else {
+        console.log('Image data broadcasted to general channel successfully')
+      }
+      
+      // Also broadcast to history channel with variation info
       const historyChannelName = `linkedin-image-history-${result.post_id || post_id}`
       const { error: historyBroadcastError } = await supabase.channel(historyChannelName)
         .send({
@@ -166,6 +198,7 @@ serve(async (req) => {
             success: true,
             image_data: result.image_data,
             post_id: result.post_id || post_id,
+            variation_number: variation_number,
             source: source,
             stored_image_id: storedImage.id
           }
@@ -182,20 +215,22 @@ serve(async (req) => {
           success: true, 
           message: 'Image generated and stored successfully',
           data: result,
-          stored_image_id: storedImage.id
+          stored_image_id: storedImage.id,
+          variation_number: variation_number
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
     } else {
-      console.log('N8N webhook triggered successfully, no immediate image data - will wait for async response')
+      console.log(`N8N webhook triggered successfully for variation ${variation_number}, no immediate image data - will wait for async response`)
       
       return new Response(
         JSON.stringify({ 
           success: true, 
           message: 'Image generation triggered successfully',
-          triggered: true
+          triggered: true,
+          variation_number: variation_number
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
