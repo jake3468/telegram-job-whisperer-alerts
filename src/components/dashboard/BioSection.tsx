@@ -62,7 +62,7 @@ const BioSection = () => {
           <Textarea
             value={bio}
             onChange={e => setBio(e.target.value)}
-            placeholder="Describe your experience, skills, career goals, and what kind of opportunities you're looking for..."
+            placeholder="I enjoy working with startups and exploring AI. My ambition is to build something impactful that people genuinely find value in."
             rows={4}
             className="
               min-h-[100px]
