@@ -45,7 +45,7 @@ const toolItems = [{
   url: '/linkedin-posts',
   icon: Share2
 }, {
-  title: 'Resume Builder',
+  title: 'Telegram Resume Bot',
   url: '/resume-builder',
   icon: FileUser
 }];

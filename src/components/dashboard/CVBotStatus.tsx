@@ -83,13 +83,13 @@ const CVBotStatus = ({ onActivationChange }: CVBotStatusProps) => {
           className={[
             "rounded-lg px-4 py-2 flex items-center gap-3 font-inter text-base font-semibold border-2 mt-2",
             isActivated
-              ? "bg-fuchsia-600/95 border-fuchsia-400 text-white"
+              ? "bg-green-600/95 border-green-400 text-white"
               : "bg-red-600/90 border-red-400 text-white"
           ].join(' ')}
           style={{ minHeight: '40px', transition: 'background 0.2s' }}
         >
-          <div className={`w-3 h-3 rounded-full ${isActivated ? 'bg-fuchsia-300' : 'bg-red-300'} shadow-lg`} />
-          <span className={isActivated ? "text-white" : "text-white"}>
+          <div className={`w-3 h-3 rounded-full ${isActivated ? 'bg-green-300' : 'bg-red-300'} shadow-lg`} />
+          <span className="text-white">
             {isActivated ? 'Bot Activated' : 'Bot not yet Activated'}
           </span>
         </div>
@@ -140,7 +140,7 @@ const CVBotStatus = ({ onActivationChange }: CVBotStatusProps) => {
 
       {/* Usage Instructions - Only show when activated */}
       {isActivated && (
-        <div className="bg-black/40 rounded-lg p-4 text-white border border-fuchsia-800">
+        <div className="bg-black/40 rounded-lg p-4 text-white border border-green-800">
           <div className="prose prose-invert max-w-none">
             <h3 className="text-lg font-medium text-white mb-4 font-inter">🤖 How to Use the Resume Builder Bot</h3>
             
@@ -157,7 +157,7 @@ const CVBotStatus = ({ onActivationChange }: CVBotStatusProps) => {
               
               <p><strong>📥 Receive your resume in PDF and DOCX format</strong> – After gathering all information and your approval, the bot will generate a clean resume that you can save, print, or style further.</p>
               
-              <p className="mt-4 text-fuchsia-200">The entire process is <strong>🗣️ conversational</strong> and <strong>🔄 step-by-step</strong>, designed to help you create a professional, tailored resume easily via Telegram.</p>
+              <p className="mt-4 text-green-200">The entire process is <strong>🗣️ conversational</strong> and <strong>🔄 step-by-step</strong>, designed to help you create a professional, tailored resume easily via Telegram.</p>
             </div>
           </div>
         </div>
