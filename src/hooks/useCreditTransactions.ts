@@ -32,11 +32,7 @@ export const useCreditTransactions = () => {
       console.log('[useCreditTransactions] Database user_id:', userProfile.user_id);
       
       try {
-        // Debug: Check what JWT claims are available
-        const { data: jwtDebug, error: jwtError } = await supabase.rpc('debug_jwt_claims');
-        console.log('[useCreditTransactions] JWT Debug:', jwtDebug, 'Error:', jwtError);
-        
-        // Query with explicit user_id filter since RLS might not be working correctly
+        // Query with explicit user_id filter
         const { data: transactions, error } = await supabase
           .from('credit_transactions')
           .select('id, transaction_type, amount, balance_before, balance_after, description, feature_used, created_at')
