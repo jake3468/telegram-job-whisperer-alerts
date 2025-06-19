@@ -28,6 +28,14 @@ export const useCreditTransactions = () => {
       
       console.log('[useCreditTransactions] Fetching transactions for user_id:', userProfile.user_id);
       
+      // Debug: Test the get_clerk_user_id function
+      try {
+        const { data: clerkUserId, error: clerkError } = await supabase.rpc('get_clerk_user_id');
+        console.log('[useCreditTransactions] get_clerk_user_id result:', clerkUserId, 'error:', clerkError);
+      } catch (debugError) {
+        console.warn('[useCreditTransactions] get_clerk_user_id function error:', debugError);
+      }
+      
       try {
         const { data: transactions, error } = await supabase
           .from('credit_transactions')
@@ -39,6 +47,12 @@ export const useCreditTransactions = () => {
 
         if (error) {
           console.error('[useCreditTransactions] Error fetching transactions:', error);
+          
+          // If we get an RLS error, it means the JWT token isn't working
+          if (error.message?.includes('policy')) {
+            console.error('[useCreditTransactions] RLS policy blocked the query. This means the Clerk JWT is not being passed correctly to Supabase.');
+          }
+          
           return [];
         }
 

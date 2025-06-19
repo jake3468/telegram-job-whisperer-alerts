@@ -15,14 +15,19 @@ export function useClerkSupabaseSync() {
     
     async function setToken() {
       try {
-        // Get the token for this signed-in user
         if (isSignedIn && getToken) {
-          const jwt = await getToken({ template: 'supabase' }).catch(() => null);
+          console.log('[useClerkSupabaseSync] User is signed in, getting token...');
+          
+          // Get the token for this signed-in user with the supabase template
+          const jwt = await getToken({ template: 'supabase' }).catch((error) => {
+            console.error('[useClerkSupabaseSync] Error getting Clerk JWT:', error);
+            return null;
+          });
           
           if (!isMounted) return; // Component unmounted
           
           if (!jwt) {
-            console.warn("[useClerkSupabaseSync] No Clerk JWT was returned. Supabase RLS will fail. This means requests are unauthenticated.");
+            console.warn("[useClerkSupabaseSync] No Clerk JWT was returned. This usually means the 'supabase' JWT template is not configured in Clerk. Supabase RLS will fail.");
             await setClerkToken(null);
           } else {
             // Only show the first/last 5 chars, do NOT log the full JWT!
@@ -34,7 +39,7 @@ export function useClerkSupabaseSync() {
             try {
               const payload = JSON.parse(atob(jwt.split('.')[1]));
               console.log('[useClerkSupabaseSync] JWT claims structure:', {
-                sub: payload.sub ? 'present' : 'missing',
+                sub: payload.sub ? `present (${payload.sub.substring(0,8)}...)` : 'missing',
                 iss: payload.iss ? 'present' : 'missing',
                 aud: payload.aud ? 'present' : 'missing',
                 exp: payload.exp ? 'present' : 'missing',
@@ -45,7 +50,7 @@ export function useClerkSupabaseSync() {
             }
           }
         } else {
-          console.warn("[useClerkSupabaseSync] Not signed in or getToken missing. Using Supabase ANON key only.");
+          console.log("[useClerkSupabaseSync] User not signed in or getToken missing. Using Supabase anon key only.");
           await setClerkToken(null);
         }
       } catch (err) {
