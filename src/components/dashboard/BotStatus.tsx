@@ -98,7 +98,7 @@ const BotStatus = ({ onActivationChange }: BotStatusProps) => {
       {!isActivated && (
         <div className="bg-black/40 rounded-lg p-4 text-white border border-red-800">
           <div className="prose prose-invert max-w-none">
-            <h3 className="text-lg font-medium text-white mb-4 font-inter">🤖 How to Activate the Job Bot on Telegram:</h3>
+            <h3 className="text-lg font-medium text-white mb-4 font-inter">🤖 How to Activate the Job Alert Bot on Telegram:</h3>
             
             <ol className="text-sm space-y-2 font-inter text-gray-200 list-decimal list-inside">
               <li>Open your 'Telegram' app</li>
