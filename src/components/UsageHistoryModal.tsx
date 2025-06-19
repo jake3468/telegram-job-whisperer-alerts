@@ -11,7 +11,10 @@ const UsageHistoryModal = () => {
   const { data: transactions, isLoading, error } = useCreditTransactions();
 
   const formatAmount = (amount: number) => {
-    return amount > 0 ? `+${amount}` : amount.toString();
+    if (amount > 0) {
+      return `+${amount}`;
+    }
+    return amount.toString();
   };
 
   const formatDate = (dateString: string) => {
@@ -92,7 +95,7 @@ const UsageHistoryModal = () => {
                     <TableCell className="text-blue-100 text-xs max-w-xs truncate">
                       {transaction.description || (transaction.feature_used ? `Used for ${transaction.feature_used}` : '-')}
                     </TableCell>
-                    <TableCell className={`text-right font-mono text-sm ${
+                    <TableCell className={`text-right font-mono text-sm font-bold ${
                       transaction.amount > 0 ? 'text-green-400' : 'text-red-400'
                     }`}>
                       {formatAmount(transaction.amount)}
