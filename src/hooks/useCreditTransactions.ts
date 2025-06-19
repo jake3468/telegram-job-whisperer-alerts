@@ -1,4 +1,5 @@
 
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -26,6 +27,14 @@ export const useCreditTransactions = () => {
       }
       
       console.log('[useCreditTransactions] Fetching transactions for user_id:', userProfile.user_id);
+      
+      // Debug: Test the JWT claims function
+      try {
+        const { data: jwtDebug, error: jwtError } = await supabase.rpc('debug_jwt_claims');
+        console.log('[useCreditTransactions] JWT claims debug:', jwtDebug, 'error:', jwtError);
+      } catch (debugError) {
+        console.warn('[useCreditTransactions] JWT debug function error:', debugError);
+      }
       
       try {
         const { data: transactions, error } = await supabase
