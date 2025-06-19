@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useUserProfile } from '@/hooks/useUserProfile';
+import { useUser } from '@clerk/clerk-react';
 
 type CreditTransaction = {
   id: string;
@@ -16,23 +16,22 @@ type CreditTransaction = {
 };
 
 export const useCreditTransactions = () => {
-  const { userProfile } = useUserProfile();
+  const { user, isLoaded } = useUser();
   
   return useQuery({
-    queryKey: ['credit_transactions', userProfile?.user_id],
+    queryKey: ['credit_transactions', user?.id],
     queryFn: async () => {
-      if (!userProfile?.user_id) {
-        console.warn('[useCreditTransactions] No user_id available from userProfile');
+      if (!user?.id) {
+        console.warn('[useCreditTransactions] No user ID available');
         return [];
       }
       
-      console.log('[useCreditTransactions] Fetching transactions for user_id:', userProfile.user_id);
+      console.log('[useCreditTransactions] Fetching transactions for Clerk user:', user.id);
       
       try {
         const { data: transactions, error } = await supabase
           .from('credit_transactions')
           .select('id, transaction_type, amount, balance_before, balance_after, description, feature_used, created_at')
-          .eq('user_id', userProfile.user_id)
           .order('created_at', { ascending: false });
 
         console.log('[useCreditTransactions] Credit transactions query result:', { transactions, error });
@@ -51,7 +50,7 @@ export const useCreditTransactions = () => {
         return [];
       }
     },
-    enabled: !!userProfile?.user_id,
+    enabled: isLoaded && !!user?.id,
     staleTime: 30000,
     refetchInterval: 60000,
   });
