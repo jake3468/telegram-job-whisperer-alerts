@@ -395,6 +395,8 @@ export type Database = {
           bot_activated: boolean | null
           chat_id: string | null
           created_at: string | null
+          cv_bot_activated: boolean
+          cv_chat_id: string | null
           id: string
           resume: string | null
           user_id: string | null
@@ -404,6 +406,8 @@ export type Database = {
           bot_activated?: boolean | null
           chat_id?: string | null
           created_at?: string | null
+          cv_bot_activated?: boolean
+          cv_chat_id?: string | null
           id?: string
           resume?: string | null
           user_id?: string | null
@@ -413,6 +417,8 @@ export type Database = {
           bot_activated?: boolean | null
           chat_id?: string | null
           created_at?: string | null
+          cv_bot_activated?: boolean
+          cv_chat_id?: string | null
           id?: string
           resume?: string | null
           user_id?: string | null
@@ -423,131 +429,6 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_resumes: {
-        Row: {
-          awards: Json | null
-          career_level: string | null
-          career_objective: string | null
-          certifications: Json | null
-          color_scheme: string | null
-          created_at: string
-          education: Json | null
-          email: string | null
-          font_preference: string | null
-          full_name: string | null
-          github_url: string | null
-          hobbies: string | null
-          id: string
-          industry_focus: string | null
-          languages: Json | null
-          length_preference: string | null
-          linkedin_url: string | null
-          location: string | null
-          memberships: Json | null
-          output_format: string | null
-          patents: Json | null
-          phone: string | null
-          portfolio_url: string | null
-          projects: Json | null
-          publications: Json | null
-          section_order: Json | null
-          skills_summary: string | null
-          soft_skills: Json | null
-          speaking_engagements: Json | null
-          technical_skills: Json | null
-          template_style: string | null
-          updated_at: string
-          user_profile_id: string
-          volunteer_work: Json | null
-          work_experience: Json | null
-          years_experience: number | null
-        }
-        Insert: {
-          awards?: Json | null
-          career_level?: string | null
-          career_objective?: string | null
-          certifications?: Json | null
-          color_scheme?: string | null
-          created_at?: string
-          education?: Json | null
-          email?: string | null
-          font_preference?: string | null
-          full_name?: string | null
-          github_url?: string | null
-          hobbies?: string | null
-          id?: string
-          industry_focus?: string | null
-          languages?: Json | null
-          length_preference?: string | null
-          linkedin_url?: string | null
-          location?: string | null
-          memberships?: Json | null
-          output_format?: string | null
-          patents?: Json | null
-          phone?: string | null
-          portfolio_url?: string | null
-          projects?: Json | null
-          publications?: Json | null
-          section_order?: Json | null
-          skills_summary?: string | null
-          soft_skills?: Json | null
-          speaking_engagements?: Json | null
-          technical_skills?: Json | null
-          template_style?: string | null
-          updated_at?: string
-          user_profile_id: string
-          volunteer_work?: Json | null
-          work_experience?: Json | null
-          years_experience?: number | null
-        }
-        Update: {
-          awards?: Json | null
-          career_level?: string | null
-          career_objective?: string | null
-          certifications?: Json | null
-          color_scheme?: string | null
-          created_at?: string
-          education?: Json | null
-          email?: string | null
-          font_preference?: string | null
-          full_name?: string | null
-          github_url?: string | null
-          hobbies?: string | null
-          id?: string
-          industry_focus?: string | null
-          languages?: Json | null
-          length_preference?: string | null
-          linkedin_url?: string | null
-          location?: string | null
-          memberships?: Json | null
-          output_format?: string | null
-          patents?: Json | null
-          phone?: string | null
-          portfolio_url?: string | null
-          projects?: Json | null
-          publications?: Json | null
-          section_order?: Json | null
-          skills_summary?: string | null
-          soft_skills?: Json | null
-          speaking_engagements?: Json | null
-          technical_skills?: Json | null
-          template_style?: string | null
-          updated_at?: string
-          user_profile_id?: string
-          volunteer_work?: Json | null
-          work_experience?: Json | null
-          years_experience?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_resumes_user_profile_id_fkey"
-            columns: ["user_profile_id"]
-            isOneToOne: false
-            referencedRelation: "user_profile"
             referencedColumns: ["id"]
           },
         ]

@@ -1,162 +1,104 @@
-import { useState } from 'react';
+
+import { useUser } from '@clerk/clerk-react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { ChevronLeft, ChevronRight, Save } from 'lucide-react';
-import { useUserResume } from '@/hooks/useUserResume';
-import PersonalInfoForm from '@/components/resume/PersonalInfoForm';
-import ProfessionalSummaryForm from '@/components/resume/ProfessionalSummaryForm';
-import WorkExperienceForm from '@/components/resume/WorkExperienceForm';
-import EducationForm from '@/components/resume/EducationForm';
-import SkillsForm from '@/components/resume/SkillsForm';
-import ProjectsForm from '@/components/resume/ProjectsForm';
-import AdditionalSectionsForm from '@/components/resume/AdditionalSectionsForm';
-import FormattingPreferencesForm from '@/components/resume/FormattingPreferencesForm';
-const steps = [{
-  id: 1,
-  title: 'Personal Information',
-  component: PersonalInfoForm
-}, {
-  id: 2,
-  title: 'Professional Summary',
-  component: ProfessionalSummaryForm
-}, {
-  id: 3,
-  title: 'Work Experience',
-  component: WorkExperienceForm
-}, {
-  id: 4,
-  title: 'Education',
-  component: EducationForm
-}, {
-  id: 5,
-  title: 'Skills',
-  component: SkillsForm
-}, {
-  id: 6,
-  title: 'Projects',
-  component: ProjectsForm
-}, {
-  id: 7,
-  title: 'Additional Sections',
-  component: AdditionalSectionsForm
-}, {
-  id: 8,
-  title: 'Formatting Preferences',
-  component: FormattingPreferencesForm
-}];
-function normalizeResumeData(formData: any) {
-  // user_resumes expects these fields as arrays (jsonb):
-  const jsonbArrayFields = ["work_experience", "education", "technical_skills", "soft_skills", "languages", "certifications", "projects", "publications", "speaking_engagements", "volunteer_work", "memberships", "awards", "patents", "section_order"];
+import CVBotStatus from '@/components/dashboard/CVBotStatus';
+import { useCreditWarnings } from '@/hooks/useCreditWarnings';
+import { FileText } from 'lucide-react';
 
-  // Fields that should be a number or null
-  const numberFields = ["years_experience"];
-
-  // The keys of the resume table:
-  const allowedKeys = ["id", "user_profile_id", "full_name", "email", "phone", "location", "linkedin_url", "portfolio_url", "github_url", "social_profiles", "career_level", "years_experience", "skills_summary", "career_objective", "industry_focus", "work_experience", "education", "technical_skills", "soft_skills", "languages", "certifications", "projects", "publications", "speaking_engagements", "volunteer_work", "memberships", "awards", "patents", "hobbies", "template_style", "color_scheme", "font_preference", "section_order", "length_preference", "output_format", "created_at", "updated_at"];
-
-  // Only keep allowed keys, convert undefined to null, handle numbers & arrays
-  const normalized: any = {};
-  for (const key of allowedKeys) {
-    let value = formData[key];
-    // Convert undefined to null
-    if (value === undefined) {
-      value = null;
-    }
-    // For array fields, always assign array (never null/undefined)
-    if (jsonbArrayFields.includes(key)) {
-      value = Array.isArray(value) ? value : [];
-    }
-
-    // Convert number fields (empty string or NaN)
-    if (numberFields.includes(key)) {
-      if (typeof value === "string" && value.trim() === "") {
-        value = null;
-      } else if (typeof value === "number" && isNaN(value)) {
-        value = null;
-      } else if (typeof value !== "number" && typeof value !== "undefined" && value !== null) {
-        let numeric = Number(value);
-        value = isNaN(numeric) ? null : numeric;
-      }
-    }
-    normalized[key] = value;
-  }
-  return normalized;
-}
 const ResumeBuilder = () => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const {
-    resumeData,
-    saveResume,
-    isSaving
-  } = useUserResume();
-  const [formData, setFormData] = useState(resumeData || {});
-  const currentStepData = steps.find(step => step.id === currentStep);
-  const CurrentComponent = currentStepData?.component;
-  const progress = currentStep / steps.length * 100;
-  const handleNext = () => {
-    if (currentStep < steps.length) {
-      setCurrentStep(currentStep + 1);
+  const { user, isLoaded } = useUser();
+  const navigate = useNavigate();
+  const [isActivated, setIsActivated] = useState<boolean>(false);
+
+  // Replace useFeatureCreditCheck with the new system
+  useCreditWarnings(); // This shows the warning popups
+
+  useEffect(() => {
+    if (isLoaded && !user) {
+      navigate('/');
     }
-  };
-  const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-  const handleSave = () => {
-    const normalized = normalizeResumeData(formData);
-    saveResume(normalized);
-  };
-  const handleDataChange = (stepData: any) => {
-    setFormData(prev => ({
-      ...prev,
-      ...stepData
-    }));
-  };
-  return <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-2 sm:p-4">
-        <div className="max-w-4xl mx-auto">
-          <Card className="bg-white/95 backdrop-blur-sm shadow-2xl border-0">
-            <CardHeader className="text-center bg-indigo-400 px-4 py-6">
-              <CardTitle className="text-2xl sm:text-3xl font-bold text-gray-800">📝 Resume Builder</CardTitle>
-              <CardDescription className="text-base sm:text-lg text-teal-950">
-                Step {currentStep} of {steps.length}: {currentStepData?.title}
-              </CardDescription>
-              <div className="mt-4">
-                <Progress value={progress} className="w-full h-2" />
-                <p className="text-sm mt-2 text-zinc-800">{Math.round(progress)}% Complete</p>
-              </div>
-            </CardHeader>
+  }, [user, isLoaded, navigate]);
 
-            <CardContent className="p-3 sm:p-6 bg-cyan-400">
-              <div className="overflow-hidden">
-                {CurrentComponent && <CurrentComponent data={formData} onChange={handleDataChange} />}
-              </div>
+  const handleActivationChange = (activated: boolean) => {
+    setIsActivated(activated);
+  };
 
-              <div className="flex flex-col sm:flex-row justify-between items-center mt-6 pt-4 border-t gap-4">
-                <Button onClick={handlePrevious} disabled={currentStep === 1} variant="outline" className="flex items-center gap-2 w-full sm:w-auto order-2 sm:order-1">
-                  <ChevronLeft className="w-4 h-4" />
-                  Previous
-                </Button>
-
-                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto order-1 sm:order-2">
-                  <Button onClick={handleSave} disabled={isSaving} variant="outline" className="flex items-center gap-2 w-full sm:w-auto">
-                    <Save className="w-4 h-4" />
-                    {isSaving ? 'Saving...' : 'Save Progress'}
-                  </Button>
-
-                  <Button onClick={handleNext} disabled={currentStep === steps.length} className="flex items-center gap-2 w-full sm:w-auto">
-                    Next
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+  if (!isLoaded || !user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pastel-mint via-pastel-lavender to-pastel-peach flex items-center justify-center">
+        <div className="text-fuchsia-900 text-xs">Loading...</div>
       </div>
-    </Layout>;
+    );
+  }
+
+  return (
+    <Layout>
+      <div className="text-center mb-8">
+        <h1
+          className="
+                text-4xl
+                font-orbitron
+                font-extrabold
+                bg-gradient-to-r
+                from-fuchsia-400
+                via-purple-400
+                to-pink-500
+                bg-clip-text
+                text-transparent
+                mb-2
+                drop-shadow
+                tracking-tight
+              "
+          style={{
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            color: 'transparent'
+          }}
+        >
+          Telegram <span className="italic">Resume</span> Bot
+        </h1>
+        <p className="text-md text-purple-100 font-inter font-light">
+          Your personal <span className="italic text-pastel-peach">resume assistant</span> on Telegram — tailor your CV for new roles, job descriptions, or career goals, all through a simple chat
+        </p>
+      </div>
+
+      <div className="max-w-4xl mx-auto">
+        <section className="rounded-3xl border-2 border-fuchsia-400 bg-gradient-to-b from-fuchsia-900/90 via-[#2b1628]/90 to-[#2b0a28]/98 shadow-none p-0">
+          <div className="pt-4 px-2 sm:px-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+              <div className="min-w-0">
+                <span className="text-2xl font-orbitron bg-gradient-to-r from-fuchsia-300 via-purple-300 to-pink-400 bg-clip-text text-transparent font-extrabold flex items-center gap-2 drop-shadow">
+                  <span className="w-6 h-6 bg-fuchsia-400/70 rounded-full flex items-center justify-center shadow-lg ring-2 ring-fuchsia-300/40">
+                    <FileText className="w-4 h-4 text-white" />
+                  </span>
+                  <span>Resume Bot</span>
+                </span>
+                <p className="text-fuchsia-100 font-inter text-sm font-semibold drop-shadow-none">
+                  Create and customize professional resumes through intelligent conversation
+                </p>
+              </div>
+            </div>
+
+            <div>
+              {/* CV Bot Status Component */}
+              <CVBotStatus onActivationChange={handleActivationChange} />
+
+              {!isActivated && (
+                <div className="text-center py-6">
+                  <FileText className="w-10 h-10 text-fuchsia-400 mx-auto mb-3" />
+                  <p className="text-fuchsia-100 font-inter text-base mb-1">Activate your bot to start building resumes</p>
+                  <p className="text-fuchsia-200 font-inter text-sm">Follow the instructions above to get started</p>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="h-2 sm:h-4" />
+        </section>
+      </div>
+    </Layout>
+  );
 };
+
 export default ResumeBuilder;
