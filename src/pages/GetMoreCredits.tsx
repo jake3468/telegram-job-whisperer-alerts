@@ -9,6 +9,7 @@ import { Check } from 'lucide-react';
 import { useUserCredits } from '@/hooks/useUserCredits';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Layout } from '@/components/Layout';
+import UsageHistoryModal from '@/components/UsageHistoryModal';
 
 const planGradientBg = {
   free: "bg-black border border-blue-400/30",
@@ -55,20 +56,23 @@ export default function GetMoreCredits() {
           <p className="text-sm sm:text-lg text-blue-100 font-inter font-light mb-1 sm:mb-2 animate-fade-in">
             Pay only for what you use. Get started with free monthly credits, and upgrade anytime with our credit packs.
           </p>
-          <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in">
-            Current Balance:{" "}
-            {isLoading || userProfileLoading ? (
-              <span className="font-bold text-cyan-100">Loading...</span>
-            ) : error ? (
-              <span className="font-bold text-rose-300">Error loading</span>
-            ) : credits && !("__error" in credits) ? (
-              <span className="font-bold text-cyan-100">
-                {Number(credits.current_balance).toLocaleString()} credits
-              </span>
-            ) : (
-              <span className="font-bold text-yellow-300">No credits found</span>
-            )}
-          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
+            <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in">
+              Current Balance:{" "}
+              {isLoading || userProfileLoading ? (
+                <span className="font-bold text-cyan-100">Loading...</span>
+              ) : error ? (
+                <span className="font-bold text-rose-300">Error loading</span>
+              ) : credits && !("__error" in credits) ? (
+                <span className="font-bold text-cyan-100">
+                  {Number(credits.current_balance).toLocaleString()} credits
+                </span>
+              ) : (
+                <span className="font-bold text-yellow-300">No credits found</span>
+              )}
+            </p>
+            <UsageHistoryModal />
+          </div>
         </div>
         {/* Responsive grid area with tight spacing for mobile; px for interior gap only */}
         <div className="flex-1 flex flex-col items-center justify-center w-full px-2 sm:px-4">
