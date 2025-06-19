@@ -1,3 +1,4 @@
+
 import { User, Bell, Target, FileText, X, Share2, CreditCard, FileUser } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
@@ -45,7 +46,7 @@ const toolItems = [{
   url: '/linkedin-posts',
   icon: Share2
 }, {
-  title: 'Telegram Resume Bot',
+  title: 'Resume Bot',
   url: '/resume-builder',
   icon: FileUser
 }];

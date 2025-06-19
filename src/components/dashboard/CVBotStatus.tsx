@@ -4,6 +4,7 @@ import { Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 
 interface CVBotStatusProps {
   onActivationChange?: (isActivated: boolean) => void;
@@ -12,14 +13,19 @@ interface CVBotStatusProps {
 const CVBotStatus = ({ onActivationChange }: CVBotStatusProps) => {
   const { toast } = useToast();
   const { userProfile, loading } = useUserProfile();
+  const { hasResume, hasBio, loading: completionLoading } = useUserCompletionStatus();
   const [copiedBotId, setCopiedBotId] = useState(false);
   const [copiedBotName, setCopiedBotName] = useState(false);
 
+  // Check if user has both resume and bio data
+  const hasRequiredData = hasResume && hasBio;
+  const isActivated = userProfile?.cv_bot_activated && hasRequiredData;
+
   useEffect(() => {
     if (userProfile) {
-      onActivationChange?.(userProfile.cv_bot_activated || false);
+      onActivationChange?.(isActivated || false);
     }
-  }, [userProfile, onActivationChange]);
+  }, [userProfile, isActivated, onActivationChange]);
 
   const copyToClipboard = async (text: string, type: 'botId' | 'botName') => {
     try {
@@ -46,7 +52,7 @@ const CVBotStatus = ({ onActivationChange }: CVBotStatusProps) => {
     }
   };
 
-  if (loading) {
+  if (loading || completionLoading) {
     return (
       <div className="mb-6 p-4 bg-black/90 rounded-xl">
         <div className="text-white text-sm">Loading bot status...</div>
@@ -56,10 +62,29 @@ const CVBotStatus = ({ onActivationChange }: CVBotStatusProps) => {
 
   // Use the user_profile.id as the Bot ID
   const botId = userProfile?.id || '';
-  const isActivated = userProfile?.cv_bot_activated || false;
+  const isBotTechnicallyActivated = userProfile?.cv_bot_activated || false;
 
   return (
     <div className="mb-6">
+      {/* Profile Completion Warning - Show if bot is activated but missing data */}
+      {isBotTechnicallyActivated && !hasRequiredData && (
+        <div className="bg-yellow-800/40 rounded-lg p-4 text-white border border-yellow-600 mb-4">
+          <div className="prose prose-invert max-w-none">
+            <h3 className="text-lg font-medium text-yellow-200 mb-3 font-inter">⚠️ Complete Your Profile to Use the Bot</h3>
+            <p className="text-yellow-100 font-inter text-sm mb-3">
+              Your bot is activated, but you need to complete your profile first:
+            </p>
+            <ul className="text-sm space-y-1 font-inter text-yellow-100 list-disc list-inside mb-3">
+              {!hasBio && <li>Add your bio in the Profile page</li>}
+              {!hasResume && <li>Upload your resume in the Profile page</li>}
+            </ul>
+            <p className="text-yellow-100 font-inter text-sm">
+              Please go to the <strong>Profile</strong> page and complete these sections to start using your Resume Bot.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Bot ID Display */}
       <div className="bg-neutral-900 rounded-xl p-4 mb-4 border border-fuchsia-400 transition-all">
         <div className="flex items-center justify-between mb-2">
@@ -95,8 +120,8 @@ const CVBotStatus = ({ onActivationChange }: CVBotStatusProps) => {
         </div>
       </div>
 
-      {/* Activation Instructions - Only show when not activated */}
-      {!isActivated && (
+      {/* Activation Instructions - Only show when not activated OR missing profile data */}
+      {(!isBotTechnicallyActivated || !hasRequiredData) && (
         <div className="bg-black/40 rounded-lg p-4 text-white border border-red-800">
           <div className="prose prose-invert max-w-none">
             <h3 className="text-lg font-medium text-white mb-4 font-inter">🤖 How to Activate your Resume Assistant Bot on Telegram:</h3>
@@ -138,7 +163,7 @@ const CVBotStatus = ({ onActivationChange }: CVBotStatusProps) => {
         </div>
       )}
 
-      {/* Usage Instructions - Only show when activated */}
+      {/* Usage Instructions - Only show when fully activated with profile data */}
       {isActivated && (
         <div className="bg-black/40 rounded-lg p-4 text-white border border-green-800">
           <div className="prose prose-invert max-w-none">
