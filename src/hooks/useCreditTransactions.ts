@@ -1,7 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useUserProfile } from '@/hooks/useUserProfile';
+import { useUser } from '@clerk/clerk-react';
 
 type CreditTransaction = {
   id: string;
@@ -15,22 +15,41 @@ type CreditTransaction = {
 };
 
 export const useCreditTransactions = () => {
-  const { userProfile } = useUserProfile();
+  const { user } = useUser();
   
   return useQuery({
-    queryKey: ['credit_transactions', userProfile?.user_id],
+    queryKey: ['credit_transactions', user?.id],
     queryFn: async () => {
-      if (!userProfile?.user_id) {
-        console.warn('[useCreditTransactions] No user_id available');
+      if (!user?.id) {
+        console.warn('[useCreditTransactions] No clerk user ID available');
         return [];
       }
       
-      console.log('[useCreditTransactions] Fetching transactions for user_id:', userProfile.user_id);
+      console.log('[useCreditTransactions] Fetching transactions for clerk user_id:', user.id);
+      
+      // First get the internal user_id from the users table using clerk_id
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('clerk_id', user.id)
+        .single();
+
+      if (userError) {
+        console.error('[useCreditTransactions] Error fetching user data:', userError);
+        throw userError;
+      }
+
+      if (!userData) {
+        console.warn('[useCreditTransactions] No user data found for clerk_id:', user.id);
+        return [];
+      }
+
+      console.log('[useCreditTransactions] Found internal user_id:', userData.id);
       
       const { data: transactions, error } = await supabase
         .from('credit_transactions')
         .select('id, transaction_type, amount, balance_before, balance_after, description, feature_used, created_at')
-        .eq('user_id', userProfile.user_id)
+        .eq('user_id', userData.id)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -41,7 +60,7 @@ export const useCreditTransactions = () => {
       console.log('[useCreditTransactions] Successfully fetched transactions:', transactions?.length || 0);
       return transactions as CreditTransaction[];
     },
-    enabled: !!userProfile?.user_id,
+    enabled: !!user?.id,
     staleTime: 30000,
     refetchInterval: 60000,
   });
