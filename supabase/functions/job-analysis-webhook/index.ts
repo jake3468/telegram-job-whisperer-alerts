@@ -142,7 +142,7 @@ serve(async (req) => {
 
       if (secretError) {
         console.error('❌ Error fetching N8N_COMPANY_WEBHOOK_URL:', secretError);
-        return new Response(JSON.stringify({ error: 'Failed to fetch company webhook URL' }), {
+        return new Response(JSON.stringify({ error: 'Failed to fetch company webhook URL', details: secretError }), {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
@@ -150,6 +150,11 @@ serve(async (req) => {
 
       n8nWebhookUrl = secretData?.decrypted_secret;
       console.log(`🔗 Found N8N Company Webhook URL: ${n8nWebhookUrl ? 'Yes' : 'No'}`);
+      
+      if (n8nWebhookUrl) {
+        console.log(`🔗 N8N Webhook URL length: ${n8nWebhookUrl.length} characters`);
+        console.log(`🔗 N8N Webhook URL starts with: ${n8nWebhookUrl.substring(0, 50)}...`);
+      }
 
     } else if (webhookType === 'job_guide' || payload.job_analysis) {
       console.log('📋 Processing job analysis webhook');
@@ -225,37 +230,55 @@ serve(async (req) => {
         source,
         webhook_type: webhookType,
         processed_at: new Date().toISOString(),
-        edge_function_version: 'v3.1'
+        edge_function_version: 'v4.0'
       }
     };
 
     console.log(`🚀 Calling N8N webhook: ${n8nWebhookUrl}`);
     console.log(`📤 Payload size: ${JSON.stringify(n8nPayload).length} characters`);
 
-    // Call the N8N webhook
-    const n8nResponse = await fetch(n8nWebhookUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'Supabase-Edge-Function/1.0',
-        'X-Webhook-Source': 'supabase-edge-function',
-        'X-Fingerprint': fingerprint,
-        'X-Source': source,
-        'X-Webhook-Type': webhookType
-      },
-      body: JSON.stringify(n8nPayload)
-    });
+    // Call the N8N webhook with enhanced error handling
+    let n8nResponse: Response;
+    let responseText: string;
+    
+    try {
+      n8nResponse = await fetch(n8nWebhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'Supabase-Edge-Function/4.0',
+          'X-Webhook-Source': 'supabase-edge-function',
+          'X-Fingerprint': fingerprint,
+          'X-Source': source,
+          'X-Webhook-Type': webhookType
+        },
+        body: JSON.stringify(n8nPayload)
+      });
 
-    const responseText = await n8nResponse.text();
-    console.log(`📡 N8N Response Status: ${n8nResponse.status}`);
-    console.log(`📡 N8N Response: ${responseText}`);
+      responseText = await n8nResponse.text();
+      console.log(`📡 N8N Response Status: ${n8nResponse.status}`);
+      console.log(`📡 N8N Response Headers: ${JSON.stringify(Object.fromEntries(n8nResponse.headers.entries()))}`);
+      console.log(`📡 N8N Response: ${responseText}`);
+
+    } catch (fetchError) {
+      console.error(`❌ N8N webhook fetch error:`, fetchError);
+      return new Response(JSON.stringify({ 
+        error: 'Failed to call N8N webhook', 
+        details: fetchError.message,
+        webhook_url: n8nWebhookUrl.substring(0, 50) + '...'
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
 
     if (!n8nResponse.ok) {
       console.error(`❌ N8N webhook failed with status ${n8nResponse.status}: ${responseText}`);
       return new Response(JSON.stringify({ 
         error: 'N8N webhook failed', 
         status: n8nResponse.status,
-        response: responseText 
+        response: responseText,
+        webhook_url: n8nWebhookUrl.substring(0, 50) + '...'
       }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -268,7 +291,8 @@ serve(async (req) => {
       success: true, 
       message: `${webhookType} webhook processed successfully`,
       fingerprint,
-      n8n_status: n8nResponse.status
+      n8n_status: n8nResponse.status,
+      n8n_response: responseText
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
