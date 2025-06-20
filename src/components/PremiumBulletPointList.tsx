@@ -88,24 +88,24 @@ export const PremiumBulletPointList: React.FC<PremiumBulletPointListProps> = ({
   };
 
   return (
-    <div className="w-full space-y-2">
+    <div className="w-full space-y-1">
       {title && (
-        <div className="w-full flex items-center gap-2 mb-3">
+        <div className="w-full flex items-center gap-2 mb-2">
           <div className={`w-1 h-4 bg-gradient-to-b ${currentTheme.primary} rounded-full flex-shrink-0`} />
           <h4 className={`text-xs font-bold ${currentTheme.headerText} break-words`}>{title}</h4>
         </div>
       )}
-      <div className="w-full space-y-2">
+      <div className="w-full space-y-1">
         {items.map((item, index) => (
           <div
             key={index}
-            className={`w-full flex items-start gap-2 p-2 rounded border transition-all duration-300 ${getItemStyle(item)}`}
+            className={`w-full flex items-start gap-2 p-2 rounded border transition-all duration-300 min-w-0 ${getItemStyle(item)}`}
           >
             <div className="p-1 bg-white rounded shadow-sm flex-shrink-0">
               {getItemIcon(item, index)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className={`${currentTheme.contentText} leading-relaxed font-medium text-xs break-words`}>
+              <p className={`${currentTheme.contentText} leading-relaxed font-medium text-xs break-words break-all`}>
                 {item}
               </p>
             </div>

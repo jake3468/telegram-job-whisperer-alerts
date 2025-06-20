@@ -14,64 +14,78 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
   const themeConfig = {
     yellow: {
       primary: 'from-yellow-500 to-orange-500',
-      headerBg: 'bg-yellow-100',
+      mainHeaderBg: 'bg-yellow-600',
+      subHeaderBg: 'bg-yellow-100',
       contentBg: 'bg-gray-50',
       border: 'border-yellow-300',
-      headerText: 'text-yellow-900',
+      mainHeaderText: 'text-white',
+      subHeaderText: 'text-yellow-900',
       contentText: 'text-gray-800',
       accent: 'text-yellow-600'
     },
     teal: {
       primary: 'from-teal-500 to-cyan-500',
-      headerBg: 'bg-teal-100',
+      mainHeaderBg: 'bg-teal-600',
+      subHeaderBg: 'bg-teal-100',
       contentBg: 'bg-gray-50',
       border: 'border-teal-300',
-      headerText: 'text-teal-900',
+      mainHeaderText: 'text-white',
+      subHeaderText: 'text-teal-900',
       contentText: 'text-gray-800',
       accent: 'text-teal-600'
     },
     indigo: {
       primary: 'from-indigo-500 to-purple-500',
-      headerBg: 'bg-indigo-100',
+      mainHeaderBg: 'bg-indigo-600',
+      subHeaderBg: 'bg-indigo-100',
       contentBg: 'bg-gray-50',
       border: 'border-indigo-300',
-      headerText: 'text-indigo-900',
+      mainHeaderText: 'text-white',
+      subHeaderText: 'text-indigo-900',
       contentText: 'text-gray-800',
       accent: 'text-indigo-600'
     },
     pink: {
       primary: 'from-pink-500 to-rose-500',
-      headerBg: 'bg-pink-100',
+      mainHeaderBg: 'bg-pink-600',
+      subHeaderBg: 'bg-pink-100',
       contentBg: 'bg-gray-50',
       border: 'border-pink-300',
-      headerText: 'text-pink-900',
+      mainHeaderText: 'text-white',
+      subHeaderText: 'text-pink-900',
       contentText: 'text-gray-800',
       accent: 'text-pink-600'
     },
     violet: {
       primary: 'from-violet-500 to-purple-500',
-      headerBg: 'bg-violet-100',
+      mainHeaderBg: 'bg-violet-600',
+      subHeaderBg: 'bg-violet-100',
       contentBg: 'bg-gray-50',
       border: 'border-violet-300',
-      headerText: 'text-violet-900',
+      mainHeaderText: 'text-white',
+      subHeaderText: 'text-violet-900',
       contentText: 'text-gray-800',
       accent: 'text-violet-600'
     },
     green: {
       primary: 'from-green-500 to-emerald-500',
-      headerBg: 'bg-green-100',
+      mainHeaderBg: 'bg-green-600',
+      subHeaderBg: 'bg-green-100',
       contentBg: 'bg-gray-50',
       border: 'border-green-300',
-      headerText: 'text-green-900',
+      mainHeaderText: 'text-white',
+      subHeaderText: 'text-green-900',
       contentText: 'text-gray-800',
       accent: 'text-green-600'
     },
     blue: {
       primary: 'from-blue-500 to-cyan-500',
-      headerBg: 'bg-blue-100',
+      mainHeaderBg: 'bg-blue-600',
+      subHeaderBg: 'bg-blue-100',
       contentBg: 'bg-gray-50',
       border: 'border-blue-300',
-      headerText: 'text-blue-900',
+      mainHeaderText: 'text-white',
+      subHeaderText: 'text-blue-900',
       contentText: 'text-gray-800',
       accent: 'text-blue-600'
     }
@@ -113,7 +127,7 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
   const renderValue = (value: any, level: number = 0, parentKey: string = ''): React.ReactNode => {
     if (Array.isArray(value)) {
       return (
-        <div className="w-full space-y-2">
+        <div className="w-full space-y-1">
           {value.map((item, index) => (
             <div key={index} className={`w-full p-2 ${currentTheme.contentBg} rounded border ${currentTheme.border}`}>
               <div className="w-full flex items-start gap-2 min-w-0">
@@ -121,7 +135,7 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
                   <div className="w-1.5 h-1.5 bg-white rounded-full" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className={`${currentTheme.contentText} text-xs leading-relaxed break-words`}>
+                  <p className={`${currentTheme.contentText} text-xs leading-relaxed break-words break-all`}>
                     {typeof item === 'string' ? 
                       (parentKey.toLowerCase().includes('salary') || parentKey.toLowerCase().includes('compensation') ? 
                         formatCurrency(item) : item
@@ -139,24 +153,42 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
 
     if (typeof value === 'object' && value !== null) {
       return (
-        <div className="w-full space-y-2">
+        <div className="w-full space-y-1">
           {Object.entries(value).map(([key, val]) => (
-            <div key={key} className="w-full space-y-1">
-              {/* Header with distinct styling */}
-              <div className={`w-full p-2 ${currentTheme.headerBg} border ${currentTheme.border} rounded`}>
-                <div className="w-full flex items-center gap-2 min-w-0">
-                  <div className="p-1 bg-white rounded shadow-sm flex-shrink-0">
-                    {getStatusIcon(key, val)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className={`font-bold ${currentTheme.headerText} text-xs break-words`}>
-                      {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                    </h4>
+            <div key={key} className="w-full space-y-1 min-w-0">
+              {/* Main Header (Level 0) - Dark background with white text */}
+              {level === 0 && (
+                <div className={`w-full p-2 ${currentTheme.mainHeaderBg} border ${currentTheme.border} rounded`}>
+                  <div className="w-full flex items-center gap-2 min-w-0">
+                    <div className="p-1 bg-white/20 rounded shadow-sm flex-shrink-0">
+                      {getStatusIcon(key, val)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className={`font-bold ${currentTheme.mainHeaderText} text-sm break-words`}>
+                        {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </h4>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
               
-              {/* Content with neutral background */}
+              {/* Sub Header (Level 1+) - Light background with dark text */}
+              {level > 0 && (
+                <div className={`w-full p-2 ${currentTheme.subHeaderBg} border ${currentTheme.border} rounded`}>
+                  <div className="w-full flex items-center gap-2 min-w-0">
+                    <div className="p-1 bg-white rounded shadow-sm flex-shrink-0">
+                      {getStatusIcon(key, val)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className={`font-semibold ${currentTheme.subHeaderText} text-xs break-words`}>
+                        {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </h4>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Content with proper left padding */}
               <div className="w-full pl-1">
                 {renderValue(val, level + 1, key)}
               </div>
@@ -174,7 +206,7 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
 
     return (
       <div className={`w-full p-2 ${currentTheme.contentBg} rounded border ${currentTheme.border}`}>
-        <p className={`${currentTheme.contentText} text-xs leading-relaxed break-words`}>
+        <p className={`${currentTheme.contentText} text-xs leading-relaxed break-words break-all`}>
           {formattedValue}
         </p>
       </div>
@@ -184,8 +216,8 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
   return (
     <div className="w-full">
       <Card className="w-full bg-white shadow-lg border-0 rounded-xl overflow-hidden">
-        <CardContent className="p-3 w-full">
-          <div className="w-full">
+        <CardContent className="p-2 w-full">
+          <div className="w-full min-w-0">
             {renderValue(data)}
           </div>
         </CardContent>

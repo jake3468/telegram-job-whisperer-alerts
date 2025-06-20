@@ -40,23 +40,23 @@ interface PremiumAnalysisResultsProps {
 
 export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ analysis }) => {
   return (
-    <div className="w-full bg-gradient-to-br from-gray-50 to-white min-h-screen">
-      <div className="w-full max-w-none mx-auto space-y-4 px-1 py-4">
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 to-white overflow-x-hidden">
+      <div className="w-full max-w-sm sm:max-w-lg md:max-w-4xl mx-auto px-2 py-4 space-y-4">
         {/* Hero Section */}
         <div className="w-full">
           <div className="w-full bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden">
             <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-3 text-white">
               <div className="w-full flex flex-col gap-3">
                 <div className="w-full space-y-2">
-                  <div className="w-full flex items-start gap-3">
+                  <div className="w-full flex items-start gap-3 min-w-0">
                     <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm flex-shrink-0">
                       <Building2 className="w-4 h-4" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h1 className="text-base md:text-lg font-bold leading-tight break-words">
+                      <h1 className="text-sm md:text-base font-bold leading-tight break-words">
                         {analysis.job_title}
                       </h1>
-                      <p className="text-xs md:text-sm text-blue-100 mt-1 break-words">
+                      <p className="text-xs text-blue-100 mt-1 break-words">
                         at {analysis.company_name}
                       </p>
                     </div>
@@ -82,7 +82,7 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                 <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {analysis.role_security_score !== null && (
                     <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 text-center">
-                      <div className="text-lg font-bold mb-1">
+                      <div className="text-base font-bold mb-1">
                         {analysis.role_security_score}%
                       </div>
                       <div className="text-xs text-blue-100 mb-1">Security Score</div>
@@ -93,7 +93,7 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                   )}
                   {analysis.role_experience_score !== null && (
                     <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 text-center">
-                      <div className="text-lg font-bold mb-1">
+                      <div className="text-base font-bold mb-1">
                         {analysis.role_experience_score}%
                       </div>
                       <div className="text-xs text-blue-100 mb-1">Experience Score</div>
@@ -121,8 +121,8 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                 description="Current market trends and opportunities"
               />
               <Card className="w-full bg-white shadow-lg border-0 rounded-lg overflow-hidden">
-                <CardContent className="p-3 w-full">
-                  <div className="w-full bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg p-3 border-l-4 border-blue-500">
+                <CardContent className="p-2 w-full">
+                  <div className="w-full bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg p-2 border-l-4 border-blue-500">
                     <p className="text-gray-700 leading-relaxed text-xs break-words">
                       {analysis.local_role_market_context}
                     </p>
@@ -143,7 +143,7 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                 description="Latest developments and company insights"
               />
               <Card className="w-full bg-white shadow-lg border-0 rounded-lg overflow-hidden">
-                <CardContent className="p-3 w-full">
+                <CardContent className="p-2 w-full">
                   <PremiumBulletPointList 
                     items={analysis.company_news_updates} 
                     theme="orange"
@@ -164,7 +164,7 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                 description="Job stability and future outlook"
               />
               <Card className="w-full bg-white shadow-lg border-0 rounded-lg overflow-hidden">
-                <CardContent className="p-3 w-full space-y-3">
+                <CardContent className="p-2 w-full space-y-2">
                   {analysis.role_security_score !== null && (
                     <EnhancedPercentageMeter 
                       score={analysis.role_security_score} 
@@ -182,8 +182,8 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                   )}
                   
                   {analysis.role_security_outlook && (
-                    <div className="w-full bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3 border-l-4 border-green-500">
-                      <h4 className="font-bold text-green-800 text-xs mb-2">Outlook</h4>
+                    <div className="w-full bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-2 border-l-4 border-green-500">
+                      <h4 className="font-bold text-green-800 text-xs mb-1">Outlook</h4>
                       <p className="text-gray-700 leading-relaxed text-xs break-words">
                         {analysis.role_security_outlook}
                       </p>
@@ -191,8 +191,8 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                   )}
                   
                   {analysis.role_security_automation_risks && (
-                    <div className="w-full bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-3 border-l-4 border-yellow-500">
-                      <h4 className="font-bold text-yellow-800 text-xs mb-2">Automation Risks</h4>
+                    <div className="w-full bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-2 border-l-4 border-yellow-500">
+                      <h4 className="font-bold text-yellow-800 text-xs mb-1">Automation Risks</h4>
                       <p className="text-gray-700 leading-relaxed text-xs break-words">
                         {analysis.role_security_automation_risks}
                       </p>
@@ -200,8 +200,8 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                   )}
                   
                   {analysis.role_security_departmental_trends && (
-                    <div className="w-full bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-3 border-l-4 border-blue-500">
-                      <h4 className="font-bold text-blue-800 text-xs mb-2">Departmental Trends</h4>
+                    <div className="w-full bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-2 border-l-4 border-blue-500">
+                      <h4 className="font-bold text-blue-800 text-xs mb-1">Departmental Trends</h4>
                       <p className="text-gray-700 leading-relaxed text-xs break-words">
                         {analysis.role_security_departmental_trends}
                       </p>
@@ -223,7 +223,7 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                 description="Experience requirements and career fit"
               />
               <Card className="w-full bg-white shadow-lg border-0 rounded-lg overflow-hidden">
-                <CardContent className="p-3 w-full space-y-3">
+                <CardContent className="p-2 w-full space-y-2">
                   {analysis.role_experience_score !== null && (
                     <EnhancedPercentageMeter 
                       score={analysis.role_experience_score} 
@@ -241,8 +241,8 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                   )}
                   
                   {analysis.role_experience_specific_insights && (
-                    <div className="w-full bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-3 border-l-4 border-purple-500">
-                      <h4 className="font-bold text-purple-800 text-xs mb-2">Specific Insights</h4>
+                    <div className="w-full bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-2 border-l-4 border-purple-500">
+                      <h4 className="font-bold text-purple-800 text-xs mb-1">Specific Insights</h4>
                       <p className="text-gray-700 leading-relaxed text-xs break-words">
                         {analysis.role_experience_specific_insights}
                       </p>
