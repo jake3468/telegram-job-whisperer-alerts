@@ -51,6 +51,51 @@ export const PremiumBulletPointList: React.FC<PremiumBulletPointListProps> = ({
       headerText: 'text-blue-900',
       contentText: 'text-gray-800',
       icon: 'text-blue-600'
+    },
+    yellow: {
+      primary: 'from-yellow-500 to-orange-500',
+      headerBg: 'bg-yellow-100',
+      contentBg: 'bg-gray-50',
+      border: 'border-yellow-300',
+      headerText: 'text-yellow-900',
+      contentText: 'text-gray-800',
+      icon: 'text-yellow-600'
+    },
+    teal: {
+      primary: 'from-teal-500 to-cyan-500',
+      headerBg: 'bg-teal-100',
+      contentBg: 'bg-gray-50',
+      border: 'border-teal-300',
+      headerText: 'text-teal-900',
+      contentText: 'text-gray-800',
+      icon: 'text-teal-600'
+    },
+    indigo: {
+      primary: 'from-indigo-500 to-purple-500',
+      headerBg: 'bg-indigo-100',
+      contentBg: 'bg-gray-50',
+      border: 'border-indigo-300',
+      headerText: 'text-indigo-900',
+      contentText: 'text-gray-800',
+      icon: 'text-indigo-600'
+    },
+    pink: {
+      primary: 'from-pink-500 to-rose-500',
+      headerBg: 'bg-pink-100',
+      contentBg: 'bg-gray-50',
+      border: 'border-pink-300',
+      headerText: 'text-pink-900',
+      contentText: 'text-gray-800',
+      icon: 'text-pink-600'
+    },
+    violet: {
+      primary: 'from-violet-500 to-purple-500',
+      headerBg: 'bg-violet-100',
+      contentBg: 'bg-gray-50',
+      border: 'border-violet-300',
+      headerText: 'text-violet-900',
+      contentText: 'text-gray-800',
+      icon: 'text-violet-600'
     }
   };
 
@@ -88,14 +133,14 @@ export const PremiumBulletPointList: React.FC<PremiumBulletPointListProps> = ({
   };
 
   return (
-    <div className="w-full space-y-1">
+    <div className="w-full space-y-1 min-w-0">
       {title && (
-        <div className="w-full flex items-center gap-2 mb-2">
+        <div className="w-full flex items-center gap-2 mb-2 min-w-0">
           <div className={`w-1 h-4 bg-gradient-to-b ${currentTheme.primary} rounded-full flex-shrink-0`} />
-          <h4 className={`text-xs font-bold ${currentTheme.headerText} break-words`}>{title}</h4>
+          <h4 className={`text-xs font-bold ${currentTheme.headerText} break-words hyphens-auto`}>{title}</h4>
         </div>
       )}
-      <div className="w-full space-y-1">
+      <div className="w-full space-y-1 min-w-0">
         {items.map((item, index) => (
           <div
             key={index}
@@ -105,7 +150,7 @@ export const PremiumBulletPointList: React.FC<PremiumBulletPointListProps> = ({
               {getItemIcon(item, index)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className={`${currentTheme.contentText} leading-relaxed font-medium text-xs break-words break-all`}>
+              <p className={`${currentTheme.contentText} leading-relaxed font-medium text-xs break-words break-all hyphens-auto`}>
                 {item}
               </p>
             </div>
