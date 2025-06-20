@@ -302,7 +302,7 @@ const CompanyRoleAnalysis = () => {
                   <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4">
                     <Button 
                       type="submit" 
-                      disabled={isSubmitting || !hasCredits} 
+                      disabled={isSubmitting} 
                       className="w-full lg:flex-1 bg-gradient-to-r from-green-700 via-green-800 to-green-900 hover:from-green-800 hover:via-green-900 hover:to-green-950 text-white font-orbitron font-bold py-4 sm:py-6 text-sm sm:text-lg shadow-2xl shadow-green-600/25 border-0 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isSubmitting ? <>

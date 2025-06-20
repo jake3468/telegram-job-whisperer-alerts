@@ -439,7 +439,7 @@ const LinkedInPosts = () => {
                         <div className="flex flex-col sm:flex-row gap-3 pt-4">
                           <Button 
                             type="submit" 
-                            disabled={isSubmitting || !formData.topic.trim() || isGenerating || !hasCredits} 
+                            disabled={isSubmitting || !formData.topic.trim() || isGenerating} 
                             className="flex-1 bg-gradient-to-r from-teal-400 via-cyan-400 to-teal-500 hover:from-teal-500 hover:via-cyan-500 hover:to-teal-600 text-black font-semibold text-base h-12 shadow-md"
                           >
                             {isSubmitting ? 'Submitting...' : 'Generate LinkedIn Posts'}
