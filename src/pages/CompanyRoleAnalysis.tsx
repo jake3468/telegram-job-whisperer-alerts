@@ -138,9 +138,7 @@ const CompanyRoleAnalysis = () => {
           <div className="text-center space-y-4">
             <div className="flex items-center justify-center gap-3 mb-4">
               <Building2 className="w-12 h-12 text-violet-400" />
-              <h1 className="text-4xl sm:text-5xl font-orbitron font-extrabold text-transparent bg-gradient-to-r from-violet-400 via-purple-500 to-indigo-400 bg-clip-text lg:text-4xl">
-                Company - Role Analysis
-              </h1>
+              <h1 className="text-4xl sm:text-5xl font-orbitron font-extrabold text-transparent bg-gradient-to-r from-violet-400 via-purple-500 to-indigo-400 bg-clip-text lg:text-4xl">Company Analysis</h1>
             </div>
             <p className="text-lg text-violet-200 max-w-3xl mx-auto leading-relaxed sm:text-lg font-light">
               Smart candidates don't just apply—they investigate. Get the career intelligence that puts you ahead of 99% of applicants.
