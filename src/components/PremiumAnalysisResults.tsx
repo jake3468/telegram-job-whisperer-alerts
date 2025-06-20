@@ -40,8 +40,8 @@ interface PremiumAnalysisResultsProps {
 
 export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ analysis }) => {
   return (
-    <div className="w-full bg-gradient-to-br from-gray-50 to-white min-h-screen">
-      <div className="w-full max-w-6xl mx-auto space-y-6 px-4 py-6">
+    <div className="w-full bg-gradient-to-br from-gray-50 to-white min-h-screen overflow-x-hidden">
+      <div className="w-full max-w-5xl mx-auto space-y-6 px-4 py-6">
         {/* Hero Section */}
         <div className="w-full bg-white rounded-xl shadow-lg border border-gray-100">
           <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-6 text-white rounded-t-xl">
@@ -52,10 +52,10 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                     <Building2 className="w-6 h-6" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h1 className="text-xl md:text-2xl lg:text-3xl font-bold break-words leading-tight">
+                    <h1 className="text-xl md:text-2xl lg:text-3xl font-bold leading-tight">
                       {analysis.job_title}
                     </h1>
-                    <p className="text-base md:text-lg text-blue-100 break-words mt-2">
+                    <p className="text-base md:text-lg text-blue-100 mt-2">
                       at {analysis.company_name}
                     </p>
                   </div>
@@ -64,12 +64,12 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                 <div className="flex flex-wrap gap-3 text-sm md:text-base">
                   <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
                     <MapPin className="w-4 h-4 flex-shrink-0" />
-                    <span className="break-words">{analysis.location}</span>
+                    <span>{analysis.location}</span>
                   </div>
                   {analysis.research_date && (
                     <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
                       <Calendar className="w-4 h-4 flex-shrink-0" />
-                      <span className="break-words">
+                      <span>
                         {new Date(analysis.research_date).toLocaleDateString()}
                       </span>
                     </div>
@@ -121,7 +121,7 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
               <Card className="w-full bg-white shadow-lg border-0 rounded-xl">
                 <CardContent className="p-6">
                   <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-6 border-l-4 border-blue-500">
-                    <p className="text-gray-700 leading-relaxed text-sm md:text-base break-words">
+                    <p className="text-gray-700 leading-relaxed text-sm md:text-base">
                       {analysis.local_role_market_context}
                     </p>
                   </div>
@@ -182,7 +182,7 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                   {analysis.role_security_outlook && (
                     <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border-l-4 border-green-500">
                       <h4 className="font-bold text-green-800 text-base md:text-lg mb-3">Outlook</h4>
-                      <p className="text-gray-700 leading-relaxed text-sm md:text-base break-words">
+                      <p className="text-gray-700 leading-relaxed text-sm md:text-base">
                         {analysis.role_security_outlook}
                       </p>
                     </div>
@@ -191,7 +191,7 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                   {analysis.role_security_automation_risks && (
                     <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-6 border-l-4 border-yellow-500">
                       <h4 className="font-bold text-yellow-800 text-base md:text-lg mb-3">Automation Risks</h4>
-                      <p className="text-gray-700 leading-relaxed text-sm md:text-base break-words">
+                      <p className="text-gray-700 leading-relaxed text-sm md:text-base">
                         {analysis.role_security_automation_risks}
                       </p>
                     </div>
@@ -200,7 +200,7 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                   {analysis.role_security_departmental_trends && (
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-l-4 border-blue-500">
                       <h4 className="font-bold text-blue-800 text-base md:text-lg mb-3">Departmental Trends</h4>
-                      <p className="text-gray-700 leading-relaxed text-sm md:text-base break-words">
+                      <p className="text-gray-700 leading-relaxed text-sm md:text-base">
                         {analysis.role_security_departmental_trends}
                       </p>
                     </div>
@@ -241,7 +241,7 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                   {analysis.role_experience_specific_insights && (
                     <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border-l-4 border-purple-500">
                       <h4 className="font-bold text-purple-800 text-base md:text-lg mb-3">Specific Insights</h4>
-                      <p className="text-gray-700 leading-relaxed text-sm md:text-base break-words">
+                      <p className="text-gray-700 leading-relaxed text-sm md:text-base">
                         {analysis.role_experience_specific_insights}
                       </p>
                     </div>

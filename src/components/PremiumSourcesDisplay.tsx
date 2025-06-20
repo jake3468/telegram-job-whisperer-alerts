@@ -13,18 +13,18 @@ export const PremiumSourcesDisplay: React.FC<PremiumSourcesDisplayProps> = ({ so
   const getCategoryIcon = (category: string) => {
     const catLower = category.toLowerCase();
     if (catLower.includes('company') || catLower.includes('corporate')) {
-      return <Building className="w-2.5 h-2.5 text-blue-500" />;
+      return <Building className="w-4 h-4 text-blue-500" />;
     }
     if (catLower.includes('news') || catLower.includes('article')) {
-      return <FileText className="w-2.5 h-2.5 text-green-500" />;
+      return <FileText className="w-4 h-4 text-green-500" />;
     }
     if (catLower.includes('salary') || catLower.includes('compensation')) {
-      return <Award className="w-2.5 h-2.5 text-yellow-500" />;
+      return <Award className="w-4 h-4 text-yellow-500" />;
     }
     if (catLower.includes('review') || catLower.includes('rating')) {
-      return <Shield className="w-2.5 h-2.5 text-purple-500" />;
+      return <Shield className="w-4 h-4 text-purple-500" />;
     }
-    return <Globe className="w-2.5 h-2.5 text-indigo-500" />;
+    return <Globe className="w-4 h-4 text-indigo-500" />;
   };
 
   const getCategoryTheme = (category: string) => {
@@ -61,7 +61,7 @@ export const PremiumSourcesDisplay: React.FC<PremiumSourcesDisplayProps> = ({ so
     const linkArray = Array.isArray(links) ? links : [links];
     
     return (
-      <div className="grid gap-1">
+      <div className="space-y-3">
         {linkArray.map((link, index) => {
           if (typeof link === 'string' && link.startsWith('https://')) {
             const domain = new URL(link).hostname.replace('www.', '');
@@ -71,25 +71,24 @@ export const PremiumSourcesDisplay: React.FC<PremiumSourcesDisplayProps> = ({ so
                 href={link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group block"
+                className="group block w-full"
               >
-                <div className={`flex items-center gap-1 p-1.5 bg-gradient-to-r ${categoryTheme.bg} hover:shadow-sm rounded-sm border ${categoryTheme.border} transition-all duration-300`}>
-                  <div className="p-0.5 bg-white rounded-sm shadow-sm group-hover:shadow-md transition-shadow flex-shrink-0">
-                    <ExternalLink className="w-2 h-2 text-green-500" />
+                <div className={`flex items-start gap-3 p-4 bg-gradient-to-r ${categoryTheme.bg} hover:shadow-md rounded-lg border ${categoryTheme.border} transition-all duration-300 w-full`}>
+                  <div className="p-2 bg-white rounded-lg shadow-sm group-hover:shadow-md transition-shadow flex-shrink-0">
+                    <ExternalLink className="w-4 h-4 text-green-500" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className={`font-bold ${categoryTheme.text} text-xs truncate`}>
+                  <div className="flex-1 min-w-0 w-full">
+                    <p className={`font-semibold ${categoryTheme.text} text-sm md:text-base mb-2`}>
                       {domain}
                     </p>
-                    <p className="text-gray-500 text-xs truncate mt-0.5 font-mono break-all">
+                    <p className="text-gray-600 text-xs md:text-sm leading-relaxed break-all overflow-wrap-anywhere word-break-break-all">
                       {link}
                     </p>
                   </div>
-                  <div className="flex items-center gap-0.5 flex-shrink-0">
-                    <div className="px-1 py-0.5 bg-white rounded-full shadow-sm">
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <div className="px-3 py-1 bg-white rounded-full shadow-sm">
                       <span className="text-xs font-medium text-gray-600">Trusted</span>
                     </div>
-                    <ExternalLink className="w-2 h-2 text-gray-400 group-hover:text-green-500 transition-colors flex-shrink-0" />
                   </div>
                 </div>
               </a>
@@ -102,43 +101,43 @@ export const PremiumSourcesDisplay: React.FC<PremiumSourcesDisplayProps> = ({ so
   };
 
   return (
-    <Card className="w-full bg-white shadow-sm border-0 rounded-md overflow-hidden">
-      <CardContent className="p-2">
-        <div className="flex flex-col gap-1 mb-2 pb-1 border-b border-gray-100">
-          <div className="p-1 bg-gradient-to-r from-gray-100 to-slate-100 rounded-sm flex-shrink-0 w-fit">
-            <Globe className="w-2.5 h-2.5 text-gray-600" />
+    <Card className="w-full bg-white shadow-lg border-0 rounded-xl">
+      <CardContent className="p-4 md:p-6">
+        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+          <div className="p-3 bg-gradient-to-r from-gray-100 to-slate-100 rounded-lg flex-shrink-0">
+            <Globe className="w-5 h-5 text-gray-600" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-xs font-bold text-gray-800 break-words">Trusted Research Sources</h3>
-            <p className="text-gray-600 mt-0.5 text-xs">Verified information from reliable sources</p>
+            <h3 className="text-lg md:text-xl font-bold text-gray-800">Trusted Research Sources</h3>
+            <p className="text-gray-600 mt-1 text-sm md:text-base">Verified information from reliable sources</p>
           </div>
           <div className="text-center flex-shrink-0">
-            <div className="px-1 py-0.5 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full border border-green-200">
-              <span className="text-xs font-bold text-green-700">
+            <div className="px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full border border-green-200">
+              <span className="text-sm font-bold text-green-700">
                 {Object.keys(sources).length} Categories
               </span>
             </div>
           </div>
         </div>
         
-        <div className="space-y-2">
+        <div className="space-y-6">
           {Object.entries(sources).map(([category, links]) => {
             const categoryTheme = getCategoryTheme(category);
             
             return (
-              <div key={category} className="space-y-1">
-                <div className="flex items-center gap-1 mb-1">
-                  <div className="p-0.5 bg-white rounded-sm shadow-sm border border-gray-100 flex-shrink-0">
+              <div key={category} className="space-y-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-white rounded-lg shadow-sm border border-gray-100 flex-shrink-0">
                     {getCategoryIcon(category)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className={`text-xs font-bold ${categoryTheme.text} break-words`}>
+                    <h4 className={`text-base md:text-lg font-bold ${categoryTheme.text}`}>
                       {category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                     </h4>
-                    <p className="text-gray-600 text-xs">Verified data sources</p>
+                    <p className="text-gray-600 text-sm">Verified data sources</p>
                   </div>
                 </div>
-                <div className="ml-0">
+                <div className="w-full">
                   {renderSourceLinks(links as string[] | string, categoryTheme)}
                 </div>
               </div>
