@@ -149,7 +149,7 @@ const CompanyRoleAnalysis = () => {
           {/* Analysis Form */}
           <Card className="bg-gradient-to-br from-green-500 via-green-600 to-green-700 border-green-400/30 shadow-2xl mx-auto max-w-3xl">
             <CardHeader className="bg-gradient-to-r from-green-600/90 via-green-700/90 to-green-800/90 border-b border-green-400/30">
-              <CardTitle className="text-2xl font-orbitron text-left text-black">
+              <CardTitle className="text-2xl font-orbitron text-left font-normal text-gray-50">
                 Company & Role Intelligence
               </CardTitle>
               <p className="text-green-100 font-medium mt-2 text-left">
