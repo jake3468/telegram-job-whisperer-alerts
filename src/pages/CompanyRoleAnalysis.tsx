@@ -164,8 +164,8 @@ const CompanyRoleAnalysis = () => {
             </CardHeader>
             <CardContent className="p-6 space-y-6">
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Company Name */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Company Name */}
                   <div className="space-y-2">
                     <Label htmlFor="companyName" className="text-violet-200 font-medium flex items-center gap-2">
                       <Building2 className="w-4 h-4" />
@@ -253,15 +253,7 @@ const CompanyRoleAnalysis = () => {
 
           {/* Loading Messages */}
           {isSubmitting && (
-            <LoadingMessages 
-              messages={[
-                "🔍 Researching company culture and values...",
-                "📊 Analyzing role requirements and expectations...",
-                "💡 Identifying key success factors...",
-                "🎯 Preparing strategic insights...",
-                "✨ Finalizing your competitive advantage report..."
-              ]}
-            />
+            <LoadingMessages type="company_analysis" />
           )}
 
           {/* History Section */}

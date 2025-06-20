@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { Loader2, Sparkles, TrendingUp, Brain, Zap, FileText, PenTool } from 'lucide-react';
+import { Loader2, Sparkles, TrendingUp, Brain, Zap, FileText, PenTool, Building2, Search, Target } from 'lucide-react';
 
 interface LoadingMessage {
   icon: React.ComponentType<{ className?: string }>;
@@ -8,7 +8,8 @@ interface LoadingMessage {
 }
 
 interface LoadingMessagesProps {
-  type?: 'linkedin' | 'cover_letter';
+  type?: 'linkedin' | 'cover_letter' | 'company_analysis';
+  messages?: string[];
 }
 
 const linkedinMessages: LoadingMessage[] = [
@@ -27,20 +28,48 @@ const coverLetterMessages: LoadingMessage[] = [
   { icon: Zap, text: "Finalizing your cover letter..." },
 ];
 
-const LoadingMessages = ({ type = 'linkedin' }: LoadingMessagesProps) => {
+const companyAnalysisMessages: LoadingMessage[] = [
+  { icon: Search, text: "🔍 Researching company culture and values..." },
+  { icon: TrendingUp, text: "📊 Analyzing role requirements and expectations..." },
+  { icon: Brain, text: "💡 Identifying key success factors..." },
+  { icon: Target, text: "🎯 Preparing strategic insights..." },
+  { icon: Sparkles, text: "✨ Finalizing your competitive advantage report..." },
+];
+
+const LoadingMessages = ({ type = 'linkedin', messages }: LoadingMessagesProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   
-  const messages = type === 'cover_letter' ? coverLetterMessages : linkedinMessages;
+  let messagesList: LoadingMessage[];
+  
+  if (messages) {
+    // Convert custom messages to LoadingMessage format
+    messagesList = messages.map((text, index) => ({
+      icon: [Search, TrendingUp, Brain, Target, Sparkles][index % 5],
+      text
+    }));
+  } else {
+    // Use predefined messages based on type
+    switch (type) {
+      case 'cover_letter':
+        messagesList = coverLetterMessages;
+        break;
+      case 'company_analysis':
+        messagesList = companyAnalysisMessages;
+        break;
+      default:
+        messagesList = linkedinMessages;
+    }
+  }
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % messages.length);
+      setCurrentIndex((prev) => (prev + 1) % messagesList.length);
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [messages.length]);
+  }, [messagesList.length]);
 
-  const CurrentIcon = messages[currentIndex].icon;
+  const CurrentIcon = messagesList[currentIndex].icon;
 
   return (
     <div className="flex items-center justify-center gap-3 py-8">
@@ -49,11 +78,10 @@ const LoadingMessages = ({ type = 'linkedin' }: LoadingMessagesProps) => {
         <CurrentIcon className="w-4 h-4 text-fuchsia-400 absolute top-1 left-1" />
       </div>
       <span className="text-fuchsia-100 text-lg font-semibold animate-pulse drop-shadow">
-        {messages[currentIndex].text}
+        {messagesList[currentIndex].text}
       </span>
     </div>
   );
 };
 
 export default LoadingMessages;
-
