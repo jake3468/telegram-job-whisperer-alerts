@@ -1,69 +1,54 @@
 
-import { Progress } from '@/components/ui/progress';
+import React from 'react';
 
 interface PercentageMeterProps {
-  percentage: string;
+  score: number | null;
+  label: string;
   className?: string;
 }
 
-const PercentageMeter = ({ percentage, className = '' }: PercentageMeterProps) => {
-  // Parse percentage value (e.g., "85%" -> 85)
-  const numericValue = parseInt(percentage.replace('%', ''), 10) || 0;
-  
-  // Determine color based on percentage
+export const PercentageMeter: React.FC<PercentageMeterProps> = ({ score, label, className = '' }) => {
+  if (score === null || score === undefined) {
+    return (
+      <div className={`space-y-2 ${className}`}>
+        <div className="flex justify-between items-center">
+          <span className="text-sm font-medium text-gray-300">{label}</span>
+          <span className="text-sm text-gray-400">N/A</span>
+        </div>
+        <div className="w-full bg-gray-700 rounded-full h-2">
+          <div className="bg-gray-600 h-2 rounded-full w-0"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Calculate color based on score (0-100)
   const getColor = (value: number) => {
-    if (value >= 80) return 'bg-green-500';
-    if (value >= 60) return 'bg-yellow-500';
-    if (value >= 40) return 'bg-orange-500';
-    return 'bg-red-500';
+    if (value <= 25) return 'bg-red-500';
+    if (value <= 50) return 'bg-yellow-500';
+    if (value <= 75) return 'bg-orange-500';
+    return 'bg-green-500';
   };
 
   const getGradientColor = (value: number) => {
-    if (value >= 80) return 'from-green-600 to-green-400';
-    if (value >= 60) return 'from-yellow-600 to-yellow-400';
-    if (value >= 40) return 'from-orange-600 to-orange-400';
-    return 'from-red-600 to-red-400';
+    if (value <= 25) return 'from-red-600 to-red-400';
+    if (value <= 50) return 'from-yellow-600 to-yellow-400';
+    if (value <= 75) return 'from-orange-600 to-orange-400';
+    return 'from-green-600 to-green-400';
   };
 
   return (
-    <div className={`space-y-3 ${className}`}>
-      <div className="flex items-center justify-between">
-        <span className="text-white font-inter text-sm font-medium">Match Score</span>
-        <span className={`text-lg font-bold font-inter ${
-          numericValue >= 80 ? 'text-green-400' :
-          numericValue >= 60 ? 'text-yellow-400' :
-          numericValue >= 40 ? 'text-orange-400' :
-          'text-red-400'
-        }`}>
-          {percentage}
-        </span>
+    <div className={`space-y-2 ${className}`}>
+      <div className="flex justify-between items-center">
+        <span className="text-sm font-medium text-white">{label}</span>
+        <span className="text-sm font-bold text-white">{score}%</span>
       </div>
-      
-      <div className="relative">
-        <Progress 
-          value={numericValue} 
-          className="h-6 bg-gray-700 border border-white/20"
-        />
+      <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
         <div 
-          className={`absolute top-0 left-0 h-full rounded-full bg-gradient-to-r ${getGradientColor(numericValue)} transition-all duration-500`}
-          style={{ width: `${numericValue}%` }}
-        />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-xs font-medium text-white font-inter drop-shadow-lg">
-            {percentage}
-          </span>
-        </div>
-      </div>
-      
-      <div className="flex justify-between text-xs text-gray-400 font-inter">
-        <span>0%</span>
-        <span>Poor</span>
-        <span>Good</span>
-        <span>Excellent</span>
-        <span>100%</span>
+          className={`h-3 rounded-full bg-gradient-to-r ${getGradientColor(score)} transition-all duration-500 ease-out`}
+          style={{ width: `${score}%` }}
+        ></div>
       </div>
     </div>
   );
 };
-
-export default PercentageMeter;

@@ -11,32 +11,62 @@ export type Database = {
     Tables: {
       company_role_analyses: {
         Row: {
-          analysis_result: string | null
           company_name: string
+          company_news_updates: string[] | null
           created_at: string | null
           id: string
           job_title: string
+          local_role_market_context: string | null
           location: string
+          research_date: string | null
+          role_experience_score: number | null
+          role_experience_score_breakdown: string[] | null
+          role_experience_specific_insights: string | null
+          role_security_automation_risks: string | null
+          role_security_departmental_trends: string | null
+          role_security_outlook: string | null
+          role_security_score: number | null
+          role_security_score_breakdown: string[] | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
-          analysis_result?: string | null
           company_name: string
+          company_news_updates?: string[] | null
           created_at?: string | null
           id?: string
           job_title: string
+          local_role_market_context?: string | null
           location: string
+          research_date?: string | null
+          role_experience_score?: number | null
+          role_experience_score_breakdown?: string[] | null
+          role_experience_specific_insights?: string | null
+          role_security_automation_risks?: string | null
+          role_security_departmental_trends?: string | null
+          role_security_outlook?: string | null
+          role_security_score?: number | null
+          role_security_score_breakdown?: string[] | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
-          analysis_result?: string | null
           company_name?: string
+          company_news_updates?: string[] | null
           created_at?: string | null
           id?: string
           job_title?: string
+          local_role_market_context?: string | null
           location?: string
+          research_date?: string | null
+          role_experience_score?: number | null
+          role_experience_score_breakdown?: string[] | null
+          role_experience_specific_insights?: string | null
+          role_security_automation_risks?: string | null
+          role_security_departmental_trends?: string | null
+          role_security_outlook?: string | null
+          role_security_score?: number | null
+          role_security_score_breakdown?: string[] | null
           updated_at?: string | null
           user_id?: string
         }
