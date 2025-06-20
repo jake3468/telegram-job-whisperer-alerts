@@ -17,21 +17,21 @@ export const PremiumSectionHeader: React.FC<PremiumSectionHeaderProps> = ({
   description
 }) => {
   return (
-    <div className="mb-1 w-full">
-      <div className="flex flex-col gap-1 mb-1">
-        <div className={`relative p-1 rounded-sm bg-gradient-to-r ${gradient} shadow-sm flex-shrink-0 w-fit`}>
-          <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-white rounded-full shadow-sm flex items-center justify-center">
-            <span className="text-xs font-bold text-gray-700">{number}</span>
+    <div className="mb-4 w-full">
+      <div className="flex flex-col gap-2 mb-4">
+        <div className={`relative p-3 rounded-lg bg-gradient-to-r ${gradient} shadow-lg flex-shrink-0 w-fit`}>
+          <div className="absolute -top-1 -right-1 w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center">
+            <span className="text-sm font-bold text-gray-700">{number}</span>
           </div>
           <div className="text-white">
             {icon}
           </div>
         </div>
         <div className="flex-1 min-w-0">
-          <h2 className="text-xs md:text-sm font-bold text-gray-800 mb-0.5 break-words leading-tight">
+          <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-1 break-words leading-tight">
             {title}
           </h2>
-          <p className="text-gray-600 text-xs break-words leading-tight">
+          <p className="text-gray-600 text-sm md:text-base break-words leading-relaxed">
             {description}
           </p>
         </div>

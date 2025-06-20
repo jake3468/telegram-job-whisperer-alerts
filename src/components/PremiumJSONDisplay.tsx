@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { DollarSign, TrendingUp, AlertCircle, CheckCircle, Info, Star, Award, Target } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -136,9 +135,9 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
       return (
         <div className="space-y-3">
           {value.map((item, index) => (
-            <div key={index} className={`flex items-start gap-3 p-3 ${level === 0 ? currentTheme.childBg : currentTheme.grandchildBg} rounded-lg border ${level === 0 ? currentTheme.childBorder : currentTheme.grandchildBorder}`}>
+            <div key={index} className={`flex items-start gap-3 p-4 ${level === 0 ? currentTheme.childBg : currentTheme.grandchildBg} rounded-lg border ${level === 0 ? currentTheme.childBorder : currentTheme.grandchildBorder}`}>
               <div className={`p-2 bg-gradient-to-r ${currentTheme.primary} rounded-lg flex-shrink-0`}>
-                <div className="w-2 h-2 bg-white rounded-full" />
+                <div className="w-3 h-3 bg-white rounded-full" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-gray-700 leading-relaxed font-medium text-sm md:text-base break-words">
@@ -164,14 +163,18 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
             const borderClass = level === 0 ? currentTheme.parentBorder : level === 1 ? currentTheme.childBorder : currentTheme.grandchildBorder;
             
             return (
-              <div key={key} className="space-y-2">
-                {/* Key Header */}
-                <div className={`flex items-center gap-3 p-3 ${bgClass} border ${borderClass} rounded-lg`}>
+              <div key={key} className="space-y-3">
+                {/* Key Header - Fixed sizing for better hierarchy */}
+                <div className={`flex items-center gap-3 p-4 ${bgClass} border ${borderClass} rounded-lg`}>
                   <div className="p-2 bg-white rounded-lg shadow-sm flex-shrink-0">
                     {getStatusIcon(key, val)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h6 className={`font-bold ${currentTheme.text} text-sm md:text-base break-words leading-relaxed`}>
+                    <h6 className={`font-semibold ${currentTheme.text} ${
+                      level === 0 ? 'text-base md:text-lg' : 
+                      level === 1 ? 'text-sm md:text-base' : 
+                      'text-sm'
+                    } break-words leading-relaxed`}>
                       {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                     </h6>
                   </div>
@@ -204,9 +207,9 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full overflow-hidden">
       <Card className="bg-white shadow-lg border-0 rounded-xl">
-        <CardContent className="p-6">
+        <CardContent className="p-4 md:p-6">
           {renderValue(data)}
         </CardContent>
       </Card>
