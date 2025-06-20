@@ -9,6 +9,47 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      company_role_analyses: {
+        Row: {
+          analysis_result: string | null
+          company_name: string
+          created_at: string | null
+          id: string
+          job_title: string
+          location: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          analysis_result?: string | null
+          company_name: string
+          created_at?: string | null
+          id?: string
+          job_title: string
+          location: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          analysis_result?: string | null
+          company_name?: string
+          created_at?: string | null
+          id?: string
+          job_title?: string
+          location?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_role_analyses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       credit_transactions: {
         Row: {
           amount: number

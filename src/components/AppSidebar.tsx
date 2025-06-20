@@ -1,5 +1,5 @@
 
-import { User, Bell, Target, FileText, X, Share2, CreditCard, FileUser } from 'lucide-react';
+import { User, Bell, Target, FileText, X, Share2, CreditCard, FileUser, Building2 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -37,6 +37,10 @@ const toolItems = [{
   title: 'Job Analysis',
   url: '/job-guide',
   icon: Target
+}, {
+  title: 'Company-Role Analysis',
+  url: '/company-role-analysis',
+  icon: Building2
 }, {
   title: 'Cover Letter',
   url: '/cover-letter',
