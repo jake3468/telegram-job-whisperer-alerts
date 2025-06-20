@@ -17,6 +17,7 @@ import { BulletPointList } from '@/components/BulletPointList';
 import { JSONSectionDisplay } from '@/components/JSONSectionDisplay';
 import { SourcesDisplay } from '@/components/SourcesDisplay';
 import { PremiumAnalysisResults } from '@/components/PremiumAnalysisResults';
+
 interface CompanyRoleAnalysisData {
   id: string;
   company_name: string;
@@ -42,6 +43,7 @@ interface CompanyRoleAnalysisData {
   created_at: string;
   updated_at: string;
 }
+
 const CompanyRoleAnalysis = () => {
   const [companyName, setCompanyName] = useState('');
   const [location, setLocation] = useState('');
@@ -129,12 +131,11 @@ const CompanyRoleAnalysis = () => {
     setLoadingMessages([messages[0]]);
     const interval = setInterval(() => {
       messageIndex = (messageIndex + 1) % messages.length;
-      setLoadingMessages(prev => [...prev.slice(-2),
-      // Keep last 2 messages
-      messages[messageIndex]]);
+      setLoadingMessages(prev => [...prev.slice(-2), messages[messageIndex]]);
     }, 3000);
     return () => clearInterval(interval);
   }, [isSubmitting, pendingAnalysisId]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!userProfile?.id) {
@@ -145,10 +146,13 @@ const CompanyRoleAnalysis = () => {
       });
       return;
     }
+    
+    // Check credits before proceeding
     if (!hasCredits) {
       showInsufficientCreditsPopup();
       return;
     }
+    
     if (!companyName.trim() || !location.trim() || !jobTitle.trim()) {
       toast({
         title: "Missing Information",
@@ -159,7 +163,15 @@ const CompanyRoleAnalysis = () => {
     }
     setIsSubmitting(true);
     setShowRecentResults(false);
+    
     try {
+      console.log('Creating company role analysis with data:', {
+        user_id: userProfile.id,
+        company_name: companyName.trim(),
+        location: location.trim(),
+        job_title: jobTitle.trim()
+      });
+
       const {
         data,
         error
@@ -169,6 +181,7 @@ const CompanyRoleAnalysis = () => {
         location: location.trim(),
         job_title: jobTitle.trim()
       }).select().single();
+      
       if (error) {
         console.error('Error creating company-role analysis:', error);
         toast({
@@ -179,6 +192,8 @@ const CompanyRoleAnalysis = () => {
         setIsSubmitting(false);
         return;
       }
+
+      console.log('Company analysis created successfully:', data);
 
       // Set pending analysis ID to track real-time updates
       setPendingAnalysisId(data.id);
@@ -204,17 +219,20 @@ const CompanyRoleAnalysis = () => {
       setIsSubmitting(false);
     }
   };
+
   const handleReset = () => {
     setCompanyName('');
     setLocation('');
     setJobTitle('');
   };
+
   const hasAnalysisResult = (analysis: CompanyRoleAnalysisData) => {
     return analysis.local_role_market_context || analysis.company_news_updates?.length || analysis.role_security_score || analysis.role_experience_score || analysis.role_compensation_analysis || analysis.role_workplace_environment || analysis.career_development || analysis.role_specific_considerations || analysis.interview_and_hiring_insights || analysis.sources;
   };
 
   // Get the most recent completed analysis for display
   const recentCompletedAnalysis = showRecentResults && analysisHistory && analysisHistory.length > 0 ? analysisHistory.find(analysis => hasAnalysisResult(analysis)) : null;
+  
   return <Layout>
       <div className="min-h-screen bg-black px-2 py-4 sm:px-4 sm:py-6 lg:px-8 lg:py-8">
         <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
@@ -280,9 +298,13 @@ const CompanyRoleAnalysis = () => {
                     <Input id="jobTitle" type="text" placeholder="e.g., Senior Software Engineer, Product Manager, Data Scientist" value={jobTitle} onChange={e => setJobTitle(e.target.value)} required className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
                   </div>
 
-                  {/* Action Buttons */}
+                  {/* Action Buttons - Desktop: same line, Mobile: stacked */}
                   <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4">
-                    <Button type="submit" disabled={isSubmitting || !hasCredits} className="w-full lg:flex-1 bg-gradient-to-r from-green-700 via-green-800 to-green-900 hover:from-green-800 hover:via-green-900 hover:to-green-950 text-white font-orbitron font-bold py-4 sm:py-6 text-sm sm:text-lg shadow-2xl shadow-green-600/25 border-0">
+                    <Button 
+                      type="submit" 
+                      disabled={isSubmitting || !hasCredits} 
+                      className="w-full lg:flex-1 bg-gradient-to-r from-green-700 via-green-800 to-green-900 hover:from-green-800 hover:via-green-900 hover:to-green-950 text-white font-orbitron font-bold py-4 sm:py-6 text-sm sm:text-lg shadow-2xl shadow-green-600/25 border-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
                       {isSubmitting ? <>
                           <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
                           Analyzing Company & Role...
@@ -292,7 +314,7 @@ const CompanyRoleAnalysis = () => {
                         </>}
                     </Button>
                     
-                    <Button type="button" variant="outline" onClick={handleReset} className="w-full lg:w-auto border-white/50 text-white hover:bg-white/20 hover:text-white font-orbitron bg-transparent py-3 sm:py-4 text-sm sm:text-base">
+                    <Button type="button" variant="outline" onClick={handleReset} className="w-full lg:w-auto border-white/50 text-white hover:bg-white/20 hover:text-white font-orbitron bg-transparent py-3 sm:py-4 text-sm sm:text-base lg:px-6">
                       <RotateCcw className="w-4 h-4 mr-2" />
                       Reset
                     </Button>
@@ -313,7 +335,7 @@ const CompanyRoleAnalysis = () => {
                     </h3>
                   </div>
                   <div className="space-y-2">
-                    {loadingMessages.map((message, index) => <div key={index} className="flex items-center gap-2 text-sm sm:text-base text-green-200">
+                    {loadingMessages.map((message, index) => <div key={index} className="flex items-center gap-2 text-sm sm:text-base text-white font-medium">
                         <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                         {message}
                       </div>)}
@@ -339,4 +361,5 @@ const CompanyRoleAnalysis = () => {
       <CompanyRoleAnalysisHistoryModal isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} gradientColors="from-green-400 via-green-500 to-green-600" />
     </Layout>;
 };
+
 export default CompanyRoleAnalysis;
