@@ -8,6 +8,7 @@ import { Bell, Plus } from 'lucide-react';
 import JobAlertForm from './JobAlertForm';
 import JobAlertsList from './JobAlertsList';
 import BotStatus from './BotStatus';
+
 interface JobAlert {
   id: string;
   country: string;
@@ -21,73 +22,93 @@ interface JobAlert {
   created_at: string;
   updated_at: string;
 }
+
 interface JobAlertsSectionProps {
   userTimezone: string;
 }
-const JobAlertsSection = ({
-  userTimezone
-}: {
-  userTimezone: string;
-}) => {
-  const {
-    user
-  } = useUser();
-  const {
-    toast
-  } = useToast();
+
+const JobAlertsSection = ({ userTimezone }: { userTimezone: string }) => {
+  const { user } = useUser();
+  const { toast } = useToast();
   const [alerts, setAlerts] = useState<JobAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingAlert, setEditingAlert] = useState<JobAlert | null>(null);
   const [isActivated, setIsActivated] = useState<boolean>(false);
   const [userProfileId, setUserProfileId] = useState<string | null>(null);
+
   useEffect(() => {
     fetchUserProfileAndAlerts();
   }, [user]);
+
   const fetchUserProfileAndAlerts = async () => {
     if (!user) return;
+
     try {
+      console.log('[JobAlertsSection] Starting to fetch user profile and alerts for user:', user.id);
+      
       // First, get the user's database ID
-      const {
-        data: userData,
-        error: userError
-      } = await supabase.from('users').select('id').eq('clerk_id', user.id).single();
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('clerk_id', user.id)
+        .single();
+
       if (userError) {
-        console.error('Error fetching user:', userError);
+        console.error('[JobAlertsSection] Error fetching user:', userError);
         setLoading(false);
         return;
       }
 
+      console.log('[JobAlertsSection] Found user data:', userData);
+
       // Get user profile
-      const {
-        data: profileData,
-        error: profileError
-      } = await supabase.from('user_profile').select('id').eq('user_id', userData.id).single();
+      const { data: profileData, error: profileError } = await supabase
+        .from('user_profile')
+        .select('id')
+        .eq('user_id', userData.id)
+        .single();
+
       if (profileError) {
-        console.error('Error fetching user profile:', profileError);
+        console.error('[JobAlertsSection] Error fetching user profile:', profileError);
         setLoading(false);
         return;
       }
+
+      console.log('[JobAlertsSection] Found profile data:', profileData);
       setUserProfileId(profileData.id);
 
       // Fetch job alerts using user_profile.id
-      const {
-        data,
-        error
-      } = await supabase.from('job_alerts').select('*').eq('user_id', profileData.id).order('created_at', {
-        ascending: false
-      });
+      console.log('[JobAlertsSection] Fetching job alerts for profile ID:', profileData.id);
+      const { data, error } = await supabase
+        .from('job_alerts')
+        .select('*')
+        .eq('user_id', profileData.id)
+        .order('created_at', { ascending: false });
+
       if (error) {
-        console.error('Error fetching job alerts:', error);
+        console.error('[JobAlertsSection] Error fetching job alerts:', error);
+        toast({
+          title: "Error loading alerts",
+          description: "There was an error loading your job alerts. Please try refreshing the page.",
+          variant: "destructive",
+        });
       } else {
+        console.log('[JobAlertsSection] Successfully fetched job alerts:', data);
         setAlerts(data || []);
       }
     } catch (error) {
-      console.error('Error fetching user profile and alerts:', error);
+      console.error('[JobAlertsSection] Error fetching user profile and alerts:', error);
+      toast({
+        title: "Error loading data",
+        description: "There was an error loading your data. Please try refreshing the page.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
+
   const handleCreateAlert = () => {
     if (!isActivated) {
       toast({
@@ -100,6 +121,7 @@ const JobAlertsSection = ({
     setEditingAlert(null);
     setShowForm(true);
   };
+
   const handleEditAlert = (alert: JobAlert) => {
     if (!isActivated) {
       toast({
@@ -112,6 +134,7 @@ const JobAlertsSection = ({
     setEditingAlert(alert);
     setShowForm(true);
   };
+
   const handleDeleteAlert = async (alertId: string) => {
     if (!isActivated) {
       toast({
@@ -121,11 +144,15 @@ const JobAlertsSection = ({
       });
       return;
     }
+
     try {
-      const {
-        error
-      } = await supabase.from('job_alerts').delete().eq('id', alertId);
+      const { error } = await supabase
+        .from('job_alerts')
+        .delete()
+        .eq('id', alertId);
+
       if (error) throw error;
+
       setAlerts(alerts.filter(alert => alert.id !== alertId));
       toast({
         title: "Alert deleted",
@@ -140,25 +167,32 @@ const JobAlertsSection = ({
       });
     }
   };
+
   const handleFormSubmit = () => {
     setShowForm(false);
     setEditingAlert(null);
     fetchUserProfileAndAlerts();
   };
+
   const handleFormCancel = () => {
     setShowForm(false);
     setEditingAlert(null);
   };
+
   const handleActivationChange = (activated: boolean) => {
     setIsActivated(activated);
   };
+
   if (loading) {
-    return <div className="max-w-2xl mx-auto w-full">
+    return (
+      <div className="max-w-2xl mx-auto w-full">
         <div className="rounded-3xl bg-black/95 border-2 border-emerald-400 shadow-none p-6 mt-3 min-h-[160px] flex items-center justify-center">
           <div className="text-emerald-100 text-xs">Loading...</div>
         </div>
-      </div>;
+      </div>
+    );
   }
+
   return (
     <section className="rounded-3xl border-2 border-orange-400 bg-gradient-to-b from-orange-900/90 via-[#2b1605]/90 to-[#2b1605]/98 shadow-none p-0">
       <div className="pt-4 px-2 sm:px-6">
@@ -166,7 +200,9 @@ const JobAlertsSection = ({
           <div className="min-w-0">
             <span className="text-2xl font-orbitron bg-gradient-to-r from-orange-300 via-yellow-300 to-pink-400 bg-clip-text text-transparent font-extrabold flex items-center gap-2 drop-shadow">
               <span className="w-6 h-6 bg-orange-400/70 rounded-full flex items-center justify-center shadow-lg ring-2 ring-orange-300/40">
-                <svg viewBox="0 0 24 24" width={18} height={18}><path fill="none" stroke="#fff" strokeWidth="2" d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z" /></svg>
+                <svg viewBox="0 0 24 24" width={18} height={18}>
+                  <path fill="none" stroke="#fff" strokeWidth="2" d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z" />
+                </svg>
               </span>
               <span>Job Alerts</span>
             </span>
@@ -175,30 +211,35 @@ const JobAlertsSection = ({
             </p>
           </div>
 
-          {isActivated && !showForm && <div className="flex items-center mt-2 sm:mt-0">
-              <Button onClick={handleCreateAlert}
+          {isActivated && !showForm && (
+            <div className="flex items-center mt-2 sm:mt-0">
+              <Button 
+                onClick={handleCreateAlert}
                 className="font-bold px-4 py-2 rounded-lg shadow-sm transition text-orange-950 bg-gradient-to-tr from-orange-200 via-yellow-100 to-orange-300 hover:bg-orange-100 hover:from-yellow-200"
               >
                 <Plus className="w-4 h-4 mr-2" /> Add Alert
               </Button>
-            </div>}
+            </div>
+          )}
         </div>
+
         <div>
           {/* Bot Status Component */}
           <BotStatus onActivationChange={handleActivationChange} />
 
           {/* Job Alerts Form and List - Only show when activated */}
-          {isActivated && <>
-              {showForm && <div
-                className="mb-6 rounded-2xl bg-gradient-to-br from-orange-900/95 via-[#3c1c01]/90 to-[#2b1605]/95 border border-orange-500/70 shadow-lg p-2 sm:p-4"
-              >
-                <JobAlertForm
-                  userTimezone={userTimezone}
-                  editingAlert={editingAlert}
-                  onSubmit={handleFormSubmit}
-                  onCancel={handleFormCancel}
-                />
-              </div>}
+          {isActivated && (
+            <>
+              {showForm && (
+                <div className="mb-6 rounded-2xl bg-gradient-to-br from-orange-900/95 via-[#3c1c01]/90 to-[#2b1605]/95 border border-orange-500/70 shadow-lg p-2 sm:p-4">
+                  <JobAlertForm
+                    userTimezone={userTimezone}
+                    editingAlert={editingAlert}
+                    onSubmit={handleFormSubmit}
+                    onCancel={handleFormCancel}
+                  />
+                </div>
+              )}
               <div className="flex flex-col gap-4 pb-6 sm:pb-8">
                 <JobAlertsList
                   alerts={alerts}
@@ -206,17 +247,21 @@ const JobAlertsSection = ({
                   onDelete={handleDeleteAlert}
                 />
               </div>
-            </>}
+            </>
+          )}
 
-          {!isActivated && <div className="text-center py-6">
+          {!isActivated && (
+            <div className="text-center py-6">
               <Bell className="w-10 h-10 text-orange-400 mx-auto mb-3" />
               <p className="text-orange-100 font-inter text-base mb-1">Activate your bot to manage job alerts</p>
               <p className="text-orange-200 font-inter text-sm">Follow the instructions above to get started</p>
-            </div>}
+            </div>
+          )}
         </div>
       </div>
       <div className="h-2 sm:h-4" />
     </section>
   );
 };
+
 export default JobAlertsSection;
