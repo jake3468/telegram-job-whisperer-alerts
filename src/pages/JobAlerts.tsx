@@ -14,7 +14,6 @@ const JobAlerts = () => {
 
   // CRITICAL: Ensure Clerk-Supabase sync runs on this page
   useClerkSupabaseSync();
-  console.log('[JobAlerts] Page loaded, useClerkSupabaseSync called');
 
   // Replace useFeatureCreditCheck with the new system
   useCreditWarnings(); // This shows the warning popups
@@ -48,23 +47,18 @@ const JobAlerts = () => {
   }, []);
 
   useEffect(() => {
-    console.log('[JobAlerts] Auth state - isLoaded:', isLoaded, 'user:', user ? 'present' : 'null');
     if (isLoaded && !user) {
-      console.log('[JobAlerts] No user found, redirecting to home');
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
 
   if (!isLoaded || !user) {
-    console.log('[JobAlerts] Loading or no user, showing loading state');
     return (
       <div className="min-h-screen bg-gradient-to-br from-pastel-mint via-pastel-lavender to-pastel-peach flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading...</div>
       </div>
     );
   }
-
-  console.log('[JobAlerts] Rendering main content for user:', user.id);
 
   return (
     <Layout>

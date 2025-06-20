@@ -13,13 +13,9 @@ export function useClerkSupabaseSync() {
   useEffect(() => {
     let isMounted = true;
     
-    console.log('[useClerkSupabaseSync] Hook triggered - isSignedIn:', isSignedIn, 'userId:', userId);
-    
     async function setToken() {
       try {
         if (isSignedIn && getToken) {
-          console.log('[useClerkSupabaseSync] User is signed in, getting token...');
-          
           // Get the token for this signed-in user with the supabase template
           const jwt = await getToken({ template: 'supabase' }).catch((error) => {
             console.error('[useClerkSupabaseSync] Error getting Clerk JWT:', error);
@@ -29,36 +25,14 @@ export function useClerkSupabaseSync() {
           if (!isMounted) return; // Component unmounted
           
           if (!jwt) {
-            console.warn("[useClerkSupabaseSync] No Clerk JWT was returned. This usually means the 'supabase' JWT template is not configured in Clerk. Supabase RLS will fail.");
-            console.warn("[useClerkSupabaseSync] Please check your Clerk dashboard for JWT templates configuration.");
+            console.warn("[useClerkSupabaseSync] No Clerk JWT was returned. Using Supabase anon key only.");
             await setClerkToken(null);
           } else {
-            // Only show the first/last 5 chars, do NOT log the full JWT!
-            const masked = jwt.length > 10 ? jwt.substring(0,5) + "..." + jwt.substring(jwt.length-5) : "[short]";
             await setClerkToken(jwt);
-            console.log(`[useClerkSupabaseSync] ✅ Clerk JWT was set successfully (masked): ${masked} for Clerk user ID: ${userId}`);
-            
-            // Debug: Log JWT claims structure (safely)
-            try {
-              const payload = JSON.parse(atob(jwt.split('.')[1]));
-              console.log('[useClerkSupabaseSync] JWT claims structure:', {
-                sub: payload.sub ? `✅ present (${payload.sub.substring(0,8)}...)` : '❌ missing',
-                iss: payload.iss ? '✅ present' : '❌ missing',
-                aud: payload.aud ? '✅ present' : '❌ missing',
-                exp: payload.exp ? '✅ present' : '❌ missing',
-                iat: payload.iat ? '✅ present' : '❌ missing'
-              });
-              
-              if (!payload.sub) {
-                console.error('[useClerkSupabaseSync] ❌ CRITICAL: JWT token missing "sub" field - RLS policies will fail!');
-              }
-            } catch (parseError) {
-              console.warn('[useClerkSupabaseSync] Could not parse JWT for debugging:', parseError);
-            }
+            console.log(`[useClerkSupabaseSync] ✅ Clerk JWT was set successfully for user: ${userId}`);
           }
         } else {
-          console.log("[useClerkSupabaseSync] User not signed in or getToken missing. Using Supabase anon key only.");
-          console.log("[useClerkSupabaseSync] isSignedIn:", isSignedIn, "getToken available:", !!getToken);
+          console.log("[useClerkSupabaseSync] User not signed in. Using Supabase anon key only.");
           await setClerkToken(null);
         }
       } catch (err) {
