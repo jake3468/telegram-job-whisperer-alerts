@@ -38,7 +38,7 @@ const toolItems = [{
   url: '/job-guide',
   icon: Target
 }, {
-  title: 'Company-Role Analysis',
+  title: 'Company Decoder',
   url: '/company-role-analysis',
   icon: Building2
 }, {
