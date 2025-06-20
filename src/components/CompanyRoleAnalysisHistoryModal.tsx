@@ -177,8 +177,49 @@ const CompanyRoleAnalysisHistoryModal = ({
           </DialogHeader>
           
           <div className="flex-1 overflow-y-auto space-y-6 mt-4">
+            {/* Input Details Section */}
+            <div className="rounded-lg p-4 border border-white/10 bg-blue-800">
+              <h3 className="text-white font-medium mb-4 flex items-center gap-2">
+                <Building className="w-4 h-4" />
+                Input Details
+              </h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-cyan-200 text-sm font-semibold">Company Name:</label>
+                  <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
+                    <p className="text-white text-sm">{selectedItem.company_name}</p>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-cyan-200 text-sm font-semibold">Job Title:</label>
+                  <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
+                    <p className="text-white text-sm">{selectedItem.job_title}</p>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-cyan-200 text-sm font-semibold">Location:</label>
+                  <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
+                    <p className="text-white text-sm">{selectedItem.location}</p>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-cyan-200 text-sm font-semibold">Created:</label>
+                  <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
+                    <p className="text-white text-sm">{formatDate(selectedItem.created_at)}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Analysis Results Section */}
             {hasAnalysisResult(selectedItem) ? (
-              <PremiumAnalysisResults analysis={selectedItem as any} />
+              <div className="rounded-lg overflow-hidden">
+                <h3 className="text-white font-medium mb-4 flex items-center gap-2 px-4">
+                  <TrendingUp className="w-4 h-4" />
+                  Analysis Results
+                </h3>
+                <PremiumAnalysisResults analysis={selectedItem as any} />
+              </div>
             ) : (
               <div className="rounded-lg p-4 border border-white/10 bg-yellow-800/30">
                 <div className="flex items-center gap-2 text-yellow-200">
@@ -235,9 +276,9 @@ const CompanyRoleAnalysisHistoryModal = ({
                   <div className="block sm:hidden space-y-2">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 text-white font-medium text-sm">
+                        <div className="flex items-center gap-2 text-white font-medium text-sm mb-1">
                           <Building className="w-3 h-3 flex-shrink-0" />
-                          <span className="truncate">{item.company_name || 'Unknown Company'}</span>
+                          <span className="break-words">{item.company_name || 'Unknown Company'}</span>
                         </div>
                         <div className="flex items-center gap-2 text-white/80 text-sm mt-1">
                           <Briefcase className="w-3 h-3 flex-shrink-0" />
@@ -282,19 +323,23 @@ const CompanyRoleAnalysisHistoryModal = ({
                   <div className="hidden sm:flex items-center justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 text-white font-medium truncate">
+                        {/* Company Name - Given priority, no truncation */}
+                        <div className="flex items-center gap-2 text-white font-medium min-w-0 flex-shrink-0">
                           <Building className="w-4 h-4 flex-shrink-0" />
-                          <span className="truncate">{item.company_name || 'Unknown Company'}</span>
+                          <span className="whitespace-nowrap">{item.company_name || 'Unknown Company'}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-white/80 truncate">
+                        {/* Job Title - Can be truncated */}
+                        <div className="flex items-center gap-2 text-white/80 min-w-0 flex-1">
                           <Briefcase className="w-4 h-4 flex-shrink-0" />
                           <span className="truncate">{item.job_title || 'Unknown Position'}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-white/60 text-sm">
+                        {/* Location */}
+                        <div className="flex items-center gap-2 text-white/60 text-sm flex-shrink-0">
                           <MapPin className="w-4 h-4 flex-shrink-0" />
-                          <span className="truncate">{item.location || 'Unknown Location'}</span>
+                          <span className="truncate max-w-24">{item.location || 'Unknown Location'}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-white/60 text-sm">
+                        {/* Date */}
+                        <div className="flex items-center gap-2 text-white/60 text-sm flex-shrink-0">
                           <Calendar className="w-4 h-4 flex-shrink-0" />
                           <span className="whitespace-nowrap">{formatDate(item.created_at)}</span>
                         </div>
