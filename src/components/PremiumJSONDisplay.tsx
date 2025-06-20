@@ -106,15 +106,15 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
   const renderValue = (value: any, level: number = 0, parentKey: string = ''): React.ReactNode => {
     if (Array.isArray(value)) {
       return (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {value.map((item, index) => (
             <div key={index} className={`p-3 ${currentTheme.childBg} rounded-lg border ${currentTheme.border} shadow-sm`}>
-              <div className="flex items-start gap-3">
-                <div className={`p-2 bg-gradient-to-r ${currentTheme.primary} rounded-md flex-shrink-0 mt-1`}>
+              <div className="flex items-start gap-2">
+                <div className={`p-1 bg-gradient-to-r ${currentTheme.primary} rounded-md flex-shrink-0 mt-1`}>
                   <div className="w-2 h-2 bg-white rounded-full" />
                 </div>
-                <div className="flex-1">
-                  <p className="text-gray-700 text-sm md:text-base leading-relaxed font-medium">
+                <div className="flex-1 min-w-0">
+                  <p className="text-gray-700 text-sm leading-relaxed font-medium break-words">
                     {typeof item === 'string' ? 
                       (parentKey.toLowerCase().includes('salary') || parentKey.toLowerCase().includes('compensation') ? 
                         formatCurrency(item) : item
@@ -132,22 +132,22 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
 
     if (typeof value === 'object' && value !== null) {
       return (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {Object.entries(value).map(([key, val]) => (
-            <div key={key} className="space-y-3">
-              <div className={`p-4 ${currentTheme.parentBg} border ${currentTheme.border} rounded-lg shadow-sm`}>
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="p-2 bg-white rounded-lg shadow-sm flex-shrink-0 mt-1">
+            <div key={key} className="space-y-2">
+              <div className={`p-3 ${currentTheme.parentBg} border ${currentTheme.border} rounded-lg shadow-sm`}>
+                <div className="flex items-start gap-2 mb-2">
+                  <div className="p-1 bg-white rounded-lg shadow-sm flex-shrink-0 mt-1">
                     {getStatusIcon(key, val)}
                   </div>
-                  <div className="flex-1">
-                    <h4 className={`font-semibold ${currentTheme.text} text-base md:text-lg mb-2`}>
+                  <div className="flex-1 min-w-0">
+                    <h4 className={`font-semibold ${currentTheme.text} text-sm mb-1 break-words`}>
                       {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                     </h4>
                   </div>
                 </div>
                 
-                <div className="ml-2">
+                <div className="ml-1">
                   {renderValue(val, level + 1, key)}
                 </div>
               </div>
@@ -165,7 +165,7 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
 
     return (
       <div className={`p-3 ${currentTheme.childBg} rounded-lg border ${currentTheme.border} shadow-sm`}>
-        <p className="text-gray-700 text-sm md:text-base leading-relaxed font-medium">
+        <p className="text-gray-700 text-sm leading-relaxed font-medium break-words">
           {formattedValue}
         </p>
       </div>
@@ -174,8 +174,8 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
 
   return (
     <div className="w-full">
-      <Card className="bg-white shadow-lg border-0 rounded-xl">
-        <CardContent className="p-4 md:p-6">
+      <Card className="bg-white shadow-lg border-0 rounded-xl overflow-hidden">
+        <CardContent className="p-4">
           {renderValue(data)}
         </CardContent>
       </Card>

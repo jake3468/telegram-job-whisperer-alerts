@@ -40,74 +40,76 @@ interface PremiumAnalysisResultsProps {
 
 export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ analysis }) => {
   return (
-    <div className="w-full bg-gradient-to-br from-gray-50 to-white min-h-screen">
-      <div className="w-full max-w-4xl mx-auto space-y-6 px-4 py-6">
+    <div className="w-full bg-gradient-to-br from-gray-50 to-white min-h-screen overflow-x-hidden">
+      <div className="w-full max-w-none mx-auto space-y-6 px-2 py-6">
         {/* Hero Section */}
-        <div className="w-full bg-white rounded-xl shadow-lg border border-gray-100">
-          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-6 text-white rounded-t-xl">
-            <div className="flex flex-col gap-4">
-              <div className="space-y-3">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm flex-shrink-0">
-                    <Building2 className="w-6 h-6" />
+        <div className="w-full max-w-4xl mx-auto">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-4 text-white">
+              <div className="flex flex-col gap-4">
+                <div className="space-y-3">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm flex-shrink-0">
+                      <Building2 className="w-6 h-6" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h1 className="text-lg md:text-xl lg:text-2xl font-bold leading-tight break-words">
+                        {analysis.job_title}
+                      </h1>
+                      <p className="text-sm md:text-base text-blue-100 mt-1 break-words">
+                        at {analysis.company_name}
+                      </p>
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <h1 className="text-xl md:text-2xl lg:text-3xl font-bold leading-tight break-words">
-                      {analysis.job_title}
-                    </h1>
-                    <p className="text-base md:text-lg text-blue-100 mt-2 break-words">
-                      at {analysis.company_name}
-                    </p>
+                  
+                  <div className="flex flex-wrap gap-2 text-xs md:text-sm">
+                    <div className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-full backdrop-blur-sm">
+                      <MapPin className="w-3 h-3 flex-shrink-0" />
+                      <span className="break-words">{analysis.location}</span>
+                    </div>
+                    {analysis.research_date && (
+                      <div className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-full backdrop-blur-sm">
+                        <Calendar className="w-3 h-3 flex-shrink-0" />
+                        <span className="break-words text-xs">
+                          {new Date(analysis.research_date).toLocaleDateString()}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
-                
-                <div className="flex flex-wrap gap-3 text-sm md:text-base">
-                  <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm min-w-0">
-                    <MapPin className="w-4 h-4 flex-shrink-0" />
-                    <span className="break-words">{analysis.location}</span>
-                  </div>
-                  {analysis.research_date && (
-                    <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm min-w-0">
-                      <Calendar className="w-4 h-4 flex-shrink-0" />
-                      <span className="break-words">
-                        {new Date(analysis.research_date).toLocaleDateString()}
-                      </span>
+
+                {/* Key Metrics Dashboard */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {analysis.role_security_score !== null && (
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
+                      <div className="text-xl md:text-2xl font-bold mb-1">
+                        {analysis.role_security_score}%
+                      </div>
+                      <div className="text-xs md:text-sm text-blue-100 mb-1">Security Score</div>
+                      <div className="flex justify-center">
+                        <Award className="w-4 h-4 text-yellow-300" />
+                      </div>
+                    </div>
+                  )}
+                  {analysis.role_experience_score !== null && (
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
+                      <div className="text-xl md:text-2xl font-bold mb-1">
+                        {analysis.role_experience_score}%
+                      </div>
+                      <div className="text-xs md:text-sm text-blue-100 mb-1">Experience Score</div>
+                      <div className="flex justify-center">
+                        <Star className="w-4 h-4 text-yellow-300" />
+                      </div>
                     </div>
                   )}
                 </div>
-              </div>
-
-              {/* Key Metrics Dashboard */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {analysis.role_security_score !== null && (
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-                    <div className="text-2xl md:text-3xl font-bold mb-2">
-                      {analysis.role_security_score}%
-                    </div>
-                    <div className="text-sm md:text-base text-blue-100 mb-2">Security Score</div>
-                    <div className="flex justify-center">
-                      <Award className="w-5 h-5 text-yellow-300" />
-                    </div>
-                  </div>
-                )}
-                {analysis.role_experience_score !== null && (
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-                    <div className="text-2xl md:text-3xl font-bold mb-2">
-                      {analysis.role_experience_score}%
-                    </div>
-                    <div className="text-sm md:text-base text-blue-100 mb-2">Experience Score</div>
-                    <div className="flex justify-center">
-                      <Star className="w-5 h-5 text-yellow-300" />
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>
         </div>
 
         {/* Analysis Sections */}
-        <div className="w-full space-y-6">
+        <div className="w-full max-w-4xl mx-auto space-y-6">
           {/* Market Context - Section 1 */}
           {analysis.local_role_market_context && (
             <div className="w-full">
@@ -118,10 +120,10 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                 gradient="from-blue-500 to-cyan-500"
                 description="Current market trends and opportunities"
               />
-              <Card className="w-full bg-white shadow-lg border-0 rounded-xl">
-                <CardContent className="p-6">
-                  <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-6 border-l-4 border-blue-500">
-                    <p className="text-gray-700 leading-relaxed text-sm md:text-base break-words">
+              <Card className="w-full bg-white shadow-lg border-0 rounded-xl overflow-hidden">
+                <CardContent className="p-4">
+                  <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border-l-4 border-blue-500">
+                    <p className="text-gray-700 leading-relaxed text-sm break-words">
                       {analysis.local_role_market_context}
                     </p>
                   </div>
@@ -140,8 +142,8 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                 gradient="from-orange-500 to-red-500"
                 description="Latest developments and company insights"
               />
-              <Card className="w-full bg-white shadow-lg border-0 rounded-xl">
-                <CardContent className="p-6">
+              <Card className="w-full bg-white shadow-lg border-0 rounded-xl overflow-hidden">
+                <CardContent className="p-4">
                   <PremiumBulletPointList 
                     items={analysis.company_news_updates} 
                     theme="orange"
@@ -161,8 +163,8 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                 gradient="from-green-500 to-emerald-500"
                 description="Job stability and future outlook"
               />
-              <Card className="w-full bg-white shadow-lg border-0 rounded-xl">
-                <CardContent className="p-6 space-y-6">
+              <Card className="w-full bg-white shadow-lg border-0 rounded-xl overflow-hidden">
+                <CardContent className="p-4 space-y-4">
                   {analysis.role_security_score !== null && (
                     <EnhancedPercentageMeter 
                       score={analysis.role_security_score} 
@@ -180,27 +182,27 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                   )}
                   
                   {analysis.role_security_outlook && (
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border-l-4 border-green-500">
-                      <h4 className="font-bold text-green-800 text-base md:text-lg mb-3">Outlook</h4>
-                      <p className="text-gray-700 leading-relaxed text-sm md:text-base break-words">
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border-l-4 border-green-500">
+                      <h4 className="font-bold text-green-800 text-sm mb-2">Outlook</h4>
+                      <p className="text-gray-700 leading-relaxed text-sm break-words">
                         {analysis.role_security_outlook}
                       </p>
                     </div>
                   )}
                   
                   {analysis.role_security_automation_risks && (
-                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-6 border-l-4 border-yellow-500">
-                      <h4 className="font-bold text-yellow-800 text-base md:text-lg mb-3">Automation Risks</h4>
-                      <p className="text-gray-700 leading-relaxed text-sm md:text-base break-words">
+                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4 border-l-4 border-yellow-500">
+                      <h4 className="font-bold text-yellow-800 text-sm mb-2">Automation Risks</h4>
+                      <p className="text-gray-700 leading-relaxed text-sm break-words">
                         {analysis.role_security_automation_risks}
                       </p>
                     </div>
                   )}
                   
                   {analysis.role_security_departmental_trends && (
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-l-4 border-blue-500">
-                      <h4 className="font-bold text-blue-800 text-base md:text-lg mb-3">Departmental Trends</h4>
-                      <p className="text-gray-700 leading-relaxed text-sm md:text-base break-words">
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-l-4 border-blue-500">
+                      <h4 className="font-bold text-blue-800 text-sm mb-2">Departmental Trends</h4>
+                      <p className="text-gray-700 leading-relaxed text-sm break-words">
                         {analysis.role_security_departmental_trends}
                       </p>
                     </div>
@@ -220,8 +222,8 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                 gradient="from-purple-500 to-pink-500"
                 description="Experience requirements and career fit"
               />
-              <Card className="w-full bg-white shadow-lg border-0 rounded-xl">
-                <CardContent className="p-6 space-y-6">
+              <Card className="w-full bg-white shadow-lg border-0 rounded-xl overflow-hidden">
+                <CardContent className="p-4 space-y-4">
                   {analysis.role_experience_score !== null && (
                     <EnhancedPercentageMeter 
                       score={analysis.role_experience_score} 
@@ -239,9 +241,9 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                   )}
                   
                   {analysis.role_experience_specific_insights && (
-                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border-l-4 border-purple-500">
-                      <h4 className="font-bold text-purple-800 text-base md:text-lg mb-3">Specific Insights</h4>
-                      <p className="text-gray-700 leading-relaxed text-sm md:text-base break-words">
+                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border-l-4 border-purple-500">
+                      <h4 className="font-bold text-purple-800 text-sm mb-2">Specific Insights</h4>
+                      <p className="text-gray-700 leading-relaxed text-sm break-words">
                         {analysis.role_experience_specific_insights}
                       </p>
                     </div>
