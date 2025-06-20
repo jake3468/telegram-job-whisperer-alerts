@@ -28,11 +28,13 @@ export const setClerkToken = async (token: string | null) => {
     // Set the authorization header in the global headers object
     globalHeaders['Authorization'] = `Bearer ${token}`;
     supabase.realtime.setAuth(token);
-    console.log('[setClerkToken] Clerk JWT token has been set in Supabase headers');
+    console.log('[setClerkToken] ✅ Clerk JWT token has been set in Supabase headers');
+    console.log('[setClerkToken] Current headers:', Object.keys(globalHeaders));
   } else {
     // Remove the authorization header when signing out
     delete globalHeaders['Authorization'];
     supabase.realtime.setAuth(null);
-    console.log('[setClerkToken] Clerk JWT token has been removed from Supabase headers');
+    console.log('[setClerkToken] ❌ Clerk JWT token has been removed from Supabase headers');
+    console.log('[setClerkToken] Current headers:', Object.keys(globalHeaders));
   }
 };
