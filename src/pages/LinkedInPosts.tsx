@@ -13,7 +13,7 @@ import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
 import LinkedInPostsHistoryModal from '@/components/LinkedInPostsHistoryModal';
 import LinkedInPostVariation from '@/components/LinkedInPostVariation';
 import LoadingMessages from '@/components/LoadingMessages';
-import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
+import { useCreditCheck } from '@/hooks/useCreditCheck';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 
@@ -36,7 +36,7 @@ const LinkedInPosts = () => {
   const { toast } = useToast();
   const { userProfile } = useUserProfile();
   const { isComplete } = useUserCompletionStatus();
-  useFeatureCreditCheck(1.5);
+  const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(1.5);
 
   const [formData, setFormData] = useState({
     topic: '',
@@ -213,6 +213,12 @@ const LinkedInPosts = () => {
         description: "Please complete your profile before creating LinkedIn posts.",
         variant: "destructive"
       });
+      return;
+    }
+
+    // Check credits before proceeding
+    if (!hasCredits) {
+      showInsufficientCreditsPopup();
       return;
     }
 
@@ -433,7 +439,7 @@ const LinkedInPosts = () => {
                         <div className="flex flex-col sm:flex-row gap-3 pt-4">
                           <Button 
                             type="submit" 
-                            disabled={isSubmitting || !formData.topic.trim() || isGenerating} 
+                            disabled={isSubmitting || !formData.topic.trim() || isGenerating || !hasCredits} 
                             className="flex-1 bg-gradient-to-r from-teal-400 via-cyan-400 to-teal-500 hover:from-teal-500 hover:via-cyan-500 hover:to-teal-600 text-black font-semibold text-base h-12 shadow-md"
                           >
                             {isSubmitting ? 'Submitting...' : 'Generate LinkedIn Posts'}
