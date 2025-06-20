@@ -15,14 +15,18 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
     yellow: {
       primary: 'from-yellow-500 to-orange-500',
       // Level 1: Main headers - Dark background with white text
-      level1Bg: 'bg-yellow-700',
+      level1Bg: 'bg-yellow-800',
       level1Text: 'text-white',
       level1Icon: 'text-white',
       // Level 2: Subheaders - Medium background with dark text
-      level2Bg: 'bg-yellow-200',
+      level2Bg: 'bg-yellow-300',
       level2Text: 'text-yellow-900',
       level2Icon: 'text-yellow-800',
-      // Level 3: Content - Light background
+      // Level 3: Sub-subheaders - Light background with medium text
+      level3Bg: 'bg-yellow-100',
+      level3Text: 'text-yellow-800',
+      level3Icon: 'text-yellow-700',
+      // Content - Lightest background
       contentBg: 'bg-yellow-50',
       contentText: 'text-gray-800',
       contentIcon: 'text-yellow-600',
@@ -30,12 +34,15 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
     },
     teal: {
       primary: 'from-teal-500 to-cyan-500',
-      level1Bg: 'bg-teal-700',
+      level1Bg: 'bg-teal-800',
       level1Text: 'text-white',
       level1Icon: 'text-white',
-      level2Bg: 'bg-teal-200',
+      level2Bg: 'bg-teal-300',
       level2Text: 'text-teal-900',
       level2Icon: 'text-teal-800',
+      level3Bg: 'bg-teal-100',
+      level3Text: 'text-teal-800',
+      level3Icon: 'text-teal-700',
       contentBg: 'bg-teal-50',
       contentText: 'text-gray-800',
       contentIcon: 'text-teal-600',
@@ -43,12 +50,15 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
     },
     indigo: {
       primary: 'from-indigo-500 to-purple-500',
-      level1Bg: 'bg-indigo-700',
+      level1Bg: 'bg-indigo-800',
       level1Text: 'text-white',
       level1Icon: 'text-white',
-      level2Bg: 'bg-indigo-200',
+      level2Bg: 'bg-indigo-300',
       level2Text: 'text-indigo-900',
       level2Icon: 'text-indigo-800',
+      level3Bg: 'bg-indigo-100',
+      level3Text: 'text-indigo-800',
+      level3Icon: 'text-indigo-700',
       contentBg: 'bg-indigo-50',
       contentText: 'text-gray-800',
       contentIcon: 'text-indigo-600',
@@ -56,12 +66,15 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
     },
     pink: {
       primary: 'from-pink-500 to-rose-500',
-      level1Bg: 'bg-pink-700',
+      level1Bg: 'bg-pink-800',
       level1Text: 'text-white',
       level1Icon: 'text-white',
-      level2Bg: 'bg-pink-200',
+      level2Bg: 'bg-pink-300',
       level2Text: 'text-pink-900',
       level2Icon: 'text-pink-800',
+      level3Bg: 'bg-pink-100',
+      level3Text: 'text-pink-800',
+      level3Icon: 'text-pink-700',
       contentBg: 'bg-pink-50',
       contentText: 'text-gray-800',
       contentIcon: 'text-pink-600',
@@ -69,12 +82,15 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
     },
     violet: {
       primary: 'from-violet-500 to-purple-500',
-      level1Bg: 'bg-violet-700',
+      level1Bg: 'bg-violet-800',
       level1Text: 'text-white',
       level1Icon: 'text-white',
-      level2Bg: 'bg-violet-200',
+      level2Bg: 'bg-violet-300',
       level2Text: 'text-violet-900',
       level2Icon: 'text-violet-800',
+      level3Bg: 'bg-violet-100',
+      level3Text: 'text-violet-800',
+      level3Icon: 'text-violet-700',
       contentBg: 'bg-violet-50',
       contentText: 'text-gray-800',
       contentIcon: 'text-violet-600',
@@ -82,12 +98,15 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
     },
     green: {
       primary: 'from-green-500 to-emerald-500',
-      level1Bg: 'bg-green-700',
+      level1Bg: 'bg-green-800',
       level1Text: 'text-white',
       level1Icon: 'text-white',
-      level2Bg: 'bg-green-200',
+      level2Bg: 'bg-green-300',
       level2Text: 'text-green-900',
       level2Icon: 'text-green-800',
+      level3Bg: 'bg-green-100',
+      level3Text: 'text-green-800',
+      level3Icon: 'text-green-700',
       contentBg: 'bg-green-50',
       contentText: 'text-gray-800',
       contentIcon: 'text-green-600',
@@ -95,12 +114,15 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
     },
     blue: {
       primary: 'from-blue-500 to-cyan-500',
-      level1Bg: 'bg-blue-700',
+      level1Bg: 'bg-blue-800',
       level1Text: 'text-white',
       level1Icon: 'text-white',
-      level2Bg: 'bg-blue-200',
+      level2Bg: 'bg-blue-300',
       level2Text: 'text-blue-900',
       level2Icon: 'text-blue-800',
+      level3Bg: 'bg-blue-100',
+      level3Text: 'text-blue-800',
+      level3Icon: 'text-blue-700',
       contentBg: 'bg-blue-50',
       contentText: 'text-gray-800',
       contentIcon: 'text-blue-600',
@@ -126,41 +148,43 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
       iconColor = currentTheme.level1Icon;
     } else if (level === 1) {
       iconColor = currentTheme.level2Icon;
+    } else if (level === 2) {
+      iconColor = currentTheme.level3Icon;
     }
 
     if (keyLower.includes('positive') || keyLower.includes('good') || keyLower.includes('strong') || keyLower.includes('benefit')) {
-      return <CheckCircle className={`w-3 h-3 text-green-500 flex-shrink-0`} />;
+      return <CheckCircle className={`w-2.5 h-2.5 text-green-500 flex-shrink-0`} />;
     }
     if (keyLower.includes('negative') || keyLower.includes('risk') || keyLower.includes('concern') || keyLower.includes('challenge')) {
-      return <AlertCircle className={`w-3 h-3 text-red-500 flex-shrink-0`} />;
+      return <AlertCircle className={`w-2.5 h-2.5 text-red-500 flex-shrink-0`} />;
     }
     if (keyLower.includes('salary') || keyLower.includes('compensation') || keyLower.includes('bonus') || keyLower.includes('pay')) {
-      return <DollarSign className={`w-3 h-3 ${iconColor} flex-shrink-0`} />;
+      return <DollarSign className={`w-2.5 h-2.5 ${iconColor} flex-shrink-0`} />;
     }
     if (keyLower.includes('growth') || keyLower.includes('development') || keyLower.includes('advancement')) {
-      return <TrendingUp className={`w-3 h-3 ${iconColor} flex-shrink-0`} />;
+      return <TrendingUp className={`w-2.5 h-2.5 ${iconColor} flex-shrink-0`} />;
     }
     if (keyLower.includes('opportunity') || keyLower.includes('potential')) {
-      return <Target className={`w-3 h-3 ${iconColor} flex-shrink-0`} />;
+      return <Target className={`w-2.5 h-2.5 ${iconColor} flex-shrink-0`} />;
     }
     if (keyLower.includes('skill') || keyLower.includes('requirement') || keyLower.includes('experience')) {
-      return <Star className={`w-3 h-3 ${iconColor} flex-shrink-0`} />;
+      return <Star className={`w-2.5 h-2.5 ${iconColor} flex-shrink-0`} />;
     }
-    return <Info className={`w-3 h-3 ${iconColor} flex-shrink-0`} />;
+    return <Info className={`w-2.5 h-2.5 ${iconColor} flex-shrink-0`} />;
   };
 
   const renderValue = (value: any, level: number = 0, parentKey: string = ''): React.ReactNode => {
     if (Array.isArray(value)) {
       return (
-        <div className="w-full space-y-1 min-w-0">
+        <div className="w-full space-y-1 min-w-0 overflow-hidden">
           {value.map((item, index) => (
-            <div key={index} className={`w-full p-2 ${currentTheme.contentBg} rounded border ${currentTheme.border} min-w-0`}>
-              <div className="w-full flex items-start gap-2 min-w-0">
+            <div key={index} className={`w-full p-1.5 ${currentTheme.contentBg} rounded border ${currentTheme.border} min-w-0 overflow-hidden`}>
+              <div className="w-full flex items-start gap-1.5 min-w-0 overflow-hidden">
                 <div className={`p-1 bg-gradient-to-r ${currentTheme.primary} rounded flex-shrink-0`}>
-                  <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                  <div className="w-1 h-1 bg-white rounded-full" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className={`${currentTheme.contentText} text-xs leading-relaxed break-words break-all`}>
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <p className={`${currentTheme.contentText} text-xs leading-relaxed break-words hyphens-auto overflow-wrap-anywhere`}>
                     {typeof item === 'string' ? 
                       (parentKey.toLowerCase().includes('salary') || parentKey.toLowerCase().includes('compensation') ? 
                         formatCurrency(item) : item
@@ -178,18 +202,18 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
 
     if (typeof value === 'object' && value !== null) {
       return (
-        <div className="w-full space-y-1 min-w-0">
+        <div className="w-full space-y-1 min-w-0 overflow-hidden">
           {Object.entries(value).map(([key, val]) => (
-            <div key={key} className="w-full space-y-1 min-w-0">
+            <div key={key} className="w-full space-y-1 min-w-0 overflow-hidden">
               {/* Level 0: Main Headers - Dark background with white text */}
               {level === 0 && (
-                <div className={`w-full p-2 ${currentTheme.level1Bg} border ${currentTheme.border} rounded min-w-0`}>
-                  <div className="w-full flex items-center gap-2 min-w-0">
+                <div className={`w-full p-1.5 ${currentTheme.level1Bg} border ${currentTheme.border} rounded min-w-0 overflow-hidden`}>
+                  <div className="w-full flex items-center gap-1.5 min-w-0 overflow-hidden">
                     <div className="p-1 bg-white/20 rounded shadow-sm flex-shrink-0">
                       {getStatusIcon(key, val, level)}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className={`font-bold ${currentTheme.level1Text} text-sm break-words hyphens-auto`}>
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <h4 className={`font-bold ${currentTheme.level1Text} text-xs break-words hyphens-auto overflow-wrap-anywhere`}>
                         {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                       </h4>
                     </div>
@@ -199,13 +223,13 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
               
               {/* Level 1: Subheaders - Medium background with dark text */}
               {level === 1 && (
-                <div className={`w-full p-2 ${currentTheme.level2Bg} border ${currentTheme.border} rounded min-w-0`}>
-                  <div className="w-full flex items-center gap-2 min-w-0">
+                <div className={`w-full p-1.5 ${currentTheme.level2Bg} border ${currentTheme.border} rounded min-w-0 overflow-hidden`}>
+                  <div className="w-full flex items-center gap-1.5 min-w-0 overflow-hidden">
                     <div className="p-1 bg-white rounded shadow-sm flex-shrink-0">
                       {getStatusIcon(key, val, level)}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h5 className={`font-semibold ${currentTheme.level2Text} text-xs break-words hyphens-auto`}>
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <h5 className={`font-semibold ${currentTheme.level2Text} text-xs break-words hyphens-auto overflow-wrap-anywhere`}>
                         {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                       </h5>
                     </div>
@@ -213,15 +237,31 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
                 </div>
               )}
               
-              {/* Level 2+: Sub-subheaders - Light background */}
-              {level >= 2 && (
-                <div className={`w-full p-2 ${currentTheme.contentBg} border ${currentTheme.border} rounded min-w-0`}>
-                  <div className="w-full flex items-center gap-2 min-w-0">
+              {/* Level 2: Sub-subheaders - Light background with medium text */}
+              {level === 2 && (
+                <div className={`w-full p-1.5 ${currentTheme.level3Bg} border ${currentTheme.border} rounded min-w-0 overflow-hidden`}>
+                  <div className="w-full flex items-center gap-1.5 min-w-0 overflow-hidden">
                     <div className="p-1 bg-white rounded shadow-sm flex-shrink-0">
                       {getStatusIcon(key, val, level)}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h6 className={`font-medium ${currentTheme.contentText} text-xs break-words hyphens-auto`}>
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <h6 className={`font-medium ${currentTheme.level3Text} text-xs break-words hyphens-auto overflow-wrap-anywhere`}>
+                        {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </h6>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Level 3+: Content headers - Lightest background */}
+              {level >= 3 && (
+                <div className={`w-full p-1.5 ${currentTheme.contentBg} border ${currentTheme.border} rounded min-w-0 overflow-hidden`}>
+                  <div className="w-full flex items-center gap-1.5 min-w-0 overflow-hidden">
+                    <div className="p-1 bg-white rounded shadow-sm flex-shrink-0">
+                      {getStatusIcon(key, val, level)}
+                    </div>
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <h6 className={`font-normal ${currentTheme.contentText} text-xs break-words hyphens-auto overflow-wrap-anywhere`}>
                         {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                       </h6>
                     </div>
@@ -230,7 +270,7 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
               )}
               
               {/* Content with proper left padding */}
-              <div className="w-full pl-1 min-w-0">
+              <div className="w-full pl-0.5 min-w-0 overflow-hidden">
                 {renderValue(val, level + 1, key)}
               </div>
             </div>
@@ -246,8 +286,8 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
                           formatCurrency(stringValue) : stringValue;
 
     return (
-      <div className={`w-full p-2 ${currentTheme.contentBg} rounded border ${currentTheme.border} min-w-0`}>
-        <p className={`${currentTheme.contentText} text-xs leading-relaxed break-words break-all hyphens-auto`}>
+      <div className={`w-full p-1.5 ${currentTheme.contentBg} rounded border ${currentTheme.border} min-w-0 overflow-hidden`}>
+        <p className={`${currentTheme.contentText} text-xs leading-relaxed break-words hyphens-auto overflow-wrap-anywhere`}>
           {formattedValue}
         </p>
       </div>
@@ -255,10 +295,10 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
   };
 
   return (
-    <div className="w-full min-w-0">
+    <div className="w-full min-w-0 overflow-hidden max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-4xl mx-auto">
       <Card className="w-full bg-white shadow-lg border-0 rounded-xl overflow-hidden min-w-0">
-        <CardContent className="p-2 w-full min-w-0">
-          <div className="w-full min-w-0">
+        <CardContent className="p-1.5 w-full min-w-0 overflow-hidden">
+          <div className="w-full min-w-0 overflow-hidden">
             {renderValue(data)}
           </div>
         </CardContent>
