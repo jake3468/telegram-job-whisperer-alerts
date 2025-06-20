@@ -142,7 +142,7 @@ const CompanyRoleAnalysis = () => {
                 Company - Role Analysis
               </h1>
             </div>
-            <p className="text-lg sm:text-xl text-violet-200 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg text-violet-200 max-w-3xl mx-auto leading-relaxed sm:text-lg font-light">
               Smart candidates don't just apply—they investigate. Get the career intelligence that puts you ahead of 99% of applicants.
             </p>
           </div>
