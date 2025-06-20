@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -52,9 +53,15 @@ const CompanyRoleAnalysis = () => {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [pendingAnalysisId, setPendingAnalysisId] = useState<string | null>(null);
   const [loadingMessages, setLoadingMessages] = useState<string[]>([]);
+  const [showRecentResults, setShowRecentResults] = useState(false);
   const { toast } = useToast();
   const { userProfile } = useUserProfile();
   const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(1.5);
+
+  // Clear results when component mounts (page refresh/navigation)
+  useEffect(() => {
+    setShowRecentResults(false);
+  }, []);
 
   // Fetch company-role analysis history
   const { data: analysisHistory, refetch: refetchHistory } = useQuery({
@@ -112,6 +119,7 @@ const CompanyRoleAnalysis = () => {
             setPendingAnalysisId(null);
             setIsSubmitting(false);
             setLoadingMessages([]);
+            setShowRecentResults(true);
             
             toast({
               title: "Analysis Complete!",
@@ -180,6 +188,7 @@ const CompanyRoleAnalysis = () => {
     }
     
     setIsSubmitting(true);
+    setShowRecentResults(false);
     try {
       const { data, error } = await supabase
         .from('company_role_analyses')
@@ -247,6 +256,11 @@ const CompanyRoleAnalysis = () => {
            analysis.interview_and_hiring_insights ||
            analysis.sources;
   };
+
+  // Get the most recent completed analysis for display
+  const recentCompletedAnalysis = showRecentResults && analysisHistory && analysisHistory.length > 0 
+    ? analysisHistory.find(analysis => hasAnalysisResult(analysis))
+    : null;
 
   return (
     <Layout>
@@ -343,11 +357,11 @@ const CompanyRoleAnalysis = () => {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex flex-col gap-3 sm:gap-4 pt-2 sm:pt-4">
+                  <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4">
                     <Button
                       type="submit"
                       disabled={isSubmitting || !hasCredits}
-                      className="w-full bg-gradient-to-r from-green-700 via-green-800 to-green-900 hover:from-green-800 hover:via-green-900 hover:to-green-950 text-white font-orbitron font-bold py-4 sm:py-6 text-sm sm:text-lg shadow-2xl shadow-green-600/25 border-0"
+                      className="w-full lg:flex-1 bg-gradient-to-r from-green-700 via-green-800 to-green-900 hover:from-green-800 hover:via-green-900 hover:to-green-950 text-white font-orbitron font-bold py-4 sm:py-6 text-sm sm:text-lg shadow-2xl shadow-green-600/25 border-0"
                     >
                       {isSubmitting ? (
                         <>
@@ -366,7 +380,7 @@ const CompanyRoleAnalysis = () => {
                       type="button"
                       variant="outline"
                       onClick={handleReset}
-                      className="w-full sm:w-auto border-white/50 text-white hover:bg-white/20 hover:text-white font-orbitron bg-transparent py-3 sm:py-4 text-sm sm:text-base"
+                      className="w-full lg:w-auto border-white/50 text-white hover:bg-white/20 hover:text-white font-orbitron bg-transparent py-3 sm:py-4 text-sm sm:text-base"
                     >
                       <RotateCcw className="w-4 h-4 mr-2" />
                       Reset
@@ -401,54 +415,15 @@ const CompanyRoleAnalysis = () => {
             </div>
           )}
 
-          {/* Results Section - Updated to use Premium Component */}
-          {analysisHistory && analysisHistory.length > 0 && (
+          {/* Results Section - Only show when showRecentResults is true */}
+          {recentCompletedAnalysis && (
             <div className="space-y-4 px-2">
               <h2 className="text-xl sm:text-2xl font-orbitron font-bold text-white">
-                Recent Company-Role Analyses
+                Latest Analysis Result
               </h2>
               
               <div className="grid gap-6">
-                {analysisHistory.slice(0, 3).map((analysis) => (
-                  <div key={analysis.id}>
-                    {hasAnalysisResult(analysis) ? (
-                      <PremiumAnalysisResults analysis={analysis} />
-                    ) : (
-                      <Card className="bg-gray-900/60 border-gray-700/40 backdrop-blur-sm">
-                        <CardContent className="p-3 sm:p-4 space-y-4">
-                          {/* Header */}
-                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-                            <div className="space-y-1 min-w-0 flex-1">
-                              <h3 className="font-orbitron font-bold text-white text-sm sm:text-base break-words">
-                                {analysis.job_title} at {analysis.company_name}
-                              </h3>
-                              <p className="text-gray-400 text-xs sm:text-sm flex items-center gap-1 break-words">
-                                <MapPin className="w-3 h-3 flex-shrink-0" />
-                                {analysis.location}
-                              </p>
-                              {analysis.research_date && (
-                                <p className="text-gray-400 text-xs sm:text-sm flex items-center gap-1">
-                                  <Calendar className="w-3 h-3 flex-shrink-0" />
-                                  Research Date: {new Date(analysis.research_date).toLocaleDateString()}
-                                </p>
-                              )}
-                            </div>
-                            <span className="text-xs text-gray-400 flex-shrink-0">
-                              {new Date(analysis.created_at).toLocaleDateString()}
-                            </span>
-                          </div>
-
-                          <div className="rounded-lg p-4 border border-yellow-500/30 bg-yellow-800/20">
-                            <div className="flex items-center gap-2 text-yellow-200">
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                              <p className="text-sm">Analysis in progress... This may take a few minutes.</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </div>
-                ))}
+                <PremiumAnalysisResults analysis={recentCompletedAnalysis} />
               </div>
             </div>
           )}
