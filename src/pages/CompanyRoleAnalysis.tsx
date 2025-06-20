@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -138,18 +139,19 @@ const CompanyRoleAnalysis = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check credits before proceeding
+    if (!hasCredits) {
+      showInsufficientCreditsPopup();
+      return;
+    }
+    
     if (!userProfile?.id) {
       toast({
         title: "Profile Required",
         description: "Please complete your profile before generating company-role analysis.",
         variant: "destructive"
       });
-      return;
-    }
-    
-    // Check credits before proceeding
-    if (!hasCredits) {
-      showInsufficientCreditsPopup();
       return;
     }
     
@@ -324,21 +326,34 @@ const CompanyRoleAnalysis = () => {
             </Card>
           </div>
 
-          {/* Loading Messages */}
+          {/* Loading Messages - Updated with better contrast and premium styling */}
           {isSubmitting && pendingAnalysisId && <div className="space-y-4 px-2">
-              <Card className="bg-gradient-to-br from-green-800/50 via-green-700/50 to-green-600/50 border-green-400/30">
-                <CardContent className="p-4 sm:p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin text-green-400" />
-                    <h3 className="text-lg sm:text-xl font-orbitron font-bold text-white">
-                      Analyzing Your Company & Role
-                    </h3>
+              <Card className="bg-gradient-to-br from-slate-900/95 via-gray-900/95 to-black/95 border-green-400/40 shadow-2xl backdrop-blur-sm">
+                <CardContent className="p-6 sm:p-8">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="relative">
+                      <Loader2 className="w-8 h-8 animate-spin text-green-400" />
+                      <div className="absolute inset-0 rounded-full border-2 border-green-400/20 animate-pulse"></div>
+                    </div>
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-orbitron font-bold text-white mb-1">
+                        Analyzing Your Company & Role
+                      </h3>
+                      <p className="text-green-300 text-sm sm:text-base">
+                        Advanced AI processing in progress...
+                      </p>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    {loadingMessages.map((message, index) => <div key={index} className="flex items-center gap-2 text-sm sm:text-base text-white font-medium">
-                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                        {message}
+                  <div className="space-y-3">
+                    {loadingMessages.map((message, index) => <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-400/20">
+                        <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full animate-pulse shadow-lg shadow-green-400/50"></div>
+                        <span className="text-white font-medium text-sm sm:text-base tracking-wide">
+                          {message}
+                        </span>
                       </div>)}
+                  </div>
+                  <div className="mt-6 w-full bg-gray-800/50 rounded-full h-2 overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-green-400 to-emerald-400 rounded-full animate-pulse"></div>
                   </div>
                 </CardContent>
               </Card>
