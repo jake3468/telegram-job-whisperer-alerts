@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +16,7 @@ import { PercentageMeter } from '@/components/PercentageMeter';
 import { BulletPointList } from '@/components/BulletPointList';
 import { JSONSectionDisplay } from '@/components/JSONSectionDisplay';
 import { SourcesDisplay } from '@/components/SourcesDisplay';
+import { PremiumAnalysisResults } from '@/components/PremiumAnalysisResults';
 
 interface CompanyRoleAnalysisData {
   id: string;
@@ -401,197 +401,53 @@ const CompanyRoleAnalysis = () => {
             </div>
           )}
 
-          {/* Results Section */}
+          {/* Results Section - Updated to use Premium Component */}
           {analysisHistory && analysisHistory.length > 0 && (
             <div className="space-y-4 px-2">
               <h2 className="text-xl sm:text-2xl font-orbitron font-bold text-white">
                 Recent Company-Role Analyses
               </h2>
               
-              <div className="grid gap-3 sm:gap-4">
+              <div className="grid gap-6">
                 {analysisHistory.slice(0, 3).map((analysis) => (
-                  <Card key={analysis.id} className="bg-gray-900/60 border-gray-700/40 backdrop-blur-sm">
-                    <CardContent className="p-3 sm:p-4 space-y-4">
-                      {/* Header */}
-                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-                        <div className="space-y-1 min-w-0 flex-1">
-                          <h3 className="font-orbitron font-bold text-white text-sm sm:text-base break-words">
-                            {analysis.job_title} at {analysis.company_name}
-                          </h3>
-                          <p className="text-gray-400 text-xs sm:text-sm flex items-center gap-1 break-words">
-                            <MapPin className="w-3 h-3 flex-shrink-0" />
-                            {analysis.location}
-                          </p>
-                          {analysis.research_date && (
-                            <p className="text-gray-400 text-xs sm:text-sm flex items-center gap-1">
-                              <Calendar className="w-3 h-3 flex-shrink-0" />
-                              Research Date: {new Date(analysis.research_date).toLocaleDateString()}
-                            </p>
-                          )}
-                        </div>
-                        <span className="text-xs text-gray-400 flex-shrink-0">
-                          {new Date(analysis.created_at).toLocaleDateString()}
-                        </span>
-                      </div>
-
-                      {/* Show analysis results or loading state */}
-                      {hasAnalysisResult(analysis) ? (
-                        <div className="space-y-4">
-                          {/* General Information */}
-                          {analysis.local_role_market_context && (
-                            <div className="space-y-2">
-                              <h4 className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                                <TrendingUp className="w-4 h-4" />
-                                Market Context
-                              </h4>
-                              <p className="text-gray-300 text-xs sm:text-sm leading-relaxed">
-                                {analysis.local_role_market_context}
+                  <div key={analysis.id}>
+                    {hasAnalysisResult(analysis) ? (
+                      <PremiumAnalysisResults analysis={analysis} />
+                    ) : (
+                      <Card className="bg-gray-900/60 border-gray-700/40 backdrop-blur-sm">
+                        <CardContent className="p-3 sm:p-4 space-y-4">
+                          {/* Header */}
+                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                            <div className="space-y-1 min-w-0 flex-1">
+                              <h3 className="font-orbitron font-bold text-white text-sm sm:text-base break-words">
+                                {analysis.job_title} at {analysis.company_name}
+                              </h3>
+                              <p className="text-gray-400 text-xs sm:text-sm flex items-center gap-1 break-words">
+                                <MapPin className="w-3 h-3 flex-shrink-0" />
+                                {analysis.location}
                               </p>
-                            </div>
-                          )}
-
-                          {/* Company News Updates */}
-                          {analysis.company_news_updates && analysis.company_news_updates.length > 0 && (
-                            <div className="space-y-2">
-                              <h4 className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                                <Building2 className="w-4 h-4" />
-                                Company News Updates
-                              </h4>
-                              <BulletPointList items={analysis.company_news_updates} />
-                            </div>
-                          )}
-
-                          {/* Role Security Section */}
-                          {(analysis.role_security_score !== null || analysis.role_security_outlook || analysis.role_security_automation_risks || analysis.role_security_departmental_trends || (analysis.role_security_score_breakdown && analysis.role_security_score_breakdown.length > 0)) && (
-                            <div className="space-y-3 p-3 bg-gray-800/30 rounded-lg border border-gray-700/20">
-                              <h4 className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                                <Shield className="w-4 h-4" />
-                                Role Security Analysis
-                              </h4>
-                              
-                              {analysis.role_security_score !== null && (
-                                <PercentageMeter 
-                                  score={analysis.role_security_score} 
-                                  label="Security Score" 
-                                />
-                              )}
-                              
-                              {analysis.role_security_score_breakdown && analysis.role_security_score_breakdown.length > 0 && (
-                                <BulletPointList 
-                                  items={analysis.role_security_score_breakdown} 
-                                  title="Score Breakdown"
-                                />
-                              )}
-                              
-                              {analysis.role_security_outlook && (
-                                <div className="space-y-1">
-                                  <h5 className="text-xs font-medium text-gray-400">Outlook</h5>
-                                  <p className="text-gray-300 text-xs leading-relaxed">{analysis.role_security_outlook}</p>
-                                </div>
-                              )}
-                              
-                              {analysis.role_security_automation_risks && (
-                                <div className="space-y-1">
-                                  <h5 className="text-xs font-medium text-gray-400">Automation Risks</h5>
-                                  <p className="text-gray-300 text-xs leading-relaxed">{analysis.role_security_automation_risks}</p>
-                                </div>
-                              )}
-                              
-                              {analysis.role_security_departmental_trends && (
-                                <div className="space-y-1">
-                                  <h5 className="text-xs font-medium text-gray-400">Departmental Trends</h5>
-                                  <p className="text-gray-300 text-xs leading-relaxed">{analysis.role_security_departmental_trends}</p>
-                                </div>
+                              {analysis.research_date && (
+                                <p className="text-gray-400 text-xs sm:text-sm flex items-center gap-1">
+                                  <Calendar className="w-3 h-3 flex-shrink-0" />
+                                  Research Date: {new Date(analysis.research_date).toLocaleDateString()}
+                                </p>
                               )}
                             </div>
-                          )}
-
-                          {/* Role Experience Section */}
-                          {(analysis.role_experience_score !== null || analysis.role_experience_specific_insights || (analysis.role_experience_score_breakdown && analysis.role_experience_score_breakdown.length > 0)) && (
-                            <div className="space-y-3 p-3 bg-gray-800/30 rounded-lg border border-gray-700/20">
-                              <h4 className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                                <Lightbulb className="w-4 h-4" />
-                                Role Experience Analysis
-                              </h4>
-                              
-                              {analysis.role_experience_score !== null && (
-                                <PercentageMeter 
-                                  score={analysis.role_experience_score} 
-                                  label="Experience Score" 
-                                />
-                              )}
-                              
-                              {analysis.role_experience_score_breakdown && analysis.role_experience_score_breakdown.length > 0 && (
-                                <BulletPointList 
-                                  items={analysis.role_experience_score_breakdown} 
-                                  title="Score Breakdown"
-                                />
-                              )}
-                              
-                              {analysis.role_experience_specific_insights && (
-                                <div className="space-y-1">
-                                  <h5 className="text-xs font-medium text-gray-400">Specific Insights</h5>
-                                  <p className="text-gray-300 text-xs leading-relaxed">{analysis.role_experience_specific_insights}</p>
-                                </div>
-                              )}
-                            </div>
-                          )}
-
-                          {/* New JSON Sections */}
-                          {analysis.role_compensation_analysis && (
-                            <JSONSectionDisplay
-                              title="Compensation Details"
-                              data={analysis.role_compensation_analysis}
-                              icon={<DollarSign className="w-4 h-4" />}
-                            />
-                          )}
-
-                          {analysis.role_workplace_environment && (
-                            <JSONSectionDisplay
-                              title="Workplace Environment"
-                              data={analysis.role_workplace_environment}
-                              icon={<Users className="w-4 h-4" />}
-                            />
-                          )}
-
-                          {analysis.career_development && (
-                            <JSONSectionDisplay
-                              title="Career Development"
-                              data={analysis.career_development}
-                              icon={<GraduationCap className="w-4 h-4" />}
-                            />
-                          )}
-
-                          {analysis.role_specific_considerations && (
-                            <JSONSectionDisplay
-                              title="Specific Considerations"
-                              data={analysis.role_specific_considerations}
-                              icon={<AlertTriangle className="w-4 h-4" />}
-                            />
-                          )}
-
-                          {analysis.interview_and_hiring_insights && (
-                            <JSONSectionDisplay
-                              title="Interview & Hiring Insights"
-                              data={analysis.interview_and_hiring_insights}
-                              icon={<Briefcase className="w-4 h-4" />}
-                            />
-                          )}
-
-                          {analysis.sources && (
-                            <SourcesDisplay sources={analysis.sources} />
-                          )}
-                        </div>
-                      ) : (
-                        <div className="rounded-lg p-4 border border-yellow-500/30 bg-yellow-800/20">
-                          <div className="flex items-center gap-2 text-yellow-200">
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <p className="text-sm">Analysis in progress... This may take a few minutes.</p>
+                            <span className="text-xs text-gray-400 flex-shrink-0">
+                              {new Date(analysis.created_at).toLocaleDateString()}
+                            </span>
                           </div>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
+
+                          <div className="rounded-lg p-4 border border-yellow-500/30 bg-yellow-800/20">
+                            <div className="flex items-center gap-2 text-yellow-200">
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <p className="text-sm">Analysis in progress... This may take a few minutes.</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
