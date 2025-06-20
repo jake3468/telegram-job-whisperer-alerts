@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { DollarSign, TrendingUp, AlertCircle, CheckCircle, Info, Star, Award, Target } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,87 +14,59 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
   const themeConfig = {
     yellow: {
       primary: 'from-yellow-500 to-orange-500',
-      parentBg: 'bg-yellow-100',
-      childBg: 'bg-yellow-50',
-      grandchildBg: 'bg-white',
+      parentBg: 'bg-yellow-50',
+      childBg: 'bg-yellow-25',
       border: 'border-yellow-200',
       text: 'text-yellow-800',
-      accent: 'text-yellow-600',
-      parentBorder: 'border-yellow-300',
-      childBorder: 'border-yellow-200',
-      grandchildBorder: 'border-yellow-100'
+      accent: 'text-yellow-600'
     },
     teal: {
       primary: 'from-teal-500 to-cyan-500',
-      parentBg: 'bg-teal-100',
-      childBg: 'bg-teal-50',
-      grandchildBg: 'bg-white',
+      parentBg: 'bg-teal-50',
+      childBg: 'bg-teal-25',
       border: 'border-teal-200',
       text: 'text-teal-800',
-      accent: 'text-teal-600',
-      parentBorder: 'border-teal-300',
-      childBorder: 'border-teal-200',
-      grandchildBorder: 'border-teal-100'
+      accent: 'text-teal-600'
     },
     indigo: {
       primary: 'from-indigo-500 to-purple-500',
-      parentBg: 'bg-indigo-100',
-      childBg: 'bg-indigo-50',
-      grandchildBg: 'bg-white',
+      parentBg: 'bg-indigo-50',
+      childBg: 'bg-indigo-25',
       border: 'border-indigo-200',
       text: 'text-indigo-800',
-      accent: 'text-indigo-600',
-      parentBorder: 'border-indigo-300',
-      childBorder: 'border-indigo-200',
-      grandchildBorder: 'border-indigo-100'
+      accent: 'text-indigo-600'
     },
     pink: {
       primary: 'from-pink-500 to-rose-500',
-      parentBg: 'bg-pink-100',
-      childBg: 'bg-pink-50',
-      grandchildBg: 'bg-white',
+      parentBg: 'bg-pink-50',
+      childBg: 'bg-pink-25',
       border: 'border-pink-200',
       text: 'text-pink-800',
-      accent: 'text-pink-600',
-      parentBorder: 'border-pink-300',
-      childBorder: 'border-pink-200',
-      grandchildBorder: 'border-pink-100'
+      accent: 'text-pink-600'
     },
     violet: {
       primary: 'from-violet-500 to-purple-500',
-      parentBg: 'bg-violet-100',
-      childBg: 'bg-violet-50',
-      grandchildBg: 'bg-white',
+      parentBg: 'bg-violet-50',
+      childBg: 'bg-violet-25',
       border: 'border-violet-200',
       text: 'text-violet-800',
-      accent: 'text-violet-600',
-      parentBorder: 'border-violet-300',
-      childBorder: 'border-violet-200',
-      grandchildBorder: 'border-violet-100'
+      accent: 'text-violet-600'
     },
     green: {
       primary: 'from-green-500 to-emerald-500',
-      parentBg: 'bg-green-100',
-      childBg: 'bg-green-50',
-      grandchildBg: 'bg-white',
+      parentBg: 'bg-green-50',
+      childBg: 'bg-green-25',
       border: 'border-green-200',
       text: 'text-green-800',
-      accent: 'text-green-600',
-      parentBorder: 'border-green-300',
-      childBorder: 'border-green-200',
-      grandchildBorder: 'border-green-100'
+      accent: 'text-green-600'
     },
     blue: {
       primary: 'from-blue-500 to-cyan-500',
-      parentBg: 'bg-blue-100',
-      childBg: 'bg-blue-50',
-      grandchildBg: 'bg-white',
+      parentBg: 'bg-blue-50',
+      childBg: 'bg-blue-25',
       border: 'border-blue-200',
       text: 'text-blue-800',
-      accent: 'text-blue-600',
-      parentBorder: 'border-blue-300',
-      childBorder: 'border-blue-200',
-      grandchildBorder: 'border-blue-100'
+      accent: 'text-blue-600'
     }
   };
 
@@ -110,24 +83,24 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
   const getStatusIcon = (key: string, value: any) => {
     const keyLower = key.toLowerCase();
     if (keyLower.includes('positive') || keyLower.includes('good') || keyLower.includes('strong') || keyLower.includes('benefit')) {
-      return <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />;
+      return <CheckCircle className="w-4 h-4 text-green-500" />;
     }
     if (keyLower.includes('negative') || keyLower.includes('risk') || keyLower.includes('concern') || keyLower.includes('challenge')) {
-      return <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />;
+      return <AlertCircle className="w-4 h-4 text-red-500" />;
     }
     if (keyLower.includes('salary') || keyLower.includes('compensation') || keyLower.includes('bonus') || keyLower.includes('pay')) {
-      return <DollarSign className={`w-4 h-4 ${currentTheme.accent} flex-shrink-0`} />;
+      return <DollarSign className={`w-4 h-4 ${currentTheme.accent}`} />;
     }
     if (keyLower.includes('growth') || keyLower.includes('development') || keyLower.includes('advancement')) {
-      return <TrendingUp className={`w-4 h-4 ${currentTheme.accent} flex-shrink-0`} />;
+      return <TrendingUp className={`w-4 h-4 ${currentTheme.accent}`} />;
     }
     if (keyLower.includes('opportunity') || keyLower.includes('potential')) {
-      return <Target className={`w-4 h-4 ${currentTheme.accent} flex-shrink-0`} />;
+      return <Target className={`w-4 h-4 ${currentTheme.accent}`} />;
     }
     if (keyLower.includes('skill') || keyLower.includes('requirement') || keyLower.includes('experience')) {
-      return <Star className={`w-4 h-4 ${currentTheme.accent} flex-shrink-0`} />;
+      return <Star className={`w-4 h-4 ${currentTheme.accent}`} />;
     }
-    return <Info className={`w-4 h-4 ${currentTheme.accent} flex-shrink-0`} />;
+    return <Info className={`w-4 h-4 ${currentTheme.accent}`} />;
   };
 
   const renderValue = (value: any, level: number = 0, parentKey: string = ''): React.ReactNode => {
@@ -135,18 +108,20 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
       return (
         <div className="space-y-3">
           {value.map((item, index) => (
-            <div key={index} className={`flex items-start gap-3 p-4 ${level === 0 ? currentTheme.childBg : currentTheme.grandchildBg} rounded-lg border ${level === 0 ? currentTheme.childBorder : currentTheme.grandchildBorder}`}>
-              <div className={`p-2 bg-gradient-to-r ${currentTheme.primary} rounded-lg flex-shrink-0`}>
-                <div className="w-3 h-3 bg-white rounded-full" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-gray-700 leading-relaxed font-medium text-sm md:text-base break-words">
-                  {typeof item === 'string' ? 
-                    (parentKey.toLowerCase().includes('salary') || parentKey.toLowerCase().includes('compensation') ? 
-                      formatCurrency(item) : item
-                    ) : 
-                    renderValue(item, level + 1, parentKey)
-                  }
+            <div key={index} className={`p-3 ${currentTheme.childBg} rounded-lg border ${currentTheme.border} shadow-sm`}>
+              <div className="flex items-start gap-3">
+                <div className={`p-2 bg-gradient-to-r ${currentTheme.primary} rounded-md flex-shrink-0 mt-1`}>
+                  <div className="w-2 h-2 bg-white rounded-full" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-gray-700 text-sm md:text-base leading-relaxed font-medium">
+                    {typeof item === 'string' ? 
+                      (parentKey.toLowerCase().includes('salary') || parentKey.toLowerCase().includes('compensation') ? 
+                        formatCurrency(item) : item
+                      ) : 
+                      renderValue(item, level + 1, parentKey)
+                    }
+                  </p>
                 </div>
               </div>
             </div>
@@ -158,35 +133,26 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
     if (typeof value === 'object' && value !== null) {
       return (
         <div className="space-y-4">
-          {Object.entries(value).map(([key, val]) => {
-            const bgClass = level === 0 ? currentTheme.parentBg : level === 1 ? currentTheme.childBg : currentTheme.grandchildBg;
-            const borderClass = level === 0 ? currentTheme.parentBorder : level === 1 ? currentTheme.childBorder : currentTheme.grandchildBorder;
-            
-            return (
-              <div key={key} className="space-y-3">
-                {/* Key Header - Fixed sizing for better hierarchy */}
-                <div className={`flex items-center gap-3 p-4 ${bgClass} border ${borderClass} rounded-lg`}>
-                  <div className="p-2 bg-white rounded-lg shadow-sm flex-shrink-0">
+          {Object.entries(value).map(([key, val]) => (
+            <div key={key} className="space-y-3">
+              <div className={`p-4 ${currentTheme.parentBg} border ${currentTheme.border} rounded-lg shadow-sm`}>
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="p-2 bg-white rounded-lg shadow-sm flex-shrink-0 mt-1">
                     {getStatusIcon(key, val)}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h6 className={`font-semibold ${currentTheme.text} ${
-                      level === 0 ? 'text-base md:text-lg' : 
-                      level === 1 ? 'text-sm md:text-base' : 
-                      'text-sm'
-                    } break-words leading-relaxed`}>
+                  <div className="flex-1">
+                    <h4 className={`font-semibold ${currentTheme.text} text-base md:text-lg mb-2`}>
                       {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                    </h6>
+                    </h4>
                   </div>
                 </div>
                 
-                {/* Value Content */}
-                <div className={`p-4 ${level === 0 ? currentTheme.childBg : currentTheme.grandchildBg} border-l-4 ${borderClass} rounded-lg ml-4`}>
+                <div className="ml-2">
                   {renderValue(val, level + 1, key)}
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       );
     }
@@ -198,8 +164,8 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
                           formatCurrency(stringValue) : stringValue;
 
     return (
-      <div className={`${currentTheme.grandchildBg} rounded-lg p-4 border ${currentTheme.grandchildBorder}`}>
-        <p className="text-gray-700 leading-relaxed font-medium text-sm md:text-base break-words">
+      <div className={`p-3 ${currentTheme.childBg} rounded-lg border ${currentTheme.border} shadow-sm`}>
+        <p className="text-gray-700 text-sm md:text-base leading-relaxed font-medium">
           {formattedValue}
         </p>
       </div>
@@ -207,7 +173,7 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
   };
 
   return (
-    <div className="w-full overflow-hidden">
+    <div className="w-full">
       <Card className="bg-white shadow-lg border-0 rounded-xl">
         <CardContent className="p-4 md:p-6">
           {renderValue(data)}
