@@ -60,10 +60,10 @@ export const EnhancedPercentageMeter: React.FC<EnhancedPercentageMeterProps> = (
   };
 
   const getScoreIcon = (percent: number) => {
-    if (percent >= 80) return <Award className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />;
-    if (percent >= 60) return <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />;
-    if (percent >= 40) return <Minus className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500" />;
-    return <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />;
+    if (percent >= 80) return <Award className="w-2.5 h-2.5 text-green-500" />;
+    if (percent >= 60) return <TrendingUp className="w-2.5 h-2.5 text-blue-500" />;
+    if (percent >= 40) return <Minus className="w-2.5 h-2.5 text-yellow-500" />;
+    return <AlertTriangle className="w-2.5 h-2.5 text-red-500" />;
   };
 
   const getScoreDescription = (percent: number) => {
@@ -81,22 +81,22 @@ export const EnhancedPercentageMeter: React.FC<EnhancedPercentageMeterProps> = (
   };
 
   return (
-    <div className={`w-full bg-gradient-to-r ${currentTheme.bg} rounded-lg sm:rounded-xl p-2 sm:p-3 md:p-4 border ${currentTheme.border} shadow-md`}>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 sm:mb-3 gap-2">
-        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
-          <div className="p-1 sm:p-1.5 bg-white rounded-md sm:rounded-lg shadow-sm flex-shrink-0">
+    <div className={`w-full bg-gradient-to-r ${currentTheme.bg} rounded-md p-2 border ${currentTheme.border} shadow-sm`}>
+      <div className="flex flex-col gap-1 mb-2">
+        <div className="flex items-center gap-1 min-w-0 flex-1">
+          <div className="p-1 bg-white rounded-sm shadow-sm flex-shrink-0">
             {getScoreIcon(percentage)}
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className={`text-xs sm:text-sm font-bold ${currentTheme.text} break-words leading-tight`}>{label}</h3>
+            <h3 className={`text-xs font-bold ${currentTheme.text} break-words leading-tight`}>{label}</h3>
             <p className="text-gray-600 text-xs">Performance Metric</p>
           </div>
         </div>
-        <div className="text-center sm:text-right flex-shrink-0">
-          <div className={`text-lg sm:text-xl font-bold ${getScoreColor(percentage)} mb-0.5`}>
+        <div className="text-center flex-shrink-0">
+          <div className={`text-sm font-bold ${getScoreColor(percentage)} mb-0.5`}>
             {score}%
           </div>
-          <div className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full border text-xs font-medium ${getScoreBadgeColor(percentage)}`}>
+          <div className={`inline-flex items-center px-1 py-0.5 rounded-full border text-xs font-medium ${getScoreBadgeColor(percentage)}`}>
             {getScoreDescription(percentage)}
           </div>
         </div>
@@ -108,17 +108,17 @@ export const EnhancedPercentageMeter: React.FC<EnhancedPercentageMeterProps> = (
           <span>50%</span>
           <span>100%</span>
         </div>
-        <div className="relative h-2 bg-white rounded-full shadow-inner overflow-hidden border">
+        <div className="relative h-1.5 bg-white rounded-full shadow-inner overflow-hidden border">
           <div 
             className={`absolute top-0 left-0 h-full bg-gradient-to-r ${currentTheme.gradient} rounded-full transition-all duration-1000 ease-out shadow-sm`}
             style={{ width: `${percentage}%` }}
           >
             <div className="absolute inset-0 bg-white/30 rounded-full animate-pulse" />
-            <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-full shadow-sm border border-current" />
+            <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1.5 h-1.5 bg-white rounded-full shadow-sm border border-current" />
           </div>
         </div>
         <div className="flex justify-center">
-          <span className="text-xs text-gray-500 bg-white px-1.5 py-0.5 rounded-full shadow-sm">
+          <span className="text-xs text-gray-500 bg-white px-1 py-0.5 rounded-full shadow-sm">
             {percentage.toFixed(1)}% Achievement Rate
           </span>
         </div>

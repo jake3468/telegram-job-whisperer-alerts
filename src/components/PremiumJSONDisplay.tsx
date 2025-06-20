@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, DollarSign, TrendingUp, AlertCircle, CheckCircle, Info, Star, Award, Target } from 'lucide-react';
+import React from 'react';
+import { DollarSign, TrendingUp, AlertCircle, CheckCircle, Info, Star, Award, Target } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 
 interface PremiumJSONDisplayProps {
@@ -9,8 +9,6 @@ interface PremiumJSONDisplayProps {
 }
 
 export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, theme = 'blue' }) => {
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
-
   if (!data) return null;
 
   const themeConfig = {
@@ -64,51 +62,41 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
   const getStatusIcon = (key: string, value: any) => {
     const keyLower = key.toLowerCase();
     if (keyLower.includes('positive') || keyLower.includes('good') || keyLower.includes('strong') || keyLower.includes('benefit')) {
-      return <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />;
+      return <CheckCircle className="w-3 h-3 text-green-500 flex-shrink-0" />;
     }
     if (keyLower.includes('negative') || keyLower.includes('risk') || keyLower.includes('concern') || keyLower.includes('challenge')) {
-      return <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />;
+      return <AlertCircle className="w-3 h-3 text-red-500 flex-shrink-0" />;
     }
     if (keyLower.includes('salary') || keyLower.includes('compensation') || keyLower.includes('bonus') || keyLower.includes('pay')) {
-      return <DollarSign className={`w-5 h-5 ${currentTheme.accent} flex-shrink-0`} />;
+      return <DollarSign className={`w-3 h-3 ${currentTheme.accent} flex-shrink-0`} />;
     }
     if (keyLower.includes('growth') || keyLower.includes('development') || keyLower.includes('advancement')) {
-      return <TrendingUp className={`w-5 h-5 ${currentTheme.accent} flex-shrink-0`} />;
+      return <TrendingUp className={`w-3 h-3 ${currentTheme.accent} flex-shrink-0`} />;
     }
     if (keyLower.includes('opportunity') || keyLower.includes('potential')) {
-      return <Target className={`w-5 h-5 ${currentTheme.accent} flex-shrink-0`} />;
+      return <Target className={`w-3 h-3 ${currentTheme.accent} flex-shrink-0`} />;
     }
     if (keyLower.includes('skill') || keyLower.includes('requirement') || keyLower.includes('experience')) {
-      return <Star className={`w-5 h-5 ${currentTheme.accent} flex-shrink-0`} />;
+      return <Star className={`w-3 h-3 ${currentTheme.accent} flex-shrink-0`} />;
     }
-    return <Info className={`w-5 h-5 ${currentTheme.accent} flex-shrink-0`} />;
+    return <Info className={`w-3 h-3 ${currentTheme.accent} flex-shrink-0`} />;
   };
 
-  const toggleExpansion = (key: string) => {
-    const newExpanded = new Set(expandedSections);
-    if (newExpanded.has(key)) {
-      newExpanded.delete(key);
-    } else {
-      newExpanded.add(key);
-    }
-    setExpandedSections(newExpanded);
-  };
-
-  const renderValue = (value: any, level: number = 0, parentKey: string = '', path: string = ''): React.ReactNode => {
+  const renderValue = (value: any, level: number = 0, parentKey: string = ''): React.ReactNode => {
     if (Array.isArray(value)) {
       return (
-        <div className="space-y-3 mt-4">
+        <div className="space-y-1 mt-1">
           {value.map((item, index) => (
-            <div key={index} className={`flex items-start gap-4 p-4 bg-white rounded-xl border-2 ${currentTheme.border} shadow-sm hover:shadow-md transition-all duration-200`}>
-              <div className={`p-2 bg-gradient-to-r ${currentTheme.primary} rounded-lg`}>
-                <div className="w-2 h-2 bg-white rounded-full" />
+            <div key={index} className={`flex items-start gap-1 p-1.5 bg-white rounded-sm border ${currentTheme.border} shadow-sm`}>
+              <div className={`p-0.5 bg-gradient-to-r ${currentTheme.primary} rounded-sm`}>
+                <div className="w-1 h-1 bg-white rounded-full" />
               </div>
-              <div className="flex-1 text-gray-700 leading-relaxed font-medium">
+              <div className="flex-1 text-gray-700 leading-relaxed font-medium text-xs break-words">
                 {typeof item === 'string' ? 
                   (parentKey.toLowerCase().includes('salary') || parentKey.toLowerCase().includes('compensation') ? 
                     formatCurrency(item) : item
                   ) : 
-                  renderValue(item, level + 1, parentKey, `${path}.${index}`)
+                  renderValue(item, level + 1, parentKey)
                 }
               </div>
             </div>
@@ -119,53 +107,25 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
 
     if (typeof value === 'object' && value !== null) {
       return (
-        <div className={`space-y-4 ${level > 0 ? 'ml-4 mt-4' : ''}`}>
+        <div className={`space-y-1 ${level > 0 ? 'ml-1 mt-1' : ''}`}>
           {Object.entries(value).map(([key, val]) => {
-            const currentPath = `${path}.${key}`;
-            const isExpanded = expandedSections.has(currentPath);
-            const hasNestedContent = (typeof val === 'object' && val !== null);
-            
             return (
-              <Card key={key} className="bg-white shadow-lg border-2 border-gray-100 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300">
+              <Card key={key} className="bg-white shadow-sm border border-gray-100 rounded-sm overflow-hidden">
                 <CardContent className="p-0">
-                  <div 
-                    className={`flex items-center gap-4 p-6 bg-gradient-to-r ${currentTheme.bg} cursor-pointer hover:opacity-80 transition-opacity`}
-                    onClick={() => hasNestedContent && toggleExpansion(currentPath)}
-                  >
-                    <div className="p-3 bg-white rounded-xl shadow-sm">
+                  <div className={`flex items-center gap-1 p-2 bg-gradient-to-r ${currentTheme.bg}`}>
+                    <div className="p-1 bg-white rounded-sm shadow-sm">
                       {getStatusIcon(key, val)}
                     </div>
-                    <div className="flex-1">
-                      <h5 className={`font-bold ${currentTheme.text} text-lg`}>
+                    <div className="flex-1 min-w-0">
+                      <h5 className={`font-bold ${currentTheme.text} text-xs break-words`}>
                         {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                       </h5>
-                      {!hasNestedContent && (
-                        <p className="text-gray-600 text-sm mt-1">Click to view details</p>
-                      )}
                     </div>
-                    {hasNestedContent && (
-                      <div className={`transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}>
-                        <ChevronRight className={`w-5 h-5 ${currentTheme.accent}`} />
-                      </div>
-                    )}
                   </div>
                   
-                  {hasNestedContent ? (
-                    <div className={`transition-all duration-300 overflow-hidden ${isExpanded ? 'max-h-none p-6' : 'max-h-0'}`}>
-                      {renderValue(val, level + 1, key, currentPath)}
-                    </div>
-                  ) : (
-                    <div className="p-6 border-t border-gray-100">
-                      <div className={`bg-gradient-to-r ${currentTheme.bg} rounded-xl p-6 border-l-4 ${currentTheme.border}`}>
-                        <p className="text-gray-700 leading-relaxed font-medium text-lg">
-                          {parentKey.toLowerCase().includes('salary') || 
-                           parentKey.toLowerCase().includes('compensation') || 
-                           parentKey.toLowerCase().includes('bonus') ? 
-                           formatCurrency(String(val)) : String(val)}
-                        </p>
-                      </div>
-                    </div>
-                  )}
+                  <div className="p-2 border-t border-gray-100">
+                    {renderValue(val, level + 1, key)}
+                  </div>
                 </CardContent>
               </Card>
             );
@@ -181,8 +141,8 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
                           formatCurrency(stringValue) : stringValue;
 
     return (
-      <div className={`bg-gradient-to-r ${currentTheme.bg} rounded-2xl p-6 border-2 ${currentTheme.border} shadow-sm`}>
-        <p className="text-gray-700 leading-relaxed font-medium text-lg">
+      <div className={`bg-gradient-to-r ${currentTheme.bg} rounded-sm p-2 border ${currentTheme.border} shadow-sm`}>
+        <p className="text-gray-700 leading-relaxed font-medium text-xs break-words">
           {formattedValue}
         </p>
       </div>
@@ -190,9 +150,9 @@ export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, th
   };
 
   return (
-    <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden group-hover:shadow-2xl transition-all duration-300">
-      <CardContent className="p-8">
-        <div className="space-y-6">
+    <Card className="bg-white shadow-sm border-0 rounded-md overflow-hidden">
+      <CardContent className="p-2">
+        <div className="space-y-2">
           {renderValue(data)}
         </div>
       </CardContent>
