@@ -50,10 +50,10 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({
                       <Building2 className="w-3 h-3 sm:w-4 sm:h-4" />
                     </div>
                     <div className="min-w-0 flex-1 overflow-hidden">
-                      <h1 className="text-xs sm:text-sm md:text-base font-bold leading-tight break-words hyphens-auto overflow-wrap-anywhere">
+                      <h1 className="text-xs sm:text-sm font-bold leading-tight break-words hyphens-auto overflow-wrap-anywhere md:text-2xl">
                         {analysis.job_title}
                       </h1>
-                      <p className="text-xs text-blue-100 mt-1 break-words hyphens-auto overflow-wrap-anywhere">
+                      <p className="text-blue-100 mt-1 break-words hyphens-auto overflow-wrap-anywhere text-base">
                         at {analysis.company_name}
                       </p>
                     </div>
@@ -62,11 +62,11 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({
                   <div className="w-full flex flex-wrap gap-1 text-xs min-w-0 overflow-hidden">
                     <div className="flex items-center gap-1 bg-white/10 px-1 sm:px-2 py-1 rounded-full backdrop-blur-sm min-w-0 overflow-hidden">
                       <MapPin className="w-2 h-2 flex-shrink-0" />
-                      <span className="break-words text-xs truncate overflow-wrap-anywhere">{analysis.location}</span>
+                      <span className="break-words truncate overflow-wrap-anywhere text-sm">{analysis.location}</span>
                     </div>
                     {analysis.research_date && <div className="flex items-center gap-1 bg-white/10 px-1 sm:px-2 py-1 rounded-full backdrop-blur-sm min-w-0 overflow-hidden">
                         <Calendar className="w-2 h-2 flex-shrink-0" />
-                        <span className="break-words text-xs truncate overflow-wrap-anywhere">
+                        <span className="break-words truncate overflow-wrap-anywhere text-sm">
                           {new Date(analysis.research_date).toLocaleDateString()}
                         </span>
                       </div>}
