@@ -54,16 +54,10 @@ const CompanyRoleAnalysis = () => {
   const [pendingAnalysisId, setPendingAnalysisId] = useState<string | null>(null);
   const [loadingMessages, setLoadingMessages] = useState<string[]>([]);
   const [showRecentResults, setShowRecentResults] = useState(false);
-  const {
-    toast
-  } = useToast();
-  const {
-    userProfile
-  } = useUserProfile();
-  const {
-    hasCredits,
-    showInsufficientCreditsPopup
-  } = useCreditCheck(1.5);
+  
+  const { toast } = useToast();
+  const { userProfile } = useUserProfile();
+  const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(1.5);
 
   // Clear results when component mounts (page refresh/navigation)
   useEffect(() => {
@@ -71,55 +65,79 @@ const CompanyRoleAnalysis = () => {
   }, []);
 
   // Fetch company-role analysis history
-  const {
-    data: analysisHistory,
-    refetch: refetchHistory
-  } = useQuery({
+  const { data: analysisHistory, refetch: refetchHistory } = useQuery({
     queryKey: ['company_role_analyses', userProfile?.id],
     queryFn: async () => {
       if (!userProfile?.id) return [];
-      const {
-        data,
-        error
-      } = await supabase.from('company_role_analyses').select('*').eq('user_id', userProfile.id).order('created_at', {
-        ascending: false
-      });
+      
+      console.log('Fetching company role analyses for user:', userProfile.id);
+      
+      const { data, error } = await supabase
+        .from('company_role_analyses')
+        .select('*')
+        .eq('user_id', userProfile.id)
+        .order('created_at', { ascending: false });
+      
       if (error) {
         console.error('Error fetching company-role analysis history:', error);
         return [];
       }
+      
+      console.log('Fetched analyses:', data);
       return data as CompanyRoleAnalysisData[];
     },
     enabled: !!userProfile?.id
   });
 
-  // Real-time subscription for analysis updates
+  // Real-time subscription for analysis updates with improved logging
   useEffect(() => {
     if (!userProfile?.id || !pendingAnalysisId) return;
-    const channel = supabase.channel('company-analysis-updates').on('postgres_changes', {
-      event: 'UPDATE',
-      schema: 'public',
-      table: 'company_role_analyses',
-      filter: `id=eq.${pendingAnalysisId}`
-    }, payload => {
-      console.log('Real-time update received:', payload);
 
-      // Check if meaningful data has been added
-      const newData = payload.new;
-      if (newData && (newData.local_role_market_context || newData.company_news_updates || newData.role_security_score || newData.role_experience_score || newData.role_compensation_analysis || newData.role_workplace_environment || newData.career_development || newData.role_specific_considerations || newData.interview_and_hiring_insights || newData.sources)) {
-        // Analysis is complete, refresh the data and stop loading
-        refetchHistory();
-        setPendingAnalysisId(null);
-        setIsSubmitting(false);
-        setLoadingMessages([]);
-        setShowRecentResults(true);
-        toast({
-          title: "Analysis Complete!",
-          description: "Your company analysis is ready to view."
-        });
-      }
-    }).subscribe();
+    console.log('Setting up real-time subscription for analysis:', pendingAnalysisId);
+
+    const channel = supabase
+      .channel('company-analysis-updates')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'company_role_analyses',
+        filter: `id=eq.${pendingAnalysisId}`
+      }, (payload) => {
+        console.log('Real-time update received for company analysis:', payload);
+
+        // Check if meaningful data has been added
+        const newData = payload.new;
+        if (newData && (
+          newData.local_role_market_context || 
+          newData.company_news_updates || 
+          newData.role_security_score || 
+          newData.role_experience_score || 
+          newData.role_compensation_analysis || 
+          newData.role_workplace_environment || 
+          newData.career_development || 
+          newData.role_specific_considerations || 
+          newData.interview_and_hiring_insights || 
+          newData.sources
+        )) {
+          console.log('Analysis is complete, refreshing data and showing results');
+          
+          // Analysis is complete, refresh the data and stop loading
+          refetchHistory();
+          setPendingAnalysisId(null);
+          setIsSubmitting(false);
+          setLoadingMessages([]);
+          setShowRecentResults(true);
+          
+          toast({
+            title: "Analysis Complete!",
+            description: "Your company analysis is ready to view."
+          });
+        }
+      })
+      .subscribe();
+
     return () => {
+      console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
   }, [userProfile?.id, pendingAnalysisId, refetchHistory, toast]);
@@ -127,13 +145,26 @@ const CompanyRoleAnalysis = () => {
   // Loading messages effect
   useEffect(() => {
     if (!isSubmitting || !pendingAnalysisId) return;
-    const messages = ["Analyzing company data...", "Researching market trends...", "Evaluating role security...", "Assessing compensation data...", "Analyzing workplace environment...", "Gathering interview insights...", "Compiling sources and references...", "Finalizing analysis report..."];
+    
+    const messages = [
+      "Analyzing company data...",
+      "Researching market trends...",
+      "Evaluating role security...",
+      "Assessing compensation data...",
+      "Analyzing workplace environment...",
+      "Gathering interview insights...",
+      "Compiling sources and references...",
+      "Finalizing analysis report..."
+    ];
+    
     let messageIndex = 0;
     setLoadingMessages([messages[0]]);
+    
     const interval = setInterval(() => {
       messageIndex = (messageIndex + 1) % messages.length;
       setLoadingMessages(prev => [...prev.slice(-2), messages[messageIndex]]);
     }, 3000);
+    
     return () => clearInterval(interval);
   }, [isSubmitting, pendingAnalysisId]);
 
@@ -163,6 +194,7 @@ const CompanyRoleAnalysis = () => {
       });
       return;
     }
+    
     setIsSubmitting(true);
     setShowRecentResults(false);
     
@@ -174,15 +206,16 @@ const CompanyRoleAnalysis = () => {
         job_title: jobTitle.trim()
       });
 
-      const {
-        data,
-        error
-      } = await supabase.from('company_role_analyses').insert({
-        user_id: userProfile.id,
-        company_name: companyName.trim(),
-        location: location.trim(),
-        job_title: jobTitle.trim()
-      }).select().single();
+      const { data, error } = await supabase
+        .from('company_role_analyses')
+        .insert({
+          user_id: userProfile.id,
+          company_name: companyName.trim(),
+          location: location.trim(),
+          job_title: jobTitle.trim()
+        })
+        .select()
+        .single();
       
       if (error) {
         console.error('Error creating company-role analysis:', error);
@@ -199,6 +232,7 @@ const CompanyRoleAnalysis = () => {
 
       // Set pending analysis ID to track real-time updates
       setPendingAnalysisId(data.id);
+      
       toast({
         title: "Analysis Started",
         description: "Your company-role analysis is being generated. You'll see results shortly!"
@@ -211,6 +245,7 @@ const CompanyRoleAnalysis = () => {
 
       // Refetch history to show the new analysis
       refetchHistory();
+      
     } catch (error) {
       console.error('Error submitting company-role analysis:', error);
       toast({
@@ -229,13 +264,25 @@ const CompanyRoleAnalysis = () => {
   };
 
   const hasAnalysisResult = (analysis: CompanyRoleAnalysisData) => {
-    return analysis.local_role_market_context || analysis.company_news_updates?.length || analysis.role_security_score || analysis.role_experience_score || analysis.role_compensation_analysis || analysis.role_workplace_environment || analysis.career_development || analysis.role_specific_considerations || analysis.interview_and_hiring_insights || analysis.sources;
+    return analysis.local_role_market_context || 
+           analysis.company_news_updates?.length || 
+           analysis.role_security_score || 
+           analysis.role_experience_score || 
+           analysis.role_compensation_analysis || 
+           analysis.role_workplace_environment || 
+           analysis.career_development || 
+           analysis.role_specific_considerations || 
+           analysis.interview_and_hiring_insights || 
+           analysis.sources;
   };
 
   // Get the most recent completed analysis for display
-  const recentCompletedAnalysis = showRecentResults && analysisHistory && analysisHistory.length > 0 ? analysisHistory.find(analysis => hasAnalysisResult(analysis)) : null;
-  
-  return <Layout>
+  const recentCompletedAnalysis = showRecentResults && analysisHistory && analysisHistory.length > 0 
+    ? analysisHistory.find(analysis => hasAnalysisResult(analysis)) 
+    : null;
+
+  return (
+    <Layout>
       <div className="min-h-screen bg-black px-2 py-4 sm:px-4 sm:py-6 lg:px-8 lg:py-8">
         <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
           {/* Header Section */}
@@ -264,7 +311,11 @@ const CompanyRoleAnalysis = () => {
                       Provide company details to uncover hidden red flags and green lights
                     </p>
                   </div>
-                  <Button onClick={() => setIsHistoryOpen(true)} variant="outline" className="w-full sm:w-auto border-white/50 text-white hover:text-white font-orbitron text-sm sm:text-base flex-shrink-0 bg-emerald-900 hover:bg-emerald-800">
+                  <Button 
+                    onClick={() => setIsHistoryOpen(true)} 
+                    variant="outline" 
+                    className="w-full sm:w-auto border-white/50 text-white hover:text-white font-orbitron text-sm sm:text-base flex-shrink-0 bg-emerald-900 hover:bg-emerald-800"
+                  >
                     <History className="w-4 h-4 mr-2" />
                     History
                   </Button>
@@ -279,7 +330,15 @@ const CompanyRoleAnalysis = () => {
                         <Building2 className="w-4 h-4" />
                         Company Name *
                       </Label>
-                      <Input id="companyName" type="text" placeholder="e.g., Google, Microsoft, Amazon" value={companyName} onChange={e => setCompanyName(e.target.value)} required className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
+                      <Input 
+                        id="companyName" 
+                        type="text" 
+                        placeholder="e.g., Google, Microsoft, Amazon" 
+                        value={companyName} 
+                        onChange={(e) => setCompanyName(e.target.value)} 
+                        required 
+                        className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" 
+                      />
                     </div>
 
                     <div className="space-y-2">
@@ -287,7 +346,15 @@ const CompanyRoleAnalysis = () => {
                         <MapPin className="w-4 h-4" />
                         Location *
                       </Label>
-                      <Input id="location" type="text" placeholder="e.g., San Francisco, New York, Remote" value={location} onChange={e => setLocation(e.target.value)} required className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
+                      <Input 
+                        id="location" 
+                        type="text" 
+                        placeholder="e.g., San Francisco, New York, Remote" 
+                        value={location} 
+                        onChange={(e) => setLocation(e.target.value)} 
+                        required 
+                        className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" 
+                      />
                     </div>
                   </div>
 
@@ -297,7 +364,15 @@ const CompanyRoleAnalysis = () => {
                       <Briefcase className="w-4 h-4" />
                       Job Title *
                     </Label>
-                    <Input id="jobTitle" type="text" placeholder="e.g., Senior Software Engineer, Product Manager, Data Scientist" value={jobTitle} onChange={e => setJobTitle(e.target.value)} required className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
+                    <Input 
+                      id="jobTitle" 
+                      type="text" 
+                      placeholder="e.g., Senior Software Engineer, Product Manager, Data Scientist" 
+                      value={jobTitle} 
+                      onChange={(e) => setJobTitle(e.target.value)} 
+                      required 
+                      className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" 
+                    />
                   </div>
 
                   {/* Action Buttons - Desktop: same line, Mobile: stacked */}
@@ -307,18 +382,26 @@ const CompanyRoleAnalysis = () => {
                       disabled={isSubmitting} 
                       className="w-full lg:flex-1 bg-gradient-to-r from-green-700 via-green-800 to-green-900 hover:from-green-800 hover:via-green-900 hover:to-green-950 text-white font-orbitron font-bold py-4 sm:py-6 text-sm sm:text-lg shadow-2xl shadow-green-600/25 border-0 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {isSubmitting ? <>
+                      {isSubmitting ? 
+                        <>
                           <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
                           Analyzing Company & Role...
-                        </> : <>
+                        </> : 
+                        <>
                           <Building2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                           Generate Analysis (1.5 Credits)
-                        </>}
+                        </>
+                      }
                     </Button>
                     
-                    <Button type="button" variant="outline" onClick={handleReset} className="w-full lg:w-auto border-white/50 text-white hover:bg-white/20 hover:text-white font-orbitron bg-transparent py-3 sm:py-4 text-sm sm:text-base lg:px-6">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={handleReset} 
+                      className="w-full lg:w-auto border-white/50 text-white hover:bg-white/20 hover:text-white font-orbitron bg-transparent py-3 sm:py-4 text-sm sm:text-base lg:px-6"
+                    >
                       <RotateCcw className="w-4 h-4 mr-2" />
-                      Reset
+                      Reset                   
                     </Button>
                   </div>
                 </form>
@@ -327,7 +410,8 @@ const CompanyRoleAnalysis = () => {
           </div>
 
           {/* Loading Messages - Updated with better contrast and premium styling */}
-          {isSubmitting && pendingAnalysisId && <div className="space-y-4 px-2">
+          {isSubmitting && pendingAnalysisId && (
+            <div className="space-y-4 px-2">
               <Card className="bg-gradient-to-br from-slate-900/95 via-gray-900/95 to-black/95 border-green-400/40 shadow-2xl backdrop-blur-sm">
                 <CardContent className="p-6 sm:p-8">
                   <div className="flex items-center gap-4 mb-6">
@@ -345,22 +429,26 @@ const CompanyRoleAnalysis = () => {
                     </div>
                   </div>
                   <div className="space-y-3">
-                    {loadingMessages.map((message, index) => <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-400/20">
+                    {loadingMessages.map((message, index) => (
+                      <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-400/20">
                         <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full animate-pulse shadow-lg shadow-green-400/50"></div>
                         <span className="text-white font-medium text-sm sm:text-base tracking-wide">
                           {message}
                         </span>
-                      </div>)}
+                      </div>
+                    ))}
                   </div>
                   <div className="mt-6 w-full bg-gray-800/50 rounded-full h-2 overflow-hidden">
                     <div className="h-full bg-gradient-to-r from-green-400 to-emerald-400 rounded-full animate-pulse"></div>
                   </div>
                 </CardContent>
               </Card>
-            </div>}
+            </div>
+          )}
 
           {/* Results Section - Only show when showRecentResults is true */}
-          {recentCompletedAnalysis && <div className="space-y-4 px-2">
+          {recentCompletedAnalysis && (
+            <div className="space-y-4 px-2">
               <h2 className="text-xl sm:text-2xl font-orbitron font-bold text-white">
                 Latest Analysis Result
               </h2>
@@ -368,13 +456,19 @@ const CompanyRoleAnalysis = () => {
               <div className="grid gap-6">
                 <PremiumAnalysisResults analysis={recentCompletedAnalysis} />
               </div>
-            </div>}
+            </div>
+          )}
         </div>
       </div>
 
       {/* History Modal */}
-      <CompanyRoleAnalysisHistoryModal isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} gradientColors="from-green-400 via-green-500 to-green-600" />
-    </Layout>;
+      <CompanyRoleAnalysisHistoryModal 
+        isOpen={isHistoryOpen} 
+        onClose={() => setIsHistoryOpen(false)} 
+        gradientColors="from-green-400 via-green-500 to-green-600" 
+      />
+    </Layout>
+  );
 };
 
 export default CompanyRoleAnalysis;
