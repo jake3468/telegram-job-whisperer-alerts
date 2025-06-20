@@ -60,10 +60,10 @@ export const EnhancedPercentageMeter: React.FC<EnhancedPercentageMeterProps> = (
   };
 
   const getScoreIcon = (percent: number) => {
-    if (percent >= 80) return <Award className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />;
-    if (percent >= 60) return <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />;
-    if (percent >= 40) return <Minus className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />;
-    return <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />;
+    if (percent >= 80) return <Award className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />;
+    if (percent >= 60) return <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />;
+    if (percent >= 40) return <Minus className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500" />;
+    return <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />;
   };
 
   const getScoreDescription = (percent: number) => {
@@ -81,44 +81,44 @@ export const EnhancedPercentageMeter: React.FC<EnhancedPercentageMeterProps> = (
   };
 
   return (
-    <div className={`w-full bg-gradient-to-r ${currentTheme.bg} rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 border-2 ${currentTheme.border} shadow-lg`}>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 gap-3">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-          <div className="p-1.5 sm:p-2 bg-white rounded-lg sm:rounded-xl shadow-md flex-shrink-0">
+    <div className={`w-full bg-gradient-to-r ${currentTheme.bg} rounded-lg sm:rounded-xl p-2 sm:p-3 md:p-4 border ${currentTheme.border} shadow-md`}>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 sm:mb-3 gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+          <div className="p-1 sm:p-1.5 bg-white rounded-md sm:rounded-lg shadow-sm flex-shrink-0">
             {getScoreIcon(percentage)}
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className={`text-sm sm:text-base font-bold ${currentTheme.text} break-words`}>{label}</h3>
-            <p className="text-gray-600 text-xs sm:text-sm">Performance Metric</p>
+            <h3 className={`text-xs sm:text-sm font-bold ${currentTheme.text} break-words leading-tight`}>{label}</h3>
+            <p className="text-gray-600 text-xs">Performance Metric</p>
           </div>
         </div>
         <div className="text-center sm:text-right flex-shrink-0">
-          <div className={`text-xl sm:text-2xl md:text-3xl font-bold ${getScoreColor(percentage)} mb-1`}>
+          <div className={`text-lg sm:text-xl font-bold ${getScoreColor(percentage)} mb-0.5`}>
             {score}%
           </div>
-          <div className={`inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border text-xs font-medium ${getScoreBadgeColor(percentage)}`}>
+          <div className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full border text-xs font-medium ${getScoreBadgeColor(percentage)}`}>
             {getScoreDescription(percentage)}
           </div>
         </div>
       </div>
       
-      <div className="space-y-2">
+      <div className="space-y-1">
         <div className="flex justify-between text-xs font-medium text-gray-600">
           <span>0%</span>
           <span>50%</span>
           <span>100%</span>
         </div>
-        <div className="relative h-2 sm:h-3 bg-white rounded-full shadow-inner overflow-hidden border">
+        <div className="relative h-2 bg-white rounded-full shadow-inner overflow-hidden border">
           <div 
-            className={`absolute top-0 left-0 h-full bg-gradient-to-r ${currentTheme.gradient} rounded-full transition-all duration-1000 ease-out shadow-lg`}
+            className={`absolute top-0 left-0 h-full bg-gradient-to-r ${currentTheme.gradient} rounded-full transition-all duration-1000 ease-out shadow-sm`}
             style={{ width: `${percentage}%` }}
           >
             <div className="absolute inset-0 bg-white/30 rounded-full animate-pulse" />
-            <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 bg-white rounded-full shadow-lg border-2 border-current" />
+            <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-full shadow-sm border border-current" />
           </div>
         </div>
         <div className="flex justify-center">
-          <span className="text-xs text-gray-500 bg-white px-2 py-1 rounded-full shadow-sm">
+          <span className="text-xs text-gray-500 bg-white px-1.5 py-0.5 rounded-full shadow-sm">
             {percentage.toFixed(1)}% Achievement Rate
           </span>
         </div>
