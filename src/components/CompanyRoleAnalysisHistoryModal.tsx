@@ -4,9 +4,13 @@ import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy } from 'lucide-react';
+import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy, TrendingUp, Shield, Lightbulb, DollarSign, Users, GraduationCap, AlertTriangle, MapPin } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { PercentageMeter } from '@/components/PercentageMeter';
+import { BulletPointList } from '@/components/BulletPointList';
+import { JSONSectionDisplay } from '@/components/JSONSectionDisplay';
+import { SourcesDisplay } from '@/components/SourcesDisplay';
 
 interface CompanyRoleAnalysisItem {
   id: string;
@@ -207,6 +211,14 @@ const CompanyRoleAnalysisHistoryModal = ({
                     <p className="text-white text-sm">{formatDate(selectedItem.created_at)}</p>
                   </div>
                 </div>
+                {selectedItem.research_date && (
+                  <div>
+                    <label className="text-green-200 text-sm font-semibold">Research Date:</label>
+                    <div className="rounded p-3 mt-1 bg-black/80 border border-green-300/20">
+                      <p className="text-white text-sm">{new Date(selectedItem.research_date).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -220,15 +232,150 @@ const CompanyRoleAnalysisHistoryModal = ({
 
                 <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
                   <div className="space-y-6">
-                    {/* Display all analysis sections here - similar to the main page */}
+                    {/* Market Context */}
                     {selectedItem.local_role_market_context && (
                       <div className="space-y-2">
-                        <h4 className="text-green-400 font-semibold">Market Context</h4>
-                        <p className="text-white text-sm leading-relaxed">{selectedItem.local_role_market_context}</p>
+                        <h4 className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                          <TrendingUp className="w-4 h-4" />
+                          Market Context
+                        </h4>
+                        <p className="text-gray-300 text-sm leading-relaxed">
+                          {selectedItem.local_role_market_context}
+                        </p>
                       </div>
                     )}
-                    
-                    {/* Add other analysis sections as needed */}
+
+                    {/* Company News Updates */}
+                    {selectedItem.company_news_updates && selectedItem.company_news_updates.length > 0 && (
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                          <Building className="w-4 h-4" />
+                          Company News Updates
+                        </h4>
+                        <BulletPointList items={selectedItem.company_news_updates} />
+                      </div>
+                    )}
+
+                    {/* Role Security Section */}
+                    {(selectedItem.role_security_score !== null || selectedItem.role_security_outlook || selectedItem.role_security_automation_risks || selectedItem.role_security_departmental_trends || (selectedItem.role_security_score_breakdown && selectedItem.role_security_score_breakdown.length > 0)) && (
+                      <div className="space-y-3 p-3 bg-gray-800/30 rounded-lg border border-gray-700/20">
+                        <h4 className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                          <Shield className="w-4 h-4" />
+                          Role Security Analysis
+                        </h4>
+                        
+                        {selectedItem.role_security_score !== null && (
+                          <PercentageMeter 
+                            score={selectedItem.role_security_score} 
+                            label="Security Score" 
+                          />
+                        )}
+                        
+                        {selectedItem.role_security_score_breakdown && selectedItem.role_security_score_breakdown.length > 0 && (
+                          <BulletPointList 
+                            items={selectedItem.role_security_score_breakdown} 
+                            title="Score Breakdown"
+                          />
+                        )}
+                        
+                        {selectedItem.role_security_outlook && (
+                          <div className="space-y-1">
+                            <h5 className="text-xs font-medium text-gray-400">Outlook</h5>
+                            <p className="text-gray-300 text-xs leading-relaxed">{selectedItem.role_security_outlook}</p>
+                          </div>
+                        )}
+                        
+                        {selectedItem.role_security_automation_risks && (
+                          <div className="space-y-1">
+                            <h5 className="text-xs font-medium text-gray-400">Automation Risks</h5>
+                            <p className="text-gray-300 text-xs leading-relaxed">{selectedItem.role_security_automation_risks}</p>
+                          </div>
+                        )}
+                        
+                        {selectedItem.role_security_departmental_trends && (
+                          <div className="space-y-1">
+                            <h5 className="text-xs font-medium text-gray-400">Departmental Trends</h5>
+                            <p className="text-gray-300 text-xs leading-relaxed">{selectedItem.role_security_departmental_trends}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Role Experience Section */}
+                    {(selectedItem.role_experience_score !== null || selectedItem.role_experience_specific_insights || (selectedItem.role_experience_score_breakdown && selectedItem.role_experience_score_breakdown.length > 0)) && (
+                      <div className="space-y-3 p-3 bg-gray-800/30 rounded-lg border border-gray-700/20">
+                        <h4 className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                          <Lightbulb className="w-4 h-4" />
+                          Role Experience Analysis
+                        </h4>
+                        
+                        {selectedItem.role_experience_score !== null && (
+                          <PercentageMeter 
+                            score={selectedItem.role_experience_score} 
+                            label="Experience Score" 
+                          />
+                        )}
+                        
+                        {selectedItem.role_experience_score_breakdown && selectedItem.role_experience_score_breakdown.length > 0 && (
+                          <BulletPointList 
+                            items={selectedItem.role_experience_score_breakdown} 
+                            title="Score Breakdown"
+                          />
+                        )}
+                        
+                        {selectedItem.role_experience_specific_insights && (
+                          <div className="space-y-1">
+                            <h5 className="text-xs font-medium text-gray-400">Specific Insights</h5>
+                            <p className="text-gray-300 text-xs leading-relaxed">{selectedItem.role_experience_specific_insights}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* JSON Sections */}
+                    {selectedItem.role_compensation_analysis && (
+                      <JSONSectionDisplay
+                        title="Compensation Details"
+                        data={selectedItem.role_compensation_analysis}
+                        icon={<DollarSign className="w-4 h-4" />}
+                      />
+                    )}
+
+                    {selectedItem.role_workplace_environment && (
+                      <JSONSectionDisplay
+                        title="Workplace Environment"
+                        data={selectedItem.role_workplace_environment}
+                        icon={<Users className="w-4 h-4" />}
+                      />
+                    )}
+
+                    {selectedItem.career_development && (
+                      <JSONSectionDisplay
+                        title="Career Development"
+                        data={selectedItem.career_development}
+                        icon={<GraduationCap className="w-4 h-4" />}
+                      />
+                    )}
+
+                    {selectedItem.role_specific_considerations && (
+                      <JSONSectionDisplay
+                        title="Specific Considerations"
+                        data={selectedItem.role_specific_considerations}
+                        icon={<AlertTriangle className="w-4 h-4" />}
+                      />
+                    )}
+
+                    {selectedItem.interview_and_hiring_insights && (
+                      <JSONSectionDisplay
+                        title="Interview & Hiring Insights"
+                        data={selectedItem.interview_and_hiring_insights}
+                        icon={<Briefcase className="w-4 h-4" />}
+                      />
+                    )}
+
+                    {selectedItem.sources && (
+                      <SourcesDisplay sources={selectedItem.sources} />
+                    )}
                   </div>
                 </div>
               </div>
@@ -297,6 +444,10 @@ const CompanyRoleAnalysisHistoryModal = ({
                           <span className="truncate">{item.job_title || 'Unknown Position'}</span>
                         </div>
                         <div className="flex items-center gap-2 text-white/60 text-xs mt-1">
+                          <MapPin className="w-3 h-3 flex-shrink-0" />
+                          <span className="truncate">{item.location || 'Unknown Location'}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-white/60 text-xs mt-1">
                           <Calendar className="w-3 h-3 flex-shrink-0" />
                           <span>{formatDate(item.created_at)}</span>
                         </div>
@@ -338,6 +489,10 @@ const CompanyRoleAnalysisHistoryModal = ({
                         <div className="flex items-center gap-2 text-white/80 truncate">
                           <Briefcase className="w-4 h-4 flex-shrink-0" />
                           <span className="truncate">{item.job_title || 'Unknown Position'}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-white/60 text-sm">
+                          <MapPin className="w-4 h-4 flex-shrink-0" />
+                          <span className="truncate">{item.location || 'Unknown Location'}</span>
                         </div>
                         <div className="flex items-center gap-2 text-white/60 text-sm">
                           <Calendar className="w-4 h-4 flex-shrink-0" />
