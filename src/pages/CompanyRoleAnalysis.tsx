@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { CompanyRoleAnalysisHistory } from '@/components/CompanyRoleAnalysisHistory';
 import LoadingMessages from '@/components/LoadingMessages';
+
 interface CompanyRoleAnalysisData {
   id: string;
   company_name: string;
@@ -21,6 +22,7 @@ interface CompanyRoleAnalysisData {
   created_at: string;
   updated_at: string;
 }
+
 const CompanyRoleAnalysis = () => {
   const [companyName, setCompanyName] = useState('');
   const [location, setLocation] = useState('');
@@ -166,7 +168,7 @@ const CompanyRoleAnalysis = () => {
                         <Building2 className="w-4 h-4" />
                         Company Name *
                       </Label>
-                      <Input id="companyName" type="text" placeholder="e.g., Google, Microsoft, Amazon" value={companyName} onChange={e => setCompanyName(e.target.value)} required className="border-green-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
+                      <Input id="companyName" type="text" placeholder="e.g., Google, Microsoft, Amazon" value={companyName} onChange={e => setCompanyName(e.target.value)} required className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
                     </div>
 
                     <div className="space-y-2">
@@ -174,7 +176,7 @@ const CompanyRoleAnalysis = () => {
                         <MapPin className="w-4 h-4" />
                         Location *
                       </Label>
-                      <Input id="location" type="text" placeholder="e.g., San Francisco, New York, Remote" value={location} onChange={e => setLocation(e.target.value)} required className="border-green-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
+                      <Input id="location" type="text" placeholder="e.g., San Francisco, New York, Remote" value={location} onChange={e => setLocation(e.target.value)} required className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
                     </div>
                   </div>
 
@@ -184,7 +186,7 @@ const CompanyRoleAnalysis = () => {
                       <Briefcase className="w-4 h-4" />
                       Job Title *
                     </Label>
-                    <Input id="jobTitle" type="text" placeholder="e.g., Senior Software Engineer, Product Manager, Data Scientist" value={jobTitle} onChange={e => setJobTitle(e.target.value)} required className="border-green-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
+                    <Input id="jobTitle" type="text" placeholder="e.g., Senior Software Engineer, Product Manager, Data Scientist" value={jobTitle} onChange={e => setJobTitle(e.target.value)} required className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
                   </div>
 
                   {/* Action Buttons */}
@@ -256,4 +258,5 @@ const CompanyRoleAnalysis = () => {
       <CompanyRoleAnalysisHistory isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} analyses={analysisHistory || []} />
     </Layout>;
 };
+
 export default CompanyRoleAnalysis;
