@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import { CompanyRoleAnalysisHistory } from '@/components/CompanyRoleAnalysisHistory';
-import { LoadingMessages } from '@/components/LoadingMessages';
+import LoadingMessages from '@/components/LoadingMessages';
 
 interface CompanyRoleAnalysisData {
   id: string;
