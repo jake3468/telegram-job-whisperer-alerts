@@ -2,9 +2,11 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
-import { Building2, MapPin, Calendar, TrendingUp, Shield, Lightbulb } from 'lucide-react';
+import { Building2, MapPin, Calendar, TrendingUp, Shield, Lightbulb, DollarSign, Users, GraduationCap, AlertTriangle, Briefcase } from 'lucide-react';
 import { PercentageMeter } from '@/components/PercentageMeter';
 import { BulletPointList } from '@/components/BulletPointList';
+import { JSONSectionDisplay } from '@/components/JSONSectionDisplay';
+import { SourcesDisplay } from '@/components/SourcesDisplay';
 
 interface CompanyRoleAnalysisData {
   id: string;
@@ -22,6 +24,12 @@ interface CompanyRoleAnalysisData {
   role_experience_score: number | null;
   role_experience_score_breakdown: string[] | null;
   role_experience_specific_insights: string | null;
+  role_compensation_analysis: any | null;
+  role_workplace_environment: any | null;
+  career_development: any | null;
+  role_specific_considerations: any | null;
+  interview_and_hiring_insights: any | null;
+  sources: any | null;
   created_at: string;
   updated_at: string;
 }
@@ -173,6 +181,51 @@ export const CompanyRoleAnalysisHistory: React.FC<CompanyRoleAnalysisHistoryProp
                         </div>
                       )}
                     </div>
+                  )}
+
+                  {/* New JSON Sections */}
+                  {analysis.role_compensation_analysis && (
+                    <JSONSectionDisplay
+                      title="Compensation Details"
+                      data={analysis.role_compensation_analysis}
+                      icon={<DollarSign className="w-4 h-4" />}
+                    />
+                  )}
+
+                  {analysis.role_workplace_environment && (
+                    <JSONSectionDisplay
+                      title="Workplace Environment"
+                      data={analysis.role_workplace_environment}
+                      icon={<Users className="w-4 h-4" />}
+                    />
+                  )}
+
+                  {analysis.career_development && (
+                    <JSONSectionDisplay
+                      title="Career Development"
+                      data={analysis.career_development}
+                      icon={<GraduationCap className="w-4 h-4" />}
+                    />
+                  )}
+
+                  {analysis.role_specific_considerations && (
+                    <JSONSectionDisplay
+                      title="Specific Considerations"
+                      data={analysis.role_specific_considerations}
+                      icon={<AlertTriangle className="w-4 h-4" />}
+                    />
+                  )}
+
+                  {analysis.interview_and_hiring_insights && (
+                    <JSONSectionDisplay
+                      title="Interview & Hiring Insights"
+                      data={analysis.interview_and_hiring_insights}
+                      icon={<Briefcase className="w-4 h-4" />}
+                    />
+                  )}
+
+                  {analysis.sources && (
+                    <SourcesDisplay sources={analysis.sources} />
                   )}
                 </CardContent>
               </Card>

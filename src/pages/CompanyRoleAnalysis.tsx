@@ -1,17 +1,17 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Building2, MapPin, Briefcase, Loader2, RotateCcw, Calendar, TrendingUp, Shield, Lightbulb, DollarSign, Users, GraduationCap, AlertTriangle } from 'lucide-react';
+import { Building2, MapPin, Briefcase, Loader2, RotateCcw, Calendar, TrendingUp, Shield, Lightbulb, DollarSign, Users, GraduationCap, AlertTriangle, History } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { useCreditCheck } from '@/hooks/useCreditCheck';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
-import { CompanyRoleAnalysisHistory } from '@/components/CompanyRoleAnalysisHistory';
+import CompanyRoleAnalysisHistoryModal from '@/components/CompanyRoleAnalysisHistoryModal';
 import LoadingMessages from '@/components/LoadingMessages';
 import { PercentageMeter } from '@/components/PercentageMeter';
 import { BulletPointList } from '@/components/BulletPointList';
@@ -50,6 +50,8 @@ const CompanyRoleAnalysis = () => {
   const [jobTitle, setJobTitle] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [pendingAnalysisId, setPendingAnalysisId] = useState<string | null>(null);
+  const [loadingMessages, setLoadingMessages] = useState<string[]>([]);
   const { toast } = useToast();
   const { userProfile } = useUserProfile();
   const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(1.5);
@@ -74,6 +76,86 @@ const CompanyRoleAnalysis = () => {
     enabled: !!userProfile?.id
   });
 
+  // Real-time subscription for analysis updates
+  useEffect(() => {
+    if (!userProfile?.id || !pendingAnalysisId) return;
+
+    const channel = supabase
+      .channel('company-analysis-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'company_role_analyses',
+          filter: `id=eq.${pendingAnalysisId}`
+        },
+        (payload) => {
+          console.log('Real-time update received:', payload);
+          
+          // Check if meaningful data has been added
+          const newData = payload.new;
+          if (newData && (
+            newData.local_role_market_context ||
+            newData.company_news_updates ||
+            newData.role_security_score ||
+            newData.role_experience_score ||
+            newData.role_compensation_analysis ||
+            newData.role_workplace_environment ||
+            newData.career_development ||
+            newData.role_specific_considerations ||
+            newData.interview_and_hiring_insights ||
+            newData.sources
+          )) {
+            // Analysis is complete, refresh the data and stop loading
+            refetchHistory();
+            setPendingAnalysisId(null);
+            setIsSubmitting(false);
+            setLoadingMessages([]);
+            
+            toast({
+              title: "Analysis Complete!",
+              description: "Your company analysis is ready to view."
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userProfile?.id, pendingAnalysisId, refetchHistory, toast]);
+
+  // Loading messages effect
+  useEffect(() => {
+    if (!isSubmitting || !pendingAnalysisId) return;
+
+    const messages = [
+      "Analyzing company data...",
+      "Researching market trends...",
+      "Evaluating role security...",
+      "Assessing compensation data...",
+      "Analyzing workplace environment...",
+      "Gathering interview insights...",
+      "Compiling sources and references...",
+      "Finalizing analysis report..."
+    ];
+
+    let messageIndex = 0;
+    setLoadingMessages([messages[0]]);
+
+    const interval = setInterval(() => {
+      messageIndex = (messageIndex + 1) % messages.length;
+      setLoadingMessages(prev => [
+        ...prev.slice(-2), // Keep last 2 messages
+        messages[messageIndex]
+      ]);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [isSubmitting, pendingAnalysisId]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!userProfile?.id) {
@@ -96,6 +178,7 @@ const CompanyRoleAnalysis = () => {
       });
       return;
     }
+    
     setIsSubmitting(true);
     try {
       const { data, error } = await supabase
@@ -116,8 +199,12 @@ const CompanyRoleAnalysis = () => {
           description: "Failed to create company-role analysis. Please try again.",
           variant: "destructive"
         });
+        setIsSubmitting(false);
         return;
       }
+      
+      // Set pending analysis ID to track real-time updates
+      setPendingAnalysisId(data.id);
       
       toast({
         title: "Analysis Started",
@@ -138,7 +225,6 @@ const CompanyRoleAnalysis = () => {
         description: "An unexpected error occurred. Please try again.",
         variant: "destructive"
       });
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -147,6 +233,19 @@ const CompanyRoleAnalysis = () => {
     setCompanyName('');
     setLocation('');
     setJobTitle('');
+  };
+
+  const hasAnalysisResult = (analysis: CompanyRoleAnalysisData) => {
+    return analysis.local_role_market_context || 
+           analysis.company_news_updates?.length ||
+           analysis.role_security_score ||
+           analysis.role_experience_score ||
+           analysis.role_compensation_analysis ||
+           analysis.role_workplace_environment ||
+           analysis.career_development ||
+           analysis.role_specific_considerations ||
+           analysis.interview_and_hiring_insights ||
+           analysis.sources;
   };
 
   return (
@@ -170,12 +269,24 @@ const CompanyRoleAnalysis = () => {
           <div className="w-full px-2">
             <Card className="bg-gradient-to-br from-green-500 via-green-600 to-green-700 border-green-400/30 shadow-2xl w-full max-w-full">
               <CardHeader className="bg-gradient-to-r from-green-600/90 via-green-700/90 to-green-800/90 border-b border-green-400/30 p-4 sm:p-6">
-                <CardTitle className="text-xl sm:text-2xl font-orbitron text-left font-normal text-gray-50">
-                  Company & Role Intelligence
-                </CardTitle>
-                <p className="text-green-100 font-medium mt-2 text-left text-sm sm:text-base">
-                  Provide company details to uncover hidden red flags and green lights
-                </p>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div>
+                    <CardTitle className="text-xl sm:text-2xl font-orbitron text-left font-normal text-gray-50">
+                      Company & Role Intelligence
+                    </CardTitle>
+                    <p className="text-green-100 font-medium mt-2 text-left text-sm sm:text-base">
+                      Provide company details to uncover hidden red flags and green lights
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => setIsHistoryOpen(true)}
+                    variant="outline"
+                    className="w-full sm:w-auto border-white/50 text-white hover:bg-white/20 hover:text-white font-orbitron bg-transparent text-sm sm:text-base flex-shrink-0"
+                  >
+                    <History className="w-4 h-4 mr-2" />
+                    History
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
                 <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
@@ -267,23 +378,35 @@ const CompanyRoleAnalysis = () => {
           </div>
 
           {/* Loading Messages */}
-          {isSubmitting && <LoadingMessages type="company_analysis" />}
+          {isSubmitting && pendingAnalysisId && (
+            <div className="space-y-4 px-2">
+              <Card className="bg-gradient-to-br from-green-800/50 via-green-700/50 to-green-600/50 border-green-400/30">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin text-green-400" />
+                    <h3 className="text-lg sm:text-xl font-orbitron font-bold text-white">
+                      Analyzing Your Company & Role
+                    </h3>
+                  </div>
+                  <div className="space-y-2">
+                    {loadingMessages.map((message, index) => (
+                      <div key={index} className="flex items-center gap-2 text-sm sm:text-base text-green-200">
+                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        {message}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
           {/* Results Section */}
           {analysisHistory && analysisHistory.length > 0 && (
             <div className="space-y-4 px-2">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <h2 className="text-xl sm:text-2xl font-orbitron font-bold text-white">
-                  Recent Company-Role Analyses
-                </h2>
-                <Button
-                  onClick={() => setIsHistoryOpen(true)}
-                  variant="outline"
-                  className="w-full sm:w-auto border-white/50 text-white hover:bg-white/20 hover:text-white font-orbitron bg-transparent text-sm sm:text-base"
-                >
-                  View All History
-                </Button>
-              </div>
+              <h2 className="text-xl sm:text-2xl font-orbitron font-bold text-white">
+                Recent Company-Role Analyses
+              </h2>
               
               <div className="grid gap-3 sm:gap-4">
                 {analysisHistory.slice(0, 3).map((analysis) => (
@@ -311,149 +434,161 @@ const CompanyRoleAnalysis = () => {
                         </span>
                       </div>
 
-                      {/* General Information */}
-                      {analysis.local_role_market_context && (
-                        <div className="space-y-2">
-                          <h4 className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4" />
-                            Market Context
-                          </h4>
-                          <p className="text-gray-300 text-xs sm:text-sm leading-relaxed">
-                            {analysis.local_role_market_context}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Company News Updates */}
-                      {analysis.company_news_updates && analysis.company_news_updates.length > 0 && (
-                        <div className="space-y-2">
-                          <h4 className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                            <Building2 className="w-4 h-4" />
-                            Company News Updates
-                          </h4>
-                          <BulletPointList items={analysis.company_news_updates} />
-                        </div>
-                      )}
-
-                      {/* Role Security Section */}
-                      {(analysis.role_security_score !== null || analysis.role_security_outlook || analysis.role_security_automation_risks || analysis.role_security_departmental_trends || (analysis.role_security_score_breakdown && analysis.role_security_score_breakdown.length > 0)) && (
-                        <div className="space-y-3 p-3 bg-gray-800/30 rounded-lg border border-gray-700/20">
-                          <h4 className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                            <Shield className="w-4 h-4" />
-                            Role Security Analysis
-                          </h4>
-                          
-                          {analysis.role_security_score !== null && (
-                            <PercentageMeter 
-                              score={analysis.role_security_score} 
-                              label="Security Score" 
-                            />
-                          )}
-                          
-                          {analysis.role_security_score_breakdown && analysis.role_security_score_breakdown.length > 0 && (
-                            <BulletPointList 
-                              items={analysis.role_security_score_breakdown} 
-                              title="Score Breakdown"
-                            />
-                          )}
-                          
-                          {analysis.role_security_outlook && (
-                            <div className="space-y-1">
-                              <h5 className="text-xs font-medium text-gray-400">Outlook</h5>
-                              <p className="text-gray-300 text-xs leading-relaxed">{analysis.role_security_outlook}</p>
+                      {/* Show analysis results or loading state */}
+                      {hasAnalysisResult(analysis) ? (
+                        <div className="space-y-4">
+                          {/* General Information */}
+                          {analysis.local_role_market_context && (
+                            <div className="space-y-2">
+                              <h4 className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                                <TrendingUp className="w-4 h-4" />
+                                Market Context
+                              </h4>
+                              <p className="text-gray-300 text-xs sm:text-sm leading-relaxed">
+                                {analysis.local_role_market_context}
+                              </p>
                             </div>
                           )}
-                          
-                          {analysis.role_security_automation_risks && (
-                            <div className="space-y-1">
-                              <h5 className="text-xs font-medium text-gray-400">Automation Risks</h5>
-                              <p className="text-gray-300 text-xs leading-relaxed">{analysis.role_security_automation_risks}</p>
-                            </div>
-                          )}
-                          
-                          {analysis.role_security_departmental_trends && (
-                            <div className="space-y-1">
-                              <h5 className="text-xs font-medium text-gray-400">Departmental Trends</h5>
-                              <p className="text-gray-300 text-xs leading-relaxed">{analysis.role_security_departmental_trends}</p>
-                            </div>
-                          )}
-                        </div>
-                      )}
 
-                      {/* Role Experience Section */}
-                      {(analysis.role_experience_score !== null || analysis.role_experience_specific_insights || (analysis.role_experience_score_breakdown && analysis.role_experience_score_breakdown.length > 0)) && (
-                        <div className="space-y-3 p-3 bg-gray-800/30 rounded-lg border border-gray-700/20">
-                          <h4 className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                            <Lightbulb className="w-4 h-4" />
-                            Role Experience Analysis
-                          </h4>
-                          
-                          {analysis.role_experience_score !== null && (
-                            <PercentageMeter 
-                              score={analysis.role_experience_score} 
-                              label="Experience Score" 
+                          {/* Company News Updates */}
+                          {analysis.company_news_updates && analysis.company_news_updates.length > 0 && (
+                            <div className="space-y-2">
+                              <h4 className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                                <Building2 className="w-4 h-4" />
+                                Company News Updates
+                              </h4>
+                              <BulletPointList items={analysis.company_news_updates} />
+                            </div>
+                          )}
+
+                          {/* Role Security Section */}
+                          {(analysis.role_security_score !== null || analysis.role_security_outlook || analysis.role_security_automation_risks || analysis.role_security_departmental_trends || (analysis.role_security_score_breakdown && analysis.role_security_score_breakdown.length > 0)) && (
+                            <div className="space-y-3 p-3 bg-gray-800/30 rounded-lg border border-gray-700/20">
+                              <h4 className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                                <Shield className="w-4 h-4" />
+                                Role Security Analysis
+                              </h4>
+                              
+                              {analysis.role_security_score !== null && (
+                                <PercentageMeter 
+                                  score={analysis.role_security_score} 
+                                  label="Security Score" 
+                                />
+                              )}
+                              
+                              {analysis.role_security_score_breakdown && analysis.role_security_score_breakdown.length > 0 && (
+                                <BulletPointList 
+                                  items={analysis.role_security_score_breakdown} 
+                                  title="Score Breakdown"
+                                />
+                              )}
+                              
+                              {analysis.role_security_outlook && (
+                                <div className="space-y-1">
+                                  <h5 className="text-xs font-medium text-gray-400">Outlook</h5>
+                                  <p className="text-gray-300 text-xs leading-relaxed">{analysis.role_security_outlook}</p>
+                                </div>
+                              )}
+                              
+                              {analysis.role_security_automation_risks && (
+                                <div className="space-y-1">
+                                  <h5 className="text-xs font-medium text-gray-400">Automation Risks</h5>
+                                  <p className="text-gray-300 text-xs leading-relaxed">{analysis.role_security_automation_risks}</p>
+                                </div>
+                              )}
+                              
+                              {analysis.role_security_departmental_trends && (
+                                <div className="space-y-1">
+                                  <h5 className="text-xs font-medium text-gray-400">Departmental Trends</h5>
+                                  <p className="text-gray-300 text-xs leading-relaxed">{analysis.role_security_departmental_trends}</p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Role Experience Section */}
+                          {(analysis.role_experience_score !== null || analysis.role_experience_specific_insights || (analysis.role_experience_score_breakdown && analysis.role_experience_score_breakdown.length > 0)) && (
+                            <div className="space-y-3 p-3 bg-gray-800/30 rounded-lg border border-gray-700/20">
+                              <h4 className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                                <Lightbulb className="w-4 h-4" />
+                                Role Experience Analysis
+                              </h4>
+                              
+                              {analysis.role_experience_score !== null && (
+                                <PercentageMeter 
+                                  score={analysis.role_experience_score} 
+                                  label="Experience Score" 
+                                />
+                              )}
+                              
+                              {analysis.role_experience_score_breakdown && analysis.role_experience_score_breakdown.length > 0 && (
+                                <BulletPointList 
+                                  items={analysis.role_experience_score_breakdown} 
+                                  title="Score Breakdown"
+                                />
+                              )}
+                              
+                              {analysis.role_experience_specific_insights && (
+                                <div className="space-y-1">
+                                  <h5 className="text-xs font-medium text-gray-400">Specific Insights</h5>
+                                  <p className="text-gray-300 text-xs leading-relaxed">{analysis.role_experience_specific_insights}</p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* New JSON Sections */}
+                          {analysis.role_compensation_analysis && (
+                            <JSONSectionDisplay
+                              title="Compensation Details"
+                              data={analysis.role_compensation_analysis}
+                              icon={<DollarSign className="w-4 h-4" />}
                             />
                           )}
-                          
-                          {analysis.role_experience_score_breakdown && analysis.role_experience_score_breakdown.length > 0 && (
-                            <BulletPointList 
-                              items={analysis.role_experience_score_breakdown} 
-                              title="Score Breakdown"
+
+                          {analysis.role_workplace_environment && (
+                            <JSONSectionDisplay
+                              title="Workplace Environment"
+                              data={analysis.role_workplace_environment}
+                              icon={<Users className="w-4 h-4" />}
                             />
                           )}
-                          
-                          {analysis.role_experience_specific_insights && (
-                            <div className="space-y-1">
-                              <h5 className="text-xs font-medium text-gray-400">Specific Insights</h5>
-                              <p className="text-gray-300 text-xs leading-relaxed">{analysis.role_experience_specific_insights}</p>
-                            </div>
+
+                          {analysis.career_development && (
+                            <JSONSectionDisplay
+                              title="Career Development"
+                              data={analysis.career_development}
+                              icon={<GraduationCap className="w-4 h-4" />}
+                            />
+                          )}
+
+                          {analysis.role_specific_considerations && (
+                            <JSONSectionDisplay
+                              title="Specific Considerations"
+                              data={analysis.role_specific_considerations}
+                              icon={<AlertTriangle className="w-4 h-4" />}
+                            />
+                          )}
+
+                          {analysis.interview_and_hiring_insights && (
+                            <JSONSectionDisplay
+                              title="Interview & Hiring Insights"
+                              data={analysis.interview_and_hiring_insights}
+                              icon={<Briefcase className="w-4 h-4" />}
+                            />
+                          )}
+
+                          {analysis.sources && (
+                            <SourcesDisplay sources={analysis.sources} />
                           )}
                         </div>
-                      )}
-
-                      {/* New JSON Sections */}
-                      {analysis.role_compensation_analysis && (
-                        <JSONSectionDisplay
-                          title="Compensation Details"
-                          data={analysis.role_compensation_analysis}
-                          icon={<DollarSign className="w-4 h-4" />}
-                        />
-                      )}
-
-                      {analysis.role_workplace_environment && (
-                        <JSONSectionDisplay
-                          title="Workplace Environment"
-                          data={analysis.role_workplace_environment}
-                          icon={<Users className="w-4 h-4" />}
-                        />
-                      )}
-
-                      {analysis.career_development && (
-                        <JSONSectionDisplay
-                          title="Career Development"
-                          data={analysis.career_development}
-                          icon={<GraduationCap className="w-4 h-4" />}
-                        />
-                      )}
-
-                      {analysis.role_specific_considerations && (
-                        <JSONSectionDisplay
-                          title="Specific Considerations"
-                          data={analysis.role_specific_considerations}
-                          icon={<AlertTriangle className="w-4 h-4" />}
-                        />
-                      )}
-
-                      {analysis.interview_and_hiring_insights && (
-                        <JSONSectionDisplay
-                          title="Interview & Hiring Insights"
-                          data={analysis.interview_and_hiring_insights}
-                          icon={<Briefcase className="w-4 h-4" />}
-                        />
-                      )}
-
-                      {analysis.sources && (
-                        <SourcesDisplay sources={analysis.sources} />
+                      ) : (
+                        <div className="rounded-lg p-4 border border-yellow-500/30 bg-yellow-800/20">
+                          <div className="flex items-center gap-2 text-yellow-200">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <p className="text-sm">Analysis in progress... This may take a few minutes.</p>
+                          </div>
+                        </div>
                       )}
                     </CardContent>
                   </Card>
@@ -465,10 +600,10 @@ const CompanyRoleAnalysis = () => {
       </div>
 
       {/* History Modal */}
-      <CompanyRoleAnalysisHistory
+      <CompanyRoleAnalysisHistoryModal
         isOpen={isHistoryOpen}
         onClose={() => setIsHistoryOpen(false)}
-        analyses={analysisHistory || []}
+        gradientColors="from-green-400 via-green-500 to-green-600"
       />
     </Layout>
   );

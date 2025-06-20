@@ -641,6 +641,12 @@ export type Database = {
         Args: { p_user_id: string; p_required_credits: number }
         Returns: boolean
       }
+      cleanup_old_company_analysis_data: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          deleted_analyses: number
+        }[]
+      }
       cleanup_old_linkedin_data: {
         Args: Record<PropertyKey, never>
         Returns: {
