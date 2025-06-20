@@ -78,10 +78,10 @@ export const PremiumSourcesDisplay: React.FC<PremiumSourcesDisplayProps> = ({ so
                     <ExternalLink className="w-4 h-4 text-green-500" />
                   </div>
                   <div className="flex-1 min-w-0 w-full">
-                    <p className={`font-semibold ${categoryTheme.text} text-sm md:text-base mb-2`}>
+                    <p className={`font-semibold ${categoryTheme.text} text-sm md:text-base mb-2 break-words`}>
                       {domain}
                     </p>
-                    <p className="text-gray-600 text-xs md:text-sm leading-relaxed break-all overflow-wrap-anywhere word-break-break-all">
+                    <p className="text-gray-600 text-xs md:text-sm leading-relaxed break-all">
                       {link}
                     </p>
                   </div>
@@ -108,7 +108,7 @@ export const PremiumSourcesDisplay: React.FC<PremiumSourcesDisplayProps> = ({ so
             <Globe className="w-5 h-5 text-gray-600" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg md:text-xl font-bold text-gray-800">Trusted Research Sources</h3>
+            <h3 className="text-lg md:text-xl font-bold text-gray-800 break-words">Trusted Research Sources</h3>
             <p className="text-gray-600 mt-1 text-sm md:text-base">Verified information from reliable sources</p>
           </div>
           <div className="text-center flex-shrink-0">
@@ -131,7 +131,7 @@ export const PremiumSourcesDisplay: React.FC<PremiumSourcesDisplayProps> = ({ so
                     {getCategoryIcon(category)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className={`text-base md:text-lg font-bold ${categoryTheme.text}`}>
+                    <h4 className={`text-base md:text-lg font-bold ${categoryTheme.text} break-words`}>
                       {category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                     </h4>
                     <p className="text-gray-600 text-sm">Verified data sources</p>
