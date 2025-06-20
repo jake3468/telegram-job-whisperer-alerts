@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -217,23 +216,25 @@ const CoverLetterHistoryModal = ({
                 </h3>
 
                 <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                  <div className="flex justify-between items-start mb-3">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-3">
                     <h4 className="text-lime-400 font-semibold">Cover Letter</h4>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                       <Button
                         onClick={() => handleCopyResult(selectedItem)}
                         size="sm"
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white w-full sm:w-auto"
                       >
                         <Copy className="w-4 h-4 mr-2" />
                         Copy Result
                       </Button>
                       {selectedItem.cover_letter && (
-                        <CoverLetterDownloadActions 
-                          coverLetter={selectedItem.cover_letter}
-                          companyName={selectedItem.company_name || 'Company'}
-                          jobTitle={selectedItem.job_title || 'Position'}
-                        />
+                        <div className="w-full sm:w-auto">
+                          <CoverLetterDownloadActions 
+                            coverLetter={selectedItem.cover_letter}
+                            companyName={selectedItem.company_name || 'Company'}
+                            jobTitle={selectedItem.job_title || 'Position'}
+                          />
+                        </div>
                       )}
                     </div>
                   </div>
@@ -307,14 +308,14 @@ const CoverLetterHistoryModal = ({
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-1 pt-2">
+                    <div className="flex flex-col gap-2 pt-2 w-full">
                       <Button 
                         onClick={() => {
                           setSelectedItem(item);
                           setShowDetails(true);
                         }} 
                         size="sm" 
-                        className="flex-1 bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-2 py-1"
+                        className="w-full bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-2 py-1"
                       >
                         <Eye className="w-3 h-3 mr-1" />
                         View
@@ -323,7 +324,7 @@ const CoverLetterHistoryModal = ({
                       <Button 
                         onClick={() => handleDelete(item.id)} 
                         size="sm" 
-                        className="flex-1 bg-red-600/80 hover:bg-red-600 text-white text-xs px-2 py-1"
+                        className="w-full bg-red-600/80 hover:bg-red-600 text-white text-xs px-2 py-1"
                       >
                         <Trash2 className="w-3 h-3 mr-1" />
                         Delete

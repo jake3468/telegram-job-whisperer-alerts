@@ -10,14 +10,14 @@ interface CoverLetterDownloadActionsProps {
   coverLetter: string;
   jobTitle: string;
   companyName: string;
-  contrast?: boolean; // NEW
+  contrast?: boolean;
 }
 
 const CoverLetterDownloadActions = ({
   coverLetter,
   jobTitle,
   companyName,
-  contrast = false,   // NEW
+  contrast = false,
 }: CoverLetterDownloadActionsProps) => {
   const { toast } = useToast();
 
@@ -112,10 +112,10 @@ const CoverLetterDownloadActions = ({
     : "border bg-white text-black hover:bg-gray-100";
 
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
       <Button
         onClick={handleDownloadPDF}
-        className={buttonClass + " flex items-center gap-2 px-4 py-2"}
+        className={buttonClass + " flex items-center gap-2 px-4 py-2 w-full sm:w-auto"}
         variant={undefined}
         size="sm"
       >
@@ -124,7 +124,7 @@ const CoverLetterDownloadActions = ({
       </Button>
       <Button
         onClick={handleDownloadDOCX}
-        className={buttonClass + " flex items-center gap-2 px-4 py-2"}
+        className={buttonClass + " flex items-center gap-2 px-4 py-2 w-full sm:w-auto"}
         variant={undefined}
         size="sm"
       >
