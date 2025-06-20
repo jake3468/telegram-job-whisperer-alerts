@@ -165,7 +165,7 @@ const CompanyRoleAnalysis = () => {
                       <Building2 className="w-4 h-4" />
                       Company Name *
                     </Label>
-                    <Input id="companyName" type="text" placeholder="e.g., Google, Microsoft, Amazon" value={companyName} onChange={e => setCompanyName(e.target.value)} className="bg-white border-green-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-12" required />
+                    <Input id="companyName" type="text" placeholder="e.g., Google, Microsoft, Amazon" value={companyName} onChange={e => setCompanyName(e.target.value)} required className="border-green-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-12 bg-zinc-950" />
                   </div>
 
                   <div className="space-y-2">
@@ -173,7 +173,7 @@ const CompanyRoleAnalysis = () => {
                       <MapPin className="w-4 h-4" />
                       Location *
                     </Label>
-                    <Input id="location" type="text" placeholder="e.g., San Francisco, New York, Remote" value={location} onChange={e => setLocation(e.target.value)} className="bg-white border-green-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-12" required />
+                    <Input id="location" type="text" placeholder="e.g., San Francisco, New York, Remote" value={location} onChange={e => setLocation(e.target.value)} required className="border-green-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-12 bg-zinc-950" />
                   </div>
                 </div>
 
@@ -183,7 +183,7 @@ const CompanyRoleAnalysis = () => {
                     <Briefcase className="w-4 h-4" />
                     Job Title *
                   </Label>
-                  <Input id="jobTitle" type="text" placeholder="e.g., Senior Software Engineer, Product Manager, Data Scientist" value={jobTitle} onChange={e => setJobTitle(e.target.value)} className="bg-white border-green-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-12" required />
+                  <Input id="jobTitle" type="text" placeholder="e.g., Senior Software Engineer, Product Manager, Data Scientist" value={jobTitle} onChange={e => setJobTitle(e.target.value)} required className="border-green-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-12 bg-zinc-950" />
                 </div>
 
                 {/* Action Buttons */}
