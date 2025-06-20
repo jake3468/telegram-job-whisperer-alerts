@@ -40,54 +40,64 @@ interface PremiumAnalysisResultsProps {
 
 export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ analysis }) => {
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-white min-h-screen p-4 sm:p-6 lg:p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="w-full bg-gradient-to-br from-gray-50 to-white min-h-screen">
+      <div className="w-full max-w-none mx-auto space-y-6 md:space-y-8 px-2 sm:px-4 py-4 sm:py-6">
         {/* Hero Section */}
-        <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-8 text-white">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-                    <Building2 className="w-8 h-8" />
+        <div className="w-full bg-white rounded-2xl md:rounded-3xl shadow-lg md:shadow-2xl border border-gray-100 overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-4 sm:p-6 md:p-8 text-white">
+            <div className="flex flex-col gap-4 md:gap-6">
+              <div className="space-y-3 md:space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 md:p-3 bg-white/20 rounded-lg md:rounded-xl backdrop-blur-sm flex-shrink-0">
+                    <Building2 className="w-6 h-6 md:w-8 md:h-8" />
                   </div>
-                  <div>
-                    <h1 className="text-3xl lg:text-4xl font-bold">{analysis.job_title}</h1>
-                    <p className="text-xl text-blue-100">at {analysis.company_name}</p>
+                  <div className="min-w-0 flex-1">
+                    <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold break-words">
+                      {analysis.job_title}
+                    </h1>
+                    <p className="text-sm sm:text-base md:text-lg xl:text-xl text-blue-100 break-words">
+                      at {analysis.company_name}
+                    </p>
                   </div>
                 </div>
                 
-                <div className="flex flex-wrap gap-4 text-sm">
-                  <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
-                    <MapPin className="w-4 h-4" />
-                    {analysis.location}
+                <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4 text-xs sm:text-sm">
+                  <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 md:px-4 md:py-2 rounded-full backdrop-blur-sm">
+                    <MapPin className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
+                    <span className="truncate">{analysis.location}</span>
                   </div>
                   {analysis.research_date && (
-                    <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
-                      <Calendar className="w-4 h-4" />
-                      Research Date: {new Date(analysis.research_date).toLocaleDateString()}
+                    <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 md:px-4 md:py-2 rounded-full backdrop-blur-sm">
+                      <Calendar className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
+                      <span className="truncate">
+                        Research: {new Date(analysis.research_date).toLocaleDateString()}
+                      </span>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Key Metrics Dashboard */}
-              <div className="grid grid-cols-2 gap-4 lg:gap-6">
+              {/* Key Metrics Dashboard - Responsive Grid */}
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 mt-4">
                 {analysis.role_security_score !== null && (
-                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
-                    <div className="text-3xl font-bold mb-1">{analysis.role_security_score}%</div>
-                    <div className="text-sm text-blue-100">Security Score</div>
-                    <div className="flex justify-center mt-2">
-                      <Award className="w-5 h-5 text-yellow-300" />
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl md:rounded-2xl p-3 sm:p-4 md:p-6 text-center">
+                    <div className="text-xl sm:text-2xl md:text-3xl font-bold mb-1">
+                      {analysis.role_security_score}%
+                    </div>
+                    <div className="text-xs sm:text-sm text-blue-100">Security Score</div>
+                    <div className="flex justify-center mt-1 md:mt-2">
+                      <Award className="w-4 h-4 md:w-5 md:h-5 text-yellow-300" />
                     </div>
                   </div>
                 )}
                 {analysis.role_experience_score !== null && (
-                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
-                    <div className="text-3xl font-bold mb-1">{analysis.role_experience_score}%</div>
-                    <div className="text-sm text-blue-100">Experience Score</div>
-                    <div className="flex justify-center mt-2">
-                      <Star className="w-5 h-5 text-yellow-300" />
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl md:rounded-2xl p-3 sm:p-4 md:p-6 text-center">
+                    <div className="text-xl sm:text-2xl md:text-3xl font-bold mb-1">
+                      {analysis.role_experience_score}%
+                    </div>
+                    <div className="text-xs sm:text-sm text-blue-100">Experience Score</div>
+                    <div className="flex justify-center mt-1 md:mt-2">
+                      <Star className="w-4 h-4 md:w-5 md:h-5 text-yellow-300" />
                     </div>
                   </div>
                 )}
@@ -97,21 +107,21 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
         </div>
 
         {/* Analysis Sections */}
-        <div className="grid gap-8">
+        <div className="w-full space-y-6 md:space-y-8">
           {/* Market Context - Section 1 */}
           {analysis.local_role_market_context && (
-            <div className="group">
+            <div className="group w-full">
               <PremiumSectionHeader
                 number={1}
                 title="Market Context Analysis"
-                icon={<TrendingUp className="w-6 h-6" />}
+                icon={<TrendingUp className="w-5 h-5 md:w-6 md:h-6" />}
                 gradient="from-blue-500 to-cyan-500"
                 description="Current market trends and opportunities"
               />
-              <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden group-hover:shadow-2xl transition-all duration-300">
-                <CardContent className="p-8">
-                  <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-6 border-l-4 border-blue-500">
-                    <p className="text-gray-700 leading-relaxed text-lg">
+              <Card className="w-full bg-white shadow-lg md:shadow-xl border-0 rounded-2xl md:rounded-3xl overflow-hidden group-hover:shadow-2xl transition-all duration-300">
+                <CardContent className="p-4 sm:p-6 md:p-8">
+                  <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl md:rounded-2xl p-4 sm:p-5 md:p-6 border-l-4 border-blue-500">
+                    <p className="text-gray-700 leading-relaxed text-sm sm:text-base md:text-lg break-words">
                       {analysis.local_role_market_context}
                     </p>
                   </div>
@@ -122,16 +132,16 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
 
           {/* Company News - Section 2 */}
           {analysis.company_news_updates && analysis.company_news_updates.length > 0 && (
-            <div className="group">
+            <div className="group w-full">
               <PremiumSectionHeader
                 number={2}
                 title="Company News & Updates"
-                icon={<Building2 className="w-6 h-6" />}
+                icon={<Building2 className="w-5 h-5 md:w-6 md:h-6" />}
                 gradient="from-orange-500 to-red-500"
                 description="Latest developments and company insights"
               />
-              <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden group-hover:shadow-2xl transition-all duration-300">
-                <CardContent className="p-8">
+              <Card className="w-full bg-white shadow-lg md:shadow-xl border-0 rounded-2xl md:rounded-3xl overflow-hidden group-hover:shadow-2xl transition-all duration-300">
+                <CardContent className="p-4 sm:p-6 md:p-8">
                   <PremiumBulletPointList 
                     items={analysis.company_news_updates} 
                     theme="orange"
@@ -143,16 +153,16 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
 
           {/* Role Security Analysis - Section 3 */}
           {(analysis.role_security_score !== null || analysis.role_security_outlook || analysis.role_security_automation_risks || analysis.role_security_departmental_trends || (analysis.role_security_score_breakdown && analysis.role_security_score_breakdown.length > 0)) && (
-            <div className="group">
+            <div className="group w-full">
               <PremiumSectionHeader
                 number={3}
                 title="Role Security Analysis"
-                icon={<Award className="w-6 h-6" />}
+                icon={<Award className="w-5 h-5 md:w-6 md:h-6" />}
                 gradient="from-green-500 to-emerald-500"
                 description="Job stability and future outlook"
               />
-              <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden group-hover:shadow-2xl transition-all duration-300">
-                <CardContent className="p-8 space-y-6">
+              <Card className="w-full bg-white shadow-lg md:shadow-xl border-0 rounded-2xl md:rounded-3xl overflow-hidden group-hover:shadow-2xl transition-all duration-300">
+                <CardContent className="p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-5 md:space-y-6">
                   {analysis.role_security_score !== null && (
                     <EnhancedPercentageMeter 
                       score={analysis.role_security_score} 
@@ -170,23 +180,29 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                   )}
                   
                   {analysis.role_security_outlook && (
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border-l-4 border-green-500">
-                      <h4 className="font-semibold text-green-800 mb-3">Outlook</h4>
-                      <p className="text-gray-700 leading-relaxed">{analysis.role_security_outlook}</p>
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl md:rounded-2xl p-4 sm:p-5 md:p-6 border-l-4 border-green-500">
+                      <h4 className="font-semibold text-green-800 mb-2 md:mb-3 text-sm sm:text-base">Outlook</h4>
+                      <p className="text-gray-700 leading-relaxed text-sm sm:text-base break-words">
+                        {analysis.role_security_outlook}
+                      </p>
                     </div>
                   )}
                   
                   {analysis.role_security_automation_risks && (
-                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-6 border-l-4 border-yellow-500">
-                      <h4 className="font-semibold text-yellow-800 mb-3">Automation Risks</h4>
-                      <p className="text-gray-700 leading-relaxed">{analysis.role_security_automation_risks}</p>
+                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl md:rounded-2xl p-4 sm:p-5 md:p-6 border-l-4 border-yellow-500">
+                      <h4 className="font-semibold text-yellow-800 mb-2 md:mb-3 text-sm sm:text-base">Automation Risks</h4>
+                      <p className="text-gray-700 leading-relaxed text-sm sm:text-base break-words">
+                        {analysis.role_security_automation_risks}
+                      </p>
                     </div>
                   )}
                   
                   {analysis.role_security_departmental_trends && (
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border-l-4 border-blue-500">
-                      <h4 className="font-semibold text-blue-800 mb-3">Departmental Trends</h4>
-                      <p className="text-gray-700 leading-relaxed">{analysis.role_security_departmental_trends}</p>
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl md:rounded-2xl p-4 sm:p-5 md:p-6 border-l-4 border-blue-500">
+                      <h4 className="font-semibold text-blue-800 mb-2 md:mb-3 text-sm sm:text-base">Departmental Trends</h4>
+                      <p className="text-gray-700 leading-relaxed text-sm sm:text-base break-words">
+                        {analysis.role_security_departmental_trends}
+                      </p>
                     </div>
                   )}
                 </CardContent>
@@ -194,19 +210,18 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
             </div>
           )}
 
-          {/* Continue with other sections... */}
           {/* Role Experience Analysis - Section 4 */}
           {(analysis.role_experience_score !== null || analysis.role_experience_specific_insights || (analysis.role_experience_score_breakdown && analysis.role_experience_score_breakdown.length > 0)) && (
-            <div className="group">
+            <div className="group w-full">
               <PremiumSectionHeader
                 number={4}
                 title="Role Experience Analysis"
-                icon={<Star className="w-6 h-6" />}
+                icon={<Star className="w-5 h-5 md:w-6 md:h-6" />}
                 gradient="from-purple-500 to-pink-500"
                 description="Experience requirements and career fit"
               />
-              <Card className="bg-white shadow-xl border-0 rounded-3xl overflow-hidden group-hover:shadow-2xl transition-all duration-300">
-                <CardContent className="p-8 space-y-6">
+              <Card className="w-full bg-white shadow-lg md:shadow-xl border-0 rounded-2xl md:rounded-3xl overflow-hidden group-hover:shadow-2xl transition-all duration-300">
+                <CardContent className="p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-5 md:space-y-6">
                   {analysis.role_experience_score !== null && (
                     <EnhancedPercentageMeter 
                       score={analysis.role_experience_score} 
@@ -224,9 +239,11 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
                   )}
                   
                   {analysis.role_experience_specific_insights && (
-                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border-l-4 border-purple-500">
-                      <h4 className="font-semibold text-purple-800 mb-3">Specific Insights</h4>
-                      <p className="text-gray-700 leading-relaxed">{analysis.role_experience_specific_insights}</p>
+                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl md:rounded-2xl p-4 sm:p-5 md:p-6 border-l-4 border-purple-500">
+                      <h4 className="font-semibold text-purple-800 mb-2 md:mb-3 text-sm sm:text-base">Specific Insights</h4>
+                      <p className="text-gray-700 leading-relaxed text-sm sm:text-base break-words">
+                        {analysis.role_experience_specific_insights}
+                      </p>
                     </div>
                   )}
                 </CardContent>
@@ -236,11 +253,11 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
 
           {/* JSON Sections with premium styling */}
           {analysis.role_compensation_analysis && (
-            <div className="group">
+            <div className="group w-full">
               <PremiumSectionHeader
                 number={5}
                 title="Compensation Analysis"
-                icon={<TrendingUp className="w-6 h-6" />}
+                icon={<TrendingUp className="w-5 h-5 md:w-6 md:h-6" />}
                 gradient="from-yellow-500 to-orange-500"
                 description="Salary insights and benefits breakdown"
               />
@@ -252,11 +269,11 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
           )}
 
           {analysis.role_workplace_environment && (
-            <div className="group">
+            <div className="group w-full">
               <PremiumSectionHeader
                 number={6}
                 title="Workplace Environment"
-                icon={<Building2 className="w-6 h-6" />}
+                icon={<Building2 className="w-5 h-5 md:w-6 md:h-6" />}
                 gradient="from-teal-500 to-cyan-500"
                 description="Company culture and work environment"
               />
@@ -268,11 +285,11 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
           )}
 
           {analysis.career_development && (
-            <div className="group">
+            <div className="group w-full">
               <PremiumSectionHeader
                 number={7}
                 title="Career Development"
-                icon={<TrendingUp className="w-6 h-6" />}
+                icon={<TrendingUp className="w-5 h-5 md:w-6 md:h-6" />}
                 gradient="from-indigo-500 to-purple-500"
                 description="Growth opportunities and advancement paths"
               />
@@ -284,11 +301,11 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
           )}
 
           {analysis.role_specific_considerations && (
-            <div className="group">
+            <div className="group w-full">
               <PremiumSectionHeader
                 number={8}
                 title="Role-Specific Considerations"
-                icon={<Award className="w-6 h-6" />}
+                icon={<Award className="w-5 h-5 md:w-6 md:h-6" />}
                 gradient="from-pink-500 to-rose-500"
                 description="Important factors and considerations"
               />
@@ -300,11 +317,11 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
           )}
 
           {analysis.interview_and_hiring_insights && (
-            <div className="group">
+            <div className="group w-full">
               <PremiumSectionHeader
                 number={9}
                 title="Interview & Hiring Insights"
-                icon={<Star className="w-6 h-6" />}
+                icon={<Star className="w-5 h-5 md:w-6 md:h-6" />}
                 gradient="from-violet-500 to-purple-500"
                 description="Interview preparation and hiring process"
               />
@@ -317,11 +334,11 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({ 
 
           {/* Sources Section */}
           {analysis.sources && (
-            <div className="group">
+            <div className="group w-full">
               <PremiumSectionHeader
                 number={10}
                 title="Research Sources"
-                icon={<Building2 className="w-6 h-6" />}
+                icon={<Building2 className="w-5 h-5 md:w-6 md:h-6" />}
                 gradient="from-gray-500 to-slate-500"
                 description="Trusted sources and references"
               />

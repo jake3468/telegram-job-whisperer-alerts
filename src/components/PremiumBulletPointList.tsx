@@ -51,25 +51,25 @@ export const PremiumBulletPointList: React.FC<PremiumBulletPointListProps> = ({
   const getItemIcon = (item: string, index: number) => {
     const itemLower = item.toLowerCase();
     if (itemLower.includes('positive') || itemLower.includes('good') || itemLower.includes('strong') || itemLower.includes('growth')) {
-      return <CheckCircle className={`w-5 h-5 ${currentTheme.icon} flex-shrink-0`} />;
+      return <CheckCircle className={`w-4 h-4 sm:w-5 sm:h-5 ${currentTheme.icon} flex-shrink-0`} />;
     }
     if (itemLower.includes('negative') || itemLower.includes('risk') || itemLower.includes('concern') || itemLower.includes('decline')) {
-      return <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />;
+      return <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 flex-shrink-0" />;
     }
     if (itemLower.includes('trend') || itemLower.includes('increase') || itemLower.includes('improve')) {
-      return <TrendingUp className={`w-5 h-5 ${currentTheme.icon} flex-shrink-0`} />;
+      return <TrendingUp className={`w-4 h-4 sm:w-5 sm:h-5 ${currentTheme.icon} flex-shrink-0`} />;
     }
     if (itemLower.includes('opportunity') || itemLower.includes('potential')) {
-      return <Target className={`w-5 h-5 ${currentTheme.icon} flex-shrink-0`} />;
+      return <Target className={`w-4 h-4 sm:w-5 sm:h-5 ${currentTheme.icon} flex-shrink-0`} />;
     }
     if (itemLower.includes('insight') || itemLower.includes('analysis')) {
-      return <Lightbulb className={`w-5 h-5 ${currentTheme.icon} flex-shrink-0`} />;
+      return <Lightbulb className={`w-4 h-4 sm:w-5 sm:h-5 ${currentTheme.icon} flex-shrink-0`} />;
     }
     
     // Default icons based on position
     const icons = [Star, Award, Target, Lightbulb, TrendingUp];
     const IconComponent = icons[index % icons.length];
-    return <IconComponent className={`w-5 h-5 ${currentTheme.icon} flex-shrink-0`} />;
+    return <IconComponent className={`w-4 h-4 sm:w-5 sm:h-5 ${currentTheme.icon} flex-shrink-0`} />;
   };
 
   const getItemStyle = (item: string) => {
@@ -81,29 +81,29 @@ export const PremiumBulletPointList: React.FC<PremiumBulletPointListProps> = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="w-full space-y-3 sm:space-y-4">
       {title && (
-        <div className="flex items-center gap-3 mb-6">
-          <div className={`w-1 h-8 bg-gradient-to-b ${currentTheme.primary} rounded-full`} />
-          <h4 className={`text-lg font-bold ${currentTheme.text}`}>{title}</h4>
+        <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+          <div className={`w-1 h-6 sm:h-8 bg-gradient-to-b ${currentTheme.primary} rounded-full flex-shrink-0`} />
+          <h4 className={`text-base sm:text-lg font-bold ${currentTheme.text} break-words`}>{title}</h4>
         </div>
       )}
-      <div className="grid gap-4">
+      <div className="grid gap-3 sm:gap-4">
         {items.map((item, index) => (
           <div
             key={index}
-            className={`group flex items-start gap-4 p-6 rounded-2xl border transition-all duration-300 ${getItemStyle(item)}`}
+            className={`group flex items-start gap-3 sm:gap-4 p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl border transition-all duration-300 ${getItemStyle(item)}`}
           >
-            <div className="p-2 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
+            <div className="p-1.5 sm:p-2 bg-white rounded-lg sm:rounded-xl shadow-sm group-hover:shadow-md transition-shadow flex-shrink-0">
               {getItemIcon(item, index)}
             </div>
-            <div className="flex-1">
-              <p className="text-gray-700 leading-relaxed font-medium">
+            <div className="flex-1 min-w-0">
+              <p className="text-gray-700 leading-relaxed font-medium text-sm sm:text-base break-words">
                 {item}
               </p>
             </div>
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-              <div className={`w-2 h-2 bg-gradient-to-r ${currentTheme.primary} rounded-full`} />
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+              <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gradient-to-r ${currentTheme.primary} rounded-full`} />
             </div>
           </div>
         ))}
