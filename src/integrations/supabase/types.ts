@@ -11,14 +11,17 @@ export type Database = {
     Tables: {
       company_role_analyses: {
         Row: {
+          career_development: Json | null
           company_name: string
           company_news_updates: string[] | null
           created_at: string | null
           id: string
+          interview_and_hiring_insights: Json | null
           job_title: string
           local_role_market_context: string | null
           location: string
           research_date: string | null
+          role_compensation_analysis: Json | null
           role_experience_score: number | null
           role_experience_score_breakdown: string[] | null
           role_experience_specific_insights: string | null
@@ -27,18 +30,24 @@ export type Database = {
           role_security_outlook: string | null
           role_security_score: number | null
           role_security_score_breakdown: string[] | null
+          role_specific_considerations: Json | null
+          role_workplace_environment: Json | null
+          sources: Json | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
+          career_development?: Json | null
           company_name: string
           company_news_updates?: string[] | null
           created_at?: string | null
           id?: string
+          interview_and_hiring_insights?: Json | null
           job_title: string
           local_role_market_context?: string | null
           location: string
           research_date?: string | null
+          role_compensation_analysis?: Json | null
           role_experience_score?: number | null
           role_experience_score_breakdown?: string[] | null
           role_experience_specific_insights?: string | null
@@ -47,18 +56,24 @@ export type Database = {
           role_security_outlook?: string | null
           role_security_score?: number | null
           role_security_score_breakdown?: string[] | null
+          role_specific_considerations?: Json | null
+          role_workplace_environment?: Json | null
+          sources?: Json | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
+          career_development?: Json | null
           company_name?: string
           company_news_updates?: string[] | null
           created_at?: string | null
           id?: string
+          interview_and_hiring_insights?: Json | null
           job_title?: string
           local_role_market_context?: string | null
           location?: string
           research_date?: string | null
+          role_compensation_analysis?: Json | null
           role_experience_score?: number | null
           role_experience_score_breakdown?: string[] | null
           role_experience_specific_insights?: string | null
@@ -67,6 +82,9 @@ export type Database = {
           role_security_outlook?: string | null
           role_security_score?: number | null
           role_security_score_breakdown?: string[] | null
+          role_specific_considerations?: Json | null
+          role_workplace_environment?: Json | null
+          sources?: Json | null
           updated_at?: string | null
           user_id?: string
         }

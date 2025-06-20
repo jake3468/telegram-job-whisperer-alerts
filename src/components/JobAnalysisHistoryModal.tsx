@@ -232,7 +232,8 @@ const JobAnalysisHistoryModal = ({
                   {selectedItem.match_score && (
                     <div className="mb-4">
                       <PercentageMeter 
-                        percentage={selectedItem.match_score} 
+                        score={parseInt(selectedItem.match_score)} 
+                        label="Match Score"
                       />
                     </div>
                   )}

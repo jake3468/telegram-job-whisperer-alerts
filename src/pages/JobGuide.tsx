@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -431,7 +430,7 @@ const JobGuide = () => {
                       <div className="w-full sm:max-w-[350px] md:max-w-[280px] mx-auto">
                         {/* slight shadow and rounded for clearer separation */}
                         <div className="shadow-md rounded-xl bg-slate-900/90 p-3 border border-slate-700">
-                          <PercentageMeter percentage={matchScore} />
+                          <PercentageMeter score={parseInt(matchScore)} label="Match Score" />
                         </div>
                       </div>
                     </div>
