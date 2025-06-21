@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,8 @@ export const InterviewPremiumDisplay: React.FC<InterviewPremiumDisplayProps> = (
       console.log('No valid data provided');
       return { title: '', strategy: '', questions: [], companyName: 'Company', jobTitle: 'Position' };
     }
+    
+    const lines = data.split('\n').map(line => line.trim()).filter(line => line.length > 0);
     
     let title = '';
     let strategy = '';
