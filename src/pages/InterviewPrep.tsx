@@ -211,12 +211,12 @@ const InterviewPrep = () => {
   const renderInterviewQuestions = (content: string) => {
     if (!content) return null;
 
-    // Simple markdown parsing - only handle basic formatting
+    // Simple markdown parsing with smaller text sizes
     const processedContent = content
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
-      .replace(/^# (.*$)/gim, '<h1 style="font-size: 1.5rem; font-weight: bold; margin: 1rem 0; color: #1e40af;">$1</h1>') // H1 headers
-      .replace(/^## (.*$)/gim, '<h2 style="font-size: 1.25rem; font-weight: bold; margin: 0.75rem 0; color: #2563eb;">$1</h2>') // H2 headers
-      .replace(/^### (.*$)/gim, '<h3 style="font-size: 1.125rem; font-weight: bold; margin: 0.5rem 0; color: #3b82f6;">$1</h3>') // H3 headers
+      .replace(/^# (.*$)/gim, '<h1 style="font-size: 1.125rem; font-weight: bold; margin: 0.75rem 0; color: #1e40af;">$1</h1>') // H1 headers - smaller
+      .replace(/^## (.*$)/gim, '<h2 style="font-size: 1rem; font-weight: bold; margin: 0.5rem 0; color: #2563eb;">$1</h2>') // H2 headers - smaller
+      .replace(/^### (.*$)/gim, '<h3 style="font-size: 0.95rem; font-weight: bold; margin: 0.375rem 0; color: #3b82f6;">$1</h3>') // H3 headers - smaller
       .replace(/\n/g, '<br>'); // Line breaks
 
     return (
