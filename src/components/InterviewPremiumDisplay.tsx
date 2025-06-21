@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Copy, MessageSquare, Lightbulb, CheckCircle, Star, Target, Users, Brain } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import InterviewPrepDownloadActions from '@/components/InterviewPrepDownloadActions';
 
 interface InterviewPremiumDisplayProps {
   interviewData: string;
@@ -19,16 +19,13 @@ interface ParsedQuestion {
 export const InterviewPremiumDisplay: React.FC<InterviewPremiumDisplayProps> = ({ interviewData }) => {
   const { toast } = useToast();
 
-  const parseInterviewData = (data: string): { title: string; strategy: string; questions: ParsedQuestion[] } => {
+  const parseInterviewData = (data: string): { title: string; strategy: string; questions: ParsedQuestion[]; companyName: string; jobTitle: string } => {
     console.log('Raw interview data received:', data);
     
     if (!data || typeof data !== 'string') {
       console.log('No valid data provided');
-      return { title: '', strategy: '', questions: [] };
+      return { title: '', strategy: '', questions: [], companyName: 'Company', jobTitle: 'Position' };
     }
-    
-    const lines = data.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-    console.log('Parsed lines:', lines.length);
     
     let title = '';
     let strategy = '';
@@ -126,11 +123,13 @@ export const InterviewPremiumDisplay: React.FC<InterviewPremiumDisplayProps> = (
     return { 
       title: title || 'Interview Preparation Guide', 
       strategy, 
-      questions 
+      questions, 
+      companyName: 'Company', 
+      jobTitle: 'Position' 
     };
   };
 
-  const { title, strategy, questions } = parseInterviewData(interviewData);
+  const { title, strategy, questions, companyName, jobTitle } = parseInterviewData(interviewData);
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -147,25 +146,36 @@ export const InterviewPremiumDisplay: React.FC<InterviewPremiumDisplayProps> = (
   };
 
   return (
-    <div className="w-full space-y-6 bg-gradient-to-br from-gray-900 to-teal-900/20 min-h-screen p-4 rounded-xl">
+    <div className="w-full space-y-6 bg-gradient-to-br from-gray-900 to-teal-900/20 min-h-screen p-4 rounded-xl overflow-x-hidden">
       {/* Header Section */}
       <div className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 rounded-xl shadow-2xl border border-teal-500/30 overflow-hidden">
-        <div className="p-6 text-white">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-              <MessageSquare className="w-8 h-8" />
+        <div className="p-4 sm:p-6 text-white">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
+            <div className="flex items-center gap-4 min-w-0 flex-1">
+              <div className="p-2 sm:p-3 bg-white/20 rounded-xl backdrop-blur-sm flex-shrink-0">
+                <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl sm:text-2xl font-bold leading-tight break-words">
+                  {title}
+                </h1>
+                <p className="text-teal-100 mt-1 text-sm sm:text-base">AI-powered interview strategy and personalized questions</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold leading-tight">
-                {title}
-              </h1>
-              <p className="text-teal-100 mt-1">AI-powered interview strategy and personalized questions</p>
+            
+            <div className="flex-shrink-0 w-full sm:w-auto">
+              <InterviewPrepDownloadActions 
+                interviewData={interviewData}
+                jobTitle={jobTitle}
+                companyName={companyName}
+                contrast={true}
+              />
             </div>
           </div>
           
           <div className="flex items-center gap-2 text-sm">
-            <CheckCircle className="w-4 h-4 text-emerald-300" />
-            <span>Interview prep complete • {questions.length} questions generated</span>
+            <CheckCircle className="w-4 h-4 text-emerald-300 flex-shrink-0" />
+            <span className="break-words">Interview prep complete • {questions.length} questions generated</span>
           </div>
         </div>
       </div>
@@ -174,26 +184,26 @@ export const InterviewPremiumDisplay: React.FC<InterviewPremiumDisplayProps> = (
       {strategy && (
         <Card className="bg-gradient-to-r from-teal-800/50 to-emerald-800/50 border border-teal-500/30 shadow-2xl rounded-xl overflow-hidden">
           <CardHeader className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white pb-4">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-3">
-                <div className="p-2 bg-white/20 rounded-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <CardTitle className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="p-2 bg-white/20 rounded-lg flex-shrink-0">
                   <Target className="w-5 h-5" />
                 </div>
-                Strategic Approach
+                <span className="break-words">Strategic Approach</span>
               </CardTitle>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => copyToClipboard(strategy, 'Interview strategy')}
-                className="text-white hover:bg-white/20"
+                className="text-white hover:bg-white/20 flex-shrink-0"
               >
                 <Copy className="w-4 h-4" />
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="bg-gradient-to-r from-teal-50/10 to-emerald-50/10 rounded-xl p-4 border-l-4 border-teal-500">
-              <p className="text-gray-200 leading-relaxed text-sm">
+              <p className="text-gray-200 leading-relaxed text-sm break-words">
                 {strategy}
               </p>
             </div>
@@ -204,45 +214,45 @@ export const InterviewPremiumDisplay: React.FC<InterviewPremiumDisplayProps> = (
       {/* Questions Section */}
       <div className="space-y-4">
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-lg">
+          <div className="p-2 bg-gradient-to-r from-teal-600 to-emerald-600 rounded-lg flex-shrink-0">
             <MessageSquare className="w-5 h-5 text-white" />
           </div>
-          <h2 className="text-xl font-bold text-white">Interview Questions & Perfect Answers</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-white break-words">Interview Questions & Perfect Answers</h2>
         </div>
 
         {questions.length > 0 ? (
           questions.map((item, index) => (
             <Card key={index} className="bg-gradient-to-r from-teal-800/30 to-emerald-800/30 border border-teal-500/30 shadow-2xl rounded-xl overflow-hidden">
               <CardHeader className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white pb-4">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-3">
-                    <div className="p-2 bg-white/20 rounded-lg">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <CardTitle className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="p-2 bg-white/20 rounded-lg flex-shrink-0">
                       {getQuestionIcon(index)}
                     </div>
-                    <div>
+                    <div className="min-w-0 flex-1">
                       <span className="text-teal-100 text-sm">Question {item.number}</span>
-                      <h3 className="text-lg font-medium mt-1">{item.question}</h3>
+                      <h3 className="text-base sm:text-lg font-medium mt-1 break-words">{item.question}</h3>
                     </div>
                   </CardTitle>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => copyToClipboard(`Q: ${item.question}\nA: ${item.answer}${item.proTip ? `\nTip: ${item.proTip}` : ''}`, `Question ${item.number}`)}
-                    className="text-white hover:bg-white/20"
+                    className="text-white hover:bg-white/20 flex-shrink-0"
                   >
                     <Copy className="w-4 h-4" />
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="p-6 space-y-4">
+              <CardContent className="p-4 sm:p-6 space-y-4">
                 {/* Answer */}
                 {item.answer && (
                   <div className="bg-gradient-to-r from-teal-50/10 to-emerald-50/10 rounded-xl p-4 border-l-4 border-teal-500">
                     <h4 className="font-bold text-teal-300 text-sm mb-2 flex items-center gap-2">
-                      <MessageSquare className="w-4 h-4" />
+                      <MessageSquare className="w-4 h-4 flex-shrink-0" />
                       Your Perfect Answer
                     </h4>
-                    <p className="text-gray-200 leading-relaxed text-sm">
+                    <p className="text-gray-200 leading-relaxed text-sm break-words">
                       {item.answer}
                     </p>
                   </div>
@@ -252,10 +262,10 @@ export const InterviewPremiumDisplay: React.FC<InterviewPremiumDisplayProps> = (
                 {item.proTip && (
                   <div className="bg-gradient-to-r from-emerald-50/10 to-yellow-50/10 rounded-xl p-4 border-l-4 border-emerald-500">
                     <h4 className="font-bold text-emerald-300 text-sm mb-2 flex items-center gap-2">
-                      <Lightbulb className="w-4 h-4" />
+                      <Lightbulb className="w-4 h-4 flex-shrink-0" />
                       Pro Interview Tip
                     </h4>
-                    <p className="text-gray-200 leading-relaxed text-sm">
+                    <p className="text-gray-200 leading-relaxed text-sm break-words">
                       {item.proTip}
                     </p>
                   </div>
@@ -265,12 +275,12 @@ export const InterviewPremiumDisplay: React.FC<InterviewPremiumDisplayProps> = (
           ))
         ) : (
           <Card className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 shadow-2xl rounded-xl overflow-hidden">
-            <CardContent className="p-6 text-center">
+            <CardContent className="p-4 sm:p-6 text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
-                <MessageSquare className="w-5 h-5 text-yellow-300" />
+                <MessageSquare className="w-5 h-5 text-yellow-300 flex-shrink-0" />
                 <p className="text-white font-medium">No Questions Available</p>
               </div>
-              <p className="text-yellow-100 text-sm">
+              <p className="text-yellow-100 text-sm break-words">
                 The interview questions couldn't be parsed from the data. Please try generating new interview prep.
               </p>
             </CardContent>

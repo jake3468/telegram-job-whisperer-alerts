@@ -4,11 +4,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Eye, Clock, Building2, Briefcase, AlertTriangle, X } from 'lucide-react';
+import { Trash2, Eye, Clock, Building2, Briefcase, AlertTriangle, X, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import InterviewPrepDownloadActions from '@/components/InterviewPrepDownloadActions';
 
 interface InterviewPrepHistoryModalProps {
   onSelectEntry?: (entry: any) => void;
@@ -96,14 +97,14 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
     // Simple markdown parsing - only handle basic formatting
     const processedContent = content
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
-      .replace(/^# (.*$)/gm, '<h1>$1</h1>') // H1 headers
-      .replace(/^## (.*$)/gm, '<h2>$1</h2>') // H2 headers
-      .replace(/^### (.*$)/gm, '<h3>$1</h3>') // H3 headers
+      .replace(/^# (.*$)/gm, '<h1 class="text-lg font-bold mb-2">$1</h1>') // H1 headers
+      .replace(/^## (.*$)/gm, '<h2 class="text-base font-bold mb-2">$1</h2>') // H2 headers
+      .replace(/^### (.*$)/gm, '<h3 class="text-sm font-bold mb-1">$1</h3>') // H3 headers
       .replace(/\n/g, '<br>'); // Line breaks
 
     return (
       <div 
-        className="text-black bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words"
+        className="text-black bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words overflow-auto"
         dangerouslySetInnerHTML={{ __html: processedContent }}
       />
     );
@@ -114,17 +115,27 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="max-w-6xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
           <DialogHeader className="flex-shrink-0">
-            <DialogTitle className="text-white font-inter flex items-center gap-2 text-lg">
-              <Clock className="w-5 h-5" />
-              Interview Prep Details
-              <Button 
-                onClick={handleBackToList} 
-                size="sm" 
-                className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm mx-[15px]"
-              >
-                <X className="w-4 h-4 mr-1" />
-                Back to List
-              </Button>
+            <DialogTitle className="text-white font-inter flex flex-col sm:flex-row sm:items-center gap-2 text-base sm:text-lg">
+              <div className="flex items-center gap-2 min-w-0 flex-1">
+                <Clock className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <span className="break-words">Interview Prep Details</span>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <InterviewPrepDownloadActions 
+                  interviewData={selectedEntry.interview_questions || ''}
+                  jobTitle={selectedEntry.job_title || 'Position'}
+                  companyName={selectedEntry.company_name || 'Company'}
+                  contrast={true}
+                />
+                <Button 
+                  onClick={handleBackToList} 
+                  size="sm" 
+                  className="bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm"
+                >
+                  <X className="w-4 h-4 mr-1" />
+                  Back
+                </Button>
+              </div>
             </DialogTitle>
           </DialogHeader>
           
@@ -139,19 +150,19 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
                 <div>
                   <label className="text-cyan-200 text-sm font-semibold">Company Name:</label>
                   <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
-                    <p className="text-white text-sm">{selectedEntry.company_name}</p>
+                    <p className="text-white text-sm break-words">{selectedEntry.company_name}</p>
                   </div>
                 </div>
                 <div>
                   <label className="text-cyan-200 text-sm font-semibold">Job Title:</label>
                   <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
-                    <p className="text-white text-sm">{selectedEntry.job_title}</p>
+                    <p className="text-white text-sm break-words">{selectedEntry.job_title}</p>
                   </div>
                 </div>
                 <div>
                   <label className="text-cyan-200 text-sm font-semibold">Job Description:</label>
                   <div className="rounded p-3 mt-1 max-h-32 overflow-y-auto bg-black/80 border border-cyan-300/20">
-                    <p className="text-white text-sm">{selectedEntry.job_description}</p>
+                    <p className="text-white text-sm break-words">{selectedEntry.job_description}</p>
                   </div>
                 </div>
                 <div>
@@ -178,7 +189,9 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
                     <h4 className="text-lime-400 font-semibold">Interview Questions & Answers</h4>
                   </div>
                   
-                  {renderInterviewQuestions(selectedEntry.interview_questions)}
+                  <div className="overflow-x-auto">
+                    {renderInterviewQuestions(selectedEntry.interview_questions)}
+                  </div>
                 </div>
               </div>
             )}
@@ -207,7 +220,7 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
         <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg p-2 sm:p-3 mb-4 flex-shrink-0">
           <div className="flex items-center gap-2 text-orange-200">
             <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-            <p className="text-xs sm:text-sm">
+            <p className="text-xs sm:text-sm break-words">
               Your history is automatically deleted after 60 days for privacy and storage optimization.
             </p>
           </div>
@@ -242,7 +255,7 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
                           <span className="truncate">{entry.job_title || 'Unknown Position'}</span>
                         </div>
                         <div className="flex items-center gap-2 text-white/60 text-xs mt-1">
-                          <Clock className="w-3 h-3 flex-shrink-0" />
+                          <Calendar className="w-3 h-3 flex-shrink-0" />
                           <span>{formatDate(entry.created_at)}</span>
                         </div>
                       </div>
@@ -284,7 +297,7 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
                           <span className="truncate">{entry.job_title || 'Unknown Position'}</span>
                         </div>
                         <div className="flex items-center gap-2 text-white/60 text-sm">
-                          <Clock className="w-4 h-4 flex-shrink-0" />
+                          <Calendar className="w-4 h-4 flex-shrink-0" />
                           <span className="whitespace-nowrap">{formatDate(entry.created_at)}</span>
                         </div>
                       </div>

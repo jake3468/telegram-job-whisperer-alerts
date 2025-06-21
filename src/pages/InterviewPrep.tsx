@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -243,39 +244,43 @@ const InterviewPrep = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-black text-white">
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="min-h-screen bg-black text-white overflow-x-hidden">
+        <div className="container mx-auto px-4 py-4 sm:py-8 max-w-5xl">
           {/* Show premium results if we have interview data */}
           {interviewData ? (
-            <InterviewPremiumDisplay interviewData={interviewData} />
+            <div className="w-full overflow-x-hidden">
+              <InterviewPremiumDisplay interviewData={interviewData} />
+            </div>
           ) : (
             <>
               {/* Header */}
-              <div className="text-center mb-8">
+              <div className="text-center mb-6 sm:mb-8 px-2">
                 <div className="inline-flex items-center gap-3 mb-4">
-                  <div className="p-3 rounded-xl bg-gradient-to-r from-[#ddd6f3] to-[#faaca8]">
-                    <MessageSquare className="w-8 h-8 text-black" />
+                  <div className="p-2 sm:p-3 rounded-xl bg-gradient-to-r from-[#ddd6f3] to-[#faaca8]">
+                    <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8 text-black" />
                   </div>
                 </div>
-                <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] bg-clip-text text-transparent md:text-4xl">
+                <h1 className="text-2xl sm:text-4xl font-bold mb-4 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] bg-clip-text text-transparent">
                   Interview Prep
                 </h1>
-                <p className="text-gray-300 max-w-2xl mx-auto text-lg font-light">
+                <p className="text-gray-300 max-w-2xl mx-auto text-sm sm:text-lg font-light px-4">
                   Your Personal Interview Coach, powered by AI. Get 15 tailored questions with perfect answers, pro tips, and strategic questions to ask your interviewer.
                 </p>
               </div>
 
               {/* Form */}
-              <Card className="mb-8 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] border-0">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-black text-xl">Interview Preparation Details</CardTitle>
-                    <InterviewPrepHistoryModal />
+              <Card className="mb-6 sm:mb-8 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] border-0 mx-2 sm:mx-0">
+                <CardHeader className="pb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <CardTitle className="text-black text-lg sm:text-xl">Interview Preparation Details</CardTitle>
+                    <div className="flex-shrink-0">
+                      <InterviewPrepHistoryModal />
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Company Name and Job Title in horizontal layout for desktop */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-black flex items-center gap-2">
                         <Building2 className="w-4 h-4" />
@@ -286,7 +291,7 @@ const InterviewPrep = () => {
                         onChange={(e) => setCompanyName(e.target.value)}
                         placeholder="e.g., Google, Microsoft, Amazon"
                         disabled={isGenerating || isSubmitting}
-                        className="border-gray-300 placeholder-gray-400 bg-black text-white"
+                        className="border-gray-300 placeholder-gray-400 bg-black text-white w-full"
                       />
                     </div>
 
@@ -300,7 +305,7 @@ const InterviewPrep = () => {
                         onChange={(e) => setJobTitle(e.target.value)}
                         placeholder="e.g., Senior Software Engineer, Product Manager"
                         disabled={isGenerating || isSubmitting}
-                        className="border-gray-300 placeholder-gray-400 bg-black text-white"
+                        className="border-gray-300 placeholder-gray-400 bg-black text-white w-full"
                       />
                     </div>
                   </div>
@@ -315,15 +320,15 @@ const InterviewPrep = () => {
                       onChange={(e) => setJobDescription(e.target.value)}
                       placeholder="Paste the complete job description here..."
                       disabled={isGenerating || isSubmitting}
-                      className="border-gray-300 placeholder-gray-400 min-h-32 bg-black text-white"
+                      className="border-gray-300 placeholder-gray-400 min-h-32 bg-black text-white w-full resize-none"
                     />
                   </div>
 
-                  <div className="flex gap-3 pt-4">
+                  <div className="flex flex-col sm:flex-row gap-3 pt-4">
                     <Button
                       onClick={handleGenerate}
                       disabled={isGenerating || isSubmitting}
-                      className="flex-1 text-white font-medium text-justify bg-rose-600 hover:bg-rose-500"
+                      className="w-full sm:flex-1 text-white font-medium bg-rose-600 hover:bg-rose-500"
                     >
                       {isGenerating || isSubmitting ? 'Generating...' : 'Generate Interview Prep'}
                     </Button>
@@ -331,7 +336,7 @@ const InterviewPrep = () => {
                       onClick={handleReset}
                       variant="outline"
                       disabled={isGenerating || isSubmitting}
-                      className="px-6 border-black text-black hover:bg-gray-100"
+                      className="w-full sm:w-auto px-6 border-black text-black hover:bg-gray-100"
                     >
                       Reset
                     </Button>
