@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MessageSquare, Clock, Building2, Briefcase, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useCreditCheck } from '@/hooks/useCreditCheck';
-import { useDeferredCreditDeduction } from '@/hooks/useDeferredCreditDeduction';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -16,6 +15,7 @@ import LoadingMessages from '@/components/LoadingMessages';
 import { useUser } from '@clerk/clerk-react';
 import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
 import { PremiumInterviewDisplay } from '@/components/PremiumInterviewDisplay';
+import { InterviewPrepHistoryModal } from '@/components/InterviewPrepHistoryModal';
 
 const InterviewPrep = () => {
   // Ensure Clerk JWT is synced with Supabase
@@ -32,7 +32,6 @@ const InterviewPrep = () => {
   
   const { toast } = useToast();
   const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(1.5);
-  const { deductCredits, isDeducting } = useDeferredCreditDeduction();
   const { userProfile } = useUserProfile();
 
   // Query for existing interview prep data
@@ -76,8 +75,10 @@ const InterviewPrep = () => {
             setInterviewData(parsedData);
             setIsGenerating(false);
             
-            // Deduct credits when results are available
-            deductCredits(1.5, 'interview_prep', `Interview prep for ${payload.new.company_name} - ${payload.new.job_title}`);
+            toast({
+              title: "Interview Prep Ready!",
+              description: "Your personalized interview questions have been generated."
+            });
           } catch (error) {
             console.error('Error processing interview questions:', error);
             setIsGenerating(false);
@@ -94,7 +95,7 @@ const InterviewPrep = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [currentAnalysis?.id, deductCredits, toast]);
+  }, [currentAnalysis?.id, toast]);
 
   const handleGenerate = async () => {
     console.log('🚀 Interview Prep Generate Button Clicked');
@@ -268,7 +269,10 @@ const InterviewPrep = () => {
               {/* Form */}
               <Card className="mb-8 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] border-0">
                 <CardHeader>
-                  <CardTitle className="text-black text-xl">Interview Preparation Details</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-black text-xl">Interview Preparation Details</CardTitle>
+                    <InterviewPrepHistoryModal />
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Company Name and Job Title in horizontal layout for desktop */}
@@ -319,7 +323,7 @@ const InterviewPrep = () => {
                   <div className="flex gap-3 pt-4">
                     <Button
                       onClick={handleGenerate}
-                      disabled={isGenerating || isSubmitting || isDeducting}
+                      disabled={isGenerating || isSubmitting}
                       className="flex-1 text-white font-medium text-justify bg-rose-600 hover:bg-rose-500"
                     >
                       {isGenerating || isSubmitting ? 'Generating...' : 'Generate Interview Prep'}
