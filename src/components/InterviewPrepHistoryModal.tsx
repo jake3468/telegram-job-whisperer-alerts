@@ -184,7 +184,7 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
           </DialogTitle>
         </DialogHeader>
         
-        <div className="border border-orange-500/30 rounded-lg p-2 sm:p-3 mb-4 flex-shrink-0 font-thin text-gray-950 bg-zinc-300 hover:bg-zinc-200">
+        <div className="border border-orange-500/30 rounded-lg p-2 sm:p-3 mb-4 flex-shrink-0 font-thin text-gray-950 bg-zinc-950">
           <div className="flex items-center gap-2 text-orange-200">
             <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
             <p className="text-xs sm:text-sm">
