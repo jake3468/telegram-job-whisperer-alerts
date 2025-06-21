@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -380,7 +379,7 @@ const CompanyRoleAnalysis = () => {
                     <Button 
                       type="submit" 
                       disabled={isSubmitting} 
-                      className="w-full lg:flex-1 bg-gradient-to-r from-green-700 via-green-800 to-green-900 hover:from-green-800 hover:via-green-900 hover:to-green-950 text-white font-orbitron font-bold py-4 sm:py-6 text-sm sm:text-lg shadow-2xl shadow-green-600/25 border-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full lg:flex-1 bg-gradient-to-r from-green-700 via-green-800 to-green-900 hover:from-green-800 hover:via-green-900 hover:to-green-950 text-white font-orbitron font-bold py-4 sm:py-6 text-xs sm:text-base shadow-2xl shadow-green-600/25 border-0 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isSubmitting ? 
                         <>

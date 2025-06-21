@@ -1,308 +1,181 @@
 
 import React from 'react';
-import { DollarSign, TrendingUp, AlertCircle, CheckCircle, Info, Star, Award, Target } from 'lucide-react';
+import { CheckCircle, AlertTriangle, ChevronRight, Star, TrendingUp } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 
 interface PremiumJSONDisplayProps {
   data: any;
-  theme?: 'yellow' | 'teal' | 'indigo' | 'pink' | 'violet' | 'green' | 'blue';
+  theme?: 'blue' | 'green' | 'purple' | 'yellow' | 'orange' | 'teal' | 'indigo' | 'pink' | 'violet';
 }
 
 export const PremiumJSONDisplay: React.FC<PremiumJSONDisplayProps> = ({ data, theme = 'blue' }) => {
   if (!data) return null;
 
-  const themeConfig = {
-    yellow: {
-      primary: 'from-yellow-500 to-orange-500',
-      // Level 1: Main headers - Dark background with white text
-      level1Bg: 'bg-yellow-800',
-      level1Text: 'text-white',
-      level1Icon: 'text-white',
-      // Level 2: Subheaders - Medium background with dark text
-      level2Bg: 'bg-yellow-300',
-      level2Text: 'text-yellow-900',
-      level2Icon: 'text-yellow-800',
-      // Level 3: Sub-subheaders - Light background with medium text
-      level3Bg: 'bg-yellow-100',
-      level3Text: 'text-yellow-800',
-      level3Icon: 'text-yellow-700',
-      // Content - Lightest background
-      contentBg: 'bg-yellow-50',
-      contentText: 'text-gray-800',
-      contentIcon: 'text-yellow-600',
-      border: 'border-yellow-300'
-    },
-    teal: {
-      primary: 'from-teal-500 to-cyan-500',
-      level1Bg: 'bg-teal-800',
-      level1Text: 'text-white',
-      level1Icon: 'text-white',
-      level2Bg: 'bg-teal-300',
-      level2Text: 'text-teal-900',
-      level2Icon: 'text-teal-800',
-      level3Bg: 'bg-teal-100',
-      level3Text: 'text-teal-800',
-      level3Icon: 'text-teal-700',
-      contentBg: 'bg-teal-50',
-      contentText: 'text-gray-800',
-      contentIcon: 'text-teal-600',
-      border: 'border-teal-300'
-    },
-    indigo: {
-      primary: 'from-indigo-500 to-purple-500',
-      level1Bg: 'bg-indigo-800',
-      level1Text: 'text-white',
-      level1Icon: 'text-white',
-      level2Bg: 'bg-indigo-300',
-      level2Text: 'text-indigo-900',
-      level2Icon: 'text-indigo-800',
-      level3Bg: 'bg-indigo-100',
-      level3Text: 'text-indigo-800',
-      level3Icon: 'text-indigo-700',
-      contentBg: 'bg-indigo-50',
-      contentText: 'text-gray-800',
-      contentIcon: 'text-indigo-600',
-      border: 'border-indigo-300'
-    },
-    pink: {
-      primary: 'from-pink-500 to-rose-500',
-      level1Bg: 'bg-pink-800',
-      level1Text: 'text-white',
-      level1Icon: 'text-white',
-      level2Bg: 'bg-pink-300',
-      level2Text: 'text-pink-900',
-      level2Icon: 'text-pink-800',
-      level3Bg: 'bg-pink-100',
-      level3Text: 'text-pink-800',
-      level3Icon: 'text-pink-700',
-      contentBg: 'bg-pink-50',
-      contentText: 'text-gray-800',
-      contentIcon: 'text-pink-600',
-      border: 'border-pink-300'
-    },
-    violet: {
-      primary: 'from-violet-500 to-purple-500',
-      level1Bg: 'bg-violet-800',
-      level1Text: 'text-white',
-      level1Icon: 'text-white',
-      level2Bg: 'bg-violet-300',
-      level2Text: 'text-violet-900',
-      level2Icon: 'text-violet-800',
-      level3Bg: 'bg-violet-100',
-      level3Text: 'text-violet-800',
-      level3Icon: 'text-violet-700',
-      contentBg: 'bg-violet-50',
-      contentText: 'text-gray-800',
-      contentIcon: 'text-violet-600',
-      border: 'border-violet-300'
-    },
-    green: {
-      primary: 'from-green-500 to-emerald-500',
-      level1Bg: 'bg-green-800',
-      level1Text: 'text-white',
-      level1Icon: 'text-white',
-      level2Bg: 'bg-green-300',
-      level2Text: 'text-green-900',
-      level2Icon: 'text-green-800',
-      level3Bg: 'bg-green-100',
-      level3Text: 'text-green-800',
-      level3Icon: 'text-green-700',
-      contentBg: 'bg-green-50',
-      contentText: 'text-gray-800',
-      contentIcon: 'text-green-600',
-      border: 'border-green-300'
-    },
-    blue: {
-      primary: 'from-blue-500 to-cyan-500',
-      level1Bg: 'bg-blue-800',
-      level1Text: 'text-white',
-      level1Icon: 'text-white',
-      level2Bg: 'bg-blue-300',
-      level2Text: 'text-blue-900',
-      level2Icon: 'text-blue-800',
-      level3Bg: 'bg-blue-100',
-      level3Text: 'text-blue-800',
-      level3Icon: 'text-blue-700',
-      contentBg: 'bg-blue-50',
-      contentText: 'text-gray-800',
-      contentIcon: 'text-blue-600',
-      border: 'border-blue-300'
-    }
+  const getThemeClasses = (theme: string) => {
+    const themes = {
+      blue: {
+        gradient: 'from-blue-50 to-indigo-50',
+        border: 'border-blue-500',
+        text: 'text-blue-800',
+        accent: 'text-blue-600',
+        redFlag: 'bg-red-50 border-red-200 text-red-800',
+        positiveFlag: 'bg-green-50 border-green-200 text-green-800'
+      },
+      green: {
+        gradient: 'from-green-50 to-emerald-50',
+        border: 'border-green-500',
+        text: 'text-green-800',
+        accent: 'text-green-600',
+        redFlag: 'bg-red-50 border-red-200 text-red-800',
+        positiveFlag: 'bg-green-50 border-green-200 text-green-800'
+      },
+      purple: {
+        gradient: 'from-purple-50 to-pink-50',
+        border: 'border-purple-500',
+        text: 'text-purple-800',
+        accent: 'text-purple-600',
+        redFlag: 'bg-red-50 border-red-200 text-red-800',
+        positiveFlag: 'bg-green-50 border-green-200 text-green-800'
+      },
+      yellow: {
+        gradient: 'from-yellow-50 to-orange-50',
+        border: 'border-yellow-500',
+        text: 'text-yellow-800',
+        accent: 'text-yellow-600',
+        redFlag: 'bg-red-50 border-red-200 text-red-800',
+        positiveFlag: 'bg-green-50 border-green-200 text-green-800'
+      },
+      orange: {
+        gradient: 'from-orange-50 to-red-50',
+        border: 'border-orange-500',
+        text: 'text-orange-800',
+        accent: 'text-orange-600',
+        redFlag: 'bg-red-50 border-red-200 text-red-800',
+        positiveFlag: 'bg-green-50 border-green-200 text-green-800'
+      },
+      teal: {
+        gradient: 'from-teal-50 to-cyan-50',
+        border: 'border-teal-500',
+        text: 'text-teal-800',
+        accent: 'text-teal-600',
+        redFlag: 'bg-red-50 border-red-200 text-red-800',
+        positiveFlag: 'bg-green-50 border-green-200 text-green-800'
+      },
+      indigo: {
+        gradient: 'from-indigo-50 to-purple-50',
+        border: 'border-indigo-500',
+        text: 'text-indigo-800',
+        accent: 'text-indigo-600',
+        redFlag: 'bg-red-50 border-red-200 text-red-800',
+        positiveFlag: 'bg-green-50 border-green-200 text-green-800'
+      },
+      pink: {
+        gradient: 'from-pink-50 to-rose-50',
+        border: 'border-pink-500',
+        text: 'text-pink-800',
+        accent: 'text-pink-600',
+        redFlag: 'bg-red-50 border-red-200 text-red-800',
+        positiveFlag: 'bg-green-50 border-green-200 text-green-800'
+      },
+      violet: {
+        gradient: 'from-violet-50 to-purple-50',
+        border: 'border-violet-500',
+        text: 'text-violet-800',
+        accent: 'text-violet-600',
+        redFlag: 'bg-red-50 border-red-200 text-red-800',
+        positiveFlag: 'bg-green-50 border-green-200 text-green-800'
+      }
+    };
+    return themes[theme] || themes.blue;
   };
 
-  const currentTheme = themeConfig[theme] || themeConfig.yellow;
+  const themeClasses = getThemeClasses(theme);
 
-  const formatCurrency = (value: string) => {
-    const numMatch = value.match(/(\d+(?:,\d+)*(?:\.\d+)?)/);
-    if (numMatch) {
-      return value.replace(numMatch[0], `₹${numMatch[0]}`);
-    }
-    return value;
-  };
+  const renderValue = (key: string, value: any, level: number = 0): React.ReactNode => {
+    if (value === null || value === undefined) return null;
 
-  const getStatusIcon = (key: string, value: any, level: number) => {
-    const keyLower = key.toLowerCase();
-    let iconColor = currentTheme.contentIcon;
-    
-    if (level === 0) {
-      iconColor = currentTheme.level1Icon;
-    } else if (level === 1) {
-      iconColor = currentTheme.level2Icon;
-    } else if (level === 2) {
-      iconColor = currentTheme.level3Icon;
-    }
+    const isRedFlag = key.toLowerCase().includes('red_flags') || key.toLowerCase().includes('redflag') || key.toLowerCase().includes('red flag');
+    const isPositiveIndicator = key.toLowerCase().includes('positive_indicators') || key.toLowerCase().includes('positive') || key.toLowerCase().includes('benefit');
 
-    if (keyLower.includes('positive') || keyLower.includes('good') || keyLower.includes('strong') || keyLower.includes('benefit')) {
-      return <CheckCircle className={`w-2.5 h-2.5 text-green-500 flex-shrink-0`} />;
-    }
-    if (keyLower.includes('negative') || keyLower.includes('risk') || keyLower.includes('concern') || keyLower.includes('challenge')) {
-      return <AlertCircle className={`w-2.5 h-2.5 text-red-500 flex-shrink-0`} />;
-    }
-    if (keyLower.includes('salary') || keyLower.includes('compensation') || keyLower.includes('bonus') || keyLower.includes('pay')) {
-      return <DollarSign className={`w-2.5 h-2.5 ${iconColor} flex-shrink-0`} />;
-    }
-    if (keyLower.includes('growth') || keyLower.includes('development') || keyLower.includes('advancement')) {
-      return <TrendingUp className={`w-2.5 h-2.5 ${iconColor} flex-shrink-0`} />;
-    }
-    if (keyLower.includes('opportunity') || keyLower.includes('potential')) {
-      return <Target className={`w-2.5 h-2.5 ${iconColor} flex-shrink-0`} />;
-    }
-    if (keyLower.includes('skill') || keyLower.includes('requirement') || keyLower.includes('experience')) {
-      return <Star className={`w-2.5 h-2.5 ${iconColor} flex-shrink-0`} />;
-    }
-    return <Info className={`w-2.5 h-2.5 ${iconColor} flex-shrink-0`} />;
-  };
-
-  const renderValue = (value: any, level: number = 0, parentKey: string = ''): React.ReactNode => {
     if (Array.isArray(value)) {
+      if (value.length === 0) return null;
+      
       return (
-        <div className="w-full space-y-1 min-w-0 overflow-hidden">
-          {value.map((item, index) => (
-            <div key={index} className={`w-full p-1.5 ${currentTheme.contentBg} rounded border ${currentTheme.border} min-w-0 overflow-hidden`}>
-              <div className="w-full flex items-start gap-1.5 min-w-0 overflow-hidden">
-                <div className={`p-1 bg-gradient-to-r ${currentTheme.primary} rounded flex-shrink-0`}>
-                  <div className="w-1 h-1 bg-white rounded-full" />
-                </div>
-                <div className="flex-1 min-w-0 overflow-hidden">
-                  <p className={`${currentTheme.contentText} text-xs leading-relaxed break-words hyphens-auto overflow-wrap-anywhere`}>
-                    {typeof item === 'string' ? 
-                      (parentKey.toLowerCase().includes('salary') || parentKey.toLowerCase().includes('compensation') ? 
-                        formatCurrency(item) : item
-                      ) : 
-                      renderValue(item, level + 1, parentKey)
-                    }
-                  </p>
-                </div>
+        <div className="space-y-2">
+          <h4 className={`font-bold text-xs mb-2 ${themeClasses.text} capitalize`}>
+            {key.replace(/_/g, ' ')}
+          </h4>
+          <div className="space-y-2">
+            {value.map((item, index) => (
+              <div 
+                key={index} 
+                className={`flex items-start gap-2 p-2 rounded-lg border-l-2 transition-all duration-200 text-xs ${
+                  isRedFlag 
+                    ? themeClasses.redFlag 
+                    : isPositiveIndicator 
+                      ? themeClasses.positiveFlag 
+                      : `bg-gradient-to-r ${themeClasses.gradient} border-l-4 ${themeClasses.border}`
+                }`}
+              >
+                {isRedFlag ? (
+                  <AlertTriangle className="w-3 h-3 text-red-500 flex-shrink-0 mt-0.5" />
+                ) : isPositiveIndicator ? (
+                  <CheckCircle className="w-3 h-3 text-green-500 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <ChevronRight className={`w-3 h-3 ${themeClasses.accent} flex-shrink-0 mt-0.5`} />
+                )}
+                <span className="leading-relaxed break-words hyphens-auto overflow-wrap-anywhere">
+                  {typeof item === 'string' ? item : JSON.stringify(item)}
+                </span>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       );
     }
 
     if (typeof value === 'object' && value !== null) {
       return (
-        <div className="w-full space-y-1 min-w-0 overflow-hidden">
-          {Object.entries(value).map(([key, val]) => (
-            <div key={key} className="w-full space-y-1 min-w-0 overflow-hidden">
-              {/* Level 0: Main Headers - Dark background with white text */}
-              {level === 0 && (
-                <div className={`w-full p-1.5 ${currentTheme.level1Bg} border ${currentTheme.border} rounded min-w-0 overflow-hidden`}>
-                  <div className="w-full flex items-center gap-1.5 min-w-0 overflow-hidden">
-                    <div className="p-1 bg-white/20 rounded shadow-sm flex-shrink-0">
-                      {getStatusIcon(key, val, level)}
-                    </div>
-                    <div className="flex-1 min-w-0 overflow-hidden">
-                      <h4 className={`font-bold ${currentTheme.level1Text} text-xs break-words hyphens-auto overflow-wrap-anywhere`}>
-                        {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                      </h4>
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-              {/* Level 1: Subheaders - Medium background with dark text */}
-              {level === 1 && (
-                <div className={`w-full p-1.5 ${currentTheme.level2Bg} border ${currentTheme.border} rounded min-w-0 overflow-hidden`}>
-                  <div className="w-full flex items-center gap-1.5 min-w-0 overflow-hidden">
-                    <div className="p-1 bg-white rounded shadow-sm flex-shrink-0">
-                      {getStatusIcon(key, val, level)}
-                    </div>
-                    <div className="flex-1 min-w-0 overflow-hidden">
-                      <h5 className={`font-semibold ${currentTheme.level2Text} text-xs break-words hyphens-auto overflow-wrap-anywhere`}>
-                        {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                      </h5>
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-              {/* Level 2: Sub-subheaders - Light background with medium text */}
-              {level === 2 && (
-                <div className={`w-full p-1.5 ${currentTheme.level3Bg} border ${currentTheme.border} rounded min-w-0 overflow-hidden`}>
-                  <div className="w-full flex items-center gap-1.5 min-w-0 overflow-hidden">
-                    <div className="p-1 bg-white rounded shadow-sm flex-shrink-0">
-                      {getStatusIcon(key, val, level)}
-                    </div>
-                    <div className="flex-1 min-w-0 overflow-hidden">
-                      <h6 className={`font-medium ${currentTheme.level3Text} text-xs break-words hyphens-auto overflow-wrap-anywhere`}>
-                        {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                      </h6>
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-              {/* Level 3+: Content headers - Lightest background */}
-              {level >= 3 && (
-                <div className={`w-full p-1.5 ${currentTheme.contentBg} border ${currentTheme.border} rounded min-w-0 overflow-hidden`}>
-                  <div className="w-full flex items-center gap-1.5 min-w-0 overflow-hidden">
-                    <div className="p-1 bg-white rounded shadow-sm flex-shrink-0">
-                      {getStatusIcon(key, val, level)}
-                    </div>
-                    <div className="flex-1 min-w-0 overflow-hidden">
-                      <h6 className={`font-normal ${currentTheme.contentText} text-xs break-words hyphens-auto overflow-wrap-anywhere`}>
-                        {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                      </h6>
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-              {/* Content with proper left padding */}
-              <div className="w-full pl-0.5 min-w-0 overflow-hidden">
-                {renderValue(val, level + 1, key)}
+        <div className="space-y-3">
+          <h4 className={`font-bold text-xs mb-2 ${themeClasses.text} capitalize`}>
+            {key.replace(/_/g, ' ')}
+          </h4>
+          <div className="space-y-2 pl-2">
+            {Object.entries(value).map(([subKey, subValue]) => (
+              <div key={subKey}>
+                {renderValue(subKey, subValue, level + 1)}
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       );
     }
 
-    const stringValue = String(value);
-    const formattedValue = parentKey.toLowerCase().includes('salary') || 
-                          parentKey.toLowerCase().includes('compensation') || 
-                          parentKey.toLowerCase().includes('bonus') ? 
-                          formatCurrency(stringValue) : stringValue;
+    if (typeof value === 'string' || typeof value === 'number') {
+      return (
+        <div className={`bg-gradient-to-r ${themeClasses.gradient} rounded-lg p-2 border-l-4 ${themeClasses.border}`}>
+          <h4 className={`font-bold ${themeClasses.text} text-xs mb-1 capitalize`}>
+            {key.replace(/_/g, ' ')}
+          </h4>
+          <p className="text-gray-700 leading-relaxed text-xs break-words hyphens-auto overflow-wrap-anywhere">
+            {value.toString()}
+          </p>
+        </div>
+      );
+    }
 
-    return (
-      <div className={`w-full p-1.5 ${currentTheme.contentBg} rounded border ${currentTheme.border} min-w-0 overflow-hidden`}>
-        <p className={`${currentTheme.contentText} text-xs leading-relaxed break-words hyphens-auto overflow-wrap-anywhere`}>
-          {formattedValue}
-        </p>
-      </div>
-    );
+    return null;
   };
 
   return (
-    <div className="w-full min-w-0 overflow-hidden max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-4xl mx-auto">
-      <Card className="w-full bg-white shadow-lg border-0 rounded-xl overflow-hidden min-w-0">
-        <CardContent className="p-1.5 w-full min-w-0 overflow-hidden">
-          <div className="w-full min-w-0 overflow-hidden">
-            {renderValue(data)}
+    <Card className="w-full bg-white shadow-lg border-0 rounded-lg overflow-hidden">
+      <CardContent className="p-2 w-full space-y-3">
+        {Object.entries(data).map(([key, value]) => (
+          <div key={key}>
+            {renderValue(key, value)}
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        ))}
+      </CardContent>
+    </Card>
   );
 };

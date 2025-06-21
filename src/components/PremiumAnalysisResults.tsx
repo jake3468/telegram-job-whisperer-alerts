@@ -6,6 +6,7 @@ import { EnhancedPercentageMeter } from './EnhancedPercentageMeter';
 import { PremiumBulletPointList } from './PremiumBulletPointList';
 import { PremiumJSONDisplay } from './PremiumJSONDisplay';
 import { PremiumSourcesDisplay } from './PremiumSourcesDisplay';
+
 interface CompanyRoleAnalysisData {
   id: string;
   company_name: string;
@@ -200,9 +201,9 @@ export const PremiumAnalysisResults: React.FC<PremiumAnalysisResultsProps> = ({
             </div>}
 
           {analysis.role_specific_considerations && <div className="w-full min-w-0 overflow-hidden">
-              <PremiumSectionHeader number={8} title="Role-Specific Considerations" icon={<Award className="w-4 h-4" />} gradient="from-pink-500 to-rose-500" description="Important factors and considerations" />
+              <PremiumSectionHeader number={8} title="Role-Specific Considerations" icon={<Award className="w-4 h-4" />} gradient="from-blue-400 to-indigo-400" description="Important factors and considerations" />
               <div className="w-full min-w-0 overflow-hidden">
-                <PremiumJSONDisplay data={analysis.role_specific_considerations} theme="pink" />
+                <PremiumJSONDisplay data={analysis.role_specific_considerations} theme="blue" />
               </div>
             </div>}
 
