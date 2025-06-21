@@ -12,6 +12,7 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import LoadingMessages from '@/components/LoadingMessages';
+
 interface InterviewQuestion {
   question: string;
   answer: string;
@@ -23,6 +24,7 @@ interface InterviewData {
   company_insights?: string;
   role_insights?: string;
 }
+
 const InterviewPrep = () => {
   const [companyName, setCompanyName] = useState('');
   const [jobTitle, setJobTitle] = useState('');
@@ -183,7 +185,13 @@ const InterviewPrep = () => {
                     <Building2 className="w-4 h-4" />
                     Company Name
                   </label>
-                  <Input value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="e.g., Google, Microsoft, Amazon" disabled={isGenerating} className="border-gray-300 placeholder-gray-500 bg-gray-900" />
+                  <Input 
+                    value={companyName} 
+                    onChange={e => setCompanyName(e.target.value)} 
+                    placeholder="e.g., Google, Microsoft, Amazon" 
+                    disabled={isGenerating} 
+                    className="border-gray-300 placeholder-gray-500 bg-white text-black"
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -191,7 +199,13 @@ const InterviewPrep = () => {
                     <Briefcase className="w-4 h-4" />
                     Job Title
                   </label>
-                  <Input value={jobTitle} onChange={e => setJobTitle(e.target.value)} placeholder="e.g., Senior Software Engineer, Product Manager" disabled={isGenerating} className="border-gray-300 placeholder-gray-500 bg-gray-900" />
+                  <Input 
+                    value={jobTitle} 
+                    onChange={e => setJobTitle(e.target.value)} 
+                    placeholder="e.g., Senior Software Engineer, Product Manager" 
+                    disabled={isGenerating} 
+                    className="border-gray-300 placeholder-gray-500 bg-white text-black"
+                  />
                 </div>
               </div>
 
@@ -200,7 +214,13 @@ const InterviewPrep = () => {
                   <FileText className="w-4 h-4" />
                   Job Description
                 </label>
-                <Textarea value={jobDescription} onChange={e => setJobDescription(e.target.value)} placeholder="Paste the complete job description here..." disabled={isGenerating} className="border-gray-300 placeholder-gray-500 min-h-32 bg-gray-900" />
+                <Textarea 
+                  value={jobDescription} 
+                  onChange={e => setJobDescription(e.target.value)} 
+                  placeholder="Paste the complete job description here..." 
+                  disabled={isGenerating} 
+                  className="border-gray-300 placeholder-gray-500 min-h-32 bg-white text-black"
+                />
               </div>
 
               <div className="flex gap-3 pt-4">
@@ -300,4 +320,5 @@ const InterviewPrep = () => {
       </div>
     </Layout>;
 };
+
 export default InterviewPrep;
