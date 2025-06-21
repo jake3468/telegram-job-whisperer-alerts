@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -135,43 +134,17 @@ serve(async (req) => {
 
     let n8nWebhookUrl: string | null = null;
 
-    // Get the appropriate N8N webhook URL based on the webhook type
+    // Get the appropriate N8N webhook URL based on the webhook type using environment variables
     if (webhookType === 'company_analysis' || payload.company_role_analysis) {
       console.log('📋 Processing company role analysis webhook');
       
-      try {
-        // Get N8N webhook URL from vault secrets - FIXED: removed 'public.' prefix
-        const { data: secretData, error: secretError } = await supabaseClient
-          .from('vault.decrypted_secrets')
-          .select('decrypted_secret')
-          .eq('name', 'N8N_COMPANY_WEBHOOK_URL')
-          .single();
-
-        if (secretError) {
-          console.error('❌ Error fetching N8N_COMPANY_WEBHOOK_URL:', secretError);
-          return new Response(JSON.stringify({ 
-            error: 'Failed to fetch company webhook URL', 
-            details: secretError,
-            execution_id: executionId,
-            fingerprint: fingerprint
-          }), {
-            status: 500,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-          });
-        }
-
-        n8nWebhookUrl = secretData?.decrypted_secret;
-        console.log(`🔗 Found N8N Company Webhook URL: ${n8nWebhookUrl ? 'Yes' : 'No'}`);
-        
-        if (n8nWebhookUrl) {
-          console.log(`🔗 N8N Webhook URL length: ${n8nWebhookUrl.length} characters`);
-          console.log(`🔗 N8N Webhook URL starts with: ${n8nWebhookUrl.substring(0, 50)}...`);
-        }
-      } catch (vaultError) {
-        console.error('❌ Error accessing vault secrets:', vaultError);
+      n8nWebhookUrl = Deno.env.get('N8N_COMPANY_WEBHOOK_URL');
+      console.log(`🔗 N8N Company Webhook URL from env: ${n8nWebhookUrl ? 'Found' : 'Not found'}`);
+      
+      if (!n8nWebhookUrl) {
+        console.error('❌ N8N_COMPANY_WEBHOOK_URL environment variable not set');
         return new Response(JSON.stringify({ 
-          error: 'Failed to access vault secrets', 
-          details: vaultError.message,
+          error: 'N8N_COMPANY_WEBHOOK_URL not configured in environment', 
           execution_id: executionId,
           fingerprint: fingerprint
         }), {
@@ -182,59 +155,17 @@ serve(async (req) => {
 
     } else if (webhookType === 'job_guide' || payload.job_analysis) {
       console.log('📋 Processing job analysis webhook');
-      const { data: secretData, error: secretError } = await supabaseClient
-        .from('vault.decrypted_secrets')
-        .select('decrypted_secret')
-        .eq('name', 'N8N_JG_WEBHOOK_URL')
-        .single();
-
-      if (secretError) {
-        console.error('❌ Error fetching N8N_JG_WEBHOOK_URL:', secretError);
-        return new Response(JSON.stringify({ error: 'Failed to fetch job guide webhook URL' }), {
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      }
-
-      n8nWebhookUrl = secretData?.decrypted_secret;
+      n8nWebhookUrl = Deno.env.get('N8N_JG_WEBHOOK_URL');
       console.log(`🔗 Found N8N Job Guide Webhook URL: ${n8nWebhookUrl ? 'Yes' : 'No'}`);
 
     } else if (webhookType === 'cover_letter' || payload.job_cover_letter) {
       console.log('📋 Processing cover letter webhook');
-      const { data: secretData, error: secretError } = await supabaseClient
-        .from('vault.decrypted_secrets')
-        .select('decrypted_secret')
-        .eq('name', 'N8N_CL_WEBHOOK_URL')
-        .single();
-
-      if (secretError) {
-        console.error('❌ Error fetching N8N_CL_WEBHOOK_URL:', secretError);
-        return new Response(JSON.stringify({ error: 'Failed to fetch cover letter webhook URL' }), {
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      }
-
-      n8nWebhookUrl = secretData?.decrypted_secret;
+      n8nWebhookUrl = Deno.env.get('N8N_CL_WEBHOOK_URL');
       console.log(`🔗 Found N8N Cover Letter Webhook URL: ${n8nWebhookUrl ? 'Yes' : 'No'}`);
 
     } else if (webhookType === 'linkedin_post' || payload.job_linkedin) {
       console.log('📋 Processing LinkedIn post webhook');
-      const { data: secretData, error: secretError } = await supabaseClient
-        .from('vault.decrypted_secrets')
-        .select('decrypted_secret')
-        .eq('name', 'N8N_LINKEDIN_WEBHOOK_URL')
-        .single();
-
-      if (secretError) {
-        console.error('❌ Error fetching N8N_LINKEDIN_WEBHOOK_URL:', secretError);
-        return new Response(JSON.stringify({ error: 'Failed to fetch LinkedIn webhook URL' }), {
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      }
-
-      n8nWebhookUrl = secretData?.decrypted_secret;
+      n8nWebhookUrl = Deno.env.get('N8N_LINKEDIN_WEBHOOK_URL');
       console.log(`🔗 Found N8N LinkedIn Webhook URL: ${n8nWebhookUrl ? 'Yes' : 'No'}`);
     }
 
@@ -259,11 +190,11 @@ serve(async (req) => {
         webhook_type: webhookType,
         execution_id: executionId,
         processed_at: new Date().toISOString(),
-        edge_function_version: 'v6.1'
+        edge_function_version: 'v7.0'
       }
     };
 
-    console.log(`🚀 Calling N8N webhook: ${n8nWebhookUrl}`);
+    console.log(`🚀 Calling N8N webhook: ${n8nWebhookUrl.substring(0, 50)}...`);
     console.log(`📤 Payload size: ${JSON.stringify(n8nPayload).length} characters`);
     console.log(`🔍 Execution ID: ${executionId}, Fingerprint: ${fingerprint}`);
 
@@ -276,7 +207,7 @@ serve(async (req) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'User-Agent': 'Supabase-Edge-Function/6.1',
+          'User-Agent': 'Supabase-Edge-Function/7.0',
           'X-Webhook-Source': 'supabase-edge-function',
           'X-Fingerprint': fingerprint,
           'X-Source': source,
