@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -118,7 +119,7 @@ const InterviewPrep = () => {
       return;
     }
 
-    if (!userProfile?.id) {
+    if (!user?.id) {
       toast({
         title: "Authentication Error",
         description: "Please sign in to generate interview prep.",
@@ -141,11 +142,11 @@ const InterviewPrep = () => {
       setInterviewData(null);
       console.log('✅ Starting interview prep submission process');
 
-      // Get user data first (following JobGuide pattern)
+      // Get user data first (following the exact JobGuide pattern)
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('id')
-        .eq('clerk_id', user?.id)
+        .eq('clerk_id', user.id)
         .single();
 
       if (userError || !userData) {
@@ -205,7 +206,7 @@ const InterviewPrep = () => {
         }
       }
 
-      // Insert new interview prep record
+      // Insert new interview prep record using the profile ID
       const insertData = {
         user_id: profileData.id,
         company_name: companyName.trim(),
@@ -242,7 +243,7 @@ const InterviewPrep = () => {
       const errorMessage = error instanceof Error ? error.message : 'Failed to generate interview prep';
       toast({
         title: "Generation Failed",
-        description: "There was an error generating your interview prep. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
