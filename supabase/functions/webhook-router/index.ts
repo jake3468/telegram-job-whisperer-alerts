@@ -20,7 +20,7 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Job analysis webhook triggered');
+    console.log('Webhook router triggered');
     
     const payload = await req.json();
     console.log('Received payload:', JSON.stringify(payload, null, 2));
