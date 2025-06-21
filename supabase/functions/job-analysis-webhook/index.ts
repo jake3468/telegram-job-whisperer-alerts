@@ -13,6 +13,7 @@ interface CompanyRoleAnalysis {
   company_name: string;
   location: string;
   job_title: string;
+  research_date?: string;
   local_role_market_context?: string;
   company_news_updates?: string[];
   role_security_score?: number;
@@ -109,6 +110,7 @@ interface WebhookPayload {
 
 serve(async (req) => {
   console.log(`🚀 Edge function called: ${req.method} ${req.url}`);
+  console.log(`📋 Request headers:`, Object.fromEntries(req.headers.entries()));
   
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -122,6 +124,7 @@ serve(async (req) => {
 
     const payload: WebhookPayload = await req.json()
     console.log(`📦 Received payload for event: ${payload.event_type}, webhook_type: ${payload.webhook_type}`);
+    console.log(`📦 Full payload structure:`, JSON.stringify(payload, null, 2));
     
     const fingerprint = req.headers.get('x-fingerprint') || 'unknown';
     const source = req.headers.get('x-source') || 'unknown';
@@ -134,21 +137,31 @@ serve(async (req) => {
     // Get the appropriate N8N webhook URL based on the webhook type
     if (webhookType === 'company_analysis' || payload.company_role_analysis) {
       console.log('📋 Processing company role analysis webhook');
-      const { data: secretData, error: secretError } = await supabaseClient
-        .from('vault.decrypted_secrets')
-        .select('decrypted_secret')
-        .eq('name', 'N8N_COMPANY_WEBHOOK_URL')
-        .single();
+      
+      // Try to get from payload first (sent by trigger)
+      if (payload.n8n_webhook_url) {
+        n8nWebhookUrl = payload.n8n_webhook_url;
+        console.log('🔗 Using N8N webhook URL from payload');
+      } else {
+        // Fallback to database lookup
+        const { data: secretData, error: secretError } = await supabaseClient
+          .from('vault.decrypted_secrets')
+          .select('decrypted_secret')
+          .eq('name', 'N8N_COMPANY_WEBHOOK_URL')
+          .single();
 
-      if (secretError) {
-        console.error('❌ Error fetching N8N_COMPANY_WEBHOOK_URL:', secretError);
-        return new Response(JSON.stringify({ error: 'Failed to fetch company webhook URL', details: secretError }), {
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
+        if (secretError) {
+          console.error('❌ Error fetching N8N_COMPANY_WEBHOOK_URL:', secretError);
+          return new Response(JSON.stringify({ error: 'Failed to fetch company webhook URL', details: secretError }), {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+
+        n8nWebhookUrl = secretData?.decrypted_secret;
+        console.log('🔗 Using N8N webhook URL from database lookup');
       }
-
-      n8nWebhookUrl = secretData?.decrypted_secret;
+      
       console.log(`🔗 Found N8N Company Webhook URL: ${n8nWebhookUrl ? 'Yes' : 'No'}`);
       
       if (n8nWebhookUrl) {
@@ -230,7 +243,7 @@ serve(async (req) => {
         source,
         webhook_type: webhookType,
         processed_at: new Date().toISOString(),
-        edge_function_version: 'v4.0'
+        edge_function_version: 'v5.0'
       }
     };
 
@@ -246,7 +259,7 @@ serve(async (req) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'User-Agent': 'Supabase-Edge-Function/4.0',
+          'User-Agent': 'Supabase-Edge-Function/5.0',
           'X-Webhook-Source': 'supabase-edge-function',
           'X-Fingerprint': fingerprint,
           'X-Source': source,
