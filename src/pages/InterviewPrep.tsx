@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import LoadingMessages from '@/components/LoadingMessages';
 import { useUser } from '@clerk/clerk-react';
+import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
 
 interface InterviewQuestion {
   question: string;
@@ -29,6 +30,9 @@ interface InterviewData {
 }
 
 const InterviewPrep = () => {
+  // Ensure Clerk JWT is synced with Supabase
+  useClerkSupabaseSync();
+  
   const { user } = useUser();
   const [companyName, setCompanyName] = useState('');
   const [jobTitle, setJobTitle] = useState('');
@@ -128,6 +132,15 @@ const InterviewPrep = () => {
       return;
     }
 
+    if (!userProfile?.id) {
+      toast({
+        title: "Profile Error",
+        description: "User profile not found. Please refresh the page and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (isSubmitting || isGenerating) {
       toast({
         title: "Please wait",
@@ -141,40 +154,13 @@ const InterviewPrep = () => {
       setIsSubmitting(true);
       setInterviewData(null);
       console.log('✅ Starting interview prep submission process');
+      console.log('✅ User profile ID:', userProfile.id);
 
-      // Get user data first (following the exact JobGuide pattern)
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('clerk_id', user.id)
-        .single();
-
-      if (userError || !userData) {
-        console.error('❌ User not found:', userError);
-        throw new Error('User not found in database');
-      }
-
-      console.log('✅ Found user in users table:', userData.id);
-
-      // Get user profile data
-      const { data: profileData, error: profileError } = await supabase
-        .from('user_profile')
-        .select('id')
-        .eq('user_id', userData.id)
-        .single();
-
-      if (profileError || !profileData) {
-        console.error('❌ User profile not found:', profileError);
-        throw new Error('User profile not found. Please complete your profile first.');
-      }
-
-      console.log('✅ Found user profile:', profileData.id);
-
-      // Check for existing analysis
+      // Check for existing analysis first
       const { data: existingAnalysis, error: checkError } = await supabase
         .from('interview_prep')
         .select('id, interview_questions')
-        .eq('user_id', profileData.id)
+        .eq('user_id', userProfile.id)
         .eq('company_name', companyName.trim())
         .eq('job_title', jobTitle.trim())
         .eq('job_description', jobDescription.trim())
@@ -206,9 +192,9 @@ const InterviewPrep = () => {
         }
       }
 
-      // Insert new interview prep record using the profile ID
+      // Insert new interview prep record using the profile ID directly
       const insertData = {
-        user_id: profileData.id,
+        user_id: userProfile.id, // Use the profile ID directly
         company_name: companyName.trim(),
         job_title: jobTitle.trim(),
         job_description: jobDescription.trim()
