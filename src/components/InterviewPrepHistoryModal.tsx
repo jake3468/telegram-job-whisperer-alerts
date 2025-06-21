@@ -171,7 +171,7 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
   }
   return <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="border-purple-400 text-purple-300 hover:bg-purple-900/50 hover:text-white transition-colors">
+        <Button variant="outline" size="sm" className="border-purple-400 transition-colors text-zinc-950 bg-slate-200 hover:bg-slate-100">
           <Clock className="w-4 h-4 mr-2" />
           History
         </Button>
