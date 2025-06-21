@@ -152,8 +152,7 @@ const InterviewPrep = () => {
       description: "Content copied to clipboard."
     });
   };
-  return (
-    <Layout>
+  return <Layout>
       <div className="min-h-screen bg-black text-white">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           {/* Header */}
@@ -184,13 +183,7 @@ const InterviewPrep = () => {
                     <Building2 className="w-4 h-4" />
                     Company Name
                   </label>
-                  <Input
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                    placeholder="e.g., Google, Microsoft, Amazon"
-                    disabled={isGenerating}
-                    className="border-gray-300 placeholder-gray-500"
-                  />
+                  <Input value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="e.g., Google, Microsoft, Amazon" disabled={isGenerating} className="border-gray-300 placeholder-gray-500 bg-gray-900" />
                 </div>
 
                 <div className="space-y-2">
@@ -198,13 +191,7 @@ const InterviewPrep = () => {
                     <Briefcase className="w-4 h-4" />
                     Job Title
                   </label>
-                  <Input
-                    value={jobTitle}
-                    onChange={(e) => setJobTitle(e.target.value)}
-                    placeholder="e.g., Senior Software Engineer, Product Manager"
-                    disabled={isGenerating}
-                    className="border-gray-300 placeholder-gray-500"
-                  />
+                  <Input value={jobTitle} onChange={e => setJobTitle(e.target.value)} placeholder="e.g., Senior Software Engineer, Product Manager" disabled={isGenerating} className="border-gray-300 placeholder-gray-500 bg-gray-900" />
                 </div>
               </div>
 
@@ -213,29 +200,14 @@ const InterviewPrep = () => {
                   <FileText className="w-4 h-4" />
                   Job Description
                 </label>
-                <Textarea
-                  value={jobDescription}
-                  onChange={(e) => setJobDescription(e.target.value)}
-                  placeholder="Paste the complete job description here..."
-                  disabled={isGenerating}
-                  className="border-gray-300 placeholder-gray-500 min-h-32"
-                />
+                <Textarea value={jobDescription} onChange={e => setJobDescription(e.target.value)} placeholder="Paste the complete job description here..." disabled={isGenerating} className="border-gray-300 placeholder-gray-500 min-h-32 bg-gray-900" />
               </div>
 
               <div className="flex gap-3 pt-4">
-                <Button
-                  onClick={handleGenerate}
-                  disabled={isGenerating || isDeducting}
-                  className="flex-1 bg-black text-white hover:bg-gray-800 font-medium"
-                >
+                <Button onClick={handleGenerate} disabled={isGenerating || isDeducting} className="flex-1 bg-black text-white hover:bg-gray-800 font-medium">
                   {isGenerating ? 'Generating...' : 'Generate Interview Prep'}
                 </Button>
-                <Button
-                  onClick={handleReset}
-                  variant="outline"
-                  disabled={isGenerating}
-                  className="px-6 border-black text-black hover:bg-gray-100"
-                >
+                <Button onClick={handleReset} variant="outline" disabled={isGenerating} className="px-6 border-black text-black hover:bg-gray-100">
                   Reset
                 </Button>
               </div>
@@ -243,23 +215,19 @@ const InterviewPrep = () => {
           </Card>
 
           {/* Loading */}
-          {isGenerating && (
-            <div className="text-center py-8">
+          {isGenerating && <div className="text-center py-8">
               <LoadingMessages type="interview_prep" />
-            </div>
-          )}
+            </div>}
 
           {/* Results */}
-          {interviewData && (
-            <div className="space-y-6">
+          {interviewData && <div className="space-y-6">
               <div className="flex items-center gap-2 text-green-400">
                 <Clock className="w-5 h-5" />
                 <span className="font-medium">Interview prep complete!</span>
               </div>
 
               {/* Questions */}
-              {interviewData.questions && (
-                <Card className="bg-gray-900 border-gray-700">
+              {interviewData.questions && <Card className="bg-gray-900 border-gray-700">
                   <CardHeader>
                     <CardTitle className="text-white flex items-center justify-between">
                       Interview Questions & Answers
@@ -269,8 +237,7 @@ const InterviewPrep = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    {interviewData.questions.map((item, index) => (
-                      <div key={index} className="space-y-3 p-4 bg-gray-800 rounded-lg">
+                    {interviewData.questions.map((item, index) => <div key={index} className="space-y-3 p-4 bg-gray-800 rounded-lg">
                         <div className="flex items-start gap-3">
                           <span className="bg-blue-600 text-white text-sm px-2 py-1 rounded-full font-medium flex-shrink-0">
                             Q{index + 1}
@@ -279,23 +246,18 @@ const InterviewPrep = () => {
                         </div>
                         <div className="ml-8 space-y-2">
                           <p className="text-gray-300">{item.answer}</p>
-                          {item.tips && (
-                            <div className="bg-yellow-900/20 border-l-4 border-yellow-500 p-3 rounded">
+                          {item.tips && <div className="bg-yellow-900/20 border-l-4 border-yellow-500 p-3 rounded">
                               <p className="text-yellow-200 text-sm">
                                 <strong>Pro Tip:</strong> {item.tips}
                               </p>
-                            </div>
-                          )}
+                            </div>}
                         </div>
-                      </div>
-                    ))}
+                      </div>)}
                   </CardContent>
-                </Card>
-              )}
+                </Card>}
 
               {/* Strategic Questions */}
-              {interviewData.strategic_questions && (
-                <Card className="bg-gray-900 border-gray-700">
+              {interviewData.strategic_questions && <Card className="bg-gray-900 border-gray-700">
                   <CardHeader>
                     <CardTitle className="text-white flex items-center justify-between">
                       Questions to Ask Your Interviewer
@@ -306,48 +268,36 @@ const InterviewPrep = () => {
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2">
-                      {interviewData.strategic_questions.map((question, index) => (
-                        <li key={index} className="flex items-start gap-3 text-gray-300">
+                      {interviewData.strategic_questions.map((question, index) => <li key={index} className="flex items-start gap-3 text-gray-300">
                           <span className="text-green-400 mt-1">•</span>
                           {question}
-                        </li>
-                      ))}
+                        </li>)}
                     </ul>
                   </CardContent>
-                </Card>
-              )}
+                </Card>}
 
               {/* Additional Insights */}
-              {(interviewData.company_insights || interviewData.role_insights) && (
-                <div className="grid md:grid-cols-2 gap-6">
-                  {interviewData.company_insights && (
-                    <Card className="bg-gray-900 border-gray-700">
+              {(interviewData.company_insights || interviewData.role_insights) && <div className="grid md:grid-cols-2 gap-6">
+                  {interviewData.company_insights && <Card className="bg-gray-900 border-gray-700">
                       <CardHeader>
                         <CardTitle className="text-white">Company Insights</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <p className="text-gray-300">{interviewData.company_insights}</p>
                       </CardContent>
-                    </Card>
-                  )}
-                  {interviewData.role_insights && (
-                    <Card className="bg-gray-900 border-gray-700">
+                    </Card>}
+                  {interviewData.role_insights && <Card className="bg-gray-900 border-gray-700">
                       <CardHeader>
                         <CardTitle className="text-white">Role Insights</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <p className="text-gray-300">{interviewData.role_insights}</p>
                       </CardContent>
-                    </Card>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
+                    </Card>}
+                </div>}
+            </div>}
         </div>
       </div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default InterviewPrep;
