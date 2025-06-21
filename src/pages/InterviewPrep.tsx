@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,7 @@ import { useQuery } from '@tanstack/react-query';
 import LoadingMessages from '@/components/LoadingMessages';
 import { useUser } from '@clerk/clerk-react';
 import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
-import { PremiumInterviewDisplay } from '@/components/PremiumInterviewDisplay';
+import { InterviewPremiumDisplay } from '@/components/InterviewPremiumDisplay';
 import { InterviewPrepHistoryModal } from '@/components/InterviewPrepHistoryModal';
 
 const InterviewPrep = () => {
@@ -248,7 +247,7 @@ const InterviewPrep = () => {
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           {/* Show premium results if we have interview data */}
           {interviewData ? (
-            <PremiumInterviewDisplay interviewData={interviewData} />
+            <InterviewPremiumDisplay interviewData={interviewData} />
           ) : (
             <>
               {/* Header */}

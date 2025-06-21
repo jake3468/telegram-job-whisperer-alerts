@@ -4,12 +4,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Eye, Clock, Building2, Briefcase } from 'lucide-react';
+import { Trash2, Eye, Clock, Building2, Briefcase, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { PremiumInterviewDisplay } from './PremiumInterviewDisplay';
+import { InterviewPremiumDisplay } from './InterviewPremiumDisplay';
 
 interface InterviewPrepHistoryModalProps {
   onSelectEntry?: (entry: any) => void;
@@ -68,6 +68,8 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
   };
 
   const handleView = (entry: any) => {
+    console.log('Viewing entry:', entry);
+    console.log('Interview questions data:', entry.interview_questions);
     setSelectedEntry(entry);
     setViewMode('view');
   };
@@ -96,7 +98,7 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
               variant="outline" 
               size="sm" 
               onClick={handleBackToList}
-              className="mb-4"
+              className="mb-4 border-purple-300 text-purple-700 hover:bg-purple-50"
             >
               ← Back to History
             </Button>
@@ -104,27 +106,27 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
 
           {/* Original Input Details */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-800">Original Request Details</h3>
-            <Card className="bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] border-0">
-              <CardContent className="p-4 space-y-3">
-                <div className="flex items-center gap-2">
-                  <Building2 className="w-4 h-4 text-black" />
-                  <span className="font-medium text-black">Company:</span>
-                  <span className="text-black">{selectedEntry.company_name}</span>
+            <h3 className="text-lg font-semibold text-white">Original Request Details</h3>
+            <Card className="bg-gradient-to-r from-purple-600 to-indigo-600 border-0 shadow-xl">
+              <CardContent className="p-6 space-y-4">
+                <div className="flex items-center gap-3">
+                  <Building2 className="w-5 h-5 text-white" />
+                  <span className="font-medium text-white">Company:</span>
+                  <span className="text-purple-100">{selectedEntry.company_name}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Briefcase className="w-4 h-4 text-black" />
-                  <span className="font-medium text-black">Job Title:</span>
-                  <span className="text-black">{selectedEntry.job_title}</span>
+                <div className="flex items-center gap-3">
+                  <Briefcase className="w-5 h-5 text-white" />
+                  <span className="font-medium text-white">Job Title:</span>
+                  <span className="text-purple-100">{selectedEntry.job_title}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-black" />
-                  <span className="font-medium text-black">Created:</span>
-                  <span className="text-black">{formatDate(selectedEntry.created_at)}</span>
+                <div className="flex items-center gap-3">
+                  <Clock className="w-5 h-5 text-white" />
+                  <span className="font-medium text-white">Created:</span>
+                  <span className="text-purple-100">{formatDate(selectedEntry.created_at)}</span>
                 </div>
                 <div className="space-y-2">
-                  <span className="font-medium text-black">Job Description:</span>
-                  <div className="text-black text-sm bg-black/10 p-2 rounded max-h-32 overflow-y-auto">
+                  <span className="font-medium text-white">Job Description:</span>
+                  <div className="text-purple-100 text-sm bg-white/10 p-3 rounded-lg max-h-40 overflow-y-auto">
                     {selectedEntry.job_description}
                   </div>
                 </div>
@@ -135,17 +137,19 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
           {/* Generated Results */}
           {selectedEntry.interview_questions ? (
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-800">Generated Interview Prep</h3>
-              <PremiumInterviewDisplay 
-                interviewData={typeof selectedEntry.interview_questions === 'string' 
-                  ? selectedEntry.interview_questions 
-                  : JSON.stringify(selectedEntry.interview_questions)} 
+              <h3 className="text-lg font-semibold text-white">Generated Interview Prep</h3>
+              <InterviewPremiumDisplay 
+                interviewData={selectedEntry.interview_questions} 
               />
             </div>
           ) : (
-            <Card className="bg-yellow-50 border-yellow-200">
-              <CardContent className="p-4 text-center">
-                <p className="text-yellow-800">Interview prep results are still being generated...</p>
+            <Card className="bg-gradient-to-r from-yellow-500 to-orange-500 border-0 shadow-xl">
+              <CardContent className="p-6 text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <Clock className="w-5 h-5 text-white" />
+                  <p className="text-white font-medium">Processing Interview Prep</p>
+                </div>
+                <p className="text-yellow-100 text-sm">Your personalized interview questions are being generated. This usually takes 2-3 minutes.</p>
               </CardContent>
             </Card>
           )}
@@ -154,51 +158,72 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
     }
 
     return (
-      <div className="space-y-4">
+      <div className="space-y-6">
+        {/* 60-day retention notice */}
+        <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-xl p-4 shadow-lg">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="w-6 h-6 text-white flex-shrink-0" />
+            <div>
+              <h4 className="text-white font-semibold text-sm">Data Retention Policy</h4>
+              <p className="text-orange-100 text-sm">
+                Interview prep history is automatically deleted after 60 days for privacy and storage optimization.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {isLoading ? (
-          <div className="text-center py-8">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="mt-2 text-gray-600">Loading interview prep history...</p>
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mb-4"></div>
+            <p className="text-gray-300 text-lg">Loading interview prep history...</p>
           </div>
         ) : !interviewHistory?.length ? (
-          <div className="text-center py-8">
-            <p className="text-gray-600">No interview prep history found.</p>
+          <div className="text-center py-12">
+            <div className="bg-gradient-to-r from-gray-700 to-gray-800 rounded-xl p-8">
+              <Clock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-300 text-lg font-medium mb-2">No Interview Prep History</p>
+              <p className="text-gray-400">Your interview preparation sessions will appear here once created.</p>
+            </div>
           </div>
         ) : (
-          <div className="space-y-3 max-h-96 overflow-y-auto">
+          <div className="space-y-4 max-h-96 overflow-y-auto">
             {interviewHistory.map((entry) => (
-              <Card key={entry.id} className="hover:shadow-md transition-shadow cursor-pointer">
-                <CardContent className="p-4">
+              <Card key={entry.id} className="bg-gradient-to-r from-purple-900/50 to-indigo-900/50 border border-purple-500/30 hover:border-purple-400/50 transition-all duration-200 cursor-pointer group hover:shadow-xl">
+                <CardContent className="p-6">
                   <div className="flex items-start justify-between">
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <Building2 className="w-4 h-4 text-gray-500" />
-                        <span className="font-medium">{entry.company_name}</span>
-                        <Badge variant="secondary" className="text-xs">
+                    <div className="flex-1 space-y-3">
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <div className="flex items-center gap-2">
+                          <Building2 className="w-4 h-4 text-purple-400" />
+                          <span className="font-semibold text-white">{entry.company_name}</span>
+                        </div>
+                        <Badge className="bg-purple-600/80 text-purple-100 border-purple-500/50 text-xs">
                           {entry.job_title}
                         </Badge>
                       </div>
                       
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Clock className="w-3 h-3" />
-                        <span>{formatDate(entry.created_at)}</span>
+                      <div className="flex items-center gap-4 text-sm">
+                        <div className="flex items-center gap-2 text-purple-300">
+                          <Clock className="w-3 h-3" />
+                          <span>{formatDate(entry.created_at)}</span>
+                        </div>
                         {entry.interview_questions ? (
-                          <Badge variant="default" className="bg-green-100 text-green-800 text-xs">
-                            Completed
+                          <Badge className="bg-green-600/80 text-green-100 border-green-500/50 text-xs">
+                            ✓ Ready
                           </Badge>
                         ) : (
-                          <Badge variant="outline" className="text-yellow-600 border-yellow-600 text-xs">
-                            Processing
+                          <Badge className="bg-yellow-600/80 text-yellow-100 border-yellow-500/50 text-xs">
+                            ⏳ Processing
                           </Badge>
                         )}
                       </div>
                       
-                      <p className="text-sm text-gray-600 line-clamp-2">
-                        {entry.job_description?.substring(0, 100)}...
+                      <p className="text-gray-300 text-sm line-clamp-2 leading-relaxed">
+                        {entry.job_description?.substring(0, 120)}...
                       </p>
                     </div>
                     
-                    <div className="flex items-center gap-1 ml-4">
+                    <div className="flex items-center gap-2 ml-4">
                       {entry.interview_questions && (
                         <Button
                           variant="ghost"
@@ -207,7 +232,7 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
                             e.stopPropagation();
                             handleView(entry);
                           }}
-                          className="h-8 w-8 p-0"
+                          className="h-9 w-9 p-0 text-purple-300 hover:text-white hover:bg-purple-600/50 transition-colors"
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
@@ -217,7 +242,7 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
                         variant="ghost"
                         size="sm"
                         onClick={(e) => handleDelete(entry.id, e)}
-                        className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                        className="h-9 w-9 p-0 text-red-400 hover:text-white hover:bg-red-600/50 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -235,14 +260,14 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="border-black text-black hover:bg-gray-100">
+        <Button variant="outline" size="sm" className="border-purple-400 text-purple-300 hover:bg-purple-900/50 hover:text-white transition-colors">
           <Clock className="w-4 h-4 mr-2" />
           History
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader>
-          <DialogTitle>
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden flex flex-col bg-gradient-to-br from-gray-900 via-purple-900/20 to-indigo-900/20 border-purple-500/30">
+        <DialogHeader className="border-b border-purple-500/30 pb-4">
+          <DialogTitle className="text-white text-xl">
             {viewMode === 'view' ? 'Interview Prep Details' : 'Interview Prep History'}
           </DialogTitle>
         </DialogHeader>
