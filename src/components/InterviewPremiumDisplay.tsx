@@ -36,6 +36,10 @@ export const InterviewPremiumDisplay: React.FC<InterviewPremiumDisplayProps> = (
     let currentSection = 'title';
     let currentQuestion: Partial<ParsedQuestion> = {};
     
+    // Extract company and job title from the data
+    let companyName = 'Company';
+    let jobTitle = 'Position';
+    
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       
@@ -43,6 +47,13 @@ export const InterviewPremiumDisplay: React.FC<InterviewPremiumDisplayProps> = (
       if (line.startsWith('# ')) {
         title = line.replace('# ', '').trim();
         console.log('Found title:', title);
+        
+        // Try to extract company and job title from title
+        const titleMatch = title.match(/(.+?)\s+at\s+(.+?)(?:\s+-|$)/i);
+        if (titleMatch) {
+          jobTitle = titleMatch[1].trim();
+          companyName = titleMatch[2].trim();
+        }
         continue;
       }
       
@@ -127,8 +138,8 @@ export const InterviewPremiumDisplay: React.FC<InterviewPremiumDisplayProps> = (
       title: title || 'Interview Preparation Guide', 
       strategy, 
       questions, 
-      companyName: 'Company', 
-      jobTitle: 'Position' 
+      companyName, 
+      jobTitle 
     };
   };
 
@@ -149,7 +160,7 @@ export const InterviewPremiumDisplay: React.FC<InterviewPremiumDisplayProps> = (
   };
 
   return (
-    <div className="w-full space-y-6 bg-gradient-to-br from-gray-900 to-teal-900/20 min-h-screen p-4 rounded-xl overflow-x-hidden">
+    <div className="w-full space-y-6 bg-gradient-to-br from-gray-900 to-teal-900/20 min-h-screen p-4 rounded-xl">
       {/* Header Section */}
       <div className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 rounded-xl shadow-2xl border border-teal-500/30 overflow-hidden">
         <div className="p-4 sm:p-6 text-white">
