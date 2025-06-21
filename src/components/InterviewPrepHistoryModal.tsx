@@ -69,7 +69,8 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
 
   const handleView = (entry: any) => {
     console.log('Viewing entry:', entry);
-    console.log('Interview questions data:', entry.interview_questions);
+    console.log('Interview questions data type:', typeof entry.interview_questions);
+    console.log('Interview questions data content:', entry.interview_questions?.substring?.(0, 200) + '...');
     setSelectedEntry(entry);
     setViewMode('view');
   };
