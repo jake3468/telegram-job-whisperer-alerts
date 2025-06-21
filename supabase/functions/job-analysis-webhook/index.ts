@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -74,6 +75,17 @@ interface LinkedInPost {
   updated_at: string;
 }
 
+interface InterviewPrep {
+  id: string;
+  user_id: string;
+  company_name: string;
+  job_title: string;
+  job_description: string;
+  interview_questions?: any;
+  created_at: string;
+  updated_at: string;
+}
+
 interface User {
   id: string;
   clerk_id: string;
@@ -98,6 +110,7 @@ interface WebhookPayload {
   job_analysis?: JobAnalysis;
   job_cover_letter?: JobCoverLetter;
   job_linkedin?: LinkedInPost;
+  interview_prep?: InterviewPrep;
   user: User;
   user_profile?: UserProfile;
   event_type: string;
@@ -167,6 +180,11 @@ serve(async (req) => {
       console.log('📋 Processing LinkedIn post webhook');
       n8nWebhookUrl = Deno.env.get('N8N_LINKEDIN_WEBHOOK_URL');
       console.log(`🔗 Found N8N LinkedIn Webhook URL: ${n8nWebhookUrl ? 'Yes' : 'No'}`);
+      
+    } else if (webhookType === 'interview_prep' || payload.interview_prep) {
+      console.log('📋 Processing interview prep webhook');
+      n8nWebhookUrl = Deno.env.get('N8N_INTERVIEW_WEBHOOK_URL');
+      console.log(`🔗 Found N8N Interview Prep Webhook URL: ${n8nWebhookUrl ? 'Yes' : 'No'}`);
     }
 
     if (!n8nWebhookUrl) {
@@ -190,7 +208,7 @@ serve(async (req) => {
         webhook_type: webhookType,
         execution_id: executionId,
         processed_at: new Date().toISOString(),
-        edge_function_version: 'v7.0'
+        edge_function_version: 'v7.1'
       }
     };
 
@@ -207,7 +225,7 @@ serve(async (req) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'User-Agent': 'Supabase-Edge-Function/7.0',
+          'User-Agent': 'Supabase-Edge-Function/7.1',
           'X-Webhook-Source': 'supabase-edge-function',
           'X-Fingerprint': fingerprint,
           'X-Source': source,
