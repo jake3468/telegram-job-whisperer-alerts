@@ -4,7 +4,7 @@ import { useToast } from './use-toast';
 import { useNavigate } from 'react-router-dom';
 import { ToastAction } from '@/components/ui/toast';
 
-export function useCreditCheck(requiredCredits: number = 1.5) {
+export function useCreditCheck(requiredCredits: number = 1.5, checkOnly: boolean = false) {
   const { data: credits, isLoading } = useUserCredits();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -53,6 +53,7 @@ export function useCreditCheck(requiredCredits: number = 1.5) {
     creditBalance,
     isLoading,
     showInsufficientCreditsPopup,
-    requiredCredits
+    requiredCredits,
+    checkOnly
   };
 }

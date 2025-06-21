@@ -17,6 +17,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import CoverLetterDownloadActions from '@/components/CoverLetterDownloadActions';
 import { useCreditCheck } from '@/hooks/useCreditCheck';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
+import { useDeferredCreditDeduction } from '@/hooks/useDeferredCreditDeduction';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 
@@ -27,8 +28,9 @@ const CoverLetter = () => {
   const { userProfile } = useUserProfile();
   const { isComplete } = useUserCompletionStatus();
   
-  // Replace useFeatureCreditCheck with the new system
-  const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(1.5);
+  // Use check-only mode for initial credit check
+  const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(1.5, true);
+  const { deductCredits } = useDeferredCreditDeduction();
   useCreditWarnings(); // This shows the warning popups
 
   const [formData, setFormData] = useState({
@@ -41,6 +43,7 @@ const CoverLetter = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentCoverLetterId, setCurrentCoverLetterId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [creditsDeducted, setCreditsDeducted] = useState(false);
 
   useEffect(() => {
     if (isLoaded && !user) {
@@ -65,6 +68,13 @@ const CoverLetter = () => {
           console.log('Cover letter content received, updating UI');
           setResult(coverLetterContent);
           setIsGenerating(false);
+          
+          // Deduct credits only after successful result display
+          if (!creditsDeducted) {
+            deductCredits(1.5, 'cover_letter', 'Credits deducted for cover letter generation');
+            setCreditsDeducted(true);
+          }
+          
           toast({
             title: "Cover Letter Generated!",
             description: "Your cover letter has been created successfully."
@@ -80,7 +90,7 @@ const CoverLetter = () => {
       console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
-  }, [currentCoverLetterId, toast]);
+  }, [currentCoverLetterId, toast, creditsDeducted, deductCredits]);
 
   // Polling fallback - check for updates every 5 seconds when generating
   useEffect(() => {
@@ -97,6 +107,13 @@ const CoverLetter = () => {
           console.log('Cover letter found via polling, updating UI');
           setResult(data.cover_letter);
           setIsGenerating(false);
+          
+          // Deduct credits only after successful result display
+          if (!creditsDeducted) {
+            deductCredits(1.5, 'cover_letter', 'Credits deducted for cover letter generation');
+            setCreditsDeducted(true);
+          }
+          
           toast({
             title: "Cover Letter Generated!",
             description: "Your cover letter has been created successfully."
@@ -110,7 +127,7 @@ const CoverLetter = () => {
       console.log('Cleaning up polling interval');
       clearInterval(pollInterval);
     };
-  }, [isGenerating, currentCoverLetterId, toast]);
+  }, [isGenerating, currentCoverLetterId, toast, creditsDeducted, deductCredits]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -119,11 +136,11 @@ const CoverLetter = () => {
     }));
   };
 
-  // Updated handleSubmit to check credits first
+  // Updated handleSubmit to only check credits, not deduct them
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Check credits first
+    // Only check credits, don't deduct them yet
     if (!hasCredits) {
       showInsufficientCreditsPopup();
       return;
@@ -157,6 +174,7 @@ const CoverLetter = () => {
     setIsGenerating(true);
     setResult('');
     setCurrentCoverLetterId(null);
+    setCreditsDeducted(false); // Reset credit deduction flag
     try {
       console.log('Submitting cover letter request...');
 
@@ -216,6 +234,7 @@ const CoverLetter = () => {
     setResult('');
     setIsGenerating(false);
     setCurrentCoverLetterId(null);
+    setCreditsDeducted(false);
   };
 
   if (!isLoaded || !user) {
