@@ -13,6 +13,7 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import LoadingMessages from '@/components/LoadingMessages';
+import { useUser } from '@clerk/clerk-react';
 
 interface InterviewQuestion {
   question: string;
@@ -28,12 +29,14 @@ interface InterviewData {
 }
 
 const InterviewPrep = () => {
+  const { user } = useUser();
   const [companyName, setCompanyName] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentAnalysis, setCurrentAnalysis] = useState<any>(null);
   const [interviewData, setInterviewData] = useState<InterviewData | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(1.5);
   const { deductCredits, isDeducting } = useDeferredCreditDeduction();
@@ -84,6 +87,9 @@ const InterviewPrep = () => {
   }, [currentAnalysis?.id, deductCredits]);
 
   const handleGenerate = async () => {
+    console.log('🚀 Interview Prep Submit Button Clicked');
+    
+    // Check credits first
     if (!hasCredits) {
       showInsufficientCreditsPopup();
       return;
@@ -107,38 +113,115 @@ const InterviewPrep = () => {
       return;
     }
 
-    setIsGenerating(true);
-    setInterviewData(null);
-
-    try {
-      const { data, error } = await supabase
-        .from('interview_prep')
-        .insert({
-          user_id: userProfile.id,
-          company_name: companyName.trim(),
-          job_title: jobTitle.trim(),
-          job_description: jobDescription.trim(),
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setCurrentAnalysis(data);
-      refetchHistory();
-
+    if (isSubmitting || isGenerating) {
       toast({
-        title: "Interview Prep Started",
-        description: "Your personalized interview questions are being generated...",
-      });
-    } catch (error) {
-      console.error('Error creating interview prep:', error);
-      setIsGenerating(false);
-      toast({
-        title: "Error",
-        description: "Failed to start interview prep generation. Please try again.",
+        title: "Please wait",
+        description: "Your interview prep is already being generated.",
         variant: "destructive",
       });
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setInterviewData(null);
+      console.log('✅ Starting interview prep submission process');
+
+      // Get user data first (following JobGuide pattern)
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('clerk_id', user?.id)
+        .single();
+
+      if (userError || !userData) {
+        console.error('❌ User not found:', userError);
+        throw new Error('User not found in database');
+      }
+
+      console.log('✅ Found user in users table:', userData.id);
+
+      // Get user profile data
+      const { data: profileData, error: profileError } = await supabase
+        .from('user_profile')
+        .select('id')
+        .eq('user_id', userData.id)
+        .single();
+
+      if (profileError || !profileData) {
+        console.error('❌ User profile not found:', profileError);
+        throw new Error('User profile not found. Please complete your profile first.');
+      }
+
+      console.log('✅ Found user profile:', profileData.id);
+
+      // Check for existing analysis
+      const { data: existingAnalysis, error: checkError } = await supabase
+        .from('interview_prep')
+        .select('id, interview_questions')
+        .eq('user_id', profileData.id)
+        .eq('company_name', companyName.trim())
+        .eq('job_title', jobTitle.trim())
+        .eq('job_description', jobDescription.trim())
+        .not('interview_questions', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
+        const existing = existingAnalysis[0];
+        console.log('✅ Found existing interview prep:', existing.id);
+        setInterviewData(existing.interview_questions);
+        setCurrentAnalysis({ id: existing.id });
+        setIsSubmitting(false);
+        toast({
+          title: "Previous Interview Prep Found",
+          description: "Using your previous interview prep for this job posting."
+        });
+        return;
+      }
+
+      // Insert new interview prep record
+      const insertData = {
+        user_id: profileData.id,
+        company_name: companyName.trim(),
+        job_title: jobTitle.trim(),
+        job_description: jobDescription.trim()
+      };
+
+      console.log('📝 Inserting interview prep data:', insertData);
+
+      const { data: insertedData, error: insertError } = await supabase
+        .from('interview_prep')
+        .insert(insertData)
+        .select('id')
+        .single();
+
+      if (insertError) {
+        console.error('❌ INSERT ERROR:', insertError);
+        throw new Error(`Database insert failed: ${insertError.message}`);
+      }
+
+      if (insertedData?.id) {
+        console.log('✅ Interview prep record inserted:', insertedData.id);
+        setCurrentAnalysis(insertedData);
+        setIsGenerating(true);
+        refetchHistory();
+
+        toast({
+          title: "Interview Prep Started!",
+          description: "Your personalized interview questions are being generated. Please wait for the results."
+        });
+      }
+    } catch (error) {
+      console.error('❌ SUBMISSION ERROR:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to generate interview prep';
+      toast({
+        title: "Generation Failed",
+        description: "There was an error generating your interview prep. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -195,7 +278,7 @@ const InterviewPrep = () => {
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
                     placeholder="e.g., Google, Microsoft, Amazon"
-                    disabled={isGenerating}
+                    disabled={isGenerating || isSubmitting}
                     className="border-gray-300 placeholder-gray-400 bg-black text-white"
                   />
                 </div>
@@ -209,7 +292,7 @@ const InterviewPrep = () => {
                     value={jobTitle}
                     onChange={(e) => setJobTitle(e.target.value)}
                     placeholder="e.g., Senior Software Engineer, Product Manager"
-                    disabled={isGenerating}
+                    disabled={isGenerating || isSubmitting}
                     className="border-gray-300 placeholder-gray-400 bg-black text-white"
                   />
                 </div>
@@ -224,7 +307,7 @@ const InterviewPrep = () => {
                   value={jobDescription}
                   onChange={(e) => setJobDescription(e.target.value)}
                   placeholder="Paste the complete job description here..."
-                  disabled={isGenerating}
+                  disabled={isGenerating || isSubmitting}
                   className="border-gray-300 placeholder-gray-400 min-h-32 bg-black text-white"
                 />
               </div>
@@ -232,15 +315,15 @@ const InterviewPrep = () => {
               <div className="flex gap-3 pt-4">
                 <Button
                   onClick={handleGenerate}
-                  disabled={isGenerating || isDeducting}
+                  disabled={isGenerating || isSubmitting || isDeducting}
                   className="flex-1 bg-black text-white hover:bg-gray-800 font-medium"
                 >
-                  {isGenerating ? 'Generating...' : 'Generate Interview Prep'}
+                  {(isGenerating || isSubmitting) ? 'Generating...' : 'Generate Interview Prep'}
                 </Button>
                 <Button
                   onClick={handleReset}
                   variant="outline"
-                  disabled={isGenerating}
+                  disabled={isGenerating || isSubmitting}
                   className="px-6 border-black text-black hover:bg-gray-100"
                 >
                   Reset
