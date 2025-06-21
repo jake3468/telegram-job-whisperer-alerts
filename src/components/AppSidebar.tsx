@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import {
   BookOpen,
@@ -18,6 +19,7 @@ import {
   LayoutDashboard,
   MessageSquare
 } from "lucide-react"
+import { NavLink } from "react-router-dom"
 
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
@@ -101,7 +103,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#">
+              <NavLink to="/profile">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                   <Bot className="size-4" />
                 </div>
@@ -109,7 +111,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <span className="truncate font-semibold">JobHuntr</span>
                   <span className="truncate text-xs">Enterprise</span>
                 </div>
-              </a>
+              </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
