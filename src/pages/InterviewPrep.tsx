@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -13,8 +14,8 @@ import { useQuery } from '@tanstack/react-query';
 import LoadingMessages from '@/components/LoadingMessages';
 import { useUser } from '@clerk/clerk-react';
 import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
-import { InterviewPremiumDisplay } from '@/components/InterviewPremiumDisplay';
 import { InterviewPrepHistoryModal } from '@/components/InterviewPrepHistoryModal';
+import InterviewPrepDownloadActions from '@/components/InterviewPrepDownloadActions';
 
 const InterviewPrep = () => {
   // Ensure Clerk JWT is synced with Supabase
@@ -241,14 +242,76 @@ const InterviewPrep = () => {
     setIsGenerating(false);
   };
 
+  const renderInterviewQuestions = (content: string) => {
+    if (!content) return null;
+
+    // Simple markdown parsing - only handle basic formatting
+    const processedContent = content
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
+      .replace(/^# (.*$)/gim, '<h1 style="font-size: 1.5rem; font-weight: bold; margin: 1rem 0; color: #1e40af;">$1</h1>') // H1 headers
+      .replace(/^## (.*$)/gim, '<h2 style="font-size: 1.25rem; font-weight: bold; margin: 0.75rem 0; color: #2563eb;">$1</h2>') // H2 headers
+      .replace(/^### (.*$)/gim, '<h3 style="font-size: 1.125rem; font-weight: bold; margin: 0.5rem 0; color: #3b82f6;">$1</h3>') // H3 headers
+      .replace(/\n/g, '<br>'); // Line breaks
+
+    return (
+      <div 
+        className="text-white bg-gray-900 rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words border border-gray-700" 
+        dangerouslySetInnerHTML={{ __html: processedContent }} 
+      />
+    );
+  };
+
   return (
     <Layout>
       <div className="min-h-screen bg-black text-white">
         <div className="container mx-auto px-4 py-4 sm:py-8 max-w-5xl">
-          {/* Show premium results if we have interview data */}
+          {/* Show raw markdown results if we have interview data */}
           {interviewData ? (
-            <div className="w-full">
-              <InterviewPremiumDisplay interviewData={interviewData} />
+            <div className="w-full space-y-6">
+              {/* Header with download actions */}
+              <div className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 rounded-xl shadow-2xl border border-teal-500/30 overflow-hidden">
+                <div className="p-4 sm:p-6 text-white">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
+                    <div className="flex items-center gap-4 min-w-0 flex-1">
+                      <div className="p-2 sm:p-3 bg-white/20 rounded-xl backdrop-blur-sm flex-shrink-0">
+                        <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h1 className="text-xl sm:text-2xl font-bold leading-tight break-words">
+                          Interview Preparation Guide
+                        </h1>
+                        <p className="text-teal-100 mt-1 text-sm sm:text-base">AI-powered interview strategy and personalized questions</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex-shrink-0 w-full sm:w-auto">
+                      <InterviewPrepDownloadActions 
+                        interviewData={interviewData}
+                        jobTitle={jobTitle}
+                        companyName={companyName}
+                        contrast={true}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Raw markdown content */}
+              <Card className="bg-gray-800 border-gray-700">
+                <CardContent className="p-6">
+                  {renderInterviewQuestions(interviewData)}
+                </CardContent>
+              </Card>
+
+              {/* Back to form button */}
+              <div className="flex justify-center">
+                <Button
+                  onClick={handleReset}
+                  className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2"
+                >
+                  Generate New Interview Prep
+                </Button>
+              </div>
             </div>
           ) : (
             <>
