@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -72,11 +71,26 @@ const InterviewPrep = () => {
       }, (payload) => {
         console.log('Interview prep updated:', payload);
         if (payload.new.interview_questions) {
-          setInterviewData(payload.new.interview_questions);
-          setIsGenerating(false);
+          try {
+            // Properly parse and type-check the JSON data
+            const parsedData = typeof payload.new.interview_questions === 'string' 
+              ? JSON.parse(payload.new.interview_questions) 
+              : payload.new.interview_questions;
+            
+            setInterviewData(parsedData as InterviewData);
+            setIsGenerating(false);
 
-          // Deduct credits when results are available
-          deductCredits(1.5, 'interview_prep', `Interview prep for ${payload.new.company_name} - ${payload.new.job_title}`);
+            // Deduct credits when results are available
+            deductCredits(1.5, 'interview_prep', `Interview prep for ${payload.new.company_name} - ${payload.new.job_title}`);
+          } catch (error) {
+            console.error('Error parsing interview questions:', error);
+            setIsGenerating(false);
+            toast({
+              title: "Error Processing Results",
+              description: "There was an error processing your interview prep results.",
+              variant: "destructive",
+            });
+          }
         }
       })
       .subscribe();
@@ -84,7 +98,7 @@ const InterviewPrep = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [currentAnalysis?.id, deductCredits]);
+  }, [currentAnalysis?.id, deductCredits, toast]);
 
   const handleGenerate = async () => {
     console.log('🚀 Interview Prep Submit Button Clicked');
@@ -170,14 +184,25 @@ const InterviewPrep = () => {
       if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
         const existing = existingAnalysis[0];
         console.log('✅ Found existing interview prep:', existing.id);
-        setInterviewData(existing.interview_questions);
-        setCurrentAnalysis({ id: existing.id });
-        setIsSubmitting(false);
-        toast({
-          title: "Previous Interview Prep Found",
-          description: "Using your previous interview prep for this job posting."
-        });
-        return;
+        
+        try {
+          // Properly parse existing data
+          const parsedData = typeof existing.interview_questions === 'string' 
+            ? JSON.parse(existing.interview_questions) 
+            : existing.interview_questions;
+          
+          setInterviewData(parsedData as InterviewData);
+          setCurrentAnalysis({ id: existing.id });
+          setIsSubmitting(false);
+          toast({
+            title: "Previous Interview Prep Found",
+            description: "Using your previous interview prep for this job posting."
+          });
+          return;
+        } catch (error) {
+          console.error('Error parsing existing interview questions:', error);
+          // Continue with new generation if parsing fails
+        }
       }
 
       // Insert new interview prep record
