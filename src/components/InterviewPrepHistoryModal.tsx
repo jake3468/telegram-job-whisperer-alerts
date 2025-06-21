@@ -2,14 +2,13 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Eye, Clock, Building2, Briefcase, AlertTriangle } from 'lucide-react';
+import { Trash2, Eye, Clock, Building2, Briefcase, AlertTriangle, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { InterviewPremiumDisplay } from './InterviewPremiumDisplay';
 
 interface InterviewPrepHistoryModalProps {
   onSelectEntry?: (entry: any) => void;
@@ -18,7 +17,7 @@ interface InterviewPrepHistoryModalProps {
 export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps> = ({ onSelectEntry }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<any>(null);
-  const [viewMode, setViewMode] = useState<'list' | 'view'>('list');
+  const [showDetails, setShowDetails] = useState(false);
   const { toast } = useToast();
   const { userProfile } = useUserProfile();
   const queryClient = useQueryClient();
@@ -31,7 +30,7 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
       const { data, error } = await supabase
         .from('interview_prep')
         .select('*')
-        .eq('user_id', userProfile.id)
+        .eq('user_id', userProfile.id)  
         .order('created_at', { ascending: false });
         
       if (error) throw error;
@@ -68,16 +67,13 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
   };
 
   const handleView = (entry: any) => {
-    console.log('Viewing entry:', entry);
-    console.log('Interview questions data type:', typeof entry.interview_questions);
-    console.log('Interview questions data content:', entry.interview_questions?.substring?.(0, 200) + '...');
     setSelectedEntry(entry);
-    setViewMode('view');
+    setShowDetails(true);
   };
 
   const handleBackToList = () => {
     setSelectedEntry(null);
-    setViewMode('list');
+    setShowDetails(false);
   };
 
   const formatDate = (dateString: string) => {
@@ -90,173 +86,107 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
     });
   };
 
-  const renderContent = () => {
-    if (viewMode === 'view' && selectedEntry) {
-      return (
-        <div className="space-y-6">
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleBackToList}
-              className="mb-4 border-purple-300 text-purple-700 hover:bg-purple-50"
-            >
-              ← Back to History
-            </Button>
-          </div>
+  const hasResult = (item: any) => {
+    return item.interview_questions && item.interview_questions.trim().length > 0;
+  };
 
-          {/* Original Input Details */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white">Original Request Details</h3>
-            <Card className="bg-gradient-to-r from-purple-600 to-indigo-600 border-0 shadow-xl">
-              <CardContent className="p-6 space-y-4">
-                <div className="flex items-center gap-3">
-                  <Building2 className="w-5 h-5 text-white" />
-                  <span className="font-medium text-white">Company:</span>
-                  <span className="text-purple-100">{selectedEntry.company_name}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Briefcase className="w-5 h-5 text-white" />
-                  <span className="font-medium text-white">Job Title:</span>
-                  <span className="text-purple-100">{selectedEntry.job_title}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Clock className="w-5 h-5 text-white" />
-                  <span className="font-medium text-white">Created:</span>
-                  <span className="text-purple-100">{formatDate(selectedEntry.created_at)}</span>
-                </div>
-                <div className="space-y-2">
-                  <span className="font-medium text-white">Job Description:</span>
-                  <div className="text-purple-100 text-sm bg-white/10 p-3 rounded-lg max-h-40 overflow-y-auto">
-                    {selectedEntry.job_description}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+  const renderInterviewQuestions = (content: string) => {
+    if (!content) return null;
 
-          {/* Generated Results */}
-          {selectedEntry.interview_questions ? (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-white">Generated Interview Prep</h3>
-              <InterviewPremiumDisplay 
-                interviewData={selectedEntry.interview_questions} 
-              />
-            </div>
-          ) : (
-            <Card className="bg-gradient-to-r from-yellow-500 to-orange-500 border-0 shadow-xl">
-              <CardContent className="p-6 text-center">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Clock className="w-5 h-5 text-white" />
-                  <p className="text-white font-medium">Processing Interview Prep</p>
-                </div>
-                <p className="text-yellow-100 text-sm">Your personalized interview questions are being generated. This usually takes 2-3 minutes.</p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      );
-    }
+    // Simple markdown parsing - only handle basic formatting
+    const processedContent = content
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
+      .replace(/^# (.*$)/gm, '<h1>$1</h1>') // H1 headers
+      .replace(/^## (.*$)/gm, '<h2>$1</h2>') // H2 headers
+      .replace(/^### (.*$)/gm, '<h3>$1</h3>') // H3 headers
+      .replace(/\n/g, '<br>'); // Line breaks
 
     return (
-      <div className="space-y-6">
-        {/* 60-day retention notice */}
-        <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-xl p-4 shadow-lg">
-          <div className="flex items-center gap-3">
-            <AlertTriangle className="w-6 h-6 text-white flex-shrink-0" />
-            <div>
-              <h4 className="text-white font-semibold text-sm">Data Retention Policy</h4>
-              <p className="text-orange-100 text-sm">
-                Interview prep history is automatically deleted after 60 days for privacy and storage optimization.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {isLoading ? (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mb-4"></div>
-            <p className="text-gray-300 text-lg">Loading interview prep history...</p>
-          </div>
-        ) : !interviewHistory?.length ? (
-          <div className="text-center py-12">
-            <div className="bg-gradient-to-r from-gray-700 to-gray-800 rounded-xl p-8">
-              <Clock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-300 text-lg font-medium mb-2">No Interview Prep History</p>
-              <p className="text-gray-400">Your interview preparation sessions will appear here once created.</p>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-4 max-h-96 overflow-y-auto">
-            {interviewHistory.map((entry) => (
-              <Card key={entry.id} className="bg-gradient-to-r from-purple-900/50 to-indigo-900/50 border border-purple-500/30 hover:border-purple-400/50 transition-all duration-200 cursor-pointer group hover:shadow-xl">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 space-y-3">
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <div className="flex items-center gap-2">
-                          <Building2 className="w-4 h-4 text-purple-400" />
-                          <span className="font-semibold text-white">{entry.company_name}</span>
-                        </div>
-                        <Badge className="bg-purple-600/80 text-purple-100 border-purple-500/50 text-xs">
-                          {entry.job_title}
-                        </Badge>
-                      </div>
-                      
-                      <div className="flex items-center gap-4 text-sm">
-                        <div className="flex items-center gap-2 text-purple-300">
-                          <Clock className="w-3 h-3" />
-                          <span>{formatDate(entry.created_at)}</span>
-                        </div>
-                        {entry.interview_questions ? (
-                          <Badge className="bg-green-600/80 text-green-100 border-green-500/50 text-xs">
-                            ✓ Ready
-                          </Badge>
-                        ) : (
-                          <Badge className="bg-yellow-600/80 text-yellow-100 border-yellow-500/50 text-xs">
-                            ⏳ Processing
-                          </Badge>
-                        )}
-                      </div>
-                      
-                      <p className="text-gray-300 text-sm line-clamp-2 leading-relaxed">
-                        {entry.job_description?.substring(0, 120)}...
-                      </p>
-                    </div>
-                    
-                    <div className="flex items-center gap-2 ml-4">
-                      {entry.interview_questions && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleView(entry);
-                          }}
-                          className="h-9 w-9 p-0 text-purple-300 hover:text-white hover:bg-purple-600/50 transition-colors"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                      )}
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => handleDelete(entry.id, e)}
-                        className="h-9 w-9 p-0 text-red-400 hover:text-white hover:bg-red-600/50 transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
+      <div 
+        className="text-black bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words"
+        dangerouslySetInnerHTML={{ __html: processedContent }}
+      />
     );
   };
+
+  if (showDetails && selectedEntry) {
+    return (
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-w-6xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
+          <DialogHeader className="flex-shrink-0">
+            <DialogTitle className="text-white font-inter flex items-center gap-2 text-lg">
+              <Clock className="w-5 h-5" />
+              Interview Prep Details
+              <Button 
+                onClick={handleBackToList} 
+                size="sm" 
+                className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm mx-[15px]"
+              >
+                <X className="w-4 h-4 mr-1" />
+                Back to List
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-y-auto space-y-6 mt-4">
+            {/* Input Details Section */}
+            <div className="rounded-lg p-4 border border-white/10 bg-blue-800">
+              <h3 className="text-white font-medium mb-4 flex items-center gap-2">
+                <Building2 className="w-4 h-4" />
+                Input Details
+              </h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-cyan-200 text-sm font-semibold">Company Name:</label>
+                  <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
+                    <p className="text-white text-sm">{selectedEntry.company_name}</p>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-cyan-200 text-sm font-semibold">Job Title:</label>
+                  <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
+                    <p className="text-white text-sm">{selectedEntry.job_title}</p>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-cyan-200 text-sm font-semibold">Job Description:</label>
+                  <div className="rounded p-3 mt-1 max-h-32 overflow-y-auto bg-black/80 border border-cyan-300/20">
+                    <p className="text-white text-sm">{selectedEntry.job_description}</p>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-cyan-200 text-sm font-semibold">Created:</label>
+                  <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
+                    <p className="text-white text-sm">{formatDate(selectedEntry.created_at)}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Result Section */}
+            {hasResult(selectedEntry) && (
+              <div className="rounded-lg p-4 border border-white/10 shadow-inner bg-red-700">
+                <h3 className="text-white font-medium mb-3 flex flex-wrap gap-2 justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    Interview Prep Result
+                  </div>
+                </h3>
+
+                <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                  <div className="flex justify-between items-start mb-3">
+                    <h4 className="text-lime-400 font-semibold">Interview Questions & Answers</h4>
+                  </div>
+                  
+                  {renderInterviewQuestions(selectedEntry.interview_questions)}
+                </div>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -266,14 +196,126 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
           History
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden flex flex-col bg-gradient-to-br from-gray-900 via-purple-900/20 to-indigo-900/20 border-purple-500/30">
-        <DialogHeader className="border-b border-purple-500/30 pb-4">
-          <DialogTitle className="text-white text-xl">
-            {viewMode === 'view' ? 'Interview Prep Details' : 'Interview Prep History'}
+      <DialogContent className="w-[95vw] max-w-5xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
+        <DialogHeader className="flex-shrink-0">
+          <DialogTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
+            <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
+            Interview Prep History
           </DialogTitle>
         </DialogHeader>
-        <div className="flex-1 overflow-y-auto">
-          {renderContent()}
+        
+        <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg p-2 sm:p-3 mb-4 flex-shrink-0">
+          <div className="flex items-center gap-2 text-orange-200">
+            <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+            <p className="text-xs sm:text-sm">
+              Your history is automatically deleted after 60 days for privacy and storage optimization.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto min-h-0">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-white/70 text-sm">Loading history...</div>
+            </div>
+          ) : !interviewHistory?.length ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-white/70 text-center">
+                <Clock className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No interview prep found.</p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2 sm:space-y-3 pb-4">
+              {interviewHistory.map(entry => (
+                <div key={entry.id} className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-indigo-800">
+                  {/* Mobile Layout */}
+                  <div className="block sm:hidden space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 text-white font-medium text-sm">
+                          <Building2 className="w-3 h-3 flex-shrink-0" />
+                          <span className="truncate">{entry.company_name || 'Unknown Company'}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-white/80 text-sm mt-1">
+                          <Briefcase className="w-3 h-3 flex-shrink-0" />
+                          <span className="truncate">{entry.job_title || 'Unknown Position'}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-white/60 text-xs mt-1">
+                          <Clock className="w-3 h-3 flex-shrink-0" />
+                          <span>{formatDate(entry.created_at)}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-1 pt-2">
+                      {hasResult(entry) && (
+                        <Button 
+                          onClick={() => handleView(entry)} 
+                          size="sm" 
+                          className="flex-1 bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-2 py-1"
+                        >
+                          <Eye className="w-3 h-3 mr-1" />
+                          View
+                        </Button>
+                      )}
+                      
+                      <Button 
+                        onClick={(e) => handleDelete(entry.id, e)} 
+                        size="sm" 
+                        className="flex-1 bg-red-600/80 hover:bg-red-600 text-white text-xs px-2 py-1"
+                      >
+                        <Trash2 className="w-3 h-3 mr-1" />
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Desktop Layout */}
+                  <div className="hidden sm:flex items-center justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 text-white font-medium truncate">
+                          <Building2 className="w-4 h-4 flex-shrink-0" />
+                          <span className="truncate">{entry.company_name || 'Unknown Company'}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-white/80 truncate">
+                          <Briefcase className="w-4 h-4 flex-shrink-0" />
+                          <span className="truncate">{entry.job_title || 'Unknown Position'}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-white/60 text-sm">
+                          <Clock className="w-4 h-4 flex-shrink-0" />
+                          <span className="whitespace-nowrap">{formatDate(entry.created_at)}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {hasResult(entry) && (
+                        <Button 
+                          onClick={() => handleView(entry)} 
+                          size="sm" 
+                          className="bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-3 py-1"
+                        >
+                          <Eye className="w-3 h-3 mr-1" />
+                          View
+                        </Button>
+                      )}
+                      
+                      <Button 
+                        onClick={(e) => handleDelete(entry.id, e)} 
+                        size="sm" 
+                        className="bg-red-600/80 hover:bg-red-600 text-white text-xs px-3 py-1"
+                      >
+                        <Trash2 className="w-3 h-3 mr-1" />
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
