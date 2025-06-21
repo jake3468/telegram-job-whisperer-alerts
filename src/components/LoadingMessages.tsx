@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { Loader2, Sparkles, TrendingUp, Brain, Zap, FileText, PenTool, Building2, Search, Target } from 'lucide-react';
+import { Loader2, Sparkles, TrendingUp, Brain, Zap, FileText, PenTool, Building2, Search, Target, MessageSquare, Users, Lightbulb } from 'lucide-react';
 
 interface LoadingMessage {
   icon: React.ComponentType<{ className?: string }>;
@@ -8,7 +8,7 @@ interface LoadingMessage {
 }
 
 interface LoadingMessagesProps {
-  type?: 'linkedin' | 'cover_letter' | 'company_analysis';
+  type?: 'linkedin' | 'cover_letter' | 'company_analysis' | 'interview_prep';
   messages?: string[];
 }
 
@@ -36,6 +36,15 @@ const companyAnalysisMessages: LoadingMessage[] = [
   { icon: Sparkles, text: "✨ Finalizing your competitive advantage report..." },
 ];
 
+const interviewPrepMessages: LoadingMessage[] = [
+  { icon: MessageSquare, text: "Creating your interview questions..." },
+  { icon: Brain, text: "Generating perfect answers and pro tips..." },
+  { icon: Lightbulb, text: "Crafting strategic questions to ask..." },
+  { icon: Users, text: "Analyzing company culture insights..." },
+  { icon: Target, text: "Preparing role-specific considerations..." },
+  { icon: Sparkles, text: "Finalizing your interview prep guide..." },
+];
+
 const LoadingMessages = ({ type = 'linkedin', messages }: LoadingMessagesProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   
@@ -55,6 +64,9 @@ const LoadingMessages = ({ type = 'linkedin', messages }: LoadingMessagesProps) 
         break;
       case 'company_analysis':
         messagesList = companyAnalysisMessages;
+        break;
+      case 'interview_prep':
+        messagesList = interviewPrepMessages;
         break;
       default:
         messagesList = linkedinMessages;
