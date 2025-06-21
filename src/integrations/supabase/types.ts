@@ -163,6 +163,39 @@ export type Database = {
         }
         Relationships: []
       }
+      interview_prep: {
+        Row: {
+          company_name: string
+          created_at: string
+          id: string
+          interview_questions: Json | null
+          job_description: string
+          job_title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          id?: string
+          interview_questions?: Json | null
+          job_description: string
+          job_title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          id?: string
+          interview_questions?: Json | null
+          job_description?: string
+          job_title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       job_alerts: {
         Row: {
           alert_frequency: string
@@ -649,6 +682,12 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: {
           deleted_analyses: number
+        }[]
+      }
+      cleanup_old_interview_prep_data: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          deleted_interview_prep: number
         }[]
       }
       cleanup_old_linkedin_data: {

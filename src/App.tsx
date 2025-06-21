@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +16,7 @@ import GetMoreCredits from "./pages/GetMoreCredits";
 import Upgrade from "./pages/Upgrade";
 import CompanyRoleAnalysis from "./pages/CompanyRoleAnalysis";
 import NotFound from "./pages/NotFound";
+import InterviewPrep from "./pages/InterviewPrep";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +39,7 @@ const AppContent = () => {
         <Route path="/get-more-credits" element={<GetMoreCredits />} />
         <Route path="/upgrade" element={<Upgrade />} />
         <Route path="/company-role-analysis" element={<CompanyRoleAnalysis />} />
+        <Route path="/interview-prep" element={<InterviewPrep />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
