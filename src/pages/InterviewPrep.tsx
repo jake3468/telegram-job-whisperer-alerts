@@ -190,7 +190,7 @@ const InterviewPrep = () => {
                     onChange={e => setCompanyName(e.target.value)} 
                     placeholder="e.g., Google, Microsoft, Amazon" 
                     disabled={isGenerating} 
-                    className="border-gray-300 placeholder-gray-500 bg-white text-black"
+                    className="border-gray-300 placeholder-gray-400 bg-black text-white"
                   />
                 </div>
 
@@ -204,7 +204,7 @@ const InterviewPrep = () => {
                     onChange={e => setJobTitle(e.target.value)} 
                     placeholder="e.g., Senior Software Engineer, Product Manager" 
                     disabled={isGenerating} 
-                    className="border-gray-300 placeholder-gray-500 bg-white text-black"
+                    className="border-gray-300 placeholder-gray-400 bg-black text-white"
                   />
                 </div>
               </div>
@@ -219,7 +219,7 @@ const InterviewPrep = () => {
                   onChange={e => setJobDescription(e.target.value)} 
                   placeholder="Paste the complete job description here..." 
                   disabled={isGenerating} 
-                  className="border-gray-300 placeholder-gray-500 min-h-32 bg-white text-black"
+                  className="border-gray-300 placeholder-gray-400 min-h-32 bg-black text-white"
                 />
               </div>
 
