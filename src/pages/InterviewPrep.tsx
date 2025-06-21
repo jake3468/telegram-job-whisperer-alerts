@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -244,11 +243,11 @@ const InterviewPrep = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-black text-white overflow-x-hidden">
+      <div className="min-h-screen bg-black text-white">
         <div className="container mx-auto px-4 py-4 sm:py-8 max-w-5xl">
           {/* Show premium results if we have interview data */}
           {interviewData ? (
-            <div className="w-full overflow-x-hidden">
+            <div className="w-full">
               <InterviewPremiumDisplay interviewData={interviewData} />
             </div>
           ) : (
