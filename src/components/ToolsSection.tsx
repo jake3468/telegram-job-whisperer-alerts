@@ -1,5 +1,5 @@
 
-import { BellRing, ScanSearch, FileText, Linkedin, LayoutDashboard, MessageSquare, ArrowRight } from "lucide-react";
+import { BellRing, ScanSearch, FileText, Linkedin, LayoutDashboard, ArrowRight } from "lucide-react";
 import { SignUpButton } from "@clerk/clerk-react";
 
 // EVEN MORE desaturated, softened pastel backgrounds and muted buttons/icons for less vibrancy
@@ -41,22 +41,13 @@ const tools = [
     iconColor: "text-purple-800 bg-white/90",
   },
   {
-    icon: MessageSquare,
+    icon: LayoutDashboard,
     title: "AI Interview Prep",
     description: "Know the Company. Nail the Interview. Ask Like a Pro.",
     cardBg: "bg-[#7daab8]",
     buttonBg: "bg-[#145671] hover:bg-[#0a3544] focus:bg-[#0a3544]",
     buttonText: "text-white",
     iconColor: "text-sky-900 bg-white/90",
-  },
-  {
-    icon: LayoutDashboard,
-    title: "Company Decoder",
-    description: "Deep insights into companies and roles for strategic career moves.",
-    cardBg: "bg-[#c9b6a4]",
-    buttonBg: "bg-[#8b6f47] hover:bg-[#6b5635] focus:bg-[#6b5635]",
-    buttonText: "text-white",
-    iconColor: "text-amber-800 bg-white/90",
   },
 ];
 
@@ -79,7 +70,7 @@ const ToolsSection = () => {
             grid-cols-1 
             sm:grid-cols-2 
             lg:grid-cols-3
-            xl:grid-cols-6
+            xl:grid-cols-5
             justify-center
           ">
           {tools.map((tool) => (
@@ -129,8 +120,7 @@ const ToolsSection = () => {
                     tool.title === "AI Job Analysis" ? "Analyze Jobs" :
                       tool.title === "AI Cover Letters" ? "Create Letters" :
                         tool.title === "Telegram Job Alerts" ? "Set Up Alerts" :
-                          tool.title === "AI LinkedIn Posts" ? "Generate Posts" :
-                            tool.title === "Company Decoder" ? "Decode Company" : "Get Started"}
+                          tool.title === "AI LinkedIn Posts" ? "Generate Posts" : "Get Started"}
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </button>
               </SignUpButton>

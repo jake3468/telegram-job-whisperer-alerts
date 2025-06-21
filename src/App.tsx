@@ -1,64 +1,67 @@
 
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ClerkProvider } from '@clerk/clerk-react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from "@/components/ui/toaster";
-import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
-import Index from './pages/Index';
-import Profile from './pages/Profile';
-import JobGuide from './pages/JobGuide';
-import CoverLetter from './pages/CoverLetter';
-import LinkedInPosts from './pages/LinkedInPosts';
-import InterviewPrep from './pages/InterviewPrep';
-import CompanyRoleAnalysis from './pages/CompanyRoleAnalysis';
-import JobAlerts from './pages/JobAlerts';
-import GetMoreCredits from './pages/GetMoreCredits';
-import ResumeBuilder from './pages/ResumeBuilder';
-import Upgrade from './pages/Upgrade';
-import NotFound from './pages/NotFound';
-import './App.css';
-
-const PUBLISHABLE_KEY = "pk_test_bmF0dXJhbC1lZWwtNDcuY2xlcmsuYWNjb3VudHMuZGV2JA";
-
-if (!PUBLISHABLE_KEY) {
-  throw new Error("Missing Publishable Key");
-}
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useClerkSupabaseSync } from "@/hooks/useClerkSupabaseSync";
+import { SignedIn, SignedOut } from "@clerk/clerk-react";
+import Index from "./pages/Index";
+import Profile from "./pages/Profile";
+import JobAlerts from "./pages/JobAlerts";
+import JobGuide from "./pages/JobGuide";
+import CoverLetter from "./pages/CoverLetter";
+import LinkedInPosts from "./pages/LinkedInPosts";
+import ResumeBuilder from "./pages/ResumeBuilder";
+import GetMoreCredits from "./pages/GetMoreCredits";
+import Upgrade from "./pages/Upgrade";
+import CompanyRoleAnalysis from "./pages/CompanyRoleAnalysis";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-function AppContent() {
-  useClerkSupabaseSync();
-  
+const AppContent = () => {
   return (
-    <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/job-guide" element={<JobGuide />} />
-      <Route path="/cover-letter" element={<CoverLetter />} />
-      <Route path="/linkedin-posts" element={<LinkedInPosts />} />
-      <Route path="/interview-prep" element={<InterviewPrep />} />
-      <Route path="/company-role-analysis" element={<CompanyRoleAnalysis />} />
-      <Route path="/job-alerts" element={<JobAlerts />} />
-      <Route path="/get-more-credits" element={<GetMoreCredits />} />
-      <Route path="/resume-builder" element={<ResumeBuilder />} />
-      <Route path="/upgrade" element={<Upgrade />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <>
+      <SignedIn>
+        <ClerkSupabaseSync />
+      </SignedIn>
+      {/* Main app routing */}
+      <Routes>
+        <Route path="/" element={<Index />} />
+        {/* Dashboard routes now use the Layout component internally */}
+        <Route path="/dashboard" element={<Profile />} />
+        <Route path="/job-alerts" element={<JobAlerts />} />
+        <Route path="/job-guide" element={<JobGuide />} />
+        <Route path="/cover-letter" element={<CoverLetter />} />
+        <Route path="/linkedin-posts" element={<LinkedInPosts />} />
+        <Route path="/resume-builder" element={<ResumeBuilder />} />
+        <Route path="/get-more-credits" element={<GetMoreCredits />} />
+        <Route path="/upgrade" element={<Upgrade />} />
+        <Route path="/company-role-analysis" element={<CompanyRoleAnalysis />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
   );
-}
+};
 
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-        <Router>
-          <AppContent />
-          <Toaster />
-        </Router>
-      </ClerkProvider>
-    </QueryClientProvider>
-  );
-}
+// Component that properly calls the useClerkSupabaseSync hook
+const ClerkSupabaseSync = () => {
+  useClerkSupabaseSync();
+  return null;
+};
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
 export default App;
