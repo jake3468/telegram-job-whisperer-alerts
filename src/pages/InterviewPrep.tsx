@@ -162,10 +162,10 @@ const InterviewPrep = () => {
                 <MessageSquare className="w-8 h-8 text-black" />
               </div>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] bg-clip-text text-transparent md:text-4xl">
               Interview Prep
             </h1>
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+            <p className="text-gray-300 max-w-2xl mx-auto text-lg font-light">
               Your Personal Interview Coach, powered by AI. Get 15 tailored questions with perfect answers, pro tips, and strategic questions to ask your interviewer.
             </p>
           </div>
