@@ -140,7 +140,7 @@ serve(async (req) => {
       console.log('📋 Processing company role analysis webhook');
       
       try {
-        // Get N8N webhook URL from vault secrets
+        // Get N8N webhook URL from vault secrets - FIXED: removed 'public.' prefix
         const { data: secretData, error: secretError } = await supabaseClient
           .from('vault.decrypted_secrets')
           .select('decrypted_secret')
@@ -259,7 +259,7 @@ serve(async (req) => {
         webhook_type: webhookType,
         execution_id: executionId,
         processed_at: new Date().toISOString(),
-        edge_function_version: 'v6.0'
+        edge_function_version: 'v6.1'
       }
     };
 
@@ -276,7 +276,7 @@ serve(async (req) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'User-Agent': 'Supabase-Edge-Function/6.0',
+          'User-Agent': 'Supabase-Edge-Function/6.1',
           'X-Webhook-Source': 'supabase-edge-function',
           'X-Fingerprint': fingerprint,
           'X-Source': source,
