@@ -4,7 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-fingerprint, x-source, x-webhook-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-fingerprint, x-source, x-webhook-type, x-execution-id',
 }
 
 interface CompanyRoleAnalysis {
@@ -129,8 +129,9 @@ serve(async (req) => {
     const fingerprint = req.headers.get('x-fingerprint') || 'unknown';
     const source = req.headers.get('x-source') || 'unknown';
     const webhookType = req.headers.get('x-webhook-type') || payload.webhook_type;
+    const executionId = req.headers.get('x-execution-id') || 'unknown';
     
-    console.log(`🔍 Headers - Fingerprint: ${fingerprint}, Source: ${source}, WebhookType: ${webhookType}`);
+    console.log(`🔍 Headers - Fingerprint: ${fingerprint}, Source: ${source}, WebhookType: ${webhookType}, ExecutionId: ${executionId}`);
 
     let n8nWebhookUrl: string | null = null;
 
@@ -138,12 +139,8 @@ serve(async (req) => {
     if (webhookType === 'company_analysis' || payload.company_role_analysis) {
       console.log('📋 Processing company role analysis webhook');
       
-      // Try to get from payload first (sent by trigger)
-      if (payload.n8n_webhook_url) {
-        n8nWebhookUrl = payload.n8n_webhook_url;
-        console.log('🔗 Using N8N webhook URL from payload');
-      } else {
-        // Fallback to database lookup
+      try {
+        // Get N8N webhook URL from vault secrets
         const { data: secretData, error: secretError } = await supabaseClient
           .from('vault.decrypted_secrets')
           .select('decrypted_secret')
@@ -152,21 +149,35 @@ serve(async (req) => {
 
         if (secretError) {
           console.error('❌ Error fetching N8N_COMPANY_WEBHOOK_URL:', secretError);
-          return new Response(JSON.stringify({ error: 'Failed to fetch company webhook URL', details: secretError }), {
+          return new Response(JSON.stringify({ 
+            error: 'Failed to fetch company webhook URL', 
+            details: secretError,
+            execution_id: executionId,
+            fingerprint: fingerprint
+          }), {
             status: 500,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           });
         }
 
         n8nWebhookUrl = secretData?.decrypted_secret;
-        console.log('🔗 Using N8N webhook URL from database lookup');
-      }
-      
-      console.log(`🔗 Found N8N Company Webhook URL: ${n8nWebhookUrl ? 'Yes' : 'No'}`);
-      
-      if (n8nWebhookUrl) {
-        console.log(`🔗 N8N Webhook URL length: ${n8nWebhookUrl.length} characters`);
-        console.log(`🔗 N8N Webhook URL starts with: ${n8nWebhookUrl.substring(0, 50)}...`);
+        console.log(`🔗 Found N8N Company Webhook URL: ${n8nWebhookUrl ? 'Yes' : 'No'}`);
+        
+        if (n8nWebhookUrl) {
+          console.log(`🔗 N8N Webhook URL length: ${n8nWebhookUrl.length} characters`);
+          console.log(`🔗 N8N Webhook URL starts with: ${n8nWebhookUrl.substring(0, 50)}...`);
+        }
+      } catch (vaultError) {
+        console.error('❌ Error accessing vault secrets:', vaultError);
+        return new Response(JSON.stringify({ 
+          error: 'Failed to access vault secrets', 
+          details: vaultError.message,
+          execution_id: executionId,
+          fingerprint: fingerprint
+        }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
       }
 
     } else if (webhookType === 'job_guide' || payload.job_analysis) {
@@ -229,7 +240,11 @@ serve(async (req) => {
 
     if (!n8nWebhookUrl) {
       console.error(`❌ No N8N webhook URL found for webhook type: ${webhookType}`);
-      return new Response(JSON.stringify({ error: `No webhook URL configured for type: ${webhookType}` }), {
+      return new Response(JSON.stringify({ 
+        error: `No webhook URL configured for type: ${webhookType}`,
+        execution_id: executionId,
+        fingerprint: fingerprint
+      }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
@@ -242,13 +257,15 @@ serve(async (req) => {
         fingerprint,
         source,
         webhook_type: webhookType,
+        execution_id: executionId,
         processed_at: new Date().toISOString(),
-        edge_function_version: 'v5.0'
+        edge_function_version: 'v6.0'
       }
     };
 
     console.log(`🚀 Calling N8N webhook: ${n8nWebhookUrl}`);
     console.log(`📤 Payload size: ${JSON.stringify(n8nPayload).length} characters`);
+    console.log(`🔍 Execution ID: ${executionId}, Fingerprint: ${fingerprint}`);
 
     // Call the N8N webhook with enhanced error handling
     let n8nResponse: Response;
@@ -259,11 +276,12 @@ serve(async (req) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'User-Agent': 'Supabase-Edge-Function/5.0',
+          'User-Agent': 'Supabase-Edge-Function/6.0',
           'X-Webhook-Source': 'supabase-edge-function',
           'X-Fingerprint': fingerprint,
           'X-Source': source,
-          'X-Webhook-Type': webhookType
+          'X-Webhook-Type': webhookType,
+          'X-Execution-ID': executionId
         },
         body: JSON.stringify(n8nPayload)
       });
@@ -278,7 +296,9 @@ serve(async (req) => {
       return new Response(JSON.stringify({ 
         error: 'Failed to call N8N webhook', 
         details: fetchError.message,
-        webhook_url: n8nWebhookUrl.substring(0, 50) + '...'
+        webhook_url: n8nWebhookUrl.substring(0, 50) + '...',
+        execution_id: executionId,
+        fingerprint: fingerprint
       }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -291,7 +311,9 @@ serve(async (req) => {
         error: 'N8N webhook failed', 
         status: n8nResponse.status,
         response: responseText,
-        webhook_url: n8nWebhookUrl.substring(0, 50) + '...'
+        webhook_url: n8nWebhookUrl.substring(0, 50) + '...',
+        execution_id: executionId,
+        fingerprint: fingerprint
       }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -299,11 +321,13 @@ serve(async (req) => {
     }
 
     console.log(`✅ Successfully processed ${webhookType} webhook for ${payload.event_type}`);
+    console.log(`🔍 Final execution details - ID: ${executionId}, Fingerprint: ${fingerprint}`);
 
     return new Response(JSON.stringify({ 
       success: true, 
       message: `${webhookType} webhook processed successfully`,
       fingerprint,
+      execution_id: executionId,
       n8n_status: n8nResponse.status,
       n8n_response: responseText
     }), {
