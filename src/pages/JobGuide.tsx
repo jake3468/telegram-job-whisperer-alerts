@@ -15,7 +15,6 @@ import JobAnalysisHistory from '@/components/JobAnalysisHistory';
 import { PercentageMeter } from '@/components/PercentageMeter';
 import { useCreditCheck } from '@/hooks/useCreditCheck';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
-
 const JobGuide = () => {
   const {
     user,
@@ -46,7 +45,10 @@ const JobGuide = () => {
   const [matchScore, setMatchScore] = useState<string | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const loadingMessages = ["🔍 Analyzing job requirements...", "✨ Crafting personalized insights...", "🚀 Tailoring advice to your profile...", "🎯 Generating strategic recommendations..."];
-  const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(1.5);
+  const {
+    hasCredits,
+    showInsufficientCreditsPopup
+  } = useCreditCheck(1.5);
   useCreditWarnings(); // This shows the warning popups
 
   useEffect(() => {
@@ -71,9 +73,7 @@ const JobGuide = () => {
         const {
           data,
           error
-        } = await supabase.from('job_analyses')
-          .select('job_match, match_score')
-          .eq('id', jobAnalysisId).single();
+        } = await supabase.from('job_analyses').select('job_match, match_score').eq('id', jobAnalysisId).single();
         if (error) {
           console.error('Error polling for results:', error);
           return;
@@ -142,13 +142,12 @@ const JobGuide = () => {
   }, [toast]);
   const handleSubmit = useCallback(async () => {
     console.log('🚀 Job Guide Submit Button Clicked');
-    
+
     // Check credits first
     if (!hasCredits) {
       showInsufficientCreditsPopup();
       return;
     }
-
     if (!isComplete) {
       toast({
         title: "Complete your profile first",
@@ -173,7 +172,6 @@ const JobGuide = () => {
       });
       return;
     }
-
     try {
       setIsSubmitting(true);
       setError(null);
@@ -202,15 +200,9 @@ const JobGuide = () => {
       const {
         data: existingAnalysis,
         error: checkError
-      } = await supabase.from('job_analyses')
-        .select('id, job_match, match_score')
-        .eq('user_id', profileData.id)
-        .eq('company_name', formData.companyName)
-        .eq('job_title', formData.jobTitle)
-        .eq('job_description', formData.jobDescription)
-        .not('job_match', 'is', null)
-        .order('created_at', { ascending: false })
-        .limit(1);
+      } = await supabase.from('job_analyses').select('id, job_match, match_score').eq('user_id', profileData.id).eq('company_name', formData.companyName).eq('job_title', formData.jobTitle).eq('job_description', formData.jobDescription).not('job_match', 'is', null).order('created_at', {
+        ascending: false
+      }).limit(1);
       if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
         const existing = existingAnalysis[0];
         console.log('✅ Found existing job analysis:', existing.id);
@@ -226,7 +218,6 @@ const JobGuide = () => {
       }
       // Insert new, clear matchScore (will be fetched when ready)
       setMatchScore(null);
-
       const insertData = {
         user_id: profileData.id,
         company_name: formData.companyName,
@@ -272,7 +263,8 @@ const JobGuide = () => {
         jobTitle,
         jobDescription,
         result,
-        matchScore, // expect this from history events if supported
+        matchScore,
+        // expect this from history events if supported
         type
       } = event.detail;
       if (type === 'job_guide') {
@@ -317,7 +309,7 @@ const JobGuide = () => {
       <div className="min-h-screen w-full flex flex-col">
         <div className="max-w-4xl mx-auto w-full px-2 py-8 sm:px-6 sm:py-12 mt-4">
           <div className="text-center mb-8 px-2">
-            <h1 className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 bg-clip-text text-transparent mb-2 drop-shadow">
+            <h1 className="font-orbitron font-extrabold bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 bg-clip-text text-transparent mb-2 drop-shadow text-5xl">
               Job Analysis
             </h1>
             <p className="text-lg text-slate-300 font-inter font-light">
@@ -372,9 +364,7 @@ const JobGuide = () => {
                 </div>
                 {/* Action Buttons */}
                 <div className="flex flex-col md:flex-row gap-3 pt-4">
-                  <Button onClick={handleSubmit}
-                    disabled={isButtonDisabled} 
-                    className={`flex-1 bg-gradient-to-r from-sky-700 via-blue-600 to-blue-800 hover:from-blue-500 hover:to-sky-700 text-white font-semibold text-base h-12 shadow-none border border-blue-600 transition-all duration-150
+                  <Button onClick={handleSubmit} disabled={isButtonDisabled} className={`flex-1 bg-gradient-to-r from-sky-700 via-blue-600 to-blue-800 hover:from-blue-500 hover:to-sky-700 text-white font-semibold text-base h-12 shadow-none border border-blue-600 transition-all duration-150
                       ${isButtonDisabled ? 'opacity-50 cursor-not-allowed' : 'opacity-100'}
                     `}>
                     {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
@@ -412,8 +402,7 @@ const JobGuide = () => {
               </Card>}
 
             {/* Result Display */}
-            {jobAnalysisResult && (
-              <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-cyan-900 border border-blue-700 shadow-lg">
+            {jobAnalysisResult && <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-cyan-900 border border-blue-700 shadow-lg">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-slate-200 font-orbitron text-xl flex items-center gap-2">
                     <FileText className="w-5 h-5 text-slate-400" />
@@ -425,32 +414,26 @@ const JobGuide = () => {
                 </CardHeader>
                 <CardContent>
                   {/* Percentage Meter (Match Score) */}
-                  {matchScore && (
-                    <div className="mb-4 max-w-full">
+                  {matchScore && <div className="mb-4 max-w-full">
                       <div className="w-full sm:max-w-[350px] md:max-w-[280px] mx-auto">
                         {/* slight shadow and rounded for clearer separation */}
                         <div className="shadow-md rounded-xl bg-slate-900/90 p-3 border border-slate-700">
                           <PercentageMeter score={parseInt(matchScore)} label="Match Score" />
                         </div>
                       </div>
-                    </div>
-                  )}
+                    </div>}
 
-                  <div
-                    className="whitespace-pre-wrap font-inter text-slate-100 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-blue-900/90 rounded-xl p-4 sm:p-5 shadow-inner mb-3 border border-slate-700 max-w-full overflow-x-hidden break-words"
-                    style={{
-                      minHeight: '140px',
-                      wordBreak: 'break-word'
-                    }}
-                  >
+                  <div className="whitespace-pre-wrap font-inter text-slate-100 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-blue-900/90 rounded-xl p-4 sm:p-5 shadow-inner mb-3 border border-slate-700 max-w-full overflow-x-hidden break-words" style={{
+                minHeight: '140px',
+                wordBreak: 'break-word'
+              }}>
                     <div className="text-sm sm:text-base md:text-base leading-normal md:leading-relaxed break-words">
                       {jobAnalysisResult}
                     </div>
                   </div>
                   <div className="flex flex-col md:flex-row gap-2"></div>
                 </CardContent>
-              </Card>
-            )}
+              </Card>}
           </div>
         </div>
       </div>
