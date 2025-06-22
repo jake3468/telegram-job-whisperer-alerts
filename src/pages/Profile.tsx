@@ -6,7 +6,6 @@ import AuthHeader from '@/components/AuthHeader';
 import ResumeSection from '@/components/dashboard/ResumeSection';
 import BioSection from '@/components/dashboard/BioSection';
 import { Layout } from '@/components/Layout';
-import { AuthDebugPanel } from '@/components/AuthDebugPanel';
 
 const Profile = () => {
   const { user, isLoaded } = useUser();
@@ -28,9 +27,6 @@ const Profile = () => {
 
   return (
     <Layout>
-      {/* Temporary debug panel - remove after authentication is confirmed working */}
-      <AuthDebugPanel />
-      
       <div className="text-center mb-8">
         <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-2">
           Welcome back, <span className="italic bg-gradient-to-r from-pastel-peach to-pastel-mint bg-clip-text text-transparent">{user.firstName || 'User'}</span>
