@@ -705,6 +705,16 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Json
       }
+      debug_user_auth: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          clerk_id: string
+          jwt_sub: string
+          current_setting_claims: string
+          user_exists: boolean
+          user_id_found: string
+        }[]
+      }
       deduct_credits: {
         Args: {
           p_user_id: string
@@ -719,6 +729,10 @@ export type Database = {
         Returns: undefined
       }
       get_clerk_user_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      get_current_clerk_user_id: {
         Args: Record<PropertyKey, never>
         Returns: string
       }
