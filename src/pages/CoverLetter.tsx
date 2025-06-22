@@ -238,7 +238,7 @@ const CoverLetter = () => {
   };
 
   if (!isLoaded || !user) {
-    return <div className="min-h-screen bg-gradient-to-br from-black via-neutral-900 to-black flex items-center justify-center">
+    return <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading...</div>
       </div>;
   }
@@ -264,13 +264,13 @@ const CoverLetter = () => {
           </div>
         </div>
       </header>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-[#0e1122] via-[#181526] to-[#21203a]">
+      <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0 lg:pl-6">
           <main className="flex-1 w-full bg-transparent">
-            <div className="min-h-screen w-full bg-gradient-to-br from-[#180F18] via-[#1b1421] to-[#221828] flex flex-col">
+            <div className="min-h-screen w-full flex flex-col">
               {/* Header Section */}
-              <div className="max-w-4xl mx-auto w-full px-3 py-4 sm:px-6 sm:py-6 rounded-3xl mt-4">
+              <div className="max-w-4xl mx-auto w-full px-3 py-4 sm:px-6 sm:py-6 mt-4">
                 {/* Gradient Heading */}
                 <div className="mb-8 text-center">
                   <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-pink-400 via-fuchsia-400 to-fuchsia-600 bg-clip-text text-transparent mb-2 drop-shadow font-orbitron animate-fade-in">
