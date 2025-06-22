@@ -19,6 +19,7 @@ export function useClerkSupabaseSync() {
           // Get the token for this signed-in user with the supabase template
           const jwt = await getToken({ template: 'supabase' }).catch((error) => {
             console.error('[useClerkSupabaseSync] Error getting Clerk JWT:', error);
+            console.warn('[useClerkSupabaseSync] Please configure the "supabase" JWT template in your Clerk dashboard');
             return null;
           });
           
