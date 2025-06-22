@@ -309,13 +309,13 @@ const JobGuide = () => {
   const hasAnyData = isFormValid || jobAnalysisResult;
   const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating;
   if (!isLoaded || !user) {
-    return <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+    return <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-slate-400 text-xs">Loading...</div>
       </div>;
   }
   return <Layout>
-      <div className="min-h-screen w-full bg-gradient-to-br from-slate-950 via-slate-900/90 to-slate-950 flex flex-col">
-        <div className="max-w-4xl mx-auto w-full px-2 py-8 sm:px-6 sm:py-12 rounded-3xl bg-transparent mt-4">
+      <div className="min-h-screen w-full flex flex-col">
+        <div className="max-w-4xl mx-auto w-full px-2 py-8 sm:px-6 sm:py-12 mt-4">
           <div className="text-center mb-8 px-2">
             <h1 className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 bg-clip-text text-transparent mb-2 drop-shadow">
               Job Analysis
