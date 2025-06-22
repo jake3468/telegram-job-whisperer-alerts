@@ -1,4 +1,3 @@
-
 import { useUser } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -6,9 +5,11 @@ import { Layout } from '@/components/Layout';
 import CVBotStatus from '@/components/dashboard/CVBotStatus';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { FileText } from 'lucide-react';
-
 const ResumeBuilder = () => {
-  const { user, isLoaded } = useUser();
+  const {
+    user,
+    isLoaded
+  } = useUser();
   const navigate = useNavigate();
   const [isActivated, setIsActivated] = useState<boolean>(false);
 
@@ -20,46 +21,24 @@ const ResumeBuilder = () => {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
-
   const handleActivationChange = (activated: boolean) => {
     setIsActivated(activated);
   };
-
   if (!isLoaded || !user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-pastel-mint via-pastel-lavender to-pastel-peach flex items-center justify-center">
+    return <div className="min-h-screen bg-gradient-to-br from-pastel-mint via-pastel-lavender to-pastel-peach flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading...</div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <Layout>
+  return <Layout>
       <div className="text-center mb-8">
-        <h1
-          className="
-                text-4xl
-                font-orbitron
-                font-extrabold
-                bg-gradient-to-r
-                from-fuchsia-400
-                via-purple-400
-                to-pink-500
-                bg-clip-text
-                text-transparent
-                mb-2
-                drop-shadow
-                tracking-tight
-              "
-          style={{
-            WebkitBackgroundClip: 'text',
-            backgroundClip: 'text',
-            color: 'transparent'
-          }}
-        >
+        <h1 style={{
+        WebkitBackgroundClip: 'text',
+        backgroundClip: 'text',
+        color: 'transparent'
+      }} className="font-orbitron bg-gradient-to-r from-fuchsia-400 via-purple-400 to-pink-500 bg-clip-text text-transparent mb-2 drop-shadow tracking-tight text-5xl font-bold">
           Telegram <span className="italic">Resume</span> Bot
         </h1>
-        <p className="text-md text-purple-100 font-inter font-light">
+        <p className="text-md text-purple-100 font-inter font-light text-lg">
           Your personal <span className="italic text-pastel-peach">resume assistant</span> on Telegram — tailor your CV for new roles, job descriptions, or career goals, all through a simple chat
         </p>
       </div>
@@ -85,20 +64,16 @@ const ResumeBuilder = () => {
               {/* CV Bot Status Component */}
               <CVBotStatus onActivationChange={handleActivationChange} />
 
-              {!isActivated && (
-                <div className="text-center py-6">
+              {!isActivated && <div className="text-center py-6">
                   <FileText className="w-10 h-10 text-fuchsia-400 mx-auto mb-3" />
                   <p className="text-fuchsia-100 font-inter text-base mb-1">Activate your bot to start building resumes</p>
                   <p className="text-fuchsia-200 font-inter text-sm">Follow the instructions above to get started</p>
-                </div>
-              )}
+                </div>}
             </div>
           </div>
           <div className="h-2 sm:h-4" />
         </section>
       </div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default ResumeBuilder;
