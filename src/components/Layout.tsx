@@ -36,7 +36,7 @@ export function Layout({ children }: LayoutProps) {
       <div
         className={`
           min-h-screen flex w-full 
-          bg-gradient-to-br from-[#0e1122] via-[#181526] to-[#21203a]
+          bg-black
         `}
         style={{
           margin: 0,
