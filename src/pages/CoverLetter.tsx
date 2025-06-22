@@ -20,17 +20,30 @@ import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { useDeferredCreditDeduction } from '@/hooks/useDeferredCreditDeduction';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
-
 const CoverLetter = () => {
-  const { user, isLoaded } = useUser();
+  const {
+    user,
+    isLoaded
+  } = useUser();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const { userProfile } = useUserProfile();
-  const { isComplete } = useUserCompletionStatus();
-  
+  const {
+    toast
+  } = useToast();
+  const {
+    userProfile
+  } = useUserProfile();
+  const {
+    isComplete
+  } = useUserCompletionStatus();
+
   // Use check-only mode for initial credit check
-  const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(1.5, true);
-  const { deductCredits } = useDeferredCreditDeduction();
+  const {
+    hasCredits,
+    showInsufficientCreditsPopup
+  } = useCreditCheck(1.5, true);
+  const {
+    deductCredits
+  } = useDeferredCreditDeduction();
   useCreditWarnings(); // This shows the warning popups
 
   const [formData, setFormData] = useState({
@@ -44,7 +57,6 @@ const CoverLetter = () => {
   const [currentCoverLetterId, setCurrentCoverLetterId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
   const [creditsDeducted, setCreditsDeducted] = useState(false);
-
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
@@ -68,13 +80,12 @@ const CoverLetter = () => {
           console.log('Cover letter content received, updating UI');
           setResult(coverLetterContent);
           setIsGenerating(false);
-          
+
           // Deduct credits only after successful result display
           if (!creditsDeducted) {
             deductCredits(1.5, 'cover_letter', 'Credits deducted for cover letter generation');
             setCreditsDeducted(true);
           }
-          
           toast({
             title: "Cover Letter Generated!",
             description: "Your cover letter has been created successfully."
@@ -98,7 +109,10 @@ const CoverLetter = () => {
     const pollInterval = setInterval(async () => {
       console.log('Polling for cover letter updates...');
       try {
-        const { data, error } = await supabase.from('job_cover_letters').select('cover_letter').eq('id', currentCoverLetterId).single();
+        const {
+          data,
+          error
+        } = await supabase.from('job_cover_letters').select('cover_letter').eq('id', currentCoverLetterId).single();
         if (error) {
           console.error('Error polling for updates:', error);
           return;
@@ -107,13 +121,12 @@ const CoverLetter = () => {
           console.log('Cover letter found via polling, updating UI');
           setResult(data.cover_letter);
           setIsGenerating(false);
-          
+
           // Deduct credits only after successful result display
           if (!creditsDeducted) {
             deductCredits(1.5, 'cover_letter', 'Credits deducted for cover letter generation');
             setCreditsDeducted(true);
           }
-          
           toast({
             title: "Cover Letter Generated!",
             description: "Your cover letter has been created successfully."
@@ -128,7 +141,6 @@ const CoverLetter = () => {
       clearInterval(pollInterval);
     };
   }, [isGenerating, currentCoverLetterId, toast, creditsDeducted, deductCredits]);
-
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -139,13 +151,12 @@ const CoverLetter = () => {
   // Updated handleSubmit to only check credits, not deduct them
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Only check credits, don't deduct them yet
     if (!hasCredits) {
       showInsufficientCreditsPopup();
       return;
     }
-
     if (!user || !userProfile) {
       toast({
         title: "Authentication Required",
@@ -179,7 +190,10 @@ const CoverLetter = () => {
       console.log('Submitting cover letter request...');
 
       // Insert into database
-      const { data, error } = await supabase.from('job_cover_letters').insert({
+      const {
+        data,
+        error
+      } = await supabase.from('job_cover_letters').insert({
         user_id: userProfile.id,
         job_title: formData.job_title,
         company_name: formData.company_name,
@@ -207,7 +221,6 @@ const CoverLetter = () => {
       setIsSubmitting(false);
     }
   };
-
   const handleCopyResult = async () => {
     if (!result) return;
     try {
@@ -224,7 +237,6 @@ const CoverLetter = () => {
       });
     }
   };
-
   const resetForm = () => {
     setFormData({
       job_title: '',
@@ -236,15 +248,12 @@ const CoverLetter = () => {
     setCurrentCoverLetterId(null);
     setCreditsDeducted(false);
   };
-
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading...</div>
       </div>;
   }
-
-  return (
-    <SidebarProvider defaultOpen={true}>
+  return <SidebarProvider defaultOpen={true}>
       {/* Header for mobile */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
         <div className="flex items-center justify-between p-3">
@@ -253,11 +262,7 @@ const CoverLetter = () => {
             <span className="sr-only">Toggle navigation menu</span>
           </SidebarTrigger>
           <div className="flex items-center gap-2">
-            <img
-              src="/lovable-uploads/6239b4a7-4f3c-4902-a936-4216ae26d9af.png"
-              alt="JobBots Logo"
-              className="h-8 w-8 drop-shadow-lg"
-            />
+            <img src="/lovable-uploads/6239b4a7-4f3c-4902-a936-4216ae26d9af.png" alt="JobBots Logo" className="h-8 w-8 drop-shadow-lg" />
             <span className="font-orbitron font-extrabold text-2xl bg-gradient-to-r from-sky-300 via-fuchsia-400 to-indigo-300 bg-clip-text text-transparent drop-shadow-sm tracking-wider select-none relative whitespace-nowrap">
               JobBots
             </span>
@@ -266,7 +271,7 @@ const CoverLetter = () => {
       </header>
       <div className="min-h-screen flex w-full">
         <AppSidebar />
-        <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0 lg:pl-6">
+        <div className="flex-1 flex flex-col pt-28 lg:pt-0 lg:pl-6 bg-zinc-950">
           <main className="flex-1 w-full bg-transparent">
             <div className="min-h-screen w-full flex flex-col">
               {/* Header Section */}
@@ -378,11 +383,7 @@ const CoverLetter = () => {
                               <Copy className="w-4 h-4" />
                               Copy Cover Letter
                             </Button>
-                            <CoverLetterDownloadActions 
-                              coverLetter={result}
-                              jobTitle={formData.job_title}
-                              companyName={formData.company_name}
-                            />
+                            <CoverLetterDownloadActions coverLetter={result} jobTitle={formData.job_title} companyName={formData.company_name} />
                           </div>
                         </div>
                       </CardContent>
@@ -391,17 +392,11 @@ const CoverLetter = () => {
               </div>
 
               {/* History Modal */}
-              <CoverLetterHistoryModal 
-                isOpen={showHistory} 
-                onClose={() => setShowHistory(false)} 
-                gradientColors="from-pink-400 to-fuchsia-400" 
-              />
+              <CoverLetterHistoryModal isOpen={showHistory} onClose={() => setShowHistory(false)} gradientColors="from-pink-400 to-fuchsia-400" />
             </div>
           </main>
         </div>
       </div>
-    </SidebarProvider>
-  );
+    </SidebarProvider>;
 };
-
 export default CoverLetter;
