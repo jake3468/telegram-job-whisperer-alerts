@@ -20,6 +20,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Deploy to aspirely.ai
-        run: echo "🚀 Live deployment to aspirely.ai will be triggered here"
-
+      - name: SSH into VPS and Deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          port: ${{ secrets.VPS_PORT }}
+          key: ${{ secrets.VPS_KEY }}
+          script: |
+            cd /var/www/aspirely
+            git pull origin production
+            bun install
+            bun run build
+            pm2 restart aspirely
