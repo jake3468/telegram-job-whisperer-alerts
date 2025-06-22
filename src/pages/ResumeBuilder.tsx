@@ -35,7 +35,7 @@ const ResumeBuilder = () => {
         WebkitBackgroundClip: 'text',
         backgroundClip: 'text',
         color: 'transparent'
-      }} className="font-orbitron bg-gradient-to-r from-fuchsia-400 via-purple-400 to-pink-500 bg-clip-text text-transparent mb-2 drop-shadow tracking-tight text-5xl font-bold">
+      }} className="font-orbitron bg-gradient-to-r from-fuchsia-400 via-purple-400 to-pink-500 bg-clip-text text-transparent mb-2 drop-shadow tracking-tight font-bold text-4xl">
           Telegram <span className="italic">Resume</span> Bot
         </h1>
         <p className="text-md text-purple-100 font-inter font-light text-lg">
