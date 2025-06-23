@@ -710,6 +710,7 @@ export type Database = {
         Returns: {
           clerk_id: string
           jwt_sub: string
+          jwt_issuer: string
           current_setting_claims: string
           user_exists: boolean
           user_id_found: string
@@ -815,6 +816,15 @@ export type Database = {
       reset_monthly_credits: {
         Args: Record<PropertyKey, never>
         Returns: number
+      }
+      test_jwt_access: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          test_result: string
+          clerk_id: string
+          issuer: string
+          can_access_users: boolean
+        }[]
       }
       text_to_bytea: {
         Args: { data: string }
