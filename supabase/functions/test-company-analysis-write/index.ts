@@ -15,11 +15,35 @@ serve(async (req) => {
   try {
     console.log('Test function called - checking service role access to company_role_analyses')
     
+    // Get environment variables
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    
+    console.log('Environment check:', {
+      hasUrl: !!supabaseUrl,
+      hasServiceKey: !!serviceRoleKey,
+      urlValue: supabaseUrl ? supabaseUrl.substring(0, 30) + '...' : 'missing'
+    })
+    
+    if (!supabaseUrl || !serviceRoleKey) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Missing environment variables',
+          details: {
+            hasUrl: !!supabaseUrl,
+            hasServiceKey: !!serviceRoleKey
+          }
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+    
     // Initialize Supabase client with service role
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    const supabase = createClient(supabaseUrl, serviceRoleKey)
 
     // Test 1: Try to read from the table
     console.log('Test 1: Reading from company_role_analyses table...')
@@ -92,7 +116,11 @@ serve(async (req) => {
         success: true, 
         message: 'Service role access test passed',
         readCount: readData?.length || 0,
-        insertedRecord: insertData?.[0] || null
+        insertedRecord: insertData?.[0] || null,
+        environment: {
+          hasUrl: !!supabaseUrl,
+          hasServiceKey: !!serviceRoleKey
+        }
       }),
       { 
         status: 200, 
@@ -106,7 +134,8 @@ serve(async (req) => {
       JSON.stringify({ 
         success: false, 
         error: 'Test function error', 
-        details: error.message 
+        details: error.message,
+        stack: error.stack
       }),
       { 
         status: 500, 

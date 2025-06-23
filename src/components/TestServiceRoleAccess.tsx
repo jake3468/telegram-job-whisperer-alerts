@@ -20,11 +20,25 @@ export const TestServiceRoleAccess = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuemxveXloemhycXN2c2xoaHJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzAyMjIsImV4cCI6MjA2NDUwNjIyMn0.xdlgb_amJ1fV31uinCFotGW00isgT5-N8zJ_gLHEKuk'}`
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuemxveXloemhycXN2c2xoaHJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzAyMjIsImV4cCI6MjA2NDUwNjIyMn0.xdlgb_amJ1fV31uinCFotGW00isgT5-N8zJ_gLHEKuk`
         }
       });
 
-      const data = await response.json();
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+
+      if (!responseText.trim()) {
+        throw new Error('Empty response from server');
+      }
+
+      const data = JSON.parse(responseText);
       setResult(data);
 
       if (data.success) {
@@ -47,7 +61,11 @@ export const TestServiceRoleAccess = () => {
         description: "Failed to run service role test",
         variant: "destructive"
       });
-      setResult({ success: false, error: error.message });
+      setResult({ 
+        success: false, 
+        error: error.message,
+        stack: error.stack 
+      });
     } finally {
       setIsLoading(false);
     }
@@ -70,7 +88,7 @@ export const TestServiceRoleAccess = () => {
         {result && (
           <div className="mt-4 p-4 bg-gray-100 rounded-lg">
             <h3 className="font-bold mb-2">Test Result:</h3>
-            <pre className="text-sm overflow-auto">
+            <pre className="text-sm overflow-auto whitespace-pre-wrap">
               {JSON.stringify(result, null, 2)}
             </pre>
           </div>
