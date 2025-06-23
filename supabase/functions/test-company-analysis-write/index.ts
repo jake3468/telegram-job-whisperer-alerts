@@ -69,30 +69,78 @@ serve(async (req) => {
 
     console.log('Read test successful, found', readData?.length || 0, 'records')
 
-    // Test 2: Get a real user_profile ID to use for testing
-    console.log('Test 2: Getting a real user_profile ID...')
-    const { data: userProfiles, error: userProfileError } = await supabase
+    // Test 2: Get a real user_profile ID to use for testing, or create one if none exist
+    console.log('Test 2: Getting or creating a user_profile ID...')
+    let { data: userProfiles, error: userProfileError } = await supabase
       .from('user_profile')
       .select('id')
       .limit(1)
 
-    if (userProfileError || !userProfiles || userProfiles.length === 0) {
-      console.error('No user profiles found:', userProfileError)
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'No user profiles found for testing', 
-          details: userProfileError 
-        }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
-    }
+    let testUserId: string
 
-    const testUserId = userProfiles[0].id
-    console.log('Using user_profile ID for test:', testUserId)
+    if (userProfileError || !userProfiles || userProfiles.length === 0) {
+      console.log('No user profiles found, creating a test user and profile...')
+      
+      // Create a test user first
+      const { data: testUser, error: userError } = await supabase
+        .from('users')
+        .insert({
+          clerk_id: 'test_user_' + Date.now(),
+          email: 'test@example.com',
+          first_name: 'Test',
+          last_name: 'User'
+        })
+        .select()
+        .single()
+      
+      if (userError || !testUser) {
+        console.error('Failed to create test user:', userError)
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: 'Failed to create test user', 
+            details: userError 
+          }),
+          { 
+            status: 500, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        )
+      }
+
+      console.log('Created test user:', testUser.id)
+
+      // Create a test user profile
+      const { data: testProfile, error: profileError } = await supabase
+        .from('user_profile')
+        .insert({
+          user_id: testUser.id,
+          bio: 'Test user profile for service role testing'
+        })
+        .select()
+        .single()
+      
+      if (profileError || !testProfile) {
+        console.error('Failed to create test profile:', profileError)
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: 'Failed to create test profile', 
+            details: profileError 
+          }),
+          { 
+            status: 500, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        )
+      }
+
+      testUserId = testProfile.id
+      console.log('Created test profile with ID:', testUserId)
+    } else {
+      testUserId = userProfiles[0].id
+      console.log('Using existing user_profile ID for test:', testUserId)
+    }
 
     // Test 3: Try to insert a test record with real user_id
     console.log('Test 3: Inserting test record...')
