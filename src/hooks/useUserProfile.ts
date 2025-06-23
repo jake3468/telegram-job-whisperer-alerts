@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserInitialization } from './useUserInitialization';
 
 interface UserProfile {
   id: string;
@@ -19,6 +20,7 @@ export const useUserProfile = () => {
   const { user } = useUser();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const { initializeUser } = useUserInitialization();
 
   const fetchUserProfile = async () => {
     if (!user) {
@@ -27,14 +29,41 @@ export const useUserProfile = () => {
     }
 
     try {
+      console.log('Fetching user profile for:', user.id);
+
       // First get the user's database ID
-      const { data: userData, error: userError } = await supabase
+      let { data: userData, error: userError } = await supabase
         .from('users')
         .select('id')
         .eq('clerk_id', user.id)
         .single();
 
-      if (userError) {
+      // If user doesn't exist in Supabase, initialize them
+      if (userError && userError.code === 'PGRST116') {
+        console.log('User not found in Supabase, initializing...');
+        
+        const initResult = await initializeUser();
+        if (!initResult.success) {
+          console.error('Failed to initialize user:', initResult.error);
+          setLoading(false);
+          return;
+        }
+
+        // Try to fetch user data again after initialization
+        const { data: newUserData, error: newUserError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('clerk_id', user.id)
+          .single();
+
+        if (newUserError) {
+          console.error('Error fetching user after initialization:', newUserError);
+          setLoading(false);
+          return;
+        }
+
+        userData = newUserData;
+      } else if (userError) {
         console.error('Error fetching user:', userError);
         setLoading(false);
         return;
@@ -53,6 +82,7 @@ export const useUserProfile = () => {
         return;
       }
 
+      console.log('Successfully fetched user profile:', profileData.id);
       setUserProfile(profileData);
     } catch (error) {
       console.error('Error in fetchUserProfile:', error);
