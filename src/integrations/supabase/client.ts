@@ -19,15 +19,10 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   auth: {
     persistSession: false, // Disable Supabase auth since we're using Clerk
     autoRefreshToken: false,
-  },
-  global: {
-    headers: {
-      // Set initial headers - will be updated when token is set
-    }
   }
 });
 
-// Enhanced function to set Clerk JWT token with direct header setting
+// Enhanced function to set Clerk JWT token using Supabase's setSession
 export const setClerkToken = async (token: string | null) => {
   try {
     console.log('[setClerkToken] 🔄 Setting Clerk JWT token...');
@@ -57,29 +52,17 @@ export const setClerkToken = async (token: string | null) => {
 
       currentJWTToken = token;
       
-      // Set auth headers directly on the client without using the Headers constructor
+      // Use Supabase's setSession method to properly set the JWT
       try {
-        // Use Supabase's built-in auth method to set the token
-        supabase.auth.setSession({
+        await supabase.auth.setSession({
           access_token: token,
           refresh_token: '', // We don't use refresh tokens with Clerk
         });
         
-        console.log('[setClerkToken] ✅ Clerk JWT token set via auth session');
+        console.log('[setClerkToken] ✅ Clerk JWT token set via setSession');
       } catch (authError) {
-        console.warn('[setClerkToken] ⚠️ Auth session method failed, trying direct headers:', authError);
-        
-        // Fallback: Set headers directly on the client instance
-        // @ts-ignore - accessing private property for direct header setting
-        if (supabase.supabaseUrl && supabase.supabaseKey) {
-          // Set the authorization header directly without using Headers constructor
-          // @ts-ignore
-          supabase.headers = {
-            ...supabase.headers,
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          };
-        }
+        console.warn('[setClerkToken] ⚠️ setSession method failed:', authError);
+        return false;
       }
       
       console.log('[setClerkToken] ✅ Clerk JWT token set successfully');
@@ -151,32 +134,13 @@ export const testJWTTransmission = async () => {
   }
 };
 
-// Enhanced function to create authenticated storage client with proper JWT
+// Function to create authenticated storage client
 export const createAuthenticatedStorageClient = () => {
   if (!currentJWTToken) {
     console.warn('[createAuthenticatedStorageClient] ⚠️ No JWT token available for storage');
     return supabase.storage;
   }
 
-  // Create a new storage client with direct auth token
-  const storageClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    }
-  }).storage;
-
-  // Set the auth token directly on the storage client
-  try {
-    // @ts-ignore - setting auth token directly
-    storageClient.headers = {
-      'Authorization': `Bearer ${currentJWTToken}`,
-      'Content-Type': 'application/json'
-    };
-  } catch (error) {
-    console.warn('[createAuthenticatedStorageClient] ⚠️ Could not set storage headers:', error);
-  }
-
-  console.log('[createAuthenticatedStorageClient] 🗄️ Created authenticated storage client');
-  return storageClient;
+  console.log('[createAuthenticatedStorageClient] 🗄️ Using authenticated storage client');
+  return supabase.storage;
 };
