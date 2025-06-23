@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
-import { supabase, testJWTTransmission } from '@/integrations/supabase/client';
+import { supabase, testJWTTransmission, makeAuthenticatedRequest } from '@/integrations/supabase/client';
 import { useUserInitialization } from './useUserInitialization';
 
 interface UserProfile {
@@ -28,25 +28,27 @@ export const useUserProfile = () => {
   };
 
   const debugAuthentication = async () => {
-    securityAuditLog('Starting enhanced authentication state audit');
+    securityAuditLog('Starting enhanced authentication state audit with direct headers');
     securityAuditLog('Clerk user loaded:', isLoaded);
     securityAuditLog('Clerk user exists:', !!user);
     securityAuditLog('Clerk user ID:', user?.id);
 
     if (user) {
       try {
-        // Test JWT transmission directly
+        // Test JWT transmission with direct headers
         const jwtTest = await testJWTTransmission();
-        securityAuditLog('JWT transmission test result:', jwtTest);
+        securityAuditLog('JWT transmission test result with direct headers:', jwtTest);
 
-        // Test direct user lookup with enhanced error handling
-        const { data: userLookup, error: userError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('clerk_id', user.id)
-          .maybeSingle();
+        // Test direct user lookup with enhanced error handling and explicit auth
+        const { data: userLookup, error: userError } = await makeAuthenticatedRequest(() =>
+          supabase
+            .from('users')
+            .select('*')
+            .eq('clerk_id', user.id)
+            .maybeSingle()
+        );
 
-        securityAuditLog('Direct user lookup result:', userLookup ? 'Found' : 'Not found');
+        securityAuditLog('Direct user lookup result with auth headers:', userLookup ? 'Found' : 'Not found');
         if (userError) {
           securityAuditLog('Direct user lookup error details:', {
             message: userError.message,
@@ -75,24 +77,26 @@ export const useUserProfile = () => {
     }
 
     try {
-      securityAuditLog('Starting enhanced secure user profile fetch for:', user.id);
+      securityAuditLog('Starting enhanced secure user profile fetch with direct auth headers for:', user.id);
       setError(null);
 
-      // Enhanced authentication debugging
+      // Enhanced authentication debugging with direct headers
       await debugAuthentication();
 
       // Add a longer delay to ensure JWT is properly set and transmitted
       securityAuditLog('Waiting for JWT transmission to stabilize...');
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // First, try to get the user's database ID with enhanced error handling
-      let { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id, clerk_id, email, first_name, last_name')
-        .eq('clerk_id', user.id)
-        .maybeSingle();
+      // First, try to get the user's database ID with enhanced error handling and direct auth
+      let { data: userData, error: userError } = await makeAuthenticatedRequest(() =>
+        supabase
+          .from('users')
+          .select('id, clerk_id, email, first_name, last_name')
+          .eq('clerk_id', user.id)
+          .maybeSingle()
+      );
 
-      securityAuditLog('User lookup result:', userData ? 'Found' : 'Not found');
+      securityAuditLog('User lookup result with direct auth:', userData ? 'Found' : 'Not found');
       if (userError) {
         securityAuditLog('User lookup error details:', {
           message: userError.message,
@@ -114,11 +118,13 @@ export const useUserProfile = () => {
         }
 
         // Try to fetch user data again after initialization
-        const { data: newUserData, error: newUserError } = await supabase
-          .from('users')
-          .select('id, clerk_id, email, first_name, last_name')
-          .eq('clerk_id', user.id)
-          .maybeSingle();
+        const { data: newUserData, error: newUserError } = await makeAuthenticatedRequest(() =>
+          supabase
+            .from('users')
+            .select('id, clerk_id, email, first_name, last_name')
+            .eq('clerk_id', user.id)
+            .maybeSingle()
+        );
 
         if (newUserError || !newUserData) {
           securityAuditLog('Error fetching user after initialization:', newUserError);
@@ -133,7 +139,7 @@ export const useUserProfile = () => {
         
         // Provide specific error message for JWT issues
         if (userError.code === '42501' || userError.message.includes('permission')) {
-          setError('JWT authentication issue detected. Please check your Clerk JWT template configuration.');
+          setError('JWT authentication issue detected. Using enhanced direct header authentication.');
         } else {
           setError(`Error fetching user: ${userError.message}`);
         }
@@ -148,7 +154,7 @@ export const useUserProfile = () => {
         return;
       }
 
-      // Now get the user profile with enhanced error handling and retry logic
+      // Now get the user profile with enhanced error handling and direct auth headers
       let profileAttempts = 0;
       const maxAttempts = 3;
       let profileData = null;
@@ -156,13 +162,15 @@ export const useUserProfile = () => {
 
       while (profileAttempts < maxAttempts && !profileData) {
         profileAttempts++;
-        securityAuditLog(`User profile fetch attempt ${profileAttempts}/${maxAttempts}`);
+        securityAuditLog(`User profile fetch attempt ${profileAttempts}/${maxAttempts} with direct auth headers`);
 
-        const profileResult = await supabase
-          .from('user_profile')
-          .select('*')
-          .eq('user_id', userData.id)
-          .maybeSingle();
+        const profileResult = await makeAuthenticatedRequest(() =>
+          supabase
+            .from('user_profile')
+            .select('*')
+            .eq('user_id', userData.id)
+            .maybeSingle()
+        );
 
         profileData = profileResult.data;
         profileError = profileResult.error;
@@ -176,7 +184,7 @@ export const useUserProfile = () => {
 
           // If it's a permission error, wait a bit and retry
           if (profileError.code === '42501' || profileError.message.includes('permission')) {
-            securityAuditLog('Permission error detected, waiting before retry...');
+            securityAuditLog('Permission error detected with direct auth, waiting before retry...');
             await new Promise(resolve => setTimeout(resolve, 1000));
           } else {
             break; // Non-permission error, don't retry
@@ -184,10 +192,10 @@ export const useUserProfile = () => {
         }
       }
 
-      securityAuditLog('User profile lookup result:', profileData ? 'Accessible' : 'Not accessible');
+      securityAuditLog('User profile lookup result with direct auth:', profileData ? 'Accessible' : 'Not accessible');
       
       if (profileError) {
-        securityAuditLog('Final profile lookup error:', {
+        securityAuditLog('Final profile lookup error with direct auth:', {
           message: profileError.message,
           code: profileError.code,
           details: profileError.details
@@ -195,7 +203,7 @@ export const useUserProfile = () => {
         
         // Provide specific error message for JWT/RLS issues
         if (profileError.code === '42501' || profileError.message.includes('permission')) {
-          setError('Profile access blocked by RLS. This indicates a JWT authentication issue. Please verify your Clerk JWT template includes "aud": "authenticated" and "role": "authenticated".');
+          setError('Profile access blocked by RLS even with direct auth headers. RLS policy may need adjustment.');
         } else {
           setError(`Error fetching profile: ${profileError.message}`);
         }
@@ -204,17 +212,17 @@ export const useUserProfile = () => {
       }
 
       if (!profileData) {
-        securityAuditLog('No profile found after all attempts');
-        setError('Profile not found - possible RLS policy issue');
+        securityAuditLog('No profile found after all attempts with direct auth');
+        setError('Profile not found - checking RLS policy configuration');
         setLoading(false);
         return;
       }
 
-      securityAuditLog('Successfully fetched user profile with enhanced security:', profileData.id);
+      securityAuditLog('Successfully fetched user profile with enhanced direct auth:', profileData.id);
       setUserProfile(profileData);
       setError(null);
     } catch (error) {
-      securityAuditLog('Error in fetchUserProfile:', error);
+      securityAuditLog('Error in fetchUserProfile with direct auth:', error);
       setError(`Unexpected error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
@@ -228,24 +236,26 @@ export const useUserProfile = () => {
     }
 
     try {
-      securityAuditLog('Attempting secure profile update for:', userProfile.id);
+      securityAuditLog('Attempting secure profile update with direct auth for:', userProfile.id);
       
-      const { error } = await supabase
-        .from('user_profile')
-        .update(updates)
-        .eq('id', userProfile.id);
+      const { error } = await makeAuthenticatedRequest(() =>
+        supabase
+          .from('user_profile')
+          .update(updates)
+          .eq('id', userProfile.id)
+      );
 
       if (error) {
-        securityAuditLog('Error updating user profile:', error);
+        securityAuditLog('Error updating user profile with direct auth:', error);
         return { error: error.message };
       }
 
       // Update local state
       setUserProfile(prev => prev ? { ...prev, ...updates } : null);
-      securityAuditLog('Profile updated successfully');
+      securityAuditLog('Profile updated successfully with direct auth');
       return { error: null };
     } catch (error) {
-      securityAuditLog('Error in updateUserProfile:', error);
+      securityAuditLog('Error in updateUserProfile with direct auth:', error);
       return { error: 'Failed to update profile' };
     }
   };

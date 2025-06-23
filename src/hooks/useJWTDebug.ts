@@ -1,12 +1,13 @@
 
 import { useAuth } from '@clerk/clerk-react';
-import { testJWTTransmission, getCurrentJWTToken } from '@/integrations/supabase/client';
+import { testJWTTransmission, getCurrentJWTToken, makeAuthenticatedRequest } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useJWTDebug = () => {
   const { getToken, isSignedIn, userId } = useAuth();
 
   const runComprehensiveJWTTest = async () => {
-    console.log('\n🔍 === COMPREHENSIVE JWT DEBUG TEST ===');
+    console.log('\n🔍 === COMPREHENSIVE JWT DEBUG TEST WITH DIRECT AUTH ===');
     console.log('📋 Test Parameters:');
     console.log('  - Signed In:', isSignedIn);
     console.log('  - User ID:', userId);
@@ -59,8 +60,8 @@ export const useJWTDebug = () => {
       console.log('  - Token stored:', currentToken ? '✅ YES' : '❌ NO');
       console.log('  - Tokens match:', (freshToken === currentToken) ? '✅ YES' : '❌ NO');
 
-      // Test 3: Test JWT transmission to Supabase with detailed analysis
-      console.log('\n🔗 Test 3: JWT Transmission to Supabase');
+      // Test 3: Test JWT transmission to Supabase with direct auth headers
+      console.log('\n🔗 Test 3: JWT Transmission with Direct Auth Headers');
       const transmissionTest = await testJWTTransmission();
       console.log('  - Transmission successful:', transmissionTest.data ? '✅ YES' : '❌ NO');
       console.log('  - Transmission error:', transmissionTest.error?.message || 'None');
@@ -74,18 +75,40 @@ export const useJWTDebug = () => {
         
         // Provide specific diagnosis
         if (!result.clerk_id) {
-          console.error('\n🚨 DIAGNOSIS: JWT NOT REACHING SUPABASE BACKEND');
+          console.error('\n🚨 DIAGNOSIS: JWT WITH DIRECT HEADERS NOT REACHING SUPABASE BACKEND');
           console.error('  - Possible causes:');
-          console.error('  1. Missing "aud": "authenticated" in Clerk JWT template');
-          console.error('  2. Missing "role": "authenticated" in Clerk JWT template');
-          console.error('  3. JWT transmission mechanism failing');
-          console.error('  4. Supabase RLS function not extracting claims properly');
+          console.error('  1. Direct header injection not working properly');
+          console.error('  2. Supabase client proxy not intercepting requests');
+          console.error('  3. RLS function not extracting claims from Authorization header');
+          console.error('  4. JWT format or encoding issue');
         } else {
-          console.log('\n✅ SUCCESS: JWT properly recognized by Supabase!');
+          console.log('\n✅ SUCCESS: JWT with direct headers properly recognized by Supabase!');
         }
       }
 
-      console.log('\n✅ === JWT DEBUG TEST COMPLETE ===\n');
+      // Test 4: Test direct authenticated request to user_profile
+      console.log('\n👤 Test 4: Direct Profile Access with Auth Headers');
+      try {
+        const { data: profileData, error: profileError } = await makeAuthenticatedRequest(() =>
+          supabase
+            .from('user_profile')
+            .select('id, user_id, bio, created_at')
+            .limit(1)
+        );
+
+        console.log('  - Profile query successful:', !profileError ? '✅ YES' : '❌ NO');
+        if (profileError) {
+          console.log('  - Profile error:', profileError.message);
+          console.log('  - Profile error code:', profileError.code);
+        } else {
+          console.log('  - Profile data accessible:', profileData ? '✅ YES' : '❌ NO');
+          console.log('  - Profile records found:', profileData?.length || 0);
+        }
+      } catch (error) {
+        console.error('  - Profile access test failed:', error);
+      }
+
+      console.log('\n✅ === JWT DEBUG TEST WITH DIRECT AUTH COMPLETE ===\n');
 
       return {
         success: true,
@@ -105,7 +128,7 @@ export const useJWTDebug = () => {
       };
 
     } catch (error) {
-      console.error('❌ JWT Debug Test Error:', error);
+      console.error('❌ JWT Debug Test with Direct Auth Error:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
   };
