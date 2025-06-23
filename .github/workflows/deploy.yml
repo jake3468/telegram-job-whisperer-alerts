@@ -34,30 +34,32 @@ jobs:
         run: echo "✅ Preview build triggered from main branch with development Clerk key"
 
   deploy-production:
-    if: github.ref == 'refs/heads/production'
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm install
-      
-      - name: Build for production
-        env:
-          VITE_CLERK_PUBLISHABLE_KEY_DEV: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY_DEV }}
-          VITE_CLERK_PUBLISHABLE_KEY_PROD: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY_PROD }}
-        run: npm run build
-      
-      - name: Deploy to aspirely.ai
-        run: echo "🚀 Live deployment to aspirely.ai will be triggered here with production Clerk key"
-        
+  if: github.ref == 'refs/heads/production'
+  runs-on: ubuntu-latest
+  environment: production
+  steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Build for production
+      env:
+        VITE_CLERK_PUBLISHABLE_KEY_DEV: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY_DEV }}
+        VITE_CLERK_PUBLISHABLE_KEY_PROD: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY_PROD }}
+      run: npm run build
+    
+    - name: Trigger Netlify Build
+      run: |
+        echo "🚀 Netlify will automatically deploy from production branch"
+        echo "Environment variables are configured in Netlify dashboard"
+
       # Add your actual deployment steps here
       # For example, if using Vercel, Netlify, or other hosting providers
       # - name: Deploy to Production
