@@ -10,6 +10,7 @@ import JWTDebugPanel from '@/components/JWTDebugPanel';
 import ClerkJWTSetupGuide from '@/components/ClerkJWTSetupGuide';
 import { Layout } from '@/components/Layout';
 import { useJWTDebug } from '@/hooks/useJWTDebug';
+import { Environment } from '@/utils/environment';
 
 const Profile = () => {
   const { user, isLoaded } = useUser();
@@ -23,9 +24,9 @@ const Profile = () => {
     }
   }, [user, isLoaded, navigate]);
 
-  // Check JWT setup on component mount
+  // Check JWT setup on component mount (only in development)
   useEffect(() => {
-    if (isLoaded && user) {
+    if (isLoaded && user && Environment.isDevelopment()) {
       const checkJWTSetup = async () => {
         const testResult = await runComprehensiveJWTTest();
         
@@ -35,8 +36,8 @@ const Profile = () => {
         }
       };
       
-      // Run the check after a short delay to ensure sync has completed
-      setTimeout(checkJWTSetup, 2000);
+      // Run the check after a short delay
+      setTimeout(checkJWTSetup, 1000);
     }
   }, [isLoaded, user, runComprehensiveJWTTest]);
 
@@ -59,8 +60,8 @@ const Profile = () => {
         </p>
       </div>
 
-      {/* Show JWT Setup Guide if needed */}
-      {showJWTSetupGuide && (
+      {/* Show JWT Setup Guide if needed (development only) */}
+      {showJWTSetupGuide && Environment.isDevelopment() && (
         <div className="mb-8 flex justify-center">
           <ClerkJWTSetupGuide />
         </div>
@@ -72,7 +73,7 @@ const Profile = () => {
       </div>
       
       {/* Debug Panels - only in development */}
-      {import.meta.env.DEV && (
+      {Environment.isDevelopment() && (
         <>
           <AuthDebugPanel />
           <JWTDebugPanel />

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { supabase, testJWTTransmission, makeAuthenticatedRequest } from '@/integrations/supabase/client';
 import { useUserInitialization } from './useUserInitialization';
+import { Environment } from '@/utils/environment';
 
 interface UserProfile {
   id: string;
@@ -23,71 +24,35 @@ export const useUserProfile = () => {
   const [error, setError] = useState<string | null>(null);
   const { initializeUser } = useUserInitialization();
 
-  const securityAuditLog = (message: string, data?: any) => {
-    console.log(`[SECURITY-AUDIT] ${message}`, data ? data : '');
-  };
-
-  const debugAuthentication = async () => {
-    securityAuditLog('Starting authentication state audit');
-    securityAuditLog('Clerk user loaded:', isLoaded);
-    securityAuditLog('Clerk user exists:', !!user);
-    securityAuditLog('Clerk user ID:', user?.id);
-
-    if (user) {
-      try {
-        // Test JWT transmission
-        const jwtTest = await testJWTTransmission();
-        securityAuditLog('JWT transmission test result:', jwtTest);
-
-        // Test direct user lookup with enhanced error handling
-        const { data: userLookup, error: userError } = await makeAuthenticatedRequest(async () => {
-          return await supabase
-            .from('users')
-            .select('*')
-            .eq('clerk_id', user.id)
-            .maybeSingle();
-        }, 'debug user lookup');
-
-        securityAuditLog('Direct user lookup result:', userLookup ? 'Found' : 'Not found');
-        if (userError) {
-          securityAuditLog('Direct user lookup error details:', {
-            message: userError.message,
-            code: userError.code,
-            details: userError.details
-          });
-        }
-
-      } catch (error) {
-        securityAuditLog('Authentication debug error:', error);
-      }
+  const debugLog = (message: string, data?: any) => {
+    if (Environment.isDevelopment()) {
+      console.log(`[UserProfile] ${message}`, data ? data : '');
     }
   };
 
   const fetchUserProfile = async () => {
     if (!isLoaded) {
-      securityAuditLog('Clerk not loaded yet, waiting...');
+      debugLog('Clerk not loaded yet, waiting...');
       return;
     }
 
     if (!user) {
-      securityAuditLog('No user found, stopping fetch');
+      debugLog('No user found, stopping fetch');
       setLoading(false);
       setError(null);
       return;
     }
 
     try {
-      securityAuditLog('Starting secure user profile fetch for:', user.id);
       setError(null);
+      debugLog('Starting user profile fetch for:', user.id);
 
-      // Enhanced authentication debugging
-      await debugAuthentication();
+      // Reduced stabilization delay for production
+      const stabilizationDelay = Environment.isProduction() ? 300 : 800;
+      debugLog(`Waiting ${stabilizationDelay}ms for JWT transmission to stabilize...`);
+      await new Promise(resolve => setTimeout(resolve, stabilizationDelay));
 
-      // Add a delay to ensure JWT is properly set and transmitted
-      securityAuditLog('Waiting for JWT transmission to stabilize...');
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // First, try to get the user's database ID with enhanced error handling
+      // Get user's database ID
       const { data: userData, error: userError } = await makeAuthenticatedRequest(async () => {
         return await supabase
           .from('users')
@@ -96,31 +61,23 @@ export const useUserProfile = () => {
           .maybeSingle();
       }, 'user lookup');
 
-      securityAuditLog('User lookup result:', userData ? 'Found' : 'Not found');
-      if (userError) {
-        securityAuditLog('User lookup error details:', {
-          message: userError.message,
-          code: userError.code,
-          details: userError.details
-        });
-      }
+      debugLog('User lookup result:', userData ? 'Found' : 'Not found');
 
-      // Use let instead of const for userData since we might reassign it
       let finalUserData = userData;
 
-      // If user doesn't exist in Supabase, initialize them
+      // If user doesn't exist, initialize them
       if (!userData && !userError) {
-        securityAuditLog('User not found in Supabase, initializing...');
+        debugLog('User not found in Supabase, initializing...');
         
         const initResult = await initializeUser();
         if (!initResult.success) {
-          securityAuditLog('Failed to initialize user:', initResult.error);
+          debugLog('Failed to initialize user:', initResult.error);
           setError(`Failed to initialize user: ${initResult.error}`);
           setLoading(false);
           return;
         }
 
-        // Try to fetch user data again after initialization
+        // Fetch user data after initialization
         const { data: newUserData, error: newUserError } = await makeAuthenticatedRequest(async () => {
           return await supabase
             .from('users')
@@ -130,7 +87,7 @@ export const useUserProfile = () => {
         }, 'user lookup after initialization');
 
         if (newUserError || !newUserData) {
-          securityAuditLog('Error fetching user after initialization:', newUserError);
+          debugLog('Error fetching user after initialization:', newUserError);
           setError(`Error fetching user after initialization: ${newUserError?.message}`);
           setLoading(false);
           return;
@@ -138,13 +95,13 @@ export const useUserProfile = () => {
 
         finalUserData = newUserData;
       } else if (userError) {
-        securityAuditLog('Error fetching user:', userError);
+        debugLog('Error fetching user:', userError);
         
-        // Provide specific error message for JWT issues
+        // Provide specific error messages
         if (userError.code === '42501' || userError.message.includes('permission')) {
-          setError('JWT authentication issue detected. Please check your authentication configuration.');
+          setError('Authentication issue detected. Please refresh the page.');
         } else if (userError.code === 'PGRST301' || userError.message.includes('JWSError')) {
-          setError('JWT signature validation failed. Supabase cannot verify the Clerk JWT.');
+          setError('JWT authentication failed. Please refresh the page.');
         } else {
           setError(`Error fetching user: ${userError.message}`);
         }
@@ -153,21 +110,19 @@ export const useUserProfile = () => {
       }
 
       if (!finalUserData) {
-        securityAuditLog('No user data available after all attempts');
-        setError('Unable to load user data - possible JWT configuration issue');
+        debugLog('No user data available after all attempts');
+        setError('Unable to load user data. Please refresh the page.');
         setLoading(false);
         return;
       }
 
-      // Now get the user profile with enhanced error handling
-      let profileAttempts = 0;
-      const maxAttempts = 3;
+      // Get user profile with optimized retry logic
+      const maxAttempts = Environment.isProduction() ? 2 : 3;
       let profileData = null;
       let profileError = null;
 
-      while (profileAttempts < maxAttempts && !profileData) {
-        profileAttempts++;
-        securityAuditLog(`User profile fetch attempt ${profileAttempts}/${maxAttempts}`);
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        debugLog(`Profile fetch attempt ${attempt}/${maxAttempts}`);
 
         const profileResult = await makeAuthenticatedRequest(async () => {
           return await supabase
@@ -175,45 +130,34 @@ export const useUserProfile = () => {
             .select('*')
             .eq('user_id', finalUserData.id)
             .maybeSingle();
-        }, `profile fetch attempt ${profileAttempts}`);
+        }, `profile fetch attempt ${attempt}`);
 
         profileData = profileResult.data;
         profileError = profileResult.error;
 
-        if (profileError) {
-          securityAuditLog(`Profile fetch attempt ${profileAttempts} error:`, {
-            message: profileError.message,
-            code: profileError.code,
-            details: profileError.details
-          });
+        if (!profileError) {
+          break; // Success
+        }
 
-          // If it's a permission error, wait a bit and retry
-          if (profileError.code === '42501' || profileError.message.includes('permission')) {
-            securityAuditLog('Permission error detected, waiting before retry...');
-            await new Promise(resolve => setTimeout(resolve, 1000));
-          } else if (profileError.code === 'PGRST301' || profileError.message.includes('JWSError')) {
-            securityAuditLog('JWT signature error detected, stopping retries...');
-            break; // Don't retry JWT signature errors
-          } else {
-            break; // Non-permission error, don't retry
-          }
+        // Only retry on permission errors and only in development
+        if ((profileError.code === '42501' || profileError.message.includes('permission')) && 
+            attempt < maxAttempts && Environment.isDevelopment()) {
+          debugLog('Permission error, retrying...');
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } else {
+          break; // Don't retry other errors or in production
         }
       }
 
-      securityAuditLog('User profile lookup result:', profileData ? 'Accessible' : 'Not accessible');
+      debugLog('Profile lookup result:', profileData ? 'Accessible' : 'Not accessible');
       
       if (profileError) {
-        securityAuditLog('Final profile lookup error:', {
-          message: profileError.message,
-          code: profileError.code,
-          details: profileError.details
-        });
+        debugLog('Profile lookup error:', profileError);
         
-        // Provide specific error message for JWT/RLS issues
         if (profileError.code === '42501' || profileError.message.includes('permission')) {
-          setError('Profile access blocked by RLS. RLS policy may need adjustment.');
+          setError('Profile access denied. Please refresh the page.');
         } else if (profileError.code === 'PGRST301' || profileError.message.includes('JWSError')) {
-          setError('JWT signature validation failed. Supabase cannot verify the Clerk JWT signature.');
+          setError('Authentication failed. Please refresh the page.');
         } else {
           setError(`Error fetching profile: ${profileError.message}`);
         }
@@ -222,17 +166,17 @@ export const useUserProfile = () => {
       }
 
       if (!profileData) {
-        securityAuditLog('No profile found after all attempts');
-        setError('Profile not found - checking RLS policy configuration');
+        debugLog('No profile found');
+        setError('Profile not found. Please contact support.');
         setLoading(false);
         return;
       }
 
-      securityAuditLog('Successfully fetched user profile:', profileData.id);
+      debugLog('Successfully fetched user profile:', profileData.id);
       setUserProfile(profileData);
       setError(null);
     } catch (error) {
-      securityAuditLog('Error in fetchUserProfile:', error);
+      debugLog('Error in fetchUserProfile:', error);
       setError(`Unexpected error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
@@ -241,12 +185,12 @@ export const useUserProfile = () => {
 
   const updateUserProfile = async (updates: Partial<Omit<UserProfile, 'id' | 'user_id' | 'created_at'>>) => {
     if (!user || !userProfile) {
-      securityAuditLog('Update attempt without authentication or profile');
+      debugLog('Update attempt without authentication or profile');
       return { error: 'User not authenticated or profile not loaded' };
     }
 
     try {
-      securityAuditLog('Attempting secure profile update for:', userProfile.id);
+      debugLog('Attempting profile update for:', userProfile.id);
       
       const { error } = await makeAuthenticatedRequest(async () => {
         return await supabase
@@ -256,16 +200,16 @@ export const useUserProfile = () => {
       }, 'profile update');
 
       if (error) {
-        securityAuditLog('Error updating user profile:', error);
+        debugLog('Error updating user profile:', error);
         return { error: error.message };
       }
 
       // Update local state
       setUserProfile(prev => prev ? { ...prev, ...updates } : null);
-      securityAuditLog('Profile updated successfully');
+      debugLog('Profile updated successfully');
       return { error: null };
     } catch (error) {
-      securityAuditLog('Error in updateUserProfile:', error);
+      debugLog('Error in updateUserProfile:', error);
       return { error: 'Failed to update profile' };
     }
   };

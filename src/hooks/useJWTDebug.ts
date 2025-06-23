@@ -2,12 +2,45 @@
 import { useAuth } from '@clerk/clerk-react';
 import { testJWTTransmission, getCurrentJWTToken, makeAuthenticatedRequest } from '@/integrations/supabase/client';
 import { supabase } from '@/integrations/supabase/client';
+import { Environment } from '@/utils/environment';
 
 export const useJWTDebug = () => {
   const { getToken, isSignedIn, userId } = useAuth();
 
   const runComprehensiveJWTTest = async () => {
-    console.log('\n🔍 === COMPREHENSIVE JWT DEBUG TEST WITH DIRECT AUTH ===');
+    // Only run comprehensive tests in development
+    if (Environment.isProduction()) {
+      console.log('🔍 JWT Debug: Production mode - running minimal test');
+      
+      if (!isSignedIn || !getToken) {
+        return { success: false, error: 'Not signed in' };
+      }
+
+      try {
+        const freshToken = await getToken({ template: 'supabase', skipCache: true });
+        const transmissionTest = await testJWTTransmission();
+        
+        return {
+          success: true,
+          hasToken: !!freshToken,
+          jwtRecognized: transmissionTest.data?.[0]?.clerk_id ? true : false,
+          hasRequiredClaims: freshToken ? (() => {
+            try {
+              const payload = JSON.parse(atob(freshToken.split('.')[1]));
+              return payload.aud === 'authenticated' && payload.role === 'authenticated';
+            } catch {
+              return false;
+            }
+          })() : false
+        };
+      } catch (error) {
+        console.error('JWT Debug Error:', error);
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+      }
+    }
+
+    // Full debug test for development
+    console.log('\n🔍 === COMPREHENSIVE JWT DEBUG TEST ===');
     console.log('📋 Test Parameters:');
     console.log('  - Signed In:', isSignedIn);
     console.log('  - User ID:', userId);
@@ -61,7 +94,7 @@ export const useJWTDebug = () => {
       console.log('  - Tokens match:', (freshToken === currentToken) ? '✅ YES' : '❌ NO');
 
       // Test 3: Test JWT transmission to Supabase
-      console.log('\n🔗 Test 3: JWT Transmission with Direct Auth Headers');
+      console.log('\n🔗 Test 3: JWT Transmission Test');
       const transmissionTest = await testJWTTransmission();
       console.log('  - Transmission successful:', transmissionTest.data ? '✅ YES' : '❌ NO');
       console.log('  - Transmission error:', transmissionTest.error?.message || 'None');
@@ -71,44 +104,16 @@ export const useJWTDebug = () => {
         console.log('  - JWT recognized by Supabase:', result.clerk_id ? '✅ YES' : '❌ NO');
         console.log('  - Auth role from Supabase:', result.auth_role || 'NOT_SET');
         console.log('  - User exists in DB:', result.user_exists ? '✅ YES' : '❌ NO');
-        console.log('  - Raw JWT claims setting:', result.current_setting_claims || 'NOT_AVAILABLE');
         
-        // Provide specific diagnosis
         if (!result.clerk_id) {
-          console.error('\n🚨 DIAGNOSIS: JWT WITH DIRECT HEADERS NOT REACHING SUPABASE BACKEND');
-          console.error('  - Possible causes:');
-          console.error('  1. Direct header injection not working properly');
-          console.error('  2. Supabase client proxy not intercepting requests');
-          console.error('  3. RLS function not extracting claims from Authorization header');
-          console.error('  4. JWT format or encoding issue');
+          console.error('\n🚨 DIAGNOSIS: JWT NOT REACHING SUPABASE BACKEND');
+          console.error('  - Check JWT secret configuration in Clerk and Supabase');
         } else {
-          console.log('\n✅ SUCCESS: JWT with direct headers properly recognized by Supabase!');
+          console.log('\n✅ SUCCESS: JWT properly recognized by Supabase!');
         }
       }
 
-      // Test 4: Test direct authenticated request to user_profile
-      console.log('\n👤 Test 4: Direct Profile Access with Auth Headers');
-      try {
-        const { data: profileData, error: profileError } = await makeAuthenticatedRequest(async () => {
-          return await supabase
-            .from('user_profile')
-            .select('id, user_id, bio, created_at')
-            .limit(1);
-        }, 'profile access test');
-
-        console.log('  - Profile query successful:', !profileError ? '✅ YES' : '❌ NO');
-        if (profileError) {
-          console.log('  - Profile error:', profileError.message);
-          console.log('  - Profile error code:', profileError.code);
-        } else {
-          console.log('  - Profile data accessible:', profileData ? '✅ YES' : '❌ NO');
-          console.log('  - Profile records found:', profileData?.length || 0);
-        }
-      } catch (error) {
-        console.error('  - Profile access test failed:', error);
-      }
-
-      console.log('\n✅ === JWT DEBUG TEST WITH DIRECT AUTH COMPLETE ===\n');
+      console.log('\n✅ === JWT DEBUG TEST COMPLETE ===\n');
 
       return {
         success: true,
@@ -128,7 +133,7 @@ export const useJWTDebug = () => {
       };
 
     } catch (error) {
-      console.error('❌ JWT Debug Test with Direct Auth Error:', error);
+      console.error('❌ JWT Debug Test Error:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
   };
