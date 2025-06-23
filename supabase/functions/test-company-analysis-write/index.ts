@@ -13,143 +13,130 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Test function called - checking service role access to company_role_analyses')
+    console.log('Testing service role access to company_role_analyses after RLS policy reset')
     
-    // Get environment variables
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    
-    console.log('Environment check:', {
-      hasUrl: !!supabaseUrl,
-      hasServiceKey: !!serviceRoleKey,
-      urlValue: supabaseUrl ? supabaseUrl.substring(0, 30) + '...' : 'missing'
-    })
     
     if (!supabaseUrl || !serviceRoleKey) {
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Missing environment variables',
-          details: {
-            hasUrl: !!supabaseUrl,
-            hasServiceKey: !!serviceRoleKey
-          }
+          error: 'Missing environment variables' 
         }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
     
     // Initialize Supabase client with service role
     const supabase = createClient(supabaseUrl, serviceRoleKey)
 
-    // Test 1: Try to read from the table
-    console.log('Test 1: Reading from company_role_analyses table...')
+    // Test 1: Check current RLS policies
+    console.log('Step 1: Checking RLS policies...')
+    const { data: policies, error: policiesError } = await supabase
+      .rpc('exec', {
+        sql: `SELECT schemaname, tablename, policyname, roles, cmd, qual, with_check 
+              FROM pg_policies 
+              WHERE tablename = 'company_role_analyses' 
+              ORDER BY policyname;`
+      })
+
+    console.log('Current RLS policies:', policies)
+
+    // Test 2: Read existing records
+    console.log('Step 2: Testing SELECT access...')
     const { data: readData, error: readError } = await supabase
       .from('company_role_analyses')
-      .select('*')
-      .limit(5)
+      .select('id, company_name, job_title, created_at')
+      .limit(3)
 
     if (readError) {
-      console.error('Read test failed:', readError)
+      console.error('READ failed:', readError)
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Read test failed', 
+          error: 'Service role cannot read from table', 
           details: readError 
         }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    console.log('Read test successful, found', readData?.length || 0, 'records')
+    console.log('READ test passed. Found', readData?.length || 0, 'existing records')
 
-    // Test 2: Get a real user_profile ID to use for testing, or create one if none exist
-    console.log('Test 2: Getting or creating a user_profile ID...')
-    let { data: userProfiles, error: userProfileError } = await supabase
+    // Test 3: Get a valid user_profile ID
+    console.log('Step 3: Getting user_profile ID for test...')
+    const { data: userProfiles, error: profileError } = await supabase
       .from('user_profile')
       .select('id')
       .limit(1)
 
     let testUserId: string
 
-    if (userProfileError || !userProfiles || userProfiles.length === 0) {
-      console.log('No user profiles found, creating a test user and profile...')
+    if (profileError || !userProfiles || userProfiles.length === 0) {
+      console.log('No user profiles found, creating test data...')
       
-      // Create a test user first
+      // Create test user
       const { data: testUser, error: userError } = await supabase
         .from('users')
         .insert({
-          clerk_id: 'test_user_' + Date.now(),
-          email: 'test@example.com',
-          first_name: 'Test',
-          last_name: 'User'
+          clerk_id: 'test_service_' + Date.now(),
+          email: 'test-service@example.com',
+          first_name: 'Service',
+          last_name: 'Test'
         })
         .select()
         .single()
       
-      if (userError || !testUser) {
+      if (userError) {
         console.error('Failed to create test user:', userError)
         return new Response(
           JSON.stringify({ 
             success: false, 
-            error: 'Failed to create test user', 
+            error: 'Cannot create test user', 
             details: userError 
           }),
-          { 
-            status: 500, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-          }
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
       }
 
-      console.log('Created test user:', testUser.id)
-
-      // Create a test user profile
-      const { data: testProfile, error: profileError } = await supabase
+      // Create test profile
+      const { data: testProfile, error: profileCreateError } = await supabase
         .from('user_profile')
         .insert({
           user_id: testUser.id,
-          bio: 'Test user profile for service role testing'
+          bio: 'Test profile for service role testing'
         })
         .select()
         .single()
       
-      if (profileError || !testProfile) {
-        console.error('Failed to create test profile:', profileError)
+      if (profileCreateError) {
+        console.error('Failed to create test profile:', profileCreateError)
         return new Response(
           JSON.stringify({ 
             success: false, 
-            error: 'Failed to create test profile', 
-            details: profileError 
+            error: 'Cannot create test profile', 
+            details: profileCreateError 
           }),
-          { 
-            status: 500, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-          }
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
       }
 
       testUserId = testProfile.id
-      console.log('Created test profile with ID:', testUserId)
     } else {
       testUserId = userProfiles[0].id
-      console.log('Using existing user_profile ID for test:', testUserId)
     }
 
-    // Test 3: Try to insert a test record with real user_id
-    console.log('Test 3: Inserting test record...')
+    console.log('Using user_profile ID:', testUserId)
+
+    // Test 4: INSERT test
+    console.log('Step 4: Testing INSERT access...')
     const testRecord = {
       user_id: testUserId,
-      company_name: 'Test Company ' + Date.now(),
+      company_name: 'Service Role Test Company ' + Date.now(),
       location: 'Test Location',
       job_title: 'Test Position',
-      local_role_market_context: 'This is a test record created by service role'
+      local_role_market_context: 'Service role insert test - ' + new Date().toISOString()
     }
 
     const { data: insertData, error: insertError } = await supabase
@@ -158,25 +145,41 @@ serve(async (req) => {
       .select()
 
     if (insertError) {
-      console.error('Insert test failed:', insertError)
+      console.error('INSERT failed:', insertError)
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Insert test failed', 
+          error: 'Service role cannot insert into table', 
           details: insertError,
-          testRecord
+          testRecord: testRecord
         }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    console.log('Insert test successful:', insertData)
+    console.log('INSERT test passed:', insertData?.[0]?.id)
 
-    // Test 4: Clean up the test record
+    // Test 5: UPDATE test
     if (insertData && insertData.length > 0) {
+      console.log('Step 5: Testing UPDATE access...')
+      const { data: updateData, error: updateError } = await supabase
+        .from('company_role_analyses')
+        .update({ 
+          local_role_market_context: 'Updated by service role - ' + new Date().toISOString() 
+        })
+        .eq('id', insertData[0].id)
+        .select()
+
+      if (updateError) {
+        console.error('UPDATE failed:', updateError)
+      } else {
+        console.log('UPDATE test passed')
+      }
+    }
+
+    // Test 6: Cleanup
+    if (insertData && insertData.length > 0) {
+      console.log('Step 6: Cleaning up test record...')
       const { error: deleteError } = await supabase
         .from('company_role_analyses')
         .delete()
@@ -185,26 +188,23 @@ serve(async (req) => {
       if (deleteError) {
         console.log('Warning: Could not clean up test record:', deleteError)
       } else {
-        console.log('Test record cleaned up successfully')
+        console.log('Cleanup successful')
       }
     }
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'Service role access test passed - N8N can write to company_role_analyses table',
-        readCount: readData?.length || 0,
-        insertedRecord: insertData?.[0] || null,
-        testUserId: testUserId,
-        environment: {
-          hasUrl: !!supabaseUrl,
-          hasServiceKey: !!serviceRoleKey
+        message: 'Service role access test completed successfully',
+        testResults: {
+          canRead: !readError,
+          canInsert: !insertError,
+          recordCount: readData?.length || 0,
+          testUserId: testUserId,
+          insertedRecordId: insertData?.[0]?.id || null
         }
       }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
   } catch (error) {
@@ -213,13 +213,9 @@ serve(async (req) => {
       JSON.stringify({ 
         success: false, 
         error: 'Test function error', 
-        details: error.message,
-        stack: error.stack
+        details: error.message
       }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 })
