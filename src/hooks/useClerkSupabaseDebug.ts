@@ -110,19 +110,19 @@ export const useClerkSupabaseDebug = () => {
       // Test 6: Profile access test (the main issue)
       console.log('\n--- Test 6: Profile Access Test (MAIN ISSUE) ---');
       if (userCheck) {
-        const { data: profileCheck, error: profileError } = await supabase
+        const { data: profileData, error: profileError } = await supabase
           .from('user_profile')
           .select('*')
           .eq('user_id', userCheck.id)
           .maybeSingle();
 
-        console.log('[DEBUG] Profile lookup result:', profileCheck ? '✅ ACCESSIBLE' : '❌ NOT ACCESSIBLE');
+        console.log('[DEBUG] Profile lookup result:', profileData ? '✅ ACCESSIBLE' : '❌ NOT ACCESSIBLE');
         console.log('[DEBUG] Profile lookup error:', profileError);
-        if (profileCheck) {
+        if (profileData) {
           console.log('[DEBUG] Profile data:', {
-            id: profileCheck.id,
-            user_id: profileCheck.user_id,
-            bio: profileCheck.bio ? 'has_bio' : 'no_bio'
+            id: profileData.id,
+            user_id: profileData.user_id,
+            bio: profileData.bio ? 'has_bio' : 'no_bio'
           });
         } else {
           console.log('[DEBUG] 🚨 PROFILE ACCESS ISSUE - This is likely the root cause!');
@@ -152,7 +152,7 @@ export const useClerkSupabaseDebug = () => {
         hasToken: !!token,
         userExists: !!userCheck,
         canAccessCredits: !!userCheck && !userError,
-        canAccessProfile: !!profileCheck
+        canAccessProfile: !!profileData
       };
 
     } catch (error) {
