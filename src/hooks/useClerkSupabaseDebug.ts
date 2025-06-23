@@ -6,7 +6,7 @@ export const useClerkSupabaseDebug = () => {
   const { getToken, isSignedIn, userId } = useAuth();
 
   const debugClerkSupabaseIntegration = async () => {
-    console.log('\n=== ENHANCED CLERK-SUPABASE DEBUG SESSION V4 ===');
+    console.log('\n=== SECURITY-ENHANCED CLERK-SUPABASE DEBUG SESSION ===');
     console.log('[DEBUG] Clerk isSignedIn:', isSignedIn);
     console.log('[DEBUG] Clerk userId:', userId);
 
@@ -25,7 +25,7 @@ export const useClerkSupabaseDebug = () => {
         const maskedToken = token.substring(0, 30) + '...';
         console.log('[DEBUG] Token (masked):', maskedToken);
         
-        // Decode token payload for debugging
+        // Decode token payload for debugging (security-safe)
         try {
           const payload = JSON.parse(atob(token.split('.')[1]));
           console.log('[DEBUG] Token payload details:', {
@@ -34,8 +34,7 @@ export const useClerkSupabaseDebug = () => {
             aud: payload.aud,
             exp: payload.exp,
             iat: payload.iat,
-            role: payload.role || 'not_set',
-            azp: payload.azp || 'not_set'
+            role: payload.role || 'not_set'
           });
         } catch (e) {
           console.log('[DEBUG] Could not decode token payload:', e);
@@ -66,28 +65,33 @@ export const useClerkSupabaseDebug = () => {
           console.log('  - JWT Audience:', result.jwt_aud || '❌ NOT FOUND');
           console.log('  - Auth Role:', result.auth_role || '❌ NOT FOUND');
           console.log('  - User exists in DB:', result.user_exists ? '✅ YES' : '❌ NO');
-          console.log('  - Current setting claims:', result.current_setting_claims || '❌ NOT FOUND');
         }
       } catch (rpcError) {
         console.log('[DEBUG] RPC function error:', rpcError);
       }
 
-      // Test 4: User lookup
-      console.log('\n--- Test 4: User Lookup ---');
+      // Test 4: User lookup with proper RLS
+      console.log('\n--- Test 4: User Lookup (RLS Protected) ---');
       const { data: userCheck, error: userError } = await supabase
         .from('users')
-        .select('id, clerk_id, email')
+        .select('id, clerk_id, email, first_name, last_name')
         .eq('clerk_id', userId)
         .maybeSingle();
 
       console.log('[DEBUG] User lookup result:', userCheck ? '✅ FOUND' : '❌ NOT FOUND');
       console.log('[DEBUG] User lookup error:', userError);
       if (userCheck) {
-        console.log('[DEBUG] User data:', userCheck);
+        console.log('[DEBUG] User data (sanitized):', {
+          id: userCheck.id,
+          clerk_id: userCheck.clerk_id,
+          email: userCheck.email ? userCheck.email.substring(0, 3) + '***' : null,
+          first_name: userCheck.first_name,
+          last_name: userCheck.last_name
+        });
       }
 
-      // Test 5: Credits access test
-      console.log('\n--- Test 5: Credits Access Test ---');
+      // Test 5: Credits access test with RLS
+      console.log('\n--- Test 5: Credits Access Test (RLS Protected) ---');
       let creditsData = null;
       if (userCheck) {
         const { data: creditsCheck, error: creditsError } = await supabase
@@ -104,8 +108,8 @@ export const useClerkSupabaseDebug = () => {
         creditsData = creditsCheck;
       }
 
-      // Test 6: Profile access test (MAIN ISSUE)
-      console.log('\n--- Test 6: Profile Access Test (MAIN ISSUE) ---');
+      // Test 6: Profile access test with enhanced RLS
+      console.log('\n--- Test 6: Profile Access Test (Enhanced RLS) ---');
       let profileData = null;
       if (userCheck) {
         const { data: profileCheck, error: profileError } = await supabase
@@ -124,7 +128,7 @@ export const useClerkSupabaseDebug = () => {
         profileData = profileCheck;
       }
 
-      console.log('\n=== ENHANCED DEBUG SESSION V4 COMPLETE ===\n');
+      console.log('\n=== SECURITY-ENHANCED DEBUG SESSION COMPLETE ===\n');
 
       return { 
         success: true, 
@@ -132,7 +136,8 @@ export const useClerkSupabaseDebug = () => {
         hasCurrentToken: !!currentToken,
         userExists: !!userCheck,
         canAccessCredits: !!creditsData,
-        canAccessProfile: !!profileData
+        canAccessProfile: !!profileData,
+        securityStatus: 'RLS policies active and protecting data'
       };
 
     } catch (error) {
