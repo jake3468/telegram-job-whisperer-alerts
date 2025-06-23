@@ -69,10 +69,35 @@ serve(async (req) => {
 
     console.log('Read test successful, found', readData?.length || 0, 'records')
 
-    // Test 2: Try to insert a test record
-    console.log('Test 2: Inserting test record...')
+    // Test 2: Get a real user_profile ID to use for testing
+    console.log('Test 2: Getting a real user_profile ID...')
+    const { data: userProfiles, error: userProfileError } = await supabase
+      .from('user_profile')
+      .select('id')
+      .limit(1)
+
+    if (userProfileError || !userProfiles || userProfiles.length === 0) {
+      console.error('No user profiles found:', userProfileError)
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'No user profiles found for testing', 
+          details: userProfileError 
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+
+    const testUserId = userProfiles[0].id
+    console.log('Using user_profile ID for test:', testUserId)
+
+    // Test 3: Try to insert a test record with real user_id
+    console.log('Test 3: Inserting test record...')
     const testRecord = {
-      user_id: '00000000-0000-0000-0000-000000000000', // dummy UUID
+      user_id: testUserId,
       company_name: 'Test Company ' + Date.now(),
       location: 'Test Location',
       job_title: 'Test Position',
@@ -102,21 +127,27 @@ serve(async (req) => {
 
     console.log('Insert test successful:', insertData)
 
-    // Test 3: Clean up the test record
+    // Test 4: Clean up the test record
     if (insertData && insertData.length > 0) {
-      await supabase
+      const { error: deleteError } = await supabase
         .from('company_role_analyses')
         .delete()
         .eq('id', insertData[0].id)
-      console.log('Test record cleaned up')
+      
+      if (deleteError) {
+        console.log('Warning: Could not clean up test record:', deleteError)
+      } else {
+        console.log('Test record cleaned up successfully')
+      }
     }
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'Service role access test passed',
+        message: 'Service role access test passed - N8N can write to company_role_analyses table',
         readCount: readData?.length || 0,
         insertedRecord: insertData?.[0] || null,
+        testUserId: testUserId,
         environment: {
           hasUrl: !!supabaseUrl,
           hasServiceKey: !!serviceRoleKey
