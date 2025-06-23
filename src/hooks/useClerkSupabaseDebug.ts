@@ -89,6 +89,7 @@ export const useClerkSupabaseDebug = () => {
 
       // Test 5: Credits access test
       console.log('\n--- Test 5: Credits Access Test ---');
+      let creditsData = null;
       if (userCheck) {
         const { data: creditsCheck, error: creditsError } = await supabase
           .from('user_credits')
@@ -105,28 +106,31 @@ export const useClerkSupabaseDebug = () => {
             subscription_plan: creditsCheck.subscription_plan
           });
         }
+        creditsData = creditsCheck;
       }
 
       // Test 6: Profile access test (the main issue)
       console.log('\n--- Test 6: Profile Access Test (MAIN ISSUE) ---');
+      let profileData = null;
       if (userCheck) {
-        const { data: profileData, error: profileError } = await supabase
+        const { data: profileCheck, error: profileError } = await supabase
           .from('user_profile')
           .select('*')
           .eq('user_id', userCheck.id)
           .maybeSingle();
 
-        console.log('[DEBUG] Profile lookup result:', profileData ? '✅ ACCESSIBLE' : '❌ NOT ACCESSIBLE');
+        console.log('[DEBUG] Profile lookup result:', profileCheck ? '✅ ACCESSIBLE' : '❌ NOT ACCESSIBLE');
         console.log('[DEBUG] Profile lookup error:', profileError);
-        if (profileData) {
+        if (profileCheck) {
           console.log('[DEBUG] Profile data:', {
-            id: profileData.id,
-            user_id: profileData.user_id,
-            bio: profileData.bio ? 'has_bio' : 'no_bio'
+            id: profileCheck.id,
+            user_id: profileCheck.user_id,
+            bio: profileCheck.bio ? 'has_bio' : 'no_bio'
           });
         } else {
           console.log('[DEBUG] 🚨 PROFILE ACCESS ISSUE - This is likely the root cause!');
         }
+        profileData = profileCheck;
       }
 
       // Test 7: Direct profile query with user_id
@@ -151,7 +155,7 @@ export const useClerkSupabaseDebug = () => {
         success: true, 
         hasToken: !!token,
         userExists: !!userCheck,
-        canAccessCredits: !!userCheck && !userError,
+        canAccessCredits: !!creditsData,
         canAccessProfile: !!profileData
       };
 
