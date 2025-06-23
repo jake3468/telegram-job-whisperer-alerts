@@ -1,6 +1,6 @@
 
 import { useAuth } from '@clerk/clerk-react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, getCurrentJWTToken } from '@/integrations/supabase/client';
 
 export const useClerkSupabaseDebug = () => {
   const { getToken, isSignedIn, userId } = useAuth();
@@ -42,12 +42,12 @@ export const useClerkSupabaseDebug = () => {
         }
       }
 
-      // Test 2: Check authorization header
-      console.log('\n--- Test 2: Authorization Header Check ---');
-      const authHeader = supabase.rest.headers['Authorization'];
-      console.log('[DEBUG] Authorization header set:', authHeader ? '✅ YES' : '❌ NO');
-      if (authHeader) {
-        console.log('[DEBUG] Auth header preview:', authHeader.substring(0, 50) + '...');
+      // Test 2: Check current JWT token in client
+      console.log('\n--- Test 2: Current JWT Token in Client ---');
+      const currentToken = getCurrentJWTToken();
+      console.log('[DEBUG] Current JWT token set:', currentToken ? '✅ YES' : '❌ NO');
+      if (currentToken) {
+        console.log('[DEBUG] Current token preview:', currentToken.substring(0, 50) + '...');
       }
 
       // Test 3: Enhanced JWT debugging function
@@ -124,22 +124,18 @@ export const useClerkSupabaseDebug = () => {
         profileData = profileCheck;
       }
 
-      // Test 7: Direct profile query (bypass user lookup)
-      console.log('\n--- Test 7: Direct Profile Query ---');
-      const { data: directProfile, error: directError } = await supabase
-        .from('user_profile')
-        .select('*')
-        .limit(5);
-
-      console.log('[DEBUG] Direct profile query result:', directProfile || []);
-      console.log('[DEBUG] Direct profile query error:', directError);
+      // Test 7: Direct auth state check
+      console.log('\n--- Test 7: Direct Auth State Check ---');
+      const { data: authState, error: authError } = await supabase.rpc('debug_current_auth_state');
+      console.log('[DEBUG] Current auth state for profile access:', authState);
+      console.log('[DEBUG] Auth state error:', authError);
 
       console.log('\n=== ENHANCED DEBUG SESSION V4 COMPLETE ===\n');
 
       return { 
         success: true, 
         hasToken: !!token,
-        hasAuthHeader: !!authHeader,
+        hasCurrentToken: !!currentToken,
         userExists: !!userCheck,
         canAccessCredits: !!creditsData,
         canAccessProfile: !!profileData

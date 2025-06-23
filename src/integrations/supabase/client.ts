@@ -6,6 +6,9 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://fnzloyyhzhrqsvslhhri.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuemxveXloemhycXN2c2xoaHJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzAyMjIsImV4cCI6MjA2NDUwNjIyMn0.xdlgb_amJ1fV31uinCFotGW00isgT5-N8zJ_gLHEKuk";
 
+// Store the current JWT token
+let currentJWTToken: string | null = null;
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
@@ -14,38 +17,46 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     persistSession: false, // Disable Supabase auth since we're using Clerk
     autoRefreshToken: false,
   },
+  global: {
+    headers: {
+      get Authorization() {
+        return currentJWTToken ? `Bearer ${currentJWTToken}` : undefined;
+      }
+    }
+  }
 });
 
-// Function to set Clerk JWT token as authorization header
+// Function to set Clerk JWT token
 export const setClerkToken = async (token: string | null) => {
-  if (token) {
-    try {
-      console.log('[setClerkToken] ✅ Setting Clerk JWT token...');
-      
-      // Set the authorization header for all requests
-      supabase.rest.headers['Authorization'] = `Bearer ${token}`;
+  try {
+    console.log('[setClerkToken] 🔄 Setting Clerk JWT token...');
+    
+    if (token) {
+      currentJWTToken = token;
+      console.log('[setClerkToken] ✅ Clerk JWT token set successfully');
       
       // Also set it for realtime if needed
       if (supabase.realtime) {
         supabase.realtime.setAuth(token);
       }
       
-      console.log('[setClerkToken] ✅ Clerk JWT token set successfully');
       return true;
-    } catch (error) {
-      console.error('[setClerkToken] ❌ Error setting Clerk JWT token:', error);
-      return false;
+    } else {
+      currentJWTToken = null;
+      console.log('[setClerkToken] ❌ Clerk JWT token cleared');
+      
+      // Clear realtime auth
+      if (supabase.realtime) {
+        supabase.realtime.setAuth(null);
+      }
+      
+      return true;
     }
-  } else {
-    // Clear the authorization header
-    delete supabase.rest.headers['Authorization'];
-    
-    // Clear realtime auth
-    if (supabase.realtime) {
-      supabase.realtime.setAuth(null);
-    }
-    
-    console.log('[setClerkToken] ❌ Clerk JWT token cleared');
-    return true;
+  } catch (error) {
+    console.error('[setClerkToken] ❌ Error setting Clerk JWT token:', error);
+    return false;
   }
 };
+
+// Function to get current JWT token for debugging
+export const getCurrentJWTToken = () => currentJWTToken;
