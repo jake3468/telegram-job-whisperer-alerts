@@ -40,11 +40,13 @@ export const useUserProfile = () => {
         securityAuditLog('JWT transmission test result:', jwtTest);
 
         // Test direct user lookup with enhanced error handling
-        const { data: userLookup, error: userError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('clerk_id', user.id)
-          .maybeSingle();
+        const { data: userLookup, error: userError } = await makeAuthenticatedRequest(async () => {
+          return await supabase
+            .from('users')
+            .select('*')
+            .eq('clerk_id', user.id)
+            .maybeSingle();
+        }, 'debug user lookup');
 
         securityAuditLog('Direct user lookup result:', userLookup ? 'Found' : 'Not found');
         if (userError) {
@@ -86,11 +88,13 @@ export const useUserProfile = () => {
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       // First, try to get the user's database ID with enhanced error handling
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id, clerk_id, email, first_name, last_name')
-        .eq('clerk_id', user.id)
-        .maybeSingle();
+      const { data: userData, error: userError } = await makeAuthenticatedRequest(async () => {
+        return await supabase
+          .from('users')
+          .select('id, clerk_id, email, first_name, last_name')
+          .eq('clerk_id', user.id)
+          .maybeSingle();
+      }, 'user lookup');
 
       securityAuditLog('User lookup result:', userData ? 'Found' : 'Not found');
       if (userError) {
@@ -100,6 +104,9 @@ export const useUserProfile = () => {
           details: userError.details
         });
       }
+
+      // Use let instead of const for userData since we might reassign it
+      let finalUserData = userData;
 
       // If user doesn't exist in Supabase, initialize them
       if (!userData && !userError) {
@@ -114,11 +121,13 @@ export const useUserProfile = () => {
         }
 
         // Try to fetch user data again after initialization
-        const { data: newUserData, error: newUserError } = await supabase
-          .from('users')
-          .select('id, clerk_id, email, first_name, last_name')
-          .eq('clerk_id', user.id)
-          .maybeSingle();
+        const { data: newUserData, error: newUserError } = await makeAuthenticatedRequest(async () => {
+          return await supabase
+            .from('users')
+            .select('id, clerk_id, email, first_name, last_name')
+            .eq('clerk_id', user.id)
+            .maybeSingle();
+        }, 'user lookup after initialization');
 
         if (newUserError || !newUserData) {
           securityAuditLog('Error fetching user after initialization:', newUserError);
@@ -127,7 +136,7 @@ export const useUserProfile = () => {
           return;
         }
 
-        userData = newUserData;
+        finalUserData = newUserData;
       } else if (userError) {
         securityAuditLog('Error fetching user:', userError);
         
@@ -143,7 +152,7 @@ export const useUserProfile = () => {
         return;
       }
 
-      if (!userData) {
+      if (!finalUserData) {
         securityAuditLog('No user data available after all attempts');
         setError('Unable to load user data - possible JWT configuration issue');
         setLoading(false);
@@ -160,11 +169,13 @@ export const useUserProfile = () => {
         profileAttempts++;
         securityAuditLog(`User profile fetch attempt ${profileAttempts}/${maxAttempts}`);
 
-        const profileResult = await supabase
-          .from('user_profile')
-          .select('*')
-          .eq('user_id', userData.id)
-          .maybeSingle();
+        const profileResult = await makeAuthenticatedRequest(async () => {
+          return await supabase
+            .from('user_profile')
+            .select('*')
+            .eq('user_id', finalUserData.id)
+            .maybeSingle();
+        }, `profile fetch attempt ${profileAttempts}`);
 
         profileData = profileResult.data;
         profileError = profileResult.error;
@@ -237,10 +248,12 @@ export const useUserProfile = () => {
     try {
       securityAuditLog('Attempting secure profile update for:', userProfile.id);
       
-      const { error } = await supabase
-        .from('user_profile')
-        .update(updates)
-        .eq('id', userProfile.id);
+      const { error } = await makeAuthenticatedRequest(async () => {
+        return await supabase
+          .from('user_profile')
+          .update(updates)
+          .eq('id', userProfile.id);
+      }, 'profile update');
 
       if (error) {
         securityAuditLog('Error updating user profile:', error);

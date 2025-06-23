@@ -94,7 +94,7 @@ export const useJWTDebug = () => {
             .from('user_profile')
             .select('id, user_id, bio, created_at')
             .limit(1);
-        });
+        }, 'profile access test');
 
         console.log('  - Profile query successful:', !profileError ? '✅ YES' : '❌ NO');
         if (profileError) {

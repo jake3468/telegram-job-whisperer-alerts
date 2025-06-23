@@ -14,7 +14,7 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
 // Store the current JWT token
 let currentJWTToken: string | null = null;
 
-// Create the Supabase client with simpler configuration
+// Create the Supabase client with global headers configuration
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     persistSession: false,
@@ -54,22 +54,10 @@ export const setClerkToken = async (token: string | null) => {
       }
 
       currentJWTToken = token;
-      
-      // Update the global headers to include Authorization
-      if (supabase.rest && supabase.rest.headers) {
-        supabase.rest.headers['Authorization'] = `Bearer ${token}`;
-      }
-      
-      console.log('[setClerkToken] ✅ Clerk JWT token stored and headers updated');
+      console.log('[setClerkToken] ✅ Clerk JWT token stored');
       return true;
     } else {
       currentJWTToken = null;
-      
-      // Remove Authorization header
-      if (supabase.rest && supabase.rest.headers) {
-        delete supabase.rest.headers['Authorization'];
-      }
-      
       console.log('[setClerkToken] ❌ Clerk JWT token cleared');
       return true;
     }
@@ -82,18 +70,68 @@ export const setClerkToken = async (token: string | null) => {
 // Function to get current JWT token for debugging
 export const getCurrentJWTToken = () => currentJWTToken;
 
+// Enhanced function to make authenticated requests with proper JWT headers
+export const makeAuthenticatedRequest = async <T>(
+  operation: () => Promise<T>,
+  operationType: string = 'unknown'
+): Promise<T> => {
+  if (!currentJWTToken) {
+    console.warn(`[makeAuthenticatedRequest] ⚠️ No JWT token available for ${operationType}`);
+  } else {
+    console.log(`[makeAuthenticatedRequest] 🔐 Making authenticated request for: ${operationType}`);
+  }
+  
+  // Create a new client instance with JWT headers for this specific request
+  if (currentJWTToken) {
+    const authenticatedClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+      global: {
+        headers: {
+          'Authorization': `Bearer ${currentJWTToken}`
+        }
+      }
+    });
+
+    console.log(`[makeAuthenticatedRequest] 🔐 Using authenticated client for ${operationType}`);
+    
+    // Replace the global supabase instance temporarily for this operation
+    const originalFrom = supabase.from.bind(supabase);
+    const originalRpc = supabase.rpc.bind(supabase);
+    
+    // Override methods to use authenticated client
+    (supabase as any).from = authenticatedClient.from.bind(authenticatedClient);
+    (supabase as any).rpc = authenticatedClient.rpc.bind(authenticatedClient);
+    
+    try {
+      const result = await operation();
+      return result;
+    } finally {
+      // Restore original methods
+      (supabase as any).from = originalFrom;
+      (supabase as any).rpc = originalRpc;
+    }
+  }
+  
+  return await operation();
+};
+
 // Function to test JWT transmission with direct RPC call
 export const testJWTTransmission = async () => {
   try {
-    console.log('[testJWTTransmission] 🧪 Testing JWT transmission...');
+    console.log('[testJWTTransmission] 🧪 Testing JWT transmission with authenticated client...');
     console.log('[testJWTTransmission] 🔑 Current token available:', currentJWTToken ? 'YES' : 'NO');
     
     if (currentJWTToken) {
       console.log('[testJWTTransmission] 📝 Token preview (first 100 chars):', currentJWTToken.substring(0, 100));
     }
     
-    // Make direct RPC call 
-    const { data, error } = await supabase.rpc('debug_user_auth');
+    // Make direct RPC call using authenticated request
+    const { data, error } = await makeAuthenticatedRequest(async () => {
+      return await supabase.rpc('debug_user_auth');
+    }, 'JWT transmission test');
     
     console.log('[testJWTTransmission] 📊 Test result:', {
       data,
@@ -128,15 +166,4 @@ export const createAuthenticatedStorageClient = () => {
 
   console.log('[createAuthenticatedStorageClient] 🗄️ Using authenticated storage client');
   return supabase.storage;
-};
-
-// Function to make authenticated requests with proper error handling
-export const makeAuthenticatedRequest = async <T>(operation: () => Promise<T>): Promise<T> => {
-  if (!currentJWTToken) {
-    console.warn('[makeAuthenticatedRequest] ⚠️ No JWT token available');
-  } else {
-    console.log('[makeAuthenticatedRequest] 🔐 Making authenticated request with JWT');
-  }
-  
-  return await operation();
 };
