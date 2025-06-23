@@ -63,7 +63,7 @@ CREATE POLICY "Users can delete their own profile" ON public.user_profile
 -- Ensure RLS is enabled
 ALTER TABLE public.user_profile ENABLE ROW LEVEL SECURITY;
 
--- Update the debug function to provide more detailed JWT information
+-- Update the debug function to include all expected fields
 CREATE OR REPLACE FUNCTION public.debug_user_auth()
 RETURNS TABLE(
   clerk_id text,
