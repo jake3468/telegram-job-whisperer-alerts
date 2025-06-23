@@ -25,10 +25,13 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
 // Function to set Clerk JWT token for Supabase requests
 export const setClerkToken = async (token: string | null) => {
   if (token) {
-    // Set the JWT token in the global headers for all Supabase requests
+    // Set the JWT token in the Authorization header
     customHeaders['Authorization'] = `Bearer ${token}`;
     
-    // Also set it for realtime if needed
+    // Also set it in the apikey header as a fallback
+    customHeaders['apikey'] = token;
+    
+    // Set it for realtime if needed
     if (supabase.realtime) {
       supabase.realtime.setAuth(token);
     }
@@ -37,6 +40,10 @@ export const setClerkToken = async (token: string | null) => {
   } else {
     // Remove the JWT token from headers
     delete customHeaders['Authorization'];
+    delete customHeaders['apikey'];
+    
+    // Restore the default anon key
+    customHeaders['apikey'] = SUPABASE_PUBLISHABLE_KEY;
     
     // Clear realtime auth
     if (supabase.realtime) {

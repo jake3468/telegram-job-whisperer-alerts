@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useClerkSupabaseSync } from "@/hooks/useClerkSupabaseSync";
 import Index from "./pages/Index";
 import JobGuide from "./pages/JobGuide";
@@ -30,6 +30,7 @@ const AppWithSync = () => {
     <>
       <Routes>
         <Route path="/" element={<Index />} />
+        <Route path="/dashboard" element={<Navigate to="/profile" replace />} />
         <Route path="/job-guide" element={<JobGuide />} />
         <Route path="/cover-letter" element={<CoverLetter />} />
         <Route path="/linkedin-posts" element={<LinkedInPosts />} />
