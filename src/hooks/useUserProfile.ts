@@ -17,34 +17,79 @@ interface UserProfile {
 }
 
 export const useUserProfile = () => {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { initializeUser } = useUserInitialization();
 
+  const debugAuthentication = async () => {
+    console.log('[DEBUG] Debugging authentication state...');
+    console.log('[DEBUG] Clerk user loaded:', isLoaded);
+    console.log('[DEBUG] Clerk user exists:', !!user);
+    console.log('[DEBUG] Clerk user ID:', user?.id);
+
+    if (user) {
+      try {
+        // Test JWT debugging function
+        const { data: debugData, error: debugError } = await supabase.rpc('debug_user_auth');
+        console.log('[DEBUG] Supabase debug_user_auth result:', debugData);
+        console.log('[DEBUG] Supabase debug_user_auth error:', debugError);
+
+        // Test direct user lookup
+        const { data: userLookup, error: userError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('clerk_id', user.id)
+          .maybeSingle();
+
+        console.log('[DEBUG] Direct user lookup result:', userLookup);
+        console.log('[DEBUG] Direct user lookup error:', userError);
+
+      } catch (error) {
+        console.error('[DEBUG] Authentication debug error:', error);
+      }
+    }
+  };
+
   const fetchUserProfile = async () => {
+    if (!isLoaded) {
+      console.log('[DEBUG] Clerk not loaded yet, waiting...');
+      return;
+    }
+
     if (!user) {
+      console.log('[DEBUG] No user found, stopping fetch');
       setLoading(false);
+      setError(null);
       return;
     }
 
     try {
-      console.log('Fetching user profile for:', user.id);
+      console.log('[DEBUG] Starting user profile fetch for:', user.id);
+      setError(null);
 
-      // First get the user's database ID
+      // Debug authentication state
+      await debugAuthentication();
+
+      // First, try to get the user's database ID
       let { data: userData, error: userError } = await supabase
         .from('users')
-        .select('id')
+        .select('id, clerk_id, email, first_name, last_name')
         .eq('clerk_id', user.id)
-        .single();
+        .maybeSingle();
+
+      console.log('[DEBUG] User lookup result:', userData);
+      console.log('[DEBUG] User lookup error:', userError);
 
       // If user doesn't exist in Supabase, initialize them
-      if (userError && userError.code === 'PGRST116') {
-        console.log('User not found in Supabase, initializing...');
+      if (!userData && !userError) {
+        console.log('[DEBUG] User not found in Supabase, initializing...');
         
         const initResult = await initializeUser();
         if (!initResult.success) {
-          console.error('Failed to initialize user:', initResult.error);
+          console.error('[DEBUG] Failed to initialize user:', initResult.error);
+          setError(`Failed to initialize user: ${initResult.error}`);
           setLoading(false);
           return;
         }
@@ -52,40 +97,62 @@ export const useUserProfile = () => {
         // Try to fetch user data again after initialization
         const { data: newUserData, error: newUserError } = await supabase
           .from('users')
-          .select('id')
+          .select('id, clerk_id, email, first_name, last_name')
           .eq('clerk_id', user.id)
-          .single();
+          .maybeSingle();
 
-        if (newUserError) {
-          console.error('Error fetching user after initialization:', newUserError);
+        if (newUserError || !newUserData) {
+          console.error('[DEBUG] Error fetching user after initialization:', newUserError);
+          setError(`Error fetching user after initialization: ${newUserError?.message}`);
           setLoading(false);
           return;
         }
 
         userData = newUserData;
       } else if (userError) {
-        console.error('Error fetching user:', userError);
+        console.error('[DEBUG] Error fetching user:', userError);
+        setError(`Error fetching user: ${userError.message}`);
         setLoading(false);
         return;
       }
 
-      // Then get the user profile
+      if (!userData) {
+        console.error('[DEBUG] No user data available after all attempts');
+        setError('Unable to load user data');
+        setLoading(false);
+        return;
+      }
+
+      // Now get the user profile
       const { data: profileData, error: profileError } = await supabase
         .from('user_profile')
         .select('*')
         .eq('user_id', userData.id)
-        .single();
+        .maybeSingle();
+
+      console.log('[DEBUG] User profile lookup result:', profileData);
+      console.log('[DEBUG] User profile lookup error:', profileError);
 
       if (profileError) {
-        console.error('Error fetching user profile:', profileError);
+        console.error('[DEBUG] Error fetching user profile:', profileError);
+        setError(`Error fetching profile: ${profileError.message}`);
         setLoading(false);
         return;
       }
 
-      console.log('Successfully fetched user profile:', profileData.id);
+      if (!profileData) {
+        console.log('[DEBUG] No profile found, this should not happen after initialization');
+        setError('Profile not found');
+        setLoading(false);
+        return;
+      }
+
+      console.log('[DEBUG] Successfully fetched user profile:', profileData.id);
       setUserProfile(profileData);
+      setError(null);
     } catch (error) {
-      console.error('Error in fetchUserProfile:', error);
+      console.error('[DEBUG] Error in fetchUserProfile:', error);
+      setError(`Unexpected error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
@@ -103,7 +170,7 @@ export const useUserProfile = () => {
         .eq('id', userProfile.id);
 
       if (error) {
-        console.error('Error updating user profile:', error);
+        console.error('[DEBUG] Error updating user profile:', error);
         return { error: error.message };
       }
 
@@ -111,18 +178,19 @@ export const useUserProfile = () => {
       setUserProfile(prev => prev ? { ...prev, ...updates } : null);
       return { error: null };
     } catch (error) {
-      console.error('Error in updateUserProfile:', error);
+      console.error('[DEBUG] Error in updateUserProfile:', error);
       return { error: 'Failed to update profile' };
     }
   };
 
   useEffect(() => {
     fetchUserProfile();
-  }, [user]);
+  }, [user, isLoaded]);
 
   return {
     userProfile,
     loading,
+    error,
     updateUserProfile,
     refetch: fetchUserProfile
   };

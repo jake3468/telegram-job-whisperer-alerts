@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useClerkSupabaseSync } from "@/hooks/useClerkSupabaseSync";
+import AuthDebugPanel from "@/components/AuthDebugPanel";
 import Index from "./pages/Index";
 import JobGuide from "./pages/JobGuide";
 import CoverLetter from "./pages/CoverLetter";
@@ -46,6 +47,7 @@ function App() {
             <Route path="/upgrade" element={<Upgrade />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <AuthDebugPanel />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
