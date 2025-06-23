@@ -6,9 +6,6 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://fnzloyyhzhrqsvslhhri.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuemxveXloemhycXN2c2xoaHJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzAyMjIsImV4cCI6MjA2NDUwNjIyMn0.xdlgb_amJ1fV31uinCFotGW00isgT5-N8zJ_gLHEKuk";
 
-// Create a custom headers object that we can modify
-const customHeaders: Record<string, string> = {};
-
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
@@ -17,39 +14,52 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     persistSession: false, // Disable Supabase auth since we're using Clerk
     autoRefreshToken: false,
   },
-  global: {
-    headers: customHeaders,
-  },
 });
 
-// Function to set Clerk JWT token for Supabase requests
+// Function to set Clerk JWT token as a proper Supabase session
 export const setClerkToken = async (token: string | null) => {
   if (token) {
-    // Set the JWT token in the Authorization header
-    customHeaders['Authorization'] = `Bearer ${token}`;
-    
-    // Also set it in the apikey header as a fallback
-    customHeaders['apikey'] = token;
-    
-    // Set it for realtime if needed
-    if (supabase.realtime) {
-      supabase.realtime.setAuth(token);
+    try {
+      // Create a proper session object with the Clerk JWT
+      const session = {
+        access_token: token,
+        refresh_token: '', // Not needed for Clerk JWTs
+        expires_in: 3600, // 1 hour default
+        expires_at: Math.floor(Date.now() / 1000) + 3600,
+        token_type: 'bearer',
+        user: null // Will be populated by Supabase
+      };
+
+      // Set the session in Supabase auth
+      const { data, error } = await supabase.auth.setSession(session);
+      
+      if (error) {
+        console.error('[setClerkToken] ❌ Failed to set Supabase session:', error);
+        return false;
+      }
+
+      console.log('[setClerkToken] ✅ Clerk JWT session set successfully:', data?.session?.user ? 'User authenticated' : 'Session set');
+      
+      // Also set it for realtime if needed
+      if (supabase.realtime) {
+        supabase.realtime.setAuth(token);
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('[setClerkToken] ❌ Error setting Clerk JWT session:', error);
+      return false;
     }
-    
-    console.log('[setClerkToken] ✅ Clerk JWT token has been set in headers');
   } else {
-    // Remove the JWT token from headers
-    delete customHeaders['Authorization'];
-    delete customHeaders['apikey'];
-    
-    // Restore the default anon key
-    customHeaders['apikey'] = SUPABASE_PUBLISHABLE_KEY;
+    // Sign out from Supabase
+    await supabase.auth.signOut();
     
     // Clear realtime auth
     if (supabase.realtime) {
       supabase.realtime.setAuth(null);
     }
     
-    console.log('[setClerkToken] ❌ Clerk JWT token has been removed from headers');
+    console.log('[setClerkToken] ❌ Clerk JWT session cleared');
+    return true;
   }
 };

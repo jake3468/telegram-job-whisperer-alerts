@@ -6,7 +6,7 @@ export const useClerkSupabaseDebug = () => {
   const { getToken, isSignedIn, userId } = useAuth();
 
   const debugClerkSupabaseIntegration = async () => {
-    console.log('\n=== ENHANCED CLERK-SUPABASE DEBUG SESSION ===');
+    console.log('\n=== ENHANCED CLERK-SUPABASE DEBUG SESSION V2 ===');
     console.log('[DEBUG] Clerk isSignedIn:', isSignedIn);
     console.log('[DEBUG] Clerk userId:', userId);
 
@@ -18,7 +18,7 @@ export const useClerkSupabaseDebug = () => {
     try {
       // Test 1: Get Clerk JWT token with supabase template
       console.log('\n--- Test 1: Clerk JWT Token ---');
-      const token = await getToken({ template: 'supabase' });
+      const token = await getToken({ template: 'supabase', skipCache: true });
       console.log('[DEBUG] Clerk JWT token obtained:', token ? '✅ YES' : '❌ NO');
       
       if (token) {
@@ -34,27 +34,46 @@ export const useClerkSupabaseDebug = () => {
             aud: payload.aud,
             exp: payload.exp,
             iat: payload.iat,
-            role: payload.role || 'not_set'
+            role: payload.role || 'not_set',
+            azp: payload.azp || 'not_set'
           });
         } catch (e) {
           console.log('[DEBUG] Could not decode token payload:', e);
         }
       }
 
-      // Test 2: Check Supabase connection
-      console.log('\n--- Test 2: Supabase Connection ---');
+      // Test 2: Check current Supabase session
+      console.log('\n--- Test 2: Current Supabase Session ---');
       try {
-        const { data: authUser } = await supabase.auth.getUser();
-        console.log('[DEBUG] Supabase auth user:', authUser.user ? '✅ FOUND' : '❌ NOT FOUND');
-        if (authUser.user) {
-          console.log('[DEBUG] Supabase user role:', authUser.user.role || 'no_role');
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        console.log('[DEBUG] Supabase session exists:', session ? '✅ YES' : '❌ NO');
+        console.log('[DEBUG] Session error:', sessionError);
+        
+        if (session) {
+          console.log('[DEBUG] Session user:', session.user ? '✅ FOUND' : '❌ NOT FOUND');
+          console.log('[DEBUG] Session access token present:', session.access_token ? '✅ YES' : '❌ NO');
+          console.log('[DEBUG] Session expires at:', new Date(session.expires_at * 1000).toISOString());
         }
       } catch (e) {
-        console.log('[DEBUG] Supabase auth error:', e);
+        console.log('[DEBUG] Supabase session error:', e);
       }
 
-      // Test 3: Enhanced JWT debugging function
-      console.log('\n--- Test 3: Enhanced JWT Debug Function ---');
+      // Test 3: Check Supabase auth user
+      console.log('\n--- Test 3: Supabase Auth User ---');
+      try {
+        const { data: authUser, error: authError } = await supabase.auth.getUser();
+        console.log('[DEBUG] Supabase auth user:', authUser.user ? '✅ FOUND' : '❌ NOT FOUND');
+        console.log('[DEBUG] Auth error:', authError);
+        if (authUser.user) {
+          console.log('[DEBUG] Auth user role:', authUser.user.role || 'no_role');
+          console.log('[DEBUG] Auth user aud:', authUser.user.aud || 'no_aud');
+        }
+      } catch (e) {
+        console.log('[DEBUG] Supabase auth user error:', e);
+      }
+
+      // Test 4: Enhanced JWT debugging function
+      console.log('\n--- Test 4: Enhanced JWT Debug Function ---');
       try {
         const { data: debugData, error: debugError } = await supabase.rpc('debug_user_auth');
         console.log('[DEBUG] Enhanced debug_user_auth result:', debugData);
@@ -68,13 +87,24 @@ export const useClerkSupabaseDebug = () => {
           console.log('  - JWT Issuer:', result.jwt_issuer || '❌ NOT FOUND');
           console.log('  - JWT Audience:', result.jwt_aud || '❌ NOT FOUND');
           console.log('  - Auth Role:', result.auth_role || '❌ NOT FOUND');
+          console.log('  - User exists in DB:', result.user_exists ? '✅ YES' : '❌ NO');
         }
       } catch (rpcError) {
         console.log('[DEBUG] RPC function error:', rpcError);
       }
 
-      // Test 4: User lookup
-      console.log('\n--- Test 4: User Lookup ---');
+      // Test 5: New detailed JWT debug function
+      console.log('\n--- Test 5: Detailed JWT Debug Function ---');
+      try {
+        const { data: detailedDebug, error: detailedError } = await supabase.rpc('debug_jwt_detailed');
+        console.log('[DEBUG] Detailed JWT debug result:', detailedDebug);
+        console.log('[DEBUG] Detailed JWT debug error:', detailedError);
+      } catch (rpcError) {
+        console.log('[DEBUG] Detailed JWT RPC error:', rpcError);
+      }
+
+      // Test 6: User lookup
+      console.log('\n--- Test 6: User Lookup ---');
       const { data: userCheck, error: userError } = await supabase
         .from('users')
         .select('id, clerk_id, email')
@@ -87,32 +117,11 @@ export const useClerkSupabaseDebug = () => {
         console.log('[DEBUG] User data:', userCheck);
       }
 
-      // Test 5: Credits access test
-      console.log('\n--- Test 5: Credits Access Test ---');
-      let creditsData = null;
-      if (userCheck) {
-        const { data: creditsCheck, error: creditsError } = await supabase
-          .from('user_credits')
-          .select('*')
-          .eq('user_id', userCheck.id)
-          .maybeSingle();
-
-        console.log('[DEBUG] Credits lookup result:', creditsCheck ? '✅ ACCESSIBLE' : '❌ NOT ACCESSIBLE');
-        console.log('[DEBUG] Credits lookup error:', creditsError);
-        if (creditsCheck) {
-          console.log('[DEBUG] Credits data:', {
-            current_balance: creditsCheck.current_balance,
-            free_credits: creditsCheck.free_credits,
-            subscription_plan: creditsCheck.subscription_plan
-          });
-        }
-        creditsData = creditsCheck;
-      }
-
-      // Test 6: Profile access test (the main issue)
-      console.log('\n--- Test 6: Profile Access Test (MAIN ISSUE) ---');
+      // Test 7: Profile access test with enhanced debugging
+      console.log('\n--- Test 7: Profile Access Test (MAIN ISSUE) ---');
       let profileData = null;
       if (userCheck) {
+        // First try with current RLS
         const { data: profileCheck, error: profileError } = await supabase
           .from('user_profile')
           .select('*')
@@ -121,41 +130,22 @@ export const useClerkSupabaseDebug = () => {
 
         console.log('[DEBUG] Profile lookup result:', profileCheck ? '✅ ACCESSIBLE' : '❌ NOT ACCESSIBLE');
         console.log('[DEBUG] Profile lookup error:', profileError);
-        if (profileCheck) {
-          console.log('[DEBUG] Profile data:', {
-            id: profileCheck.id,
-            user_id: profileCheck.user_id,
-            bio: profileCheck.bio ? 'has_bio' : 'no_bio'
-          });
-        } else {
-          console.log('[DEBUG] 🚨 PROFILE ACCESS ISSUE - This is likely the root cause!');
-        }
+        
+        // Try raw SQL query to see if profile exists at all
+        const { data: rawProfile, error: rawError } = await supabase
+          .rpc('debug_jwt_detailed'); // This will show us current auth state
+        
+        console.log('[DEBUG] Current auth state for profile access:', rawProfile);
+        
         profileData = profileCheck;
       }
 
-      // Test 7: Direct profile query with user_id
-      console.log('\n--- Test 7: Direct Profile Query ---');
-      if (userCheck) {
-        try {
-          const { data: directProfile, error: directError } = await supabase
-            .from('user_profile')
-            .select('id, user_id, bio, created_at')
-            .eq('user_id', userCheck.id);
-          
-          console.log('[DEBUG] Direct profile query result:', directProfile);
-          console.log('[DEBUG] Direct profile query error:', directError);
-        } catch (directErr) {
-          console.log('[DEBUG] Direct profile query exception:', directErr);
-        }
-      }
-
-      console.log('\n=== ENHANCED DEBUG SESSION COMPLETE ===\n');
+      console.log('\n=== ENHANCED DEBUG SESSION V2 COMPLETE ===\n');
 
       return { 
         success: true, 
         hasToken: !!token,
         userExists: !!userCheck,
-        canAccessCredits: !!creditsData,
         canAccessProfile: !!profileData
       };
 
