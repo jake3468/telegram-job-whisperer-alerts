@@ -5,8 +5,6 @@ import { useUserCredits } from "@/hooks/useUserCredits";
 const CreditBalanceDisplay = () => {
   const { data: credits, isLoading, error, isFetching } = useUserCredits();
 
-  console.log('[CreditBalanceDisplay] Render - credits:', credits, 'isLoading:', isLoading, 'error:', error);
-
   // Show a subtle loading state only when initially loading (no previous data)
   if (isLoading && !credits) {
     return (
@@ -37,7 +35,6 @@ const CreditBalanceDisplay = () => {
 
   // Only show error state if there's actually an error and no cached data
   if (error && !credits) {
-    console.error("Error loading credits:", error);
     return (
       <div className="flex flex-col text-fuchsia-200 font-orbitron text-xs opacity-70">
         <div className="flex items-center gap-2">

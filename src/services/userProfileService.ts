@@ -16,7 +16,7 @@ export const fetchUserFromDatabase = async (clerkUserId: string) => {
   }, 'user lookup');
 };
 
-export const fetchUserProfile = async (userId: string, maxAttempts: number = Environment.isProduction() ? 2 : 3) => {
+export const fetchUserProfile = async (userId: string, maxAttempts: number = 1) => {
   let profileData = null;
   let profileError = null;
 
@@ -42,7 +42,7 @@ export const fetchUserProfile = async (userId: string, maxAttempts: number = Env
     if ((profileError.code === '42501' || profileError.message.includes('permission')) && 
         attempt < maxAttempts && Environment.isDevelopment()) {
       debugLog('Permission error, retrying...');
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 200)); // Reduced retry delay
     } else {
       break; // Don't retry other errors or in production
     }

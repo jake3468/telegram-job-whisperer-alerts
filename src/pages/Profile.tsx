@@ -24,7 +24,7 @@ const Profile = () => {
     }
   }, [user, isLoaded, navigate]);
 
-  // Check JWT setup on component mount (only in development)
+  // Only check JWT setup in development to avoid production delays
   useEffect(() => {
     if (isLoaded && user && Environment.isDevelopment()) {
       const checkJWTSetup = async () => {
@@ -36,8 +36,8 @@ const Profile = () => {
         }
       };
       
-      // Run the check after a short delay
-      setTimeout(checkJWTSetup, 1000);
+      // Reduced delay for faster loading
+      setTimeout(checkJWTSetup, 500);
     }
   }, [isLoaded, user, runComprehensiveJWTTest]);
 

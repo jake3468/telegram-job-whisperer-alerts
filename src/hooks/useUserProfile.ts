@@ -37,12 +37,7 @@ export const useUserProfile = () => {
       setError(null);
       debugLog('Starting user profile fetch for:', user.id);
 
-      // Reduced stabilization delay for production
-      const stabilizationDelay = Environment.isProduction() ? 300 : 800;
-      debugLog(`Waiting ${stabilizationDelay}ms for JWT transmission to stabilize...`);
-      await new Promise(resolve => setTimeout(resolve, stabilizationDelay));
-
-      // Get user's database ID
+      // No artificial delays - fetch immediately
       const { data: userData, error: userError } = await fetchUserFromDatabase(user.id);
       debugLog('User lookup result:', userData ? 'Found' : 'Not found');
 
@@ -93,8 +88,9 @@ export const useUserProfile = () => {
         return;
       }
 
-      // Get user profile with optimized retry logic
-      const { data: profileData, error: profileError } = await fetchUserProfileFromService(finalUserData.id);
+      // Get user profile - simplified, no retry logic in production
+      const maxAttempts = Environment.isProduction() ? 1 : 2;
+      const { data: profileData, error: profileError } = await fetchUserProfileFromService(finalUserData.id, maxAttempts);
 
       debugLog('Profile lookup result:', profileData ? 'Accessible' : 'Not accessible');
       
