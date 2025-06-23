@@ -1,21 +1,17 @@
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
-import { supabase, testJWTTransmission, makeAuthenticatedRequest } from '@/integrations/supabase/client';
 import { useUserInitialization } from './useUserInitialization';
 import { Environment } from '@/utils/environment';
+import { UserProfile, UserProfileUpdateData } from '@/types/userProfile';
+import { createUserProfileDebugger } from '@/utils/userProfileDebug';
+import { 
+  fetchUserFromDatabase, 
+  fetchUserProfile as fetchUserProfileFromService, 
+  updateUserProfileInDatabase 
+} from '@/services/userProfileService';
 
-interface UserProfile {
-  id: string;
-  user_id: string;
-  bio: string | null;
-  resume: string | null;
-  bot_activated: boolean | null;
-  chat_id: string | null;
-  cv_bot_activated: boolean;
-  cv_chat_id: string | null;
-  created_at: string | null;
-}
+const { debugLog } = createUserProfileDebugger();
 
 export const useUserProfile = () => {
   const { user, isLoaded } = useUser();
@@ -23,12 +19,6 @@ export const useUserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { initializeUser } = useUserInitialization();
-
-  const debugLog = (message: string, data?: any) => {
-    if (Environment.isDevelopment()) {
-      console.log(`[UserProfile] ${message}`, data ? data : '');
-    }
-  };
 
   const fetchUserProfile = async () => {
     if (!isLoaded) {
@@ -53,14 +43,7 @@ export const useUserProfile = () => {
       await new Promise(resolve => setTimeout(resolve, stabilizationDelay));
 
       // Get user's database ID
-      const { data: userData, error: userError } = await makeAuthenticatedRequest(async () => {
-        return await supabase
-          .from('users')
-          .select('id, clerk_id, email, first_name, last_name')
-          .eq('clerk_id', user.id)
-          .maybeSingle();
-      }, 'user lookup');
-
+      const { data: userData, error: userError } = await fetchUserFromDatabase(user.id);
       debugLog('User lookup result:', userData ? 'Found' : 'Not found');
 
       let finalUserData = userData;
@@ -78,13 +61,7 @@ export const useUserProfile = () => {
         }
 
         // Fetch user data after initialization
-        const { data: newUserData, error: newUserError } = await makeAuthenticatedRequest(async () => {
-          return await supabase
-            .from('users')
-            .select('id, clerk_id, email, first_name, last_name')
-            .eq('clerk_id', user.id)
-            .maybeSingle();
-        }, 'user lookup after initialization');
+        const { data: newUserData, error: newUserError } = await fetchUserFromDatabase(user.id);
 
         if (newUserError || !newUserData) {
           debugLog('Error fetching user after initialization:', newUserError);
@@ -117,37 +94,7 @@ export const useUserProfile = () => {
       }
 
       // Get user profile with optimized retry logic
-      const maxAttempts = Environment.isProduction() ? 2 : 3;
-      let profileData = null;
-      let profileError = null;
-
-      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-        debugLog(`Profile fetch attempt ${attempt}/${maxAttempts}`);
-
-        const profileResult = await makeAuthenticatedRequest(async () => {
-          return await supabase
-            .from('user_profile')
-            .select('*')
-            .eq('user_id', finalUserData.id)
-            .maybeSingle();
-        }, `profile fetch attempt ${attempt}`);
-
-        profileData = profileResult.data;
-        profileError = profileResult.error;
-
-        if (!profileError) {
-          break; // Success
-        }
-
-        // Only retry on permission errors and only in development
-        if ((profileError.code === '42501' || profileError.message.includes('permission')) && 
-            attempt < maxAttempts && Environment.isDevelopment()) {
-          debugLog('Permission error, retrying...');
-          await new Promise(resolve => setTimeout(resolve, 500));
-        } else {
-          break; // Don't retry other errors or in production
-        }
-      }
+      const { data: profileData, error: profileError } = await fetchUserProfileFromService(finalUserData.id);
 
       debugLog('Profile lookup result:', profileData ? 'Accessible' : 'Not accessible');
       
@@ -183,7 +130,7 @@ export const useUserProfile = () => {
     }
   };
 
-  const updateUserProfile = async (updates: Partial<Omit<UserProfile, 'id' | 'user_id' | 'created_at'>>) => {
+  const updateUserProfile = async (updates: UserProfileUpdateData) => {
     if (!user || !userProfile) {
       debugLog('Update attempt without authentication or profile');
       return { error: 'User not authenticated or profile not loaded' };
@@ -192,12 +139,7 @@ export const useUserProfile = () => {
     try {
       debugLog('Attempting profile update for:', userProfile.id);
       
-      const { error } = await makeAuthenticatedRequest(async () => {
-        return await supabase
-          .from('user_profile')
-          .update(updates)
-          .eq('id', userProfile.id);
-      }, 'profile update');
+      const { error } = await updateUserProfileInDatabase(userProfile.id, updates);
 
       if (error) {
         debugLog('Error updating user profile:', error);
