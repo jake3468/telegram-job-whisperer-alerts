@@ -711,7 +711,9 @@ export type Database = {
           clerk_id: string
           jwt_sub: string
           jwt_issuer: string
+          jwt_aud: string
           current_setting_claims: string
+          auth_role: string
           user_exists: boolean
           user_id_found: string
         }[]
