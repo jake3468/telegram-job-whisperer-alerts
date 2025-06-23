@@ -16,7 +16,8 @@ export const TestServiceRoleAccess = () => {
     try {
       console.log('Testing service role access to company_role_analyses table...');
       
-      const response = await fetch('/functions/v1/test-company-analysis-write', {
+      // Use the full Supabase URL for the edge function
+      const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/functions/v1/test-company-analysis-write', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
