@@ -14,7 +14,7 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
 // Store the current JWT token
 let currentJWTToken: string | null = null;
 
-// Create the Supabase client with proper JWT transmission
+// Create the Supabase client with simplified JWT transmission
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     persistSession: false, // Disable Supabase auth since we're using Clerk
@@ -22,34 +22,12 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   },
   global: {
     headers: {
-      // Always include the current token if available
-      'Authorization': () => {
-        if (currentJWTToken) {
-          console.log('[Supabase Client] 🔑 Using Clerk JWT for request');
-          return `Bearer ${currentJWTToken}`;
-        }
-        return undefined;
-      }
-    },
-    // Add request interceptor to ensure JWT is attached
-    fetch: (url, options = {}) => {
-      const headers = new Headers(options.headers);
-      
-      // Force set Authorization header if we have a token
-      if (currentJWTToken && !headers.has('Authorization')) {
-        headers.set('Authorization', `Bearer ${currentJWTToken}`);
-        console.log('[Supabase Client] 🔄 Force-setting JWT in request headers');
-      }
-      
-      return fetch(url, {
-        ...options,
-        headers,
-      });
+      // Set initial headers - will be updated when token is set
     }
   }
 });
 
-// Enhanced function to set Clerk JWT token with improved transmission
+// Enhanced function to set Clerk JWT token with direct header setting
 export const setClerkToken = async (token: string | null) => {
   try {
     console.log('[setClerkToken] 🔄 Setting Clerk JWT token...');
@@ -78,6 +56,32 @@ export const setClerkToken = async (token: string | null) => {
       }
 
       currentJWTToken = token;
+      
+      // Set auth headers directly on the client without using the Headers constructor
+      try {
+        // Use Supabase's built-in auth method to set the token
+        supabase.auth.setSession({
+          access_token: token,
+          refresh_token: '', // We don't use refresh tokens with Clerk
+        });
+        
+        console.log('[setClerkToken] ✅ Clerk JWT token set via auth session');
+      } catch (authError) {
+        console.warn('[setClerkToken] ⚠️ Auth session method failed, trying direct headers:', authError);
+        
+        // Fallback: Set headers directly on the client instance
+        // @ts-ignore - accessing private property for direct header setting
+        if (supabase.supabaseUrl && supabase.supabaseKey) {
+          // Set the authorization header directly without using Headers constructor
+          // @ts-ignore
+          supabase.headers = {
+            ...supabase.headers,
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          };
+        }
+      }
+      
       console.log('[setClerkToken] ✅ Clerk JWT token set successfully');
       
       // Set auth for realtime if needed
@@ -86,14 +90,13 @@ export const setClerkToken = async (token: string | null) => {
         console.log('[setClerkToken] 🔄 Realtime auth updated');
       }
       
-      // Force update the client with new token
-      // This ensures the token is immediately available for the next request
-      console.log('[setClerkToken] 🔄 Force-updating client headers');
-      
       return true;
     } else {
       currentJWTToken = null;
       console.log('[setClerkToken] ❌ Clerk JWT token cleared');
+      
+      // Clear auth session
+      await supabase.auth.signOut();
       
       // Clear realtime auth
       if (supabase.realtime) {
@@ -155,35 +158,24 @@ export const createAuthenticatedStorageClient = () => {
     return supabase.storage;
   }
 
-  // Create a new storage client with explicit auth headers and request interceptor
+  // Create a new storage client with direct auth token
   const storageClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
-    },
-    global: {
-      headers: {
-        'Authorization': `Bearer ${currentJWTToken}`,
-        'Content-Type': 'application/json'
-      },
-      // Add request interceptor for storage operations
-      fetch: (url, options = {}) => {
-        const headers = new Headers(options.headers);
-        
-        // Ensure Authorization header is always present
-        if (!headers.has('Authorization')) {
-          headers.set('Authorization', `Bearer ${currentJWTToken}`);
-        }
-        
-        console.log('[Storage Client] 🗄️ Making authenticated storage request');
-        
-        return fetch(url, {
-          ...options,
-          headers,
-        });
-      }
     }
   }).storage;
+
+  // Set the auth token directly on the storage client
+  try {
+    // @ts-ignore - setting auth token directly
+    storageClient.headers = {
+      'Authorization': `Bearer ${currentJWTToken}`,
+      'Content-Type': 'application/json'
+    };
+  } catch (error) {
+    console.warn('[createAuthenticatedStorageClient] ⚠️ Could not set storage headers:', error);
+  }
 
   console.log('[createAuthenticatedStorageClient] 🗄️ Created authenticated storage client');
   return storageClient;

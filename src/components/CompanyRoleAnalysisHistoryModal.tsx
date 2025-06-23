@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -75,7 +74,33 @@ const CompanyRoleAnalysisHistoryModal = ({
         throw error;
       }
 
-      setHistoryData(data || []);
+      // Transform the data to match our interface
+      const transformedData = (data || []).map((item: any) => ({
+        id: item.id,
+        company_name: item.company_name,
+        location: item.location,
+        job_title: item.job_title,
+        created_at: item.created_at,
+        research_date: item.research_date,
+        local_role_market_context: item.local_role_market_context,
+        company_news_updates: item.company_news_updates,
+        role_security_score: item.role_security_score,
+        role_security_score_breakdown: item.role_security_score_breakdown,
+        role_security_outlook: item.role_security_outlook,
+        role_security_automation_risks: item.role_security_automation_risks,
+        role_security_departmental_trends: item.role_security_departmental_trends,
+        role_experience_score: item.role_experience_score,
+        role_experience_score_breakdown: item.role_experience_score_breakdown,
+        role_experience_specific_insights: item.role_experience_specific_insights,
+        role_compensation_analysis: item.role_compensation_analysis,
+        role_workplace_environment: item.role_workplace_environment,
+        career_development: item.career_development,
+        role_specific_considerations: item.role_specific_considerations,
+        interview_and_hiring_insights: item.interview_and_hiring_insights,
+        sources: item.sources
+      }));
+
+      setHistoryData(transformedData);
     } catch (err) {
       console.error('Failed to fetch history:', err);
       toast({
