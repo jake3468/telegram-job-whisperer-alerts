@@ -6,9 +6,6 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://fnzloyyhzhrqsvslhhri.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuemxveXloemhycXN2c2xoaHJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzAyMjIsImV4cCI6MjA2NDUwNjIyMn0.xdlgb_amJ1fV31uinCFotGW00isgT5-N8zJ_gLHEKuk";
 
-// Global headers object that we can modify
-const globalHeaders: Record<string, string> = {};
-
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
@@ -18,21 +15,22 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     autoRefreshToken: false,
   },
   global: {
-    headers: globalHeaders,
+    headers: {},
   },
 });
 
 // Function to set Clerk JWT token for Supabase requests
 export const setClerkToken = async (token: string | null) => {
   if (token) {
-    // Set the authorization header in the global headers object
-    globalHeaders['Authorization'] = `Bearer ${token}`;
-    supabase.realtime.setAuth(token);
-    console.log('[setClerkToken] ✅ Clerk JWT token has been set in Supabase headers');
+    // Create session with the Clerk JWT token
+    await supabase.auth.setSession({
+      access_token: token,
+      refresh_token: '', // Not needed for Clerk integration
+    });
+    console.log('[setClerkToken] ✅ Clerk JWT token has been set as Supabase session');
   } else {
-    // Remove the authorization header when signing out
-    delete globalHeaders['Authorization'];
-    supabase.realtime.setAuth(null);
-    console.log('[setClerkToken] ❌ Clerk JWT token has been removed from Supabase headers');
+    // Sign out to clear the session
+    await supabase.auth.signOut();
+    console.log('[setClerkToken] ❌ Clerk JWT token has been removed from Supabase session');
   }
 };
