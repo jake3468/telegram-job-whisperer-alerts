@@ -60,7 +60,7 @@ export const useJWTDebug = () => {
       console.log('  - Token stored:', currentToken ? '✅ YES' : '❌ NO');
       console.log('  - Tokens match:', (freshToken === currentToken) ? '✅ YES' : '❌ NO');
 
-      // Test 3: Test JWT transmission to Supabase with direct auth headers
+      // Test 3: Test JWT transmission to Supabase
       console.log('\n🔗 Test 3: JWT Transmission with Direct Auth Headers');
       const transmissionTest = await testJWTTransmission();
       console.log('  - Transmission successful:', transmissionTest.data ? '✅ YES' : '❌ NO');
@@ -89,12 +89,12 @@ export const useJWTDebug = () => {
       // Test 4: Test direct authenticated request to user_profile
       console.log('\n👤 Test 4: Direct Profile Access with Auth Headers');
       try {
-        const { data: profileData, error: profileError } = await makeAuthenticatedRequest(() =>
-          supabase
+        const { data: profileData, error: profileError } = await makeAuthenticatedRequest(async () => {
+          return await supabase
             .from('user_profile')
             .select('id, user_id, bio, created_at')
-            .limit(1)
-        );
+            .limit(1);
+        });
 
         console.log('  - Profile query successful:', !profileError ? '✅ YES' : '❌ NO');
         if (profileError) {

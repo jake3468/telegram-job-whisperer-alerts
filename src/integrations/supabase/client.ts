@@ -14,85 +14,21 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
 // Store the current JWT token
 let currentJWTToken: string | null = null;
 
-// Create the base Supabase client
-const baseClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+// Create the Supabase client with simpler configuration
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    persistSession: false, // Disable Supabase auth since we're using Clerk
+    persistSession: false,
     autoRefreshToken: false,
+  },
+  global: {
+    headers: {}
   }
 });
 
-// Create a proxy handler to intercept and modify requests
-const createAuthenticatedClient = () => {
-  return new Proxy(baseClient, {
-    get(target, prop) {
-      const originalMethod = target[prop];
-      
-      // Intercept methods that make requests
-      if (prop === 'from' || prop === 'rpc' || prop === 'storage') {
-        return function(...args: any[]) {
-          const result = originalMethod.apply(target, args);
-          
-          // If we have a JWT token, add Authorization header to the request
-          if (currentJWTToken && result && typeof result === 'object') {
-            // For query builders, intercept the actual request
-            if (result.select || result.insert || result.update || result.delete || result.upsert) {
-              return new Proxy(result, {
-                get(queryTarget, queryProp) {
-                  const queryMethod = queryTarget[queryProp];
-                  
-                  if (typeof queryMethod === 'function') {
-                    return function(...queryArgs: any[]) {
-                      const queryResult = queryMethod.apply(queryTarget, queryArgs);
-                      
-                      // If this is the final request execution, add auth header
-                      if (queryResult && typeof queryResult.then === 'function') {
-                        // Modify the request to include Authorization header
-                        const originalRequest = queryResult;
-                        
-                        // Override the request headers
-                        if (queryTarget.headers) {
-                          queryTarget.headers['Authorization'] = `Bearer ${currentJWTToken}`;
-                        } else {
-                          queryTarget.headers = { 'Authorization': `Bearer ${currentJWTToken}` };
-                        }
-                        
-                        console.log('[AuthProxy] 🔐 Added JWT to request:', prop, queryProp);
-                        return originalRequest;
-                      }
-                      
-                      return queryResult;
-                    };
-                  }
-                  
-                  return queryMethod;
-                }
-              });
-            }
-            
-            // For RPC calls, add auth header directly
-            if (prop === 'rpc' && currentJWTToken) {
-              console.log('[AuthProxy] 🔐 Adding JWT to RPC call');
-              // The RPC call will be made with the JWT token
-            }
-          }
-          
-          return result;
-        };
-      }
-      
-      return originalMethod;
-    }
-  });
-};
-
-// Create the authenticated Supabase client
-export const supabase = createAuthenticatedClient();
-
-// Enhanced function to set Clerk JWT token with direct request interception
+// Function to set Clerk JWT token  
 export const setClerkToken = async (token: string | null) => {
   try {
-    console.log('[setClerkToken] 🔄 Setting Clerk JWT token with direct auth headers...');
+    console.log('[setClerkToken] 🔄 Setting Clerk JWT token...');
     
     if (token) {
       // Validate token format before setting
@@ -118,11 +54,22 @@ export const setClerkToken = async (token: string | null) => {
       }
 
       currentJWTToken = token;
-      console.log('[setClerkToken] ✅ Clerk JWT token stored for direct header injection');
       
+      // Update the global headers to include Authorization
+      if (supabase.rest && supabase.rest.headers) {
+        supabase.rest.headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      console.log('[setClerkToken] ✅ Clerk JWT token stored and headers updated');
       return true;
     } else {
       currentJWTToken = null;
+      
+      // Remove Authorization header
+      if (supabase.rest && supabase.rest.headers) {
+        delete supabase.rest.headers['Authorization'];
+      }
+      
       console.log('[setClerkToken] ❌ Clerk JWT token cleared');
       return true;
     }
@@ -135,23 +82,18 @@ export const setClerkToken = async (token: string | null) => {
 // Function to get current JWT token for debugging
 export const getCurrentJWTToken = () => currentJWTToken;
 
-// Enhanced function to test JWT transmission with direct RPC call
+// Function to test JWT transmission with direct RPC call
 export const testJWTTransmission = async () => {
   try {
-    console.log('[testJWTTransmission] 🧪 Testing JWT transmission with direct auth headers...');
+    console.log('[testJWTTransmission] 🧪 Testing JWT transmission...');
     console.log('[testJWTTransmission] 🔑 Current token available:', currentJWTToken ? 'YES' : 'NO');
     
     if (currentJWTToken) {
       console.log('[testJWTTransmission] 📝 Token preview (first 100 chars):', currentJWTToken.substring(0, 100));
     }
     
-    // Make direct RPC call with explicit auth header
-    const { data, error } = await baseClient.rpc('debug_user_auth', {}, {
-      headers: {
-        'Authorization': `Bearer ${currentJWTToken || ''}`,
-        'Content-Type': 'application/json'
-      }
-    });
+    // Make direct RPC call 
+    const { data, error } = await supabase.rpc('debug_user_auth');
     
     console.log('[testJWTTransmission] 📊 Test result:', {
       data,
@@ -188,13 +130,13 @@ export const createAuthenticatedStorageClient = () => {
   return supabase.storage;
 };
 
-// Enhanced function to make authenticated requests
-export const makeAuthenticatedRequest = async (operation: () => Promise<any>) => {
+// Function to make authenticated requests with proper error handling
+export const makeAuthenticatedRequest = async <T>(operation: () => Promise<T>): Promise<T> => {
   if (!currentJWTToken) {
     console.warn('[makeAuthenticatedRequest] ⚠️ No JWT token available');
-    return operation();
+  } else {
+    console.log('[makeAuthenticatedRequest] 🔐 Making authenticated request with JWT');
   }
   
-  console.log('[makeAuthenticatedRequest] 🔐 Making authenticated request with JWT');
-  return operation();
+  return await operation();
 };
