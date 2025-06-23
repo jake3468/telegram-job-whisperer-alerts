@@ -22,15 +22,14 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
 // Function to set Clerk JWT token for Supabase requests
 export const setClerkToken = async (token: string | null) => {
   if (token) {
-    // Create session with the Clerk JWT token
-    await supabase.auth.setSession({
-      access_token: token,
-      refresh_token: '', // Not needed for Clerk integration
-    });
-    console.log('[setClerkToken] ✅ Clerk JWT token has been set as Supabase session');
+    // Set the authorization header directly for all requests
+    supabase.rest.headers['Authorization'] = `Bearer ${token}`;
+    supabase.realtime.setAuth(token);
+    console.log('[setClerkToken] ✅ Clerk JWT token has been set as Authorization header');
   } else {
-    // Sign out to clear the session
-    await supabase.auth.signOut();
-    console.log('[setClerkToken] ❌ Clerk JWT token has been removed from Supabase session');
+    // Remove the authorization header
+    delete supabase.rest.headers['Authorization'];
+    supabase.realtime.setAuth(null);
+    console.log('[setClerkToken] ❌ Clerk JWT token has been removed from Authorization header');
   }
 };

@@ -31,7 +31,7 @@ export function useClerkSupabaseSync() {
             console.warn("[useClerkSupabaseSync] ⚠️ No Clerk JWT returned. Using Supabase anon key only.");
             await setClerkToken(null);
           } else {
-            console.log(`[useClerkSupabaseSync] 🔑 Setting Clerk JWT session for user: ${userId}`);
+            console.log(`[useClerkSupabaseSync] 🔑 Setting Clerk JWT for user: ${userId}`);
             await setClerkToken(jwt);
             
             // Debug: Log token info (first 50 chars for security)
@@ -43,14 +43,14 @@ export function useClerkSupabaseSync() {
                 const { data: testResult } = await import('@/integrations/supabase/client').then(m => 
                   m.supabase.rpc('debug_user_auth')
                 );
-                console.log('[useClerkSupabaseSync] 🧪 JWT test result after session setup:', testResult);
+                console.log('[useClerkSupabaseSync] 🧪 JWT test result after token sync:', testResult);
               } catch (error) {
                 console.warn('[useClerkSupabaseSync] ⚠️ JWT test failed:', error);
               }
             }, 1000);
           }
         } else {
-          console.log("[useClerkSupabaseSync] 👤 User not signed in. Clearing Supabase session.");
+          console.log("[useClerkSupabaseSync] 👤 User not signed in. Clearing Supabase token.");
           await setClerkToken(null);
         }
       } catch (err) {
