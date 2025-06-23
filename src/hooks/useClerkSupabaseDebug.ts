@@ -6,7 +6,7 @@ export const useClerkSupabaseDebug = () => {
   const { getToken, isSignedIn, userId } = useAuth();
 
   const debugClerkSupabaseIntegration = async () => {
-    console.log('\n=== ENHANCED CLERK-SUPABASE DEBUG SESSION V2 ===');
+    console.log('\n=== ENHANCED CLERK-SUPABASE DEBUG SESSION V3 ===');
     console.log('[DEBUG] Clerk isSignedIn:', isSignedIn);
     console.log('[DEBUG] Clerk userId:', userId);
 
@@ -93,18 +93,8 @@ export const useClerkSupabaseDebug = () => {
         console.log('[DEBUG] RPC function error:', rpcError);
       }
 
-      // Test 5: New detailed JWT debug function
-      console.log('\n--- Test 5: Detailed JWT Debug Function ---');
-      try {
-        const { data: detailedDebug, error: detailedError } = await supabase.rpc('debug_jwt_detailed');
-        console.log('[DEBUG] Detailed JWT debug result:', detailedDebug);
-        console.log('[DEBUG] Detailed JWT debug error:', detailedError);
-      } catch (rpcError) {
-        console.log('[DEBUG] Detailed JWT RPC error:', rpcError);
-      }
-
-      // Test 6: User lookup
-      console.log('\n--- Test 6: User Lookup ---');
+      // Test 5: User lookup
+      console.log('\n--- Test 5: User Lookup ---');
       const { data: userCheck, error: userError } = await supabase
         .from('users')
         .select('id, clerk_id, email')
@@ -117,8 +107,8 @@ export const useClerkSupabaseDebug = () => {
         console.log('[DEBUG] User data:', userCheck);
       }
 
-      // Test 7: Profile access test with enhanced debugging
-      console.log('\n--- Test 7: Profile Access Test (MAIN ISSUE) ---');
+      // Test 6: Profile access test with enhanced debugging
+      console.log('\n--- Test 6: Profile Access Test (MAIN ISSUE) ---');
       let profileData = null;
       if (userCheck) {
         // First try with current RLS
@@ -131,16 +121,20 @@ export const useClerkSupabaseDebug = () => {
         console.log('[DEBUG] Profile lookup result:', profileCheck ? '✅ ACCESSIBLE' : '❌ NOT ACCESSIBLE');
         console.log('[DEBUG] Profile lookup error:', profileError);
         
-        // Try raw SQL query to see if profile exists at all
-        const { data: rawProfile, error: rawError } = await supabase
-          .rpc('debug_jwt_detailed'); // This will show us current auth state
-        
-        console.log('[DEBUG] Current auth state for profile access:', rawProfile);
-        
         profileData = profileCheck;
       }
 
-      console.log('\n=== ENHANCED DEBUG SESSION V2 COMPLETE ===\n');
+      // Test 7: Direct auth state check
+      console.log('\n--- Test 7: Direct Auth State Check ---');
+      try {
+        const { data: authStateData, error: authStateError } = await supabase.rpc('debug_user_auth');
+        console.log('[DEBUG] Current auth state for profile access:', authStateData);
+        console.log('[DEBUG] Auth state error:', authStateError);
+      } catch (e) {
+        console.log('[DEBUG] Auth state check error:', e);
+      }
+
+      console.log('\n=== ENHANCED DEBUG SESSION V3 COMPLETE ===\n');
 
       return { 
         success: true, 
