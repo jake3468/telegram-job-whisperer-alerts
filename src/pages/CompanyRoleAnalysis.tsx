@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,7 +18,6 @@ import { BulletPointList } from '@/components/BulletPointList';
 import { JSONSectionDisplay } from '@/components/JSONSectionDisplay';
 import { SourcesDisplay } from '@/components/SourcesDisplay';
 import { PremiumAnalysisResults } from '@/components/PremiumAnalysisResults';
-import { TestServiceRoleAccess } from '@/components/TestServiceRoleAccess';
 
 interface CompanyRoleAnalysisData {
   id: string;
@@ -296,17 +296,6 @@ const CompanyRoleAnalysis = () => {
             <p className="text-base sm:text-lg text-white max-w-3xl mx-auto leading-relaxed font-light px-2">
               Smart candidates don't just apply—they investigate. Get the career intelligence that puts you ahead of 99% of applicants.
             </p>
-          </div>
-
-          {/* Add Test Component for debugging */}
-          <div className="w-full px-2">
-            <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4 mb-6">
-              <h3 className="text-red-200 font-medium mb-2">Debug Mode: Service Role Test</h3>
-              <p className="text-red-300/80 text-sm mb-4">
-                This test component will help us verify if the service role can write to the company_role_analyses table.
-              </p>
-              <TestServiceRoleAccess />
-            </div>
           </div>
 
           {/* Analysis Form */}
