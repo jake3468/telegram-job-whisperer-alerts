@@ -21,7 +21,6 @@ export function useClerkSupabaseSync() {
           // Get the token for this signed-in user with the supabase template
           const jwt = await getToken({ 
             template: 'supabase',
-            // Add additional claims that Supabase expects
             skipCache: true
           }).catch((error) => {
             console.error('[useClerkSupabaseSync] ❌ Error getting Clerk JWT:', error);
@@ -35,38 +34,32 @@ export function useClerkSupabaseSync() {
             console.warn("[useClerkSupabaseSync] ⚠️ No Clerk JWT returned. Using Supabase anon key only.");
             await setClerkToken(null);
           } else {
-            console.log(`[useClerkSupabaseSync] 🔑 Setting Clerk JWT session for user: ${userId}`);
+            console.log(`[useClerkSupabaseSync] 🔑 Setting Clerk JWT for user: ${userId}`);
             
-            // Use the new session-based approach
+            // Set the JWT token as authorization header
             const success = await setClerkToken(jwt);
             
             if (success) {
               // Debug: Log token info (first 50 chars for security)
               console.log(`[useClerkSupabaseSync] 📝 Token preview: ${jwt.substring(0, 50)}...`);
               
-              // Verify the session was set properly after a short delay
+              // Test a simple query to verify authentication
               setTimeout(async () => {
                 try {
-                  const { data: { session } } = await import('@/integrations/supabase/client').then(m => 
-                    m.supabase.auth.getSession()
-                  );
-                  console.log('[useClerkSupabaseSync] 🧪 Current Supabase session:', session?.user ? 'Authenticated' : 'Anonymous');
-                  
-                  // Test the debug function
                   const { data: testResult } = await import('@/integrations/supabase/client').then(m => 
                     m.supabase.rpc('debug_user_auth')
                   );
-                  console.log('[useClerkSupabaseSync] 🧪 JWT test result after session setup:', testResult);
+                  console.log('[useClerkSupabaseSync] 🧪 JWT test result after token setup:', testResult);
                 } catch (error) {
-                  console.warn('[useClerkSupabaseSync] ⚠️ Session verification failed:', error);
+                  console.warn('[useClerkSupabaseSync] ⚠️ JWT verification failed:', error);
                 }
               }, 1000);
             } else {
-              console.error('[useClerkSupabaseSync] ❌ Failed to set Clerk JWT session');
+              console.error('[useClerkSupabaseSync] ❌ Failed to set Clerk JWT token');
             }
           }
         } else {
-          console.log("[useClerkSupabaseSync] 👤 User not signed in. Clearing Supabase session.");
+          console.log("[useClerkSupabaseSync] 👤 User not signed in. Clearing Supabase token.");
           await setClerkToken(null);
         }
       } catch (err) {

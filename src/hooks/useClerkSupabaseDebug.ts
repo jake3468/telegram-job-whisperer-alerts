@@ -6,7 +6,7 @@ export const useClerkSupabaseDebug = () => {
   const { getToken, isSignedIn, userId } = useAuth();
 
   const debugClerkSupabaseIntegration = async () => {
-    console.log('\n=== ENHANCED CLERK-SUPABASE DEBUG SESSION V3 ===');
+    console.log('\n=== ENHANCED CLERK-SUPABASE DEBUG SESSION V4 ===');
     console.log('[DEBUG] Clerk isSignedIn:', isSignedIn);
     console.log('[DEBUG] Clerk userId:', userId);
 
@@ -42,38 +42,16 @@ export const useClerkSupabaseDebug = () => {
         }
       }
 
-      // Test 2: Check current Supabase session
-      console.log('\n--- Test 2: Current Supabase Session ---');
-      try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        console.log('[DEBUG] Supabase session exists:', session ? '✅ YES' : '❌ NO');
-        console.log('[DEBUG] Session error:', sessionError);
-        
-        if (session) {
-          console.log('[DEBUG] Session user:', session.user ? '✅ FOUND' : '❌ NOT FOUND');
-          console.log('[DEBUG] Session access token present:', session.access_token ? '✅ YES' : '❌ NO');
-          console.log('[DEBUG] Session expires at:', new Date(session.expires_at * 1000).toISOString());
-        }
-      } catch (e) {
-        console.log('[DEBUG] Supabase session error:', e);
+      // Test 2: Check authorization header
+      console.log('\n--- Test 2: Authorization Header Check ---');
+      const authHeader = supabase.rest.headers['Authorization'];
+      console.log('[DEBUG] Authorization header set:', authHeader ? '✅ YES' : '❌ NO');
+      if (authHeader) {
+        console.log('[DEBUG] Auth header preview:', authHeader.substring(0, 50) + '...');
       }
 
-      // Test 3: Check Supabase auth user
-      console.log('\n--- Test 3: Supabase Auth User ---');
-      try {
-        const { data: authUser, error: authError } = await supabase.auth.getUser();
-        console.log('[DEBUG] Supabase auth user:', authUser.user ? '✅ FOUND' : '❌ NOT FOUND');
-        console.log('[DEBUG] Auth error:', authError);
-        if (authUser.user) {
-          console.log('[DEBUG] Auth user role:', authUser.user.role || 'no_role');
-          console.log('[DEBUG] Auth user aud:', authUser.user.aud || 'no_aud');
-        }
-      } catch (e) {
-        console.log('[DEBUG] Supabase auth user error:', e);
-      }
-
-      // Test 4: Enhanced JWT debugging function
-      console.log('\n--- Test 4: Enhanced JWT Debug Function ---');
+      // Test 3: Enhanced JWT debugging function
+      console.log('\n--- Test 3: Enhanced JWT Debug Function ---');
       try {
         const { data: debugData, error: debugError } = await supabase.rpc('debug_user_auth');
         console.log('[DEBUG] Enhanced debug_user_auth result:', debugData);
@@ -88,13 +66,14 @@ export const useClerkSupabaseDebug = () => {
           console.log('  - JWT Audience:', result.jwt_aud || '❌ NOT FOUND');
           console.log('  - Auth Role:', result.auth_role || '❌ NOT FOUND');
           console.log('  - User exists in DB:', result.user_exists ? '✅ YES' : '❌ NO');
+          console.log('  - Current setting claims:', result.current_setting_claims || '❌ NOT FOUND');
         }
       } catch (rpcError) {
         console.log('[DEBUG] RPC function error:', rpcError);
       }
 
-      // Test 5: User lookup
-      console.log('\n--- Test 5: User Lookup ---');
+      // Test 4: User lookup
+      console.log('\n--- Test 4: User Lookup ---');
       const { data: userCheck, error: userError } = await supabase
         .from('users')
         .select('id, clerk_id, email')
@@ -107,11 +86,28 @@ export const useClerkSupabaseDebug = () => {
         console.log('[DEBUG] User data:', userCheck);
       }
 
-      // Test 6: Profile access test with enhanced debugging
+      // Test 5: Credits access test
+      console.log('\n--- Test 5: Credits Access Test ---');
+      let creditsData = null;
+      if (userCheck) {
+        const { data: creditsCheck, error: creditsError } = await supabase
+          .from('user_credits')
+          .select('current_balance, free_credits, subscription_plan')
+          .eq('user_id', userCheck.id)
+          .maybeSingle();
+
+        console.log('[DEBUG] Credits lookup result:', creditsCheck ? '✅ ACCESSIBLE' : '❌ NOT ACCESSIBLE');
+        console.log('[DEBUG] Credits lookup error:', creditsError);
+        if (creditsCheck) {
+          console.log('[DEBUG] Credits data:', creditsCheck);
+        }
+        creditsData = creditsCheck;
+      }
+
+      // Test 6: Profile access test (MAIN ISSUE)
       console.log('\n--- Test 6: Profile Access Test (MAIN ISSUE) ---');
       let profileData = null;
       if (userCheck) {
-        // First try with current RLS
         const { data: profileCheck, error: profileError } = await supabase
           .from('user_profile')
           .select('*')
@@ -121,25 +117,31 @@ export const useClerkSupabaseDebug = () => {
         console.log('[DEBUG] Profile lookup result:', profileCheck ? '✅ ACCESSIBLE' : '❌ NOT ACCESSIBLE');
         console.log('[DEBUG] Profile lookup error:', profileError);
         
+        if (!profileCheck && !profileError) {
+          console.log('[DEBUG] 🚨 PROFILE ACCESS ISSUE - Profile exists but RLS is blocking access');
+        }
+        
         profileData = profileCheck;
       }
 
-      // Test 7: Direct auth state check
-      console.log('\n--- Test 7: Direct Auth State Check ---');
-      try {
-        const { data: authStateData, error: authStateError } = await supabase.rpc('debug_user_auth');
-        console.log('[DEBUG] Current auth state for profile access:', authStateData);
-        console.log('[DEBUG] Auth state error:', authStateError);
-      } catch (e) {
-        console.log('[DEBUG] Auth state check error:', e);
-      }
+      // Test 7: Direct profile query (bypass user lookup)
+      console.log('\n--- Test 7: Direct Profile Query ---');
+      const { data: directProfile, error: directError } = await supabase
+        .from('user_profile')
+        .select('*')
+        .limit(5);
 
-      console.log('\n=== ENHANCED DEBUG SESSION V3 COMPLETE ===\n');
+      console.log('[DEBUG] Direct profile query result:', directProfile || []);
+      console.log('[DEBUG] Direct profile query error:', directError);
+
+      console.log('\n=== ENHANCED DEBUG SESSION V4 COMPLETE ===\n');
 
       return { 
         success: true, 
         hasToken: !!token,
+        hasAuthHeader: !!authHeader,
         userExists: !!userCheck,
+        canAccessCredits: !!creditsData,
         canAccessProfile: !!profileData
       };
 

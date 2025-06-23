@@ -16,50 +16,36 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   },
 });
 
-// Function to set Clerk JWT token as a proper Supabase session
+// Function to set Clerk JWT token as authorization header
 export const setClerkToken = async (token: string | null) => {
   if (token) {
     try {
-      // Create a proper session object with the Clerk JWT
-      const session = {
-        access_token: token,
-        refresh_token: '', // Not needed for Clerk JWTs
-        expires_in: 3600, // 1 hour default
-        expires_at: Math.floor(Date.now() / 1000) + 3600,
-        token_type: 'bearer',
-        user: null // Will be populated by Supabase
-      };
-
-      // Set the session in Supabase auth
-      const { data, error } = await supabase.auth.setSession(session);
+      console.log('[setClerkToken] ✅ Setting Clerk JWT token...');
       
-      if (error) {
-        console.error('[setClerkToken] ❌ Failed to set Supabase session:', error);
-        return false;
-      }
-
-      console.log('[setClerkToken] ✅ Clerk JWT session set successfully:', data?.session?.user ? 'User authenticated' : 'Session set');
+      // Set the authorization header for all requests
+      supabase.rest.headers['Authorization'] = `Bearer ${token}`;
       
       // Also set it for realtime if needed
       if (supabase.realtime) {
         supabase.realtime.setAuth(token);
       }
       
+      console.log('[setClerkToken] ✅ Clerk JWT token set successfully');
       return true;
     } catch (error) {
-      console.error('[setClerkToken] ❌ Error setting Clerk JWT session:', error);
+      console.error('[setClerkToken] ❌ Error setting Clerk JWT token:', error);
       return false;
     }
   } else {
-    // Sign out from Supabase
-    await supabase.auth.signOut();
+    // Clear the authorization header
+    delete supabase.rest.headers['Authorization'];
     
     // Clear realtime auth
     if (supabase.realtime) {
       supabase.realtime.setAuth(null);
     }
     
-    console.log('[setClerkToken] ❌ Clerk JWT session cleared');
+    console.log('[setClerkToken] ❌ Clerk JWT token cleared');
     return true;
   }
 };
