@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import AuthHeader from '@/components/AuthHeader';
 import ResumeSection from '@/components/dashboard/ResumeSection';
 import BioSection from '@/components/dashboard/BioSection';
+import AuthDebugPanel from '@/components/AuthDebugPanel';
+import JWTDebugPanel from '@/components/JWTDebugPanel';
 import { Layout } from '@/components/Layout';
 
 const Profile = () => {
@@ -39,6 +41,14 @@ const Profile = () => {
         <ResumeSection />
         <BioSection />
       </div>
+      
+      {/* Debug Panels - only in development */}
+      {import.meta.env.DEV && (
+        <>
+          <AuthDebugPanel />
+          <JWTDebugPanel />
+        </>
+      )}
     </Layout>
   );
 };

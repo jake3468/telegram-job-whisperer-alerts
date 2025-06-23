@@ -14,9 +14,7 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
 // Store the current JWT token
 let currentJWTToken: string | null = null;
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
-
+// Create the Supabase client with improved JWT handling
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     persistSession: false, // Disable Supabase auth since we're using Clerk
@@ -24,25 +22,53 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   },
   global: {
     headers: {
+      // Dynamic authorization header that updates with current token
       get Authorization() {
-        return currentJWTToken ? `Bearer ${currentJWTToken}` : undefined;
+        if (currentJWTToken) {
+          console.log('[Supabase Client] 🔑 Using Clerk JWT for request');
+          return `Bearer ${currentJWTToken}`;
+        }
+        console.log('[Supabase Client] ⚠️ No JWT token available, using anon');
+        return undefined;
       }
     }
   }
 });
 
-// Function to set Clerk JWT token
+// Enhanced function to set Clerk JWT token with better error handling
 export const setClerkToken = async (token: string | null) => {
   try {
     console.log('[setClerkToken] 🔄 Setting Clerk JWT token...');
     
     if (token) {
+      // Validate token format before setting
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        console.error('[setClerkToken] ❌ Invalid JWT format - token does not have 3 parts');
+        return false;
+      }
+
+      // Try to decode the payload to validate
+      try {
+        const payload = JSON.parse(atob(parts[1]));
+        console.log('[setClerkToken] 🔍 JWT payload preview:', {
+          sub: payload.sub,
+          iss: payload.iss,
+          aud: payload.aud,
+          exp: payload.exp,
+          iat: payload.iat
+        });
+      } catch (e) {
+        console.warn('[setClerkToken] ⚠️ Could not decode JWT payload for validation:', e);
+      }
+
       currentJWTToken = token;
       console.log('[setClerkToken] ✅ Clerk JWT token set successfully');
       
-      // Also set it for realtime if needed
+      // Set auth for realtime if needed
       if (supabase.realtime) {
         supabase.realtime.setAuth(token);
+        console.log('[setClerkToken] 🔄 Realtime auth updated');
       }
       
       return true;
@@ -53,6 +79,7 @@ export const setClerkToken = async (token: string | null) => {
       // Clear realtime auth
       if (supabase.realtime) {
         supabase.realtime.setAuth(null);
+        console.log('[setClerkToken] 🔄 Realtime auth cleared');
       }
       
       return true;
@@ -65,3 +92,48 @@ export const setClerkToken = async (token: string | null) => {
 
 // Function to get current JWT token for debugging
 export const getCurrentJWTToken = () => currentJWTToken;
+
+// New function to test JWT transmission
+export const testJWTTransmission = async () => {
+  try {
+    console.log('[testJWTTransmission] 🧪 Testing JWT transmission to Supabase...');
+    
+    const { data, error } = await supabase.rpc('debug_user_auth');
+    
+    console.log('[testJWTTransmission] 📊 Test result:', {
+      data,
+      error,
+      currentToken: currentJWTToken ? 'SET' : 'NOT_SET'
+    });
+    
+    return { data, error };
+  } catch (error) {
+    console.error('[testJWTTransmission] ❌ JWT transmission test failed:', error);
+    return { data: null, error };
+  }
+};
+
+// Enhanced function to create authenticated storage client
+export const createAuthenticatedStorageClient = () => {
+  if (!currentJWTToken) {
+    console.warn('[createAuthenticatedStorageClient] ⚠️ No JWT token available for storage');
+    return supabase.storage;
+  }
+
+  // Create a new storage client with explicit auth headers
+  const storageClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+    global: {
+      headers: {
+        'Authorization': `Bearer ${currentJWTToken}`,
+        'Content-Type': 'application/json'
+      }
+    }
+  }).storage;
+
+  console.log('[createAuthenticatedStorageClient] 🗄️ Created authenticated storage client');
+  return storageClient;
+};

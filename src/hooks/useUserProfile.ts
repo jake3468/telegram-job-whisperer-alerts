@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, testJWTTransmission } from '@/integrations/supabase/client';
 import { useUserInitialization } from './useUserInitialization';
 
 interface UserProfile {
@@ -28,21 +28,18 @@ export const useUserProfile = () => {
   };
 
   const debugAuthentication = async () => {
-    securityAuditLog('Starting authentication state audit');
+    securityAuditLog('Starting enhanced authentication state audit');
     securityAuditLog('Clerk user loaded:', isLoaded);
     securityAuditLog('Clerk user exists:', !!user);
     securityAuditLog('Clerk user ID:', user?.id);
 
     if (user) {
       try {
-        // Test JWT debugging function with security audit
-        const { data: debugData, error: debugError } = await supabase.rpc('debug_user_auth');
-        securityAuditLog('Supabase debug_user_auth result:', debugData);
-        if (debugError) {
-          securityAuditLog('Supabase debug_user_auth error:', debugError);
-        }
+        // Test JWT transmission directly
+        const jwtTest = await testJWTTransmission();
+        securityAuditLog('JWT transmission test result:', jwtTest);
 
-        // Test direct user lookup with RLS protection
+        // Test direct user lookup with enhanced error handling
         const { data: userLookup, error: userError } = await supabase
           .from('users')
           .select('*')
@@ -51,7 +48,11 @@ export const useUserProfile = () => {
 
         securityAuditLog('Direct user lookup result:', userLookup ? 'Found' : 'Not found');
         if (userError) {
-          securityAuditLog('Direct user lookup error:', userError);
+          securityAuditLog('Direct user lookup error details:', {
+            message: userError.message,
+            code: userError.code,
+            details: userError.details
+          });
         }
 
       } catch (error) {
@@ -74,13 +75,16 @@ export const useUserProfile = () => {
     }
 
     try {
-      securityAuditLog('Starting secure user profile fetch for:', user.id);
+      securityAuditLog('Starting enhanced secure user profile fetch for:', user.id);
       setError(null);
 
-      // Debug authentication state with security audit
+      // Enhanced authentication debugging
       await debugAuthentication();
 
-      // First, try to get the user's database ID with RLS protection
+      // Add a small delay to ensure JWT is set
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // First, try to get the user's database ID with enhanced error handling
       let { data: userData, error: userError } = await supabase
         .from('users')
         .select('id, clerk_id, email, first_name, last_name')
@@ -89,7 +93,11 @@ export const useUserProfile = () => {
 
       securityAuditLog('User lookup result:', userData ? 'Found' : 'Not found');
       if (userError) {
-        securityAuditLog('User lookup error:', userError);
+        securityAuditLog('User lookup error details:', {
+          message: userError.message,
+          code: userError.code,
+          details: userError.details
+        });
       }
 
       // If user doesn't exist in Supabase, initialize them
@@ -133,27 +141,57 @@ export const useUserProfile = () => {
         return;
       }
 
-      // Now get the user profile with RLS protection
-      const { data: profileData, error: profileError } = await supabase
-        .from('user_profile')
-        .select('*')
-        .eq('user_id', userData.id)
-        .maybeSingle();
+      // Now get the user profile with enhanced error handling and retry logic
+      let profileAttempts = 0;
+      const maxAttempts = 3;
+      let profileData = null;
+      let profileError = null;
 
-      securityAuditLog('User profile lookup result:', profileData ? 'Accessible' : 'Not accessible');
-      if (profileError) {
-        securityAuditLog('User profile lookup error:', profileError);
+      while (profileAttempts < maxAttempts && !profileData) {
+        profileAttempts++;
+        securityAuditLog(`User profile fetch attempt ${profileAttempts}/${maxAttempts}`);
+
+        const profileResult = await supabase
+          .from('user_profile')
+          .select('*')
+          .eq('user_id', userData.id)
+          .maybeSingle();
+
+        profileData = profileResult.data;
+        profileError = profileResult.error;
+
+        if (profileError) {
+          securityAuditLog(`Profile fetch attempt ${profileAttempts} error:`, {
+            message: profileError.message,
+            code: profileError.code,
+            details: profileError.details
+          });
+
+          // If it's a permission error, wait a bit and retry
+          if (profileError.code === '42501' || profileError.message.includes('permission')) {
+            securityAuditLog('Permission error detected, waiting before retry...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          } else {
+            break; // Non-permission error, don't retry
+          }
+        }
       }
 
+      securityAuditLog('User profile lookup result:', profileData ? 'Accessible' : 'Not accessible');
+      
       if (profileError) {
-        securityAuditLog('Error fetching user profile:', profileError);
+        securityAuditLog('Final profile lookup error:', {
+          message: profileError.message,
+          code: profileError.code,
+          details: profileError.details
+        });
         setError(`Error fetching profile: ${profileError.message}`);
         setLoading(false);
         return;
       }
 
       if (!profileData) {
-        securityAuditLog('No profile found, this should not happen after initialization');
+        securityAuditLog('No profile found after all attempts');
         setError('Profile not found');
         setLoading(false);
         return;
