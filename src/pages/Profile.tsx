@@ -1,23 +1,44 @@
 
 import { useUser } from '@clerk/clerk-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthHeader from '@/components/AuthHeader';
 import ResumeSection from '@/components/dashboard/ResumeSection';
 import BioSection from '@/components/dashboard/BioSection';
 import AuthDebugPanel from '@/components/AuthDebugPanel';
 import JWTDebugPanel from '@/components/JWTDebugPanel';
+import ClerkJWTSetupGuide from '@/components/ClerkJWTSetupGuide';
 import { Layout } from '@/components/Layout';
+import { useJWTDebug } from '@/hooks/useJWTDebug';
 
 const Profile = () => {
   const { user, isLoaded } = useUser();
   const navigate = useNavigate();
+  const { runComprehensiveJWTTest } = useJWTDebug();
+  const [showJWTSetupGuide, setShowJWTSetupGuide] = useState(false);
 
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
+
+  // Check JWT setup on component mount
+  useEffect(() => {
+    if (isLoaded && user) {
+      const checkJWTSetup = async () => {
+        const testResult = await runComprehensiveJWTTest();
+        
+        // Show setup guide if JWT is not properly configured
+        if (!testResult.jwtRecognized || !testResult.hasRequiredClaims) {
+          setShowJWTSetupGuide(true);
+        }
+      };
+      
+      // Run the check after a short delay to ensure sync has completed
+      setTimeout(checkJWTSetup, 2000);
+    }
+  }, [isLoaded, user, runComprehensiveJWTTest]);
 
   if (!isLoaded || !user) {
     return (
@@ -37,6 +58,14 @@ const Profile = () => {
           Manage your <span className="italic text-pastel-blue">profile</span> information and resume
         </p>
       </div>
+
+      {/* Show JWT Setup Guide if needed */}
+      {showJWTSetupGuide && (
+        <div className="mb-8 flex justify-center">
+          <ClerkJWTSetupGuide />
+        </div>
+      )}
+
       <div className="space-y-8">
         <ResumeSection />
         <BioSection />

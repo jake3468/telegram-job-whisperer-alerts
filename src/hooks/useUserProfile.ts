@@ -81,8 +81,9 @@ export const useUserProfile = () => {
       // Enhanced authentication debugging
       await debugAuthentication();
 
-      // Add a small delay to ensure JWT is set
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Add a longer delay to ensure JWT is properly set and transmitted
+      securityAuditLog('Waiting for JWT transmission to stabilize...');
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
       // First, try to get the user's database ID with enhanced error handling
       let { data: userData, error: userError } = await supabase
@@ -129,14 +130,20 @@ export const useUserProfile = () => {
         userData = newUserData;
       } else if (userError) {
         securityAuditLog('Error fetching user:', userError);
-        setError(`Error fetching user: ${userError.message}`);
+        
+        // Provide specific error message for JWT issues
+        if (userError.code === '42501' || userError.message.includes('permission')) {
+          setError('JWT authentication issue detected. Please check your Clerk JWT template configuration.');
+        } else {
+          setError(`Error fetching user: ${userError.message}`);
+        }
         setLoading(false);
         return;
       }
 
       if (!userData) {
         securityAuditLog('No user data available after all attempts');
-        setError('Unable to load user data');
+        setError('Unable to load user data - possible JWT configuration issue');
         setLoading(false);
         return;
       }
@@ -185,14 +192,20 @@ export const useUserProfile = () => {
           code: profileError.code,
           details: profileError.details
         });
-        setError(`Error fetching profile: ${profileError.message}`);
+        
+        // Provide specific error message for JWT/RLS issues
+        if (profileError.code === '42501' || profileError.message.includes('permission')) {
+          setError('Profile access blocked by RLS. This indicates a JWT authentication issue. Please verify your Clerk JWT template includes "aud": "authenticated" and "role": "authenticated".');
+        } else {
+          setError(`Error fetching profile: ${profileError.message}`);
+        }
         setLoading(false);
         return;
       }
 
       if (!profileData) {
         securityAuditLog('No profile found after all attempts');
-        setError('Profile not found');
+        setError('Profile not found - possible RLS policy issue');
         setLoading(false);
         return;
       }
