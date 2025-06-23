@@ -124,12 +124,6 @@ export const useClerkSupabaseDebug = () => {
         profileData = profileCheck;
       }
 
-      // Test 7: Direct auth state check
-      console.log('\n--- Test 7: Direct Auth State Check ---');
-      const { data: authState, error: authError } = await supabase.rpc('debug_current_auth_state');
-      console.log('[DEBUG] Current auth state for profile access:', authState);
-      console.log('[DEBUG] Auth state error:', authError);
-
       console.log('\n=== ENHANCED DEBUG SESSION V4 COMPLETE ===\n');
 
       return { 
