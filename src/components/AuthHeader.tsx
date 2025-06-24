@@ -1,7 +1,5 @@
-
 import { SignedIn, SignedOut, SignInButton, SignUpButton } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
-
 const AuthHeader = () => {
   const navigate = useNavigate();
   return (
@@ -9,35 +7,23 @@ const AuthHeader = () => {
     <header className="w-full backdrop-blur-md bg-black/70 fixed top-0 left-0 right-0 z-50 border-b border-sky-600/40 shadow-[0_6px_24px_0px_rgba(16,118,238,0.08)]">
       <div className="flex justify-between items-center px-3 sm:px-6 py-4 max-w-7xl mx-auto">
         {/* Logo and Site Name: Left side */}
-        <div
-          className="flex items-center space-x-2 sm:space-x-3 z-40 cursor-pointer"
-          onClick={() => navigate('/')}
-        >
-          <img
-            src="/lovable-uploads/6239b4a7-4f3c-4902-a936-4216ae26d9af.png"
-            alt="JobBots Logo"
-            className="h-9 w-9 sm:h-10 sm:w-10 drop-shadow-lg"
-          />
-          <span
-            className="text-[1.4rem] sm:text-3xl font-extrabold font-orbitron
-            bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-500 bg-clip-text text-transparent tracking-wider drop-shadow"
-            style={{
-              letterSpacing: '0.09em',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}>
-            JobBots
-          </span>
+        <div className="flex items-center space-x-2 sm:space-x-3 z-40 cursor-pointer" onClick={() => navigate('/')}>
+          <img src="/lovable-uploads/6239b4a7-4f3c-4902-a936-4216ae26d9af.png" alt="JobBots Logo" className="h-9 w-9 sm:h-10 sm:w-10 drop-shadow-lg" />
+          <span style={{
+            letterSpacing: '0.09em',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }} className="text-[1.4rem] font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-500 bg-clip-text tracking-wider drop-shadow text-white font-extrabold sm:text-3xl">Aspirely.ai</span>
         </div>
         {/* Auth Buttons: Right side */}
         <div>
           <SignedOut>
             <div className="flex flex-col items-end space-y-1 sm:space-y-0 sm:space-x-4 sm:flex-row sm:items-center">
               <SignInButton mode="modal">
-                <button 
-                  className="rounded-xl border border-sky-400/80 bg-black/80 text-white hover:border-fuchsia-500 hover:text-fuchsia-300 transition-colors duration-200 font-inter text-base font-semibold px-6 py-2 shadow-md focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2"
-                  style={{ minWidth: '100px', boxShadow: "0 4px 32px 0 rgba(56,189,248,0.09)" }}
-                >
+                <button className="rounded-xl border border-sky-400/80 bg-black/80 text-white hover:border-fuchsia-500 hover:text-fuchsia-300 transition-colors duration-200 font-inter text-base font-semibold px-6 py-2 shadow-md focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2" style={{
+                  minWidth: '100px',
+                  boxShadow: "0 4px 32px 0 rgba(56,189,248,0.09)"
+                }}>
                   <span className="text-sm sm:text-base tracking-wide">Sign In</span>
                 </button>
               </SignInButton>
@@ -56,5 +42,4 @@ const AuthHeader = () => {
     </header>
   );
 };
-
 export default AuthHeader;
