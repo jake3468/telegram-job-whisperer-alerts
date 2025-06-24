@@ -13,7 +13,7 @@ const AuthHeader = () => {
             letterSpacing: '0.09em',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent'
-          }} className="font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-500 bg-clip-text tracking-wider drop-shadow text-white font-extrabold sm:text-3xl text-2xl">Aspirely.ai</span>
+          }} className="font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-500 bg-clip-text tracking-wider drop-shadow font-extrabold sm:text-3xl text-white text-3xl">Aspirely.ai</span>
         </div>
         {/* Auth Buttons: Right side */}
         <div>
