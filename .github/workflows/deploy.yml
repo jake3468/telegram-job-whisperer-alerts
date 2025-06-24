@@ -6,6 +6,16 @@ on:
     branches: [ main, production ]
   pull_request:
     branches: [ main, production ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - development
 
 jobs:
   deploy-preview:
