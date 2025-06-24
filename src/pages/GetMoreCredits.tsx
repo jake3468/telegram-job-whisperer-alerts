@@ -1,3 +1,4 @@
+
 import { useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -28,9 +29,6 @@ export default function GetMoreCredits() {
   const { data: credits, isLoading, error } = useUserCredits();
   const { userProfile } = useUserProfile();
 
-  console.log('[GetMoreCredits] Render - credits:', credits, 'isLoading:', isLoading, 'error:', error);
-  console.log('[GetMoreCredits] UserProfile:', userProfile);
-
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
@@ -44,6 +42,9 @@ export default function GetMoreCredits() {
       </div>
     );
   }
+
+  // Static credit balance calculation
+  const currentBalance = credits ? Number(credits.current_balance) : 0;
 
   return (
     <Layout>
@@ -62,9 +63,9 @@ export default function GetMoreCredits() {
                 <span className="font-bold text-cyan-100">Loading...</span>
               ) : error ? (
                 <span className="font-bold text-rose-300">Error loading</span>
-              ) : credits && !("__error" in credits) ? (
+              ) : credits ? (
                 <span className="font-bold text-cyan-100">
-                  {Number(credits.current_balance).toLocaleString()} credits
+                  {currentBalance.toLocaleString()} credits
                 </span>
               ) : (
                 <span className="font-bold text-yellow-300">No credits found</span>

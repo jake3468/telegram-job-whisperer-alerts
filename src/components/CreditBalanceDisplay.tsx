@@ -1,11 +1,18 @@
 
 import { BadgeDollarSign } from "lucide-react";
 import { useUserCredits } from "@/hooks/useUserCredits";
+import { useMemo } from "react";
 
 const CreditBalanceDisplay = () => {
   const { data: credits, isLoading, error } = useUserCredits();
 
-  // Show loading only on initial load (no isFetching states)
+  // Memoize the credit balance to prevent unnecessary recalculations
+  const creditBalance = useMemo(() => {
+    if (!credits) return 0;
+    return Number(credits.current_balance) ?? 0;
+  }, [credits]);
+
+  // Show loading only on very first load when no data exists
   if (isLoading && !credits) {
     return (
       <div className="flex flex-col gap-2 text-fuchsia-200 font-orbitron text-xs">
@@ -19,14 +26,12 @@ const CreditBalanceDisplay = () => {
 
   // Static display - show credits without any loading indicators
   if (credits) {
-    const balance = credits.current_balance ?? 0;
-
     return (
       <div className="flex flex-col gap-0.5 text-fuchsia-200 font-orbitron text-sm px-2">
         <div className="flex items-center gap-2">
           <BadgeDollarSign className="w-5 h-5" />
           <span>
-            {Number(balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} credits
+            {creditBalance.toLocaleString(undefined, { maximumFractionDigits: 2 })} credits
           </span>
         </div>
       </div>
@@ -34,18 +39,6 @@ const CreditBalanceDisplay = () => {
   }
 
   // Show error state or fallback
-  if (error && !credits) {
-    return (
-      <div className="flex flex-col text-fuchsia-200 font-orbitron text-xs opacity-70">
-        <div className="flex items-center gap-2">
-          <BadgeDollarSign className="w-5 h-5" />
-          <span className="text-xs">Credits</span>
-        </div>
-      </div>
-    );
-  }
-
-  // Fallback - should rarely be shown
   return (
     <div className="flex flex-col text-fuchsia-200 font-orbitron text-xs opacity-70">
       <div className="flex items-center gap-2">

@@ -22,13 +22,16 @@ export const useUserCredits = () => {
   const { user } = useUser();
   
   return useQuery({
-    queryKey: ['user_credits', userProfile?.user_id, user?.id],
+    queryKey: ['user_credits_static'], // Static key that doesn't change
     queryFn: async () => {
+      // Wait for userProfile to be available before fetching
       if (!userProfile?.user_id) {
         return null;
       }
       
       try {
+        console.log('[useUserCredits] Fetching credits for user:', userProfile.user_id);
+        
         // Direct query with no excessive logging
         const { data: credits, error } = await supabase
           .from('user_credits')
@@ -75,13 +78,13 @@ export const useUserCredits = () => {
         return null;
       }
     },
-    enabled: !!userProfile?.user_id && !!user?.id,
-    // Static configuration - no automatic refetching
+    enabled: !!userProfile?.user_id && !!user?.id, // Only enable when both are available
+    // Static configuration - data is cached for the entire session
     staleTime: Infinity, // Data never becomes stale during session
     gcTime: Infinity, // Keep data cached indefinitely during session
     refetchOnWindowFocus: false, // Don't refetch when window gains focus
     refetchOnReconnect: false, // Don't refetch on network reconnect
-    refetchOnMount: true, // Only fetch on initial mount
+    refetchOnMount: false, // Don't refetch on component remount after initial fetch
     retry: 1, // Reduced retry attempts
   });
 };
