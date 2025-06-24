@@ -27,10 +27,7 @@ export default function GetMoreCredits() {
   const { user, isLoaded } = useUser();
   const navigate = useNavigate();
   const { data: credits, isLoading, error } = useUserCredits();
-  const { userProfile, loading: userProfileLoading } = useUserProfile();
-
-  console.log('[GetMoreCredits] Render - credits:', credits, 'isLoading:', isLoading, 'error:', error);
-  console.log('[GetMoreCredits] UserProfile:', userProfile, 'userProfileLoading:', userProfileLoading);
+  const { userProfile } = useUserProfile();
 
   useEffect(() => {
     if (isLoaded && !user) {
@@ -46,6 +43,9 @@ export default function GetMoreCredits() {
     );
   }
 
+  // Static credit balance calculation
+  const currentBalance = credits ? Number(credits.current_balance) : 0;
+
   return (
     <Layout>
       <div className="w-full flex flex-col pb-5 sm:pb-8">
@@ -59,13 +59,13 @@ export default function GetMoreCredits() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
             <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in">
               Current Balance:{" "}
-              {isLoading || userProfileLoading ? (
+              {isLoading ? (
                 <span className="font-bold text-cyan-100">Loading...</span>
               ) : error ? (
                 <span className="font-bold text-rose-300">Error loading</span>
-              ) : credits && !("__error" in credits) ? (
+              ) : credits ? (
                 <span className="font-bold text-cyan-100">
-                  {Number(credits.current_balance).toLocaleString()} credits
+                  {currentBalance.toLocaleString()} credits
                 </span>
               ) : (
                 <span className="font-bold text-yellow-300">No credits found</span>

@@ -64,12 +64,13 @@ export function useCreditWarnings() {
     });
   };
 
+  // Only show warnings on initial load, not on background updates
   useEffect(() => {
     if (isLoading || !credits) return;
 
     const balance = Number(credits.current_balance);
 
-    // Show low credit warning (when < 3 but > 0)
+    // Show low credit warning (when < 3 but > 0) - only once per session
     if (balance > 0 && balance < 3 && !warningState.hasShownLowCreditWarning) {
       const resetDate = formatResetDate(credits.next_reset_date);
       
@@ -87,7 +88,7 @@ export function useCreditWarnings() {
       updateWarningState({ hasShownLowCreditWarning: true });
     }
 
-    // Show zero credit warning (when = 0)
+    // Show zero credit warning (when = 0) - only once per session
     if (balance === 0 && !warningState.hasShownZeroCreditWarning) {
       const resetDate = formatResetDate(credits.next_reset_date);
       

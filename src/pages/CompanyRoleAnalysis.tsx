@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -89,7 +88,55 @@ const CompanyRoleAnalysis = () => {
     enabled: !!userProfile?.id
   });
 
-  // Real-time subscription for analysis updates with improved logging
+  // Enhanced helper function to check if analysis has meaningful data
+  const hasAnalysisResult = (analysis: CompanyRoleAnalysisData) => {
+    return !!(
+      analysis.research_date || 
+      analysis.local_role_market_context || 
+      (analysis.company_news_updates && analysis.company_news_updates.length > 0) || 
+      (analysis.role_security_score !== null && analysis.role_security_score !== undefined) || 
+      (analysis.role_security_score_breakdown && analysis.role_security_score_breakdown.length > 0) ||
+      analysis.role_security_outlook || 
+      analysis.role_security_automation_risks ||
+      analysis.role_security_departmental_trends ||
+      (analysis.role_experience_score !== null && analysis.role_experience_score !== undefined) ||
+      (analysis.role_experience_score_breakdown && analysis.role_experience_score_breakdown.length > 0) ||
+      analysis.role_experience_specific_insights ||
+      analysis.role_compensation_analysis || 
+      analysis.role_workplace_environment || 
+      analysis.career_development || 
+      analysis.role_specific_considerations || 
+      analysis.interview_and_hiring_insights || 
+      analysis.sources
+    );
+  };
+
+  // Check for completed analysis when data is fetched or pendingAnalysisId changes
+  useEffect(() => {
+    if (!pendingAnalysisId || !analysisHistory) return;
+    
+    console.log('Checking for completed analysis with ID:', pendingAnalysisId);
+    
+    // Find the pending analysis in the fetched data
+    const completedAnalysis = analysisHistory.find(
+      analysis => analysis.id === pendingAnalysisId && hasAnalysisResult(analysis)
+    );
+    
+    if (completedAnalysis) {
+      console.log('Found completed analysis, stopping loading and showing results');
+      setPendingAnalysisId(null);
+      setIsSubmitting(false);
+      setLoadingMessages([]);
+      setShowRecentResults(true);
+      
+      toast({
+        title: "Analysis Complete!",
+        description: "Your company analysis is ready to view."
+      });
+    }
+  }, [analysisHistory, pendingAnalysisId, toast]);
+
+  // Real-time subscription for analysis updates with enhanced detection
   useEffect(() => {
     if (!userProfile?.id || !pendingAnalysisId) return;
 
@@ -105,23 +152,12 @@ const CompanyRoleAnalysis = () => {
       }, (payload) => {
         console.log('Real-time update received for company analysis:', payload);
 
-        // Check if meaningful data has been added
-        const newData = payload.new;
-        if (newData && (
-          newData.local_role_market_context || 
-          newData.company_news_updates || 
-          newData.role_security_score || 
-          newData.role_experience_score || 
-          newData.role_compensation_analysis || 
-          newData.role_workplace_environment || 
-          newData.career_development || 
-          newData.role_specific_considerations || 
-          newData.interview_and_hiring_insights || 
-          newData.sources
-        )) {
-          console.log('Analysis is complete, refreshing data and showing results');
+        // Enhanced detection - check if the updated record has meaningful data
+        const updatedData = payload.new as CompanyRoleAnalysisData;
+        if (updatedData && hasAnalysisResult(updatedData)) {
+          console.log('Meaningful analysis data detected, showing results');
           
-          // Analysis is complete, refresh the data and stop loading
+          // Analysis has meaningful data, refresh and show results
           refetchHistory();
           setPendingAnalysisId(null);
           setIsSubmitting(false);
@@ -132,6 +168,8 @@ const CompanyRoleAnalysis = () => {
             title: "Analysis Complete!",
             description: "Your company analysis is ready to view."
           });
+        } else {
+          console.log('Update received but no meaningful data yet, continuing to wait...');
         }
       })
       .subscribe();
@@ -261,19 +299,6 @@ const CompanyRoleAnalysis = () => {
     setCompanyName('');
     setLocation('');
     setJobTitle('');
-  };
-
-  const hasAnalysisResult = (analysis: CompanyRoleAnalysisData) => {
-    return analysis.local_role_market_context || 
-           analysis.company_news_updates?.length || 
-           analysis.role_security_score || 
-           analysis.role_experience_score || 
-           analysis.role_compensation_analysis || 
-           analysis.role_workplace_environment || 
-           analysis.career_development || 
-           analysis.role_specific_considerations || 
-           analysis.interview_and_hiring_insights || 
-           analysis.sources;
   };
 
   // Get the most recent completed analysis for display
