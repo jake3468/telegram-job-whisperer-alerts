@@ -2,7 +2,7 @@ const Footer = () => {
   return <footer className="bg-black py-12 px-4 border-t border-gray-800">
       <div className="max-w-6xl mx-auto text-center">
         <div className="flex justify-center items-center mb-8 space-x-3">
-          <img alt="JobBots Logo" className="h-8 w-8" src="/lovable-uploads/337e9865-28c9-4448-b0d5-f17bd4009106.png" />
+          <img alt="JobBots Logo" className="h-8 w-8" src="/lovable-uploads/d1063169-3726-4087-9672-b20c6091d9a4.jpg" />
           <span className="text-xl font-semibold text-white font-orbitron">Aspirely.ai</span>
         </div>
 
