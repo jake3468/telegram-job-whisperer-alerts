@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -89,7 +88,7 @@ const CompanyRoleAnalysis = () => {
     enabled: !!userProfile?.id
   });
 
-  // Real-time subscription for analysis updates with improved logging
+  // Real-time subscription for analysis updates with improved detection
   useEffect(() => {
     if (!userProfile?.id || !pendingAnalysisId) return;
 
@@ -105,13 +104,14 @@ const CompanyRoleAnalysis = () => {
       }, (payload) => {
         console.log('Real-time update received for company analysis:', payload);
 
-        // Check if meaningful data has been added
+        // Check if ANY meaningful data has been added (not just checking for all fields)
         const newData = payload.new;
         if (newData && (
+          newData.research_date || 
           newData.local_role_market_context || 
-          newData.company_news_updates || 
-          newData.role_security_score || 
-          newData.role_experience_score || 
+          newData.company_news_updates?.length > 0 || 
+          newData.role_security_score !== null || 
+          newData.role_experience_score !== null || 
           newData.role_compensation_analysis || 
           newData.role_workplace_environment || 
           newData.career_development || 
@@ -119,9 +119,9 @@ const CompanyRoleAnalysis = () => {
           newData.interview_and_hiring_insights || 
           newData.sources
         )) {
-          console.log('Analysis is complete, refreshing data and showing results');
+          console.log('Analysis data detected, refreshing and showing results');
           
-          // Analysis is complete, refresh the data and stop loading
+          // Analysis has meaningful data, refresh and show results
           refetchHistory();
           setPendingAnalysisId(null);
           setIsSubmitting(false);
