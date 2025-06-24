@@ -240,7 +240,7 @@ const InterviewPrep = () => {
                 <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8 text-black" />
               </div>
             </div>
-            <h1 className="text-2xl font-bold mb-4 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] bg-clip-text text-transparent sm:text-5xl">
+            <h1 className="text-2xl font-bold mb-4 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] bg-clip-text text-transparent sm:text-4xl">
               Interview Prep
             </h1>
             <p className="text-gray-300 max-w-2xl mx-auto text-sm sm:text-lg font-light px-4">
