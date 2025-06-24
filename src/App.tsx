@@ -17,7 +17,6 @@ import JobAlerts from "./pages/JobAlerts";
 import GetMoreCredits from "./pages/GetMoreCredits";
 import Upgrade from "./pages/Upgrade";
 import NotFound from "./pages/NotFound";
-import AuthDebugPanel from "@/components/AuthDebugPanel";
 
 const queryClient = new QueryClient();
 
@@ -43,7 +42,6 @@ const AppWithSync = () => {
         <Route path="/upgrade" element={<Upgrade />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-      <AuthDebugPanel />
     </>
   );
 };
