@@ -15,11 +15,12 @@ import { useUser } from '@clerk/clerk-react';
 import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
 import { InterviewPrepHistoryModal } from '@/components/InterviewPrepHistoryModal';
 import InterviewPrepDownloadActions from '@/components/InterviewPrepDownloadActions';
-
 const InterviewPrep = () => {
   // Ensure Clerk JWT is synced with Supabase
   useClerkSupabaseSync();
-  const { user } = useUser();
+  const {
+    user
+  } = useUser();
   const [companyName, setCompanyName] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [jobDescription, setJobDescription] = useState('');
@@ -27,9 +28,16 @@ const InterviewPrep = () => {
   const [currentAnalysis, setCurrentAnalysis] = useState<any>(null);
   const [interviewData, setInterviewData] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
-  const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(1.5);
-  const { userProfile } = useUserProfile();
+  const {
+    toast
+  } = useToast();
+  const {
+    hasCredits,
+    showInsufficientCreditsPopup
+  } = useCreditCheck(1.5);
+  const {
+    userProfile
+  } = useUserProfile();
 
   // Query for existing interview prep data
   const {
@@ -212,22 +220,17 @@ const InterviewPrep = () => {
     if (!content) return null;
 
     // Simple markdown parsing with smaller text sizes
-    const processedContent = content
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
-      .replace(/^# (.*$)/gim, '<h1 style="font-size: 1.125rem; font-weight: bold; margin: 0.75rem 0; color: #1e40af;">$1</h1>') // H1 headers - smaller
-      .replace(/^## (.*$)/gim, '<h2 style="font-size: 1rem; font-weight: bold; margin: 0.5rem 0; color: #2563eb;">$1</h2>') // H2 headers - smaller
-      .replace(/^### (.*$)/gim, '<h3 style="font-size: 0.95rem; font-weight: bold; margin: 0.375rem 0; color: #3b82f6;">$1</h3>') // H3 headers - smaller
-      .replace(/\n/g, '<br>'); // Line breaks
+    const processedContent = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
+    .replace(/^# (.*$)/gim, '<h1 style="font-size: 1.125rem; font-weight: bold; margin: 0.75rem 0; color: #1e40af;">$1</h1>') // H1 headers - smaller
+    .replace(/^## (.*$)/gim, '<h2 style="font-size: 1rem; font-weight: bold; margin: 0.5rem 0; color: #2563eb;">$1</h2>') // H2 headers - smaller
+    .replace(/^### (.*$)/gim, '<h3 style="font-size: 0.95rem; font-weight: bold; margin: 0.375rem 0; color: #3b82f6;">$1</h3>') // H3 headers - smaller
+    .replace(/\n/g, '<br>'); // Line breaks
 
-    return (
-      <div 
-        className="text-gray-800 bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words border border-gray-700" 
-        dangerouslySetInnerHTML={{ __html: processedContent }} 
-      />
-    );
+    return <div className="text-gray-800 bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words border border-gray-700" dangerouslySetInnerHTML={{
+      __html: processedContent
+    }} />;
   };
-  return (
-    <Layout>
+  return <Layout>
       <div className="min-h-screen bg-black text-white">
         <div className="container mx-auto px-4 py-4 sm:py-8 max-w-5xl">
           {/* Header */}
@@ -237,7 +240,7 @@ const InterviewPrep = () => {
                 <MessageSquare className="w-6 h-6 sm:w-8 sm:h-8 text-black" />
               </div>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-bold mb-4 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold mb-4 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] bg-clip-text text-transparent sm:text-5xl">
               Interview Prep
             </h1>
             <p className="text-gray-300 max-w-2xl mx-auto text-sm sm:text-lg font-light px-4">
@@ -263,13 +266,7 @@ const InterviewPrep = () => {
                     <Building2 className="w-4 h-4" />
                     Company Name
                   </label>
-                  <Input
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                    placeholder="e.g., Google, Microsoft, Amazon"
-                    disabled={isGenerating || isSubmitting}
-                    className="border-gray-300 placeholder-gray-400 bg-black text-white w-full"
-                  />
+                  <Input value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="e.g., Google, Microsoft, Amazon" disabled={isGenerating || isSubmitting} className="border-gray-300 placeholder-gray-400 bg-black text-white w-full" />
                 </div>
 
                 <div className="space-y-2">
@@ -277,13 +274,7 @@ const InterviewPrep = () => {
                     <Briefcase className="w-4 h-4" />
                     Job Title
                   </label>
-                  <Input
-                    value={jobTitle}
-                    onChange={(e) => setJobTitle(e.target.value)}
-                    placeholder="e.g., Senior Software Engineer, Product Manager"
-                    disabled={isGenerating || isSubmitting}
-                    className="border-gray-300 placeholder-gray-400 bg-black text-white w-full"
-                  />
+                  <Input value={jobTitle} onChange={e => setJobTitle(e.target.value)} placeholder="e.g., Senior Software Engineer, Product Manager" disabled={isGenerating || isSubmitting} className="border-gray-300 placeholder-gray-400 bg-black text-white w-full" />
                 </div>
               </div>
 
@@ -292,29 +283,14 @@ const InterviewPrep = () => {
                   <FileText className="w-4 h-4" />
                   Job Description
                 </label>
-                <Textarea
-                  value={jobDescription}
-                  onChange={(e) => setJobDescription(e.target.value)}
-                  placeholder="Paste the complete job description here..."
-                  disabled={isGenerating || isSubmitting}
-                  className="border-gray-300 placeholder-gray-400 min-h-32 bg-black text-white w-full resize-none"
-                />
+                <Textarea value={jobDescription} onChange={e => setJobDescription(e.target.value)} placeholder="Paste the complete job description here..." disabled={isGenerating || isSubmitting} className="border-gray-300 placeholder-gray-400 min-h-32 bg-black text-white w-full resize-none" />
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                <Button
-                  onClick={handleGenerate}
-                  disabled={isGenerating || isSubmitting}
-                  className="w-full sm:flex-1 text-white font-medium bg-rose-600 hover:bg-rose-500"
-                >
+                <Button onClick={handleGenerate} disabled={isGenerating || isSubmitting} className="w-full sm:flex-1 text-white font-medium bg-rose-600 hover:bg-rose-500">
                   {isGenerating || isSubmitting ? 'Generating...' : 'Generate Interview Prep'}
                 </Button>
-                <Button
-                  onClick={handleReset}
-                  variant="outline"
-                  disabled={isGenerating || isSubmitting}
-                  className="w-full sm:w-auto px-6 border-black text-black hover:bg-gray-100"
-                >
+                <Button onClick={handleReset} variant="outline" disabled={isGenerating || isSubmitting} className="w-full sm:w-auto px-6 border-black text-black hover:bg-gray-100">
                   Reset
                 </Button>
               </div>
@@ -322,15 +298,12 @@ const InterviewPrep = () => {
           </Card>
 
           {/* Loading */}
-          {isGenerating && (
-            <div className="text-center py-8">
+          {isGenerating && <div className="text-center py-8">
               <LoadingMessages type="interview_prep" />
-            </div>
-          )}
+            </div>}
 
           {/* Results - Show below form when available */}
-          {interviewData && (
-            <div className="w-full space-y-6">
+          {interviewData && <div className="w-full space-y-6">
               {/* Simple result section matching history format */}
               <div className="rounded-lg p-4 border border-white/10 shadow-inner bg-red-700">
                 <h3 className="text-white font-medium mb-3 flex flex-wrap gap-2 justify-between items-center">
@@ -339,12 +312,7 @@ const InterviewPrep = () => {
                     Interview Prep Result
                   </div>
                   <div className="flex-shrink-0">
-                    <InterviewPrepDownloadActions 
-                      interviewData={interviewData}
-                      jobTitle={jobTitle}
-                      companyName={companyName}
-                      contrast={true}
-                    />
+                    <InterviewPrepDownloadActions interviewData={interviewData} jobTitle={jobTitle} companyName={companyName} contrast={true} />
                   </div>
                 </h3>
 
@@ -356,12 +324,9 @@ const InterviewPrep = () => {
                   {renderInterviewQuestions(interviewData)}
                 </div>
               </div>
-            </div>
-          )}
+            </div>}
         </div>
       </div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default InterviewPrep;
