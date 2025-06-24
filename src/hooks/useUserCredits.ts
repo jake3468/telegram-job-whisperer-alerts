@@ -1,3 +1,4 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@clerk/clerk-react';
@@ -75,12 +76,12 @@ export const useUserCredits = () => {
       }
     },
     enabled: !!userProfile?.user_id && !!user?.id,
-    staleTime: 5 * 60 * 1000, // 5 minutes - increased cache time
-    refetchInterval: 2 * 60 * 1000, // 2 minutes - reduced refetch frequency
+    // Static configuration - no automatic refetching
+    staleTime: Infinity, // Data never becomes stale during session
+    gcTime: Infinity, // Keep data cached indefinitely during session
+    refetchOnWindowFocus: false, // Don't refetch when window gains focus
+    refetchOnReconnect: false, // Don't refetch on network reconnect
+    refetchOnMount: true, // Only fetch on initial mount
     retry: 1, // Reduced retry attempts
-    // Keep previous data during refetch to avoid showing empty states
-    placeholderData: (previousData) => previousData,
-    // Cache data for longer to avoid refetching during navigation
-    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 };

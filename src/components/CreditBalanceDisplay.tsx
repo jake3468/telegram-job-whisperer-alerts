@@ -3,9 +3,9 @@ import { BadgeDollarSign } from "lucide-react";
 import { useUserCredits } from "@/hooks/useUserCredits";
 
 const CreditBalanceDisplay = () => {
-  const { data: credits, isLoading, error, isFetching } = useUserCredits();
+  const { data: credits, isLoading, error } = useUserCredits();
 
-  // Show a subtle loading state only when initially loading (no previous data)
+  // Show loading only on initial load (no isFetching states)
   if (isLoading && !credits) {
     return (
       <div className="flex flex-col gap-2 text-fuchsia-200 font-orbitron text-xs">
@@ -17,15 +17,15 @@ const CreditBalanceDisplay = () => {
     );
   }
 
-  // If we have credits data, always show it (even during background refetching)
+  // Static display - show credits without any loading indicators
   if (credits) {
     const balance = credits.current_balance ?? 0;
 
     return (
       <div className="flex flex-col gap-0.5 text-fuchsia-200 font-orbitron text-sm px-2">
         <div className="flex items-center gap-2">
-          <BadgeDollarSign className={`w-5 h-5 ${isFetching ? 'opacity-70' : ''}`} />
-          <span className={isFetching ? 'opacity-70' : ''}>
+          <BadgeDollarSign className="w-5 h-5" />
+          <span>
             {Number(balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} credits
           </span>
         </div>
@@ -33,7 +33,7 @@ const CreditBalanceDisplay = () => {
     );
   }
 
-  // Only show error state if there's actually an error and no cached data
+  // Show error state or fallback
   if (error && !credits) {
     return (
       <div className="flex flex-col text-fuchsia-200 font-orbitron text-xs opacity-70">

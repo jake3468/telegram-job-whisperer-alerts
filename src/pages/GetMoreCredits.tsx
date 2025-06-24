@@ -1,4 +1,3 @@
-
 import { useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -27,10 +26,10 @@ export default function GetMoreCredits() {
   const { user, isLoaded } = useUser();
   const navigate = useNavigate();
   const { data: credits, isLoading, error } = useUserCredits();
-  const { userProfile, loading: userProfileLoading } = useUserProfile();
+  const { userProfile } = useUserProfile();
 
   console.log('[GetMoreCredits] Render - credits:', credits, 'isLoading:', isLoading, 'error:', error);
-  console.log('[GetMoreCredits] UserProfile:', userProfile, 'userProfileLoading:', userProfileLoading);
+  console.log('[GetMoreCredits] UserProfile:', userProfile);
 
   useEffect(() => {
     if (isLoaded && !user) {
@@ -59,7 +58,7 @@ export default function GetMoreCredits() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
             <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in">
               Current Balance:{" "}
-              {isLoading || userProfileLoading ? (
+              {isLoading ? (
                 <span className="font-bold text-cyan-100">Loading...</span>
               ) : error ? (
                 <span className="font-bold text-rose-300">Error loading</span>
