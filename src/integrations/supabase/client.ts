@@ -6,33 +6,164 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://fnzloyyhzhrqsvslhhri.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuemxveXloemhycXN2c2xoaHJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzAyMjIsImV4cCI6MjA2NDUwNjIyMn0.xdlgb_amJ1fV31uinCFotGW00isgT5-N8zJ_gLHEKuk";
 
-// Global headers object that we can modify
-const globalHeaders: Record<string, string> = {};
+// Validate required environment variables
+if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  throw new Error('Missing required Supabase configuration. Please check your environment variables.');
+}
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
+// Store the current JWT token
+let currentJWTToken: string | null = null;
 
+// Create the Supabase client with global headers configuration
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    persistSession: false, // Disable Supabase auth since we're using Clerk
+    persistSession: false,
     autoRefreshToken: false,
   },
   global: {
-    headers: globalHeaders,
-  },
+    headers: {}
+  }
 });
 
-// Function to set Clerk JWT token for Supabase requests
+// Function to set Clerk JWT token  
 export const setClerkToken = async (token: string | null) => {
-  if (token) {
-    // Set the authorization header in the global headers object
-    globalHeaders['Authorization'] = `Bearer ${token}`;
-    supabase.realtime.setAuth(token);
-    console.log('[setClerkToken] ✅ Clerk JWT token has been set in Supabase headers');
-  } else {
-    // Remove the authorization header when signing out
-    delete globalHeaders['Authorization'];
-    supabase.realtime.setAuth(null);
-    console.log('[setClerkToken] ❌ Clerk JWT token has been removed from Supabase headers');
+  try {
+    console.log('[setClerkToken] 🔄 Setting Clerk JWT token...');
+    
+    if (token) {
+      // Validate token format before setting
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        console.error('[setClerkToken] ❌ Invalid JWT format - token does not have 3 parts');
+        return false;
+      }
+
+      // Try to decode the payload to validate
+      try {
+        const payload = JSON.parse(atob(parts[1]));
+        console.log('[setClerkToken] 🔍 JWT payload preview:', {
+          sub: payload.sub,
+          iss: payload.iss,
+          aud: payload.aud,
+          exp: payload.exp,
+          iat: payload.iat,
+          role: payload.role
+        });
+      } catch (e) {
+        console.warn('[setClerkToken] ⚠️ Could not decode JWT payload for validation:', e);
+      }
+
+      currentJWTToken = token;
+      console.log('[setClerkToken] ✅ Clerk JWT token stored');
+      return true;
+    } else {
+      currentJWTToken = null;
+      console.log('[setClerkToken] ❌ Clerk JWT token cleared');
+      return true;
+    }
+  } catch (error) {
+    console.error('[setClerkToken] ❌ Error setting Clerk JWT token:', error);
+    return false;
   }
+};
+
+// Function to get current JWT token for debugging
+export const getCurrentJWTToken = () => currentJWTToken;
+
+// Enhanced function to make authenticated requests with proper JWT headers
+export const makeAuthenticatedRequest = async <T>(
+  operation: () => Promise<T>,
+  operationType: string = 'unknown'
+): Promise<T> => {
+  if (!currentJWTToken) {
+    console.warn(`[makeAuthenticatedRequest] ⚠️ No JWT token available for ${operationType}`);
+  } else {
+    console.log(`[makeAuthenticatedRequest] 🔐 Making authenticated request for: ${operationType}`);
+  }
+  
+  // Create a new client instance with JWT headers for this specific request
+  if (currentJWTToken) {
+    const authenticatedClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+      global: {
+        headers: {
+          'Authorization': `Bearer ${currentJWTToken}`
+        }
+      }
+    });
+
+    console.log(`[makeAuthenticatedRequest] 🔐 Using authenticated client for ${operationType}`);
+    
+    // Replace the global supabase instance temporarily for this operation
+    const originalFrom = supabase.from.bind(supabase);
+    const originalRpc = supabase.rpc.bind(supabase);
+    
+    // Override methods to use authenticated client
+    (supabase as any).from = authenticatedClient.from.bind(authenticatedClient);
+    (supabase as any).rpc = authenticatedClient.rpc.bind(authenticatedClient);
+    
+    try {
+      const result = await operation();
+      return result;
+    } finally {
+      // Restore original methods
+      (supabase as any).from = originalFrom;
+      (supabase as any).rpc = originalRpc;
+    }
+  }
+  
+  return await operation();
+};
+
+// Function to test JWT transmission with direct RPC call
+export const testJWTTransmission = async () => {
+  try {
+    console.log('[testJWTTransmission] 🧪 Testing JWT transmission with authenticated client...');
+    console.log('[testJWTTransmission] 🔑 Current token available:', currentJWTToken ? 'YES' : 'NO');
+    
+    if (currentJWTToken) {
+      console.log('[testJWTTransmission] 📝 Token preview (first 100 chars):', currentJWTToken.substring(0, 100));
+    }
+    
+    // Make direct RPC call using authenticated request
+    const { data, error } = await makeAuthenticatedRequest(async () => {
+      return await supabase.rpc('debug_user_auth');
+    }, 'JWT transmission test');
+    
+    console.log('[testJWTTransmission] 📊 Test result:', {
+      data,
+      error,
+      currentToken: currentJWTToken ? 'SET' : 'NOT_SET'
+    });
+    
+    if (data && data.length > 0) {
+      const result = data[0];
+      console.log('[testJWTTransmission] 🔍 Detailed analysis:', {
+        clerkIdFromFunction: result.clerk_id,
+        jwtSubFromAuth: result.jwt_sub,
+        authRole: result.auth_role,
+        userExistsInDB: result.user_exists,
+        rawClaims: result.current_setting_claims
+      });
+    }
+    
+    return { data, error };
+  } catch (error) {
+    console.error('[testJWTTransmission] ❌ JWT transmission test failed:', error);
+    return { data: null, error };
+  }
+};
+
+// Function to create authenticated storage client
+export const createAuthenticatedStorageClient = () => {
+  if (!currentJWTToken) {
+    console.warn('[createAuthenticatedStorageClient] ⚠️ No JWT token available for storage');
+    return supabase.storage;
+  }
+
+  console.log('[createAuthenticatedStorageClient] 🗄️ Using authenticated storage client');
+  return supabase.storage;
 };

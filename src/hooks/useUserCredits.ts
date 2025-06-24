@@ -24,35 +24,24 @@ export const useUserCredits = () => {
     queryKey: ['user_credits', userProfile?.user_id, user?.id],
     queryFn: async () => {
       if (!userProfile?.user_id) {
-        console.warn('[useUserCredits] No user_id available');
         return null;
       }
       
-      console.log('[useUserCredits] Fetching credits for user_id:', userProfile.user_id);
-      
       try {
-        // Query the user_credits table directly using the user_id
+        // Direct query with no excessive logging
         const { data: credits, error } = await supabase
           .from('user_credits')
           .select('current_balance, free_credits, paid_credits, subscription_plan, next_reset_date, created_at, updated_at, id, user_id')
           .eq('user_id', userProfile.user_id)
           .single();
 
-        console.log('[useUserCredits] Credits query result:', credits, 'error:', error);
-
         if (error) {
-          console.error('[useUserCredits] Error fetching credits:', error);
-          
           // If no record found, try to initialize credits
           if (error.code === 'PGRST116') {
-            console.log('[useUserCredits] No credits found, attempting to initialize...');
-            
             try {
               const { data: initResult, error: initError } = await supabase.rpc('initialize_user_credits', {
                 p_user_id: userProfile.user_id
               });
-              
-              console.log('[useUserCredits] Initialize result:', initResult, 'error:', initError);
               
               if (!initError) {
                 // Retry the query after initialization
@@ -63,7 +52,6 @@ export const useUserCredits = () => {
                   .single();
                   
                 if (!retryError && retryCredits) {
-                  console.log('[useUserCredits] Successfully fetched credits after initialization:', retryCredits);
                   return retryCredits as UserCreditsData;
                 }
               }
@@ -76,7 +64,6 @@ export const useUserCredits = () => {
         }
 
         if (credits) {
-          console.log('[useUserCredits] Successfully fetched credits:', credits);
           return credits as UserCreditsData;
         }
 
@@ -88,12 +75,12 @@ export const useUserCredits = () => {
       }
     },
     enabled: !!userProfile?.user_id && !!user?.id,
-    staleTime: 30000,
-    refetchInterval: 60000,
-    retry: 2,
+    staleTime: 5 * 60 * 1000, // 5 minutes - increased cache time
+    refetchInterval: 2 * 60 * 1000, // 2 minutes - reduced refetch frequency
+    retry: 1, // Reduced retry attempts
     // Keep previous data during refetch to avoid showing empty states
     placeholderData: (previousData) => previousData,
     // Cache data for longer to avoid refetching during navigation
-    gcTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 };

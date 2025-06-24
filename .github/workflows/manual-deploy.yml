@@ -1,0 +1,60 @@
+
+name: Manual Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - development
+      confirm_production:
+        description: 'Type "CONFIRM" to deploy to production'
+        required: false
+        type: string
+
+jobs:
+  manual-deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - name: Validate production deployment
+        if: github.event.inputs.environment == 'production'
+        run: |
+          if [ "${{ github.event.inputs.confirm_production }}" != "CONFIRM" ]; then
+            echo "❌ Production deployment requires typing 'CONFIRM' in the confirmation field"
+            exit 1
+          fi
+          echo "✅ Production deployment confirmed"
+      
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Build application
+        env:
+          VITE_CLERK_PUBLISHABLE_KEY_DEV: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY_DEV }}
+          VITE_CLERK_PUBLISHABLE_KEY_PROD: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY_PROD }}
+        run: npm run build
+      
+      - name: Deploy to environment
+        run: |
+          echo "🚀 Manual deployment to ${{ github.event.inputs.environment }} triggered"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+          if [ "${{ github.event.inputs.environment }}" = "production" ]; then
+            echo "🔴 PRODUCTION DEPLOYMENT - Netlify will deploy from production branch"
+          else
+            echo "🟡 DEVELOPMENT DEPLOYMENT - Preview environment"
+          fi

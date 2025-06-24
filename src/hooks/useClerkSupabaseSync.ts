@@ -1,11 +1,11 @@
 
 import { useEffect } from 'react';
 import { useAuth } from '@clerk/clerk-react';
-import { setClerkToken } from '@/integrations/supabase/client';
+import { setClerkToken, testJWTTransmission } from '@/integrations/supabase/client';
+import { Environment } from '@/utils/environment';
 
 /**
- * Keeps Supabase client in sync with Clerk JWT for RLS policies.
- * This is critical for RLS to work! Must call this in your app root.
+ * Production-optimized Clerk-Supabase sync with minimal overhead.
  */
 export function useClerkSupabaseSync() {
   const { getToken, isSignedIn, userId } = useAuth();
@@ -16,32 +16,57 @@ export function useClerkSupabaseSync() {
     async function setToken() {
       try {
         if (isSignedIn && getToken) {
-          // Get the token for this signed-in user with the supabase template
-          const jwt = await getToken({ template: 'supabase' }).catch((error) => {
-            console.error('[useClerkSupabaseSync] Error getting Clerk JWT:', error);
+          // Get fresh token - no artificial delays in production
+          const jwt = await getToken({ 
+            template: 'supabase',
+            skipCache: true,
+            leewayInSeconds: 0
+          }).catch((error) => {
+            if (Environment.isDevelopment()) {
+              console.error('[useClerkSupabaseSync] Error getting Clerk JWT:', error);
+            }
             return null;
           });
           
-          if (!isMounted) return; // Component unmounted
+          if (!isMounted) return;
           
           if (!jwt) {
-            console.warn("[useClerkSupabaseSync] No Clerk JWT was returned. Using Supabase anon key only.");
+            if (Environment.isDevelopment()) {
+              console.warn("[useClerkSupabaseSync] No Clerk JWT returned. Check template configuration.");
+            }
             await setClerkToken(null);
           } else {
-            await setClerkToken(jwt);
-            console.log(`[useClerkSupabaseSync] ✅ Clerk JWT was set successfully for user: ${userId}`);
+            // Set the JWT token immediately
+            const success = await setClerkToken(jwt);
+            
+            // Only run comprehensive tests in development
+            if (success && Environment.isDevelopment()) {
+              console.log(`[useClerkSupabaseSync] Token set for user: ${userId}`);
+              
+              // Test JWT transmission only in development
+              try {
+                const testResult = await testJWTTransmission();
+                if (testResult.data?.[0]?.clerk_id) {
+                  console.log('[useClerkSupabaseSync] ✅ JWT verified');
+                } else {
+                  console.error('[useClerkSupabaseSync] JWT not recognized');
+                }
+              } catch (error) {
+                console.warn('[useClerkSupabaseSync] JWT test failed:', error);
+              }
+            }
           }
         } else {
-          console.log("[useClerkSupabaseSync] User not signed in. Using Supabase anon key only.");
           await setClerkToken(null);
         }
       } catch (err) {
-        if (isMounted) {
-          console.error("[useClerkSupabaseSync] ❌ Error setting Clerk token:", err);
+        if (isMounted && Environment.isDevelopment()) {
+          console.error("[useClerkSupabaseSync] Error in token sync:", err);
         }
       }
     }
     
+    // Immediate token refresh with no delays
     setToken();
     
     return () => { 

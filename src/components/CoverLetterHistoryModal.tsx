@@ -58,7 +58,17 @@ const CoverLetterHistoryModal = ({
         throw error;
       }
 
-      setHistoryData(data || []);
+      // Transform the data to match our interface
+      const transformedData = (data || []).map((item: any) => ({
+        id: item.id,
+        company_name: item.company_name,
+        job_title: item.job_title,
+        job_description: item.job_description,
+        created_at: item.created_at,
+        cover_letter: item.cover_letter
+      }));
+
+      setHistoryData(transformedData);
     } catch (err) {
       console.error('Failed to fetch history:', err);
       toast({

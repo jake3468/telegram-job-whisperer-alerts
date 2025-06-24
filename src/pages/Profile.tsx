@@ -1,21 +1,45 @@
 
 import { useUser } from '@clerk/clerk-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthHeader from '@/components/AuthHeader';
 import ResumeSection from '@/components/dashboard/ResumeSection';
 import BioSection from '@/components/dashboard/BioSection';
+import AuthDebugPanel from '@/components/AuthDebugPanel';
+import JWTDebugPanel from '@/components/JWTDebugPanel';
+import ClerkJWTSetupGuide from '@/components/ClerkJWTSetupGuide';
 import { Layout } from '@/components/Layout';
+import { useJWTDebug } from '@/hooks/useJWTDebug';
+import { Environment } from '@/utils/environment';
 
 const Profile = () => {
   const { user, isLoaded } = useUser();
   const navigate = useNavigate();
+  const { runComprehensiveJWTTest } = useJWTDebug();
+  const [showJWTSetupGuide, setShowJWTSetupGuide] = useState(false);
 
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
+
+  // Only check JWT setup in development to avoid production delays
+  useEffect(() => {
+    if (isLoaded && user && Environment.isDevelopment()) {
+      const checkJWTSetup = async () => {
+        const testResult = await runComprehensiveJWTTest();
+        
+        // Show setup guide if JWT is not properly configured
+        if (!testResult.jwtRecognized || !testResult.hasRequiredClaims) {
+          setShowJWTSetupGuide(true);
+        }
+      };
+      
+      // Reduced delay for faster loading
+      setTimeout(checkJWTSetup, 500);
+    }
+  }, [isLoaded, user, runComprehensiveJWTTest]);
 
   if (!isLoaded || !user) {
     return (
@@ -35,10 +59,26 @@ const Profile = () => {
           Manage your <span className="italic text-pastel-blue">profile</span> information and resume
         </p>
       </div>
+
+      {/* Show JWT Setup Guide if needed (development only) */}
+      {showJWTSetupGuide && Environment.isDevelopment() && (
+        <div className="mb-8 flex justify-center">
+          <ClerkJWTSetupGuide />
+        </div>
+      )}
+
       <div className="space-y-8">
         <ResumeSection />
         <BioSection />
       </div>
+      
+      {/* Debug Panels - only in development */}
+      {Environment.isDevelopment() && (
+        <>
+          <AuthDebugPanel />
+          <JWTDebugPanel />
+        </>
+      )}
     </Layout>
   );
 };

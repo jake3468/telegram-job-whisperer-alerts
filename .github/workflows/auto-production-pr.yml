@@ -1,0 +1,65 @@
+
+name: Auto Create Production PR
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  create-production-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Check if PR already exists
+        id: check-pr
+        run: |
+          PR_EXISTS=$(gh pr list --base production --head main --json number --jq length)
+          echo "pr_exists=$PR_EXISTS" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Create Pull Request to Production
+        if: steps.check-pr.outputs.pr_exists == '0'
+        run: |
+          gh pr create \
+            --base production \
+            --head main \
+            --title "🚀 Deploy to Production - $(date +'%Y-%m-%d %H:%M')" \
+            --body "
+          ## 📋 Production Deployment
+
+          This PR contains the latest changes from the main branch ready for production deployment.
+
+          ### 🔍 What's Changed
+          - Latest features and fixes from main branch
+          - All changes have been tested in development environment
+
+          ### ✅ Pre-deployment Checklist
+          - [ ] Review all changes in this PR
+          - [ ] Verify environment variables are set correctly in production
+          - [ ] Confirm database migrations (if any) are ready
+          - [ ] Check that external integrations are configured for production
+
+          ### 🚀 Deployment Process
+          Once this PR is merged:
+          1. Netlify will automatically deploy from the production branch
+          2. Production environment variables will be used
+          3. The live site will be updated
+
+          **Note:** Only merge this PR when you're ready to deploy to production!
+          " \
+            --label "deployment" \
+            --label "production"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Comment on existing PR
+        if: steps.check-pr.outputs.pr_exists != '0'
+        run: |
+          PR_NUMBER=$(gh pr list --base production --head main --json number --jq '.[0].number')
+          gh pr comment $PR_NUMBER --body "🔄 New changes pushed to main branch at $(date +'%Y-%m-%d %H:%M UTC')"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

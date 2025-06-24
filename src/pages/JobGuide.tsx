@@ -15,6 +15,9 @@ import JobAnalysisHistory from '@/components/JobAnalysisHistory';
 import { PercentageMeter } from '@/components/PercentageMeter';
 import { useCreditCheck } from '@/hooks/useCreditCheck';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
+import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
+import { validateInput, sanitizeText } from '@/utils/sanitize';
+
 const JobGuide = () => {
   const {
     user,
@@ -118,9 +121,29 @@ const JobGuide = () => {
     };
   }, [jobAnalysisId, isGenerating, toast]);
   const handleInputChange = (field: string, value: string) => {
+    // Sanitize input to prevent XSS
+    const sanitizedValue = sanitizeText(value);
+    
+    // Validate input length and content
+    if (field === 'jobDescription' && !validateInput(sanitizedValue, 5000)) {
+      toast({
+        title: "Invalid Input",
+        description: "Job description contains invalid characters or is too long.",
+        variant: "destructive"
+      });
+      return;
+    } else if ((field === 'companyName' || field === 'jobTitle') && !validateInput(sanitizedValue, 200)) {
+      toast({
+        title: "Invalid Input",
+        description: `${field === 'companyName' ? 'Company name' : 'Job title'} contains invalid characters or is too long.`,
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: sanitizedValue
     }));
   };
   const handleClearData = useCallback(() => {
@@ -283,7 +306,9 @@ const JobGuide = () => {
   const handleCopyResult = async () => {
     if (!jobAnalysisResult) return;
     try {
-      await navigator.clipboard.writeText(jobAnalysisResult);
+      // Sanitize before copying to clipboard
+      const sanitizedText = sanitizeText(jobAnalysisResult);
+      await navigator.clipboard.writeText(sanitizedText);
       toast({
         title: "Copied!",
         description: "Job analysis copied to clipboard successfully."
@@ -342,14 +367,30 @@ const JobGuide = () => {
                     <label htmlFor="companyName" className="text-slate-200 font-semibold text-base">
                       Company Name *
                     </label>
-                    <Input id="companyName" placeholder="Google, Microsoft" value={formData.companyName} onChange={e => handleInputChange('companyName', e.target.value)} required className="bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold" />
+                    <Input 
+                      id="companyName" 
+                      placeholder="Google, Microsoft" 
+                      value={formData.companyName} 
+                      onChange={e => handleInputChange('companyName', e.target.value)} 
+                      required 
+                      maxLength={200}
+                      className="bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold" 
+                    />
                   </div>
                   {/* Job Title */}
                   <div className="space-y-2">
                     <label htmlFor="jobTitle" className="text-slate-200 font-semibold text-base">
                       Job Title *
                     </label>
-                    <Input id="jobTitle" placeholder="Software Engineer, Marketing Manager" value={formData.jobTitle} onChange={e => handleInputChange('jobTitle', e.target.value)} required className="bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold" />
+                    <Input 
+                      id="jobTitle" 
+                      placeholder="Software Engineer, Marketing Manager" 
+                      value={formData.jobTitle} 
+                      onChange={e => handleInputChange('jobTitle', e.target.value)} 
+                      required 
+                      maxLength={200}
+                      className="bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold" 
+                    />
                   </div>
                 </div>
                 {/* Job Description */}
@@ -360,7 +401,15 @@ const JobGuide = () => {
                   <span className="text-slate-400 font-normal text-xs block mb-2">
                     Paste in the job description or key requirements
                   </span>
-                  <Textarea id="jobDescription" placeholder="Paste the job description here..." value={formData.jobDescription} onChange={e => handleInputChange('jobDescription', e.target.value)} required className="min-h-[100px] bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold" />
+                  <Textarea 
+                    id="jobDescription" 
+                    placeholder="Paste the job description here..." 
+                    value={formData.jobDescription} 
+                    onChange={e => handleInputChange('jobDescription', e.target.value)} 
+                    required 
+                    maxLength={5000}
+                    className="min-h-[100px] bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold" 
+                  />
                 </div>
                 {/* Action Buttons */}
                 <div className="flex flex-col md:flex-row gap-3 pt-4">
@@ -401,7 +450,7 @@ const JobGuide = () => {
                 </CardContent>
               </Card>}
 
-            {/* Result Display */}
+            {/* Result Display - Updated to use SafeHTMLRenderer */}
             {jobAnalysisResult && <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-cyan-900 border border-blue-700 shadow-lg">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-slate-200 font-orbitron text-xl flex items-center gap-2">
@@ -409,29 +458,36 @@ const JobGuide = () => {
                     Your Job Analysis
                   </CardTitle>
                   <CardDescription className="text-slate-300 font-inter">
-                    Personalized result for <span className="font-bold text-slate-200">{formData.jobTitle}</span> at <span className="font-bold text-slate-200">{formData.companyName}</span>
+                    Personalized result for <span className="font-bold text-slate-200">{sanitizeText(formData.jobTitle)}</span> at <span className="font-bold text-slate-200">{sanitizeText(formData.companyName)}</span>
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {/* Percentage Meter (Match Score) */}
                   {matchScore && <div className="mb-4 max-w-full">
                       <div className="w-full sm:max-w-[350px] md:max-w-[280px] mx-auto">
-                        {/* slight shadow and rounded for clearer separation */}
                         <div className="shadow-md rounded-xl bg-slate-900/90 p-3 border border-slate-700">
                           <PercentageMeter score={parseInt(matchScore)} label="Match Score" />
                         </div>
                       </div>
                     </div>}
 
-                  <div className="whitespace-pre-wrap font-inter text-slate-100 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-blue-900/90 rounded-xl p-4 sm:p-5 shadow-inner mb-3 border border-slate-700 max-w-full overflow-x-hidden break-words" style={{
-                minHeight: '140px',
-                wordBreak: 'break-word'
-              }}>
-                    <div className="text-sm sm:text-base md:text-base leading-normal md:leading-relaxed break-words">
-                      {jobAnalysisResult}
-                    </div>
+                  <SafeHTMLRenderer
+                    content={jobAnalysisResult}
+                    className="whitespace-pre-wrap font-inter text-slate-100 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-blue-900/90 rounded-xl p-4 sm:p-5 shadow-inner mb-3 border border-slate-700 max-w-full overflow-x-hidden break-words"
+                    maxLength={15000}
+                  />
+                  
+                  <div className="flex flex-col md:flex-row gap-2">
+                    <Button 
+                      onClick={handleCopyResult}
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-none min-w-[120px] bg-slate-900/70 border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-slate-200 h-10 px-4"
+                    >
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copy Result
+                    </Button>
                   </div>
-                  <div className="flex flex-col md:flex-row gap-2"></div>
                 </CardContent>
               </Card>}
           </div>
@@ -439,4 +495,5 @@ const JobGuide = () => {
       </div>
     </Layout>;
 };
+
 export default JobGuide;

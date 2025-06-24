@@ -1,3 +1,4 @@
+
 import { User, Bell, Target, FileText, X, Share2, CreditCard, FileUser, Building2, MessageSquare } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
@@ -20,7 +21,7 @@ import CreditBalanceDisplay from './CreditBalanceDisplay';
 
 const profileItems = [{
   title: 'Profile',
-  url: '/dashboard',
+  url: '/profile',
   icon: User
 }, {
   title: 'Get More Credits',
