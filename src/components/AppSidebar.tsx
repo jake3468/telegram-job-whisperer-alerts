@@ -74,7 +74,7 @@ export function AppSidebar() {
     ">
       {/* Logo & Name section: always visible */}
       <SidebarHeader className="py-8 px-3 border-b border-fuchsia-400/15 bg-black/95 relative flex flex-col items-center gap-2">
-        <img alt="JobBots Logo" className="h-10 w-10 mb-1 drop-shadow-xl" src="/lovable-uploads/9641c8c6-1fe2-4efc-a7f7-decee3f83add.png" />
+        <img alt="JobBots Logo" src="/lovable-uploads/9641c8c6-1fe2-4efc-a7f7-decee3f83add.png" className="h-10 w-10 mb-1 drop-shadow-xl object-fill" />
         <span className="font-orbitron drop-shadow font-extrabold bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-400 bg-clip-text select-none tracking-widest whitespace-nowrap text-3xl text-white">Aspirely.ai</span>
         {/* X button for mobile - only close button, no hamburger */}
         {isMobile && <Button variant="ghost" size="icon" onClick={() => setOpenMobile(false)} className="h-10 w-10 text-fuchsia-300 hover:bg-fuchsia-800/40 border border-fuchsia-400/20 bg-black/50 rounded-xl transition-all absolute right-3 top-4">
