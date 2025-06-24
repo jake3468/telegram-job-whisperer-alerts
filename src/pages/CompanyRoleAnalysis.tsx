@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -111,6 +110,31 @@ const CompanyRoleAnalysis = () => {
       analysis.sources
     );
   };
+
+  // Check for completed analysis when data is fetched or pendingAnalysisId changes
+  useEffect(() => {
+    if (!pendingAnalysisId || !analysisHistory) return;
+    
+    console.log('Checking for completed analysis with ID:', pendingAnalysisId);
+    
+    // Find the pending analysis in the fetched data
+    const completedAnalysis = analysisHistory.find(
+      analysis => analysis.id === pendingAnalysisId && hasAnalysisResult(analysis)
+    );
+    
+    if (completedAnalysis) {
+      console.log('Found completed analysis, stopping loading and showing results');
+      setPendingAnalysisId(null);
+      setIsSubmitting(false);
+      setLoadingMessages([]);
+      setShowRecentResults(true);
+      
+      toast({
+        title: "Analysis Complete!",
+        description: "Your company analysis is ready to view."
+      });
+    }
+  }, [analysisHistory, pendingAnalysisId, toast]);
 
   // Real-time subscription for analysis updates with enhanced detection
   useEffect(() => {
