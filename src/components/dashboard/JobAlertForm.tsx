@@ -29,9 +29,11 @@ interface JobAlertFormProps {
   editingAlert: JobAlert | null;
   onSubmit: () => void;
   onCancel: () => void;
+  currentAlertCount: number;
+  maxAlerts: number;
 }
 
-const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAlertFormProps) => {
+const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentAlertCount, maxAlerts }: JobAlertFormProps) => {
   const { user } = useUser();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -70,6 +72,16 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
+
+    // Check alert limit for new alerts (not for editing existing ones)
+    if (!editingAlert && currentAlertCount >= maxAlerts) {
+      toast({
+        title: "Alert limit reached",
+        description: `You can only create up to ${maxAlerts} job alerts. Please delete an existing alert to create a new one.`,
+        variant: "destructive"
+      });
+      return;
+    }
 
     setLoading(true);
     try {
@@ -121,7 +133,18 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
             user_id: profileData.id // Use profile ID, not user ID
           });
 
-        if (error) throw error;
+        if (error) {
+          // Handle the specific case of hitting the 5-alert limit
+          if (error.message && error.message.includes('Maximum of 5 job alerts allowed')) {
+            toast({
+              title: "Alert limit reached",
+              description: "You can only create up to 5 job alerts. Please delete an existing alert to create a new one.",
+              variant: "destructive"
+            });
+            return;
+          }
+          throw error;
+        }
 
         toast({
           title: "Alert created",
@@ -156,6 +179,18 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Alert limit warning for new alerts */}
+      {!editingAlert && currentAlertCount >= maxAlerts - 1 && (
+        <div className="bg-yellow-900/50 border border-yellow-500/50 rounded-lg p-3 mb-4">
+          <p className="text-yellow-200 text-sm">
+            {currentAlertCount === maxAlerts - 1 
+              ? `You're creating your last alert (${currentAlertCount + 1}/${maxAlerts}).`
+              : `You have reached the maximum limit of ${maxAlerts} alerts.`
+            }
+          </p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
         <div className="space-y-1">
           <Label htmlFor="country" className="text-white font-inter font-medium text-sm">Country</Label>
@@ -297,8 +332,8 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel }: JobAle
       <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2">
         <Button 
           type="submit" 
-          disabled={loading} 
-          className="font-inter bg-pastel-lavender hover:bg-pastel-lavender/80 text-black font-medium text-sm px-4 py-2 h-9"
+          disabled={loading || (!editingAlert && currentAlertCount >= maxAlerts)} 
+          className="font-inter bg-pastel-lavender hover:bg-pastel-lavender/80 text-black font-medium text-sm px-4 py-2 h-9 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Saving...' : editingAlert ? 'Update Alert' : 'Create Alert'}
         </Button>

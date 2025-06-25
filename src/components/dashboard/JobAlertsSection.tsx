@@ -1,10 +1,11 @@
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Bell, Plus } from 'lucide-react';
+import { Bell, Plus, AlertCircle } from 'lucide-react';
 import JobAlertForm from './JobAlertForm';
 import JobAlertsList from './JobAlertsList';
 import BotStatus from './BotStatus';
@@ -36,6 +37,11 @@ const JobAlertsSection = ({ userTimezone }: { userTimezone: string }) => {
   const [editingAlert, setEditingAlert] = useState<JobAlert | null>(null);
   const [isActivated, setIsActivated] = useState<boolean>(false);
   const [userProfileId, setUserProfileId] = useState<string | null>(null);
+
+  const MAX_ALERTS = 5;
+  const alertsUsed = alerts.length;
+  const alertsRemaining = MAX_ALERTS - alertsUsed;
+  const isAtLimit = alertsUsed >= MAX_ALERTS;
 
   useEffect(() => {
     fetchUserProfileAndAlerts();
@@ -118,6 +124,16 @@ const JobAlertsSection = ({ userTimezone }: { userTimezone: string }) => {
       });
       return;
     }
+
+    if (isAtLimit) {
+      toast({
+        title: "Alert limit reached",
+        description: `You can only create up to ${MAX_ALERTS} job alerts. Please delete an existing alert to create a new one.`,
+        variant: "destructive"
+      });
+      return;
+    }
+
     setEditingAlert(null);
     setShowForm(true);
   };
@@ -209,15 +225,40 @@ const JobAlertsSection = ({ userTimezone }: { userTimezone: string }) => {
             <p className="text-orange-100 font-inter text-sm font-semibold drop-shadow-none">
               Set up personalized job alerts based on your preferences
             </p>
+            
+            {/* Alert Usage Counter */}
+            {isActivated && (
+              <div className="flex items-center gap-2 mt-2">
+                <div className="flex items-center gap-1 text-xs">
+                  <span className={`font-medium ${isAtLimit ? 'text-red-300' : 'text-orange-200'}`}>
+                    {alertsUsed}/{MAX_ALERTS} alerts used
+                  </span>
+                  {isAtLimit && (
+                    <AlertCircle className="w-3 h-3 text-red-300" />
+                  )}
+                </div>
+                {alertsRemaining > 0 && (
+                  <span className="text-xs text-green-300">
+                    ({alertsRemaining} remaining)
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
           {isActivated && !showForm && (
             <div className="flex items-center mt-2 sm:mt-0">
               <Button 
                 onClick={handleCreateAlert}
-                className="font-bold px-4 py-2 rounded-lg shadow-sm transition text-orange-950 bg-gradient-to-tr from-orange-200 via-yellow-100 to-orange-300 hover:bg-orange-100 hover:from-yellow-200"
+                disabled={isAtLimit}
+                className={`font-bold px-4 py-2 rounded-lg shadow-sm transition text-orange-950 ${
+                  isAtLimit 
+                    ? 'bg-gray-400 cursor-not-allowed opacity-50' 
+                    : 'bg-gradient-to-tr from-orange-200 via-yellow-100 to-orange-300 hover:bg-orange-100 hover:from-yellow-200'
+                }`}
               >
-                <Plus className="w-4 h-4 mr-2" /> Add Alert
+                <Plus className="w-4 h-4 mr-2" /> 
+                {isAtLimit ? 'Limit Reached' : 'Add Alert'}
               </Button>
             </div>
           )}
@@ -237,6 +278,8 @@ const JobAlertsSection = ({ userTimezone }: { userTimezone: string }) => {
                     editingAlert={editingAlert}
                     onSubmit={handleFormSubmit}
                     onCancel={handleFormCancel}
+                    currentAlertCount={alertsUsed}
+                    maxAlerts={MAX_ALERTS}
                   />
                 </div>
               )}

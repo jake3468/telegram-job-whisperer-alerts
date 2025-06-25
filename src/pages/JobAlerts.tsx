@@ -86,9 +86,18 @@ const JobAlerts = () => {
         >
           Telegram <span className="italic">Job</span> Alerts
         </h1>
-        <p className="text-md text-orange-100 font-inter font-light">
+        
+        <p className="text-md text-orange-100 font-inter font-light mb-4">
           Manage your personalized <span className="italic text-pastel-peach">job alerts</span> and preferences
         </p>
+
+        {/* Usage Cost Badge */}
+        <div className="flex justify-center mb-4">
+          <div className="inline-flex items-center px-4 py-2 bg-green-500 text-white text-sm font-semibold rounded-full shadow-md">
+            <span className="mr-2 text-xs">💰</span>
+            Usage Cost: Free
+          </div>
+        </div>
       </div>
       <div className="space-y-8">
         <JobAlertsSection userTimezone={userTimezone} />
