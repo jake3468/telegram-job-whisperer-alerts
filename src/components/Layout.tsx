@@ -19,7 +19,7 @@ export function Layout({
             <span className="sr-only">Toggle navigation menu</span>
           </SidebarTrigger>
           <div className="flex items-center gap-2">
-            <img alt="JobBots Logo" className="h-8 w-8 drop-shadow-lg" src="/lovable-uploads/0b3f5e54-54d8-499d-86ef-bfa7ff683930.png" />
+            <img alt="JobBots Logo" className="h-8 w-8 drop-shadow-lg" src="/lovable-uploads/d96bbe67-6153-45c2-bca7-c9b6d09b810b.jpg" />
             <span className="font-orbitron font-extrabold text-2xl bg-gradient-to-r from-sky-300 via-fuchsia-400 to-indigo-300 bg-clip-text text-transparent drop-shadow-sm tracking-wider select-none relative whitespace-nowrap">Aspirely.ai</span>
           </div>
         </div>

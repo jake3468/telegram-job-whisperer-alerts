@@ -8,12 +8,12 @@ const AuthHeader = () => {
       <div className="flex justify-between items-center px-3 sm:px-6 py-4 max-w-7xl mx-auto">
         {/* Logo and Site Name: Left side */}
         <div className="flex items-center space-x-2 sm:space-x-3 z-40 cursor-pointer" onClick={() => navigate('/')}>
-          <img alt="JobBots Logo" className="h-9 w-9 sm:h-10 sm:w-10 drop-shadow-lg" src="/lovable-uploads/be73b7c9-b451-4e89-ac09-de15aa29fe01.png" />
+          <img alt="JobBots Logo" className="h-9 w-9 sm:h-10 sm:w-10 drop-shadow-lg" src="/lovable-uploads/924d7c77-405f-4345-8967-693eebdb7865.jpg" />
           <span style={{
             letterSpacing: '0.09em',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent'
-          }} className="font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-500 bg-clip-text tracking-wider drop-shadow font-extrabold sm:text-3xl text-white text-3xl">Aspirely.ai</span>
+          }} className="font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-500 bg-clip-text tracking-wider drop-shadow font-extrabold sm:text-3xl text-white text-2xl">Aspirely.ai</span>
         </div>
         {/* Auth Buttons: Right side */}
         <div>

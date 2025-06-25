@@ -1,15 +1,14 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-
 const SignupSection = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -18,15 +17,13 @@ const SignupSection = () => {
     setTimeout(() => {
       toast({
         title: "Account Created!",
-        description: "Check your email for next steps to complete your setup.",
+        description: "Check your email for next steps to complete your setup."
       });
       setLoading(false);
       setEmail("");
     }, 1500);
   };
-
-  return (
-    <section id="signup-section" className="py-20 px-4 bg-gradient-to-br from-sky-950 via-black to-indigo-950 min-h-[480px]">
+  return <section id="signup-section" className="py-20 px-4 bg-gradient-to-br from-sky-950 via-black to-indigo-950 min-h-[480px]">
       <div className="max-w-md mx-auto">
         <div className="p-1 rounded-3xl bg-gradient-to-tr from-sky-400 via-fuchsia-400/40 to-indigo-400 shadow-2xl">
           <div className="bg-black/85 border border-slate-700 rounded-[1.3rem] p-8 shadow-2xl backdrop-blur-md relative">
@@ -37,7 +34,7 @@ const SignupSection = () => {
                 Ready to Get Started?
               </h2>
               <p className="text-gray-200 font-inter font-medium text-base drop-shadow font-playfair">
-                Create your account and <span className="bg-gradient-to-r from-yellow-400 via-fuchsia-400 to-sky-300 text-transparent bg-clip-text font-semibold">let JobBots assist your job search.</span>
+                Create your account and <span className="bg-gradient-to-r from-yellow-400 via-fuchsia-400 to-sky-300 text-transparent bg-clip-text font-semibold">let Aspirely.ai assist your job search.</span>
               </p>
             </div>
             <form onSubmit={handleSignup} className="space-y-6">
@@ -45,24 +42,11 @@ const SignupSection = () => {
                 <Label htmlFor="email" className="text-gray-200 font-inter font-semibold tracking-wide">
                   Email Address
                 </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  required
-                  className="mt-2 bg-slate-700/80 border-sky-500 shadow-lg shadow-sky-400/20 text-white placeholder:text-slate-300 font-inter h-12 text-base focus:border-fuchsia-500 focus:ring-fuchsia-500 transition-all"
-                />
+                <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com" required className="mt-2 bg-slate-700/80 border-sky-500 shadow-lg shadow-sky-400/20 text-white placeholder:text-slate-300 font-inter h-12 text-base focus:border-fuchsia-500 focus:ring-fuchsia-500 transition-all" />
               </div>
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-500 hover:from-sky-500 hover:to-fuchsia-600 text-white py-3 rounded-xl font-inter font-bold transition-all duration-200 h-12 text-base shadow-lg shadow-fuchsia-400/30 relative focus:outline-none focus:ring-4 focus:ring-fuchsia-400/60 drop-shadow hover:brightness-105 hover:scale-[1.03]"
-                style={{
-                  boxShadow: "0 4px 24px 0 rgba(126, 34, 206, 0.13), 0 0px 0px 2px #a5b4fc",
-                }}
-              >
+              <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-500 hover:from-sky-500 hover:to-fuchsia-600 text-white py-3 rounded-xl font-inter font-bold transition-all duration-200 h-12 text-base shadow-lg shadow-fuchsia-400/30 relative focus:outline-none focus:ring-4 focus:ring-fuchsia-400/60 drop-shadow hover:brightness-105 hover:scale-[1.03]" style={{
+              boxShadow: "0 4px 24px 0 rgba(126, 34, 206, 0.13), 0 0px 0px 2px #a5b4fc"
+            }}>
                 {loading ? "Creating Account..." : "Create Free Account"}
               </Button>
             </form>
@@ -74,8 +58,6 @@ const SignupSection = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default SignupSection;
