@@ -1,76 +1,60 @@
 
-import { useEffect } from 'react';
-import { useAuth } from '@clerk/clerk-react';
-import { setClerkToken, testJWTTransmission } from '@/integrations/supabase/client';
-import { Environment } from '@/utils/environment';
+import { useUser } from '@clerk/clerk-react';
+import { useEffect, useRef } from 'react';
+import { setClerkToken, setTokenRefreshFunction } from '@/integrations/supabase/client';
 
-/**
- * Production-optimized Clerk-Supabase sync with minimal overhead.
- */
-export function useClerkSupabaseSync() {
-  const { getToken, isSignedIn, userId } = useAuth();
+export const useClerkSupabaseSync = () => {
+  const { user, isLoaded } = useUser();
+  const syncedRef = useRef(false);
+  const tokenSetRef = useRef(false);
 
   useEffect(() => {
-    let isMounted = true;
-    
-    async function setToken() {
+    const setupTokenRefresh = async () => {
+      if (!user || !isLoaded) return;
+
       try {
-        if (isSignedIn && getToken) {
-          // Get fresh token - no artificial delays in production
-          const jwt = await getToken({ 
-            template: 'supabase',
-            skipCache: true,
-            leewayInSeconds: 0
-          }).catch((error) => {
-            if (Environment.isDevelopment()) {
-              console.error('[useClerkSupabaseSync] Error getting Clerk JWT:', error);
-            }
+        // Set up the token refresh function
+        const refreshFunction = async () => {
+          try {
+            console.log('[useClerkSupabaseSync] 🔄 Token refresh function called');
+            const token = await user.getToken({ template: 'supabase' });
+            console.log('[useClerkSupabaseSync] ✅ New token obtained from Clerk');
+            return token;
+          } catch (error) {
+            console.error('[useClerkSupabaseSync] ❌ Failed to get token from Clerk:', error);
             return null;
-          });
-          
-          if (!isMounted) return;
-          
-          if (!jwt) {
-            if (Environment.isDevelopment()) {
-              console.warn("[useClerkSupabaseSync] No Clerk JWT returned. Check template configuration.");
-            }
-            await setClerkToken(null);
-          } else {
-            // Set the JWT token immediately
-            const success = await setClerkToken(jwt);
-            
-            // Only run comprehensive tests in development
-            if (success && Environment.isDevelopment()) {
-              console.log(`[useClerkSupabaseSync] Token set for user: ${userId}`);
-              
-              // Test JWT transmission only in development
-              try {
-                const testResult = await testJWTTransmission();
-                if (testResult.data?.[0]?.clerk_id) {
-                  console.log('[useClerkSupabaseSync] ✅ JWT verified');
-                } else {
-                  console.error('[useClerkSupabaseSync] JWT not recognized');
-                }
-              } catch (error) {
-                console.warn('[useClerkSupabaseSync] JWT test failed:', error);
-              }
-            }
           }
-        } else {
-          await setClerkToken(null);
+        };
+
+        // Set the refresh function
+        setTokenRefreshFunction(refreshFunction);
+
+        // Get initial token
+        const token = await user.getToken({ template: 'supabase' });
+        
+        if (token) {
+          const success = await setClerkToken(token);
+          if (success) {
+            console.log('[useClerkSupabaseSync] ✅ Initial Clerk-Supabase sync completed');
+            syncedRef.current = true;
+            tokenSetRef.current = true;
+          }
         }
-      } catch (err) {
-        if (isMounted && Environment.isDevelopment()) {
-          console.error("[useClerkSupabaseSync] Error in token sync:", err);
-        }
+      } catch (error) {
+        console.error('[useClerkSupabaseSync] ❌ Error in token setup:', error);
       }
-    }
-    
-    // Immediate token refresh with no delays
-    setToken();
-    
-    return () => { 
-      isMounted = false; 
     };
-  }, [getToken, isSignedIn, userId]);
-}
+
+    if (isLoaded && user && !syncedRef.current) {
+      setupTokenRefresh();
+    } else if (isLoaded && !user && tokenSetRef.current) {
+      // User logged out, clear the token
+      setClerkToken(null);
+      tokenSetRef.current = false;
+      syncedRef.current = false;
+      console.log('[useClerkSupabaseSync] 🔄 User logged out, tokens cleared');
+    }
+  }, [user, isLoaded]);
+
+  return { isLoaded, user, isSynced: syncedRef.current };
+};

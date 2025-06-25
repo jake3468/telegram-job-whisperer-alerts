@@ -11,8 +11,9 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
   throw new Error('Missing required Supabase configuration. Please check your environment variables.');
 }
 
-// Store the current JWT token
+// Store the current JWT token and refresh function
 let currentJWTToken: string | null = null;
+let tokenRefreshFunction: (() => Promise<string | null>) | null = null;
 
 // Create the Supabase client with enhanced auth configuration
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
@@ -25,6 +26,53 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     headers: {}
   }
 });
+
+// Function to set token refresh function from Clerk
+export const setTokenRefreshFunction = (refreshFn: () => Promise<string | null>) => {
+  tokenRefreshFunction = refreshFn;
+  console.log('[setTokenRefreshFunction] ✅ Token refresh function set');
+};
+
+// Function to refresh JWT token
+export const refreshJWTToken = async (): Promise<string | null> => {
+  try {
+    if (!tokenRefreshFunction) {
+      console.warn('[refreshJWTToken] ⚠️ No token refresh function available');
+      return null;
+    }
+
+    console.log('[refreshJWTToken] 🔄 Refreshing JWT token...');
+    const newToken = await tokenRefreshFunction();
+    
+    if (newToken) {
+      currentJWTToken = newToken;
+      console.log('[refreshJWTToken] ✅ JWT token refreshed successfully');
+      return newToken;
+    } else {
+      console.warn('[refreshJWTToken] ⚠️ Failed to refresh JWT token');
+      return null;
+    }
+  } catch (error) {
+    console.error('[refreshJWTToken] ❌ Error refreshing JWT token:', error);
+    return null;
+  }
+};
+
+// Function to check if token is expired
+const isTokenExpired = (token: string): boolean => {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return true;
+    
+    const payload = JSON.parse(atob(parts[1]));
+    const now = Math.floor(Date.now() / 1000);
+    const buffer = 60; // 60 seconds buffer before expiration
+    
+    return payload.exp && (payload.exp - buffer) < now;
+  } catch (e) {
+    return true;
+  }
+};
 
 // Function to set Clerk JWT token  
 export const setClerkToken = async (token: string | null) => {
@@ -78,16 +126,22 @@ export const setClerkToken = async (token: string | null) => {
 // Function to get current JWT token for debugging
 export const getCurrentJWTToken = () => currentJWTToken;
 
-// Enhanced function to make authenticated requests with proper JWT headers and retry logic
+// Enhanced function to make authenticated requests with automatic token refresh
 export const makeAuthenticatedRequest = async <T>(
   operation: () => Promise<T>,
   operationType: string = 'unknown',
-  maxRetries: number = 3
+  maxRetries: number = 2
 ): Promise<T> => {
   let lastError: any = null;
   
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
+      // Check if we need to refresh the token
+      if (currentJWTToken && isTokenExpired(currentJWTToken)) {
+        console.log(`[makeAuthenticatedRequest] 🔄 Token expired, refreshing before ${operationType}...`);
+        await refreshJWTToken();
+      }
+
       if (!currentJWTToken) {
         console.warn(`[makeAuthenticatedRequest] ⚠️ No JWT token available for ${operationType} (attempt ${attempt + 1})`);
       } else {
@@ -133,17 +187,19 @@ export const makeAuthenticatedRequest = async <T>(
       lastError = error;
       console.error(`[makeAuthenticatedRequest] ❌ Attempt ${attempt + 1} failed for ${operationType}:`, error);
       
-      // If it's a JWT expired error and we have more attempts, wait a bit and retry
-      if (error?.code === 'PGRST301' || error?.message?.includes('JWT expired')) {
-        if (attempt < maxRetries - 1) {
-          console.log(`[makeAuthenticatedRequest] 🔄 JWT expired, retrying in ${(attempt + 1) * 1000}ms...`);
-          await new Promise(resolve => setTimeout(resolve, (attempt + 1) * 1000));
+      // If it's a JWT expired error, try to refresh token and retry
+      if ((error?.code === 'PGRST301' || error?.message?.includes('JWT expired')) && attempt < maxRetries - 1) {
+        console.log(`[makeAuthenticatedRequest] 🔄 JWT expired, attempting token refresh...`);
+        const refreshed = await refreshJWTToken();
+        if (refreshed) {
+          console.log(`[makeAuthenticatedRequest] ✅ Token refreshed, retrying in 1000ms...`);
+          await new Promise(resolve => setTimeout(resolve, 1000));
           continue;
         }
       }
       
-      // For other errors, don't retry
-      if (!error?.message?.includes('JWT expired')) {
+      // For other errors, don't retry unless it's the first attempt and token-related
+      if (!error?.message?.includes('JWT expired') && !error?.code?.includes('PGRST301')) {
         throw error;
       }
     }
