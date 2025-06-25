@@ -54,7 +54,9 @@ export default function GetMoreCredits() {
 
   // Static credit balance calculation
   const currentBalance = credits ? Number(credits.current_balance) : 0;
-  return <Layout>
+  
+  return (
+    <Layout>
       <div className="w-full flex flex-col pb-5 sm:pb-8">
         <div className="text-center mb-5 sm:mb-12 px-2 sm:px-4">
           <h1 className="text-2xl xs:text-3xl sm:text-5xl font-orbitron font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-1 sm:mb-2 drop-shadow tracking-tight animate-fade-in">
@@ -66,13 +68,22 @@ export default function GetMoreCredits() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
             <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in">
               Current Balance:{" "}
-              {isLoading ? <span className="font-bold text-cyan-100">Loading...</span> : error ? <span className="font-bold text-rose-300">Error loading</span> : credits ? <span className="font-bold text-cyan-100">
+              {isLoading ? (
+                <span className="font-bold text-cyan-100">Loading...</span>
+              ) : error ? (
+                <span className="font-bold text-rose-300">Error loading</span>
+              ) : credits ? (
+                <span className="font-bold text-cyan-100">
                   {currentBalance.toLocaleString()} credits
-                </span> : <span className="font-bold text-yellow-300">No credits found</span>}
+                </span>
+              ) : (
+                <span className="font-bold text-yellow-300">No credits found</span>
+              )}
             </p>
             <UsageHistoryModal />
           </div>
         </div>
+        
         {/* Responsive grid area with tight spacing for mobile; px for interior gap only */}
         <div className="flex-1 flex flex-col items-center justify-center w-full px-2 sm:px-4">
           <div className={`
@@ -83,6 +94,7 @@ export default function GetMoreCredits() {
               items-stretch
               duration-500
             `}>
+            
             {/* Free Plan */}
             <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-blue-400/30 min-h-[340px] sm:min-h-[420px]`}>
               <CardHeader className="text-center pb-3 pt-4 sm:pb-4 sm:pt-6 px-2 sm:px-4">
@@ -177,28 +189,24 @@ export default function GetMoreCredits() {
                     <span className="text-indigo-100 font-medium text-xs sm:text-sm">50 credits</span>
                     <div className="text-right">
                       <span className="text-indigo-50 font-bold text-xs sm:text-sm">₹99</span>
-                      
                     </div>
                   </div>
                   <div className="bg-gradient-to-r from-[#385494] via-[#4481db] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
                     <span className="text-indigo-100 font-medium text-xs sm:text-sm">100 credits</span>
                     <div className="text-right">
                       <span className="text-indigo-50 font-bold text-xs sm:text-sm">₹189</span>
-                      
                     </div>
                   </div>
                   <div className="bg-gradient-to-r from-[#385494] via-[#4481db] to-[#528bfd] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
                     <span className="text-indigo-100 font-medium text-xs sm:text-sm">200 credits</span>
                     <div className="text-right">
                       <span className="text-indigo-50 font-bold text-xs sm:text-sm">₹349</span>
-                      
                     </div>
                   </div>
                   <div className="bg-gradient-to-r from-[#385494] via-[#4481db] to-[#789cfb] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
                     <span className="text-indigo-100 font-medium text-xs sm:text-sm">500 credits</span>
                     <div className="text-right">
                       <span className="text-indigo-50 font-bold text-xs sm:text-sm">₹799</span>
-                      
                     </div>
                   </div>
                 </div>
@@ -226,5 +234,6 @@ export default function GetMoreCredits() {
           </div>
         </div>
       </div>
-    </Layout>;
+    </Layout>
+  );
 }
