@@ -235,17 +235,9 @@ const JobGuide = () => {
       return;
     }
     
-    // Only show profile completion error if we're sure the profile is incomplete
-    // Don't block if data is still loading
-    if (!completionLoading && !profileLoading && !isComplete && userProfile) {
-      console.log('❌ Profile incomplete after loading finished:', { hasResume, hasBio, isComplete, completionLoading, profileLoading });
-      toast({
-        title: "Complete your profile first",
-        description: "Please upload your resume and add your bio in the Home page before using Job Analysis.",
-        variant: "destructive"
-      });
-      return;
-    }
+    // REMOVED PROFILE COMPLETION CHECK - Allow users to proceed regardless
+    // The profile completion check was causing issues for users who have valid profiles
+    // Let the backend handle any necessary validations
     
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
