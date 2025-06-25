@@ -88,7 +88,7 @@ const JobAlerts = () => {
         {/* Usage Cost Badge */}
         <div className="flex justify-center mb-4">
           <div className="inline-flex items-center px-4 py-2 bg-green-500 text-black text-sm font-semibold rounded-full shadow-md">
-            <span className="mr-2 text-xs">💰</span>
+            <span className="mr-2 text-sm">💰</span>
             Usage Cost: Free
           </div>
         </div>
