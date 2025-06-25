@@ -9,6 +9,7 @@ import { useUserCredits } from '@/hooks/useUserCredits';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Layout } from '@/components/Layout';
 import UsageHistoryModal from '@/components/UsageHistoryModal';
+
 const planGradientBg = {
   free: "bg-black border border-blue-400/30",
   subscription: "bg-gradient-to-br from-[#2563eb] via-[#3893ec] to-[#1872ba] dark:from-[#274299] dark:via-[#3177c7] dark:to-[#1b466c]",
@@ -19,6 +20,7 @@ const planTextColor = {
   subscription: "text-cyan-100",
   pack: "text-indigo-100"
 };
+
 export default function GetMoreCredits() {
   const {
     user,
@@ -33,11 +35,17 @@ export default function GetMoreCredits() {
   const {
     userProfile
   } = useUserProfile();
+
+  const handleSubscribeClick = () => {
+    window.open('https://test.checkout.dodopayments.com/buy/pdt_NoeZBi7dtSLdIthX7TDoj?quantity=1&redirect_url=https://preview--telegram-job-whisperer-alerts.lovable.app%2Fget-more-credits', '_blank');
+  };
+
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
+
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-gradient-to-br from-pastel-mint via-pastel-lavender to-pastel-peach flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading...</div>
@@ -145,7 +153,12 @@ export default function GetMoreCredits() {
                   </li>
                 </ul>
                 <div className="mt-auto">
-                  <Button disabled className="w-full py-2 sm:py-2.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 hover:from-cyan-700 hover:to-blue-800 text-white font-orbitron text-xs rounded-xl shadow border-0 bg-stone-950 hover:bg-stone-800 sm:min-w-full ">Subscribe Now</Button>
+                  <Button 
+                    onClick={handleSubscribeClick}
+                    className="w-full py-2 sm:py-2.5 bg-white hover:bg-yellow-100 text-black font-orbitron text-xs rounded-xl shadow border-0 font-bold transition-colors duration-200"
+                  >
+                    Subscribe Now
+                  </Button>
                 </div>
               </CardContent>
             </Card>
