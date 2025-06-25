@@ -316,10 +316,29 @@ const JobGuide = () => {
     }
   };
 
-  // Fix form validation logic
-  const isFormValid = formData.companyName.trim() && formData.jobTitle.trim() && formData.jobDescription.trim();
+  // Fix form validation logic - make it more reliable
+  const isFormValid = Boolean(
+    formData.companyName && 
+    formData.companyName.trim().length > 0 &&
+    formData.jobTitle && 
+    formData.jobTitle.trim().length > 0 &&
+    formData.jobDescription && 
+    formData.jobDescription.trim().length > 0
+  );
+  
   const hasAnyData = isFormValid || jobAnalysisResult;
   const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating;
+
+  // Debug logging to help identify the issue
+  console.log('Form validation debug:', {
+    companyName: formData.companyName,
+    jobTitle: formData.jobTitle,
+    jobDescription: formData.jobDescription?.substring(0, 50) + '...',
+    isFormValid,
+    isComplete,
+    isButtonDisabled
+  });
+
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-slate-400 text-xs">Loading...</div>
