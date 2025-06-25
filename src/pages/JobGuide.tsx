@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { AlertCircle, FileText, Sparkles, Loader2, CheckCircle, Trash2, Building, Briefcase, Copy, History } from 'lucide-react';
 import AuthHeader from '@/components/AuthHeader';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/client';
 import { Layout } from '@/components/Layout';
 import JobAnalysisHistory from '@/components/JobAnalysisHistory';
 import { PercentageMeter } from '@/components/PercentageMeter';
@@ -83,12 +83,14 @@ const JobGuide = () => {
       try {
         console.log('📡 Polling attempt', retryCount + 1, 'for analysis ID:', jobAnalysisId);
         
-        // Create a fresh supabase client instance for each request to handle token refresh
-        const { data, error } = await supabase
-          .from('job_analyses')
-          .select('job_match, match_score')
-          .eq('id', jobAnalysisId)
-          .maybeSingle();
+        // Use authenticated request for polling
+        const { data, error } = await makeAuthenticatedRequest(async () => {
+          return await supabase
+            .from('job_analyses')
+            .select('job_match, match_score')
+            .eq('id', jobAnalysisId)
+            .maybeSingle();
+        }, 'poll job analysis results');
         
         if (error) {
           console.error('❌ Error polling for results:', error);
@@ -276,17 +278,19 @@ const JobGuide = () => {
       console.log('✅ Starting job analysis submission process');
       console.log('✅ Using user profile:', userProfile?.id);
 
-      // Check for existing analysis (now fetch match_score as well)
-      const { data: existingAnalysis, error: checkError } = await supabase
-        .from('job_analyses')
-        .select('id, job_match, match_score')
-        .eq('user_id', userProfile?.id)
-        .eq('company_name', formData.companyName)
-        .eq('job_title', formData.jobTitle)
-        .eq('job_description', formData.jobDescription)
-        .not('job_match', 'is', null)
-        .order('created_at', { ascending: false })
-        .limit(1);
+      // Check for existing analysis using authenticated request
+      const { data: existingAnalysis, error: checkError } = await makeAuthenticatedRequest(async () => {
+        return await supabase
+          .from('job_analyses')
+          .select('id, job_match, match_score')
+          .eq('user_id', userProfile?.id)
+          .eq('company_name', formData.companyName)
+          .eq('job_title', formData.jobTitle)
+          .eq('job_description', formData.jobDescription)
+          .not('job_match', 'is', null)
+          .order('created_at', { ascending: false })
+          .limit(1);
+      }, 'check existing analysis');
 
       if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
         const existing = existingAnalysis[0];
@@ -302,7 +306,7 @@ const JobGuide = () => {
         return;
       }
 
-      // Insert new analysis record
+      // Insert new analysis record using authenticated request
       const insertData = {
         user_id: userProfile?.id,
         company_name: formData.companyName,
@@ -312,11 +316,13 @@ const JobGuide = () => {
       
       console.log('📝 Inserting job analysis data:', insertData);
       
-      const { data: insertedData, error: insertError } = await supabase
-        .from('job_analyses')
-        .insert(insertData)
-        .select('id')
-        .single();
+      const { data: insertedData, error: insertError } = await makeAuthenticatedRequest(async () => {
+        return await supabase
+          .from('job_analyses')
+          .insert(insertData)
+          .select('id')
+          .single();
+      }, 'insert job analysis', 3); // 3 retries for JWT issues
       
       if (insertError) {
         console.error('❌ INSERT ERROR:', insertError);

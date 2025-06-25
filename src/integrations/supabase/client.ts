@@ -14,11 +14,12 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
 // Store the current JWT token
 let currentJWTToken: string | null = null;
 
-// Create the Supabase client with global headers configuration
+// Create the Supabase client with enhanced auth configuration
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     persistSession: false,
-    autoRefreshToken: false,
+    autoRefreshToken: true,
+    detectSessionInUrl: false,
   },
   global: {
     headers: {}
@@ -49,6 +50,13 @@ export const setClerkToken = async (token: string | null) => {
           iat: payload.iat,
           role: payload.role
         });
+        
+        // Check if token is expired
+        const now = Math.floor(Date.now() / 1000);
+        if (payload.exp && payload.exp < now) {
+          console.warn('[setClerkToken] ⚠️ JWT token is already expired');
+          return false;
+        }
       } catch (e) {
         console.warn('[setClerkToken] ⚠️ Could not decode JWT payload for validation:', e);
       }
@@ -70,52 +78,79 @@ export const setClerkToken = async (token: string | null) => {
 // Function to get current JWT token for debugging
 export const getCurrentJWTToken = () => currentJWTToken;
 
-// Enhanced function to make authenticated requests with proper JWT headers
+// Enhanced function to make authenticated requests with proper JWT headers and retry logic
 export const makeAuthenticatedRequest = async <T>(
   operation: () => Promise<T>,
-  operationType: string = 'unknown'
+  operationType: string = 'unknown',
+  maxRetries: number = 3
 ): Promise<T> => {
-  if (!currentJWTToken) {
-    console.warn(`[makeAuthenticatedRequest] ⚠️ No JWT token available for ${operationType}`);
-  } else {
-    console.log(`[makeAuthenticatedRequest] 🔐 Making authenticated request for: ${operationType}`);
-  }
+  let lastError: any = null;
   
-  // Create a new client instance with JWT headers for this specific request
-  if (currentJWTToken) {
-    const authenticatedClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-      },
-      global: {
-        headers: {
-          'Authorization': `Bearer ${currentJWTToken}`
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      if (!currentJWTToken) {
+        console.warn(`[makeAuthenticatedRequest] ⚠️ No JWT token available for ${operationType} (attempt ${attempt + 1})`);
+      } else {
+        console.log(`[makeAuthenticatedRequest] 🔐 Making authenticated request for: ${operationType} (attempt ${attempt + 1})`);
+      }
+      
+      // Create a new client instance with JWT headers for this specific request
+      if (currentJWTToken) {
+        const authenticatedClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+          auth: {
+            persistSession: false,
+            autoRefreshToken: true,
+          },
+          global: {
+            headers: {
+              'Authorization': `Bearer ${currentJWTToken}`
+            }
+          }
+        });
+
+        console.log(`[makeAuthenticatedRequest] 🔐 Using authenticated client for ${operationType} (attempt ${attempt + 1})`);
+        
+        // Replace the global supabase instance temporarily for this operation
+        const originalFrom = supabase.from.bind(supabase);
+        const originalRpc = supabase.rpc.bind(supabase);
+        
+        // Override methods to use authenticated client
+        (supabase as any).from = authenticatedClient.from.bind(authenticatedClient);
+        (supabase as any).rpc = authenticatedClient.rpc.bind(authenticatedClient);
+        
+        try {
+          const result = await operation();
+          return result;
+        } finally {
+          // Restore original methods
+          (supabase as any).from = originalFrom;
+          (supabase as any).rpc = originalRpc;
         }
       }
-    });
-
-    console.log(`[makeAuthenticatedRequest] 🔐 Using authenticated client for ${operationType}`);
-    
-    // Replace the global supabase instance temporarily for this operation
-    const originalFrom = supabase.from.bind(supabase);
-    const originalRpc = supabase.rpc.bind(supabase);
-    
-    // Override methods to use authenticated client
-    (supabase as any).from = authenticatedClient.from.bind(authenticatedClient);
-    (supabase as any).rpc = authenticatedClient.rpc.bind(authenticatedClient);
-    
-    try {
-      const result = await operation();
-      return result;
-    } finally {
-      // Restore original methods
-      (supabase as any).from = originalFrom;
-      (supabase as any).rpc = originalRpc;
+      
+      return await operation();
+    } catch (error: any) {
+      lastError = error;
+      console.error(`[makeAuthenticatedRequest] ❌ Attempt ${attempt + 1} failed for ${operationType}:`, error);
+      
+      // If it's a JWT expired error and we have more attempts, wait a bit and retry
+      if (error?.code === 'PGRST301' || error?.message?.includes('JWT expired')) {
+        if (attempt < maxRetries - 1) {
+          console.log(`[makeAuthenticatedRequest] 🔄 JWT expired, retrying in ${(attempt + 1) * 1000}ms...`);
+          await new Promise(resolve => setTimeout(resolve, (attempt + 1) * 1000));
+          continue;
+        }
+      }
+      
+      // For other errors, don't retry
+      if (!error?.message?.includes('JWT expired')) {
+        throw error;
+      }
     }
   }
   
-  return await operation();
+  // If we've exhausted all retries, throw the last error
+  throw lastError;
 };
 
 // Function to test JWT transmission with direct RPC call
