@@ -1,5 +1,4 @@
 
-
 import { User, Bell, Target, FileText, X, Share2, CreditCard, FileUser, Building2, MessageSquare } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
@@ -78,28 +77,15 @@ export function AppSidebar() {
       scrollbar-none
       /* No rounded corners for a squared sidebar */
     ">
-      {/* Logo & Name section: hide on mobile/tablet since it's shown in top navbar */}
-      {!isMobile && (
-        <SidebarHeader className="py-2 px-3 border-b border-fuchsia-400/15 bg-black/95 relative flex flex-col items-center gap-1">
-          <img 
-            alt="JobBots Logo" 
-            src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" 
-            className="max-h-10 mb-1 drop-shadow-2xl object-fill"
-            loading="eager"
-            style={{ imageRendering: 'auto' }}
-          />
-          <span className="font-orbitron drop-shadow bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-400 bg-clip-text select-none tracking-widest text-white font-bold min-w-0 truncate text-xl">Aspirely.ai</span>
-        </SidebarHeader>
-      )}
-
-      {/* X button for mobile - positioned differently when header is hidden */}
-      {isMobile && (
-        <div className="absolute right-3 top-4 z-10">
-          <Button variant="ghost" size="icon" onClick={() => setOpenMobile(false)} className="h-10 w-10 text-fuchsia-300 hover:bg-fuchsia-800/40 border border-fuchsia-400/20 bg-black/50 rounded-xl transition-all">
+      {/* Logo & Name section: compact header */}
+      <SidebarHeader className="py-2 px-3 border-b border-fuchsia-400/15 bg-black/95 relative flex flex-col items-center gap-1">
+        <img alt="JobBots Logo" src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" className="max-h-10 mb-1 drop-shadow-2xl object-fill" />
+        <span className="font-orbitron drop-shadow bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-400 bg-clip-text select-none tracking-widest text-white font-bold min-w-0 truncate text-xl">Aspirely.ai</span>
+        {/* X button for mobile - only close button, no hamburger */}
+        {isMobile && <Button variant="ghost" size="icon" onClick={() => setOpenMobile(false)} className="h-10 w-10 text-fuchsia-300 hover:bg-fuchsia-800/40 border border-fuchsia-400/20 bg-black/50 rounded-xl transition-all absolute right-3 top-4">
             <X className="h-6 w-6" />
-          </Button>
-        </div>
-      )}
+          </Button>}
+      </SidebarHeader>
 
       <SidebarContent className="overflow-x-hidden w-full px-0 !pr-0">
         {/* Profile Section - without heading */}
@@ -206,4 +192,3 @@ export function AppSidebar() {
 }
 
 // no export default, just named export
-
