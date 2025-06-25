@@ -29,7 +29,7 @@ const JobAnalysisHistoryModal = ({
   onClose,
   gradientColors
 }: JobAnalysisHistoryModalProps) => {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const { toast } = useToast();
   const { userProfile } = useUserProfile();
   const [historyData, setHistoryData] = useState<JobAnalysisItem[]>([]);
@@ -39,16 +39,22 @@ const JobAnalysisHistoryModal = ({
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    if (isOpen && user && userProfile) {
+    if (isOpen && isLoaded && user && userProfile) {
+      console.log('🔄 JobAnalysisHistoryModal: Starting to fetch history');
       fetchHistory();
     }
-  }, [isOpen, user, userProfile]);
+  }, [isOpen, isLoaded, user, userProfile]);
 
   const fetchHistory = async (isRetry = false) => {
-    if (!user || !userProfile) return;
+    if (!isLoaded || !user || !userProfile) {
+      console.log('❌ Cannot fetch history: missing requirements', { isLoaded, user: !!user, userProfile: !!userProfile });
+      return;
+    }
     
     setIsLoading(true);
     try {
+      console.log('📡 Fetching job analysis history for user:', userProfile.id);
+      
       const { data, error } = await supabase
         .from('job_analyses')
         .select('id, company_name, job_title, job_description, created_at, job_match, match_score')
@@ -57,25 +63,33 @@ const JobAnalysisHistoryModal = ({
         .limit(20);
 
       if (error) {
-        console.error('Error fetching history:', error);
-        if (!isRetry && retryCount < 2) {
-          // Retry once after a short delay
-          setTimeout(() => {
-            setRetryCount(prev => prev + 1);
-            fetchHistory(true);
-          }, 1000);
-          return;
+        console.error('❌ Error fetching history:', error);
+        
+        // If JWT expired, try to refresh the session
+        if (error.message?.includes('JWT expired') || error.code === 'PGRST301') {
+          console.log('🔄 JWT expired, attempting to refresh session...');
+          
+          if (!isRetry && retryCount < 2) {
+            // Wait a moment for potential token refresh, then retry
+            setTimeout(() => {
+              setRetryCount(prev => prev + 1);
+              fetchHistory(true);
+            }, 2000);
+            return;
+          }
         }
+        
         throw error;
       }
 
+      console.log('✅ Successfully fetched history:', data?.length || 0, 'items');
       setHistoryData(data || []);
       setRetryCount(0); // Reset retry count on success
     } catch (err) {
-      console.error('Failed to fetch history:', err);
+      console.error('❌ Failed to fetch history:', err);
       toast({
         title: "Error",
-        description: "Failed to load history. Please try again.",
+        description: "Failed to load history. Please try again or refresh the page.",
         variant: "destructive"
       });
     } finally {
@@ -293,15 +307,13 @@ const JobAnalysisHistoryModal = ({
               <div className="text-white/70 text-center">
                 <History className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No job analyses found.</p>
-                {retryCount > 0 && (
-                  <Button 
-                    onClick={() => fetchHistory()} 
-                    size="sm" 
-                    className="mt-2 bg-blue-600 hover:bg-blue-700"
-                  >
-                    Retry Loading
-                  </Button>
-                )}
+                <Button 
+                  onClick={() => fetchHistory()} 
+                  size="sm" 
+                  className="mt-2 bg-blue-600 hover:bg-blue-700"
+                >
+                  Retry Loading
+                </Button>
               </div>
             </div>
           ) : (

@@ -32,7 +32,7 @@ const JobGuide = () => {
     hasResume,
     hasBio,
     isComplete,
-    loading
+    loading: completionLoading
   } = useUserCompletionStatus();
   const { userProfile } = useUserProfile();
   const [formData, setFormData] = useState({
@@ -194,7 +194,9 @@ const JobGuide = () => {
       return;
     }
     
-    if (!isComplete) {
+    // More lenient profile completion check - allow if loading or if actually incomplete
+    if (!completionLoading && !isComplete) {
+      console.log('❌ Profile incomplete:', { hasResume, hasBio, isComplete, completionLoading });
       toast({
         title: "Complete your profile first",
         description: "Please upload your resume and add your bio in the Home page before using Job Analysis.",
@@ -310,7 +312,7 @@ const JobGuide = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, isComplete, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup, userProfile]);
+  }, [formData, isComplete, completionLoading, hasResume, hasBio, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup, userProfile]);
   useEffect(() => {
     const handleHistoryData = (event: any) => {
       const {
@@ -355,7 +357,7 @@ const JobGuide = () => {
     }
   };
 
-  // Fix form validation logic - make it more reliable
+  // Updated form validation logic to be more reliable
   const isFormValid = Boolean(
     formData.companyName && 
     formData.companyName.trim().length > 0 &&
@@ -366,15 +368,20 @@ const JobGuide = () => {
   );
   
   const hasAnyData = isFormValid || jobAnalysisResult;
-  const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating;
+  
+  // More lenient button disable logic - allow if completion is still loading
+  const isButtonDisabled = (!completionLoading && !isComplete) || !isFormValid || isSubmitting || isGenerating;
 
-  // Debug logging to help identify the issue
+  // Enhanced debug logging
   console.log('Form validation debug:', {
     companyName: formData.companyName,
     jobTitle: formData.jobTitle,
     jobDescription: formData.jobDescription?.substring(0, 50) + '...',
     isFormValid,
     isComplete,
+    completionLoading,
+    hasResume,
+    hasBio,
     isButtonDisabled
   });
 
