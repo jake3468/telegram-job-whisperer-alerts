@@ -1,9 +1,11 @@
+
 import { User, Bell, Target, FileText, X, Share2, CreditCard, FileUser, Building2, MessageSquare } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { SignedIn, UserButton, useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import CreditBalanceDisplay from './CreditBalanceDisplay';
+
 const profileItems = [{
   title: 'Profile',
   url: '/profile',
@@ -13,6 +15,7 @@ const profileItems = [{
   url: '/get-more-credits',
   icon: CreditCard
 }];
+
 const toolItems = [{
   title: 'Telegram Job Alerts',
   url: '/job-alerts',
@@ -42,6 +45,7 @@ const toolItems = [{
   url: '/resume-builder',
   icon: FileUser
 }];
+
 export function AppSidebar() {
   const {
     state,
@@ -72,10 +76,10 @@ export function AppSidebar() {
       scrollbar-none
       /* No rounded corners for a squared sidebar */
     ">
-      {/* Logo & Name section: always visible */}
-      <SidebarHeader className="py-8 px-3 border-b border-fuchsia-400/15 bg-black/95 relative flex flex-col items-center gap-2">
-        <img alt="JobBots Logo" src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" className="max-h-20 mb-12 drop-shadow-2xl mb-10 object-fill" />
-        <span className="font-orbitron drop-shadow bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-400 bg-clip-text select-none tracking-widest whitespace-nowrap text-white text-2xl font-bold">Aspirely.ai</span>
+      {/* Logo & Name section: compact header */}
+      <SidebarHeader className="py-4 px-3 border-b border-fuchsia-400/15 bg-black/95 relative flex flex-col items-center gap-1">
+        <img alt="JobBots Logo" src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" className="max-h-12 mb-2 drop-shadow-2xl object-fill" />
+        <span className="font-orbitron drop-shadow bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-400 bg-clip-text select-none tracking-widest whitespace-nowrap text-white text-xl font-bold">Aspirely.ai</span>
         {/* X button for mobile - only close button, no hamburger */}
         {isMobile && <Button variant="ghost" size="icon" onClick={() => setOpenMobile(false)} className="h-10 w-10 text-fuchsia-300 hover:bg-fuchsia-800/40 border border-fuchsia-400/20 bg-black/50 rounded-xl transition-all absolute right-3 top-4">
             <X className="h-6 w-6" />
@@ -84,8 +88,8 @@ export function AppSidebar() {
 
       <SidebarContent className="overflow-x-hidden w-full px-0 !pr-0">
         {/* Profile Section */}
-        <SidebarGroup className="bg-black/60 mb-2 mx-2 mt-6 shadow-md rounded-none">
-          <SidebarGroupLabel className="text-fuchsia-200 font-orbitron text-xs px-3 py-2">
+        <SidebarGroup className="bg-black/60 mb-2 mx-2 mt-4 shadow-md rounded-none">
+          <SidebarGroupLabel className="text-fuchsia-200 font-orbitron text-xs px-3 py-1">
             Profile
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -95,7 +99,7 @@ export function AppSidebar() {
               return <SidebarMenuItem key={item.title} className="w-full">
                     <SidebarMenuButton asChild className="w-full px-0">
                       <NavLink to={item.url} className={`
-                          flex items-center gap-2 py-3 
+                          flex items-center gap-2 py-2.5 
                           mx-0                          /* remove horizontal margin for full-width highlight */
                           px-3
                           rounded-none                   /* squared corners */
@@ -117,8 +121,8 @@ export function AppSidebar() {
         </SidebarGroup>
 
         {/* Tools Section */}
-        <SidebarGroup className="bg-black/60 mt-5 mx-2 shadow-md rounded-none">
-          <SidebarGroupLabel className="text-fuchsia-200 font-orbitron text-xs px-3 py-2">
+        <SidebarGroup className="bg-black/60 mt-3 mx-2 shadow-md rounded-none">
+          <SidebarGroupLabel className="text-fuchsia-200 font-orbitron text-xs px-3 py-1">
             Tools
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -128,7 +132,7 @@ export function AppSidebar() {
               return <SidebarMenuItem key={item.title} className="w-full">
                     <SidebarMenuButton asChild className="w-full px-0">
                       <NavLink to={item.url} className={`
-                          flex items-center gap-2 py-3 
+                          flex items-center gap-2 py-2.5 
                           mx-0                          /* remove horizontal margin for full-width highlight */
                           px-3
                           rounded-none
@@ -150,7 +154,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-5 border-t border-fuchsia-400/10 bg-gradient-to-r from-black/90 to-fuchsia-950/80 mt-2 rounded-none relative">
+      <SidebarFooter className="p-4 border-t border-fuchsia-400/10 bg-gradient-to-r from-black/90 to-fuchsia-950/80 mt-2 rounded-none relative">
         <SignedIn>
           <div className="flex flex-col gap-2 w-full">
             <div className="flex items-center gap-3 w-full">
