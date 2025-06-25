@@ -17,6 +17,7 @@ import { useCreditCheck } from '@/hooks/useCreditCheck';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
 import { validateInput, sanitizeText, isValidForTyping } from '@/utils/sanitize';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 const JobGuide = () => {
   const {
@@ -33,6 +34,7 @@ const JobGuide = () => {
     isComplete,
     loading
   } = useUserCompletionStatus();
+  const { userProfile } = useUserProfile();
   const [formData, setFormData] = useState({
     companyName: '',
     jobTitle: '',
@@ -191,35 +193,30 @@ const JobGuide = () => {
       });
       return;
     }
+
+    // Check if userProfile is available
+    if (!userProfile) {
+      toast({
+        title: "Profile not found",
+        description: "Unable to find your profile. Please try refreshing the page.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       setError(null);
       setIsSuccess(false);
       setJobAnalysisResult(null);
       console.log('✅ Starting job analysis submission process');
-      const {
-        data: userData,
-        error: userError
-      } = await supabase.from('users').select('id').eq('clerk_id', user?.id).single();
-      if (userError || !userData) {
-        console.error('❌ User not found:', userError);
-        throw new Error('User not found in database');
-      }
-      console.log('✅ Found user in users table:', userData.id);
-      const {
-        data: profileData,
-        error: profileError
-      } = await supabase.from('user_profile').select('id').eq('user_id', userData.id).single();
-      if (profileError || !profileData) {
-        console.error('❌ User profile not found:', profileError);
-        throw new Error('User profile not found. Please complete your profile first.');
-      }
-      console.log('✅ Found user profile:', profileData.id);
+      console.log('✅ Using user profile:', userProfile.id);
+
       // Check for existing analysis (now fetch match_score as well)
       const {
         data: existingAnalysis,
         error: checkError
-      } = await supabase.from('job_analyses').select('id, job_match, match_score').eq('user_id', profileData.id).eq('company_name', formData.companyName).eq('job_title', formData.jobTitle).eq('job_description', formData.jobDescription).not('job_match', 'is', null).order('created_at', {
+      } = await supabase.from('job_analyses').select('id, job_match, match_score').eq('user_id', userProfile.id).eq('company_name', formData.companyName).eq('job_title', formData.jobTitle).eq('job_description', formData.jobDescription).not('job_match', 'is', null).order('created_at', {
         ascending: false
       }).limit(1);
       if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
@@ -238,7 +235,7 @@ const JobGuide = () => {
       // Insert new, clear matchScore (will be fetched when ready)
       setMatchScore(null);
       const insertData = {
-        user_id: profileData.id,
+        user_id: userProfile.id,
         company_name: formData.companyName,
         job_title: formData.jobTitle,
         job_description: formData.jobDescription
@@ -274,7 +271,7 @@ const JobGuide = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, isComplete, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup]);
+  }, [formData, isComplete, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup, userProfile]);
   useEffect(() => {
     const handleHistoryData = (event: any) => {
       const {
