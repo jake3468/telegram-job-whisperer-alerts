@@ -1,6 +1,7 @@
 
 import { AlertCircle } from 'lucide-react';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
+import { useState, useEffect } from 'react';
 
 interface ProfileCompletionWarningProps {
   className?: string;
@@ -8,14 +9,18 @@ interface ProfileCompletionWarningProps {
 
 export const ProfileCompletionWarning = ({ className = '' }: ProfileCompletionWarningProps) => {
   const { hasResume, hasBio, loading } = useUserCompletionStatus();
+  const [showWarning, setShowWarning] = useState(false);
 
-  // Don't show anything while loading
-  if (loading) {
-    return null;
-  }
+  useEffect(() => {
+    // Only show warning after loading is complete and profile is actually incomplete
+    if (!loading) {
+      const isIncomplete = !hasResume || !hasBio;
+      setShowWarning(isIncomplete);
+    }
+  }, [loading, hasResume, hasBio]);
 
-  // Don't show warning if profile is complete
-  if (hasResume && hasBio) {
+  // Don't show anything while loading or if profile is complete
+  if (loading || !showWarning) {
     return null;
   }
 
