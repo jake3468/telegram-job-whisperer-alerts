@@ -1,4 +1,3 @@
-
 import { useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,44 +9,44 @@ import { useUserCredits } from '@/hooks/useUserCredits';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Layout } from '@/components/Layout';
 import UsageHistoryModal from '@/components/UsageHistoryModal';
-
 const planGradientBg = {
   free: "bg-black border border-blue-400/30",
   subscription: "bg-gradient-to-br from-[#2563eb] via-[#3893ec] to-[#1872ba] dark:from-[#274299] dark:via-[#3177c7] dark:to-[#1b466c]",
-  pack: "bg-black border border-indigo-400/30",
+  pack: "bg-black border border-indigo-400/30"
 };
-
 const planTextColor = {
   free: "text-blue-100",
   subscription: "text-cyan-100",
-  pack: "text-indigo-100",
+  pack: "text-indigo-100"
 };
-
 export default function GetMoreCredits() {
-  const { user, isLoaded } = useUser();
+  const {
+    user,
+    isLoaded
+  } = useUser();
   const navigate = useNavigate();
-  const { data: credits, isLoading, error } = useUserCredits();
-  const { userProfile } = useUserProfile();
-
+  const {
+    data: credits,
+    isLoading,
+    error
+  } = useUserCredits();
+  const {
+    userProfile
+  } = useUserProfile();
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
-
   if (!isLoaded || !user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-pastel-mint via-pastel-lavender to-pastel-peach flex items-center justify-center">
+    return <div className="min-h-screen bg-gradient-to-br from-pastel-mint via-pastel-lavender to-pastel-peach flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading...</div>
-      </div>
-    );
+      </div>;
   }
 
   // Static credit balance calculation
   const currentBalance = credits ? Number(credits.current_balance) : 0;
-
-  return (
-    <Layout>
+  return <Layout>
       <div className="w-full flex flex-col pb-5 sm:pb-8">
         <div className="text-center mb-5 sm:mb-12 px-2 sm:px-4">
           <h1 className="text-2xl xs:text-3xl sm:text-5xl font-orbitron font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-1 sm:mb-2 drop-shadow tracking-tight animate-fade-in">
@@ -59,37 +58,25 @@ export default function GetMoreCredits() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
             <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in">
               Current Balance:{" "}
-              {isLoading ? (
-                <span className="font-bold text-cyan-100">Loading...</span>
-              ) : error ? (
-                <span className="font-bold text-rose-300">Error loading</span>
-              ) : credits ? (
-                <span className="font-bold text-cyan-100">
+              {isLoading ? <span className="font-bold text-cyan-100">Loading...</span> : error ? <span className="font-bold text-rose-300">Error loading</span> : credits ? <span className="font-bold text-cyan-100">
                   {currentBalance.toLocaleString()} credits
-                </span>
-              ) : (
-                <span className="font-bold text-yellow-300">No credits found</span>
-              )}
+                </span> : <span className="font-bold text-yellow-300">No credits found</span>}
             </p>
             <UsageHistoryModal />
           </div>
         </div>
         {/* Responsive grid area with tight spacing for mobile; px for interior gap only */}
         <div className="flex-1 flex flex-col items-center justify-center w-full px-2 sm:px-4">
-          <div
-            className={`
+          <div className={`
               grid gap-3 sm:gap-4 
               w-full
               grid-cols-1
               lg:grid-cols-3
               items-stretch
               duration-500
-            `}
-          >
+            `}>
             {/* Free Plan */}
-            <Card
-              className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-blue-400/30 min-h-[340px] sm:min-h-[420px]`}
-            >
+            <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-blue-400/30 min-h-[340px] sm:min-h-[420px]`}>
               <CardHeader className="text-center pb-3 pt-4 sm:pb-4 sm:pt-6 px-2 sm:px-4">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 sm:mb-2 ${planTextColor.free}`}>Free Plan</CardTitle>
                 <div className="text-2xl sm:text-3xl font-extrabold text-blue-100 mt-0.5 mb-0.5">Free</div>
@@ -115,10 +102,7 @@ export default function GetMoreCredits() {
                   </li>
                 </ul>
                 <div className="mt-auto">
-                  <Button
-                    className="w-full py-2 sm:py-2.5 bg-blue-500/90 hover:bg-blue-700 text-white rounded-xl font-orbitron text-xs sm:text-sm shadow border-0"
-                    disabled
-                  >
+                  <Button className="w-full py-2 sm:py-2.5 bg-blue-500/90 hover:bg-blue-700 text-white rounded-xl font-orbitron text-xs sm:text-sm shadow border-0" disabled>
                     Current Plan
                   </Button>
                 </div>
@@ -126,9 +110,7 @@ export default function GetMoreCredits() {
             </Card>
 
             {/* Monthly Subscription */}
-            <Card
-              className={`flex flex-col rounded-2xl shadow-2xl border-0 ${planGradientBg.subscription} relative transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-cyan-400/30 min-h-[370px] sm:min-h-[460px]`}
-            >
+            <Card className={`flex flex-col rounded-2xl shadow-2xl border-0 ${planGradientBg.subscription} relative transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-cyan-400/30 min-h-[370px] sm:min-h-[460px]`}>
               <div className="absolute -top-4 sm:-top-6 left-1/2 -translate-x-1/2 z-10">
                 <Badge className="bg-gradient-to-r from-blue-400 to-cyan-400 text-white font-orbitron text-xs px-3 sm:px-4 py-0.5 sm:py-1 shadow-xl border-0 tracking-wide">
                   MOST POPULAR
@@ -163,10 +145,7 @@ export default function GetMoreCredits() {
                   </li>
                 </ul>
                 <div className="mt-auto">
-                  <Button
-                    className="w-full py-2 sm:py-2.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 hover:from-cyan-700 hover:to-blue-800 text-white font-orbitron text-xs sm:text-sm rounded-xl shadow border-0"
-                    disabled
-                  >
+                  <Button className="w-full py-2 sm:py-2.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 hover:from-cyan-700 hover:to-blue-800 text-white font-orbitron text-xs sm:text-sm rounded-xl shadow border-0" disabled>
                     Coming Soon
                   </Button>
                 </div>
@@ -174,9 +153,7 @@ export default function GetMoreCredits() {
             </Card>
 
             {/* Credit Packs */}
-            <Card
-              className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-indigo-400/30 min-h-[340px] sm:min-h-[420px]`}
-            >
+            <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-indigo-400/30 min-h-[340px] sm:min-h-[420px]`}>
               <CardHeader className="text-center pb-3 pt-4 sm:pb-4 sm:pt-6 px-2 sm:px-4">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 sm:mb-2 ${planTextColor.pack}`}>Credit Packs</CardTitle>
                 <div className="text-2xl sm:text-3xl font-extrabold text-[#badbff] mb-0.5 sm:mb-1">₹99</div>
@@ -189,28 +166,28 @@ export default function GetMoreCredits() {
                     <span className="text-indigo-100 font-medium text-xs sm:text-sm">50 credits</span>
                     <div className="text-right">
                       <span className="text-indigo-50 font-bold text-xs sm:text-sm">₹99</span>
-                      <div className="text-[10px] sm:text-xs text-indigo-200">₹2/credit</div>
+                      
                     </div>
                   </div>
                   <div className="bg-gradient-to-r from-[#385494] via-[#4481db] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
                     <span className="text-indigo-100 font-medium text-xs sm:text-sm">100 credits</span>
                     <div className="text-right">
                       <span className="text-indigo-50 font-bold text-xs sm:text-sm">₹189</span>
-                      <div className="text-[10px] sm:text-xs text-indigo-200">₹1.89/credit</div>
+                      
                     </div>
                   </div>
                   <div className="bg-gradient-to-r from-[#385494] via-[#4481db] to-[#528bfd] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
                     <span className="text-indigo-100 font-medium text-xs sm:text-sm">200 credits</span>
                     <div className="text-right">
                       <span className="text-indigo-50 font-bold text-xs sm:text-sm">₹349</span>
-                      <div className="text-[10px] sm:text-xs text-indigo-200">₹1.75/credit</div>
+                      
                     </div>
                   </div>
                   <div className="bg-gradient-to-r from-[#385494] via-[#4481db] to-[#789cfb] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
                     <span className="text-indigo-100 font-medium text-xs sm:text-sm">500 credits</span>
                     <div className="text-right">
                       <span className="text-indigo-50 font-bold text-xs sm:text-sm">₹799</span>
-                      <div className="text-[10px] sm:text-xs text-indigo-200">₹1.60/credit</div>
+                      
                     </div>
                   </div>
                 </div>
@@ -229,10 +206,7 @@ export default function GetMoreCredits() {
                   </li>
                 </ul>
                 <div className="mt-auto">
-                  <Button
-                    className="w-full py-2 sm:py-2.5 bg-gradient-to-r from-indigo-500 via-blue-500 to-sky-600 hover:from-indigo-600 hover:to-purple-800 text-white font-orbitron text-xs sm:text-sm rounded-xl shadow border-0"
-                    disabled
-                  >
+                  <Button className="w-full py-2 sm:py-2.5 bg-gradient-to-r from-indigo-500 via-blue-500 to-sky-600 hover:from-indigo-600 hover:to-purple-800 text-white font-orbitron text-xs sm:text-sm rounded-xl shadow border-0" disabled>
                     Coming Soon
                   </Button>
                 </div>
@@ -241,6 +215,5 @@ export default function GetMoreCredits() {
           </div>
         </div>
       </div>
-    </Layout>
-  );
+    </Layout>;
 }
