@@ -34,7 +34,7 @@ const JobGuide = () => {
     isComplete,
     loading: completionLoading
   } = useUserCompletionStatus();
-  const { userProfile } = useUserProfile();
+  const { userProfile, loading: profileLoading } = useUserProfile();
   const [formData, setFormData] = useState({
     companyName: '',
     jobTitle: '',
@@ -235,9 +235,10 @@ const JobGuide = () => {
       return;
     }
     
-    // More lenient profile completion check - allow if loading or if actually incomplete
-    if (!completionLoading && !isComplete) {
-      console.log('❌ Profile incomplete:', { hasResume, hasBio, isComplete, completionLoading });
+    // Only show profile completion error if we're sure the profile is incomplete
+    // Don't block if data is still loading
+    if (!completionLoading && !profileLoading && !isComplete && userProfile) {
+      console.log('❌ Profile incomplete after loading finished:', { hasResume, hasBio, isComplete, completionLoading, profileLoading });
       toast({
         title: "Complete your profile first",
         description: "Please upload your resume and add your bio in the Home page before using Job Analysis.",
@@ -264,8 +265,8 @@ const JobGuide = () => {
       return;
     }
 
-    // Check if userProfile is available
-    if (!userProfile) {
+    // Check if userProfile is available (but allow if still loading)
+    if (!profileLoading && !userProfile) {
       toast({
         title: "Profile not found",
         description: "Unable to find your profile. Please try refreshing the page.",
@@ -281,13 +282,13 @@ const JobGuide = () => {
       setJobAnalysisResult(null);
       setMatchScore(null); // Clear previous match score
       console.log('✅ Starting job analysis submission process');
-      console.log('✅ Using user profile:', userProfile.id);
+      console.log('✅ Using user profile:', userProfile?.id);
 
       // Check for existing analysis (now fetch match_score as well)
       const { data: existingAnalysis, error: checkError } = await supabase
         .from('job_analyses')
         .select('id, job_match, match_score')
-        .eq('user_id', userProfile.id)
+        .eq('user_id', userProfile?.id)
         .eq('company_name', formData.companyName)
         .eq('job_title', formData.jobTitle)
         .eq('job_description', formData.jobDescription)
@@ -311,7 +312,7 @@ const JobGuide = () => {
 
       // Insert new analysis record
       const insertData = {
-        user_id: userProfile.id,
+        user_id: userProfile?.id,
         company_name: formData.companyName,
         job_title: formData.jobTitle,
         job_description: formData.jobDescription
@@ -353,7 +354,7 @@ const JobGuide = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, isComplete, completionLoading, hasResume, hasBio, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup, userProfile]);
+  }, [formData, isComplete, completionLoading, profileLoading, hasResume, hasBio, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup, userProfile]);
   useEffect(() => {
     const handleHistoryData = (event: any) => {
       const {
@@ -398,19 +399,16 @@ const JobGuide = () => {
     }
   };
 
-  // Simplified and more reliable form validation
+  // Simplified form validation - only check if fields have content
   const isFormValid = Boolean(
     formData.companyName?.trim() &&
     formData.jobTitle?.trim() &&
-    formData.jobDescription?.trim() &&
-    formData.companyName.trim().length > 0 &&
-    formData.jobTitle.trim().length > 0 &&
-    formData.jobDescription.trim().length > 0
+    formData.jobDescription?.trim()
   );
   
   const hasAnyData = isFormValid || jobAnalysisResult;
   
-  // Simplified button disable logic - be more permissive
+  // Simplified button disable logic - be very permissive during loading states
   const isButtonDisabled = !isFormValid || isSubmitting || isGenerating || !hasCredits;
 
   // Enhanced debug logging
@@ -421,6 +419,7 @@ const JobGuide = () => {
     isFormValid,
     isComplete,
     completionLoading,
+    profileLoading,
     hasResume,
     hasBio,
     hasCredits,
