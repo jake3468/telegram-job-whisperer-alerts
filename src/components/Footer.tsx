@@ -21,7 +21,7 @@ const Footer = () => {
         </div>
         
         <p className="text-gray-500 text-sm font-inter">
-          © {new Date().getFullYear()} JobBots. All rights reserved.
+          © {new Date().getFullYear()} Aspirely.ai All rights reserved.
         </p>
       </div>
     </footer>;
