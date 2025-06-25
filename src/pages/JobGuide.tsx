@@ -357,32 +357,36 @@ const JobGuide = () => {
     }
   };
 
-  // Updated form validation logic to be more reliable
+  // Simplified and more reliable form validation
   const isFormValid = Boolean(
-    formData.companyName && 
+    formData.companyName?.trim() &&
+    formData.jobTitle?.trim() &&
+    formData.jobDescription?.trim() &&
     formData.companyName.trim().length > 0 &&
-    formData.jobTitle && 
     formData.jobTitle.trim().length > 0 &&
-    formData.jobDescription && 
     formData.jobDescription.trim().length > 0
   );
   
   const hasAnyData = isFormValid || jobAnalysisResult;
   
-  // More lenient button disable logic - allow if completion is still loading
-  const isButtonDisabled = (!completionLoading && !isComplete) || !isFormValid || isSubmitting || isGenerating;
+  // Simplified button disable logic - be more permissive
+  const isButtonDisabled = !isFormValid || isSubmitting || isGenerating || !hasCredits;
 
   // Enhanced debug logging
-  console.log('Form validation debug:', {
-    companyName: formData.companyName,
-    jobTitle: formData.jobTitle,
-    jobDescription: formData.jobDescription?.substring(0, 50) + '...',
+  console.log('🔍 Form validation debug:', {
+    companyName: `"${formData.companyName}" (length: ${formData.companyName?.length || 0})`,
+    jobTitle: `"${formData.jobTitle}" (length: ${formData.jobTitle?.length || 0})`,
+    jobDescription: `"${formData.jobDescription?.substring(0, 50)}..." (length: ${formData.jobDescription?.length || 0})`,
     isFormValid,
     isComplete,
     completionLoading,
     hasResume,
     hasBio,
-    isButtonDisabled
+    hasCredits,
+    isSubmitting,
+    isGenerating,
+    isButtonDisabled,
+    userProfile: !!userProfile
   });
 
   if (!isLoaded || !user) {
