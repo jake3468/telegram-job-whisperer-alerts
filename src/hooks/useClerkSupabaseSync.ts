@@ -1,10 +1,11 @@
 
-import { useUser } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import { useEffect, useRef } from 'react';
 import { setClerkToken, setTokenRefreshFunction } from '@/integrations/supabase/client';
 
 export const useClerkSupabaseSync = () => {
   const { user, isLoaded } = useUser();
+  const { getToken } = useAuth();
   const syncedRef = useRef(false);
   const tokenSetRef = useRef(false);
 
@@ -17,7 +18,7 @@ export const useClerkSupabaseSync = () => {
         const refreshFunction = async () => {
           try {
             console.log('[useClerkSupabaseSync] 🔄 Token refresh function called');
-            const token = await user.getToken({ template: 'supabase' });
+            const token = await getToken({ template: 'supabase' });
             console.log('[useClerkSupabaseSync] ✅ New token obtained from Clerk');
             return token;
           } catch (error) {
@@ -30,7 +31,7 @@ export const useClerkSupabaseSync = () => {
         setTokenRefreshFunction(refreshFunction);
 
         // Get initial token
-        const token = await user.getToken({ template: 'supabase' });
+        const token = await getToken({ template: 'supabase' });
         
         if (token) {
           const success = await setClerkToken(token);
@@ -54,7 +55,7 @@ export const useClerkSupabaseSync = () => {
       syncedRef.current = false;
       console.log('[useClerkSupabaseSync] 🔄 User logged out, tokens cleared');
     }
-  }, [user, isLoaded]);
+  }, [user, isLoaded, getToken]);
 
   return { isLoaded, user, isSynced: syncedRef.current };
 };
