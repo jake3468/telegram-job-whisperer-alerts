@@ -15,7 +15,7 @@ export type SubscriptionStatus = {
     product_name: string;
     product_type: string;
     credits_amount: number;
-  };
+  } | null;
 };
 
 export const useSubscriptionStatus = () => {
@@ -46,7 +46,13 @@ export const useSubscriptionStatus = () => {
         throw error;
       }
 
-      return data as SubscriptionStatus[];
+      // Transform the data to match our expected type
+      return (data || []).map(record => ({
+        ...record,
+        payment_products: record.payment_products && !('error' in record.payment_products) 
+          ? record.payment_products 
+          : null
+      })) as SubscriptionStatus[];
     },
     enabled: !!userProfile?.user_id,
     staleTime: 1000 * 60 * 2, // 2 minutes

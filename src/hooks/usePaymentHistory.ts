@@ -20,7 +20,7 @@ export type PaymentRecord = {
   payment_products?: {
     product_name: string;
     product_type: string;
-  };
+  } | null;
 };
 
 export const usePaymentHistory = () => {
@@ -50,7 +50,13 @@ export const usePaymentHistory = () => {
         throw error;
       }
 
-      return data as PaymentRecord[];
+      // Transform the data to match our expected type
+      return (data || []).map(record => ({
+        ...record,
+        payment_products: record.payment_products && !('error' in record.payment_products) 
+          ? record.payment_products 
+          : null
+      })) as PaymentRecord[];
     },
     enabled: !!userProfile?.user_id,
     staleTime: 1000 * 60 * 2, // 2 minutes
