@@ -145,9 +145,7 @@ export default function GetMoreCredits() {
                   </li>
                 </ul>
                 <div className="mt-auto">
-                  <Button className="w-full py-2 sm:py-2.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 hover:from-cyan-700 hover:to-blue-800 text-white font-orbitron text-xs sm:text-sm rounded-xl shadow border-0" disabled>
-                    Coming Soon
-                  </Button>
+                  <Button disabled className="w-full py-2 sm:py-2.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 hover:from-cyan-700 hover:to-blue-800 text-white font-orbitron text-xs rounded-xl shadow border-0 bg-stone-950 hover:bg-stone-800 sm:min-w-full ">Subscribe Now</Button>
                 </div>
               </CardContent>
             </Card>
