@@ -9,6 +9,7 @@ import { useUserCredits } from '@/hooks/useUserCredits';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Layout } from '@/components/Layout';
 import UsageHistoryModal from '@/components/UsageHistoryModal';
+import SubscriptionBadge from '@/components/SubscriptionBadge';
 
 const planGradientBg = {
   free: "bg-black border border-blue-400/30",
@@ -70,7 +71,10 @@ export default function GetMoreCredits() {
                   {currentBalance.toLocaleString()} credits
                 </span> : <span className="font-bold text-yellow-300">No credits found</span>}
             </p>
-            <UsageHistoryModal />
+            <div className="flex items-center gap-2">
+              <SubscriptionBadge />
+              <UsageHistoryModal />
+            </div>
           </div>
         </div>
         {/* Responsive grid area with tight spacing for mobile; px for interior gap only */}
