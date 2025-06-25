@@ -36,6 +36,7 @@ const JobAnalysisHistoryModal = ({
   const [isLoading, setIsLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<JobAnalysisItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     if (isOpen && user && userProfile) {
@@ -43,8 +44,9 @@ const JobAnalysisHistoryModal = ({
     }
   }, [isOpen, user, userProfile]);
 
-  const fetchHistory = async () => {
+  const fetchHistory = async (isRetry = false) => {
     if (!user || !userProfile) return;
+    
     setIsLoading(true);
     try {
       const { data, error } = await supabase
@@ -56,10 +58,19 @@ const JobAnalysisHistoryModal = ({
 
       if (error) {
         console.error('Error fetching history:', error);
+        if (!isRetry && retryCount < 2) {
+          // Retry once after a short delay
+          setTimeout(() => {
+            setRetryCount(prev => prev + 1);
+            fetchHistory(true);
+          }, 1000);
+          return;
+        }
         throw error;
       }
 
       setHistoryData(data || []);
+      setRetryCount(0); // Reset retry count on success
     } catch (err) {
       console.error('Failed to fetch history:', err);
       toast({
@@ -278,10 +289,19 @@ const JobAnalysisHistoryModal = ({
               <div className="text-white/70 text-sm">Loading history...</div>
             </div>
           ) : historyData.length === 0 ? (
-            <div className="flex items-center justify-center py-8">
+            <div className="flex flex-col items-center justify-center py-8">
               <div className="text-white/70 text-center">
                 <History className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No job analyses found.</p>
+                {retryCount > 0 && (
+                  <Button 
+                    onClick={() => fetchHistory()} 
+                    size="sm" 
+                    className="mt-2 bg-blue-600 hover:bg-blue-700"
+                  >
+                    Retry Loading
+                  </Button>
+                )}
               </div>
             </div>
           ) : (

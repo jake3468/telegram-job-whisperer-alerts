@@ -16,7 +16,7 @@ import { PercentageMeter } from '@/components/PercentageMeter';
 import { useCreditCheck } from '@/hooks/useCreditCheck';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
-import { validateInput, sanitizeText } from '@/utils/sanitize';
+import { validateInput, sanitizeText, isValidForTyping } from '@/utils/sanitize';
 
 const JobGuide = () => {
   const {
@@ -121,29 +121,25 @@ const JobGuide = () => {
     };
   }, [jobAnalysisId, isGenerating, toast]);
   const handleInputChange = (field: string, value: string) => {
-    // Sanitize input to prevent XSS
-    const sanitizedValue = sanitizeText(value);
+    // Use more lenient validation for real-time typing
+    const maxLength = field === 'jobDescription' ? 5000 : 200;
     
-    // Validate input length and content
-    if (field === 'jobDescription' && !validateInput(sanitizedValue, 5000)) {
+    // Only validate for truly malicious content, allow normal editing
+    if (!isValidForTyping(value, maxLength)) {
       toast({
         title: "Invalid Input",
-        description: "Job description contains invalid characters or is too long.",
-        variant: "destructive"
-      });
-      return;
-    } else if ((field === 'companyName' || field === 'jobTitle') && !validateInput(sanitizedValue, 200)) {
-      toast({
-        title: "Invalid Input",
-        description: `${field === 'companyName' ? 'Company name' : 'Job title'} contains invalid characters or is too long.`,
+        description: `${field === 'companyName' ? 'Company name' : field === 'jobTitle' ? 'Job title' : 'Job description'} contains invalid content or is too long.`,
         variant: "destructive"
       });
       return;
     }
     
+    // Light sanitization - only remove actual HTML tags
+    const cleanValue = value.replace(/<[^>]*>/g, '');
+    
     setFormData(prev => ({
       ...prev,
-      [field]: sanitizedValue
+      [field]: cleanValue
     }));
   };
   const handleClearData = useCallback(() => {
@@ -322,7 +318,9 @@ const JobGuide = () => {
       });
     }
   };
-  const isFormValid = formData.companyName && formData.jobTitle && formData.jobDescription;
+
+  // Fix form validation logic
+  const isFormValid = formData.companyName.trim() && formData.jobTitle.trim() && formData.jobDescription.trim();
   const hasAnyData = isFormValid || jobAnalysisResult;
   const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating;
   if (!isLoaded || !user) {

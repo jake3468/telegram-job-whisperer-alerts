@@ -9,9 +9,8 @@ export const sanitizeHTML = (dirty: string): string => {
 };
 
 export const sanitizeText = (text: string): string => {
-  // Remove any HTML tags and decode HTML entities
+  // Only remove HTML tags and decode entities, don't be overly aggressive
   return text
-    .replace(/<[^>]*>/g, '')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&amp;/g, '&')
@@ -24,13 +23,29 @@ export const validateInput = (input: string, maxLength: number = 1000): boolean 
     return false;
   }
   
-  // Check for suspicious patterns
+  // Only check for truly malicious patterns, not normal editing
   const suspiciousPatterns = [
-    /<script/i,
+    /<script[^>]*>/i,
     /javascript:/i,
     /on\w+\s*=/i,
     /data:text\/html/i
   ];
   
   return !suspiciousPatterns.some(pattern => pattern.test(input));
+};
+
+// New function for more lenient real-time validation during typing
+export const isValidForTyping = (input: string, maxLength: number = 1000): boolean => {
+  // Allow empty input and reasonable length
+  if (input.length > maxLength) {
+    return false;
+  }
+  
+  // Only block clearly malicious content, allow normal text editing
+  const maliciousPatterns = [
+    /<script[^>]*>/i,
+    /javascript:/i
+  ];
+  
+  return !maliciousPatterns.some(pattern => pattern.test(input));
 };

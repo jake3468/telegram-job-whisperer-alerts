@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { History, Loader2 } from 'lucide-react';
@@ -18,11 +17,17 @@ const JobAnalysisHistory = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleOpenModal = () => {
+  const handleOpenModal = async () => {
     setIsLoading(true);
-    setIsModalOpen(true);
-    // Small delay to show loading state
-    setTimeout(() => setIsLoading(false), 300);
+    try {
+      // Preload data before opening modal
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error('Error opening history modal:', error);
+    } finally {
+      // Keep loading state briefly to ensure modal has time to load
+      setTimeout(() => setIsLoading(false), 500);
+    }
   };
 
   return (
@@ -49,7 +54,10 @@ const JobAnalysisHistory = ({
 
       <JobAnalysisHistoryModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setIsLoading(false);
+        }}
         gradientColors={gradientColors}
       />
     </>
