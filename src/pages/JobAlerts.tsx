@@ -6,6 +6,8 @@ import JobAlertsSection from '@/components/dashboard/JobAlertsSection';
 import { Layout } from '@/components/Layout';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
+import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
+
 const JobAlerts = () => {
   const {
     user,
@@ -93,9 +95,14 @@ const JobAlerts = () => {
           </div>
         </div>
       </div>
+
+      {/* Profile Completion Warning */}
+      <ProfileCompletionWarning />
+
       <div className="space-y-8">
         <JobAlertsSection userTimezone={userTimezone} />
       </div>
     </Layout>;
 };
+
 export default JobAlerts;

@@ -18,6 +18,7 @@ import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
 import { validateInput, sanitizeText, isValidForTyping } from '@/utils/sanitize';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
 
 const JobGuide = () => {
   const {
@@ -238,8 +239,6 @@ const JobGuide = () => {
     }
     
     // REMOVED PROFILE COMPLETION CHECK - Allow users to proceed regardless
-    // The profile completion check was causing issues for users who have valid profiles
-    // Let the backend handle any necessary validations
     
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
@@ -406,7 +405,7 @@ const JobGuide = () => {
   
   const hasAnyData = isFormValid || jobAnalysisResult;
   
-  // Simplified button disable logic - be very permissive during loading states
+  // Simplified button disable logic - remove profile completion checks
   const isButtonDisabled = !isFormValid || isSubmitting || isGenerating || !hasCredits;
 
   // Enhanced debug logging
@@ -443,6 +442,10 @@ const JobGuide = () => {
               In-depth breakdown and <span className="italic text-slate-400">insights</span> for your ideal jobs
             </p>
           </div>
+
+          {/* Profile Completion Warning */}
+          <ProfileCompletionWarning />
+
           <div className="space-y-8">
             {/* Input Form */}
             <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-sky-900 border border-blue-700/70 shadow-xl drop-shadow-2xl">

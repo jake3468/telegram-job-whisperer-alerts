@@ -15,6 +15,7 @@ import { useUser } from '@clerk/clerk-react';
 import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
 import { InterviewPrepHistoryModal } from '@/components/InterviewPrepHistoryModal';
 import InterviewPrepDownloadActions from '@/components/InterviewPrepDownloadActions';
+import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
 
 const InterviewPrep = () => {
   // Ensure Clerk JWT is synced with Supabase
@@ -267,6 +268,9 @@ const InterviewPrep = () => {
               Your Personal Interview Coach, powered by AI. Get 15 tailored questions with perfect answers, pro tips, and strategic questions to ask your interviewer.
             </p>
           </div>
+
+          {/* Profile Completion Warning */}
+          <ProfileCompletionWarning />
 
           {/* Form - Always visible */}
           <Card className="mb-6 sm:mb-8 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] border-0 mx-2 sm:mx-0">
