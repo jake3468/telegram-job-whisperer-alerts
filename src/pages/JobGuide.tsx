@@ -74,28 +74,54 @@ const JobGuide = () => {
   useEffect(() => {
     if (!jobAnalysisId || !isGenerating) return;
     
-    console.log('🔄 Starting polling for job analysis results, ID:', jobAnalysisId);
+    console.log('🔄 Starting enhanced polling for job analysis results, ID:', jobAnalysisId);
+    
+    let retryCount = 0;
+    const maxRetries = 3;
     
     const pollForResults = async () => {
       try {
-        console.log('📡 Polling for results, analysis ID:', jobAnalysisId);
+        console.log('📡 Polling attempt', retryCount + 1, 'for analysis ID:', jobAnalysisId);
         
+        // Create a fresh supabase client instance for each request to handle token refresh
         const { data, error } = await supabase
           .from('job_analyses')
           .select('job_match, match_score')
           .eq('id', jobAnalysisId)
-          .single();
+          .maybeSingle();
         
         if (error) {
           console.error('❌ Error polling for results:', error);
-          return;
+          
+          // Handle JWT expiration by retrying with a delay
+          if (error.message?.includes('JWT expired') || error.code === 'PGRST301') {
+            console.log('🔄 JWT expired, retrying after delay...');
+            retryCount++;
+            
+            if (retryCount < maxRetries) {
+              // Wait a bit longer for token refresh and retry
+              setTimeout(() => {
+                pollForResults();
+              }, 2000);
+              return;
+            } else {
+              console.log('❌ Max retries reached for JWT refresh');
+              throw new Error('Authentication failed after retries');
+            }
+          }
+          
+          throw error;
         }
         
         console.log('📊 Polling response:', { 
           hasJobMatch: !!data?.job_match, 
           jobMatchLength: data?.job_match?.length,
-          matchScore: data?.match_score 
+          matchScore: data?.match_score,
+          retryCount
         });
+        
+        // Reset retry count on successful response
+        retryCount = 0;
         
         // Check if we have actual content (not just empty strings)
         if (data?.job_match && data.job_match.trim().length > 0) {
@@ -117,6 +143,21 @@ const JobGuide = () => {
         }
       } catch (err) {
         console.error('❌ Polling error:', err);
+        
+        // If we've exhausted retries, stop polling and show error
+        if (retryCount >= maxRetries) {
+          if (pollingIntervalRef.current) {
+            clearInterval(pollingIntervalRef.current);
+            pollingIntervalRef.current = null;
+          }
+          setIsGenerating(false);
+          setError('Failed to load job analysis results. Please try again.');
+          toast({
+            title: "Loading Failed",
+            description: "Unable to load your job analysis. Please try generating again.",
+            variant: "destructive"
+          });
+        }
       }
     };
     
