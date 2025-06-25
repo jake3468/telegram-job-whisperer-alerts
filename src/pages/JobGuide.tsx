@@ -73,35 +73,58 @@ const JobGuide = () => {
   }, [isGenerating]);
   useEffect(() => {
     if (!jobAnalysisId || !isGenerating) return;
+    
+    console.log('🔄 Starting polling for job analysis results, ID:', jobAnalysisId);
+    
     const pollForResults = async () => {
       try {
-        const {
-          data,
-          error
-        } = await supabase.from('job_analyses').select('job_match, match_score').eq('id', jobAnalysisId).single();
+        console.log('📡 Polling for results, analysis ID:', jobAnalysisId);
+        
+        const { data, error } = await supabase
+          .from('job_analyses')
+          .select('job_match, match_score')
+          .eq('id', jobAnalysisId)
+          .single();
+        
         if (error) {
-          console.error('Error polling for results:', error);
+          console.error('❌ Error polling for results:', error);
           return;
         }
-        if (data?.job_match) {
+        
+        console.log('📊 Polling response:', { 
+          hasJobMatch: !!data?.job_match, 
+          jobMatchLength: data?.job_match?.length,
+          matchScore: data?.match_score 
+        });
+        
+        // Check if we have actual content (not just empty strings)
+        if (data?.job_match && data.job_match.trim().length > 0) {
+          console.log('✅ Results found! Setting job analysis result');
           setJobAnalysisResult(data.job_match);
           setIsGenerating(false);
           setIsSuccess(false);
           setMatchScore(data.match_score || null);
+          
           if (pollingIntervalRef.current) {
             clearInterval(pollingIntervalRef.current);
             pollingIntervalRef.current = null;
           }
+          
           toast({
             title: "Job Analysis Generated!",
             description: "Your personalized job analysis is ready."
           });
         }
       } catch (err) {
-        console.error('Polling error:', err);
+        console.error('❌ Polling error:', err);
       }
     };
+    
+    // Start polling immediately, then every 3 seconds
+    pollForResults();
     pollingIntervalRef.current = setInterval(pollForResults, 3000);
+    
+    // Set timeout to stop polling after 5 minutes
     const timeout = setTimeout(() => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
@@ -114,7 +137,8 @@ const JobGuide = () => {
         description: "The job analysis generation took too long. Please try submitting again.",
         variant: "destructive"
       });
-    }, 300000);
+    }, 300000); // 5 minutes timeout
+    
     return () => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
@@ -169,6 +193,7 @@ const JobGuide = () => {
       showInsufficientCreditsPopup();
       return;
     }
+    
     if (!isComplete) {
       toast({
         title: "Complete your profile first",
@@ -177,6 +202,7 @@ const JobGuide = () => {
       });
       return;
     }
+    
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
         title: "Missing information",
@@ -185,6 +211,7 @@ const JobGuide = () => {
       });
       return;
     }
+    
     if (isSubmitting || isGenerating) {
       toast({
         title: "Please wait",
@@ -209,16 +236,22 @@ const JobGuide = () => {
       setError(null);
       setIsSuccess(false);
       setJobAnalysisResult(null);
+      setMatchScore(null); // Clear previous match score
       console.log('✅ Starting job analysis submission process');
       console.log('✅ Using user profile:', userProfile.id);
 
       // Check for existing analysis (now fetch match_score as well)
-      const {
-        data: existingAnalysis,
-        error: checkError
-      } = await supabase.from('job_analyses').select('id, job_match, match_score').eq('user_id', userProfile.id).eq('company_name', formData.companyName).eq('job_title', formData.jobTitle).eq('job_description', formData.jobDescription).not('job_match', 'is', null).order('created_at', {
-        ascending: false
-      }).limit(1);
+      const { data: existingAnalysis, error: checkError } = await supabase
+        .from('job_analyses')
+        .select('id, job_match, match_score')
+        .eq('user_id', userProfile.id)
+        .eq('company_name', formData.companyName)
+        .eq('job_title', formData.jobTitle)
+        .eq('job_description', formData.jobDescription)
+        .not('job_match', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
       if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
         const existing = existingAnalysis[0];
         console.log('✅ Found existing job analysis:', existing.id);
@@ -232,28 +265,34 @@ const JobGuide = () => {
         });
         return;
       }
-      // Insert new, clear matchScore (will be fetched when ready)
-      setMatchScore(null);
+
+      // Insert new analysis record
       const insertData = {
         user_id: userProfile.id,
         company_name: formData.companyName,
         job_title: formData.jobTitle,
         job_description: formData.jobDescription
       };
+      
       console.log('📝 Inserting job analysis data:', insertData);
-      const {
-        data: insertedData,
-        error: insertError
-      } = await supabase.from('job_analyses').insert(insertData).select('id').single();
+      
+      const { data: insertedData, error: insertError } = await supabase
+        .from('job_analyses')
+        .insert(insertData)
+        .select('id')
+        .single();
+      
       if (insertError) {
         console.error('❌ INSERT ERROR:', insertError);
         throw new Error(`Database insert failed: ${insertError.message}`);
       }
+      
       if (insertedData?.id) {
         console.log('✅ Job analysis record inserted:', insertedData.id);
         setJobAnalysisId(insertedData.id);
         setIsSuccess(true);
         setIsGenerating(true);
+        
         toast({
           title: "Job Analysis Started!",
           description: "Your personalized job analysis is being created. Please wait for the results."
