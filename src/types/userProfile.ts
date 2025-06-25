@@ -8,8 +8,6 @@ export interface UserProfile {
   chat_id: string | null;
   cv_bot_activated: boolean;
   cv_chat_id: string | null;
-  first_name: string | null;
-  last_name: string | null;
   created_at: string | null;
 }
 
@@ -20,6 +18,4 @@ export interface UserProfileUpdateData {
   chat_id?: string | null;
   cv_bot_activated?: boolean;
   cv_chat_id?: string | null;
-  first_name?: string | null;
-  last_name?: string | null;
 }
