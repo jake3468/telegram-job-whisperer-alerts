@@ -78,8 +78,8 @@ export function AppSidebar() {
     ">
       {/* Logo & Name section: compact header */}
       <SidebarHeader className="py-2 px-3 border-b border-fuchsia-400/15 bg-black/95 relative flex flex-col items-center gap-1">
-        <img alt="JobBots Logo" src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" className="max-h-10 mb-1 drop-shadow-2xl object-fill" />
-        <span className="font-orbitron drop-shadow bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-400 bg-clip-text select-none tracking-widest whitespace-nowrap text-white text-lg font-bold">Aspirely.ai</span>
+        <img alt="JobBots Logo" src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" className="max-h-8 mb-1 drop-shadow-2xl object-fill" />
+        <span className="font-orbitron drop-shadow bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-400 bg-clip-text select-none tracking-widest text-white text-sm font-bold min-w-0 truncate">Aspirely.ai</span>
         {/* X button for mobile - only close button, no hamburger */}
         {isMobile && <Button variant="ghost" size="icon" onClick={() => setOpenMobile(false)} className="h-10 w-10 text-fuchsia-300 hover:bg-fuchsia-800/40 border border-fuchsia-400/20 bg-black/50 rounded-xl transition-all absolute right-3 top-4">
             <X className="h-6 w-6" />
@@ -88,7 +88,7 @@ export function AppSidebar() {
 
       <SidebarContent className="overflow-x-hidden w-full px-0 !pr-0">
         {/* Profile Section - without heading */}
-        <SidebarGroup className="bg-black/60 mx-2 mt-2 shadow-md rounded-none">
+        <SidebarGroup className="bg-gray-900/40 mx-2 mt-2 shadow-md rounded-none">
           <SidebarGroupContent>
             <SidebarMenu>
               {profileItems.map(item => {
@@ -118,7 +118,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         {/* Tools Section */}
-        <SidebarGroup className="bg-black/60 mt-1 mx-2 shadow-md rounded-none">
+        <SidebarGroup className="bg-gray-800/40 mt-1 mx-2 shadow-md rounded-none">
           <SidebarGroupLabel className="text-fuchsia-200 font-orbitron text-xs px-3 py-1">
             Tools
           </SidebarGroupLabel>
