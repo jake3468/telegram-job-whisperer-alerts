@@ -1,12 +1,21 @@
 
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useUser } from '@clerk/clerk-react';
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const { user, isLoaded } = useUser();
+
+  useEffect(() => {
+    if (isLoaded && user) {
+      navigate('/dashboard');
+    }
+  }, [user, isLoaded, navigate]);
 
   const goToDashboard = () => {
-    navigate('/profile');
+    navigate('/dashboard');
   };
 
   return (
@@ -42,30 +51,26 @@ const HeroSection = () => {
           </span>
           . Weirdly effective.
         </p>
-        
-        <div className="flex flex-col items-center">
-          <SignedOut>
-            <SignUpButton mode="modal">
-              <button className="bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-600 hover:from-sky-600 hover:to-blue-700 text-white px-12 py-4 text-lg sm:text-xl rounded-xl transition-all duration-300 font-inter font-bold shadow-2xl drop-shadow-xl hover:shadow-sky-500/60 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-sky-400/50 mb-2">
-                Get Started Free
-              </button>
-            </SignUpButton>
-          </SignedOut>
-          <SignedIn>
-            <button
-              onClick={goToDashboard}
-              className="bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-600 hover:from-sky-600 hover:to-blue-700 text-white px-12 py-4 text-lg sm:text-xl rounded-xl transition-all duration-300 font-inter font-bold shadow-2xl drop-shadow-xl hover:shadow-sky-500/60 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-sky-400/50 mb-2"
-            >
-              Go to Dashboard
+        <SignedOut>
+          <SignUpButton mode="modal">
+            <button className="bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-600 hover:from-sky-600 hover:to-blue-700 text-white px-12 py-4 text-lg sm:text-xl rounded-xl transition-all duration-300 font-inter font-bold shadow-2xl drop-shadow-xl hover:shadow-sky-500/60 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-sky-400/50 mb-2">
+              Get Started Free
             </button>
-          </SignedIn>
-          <p className="text-gray-400 text-sm mt-10 font-inter drop-shadow shadow-black">
-            No credit card required. Unlock your potential today.
-          </p>
-        </div>
+          </SignUpButton>
+        </SignedOut>
+        <SignedIn>
+          <button
+            onClick={goToDashboard}
+            className="bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-600 hover:from-sky-600 hover:to-blue-700 text-white px-12 py-4 text-lg sm:text-xl rounded-xl transition-all duration-300 font-inter font-bold shadow-2xl drop-shadow-xl hover:shadow-sky-500/60 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-sky-400/50 mb-2"
+          >
+            Go to Dashboard
+          </button>
+        </SignedIn>
+        <p className="text-gray-400 text-sm mt-10 font-inter drop-shadow shadow-black">
+          No credit card required. Unlock your potential today.
+        </p>
       </div>
     </section>
   );
 };
-
 export default HeroSection;
