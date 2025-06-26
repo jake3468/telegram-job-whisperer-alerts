@@ -3,7 +3,7 @@ import AuthHeader from "@/components/AuthHeader";
 import HeroSection from "@/components/HeroSection";
 import ToolsSection from "@/components/ToolsSection";
 import PricingSection from "@/components/PricingSection";
-import SignupSection from "@/components/SignupSection";
+import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -13,7 +13,7 @@ const Index = () => {
       <HeroSection />
       <ToolsSection />
       <PricingSection />
-      <SignupSection />
+      <FAQSection />
       <Footer />
     </div>
   );
