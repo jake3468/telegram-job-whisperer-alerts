@@ -13,8 +13,11 @@ const getClerkPublishableKey = () => {
   if (isProduction) {
     // Production key for aspirely.ai domain
     return import.meta.env.VITE_CLERK_PUBLISHABLE_KEY_PROD || "pk_live_Y2xlcmsuYXNwaXJlbHkuYWkk";
+  } else if (isLovablePreview) {
+    // Development key for Lovable preview
+    return import.meta.env.VITE_CLERK_PUBLISHABLE_KEY_DEV || "pk_test_bmF0dXJhbC1lZWwtNDcuY2xlcmsuYWNjb3VudHMuZGV2JA";
   } else {
-    // Development key for Lovable preview and localhost
+    // Default to development key for localhost
     return import.meta.env.VITE_CLERK_PUBLISHABLE_KEY_DEV || "pk_test_bmF0dXJhbC1lZWwtNDcuY2xlcmsuYWNjb3VudHMuZGV2JA";
   }
 };

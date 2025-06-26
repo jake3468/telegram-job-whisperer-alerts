@@ -19,19 +19,19 @@ const AuthHeader = () => {
         </div>
         
         {/* Auth Buttons: Right side */}
-        <div className="flex items-center">
+        <div className="flex items-center space-x-4">
           <SignedOut>
-            <div className="flex flex-col items-end space-y-1 sm:space-y-0 sm:space-x-4 sm:flex-row sm:items-center">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <SignInButton mode="modal">
-                <button className="rounded-xl border border-sky-400/80 bg-black/80 text-white hover:border-fuchsia-500 hover:text-fuchsia-300 transition-colors duration-200 font-inter text-base font-semibold px-6 py-2 shadow-md focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2" style={{
-                  minWidth: '100px',
+                <button className="rounded-xl border border-sky-400/80 bg-black/80 text-white hover:border-fuchsia-500 hover:text-fuchsia-300 transition-colors duration-200 font-inter text-sm sm:text-base font-semibold px-4 sm:px-6 py-2 shadow-md focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2" style={{
+                  minWidth: '80px',
                   boxShadow: "0 4px 32px 0 rgba(56,189,248,0.09)"
                 }}>
-                  <span className="text-sm sm:text-base tracking-wide">Sign In</span>
+                  Sign In
                 </button>
               </SignInButton>
               <SignUpButton mode="modal">
-                <button className="rounded-xl bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-500 text-white px-6 py-2 shadow-lg hover:from-sky-500 hover:to-indigo-600 transition-all duration-200 font-inter font-semibold text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-fuchsia-400 focus:ring-offset-2 animate-pulse-[2s_1s_infinite_alternate]">
+                <button className="rounded-xl bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-500 text-white px-4 sm:px-6 py-2 shadow-lg hover:from-sky-500 hover:to-indigo-600 transition-all duration-200 font-inter font-semibold text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-fuchsia-400 focus:ring-offset-2">
                   Sign Up
                 </button>
               </SignUpButton>
@@ -40,7 +40,7 @@ const AuthHeader = () => {
           <SignedIn>
             <button
               onClick={() => navigate('/profile')}
-              className="rounded-xl bg-gradient-to-r from-green-400 to-blue-500 text-white px-6 py-2 shadow-lg hover:from-green-500 hover:to-blue-600 transition-all duration-200 font-inter font-semibold text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
+              className="rounded-xl bg-gradient-to-r from-green-400 to-blue-500 text-white px-4 sm:px-6 py-2 shadow-lg hover:from-green-500 hover:to-blue-600 transition-all duration-200 font-inter font-semibold text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
             >
               Dashboard
             </button>
