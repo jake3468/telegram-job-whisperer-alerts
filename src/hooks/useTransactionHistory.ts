@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@clerk/clerk-react';
@@ -30,66 +29,132 @@ type PaymentRecord = {
   record_type: 'payment';
 };
 
+type TransactionHistoryItem = {
+  id: string;
+  type: string;
+  amount: number;
+  description: string;
+  date: string;
+  balanceAfter: number | null;
+  featureUsed: string | null;
+  source: string;
+  paymentDetails?: {
+    product_name: string | null;
+    product_type: string | null;
+    price_amount: number;
+    currency: string | null;
+    status: string;
+  };
+};
+
 type CombinedTransaction = CreditTransaction | PaymentRecord;
 
 export const useTransactionHistory = () => {
-  const { user, isLoaded } = useUser();
   const { userProfile } = useUserProfile();
+  const { user } = useUser();
   
   return useQuery({
-    queryKey: ['transaction_history', user?.id, userProfile?.user_id],
+    queryKey: ['transaction_history', userProfile?.user_id],
     queryFn: async () => {
-      if (!user?.id || !userProfile?.user_id) {
-        console.warn('[useTransactionHistory] No user ID available');
+      if (!userProfile?.user_id) {
         return [];
       }
-      
-      console.log('[useTransactionHistory] Fetching transaction history for user:', user.id);
-      
+
       try {
-        // Fetch credit transactions
+        console.log('[useTransactionHistory] Fetching transaction history for user:', userProfile.user_id);
+        
+        // Get credit transactions
         const { data: creditTransactions, error: creditError } = await supabase
           .from('credit_transactions')
-          .select('id, transaction_type, amount, balance_before, balance_after, description, feature_used, created_at')
+          .select('*')
           .eq('user_id', userProfile.user_id)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .limit(50);
 
         if (creditError) {
           console.error('[useTransactionHistory] Error fetching credit transactions:', creditError);
+          throw creditError;
         }
 
-        // Fetch payment records
+        // Get payment records
         const { data: paymentRecords, error: paymentError } = await supabase
           .from('payment_records')
-          .select('id, event_type, amount, currency, status, product_id, credits_awarded, created_at, processed, customer_email')
+          .select(`
+            *,
+            payment_products!inner(
+              product_name,
+              product_type,
+              credits_amount
+            )
+          `)
           .eq('user_id', userProfile.user_id)
-          .order('created_at', { ascending: false });
+          .eq('processed', true)
+          .order('created_at', { ascending: false })
+          .limit(50);
 
         if (paymentError) {
           console.error('[useTransactionHistory] Error fetching payment records:', paymentError);
+          throw paymentError;
         }
 
-        // Combine and sort transactions
-        const combinedTransactions: CombinedTransaction[] = [
-          ...(creditTransactions || []).map(tx => ({ ...tx, record_type: 'credit' as const })),
-          ...(paymentRecords || []).map(tx => ({ ...tx, record_type: 'payment' as const }))
-        ];
+        // Combine and format the transactions
+        const allTransactions: TransactionHistoryItem[] = [];
 
-        // Sort by created_at date (newest first)
-        combinedTransactions.sort((a, b) => 
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        );
+        // Add credit transactions
+        if (creditTransactions) {
+          creditTransactions.forEach(transaction => {
+            allTransactions.push({
+              id: transaction.id,
+              type: transaction.transaction_type,
+              amount: Number(transaction.amount),
+              description: transaction.description || 'Credit transaction',
+              date: transaction.created_at,
+              balanceAfter: Number(transaction.balance_after),
+              featureUsed: transaction.feature_used,
+              source: 'credit_transaction'
+            });
+          });
+        }
 
-        console.log('[useTransactionHistory] Successfully fetched combined transactions:', combinedTransactions.length);
-        
-        return combinedTransactions;
-      } catch (error) {
-        console.error('[useTransactionHistory] Unexpected error:', error);
-        return [];
+        // Add payment records
+        if (paymentRecords) {
+          paymentRecords.forEach(payment => {
+            const product = payment.payment_products;
+            allTransactions.push({
+              id: payment.id,
+              type: payment.event_type,
+              amount: Number(payment.credits_awarded || 0),
+              description: `${product?.product_name || 'Product purchase'} - ${payment.status}`,
+              date: payment.created_at,
+              balanceAfter: null,
+              featureUsed: null,
+              source: 'payment_record',
+              paymentDetails: {
+                product_name: product?.product_name,
+                product_type: product?.product_type,
+                price_amount: Number(payment.amount || 0),
+                currency: payment.currency,
+                status: payment.status
+              }
+            });
+          });
+        }
+
+        // Sort all transactions by date (newest first)
+        allTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+        console.log('[useTransactionHistory] Successfully fetched', allTransactions.length, 'transactions');
+        return allTransactions;
+
+      } catch (err) {
+        console.error('[useTransactionHistory] Exception during fetch:', err);
+        throw err;
       }
     },
-    enabled: isLoaded && !!user?.id && !!userProfile?.user_id,
-    staleTime: 30000,
-    refetchInterval: 60000,
+    enabled: !!userProfile?.user_id && !!user?.id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
+    retry: 1,
   });
 };

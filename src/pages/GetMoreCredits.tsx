@@ -25,19 +25,10 @@ const planTextColor = {
 };
 
 export default function GetMoreCredits() {
-  const {
-    user,
-    isLoaded
-  } = useUser();
+  const { user, isLoaded } = useUser();
   const navigate = useNavigate();
-  const {
-    data: credits,
-    isLoading,
-    error
-  } = useUserCredits();
-  const {
-    userProfile
-  } = useUserProfile();
+  const { data: credits, isLoading, error } = useUserCredits();
+  const { userProfile } = useUserProfile();
   const { pricingData, isLoading: isPricingLoading, userCountry } = useLocationPricing();
 
   const handleSubscribeClick = () => {

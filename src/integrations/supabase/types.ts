@@ -571,42 +571,6 @@ export type Database = {
           },
         ]
       }
-      subscription_plans: {
-        Row: {
-          billing_cycle: string | null
-          created_at: string
-          credits_amount: number
-          description: string | null
-          id: string
-          is_active: boolean
-          plan_name: string
-          plan_type: string
-          price_amount: number | null
-        }
-        Insert: {
-          billing_cycle?: string | null
-          created_at?: string
-          credits_amount: number
-          description?: string | null
-          id?: string
-          is_active?: boolean
-          plan_name: string
-          plan_type: string
-          price_amount?: number | null
-        }
-        Update: {
-          billing_cycle?: string | null
-          created_at?: string
-          credits_amount?: number
-          description?: string | null
-          id?: string
-          is_active?: boolean
-          plan_name?: string
-          plan_type?: string
-          price_amount?: number | null
-        }
-        Relationships: []
-      }
       subscription_tracking: {
         Row: {
           cancelled_at: string | null
