@@ -1,5 +1,5 @@
 
-import { BellRing, ScanSearch, FileText, Linkedin, LayoutDashboard, ArrowRight } from "lucide-react";
+import { BellRing, ScanSearch, FileText, Linkedin, LayoutDashboard, ArrowRight, Building2, Bot } from "lucide-react";
 import { SignUpButton } from "@clerk/clerk-react";
 
 // EVEN MORE desaturated, softened pastel backgrounds and muted buttons/icons for less vibrancy
@@ -15,7 +15,7 @@ const tools = [
   },
   {
     icon: ScanSearch,
-    title: "AI Job Analysis",
+    title: "Job Analysis",
     description: "Analyze job descriptions against your resume to identify key skills and gaps.",
     cardBg: "bg-[#aecfc1]",
     buttonBg: "bg-[#12714a] hover:bg-[#0b4d34] focus:bg-[#0b4d34]",
@@ -23,8 +23,26 @@ const tools = [
     iconColor: "text-green-800 bg-white/90",
   },
   {
+    icon: Building2,
+    title: "Company Decoder",
+    description: "Get deep insights into company culture, values, and what they're really looking for.",
+    cardBg: "bg-[#c8d4e8]",
+    buttonBg: "bg-[#4a6791] hover:bg-[#344861] focus:bg-[#344861]",
+    buttonText: "text-white",
+    iconColor: "text-blue-800 bg-white/90",
+  },
+  {
+    icon: LayoutDashboard,
+    title: "Interview Prep",
+    description: "Know the Company. Nail the Interview. Ask Like a Pro.",
+    cardBg: "bg-[#7daab8]",
+    buttonBg: "bg-[#145671] hover:bg-[#0a3544] focus:bg-[#0a3544]",
+    buttonText: "text-white",
+    iconColor: "text-sky-900 bg-white/90",
+  },
+  {
     icon: FileText,
-    title: "AI Cover Letters",
+    title: "Cover Letter",
     description: "Generate personalized cover letters in seconds for any job application.",
     cardBg: "bg-[#e7b891]",
     buttonBg: "bg-[#a4501e] hover:bg-[#74360e] focus:bg-[#74360e]",
@@ -33,7 +51,7 @@ const tools = [
   },
   {
     icon: Linkedin,
-    title: "AI LinkedIn Posts",
+    title: "LinkedIn Posts",
     description: "Create engaging LinkedIn posts to boost your professional presence.",
     cardBg: "bg-[#b6a4c9]",
     buttonBg: "bg-[#765696] hover:bg-[#543a6a] focus:bg-[#543a6a]",
@@ -41,13 +59,13 @@ const tools = [
     iconColor: "text-purple-800 bg-white/90",
   },
   {
-    icon: LayoutDashboard,
-    title: "AI Interview Prep",
-    description: "Know the Company. Nail the Interview. Ask Like a Pro.",
-    cardBg: "bg-[#7daab8]",
-    buttonBg: "bg-[#145671] hover:bg-[#0a3544] focus:bg-[#0a3544]",
+    icon: Bot,
+    title: "Telegram Resume Bot",
+    description: "Automated resume optimization and job matching through our intelligent Telegram bot.",
+    cardBg: "bg-[#d4c8a8]",
+    buttonBg: "bg-[#8b7355] hover:bg-[#6b5642] focus:bg-[#6b5642]",
     buttonText: "text-white",
-    iconColor: "text-sky-900 bg-white/90",
+    iconColor: "text-yellow-800 bg-white/90",
   },
 ];
 
@@ -70,7 +88,8 @@ const ToolsSection = () => {
             grid-cols-1 
             sm:grid-cols-2 
             lg:grid-cols-3
-            xl:grid-cols-5
+            xl:grid-cols-4
+            2xl:grid-cols-7
             justify-center
           ">
           {tools.map((tool) => (
@@ -116,11 +135,13 @@ const ToolsSection = () => {
                     letterSpacing: "0.025em",
                   }}
                 >
-                  {tool.title === "AI Interview Prep" ? "Start Prep" :
-                    tool.title === "AI Job Analysis" ? "Analyze Jobs" :
-                      tool.title === "AI Cover Letters" ? "Create Letters" :
+                  {tool.title === "Interview Prep" ? "Start Prep" :
+                    tool.title === "Job Analysis" ? "Analyze Jobs" :
+                      tool.title === "Cover Letter" ? "Create Letters" :
                         tool.title === "Telegram Job Alerts" ? "Set Up Alerts" :
-                          tool.title === "AI LinkedIn Posts" ? "Generate Posts" : "Get Started"}
+                          tool.title === "LinkedIn Posts" ? "Generate Posts" :
+                            tool.title === "Company Decoder" ? "Decode Companies" :
+                              tool.title === "Telegram Resume Bot" ? "Start Bot" : "Get Started"}
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </button>
               </SignUpButton>
