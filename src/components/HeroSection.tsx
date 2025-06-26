@@ -9,6 +9,7 @@ const HeroSection = () => {
   const { user, isLoaded } = useUser();
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
   const fullText = 'AI does the boring stuff.\nYou get the Job.';
 
   useEffect(() => {
@@ -17,13 +18,20 @@ const HeroSection = () => {
     }
   }, [user, isLoaded, navigate]);
 
-  // Typing animation effect
+  // Preload background image
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => setIsImageLoaded(true);
+    img.src = '/lovable-uploads/9f89bb0c-b59d-4e5a-8c4d-609218bee6d4.png';
+  }, []);
+
+  // Optimized typing animation effect
   useEffect(() => {
     if (currentIndex < fullText.length) {
       const timeout = setTimeout(() => {
         setDisplayedText(prev => prev + fullText[currentIndex]);
         setCurrentIndex(prev => prev + 1);
-      }, 80); // Adjust speed here (lower = faster)
+      }, 60); // Slightly faster animation
 
       return () => clearTimeout(timeout);
     }
@@ -33,21 +41,40 @@ const HeroSection = () => {
     navigate('/dashboard');
   };
 
+  const aiServices = [
+    {
+      name: 'OpenAI',
+      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/openai/openai-original.svg',
+      color: 'from-green-400 to-green-600'
+    },
+    {
+      name: 'Claude',
+      logo: 'https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@latest/icons/anthropic.svg',
+      color: 'from-orange-400 to-red-500'
+    },
+    {
+      name: 'Perplexity',
+      logo: 'https://pbs.twimg.com/profile_images/1667900002031792128/3xg-dQI7_400x400.jpg',
+      color: 'from-blue-400 to-purple-500'
+    }
+  ];
+
   return (
     <section className="relative min-h-[80vh] sm:min-h-screen flex flex-col items-center justify-center px-4 pt-28 sm:pt-32 overflow-hidden bg-black">
-      {/* Background Gradient Image */}
+      {/* Optimized Background with loading state */}
       <div
-        className="absolute inset-0 z-0 pointer-events-none"
+        className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-500 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
         aria-hidden="true"
         style={{
-          background: `url('/lovable-uploads/9f89bb0c-b59d-4e5a-8c4d-609218bee6d4.png') center top / cover no-repeat`,
+          background: isImageLoaded ? `url('/lovable-uploads/9f89bb0c-b59d-4e5a-8c4d-609218bee6d4.png') center top / cover no-repeat` : 'transparent',
           maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
           WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
         }}
       />
       <div className="absolute inset-0 z-10 bg-black/60" aria-hidden="true" />
+      
       <div className="text-center max-w-4xl mx-auto z-20 mt-10 sm:mt-0 relative">
-        <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-8 leading-tight font-inter drop-shadow-xl min-h-[200px] sm:min-h-[240px]">
+        <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight font-inter drop-shadow-xl min-h-[200px] sm:min-h-[240px]">
           {displayedText.split('\n').map((line, index) => (
             <span key={index}>
               {line.split(' ').map((word, wordIndex) => {
@@ -78,6 +105,27 @@ const HeroSection = () => {
           ))}
           <span className="animate-pulse">|</span>
         </h1>
+        
+        {/* AI Services Badges */}
+        <div className="flex justify-center items-center gap-6 mb-8 opacity-90">
+          <span className="text-gray-300 text-sm font-inter font-medium">Powered by</span>
+          {aiServices.map((service, index) => (
+            <div key={index} className="flex items-center gap-2 group">
+              <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${service.color} p-1.5 shadow-lg group-hover:scale-110 transition-transform duration-200`}>
+                <img 
+                  src={service.logo} 
+                  alt={`${service.name} logo`}
+                  className="w-full h-full object-contain filter brightness-0 invert"
+                  loading="lazy"
+                />
+              </div>
+              <span className="text-gray-300 text-xs font-inter font-medium group-hover:text-white transition-colors">
+                {service.name}
+              </span>
+            </div>
+          ))}
+        </div>
+
         <p className="text-lg md:text-xl text-gray-200 mb-12 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black">
           Job hunting toolkit that writes your cover letter, preps you for interviews, and even pings you new jobs — all powered by{" "}
           <span className="italic bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent font-medium">
@@ -85,6 +133,7 @@ const HeroSection = () => {
           </span>
           . Weirdly effective.
         </p>
+        
         <SignedOut>
           <SignUpButton mode="modal">
             <button className="bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-600 hover:from-sky-600 hover:to-blue-700 text-white px-12 py-4 text-lg sm:text-xl rounded-xl transition-all duration-300 font-inter font-bold shadow-2xl drop-shadow-xl hover:shadow-sky-500/60 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-sky-400/50 mb-2">
