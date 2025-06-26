@@ -132,7 +132,7 @@ const PrivacyPolicy = () => {
                 <li>Delete your personal information from our active databases within 30 days</li>
                 <li>Remove your generated content (cover letters, interview prep materials, etc.)</li>
                 <li>Anonymize any remaining data used for analytics purposes</li>
-                <li>Notify our third-party processors to delete your data from their systems</li>
+                
               </ul>
               <p className="text-gray-300">
                 Some information may be retained in backup systems for up to 90 days for security and recovery purposes, after which it will be permanently deleted.
