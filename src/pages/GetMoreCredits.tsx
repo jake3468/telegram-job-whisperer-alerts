@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Globe, Loader2 } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 import { useUserCredits } from '@/hooks/useUserCredits';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Layout } from '@/components/Layout';
@@ -90,7 +90,9 @@ export default function GetMoreCredits() {
   
   // Static credit balance calculation
   const currentBalance = credits ? Number(credits.current_balance) : 0;
-  return <Layout>
+
+  return (
+    <Layout>
       <div className="w-full flex flex-col pb-5 sm:pb-8">
         <div className="text-center mb-5 sm:mb-12 px-2 sm:px-4">
           <h1 className="text-2xl xs:text-3xl sm:text-5xl font-orbitron font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-1 sm:mb-2 drop-shadow tracking-tight animate-fade-in">
@@ -102,9 +104,17 @@ export default function GetMoreCredits() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
             <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in">
               Current Balance:{" "}
-              {isLoading ? <span className="font-bold text-cyan-100">Loading...</span> : error ? <span className="font-bold text-rose-300">Error loading</span> : credits ? <span className="font-bold text-cyan-100">
+              {isLoading ? (
+                <span className="font-bold text-cyan-100">Loading...</span>
+              ) : error ? (
+                <span className="font-bold text-rose-300">Error loading</span>
+              ) : credits ? (
+                <span className="font-bold text-cyan-100">
                   {currentBalance.toLocaleString()} credits
-                </span> : <span className="font-bold text-yellow-300">No credits found</span>}
+                </span>
+              ) : (
+                <span className="font-bold text-yellow-300">No credits found</span>
+              )}
             </p>
             <div className="flex items-center gap-2">
               <SubscriptionBadge />
@@ -112,17 +122,11 @@ export default function GetMoreCredits() {
             </div>
           </div>
           
-          {/* Location Detection Display */}
-          {!isPricingLoading && <div className="flex items-center gap-2 text-sm text-blue-200 mb-4 justify-center">
-              <Globe className="w-4 h-4" />
-              <span>
-                Pricing for: 
-                {pricingData.region === 'IN' ? <span className="ml-1 font-semibold text-blue-100">🇮🇳 India ({pricingData.currency})</span> : <span className="ml-1 font-semibold text-blue-100">🌍 International ({pricingData.currency})</span>}
-              </span>
-              {userCountry && <span className="text-xs text-blue-300">
-                  (Detected: {userCountry})
-                </span>}
-            </div>}
+          {/* Payment Partner Information */}
+          <div className="flex items-center gap-2 text-sm text-blue-200 mb-4 justify-center">
+            <span>Powered by</span>
+            <span className="ml-1 font-semibold text-blue-100">Dodo Payments</span>
+          </div>
         </div>
         
         {/* Responsive grid area with tight spacing for mobile; px for interior gap only */}
@@ -286,5 +290,6 @@ export default function GetMoreCredits() {
           </div>
         </div>
       </div>
-    </Layout>;
+    </Layout>
+  );
 }

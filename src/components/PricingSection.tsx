@@ -34,17 +34,11 @@ const PricingSection = () => {
             Pay only for what you use. Get started with free monthly credits, and upgrade anytime.
           </p>
           
-          {/* Location Detection Display */}
-          {!isPricingLoading && <div className="flex items-center gap-2 text-sm text-blue-200 mb-8 justify-center">
-              <Globe className="w-4 h-4" />
-              <span>
-                Pricing for: 
-                {pricingData.region === 'IN' ? <span className="ml-1 font-semibold text-blue-100">🇮🇳 India ({pricingData.currency})</span> : <span className="ml-1 font-semibold text-blue-100">🌍 International ({pricingData.currency})</span>}
-              </span>
-              {userCountry && <span className="text-xs text-blue-300">
-                  (Detected: {userCountry})
-                </span>}
-            </div>}
+          {/* Payment Partner Information */}
+          <div className="flex items-center gap-2 text-sm text-blue-200 mb-8 justify-center">
+            <span>Powered by</span>
+            <span className="ml-1 font-semibold text-blue-100">Dodo Payments</span>
+          </div>
         </div>
 
         <div className="grid gap-6 lg:gap-8 grid-cols-1 lg:grid-cols-3 items-stretch max-w-6xl mx-auto">
