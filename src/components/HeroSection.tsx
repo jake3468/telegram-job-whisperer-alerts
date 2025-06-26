@@ -56,7 +56,7 @@ const HeroSection = () => {
       <div className="absolute inset-0 z-10 bg-black/60" aria-hidden="true" />
       
       <div className="text-center max-w-4xl mx-auto z-20 mt-10 sm:mt-0 relative">
-        <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 leading-tight font-inter drop-shadow-xl min-h-[200px] sm:min-h-[240px]">
+        <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-2 leading-tight font-inter drop-shadow-xl min-h-[200px] sm:min-h-[240px]">
           {displayedText.split('\n').map((line, index) => (
             <span key={index}>
               {line.split(' ').map((word, wordIndex) => {
@@ -88,34 +88,16 @@ const HeroSection = () => {
           <span className="animate-pulse">|</span>
         </h1>
         
-        {/* AI Services Badges - Condensed */}
+        {/* AI Services Badges - Combined Image */}
         <div className="flex justify-center items-center gap-3 mb-8 opacity-90">
           <span className="text-gray-300 text-sm font-inter font-medium">Powered by</span>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-green-400 to-green-600 p-1.5 shadow-lg hover:scale-110 transition-transform duration-200">
-              <img 
-                src="/lovable-uploads/7801b050-466c-4e54-a21b-7810a4829ed5.png" 
-                alt="AI Service logo"
-                className="w-full h-full object-contain"
-                loading="lazy"
-              />
-            </div>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-gray-700 to-gray-900 p-1.5 shadow-lg hover:scale-110 transition-transform duration-200">
-              <img 
-                src="/lovable-uploads/cd9331ba-9c6d-4b41-ad5a-2b036541e054.png" 
-                alt="AI Service logo"
-                className="w-full h-full object-contain filter brightness-0 invert"
-                loading="lazy"
-              />
-            </div>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-400 to-red-500 p-1.5 shadow-lg hover:scale-110 transition-transform duration-200">
-              <img 
-                src="/lovable-uploads/18dbc777-0fee-4f1a-a6b2-958a1ebcf027.png" 
-                alt="AI Service logo"
-                className="w-full h-full object-contain"
-                loading="lazy"
-              />
-            </div>
+          <div className="flex items-center">
+            <img 
+              src="/lovable-uploads/1d5e91f4-143e-466d-b67e-d758c9895257.png" 
+              alt="AI Services - OpenAI, Claude, and Perplexity"
+              className="h-8 object-contain hover:scale-110 transition-transform duration-200"
+              loading="lazy"
+            />
           </div>
         </div>
 
