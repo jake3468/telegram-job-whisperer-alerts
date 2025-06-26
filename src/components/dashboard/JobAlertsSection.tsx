@@ -53,29 +53,33 @@ const JobAlertsSection = ({ userTimezone }: { userTimezone: string }) => {
     try {
       console.log('[JobAlertsSection] Starting to fetch user profile and alerts for user:', user.id);
       
-      // First, get the user's database ID
+      // Add delay to allow JWT refresh to complete
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // First, get the user's database ID - single attempt
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('id')
         .eq('clerk_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (userError) {
+      if (userError || !userData) {
         console.error('[JobAlertsSection] Error fetching user:', userError);
+        // Don't show error toast for authentication issues, just fail silently
         setLoading(false);
         return;
       }
 
       console.log('[JobAlertsSection] Found user data:', userData);
 
-      // Get user profile
+      // Get user profile - single attempt
       const { data: profileData, error: profileError } = await supabase
         .from('user_profile')
         .select('id')
         .eq('user_id', userData.id)
-        .single();
+        .maybeSingle();
 
-      if (profileError) {
+      if (profileError || !profileData) {
         console.error('[JobAlertsSection] Error fetching user profile:', profileError);
         setLoading(false);
         return;
@@ -105,11 +109,14 @@ const JobAlertsSection = ({ userTimezone }: { userTimezone: string }) => {
       }
     } catch (error) {
       console.error('[JobAlertsSection] Error fetching user profile and alerts:', error);
-      toast({
-        title: "Error loading data",
-        description: "There was an error loading your data. Please try refreshing the page.",
-        variant: "destructive",
-      });
+      // Don't show error toast for authentication timeouts
+      if (!error.message?.includes('JWT') && !error.message?.includes('timeout')) {
+        toast({
+          title: "Error loading data",
+          description: "There was an error loading your data. Please try refreshing the page.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }

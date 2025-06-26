@@ -13,9 +13,14 @@ export const ProfileCompletionWarning = ({ className = '' }: ProfileCompletionWa
 
   useEffect(() => {
     // Only show warning after loading is complete and profile is actually incomplete
+    // Add extra delay to ensure all authentication is settled
     if (!loading) {
-      const isIncomplete = !hasResume || !hasBio;
-      setShowWarning(isIncomplete);
+      const timer = setTimeout(() => {
+        const isIncomplete = !hasResume || !hasBio;
+        setShowWarning(isIncomplete);
+      }, 500);
+
+      return () => clearTimeout(timer);
     }
   }, [loading, hasResume, hasBio]);
 
