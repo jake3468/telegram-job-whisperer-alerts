@@ -28,14 +28,15 @@ export const usePaymentProducts = () => {
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
-        console.log('Fetching products for region:', pricingData.region);
+        console.log('Fetching products for region:', pricingData.region, 'currency:', pricingData.currency);
         
-        // Query products for the specific region only
+        // Query products for the specific region and currency
         const { data, error } = await supabase
           .from('payment_products')
           .select('*')
           .eq('is_active', true)
           .eq('region', pricingData.region)
+          .eq('currency_code', pricingData.currency)
           .order('price_amount', { ascending: true });
 
         if (error) {
@@ -51,6 +52,10 @@ export const usePaymentProducts = () => {
           .filter(product => 
             product.product_type === 'subscription' || 
             product.product_type === 'credit_pack'
+          )
+          .filter(product => 
+            // Ensure currency matches the detected pricing data
+            product.currency_code === pricingData.currency
           )
           .map(product => ({
             id: product.id,
@@ -68,6 +73,7 @@ export const usePaymentProducts = () => {
           }));
 
         console.log('Processed payment products:', validProducts);
+        console.log('Expected currency:', pricingData.currency, 'Expected region:', pricingData.region);
         setProducts(validProducts);
       } catch (err) {
         console.error('Exception fetching payment products:', err);
@@ -77,11 +83,11 @@ export const usePaymentProducts = () => {
       }
     };
 
-    // Only fetch when we have a region
-    if (pricingData.region) {
+    // Only fetch when we have a region and currency
+    if (pricingData.region && pricingData.currency) {
       fetchProducts();
     }
-  }, [pricingData.region]);
+  }, [pricingData.region, pricingData.currency]);
 
   const getSubscriptionProducts = () => products.filter(p => p.product_type === 'subscription');
   const getCreditPackProducts = () => products.filter(p => p.product_type === 'credit_pack' && p.product_id !== 'initial_free_credits');
