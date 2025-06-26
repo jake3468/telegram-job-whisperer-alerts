@@ -1,17 +1,10 @@
-
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-
 const PrivacyPolicy = () => {
   const navigate = useNavigate();
-
-  return (
-    <div className="min-h-screen bg-black text-slate-50 font-inter">
+  return <div className="min-h-screen bg-black text-slate-50 font-inter">
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <button 
-          onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-sky-400 hover:text-sky-300 transition-colors mb-8"
-        >
+        <button onClick={() => navigate('/')} className="flex items-center gap-2 text-sky-400 hover:text-sky-300 transition-colors mb-8">
           <ArrowLeft size={20} />
           Back to Home
         </button>
@@ -45,7 +38,7 @@ const PrivacyPolicy = () => {
                 <li><strong>Professional Information:</strong> Resume content, work experience, education details, skills, and job preferences</li>
                 <li><strong>Location Data:</strong> Geographic location information for personalized job alerts and location-based pricing</li>
                 <li><strong>Payment Information:</strong> Billing details and payment method information (processed securely through our payment processor)</li>
-                <li><strong>Account Information:</strong> Username, password, and account preferences</li>
+                
               </ul>
 
               <h3 className="text-xl font-medium text-sky-400 mb-3">2.2 Usage Data</h3>
@@ -245,8 +238,6 @@ const PrivacyPolicy = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default PrivacyPolicy;
