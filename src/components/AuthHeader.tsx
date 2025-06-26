@@ -12,6 +12,21 @@ const AuthHeader = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+    setIsMenuOpen(false); // Close mobile menu after navigation
+  };
+
+  const navItems = [
+    { label: 'Features', id: 'features' },
+    { label: 'How It Works', id: 'how-it-works' },
+    { label: 'Pricing', id: 'pricing' },
+    { label: 'FAQ', id: 'faq' },
+  ];
+
   return (
     // Blended navbar with transparent background
     <header className="w-full backdrop-blur-md bg-black/30 fixed top-0 left-0 right-0 z-50 border-b border-sky-600/20 shadow-[0_6px_24px_0px_rgba(16,118,238,0.05)]">
@@ -23,6 +38,19 @@ const AuthHeader = () => {
             Aspirely.ai
           </span>
         </div>
+
+        {/* Desktop Navigation Menu */}
+        <nav className="hidden lg:flex items-center space-x-8">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => scrollToSection(item.id)}
+              className="text-white hover:text-sky-300 transition-colors duration-200 font-inter font-medium text-base"
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
 
         {/* Desktop Auth Buttons: Right side */}
         <div className="hidden sm:block">
@@ -64,6 +92,21 @@ const AuthHeader = () => {
       {isMenuOpen && (
         <div className="sm:hidden absolute top-full left-0 right-0 bg-black/95 backdrop-blur-md border-b border-sky-600/20 shadow-lg">
           <div className="px-4 py-4 space-y-3">
+            {/* Navigation Items */}
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => scrollToSection(item.id)}
+                className="w-full text-left text-white hover:text-sky-300 transition-colors duration-200 font-inter font-medium text-base py-2 px-2 rounded hover:bg-white/5"
+              >
+                {item.label}
+              </button>
+            ))}
+            
+            {/* Divider */}
+            <div className="border-t border-gray-600 my-3"></div>
+            
+            {/* Auth Buttons */}
             <SignedOut>
               <SignInButton mode="modal">
                 <button 

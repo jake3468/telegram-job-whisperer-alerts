@@ -1,5 +1,4 @@
-
-import { BellRing, ScanSearch, FileText, Linkedin, LayoutDashboard, ArrowRight, Building2, Bot } from "lucide-react";
+import { BellRing, ScanSearch, FileText, Linkedin, LayoutDashboard, ArrowRight, Building2, Bot, Plus } from "lucide-react";
 import { SignUpButton } from "@clerk/clerk-react";
 
 // EVEN MORE desaturated, softened pastel backgrounds and muted buttons/icons for less vibrancy
@@ -67,11 +66,21 @@ const tools = [
     buttonText: "text-white",
     iconColor: "text-yellow-800 bg-white/90",
   },
+  {
+    icon: Plus,
+    title: "More Features",
+    description: "We're constantly building new AI-powered tools to supercharge your job search. Stay tuned!",
+    cardBg: "bg-gray-900",
+    buttonBg: "bg-gray-700 hover:bg-gray-600 focus:bg-gray-600",
+    buttonText: "text-white",
+    iconColor: "text-gray-300 bg-gray-800",
+    isComingSoon: true,
+  },
 ];
 
 const ToolsSection = () => {
   return (
-    <section className="relative bg-black py-14 px-2 sm:py-16 sm:px-4">
+    <section id="features" className="relative bg-black py-14 px-2 sm:py-16 sm:px-4">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-white mb-4 font-inter">
@@ -89,7 +98,7 @@ const ToolsSection = () => {
             sm:grid-cols-2 
             lg:grid-cols-3
             xl:grid-cols-4
-            2xl:grid-cols-7
+            2xl:grid-cols-8
             justify-center
           ">
           {tools.map((tool) => (
@@ -109,6 +118,7 @@ const ToolsSection = () => {
                 transition-all
                 duration-300
                 border border-black/10
+                ${tool.isComingSoon ? 'border-gray-600' : ''}
               `}
               style={{
                 boxShadow: "0 4px 16px 0 rgba(31,38,135,0.08)",
@@ -121,30 +131,45 @@ const ToolsSection = () => {
               </div>
               <div>
                 <div className="mb-1">
-                  <h3 className="text-lg sm:text-xl md:text-2xl font-semibold font-inter text-black">{tool.title}</h3>
+                  <h3 className={`text-lg sm:text-xl md:text-2xl font-semibold font-inter ${tool.isComingSoon ? 'text-white' : 'text-black'}`}>
+                    {tool.title}
+                  </h3>
                 </div>
-                <p className="mb-4 text-sm sm:text-base font-inter font-normal text-black/80 leading-relaxed">
+                <p className={`mb-4 text-sm sm:text-base font-inter font-normal leading-relaxed ${tool.isComingSoon ? 'text-gray-300' : 'text-black/80'}`}>
                   {tool.description}
                 </p>
               </div>
-              <SignUpButton mode="modal">
+              {tool.isComingSoon ? (
                 <button
                   type="button"
-                  className={`mt-auto rounded-full w-full py-2 px-3 sm:py-3 sm:px-5 flex items-center justify-center gap-2 font-inter text-sm sm:text-base font-bold shadow-md transition-all duration-200 focus:outline-none focus:ring-2 ${tool.buttonBg} ${tool.buttonText} z-20`}
+                  disabled
+                  className={`mt-auto rounded-full w-full py-2 px-3 sm:py-3 sm:px-5 flex items-center justify-center gap-2 font-inter text-sm sm:text-base font-bold shadow-md transition-all duration-200 focus:outline-none ${tool.buttonBg} ${tool.buttonText} cursor-not-allowed opacity-75`}
                   style={{
                     letterSpacing: "0.025em",
                   }}
                 >
-                  {tool.title === "Interview Prep" ? "Start Prep" :
-                    tool.title === "Job Analysis" ? "Analyze Jobs" :
-                      tool.title === "Cover Letter" ? "Create Letters" :
-                        tool.title === "Telegram Job Alerts" ? "Set Up Alerts" :
-                          tool.title === "LinkedIn Posts" ? "Generate Posts" :
-                            tool.title === "Company Decoder" ? "Decode Companies" :
-                              tool.title === "Telegram Resume Bot" ? "Start Bot" : "Get Started"}
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                  Coming Soon
                 </button>
-              </SignUpButton>
+              ) : (
+                <SignUpButton mode="modal">
+                  <button
+                    type="button"
+                    className={`mt-auto rounded-full w-full py-2 px-3 sm:py-3 sm:px-5 flex items-center justify-center gap-2 font-inter text-sm sm:text-base font-bold shadow-md transition-all duration-200 focus:outline-none focus:ring-2 ${tool.buttonBg} ${tool.buttonText} z-20`}
+                    style={{
+                      letterSpacing: "0.025em",
+                    }}
+                  >
+                    {tool.title === "Interview Prep" ? "Start Prep" :
+                      tool.title === "Job Analysis" ? "Analyze Jobs" :
+                        tool.title === "Cover Letter" ? "Create Letters" :
+                          tool.title === "Telegram Job Alerts" ? "Set Up Alerts" :
+                            tool.title === "LinkedIn Posts" ? "Generate Posts" :
+                              tool.title === "Company Decoder" ? "Decode Companies" :
+                                tool.title === "Telegram Resume Bot" ? "Start Bot" : "Get Started"}
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </button>
+                </SignUpButton>
+              )}
             </div>
           ))}
         </div>

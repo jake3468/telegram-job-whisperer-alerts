@@ -2,6 +2,7 @@
 import AuthHeader from "@/components/AuthHeader";
 import HeroSection from "@/components/HeroSection";
 import ToolsSection from "@/components/ToolsSection";
+import HowItWorksSection from "@/components/HowItWorksSection";
 import PricingSection from "@/components/PricingSection";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
@@ -12,8 +13,13 @@ const Index = () => {
       <AuthHeader />
       <HeroSection />
       <ToolsSection />
-      <PricingSection />
-      <FAQSection />
+      <HowItWorksSection />
+      <div id="pricing">
+        <PricingSection />
+      </div>
+      <div id="faq">
+        <FAQSection />
+      </div>
       <Footer />
     </div>
   );
