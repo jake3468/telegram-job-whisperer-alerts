@@ -1,21 +1,12 @@
 
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
 
 const HeroSection = () => {
   const navigate = useNavigate();
-  const { user, isLoaded } = useUser();
-
-  useEffect(() => {
-    if (isLoaded && user) {
-      navigate('/dashboard');
-    }
-  }, [user, isLoaded, navigate]);
 
   const goToDashboard = () => {
-    navigate('/dashboard');
+    navigate('/profile');
   };
 
   return (
@@ -73,4 +64,5 @@ const HeroSection = () => {
     </section>
   );
 };
+
 export default HeroSection;

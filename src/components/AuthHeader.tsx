@@ -1,7 +1,10 @@
+
 import { SignedIn, SignedOut, SignInButton, SignUpButton } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
+
 const AuthHeader = () => {
   const navigate = useNavigate();
+
   return (
     // Glassy, vibrant navbar with colored border & subtle shadow
     <header className="w-full backdrop-blur-md bg-black/70 fixed top-0 left-0 right-0 z-50 border-b border-sky-600/40 shadow-[0_6px_24px_0px_rgba(16,118,238,0.08)]">
@@ -42,4 +45,5 @@ const AuthHeader = () => {
     </header>
   );
 };
+
 export default AuthHeader;
