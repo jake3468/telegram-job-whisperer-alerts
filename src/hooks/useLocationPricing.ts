@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 
 export interface PricingData {
@@ -18,12 +19,12 @@ export const useLocationPricing = () => {
     region: 'global',
     currency: 'USD',
     currencySymbol: '$',
-    monthlyPrice: 4.99,
+    monthlyPrice: 9.99,
     creditPacks: [
-      { credits: 50, price: 2.49, productId: 'pdt_global_50_credits' },
-      { credits: 100, price: 4.49, productId: 'pdt_global_100_credits' },
-      { credits: 200, price: 7.99, productId: 'pdt_global_200_credits' },
-      { credits: 500, price: 17.99, productId: 'pdt_global_500_credits' }
+      { credits: 30, price: 2.99, productId: 'pdt_global_30_credits' },
+      { credits: 80, price: 4.99, productId: 'pdt_global_80_credits' },
+      { credits: 200, price: 9.99, productId: 'pdt_global_200_credits' },
+      { credits: 500, price: 19.99, productId: 'pdt_global_500_credits' }
     ],
     subscriptionProductId: 'pdt_global_monthly_subscription'
   });
@@ -73,11 +74,11 @@ export const useLocationPricing = () => {
               region: 'IN',
               currency: 'INR',
               currencySymbol: '₹',
-              monthlyPrice: 199,
+              monthlyPrice: 499,
               creditPacks: [
-                { credits: 50, price: 99, productId: 'pdt_indian_50_credits' },
-                { credits: 100, price: 189, productId: 'pdt_indian_100_credits' },
-                { credits: 200, price: 349, productId: 'pdt_indian_200_credits' },
+                { credits: 30, price: 99, productId: 'pdt_indian_30_credits' },
+                { credits: 80, price: 199, productId: 'pdt_indian_80_credits' },
+                { credits: 200, price: 399, productId: 'pdt_indian_200_credits' },
                 { credits: 500, price: 799, productId: 'pdt_indian_500_credits' }
               ],
               subscriptionProductId: 'pdt_indian_monthly_subscription'

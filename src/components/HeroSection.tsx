@@ -67,7 +67,7 @@ const HeroSection = () => {
           </button>
         </SignedIn>
         <p className="text-gray-400 text-sm mt-10 font-inter drop-shadow shadow-black">
-          No credit card required. Unlock your potential today.
+          No credit card required. Start with 30 free credits today.
         </p>
       </div>
     </section>

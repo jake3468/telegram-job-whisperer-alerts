@@ -52,6 +52,7 @@ export default function GetMoreCredits() {
     createCheckoutSession,
     isLoading: isCheckoutLoading
   } = useCheckoutSession();
+  
   const handleSubscribeClick = async () => {
     const subscriptionProduct = subscriptionProducts[0];
     if (!subscriptionProduct) {
@@ -65,6 +66,7 @@ export default function GetMoreCredits() {
       toast.error('Failed to create checkout session');
     }
   };
+  
   const handleCreditPackClick = async (productId: string) => {
     const session = await createCheckoutSession(productId);
     if (session?.url) {
@@ -73,17 +75,19 @@ export default function GetMoreCredits() {
       toast.error('Failed to create checkout session');
     }
   };
+  
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
+  
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-gradient-to-br from-pastel-mint via-pastel-lavender to-pastel-peach flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading...</div>
       </div>;
   }
-
+  
   // Static credit balance calculation
   const currentBalance = credits ? Number(credits.current_balance) : 0;
   return <Layout>
@@ -136,7 +140,7 @@ export default function GetMoreCredits() {
               <CardHeader className="text-center pb-3 pt-4 sm:pb-4 sm:pt-6 px-2 sm:px-4">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 sm:mb-2 ${planTextColor.free}`}>Free Plan</CardTitle>
                 <div className="text-2xl sm:text-3xl font-extrabold text-blue-100 mt-0.5 mb-0.5">Free</div>
-                <div className="mt-0 text-xs sm:text-sm font-semibold text-blue-300">15 credits/month</div>
+                <div className="mt-0 text-xs sm:text-sm font-semibold text-blue-300">30 credits/month</div>
               </CardHeader>
               <CardContent className="grow flex flex-col px-2 sm:px-4 pb-3">
                 <ul className="space-y-1.5 sm:space-y-2 my-2 sm:my-4 flex-grow">
@@ -146,7 +150,7 @@ export default function GetMoreCredits() {
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-blue-100">15 credits every month</span>
+                    <span className="text-xs sm:text-sm text-blue-100">30 credits every month</span>
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
@@ -184,7 +188,7 @@ export default function GetMoreCredits() {
                     </>}
                 </div>
                 <div className="mt-0 text-xs sm:text-sm font-semibold text-cyan-200">
-                  {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits/month` : '200 credits/month'}
+                  {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits/month` : '300 credits/month'}
                 </div>
               </CardHeader>
               <CardContent className="grow flex flex-col px-2 sm:px-4 pb-3">
@@ -192,7 +196,7 @@ export default function GetMoreCredits() {
                   <li className="flex items-center gap-1 sm:gap-2">
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
                     <span className="text-xs sm:text-sm text-cyan-100">
-                      {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits every month` : '200 credits every month'}
+                      {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits every month` : '300 credits every month'}
                     </span>
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
