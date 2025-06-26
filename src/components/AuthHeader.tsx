@@ -39,8 +39,8 @@ const AuthHeader = () => {
           </span>
         </div>
 
-        {/* Desktop Navigation Menu */}
-        <nav className="hidden lg:flex items-center space-x-8">
+        {/* Desktop Navigation Menu - now shows on md (tablet) and above */}
+        <nav className="hidden md:flex items-center space-x-8">
           {navItems.map((item) => (
             <button
               key={item.id}
@@ -76,8 +76,8 @@ const AuthHeader = () => {
           </SignedIn>
         </div>
 
-        {/* Mobile Hamburger Menu */}
-        <div className="sm:hidden">
+        {/* Mobile Hamburger Menu - now only shows on small screens */}
+        <div className="md:hidden">
           <button
             onClick={toggleMenu}
             className="text-white p-2 rounded-lg hover:bg-white/10 transition-colors duration-200"
@@ -88,9 +88,9 @@ const AuthHeader = () => {
         </div>
       </div>
 
-      {/* Mobile Dropdown Menu */}
+      {/* Mobile Dropdown Menu - now only shows on small screens */}
       {isMenuOpen && (
-        <div className="sm:hidden absolute top-full left-0 right-0 bg-black/95 backdrop-blur-md border-b border-sky-600/20 shadow-lg">
+        <div className="md:hidden absolute top-full left-0 right-0 bg-black/95 backdrop-blur-md border-b border-sky-600/20 shadow-lg">
           <div className="px-4 py-4 space-y-3">
             {/* Navigation Items */}
             {navItems.map((item) => (
