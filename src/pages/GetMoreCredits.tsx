@@ -232,7 +232,7 @@ export default function GetMoreCredits() {
               </CardContent>
             </Card>
 
-            {/* Credit Packs */}
+            {/* Credit Packs - Only show database products OR fallback, not both */}
             <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-indigo-400/30 min-h-[340px] sm:min-h-[420px]`}>
               <CardHeader className="text-center pb-3 pt-4 sm:pb-4 sm:pt-6 px-2 sm:px-4">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 sm:mb-2 ${planTextColor.pack}`}>Credit Packs</CardTitle>
@@ -243,7 +243,7 @@ export default function GetMoreCredits() {
               </CardHeader>
               <CardContent className="grow flex flex-col px-2 sm:px-4 pb-3">
                 <div className="flex flex-col gap-1.5 sm:gap-2 my-2 sm:my-3 flex-grow">
-                  {/* Credit pack cards from database */}
+                  {/* Show either database products OR fallback, not both */}
                   {creditPackProducts.length > 0 ? (
                     creditPackProducts.map((pack) => (
                       <div key={pack.product_id} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
@@ -262,7 +262,7 @@ export default function GetMoreCredits() {
                       </div>
                     ))
                   ) : (
-                    // Fallback to static pricing data
+                    // Fallback to static pricing data only if no database products found
                     pricingData.creditPacks.map((pack) => (
                       <div key={pack.credits} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
                         <span className="text-indigo-100 font-medium text-xs sm:text-sm">{pack.credits} credits</span>
