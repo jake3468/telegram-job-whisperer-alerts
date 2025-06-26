@@ -41,7 +41,28 @@ export const usePaymentProducts = () => {
           return;
         }
 
-        setProducts(data || []);
+        // Filter and type-cast the products to ensure they match our interface
+        const validProducts = (data || [])
+          .filter(product => 
+            product.product_type === 'subscription' || 
+            product.product_type === 'credit_pack'
+          )
+          .map(product => ({
+            id: product.id,
+            product_id: product.product_id,
+            product_name: product.product_name,
+            product_type: product.product_type as 'subscription' | 'credit_pack',
+            credits_amount: product.credits_amount,
+            price_amount: product.price_amount,
+            currency: product.currency,
+            currency_code: product.currency_code,
+            region: product.region,
+            is_default_region: product.is_default_region,
+            description: product.description,
+            is_active: product.is_active
+          }));
+
+        setProducts(validProducts);
       } catch (err) {
         console.error('Exception fetching payment products:', err);
         setError('Failed to fetch payment products');

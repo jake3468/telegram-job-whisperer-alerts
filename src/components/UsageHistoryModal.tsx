@@ -51,8 +51,8 @@ const UsageHistoryModal = () => {
     return eventMap[eventType] || eventType;
   };
 
-  const creditTransactions = transactions?.filter(tx => tx.record_type === 'credit') || [];
-  const paymentRecords = transactions?.filter(tx => tx.record_type === 'payment') || [];
+  const creditTransactions = transactions?.filter(tx => tx.source === 'credit_transaction') || [];
+  const paymentRecords = transactions?.filter(tx => tx.source === 'payment_record') || [];
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -115,21 +115,21 @@ const UsageHistoryModal = () => {
                     {creditTransactions.map((transaction) => (
                       <TableRow key={transaction.id} className="border-blue-400/20 hover:bg-white/5">
                         <TableCell className="text-blue-100 text-sm">
-                          {transaction.record_type === 'credit' && formatDate(transaction.created_at)}
+                          {formatDate(transaction.date)}
                         </TableCell>
                         <TableCell className="text-blue-100 text-sm font-medium">
-                          {transaction.record_type === 'credit' && getTransactionTypeDisplay(transaction.transaction_type)}
+                          {getTransactionTypeDisplay(transaction.type)}
                         </TableCell>
                         <TableCell className="text-blue-100 text-xs max-w-xs truncate">
-                          {transaction.record_type === 'credit' && (transaction.description || (transaction.feature_used ? `Used for ${transaction.feature_used}` : '-'))}
+                          {transaction.description || (transaction.featureUsed ? `Used for ${transaction.featureUsed}` : '-')}
                         </TableCell>
                         <TableCell className={`text-right font-mono text-sm font-bold ${
-                          transaction.record_type === 'credit' && transaction.amount > 0 ? 'text-green-400' : 'text-red-400'
+                          transaction.amount > 0 ? 'text-green-400' : 'text-red-400'
                         }`}>
-                          {transaction.record_type === 'credit' && formatAmount(transaction.amount)}
+                          {formatAmount(transaction.amount)}
                         </TableCell>
                         <TableCell className="text-blue-100 text-right font-mono text-sm">
-                          {transaction.record_type === 'credit' && transaction.balance_after.toFixed(1)}
+                          {transaction.balanceAfter?.toFixed(1) || '-'}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -158,29 +158,27 @@ const UsageHistoryModal = () => {
                     {paymentRecords.map((record) => (
                       <TableRow key={record.id} className="border-blue-400/20 hover:bg-white/5">
                         <TableCell className="text-blue-100 text-sm">
-                          {record.record_type === 'payment' && formatDate(record.created_at)}
+                          {formatDate(record.date)}
                         </TableCell>
                         <TableCell className="text-blue-100 text-sm font-medium">
-                          {record.record_type === 'payment' && getPaymentEventDisplay(record.event_type)}
+                          {getPaymentEventDisplay(record.type)}
                         </TableCell>
                         <TableCell className="text-blue-100 text-xs">
                           <span className={`px-2 py-1 rounded text-xs font-medium ${
-                            record.record_type === 'payment' && record.status === 'active' 
+                            record.status === 'active' || record.status === 'completed'
                               ? 'bg-green-500/20 text-green-300' 
                               : 'bg-gray-500/20 text-gray-300'
                           }`}>
-                            {record.record_type === 'payment' && record.status}
+                            {record.status}
                           </span>
                         </TableCell>
                         <TableCell className="text-blue-100 text-right font-mono text-sm">
-                          {record.record_type === 'payment' && record.amount && record.currency 
-                            ? `${record.currency === 'INR' ? '₹' : '$'}${record.amount}` 
+                          {record.paymentDetails?.price_amount && record.currency 
+                            ? `${record.currency === 'INR' ? '₹' : '$'}${record.paymentDetails.price_amount}` 
                             : '-'}
                         </TableCell>
                         <TableCell className="text-green-400 text-right font-mono text-sm font-bold">
-                          {record.record_type === 'payment' && record.credits_awarded 
-                            ? `+${record.credits_awarded}` 
-                            : '-'}
+                          {record.amount > 0 ? `+${record.amount}` : '-'}
                         </TableCell>
                       </TableRow>
                     ))}

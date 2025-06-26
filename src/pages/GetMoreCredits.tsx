@@ -5,13 +5,16 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Globe } from 'lucide-react';
+import { Check, Globe, Loader2 } from 'lucide-react';
 import { useUserCredits } from '@/hooks/useUserCredits';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Layout } from '@/components/Layout';
 import UsageHistoryModal from '@/components/UsageHistoryModal';
 import SubscriptionBadge from '@/components/SubscriptionBadge';
 import { useLocationPricing } from '@/hooks/useLocationPricing';
+import { usePaymentProducts } from '@/hooks/usePaymentProducts';
+import { useCheckoutSession } from '@/hooks/useCheckoutSession';
+import { toast } from 'sonner';
 
 const planGradientBg = {
   free: "bg-black border border-blue-400/30",
@@ -30,11 +33,31 @@ export default function GetMoreCredits() {
   const { data: credits, isLoading, error } = useUserCredits();
   const { userProfile } = useUserProfile();
   const { pricingData, isLoading: isPricingLoading, userCountry } = useLocationPricing();
+  const { subscriptionProducts, creditPackProducts, isLoading: isProductsLoading } = usePaymentProducts();
+  const { createCheckoutSession, isLoading: isCheckoutLoading } = useCheckoutSession();
 
-  const handleSubscribeClick = () => {
-    const baseUrl = 'https://test.checkout.dodopayments.com/buy/';
-    const subscriptionUrl = `${baseUrl}${pricingData.subscriptionProductId}?quantity=1&redirect_url=https://preview--telegram-job-whisperer-alerts.lovable.app%2Fget-more-credits`;
-    window.open(subscriptionUrl, '_blank');
+  const handleSubscribeClick = async () => {
+    const subscriptionProduct = subscriptionProducts[0];
+    if (!subscriptionProduct) {
+      toast.error('Subscription product not available');
+      return;
+    }
+
+    const session = await createCheckoutSession(subscriptionProduct.product_id);
+    if (session?.url) {
+      window.open(session.url, '_blank');
+    } else {
+      toast.error('Failed to create checkout session');
+    }
+  };
+
+  const handleCreditPackClick = async (productId: string) => {
+    const session = await createCheckoutSession(productId);
+    if (session?.url) {
+      window.open(session.url, '_blank');
+    } else {
+      toast.error('Failed to create checkout session');
+    }
   };
 
   useEffect(() => {
@@ -149,16 +172,29 @@ export default function GetMoreCredits() {
               <CardHeader className="text-center pb-3 pt-5 sm:pb-4 sm:pt-8 px-2 sm:px-4">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 sm:mb-2 ${planTextColor.subscription}`}>Monthly Subscription</CardTitle>
                 <div className="text-2xl sm:text-3xl font-extrabold text-cyan-100 mb-0.5 sm:mb-1 mt-0.5">
-                  {pricingData.currencySymbol}{pricingData.monthlyPrice}
-                  <span className="text-xs sm:text-base font-bold align-super">/month</span>
+                  {subscriptionProducts[0] ? (
+                    <>
+                      {pricingData.currencySymbol}{subscriptionProducts[0].price_amount}
+                      <span className="text-xs sm:text-base font-bold align-super">/month</span>
+                    </>
+                  ) : (
+                    <>
+                      {pricingData.currencySymbol}{pricingData.monthlyPrice}
+                      <span className="text-xs sm:text-base font-bold align-super">/month</span>
+                    </>
+                  )}
                 </div>
-                <div className="mt-0 text-xs sm:text-sm font-semibold text-cyan-200">200 credits/month</div>
+                <div className="mt-0 text-xs sm:text-sm font-semibold text-cyan-200">
+                  {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits/month` : '200 credits/month'}
+                </div>
               </CardHeader>
               <CardContent className="grow flex flex-col px-2 sm:px-4 pb-3">
                 <ul className="space-y-1.5 sm:space-y-2 my-2 sm:my-4 flex-grow">
                   <li className="flex items-center gap-1 sm:gap-2">
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-cyan-100">200 credits every month</span>
+                    <span className="text-xs sm:text-sm text-cyan-100">
+                      {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits every month` : '200 credits every month'}
+                    </span>
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
@@ -181,9 +217,16 @@ export default function GetMoreCredits() {
                   <Button 
                     onClick={handleSubscribeClick}
                     className="w-full py-2 sm:py-2.5 bg-white hover:bg-yellow-100 text-black font-orbitron text-xs rounded-xl shadow border-0 font-bold transition-colors duration-200"
-                    disabled={isPricingLoading}
+                    disabled={isPricingLoading || isProductsLoading || isCheckoutLoading}
                   >
-                    {isPricingLoading ? 'Loading...' : 'Subscribe Now'}
+                    {isCheckoutLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        Processing...
+                      </>
+                    ) : (
+                      'Subscribe Now'
+                    )}
                   </Button>
                 </div>
               </CardContent>
@@ -193,20 +236,50 @@ export default function GetMoreCredits() {
             <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-indigo-400/30 min-h-[340px] sm:min-h-[420px]`}>
               <CardHeader className="text-center pb-3 pt-4 sm:pb-4 sm:pt-6 px-2 sm:px-4">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 sm:mb-2 ${planTextColor.pack}`}>Credit Packs</CardTitle>
-                <div className="text-2xl sm:text-3xl font-extrabold text-[#badbff] mb-0.5 sm:mb-1">Starting {pricingData.currencySymbol}{pricingData.creditPacks[0]?.price}</div>
+                <div className="text-2xl sm:text-3xl font-extrabold text-[#badbff] mb-0.5 sm:mb-1">
+                  Starting {pricingData.currencySymbol}{creditPackProducts[0]?.price_amount || pricingData.creditPacks[0]?.price}
+                </div>
                 <div className="mt-0 text-xs sm:text-sm font-semibold text-indigo-200">Select your desired amount:</div>
               </CardHeader>
               <CardContent className="grow flex flex-col px-2 sm:px-4 pb-3">
                 <div className="flex flex-col gap-1.5 sm:gap-2 my-2 sm:my-3 flex-grow">
-                  {/* Each credit pack card is now more compact */}
-                  {pricingData.creditPacks.map((pack) => (
-                    <div key={pack.credits} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
-                      <span className="text-indigo-100 font-medium text-xs sm:text-sm">{pack.credits} credits</span>
-                      <div className="text-right">
-                        <span className="text-indigo-50 font-bold text-xs sm:text-sm">{pricingData.currencySymbol}{pack.price}</span>
+                  {/* Credit pack cards from database */}
+                  {creditPackProducts.length > 0 ? (
+                    creditPackProducts.map((pack) => (
+                      <div key={pack.product_id} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
+                        <span className="text-indigo-100 font-medium text-xs sm:text-sm">{pack.credits_amount} credits</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-indigo-50 font-bold text-xs sm:text-sm">{pricingData.currencySymbol}{pack.price_amount}</span>
+                          <Button
+                            size="sm"
+                            onClick={() => handleCreditPackClick(pack.product_id)}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2 py-1 h-auto"
+                            disabled={isCheckoutLoading}
+                          >
+                            {isCheckoutLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    // Fallback to static pricing data
+                    pricingData.creditPacks.map((pack) => (
+                      <div key={pack.credits} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
+                        <span className="text-indigo-100 font-medium text-xs sm:text-sm">{pack.credits} credits</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-indigo-50 font-bold text-xs sm:text-sm">{pricingData.currencySymbol}{pack.price}</span>
+                          <Button
+                            size="sm"
+                            onClick={() => handleCreditPackClick(pack.productId)}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2 py-1 h-auto"
+                            disabled={isCheckoutLoading}
+                          >
+                            {isCheckoutLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
                 <ul className="space-y-1 mb-3">
                   <li className="flex items-center gap-1 sm:gap-2">
@@ -222,11 +295,6 @@ export default function GetMoreCredits() {
                     <span className="text-indigo-100 text-[10px] sm:text-xs">Secure payment</span>
                   </li>
                 </ul>
-                <div className="mt-auto">
-                  <Button className="w-full py-2 sm:py-2.5 bg-gradient-to-r from-indigo-500 via-blue-500 to-sky-600 hover:from-indigo-600 hover:to-purple-800 text-white font-orbitron text-xs sm:text-sm rounded-xl shadow border-0" disabled>
-                    Coming Soon
-                  </Button>
-                </div>
               </CardContent>
             </Card>
           </div>

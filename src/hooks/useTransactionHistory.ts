@@ -1,33 +1,8 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@clerk/clerk-react';
 import { useUserProfile } from '@/hooks/useUserProfile';
-
-type CreditTransaction = {
-  id: string;
-  transaction_type: string;
-  amount: number;
-  balance_before: number;
-  balance_after: number;
-  description: string | null;
-  feature_used: string | null;
-  created_at: string;
-  record_type: 'credit';
-};
-
-type PaymentRecord = {
-  id: string;
-  event_type: string;
-  amount: number | null;
-  currency: string | null;
-  status: string;
-  product_id: string;
-  credits_awarded: number | null;
-  created_at: string;
-  processed: boolean;
-  customer_email: string;
-  record_type: 'payment';
-};
 
 type TransactionHistoryItem = {
   id: string;
@@ -37,7 +12,17 @@ type TransactionHistoryItem = {
   date: string;
   balanceAfter: number | null;
   featureUsed: string | null;
-  source: string;
+  source: 'credit_transaction' | 'payment_record';
+  // Credit transaction specific fields
+  transaction_type?: string;
+  balance_after?: number;
+  feature_used?: string;
+  created_at?: string;
+  // Payment record specific fields
+  event_type?: string;
+  status?: string;
+  currency?: string;
+  credits_awarded?: number;
   paymentDetails?: {
     product_name: string | null;
     product_type: string | null;
@@ -46,8 +31,6 @@ type TransactionHistoryItem = {
     status: string;
   };
 };
-
-type CombinedTransaction = CreditTransaction | PaymentRecord;
 
 export const useTransactionHistory = () => {
   const { userProfile } = useUserProfile();
@@ -76,16 +59,20 @@ export const useTransactionHistory = () => {
           throw creditError;
         }
 
-        // Get payment records
+        // Get payment records with product details
         const { data: paymentRecords, error: paymentError } = await supabase
           .from('payment_records')
           .select(`
-            *,
-            payment_products!inner(
-              product_name,
-              product_type,
-              credits_amount
-            )
+            id,
+            event_type,
+            amount,
+            currency,
+            status,
+            product_id,
+            credits_awarded,
+            created_at,
+            processed,
+            customer_email
           `)
           .eq('user_id', userProfile.user_id)
           .eq('processed', true)
@@ -96,6 +83,15 @@ export const useTransactionHistory = () => {
           console.error('[useTransactionHistory] Error fetching payment records:', paymentError);
           throw paymentError;
         }
+
+        // Get product details separately
+        const productIds = paymentRecords?.map(p => p.product_id).filter(Boolean) || [];
+        const { data: products } = await supabase
+          .from('payment_products')
+          .select('product_id, product_name, product_type')
+          .in('product_id', productIds);
+
+        const productMap = new Map(products?.map(p => [p.product_id, p]) || []);
 
         // Combine and format the transactions
         const allTransactions: TransactionHistoryItem[] = [];
@@ -111,7 +107,12 @@ export const useTransactionHistory = () => {
               date: transaction.created_at,
               balanceAfter: Number(transaction.balance_after),
               featureUsed: transaction.feature_used,
-              source: 'credit_transaction'
+              source: 'credit_transaction',
+              // Include original fields for filtering
+              transaction_type: transaction.transaction_type,
+              balance_after: Number(transaction.balance_after),
+              feature_used: transaction.feature_used,
+              created_at: transaction.created_at
             });
           });
         }
@@ -119,7 +120,7 @@ export const useTransactionHistory = () => {
         // Add payment records
         if (paymentRecords) {
           paymentRecords.forEach(payment => {
-            const product = payment.payment_products;
+            const product = productMap.get(payment.product_id);
             allTransactions.push({
               id: payment.id,
               type: payment.event_type,
@@ -129,9 +130,15 @@ export const useTransactionHistory = () => {
               balanceAfter: null,
               featureUsed: null,
               source: 'payment_record',
+              // Include original fields for filtering
+              event_type: payment.event_type,
+              status: payment.status,
+              currency: payment.currency,
+              credits_awarded: payment.credits_awarded,
+              created_at: payment.created_at,
               paymentDetails: {
-                product_name: product?.product_name,
-                product_type: product?.product_type,
+                product_name: product?.product_name || null,
+                product_type: product?.product_type || null,
                 price_amount: Number(payment.amount || 0),
                 currency: payment.currency,
                 status: payment.status
