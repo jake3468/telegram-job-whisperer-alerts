@@ -94,9 +94,7 @@ const PrivacyPolicy = () => {
               <h2 className="text-2xl font-semibold text-white mb-4">4. Information Sharing and Disclosure</h2>
               
               <h3 className="text-xl font-medium text-sky-400 mb-3">4.1 Third-Party AI Services</h3>
-              <p className="text-gray-300 mb-4">
-                To provide our core services, we share your data with the following AI service providers under strict data processing agreements:
-              </p>
+              <p className="text-gray-300 mb-4">To provide our core services, we share your data with the following service providers under strict data processing agreements:</p>
               <ul className="list-disc list-inside text-gray-300 space-y-2 mb-6">
                 <li><strong>OpenAI:</strong> For job analysis, job alerts personalization, LinkedIn content generation, and resume bot functionality</li>
                 <li><strong>Anthropic (Claude):</strong> For cover letter generation and interview preparation materials</li>
