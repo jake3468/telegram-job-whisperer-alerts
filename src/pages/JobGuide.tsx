@@ -9,14 +9,16 @@ import { useToast } from '@/hooks/use-toast';
 import { AlertCircle, FileText, Sparkles, Loader2, CheckCircle, Trash2, Building, Briefcase, Copy, History } from 'lucide-react';
 import AuthHeader from '@/components/AuthHeader';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/client';
 import { Layout } from '@/components/Layout';
 import JobAnalysisHistory from '@/components/JobAnalysisHistory';
 import { PercentageMeter } from '@/components/PercentageMeter';
 import { useCreditCheck } from '@/hooks/useCreditCheck';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
-import { validateInput, sanitizeText } from '@/utils/sanitize';
+import { validateInput, sanitizeText, isValidForTyping } from '@/utils/sanitize';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
 
 const JobGuide = () => {
   const {
@@ -31,8 +33,9 @@ const JobGuide = () => {
     hasResume,
     hasBio,
     isComplete,
-    loading
+    loading: completionLoading
   } = useUserCompletionStatus();
+  const { userProfile, loading: profileLoading } = useUserProfile();
   const [formData, setFormData] = useState({
     companyName: '',
     jobTitle: '',
@@ -71,35 +74,101 @@ const JobGuide = () => {
   }, [isGenerating]);
   useEffect(() => {
     if (!jobAnalysisId || !isGenerating) return;
+    
+    console.log('🔄 Starting enhanced polling for job analysis results, ID:', jobAnalysisId);
+    
+    let retryCount = 0;
+    const maxRetries = 3;
+    
     const pollForResults = async () => {
       try {
-        const {
-          data,
-          error
-        } = await supabase.from('job_analyses').select('job_match, match_score').eq('id', jobAnalysisId).single();
+        console.log('📡 Polling attempt', retryCount + 1, 'for analysis ID:', jobAnalysisId);
+        
+        // Use authenticated request for polling
+        const { data, error } = await makeAuthenticatedRequest(async () => {
+          return await supabase
+            .from('job_analyses')
+            .select('job_match, match_score')
+            .eq('id', jobAnalysisId)
+            .maybeSingle();
+        }, 'poll job analysis results');
+        
         if (error) {
-          console.error('Error polling for results:', error);
-          return;
+          console.error('❌ Error polling for results:', error);
+          
+          // Handle JWT expiration by retrying with a delay
+          if (error.message?.includes('JWT expired') || error.code === 'PGRST301') {
+            console.log('🔄 JWT expired, retrying after delay...');
+            retryCount++;
+            
+            if (retryCount < maxRetries) {
+              // Wait a bit longer for token refresh and retry
+              setTimeout(() => {
+                pollForResults();
+              }, 2000);
+              return;
+            } else {
+              console.log('❌ Max retries reached for JWT refresh');
+              throw new Error('Authentication failed after retries');
+            }
+          }
+          
+          throw error;
         }
-        if (data?.job_match) {
+        
+        console.log('📊 Polling response:', { 
+          hasJobMatch: !!data?.job_match, 
+          jobMatchLength: data?.job_match?.length,
+          matchScore: data?.match_score,
+          retryCount
+        });
+        
+        // Reset retry count on successful response
+        retryCount = 0;
+        
+        // Check if we have actual content (not just empty strings)
+        if (data?.job_match && data.job_match.trim().length > 0) {
+          console.log('✅ Results found! Setting job analysis result');
           setJobAnalysisResult(data.job_match);
           setIsGenerating(false);
           setIsSuccess(false);
           setMatchScore(data.match_score || null);
+          
           if (pollingIntervalRef.current) {
             clearInterval(pollingIntervalRef.current);
             pollingIntervalRef.current = null;
           }
+          
           toast({
             title: "Job Analysis Generated!",
             description: "Your personalized job analysis is ready."
           });
         }
       } catch (err) {
-        console.error('Polling error:', err);
+        console.error('❌ Polling error:', err);
+        
+        // If we've exhausted retries, stop polling and show error
+        if (retryCount >= maxRetries) {
+          if (pollingIntervalRef.current) {
+            clearInterval(pollingIntervalRef.current);
+            pollingIntervalRef.current = null;
+          }
+          setIsGenerating(false);
+          setError('Failed to load job analysis results. Please try again.');
+          toast({
+            title: "Loading Failed",
+            description: "Unable to load your job analysis. Please try generating again.",
+            variant: "destructive"
+          });
+        }
       }
     };
+    
+    // Start polling immediately, then every 3 seconds
+    pollForResults();
     pollingIntervalRef.current = setInterval(pollForResults, 3000);
+    
+    // Set timeout to stop polling after 5 minutes
     const timeout = setTimeout(() => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
@@ -112,7 +181,8 @@ const JobGuide = () => {
         description: "The job analysis generation took too long. Please try submitting again.",
         variant: "destructive"
       });
-    }, 300000);
+    }, 300000); // 5 minutes timeout
+    
     return () => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
@@ -121,29 +191,25 @@ const JobGuide = () => {
     };
   }, [jobAnalysisId, isGenerating, toast]);
   const handleInputChange = (field: string, value: string) => {
-    // Sanitize input to prevent XSS
-    const sanitizedValue = sanitizeText(value);
+    // Use more lenient validation for real-time typing
+    const maxLength = field === 'jobDescription' ? 5000 : 200;
     
-    // Validate input length and content
-    if (field === 'jobDescription' && !validateInput(sanitizedValue, 5000)) {
+    // Only validate for truly malicious content, allow normal editing
+    if (!isValidForTyping(value, maxLength)) {
       toast({
         title: "Invalid Input",
-        description: "Job description contains invalid characters or is too long.",
-        variant: "destructive"
-      });
-      return;
-    } else if ((field === 'companyName' || field === 'jobTitle') && !validateInput(sanitizedValue, 200)) {
-      toast({
-        title: "Invalid Input",
-        description: `${field === 'companyName' ? 'Company name' : 'Job title'} contains invalid characters or is too long.`,
+        description: `${field === 'companyName' ? 'Company name' : field === 'jobTitle' ? 'Job title' : 'Job description'} contains invalid content or is too long.`,
         variant: "destructive"
       });
       return;
     }
     
+    // Light sanitization - only remove actual HTML tags
+    const cleanValue = value.replace(/<[^>]*>/g, '');
+    
     setFormData(prev => ({
       ...prev,
-      [field]: sanitizedValue
+      [field]: cleanValue
     }));
   };
   const handleClearData = useCallback(() => {
@@ -171,14 +237,9 @@ const JobGuide = () => {
       showInsufficientCreditsPopup();
       return;
     }
-    if (!isComplete) {
-      toast({
-        title: "Complete your profile first",
-        description: "Please upload your resume and add your bio in the Home page before using Job Analysis.",
-        variant: "destructive"
-      });
-      return;
-    }
+    
+    // REMOVED PROFILE COMPLETION CHECK - Allow users to proceed regardless
+    
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
         title: "Missing information",
@@ -187,6 +248,7 @@ const JobGuide = () => {
       });
       return;
     }
+    
     if (isSubmitting || isGenerating) {
       toast({
         title: "Please wait",
@@ -195,37 +257,40 @@ const JobGuide = () => {
       });
       return;
     }
+
+    // Check if userProfile is available (but allow if still loading)
+    if (!profileLoading && !userProfile) {
+      toast({
+        title: "Profile not found",
+        description: "Unable to find your profile. Please try refreshing the page.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       setError(null);
       setIsSuccess(false);
       setJobAnalysisResult(null);
+      setMatchScore(null); // Clear previous match score
       console.log('✅ Starting job analysis submission process');
-      const {
-        data: userData,
-        error: userError
-      } = await supabase.from('users').select('id').eq('clerk_id', user?.id).single();
-      if (userError || !userData) {
-        console.error('❌ User not found:', userError);
-        throw new Error('User not found in database');
-      }
-      console.log('✅ Found user in users table:', userData.id);
-      const {
-        data: profileData,
-        error: profileError
-      } = await supabase.from('user_profile').select('id').eq('user_id', userData.id).single();
-      if (profileError || !profileData) {
-        console.error('❌ User profile not found:', profileError);
-        throw new Error('User profile not found. Please complete your profile first.');
-      }
-      console.log('✅ Found user profile:', profileData.id);
-      // Check for existing analysis (now fetch match_score as well)
-      const {
-        data: existingAnalysis,
-        error: checkError
-      } = await supabase.from('job_analyses').select('id, job_match, match_score').eq('user_id', profileData.id).eq('company_name', formData.companyName).eq('job_title', formData.jobTitle).eq('job_description', formData.jobDescription).not('job_match', 'is', null).order('created_at', {
-        ascending: false
-      }).limit(1);
+      console.log('✅ Using user profile:', userProfile?.id);
+
+      // Check for existing analysis using authenticated request
+      const { data: existingAnalysis, error: checkError } = await makeAuthenticatedRequest(async () => {
+        return await supabase
+          .from('job_analyses')
+          .select('id, job_match, match_score')
+          .eq('user_id', userProfile?.id)
+          .eq('company_name', formData.companyName)
+          .eq('job_title', formData.jobTitle)
+          .eq('job_description', formData.jobDescription)
+          .not('job_match', 'is', null)
+          .order('created_at', { ascending: false })
+          .limit(1);
+      }, 'check existing analysis');
+
       if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
         const existing = existingAnalysis[0];
         console.log('✅ Found existing job analysis:', existing.id);
@@ -239,28 +304,36 @@ const JobGuide = () => {
         });
         return;
       }
-      // Insert new, clear matchScore (will be fetched when ready)
-      setMatchScore(null);
+
+      // Insert new analysis record using authenticated request
       const insertData = {
-        user_id: profileData.id,
+        user_id: userProfile?.id,
         company_name: formData.companyName,
         job_title: formData.jobTitle,
         job_description: formData.jobDescription
       };
+      
       console.log('📝 Inserting job analysis data:', insertData);
-      const {
-        data: insertedData,
-        error: insertError
-      } = await supabase.from('job_analyses').insert(insertData).select('id').single();
+      
+      const { data: insertedData, error: insertError } = await makeAuthenticatedRequest(async () => {
+        return await supabase
+          .from('job_analyses')
+          .insert(insertData)
+          .select('id')
+          .single();
+      }, 'insert job analysis', 3); // 3 retries for JWT issues
+      
       if (insertError) {
         console.error('❌ INSERT ERROR:', insertError);
         throw new Error(`Database insert failed: ${insertError.message}`);
       }
+      
       if (insertedData?.id) {
         console.log('✅ Job analysis record inserted:', insertedData.id);
         setJobAnalysisId(insertedData.id);
         setIsSuccess(true);
         setIsGenerating(true);
+        
         toast({
           title: "Job Analysis Started!",
           description: "Your personalized job analysis is being created. Please wait for the results."
@@ -278,7 +351,7 @@ const JobGuide = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, isComplete, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup]);
+  }, [formData, isComplete, completionLoading, profileLoading, hasResume, hasBio, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup, userProfile]);
   useEffect(() => {
     const handleHistoryData = (event: any) => {
       const {
@@ -322,9 +395,37 @@ const JobGuide = () => {
       });
     }
   };
-  const isFormValid = formData.companyName && formData.jobTitle && formData.jobDescription;
+
+  // Simplified form validation - only check if fields have content
+  const isFormValid = Boolean(
+    formData.companyName?.trim() &&
+    formData.jobTitle?.trim() &&
+    formData.jobDescription?.trim()
+  );
+  
   const hasAnyData = isFormValid || jobAnalysisResult;
-  const isButtonDisabled = !isComplete || !isFormValid || isSubmitting || isGenerating;
+  
+  // Simplified button disable logic - remove profile completion checks
+  const isButtonDisabled = !isFormValid || isSubmitting || isGenerating || !hasCredits;
+
+  // Enhanced debug logging
+  console.log('🔍 Form validation debug:', {
+    companyName: `"${formData.companyName}" (length: ${formData.companyName?.length || 0})`,
+    jobTitle: `"${formData.jobTitle}" (length: ${formData.jobTitle?.length || 0})`,
+    jobDescription: `"${formData.jobDescription?.substring(0, 50)}..." (length: ${formData.jobDescription?.length || 0})`,
+    isFormValid,
+    isComplete,
+    completionLoading,
+    profileLoading,
+    hasResume,
+    hasBio,
+    hasCredits,
+    isSubmitting,
+    isGenerating,
+    isButtonDisabled,
+    userProfile: !!userProfile
+  });
+
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-slate-400 text-xs">Loading...</div>
@@ -332,8 +433,8 @@ const JobGuide = () => {
   }
   return <Layout>
       <div className="min-h-screen w-full flex flex-col">
-        <div className="max-w-4xl mx-auto w-full px-2 py-8 sm:px-6 sm:py-12 mt-4">
-          <div className="text-center mb-8 px-2">
+        <div className="max-w-4xl mx-auto w-full px-2 py-4 sm:px-6 sm:py-8 mt-0">
+          <div className="text-center mb-6 px-2">
             <h1 className="font-orbitron bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 bg-clip-text text-transparent mb-2 drop-shadow text-5xl font-bold">
               Job Analysis
             </h1>
@@ -341,6 +442,10 @@ const JobGuide = () => {
               In-depth breakdown and <span className="italic text-slate-400">insights</span> for your ideal jobs
             </p>
           </div>
+
+          {/* Profile Completion Warning */}
+          <ProfileCompletionWarning />
+
           <div className="space-y-8">
             {/* Input Form */}
             <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-sky-900 border border-blue-700/70 shadow-xl drop-shadow-2xl">
@@ -450,7 +555,7 @@ const JobGuide = () => {
                 </CardContent>
               </Card>}
 
-            {/* Result Display - Updated to use SafeHTMLRenderer */}
+            {/* Result Display - Fixed for mobile responsiveness */}
             {jobAnalysisResult && <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-cyan-900 border border-blue-700 shadow-lg">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-slate-200 font-orbitron text-xl flex items-center gap-2">
@@ -461,21 +566,23 @@ const JobGuide = () => {
                     Personalized result for <span className="font-bold text-slate-200">{sanitizeText(formData.jobTitle)}</span> at <span className="font-bold text-slate-200">{sanitizeText(formData.companyName)}</span>
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="w-full overflow-hidden">
                   {/* Percentage Meter (Match Score) */}
-                  {matchScore && <div className="mb-4 max-w-full">
-                      <div className="w-full sm:max-w-[350px] md:max-w-[280px] mx-auto">
+                  {matchScore && <div className="mb-4 w-full overflow-hidden">
+                      <div className="w-full max-w-full sm:max-w-[350px] md:max-w-[280px] mx-auto">
                         <div className="shadow-md rounded-xl bg-slate-900/90 p-3 border border-slate-700">
                           <PercentageMeter score={parseInt(matchScore)} label="Match Score" />
                         </div>
                       </div>
                     </div>}
 
-                  <SafeHTMLRenderer
-                    content={jobAnalysisResult}
-                    className="whitespace-pre-wrap font-inter text-slate-100 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-blue-900/90 rounded-xl p-4 sm:p-5 shadow-inner mb-3 border border-slate-700 max-w-full overflow-x-hidden break-words"
-                    maxLength={15000}
-                  />
+                  <div className="w-full overflow-hidden">
+                    <SafeHTMLRenderer
+                      content={jobAnalysisResult}
+                      className="whitespace-pre-wrap font-inter text-slate-100 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-blue-900/90 rounded-xl p-3 sm:p-4 md:p-5 shadow-inner mb-3 border border-slate-700 w-full overflow-x-hidden break-words word-wrap"
+                      maxLength={15000}
+                    />
+                  </div>
                   
                   <div className="flex flex-col md:flex-row gap-2">
                     <Button 

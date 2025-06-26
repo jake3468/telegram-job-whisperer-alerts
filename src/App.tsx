@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +15,9 @@ import ResumeBuilder from "./pages/ResumeBuilder";
 import JobAlerts from "./pages/JobAlerts";
 import GetMoreCredits from "./pages/GetMoreCredits";
 import Upgrade from "./pages/Upgrade";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import ContactSupport from "./pages/ContactSupport";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +42,9 @@ const AppWithSync = () => {
         <Route path="/job-alerts" element={<JobAlerts />} />
         <Route path="/get-more-credits" element={<GetMoreCredits />} />
         <Route path="/upgrade" element={<Upgrade />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/contact-support" element={<ContactSupport />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

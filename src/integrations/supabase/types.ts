@@ -431,41 +431,192 @@ export type Database = {
           },
         ]
       }
-      subscription_plans: {
+      payment_products: {
         Row: {
           billing_cycle: string | null
           created_at: string
           credits_amount: number
+          currency: string | null
+          currency_code: string | null
           description: string | null
           id: string
           is_active: boolean
-          plan_name: string
-          plan_type: string
+          is_default_region: boolean | null
           price_amount: number | null
+          product_id: string
+          product_name: string
+          product_type: string
+          region: string | null
+          updated_at: string
         }
         Insert: {
           billing_cycle?: string | null
           created_at?: string
           credits_amount: number
+          currency?: string | null
+          currency_code?: string | null
           description?: string | null
           id?: string
           is_active?: boolean
-          plan_name: string
-          plan_type: string
+          is_default_region?: boolean | null
           price_amount?: number | null
+          product_id: string
+          product_name: string
+          product_type: string
+          region?: string | null
+          updated_at?: string
         }
         Update: {
           billing_cycle?: string | null
           created_at?: string
           credits_amount?: number
+          currency?: string | null
+          currency_code?: string | null
           description?: string | null
           id?: string
           is_active?: boolean
-          plan_name?: string
-          plan_type?: string
+          is_default_region?: boolean | null
           price_amount?: number | null
+          product_id?: string
+          product_name?: string
+          product_type?: string
+          region?: string | null
+          updated_at?: string
         }
         Relationships: []
+      }
+      payment_records: {
+        Row: {
+          amount: number | null
+          created_at: string
+          credits_awarded: number | null
+          currency: string | null
+          customer_email: string
+          customer_name: string | null
+          error_code: string | null
+          error_message: string | null
+          event_type: string
+          id: string
+          payment_id: string | null
+          payment_method: string | null
+          processed: boolean
+          processed_at: string | null
+          product_id: string
+          quantity: number | null
+          raw_payload: Json
+          status: string
+          subscription_id: string | null
+          updated_at: string
+          user_id: string | null
+          webhook_id: string
+          webhook_timestamp: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          credits_awarded?: number | null
+          currency?: string | null
+          customer_email: string
+          customer_name?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          event_type: string
+          id?: string
+          payment_id?: string | null
+          payment_method?: string | null
+          processed?: boolean
+          processed_at?: string | null
+          product_id: string
+          quantity?: number | null
+          raw_payload: Json
+          status: string
+          subscription_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+          webhook_id: string
+          webhook_timestamp: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          credits_awarded?: number | null
+          currency?: string | null
+          customer_email?: string
+          customer_name?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          event_type?: string
+          id?: string
+          payment_id?: string | null
+          payment_method?: string | null
+          processed?: boolean
+          processed_at?: string | null
+          product_id?: string
+          quantity?: number | null
+          raw_payload?: Json
+          status?: string
+          subscription_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+          webhook_id?: string
+          webhook_timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_records_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscription_tracking: {
+        Row: {
+          cancelled_at: string | null
+          created_at: string
+          id: string
+          next_billing_date: string | null
+          previous_billing_date: string | null
+          product_id: string
+          status: string
+          subscription_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          created_at?: string
+          id?: string
+          next_billing_date?: string | null
+          previous_billing_date?: string | null
+          product_id: string
+          status: string
+          subscription_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          created_at?: string
+          id?: string
+          next_billing_date?: string | null
+          previous_billing_date?: string | null
+          product_id?: string
+          status?: string
+          subscription_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_tracking_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_credits: {
         Row: {
@@ -814,6 +965,27 @@ export type Database = {
           p_job_description: string
         }
         Returns: string
+      }
+      process_payment_credits: {
+        Args: {
+          p_webhook_id: string
+          p_event_type: string
+          p_customer_email: string
+          p_customer_name?: string
+          p_product_id?: string
+          p_quantity?: number
+          p_amount?: number
+          p_currency?: string
+          p_status?: string
+          p_payment_id?: string
+          p_subscription_id?: string
+          p_payment_method?: string
+          p_error_code?: string
+          p_error_message?: string
+          p_webhook_timestamp?: string
+          p_raw_payload?: Json
+        }
+        Returns: Json
       }
       reset_monthly_credits: {
         Args: Record<PropertyKey, never>

@@ -5,6 +5,8 @@ import { Layout } from '@/components/Layout';
 import CVBotStatus from '@/components/dashboard/CVBotStatus';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { FileText } from 'lucide-react';
+import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
+
 const ResumeBuilder = () => {
   const {
     user,
@@ -43,6 +45,9 @@ const ResumeBuilder = () => {
         </p>
       </div>
 
+      {/* Profile Completion Warning */}
+      <ProfileCompletionWarning />
+
       <div className="max-w-4xl mx-auto">
         <section className="rounded-3xl border-2 border-fuchsia-400 bg-gradient-to-b from-fuchsia-900/90 via-[#2b1628]/90 to-[#2b0a28]/98 shadow-none p-0">
           <div className="pt-4 px-2 sm:px-6">
@@ -76,4 +81,5 @@ const ResumeBuilder = () => {
       </div>
     </Layout>;
 };
+
 export default ResumeBuilder;

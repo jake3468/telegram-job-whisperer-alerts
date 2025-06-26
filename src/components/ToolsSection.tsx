@@ -1,5 +1,4 @@
-
-import { BellRing, ScanSearch, FileText, Linkedin, LayoutDashboard, ArrowRight } from "lucide-react";
+import { BellRing, ScanSearch, FileText, Linkedin, LayoutDashboard, ArrowRight, Building2, Bot, Plus } from "lucide-react";
 import { SignUpButton } from "@clerk/clerk-react";
 
 // EVEN MORE desaturated, softened pastel backgrounds and muted buttons/icons for less vibrancy
@@ -15,7 +14,7 @@ const tools = [
   },
   {
     icon: ScanSearch,
-    title: "AI Job Analysis",
+    title: "Job Analysis",
     description: "Analyze job descriptions against your resume to identify key skills and gaps.",
     cardBg: "bg-[#aecfc1]",
     buttonBg: "bg-[#12714a] hover:bg-[#0b4d34] focus:bg-[#0b4d34]",
@@ -23,8 +22,26 @@ const tools = [
     iconColor: "text-green-800 bg-white/90",
   },
   {
+    icon: Building2,
+    title: "Company Decoder",
+    description: "Get deep insights into company culture, values, and what they're really looking for.",
+    cardBg: "bg-[#c8d4e8]",
+    buttonBg: "bg-[#4a6791] hover:bg-[#344861] focus:bg-[#344861]",
+    buttonText: "text-white",
+    iconColor: "text-blue-800 bg-white/90",
+  },
+  {
+    icon: LayoutDashboard,
+    title: "Interview Prep",
+    description: "Know the Company. Nail the Interview. Ask Like a Pro.",
+    cardBg: "bg-[#7daab8]",
+    buttonBg: "bg-[#145671] hover:bg-[#0a3544] focus:bg-[#0a3544]",
+    buttonText: "text-white",
+    iconColor: "text-sky-900 bg-white/90",
+  },
+  {
     icon: FileText,
-    title: "AI Cover Letters",
+    title: "Cover Letter",
     description: "Generate personalized cover letters in seconds for any job application.",
     cardBg: "bg-[#e7b891]",
     buttonBg: "bg-[#a4501e] hover:bg-[#74360e] focus:bg-[#74360e]",
@@ -33,7 +50,7 @@ const tools = [
   },
   {
     icon: Linkedin,
-    title: "AI LinkedIn Posts",
+    title: "LinkedIn Posts",
     description: "Create engaging LinkedIn posts to boost your professional presence.",
     cardBg: "bg-[#b6a4c9]",
     buttonBg: "bg-[#765696] hover:bg-[#543a6a] focus:bg-[#543a6a]",
@@ -41,19 +58,29 @@ const tools = [
     iconColor: "text-purple-800 bg-white/90",
   },
   {
-    icon: LayoutDashboard,
-    title: "AI Interview Prep",
-    description: "Know the Company. Nail the Interview. Ask Like a Pro.",
-    cardBg: "bg-[#7daab8]",
-    buttonBg: "bg-[#145671] hover:bg-[#0a3544] focus:bg-[#0a3544]",
+    icon: Bot,
+    title: "Telegram Resume Bot",
+    description: "Automated resume optimization and job matching through our intelligent Telegram bot.",
+    cardBg: "bg-[#d4c8a8]",
+    buttonBg: "bg-[#8b7355] hover:bg-[#6b5642] focus:bg-[#6b5642]",
     buttonText: "text-white",
-    iconColor: "text-sky-900 bg-white/90",
+    iconColor: "text-yellow-800 bg-white/90",
+  },
+  {
+    icon: Plus,
+    title: "More Features",
+    description: "We're constantly building new AI-powered tools to supercharge your job search. Stay tuned!",
+    cardBg: "bg-gray-900",
+    buttonBg: "bg-gray-700 hover:bg-gray-600 focus:bg-gray-600",
+    buttonText: "text-white",
+    iconColor: "text-gray-300 bg-gray-800",
+    isComingSoon: true,
   },
 ];
 
 const ToolsSection = () => {
   return (
-    <section className="relative bg-black py-14 px-2 sm:py-16 sm:px-4">
+    <section id="features" className="relative bg-black py-14 px-2 sm:py-16 sm:px-4">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-white mb-4 font-inter">
@@ -70,7 +97,8 @@ const ToolsSection = () => {
             grid-cols-1 
             sm:grid-cols-2 
             lg:grid-cols-3
-            xl:grid-cols-5
+            xl:grid-cols-4
+            2xl:grid-cols-8
             justify-center
           ">
           {tools.map((tool) => (
@@ -90,6 +118,7 @@ const ToolsSection = () => {
                 transition-all
                 duration-300
                 border border-black/10
+                ${tool.isComingSoon ? 'border-gray-600' : ''}
               `}
               style={{
                 boxShadow: "0 4px 16px 0 rgba(31,38,135,0.08)",
@@ -102,28 +131,45 @@ const ToolsSection = () => {
               </div>
               <div>
                 <div className="mb-1">
-                  <h3 className="text-lg sm:text-xl md:text-2xl font-semibold font-inter text-black">{tool.title}</h3>
+                  <h3 className={`text-lg sm:text-xl md:text-2xl font-semibold font-inter ${tool.isComingSoon ? 'text-white' : 'text-black'}`}>
+                    {tool.title}
+                  </h3>
                 </div>
-                <p className="mb-4 text-sm sm:text-base font-inter font-normal text-black/80 leading-relaxed">
+                <p className={`mb-4 text-sm sm:text-base font-inter font-normal leading-relaxed ${tool.isComingSoon ? 'text-gray-300' : 'text-black/80'}`}>
                   {tool.description}
                 </p>
               </div>
-              <SignUpButton mode="modal">
+              {tool.isComingSoon ? (
                 <button
                   type="button"
-                  className={`mt-auto rounded-full w-full py-2 px-3 sm:py-3 sm:px-5 flex items-center justify-center gap-2 font-inter text-sm sm:text-base font-bold shadow-md transition-all duration-200 focus:outline-none focus:ring-2 ${tool.buttonBg} ${tool.buttonText} z-20`}
+                  disabled
+                  className={`mt-auto rounded-full w-full py-2 px-3 sm:py-3 sm:px-5 flex items-center justify-center gap-2 font-inter text-sm sm:text-base font-bold shadow-md transition-all duration-200 focus:outline-none ${tool.buttonBg} ${tool.buttonText} cursor-not-allowed opacity-75`}
                   style={{
                     letterSpacing: "0.025em",
                   }}
                 >
-                  {tool.title === "AI Interview Prep" ? "Start Prep" :
-                    tool.title === "AI Job Analysis" ? "Analyze Jobs" :
-                      tool.title === "AI Cover Letters" ? "Create Letters" :
-                        tool.title === "Telegram Job Alerts" ? "Set Up Alerts" :
-                          tool.title === "AI LinkedIn Posts" ? "Generate Posts" : "Get Started"}
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                  Coming Soon
                 </button>
-              </SignUpButton>
+              ) : (
+                <SignUpButton mode="modal">
+                  <button
+                    type="button"
+                    className={`mt-auto rounded-full w-full py-2 px-3 sm:py-3 sm:px-5 flex items-center justify-center gap-2 font-inter text-sm sm:text-base font-bold shadow-md transition-all duration-200 focus:outline-none focus:ring-2 ${tool.buttonBg} ${tool.buttonText} z-20`}
+                    style={{
+                      letterSpacing: "0.025em",
+                    }}
+                  >
+                    {tool.title === "Interview Prep" ? "Start Prep" :
+                      tool.title === "Job Analysis" ? "Analyze Jobs" :
+                        tool.title === "Cover Letter" ? "Create Letters" :
+                          tool.title === "Telegram Job Alerts" ? "Set Up Alerts" :
+                            tool.title === "LinkedIn Posts" ? "Generate Posts" :
+                              tool.title === "Company Decoder" ? "Decode Companies" :
+                                tool.title === "Telegram Resume Bot" ? "Start Bot" : "Get Started"}
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </button>
+                </SignUpButton>
+              )}
             </div>
           ))}
         </div>

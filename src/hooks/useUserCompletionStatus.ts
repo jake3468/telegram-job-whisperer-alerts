@@ -27,36 +27,49 @@ export const useUserCompletionStatus = (): CompletionStatus => {
       }
 
       try {
-        // Get user's database ID
+        // Get user's database ID - single attempt, no retries
         const { data: userData, error: userError } = await supabase
           .from('users')
           .select('id')
           .eq('clerk_id', user.id)
-          .single();
+          .maybeSingle();
 
-        if (userError) {
+        if (userError || !userData) {
+          console.warn('User not found in database:', userError?.message);
           setStatus({ hasResume: false, hasBio: false, isComplete: false, loading: false });
           return;
         }
 
         // Check for resume
-        const { data: resumeData, error: resumeError } = await supabase.storage
-          .from('resumes')
-          .list(user.id, {
-            limit: 1,
-            search: 'resume.pdf'
-          });
+        let hasResume = false;
+        try {
+          const { data: resumeData, error: resumeError } = await supabase.storage
+            .from('resumes')
+            .list(user.id, {
+              limit: 1,
+              search: 'resume.pdf'
+            });
 
-        const hasResume = !resumeError && resumeData && resumeData.length > 0;
+          hasResume = !resumeError && resumeData && resumeData.length > 0;
+        } catch (error) {
+          console.warn('Resume check failed:', error);
+          hasResume = false;
+        }
 
-        // Check for bio in user_profile table
-        const { data: profileData, error: profileError } = await supabase
-          .from('user_profile')
-          .select('bio')
-          .eq('user_id', userData.id)
-          .single();
+        // Check for bio - single attempt, no retries
+        let hasBio = false;
+        try {
+          const { data: profileData, error: profileError } = await supabase
+            .from('user_profile')
+            .select('bio')
+            .eq('user_id', userData.id)
+            .maybeSingle();
 
-        const hasBio = !profileError && profileData?.bio && profileData.bio.trim().length > 0;
+          hasBio = !profileError && profileData?.bio && profileData.bio.trim().length > 0;
+        } catch (error) {
+          console.warn('Bio check failed:', error);
+          hasBio = false;
+        }
 
         const isComplete = hasResume && hasBio;
 
@@ -68,11 +81,15 @@ export const useUserCompletionStatus = (): CompletionStatus => {
         });
       } catch (error) {
         console.error('Error checking user completion status:', error);
+        // On error, assume incomplete rather than showing false warnings
         setStatus({ hasResume: false, hasBio: false, isComplete: false, loading: false });
       }
     };
 
-    checkUserCompletion();
+    // Add a longer delay to prevent rapid successive calls and allow JWT refresh
+    const timeoutId = setTimeout(checkUserCompletion, 1000);
+    
+    return () => clearTimeout(timeoutId);
   }, [user]);
 
   return status;

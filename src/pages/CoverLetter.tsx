@@ -20,6 +20,7 @@ import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { useDeferredCreditDeduction } from '@/hooks/useDeferredCreditDeduction';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
+import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
 
 const CoverLetter = () => {
   const { user, isLoaded } = useUser();
@@ -296,6 +297,9 @@ const CoverLetter = () => {
                     Instantly create stunning <span className="italic text-white/85">Cover Letters</span> for every job
                   </p>
                 </div>
+
+                {/* Profile Completion Warning */}
+                <ProfileCompletionWarning />
 
                 <div className="space-y-8">
                   {/* Input Form in Gradient Box */}
