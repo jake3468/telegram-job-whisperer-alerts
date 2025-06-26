@@ -41,18 +41,18 @@ const PrivacyPolicy = () => {
                 
               </ul>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">2.2 Usage Data</h3>
-              <p className="text-gray-300 mb-4">We automatically collect certain information about your device and usage patterns:</p>
+              
+              
               <ul className="list-disc list-inside text-gray-300 space-y-2 mb-6">
-                <li>Browser type and version</li>
-                <li>Operating system</li>
-                <li>IP address and general location</li>
-                <li>Pages visited and time spent on our platform</li>
-                <li>Features used and interaction patterns</li>
-                <li>Device identifiers and technical specifications</li>
+                
+                
+                
+                
+                
+                
               </ul>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">2.3 Generated Content</h3>
+              <h3 className="text-xl font-medium text-sky-400 mb-3">2.2 Generated Content</h3>
               <p className="text-gray-300">
                 We store the content generated through our AI tools, including cover letters, interview preparation materials, LinkedIn posts, and job analyses, to provide you with access to your history and improve our services.
               </p>
