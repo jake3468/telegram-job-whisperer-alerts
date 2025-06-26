@@ -1,3 +1,4 @@
+
 import { BellRing, ScanSearch, FileText, Linkedin, LayoutDashboard, ArrowRight, Building2, Bot, Plus } from "lucide-react";
 import { SignUpButton } from "@clerk/clerk-react";
 
@@ -98,7 +99,6 @@ const ToolsSection = () => {
             sm:grid-cols-2 
             lg:grid-cols-3
             xl:grid-cols-4
-            2xl:grid-cols-8
             justify-center
           ">
           {tools.map((tool) => (
