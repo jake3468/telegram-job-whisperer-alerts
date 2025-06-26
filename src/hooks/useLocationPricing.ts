@@ -84,16 +84,56 @@ export const useLocationPricing = () => {
               subscriptionProductId: 'pdt_indian_monthly_subscription'
             });
           } else {
-            console.log('Setting international pricing...');
-            // Keep default USD pricing for non-Indian users
+            console.log('Setting international pricing for country:', locationData.country_code);
+            // Explicitly set USD pricing for non-Indian users
+            setPricingData({
+              region: 'global',
+              currency: 'USD',
+              currencySymbol: '$',
+              monthlyPrice: 9.99,
+              creditPacks: [
+                { credits: 30, price: 2.99, productId: 'pdt_global_30_credits' },
+                { credits: 80, price: 4.99, productId: 'pdt_global_80_credits' },
+                { credits: 200, price: 9.99, productId: 'pdt_global_200_credits' },
+                { credits: 500, price: 19.99, productId: 'pdt_global_500_credits' }
+              ],
+              subscriptionProductId: 'pdt_global_monthly_subscription'
+            });
           }
         } else {
           console.log('No valid country code detected, using default USD pricing');
+          // Explicitly set default USD pricing
+          setPricingData({
+            region: 'global',
+            currency: 'USD',
+            currencySymbol: '$',
+            monthlyPrice: 9.99,
+            creditPacks: [
+              { credits: 30, price: 2.99, productId: 'pdt_global_30_credits' },
+              { credits: 80, price: 4.99, productId: 'pdt_global_80_credits' },
+              { credits: 200, price: 9.99, productId: 'pdt_global_200_credits' },
+              { credits: 500, price: 19.99, productId: 'pdt_global_500_credits' }
+            ],
+            subscriptionProductId: 'pdt_global_monthly_subscription'
+          });
         }
         
       } catch (error) {
         console.log('Location detection completely failed, using default USD pricing:', error);
-        // Keep default USD pricing on any error
+        // Explicitly set default USD pricing on any error
+        setPricingData({
+          region: 'global',
+          currency: 'USD',
+          currencySymbol: '$',
+          monthlyPrice: 9.99,
+          creditPacks: [
+            { credits: 30, price: 2.99, productId: 'pdt_global_30_credits' },
+            { credits: 80, price: 4.99, productId: 'pdt_global_80_credits' },
+            { credits: 200, price: 9.99, productId: 'pdt_global_200_credits' },
+            { credits: 500, price: 19.99, productId: 'pdt_global_500_credits' }
+          ],
+          subscriptionProductId: 'pdt_global_monthly_subscription'
+        });
       } finally {
         setIsLoading(false);
       }
