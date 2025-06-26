@@ -437,13 +437,16 @@ export type Database = {
           created_at: string
           credits_amount: number
           currency: string | null
+          currency_code: string | null
           description: string | null
           id: string
           is_active: boolean
+          is_default_region: boolean | null
           price_amount: number | null
           product_id: string
           product_name: string
           product_type: string
+          region: string | null
           updated_at: string
         }
         Insert: {
@@ -451,13 +454,16 @@ export type Database = {
           created_at?: string
           credits_amount: number
           currency?: string | null
+          currency_code?: string | null
           description?: string | null
           id?: string
           is_active?: boolean
+          is_default_region?: boolean | null
           price_amount?: number | null
           product_id: string
           product_name: string
           product_type: string
+          region?: string | null
           updated_at?: string
         }
         Update: {
@@ -465,13 +471,16 @@ export type Database = {
           created_at?: string
           credits_amount?: number
           currency?: string | null
+          currency_code?: string | null
           description?: string | null
           id?: string
           is_active?: boolean
+          is_default_region?: boolean | null
           price_amount?: number | null
           product_id?: string
           product_name?: string
           product_type?: string
+          region?: string | null
           updated_at?: string
         }
         Relationships: []

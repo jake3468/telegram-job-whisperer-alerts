@@ -1,3 +1,4 @@
+
 import { useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +11,8 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { Layout } from '@/components/Layout';
 import UsageHistoryModal from '@/components/UsageHistoryModal';
 import SubscriptionBadge from '@/components/SubscriptionBadge';
+import { useLocationPricing } from '@/hooks/useLocationPricing';
+import { CountrySelector } from '@/components/CountrySelector';
 
 const planGradientBg = {
   free: "bg-black border border-blue-400/30",
@@ -36,9 +39,12 @@ export default function GetMoreCredits() {
   const {
     userProfile
   } = useUserProfile();
+  const { pricingData, isLoading: isPricingLoading, userCountry, switchToPricing } = useLocationPricing();
 
   const handleSubscribeClick = () => {
-    window.open('https://test.checkout.dodopayments.com/buy/pdt_NoeZBi7dtSLdIthX7TDoj?quantity=1&redirect_url=https://preview--telegram-job-whisperer-alerts.lovable.app%2Fget-more-credits', '_blank');
+    const baseUrl = 'https://test.checkout.dodopayments.com/buy/';
+    const subscriptionUrl = `${baseUrl}${pricingData.subscriptionProductId}?quantity=1&redirect_url=https://preview--telegram-job-whisperer-alerts.lovable.app%2Fget-more-credits`;
+    window.open(subscriptionUrl, '_blank');
   };
 
   useEffect(() => {
@@ -55,6 +61,7 @@ export default function GetMoreCredits() {
 
   // Static credit balance calculation
   const currentBalance = credits ? Number(credits.current_balance) : 0;
+  
   return <Layout>
       <div className="w-full flex flex-col pb-5 sm:pb-8">
         <div className="text-center mb-5 sm:mb-12 px-2 sm:px-4">
@@ -76,7 +83,17 @@ export default function GetMoreCredits() {
               <UsageHistoryModal />
             </div>
           </div>
+          
+          {/* Country Selector */}
+          {!isPricingLoading && (
+            <CountrySelector 
+              currentRegion={pricingData.region}
+              detectedCountry={userCountry}
+              onRegionChange={switchToPricing}
+            />
+          )}
         </div>
+        
         {/* Responsive grid area with tight spacing for mobile; px for interior gap only */}
         <div className="flex-1 flex flex-col items-center justify-center w-full px-2 sm:px-4">
           <div className={`
@@ -130,7 +147,10 @@ export default function GetMoreCredits() {
               </div>
               <CardHeader className="text-center pb-3 pt-5 sm:pb-4 sm:pt-8 px-2 sm:px-4">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 sm:mb-2 ${planTextColor.subscription}`}>Monthly Subscription</CardTitle>
-                <div className="text-2xl sm:text-3xl font-extrabold text-cyan-100 mb-0.5 sm:mb-1 mt-0.5">₹199<span className="text-xs sm:text-base font-bold align-super">/month</span></div>
+                <div className="text-2xl sm:text-3xl font-extrabold text-cyan-100 mb-0.5 sm:mb-1 mt-0.5">
+                  {pricingData.currencySymbol}{pricingData.monthlyPrice}
+                  <span className="text-xs sm:text-base font-bold align-super">/month</span>
+                </div>
                 <div className="mt-0 text-xs sm:text-sm font-semibold text-cyan-200">200 credits/month</div>
               </CardHeader>
               <CardContent className="grow flex flex-col px-2 sm:px-4 pb-3">
@@ -160,8 +180,9 @@ export default function GetMoreCredits() {
                   <Button 
                     onClick={handleSubscribeClick}
                     className="w-full py-2 sm:py-2.5 bg-white hover:bg-yellow-100 text-black font-orbitron text-xs rounded-xl shadow border-0 font-bold transition-colors duration-200"
+                    disabled={isPricingLoading}
                   >
-                    Subscribe Now
+                    {isPricingLoading ? 'Loading...' : 'Subscribe Now'}
                   </Button>
                 </div>
               </CardContent>
@@ -171,40 +192,20 @@ export default function GetMoreCredits() {
             <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-indigo-400/30 min-h-[340px] sm:min-h-[420px]`}>
               <CardHeader className="text-center pb-3 pt-4 sm:pb-4 sm:pt-6 px-2 sm:px-4">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 sm:mb-2 ${planTextColor.pack}`}>Credit Packs</CardTitle>
-                <div className="text-2xl sm:text-3xl font-extrabold text-[#badbff] mb-0.5 sm:mb-1">₹99</div>
+                <div className="text-2xl sm:text-3xl font-extrabold text-[#badbff] mb-0.5 sm:mb-1">Starting {pricingData.currencySymbol}{pricingData.creditPacks[0]?.price}</div>
                 <div className="mt-0 text-xs sm:text-sm font-semibold text-indigo-200">Select your desired amount:</div>
               </CardHeader>
               <CardContent className="grow flex flex-col px-2 sm:px-4 pb-3">
                 <div className="flex flex-col gap-1.5 sm:gap-2 my-2 sm:my-3 flex-grow">
                   {/* Each credit pack card is now more compact */}
-                  <div className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
-                    <span className="text-indigo-100 font-medium text-xs sm:text-sm">50 credits</span>
-                    <div className="text-right">
-                      <span className="text-indigo-50 font-bold text-xs sm:text-sm">₹99</span>
-                      
+                  {pricingData.creditPacks.map((pack) => (
+                    <div key={pack.credits} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
+                      <span className="text-indigo-100 font-medium text-xs sm:text-sm">{pack.credits} credits</span>
+                      <div className="text-right">
+                        <span className="text-indigo-50 font-bold text-xs sm:text-sm">{pricingData.currencySymbol}{pack.price}</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="bg-gradient-to-r from-[#385494] via-[#4481db] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
-                    <span className="text-indigo-100 font-medium text-xs sm:text-sm">100 credits</span>
-                    <div className="text-right">
-                      <span className="text-indigo-50 font-bold text-xs sm:text-sm">₹189</span>
-                      
-                    </div>
-                  </div>
-                  <div className="bg-gradient-to-r from-[#385494] via-[#4481db] to-[#528bfd] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
-                    <span className="text-indigo-100 font-medium text-xs sm:text-sm">200 credits</span>
-                    <div className="text-right">
-                      <span className="text-indigo-50 font-bold text-xs sm:text-sm">₹349</span>
-                      
-                    </div>
-                  </div>
-                  <div className="bg-gradient-to-r from-[#385494] via-[#4481db] to-[#789cfb] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
-                    <span className="text-indigo-100 font-medium text-xs sm:text-sm">500 credits</span>
-                    <div className="text-right">
-                      <span className="text-indigo-50 font-bold text-xs sm:text-sm">₹799</span>
-                      
-                    </div>
-                  </div>
+                  ))}
                 </div>
                 <ul className="space-y-1 mb-3">
                   <li className="flex items-center gap-1 sm:gap-2">
