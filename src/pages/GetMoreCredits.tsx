@@ -5,14 +5,13 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check } from 'lucide-react';
+import { Check, Globe } from 'lucide-react';
 import { useUserCredits } from '@/hooks/useUserCredits';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Layout } from '@/components/Layout';
 import UsageHistoryModal from '@/components/UsageHistoryModal';
 import SubscriptionBadge from '@/components/SubscriptionBadge';
 import { useLocationPricing } from '@/hooks/useLocationPricing';
-import { CountrySelector } from '@/components/CountrySelector';
 
 const planGradientBg = {
   free: "bg-black border border-blue-400/30",
@@ -39,7 +38,7 @@ export default function GetMoreCredits() {
   const {
     userProfile
   } = useUserProfile();
-  const { pricingData, isLoading: isPricingLoading, userCountry, switchToPricing } = useLocationPricing();
+  const { pricingData, isLoading: isPricingLoading, userCountry } = useLocationPricing();
 
   const handleSubscribeClick = () => {
     const baseUrl = 'https://test.checkout.dodopayments.com/buy/';
@@ -84,13 +83,24 @@ export default function GetMoreCredits() {
             </div>
           </div>
           
-          {/* Country Selector */}
+          {/* Location Detection Display */}
           {!isPricingLoading && (
-            <CountrySelector 
-              currentRegion={pricingData.region}
-              detectedCountry={userCountry}
-              onRegionChange={switchToPricing}
-            />
+            <div className="flex items-center gap-2 text-sm text-blue-200 mb-4 justify-center">
+              <Globe className="w-4 h-4" />
+              <span>
+                Pricing for: 
+                {pricingData.region === 'IN' ? (
+                  <span className="ml-1 font-semibold text-blue-100">🇮🇳 India ({pricingData.currency})</span>
+                ) : (
+                  <span className="ml-1 font-semibold text-blue-100">🌍 International ({pricingData.currency})</span>
+                )}
+              </span>
+              {userCountry && (
+                <span className="text-xs text-blue-300">
+                  (Detected: {userCountry})
+                </span>
+              )}
+            </div>
           )}
         </div>
         

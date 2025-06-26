@@ -34,32 +34,65 @@ export const useLocationPricing = () => {
   useEffect(() => {
     const detectLocation = async () => {
       try {
-        // Try to get location from IP
-        const response = await fetch('https://ipapi.co/json/');
-        const locationData = await response.json();
+        console.log('Starting location detection...');
         
-        console.log('Location detected:', locationData.country_code);
-        setUserCountry(locationData.country_code || '');
+        // Primary IP detection service
+        let locationData = null;
         
-        // Check if user is from India
-        if (locationData.country_code === 'IN') {
-          setPricingData({
-            region: 'IN',
-            currency: 'INR',
-            currencySymbol: '₹',
-            monthlyPrice: 199,
-            creditPacks: [
-              { credits: 50, price: 99, productId: 'pdt_indian_50_credits' },
-              { credits: 100, price: 189, productId: 'pdt_indian_100_credits' },
-              { credits: 200, price: 349, productId: 'pdt_indian_200_credits' },
-              { credits: 500, price: 799, productId: 'pdt_indian_500_credits' }
-            ],
-            subscriptionProductId: 'pdt_indian_monthly_subscription'
-          });
+        try {
+          const response = await fetch('https://ipapi.co/json/');
+          locationData = await response.json();
+          console.log('Primary location service response:', locationData);
+        } catch (error) {
+          console.log('Primary location service failed, trying fallback...');
+          
+          // Fallback to alternative service
+          try {
+            const fallbackResponse = await fetch('https://api.ipify.org?format=json');
+            const ipData = await fallbackResponse.json();
+            console.log('Fallback IP detected:', ipData.ip);
+            
+            // Use a basic geolocation service
+            const geoResponse = await fetch(`https://ipwhois.app/json/${ipData.ip}`);
+            const geoData = await geoResponse.json();
+            locationData = { country_code: geoData.country_code };
+            console.log('Fallback location data:', locationData);
+          } catch (fallbackError) {
+            console.log('All location services failed:', fallbackError);
+          }
         }
+        
+        if (locationData?.country_code) {
+          setUserCountry(locationData.country_code);
+          console.log('Final detected country:', locationData.country_code);
+          
+          // Set pricing based on detected location (IP-based only)
+          if (locationData.country_code === 'IN') {
+            console.log('Setting Indian pricing...');
+            setPricingData({
+              region: 'IN',
+              currency: 'INR',
+              currencySymbol: '₹',
+              monthlyPrice: 199,
+              creditPacks: [
+                { credits: 50, price: 99, productId: 'pdt_indian_50_credits' },
+                { credits: 100, price: 189, productId: 'pdt_indian_100_credits' },
+                { credits: 200, price: 349, productId: 'pdt_indian_200_credits' },
+                { credits: 500, price: 799, productId: 'pdt_indian_500_credits' }
+              ],
+              subscriptionProductId: 'pdt_indian_monthly_subscription'
+            });
+          } else {
+            console.log('Setting international pricing...');
+            // Keep default USD pricing for non-Indian users
+          }
+        } else {
+          console.log('No valid country code detected, using default USD pricing');
+        }
+        
       } catch (error) {
-        console.log('Location detection failed, using default USD pricing:', error);
-        // Keep default USD pricing
+        console.log('Location detection completely failed, using default USD pricing:', error);
+        // Keep default USD pricing on any error
       } finally {
         setIsLoading(false);
       }
@@ -68,42 +101,9 @@ export const useLocationPricing = () => {
     detectLocation();
   }, []);
 
-  const switchToPricing = (region: 'IN' | 'global') => {
-    if (region === 'IN') {
-      setPricingData({
-        region: 'IN',
-        currency: 'INR',
-        currencySymbol: '₹',
-        monthlyPrice: 199,
-        creditPacks: [
-          { credits: 50, price: 99, productId: 'pdt_indian_50_credits' },
-          { credits: 100, price: 189, productId: 'pdt_indian_100_credits' },
-          { credits: 200, price: 349, productId: 'pdt_indian_200_credits' },
-          { credits: 500, price: 799, productId: 'pdt_indian_500_credits' }
-        ],
-        subscriptionProductId: 'pdt_indian_monthly_subscription'
-      });
-    } else {
-      setPricingData({
-        region: 'global',
-        currency: 'USD',
-        currencySymbol: '$',
-        monthlyPrice: 4.99,
-        creditPacks: [
-          { credits: 50, price: 2.49, productId: 'pdt_global_50_credits' },
-          { credits: 100, price: 4.49, productId: 'pdt_global_100_credits' },
-          { credits: 200, price: 7.99, productId: 'pdt_global_200_credits' },
-          { credits: 500, price: 17.99, productId: 'pdt_global_500_credits' }
-        ],
-        subscriptionProductId: 'pdt_global_monthly_subscription'
-      });
-    }
-  };
-
   return {
     pricingData,
     isLoading,
-    userCountry,
-    switchToPricing
+    userCountry
   };
 };
