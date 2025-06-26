@@ -1,4 +1,3 @@
-
 import { SignUpButton } from '@clerk/clerk-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,19 +5,16 @@ import { Badge } from '@/components/ui/badge';
 import { Check, Globe, Loader2 } from 'lucide-react';
 import { useLocationPricing } from '@/hooks/useLocationPricing';
 import { usePaymentProducts } from '@/hooks/usePaymentProducts';
-
 const planGradientBg = {
   free: "bg-black border border-blue-400/30",
   subscription: "bg-gradient-to-br from-[#2563eb] via-[#3893ec] to-[#1872ba] dark:from-[#274299] dark:via-[#3177c7] dark:to-[#1b466c]",
   pack: "bg-black border border-indigo-400/30"
 };
-
 const planTextColor = {
   free: "text-blue-100",
   subscription: "text-cyan-100",
   pack: "text-indigo-100"
 };
-
 const PricingSection = () => {
   const {
     pricingData,
@@ -30,37 +26,25 @@ const PricingSection = () => {
     creditPackProducts,
     isLoading: isProductsLoading
   } = usePaymentProducts();
-
-  return (
-    <section className="py-16 sm:py-24 px-4 bg-black">
+  return <section className="py-16 sm:py-24 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-5xl font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-4 font-inter">
-            Flexible Pricing for All Users
-          </h2>
+          <h2 className="text-3xl sm:text-5xl font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-4 font-inter">Pricing Plans</h2>
           <p className="text-lg text-blue-100 font-inter font-light mb-6">
             Pay only for what you use. Get started with free monthly credits, and upgrade anytime.
           </p>
           
           {/* Location Detection Display */}
-          {!isPricingLoading && (
-            <div className="flex items-center gap-2 text-sm text-blue-200 mb-8 justify-center">
+          {!isPricingLoading && <div className="flex items-center gap-2 text-sm text-blue-200 mb-8 justify-center">
               <Globe className="w-4 h-4" />
               <span>
                 Pricing for: 
-                {pricingData.region === 'IN' ? (
-                  <span className="ml-1 font-semibold text-blue-100">🇮🇳 India ({pricingData.currency})</span>
-                ) : (
-                  <span className="ml-1 font-semibold text-blue-100">🌍 International ({pricingData.currency})</span>
-                )}
+                {pricingData.region === 'IN' ? <span className="ml-1 font-semibold text-blue-100">🇮🇳 India ({pricingData.currency})</span> : <span className="ml-1 font-semibold text-blue-100">🌍 International ({pricingData.currency})</span>}
               </span>
-              {userCountry && (
-                <span className="text-xs text-blue-300">
+              {userCountry && <span className="text-xs text-blue-300">
                   (Detected: {userCountry})
-                </span>
-              )}
-            </div>
-          )}
+                </span>}
+            </div>}
         </div>
 
         <div className="grid gap-6 lg:gap-8 grid-cols-1 lg:grid-cols-3 items-stretch max-w-6xl mx-auto">
@@ -110,17 +94,13 @@ const PricingSection = () => {
             <CardHeader className="text-center pb-4 pt-8 px-4">
               <CardTitle className={`text-xl font-bold mb-2 ${planTextColor.subscription} font-inter`}>Monthly Subscription</CardTitle>
               <div className="text-3xl font-extrabold text-cyan-100 mb-1">
-                {subscriptionProducts[0] ? (
-                  <>
+                {subscriptionProducts[0] ? <>
                     {pricingData.currencySymbol}{subscriptionProducts[0].price_amount}
                     <span className="text-base font-bold align-super">/month</span>
-                  </>
-                ) : (
-                  <>
+                  </> : <>
                     {pricingData.currencySymbol}{pricingData.monthlyPrice}
                     <span className="text-base font-bold align-super">/month</span>
-                  </>
-                )}
+                  </>}
               </div>
               <div className="text-sm font-semibold text-cyan-200">
                 {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits/month` : '300 credits/month'}
@@ -154,14 +134,10 @@ const PricingSection = () => {
               <div className="mt-auto">
                 <SignUpButton mode="modal">
                   <Button className="w-full py-2.5 bg-white hover:bg-yellow-100 text-black font-inter text-sm rounded-xl shadow border-0 font-bold transition-colors duration-200" disabled={isPricingLoading || isProductsLoading}>
-                    {isPricingLoading || isProductsLoading ? (
-                      <>
+                    {isPricingLoading || isProductsLoading ? <>
                         <Loader2 className="w-4 h-4 animate-spin mr-2" />
                         Loading...
-                      </>
-                    ) : (
-                      'Subscribe Now'
-                    )}
+                      </> : 'Subscribe Now'}
                   </Button>
                 </SignUpButton>
               </div>
@@ -180,9 +156,7 @@ const PricingSection = () => {
             <CardContent className="grow flex flex-col px-4 pb-4">
               <div className="flex flex-col gap-2 my-3 flex-grow">
                 {/* Show database products if available, otherwise show static fallback */}
-                {creditPackProducts.length > 0 ? (
-                  creditPackProducts.map((pack) => (
-                    <div key={pack.product_id} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
+                {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
                       <span className="text-indigo-100 font-medium text-sm">{pack.credits_amount} credits</span>
                       <div className="flex items-center gap-2">
                         <span className="text-indigo-50 font-bold text-sm">{pricingData.currencySymbol}{pack.price_amount}</span>
@@ -192,12 +166,9 @@ const PricingSection = () => {
                           </Button>
                         </SignUpButton>
                       </div>
-                    </div>
-                  ))
-                ) : (
-                  // Only show fallback if no database products and not loading
-                  !isProductsLoading && pricingData.creditPacks.map((pack) => (
-                    <div key={pack.credits} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
+                    </div>) :
+              // Only show fallback if no database products and not loading
+              !isProductsLoading && pricingData.creditPacks.map(pack => <div key={pack.credits} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
                       <span className="text-indigo-100 font-medium text-sm">{pack.credits} credits</span>
                       <div className="flex items-center gap-2">
                         <span className="text-indigo-50 font-bold text-sm">{pricingData.currencySymbol}{pack.price}</span>
@@ -207,17 +178,13 @@ const PricingSection = () => {
                           </Button>
                         </SignUpButton>
                       </div>
-                    </div>
-                  ))
-                )}
+                    </div>)}
                 
                 {/* Loading state */}
-                {isProductsLoading && (
-                  <div className="flex items-center justify-center py-4">
+                {isProductsLoading && <div className="flex items-center justify-center py-4">
                     <Loader2 className="w-4 h-4 animate-spin text-indigo-300" />
                     <span className="ml-2 text-indigo-200 text-xs">Loading credit packs...</span>
-                  </div>
-                )}
+                  </div>}
               </div>
               
               {/* Features list */}
@@ -239,8 +206,6 @@ const PricingSection = () => {
           </Card>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default PricingSection;
