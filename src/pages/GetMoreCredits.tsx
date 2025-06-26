@@ -14,7 +14,6 @@ import { useLocationPricing } from '@/hooks/useLocationPricing';
 import { usePaymentProducts } from '@/hooks/usePaymentProducts';
 import { useCheckoutSession } from '@/hooks/useCheckoutSession';
 import { toast } from 'sonner';
-
 const planGradientBg = {
   free: "bg-black border border-blue-400/30",
   subscription: "bg-gradient-to-br from-[#2563eb] via-[#3893ec] to-[#1872ba] dark:from-[#274299] dark:via-[#3177c7] dark:to-[#1b466c]",
@@ -25,23 +24,40 @@ const planTextColor = {
   subscription: "text-cyan-100",
   pack: "text-indigo-100"
 };
-
 export default function GetMoreCredits() {
-  const { user, isLoaded } = useUser();
+  const {
+    user,
+    isLoaded
+  } = useUser();
   const navigate = useNavigate();
-  const { data: credits, isLoading, error } = useUserCredits();
-  const { userProfile } = useUserProfile();
-  const { pricingData, isLoading: isPricingLoading, userCountry } = useLocationPricing();
-  const { subscriptionProducts, creditPackProducts, isLoading: isProductsLoading } = usePaymentProducts();
-  const { createCheckoutSession, isLoading: isCheckoutLoading } = useCheckoutSession();
-
+  const {
+    data: credits,
+    isLoading,
+    error
+  } = useUserCredits();
+  const {
+    userProfile
+  } = useUserProfile();
+  const {
+    pricingData,
+    isLoading: isPricingLoading,
+    userCountry
+  } = useLocationPricing();
+  const {
+    subscriptionProducts,
+    creditPackProducts,
+    isLoading: isProductsLoading
+  } = usePaymentProducts();
+  const {
+    createCheckoutSession,
+    isLoading: isCheckoutLoading
+  } = useCheckoutSession();
   const handleSubscribeClick = async () => {
     const subscriptionProduct = subscriptionProducts[0];
     if (!subscriptionProduct) {
       toast.error('Subscription product not available');
       return;
     }
-
     const session = await createCheckoutSession(subscriptionProduct.product_id);
     if (session?.url) {
       window.open(session.url, '_blank');
@@ -49,7 +65,6 @@ export default function GetMoreCredits() {
       toast.error('Failed to create checkout session');
     }
   };
-
   const handleCreditPackClick = async (productId: string) => {
     const session = await createCheckoutSession(productId);
     if (session?.url) {
@@ -58,13 +73,11 @@ export default function GetMoreCredits() {
       toast.error('Failed to create checkout session');
     }
   };
-
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
-
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-gradient-to-br from-pastel-mint via-pastel-lavender to-pastel-peach flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading...</div>
@@ -73,7 +86,6 @@ export default function GetMoreCredits() {
 
   // Static credit balance calculation
   const currentBalance = credits ? Number(credits.current_balance) : 0;
-  
   return <Layout>
       <div className="w-full flex flex-col pb-5 sm:pb-8">
         <div className="text-center mb-5 sm:mb-12 px-2 sm:px-4">
@@ -97,24 +109,16 @@ export default function GetMoreCredits() {
           </div>
           
           {/* Location Detection Display */}
-          {!isPricingLoading && (
-            <div className="flex items-center gap-2 text-sm text-blue-200 mb-4 justify-center">
+          {!isPricingLoading && <div className="flex items-center gap-2 text-sm text-blue-200 mb-4 justify-center">
               <Globe className="w-4 h-4" />
               <span>
                 Pricing for: 
-                {pricingData.region === 'IN' ? (
-                  <span className="ml-1 font-semibold text-blue-100">🇮🇳 India ({pricingData.currency})</span>
-                ) : (
-                  <span className="ml-1 font-semibold text-blue-100">🌍 International ({pricingData.currency})</span>
-                )}
+                {pricingData.region === 'IN' ? <span className="ml-1 font-semibold text-blue-100">🇮🇳 India ({pricingData.currency})</span> : <span className="ml-1 font-semibold text-blue-100">🌍 International ({pricingData.currency})</span>}
               </span>
-              {userCountry && (
-                <span className="text-xs text-blue-300">
+              {userCountry && <span className="text-xs text-blue-300">
                   (Detected: {userCountry})
-                </span>
-              )}
-            </div>
-          )}
+                </span>}
+            </div>}
         </div>
         
         {/* Responsive grid area with tight spacing for mobile; px for interior gap only */}
@@ -171,17 +175,13 @@ export default function GetMoreCredits() {
               <CardHeader className="text-center pb-3 pt-5 sm:pb-4 sm:pt-8 px-2 sm:px-4">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 sm:mb-2 ${planTextColor.subscription}`}>Monthly Subscription</CardTitle>
                 <div className="text-2xl sm:text-3xl font-extrabold text-cyan-100 mb-0.5 sm:mb-1 mt-0.5">
-                  {subscriptionProducts[0] ? (
-                    <>
+                  {subscriptionProducts[0] ? <>
                       {pricingData.currencySymbol}{subscriptionProducts[0].price_amount}
                       <span className="text-xs sm:text-base font-bold align-super">/month</span>
-                    </>
-                  ) : (
-                    <>
+                    </> : <>
                       {pricingData.currencySymbol}{pricingData.monthlyPrice}
                       <span className="text-xs sm:text-base font-bold align-super">/month</span>
-                    </>
-                  )}
+                    </>}
                 </div>
                 <div className="mt-0 text-xs sm:text-sm font-semibold text-cyan-200">
                   {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits/month` : '200 credits/month'}
@@ -213,19 +213,11 @@ export default function GetMoreCredits() {
                   </li>
                 </ul>
                 <div className="mt-auto">
-                  <Button 
-                    onClick={handleSubscribeClick}
-                    className="w-full py-2 sm:py-2.5 bg-white hover:bg-yellow-100 text-black font-orbitron text-xs rounded-xl shadow border-0 font-bold transition-colors duration-200"
-                    disabled={isPricingLoading || isProductsLoading || isCheckoutLoading}
-                  >
-                    {isCheckoutLoading ? (
-                      <>
+                  <Button onClick={handleSubscribeClick} className="w-full py-2 sm:py-2.5 bg-white hover:bg-yellow-100 text-black font-orbitron text-xs rounded-xl shadow border-0 font-bold transition-colors duration-200" disabled={isPricingLoading || isProductsLoading || isCheckoutLoading}>
+                    {isCheckoutLoading ? <>
                         <Loader2 className="w-4 h-4 animate-spin mr-2" />
                         Processing...
-                      </>
-                    ) : (
-                      'Subscribe Now'
-                    )}
+                      </> : 'Subscribe Now'}
                   </Button>
                 </div>
               </CardContent>
@@ -236,60 +228,38 @@ export default function GetMoreCredits() {
               <CardHeader className="text-center pb-3 pt-4 sm:pb-4 sm:pt-6 px-2 sm:px-4">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 sm:mb-2 ${planTextColor.pack}`}>Credit Packs</CardTitle>
                 <div className="text-2xl sm:text-3xl font-extrabold text-[#badbff] mb-0.5 sm:mb-1">
-                  Starting {pricingData.currencySymbol}{creditPackProducts.length > 0 
-                    ? Math.min(...creditPackProducts.map(p => p.price_amount))
-                    : pricingData.creditPacks[0]?.price
-                  }
+                  Starting {pricingData.currencySymbol}{creditPackProducts.length > 0 ? Math.min(...creditPackProducts.map(p => p.price_amount)) : pricingData.creditPacks[0]?.price}
                 </div>
                 <div className="mt-0 text-xs sm:text-sm font-semibold text-indigo-200">Select your desired amount:</div>
               </CardHeader>
               <CardContent className="grow flex flex-col px-2 sm:px-4 pb-3">
                 <div className="flex flex-col gap-1.5 sm:gap-2 my-2 sm:my-3 flex-grow">
                   {/* Show database products if available, otherwise show static fallback */}
-                  {creditPackProducts.length > 0 ? (
-                    creditPackProducts.map((pack) => (
-                      <div key={pack.product_id} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
+                  {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300 bg-blue-400">
                         <span className="text-indigo-100 font-medium text-xs sm:text-sm">{pack.credits_amount} credits</span>
                         <div className="flex items-center gap-2">
                           <span className="text-indigo-50 font-bold text-xs sm:text-sm">{pricingData.currencySymbol}{pack.price_amount}</span>
-                          <Button
-                            size="sm"
-                            onClick={() => handleCreditPackClick(pack.product_id)}
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2 py-1 h-auto"
-                            disabled={isCheckoutLoading}
-                          >
+                          <Button size="sm" onClick={() => handleCreditPackClick(pack.product_id)} className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2 py-1 h-auto" disabled={isCheckoutLoading}>
                             {isCheckoutLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
                           </Button>
                         </div>
-                      </div>
-                    ))
-                  ) : (
-                    // Only show fallback if no database products and not loading
-                    !isProductsLoading && pricingData.creditPacks.map((pack) => (
-                      <div key={pack.credits} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
+                      </div>) :
+                // Only show fallback if no database products and not loading
+                !isProductsLoading && pricingData.creditPacks.map(pack => <div key={pack.credits} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
                         <span className="text-indigo-100 font-medium text-xs sm:text-sm">{pack.credits} credits</span>
                         <div className="flex items-center gap-2">
                           <span className="text-indigo-50 font-bold text-xs sm:text-sm">{pricingData.currencySymbol}{pack.price}</span>
-                          <Button
-                            size="sm"
-                            onClick={() => handleCreditPackClick(pack.productId)}
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2 py-1 h-auto"
-                            disabled={isCheckoutLoading}
-                          >
+                          <Button size="sm" onClick={() => handleCreditPackClick(pack.productId)} className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2 py-1 h-auto" disabled={isCheckoutLoading}>
                             {isCheckoutLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
                           </Button>
                         </div>
-                      </div>
-                    ))
-                  )}
+                      </div>)}
                   
                   {/* Loading state */}
-                  {isProductsLoading && (
-                    <div className="flex items-center justify-center py-4">
+                  {isProductsLoading && <div className="flex items-center justify-center py-4">
                       <Loader2 className="w-4 h-4 animate-spin text-indigo-300" />
                       <span className="ml-2 text-indigo-200 text-xs">Loading credit packs...</span>
-                    </div>
-                  )}
+                    </div>}
                 </div>
                 
                 {/* Features list */}
