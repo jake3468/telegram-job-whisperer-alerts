@@ -1,18 +1,33 @@
 
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 
 const HeroSection = () => {
   const navigate = useNavigate();
   const { user, isLoaded } = useUser();
+  const [displayedText, setDisplayedText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const fullText = 'AI does the boring stuff.\nYou get the Job.';
 
   useEffect(() => {
     if (isLoaded && user) {
       navigate('/dashboard');
     }
   }, [user, isLoaded, navigate]);
+
+  // Typing animation effect
+  useEffect(() => {
+    if (currentIndex < fullText.length) {
+      const timeout = setTimeout(() => {
+        setDisplayedText(prev => prev + fullText[currentIndex]);
+        setCurrentIndex(prev => prev + 1);
+      }, 80); // Adjust speed here (lower = faster)
+
+      return () => clearTimeout(timeout);
+    }
+  }, [currentIndex, fullText]);
 
   const goToDashboard = () => {
     navigate('/dashboard');
@@ -32,17 +47,36 @@ const HeroSection = () => {
       />
       <div className="absolute inset-0 z-10 bg-black/60" aria-hidden="true" />
       <div className="text-center max-w-4xl mx-auto z-20 mt-10 sm:mt-0 relative">
-        <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-8 leading-tight font-inter drop-shadow-xl">
-          <span className="italic font-extrabold bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent">
-            AI
-          </span>{" "}
-          does the <span className="bg-gradient-to-r from-pink-400 to-yellow-300 bg-clip-text text-transparent">boring</span> stuff.
-          <br className="hidden sm:block" />
-          You get the{" "}
-          <span className="italic font-extrabold bg-gradient-to-r from-blue-400 to-sky-500 bg-clip-text text-transparent">
-            Job
-          </span>
-          .
+        <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-8 leading-tight font-inter drop-shadow-xl min-h-[200px] sm:min-h-[240px]">
+          {displayedText.split('\n').map((line, index) => (
+            <span key={index}>
+              {line.split(' ').map((word, wordIndex) => {
+                if (word === 'AI') {
+                  return (
+                    <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent">
+                      AI
+                    </span>
+                  );
+                } else if (word === 'boring') {
+                  return (
+                    <span key={wordIndex} className="bg-gradient-to-r from-pink-400 to-yellow-300 bg-clip-text text-transparent">
+                      {' boring'}
+                    </span>
+                  );
+                } else if (word === 'Job') {
+                  return (
+                    <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-blue-400 to-sky-500 bg-clip-text text-transparent">
+                      {' Job'}
+                    </span>
+                  );
+                } else {
+                  return <span key={wordIndex}>{wordIndex === 0 ? word : ` ${word}`}</span>;
+                }
+              })}
+              {index === 0 && <br className="hidden sm:block" />}
+            </span>
+          ))}
+          <span className="animate-pulse">|</span>
         </h1>
         <p className="text-lg md:text-xl text-gray-200 mb-12 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black">
           Job hunting toolkit that writes your cover letter, preps you for interviews, and even pings you new jobs — all powered by{" "}
@@ -73,4 +107,5 @@ const HeroSection = () => {
     </section>
   );
 };
+
 export default HeroSection;
