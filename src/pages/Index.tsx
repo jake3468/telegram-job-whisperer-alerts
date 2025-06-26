@@ -1,6 +1,7 @@
 
 import AuthHeader from "@/components/AuthHeader";
 import HeroSection from "@/components/HeroSection";
+import AboutUsSection from "@/components/AboutUsSection";
 import ToolsSection from "@/components/ToolsSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import PricingSection from "@/components/PricingSection";
@@ -12,6 +13,7 @@ const Index = () => {
     <div className="min-h-screen bg-black font-inter text-slate-50">
       <AuthHeader />
       <HeroSection />
+      <AboutUsSection />
       <ToolsSection />
       <HowItWorksSection />
       <div id="pricing">
