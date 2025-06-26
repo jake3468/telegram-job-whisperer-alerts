@@ -1,4 +1,3 @@
-
 import { useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -232,18 +231,21 @@ export default function GetMoreCredits() {
               </CardContent>
             </Card>
 
-            {/* Credit Packs - Only show database products OR fallback, not both */}
+            {/* Credit Packs - Region-specific products only */}
             <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-indigo-400/30 min-h-[340px] sm:min-h-[420px]`}>
               <CardHeader className="text-center pb-3 pt-4 sm:pb-4 sm:pt-6 px-2 sm:px-4">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 sm:mb-2 ${planTextColor.pack}`}>Credit Packs</CardTitle>
                 <div className="text-2xl sm:text-3xl font-extrabold text-[#badbff] mb-0.5 sm:mb-1">
-                  Starting {pricingData.currencySymbol}{creditPackProducts[0]?.price_amount || pricingData.creditPacks[0]?.price}
+                  Starting {pricingData.currencySymbol}{creditPackProducts.length > 0 
+                    ? Math.min(...creditPackProducts.map(p => p.price_amount))
+                    : pricingData.creditPacks[0]?.price
+                  }
                 </div>
                 <div className="mt-0 text-xs sm:text-sm font-semibold text-indigo-200">Select your desired amount:</div>
               </CardHeader>
               <CardContent className="grow flex flex-col px-2 sm:px-4 pb-3">
                 <div className="flex flex-col gap-1.5 sm:gap-2 my-2 sm:my-3 flex-grow">
-                  {/* Show either database products OR fallback, not both */}
+                  {/* Show database products if available, otherwise show static fallback */}
                   {creditPackProducts.length > 0 ? (
                     creditPackProducts.map((pack) => (
                       <div key={pack.product_id} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
@@ -262,8 +264,8 @@ export default function GetMoreCredits() {
                       </div>
                     ))
                   ) : (
-                    // Fallback to static pricing data only if no database products found
-                    pricingData.creditPacks.map((pack) => (
+                    // Only show fallback if no database products and not loading
+                    !isProductsLoading && pricingData.creditPacks.map((pack) => (
                       <div key={pack.credits} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
                         <span className="text-indigo-100 font-medium text-xs sm:text-sm">{pack.credits} credits</span>
                         <div className="flex items-center gap-2">
@@ -280,7 +282,17 @@ export default function GetMoreCredits() {
                       </div>
                     ))
                   )}
+                  
+                  {/* Loading state */}
+                  {isProductsLoading && (
+                    <div className="flex items-center justify-center py-4">
+                      <Loader2 className="w-4 h-4 animate-spin text-indigo-300" />
+                      <span className="ml-2 text-indigo-200 text-xs">Loading credit packs...</span>
+                    </div>
+                  )}
                 </div>
+                
+                {/* Features list */}
                 <ul className="space-y-1 mb-3">
                   <li className="flex items-center gap-1 sm:gap-2">
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />

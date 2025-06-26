@@ -28,11 +28,14 @@ export const usePaymentProducts = () => {
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
+        console.log('Fetching products for region:', pricingData.region);
+        
+        // Query products for the specific region only
         const { data, error } = await supabase
           .from('payment_products')
           .select('*')
           .eq('is_active', true)
-          .or(`region.eq.${pricingData.region},region.eq.global`)
+          .eq('region', pricingData.region)
           .order('price_amount', { ascending: true });
 
         if (error) {
@@ -40,6 +43,8 @@ export const usePaymentProducts = () => {
           setError(error.message);
           return;
         }
+
+        console.log('Raw payment products data:', data);
 
         // Filter and type-cast the products to ensure they match our interface
         const validProducts = (data || [])
@@ -62,6 +67,7 @@ export const usePaymentProducts = () => {
             is_active: product.is_active
           }));
 
+        console.log('Processed payment products:', validProducts);
         setProducts(validProducts);
       } catch (err) {
         console.error('Exception fetching payment products:', err);
@@ -71,7 +77,10 @@ export const usePaymentProducts = () => {
       }
     };
 
-    fetchProducts();
+    // Only fetch when we have a region
+    if (pricingData.region) {
+      fetchProducts();
+    }
   }, [pricingData.region]);
 
   const getSubscriptionProducts = () => products.filter(p => p.product_type === 'subscription');
