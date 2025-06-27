@@ -1,5 +1,5 @@
 
-import { LinkedInPosts } from "./LinkedInPosts";
+import LinkedInPosts from "./LinkedInPosts";
 
 const LinkedInPost = () => {
   return <LinkedInPosts />;

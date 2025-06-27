@@ -1,5 +1,5 @@
 
-import { Upgrade } from "./Upgrade";
+import Upgrade from "./Upgrade";
 
 const PricingPage = () => {
   return <Upgrade />;

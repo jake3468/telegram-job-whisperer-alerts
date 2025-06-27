@@ -1,5 +1,5 @@
 
-import { CompanyRoleAnalysis } from "./CompanyRoleAnalysis";
+import CompanyRoleAnalysis from "./CompanyRoleAnalysis";
 
 const CompanyAnalysis = () => {
   return <CompanyRoleAnalysis />;
