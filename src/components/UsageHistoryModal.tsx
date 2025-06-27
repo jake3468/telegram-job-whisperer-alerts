@@ -88,7 +88,7 @@ const UsageHistoryModal = () => {
           Usage History
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-5xl max-h-[80vh] bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 border-blue-400/30">
+      <DialogContent className="max-w-[95vw] sm:max-w-5xl max-h-[90vh] bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 border-blue-400/30">
         <DialogHeader>
           <DialogTitle className="text-xl font-orbitron font-bold text-blue-100">
             Transaction History
@@ -124,37 +124,37 @@ const UsageHistoryModal = () => {
                 </div>
               ) : (
                 <ScrollArea className="h-[50vh] w-full">
-                  <div className="min-w-full overflow-x-auto">
-                    <Table className="min-w-[600px]">
+                  <div className="w-full overflow-x-auto">
+                    <Table className="w-full min-w-[800px]">
                       <TableHeader>
                         <TableRow className="border-blue-400/30 hover:bg-white/5">
-                          <TableHead className="text-blue-200 font-orbitron min-w-[120px]">Date</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron min-w-[140px]">Type</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron min-w-[200px]">Description</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron text-right min-w-[100px]">Amount</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron text-right min-w-[120px]">Balance After</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron w-[120px] min-w-[120px]">Date</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron w-[140px] min-w-[140px]">Type</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron w-[250px] min-w-[200px]">Description</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron text-right w-[100px] min-w-[100px]">Amount</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron text-right w-[120px] min-w-[120px]">Balance After</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {creditTransactions.map((transaction) => (
                           <TableRow key={transaction.id} className="border-blue-400/20 hover:bg-white/5">
-                            <TableCell className="text-blue-100 text-sm">
+                            <TableCell className="text-blue-100 text-sm w-[120px]">
                               {formatDate(transaction.date)}
                             </TableCell>
-                            <TableCell className="text-blue-100 text-sm font-medium">
+                            <TableCell className="text-blue-100 text-sm font-medium w-[140px]">
                               {getTransactionTypeDisplay(transaction.type, transaction.description)}
                             </TableCell>
-                            <TableCell className="text-blue-100 text-xs max-w-xs">
-                              <div className="truncate" title={transaction.description || (transaction.featureUsed ? `Used for ${transaction.featureUsed}` : '-')}>
+                            <TableCell className="text-blue-100 text-xs w-[250px]">
+                              <div className="break-words" title={transaction.description || (transaction.featureUsed ? `Used for ${transaction.featureUsed}` : '-')}>
                                 {transaction.description || (transaction.featureUsed ? `Used for ${transaction.featureUsed}` : '-')}
                               </div>
                             </TableCell>
-                            <TableCell className={`text-right font-mono text-sm font-bold ${
+                            <TableCell className={`text-right font-mono text-sm font-bold w-[100px] ${
                               transaction.amount > 0 ? 'text-green-400' : 'text-red-400'
                             }`}>
                               {formatAmount(transaction.amount)}
                             </TableCell>
-                            <TableCell className="text-blue-100 text-right font-mono text-sm">
+                            <TableCell className="text-blue-100 text-right font-mono text-sm w-[120px]">
                               {transaction.balanceAfter?.toFixed(1) || '-'}
                             </TableCell>
                           </TableRow>
@@ -173,27 +173,27 @@ const UsageHistoryModal = () => {
                 </div>
               ) : (
                 <ScrollArea className="h-[50vh] w-full">
-                  <div className="min-w-full overflow-x-auto">
-                    <Table className="min-w-[600px]">
+                  <div className="w-full overflow-x-auto">
+                    <Table className="w-full min-w-[700px]">
                       <TableHeader>
                         <TableRow className="border-blue-400/30 hover:bg-white/5">
-                          <TableHead className="text-blue-200 font-orbitron min-w-[120px]">Date</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron min-w-[140px]">Event</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron min-w-[100px]">Status</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron text-right min-w-[100px]">Amount</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron text-right min-w-[100px]">Credits</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron w-[120px] min-w-[120px]">Date</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron w-[140px] min-w-[140px]">Event</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron w-[100px] min-w-[100px]">Status</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron text-right w-[100px] min-w-[100px]">Amount</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron text-right w-[100px] min-w-[100px]">Credits</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {paymentRecords.map((record) => (
                           <TableRow key={record.id} className="border-blue-400/20 hover:bg-white/5">
-                            <TableCell className="text-blue-100 text-sm">
+                            <TableCell className="text-blue-100 text-sm w-[120px]">
                               {formatDate(record.date)}
                             </TableCell>
-                            <TableCell className="text-blue-100 text-sm font-medium">
+                            <TableCell className="text-blue-100 text-sm font-medium w-[140px]">
                               {getPaymentEventDisplay(record.type)}
                             </TableCell>
-                            <TableCell className="text-blue-100 text-xs">
+                            <TableCell className="text-blue-100 text-xs w-[100px]">
                               <span className={`px-2 py-1 rounded text-xs font-medium ${
                                 record.status === 'active' || record.status === 'completed'
                                   ? 'bg-green-500/20 text-green-300' 
@@ -202,12 +202,12 @@ const UsageHistoryModal = () => {
                                 {record.status}
                               </span>
                             </TableCell>
-                            <TableCell className="text-blue-100 text-right font-mono text-sm">
+                            <TableCell className="text-blue-100 text-right font-mono text-sm w-[100px]">
                               {record.paymentDetails?.price_amount && record.currency 
                                 ? `${record.currency === 'INR' ? '₹' : '$'}${record.paymentDetails.price_amount}` 
                                 : '-'}
                             </TableCell>
-                            <TableCell className="text-green-400 text-right font-mono text-sm font-bold">
+                            <TableCell className="text-green-400 text-right font-mono text-sm font-bold w-[100px]">
                               {record.amount > 0 ? `+${record.amount}` : '-'}
                             </TableCell>
                           </TableRow>
