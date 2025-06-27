@@ -45,6 +45,10 @@ class ContentSecurityPolicyManager {
         'https://js.stripe.com',
         'https://hooks.stripe.com'
       ],
+      'worker-src': [
+        "'self'",
+        'blob:' // Allow blob workers for Clerk
+      ],
       'object-src': ["'none'"],
       'base-uri': ["'self'"],
       'form-action': ["'self'"],
