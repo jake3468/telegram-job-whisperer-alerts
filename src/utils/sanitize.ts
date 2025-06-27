@@ -15,8 +15,8 @@ export const sanitizeHTML = (dirty: string): string => {
     ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
     ALLOWED_ATTR: [],
     KEEP_CONTENT: false,
-    REMOVE_TAGS: ['script', 'object', 'embed', 'link', 'style', 'img', 'video', 'audio'],
-    REMOVE_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover']
+    FORBID_TAGS: ['script', 'object', 'embed', 'link', 'style', 'img', 'video', 'audio'],
+    FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover']
   });
 };
 
