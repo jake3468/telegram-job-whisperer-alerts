@@ -7,7 +7,6 @@ import { Layout } from '@/components/Layout';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
-
 const JobAlerts = () => {
   const {
     user,
@@ -62,24 +61,11 @@ const JobAlerts = () => {
   }
   return <Layout>
       <div className="text-center mb-8">
-        <h1 className="
-                text-4xl
-                font-orbitron
-                font-extrabold
-                bg-gradient-to-r
-                from-orange-400
-                via-yellow-400
-                to-pink-500
-                bg-clip-text
-                text-transparent
-                mb-2
-                drop-shadow
-                tracking-tight
-              " style={{
+        <h1 style={{
         WebkitBackgroundClip: 'text',
         backgroundClip: 'text',
         color: 'transparent'
-      }}>
+      }} className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-orange-400 via-yellow-400 to-pink-500 bg-clip-text mb-2 drop-shadow tracking-tight text-yellow-500">
           ⏰ Telegram <span className="italic">Job</span> Alerts
         </h1>
         
@@ -104,5 +90,4 @@ const JobAlerts = () => {
       </div>
     </Layout>;
 };
-
 export default JobAlerts;
