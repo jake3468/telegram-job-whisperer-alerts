@@ -243,7 +243,7 @@ const InterviewPrep = () => {
             <div className="inline-flex items-center gap-3 mb-4">
               
             </div>
-            <h1 className="text-2xl font-bold mb-4 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] bg-clip-text text-transparent sm:text-4xl">👔 Interview Prep</h1>
+            <h1 className="text-2xl font-bold mb-4 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] bg-clip-text sm:text-4xl text-red-200">👔 Interview Prep</h1>
             <p className="text-gray-300 max-w-2xl mx-auto text-sm sm:text-lg font-light px-4">
               Your Personal Interview Coach, powered by AI. Get 15 tailored questions with perfect answers, pro tips, and strategic questions to ask your interviewer.
             </p>
