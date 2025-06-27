@@ -1,3 +1,4 @@
+
 import { useUser } from '@clerk/clerk-react';
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +8,8 @@ import { Layout } from '@/components/Layout';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
+import { Badge } from '@/components/ui/badge';
+
 const JobAlerts = () => {
   const {
     user,
@@ -77,12 +80,9 @@ const JobAlerts = () => {
         </p>
 
         {/* Usage Cost Badge */}
-        <div className="flex justify-center mb-4">
-          <div className="inline-flex items-center px-4 py-2 bg-green-500 text-black text-sm font-semibold rounded-full shadow-md">
-            <span className="mr-2 text-sm">💰</span>
-            Usage Cost: Free
-          </div>
-        </div>
+        <Badge variant="outline" className="bg-orange-900/30 border-orange-600/50 text-orange-300 font-semibold">
+          Usage Fee: 1.5 credits/day/alert
+        </Badge>
       </div>
 
       {/* Profile Completion Warning */}
