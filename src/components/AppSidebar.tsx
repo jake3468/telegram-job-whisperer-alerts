@@ -1,3 +1,4 @@
+
 import { User, Bell, Target, FileText, X, Share2, CreditCard, FileUser, Building2, MessageSquare } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
@@ -92,7 +93,7 @@ export function AppSidebar() {
       )}
 
       <SidebarContent className="overflow-x-hidden w-full px-0 !pr-0">
-        {/* Profile Section - without heading */}
+        {/* Profile Section - visible on all screen sizes */}
         <SidebarGroup className="bg-gray-900/40 mx-2 mt-1 shadow-md rounded-none">
           <SidebarGroupContent>
             <SidebarMenu>
