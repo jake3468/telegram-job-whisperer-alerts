@@ -308,7 +308,7 @@ const LinkedInPosts = () => {
               <div className="container mx-auto px-2 sm:px-4 py-8 bg-transparent rounded-3xl mt-4 mb-8 max-w-6xl w-full min-w-0">
                 {/* Header Section */}
                 <div className="text-center mb-10">
-                  <h1 className="text-2xl sm:text-3xl font-orbitron bg-gradient-to-r from-teal-300 via-teal-400 to-cyan-400 bg-clip-text drop-shadow mb-4 tracking-tight font-bold lg:text-4xl text-teal-500">
+                  <h1 className="sm:text-3xl font-orbitron bg-gradient-to-r from-teal-300 via-teal-400 to-cyan-400 bg-clip-text drop-shadow mb-4 tracking-tight font-bold lg:text-4xl text-teal-500 text-4xl">
                     ✍🏻 LinkedIn <span className="italic">Posts</span>
                   </h1>
                   <p className="text-cyan-200 max-w-2xl mx-auto font-inter text-sm sm:text-base lg:text-lg font-light shadow-sm px-4">
