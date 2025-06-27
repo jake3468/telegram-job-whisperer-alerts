@@ -80,7 +80,7 @@ const JobAlerts = () => {
         backgroundClip: 'text',
         color: 'transparent'
       }}>
-          Telegram <span className="italic">Job</span> Alerts
+          ⏰ Telegram <span className="italic">Job</span> Alerts
         </h1>
         
         <p className="text-md text-orange-100 font-inter font-light mb-4">
