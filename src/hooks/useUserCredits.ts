@@ -23,10 +23,11 @@ export const useUserCredits = () => {
   const queryClient = useQueryClient();
   
   const query = useQuery({
-    queryKey: ['user_credits', userProfile?.user_id], // Make key depend on user_id for proper caching
+    queryKey: ['user_credits', userProfile?.user_id], 
     queryFn: async () => {
       // Wait for userProfile to be available before fetching
       if (!userProfile?.user_id) {
+        console.log('[useUserCredits] No user profile available, skipping fetch');
         return null;
       }
       
@@ -43,6 +44,8 @@ export const useUserCredits = () => {
         }, 'fetch user credits');
 
         if (error) {
+          console.error('[useUserCredits] Error fetching credits:', error);
+          
           // If no record found, try to initialize credits
           if (error.code === 'PGRST116') {
             try {
@@ -64,12 +67,11 @@ export const useUserCredits = () => {
                 }, 'retry fetch user credits');
                   
                 if (!retryError && retryCredits) {
-                  // Ensure current_balance is never null
-                  const safeCredits = {
+                  console.log('[useUserCredits] Successfully initialized and fetched credits:', retryCredits);
+                  return {
                     ...retryCredits,
-                    current_balance: retryCredits.current_balance ?? 0
-                  };
-                  return safeCredits as UserCreditsData;
+                    current_balance: Math.max(Number(retryCredits.current_balance) || 0, 0)
+                  } as UserCreditsData;
                 }
               }
             } catch (initError) {
@@ -77,69 +79,45 @@ export const useUserCredits = () => {
             }
           }
           
-          console.error('[useUserCredits] Error fetching credits:', error);
-          // Return a default credits object instead of throwing error
-          return {
-            id: '',
-            user_id: userProfile.user_id,
-            current_balance: 0,
-            free_credits: 0,
-            paid_credits: 0,
-            subscription_plan: 'free',
-            next_reset_date: new Date().toISOString(),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          } as UserCreditsData;
+          // Don't return a default object - let the component handle the error state
+          throw new Error(`Failed to fetch credits: ${error.message || 'Unknown error'}`);
         }
 
         if (credits) {
-          // Ensure current_balance is never null or undefined
+          console.log('[useUserCredits] Successfully fetched credits:', credits);
+          // Ensure current_balance is never null or undefined and is a valid number
           const safeCredits = {
             ...credits,
-            current_balance: credits.current_balance ?? 0
+            current_balance: Math.max(Number(credits.current_balance) || 0, 0)
           };
           return safeCredits as UserCreditsData;
         }
 
-        // Fallback default object
-        return {
-          id: '',
-          user_id: userProfile.user_id,
-          current_balance: 0,
-          free_credits: 0,
-          paid_credits: 0,
-          subscription_plan: 'free',
-          next_reset_date: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        } as UserCreditsData;
+        throw new Error('No credits data returned from query');
 
       } catch (err) {
         console.error('[useUserCredits] Exception during fetch:', err);
-        // Return default instead of throwing
-        return {
-          id: '',
-          user_id: userProfile?.user_id || '',
-          current_balance: 0,
-          free_credits: 0,
-          paid_credits: 0,
-          subscription_plan: 'free',
-          next_reset_date: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        } as UserCreditsData;
+        throw err; // Re-throw to let React Query handle the error
       }
     },
     enabled: !!userProfile?.user_id && !!user?.id, // Only enable when both are available
-    staleTime: 10000, // Consider data stale after 10 seconds for more frequent updates
+    staleTime: 30000, // Consider data stale after 30 seconds
     gcTime: 300000, // Keep data cached for 5 minutes
-    refetchOnWindowFocus: true, // Refetch when window gains focus to ensure accurate balance
+    refetchOnWindowFocus: true, // Refetch when window gains focus
     refetchOnReconnect: true, // Refetch on network reconnect
-    retry: 2, // Retry twice on failure
+    retry: (failureCount, error) => {
+      // Only retry on network errors, not on data errors
+      if (failureCount < 3 && error?.message?.includes('network')) {
+        return true;
+      }
+      return false;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
   });
 
   // Function to refresh credits data
   const refreshCredits = () => {
+    console.log('[useUserCredits] Manually refreshing credits');
     queryClient.invalidateQueries({ queryKey: ['user_credits', userProfile?.user_id] });
   };
 

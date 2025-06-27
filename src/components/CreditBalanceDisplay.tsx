@@ -1,10 +1,10 @@
 
 import { useUserCredits } from '@/hooks/useUserCredits';
 import { useSidebar } from '@/components/ui/sidebar';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertTriangle } from 'lucide-react';
 
 const CreditBalanceDisplay = () => {
-  const { data: credits, isLoading, error } = useUserCredits();
+  const { data: credits, isLoading, error, isError } = useUserCredits();
   const { state } = useSidebar();
 
   if (isLoading) {
@@ -16,19 +16,23 @@ const CreditBalanceDisplay = () => {
     );
   }
 
-  if (error || !credits) {
+  // Handle error state - show warning but don't show 0 credits
+  if (isError || !credits) {
+    console.error('[CreditBalanceDisplay] Error loading credits:', error);
     return (
-      <div className="text-fuchsia-200 text-sm font-orbitron">
-        {state === 'expanded' ? 'Credits: 0' : '0'}
+      <div className="flex items-center gap-2 text-orange-400 text-sm font-orbitron">
+        <AlertTriangle className="w-4 h-4" />
+        {state === 'expanded' ? (
+          <span>Credits unavailable</span>
+        ) : (
+          <span className="text-xs">!</span>
+        )}
       </div>
     );
   }
 
-  // Ensure we have a valid number for current_balance
-  const balance = credits.current_balance !== null && credits.current_balance !== undefined 
-    ? Number(credits.current_balance) 
-    : 0;
-  
+  // Ensure we have a valid number for current_balance - never show negative or invalid values
+  const balance = Math.max(Number(credits.current_balance) || 0, 0);
   const isLowCredits = balance < 5;
 
   return (
