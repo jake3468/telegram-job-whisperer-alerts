@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
@@ -82,7 +83,7 @@ const LinkedInPosts = () => {
         
         if (payload.new && areAllPostsReady(payload.new)) {
           console.log('All posts ready, updating UI');
-          setLinkedInPosts(payload.new);
+          setLinkedInPosts(payload.new as LinkedInPostsData);
           setIsGenerating(false);
           
           // Deduct credits only after successful result display
@@ -126,7 +127,7 @@ const LinkedInPosts = () => {
 
         if (data && areAllPostsReady(data)) {
           console.log('LinkedIn posts found via polling, updating UI');
-          setLinkedInPosts(data);
+          setLinkedInPosts(data as LinkedInPostsData);
           setIsGenerating(false);
           
           // Deduct credits only after successful result display

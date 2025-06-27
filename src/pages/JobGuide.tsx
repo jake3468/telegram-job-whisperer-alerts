@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
@@ -24,6 +25,7 @@ const JobGuide = () => {
   const { userProfile } = useUserProfile();
 
   const [jobTitle, setJobTitle] = useState('');
+  const [companyName, setCompanyName] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [jobAnalysisResult, setJobAnalysisResult] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -188,6 +190,7 @@ const JobGuide = () => {
           {
             user_id: userProfile.id,
             job_title: jobTitle.trim(),
+            company_name: companyName.trim() || 'Not specified',
             job_description: jobDescription.trim(),
           },
         ])
@@ -218,6 +221,7 @@ const JobGuide = () => {
 
   const handleReset = () => {
     setJobTitle('');
+    setCompanyName('');
     setJobDescription('');
     setJobAnalysisResult('');
     setIsGenerating(false);
@@ -263,7 +267,11 @@ const JobGuide = () => {
             <CardHeader className="pb-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <CardTitle className="text-white text-lg sm:text-xl">Job Description Analysis</CardTitle>
-                <JobAnalysisHistory />
+                <JobAnalysisHistory 
+                  type="job_analysis"
+                  gradientColors="from-purple-800 via-fuchsia-700 to-red-600"
+                  borderColors="border-purple-400/30"
+                />
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -278,6 +286,19 @@ const JobGuide = () => {
                     value={jobTitle}
                     onChange={(e) => setJobTitle(e.target.value)}
                     required
+                    className="bg-black text-white placeholder:text-gray-400 border-gray-700"
+                    disabled={isGenerating}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="companyName" className="text-white">
+                    Company Name (Optional)
+                  </Label>
+                  <Input
+                    id="companyName"
+                    placeholder="e.g., Google, Microsoft"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
                     className="bg-black text-white placeholder:text-gray-400 border-gray-700"
                     disabled={isGenerating}
                   />
