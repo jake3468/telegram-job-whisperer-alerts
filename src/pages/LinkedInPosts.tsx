@@ -1,268 +1,260 @@
-import { useState, useEffect } from 'react';
-import { useUser, useAuth } from '@clerk/clerk-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Textarea as TTextarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
-import { Share2, History, Sparkles, Menu } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useUserProfile } from '@/hooks/useUserProfile';
-import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
-import LinkedInPostsHistoryModal from '@/components/LinkedInPostsHistoryModal';
-import LinkedInPostVariation from '@/components/LinkedInPostVariation';
-import LoadingMessages from '@/components/LoadingMessages';
-import { useCreditCheck } from '@/hooks/useCreditCheck';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/AppSidebar';
 
-interface LinkedInPostData {
-  post_heading_1: string | null;
-  post_content_1: string | null;
-  post_heading_2: string | null;
-  post_content_2: string | null;
-  post_heading_3: string | null;
-  post_content_3: string | null;
-}
-interface UserData {
-  first_name: string | null;
-  last_name: string | null;
-}
+import React, { useState, useEffect } from 'react';
+import { Layout } from '@/components/Layout';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { MessageSquare, Image as ImageIcon, Upload, X, Loader2, TrendingUp, Users, Share2, Clock } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useCreditCheck } from '@/hooks/useCreditCheck';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
+import LoadingMessages from '@/components/LoadingMessages';
+import { useUser } from '@clerk/clerk-react';
+import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
+import { LinkedInPostsHistoryModal } from '@/components/LinkedInPostsHistoryModal';
+import { LinkedInPostDisplay } from '@/components/LinkedInPostDisplay';
+import { useLinkedInImageCreditCheck } from '@/hooks/useLinkedInImageCreditCheck';
+import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
 
 const LinkedInPosts = () => {
-  const {
-    user
-  } = useUser();
-  const {
-    toast
-  } = useToast();
-  const {
-    userProfile
-  } = useUserProfile();
-  const {
-    isComplete
-  } = useUserCompletionStatus();
-  const {
-    hasCredits,
-    showInsufficientCreditsPopup
-  } = useCreditCheck(1.5);
-  const [formData, setFormData] = useState({
-    topic: '',
-    opinion: '',
-    personal_story: '',
-    audience: '',
-    tone: ''
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [postsData, setPostsData] = useState<LinkedInPostData | null>(null);
-  const [userData, setUserData] = useState<UserData | null>(null);
+  // Ensure Clerk JWT is synced with Supabase
+  useClerkSupabaseSync();
+  
+  const { user } = useUser();
+  const [postContent, setPostContent] = useState('');
+  const [postType, setPostType] = useState('personal_branding');
+  const [includeHashtags, setIncludeHashtags] = useState(true);
+  const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [currentPostId, setCurrentPostId] = useState<string | null>(null);
-  const [showHistory, setShowHistory] = useState(false);
-  const toneOptions = [{
-    value: 'professional',
-    label: 'Professional & Insightful'
-  }, {
-    value: 'conversational',
-    label: 'Conversational & Friendly'
-  }, {
-    value: 'bold',
-    label: 'Bold & Opinionated'
-  }, {
-    value: 'thoughtful',
-    label: 'Thoughtful & Reflective'
-  }];
+  const [currentAnalysis, setCurrentAnalysis] = useState<any>(null);
+  const [linkedInPostData, setLinkedInPostData] = useState<any>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+  const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(1.0);
+  const { userProfile } = useUserProfile();
+  const { checkImageCredits, showImageCreditPopup } = useLinkedInImageCreditCheck();
 
-  // Fetch user data when component mounts
+  // Query for existing LinkedIn posts data
+  const { data: linkedInHistory, refetch: refetchHistory } = useQuery({
+    queryKey: ['linkedin-posts-history', userProfile?.id],
+    queryFn: async () => {
+      if (!userProfile?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('linkedin_posts')
+        .select('*')
+        .eq('user_id', userProfile.id)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!userProfile?.id
+  });
+
+  // Real-time subscription for LinkedIn post results
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (!user?.id) return;
-      try {
-        const {
-          data,
-          error
-        } = await supabase.from('users').select('first_name, last_name').eq('clerk_id', user.id).single();
-        if (error) {
-          console.error('Error fetching user data:', error);
-          return;
-        }
-        setUserData(data);
-      } catch (err) {
-        console.error('Error fetching user data:', err);
-      }
-    };
-    fetchUserData();
-  }, [user?.id]);
+    if (!currentAnalysis?.id) return;
 
-  // Check if all posts are ready (all 6 columns have non-null values)
-  const areAllPostsReady = (data: LinkedInPostData) => {
-    const allFieldsPresent = data.post_heading_1 && data.post_content_1 && data.post_heading_2 && data.post_content_2 && data.post_heading_3 && data.post_content_3;
-    console.log('Checking if all posts ready:', {
-      post_heading_1: !!data.post_heading_1,
-      post_content_1: !!data.post_content_1,
-      post_heading_2: !!data.post_heading_2,
-      post_content_2: !!data.post_content_2,
-      post_heading_3: !!data.post_heading_3,
-      post_content_3: !!data.post_content_3,
-      allReady: allFieldsPresent
-    });
-    return allFieldsPresent;
-  };
-
-  // Real-time subscription for LinkedIn post updates
-  useEffect(() => {
-    if (!currentPostId) return;
-    console.log('Setting up real-time subscription for post ID:', currentPostId);
-    const channel = supabase.channel('linkedin-post-updates').on('postgres_changes', {
-      event: 'UPDATE',
-      schema: 'public',
-      table: 'job_linkedin',
-      filter: `id=eq.${currentPostId}`
-    }, payload => {
-      console.log('LinkedIn post updated via real-time:', payload);
-      const newData = payload.new as LinkedInPostData;
-      console.log('New data received:', {
-        post_heading_1: newData.post_heading_1,
-        post_content_1: !!newData.post_content_1,
-        post_heading_2: newData.post_heading_2,
-        post_content_2: !!newData.post_content_2,
-        post_heading_3: newData.post_heading_3,
-        post_content_3: !!newData.post_content_3
-      });
-      setPostsData(newData);
-      if (areAllPostsReady(newData)) {
-        console.log('All posts are ready, stopping loading state');
-        setIsGenerating(false);
-        toast({
-          title: "LinkedIn Posts Generated!",
-          description: "Your 3 LinkedIn post variations have been created successfully."
-        });
-      } else {
-        console.log('Not all posts ready yet, continuing to wait...');
-      }
-    }).subscribe(status => {
-      console.log('Real-time subscription status:', status);
-    });
-
-    // Also check immediately for existing data
-    const checkExistingData = async () => {
-      try {
-        const {
-          data,
-          error
-        } = await supabase.from('job_linkedin').select('post_heading_1, post_content_1, post_heading_2, post_content_2, post_heading_3, post_content_3').eq('id', currentPostId).single();
-        if (error) {
-          console.error('Error checking existing data:', error);
-          return;
-        }
-        if (data) {
-          console.log('Found existing data:', data);
-          setPostsData(data);
-          if (areAllPostsReady(data)) {
-            console.log('Existing data is complete, stopping loading');
+    const channel = supabase
+      .channel('linkedin-posts-updates')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'linkedin_posts',
+        filter: `id=eq.${currentAnalysis.id}`
+      }, (payload) => {
+        console.log('LinkedIn post updated:', payload);
+        
+        if (payload.new.post_variations) {
+          try {
+            const parsedData = typeof payload.new.post_variations === 'string' 
+              ? JSON.parse(payload.new.post_variations)
+              : payload.new.post_variations;
+            
+            if (parsedData && Object.keys(parsedData).length > 0) {
+              setLinkedInPostData(parsedData);
+              setIsGenerating(false);
+              toast({
+                title: "LinkedIn Posts Ready!",
+                description: "Your personalized LinkedIn posts have been generated."
+              });
+            }
+          } catch (error) {
+            console.error('Error processing LinkedIn post variations:', error);
             setIsGenerating(false);
+            toast({
+              title: "Error Processing Results",
+              description: "There was an error processing your LinkedIn post results.",
+              variant: "destructive"
+            });
           }
         }
-      } catch (err) {
-        console.error('Error checking existing data:', err);
-      }
-    };
+      })
+      .subscribe();
 
-    // Check immediately, then every 3 seconds as fallback
-    checkExistingData();
-    const interval = setInterval(checkExistingData, 3000);
     return () => {
-      console.log('Cleaning up real-time subscription and interval');
       supabase.removeChannel(channel);
-      clearInterval(interval);
     };
-  }, [currentPostId, toast]);
+  }, [currentAnalysis?.id, toast]);
 
-  // Handle input changes
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    
+    if (imageFiles.length === 0) {
+      toast({
+        title: "Invalid File Type",
+        description: "Please upload only image files (JPG, PNG, etc.)",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Limit to 4 images maximum
+    const newImages = [...uploadedImages, ...imageFiles].slice(0, 4);
+    setUploadedImages(newImages);
+    
+    if (newImages.length > uploadedImages.length) {
+      toast({
+        title: "Images Added",
+        description: `Added ${newImages.length - uploadedImages.length} image(s). Maximum 4 images allowed.`
+      });
+    }
   };
 
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || !userProfile) {
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in to create LinkedIn posts.",
-        variant: "destructive"
-      });
-      return;
-    }
-    if (!isComplete) {
-      toast({
-        title: "Profile Incomplete",
-        description: "Please complete your profile before creating LinkedIn posts.",
-        variant: "destructive"
-      });
-      return;
-    }
+  const removeImage = (index: number) => {
+    setUploadedImages(prev => prev.filter((_, i) => i !== index));
+  };
 
-    // Check credits before proceeding
+  const handleGenerate = async () => {
+    console.log('🚀 LinkedIn Posts Generate Button Clicked');
+    
+    // Check credits for text generation
     if (!hasCredits) {
       showInsufficientCreditsPopup();
       return;
     }
-    if (!formData.topic.trim()) {
+
+    // Check image credits if images are uploaded
+    if (uploadedImages.length > 0) {
+      const hasImageCredits = await checkImageCredits(uploadedImages.length);
+      if (!hasImageCredits) {
+        showImageCreditPopup(uploadedImages.length);
+        return;
+      }
+    }
+
+    if (!postContent.trim()) {
       toast({
-        title: "Topic Required",
-        description: "Please enter a topic for your LinkedIn post.",
+        title: "Missing Information",
+        description: "Please provide the content or topic for your LinkedIn post.",
         variant: "destructive"
       });
       return;
     }
-    setIsSubmitting(true);
-    setIsGenerating(true);
-    setPostsData(null);
-    setCurrentPostId(null);
-    try {
-      console.log('Creating LinkedIn post with user_profile.id:', userProfile.id);
-      console.log('Clerk user ID:', user.id);
-      const {
-        data,
-        error
-      } = await supabase.from('job_linkedin').insert({
-        user_id: userProfile.id,
-        topic: formData.topic,
-        opinion: formData.opinion || null,
-        personal_story: formData.personal_story || null,
-        audience: formData.audience || null,
-        tone: formData.tone || null
-      }).select().single();
-      if (error) {
-        console.error('Supabase error:', error);
-        console.error('Error details:', {
-          message: error.message,
-          code: error.code,
-          details: error.details,
-          hint: error.hint
-        });
-        throw error;
-      }
-      console.log('LinkedIn post created successfully:', data);
-      setCurrentPostId(data.id);
+
+    if (!user?.id) {
       toast({
-        title: "Request Submitted!",
-        description: "Your LinkedIn posts are being generated. Please wait..."
+        title: "Authentication Error",
+        description: "Please sign in to generate LinkedIn posts.",
+        variant: "destructive"
       });
-    } catch (err: any) {
-      console.error('Error creating LinkedIn post:', err);
-      setIsGenerating(false);
-      let errorMessage = "Failed to create LinkedIn post. Please try again.";
-      if (err.message) {
-        errorMessage = `Error: ${err.message}`;
-      }
+      return;
+    }
+
+    if (!userProfile?.id) {
       toast({
-        title: "Error",
+        title: "Profile Error",
+        description: "User profile not found. Please refresh the page and try again.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (isSubmitting || isGenerating) {
+      toast({
+        title: "Please wait",
+        description: "Your LinkedIn posts are already being generated.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setLinkedInPostData(null);
+      console.log('✅ Starting LinkedIn posts submission process');
+
+      // Upload images first if any
+      let imageUrls: string[] = [];
+      if (uploadedImages.length > 0) {
+        console.log('📸 Uploading images...');
+        
+        for (const image of uploadedImages) {
+          const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}-${image.name}`;
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('linkedin-images')
+            .upload(fileName, image);
+          
+          if (uploadError) {
+            console.error('Image upload error:', uploadError);
+            throw new Error(`Failed to upload image: ${uploadError.message}`);
+          }
+          
+          const { data: { publicUrl } } = supabase.storage
+            .from('linkedin-images')
+            .getPublicUrl(fileName);
+          
+          imageUrls.push(publicUrl);
+        }
+        
+        console.log('✅ Images uploaded successfully:', imageUrls);
+      }
+
+      // Insert new LinkedIn post record
+      const insertData = {
+        user_id: userProfile.id,
+        post_content: postContent.trim(),
+        post_type: postType,
+        include_hashtags: includeHashtags,
+        image_urls: imageUrls.length > 0 ? imageUrls : null
+      };
+
+      console.log('📝 Inserting LinkedIn post data:', insertData);
+      
+      const { data: insertedData, error: insertError } = await supabase
+        .from('linkedin_posts')
+        .insert(insertData)
+        .select('id')
+        .single();
+
+      if (insertError) {
+        console.error('❌ INSERT ERROR:', insertError);
+        throw new Error(`Database insert failed: ${insertError.message}`);
+      }
+
+      if (insertedData?.id) {
+        console.log('✅ LinkedIn post record inserted:', insertedData.id);
+        setCurrentAnalysis(insertedData);
+        setIsGenerating(true);
+        refetchHistory();
+        
+        toast({
+          title: "LinkedIn Posts Started!",
+          description: "Your personalized LinkedIn posts are being generated. Please wait for the results."
+        });
+      }
+    } catch (error) {
+      console.error('❌ SUBMISSION ERROR:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to generate LinkedIn posts';
+      toast({
+        title: "Generation Failed",
         description: errorMessage,
         variant: "destructive"
       });
@@ -271,168 +263,204 @@ const LinkedInPosts = () => {
     }
   };
 
-  // Reset form
-  const resetForm = () => {
-    setFormData({
-      topic: '',
-      opinion: '',
-      personal_story: '',
-      audience: '',
-      tone: ''
-    });
-    setPostsData(null);
+  const handleReset = () => {
+    setPostContent('');
+    setPostType('personal_branding');
+    setIncludeHashtags(true);
+    setUploadedImages([]);
+    setLinkedInPostData(null);
+    setCurrentAnalysis(null);
     setIsGenerating(false);
-    setCurrentPostId(null);
   };
-  return <SidebarProvider defaultOpen={true}>
-      {/* Header for mobile */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
-        <div className="flex items-center justify-between p-3">
-          <SidebarTrigger className="h-12 w-12 bg-white/10 border-fuchsia-400/30 ring-2 ring-fuchsia-400/10 text-fuchsia-200 rounded-2xl shadow-lg hover:bg-fuchsia-700/30 transition-all flex items-center justify-center">
-            <Menu className="w-7 h-7" strokeWidth={2.4} />
-            <span className="sr-only">Toggle navigation menu</span>
-          </SidebarTrigger>
-          <div className="flex items-center gap-2">
-            <img alt="Aspirely Logo" src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" className="max-h-8 drop-shadow-2xl object-fill" />
-            <span className="font-orbitron drop-shadow bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-400 bg-clip-text text-white font-bold min-w-0 truncate text-lg">Aspirely.ai</span>
-          </div>
-        </div>
-      </header>
 
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-[#0e1122] via-[#181526] to-[#21203a]">
-        <AppSidebar />
-        
-        <div className="flex-1 flex flex-col pt-28 lg:pt-0 lg:pl-6 min-w-0 bg-zinc-950">
-          <main className="flex-1 w-full bg-transparent min-w-0">
-            <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-slate-800 pt-0 flex flex-col">
-              <div className="container mx-auto px-2 sm:px-4 py-8 bg-transparent rounded-3xl mt-4 mb-8 max-w-6xl w-full min-w-0">
-                {/* Header Section */}
-                <div className="text-center mb-10">
-                  <h1 className="sm:text-3xl font-orbitron bg-gradient-to-r from-teal-300 via-teal-400 to-cyan-400 bg-clip-text drop-shadow mb-4 tracking-tight font-bold lg:text-4xl text-teal-500 text-4xl">
-                    ✍🏻 LinkedIn <span className="italic">Posts</span>
-                  </h1>
-                  <p className="text-cyan-200 max-w-2xl mx-auto font-inter text-sm sm:text-base lg:text-lg font-light shadow-sm px-4">
-                    Create engaging LinkedIn posts that showcase your expertise and connect with your professional network
-                  </p>
+  const postTypes = [
+    { value: 'personal_branding', label: 'Personal Branding' },
+    { value: 'industry_insights', label: 'Industry Insights' },
+    { value: 'career_update', label: 'Career Update' },
+    { value: 'thought_leadership', label: 'Thought Leadership' },
+    { value: 'company_news', label: 'Company News' },
+    { value: 'networking', label: 'Networking' }
+  ];
+
+  return (
+    <Layout>
+      <div className="min-h-screen bg-black text-white">
+        <div className="container mx-auto px-4 pb-2 max-w-5xl">
+          {/* Header */}
+          <div className="text-center mb-6 sm:mb-8 px-2">
+            <div className="inline-flex items-center gap-3 mb-4">
+              {/* Icon removed as requested */}
+            </div>
+            <h1 className="mb-4 bg-gradient-to-r from-blue-400 via-purple-500 to-blue-600 bg-clip-text text-transparent font-extrabold sm:text-4xl text-4xl">
+              💼 LinkedIn Posts
+            </h1>
+            <p className="text-gray-300 max-w-2xl mx-auto text-sm sm:text-lg font-light px-4">
+              Your Personal LinkedIn Content Creator, powered by AI. Generate engaging posts that boost your professional presence and drive meaningful connections.
+            </p>
+          </div>
+
+          {/* Profile Completion Warning */}
+          <ProfileCompletionWarning />
+
+          {/* Form - Always visible */}
+          <Card className="mb-6 sm:mb-8 bg-gradient-to-r from-blue-500 via-purple-600 to-blue-700 border-0 mx-2 sm:mx-0">
+            <CardHeader className="pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <CardTitle className="text-white text-lg sm:text-xl">LinkedIn Post Details</CardTitle>
+                <div className="flex-shrink-0">
+                  <LinkedInPostsHistoryModal />
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Post Content */}
+              <div className="space-y-2">
+                <Label className="text-white font-medium flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4" />
+                  Post Content or Topic
+                </Label>
+                <Textarea
+                  value={postContent}
+                  onChange={(e) => setPostContent(e.target.value)}
+                  placeholder="Describe what you want to post about, share your thoughts, or provide a topic for AI to expand on..."
+                  disabled={isGenerating || isSubmitting}
+                  className="border-gray-300 placeholder-gray-400 min-h-32 bg-black text-white w-full resize-none"
+                />
+              </div>
+
+              {/* Post Type and Hashtags in horizontal layout */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-white font-medium">Post Type</Label>
+                  <select
+                    value={postType}
+                    onChange={(e) => setPostType(e.target.value)}
+                    disabled={isGenerating || isSubmitting}
+                    className="w-full p-2 rounded border border-gray-300 bg-black text-white"
+                  >
+                    {postTypes.map((type) => (
+                      <option key={type.value} value={type.value}>
+                        {type.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
-                <div className="max-w-5xl mx-auto min-w-0">
-                  {/* Input Form */}
-                  <Card className="bg-gradient-to-br from-cyan-400 via-teal-300 to-teal-500 border-white/10 backdrop-blur-md mb-8 shadow-xl">
-                    <CardHeader className="pb-6">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div className="min-w-0">
-                          <CardTitle className="font-inter text-lg sm:text-xl flex items-center gap-2 text-black font-bold drop-shadow">
-                            <Sparkles className="w-5 h-5 text-black drop-shadow flex-shrink-0" />
-                            <span>Create Your Posts</span>
-                          </CardTitle>
-                          <CardDescription className="text-black/80 font-inter mb-0 text-sm sm:text-base">
-                            Fill in the details to generate 3 LinkedIn post variations
-                          </CardDescription>
-                        </div>
-                        <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 text-black bg-teal-200 hover:bg-teal-100 flex-shrink-0">
-                          <History className="w-4 h-4 mr-2 text-black" />
-                          History
-                        </Button>
-                      </div>
-                    </CardHeader>
-
-                    <CardContent className="space-y-6 sm:space-y-8">
-                      <form onSubmit={handleSubmit} className="space-y-6">
-                        
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-                          <div className="space-y-2">
-                            <Label htmlFor="topic" className="text-black font-semibold text-base">💡Topic or Theme *</Label>
-                            <Label htmlFor="topic" className="text-black/70 font-normal text-sm block">What is the main topic you want to write about?</Label>
-                            <TTextarea id="topic" placeholder="e.g. AI in customer service, Layoffs in tech, Remote work trends" value={formData.topic} onChange={e => handleInputChange('topic', e.target.value)} required className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="opinion" className="text-black font-semibold text-base">🤔Your Key Point or Opinion</Label>
-                            <Label htmlFor="opinion" className="text-black/70 font-normal text-sm block">What is your main insight, opinion, or message?</Label>
-                            <TTextarea id="opinion" placeholder="I believe hybrid AI + human support is the future." value={formData.opinion} onChange={e => handleInputChange('opinion', e.target.value)} className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-                          <div className="space-y-2">
-                            <Label htmlFor="personal_story" className="text-black font-semibold text-base">📖Personal Experience or Story</Label>
-                            <Label htmlFor="personal_story" className="text-black/70 font-normal text-sm block">Do you have a story, data point, or personal experience to include?</Label>
-                            <TTextarea id="personal_story" placeholder="We reduced response time by 40% after implementing AI chat." value={formData.personal_story} onChange={e => handleInputChange('personal_story', e.target.value)} className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="audience" className="text-black font-semibold text-base">👥Target Audience</Label>
-                            <Label htmlFor="audience" className="text-black/70 font-normal text-sm block">Who are you writing this for?</Label>
-                            <TTextarea id="audience" placeholder="Startup founders, product managers, working moms, new grads…" value={formData.audience} onChange={e => handleInputChange('audience', e.target.value)} className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="tone" className="text-black font-semibold text-base">🗣️Tone/Style Preference</Label>
-                          <Label htmlFor="tone" className="text-black/70 font-normal text-sm block">What tone do you prefer?</Label>
-                          <Select onValueChange={value => handleInputChange('tone', value)}>
-                            <SelectTrigger className="text-base bg-black/80 text-white border-teal-300/30 font-medium [&>span[data-placeholder]]:text-white/80">
-                              <SelectValue placeholder="Select a tone..." />
-                            </SelectTrigger>
-                            <SelectContent className="bg-black/80 border-teal-200/30 text-white">
-                              {toneOptions.map(option => <SelectItem key={option.value} value={option.value} className="font-medium data-[highlighted]:bg-teal-200 data-[highlighted]:text-black">
-                                  {option.label}
-                                </SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                          <Button type="submit" disabled={isSubmitting || !formData.topic.trim() || isGenerating} className="flex-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 hover:from-indigo-600 hover:via-purple-600 hover:to-blue-600 text-white font-semibold text-base h-12 shadow-md rounded-lg">
-                            {isSubmitting ? 'Submitting...' : 'Generate LinkedIn Posts'}
-                          </Button>
-                          
-                          <Button type="button" onClick={resetForm} variant="outline" className="bg-white/10 border-teal-400/25 text-black hover:bg-white/20 text-base h-12 px-6">
-                            Reset
-                          </Button>
-                        </div>
-                      </form>
-                    </CardContent>
-                  </Card>
-
-                  {/* Loading State for Post Generation - Show immediately when isGenerating is true */}
-                  {isGenerating && <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm mb-8">
-                      <CardContent className="py-8 flex items-center justify-center">
-                        <LoadingMessages type="linkedin" />
-                      </CardContent>
-                    </Card>}
-
-                  {/* Results Display - Only show when posts are ready AND not generating */}
-                  {postsData && areAllPostsReady(postsData) && !isGenerating && <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm">
-                      <CardHeader className="pb-6">
-                        <CardTitle className="font-inter text-lg sm:text-xl flex items-center gap-2 bg-gradient-to-r from-teal-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent drop-shadow font-bold">
-                          <Share2 className="w-5 h-5 text-teal-400 drop-shadow flex-shrink-0" />
-                          <span>Your LinkedIn Post Variations</span>
-                        </CardTitle>
-                        <CardDescription className="text-cyan-300/90 font-inter text-sm sm:text-base">
-                          Choose from 3 different LinkedIn post styles and copy your favorite!
-                        </CardDescription>
-                      </CardHeader>
-                      
-                      <CardContent>
-                        <div className="space-y-8">
-                          <LinkedInPostVariation heading={postsData.post_heading_1!} content={postsData.post_content_1!} userProfile={userProfile} userData={userData} variationNumber={1} postId={currentPostId || undefined} />
-                          
-                          <LinkedInPostVariation heading={postsData.post_heading_2!} content={postsData.post_content_2!} userProfile={userProfile} userData={userData} variationNumber={2} postId={currentPostId || undefined} />
-                          
-                          <LinkedInPostVariation heading={postsData.post_heading_3!} content={postsData.post_content_3!} userProfile={userProfile} userData={userData} variationNumber={3} postId={currentPostId || undefined} />
-                        </div>
-                      </CardContent>
-                    </Card>}
+                <div className="space-y-2 flex flex-col justify-center">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="hashtags"
+                      checked={includeHashtags}
+                      onCheckedChange={(checked) => setIncludeHashtags(checked as boolean)}
+                      disabled={isGenerating || isSubmitting}
+                    />
+                    <Label htmlFor="hashtags" className="text-white font-medium">
+                      Include Hashtags
+                    </Label>
+                  </div>
                 </div>
               </div>
 
-              {/* History Modal */}
-              <LinkedInPostsHistoryModal isOpen={showHistory} onClose={() => setShowHistory(false)} gradientColors="from-cyan-400 to-teal-400" />
+              {/* Image Upload */}
+              <div className="space-y-2">
+                <Label className="text-white font-medium flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4" />
+                  Upload Images (optional) - Max 4 images
+                </Label>
+                <div className="border-2 border-dashed border-gray-400 rounded-lg p-4 text-center">
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={isGenerating || isSubmitting || uploadedImages.length >= 4}
+                    className="hidden"
+                    id="image-upload"
+                  />
+                  <label
+                    htmlFor="image-upload"
+                    className={`cursor-pointer flex flex-col items-center gap-2 ${
+                      uploadedImages.length >= 4 ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    <Upload className="w-8 h-8 text-gray-400" />
+                    <span className="text-gray-400 text-sm">
+                      {uploadedImages.length >= 4 
+                        ? 'Maximum 4 images reached' 
+                        : 'Click to upload images or drag and drop'
+                      }
+                    </span>
+                  </label>
+                </div>
+
+                {/* Display uploaded images */}
+                {uploadedImages.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4">
+                    {uploadedImages.map((image, index) => (
+                      <div key={index} className="relative">
+                        <img
+                          src={URL.createObjectURL(image)}
+                          alt={`Upload ${index + 1}`}
+                          className="w-full h-24 object-cover rounded border border-gray-600"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                          disabled={isGenerating || isSubmitting}
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <Button
+                  onClick={handleGenerate}
+                  disabled={isGenerating || isSubmitting}
+                  className="w-full sm:flex-1 text-white font-medium bg-blue-600 hover:bg-blue-500"
+                >
+                  {isGenerating || isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    'Generate LinkedIn Posts'
+                  )}
+                </Button>
+                <Button
+                  onClick={handleReset}
+                  variant="outline"
+                  disabled={isGenerating || isSubmitting}
+                  className="w-full sm:w-auto px-6 border-white text-white hover:bg-white/10"
+                >
+                  Reset
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Loading */}
+          {isGenerating && (
+            <div className="text-center py-8">
+              <LoadingMessages type="linkedin_posts" />
             </div>
-          </main>
+          )}
+
+          {/* Results - Show below form when available */}
+          {linkedInPostData && (
+            <div className="w-full space-y-6">
+              <LinkedInPostDisplay postData={linkedInPostData} />
+            </div>
+          )}
         </div>
       </div>
-    </SidebarProvider>;
+    </Layout>
+  );
 };
 
 export default LinkedInPosts;
