@@ -258,7 +258,7 @@ const CompanyRoleAnalysis = () => {
           {/* Header Section */}
           <div className="text-center space-y-3 sm:space-y-4 px-2">
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <Building2 className="w-10 h-10 sm:w-12 sm:h-12 text-green-400" />
+              
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-orbitron font-extrabold bg-gradient-to-r from-green-400 via-green-500 to-green-600 bg-clip-text text-green-500">
                 🏢 Company Decoder
               </h1>
