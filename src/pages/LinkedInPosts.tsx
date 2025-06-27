@@ -342,12 +342,12 @@ const LinkedInPosts = () => {
                         
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                           <div className="space-y-2">
-                            <Label htmlFor="topic" className="text-black font-semibold text-base">Topic or Theme *</Label>
+                            <Label htmlFor="topic" className="text-black font-semibold text-base">💡Topic or Theme *</Label>
                             <Label htmlFor="topic" className="text-black/70 font-normal text-sm block">What is the main topic you want to write about?</Label>
                             <TTextarea id="topic" placeholder="e.g. AI in customer service, Layoffs in tech, Remote work trends" value={formData.topic} onChange={e => handleInputChange('topic', e.target.value)} required className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="opinion" className="text-black font-semibold text-base">Your Key Point or Opinion</Label>
+                            <Label htmlFor="opinion" className="text-black font-semibold text-base">🤔Your Key Point or Opinion</Label>
                             <Label htmlFor="opinion" className="text-black/70 font-normal text-sm block">What is your main insight, opinion, or message?</Label>
                             <TTextarea id="opinion" placeholder="I believe hybrid AI + human support is the future." value={formData.opinion} onChange={e => handleInputChange('opinion', e.target.value)} className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                           </div>
@@ -355,19 +355,19 @@ const LinkedInPosts = () => {
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                           <div className="space-y-2">
-                            <Label htmlFor="personal_story" className="text-black font-semibold text-base">Personal Experience or Story</Label>
+                            <Label htmlFor="personal_story" className="text-black font-semibold text-base">📖Personal Experience or Story</Label>
                             <Label htmlFor="personal_story" className="text-black/70 font-normal text-sm block">Do you have a story, data point, or personal experience to include?</Label>
                             <TTextarea id="personal_story" placeholder="We reduced response time by 40% after implementing AI chat." value={formData.personal_story} onChange={e => handleInputChange('personal_story', e.target.value)} className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="audience" className="text-black font-semibold text-base">Target Audience</Label>
+                            <Label htmlFor="audience" className="text-black font-semibold text-base">👥Target Audience</Label>
                             <Label htmlFor="audience" className="text-black/70 font-normal text-sm block">Who are you writing this for?</Label>
                             <TTextarea id="audience" placeholder="Startup founders, product managers, working moms, new grads…" value={formData.audience} onChange={e => handleInputChange('audience', e.target.value)} className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                           </div>
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="tone" className="text-black font-semibold text-base">Tone/Style Preference</Label>
+                          <Label htmlFor="tone" className="text-black font-semibold text-base">🗣️Tone/Style Preference</Label>
                           <Label htmlFor="tone" className="text-black/70 font-normal text-sm block">What tone do you prefer?</Label>
                           <Select onValueChange={value => handleInputChange('tone', value)}>
                             <SelectTrigger className="text-base bg-black/80 text-white border-teal-300/30 font-medium [&>span[data-placeholder]]:text-white/80">
