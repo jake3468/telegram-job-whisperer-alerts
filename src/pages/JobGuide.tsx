@@ -416,7 +416,7 @@ const JobGuide = () => {
 
   return <Layout>
       <div className="min-h-screen w-full flex flex-col">
-        <div className="max-w-4xl mx-auto w-full px-2 py-4 sm:px-6 sm:py-4">
+        <div className="max-w-4xl mx-auto w-full px-2 py-2 sm:px-6 sm:py-2">
           <div className="text-center mb-6 px-2">
             <h1 className="font-orbitron bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 bg-clip-text mb-2 drop-shadow font-bold text-blue-500 text-4xl">
               🎯 Job Analysis

@@ -255,7 +255,7 @@ const CompanyRoleAnalysis = () => {
   // Get the most recent completed analysis for display
   const recentCompletedAnalysis = showRecentResults && analysisHistory && analysisHistory.length > 0 ? analysisHistory.find(analysis => hasAnalysisResult(analysis)) : null;
   return <Layout>
-      <div className="min-h-screen bg-black px-2 py-4 sm:px-4 sm:py-4 lg:px-8 lg:py-4">
+      <div className="min-h-screen bg-black px-2 py-2 sm:px-4 sm:py-2 lg:px-8 lg:py-2">
         <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
           {/* Header Section */}
           <div className="text-center space-y-3 sm:space-y-4 px-2">
