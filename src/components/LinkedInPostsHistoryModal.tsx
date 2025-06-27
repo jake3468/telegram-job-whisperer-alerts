@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -53,7 +52,7 @@ const LinkedInPostsHistoryModal = ({
     imageGenerationFailed,
     hasImages,
     handleGetImageForPost
-  } = useLinkedInImageManager(selectedItem);
+  } = useLinkedInImageManager(selectedItem?.id || null);
 
   useEffect(() => {
     if (isOpen && user && userProfile) {
