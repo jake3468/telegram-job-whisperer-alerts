@@ -33,7 +33,7 @@ export const useUserCredits = () => {
       try {
         console.log('[useUserCredits] Fetching credits for user:', userProfile.user_id);
         
-        // Direct query with no excessive logging
+        // Direct query with proper error handling
         const { data: credits, error } = await supabase
           .from('user_credits')
           .select('current_balance, free_credits, paid_credits, subscription_plan, next_reset_date, created_at, updated_at, id, user_id')
@@ -65,18 +65,19 @@ export const useUserCredits = () => {
             }
           }
           
-          return null;
+          console.error('[useUserCredits] Error fetching credits:', error);
+          throw error; // Re-throw to trigger error state
         }
 
-        if (credits) {
+        if (credits && typeof credits.current_balance === 'number') {
           return credits as UserCreditsData;
         }
 
-        return null;
+        throw new Error('Invalid credits data received');
 
       } catch (err) {
         console.error('[useUserCredits] Exception during fetch:', err);
-        return null;
+        throw err; // Re-throw to trigger error state
       }
     },
     enabled: !!userProfile?.user_id && !!user?.id, // Only enable when both are available

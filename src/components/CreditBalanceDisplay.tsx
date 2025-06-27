@@ -16,10 +16,10 @@ const CreditBalanceDisplay = () => {
     );
   }
 
-  if (error || !credits) {
+  if (error || !credits || credits.current_balance === null || credits.current_balance === undefined) {
     return (
-      <div className="text-red-400 text-sm font-orbitron">
-        {state === 'expanded' ? 'Credits: Error' : '⚠️'}
+      <div className="text-fuchsia-200 text-sm font-orbitron">
+        {state === 'expanded' ? 'Credits: --' : '--'}
       </div>
     );
   }
