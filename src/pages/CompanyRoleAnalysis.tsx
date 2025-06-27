@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,7 +18,7 @@ import { BulletPointList } from '@/components/BulletPointList';
 import { JSONSectionDisplay } from '@/components/JSONSectionDisplay';
 import { SourcesDisplay } from '@/components/SourcesDisplay';
 import { PremiumAnalysisResults } from '@/components/PremiumAnalysisResults';
-import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
+import { useDeferredCreditDeduction } from '@/hooks/useDeferredCreditDeduction';
 import { Badge } from '@/components/ui/badge';
 
 interface CompanyRoleAnalysisData {
@@ -55,34 +56,16 @@ const CompanyRoleAnalysis = () => {
   const [pendingAnalysisId, setPendingAnalysisId] = useState<string | null>(null);
   const [loadingMessages, setLoadingMessages] = useState<string[]>([]);
   const [showRecentResults, setShowRecentResults] = useState(false);
-  const [creditsPendingDeduction, setCreditsPendingDeduction] = useState(false);
-  const {
-    toast
-  } = useToast();
-  const {
-    userProfile
-  } = useUserProfile();
-
-  const {
-    hasCredits,
-    checkAndDeductCredits,
-    isDeducting,
-    showInsufficientCreditsPopup
-  } = useFeatureCreditCheck({
-    feature: 'COMPANY_ROLE_ANALYSIS',
-    onSuccess: () => {
-      console.log('Credit deduction successful for company analysis');
-      setCreditsPendingDeduction(false);
-    },
-    onInsufficientCredits: () => {
-      setIsSubmitting(false);
-      setCreditsPendingDeduction(false);
-    }
-  });
+  const [creditsDeducted, setCreditsDeducted] = useState(false);
+  const { toast } = useToast();
+  const { userProfile } = useUserProfile();
+  const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(3.0);
+  const { deductCredits, isDeducting } = useDeferredCreditDeduction();
 
   // Clear results when component mounts (page refresh/navigation)
   useEffect(() => {
     setShowRecentResults(false);
+    setCreditsDeducted(false);
   }, []);
 
   // Fetch company-role analysis history with authenticated requests
@@ -159,10 +142,31 @@ const CompanyRoleAnalysis = () => {
       setLoadingMessages([]);
       setShowRecentResults(true);
 
-      // Deduct credits when results are successfully displayed
-      if (creditsPendingDeduction) {
+      // Deduct credits when results are successfully displayed (only once)
+      if (!creditsDeducted) {
         console.log('Deducting credits for company analysis results');
-        checkAndDeductCredits('Company Analysis - Results Generated');
+        deductCredits(3.0, 'company_analysis', 'Company Analysis - Results Generated')
+          .then((success) => {
+            if (success) {
+              setCreditsDeducted(true);
+              console.log('Credits deducted successfully');
+            } else {
+              console.error('Failed to deduct credits');
+              toast({
+                title: "Credit Deduction Failed",
+                description: "Unable to deduct credits. Please contact support if this persists.",
+                variant: "destructive"
+              });
+            }
+          })
+          .catch((error) => {
+            console.error('Error deducting credits:', error);
+            toast({
+              title: "Credit Deduction Error",
+              description: "An error occurred while deducting credits.",
+              variant: "destructive"
+            });
+          });
       }
 
       toast({
@@ -170,7 +174,7 @@ const CompanyRoleAnalysis = () => {
         description: "Your company analysis is ready to view."
       });
     }
-  }, [analysisHistory, pendingAnalysisId, toast, creditsPendingDeduction, checkAndDeductCredits]);
+  }, [analysisHistory, pendingAnalysisId, toast, creditsDeducted, deductCredits]);
 
   // Real-time subscription for analysis updates with enhanced detection
   useEffect(() => {
@@ -199,10 +203,31 @@ const CompanyRoleAnalysis = () => {
           setLoadingMessages([]);
           setShowRecentResults(true);
 
-          // Deduct credits when results are successfully displayed
-          if (creditsPendingDeduction) {
+          // Deduct credits when results are successfully displayed (only once)
+          if (!creditsDeducted) {
             console.log('Deducting credits for company analysis results via real-time');
-            checkAndDeductCredits('Company Analysis - Results Generated');
+            deductCredits(3.0, 'company_analysis', 'Company Analysis - Results Generated')
+              .then((success) => {
+                if (success) {
+                  setCreditsDeducted(true);
+                  console.log('Credits deducted successfully via real-time');
+                } else {
+                  console.error('Failed to deduct credits via real-time');
+                  toast({
+                    title: "Credit Deduction Failed",
+                    description: "Unable to deduct credits. Please contact support if this persists.",
+                    variant: "destructive"
+                  });
+                }
+              })
+              .catch((error) => {
+                console.error('Error deducting credits via real-time:', error);
+                toast({
+                  title: "Credit Deduction Error",
+                  description: "An error occurred while deducting credits.",
+                  variant: "destructive"
+                });
+              });
           }
 
           toast({
@@ -219,7 +244,7 @@ const CompanyRoleAnalysis = () => {
       console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
-  }, [userProfile?.id, pendingAnalysisId, refetchHistory, toast, checkAndDeductCredits, creditsPendingDeduction]);
+  }, [userProfile?.id, pendingAnalysisId, refetchHistory, toast, deductCredits, creditsDeducted]);
 
   // Loading messages effect
   useEffect(() => {
@@ -276,7 +301,7 @@ const CompanyRoleAnalysis = () => {
 
     setIsSubmitting(true);
     setShowRecentResults(false);
-    setCreditsPendingDeduction(true);
+    setCreditsDeducted(false);
 
     try {
       console.log('Creating company role analysis with data:', {
@@ -307,7 +332,6 @@ const CompanyRoleAnalysis = () => {
           variant: "destructive"
         });
         setIsSubmitting(false);
-        setCreditsPendingDeduction(false);
         return;
       }
 
@@ -335,7 +359,6 @@ const CompanyRoleAnalysis = () => {
         variant: "destructive"
       });
       setIsSubmitting(false);
-      setCreditsPendingDeduction(false);
     }
   };
 
@@ -449,7 +472,7 @@ const CompanyRoleAnalysis = () => {
                   <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4">
                     <Button
                       type="submit"
-                      disabled={isSubmitting || !hasCredits}
+                      disabled={isSubmitting || isDeducting || !hasCredits}
                       className="w-full lg:flex-1 bg-gradient-to-r from-white via-white to-white hover:from-white/90 hover:via-white/90 hover:to-white/90 text-black font-orbitron font-bold py-4 sm:py-6 text-xs sm:text-base shadow-2xl shadow-gray-300/50 border-0 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isSubmitting ? (

@@ -1,6 +1,6 @@
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/client';
 import { useUser } from '@clerk/clerk-react';
 import { useUserProfile } from '@/hooks/useUserProfile';
 
@@ -33,31 +33,43 @@ export const useUserCredits = () => {
       try {
         console.log('[useUserCredits] Fetching credits for user:', userProfile.user_id);
         
-        // Direct query with proper error handling
-        const { data: credits, error } = await supabase
-          .from('user_credits')
-          .select('current_balance, free_credits, paid_credits, subscription_plan, next_reset_date, created_at, updated_at, id, user_id')
-          .eq('user_id', userProfile.user_id)
-          .single();
+        // Use authenticated request to ensure proper JWT token handling
+        const { data: credits, error } = await makeAuthenticatedRequest(async () => {
+          return await supabase
+            .from('user_credits')
+            .select('current_balance, free_credits, paid_credits, subscription_plan, next_reset_date, created_at, updated_at, id, user_id')
+            .eq('user_id', userProfile.user_id)
+            .single();
+        }, 'fetch user credits');
 
         if (error) {
           // If no record found, try to initialize credits
           if (error.code === 'PGRST116') {
             try {
-              const { data: initResult, error: initError } = await supabase.rpc('initialize_user_credits', {
-                p_user_id: userProfile.user_id
-              });
+              console.log('[useUserCredits] No credits record found, initializing...');
+              const { data: initResult, error: initError } = await makeAuthenticatedRequest(async () => {
+                return await supabase.rpc('initialize_user_credits', {
+                  p_user_id: userProfile.user_id
+                });
+              }, 'initialize user credits');
               
               if (!initError) {
                 // Retry the query after initialization
-                const { data: retryCredits, error: retryError } = await supabase
-                  .from('user_credits')
-                  .select('current_balance, free_credits, paid_credits, subscription_plan, next_reset_date, created_at, updated_at, id, user_id')
-                  .eq('user_id', userProfile.user_id)
-                  .single();
+                const { data: retryCredits, error: retryError } = await makeAuthenticatedRequest(async () => {
+                  return await supabase
+                    .from('user_credits')
+                    .select('current_balance, free_credits, paid_credits, subscription_plan, next_reset_date, created_at, updated_at, id, user_id')
+                    .eq('user_id', userProfile.user_id)
+                    .single();
+                }, 'retry fetch user credits');
                   
                 if (!retryError && retryCredits) {
-                  return retryCredits as UserCreditsData;
+                  // Ensure current_balance is never null
+                  const safeCredits = {
+                    ...retryCredits,
+                    current_balance: retryCredits.current_balance ?? 0
+                  };
+                  return safeCredits as UserCreditsData;
                 }
               }
             } catch (initError) {
@@ -66,26 +78,64 @@ export const useUserCredits = () => {
           }
           
           console.error('[useUserCredits] Error fetching credits:', error);
-          throw error; // Re-throw to trigger error state
+          // Return a default credits object instead of throwing error
+          return {
+            id: '',
+            user_id: userProfile.user_id,
+            current_balance: 0,
+            free_credits: 0,
+            paid_credits: 0,
+            subscription_plan: 'free',
+            next_reset_date: new Date().toISOString(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          } as UserCreditsData;
         }
 
-        if (credits && typeof credits.current_balance === 'number') {
-          return credits as UserCreditsData;
+        if (credits) {
+          // Ensure current_balance is never null or undefined
+          const safeCredits = {
+            ...credits,
+            current_balance: credits.current_balance ?? 0
+          };
+          return safeCredits as UserCreditsData;
         }
 
-        throw new Error('Invalid credits data received');
+        // Fallback default object
+        return {
+          id: '',
+          user_id: userProfile.user_id,
+          current_balance: 0,
+          free_credits: 0,
+          paid_credits: 0,
+          subscription_plan: 'free',
+          next_reset_date: new Date().toISOString(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        } as UserCreditsData;
 
       } catch (err) {
         console.error('[useUserCredits] Exception during fetch:', err);
-        throw err; // Re-throw to trigger error state
+        // Return default instead of throwing
+        return {
+          id: '',
+          user_id: userProfile?.user_id || '',
+          current_balance: 0,
+          free_credits: 0,
+          paid_credits: 0,
+          subscription_plan: 'free',
+          next_reset_date: new Date().toISOString(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        } as UserCreditsData;
       }
     },
     enabled: !!userProfile?.user_id && !!user?.id, // Only enable when both are available
-    staleTime: 30000, // Consider data stale after 30 seconds
+    staleTime: 10000, // Consider data stale after 10 seconds for more frequent updates
     gcTime: 300000, // Keep data cached for 5 minutes
-    refetchOnWindowFocus: false, // Don't refetch when window gains focus
+    refetchOnWindowFocus: true, // Refetch when window gains focus to ensure accurate balance
     refetchOnReconnect: true, // Refetch on network reconnect
-    retry: 1, // Reduced retry attempts
+    retry: 2, // Retry twice on failure
   });
 
   // Function to refresh credits data

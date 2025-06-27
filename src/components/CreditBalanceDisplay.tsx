@@ -16,15 +16,19 @@ const CreditBalanceDisplay = () => {
     );
   }
 
-  if (error || !credits || credits.current_balance === null || credits.current_balance === undefined) {
+  if (error || !credits) {
     return (
       <div className="text-fuchsia-200 text-sm font-orbitron">
-        {state === 'expanded' ? 'Credits: --' : '--'}
+        {state === 'expanded' ? 'Credits: 0' : '0'}
       </div>
     );
   }
 
-  const balance = Number(credits.current_balance);
+  // Ensure we have a valid number for current_balance
+  const balance = credits.current_balance !== null && credits.current_balance !== undefined 
+    ? Number(credits.current_balance) 
+    : 0;
+  
   const isLowCredits = balance < 5;
 
   return (
