@@ -1,7 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useLocationPricing } from './useLocationPricing';
+import { logger } from '@/utils/logger';
 
 export interface PaymentProduct {
   id: string;
@@ -28,7 +28,7 @@ export const usePaymentProducts = () => {
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
-        console.log('Fetching products for region:', pricingData.region, 'currency:', pricingData.currency);
+        logger.debug('Fetching products for region and currency');
         
         // Query products for the specific region and currency
         const { data, error } = await supabase
@@ -40,12 +40,12 @@ export const usePaymentProducts = () => {
           .order('price_amount', { ascending: true });
 
         if (error) {
-          console.error('Error fetching payment products:', error);
+          logger.error('Error fetching payment products:', error);
           setError(error.message);
           return;
         }
 
-        console.log('Raw payment products data:', data);
+        logger.debug('Payment products fetched successfully');
 
         // Filter and type-cast the products to ensure they match our interface
         const validProducts = (data || [])
@@ -72,11 +72,10 @@ export const usePaymentProducts = () => {
             is_active: product.is_active
           }));
 
-        console.log('Processed payment products:', validProducts);
-        console.log('Expected currency:', pricingData.currency, 'Expected region:', pricingData.region);
+        logger.info(`Processed ${validProducts.length} payment products for region: ${pricingData.region}, currency: ${pricingData.currency}`);
         setProducts(validProducts);
       } catch (err) {
-        console.error('Exception fetching payment products:', err);
+        logger.error('Exception fetching payment products:', err);
         setError('Failed to fetch payment products');
       } finally {
         setIsLoading(false);

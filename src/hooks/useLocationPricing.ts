@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { logger } from '@/utils/logger';
 
 export interface PricingData {
   region: 'IN' | 'global';
@@ -35,7 +36,7 @@ export const useLocationPricing = () => {
   useEffect(() => {
     const detectLocation = async () => {
       try {
-        console.log('Starting location detection...');
+        logger.debug('Starting location detection...');
         
         // Primary IP detection service
         let locationData = null;
@@ -43,33 +44,33 @@ export const useLocationPricing = () => {
         try {
           const response = await fetch('https://ipapi.co/json/');
           locationData = await response.json();
-          console.log('Primary location service response:', locationData);
+          logger.debug('Location service response received');
         } catch (error) {
-          console.log('Primary location service failed, trying fallback...');
+          logger.info('Primary location service failed, trying fallback...');
           
           // Fallback to alternative service
           try {
             const fallbackResponse = await fetch('https://api.ipify.org?format=json');
             const ipData = await fallbackResponse.json();
-            console.log('Fallback IP detected:', ipData.ip);
+            logger.debug('Fallback IP detected');
             
             // Use a basic geolocation service
             const geoResponse = await fetch(`https://ipwhois.app/json/${ipData.ip}`);
             const geoData = await geoResponse.json();
             locationData = { country_code: geoData.country_code };
-            console.log('Fallback location data:', locationData);
+            logger.debug('Fallback location data obtained');
           } catch (fallbackError) {
-            console.log('All location services failed:', fallbackError);
+            logger.warn('All location services failed');
           }
         }
         
         if (locationData?.country_code) {
           setUserCountry(locationData.country_code);
-          console.log('Final detected country:', locationData.country_code);
+          logger.info('Location detected successfully');
           
           // Set pricing based on detected location (IP-based only)
           if (locationData.country_code === 'IN') {
-            console.log('Setting Indian pricing...');
+            logger.info('Setting Indian pricing...');
             setPricingData({
               region: 'IN',
               currency: 'INR',
@@ -84,7 +85,7 @@ export const useLocationPricing = () => {
               subscriptionProductId: 'pdt_indian_monthly_subscription'
             });
           } else {
-            console.log('Setting international pricing for country:', locationData.country_code);
+            logger.debug('Setting international pricing');
             // Explicitly set USD pricing for non-Indian users
             setPricingData({
               region: 'global',
@@ -101,7 +102,7 @@ export const useLocationPricing = () => {
             });
           }
         } else {
-          console.log('No valid country code detected, using default USD pricing');
+          logger.info('No valid country code detected, using default USD pricing');
           // Explicitly set default USD pricing
           setPricingData({
             region: 'global',
@@ -119,7 +120,7 @@ export const useLocationPricing = () => {
         }
         
       } catch (error) {
-        console.log('Location detection completely failed, using default USD pricing:', error);
+        logger.error('Location detection completely failed, using default USD pricing:', error);
         // Explicitly set default USD pricing on any error
         setPricingData({
           region: 'global',
