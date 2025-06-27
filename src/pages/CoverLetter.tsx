@@ -14,7 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import LoadingMessages from '@/components/LoadingMessages';
 import { useUser } from '@clerk/clerk-react';
 import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
-import { CoverLetterHistoryModal } from '@/components/CoverLetterHistoryModal';
+import CoverLetterHistoryModal from '@/components/CoverLetterHistoryModal';
 import CoverLetterDownloadActions from '@/components/CoverLetterDownloadActions';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
 
@@ -41,7 +41,7 @@ const CoverLetter = () => {
       if (!userProfile?.id) return [];
       
       const { data, error } = await supabase
-        .from('cover_letters')
+        .from('job_cover_letters')
         .select('*')
         .eq('user_id', userProfile.id)
         .order('created_at', { ascending: false });
@@ -61,17 +61,17 @@ const CoverLetter = () => {
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
-        table: 'cover_letters',
+        table: 'job_cover_letters',
         filter: `id=eq.${currentAnalysis.id}`
       }, (payload) => {
         console.log('Cover letter updated:', payload);
         
-        if (payload.new.cover_letter_content) {
+        if (payload.new.cover_letter) {
           try {
             // Handle both string and already parsed data
-            const parsedData = typeof payload.new.cover_letter_content === 'string' 
-              ? payload.new.cover_letter_content 
-              : JSON.stringify(payload.new.cover_letter_content);
+            const parsedData = typeof payload.new.cover_letter === 'string' 
+              ? payload.new.cover_letter 
+              : JSON.stringify(payload.new.cover_letter);
             
             // Check if the data is meaningful (not just empty or null)
             if (parsedData && parsedData.trim().length > 0) {
@@ -153,13 +153,13 @@ const CoverLetter = () => {
 
       // Check for existing analysis first
       const { data: existingAnalysis, error: checkError } = await supabase
-        .from('cover_letters')
-        .select('id, cover_letter_content')
+        .from('job_cover_letters')
+        .select('id, cover_letter')
         .eq('user_id', userProfile.id)
         .eq('company_name', companyName.trim())
         .eq('job_title', jobTitle.trim())
         .eq('job_description', jobDescription.trim())
-        .not('cover_letter_content', 'is', null)
+        .not('cover_letter', 'is', null)
         .order('created_at', { ascending: false })
         .limit(1);
 
@@ -169,9 +169,9 @@ const CoverLetter = () => {
         
         try {
           // Handle both string and object data
-          const parsedData = typeof existing.cover_letter_content === 'string' 
-            ? existing.cover_letter_content 
-            : JSON.stringify(existing.cover_letter_content);
+          const parsedData = typeof existing.cover_letter === 'string' 
+            ? existing.cover_letter 
+            : JSON.stringify(existing.cover_letter);
           
           setCoverLetterData(parsedData);
           setCurrentAnalysis({ id: existing.id });
@@ -198,7 +198,7 @@ const CoverLetter = () => {
       console.log('📝 Inserting cover letter data:', insertData);
       
       const { data: insertedData, error: insertError } = await supabase
-        .from('cover_letters')
+        .from('job_cover_letters')
         .insert(insertData)
         .select('id')
         .single();
@@ -286,7 +286,11 @@ const CoverLetter = () => {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <CardTitle className="text-black text-lg sm:text-xl">Cover Letter Details</CardTitle>
                 <div className="flex-shrink-0">
-                  <CoverLetterHistoryModal />
+                  <CoverLetterHistoryModal 
+                    isOpen={false} 
+                    onClose={() => {}} 
+                    gradientColors="from-[#ddd6f3] to-[#faaca8]" 
+                  />
                 </div>
               </div>
             </CardHeader>
@@ -375,7 +379,7 @@ const CoverLetter = () => {
                   </div>
                   <div className="flex-shrink-0">
                     <CoverLetterDownloadActions
-                      coverLetterData={coverLetterData}
+                      coverLetter={coverLetterData}
                       jobTitle={jobTitle}
                       companyName={companyName}
                       contrast={true}

@@ -16,8 +16,8 @@ import { useQuery } from '@tanstack/react-query';
 import LoadingMessages from '@/components/LoadingMessages';
 import { useUser } from '@clerk/clerk-react';
 import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
-import { LinkedInPostsHistoryModal } from '@/components/LinkedInPostsHistoryModal';
-import { LinkedInPostDisplay } from '@/components/LinkedInPostDisplay';
+import LinkedInPostsHistoryModal from '@/components/LinkedInPostsHistoryModal';
+import LinkedInPostDisplay from '@/components/LinkedInPostDisplay';
 import { useLinkedInImageCreditCheck } from '@/hooks/useLinkedInImageCreditCheck';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
 
@@ -37,7 +37,7 @@ const LinkedInPosts = () => {
   const { toast } = useToast();
   const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(1.0);
   const { userProfile } = useUserProfile();
-  const { checkImageCredits, showImageCreditPopup } = useLinkedInImageCreditCheck();
+  const { checkAndDeductForImage, showInsufficientCreditsPopup: showImageCreditPopup } = useLinkedInImageCreditCheck();
 
   // Query for existing LinkedIn posts data
   const { data: linkedInHistory, refetch: refetchHistory } = useQuery({
@@ -46,7 +46,7 @@ const LinkedInPosts = () => {
       if (!userProfile?.id) return [];
       
       const { data, error } = await supabase
-        .from('linkedin_posts')
+        .from('job_linkedin')
         .select('*')
         .eq('user_id', userProfile.id)
         .order('created_at', { ascending: false });
@@ -66,16 +66,21 @@ const LinkedInPosts = () => {
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
-        table: 'linkedin_posts',
+        table: 'job_linkedin',
         filter: `id=eq.${currentAnalysis.id}`
       }, (payload) => {
         console.log('LinkedIn post updated:', payload);
         
-        if (payload.new.post_variations) {
+        if (payload.new.post_content_1 || payload.new.post_content_2 || payload.new.post_content_3) {
           try {
-            const parsedData = typeof payload.new.post_variations === 'string' 
-              ? JSON.parse(payload.new.post_variations)
-              : payload.new.post_variations;
+            const parsedData = {
+              post_heading_1: payload.new.post_heading_1,
+              post_content_1: payload.new.post_content_1,
+              post_heading_2: payload.new.post_heading_2,
+              post_content_2: payload.new.post_content_2,
+              post_heading_3: payload.new.post_heading_3,
+              post_content_3: payload.new.post_content_3
+            };
             
             if (parsedData && Object.keys(parsedData).length > 0) {
               setLinkedInPostData(parsedData);
@@ -143,9 +148,9 @@ const LinkedInPosts = () => {
 
     // Check image credits if images are uploaded
     if (uploadedImages.length > 0) {
-      const hasImageCredits = await checkImageCredits(uploadedImages.length);
+      const hasImageCredits = await checkAndDeductForImage('test', 1);
       if (!hasImageCredits) {
-        showImageCreditPopup(uploadedImages.length);
+        showImageCreditPopup();
         return;
       }
     }
@@ -220,16 +225,17 @@ const LinkedInPosts = () => {
       // Insert new LinkedIn post record
       const insertData = {
         user_id: userProfile.id,
-        post_content: postContent.trim(),
-        post_type: postType,
-        include_hashtags: includeHashtags,
-        image_urls: imageUrls.length > 0 ? imageUrls : null
+        topic: postContent.trim(),
+        opinion: postContent.trim(),
+        personal_story: '',
+        audience: postType,
+        tone: 'professional'
       };
 
       console.log('📝 Inserting LinkedIn post data:', insertData);
       
       const { data: insertedData, error: insertError } = await supabase
-        .from('linkedin_posts')
+        .from('job_linkedin')
         .insert(insertData)
         .select('id')
         .single();
