@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Layout } from '@/components/Layout';
-import { LinkedInPostHistoryModal } from '@/components/LinkedInPostHistoryModal';
+import LinkedInPostHistoryModal from '@/components/LinkedInPostHistoryModal';
 import LoadingMessages from '@/components/LoadingMessages';
 import { Copy, FileText, Sparkles } from 'lucide-react';
 import LinkedInPostDownloadActions from '@/components/LinkedInPostDownloadActions';
