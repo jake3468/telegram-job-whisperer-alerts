@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,6 @@ import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
 import { InterviewPrepHistoryModal } from '@/components/InterviewPrepHistoryModal';
 import InterviewPrepDownloadActions from '@/components/InterviewPrepDownloadActions';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
-import { useDeferredCreditDeduction } from '@/hooks/useDeferredCreditDeduction';
 
 const InterviewPrep = () => {
   // Ensure Clerk JWT is synced with Supabase
@@ -37,12 +37,10 @@ const InterviewPrep = () => {
   const {
     hasCredits,
     showInsufficientCreditsPopup
-  } = useCreditCheck(6.0, true);
+  } = useCreditCheck(1.5);
   const {
     userProfile
   } = useUserProfile();
-  const { deductCredits } = useDeferredCreditDeduction();
-  const [creditsDeducted, setCreditsDeducted] = useState(false);
 
   // Query for existing interview prep data
   const {
@@ -64,58 +62,45 @@ const InterviewPrep = () => {
     enabled: !!userProfile?.id
   });
 
-  // Real-time subscription for interview results with credit deduction
+  // Real-time subscription for interview results with improved detection
   useEffect(() => {
     if (!currentAnalysis?.id) return;
-    
-    const channel = supabase
-      .channel('interview-prep-updates')
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'interview_prep',
-        filter: `id=eq.${currentAnalysis.id}`
-      }, (payload) => {
-        console.log('Interview prep updated:', payload);
-        
-        if (payload.new.interview_questions) {
-          try {
-            const parsedData = typeof payload.new.interview_questions === 'string' 
-              ? payload.new.interview_questions 
-              : JSON.stringify(payload.new.interview_questions);
+    const channel = supabase.channel('interview-prep-updates').on('postgres_changes', {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'interview_prep',
+      filter: `id=eq.${currentAnalysis.id}`
+    }, payload => {
+      console.log('Interview prep updated:', payload);
+      if (payload.new.interview_questions) {
+        try {
+          // Handle both string and already parsed data
+          const parsedData = typeof payload.new.interview_questions === 'string' ? payload.new.interview_questions : JSON.stringify(payload.new.interview_questions);
 
-            if (parsedData && parsedData.trim().length > 0) {
-              setInterviewData(parsedData);
-              setIsGenerating(false);
-              
-              // Deduct credits only after successful result display
-              if (!creditsDeducted) {
-                deductCredits(6.0, 'interview_prep', 'Credits deducted for interview preparation');
-                setCreditsDeducted(true);
-              }
-              
-              toast({
-                title: "Interview Prep Ready!",
-                description: "Your personalized interview questions have been generated."
-              });
-            }
-          } catch (error) {
-            console.error('Error processing interview questions:', error);
+          // Check if the data is meaningful (not just empty or null)
+          if (parsedData && parsedData.trim().length > 0) {
+            setInterviewData(parsedData);
             setIsGenerating(false);
             toast({
-              title: "Error Processing Results",
-              description: "There was an error processing your interview prep results.",
-              variant: "destructive"
+              title: "Interview Prep Ready!",
+              description: "Your personalized interview questions have been generated."
             });
           }
+        } catch (error) {
+          console.error('Error processing interview questions:', error);
+          setIsGenerating(false);
+          toast({
+            title: "Error Processing Results",
+            description: "There was an error processing your interview prep results.",
+            variant: "destructive"
+          });
         }
-      })
-      .subscribe();
-
+      }
+    }).subscribe();
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [currentAnalysis?.id, toast, creditsDeducted, deductCredits]);
+  }, [currentAnalysis?.id, toast]);
 
   const handleGenerate = async () => {
     console.log('🚀 Interview Prep Generate Button Clicked');
@@ -160,8 +145,6 @@ const InterviewPrep = () => {
     try {
       setIsSubmitting(true);
       setInterviewData(null);
-      setCreditsDeducted(false); // Reset credit deduction flag
-      
       console.log('✅ Starting interview prep submission process');
       console.log('✅ User profile ID:', userProfile.id);
 

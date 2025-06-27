@@ -1,5 +1,5 @@
 import { useUser } from '@clerk/clerk-react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,19 +14,16 @@ import { useLocationPricing } from '@/hooks/useLocationPricing';
 import { usePaymentProducts } from '@/hooks/usePaymentProducts';
 import { useCheckoutSession } from '@/hooks/useCheckoutSession';
 import { toast } from 'sonner';
-
 const planGradientBg = {
   free: "bg-black border border-blue-400/30",
   subscription: "bg-gradient-to-br from-[#2563eb] via-[#3893ec] to-[#1872ba] dark:from-[#274299] dark:via-[#3177c7] dark:to-[#1b466c]",
   pack: "bg-black border border-indigo-400/30"
 };
-
 const planTextColor = {
   free: "text-blue-100",
   subscription: "text-cyan-100",
   pack: "text-indigo-100"
 };
-
 export default function GetMoreCredits() {
   const {
     user,
@@ -55,8 +52,6 @@ export default function GetMoreCredits() {
     createCheckoutSession,
     isLoading: isCheckoutLoading
   } = useCheckoutSession();
-
-  const [showUsageHistory, setShowUsageHistory] = useState(false);
   
   const handleSubscribeClick = async () => {
     const subscriptionProduct = subscriptionProducts[0];
@@ -123,14 +118,7 @@ export default function GetMoreCredits() {
             </p>
             <div className="flex items-center gap-2">
               <SubscriptionBadge />
-              <Button
-                onClick={() => setShowUsageHistory(true)}
-                variant="outline"
-                size="sm"
-                className="text-xs border-cyan-400/30 text-cyan-100 hover:bg-cyan-400/10"
-              >
-                Usage History
-              </Button>
+              <UsageHistoryModal />
             </div>
           </div>
           
@@ -302,10 +290,6 @@ export default function GetMoreCredits() {
           </div>
         </div>
       </div>
-      <UsageHistoryModal 
-        isOpen={showUsageHistory} 
-        onClose={() => setShowUsageHistory(false)} 
-      />
     </Layout>
   );
 }

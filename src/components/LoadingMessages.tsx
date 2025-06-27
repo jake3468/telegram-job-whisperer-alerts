@@ -1,90 +1,97 @@
 
-import React, { useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Loader2, Sparkles, TrendingUp, Brain, Zap, FileText, PenTool, Building2, Search, Target, MessageSquare, Users, Lightbulb } from 'lucide-react';
 
-interface LoadingMessagesProps {
-  type: 'job_analysis' | 'interview_prep' | 'cover_letter' | 'linkedin_post' | 'company_analysis';
+interface LoadingMessage {
+  icon: React.ComponentType<{ className?: string }>;
+  text: string;
 }
 
-const LoadingMessages: React.FC<LoadingMessagesProps> = ({ type }) => {
-  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+interface LoadingMessagesProps {
+  type?: 'linkedin' | 'cover_letter' | 'company_analysis' | 'interview_prep';
+  messages?: string[];
+}
 
-  const messagesByType = {
-    job_analysis: [
-      "Analyzing job requirements...",
-      "Extracting key skills and qualifications...",
-      "Matching with your profile...",
-      "Generating personalized insights...",
-      "Finalizing your job analysis..."
-    ],
-    interview_prep: [
-      "Analyzing company culture...",
-      "Researching recent company news...",
-      "Generating tailored interview questions...",
-      "Preparing industry-specific scenarios...",
-      "Finalizing your interview preparation..."
-    ],
-    cover_letter: [
-      "Analyzing job requirements...",
-      "Personalizing content for the role...",
-      "Crafting compelling introduction...",
-      "Highlighting relevant experience...",
-      "Finalizing your cover letter..."
-    ],
-    linkedin_post: [
-      "Brainstorming content ideas...",
-      "Researching trending topics...",
-      "Crafting engaging headlines...",
-      "Writing compelling content...",
-      "Finalizing your LinkedIn posts..."
-    ],
-    company_analysis: [
-      "Researching company background...",
-      "Analyzing market position...",
-      "Gathering recent news and updates...",
-      "Evaluating role security...",
-      "Generating comprehensive analysis..."
-    ]
-  };
+const linkedinMessages: LoadingMessage[] = [
+  { icon: Sparkles, text: "Generating your LinkedIn post..." },
+  { icon: TrendingUp, text: "Analyzing current trends..." },
+  { icon: Brain, text: "Crafting engaging content..." },
+  { icon: Zap, text: "Adding professional polish..." },
+  { icon: Sparkles, text: "Optimizing for maximum engagement..." },
+];
 
-  const messages = messagesByType[type];
+const coverLetterMessages: LoadingMessage[] = [
+  { icon: FileText, text: "Generating your cover letter..." },
+  { icon: Brain, text: "Analyzing job requirements..." },
+  { icon: PenTool, text: "Crafting personalized content..." },
+  { icon: Sparkles, text: "Adding professional touch..." },
+  { icon: Zap, text: "Finalizing your cover letter..." },
+];
+
+const companyAnalysisMessages: LoadingMessage[] = [
+  { icon: Search, text: "🔍 Researching company culture and values..." },
+  { icon: TrendingUp, text: "📊 Analyzing role requirements and expectations..." },
+  { icon: Brain, text: "💡 Identifying key success factors..." },
+  { icon: Target, text: "🎯 Preparing strategic insights..." },
+  { icon: Sparkles, text: "✨ Finalizing your competitive advantage report..." },
+];
+
+const interviewPrepMessages: LoadingMessage[] = [
+  { icon: MessageSquare, text: "Creating your interview questions..." },
+  { icon: Brain, text: "Generating perfect answers and pro tips..." },
+  { icon: Lightbulb, text: "Crafting strategic questions to ask..." },
+  { icon: Users, text: "Analyzing company culture insights..." },
+  { icon: Target, text: "Preparing role-specific considerations..." },
+  { icon: Sparkles, text: "Finalizing your interview prep guide..." },
+];
+
+const LoadingMessages = ({ type = 'linkedin', messages }: LoadingMessagesProps) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  
+  let messagesList: LoadingMessage[];
+  
+  if (messages) {
+    // Convert custom messages to LoadingMessage format
+    messagesList = messages.map((text, index) => ({
+      icon: [Search, TrendingUp, Brain, Target, Sparkles][index % 5],
+      text
+    }));
+  } else {
+    // Use predefined messages based on type
+    switch (type) {
+      case 'cover_letter':
+        messagesList = coverLetterMessages;
+        break;
+      case 'company_analysis':
+        messagesList = companyAnalysisMessages;
+        break;
+      case 'interview_prep':
+        messagesList = interviewPrepMessages;
+        break;
+      default:
+        messagesList = linkedinMessages;
+    }
+  }
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentMessageIndex((prev) => (prev + 1) % messages.length);
-    }, 3000);
+      setCurrentIndex((prev) => (prev + 1) % messagesList.length);
+    }, 2000);
 
     return () => clearInterval(interval);
-  }, [messages.length]);
+  }, [messagesList.length]);
+
+  const CurrentIcon = messagesList[currentIndex].icon;
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-4 py-8">
+    <div className="flex items-center justify-center gap-3 py-8">
       <div className="relative">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
-        <div className="absolute inset-0 animate-pulse">
-          <div className="h-8 w-8 rounded-full bg-purple-400/20"></div>
-        </div>
+        <Loader2 className="w-6 h-6 text-fuchsia-300 animate-spin" />
+        <CurrentIcon className="w-4 h-4 text-fuchsia-400 absolute top-1 left-1" />
       </div>
-      
-      <div className="text-center space-y-2">
-        <p className="text-white font-medium animate-fade-in">
-          {messages[currentMessageIndex]}
-        </p>
-        <p className="text-gray-400 text-sm">
-          This usually takes 30-60 seconds
-        </p>
-      </div>
-      
-      <div className="flex space-x-1">
-        {messages.map((_, index) => (
-          <div
-            key={index}
-            className={`h-2 w-2 rounded-full transition-colors duration-300 ${
-              index === currentMessageIndex ? 'bg-purple-400' : 'bg-gray-600'
-            }`}
-          />
-        ))}
-      </div>
+      <span className="text-fuchsia-100 text-lg font-semibold animate-pulse drop-shadow">
+        {messagesList[currentIndex].text}
+      </span>
     </div>
   );
 };

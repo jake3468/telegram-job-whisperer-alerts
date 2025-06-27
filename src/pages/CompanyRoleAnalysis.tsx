@@ -17,7 +17,6 @@ import { BulletPointList } from '@/components/BulletPointList';
 import { JSONSectionDisplay } from '@/components/JSONSectionDisplay';
 import { SourcesDisplay } from '@/components/SourcesDisplay';
 import { PremiumAnalysisResults } from '@/components/PremiumAnalysisResults';
-import { useDeferredCreditDeduction } from '@/hooks/useDeferredCreditDeduction';
 
 interface CompanyRoleAnalysisData {
   id: string;
@@ -60,9 +59,10 @@ const CompanyRoleAnalysis = () => {
   const {
     userProfile
   } = useUserProfile();
-  const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(3.0, true);
-  const { deductCredits } = useDeferredCreditDeduction();
-  const [creditsDeducted, setCreditsDeducted] = useState(false);
+  const {
+    hasCredits,
+    showInsufficientCreditsPopup
+  } = useCreditCheck(1.5);
 
   // Clear results when component mounts (page refresh/navigation)
   useEffect(() => {
@@ -102,81 +102,72 @@ const CompanyRoleAnalysis = () => {
   // Check for completed analysis when data is fetched or pendingAnalysisId changes
   useEffect(() => {
     if (!pendingAnalysisId || !analysisHistory) return;
-    
     console.log('Checking for completed analysis with ID:', pendingAnalysisId);
 
-    const completedAnalysis = analysisHistory.find(analysis => 
-      analysis.id === pendingAnalysisId && hasAnalysisResult(analysis)
-    );
-    
+    // Find the pending analysis in the fetched data
+    const completedAnalysis = analysisHistory.find(analysis => analysis.id === pendingAnalysisId && hasAnalysisResult(analysis));
     if (completedAnalysis) {
       console.log('Found completed analysis, stopping loading and showing results');
       setPendingAnalysisId(null);
       setIsSubmitting(false);
       setLoadingMessages([]);
       setShowRecentResults(true);
-      
-      // Deduct credits only after successful result display
-      if (!creditsDeducted) {
-        deductCredits(3.0, 'company_role_analysis', 'Credits deducted for company role analysis');
-        setCreditsDeducted(true);
-      }
-      
       toast({
         title: "Analysis Complete!",
         description: "Your company analysis is ready to view."
       });
     }
-  }, [analysisHistory, pendingAnalysisId, toast, creditsDeducted, deductCredits]);
+  }, [analysisHistory, pendingAnalysisId, toast]);
 
-  // Real-time subscription for analysis updates with credit deduction
+  // Real-time subscription for analysis updates with enhanced detection
   useEffect(() => {
     if (!userProfile?.id || !pendingAnalysisId) return;
-    
     console.log('Setting up real-time subscription for analysis:', pendingAnalysisId);
-    
-    const channel = supabase
-      .channel('company-analysis-updates')
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'company_role_analyses',
-        filter: `id=eq.${pendingAnalysisId}`
-      }, (payload) => {
-        console.log('Real-time update received for company analysis:', payload);
+    const channel = supabase.channel('company-analysis-updates').on('postgres_changes', {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'company_role_analyses',
+      filter: `id=eq.${pendingAnalysisId}`
+    }, payload => {
+      console.log('Real-time update received for company analysis:', payload);
 
-        const updatedData = payload.new as CompanyRoleAnalysisData;
-        if (updatedData && hasAnalysisResult(updatedData)) {
-          console.log('Meaningful analysis data detected, showing results');
+      // Enhanced detection - check if the updated record has meaningful data
+      const updatedData = payload.new as CompanyRoleAnalysisData;
+      if (updatedData && hasAnalysisResult(updatedData)) {
+        console.log('Meaningful analysis data detected, showing results');
 
-          refetchHistory();
-          setPendingAnalysisId(null);
-          setIsSubmitting(false);
-          setLoadingMessages([]);
-          setShowRecentResults(true);
-          
-          // Deduct credits only after successful result display
-          if (!creditsDeducted) {
-            deductCredits(3.0, 'company_role_analysis', 'Credits deducted for company role analysis');
-            setCreditsDeducted(true);
-          }
-          
-          toast({
-            title: "Analysis Complete!",
-            description: "Your company analysis is ready to view."
-          });
-        } else {
-          console.log('Update received but no meaningful data yet, continuing to wait...');
-        }
-      })
-      .subscribe();
-
+        // Analysis has meaningful data, refresh and show results
+        refetchHistory();
+        setPendingAnalysisId(null);
+        setIsSubmitting(false);
+        setLoadingMessages([]);
+        setShowRecentResults(true);
+        toast({
+          title: "Analysis Complete!",
+          description: "Your company analysis is ready to view."
+        });
+      } else {
+        console.log('Update received but no meaningful data yet, continuing to wait...');
+      }
+    }).subscribe();
     return () => {
       console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
-  }, [userProfile?.id, pendingAnalysisId, refetchHistory, toast, creditsDeducted, deductCredits]);
+  }, [userProfile?.id, pendingAnalysisId, refetchHistory, toast]);
 
+  // Loading messages effect
+  useEffect(() => {
+    if (!isSubmitting || !pendingAnalysisId) return;
+    const messages = ["Analyzing company data...", "Researching market trends...", "Evaluating role security...", "Assessing compensation data...", "Analyzing workplace environment...", "Gathering interview insights...", "Compiling sources and references...", "Finalizing analysis report..."];
+    let messageIndex = 0;
+    setLoadingMessages([messages[0]]);
+    const interval = setInterval(() => {
+      messageIndex = (messageIndex + 1) % messages.length;
+      setLoadingMessages(prev => [...prev.slice(-2), messages[messageIndex]]);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [isSubmitting, pendingAnalysisId]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -185,7 +176,6 @@ const CompanyRoleAnalysis = () => {
       showInsufficientCreditsPopup();
       return;
     }
-
     if (!userProfile?.id) {
       toast({
         title: "Profile Required",
@@ -194,7 +184,6 @@ const CompanyRoleAnalysis = () => {
       });
       return;
     }
-
     if (!companyName.trim() || !location.trim() || !jobTitle.trim()) {
       toast({
         title: "Missing Information",
@@ -203,11 +192,8 @@ const CompanyRoleAnalysis = () => {
       });
       return;
     }
-
     setIsSubmitting(true);
     setShowRecentResults(false);
-    setCreditsDeducted(false); // Reset credit deduction flag
-    
     try {
       console.log('Creating company role analysis with data:', {
         user_id: userProfile.id,
@@ -215,7 +201,6 @@ const CompanyRoleAnalysis = () => {
         location: location.trim(),
         job_title: jobTitle.trim()
       });
-
       const {
         data,
         error
@@ -225,7 +210,6 @@ const CompanyRoleAnalysis = () => {
         location: location.trim(),
         job_title: jobTitle.trim()
       }).select().single();
-
       if (error) {
         console.error('Error creating company-role analysis:', error);
         toast({
@@ -236,9 +220,9 @@ const CompanyRoleAnalysis = () => {
         setIsSubmitting(false);
         return;
       }
-
       console.log('Company analysis created successfully:', data);
-      
+
+      // Set pending analysis ID to track real-time updates
       setPendingAnalysisId(data.id);
       toast({
         title: "Analysis Started",
@@ -250,6 +234,7 @@ const CompanyRoleAnalysis = () => {
       setLocation('');
       setJobTitle('');
 
+      // Refetch history to show the new analysis
       refetchHistory();
     } catch (error) {
       console.error('Error submitting company-role analysis:', error);
@@ -259,10 +244,8 @@ const CompanyRoleAnalysis = () => {
         variant: "destructive"
       });
       setIsSubmitting(false);
-      setCreditsDeducted(false);
     }
   };
-
   const handleReset = () => {
     setCompanyName('');
     setLocation('');
@@ -271,29 +254,6 @@ const CompanyRoleAnalysis = () => {
 
   // Get the most recent completed analysis for display
   const recentCompletedAnalysis = showRecentResults && analysisHistory && analysisHistory.length > 0 ? analysisHistory.find(analysis => hasAnalysisResult(analysis)) : null;
-
-  // Loading messages effect
-  useEffect(() => {
-    if (!isSubmitting || !pendingAnalysisId) return;
-    const messages = [
-      "Analyzing company data...",
-      "Researching market trends...",
-      "Evaluating role security...",
-      "Assessing compensation data...",
-      "Analyzing workplace environment...",
-      "Gathering interview insights...",
-      "Compiling sources and references...",
-      "Finalizing analysis report..."
-    ];
-    let messageIndex = 0;
-    setLoadingMessages([messages[0]]);
-    const interval = setInterval(() => {
-      messageIndex = (messageIndex + 1) % messages.length;
-      setLoadingMessages(prev => [...prev.slice(-2), messages[messageIndex]]);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [isSubmitting, pendingAnalysisId]);
-
   return <Layout>
       <div className="min-h-screen bg-black px-2 pt-2 pb-2 sm:px-4 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
