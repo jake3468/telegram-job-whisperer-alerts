@@ -266,7 +266,7 @@ const CoverLetter = () => {
           <div className="flex items-center gap-2">
             <img src="/lovable-uploads/6239b4a7-4f3c-4902-a936-4216ae26d9af.png" alt="JobBots Logo" className="h-8 w-8 drop-shadow-lg" />
             <span className="font-orbitron font-extrabold text-2xl bg-gradient-to-r from-sky-300 via-fuchsia-400 to-indigo-300 bg-clip-text text-transparent drop-shadow-sm tracking-wider select-none relative whitespace-nowrap">
-              JobBots
+              Aspirely.ai
             </span>
           </div>
         </div>
@@ -305,7 +305,7 @@ const CoverLetter = () => {
                             Fill in the details to generate your personalized cover letter
                           </CardDescription>
                         </div>
-                        <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 text-white bg-pink-700 hover:bg-pink-600">
+                        <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 text-white bg-pink-700 hover:bg-red-600">
                           <History className="w-4 h-4 mr-2" />
                           History
                         </Button>
