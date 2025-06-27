@@ -267,7 +267,7 @@ const InterviewPrep = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-black flex items-center gap-2">
-                    <Building2 className="w-4 h-4" />
+                    
                     Company Name
                   </label>
                   <Input value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="e.g., Google, Microsoft, Amazon" disabled={isGenerating || isSubmitting} className="border-gray-300 placeholder-gray-400 bg-black text-white w-full" />
@@ -275,7 +275,7 @@ const InterviewPrep = () => {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-black flex items-center gap-2">
-                    <Briefcase className="w-4 h-4" />
+                    
                     Job Title
                   </label>
                   <Input value={jobTitle} onChange={e => setJobTitle(e.target.value)} placeholder="e.g., Senior Software Engineer, Product Manager" disabled={isGenerating || isSubmitting} className="border-gray-300 placeholder-gray-400 bg-black text-white w-full" />
@@ -284,7 +284,7 @@ const InterviewPrep = () => {
 
               <div className="space-y-2">
                 <label className="text-sm font-medium text-black flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
+                  
                   Job Description
                 </label>
                 <Textarea value={jobDescription} onChange={e => setJobDescription(e.target.value)} placeholder="Paste the complete job description here..." disabled={isGenerating || isSubmitting} className="border-gray-300 placeholder-gray-400 min-h-32 bg-black text-white w-full resize-none" />
