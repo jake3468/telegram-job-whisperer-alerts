@@ -294,7 +294,7 @@ const CompanyRoleAnalysis = () => {
                     <div className="space-y-2">
                       <Label htmlFor="companyName" className="text-white font-medium flex items-center gap-2 text-sm sm:text-base">
                         
-                        Company Name *
+                        🏭 Company Name *
                       </Label>
                       <Input id="companyName" type="text" placeholder="e.g., Google, Microsoft, Amazon" value={companyName} onChange={e => setCompanyName(e.target.value)} required className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
                     </div>
@@ -302,7 +302,7 @@ const CompanyRoleAnalysis = () => {
                     <div className="space-y-2">
                       <Label htmlFor="location" className="text-white font-medium flex items-center gap-2 text-sm sm:text-base">
                         
-                        Location *
+                        📍Location *
                       </Label>
                       <Input id="location" type="text" placeholder="e.g., San Francisco, New York, Remote" value={location} onChange={e => setLocation(e.target.value)} required className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
                     </div>
@@ -312,7 +312,7 @@ const CompanyRoleAnalysis = () => {
                   <div className="space-y-2">
                     <Label htmlFor="jobTitle" className="text-white font-medium flex items-center gap-2 text-sm sm:text-base">
                       
-                      Job Title *
+                      👨🏼‍💻 Job Title *
                     </Label>
                     <Input id="jobTitle" type="text" placeholder="e.g., Senior Software Engineer, Product Manager, Data Scientist" value={jobTitle} onChange={e => setJobTitle(e.target.value)} required className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
                   </div>
