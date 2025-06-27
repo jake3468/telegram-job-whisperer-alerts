@@ -293,7 +293,7 @@ const CompanyRoleAnalysis = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="companyName" className="text-white font-medium flex items-center gap-2 text-sm sm:text-base">
-                        <Building2 className="w-4 h-4" />
+                        
                         Company Name *
                       </Label>
                       <Input id="companyName" type="text" placeholder="e.g., Google, Microsoft, Amazon" value={companyName} onChange={e => setCompanyName(e.target.value)} required className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
@@ -301,7 +301,7 @@ const CompanyRoleAnalysis = () => {
 
                     <div className="space-y-2">
                       <Label htmlFor="location" className="text-white font-medium flex items-center gap-2 text-sm sm:text-base">
-                        <MapPin className="w-4 h-4" />
+                        
                         Location *
                       </Label>
                       <Input id="location" type="text" placeholder="e.g., San Francisco, New York, Remote" value={location} onChange={e => setLocation(e.target.value)} required className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
@@ -311,7 +311,7 @@ const CompanyRoleAnalysis = () => {
                   {/* Job Title */}
                   <div className="space-y-2">
                     <Label htmlFor="jobTitle" className="text-white font-medium flex items-center gap-2 text-sm sm:text-base">
-                      <Briefcase className="w-4 h-4" />
+                      
                       Job Title *
                     </Label>
                     <Input id="jobTitle" type="text" placeholder="e.g., Senior Software Engineer, Product Manager, Data Scientist" value={jobTitle} onChange={e => setJobTitle(e.target.value)} required className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
