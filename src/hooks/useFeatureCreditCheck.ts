@@ -4,13 +4,13 @@ import { useDeferredCreditDeduction } from './useDeferredCreditDeduction';
 
 // Credit costs for each feature based on the new pricing structure
 export const FEATURE_CREDITS = {
-  JOB_ANALYSIS: 1.5,
-  COMPANY_ROLE_ANALYSIS: 1.5,
-  INTERVIEW_PREP: 1.5,
+  JOB_ANALYSIS: 1.0,
+  COMPANY_ROLE_ANALYSIS: 3.0,
+  INTERVIEW_PREP: 6.0,
   COVER_LETTER: 1.5,
-  LINKEDIN_POST: 1.5,
-  LINKEDIN_IMAGE: 0.5,
-  JOB_ALERT: 1.5,
+  LINKEDIN_POST: 3.0,
+  LINKEDIN_IMAGE: 1.5,
+  JOB_ALERT: 0, // Free for users
   RESUME_PDF: 1.5
 } as const;
 
@@ -32,6 +32,12 @@ export function useFeatureCreditCheck({
   const { deductCredits, isDeducting } = useDeferredCreditDeduction();
 
   const checkAndDeductCredits = async (description?: string): Promise<boolean> => {
+    // If feature is free (JOB_ALERT), always allow
+    if (requiredCredits === 0) {
+      onSuccess?.();
+      return true;
+    }
+
     if (!hasCredits) {
       showInsufficientCreditsPopup();
       onInsufficientCredits?.();

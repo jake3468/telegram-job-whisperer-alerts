@@ -11,13 +11,36 @@ interface LinkedInImageData {
   created_at: string;
 }
 
-export function useLinkedInImageManager(postId: string) {
+export function useLinkedInImageManager(postId: string | null) {
   const [images, setImages] = useState<LinkedInImageData[]>([]);
-  const [isGenerating, setIsGenerating] = useState<boolean[]>([]);
+  const [isGenerating, setIsGenerating] = useState<boolean[]>([false, false, false]);
   const { toast } = useToast();
   const { checkAndDeductForImage, isDeducting } = useLinkedInImageCreditCheck();
 
+  // Transform images data to match the expected format
+  const generatedImages = {
+    1: images.filter(img => img.variation_number === 1).map(img => img.image_data),
+    2: images.filter(img => img.variation_number === 2).map(img => img.image_data),
+    3: images.filter(img => img.variation_number === 3).map(img => img.image_data)
+  };
+
+  const loadingImage = {
+    1: isGenerating[0],
+    2: isGenerating[1], 
+    3: isGenerating[2]
+  };
+
+  const imageGenerationFailed = {
+    1: false,
+    2: false,
+    3: false
+  };
+
+  const hasImages = images.length > 0;
+
   const generateImage = useCallback(async (variationNumber: number) => {
+    if (!postId) return;
+
     // Check and deduct credits before generating image
     const canProceed = await checkAndDeductForImage(postId, variationNumber);
     if (!canProceed) {
@@ -65,7 +88,14 @@ export function useLinkedInImageManager(postId: string) {
     }
   }, [postId, checkAndDeductForImage, toast]);
 
+  const handleGetImageForPost = useCallback(async (item: any, postNumber: number) => {
+    if (!postId) return;
+    await generateImage(postNumber);
+  }, [generateImage, postId]);
+
   const fetchImages = useCallback(async () => {
+    if (!postId) return;
+
     try {
       const { data, error } = await supabase
         .from('linkedin_post_images')
@@ -142,6 +172,12 @@ export function useLinkedInImageManager(postId: string) {
     isDeducting,
     generateImage,
     fetchImages,
-    deleteImage
+    deleteImage,
+    // Compatibility properties for existing code
+    generatedImages,
+    loadingImage,
+    imageGenerationFailed,
+    hasImages,
+    handleGetImageForPost
   };
 }

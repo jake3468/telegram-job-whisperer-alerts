@@ -15,7 +15,7 @@ export function useLinkedInImageCreditCheck() {
     );
     
     if (success) {
-      console.log(`Successfully deducted 0.5 credits for LinkedIn image generation`);
+      console.log(`Successfully deducted 1.5 credits for LinkedIn image generation`);
     }
     
     return success;
