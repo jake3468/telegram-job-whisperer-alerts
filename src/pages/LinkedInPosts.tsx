@@ -16,6 +16,7 @@ import LoadingMessages from '@/components/LoadingMessages';
 import { useCreditCheck } from '@/hooks/useCreditCheck';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
+
 interface LinkedInPostData {
   post_heading_1: string | null;
   post_content_1: string | null;
@@ -28,6 +29,7 @@ interface UserData {
   first_name: string | null;
   last_name: string | null;
 }
+
 const LinkedInPosts = () => {
   const {
     user
@@ -291,10 +293,8 @@ const LinkedInPosts = () => {
             <span className="sr-only">Toggle navigation menu</span>
           </SidebarTrigger>
           <div className="flex items-center gap-2">
-            <img src="/lovable-uploads/6239b4a7-4f3c-4902-a936-4216ae26d9af.png" alt="JobBots Logo" className="h-8 w-8 drop-shadow-lg" />
-            <span className="font-orbitron font-extrabold text-2xl bg-gradient-to-r from-sky-300 via-fuchsia-400 to-indigo-300 bg-clip-text text-transparent drop-shadow-sm tracking-wider select-none relative whitespace-nowrap">
-              JobBots
-            </span>
+            <img alt="Aspirely Logo" src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" className="max-h-8 drop-shadow-2xl object-fill" />
+            <span className="font-orbitron drop-shadow bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-400 bg-clip-text text-white font-bold min-w-0 truncate text-lg">Aspirely.ai</span>
           </div>
         </div>
       </header>
@@ -434,4 +434,5 @@ const LinkedInPosts = () => {
       </div>
     </SidebarProvider>;
 };
+
 export default LinkedInPosts;
