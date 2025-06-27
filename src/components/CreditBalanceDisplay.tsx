@@ -1,50 +1,51 @@
 
-import { BadgeDollarSign } from "lucide-react";
-import { useUserCredits } from "@/hooks/useUserCredits";
-import { useMemo } from "react";
+import { useUserCredits } from '@/hooks/useUserCredits';
+import { useSidebar } from '@/components/ui/sidebar';
+import { Loader2 } from 'lucide-react';
 
 const CreditBalanceDisplay = () => {
   const { data: credits, isLoading, error } = useUserCredits();
+  const { state } = useSidebar();
 
-  // Memoize the credit balance to prevent unnecessary recalculations
-  const creditBalance = useMemo(() => {
-    if (!credits) return 0;
-    return Number(credits.current_balance) ?? 0;
-  }, [credits]);
-
-  // Show loading only on very first load when no data exists
-  if (isLoading && !credits) {
+  if (isLoading) {
     return (
-      <div className="flex flex-col gap-2 text-fuchsia-200 font-orbitron text-xs">
-        <div className="flex items-center gap-2">
-          <BadgeDollarSign className="w-5 h-5 animate-pulse opacity-70" />
-          <span className="opacity-70">Loading...</span>
-        </div>
+      <div className="flex items-center gap-2 text-fuchsia-200 text-sm font-orbitron">
+        <Loader2 className="w-4 h-4 animate-spin" />
+        {state === 'expanded' && <span>Loading...</span>}
       </div>
     );
   }
 
-  // Static display - show credits without any loading indicators
-  if (credits) {
+  if (error || !credits) {
     return (
-      <div className="flex flex-col gap-0.5 text-fuchsia-200 font-orbitron text-sm px-2">
-        <div className="flex items-center gap-2">
-          <BadgeDollarSign className="w-5 h-5" />
-          <span>
-            {creditBalance.toLocaleString(undefined, { maximumFractionDigits: 2 })} credits
-          </span>
-        </div>
+      <div className="text-red-400 text-sm font-orbitron">
+        {state === 'expanded' ? 'Credits: Error' : '⚠️'}
       </div>
     );
   }
 
-  // Show error state or fallback
+  const balance = Number(credits.current_balance);
+  const isLowCredits = balance < 5;
+
   return (
-    <div className="flex flex-col text-fuchsia-200 font-orbitron text-xs opacity-70">
-      <div className="flex items-center gap-2">
-        <BadgeDollarSign className="w-5 h-5" />
-        <span className="text-xs">Credits</span>
-      </div>
+    <div className={`text-sm font-orbitron transition-colors ${
+      isLowCredits ? 'text-orange-400' : 'text-fuchsia-200'
+    }`}>
+      {state === 'expanded' ? (
+        <div className="flex flex-col gap-1">
+          <span>Credits: {balance}</span>
+          {isLowCredits && (
+            <span className="text-xs text-orange-300">
+              Low credits - consider upgrading
+            </span>
+          )}
+        </div>
+      ) : (
+        <span className="text-xs">
+          {balance}
+          {isLowCredits && '⚠️'}
+        </span>
+      )}
     </div>
   );
 };

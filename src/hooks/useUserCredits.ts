@@ -1,5 +1,5 @@
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@clerk/clerk-react';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -20,9 +20,10 @@ type UserCreditsData = {
 export const useUserCredits = () => {
   const { userProfile } = useUserProfile();
   const { user } = useUser();
+  const queryClient = useQueryClient();
   
-  return useQuery({
-    queryKey: ['user_credits_static'], // Static key that doesn't change
+  const query = useQuery({
+    queryKey: ['user_credits', userProfile?.user_id], // Make key depend on user_id for proper caching
     queryFn: async () => {
       // Wait for userProfile to be available before fetching
       if (!userProfile?.user_id) {
@@ -79,12 +80,20 @@ export const useUserCredits = () => {
       }
     },
     enabled: !!userProfile?.user_id && !!user?.id, // Only enable when both are available
-    // Static configuration - data is cached for the entire session
-    staleTime: Infinity, // Data never becomes stale during session
-    gcTime: Infinity, // Keep data cached indefinitely during session
+    staleTime: 30000, // Consider data stale after 30 seconds
+    gcTime: 300000, // Keep data cached for 5 minutes
     refetchOnWindowFocus: false, // Don't refetch when window gains focus
-    refetchOnReconnect: false, // Don't refetch on network reconnect
-    refetchOnMount: false, // Don't refetch on component remount after initial fetch
+    refetchOnReconnect: true, // Refetch on network reconnect
     retry: 1, // Reduced retry attempts
   });
+
+  // Function to refresh credits data
+  const refreshCredits = () => {
+    queryClient.invalidateQueries({ queryKey: ['user_credits', userProfile?.user_id] });
+  };
+
+  return {
+    ...query,
+    refreshCredits
+  };
 };

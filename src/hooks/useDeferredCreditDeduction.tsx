@@ -3,11 +3,13 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useUserCredits } from '@/hooks/useUserCredits';
 
 export function useDeferredCreditDeduction() {
   const [isDeducting, setIsDeducting] = useState(false);
   const { toast } = useToast();
   const { userProfile } = useUserProfile();
+  const { refreshCredits } = useUserCredits();
 
   const deductCredits = async (amount: number, featureName: string, description: string) => {
     if (!userProfile?.user_id) {
@@ -47,6 +49,10 @@ export function useDeferredCreditDeduction() {
       }
 
       console.log(`Successfully deducted ${amount} credits for ${featureName}`);
+      
+      // Refresh credits data after successful deduction
+      refreshCredits();
+      
       return true;
 
     } catch (error) {
