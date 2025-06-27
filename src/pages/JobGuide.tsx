@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,7 @@ const JobGuide = () => {
   const [jobAnalysisResult, setJobAnalysisResult] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasCreditBeenDeducted, setHasCreditBeenDeducted] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   
   const { toast } = useToast();
   const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(1);
@@ -285,7 +287,11 @@ const JobGuide = () => {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <CardTitle className="text-black text-lg sm:text-xl">Job Analysis Details</CardTitle>
                 <div className="flex-shrink-0">
-                  <JobAnalysisHistoryModal />
+                  <JobAnalysisHistoryModal 
+                    isOpen={isHistoryModalOpen}
+                    onClose={() => setIsHistoryModalOpen(false)}
+                    gradientColors="from-purple-600 to-blue-600"
+                  />
                 </div>
               </div>
             </CardHeader>
@@ -366,9 +372,31 @@ const JobGuide = () => {
           {jobAnalysisResult && (
             <div className="w-full">
               <PremiumAnalysisResults 
-                analysisResult={jobAnalysisResult}
-                companyName={companyName}
-                jobTitle={jobTitle}
+                analysis={{
+                  id: currentAnalysis?.id || '',
+                  company_name: companyName,
+                  location: 'Remote/Various Locations',
+                  job_title: jobTitle,
+                  research_date: new Date().toISOString(),
+                  local_role_market_context: jobAnalysisResult,
+                  company_news_updates: null,
+                  role_security_score: null,
+                  role_security_score_breakdown: null,
+                  role_security_outlook: null,
+                  role_security_automation_risks: null,
+                  role_security_departmental_trends: null,
+                  role_experience_score: null,
+                  role_experience_score_breakdown: null,
+                  role_experience_specific_insights: null,
+                  role_compensation_analysis: null,
+                  role_workplace_environment: null,
+                  career_development: null,
+                  role_specific_considerations: null,
+                  interview_and_hiring_insights: null,
+                  sources: null,
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString()
+                }}
               />
             </div>
           )}
