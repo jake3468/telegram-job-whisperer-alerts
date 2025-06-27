@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,6 +18,7 @@ import { JSONSectionDisplay } from '@/components/JSONSectionDisplay';
 import { SourcesDisplay } from '@/components/SourcesDisplay';
 import { PremiumAnalysisResults } from '@/components/PremiumAnalysisResults';
 import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
+import { Badge } from '@/components/ui/badge';
 
 interface CompanyRoleAnalysisData {
   id: string;
@@ -55,7 +55,6 @@ const CompanyRoleAnalysis = () => {
   const [pendingAnalysisId, setPendingAnalysisId] = useState<string | null>(null);
   const [loadingMessages, setLoadingMessages] = useState<string[]>([]);
   const [showRecentResults, setShowRecentResults] = useState(false);
-  const [creditsDeducted, setCreditsDeducted] = useState(false);
   const {
     toast
   } = useToast();
@@ -71,7 +70,7 @@ const CompanyRoleAnalysis = () => {
   } = useFeatureCreditCheck({
     feature: 'COMPANY_ROLE_ANALYSIS',
     onSuccess: () => {
-      setCreditsDeducted(true);
+      console.log('Credit deduction successful for company analysis');
     },
     onInsufficientCredits: () => {
       setIsSubmitting(false);
@@ -198,10 +197,8 @@ const CompanyRoleAnalysis = () => {
           setShowRecentResults(true);
 
           // Deduct credits when results are successfully displayed
-          if (!creditsDeducted) {
-            console.log('Deducting credits for company analysis results via real-time');
-            checkAndDeductCredits('Company Analysis - Results Generated');
-          }
+          console.log('Deducting credits for company analysis results via real-time');
+          checkAndDeductCredits('Company Analysis - Results Generated');
 
           toast({
             title: "Analysis Complete!",
@@ -217,7 +214,7 @@ const CompanyRoleAnalysis = () => {
       console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
-  }, [userProfile?.id, pendingAnalysisId, refetchHistory, toast, creditsDeducted, checkAndDeductCredits]);
+  }, [userProfile?.id, pendingAnalysisId, refetchHistory, toast, checkAndDeductCredits]);
 
   // Loading messages effect
   useEffect(() => {
@@ -274,7 +271,6 @@ const CompanyRoleAnalysis = () => {
 
     setIsSubmitting(true);
     setShowRecentResults(false);
-    setCreditsDeducted(false); // Reset credit deduction flag
 
     try {
       console.log('Creating company role analysis with data:', {
@@ -360,6 +356,11 @@ const CompanyRoleAnalysis = () => {
             <p className="text-base sm:text-lg text-white max-w-3xl mx-auto leading-relaxed font-light px-2">
               Smart candidates don't just apply—they investigate. Get the career intelligence that puts you ahead of 99% of applicants.
             </p>
+            
+            {/* Usage Cost Badge */}
+            <Badge variant="outline" className="bg-green-900/30 border-green-600/50 text-green-300 font-semibold">
+              Usage Fee: 3 credits
+            </Badge>
           </div>
 
           {/* Analysis Form */}

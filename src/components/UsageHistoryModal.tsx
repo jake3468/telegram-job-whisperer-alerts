@@ -124,37 +124,65 @@ const UsageHistoryModal = () => {
                 </div>
               ) : (
                 <ScrollArea className="h-[50vh] w-full">
-                  <div className="w-full overflow-x-auto">
-                    <Table className="w-full min-w-[800px]">
+                  {/* Mobile View */}
+                  <div className="block md:hidden space-y-4">
+                    {creditTransactions.map((transaction) => (
+                      <div key={transaction.id} className="bg-slate-800/40 rounded-lg p-4 border border-blue-400/20">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="text-blue-100 text-sm font-medium">
+                            {getTransactionTypeDisplay(transaction.type, transaction.description)}
+                          </div>
+                          <div className={`text-sm font-bold font-mono ${
+                            transaction.amount > 0 ? 'text-green-400' : 'text-red-400'
+                          }`}>
+                            {formatAmount(transaction.amount)}
+                          </div>
+                        </div>
+                        <div className="text-blue-200 text-xs mb-2">
+                          {formatDate(transaction.date)}
+                        </div>
+                        <div className="text-blue-100 text-xs mb-2 break-words">
+                          {transaction.description || (transaction.featureUsed ? `Used for ${transaction.featureUsed}` : '-')}
+                        </div>
+                        <div className="text-blue-200 text-xs">
+                          Balance: {transaction.balanceAfter?.toFixed(1) || '-'}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Desktop/Tablet View */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <Table className="w-full min-w-[600px]">
                       <TableHeader>
                         <TableRow className="border-blue-400/30 hover:bg-white/5">
-                          <TableHead className="text-blue-200 font-orbitron w-[120px] min-w-[120px]">Date</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron w-[140px] min-w-[140px]">Type</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron w-[250px] min-w-[200px]">Description</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron text-right w-[100px] min-w-[100px]">Amount</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron text-right w-[120px] min-w-[120px]">Balance After</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron">Date</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron">Type</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron">Description</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron text-right">Amount</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron text-right">Balance</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {creditTransactions.map((transaction) => (
                           <TableRow key={transaction.id} className="border-blue-400/20 hover:bg-white/5">
-                            <TableCell className="text-blue-100 text-sm w-[120px]">
+                            <TableCell className="text-blue-100 text-sm">
                               {formatDate(transaction.date)}
                             </TableCell>
-                            <TableCell className="text-blue-100 text-sm font-medium w-[140px]">
+                            <TableCell className="text-blue-100 text-sm font-medium">
                               {getTransactionTypeDisplay(transaction.type, transaction.description)}
                             </TableCell>
-                            <TableCell className="text-blue-100 text-xs w-[250px]">
+                            <TableCell className="text-blue-100 text-xs">
                               <div className="break-words" title={transaction.description || (transaction.featureUsed ? `Used for ${transaction.featureUsed}` : '-')}>
                                 {transaction.description || (transaction.featureUsed ? `Used for ${transaction.featureUsed}` : '-')}
                               </div>
                             </TableCell>
-                            <TableCell className={`text-right font-mono text-sm font-bold w-[100px] ${
+                            <TableCell className={`text-right font-mono text-sm font-bold ${
                               transaction.amount > 0 ? 'text-green-400' : 'text-red-400'
                             }`}>
                               {formatAmount(transaction.amount)}
                             </TableCell>
-                            <TableCell className="text-blue-100 text-right font-mono text-sm w-[120px]">
+                            <TableCell className="text-blue-100 text-right font-mono text-sm">
                               {transaction.balanceAfter?.toFixed(1) || '-'}
                             </TableCell>
                           </TableRow>
@@ -173,27 +201,61 @@ const UsageHistoryModal = () => {
                 </div>
               ) : (
                 <ScrollArea className="h-[50vh] w-full">
-                  <div className="w-full overflow-x-auto">
-                    <Table className="w-full min-w-[700px]">
+                  {/* Mobile View */}
+                  <div className="block md:hidden space-y-4">
+                    {paymentRecords.map((record) => (
+                      <div key={record.id} className="bg-slate-800/40 rounded-lg p-4 border border-blue-400/20">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="text-blue-100 text-sm font-medium">
+                            {getPaymentEventDisplay(record.type)}
+                          </div>
+                          <div className="text-green-400 text-sm font-bold font-mono">
+                            {record.amount > 0 ? `+${record.amount}` : '-'}
+                          </div>
+                        </div>
+                        <div className="text-blue-200 text-xs mb-2">
+                          {formatDate(record.date)}
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            record.status === 'active' || record.status === 'completed'
+                              ? 'bg-green-500/20 text-green-300' 
+                              : 'bg-gray-500/20 text-gray-300'
+                          }`}>
+                            {record.status}
+                          </span>
+                          <div className="text-blue-100 text-xs font-mono">
+                            {record.paymentDetails?.price_amount && record.currency 
+                              ? `${record.currency === 'INR' ? '₹' : '$'}${record.paymentDetails.price_amount}` 
+                              : '-'}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Desktop/Tablet View */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <Table className="w-full min-w-[600px]">
                       <TableHeader>
                         <TableRow className="border-blue-400/30 hover:bg-white/5">
-                          <TableHead className="text-blue-200 font-orbitron w-[120px] min-w-[120px]">Date</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron w-[140px] min-w-[140px]">Event</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron w-[100px] min-w-[100px]">Status</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron text-right w-[100px] min-w-[100px]">Amount</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron text-right w-[100px] min-w-[100px]">Credits</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron">Date</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron">Event</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron">Status</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron text-right">Amount</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron text-right">Credits</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {paymentRecords.map((record) => (
                           <TableRow key={record.id} className="border-blue-400/20 hover:bg-white/5">
-                            <TableCell className="text-blue-100 text-sm w-[120px]">
+                            <TableCell className="text-blue-100 text-sm">
                               {formatDate(record.date)}
                             </TableCell>
-                            <TableCell className="text-blue-100 text-sm font-medium w-[140px]">
+                            <TableCell className="text-blue-100 text-sm font-medium">
                               {getPaymentEventDisplay(record.type)}
                             </TableCell>
-                            <TableCell className="text-blue-100 text-xs w-[100px]">
+                            <TableCell className="text-blue-100 text-xs">
                               <span className={`px-2 py-1 rounded text-xs font-medium ${
                                 record.status === 'active' || record.status === 'completed'
                                   ? 'bg-green-500/20 text-green-300' 
@@ -202,12 +264,12 @@ const UsageHistoryModal = () => {
                                 {record.status}
                               </span>
                             </TableCell>
-                            <TableCell className="text-blue-100 text-right font-mono text-sm w-[100px]">
+                            <TableCell className="text-blue-100 text-right font-mono text-sm">
                               {record.paymentDetails?.price_amount && record.currency 
                                 ? `${record.currency === 'INR' ? '₹' : '$'}${record.paymentDetails.price_amount}` 
                                 : '-'}
                             </TableCell>
-                            <TableCell className="text-green-400 text-right font-mono text-sm font-bold w-[100px]">
+                            <TableCell className="text-green-400 text-right font-mono text-sm font-bold">
                               {record.amount > 0 ? `+${record.amount}` : '-'}
                             </TableCell>
                           </TableRow>
