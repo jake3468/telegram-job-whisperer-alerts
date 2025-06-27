@@ -436,7 +436,7 @@ const JobGuide = () => {
         <div className="max-w-4xl mx-auto w-full px-2 py-4 sm:px-6 sm:py-8 mt-0">
           <div className="text-center mb-6 px-2">
             <h1 className="font-orbitron bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 bg-clip-text text-transparent mb-2 drop-shadow text-5xl font-bold">
-              Job Analysis
+              🎯 Job Analysis
             </h1>
             <p className="text-lg text-slate-300 font-inter font-light">
               In-depth breakdown and <span className="italic text-slate-400">insights</span> for your ideal jobs
