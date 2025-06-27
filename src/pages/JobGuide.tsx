@@ -443,14 +443,14 @@ const JobGuide = () => {
                   {/* Company Name */}
                   <div className="space-y-2">
                     <label htmlFor="companyName" className="text-slate-200 font-semibold text-base">
-                      Company Name *
+                      🏬 Company Name *
                     </label>
                     <Input id="companyName" placeholder="Google, Microsoft" value={formData.companyName} onChange={e => handleInputChange('companyName', e.target.value)} required maxLength={200} className="bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold" />
                   </div>
                   {/* Job Title */}
                   <div className="space-y-2">
                     <label htmlFor="jobTitle" className="text-slate-200 font-semibold text-base">
-                      Job Title *
+                      👨🏻‍💼 Job Title *
                     </label>
                     <Input id="jobTitle" placeholder="Software Engineer, Marketing Manager" value={formData.jobTitle} onChange={e => handleInputChange('jobTitle', e.target.value)} required maxLength={200} className="bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold" />
                   </div>
@@ -458,7 +458,7 @@ const JobGuide = () => {
                 {/* Job Description */}
                 <div className="space-y-2">
                   <label htmlFor="jobDescription" className="text-slate-200 font-semibold text-base">
-                    Job Description *
+                    🧾 Job Description *
                   </label>
                   <span className="text-slate-400 font-normal text-xs block mb-2">
                     Paste in the job description or key requirements
