@@ -244,9 +244,7 @@ const InterviewPrep = () => {
               
             </div>
             <h1 className="text-2xl mb-4 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] bg-clip-text text-red-200 font-extrabold sm:text-4xl">👔 Interview Prep</h1>
-            <p className="text-gray-300 max-w-2xl mx-auto text-sm sm:text-lg font-light px-4">
-              Your Personal Interview Coach, powered by AI. Get 15 tailored questions with perfect answers, pro tips, and strategic questions to ask your interviewer.
-            </p>
+            <p className="text-gray-300 max-w-2xl mx-auto text-sm sm:text-lg font-light px-4">Your Personal Interview Coach, powered by AI. Get tailored questions with perfect answers, pro tips, and strategic questions to ask your interviewer.</p>
           </div>
 
           {/* Profile Completion Warning */}
