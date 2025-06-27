@@ -243,7 +243,7 @@ const InterviewPrep = () => {
 
   return <Layout>
       <div className="min-h-screen bg-black text-white">
-        <div className="container mx-auto px-4 py-2 max-w-5xl">
+        <div className="container mx-auto px-4 pt-2 pb-2 max-w-5xl">
           {/* Header */}
           <div className="text-center mb-6 sm:mb-8 px-2">
             <div className="inline-flex items-center gap-3 mb-4">
