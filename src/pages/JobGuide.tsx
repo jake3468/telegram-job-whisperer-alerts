@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -12,7 +11,7 @@ import { useDeferredCreditDeduction } from '@/hooks/useDeferredCreditDeduction';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
-import PremiumAnalysisResults from '@/components/PremiumAnalysisResults';
+import { PremiumAnalysisResults } from '@/components/PremiumAnalysisResults';
 import LoadingMessages from '@/components/LoadingMessages';
 import { useUser } from '@clerk/clerk-react';
 import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
@@ -286,11 +285,7 @@ const JobGuide = () => {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <CardTitle className="text-black text-lg sm:text-xl">Job Analysis Details</CardTitle>
                 <div className="flex-shrink-0">
-                  <JobAnalysisHistoryModal 
-                    type="job_analysis"
-                    gradientColors="from-purple-600 to-blue-600"
-                    borderColors="border-purple-500/20"
-                  />
+                  <JobAnalysisHistoryModal />
                 </div>
               </div>
             </CardHeader>
