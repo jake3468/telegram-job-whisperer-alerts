@@ -1,47 +1,66 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { Toaster } from "@/components/ui/toaster"
-import { TooltipProvider } from "@/components/ui/tooltip"
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-} from "react-router-dom";
-import AppLayout from "@/layouts/AppLayout";
-import Home from "@/pages/Home";
-import JobGuide from "@/pages/JobGuide";
-import CoverLetter from "@/pages/CoverLetter";
-import LinkedInPost from "@/pages/LinkedInPost";
-import CompanyAnalysis from "@/pages/CompanyAnalysis";
-import InterviewPrep from "@/pages/InterviewPrep";
-import PricingPage from "@/pages/PricingPage";
-import ProfilePage from "@/pages/ProfilePage";
-import SecurityDashboardPage from "@/pages/SecurityDashboard";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useClerkSupabaseSync } from "@/hooks/useClerkSupabaseSync";
+import Index from "./pages/Index";
+import JobGuide from "./pages/JobGuide";
+import CoverLetter from "./pages/CoverLetter";
+import LinkedInPosts from "./pages/LinkedInPosts";
+import InterviewPrep from "./pages/InterviewPrep";
+import CompanyRoleAnalysis from "./pages/CompanyRoleAnalysis";
+import Profile from "./pages/Profile";
+import ResumeBuilder from "./pages/ResumeBuilder";
+import JobAlerts from "./pages/JobAlerts";
+import GetMoreCredits from "./pages/GetMoreCredits";
+import Upgrade from "./pages/Upgrade";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import ContactSupport from "./pages/ContactSupport";
+import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient();
 
-function App() {
+// Component to initialize Clerk-Supabase sync
+const AppWithSync = () => {
+  // This hook MUST be called to sync Clerk JWT with Supabase
+  useClerkSupabaseSync();
+  
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<AppLayout />} >
-              <Route index element={<Home />} />
-              <Route path="job-guide" element={<JobGuide />} />
-              <Route path="cover-letter" element={<CoverLetter />} />
-              <Route path="linkedin-post" element={<LinkedInPost />} />
-              <Route path="company-analysis" element={<CompanyAnalysis />} />
-              <Route path="interview-prep" element={<InterviewPrep />} />
-              <Route path="pricing" element={<PricingPage />} />
-              <Route path="profile" element={<ProfilePage />} />
-            </Route>
-            <Route path="/security-dashboard" element={<SecurityDashboardPage />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/dashboard" element={<Navigate to="/profile" replace />} />
+        <Route path="/job-guide" element={<JobGuide />} />
+        <Route path="/cover-letter" element={<CoverLetter />} />
+        <Route path="/linkedin-posts" element={<LinkedInPosts />} />
+        <Route path="/interview-prep" element={<InterviewPrep />} />
+        <Route path="/company-role-analysis" element={<CompanyRoleAnalysis />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/resume-builder" element={<ResumeBuilder />} />
+        <Route path="/job-alerts" element={<JobAlerts />} />
+        <Route path="/get-more-credits" element={<GetMoreCredits />} />
+        <Route path="/upgrade" element={<Upgrade />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/contact-support" element={<ContactSupport />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
   );
-}
+};
 
-export default App
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <AppWithSync />
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
+
+export default App;
