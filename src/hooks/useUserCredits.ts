@@ -1,4 +1,3 @@
-
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase, makeAuthenticatedRequest, refreshJWTToken } from '@/integrations/supabase/client';
 import { useUser } from '@clerk/clerk-react';
@@ -133,12 +132,14 @@ export const useUserCredits = () => {
     },
     enabled: !!(isClerkLoaded && user?.id && userProfile?.user_id), // Only enable when everything is loaded
     staleTime: 10000, // Consider data stale after 10 seconds
-    gcTime: 60000, // Keep data cached for 1 minute
-    refetchOnWindowFocus: true, // Always refetch when window gains focus
+    gcTime: 300000, // Keep data cached for 5 minutes (increased from 1 minute)
+    refetchOnWindowFocus: false, // Don't refetch on window focus to prevent flashing
     refetchOnReconnect: true, // Always refetch on network reconnect
-    refetchOnMount: true, // Always refetch on component mount
+    refetchOnMount: false, // Don't refetch on component mount if we have cached data
     retry: false, // Disable React Query's retry since we handle it manually
     retryDelay: 0, // No additional delay since we handle it manually
+    // Keep previous data while fetching new data to prevent flashing
+    placeholderData: (previousData) => previousData,
   });
 
   // Function to refresh credits data

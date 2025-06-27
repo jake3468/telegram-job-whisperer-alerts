@@ -1,14 +1,14 @@
 
 import { useUserCredits } from '@/hooks/useUserCredits';
 import { useSidebar } from '@/components/ui/sidebar';
-import { Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 
 const CreditBalanceDisplay = () => {
-  const { data: credits, isLoading, error, isError, refetch } = useUserCredits();
+  const { data: credits, isLoading, isPending } = useUserCredits();
   const { state } = useSidebar();
 
-  if (isLoading) {
+  // Only show loading on initial load, not on subsequent fetches
+  if ((isLoading || isPending) && !credits) {
     return (
       <div className="flex items-center gap-2 text-fuchsia-200 text-sm font-orbitron">
         <Loader2 className="w-4 h-4 animate-spin" />
@@ -17,40 +17,8 @@ const CreditBalanceDisplay = () => {
     );
   }
 
-  // Handle error state - show retry option instead of defaulting to 0
-  if (isError || !credits) {
-    console.error('[CreditBalanceDisplay] Error loading credits:', error);
-    return (
-      <div className="flex items-center gap-2 text-orange-400 text-sm font-orbitron">
-        <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-        {state === 'expanded' ? (
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="truncate">Credits failed to load</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => refetch()}
-              className="h-6 w-6 p-0 hover:bg-orange-400/20"
-            >
-              <RefreshCw className="w-3 h-3" />
-            </Button>
-          </div>
-        ) : (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => refetch()}
-            className="h-5 w-5 p-0 hover:bg-orange-400/20"
-          >
-            <RefreshCw className="w-3 h-3" />
-          </Button>
-        )}
-      </div>
-    );
-  }
-
-  // Ensure we have a valid number for current_balance - never show negative or invalid values
-  const balance = Math.max(Number(credits.current_balance) || 0, 0);
+  // Always show credits - use cached data if available, fallback to 0 only if no data at all
+  const balance = credits ? Math.max(Number(credits.current_balance) || 0, 0) : 0;
   const isLowCredits = balance < 5;
 
   return (
