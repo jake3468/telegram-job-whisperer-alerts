@@ -315,7 +315,7 @@ const CompanyRoleAnalysis = () => {
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
               <Building2 className="w-10 h-10 sm:w-12 sm:h-12 text-green-400" />
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-orbitron font-extrabold text-transparent bg-gradient-to-r from-green-400 via-green-500 to-green-600 bg-clip-text">
-                Company Decoder
+                🏢 Company Decoder
               </h1>
             </div>
             <p className="text-base sm:text-lg text-white max-w-3xl mx-auto leading-relaxed font-light px-2">
