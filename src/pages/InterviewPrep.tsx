@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,7 @@ import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
 import { InterviewPrepHistoryModal } from '@/components/InterviewPrepHistoryModal';
 import InterviewPrepDownloadActions from '@/components/InterviewPrepDownloadActions';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
+
 const InterviewPrep = () => {
   // Ensure Clerk JWT is synced with Supabase
   useClerkSupabaseSync();
@@ -99,6 +101,7 @@ const InterviewPrep = () => {
       supabase.removeChannel(channel);
     };
   }, [currentAnalysis?.id, toast]);
+
   const handleGenerate = async () => {
     console.log('🚀 Interview Prep Generate Button Clicked');
 
@@ -213,6 +216,7 @@ const InterviewPrep = () => {
       setIsSubmitting(false);
     }
   };
+
   const handleReset = () => {
     setCompanyName('');
     setJobTitle('');
@@ -221,6 +225,7 @@ const InterviewPrep = () => {
     setCurrentAnalysis(null);
     setIsGenerating(false);
   };
+
   const renderInterviewQuestions = (content: string) => {
     if (!content) return null;
 
@@ -235,9 +240,10 @@ const InterviewPrep = () => {
       __html: processedContent
     }} />;
   };
+
   return <Layout>
       <div className="min-h-screen bg-black text-white">
-        <div className="container mx-auto px-4 py-4 sm:py-8 max-w-5xl">
+        <div className="container mx-auto px-4 py-4 sm:py-4 max-w-5xl">
           {/* Header */}
           <div className="text-center mb-6 sm:mb-8 px-2">
             <div className="inline-flex items-center gap-3 mb-4">
@@ -331,4 +337,5 @@ const InterviewPrep = () => {
       </div>
     </Layout>;
 };
+
 export default InterviewPrep;

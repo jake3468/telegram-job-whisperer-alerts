@@ -19,6 +19,7 @@ import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
 import { validateInput, sanitizeText, isValidForTyping } from '@/utils/sanitize';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
+
 const JobGuide = () => {
   const {
     user,
@@ -64,6 +65,7 @@ const JobGuide = () => {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
+
   useEffect(() => {
     if (!isGenerating) return;
     let messageIndex = 0;
@@ -74,6 +76,7 @@ const JobGuide = () => {
     }, 3000);
     return () => clearInterval(messageInterval);
   }, [isGenerating]);
+
   useEffect(() => {
     if (!jobAnalysisId || !isGenerating) return;
     console.log('🔄 Starting enhanced polling for job analysis results, ID:', jobAnalysisId);
@@ -182,6 +185,7 @@ const JobGuide = () => {
       clearTimeout(timeout);
     };
   }, [jobAnalysisId, isGenerating, toast]);
+
   const handleInputChange = (field: string, value: string) => {
     // Use more lenient validation for real-time typing
     const maxLength = field === 'jobDescription' ? 5000 : 200;
@@ -203,6 +207,7 @@ const JobGuide = () => {
       [field]: cleanValue
     }));
   };
+
   const handleClearData = useCallback(() => {
     setFormData({
       companyName: '',
@@ -220,6 +225,7 @@ const JobGuide = () => {
       description: "All form data and results have been cleared."
     });
   }, [toast]);
+
   const handleSubmit = useCallback(async () => {
     console.log('🚀 Job Guide Submit Button Clicked');
 
@@ -331,6 +337,7 @@ const JobGuide = () => {
       setIsSubmitting(false);
     }
   }, [formData, isComplete, completionLoading, profileLoading, hasResume, hasBio, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup, userProfile]);
+
   useEffect(() => {
     const handleHistoryData = (event: any) => {
       const {
@@ -355,6 +362,7 @@ const JobGuide = () => {
     window.addEventListener('useHistoryData', handleHistoryData);
     return () => window.removeEventListener('useHistoryData', handleHistoryData);
   }, []);
+
   const handleCopyResult = async () => {
     if (!jobAnalysisResult) return;
     try {
@@ -399,14 +407,16 @@ const JobGuide = () => {
     isButtonDisabled,
     userProfile: !!userProfile
   });
+
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-slate-400 text-xs">Loading...</div>
       </div>;
   }
+
   return <Layout>
       <div className="min-h-screen w-full flex flex-col">
-        <div className="max-w-4xl mx-auto w-full px-2 py-4 sm:px-6 sm:py-8 mt-0">
+        <div className="max-w-4xl mx-auto w-full px-2 py-4 sm:px-6 sm:py-4">
           <div className="text-center mb-6 px-2">
             <h1 className="font-orbitron bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 bg-clip-text mb-2 drop-shadow font-bold text-blue-500 text-4xl">
               🎯 Job Analysis
@@ -542,4 +552,5 @@ const JobGuide = () => {
       </div>
     </Layout>;
 };
+
 export default JobGuide;

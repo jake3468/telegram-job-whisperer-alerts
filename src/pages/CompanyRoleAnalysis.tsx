@@ -17,6 +17,7 @@ import { BulletPointList } from '@/components/BulletPointList';
 import { JSONSectionDisplay } from '@/components/JSONSectionDisplay';
 import { SourcesDisplay } from '@/components/SourcesDisplay';
 import { PremiumAnalysisResults } from '@/components/PremiumAnalysisResults';
+
 interface CompanyRoleAnalysisData {
   id: string;
   company_name: string;
@@ -42,6 +43,7 @@ interface CompanyRoleAnalysisData {
   created_at: string;
   updated_at: string;
 }
+
 const CompanyRoleAnalysis = () => {
   const [companyName, setCompanyName] = useState('');
   const [location, setLocation] = useState('');
@@ -253,7 +255,7 @@ const CompanyRoleAnalysis = () => {
   // Get the most recent completed analysis for display
   const recentCompletedAnalysis = showRecentResults && analysisHistory && analysisHistory.length > 0 ? analysisHistory.find(analysis => hasAnalysisResult(analysis)) : null;
   return <Layout>
-      <div className="min-h-screen bg-black px-2 py-4 sm:px-4 sm:py-6 lg:px-8 lg:py-8">
+      <div className="min-h-screen bg-black px-2 py-4 sm:px-4 sm:py-4 lg:px-8 lg:py-4">
         <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
           {/* Header Section */}
           <div className="text-center space-y-3 sm:space-y-4 px-2">
@@ -389,4 +391,5 @@ const CompanyRoleAnalysis = () => {
       <CompanyRoleAnalysisHistoryModal isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} gradientColors="from-green-400 via-green-500 to-green-600" />
     </Layout>;
 };
+
 export default CompanyRoleAnalysis;
