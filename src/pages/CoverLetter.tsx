@@ -280,7 +280,7 @@ const CoverLetter = () => {
               <div className="max-w-4xl mx-auto w-full px-3 py-4 sm:px-6 sm:py-6 mt-4">
                 {/* Gradient Heading */}
                 <div className="mb-8 text-center">
-                  <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-400 via-fuchsia-400 to-fuchsia-600 bg-clip-text text-transparent mb-2 drop-shadow font-orbitron animate-fade-in md:text-4xl">📝 Cover Letter</h1>
+                  <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-400 via-fuchsia-400 to-fuchsia-600 bg-clip-text mb-2 drop-shadow font-orbitron animate-fade-in md:text-4xl text-pink-500">📝 Cover Letter</h1>
                   <p className="text-lg font-inter font-light text-white/90">
                     Instantly create stunning <span className="italic text-white/85">Cover Letters</span> for every job
                   </p>
