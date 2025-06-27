@@ -1,3 +1,4 @@
+
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Menu } from 'lucide-react';
@@ -36,7 +37,7 @@ export function Layout({
         {/* Main content area now has padding-top to avoid the fixed mobile header */}
         <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0">
           <main className="flex-1 w-full px-0 py-0 bg-transparent">
-            <div className="w-full px-3 sm:px-6 pt-3 sm:pt-8">
+            <div className="w-full px-3 sm:px-6">
               {children}
             </div>
           </main>
