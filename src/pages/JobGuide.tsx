@@ -1,4 +1,5 @@
 
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -6,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { AlertCircle, FileText, Sparkles, Loader2, CheckCircle, Trash2, Building, Briefcase, Copy, History } from 'lucide-react';
 import AuthHeader from '@/components/AuthHeader';
@@ -451,9 +453,12 @@ const JobGuide = () => {
             <h1 className="font-orbitron bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 bg-clip-text mb-2 drop-shadow font-bold text-blue-500 text-4xl">
               🎯 Job Analysis
             </h1>
-            <p className="text-lg text-slate-300 font-inter font-light">
+            <p className="text-lg text-slate-300 font-inter font-light mb-3">
               In-depth breakdown and <span className="italic text-slate-400">insights</span> for your ideal jobs
             </p>
+            <Badge variant="outline" className="bg-blue-900/30 border-blue-600/50 text-blue-300 font-semibold">
+              Usage Fee: 1 Credit
+            </Badge>
           </div>
 
           {/* Profile Completion Warning */}
@@ -588,3 +593,4 @@ const JobGuide = () => {
 };
 
 export default JobGuide;
+
