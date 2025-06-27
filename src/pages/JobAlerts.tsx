@@ -65,7 +65,7 @@ const JobAlerts = () => {
         WebkitBackgroundClip: 'text',
         backgroundClip: 'text',
         color: 'transparent'
-      }} className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-orange-400 via-yellow-400 to-pink-500 bg-clip-text mb-2 drop-shadow tracking-tight text-yellow-500">
+      }} className="text-4xl font-orbitron font-extrabold bg-gradient-to-r from-orange-400 via-yellow-400 to-pink-500 bg-clip-text mb-2 drop-shadow tracking-tight text-yellow-400">
           ⏰ Telegram <span className="italic">Job</span> Alerts
         </h1>
         
