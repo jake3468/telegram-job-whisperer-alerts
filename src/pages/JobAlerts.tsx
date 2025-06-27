@@ -1,4 +1,3 @@
-
 import { useUser } from '@clerk/clerk-react';
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -8,9 +7,11 @@ import { Layout } from '@/components/Layout';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
-
 const JobAlerts = () => {
-  const { user, isLoaded } = useUser();
+  const {
+    user,
+    isLoaded
+  } = useUser();
   const navigate = useNavigate();
 
   // CRITICAL: Ensure Clerk-Supabase sync runs on this page
@@ -26,7 +27,9 @@ const JobAlerts = () => {
       const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
       // Map legacy timezone names to modern IANA standard
-      const timezoneMapping: { [key: string]: string } = {
+      const timezoneMapping: {
+        [key: string]: string;
+      } = {
         'Asia/Calcutta': 'Asia/Kolkata'
         // Add other legacy mappings if needed in the future
       };
@@ -46,34 +49,25 @@ const JobAlerts = () => {
       return 'UTC';
     }
   }, []);
-
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
-
   if (!isLoaded || !user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-pastel-mint via-pastel-lavender to-pastel-peach flex items-center justify-center">
+    return <div className="min-h-screen bg-gradient-to-br from-pastel-mint via-pastel-lavender to-pastel-peach flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading...</div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <Layout>
+  return <Layout>
       <div className="text-center mb-8">
         <h1 className="text-4xl font-orbitron font-extrabold mb-2 drop-shadow tracking-tight flex items-center justify-center gap-2">
           <span>⏰</span>
-          <span 
-            style={{
-              WebkitBackgroundClip: 'text',
-              backgroundClip: 'text',
-              color: 'transparent'
-            }}
-            className="bg-gradient-to-r from-orange-400 via-yellow-400 to-pink-500 bg-clip-text text-amber-400"
-          >
+          <span style={{
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          color: 'transparent'
+        }} className="bg-gradient-to-r from-orange-400 via-yellow-400 to-pink-500 bg-clip-text text-amber-400 text-left">
             Telegram <span className="italic">Job</span> Alerts
           </span>
         </h1>
@@ -97,8 +91,6 @@ const JobAlerts = () => {
       <div className="space-y-8">
         <JobAlertsSection userTimezone={userTimezone} />
       </div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default JobAlerts;
