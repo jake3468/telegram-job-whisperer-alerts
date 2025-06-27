@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -444,7 +445,7 @@ const JobGuide = () => {
   }
 
   return <Layout>
-      <div className="min-h-screen w-full flex flex-col overflow-x-hidden">
+      <div className="min-h-screen w-full flex flex-col overflow-x-hidden bg-black">
         <div className="max-w-4xl mx-auto w-full px-2 pt-2 pb-2 sm:px-6">
           <div className="text-center mb-6 px-2">
             <h1 className="font-orbitron bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 bg-clip-text mb-2 drop-shadow font-bold text-blue-500 text-4xl">
@@ -543,8 +544,8 @@ const JobGuide = () => {
                 </CardContent>
               </Card>}
 
-            {/* Result Display - Fixed for mobile responsiveness and horizontal scrolling */}
-            {jobAnalysisResult && <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-cyan-900 border border-blue-700 shadow-lg overflow-hidden">
+            {/* Result Display - Fixed for horizontal scrolling and background issues */}
+            {jobAnalysisResult && <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-cyan-900 border border-blue-700 shadow-lg w-full max-w-full overflow-hidden">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-slate-200 font-orbitron text-xl flex items-center gap-2">
                     <FileText className="w-5 h-5 text-slate-400" />
@@ -554,7 +555,7 @@ const JobGuide = () => {
                     Personalized result for <span className="font-bold text-slate-200">{sanitizeText(formData.jobTitle)}</span> at <span className="font-bold text-slate-200">{sanitizeText(formData.companyName)}</span>
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="w-full max-w-full overflow-hidden">
+                <CardContent className="w-full max-w-full p-4">
                   {/* Percentage Meter (Match Score) */}
                   {matchScore && <div className="mb-4 w-full">
                       <div className="w-full max-w-sm mx-auto">
@@ -564,10 +565,10 @@ const JobGuide = () => {
                       </div>
                     </div>}
 
-                  <div className="w-full max-w-full overflow-hidden">
+                  <div className="w-full overflow-hidden">
                     <SafeHTMLRenderer 
                       content={jobAnalysisResult} 
-                      className="whitespace-pre-wrap font-inter text-slate-100 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-blue-900/90 rounded-xl p-3 sm:p-4 md:p-5 shadow-inner mb-3 border border-slate-700 w-full max-w-full overflow-x-auto break-words hyphens-auto" 
+                      className="whitespace-pre-wrap font-inter text-slate-100 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-blue-900/90 rounded-xl p-3 sm:p-4 md:p-5 shadow-inner mb-3 border border-slate-700 w-full overflow-hidden break-words hyphens-auto [word-break:break-word]" 
                       maxLength={15000} 
                     />
                   </div>
