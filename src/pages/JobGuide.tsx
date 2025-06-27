@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -19,6 +20,7 @@ import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
 import { validateInput, sanitizeText, isValidForTyping } from '@/utils/sanitize';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
+import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
 
 const JobGuide = () => {
   const {
@@ -52,12 +54,26 @@ const JobGuide = () => {
   const [jobAnalysisResult, setJobAnalysisResult] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('');
   const [matchScore, setMatchScore] = useState<string | null>(null);
+  const [creditsDeducted, setCreditsDeducted] = useState(false);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const loadingMessages = ["🔍 Analyzing job requirements...", "✨ Crafting personalized insights...", "🚀 Tailoring advice to your profile...", "🎯 Generating strategic recommendations..."];
+  
   const {
     hasCredits,
+    checkAndDeductCredits,
+    isDeducting,
     showInsufficientCreditsPopup
-  } = useCreditCheck(1.5);
+  } = useFeatureCreditCheck({
+    feature: 'JOB_ANALYSIS',
+    onSuccess: () => {
+      setCreditsDeducted(true);
+    },
+    onInsufficientCredits: () => {
+      setIsGenerating(false);
+      setIsSubmitting(false);
+    }
+  });
+
   useCreditWarnings(); // This shows the warning popups
 
   useEffect(() => {
@@ -134,6 +150,13 @@ const JobGuide = () => {
             clearInterval(pollingIntervalRef.current);
             pollingIntervalRef.current = null;
           }
+
+          // Deduct credits only when results are successfully displayed
+          if (!creditsDeducted) {
+            console.log('🔒 Deducting credits for job analysis results');
+            await checkAndDeductCredits('Job Analysis - Results Generated');
+          }
+
           toast({
             title: "Job Analysis Generated!",
             description: "Your personalized job analysis is ready."
@@ -184,7 +207,7 @@ const JobGuide = () => {
       }
       clearTimeout(timeout);
     };
-  }, [jobAnalysisId, isGenerating, toast]);
+  }, [jobAnalysisId, isGenerating, toast, creditsDeducted, checkAndDeductCredits]);
 
   const handleInputChange = (field: string, value: string) => {
     // Use more lenient validation for real-time typing
@@ -220,6 +243,7 @@ const JobGuide = () => {
     setError(null);
     setIsGenerating(false);
     setIsSubmitting(false);
+    setCreditsDeducted(false);
     toast({
       title: "Data Cleared",
       description: "All form data and results have been cleared."
@@ -234,8 +258,6 @@ const JobGuide = () => {
       showInsufficientCreditsPopup();
       return;
     }
-
-    // REMOVED PROFILE COMPLETION CHECK - Allow users to proceed regardless
 
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
@@ -269,6 +291,7 @@ const JobGuide = () => {
       setIsSuccess(false);
       setJobAnalysisResult(null);
       setMatchScore(null); // Clear previous match score
+      setCreditsDeducted(false); // Reset credit deduction flag
       console.log('✅ Starting job analysis submission process');
       console.log('✅ Using user profile:', userProfile?.id);
 
@@ -288,6 +311,13 @@ const JobGuide = () => {
         setMatchScore(existing.match_score || null);
         setJobAnalysisId(existing.id);
         setIsSubmitting(false);
+        
+        // Deduct credits for existing analysis display
+        if (!creditsDeducted) {
+          console.log('🔒 Deducting credits for existing job analysis display');
+          await checkAndDeductCredits('Job Analysis - Existing Results Displayed');
+        }
+        
         toast({
           title: "Previous Job Analysis Found",
           description: "Using your previous job analysis for this job posting."
@@ -336,7 +366,7 @@ const JobGuide = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, isComplete, completionLoading, profileLoading, hasResume, hasBio, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup, userProfile]);
+  }, [formData, isComplete, completionLoading, profileLoading, hasResume, hasBio, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup, userProfile, creditsDeducted, checkAndDeductCredits]);
 
   useEffect(() => {
     const handleHistoryData = (event: any) => {
