@@ -55,6 +55,7 @@ const CompanyRoleAnalysis = () => {
   const [pendingAnalysisId, setPendingAnalysisId] = useState<string | null>(null);
   const [loadingMessages, setLoadingMessages] = useState<string[]>([]);
   const [showRecentResults, setShowRecentResults] = useState(false);
+  const [creditsPendingDeduction, setCreditsPendingDeduction] = useState(false);
   const {
     toast
   } = useToast();
@@ -71,9 +72,11 @@ const CompanyRoleAnalysis = () => {
     feature: 'COMPANY_ROLE_ANALYSIS',
     onSuccess: () => {
       console.log('Credit deduction successful for company analysis');
+      setCreditsPendingDeduction(false);
     },
     onInsufficientCredits: () => {
       setIsSubmitting(false);
+      setCreditsPendingDeduction(false);
     }
   });
 
@@ -157,7 +160,7 @@ const CompanyRoleAnalysis = () => {
       setShowRecentResults(true);
 
       // Deduct credits when results are successfully displayed
-      if (!creditsDeducted) {
+      if (creditsPendingDeduction) {
         console.log('Deducting credits for company analysis results');
         checkAndDeductCredits('Company Analysis - Results Generated');
       }
@@ -167,7 +170,7 @@ const CompanyRoleAnalysis = () => {
         description: "Your company analysis is ready to view."
       });
     }
-  }, [analysisHistory, pendingAnalysisId, toast, creditsDeducted, checkAndDeductCredits]);
+  }, [analysisHistory, pendingAnalysisId, toast, creditsPendingDeduction, checkAndDeductCredits]);
 
   // Real-time subscription for analysis updates with enhanced detection
   useEffect(() => {
@@ -197,8 +200,10 @@ const CompanyRoleAnalysis = () => {
           setShowRecentResults(true);
 
           // Deduct credits when results are successfully displayed
-          console.log('Deducting credits for company analysis results via real-time');
-          checkAndDeductCredits('Company Analysis - Results Generated');
+          if (creditsPendingDeduction) {
+            console.log('Deducting credits for company analysis results via real-time');
+            checkAndDeductCredits('Company Analysis - Results Generated');
+          }
 
           toast({
             title: "Analysis Complete!",
@@ -214,7 +219,7 @@ const CompanyRoleAnalysis = () => {
       console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
-  }, [userProfile?.id, pendingAnalysisId, refetchHistory, toast, checkAndDeductCredits]);
+  }, [userProfile?.id, pendingAnalysisId, refetchHistory, toast, checkAndDeductCredits, creditsPendingDeduction]);
 
   // Loading messages effect
   useEffect(() => {
@@ -271,6 +276,7 @@ const CompanyRoleAnalysis = () => {
 
     setIsSubmitting(true);
     setShowRecentResults(false);
+    setCreditsPendingDeduction(true);
 
     try {
       console.log('Creating company role analysis with data:', {
@@ -301,6 +307,7 @@ const CompanyRoleAnalysis = () => {
           variant: "destructive"
         });
         setIsSubmitting(false);
+        setCreditsPendingDeduction(false);
         return;
       }
 
@@ -328,6 +335,7 @@ const CompanyRoleAnalysis = () => {
         variant: "destructive"
       });
       setIsSubmitting(false);
+      setCreditsPendingDeduction(false);
     }
   };
 
