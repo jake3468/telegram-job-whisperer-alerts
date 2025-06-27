@@ -21,11 +21,11 @@ export function useCreditCheck(requiredCredits: number = 1.5, checkOnly: boolean
         })
       : 'soon';
 
-    // Special message for LinkedIn image generation (0.5 credits)
-    if (requiredCredits === 0.5) {
+    // Special message for LinkedIn image generation (1.5 credits)
+    if (requiredCredits === 1.5) {
       toast({
         title: "Insufficient Credits",
-        description: `You need 0.5 credits to generate an image. You currently have ${creditBalance} credits. Purchase credit packs or subscribe to a monthly plan for unlimited access. Otherwise, wait for your next credit reset on ${resetDate}.`,
+        description: `You need ${requiredCredits} credits to generate an image. You currently have ${creditBalance} credits. Purchase credit packs or subscribe to a monthly plan for unlimited access. Otherwise, wait for your next credit reset on ${resetDate}.`,
         duration: 10000,
         action: (
           <ToastAction altText="Get More Credits" onClick={() => navigate('/get-more-credits')}>

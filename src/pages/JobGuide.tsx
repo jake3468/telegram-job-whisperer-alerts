@@ -1,3 +1,5 @@
+
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -5,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { AlertCircle, FileText, Sparkles, Loader2, CheckCircle, Trash2, Building, Briefcase, Copy, History } from 'lucide-react';
 import AuthHeader from '@/components/AuthHeader';
@@ -19,6 +22,7 @@ import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
 import { validateInput, sanitizeText, isValidForTyping } from '@/utils/sanitize';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
+import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
 
 const JobGuide = () => {
   const {
@@ -35,7 +39,10 @@ const JobGuide = () => {
     isComplete,
     loading: completionLoading
   } = useUserCompletionStatus();
-  const { userProfile, loading: profileLoading } = useUserProfile();
+  const {
+    userProfile,
+    loading: profileLoading
+  } = useUserProfile();
   const [formData, setFormData] = useState({
     companyName: '',
     jobTitle: '',
@@ -49,12 +56,26 @@ const JobGuide = () => {
   const [jobAnalysisResult, setJobAnalysisResult] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('');
   const [matchScore, setMatchScore] = useState<string | null>(null);
+  const [creditsDeducted, setCreditsDeducted] = useState(false);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const loadingMessages = ["🔍 Analyzing job requirements...", "✨ Crafting personalized insights...", "🚀 Tailoring advice to your profile...", "🎯 Generating strategic recommendations..."];
+  
   const {
     hasCredits,
+    checkAndDeductCredits,
+    isDeducting,
     showInsufficientCreditsPopup
-  } = useCreditCheck(1.5);
+  } = useFeatureCreditCheck({
+    feature: 'JOB_ANALYSIS',
+    onSuccess: () => {
+      setCreditsDeducted(true);
+    },
+    onInsufficientCredits: () => {
+      setIsGenerating(false);
+      setIsSubmitting(false);
+    }
+  });
+
   useCreditWarnings(); // This shows the warning popups
 
   useEffect(() => {
@@ -62,6 +83,7 @@ const JobGuide = () => {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
+
   useEffect(() => {
     if (!isGenerating) return;
     let messageIndex = 0;
@@ -72,35 +94,30 @@ const JobGuide = () => {
     }, 3000);
     return () => clearInterval(messageInterval);
   }, [isGenerating]);
+
   useEffect(() => {
     if (!jobAnalysisId || !isGenerating) return;
-    
     console.log('🔄 Starting enhanced polling for job analysis results, ID:', jobAnalysisId);
-    
     let retryCount = 0;
     const maxRetries = 3;
-    
     const pollForResults = async () => {
       try {
         console.log('📡 Polling attempt', retryCount + 1, 'for analysis ID:', jobAnalysisId);
-        
+
         // Use authenticated request for polling
-        const { data, error } = await makeAuthenticatedRequest(async () => {
-          return await supabase
-            .from('job_analyses')
-            .select('job_match, match_score')
-            .eq('id', jobAnalysisId)
-            .maybeSingle();
+        const {
+          data,
+          error
+        } = await makeAuthenticatedRequest(async () => {
+          return await supabase.from('job_analyses').select('job_match, match_score').eq('id', jobAnalysisId).maybeSingle();
         }, 'poll job analysis results');
-        
         if (error) {
           console.error('❌ Error polling for results:', error);
-          
+
           // Handle JWT expiration by retrying with a delay
           if (error.message?.includes('JWT expired') || error.code === 'PGRST301') {
             console.log('🔄 JWT expired, retrying after delay...');
             retryCount++;
-            
             if (retryCount < maxRetries) {
               // Wait a bit longer for token refresh and retry
               setTimeout(() => {
@@ -112,20 +129,18 @@ const JobGuide = () => {
               throw new Error('Authentication failed after retries');
             }
           }
-          
           throw error;
         }
-        
-        console.log('📊 Polling response:', { 
-          hasJobMatch: !!data?.job_match, 
+        console.log('📊 Polling response:', {
+          hasJobMatch: !!data?.job_match,
           jobMatchLength: data?.job_match?.length,
           matchScore: data?.match_score,
           retryCount
         });
-        
+
         // Reset retry count on successful response
         retryCount = 0;
-        
+
         // Check if we have actual content (not just empty strings)
         if (data?.job_match && data.job_match.trim().length > 0) {
           console.log('✅ Results found! Setting job analysis result');
@@ -133,12 +148,17 @@ const JobGuide = () => {
           setIsGenerating(false);
           setIsSuccess(false);
           setMatchScore(data.match_score || null);
-          
           if (pollingIntervalRef.current) {
             clearInterval(pollingIntervalRef.current);
             pollingIntervalRef.current = null;
           }
-          
+
+          // Deduct credits only when results are successfully displayed
+          if (!creditsDeducted) {
+            console.log('🔒 Deducting credits for job analysis results');
+            await checkAndDeductCredits('Job Analysis - Results Generated');
+          }
+
           toast({
             title: "Job Analysis Generated!",
             description: "Your personalized job analysis is ready."
@@ -146,7 +166,7 @@ const JobGuide = () => {
         }
       } catch (err) {
         console.error('❌ Polling error:', err);
-        
+
         // If we've exhausted retries, stop polling and show error
         if (retryCount >= maxRetries) {
           if (pollingIntervalRef.current) {
@@ -163,11 +183,11 @@ const JobGuide = () => {
         }
       }
     };
-    
+
     // Start polling immediately, then every 3 seconds
     pollForResults();
     pollingIntervalRef.current = setInterval(pollForResults, 3000);
-    
+
     // Set timeout to stop polling after 5 minutes
     const timeout = setTimeout(() => {
       if (pollingIntervalRef.current) {
@@ -182,18 +202,19 @@ const JobGuide = () => {
         variant: "destructive"
       });
     }, 300000); // 5 minutes timeout
-    
+
     return () => {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
       }
       clearTimeout(timeout);
     };
-  }, [jobAnalysisId, isGenerating, toast]);
+  }, [jobAnalysisId, isGenerating, toast, creditsDeducted, checkAndDeductCredits]);
+
   const handleInputChange = (field: string, value: string) => {
     // Use more lenient validation for real-time typing
     const maxLength = field === 'jobDescription' ? 5000 : 200;
-    
+
     // Only validate for truly malicious content, allow normal editing
     if (!isValidForTyping(value, maxLength)) {
       toast({
@@ -203,15 +224,15 @@ const JobGuide = () => {
       });
       return;
     }
-    
+
     // Light sanitization - only remove actual HTML tags
     const cleanValue = value.replace(/<[^>]*>/g, '');
-    
     setFormData(prev => ({
       ...prev,
       [field]: cleanValue
     }));
   };
+
   const handleClearData = useCallback(() => {
     setFormData({
       companyName: '',
@@ -224,11 +245,13 @@ const JobGuide = () => {
     setError(null);
     setIsGenerating(false);
     setIsSubmitting(false);
+    setCreditsDeducted(false);
     toast({
       title: "Data Cleared",
       description: "All form data and results have been cleared."
     });
   }, [toast]);
+
   const handleSubmit = useCallback(async () => {
     console.log('🚀 Job Guide Submit Button Clicked');
 
@@ -237,9 +260,7 @@ const JobGuide = () => {
       showInsufficientCreditsPopup();
       return;
     }
-    
-    // REMOVED PROFILE COMPLETION CHECK - Allow users to proceed regardless
-    
+
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
         title: "Missing information",
@@ -248,7 +269,6 @@ const JobGuide = () => {
       });
       return;
     }
-    
     if (isSubmitting || isGenerating) {
       toast({
         title: "Please wait",
@@ -267,30 +287,25 @@ const JobGuide = () => {
       });
       return;
     }
-
     try {
       setIsSubmitting(true);
       setError(null);
       setIsSuccess(false);
       setJobAnalysisResult(null);
       setMatchScore(null); // Clear previous match score
+      setCreditsDeducted(false); // Reset credit deduction flag
       console.log('✅ Starting job analysis submission process');
       console.log('✅ Using user profile:', userProfile?.id);
 
       // Check for existing analysis using authenticated request
-      const { data: existingAnalysis, error: checkError } = await makeAuthenticatedRequest(async () => {
-        return await supabase
-          .from('job_analyses')
-          .select('id, job_match, match_score')
-          .eq('user_id', userProfile?.id)
-          .eq('company_name', formData.companyName)
-          .eq('job_title', formData.jobTitle)
-          .eq('job_description', formData.jobDescription)
-          .not('job_match', 'is', null)
-          .order('created_at', { ascending: false })
-          .limit(1);
+      const {
+        data: existingAnalysis,
+        error: checkError
+      } = await makeAuthenticatedRequest(async () => {
+        return await supabase.from('job_analyses').select('id, job_match, match_score').eq('user_id', userProfile?.id).eq('company_name', formData.companyName).eq('job_title', formData.jobTitle).eq('job_description', formData.jobDescription).not('job_match', 'is', null).order('created_at', {
+          ascending: false
+        }).limit(1);
       }, 'check existing analysis');
-
       if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
         const existing = existingAnalysis[0];
         console.log('✅ Found existing job analysis:', existing.id);
@@ -298,6 +313,13 @@ const JobGuide = () => {
         setMatchScore(existing.match_score || null);
         setJobAnalysisId(existing.id);
         setIsSubmitting(false);
+        
+        // Deduct credits for existing analysis display
+        if (!creditsDeducted) {
+          console.log('🔒 Deducting credits for existing job analysis display');
+          await checkAndDeductCredits('Job Analysis - Existing Results Displayed');
+        }
+        
         toast({
           title: "Previous Job Analysis Found",
           description: "Using your previous job analysis for this job posting."
@@ -312,28 +334,23 @@ const JobGuide = () => {
         job_title: formData.jobTitle,
         job_description: formData.jobDescription
       };
-      
       console.log('📝 Inserting job analysis data:', insertData);
-      
-      const { data: insertedData, error: insertError } = await makeAuthenticatedRequest(async () => {
-        return await supabase
-          .from('job_analyses')
-          .insert(insertData)
-          .select('id')
-          .single();
+      const {
+        data: insertedData,
+        error: insertError
+      } = await makeAuthenticatedRequest(async () => {
+        return await supabase.from('job_analyses').insert(insertData).select('id').single();
       }, 'insert job analysis', 3); // 3 retries for JWT issues
-      
+
       if (insertError) {
         console.error('❌ INSERT ERROR:', insertError);
         throw new Error(`Database insert failed: ${insertError.message}`);
       }
-      
       if (insertedData?.id) {
         console.log('✅ Job analysis record inserted:', insertedData.id);
         setJobAnalysisId(insertedData.id);
         setIsSuccess(true);
         setIsGenerating(true);
-        
         toast({
           title: "Job Analysis Started!",
           description: "Your personalized job analysis is being created. Please wait for the results."
@@ -351,7 +368,8 @@ const JobGuide = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, isComplete, completionLoading, profileLoading, hasResume, hasBio, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup, userProfile]);
+  }, [formData, isComplete, completionLoading, profileLoading, hasResume, hasBio, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup, userProfile, creditsDeducted, checkAndDeductCredits]);
+
   useEffect(() => {
     const handleHistoryData = (event: any) => {
       const {
@@ -376,6 +394,7 @@ const JobGuide = () => {
     window.addEventListener('useHistoryData', handleHistoryData);
     return () => window.removeEventListener('useHistoryData', handleHistoryData);
   }, []);
+
   const handleCopyResult = async () => {
     if (!jobAnalysisResult) return;
     try {
@@ -397,14 +416,9 @@ const JobGuide = () => {
   };
 
   // Simplified form validation - only check if fields have content
-  const isFormValid = Boolean(
-    formData.companyName?.trim() &&
-    formData.jobTitle?.trim() &&
-    formData.jobDescription?.trim()
-  );
-  
+  const isFormValid = Boolean(formData.companyName?.trim() && formData.jobTitle?.trim() && formData.jobDescription?.trim());
   const hasAnyData = isFormValid || jobAnalysisResult;
-  
+
   // Simplified button disable logic - remove profile completion checks
   const isButtonDisabled = !isFormValid || isSubmitting || isGenerating || !hasCredits;
 
@@ -431,16 +445,20 @@ const JobGuide = () => {
         <div className="text-slate-400 text-xs">Loading...</div>
       </div>;
   }
+
   return <Layout>
-      <div className="min-h-screen w-full flex flex-col">
-        <div className="max-w-4xl mx-auto w-full px-2 py-4 sm:px-6 sm:py-8 mt-0">
+      <div className="min-h-screen w-full flex flex-col overflow-x-hidden bg-black">
+        <div className="max-w-4xl mx-auto w-full px-2 pt-2 pb-2 sm:px-6">
           <div className="text-center mb-6 px-2">
-            <h1 className="font-orbitron bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 bg-clip-text text-transparent mb-2 drop-shadow text-5xl font-bold">
-              Job Analysis
+            <h1 className="font-orbitron bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 bg-clip-text mb-2 drop-shadow font-bold text-blue-500 text-4xl">
+              🎯 Job Analysis
             </h1>
-            <p className="text-lg text-slate-300 font-inter font-light">
+            <p className="text-lg text-slate-300 font-inter font-light mb-3">
               In-depth breakdown and <span className="italic text-slate-400">insights</span> for your ideal jobs
             </p>
+            <Badge variant="outline" className="bg-blue-900/30 border-blue-600/50 text-blue-300 font-semibold">
+              Usage Fee: 1 Credit
+            </Badge>
           </div>
 
           {/* Profile Completion Warning */}
@@ -470,55 +488,31 @@ const JobGuide = () => {
                   {/* Company Name */}
                   <div className="space-y-2">
                     <label htmlFor="companyName" className="text-slate-200 font-semibold text-base">
-                      Company Name *
+                      🏬 Company Name *
                     </label>
-                    <Input 
-                      id="companyName" 
-                      placeholder="Google, Microsoft" 
-                      value={formData.companyName} 
-                      onChange={e => handleInputChange('companyName', e.target.value)} 
-                      required 
-                      maxLength={200}
-                      className="bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold" 
-                    />
+                    <Input id="companyName" placeholder="Google, Microsoft" value={formData.companyName} onChange={e => handleInputChange('companyName', e.target.value)} required maxLength={200} className="text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold bg-gray-950" />
                   </div>
                   {/* Job Title */}
                   <div className="space-y-2">
                     <label htmlFor="jobTitle" className="text-slate-200 font-semibold text-base">
-                      Job Title *
+                      👨🏻‍💼 Job Title *
                     </label>
-                    <Input 
-                      id="jobTitle" 
-                      placeholder="Software Engineer, Marketing Manager" 
-                      value={formData.jobTitle} 
-                      onChange={e => handleInputChange('jobTitle', e.target.value)} 
-                      required 
-                      maxLength={200}
-                      className="bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold" 
-                    />
+                    <Input id="jobTitle" placeholder="Software Engineer, Marketing Manager" value={formData.jobTitle} onChange={e => handleInputChange('jobTitle', e.target.value)} required maxLength={200} className="text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold bg-gray-950" />
                   </div>
                 </div>
                 {/* Job Description */}
                 <div className="space-y-2">
                   <label htmlFor="jobDescription" className="text-slate-200 font-semibold text-base">
-                    Job Description *
+                    🧾 Job Description *
                   </label>
                   <span className="text-slate-400 font-normal text-xs block mb-2">
                     Paste in the job description or key requirements
                   </span>
-                  <Textarea 
-                    id="jobDescription" 
-                    placeholder="Paste the job description here..." 
-                    value={formData.jobDescription} 
-                    onChange={e => handleInputChange('jobDescription', e.target.value)} 
-                    required 
-                    maxLength={5000}
-                    className="min-h-[100px] bg-slate-900 text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold" 
-                  />
+                  <Textarea id="jobDescription" placeholder="Paste the job description here..." value={formData.jobDescription} onChange={e => handleInputChange('jobDescription', e.target.value)} required maxLength={5000} className="min-h-[100px] text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold bg-gray-950" />
                 </div>
                 {/* Action Buttons */}
                 <div className="flex flex-col md:flex-row gap-3 pt-4">
-                  <Button onClick={handleSubmit} disabled={isButtonDisabled} className={`flex-1 bg-gradient-to-r from-sky-700 via-blue-600 to-blue-800 hover:from-blue-500 hover:to-sky-700 text-white font-semibold text-base h-12 shadow-none border border-blue-600 transition-all duration-150
+                  <Button onClick={handleSubmit} disabled={isButtonDisabled} className={`flex-1 bg-gradient-to-r from-white via-white to-white hover:from-white/90 hover:to-white/90 text-black font-semibold text-base h-12 shadow-none border border-gray-300 transition-all duration-150
                       ${isButtonDisabled ? 'opacity-50 cursor-not-allowed' : 'opacity-100'}
                     `}>
                     {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
@@ -555,8 +549,8 @@ const JobGuide = () => {
                 </CardContent>
               </Card>}
 
-            {/* Result Display - Fixed for mobile responsiveness */}
-            {jobAnalysisResult && <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-cyan-900 border border-blue-700 shadow-lg">
+            {/* Result Display - Fixed for horizontal scrolling and background issues */}
+            {jobAnalysisResult && <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-cyan-900 border border-blue-700 shadow-lg w-full max-w-full overflow-hidden">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-slate-200 font-orbitron text-xl flex items-center gap-2">
                     <FileText className="w-5 h-5 text-slate-400" />
@@ -566,10 +560,10 @@ const JobGuide = () => {
                     Personalized result for <span className="font-bold text-slate-200">{sanitizeText(formData.jobTitle)}</span> at <span className="font-bold text-slate-200">{sanitizeText(formData.companyName)}</span>
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="w-full overflow-hidden">
+                <CardContent className="w-full max-w-full p-4">
                   {/* Percentage Meter (Match Score) */}
-                  {matchScore && <div className="mb-4 w-full overflow-hidden">
-                      <div className="w-full max-w-full sm:max-w-[350px] md:max-w-[280px] mx-auto">
+                  {matchScore && <div className="mb-4 w-full">
+                      <div className="w-full max-w-sm mx-auto">
                         <div className="shadow-md rounded-xl bg-slate-900/90 p-3 border border-slate-700">
                           <PercentageMeter score={parseInt(matchScore)} label="Match Score" />
                         </div>
@@ -577,20 +571,15 @@ const JobGuide = () => {
                     </div>}
 
                   <div className="w-full overflow-hidden">
-                    <SafeHTMLRenderer
-                      content={jobAnalysisResult}
-                      className="whitespace-pre-wrap font-inter text-slate-100 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-blue-900/90 rounded-xl p-3 sm:p-4 md:p-5 shadow-inner mb-3 border border-slate-700 w-full overflow-x-hidden break-words word-wrap"
-                      maxLength={15000}
+                    <SafeHTMLRenderer 
+                      content={jobAnalysisResult} 
+                      className="whitespace-pre-wrap font-inter text-slate-100 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-blue-900/90 rounded-xl p-3 sm:p-4 md:p-5 shadow-inner mb-3 border border-slate-700 w-full overflow-hidden break-words hyphens-auto [word-break:break-word]" 
+                      maxLength={15000} 
                     />
                   </div>
                   
                   <div className="flex flex-col md:flex-row gap-2">
-                    <Button 
-                      onClick={handleCopyResult}
-                      variant="outline" 
-                      size="sm" 
-                      className="flex-none min-w-[120px] bg-slate-900/70 border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-slate-200 h-10 px-4"
-                    >
+                    <Button onClick={handleCopyResult} variant="outline" size="sm" className="flex-none min-w-[120px] bg-slate-900/70 border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-slate-200 h-10 px-4">
                       <Copy className="w-4 h-4 mr-2" />
                       Copy Result
                     </Button>
@@ -604,3 +593,4 @@ const JobGuide = () => {
 };
 
 export default JobGuide;
+

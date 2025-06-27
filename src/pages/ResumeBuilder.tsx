@@ -6,7 +6,6 @@ import CVBotStatus from '@/components/dashboard/CVBotStatus';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { FileText } from 'lucide-react';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
-
 const ResumeBuilder = () => {
   const {
     user,
@@ -33,12 +32,15 @@ const ResumeBuilder = () => {
   }
   return <Layout>
       <div className="text-center mb-8">
-        <h1 style={{
-        WebkitBackgroundClip: 'text',
-        backgroundClip: 'text',
-        color: 'transparent'
-      }} className="font-orbitron bg-gradient-to-r from-fuchsia-400 via-purple-400 to-pink-500 bg-clip-text text-transparent mb-2 drop-shadow tracking-tight font-bold text-4xl">
-          Telegram <span className="italic">Resume</span> Bot
+        <h1 className="font-orbitron mb-2 drop-shadow tracking-tight font-bold text-4xl flex items-center justify-center gap-2">
+          <span>📑</span>
+          <span style={{
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          color: 'transparent'
+        }} className="bg-gradient-to-r from-fuchsia-400 via-purple-400 to-pink-500 bg-clip-text text-purple-500 text-left">
+            Telegram <span className="italic">Resume</span> Bot
+          </span>
         </h1>
         <p className="text-md text-purple-100 font-inter font-light text-lg">
           Your personal <span className="italic text-pastel-peach">resume assistant</span> on Telegram — tailor your CV for new roles, job descriptions, or career goals, all through a simple chat
@@ -81,5 +83,4 @@ const ResumeBuilder = () => {
       </div>
     </Layout>;
 };
-
 export default ResumeBuilder;

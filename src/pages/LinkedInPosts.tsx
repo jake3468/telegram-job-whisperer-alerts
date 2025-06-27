@@ -16,6 +16,7 @@ import LoadingMessages from '@/components/LoadingMessages';
 import { useCreditCheck } from '@/hooks/useCreditCheck';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
+
 interface LinkedInPostData {
   post_heading_1: string | null;
   post_content_1: string | null;
@@ -28,6 +29,7 @@ interface UserData {
   first_name: string | null;
   last_name: string | null;
 }
+
 const LinkedInPosts = () => {
   const {
     user
@@ -291,10 +293,8 @@ const LinkedInPosts = () => {
             <span className="sr-only">Toggle navigation menu</span>
           </SidebarTrigger>
           <div className="flex items-center gap-2">
-            <img src="/lovable-uploads/6239b4a7-4f3c-4902-a936-4216ae26d9af.png" alt="JobBots Logo" className="h-8 w-8 drop-shadow-lg" />
-            <span className="font-orbitron font-extrabold text-2xl bg-gradient-to-r from-sky-300 via-fuchsia-400 to-indigo-300 bg-clip-text text-transparent drop-shadow-sm tracking-wider select-none relative whitespace-nowrap">
-              JobBots
-            </span>
+            <img alt="Aspirely Logo" src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" className="max-h-8 drop-shadow-2xl object-fill" />
+            <span className="font-orbitron drop-shadow bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-400 bg-clip-text text-white font-bold min-w-0 truncate text-lg">Aspirely.ai</span>
           </div>
         </div>
       </header>
@@ -308,8 +308,8 @@ const LinkedInPosts = () => {
               <div className="container mx-auto px-2 sm:px-4 py-8 bg-transparent rounded-3xl mt-4 mb-8 max-w-6xl w-full min-w-0">
                 {/* Header Section */}
                 <div className="text-center mb-10">
-                  <h1 className="text-2xl sm:text-3xl font-orbitron bg-gradient-to-r from-teal-300 via-teal-400 to-cyan-400 bg-clip-text text-transparent drop-shadow mb-4 tracking-tight font-bold lg:text-4xl">
-                    LinkedIn <span className="italic">Posts</span>
+                  <h1 className="sm:text-3xl font-orbitron bg-gradient-to-r from-teal-300 via-teal-400 to-cyan-400 bg-clip-text drop-shadow mb-4 tracking-tight font-bold lg:text-4xl text-teal-500 text-4xl">
+                    ✍🏻 LinkedIn <span className="italic">Posts</span>
                   </h1>
                   <p className="text-cyan-200 max-w-2xl mx-auto font-inter text-sm sm:text-base lg:text-lg font-light shadow-sm px-4">
                     Create engaging LinkedIn posts that showcase your expertise and connect with your professional network
@@ -342,12 +342,12 @@ const LinkedInPosts = () => {
                         
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                           <div className="space-y-2">
-                            <Label htmlFor="topic" className="text-black font-semibold text-base">Topic or Theme *</Label>
+                            <Label htmlFor="topic" className="text-black font-semibold text-base">💡Topic or Theme *</Label>
                             <Label htmlFor="topic" className="text-black/70 font-normal text-sm block">What is the main topic you want to write about?</Label>
                             <TTextarea id="topic" placeholder="e.g. AI in customer service, Layoffs in tech, Remote work trends" value={formData.topic} onChange={e => handleInputChange('topic', e.target.value)} required className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="opinion" className="text-black font-semibold text-base">Your Key Point or Opinion</Label>
+                            <Label htmlFor="opinion" className="text-black font-semibold text-base">🤔Your Key Point or Opinion</Label>
                             <Label htmlFor="opinion" className="text-black/70 font-normal text-sm block">What is your main insight, opinion, or message?</Label>
                             <TTextarea id="opinion" placeholder="I believe hybrid AI + human support is the future." value={formData.opinion} onChange={e => handleInputChange('opinion', e.target.value)} className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                           </div>
@@ -355,19 +355,19 @@ const LinkedInPosts = () => {
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                           <div className="space-y-2">
-                            <Label htmlFor="personal_story" className="text-black font-semibold text-base">Personal Experience or Story</Label>
+                            <Label htmlFor="personal_story" className="text-black font-semibold text-base">📖Personal Experience or Story</Label>
                             <Label htmlFor="personal_story" className="text-black/70 font-normal text-sm block">Do you have a story, data point, or personal experience to include?</Label>
                             <TTextarea id="personal_story" placeholder="We reduced response time by 40% after implementing AI chat." value={formData.personal_story} onChange={e => handleInputChange('personal_story', e.target.value)} className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="audience" className="text-black font-semibold text-base">Target Audience</Label>
+                            <Label htmlFor="audience" className="text-black font-semibold text-base">👥Target Audience</Label>
                             <Label htmlFor="audience" className="text-black/70 font-normal text-sm block">Who are you writing this for?</Label>
                             <TTextarea id="audience" placeholder="Startup founders, product managers, working moms, new grads…" value={formData.audience} onChange={e => handleInputChange('audience', e.target.value)} className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                           </div>
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="tone" className="text-black font-semibold text-base">Tone/Style Preference</Label>
+                          <Label htmlFor="tone" className="text-black font-semibold text-base">🗣️Tone/Style Preference</Label>
                           <Label htmlFor="tone" className="text-black/70 font-normal text-sm block">What tone do you prefer?</Label>
                           <Select onValueChange={value => handleInputChange('tone', value)}>
                             <SelectTrigger className="text-base bg-black/80 text-white border-teal-300/30 font-medium [&>span[data-placeholder]]:text-white/80">
@@ -382,7 +382,7 @@ const LinkedInPosts = () => {
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                          <Button type="submit" disabled={isSubmitting || !formData.topic.trim() || isGenerating} className="flex-1 bg-gradient-to-r from-teal-400 via-cyan-400 to-teal-500 hover:from-teal-500 hover:via-cyan-500 hover:to-teal-600 text-black font-semibold text-base h-12 shadow-md">
+                          <Button type="submit" disabled={isSubmitting || !formData.topic.trim() || isGenerating} className="flex-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 hover:from-indigo-600 hover:via-purple-600 hover:to-blue-600 text-white font-semibold text-base h-12 shadow-md rounded-lg">
                             {isSubmitting ? 'Submitting...' : 'Generate LinkedIn Posts'}
                           </Button>
                           
@@ -434,4 +434,5 @@ const LinkedInPosts = () => {
       </div>
     </SidebarProvider>;
 };
+
 export default LinkedInPosts;

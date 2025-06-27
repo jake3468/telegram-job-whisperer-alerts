@@ -1,3 +1,4 @@
+
 import { useUser } from '@clerk/clerk-react';
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +8,7 @@ import { Layout } from '@/components/Layout';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
+import { Badge } from '@/components/ui/badge';
 
 const JobAlerts = () => {
   const {
@@ -62,25 +64,15 @@ const JobAlerts = () => {
   }
   return <Layout>
       <div className="text-center mb-8">
-        <h1 className="
-                text-4xl
-                font-orbitron
-                font-extrabold
-                bg-gradient-to-r
-                from-orange-400
-                via-yellow-400
-                to-pink-500
-                bg-clip-text
-                text-transparent
-                mb-2
-                drop-shadow
-                tracking-tight
-              " style={{
-        WebkitBackgroundClip: 'text',
-        backgroundClip: 'text',
-        color: 'transparent'
-      }}>
-          Telegram <span className="italic">Job</span> Alerts
+        <h1 className="text-4xl font-orbitron font-extrabold mb-2 drop-shadow tracking-tight flex items-center justify-center gap-2">
+          <span>⏰</span>
+          <span style={{
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          color: 'transparent'
+        }} className="bg-gradient-to-r from-orange-400 via-yellow-400 to-pink-500 bg-clip-text text-amber-400 text-left">
+            Telegram <span className="italic">Job</span> Alerts
+          </span>
         </h1>
         
         <p className="text-md text-orange-100 font-inter font-light mb-4">
@@ -88,12 +80,9 @@ const JobAlerts = () => {
         </p>
 
         {/* Usage Cost Badge */}
-        <div className="flex justify-center mb-4">
-          <div className="inline-flex items-center px-4 py-2 bg-green-500 text-black text-sm font-semibold rounded-full shadow-md">
-            <span className="mr-2 text-sm">💰</span>
-            Usage Cost: Free
-          </div>
-        </div>
+        <Badge variant="outline" className="bg-orange-900/30 border-orange-600/50 text-orange-300 font-semibold">
+          Usage Fee: 1.5 credits/day/alert
+        </Badge>
       </div>
 
       {/* Profile Completion Warning */}
@@ -104,5 +93,4 @@ const JobAlerts = () => {
       </div>
     </Layout>;
 };
-
 export default JobAlerts;

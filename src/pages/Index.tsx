@@ -7,10 +7,12 @@ import HowItWorksSection from "@/components/HowItWorksSection";
 import PricingSection from "@/components/PricingSection";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
+import SecurityHeaders from "@/components/SecurityHeaders";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-black font-inter text-slate-50">
+      <SecurityHeaders />
       <AuthHeader />
       <HeroSection />
       <AboutUsSection />
