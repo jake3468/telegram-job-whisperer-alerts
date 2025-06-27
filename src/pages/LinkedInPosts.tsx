@@ -34,6 +34,7 @@ const LinkedInPosts = () => {
   const [currentAnalysis, setCurrentAnalysis] = useState<any>(null);
   const [linkedInPostData, setLinkedInPostData] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
   const { toast } = useToast();
   const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(1.0);
   const { userProfile } = useUserProfile();
@@ -314,7 +315,11 @@ const LinkedInPosts = () => {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <CardTitle className="text-white text-lg sm:text-xl">LinkedIn Post Details</CardTitle>
                 <div className="flex-shrink-0">
-                  <LinkedInPostsHistoryModal />
+                  <LinkedInPostsHistoryModal 
+                    isOpen={showHistoryModal}
+                    onClose={() => setShowHistoryModal(false)}
+                    gradientColors="from-blue-500 via-purple-600 to-blue-700"
+                  />
                 </div>
               </div>
             </CardHeader>
@@ -453,14 +458,30 @@ const LinkedInPosts = () => {
           {/* Loading */}
           {isGenerating && (
             <div className="text-center py-8">
-              <LoadingMessages type="linkedin_posts" />
+              <LoadingMessages type="linkedin" />
             </div>
           )}
 
           {/* Results - Show below form when available */}
           {linkedInPostData && (
             <div className="w-full space-y-6">
-              <LinkedInPostDisplay postData={linkedInPostData} />
+              {/* Display each post variation */}
+              {[1, 2, 3].map(postNumber => {
+                const content = linkedInPostData[`post_content_${postNumber}`];
+                if (!content) return null;
+                
+                return (
+                  <div key={postNumber} className="space-y-4">
+                    <h3 className="text-white font-medium text-lg">
+                      Post Variation {postNumber}
+                    </h3>
+                    <LinkedInPostDisplay 
+                      content={content}
+                      userProfile={userProfile}
+                    />
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
