@@ -35,7 +35,13 @@ const UsageHistoryModal = () => {
       'free_monthly_reset': 'Monthly Reset',
       'subscription_add': 'Subscription',
       'manual_adjustment': 'Manual Adjustment',
-      'credit_pack_purchase': 'Credit Pack'
+      'credit_pack_purchase': 'Credit Pack',
+      'job_analysis': 'Job Analysis',
+      'linkedin_posts': 'LinkedIn Posts',
+      'linkedin_image': 'LinkedIn Image',
+      'interview_prep': 'Interview Prep',
+      'cover_letter': 'Cover Letter',
+      'company_analysis': 'Company Analysis'
     };
     return typeMap[type] || type;
   };
@@ -66,7 +72,7 @@ const UsageHistoryModal = () => {
           Usage History
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-5xl max-h-[80vh] bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 border-blue-400/30">
+      <DialogContent className="max-w-6xl max-h-[85vh] bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 border-blue-400/30">
         <DialogHeader>
           <DialogTitle className="text-xl font-orbitron font-bold text-blue-100">
             Transaction History
@@ -95,95 +101,101 @@ const UsageHistoryModal = () => {
               </TabsTrigger>
             </TabsList>
             
-            <TabsContent value="credits" className="overflow-auto max-h-[50vh]">
+            <TabsContent value="credits" className="overflow-hidden">
               {creditTransactions.length === 0 ? (
                 <div className="text-center py-8 text-blue-200">
                   No credit transactions found
                 </div>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-blue-400/30 hover:bg-white/5">
-                      <TableHead className="text-blue-200 font-orbitron">Date</TableHead>
-                      <TableHead className="text-blue-200 font-orbitron">Type</TableHead>
-                      <TableHead className="text-blue-200 font-orbitron">Description</TableHead>
-                      <TableHead className="text-blue-200 font-orbitron text-right">Amount</TableHead>
-                      <TableHead className="text-blue-200 font-orbitron text-right">Balance After</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {creditTransactions.map((transaction) => (
-                      <TableRow key={transaction.id} className="border-blue-400/20 hover:bg-white/5">
-                        <TableCell className="text-blue-100 text-sm">
-                          {formatDate(transaction.date)}
-                        </TableCell>
-                        <TableCell className="text-blue-100 text-sm font-medium">
-                          {getTransactionTypeDisplay(transaction.type)}
-                        </TableCell>
-                        <TableCell className="text-blue-100 text-xs max-w-xs truncate">
-                          {transaction.description || (transaction.featureUsed ? `Used for ${transaction.featureUsed}` : '-')}
-                        </TableCell>
-                        <TableCell className={`text-right font-mono text-sm font-bold ${
-                          transaction.amount > 0 ? 'text-green-400' : 'text-red-400'
-                        }`}>
-                          {formatAmount(transaction.amount)}
-                        </TableCell>
-                        <TableCell className="text-blue-100 text-right font-mono text-sm">
-                          {transaction.balanceAfter?.toFixed(1) || '-'}
-                        </TableCell>
+                <div className="overflow-x-auto max-h-[55vh] rounded-lg border border-blue-400/20">
+                  <Table>
+                    <TableHeader className="sticky top-0 bg-slate-800/90 backdrop-blur-sm">
+                      <TableRow className="border-blue-400/30 hover:bg-white/5">
+                        <TableHead className="text-blue-200 font-orbitron min-w-[140px]">Date</TableHead>
+                        <TableHead className="text-blue-200 font-orbitron min-w-[120px]">Type</TableHead>
+                        <TableHead className="text-blue-200 font-orbitron min-w-[200px]">Description</TableHead>
+                        <TableHead className="text-blue-200 font-orbitron text-right min-w-[80px]">Amount</TableHead>
+                        <TableHead className="text-blue-200 font-orbitron text-right min-w-[100px]">Balance After</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {creditTransactions.map((transaction) => (
+                        <TableRow key={transaction.id} className="border-blue-400/20 hover:bg-white/5">
+                          <TableCell className="text-blue-100 text-xs sm:text-sm">
+                            {formatDate(transaction.date)}
+                          </TableCell>
+                          <TableCell className="text-blue-100 text-xs sm:text-sm font-medium">
+                            {getTransactionTypeDisplay(transaction.type)}
+                          </TableCell>
+                          <TableCell className="text-blue-100 text-xs sm:text-sm max-w-xs">
+                            <div className="truncate" title={transaction.description || (transaction.featureUsed ? `Used for ${transaction.featureUsed}` : '-')}>
+                              {transaction.description || (transaction.featureUsed ? `Used for ${transaction.featureUsed}` : '-')}
+                            </div>
+                          </TableCell>
+                          <TableCell className={`text-right font-mono text-xs sm:text-sm font-bold ${
+                            transaction.amount > 0 ? 'text-green-400' : 'text-red-400'
+                          }`}>
+                            {formatAmount(transaction.amount)}
+                          </TableCell>
+                          <TableCell className="text-blue-100 text-right font-mono text-xs sm:text-sm">
+                            {transaction.balanceAfter?.toFixed(1) || '-'}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               )}
             </TabsContent>
             
-            <TabsContent value="payments" className="overflow-auto max-h-[50vh]">
+            <TabsContent value="payments" className="overflow-hidden">
               {paymentRecords.length === 0 ? (
                 <div className="text-center py-8 text-blue-200">
                   No payment records found
                 </div>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-blue-400/30 hover:bg-white/5">
-                      <TableHead className="text-blue-200 font-orbitron">Date</TableHead>
-                      <TableHead className="text-blue-200 font-orbitron">Event</TableHead>
-                      <TableHead className="text-blue-200 font-orbitron">Status</TableHead>
-                      <TableHead className="text-blue-200 font-orbitron text-right">Amount</TableHead>
-                      <TableHead className="text-blue-200 font-orbitron text-right">Credits</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paymentRecords.map((record) => (
-                      <TableRow key={record.id} className="border-blue-400/20 hover:bg-white/5">
-                        <TableCell className="text-blue-100 text-sm">
-                          {formatDate(record.date)}
-                        </TableCell>
-                        <TableCell className="text-blue-100 text-sm font-medium">
-                          {getPaymentEventDisplay(record.type)}
-                        </TableCell>
-                        <TableCell className="text-blue-100 text-xs">
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${
-                            record.status === 'active' || record.status === 'completed'
-                              ? 'bg-green-500/20 text-green-300' 
-                              : 'bg-gray-500/20 text-gray-300'
-                          }`}>
-                            {record.status}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-blue-100 text-right font-mono text-sm">
-                          {record.paymentDetails?.price_amount && record.currency 
-                            ? `${record.currency === 'INR' ? '₹' : '$'}${record.paymentDetails.price_amount}` 
-                            : '-'}
-                        </TableCell>
-                        <TableCell className="text-green-400 text-right font-mono text-sm font-bold">
-                          {record.amount > 0 ? `+${record.amount}` : '-'}
-                        </TableCell>
+                <div className="overflow-x-auto max-h-[55vh] rounded-lg border border-blue-400/20">
+                  <Table>
+                    <TableHeader className="sticky top-0 bg-slate-800/90 backdrop-blur-sm">
+                      <TableRow className="border-blue-400/30 hover:bg-white/5">
+                        <TableHead className="text-blue-200 font-orbitron min-w-[140px]">Date</TableHead>
+                        <TableHead className="text-blue-200 font-orbitron min-w-[140px]">Event</TableHead>
+                        <TableHead className="text-blue-200 font-orbitron min-w-[100px]">Status</TableHead>
+                        <TableHead className="text-blue-200 font-orbitron text-right min-w-[80px]">Amount</TableHead>
+                        <TableHead className="text-blue-200 font-orbitron text-right min-w-[80px]">Credits</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {paymentRecords.map((record) => (
+                        <TableRow key={record.id} className="border-blue-400/20 hover:bg-white/5">
+                          <TableCell className="text-blue-100 text-xs sm:text-sm">
+                            {formatDate(record.date)}
+                          </TableCell>
+                          <TableCell className="text-blue-100 text-xs sm:text-sm font-medium">
+                            {getPaymentEventDisplay(record.type)}
+                          </TableCell>
+                          <TableCell className="text-blue-100 text-xs sm:text-sm">
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                              record.status === 'active' || record.status === 'completed'
+                                ? 'bg-green-500/20 text-green-300' 
+                                : 'bg-gray-500/20 text-gray-300'
+                            }`}>
+                              {record.status}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-blue-100 text-right font-mono text-xs sm:text-sm">
+                            {record.paymentDetails?.price_amount && record.currency 
+                              ? `${record.currency === 'INR' ? '₹' : '$'}${record.paymentDetails.price_amount}` 
+                              : '-'}
+                          </TableCell>
+                          <TableCell className="text-green-400 text-right font-mono text-xs sm:text-sm font-bold">
+                            {record.amount > 0 ? `+${record.amount}` : '-'}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               )}
             </TabsContent>
           </Tabs>

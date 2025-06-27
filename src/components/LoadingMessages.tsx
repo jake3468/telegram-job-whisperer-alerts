@@ -8,7 +8,7 @@ interface LoadingMessage {
 }
 
 interface LoadingMessagesProps {
-  type?: 'linkedin' | 'cover_letter' | 'company_analysis' | 'interview_prep';
+  type?: 'linkedin' | 'cover_letter' | 'company_analysis' | 'interview_prep' | 'job_analysis';
   messages?: string[];
 }
 
@@ -45,6 +45,14 @@ const interviewPrepMessages: LoadingMessage[] = [
   { icon: Sparkles, text: "Finalizing your interview prep guide..." },
 ];
 
+const jobAnalysisMessages: LoadingMessage[] = [
+  { icon: Search, text: "🔍 Analyzing job requirements..." },
+  { icon: Brain, text: "💡 Matching your profile to the role..." },
+  { icon: TrendingUp, text: "📊 Calculating compatibility score..." },
+  { icon: Target, text: "🎯 Identifying improvement opportunities..." },
+  { icon: Sparkles, text: "✨ Finalizing your job analysis report..." },
+];
+
 const LoadingMessages = ({ type = 'linkedin', messages }: LoadingMessagesProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   
@@ -67,6 +75,9 @@ const LoadingMessages = ({ type = 'linkedin', messages }: LoadingMessagesProps) 
         break;
       case 'interview_prep':
         messagesList = interviewPrepMessages;
+        break;
+      case 'job_analysis':
+        messagesList = jobAnalysisMessages;
         break;
       default:
         messagesList = linkedinMessages;

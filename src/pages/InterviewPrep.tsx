@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MessageSquare, Clock, Building2, Briefcase, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useCreditCheck } from '@/hooks/useCreditCheck';
+import { useDeferredCreditDeduction } from '@/hooks/useDeferredCreditDeduction';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -31,13 +31,16 @@ const InterviewPrep = () => {
   const [currentAnalysis, setCurrentAnalysis] = useState<any>(null);
   const [interviewData, setInterviewData] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const {
-    toast
-  } = useToast();
+  const [hasCreditBeenDeducted, setHasCreditBeenDeducted] = useState(false);
+  
+  const { toast } = useToast();
   const {
     hasCredits,
     showInsufficientCreditsPopup
   } = useCreditCheck(1.5);
+  const {
+    deductCredits
+  } = useDeferredCreditDeduction();
   const {
     userProfile
   } = useUserProfile();
@@ -50,57 +53,87 @@ const InterviewPrep = () => {
     queryKey: ['interview-prep-history', userProfile?.id],
     queryFn: async () => {
       if (!userProfile?.id) return [];
+      
       const {
         data,
         error
-      } = await supabase.from('interview_prep').select('*').eq('user_id', userProfile.id).order('created_at', {
-        ascending: false
-      });
+      } = await supabase
+        .from('interview_prep')
+        .select('*')
+        .eq('user_id', userProfile.id)
+        .order('created_at', { ascending: false });
+      
       if (error) throw error;
       return data || [];
     },
-    enabled: !!userProfile?.id
+    enabled: !!userProfile?.id,
   });
 
   // Real-time subscription for interview results with improved detection
   useEffect(() => {
     if (!currentAnalysis?.id) return;
-    const channel = supabase.channel('interview-prep-updates').on('postgres_changes', {
-      event: 'UPDATE',
-      schema: 'public',
-      table: 'interview_prep',
-      filter: `id=eq.${currentAnalysis.id}`
-    }, payload => {
-      console.log('Interview prep updated:', payload);
-      if (payload.new.interview_questions) {
-        try {
-          // Handle both string and already parsed data
-          const parsedData = typeof payload.new.interview_questions === 'string' ? payload.new.interview_questions : JSON.stringify(payload.new.interview_questions);
 
-          // Check if the data is meaningful (not just empty or null)
-          if (parsedData && parsedData.trim().length > 0) {
-            setInterviewData(parsedData);
-            setIsGenerating(false);
-            toast({
-              title: "Interview Prep Ready!",
-              description: "Your personalized interview questions have been generated."
-            });
+    const channel = supabase
+      .channel('interview-prep-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'interview_prep',
+          filter: `id=eq.${currentAnalysis.id}`,
+        },
+        (payload) => {
+          console.log('Interview prep updated:', payload);
+          if (payload.new.interview_questions) {
+            try {
+              // Handle both string and already parsed data
+              const parsedData = typeof payload.new.interview_questions === 'string' 
+                ? payload.new.interview_questions 
+                : JSON.stringify(payload.new.interview_questions);
+
+              // Check if the data is meaningful (not just empty or null)
+              if (parsedData && parsedData.trim().length > 0) {
+                setInterviewData(parsedData);
+                setIsGenerating(false);
+                toast({
+                  title: "Interview Prep Ready!",
+                  description: "Your personalized interview questions have been generated."
+                });
+              }
+            } catch (error) {
+              console.error('Error processing interview questions:', error);
+              setIsGenerating(false);
+              toast({
+                title: "Error Processing Results",
+                description: "There was an error processing your interview prep results.",
+                variant: "destructive"
+              });
+            }
           }
-        } catch (error) {
-          console.error('Error processing interview questions:', error);
-          setIsGenerating(false);
-          toast({
-            title: "Error Processing Results",
-            description: "There was an error processing your interview prep results.",
-            variant: "destructive"
-          });
         }
-      }
-    }).subscribe();
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(channel);
     };
   }, [currentAnalysis?.id, toast]);
+
+  // Deferred credit deduction when interview prep results are displayed
+  useEffect(() => {
+    if (interviewData && !hasCreditBeenDeducted && currentAnalysis?.id) {
+      const deductCreditsForInterviewPrep = async () => {
+        const success = await deductCredits(1.5, 'interview_prep', 'Interview Preparation - Tailored questions and answers');
+        if (success) {
+          setHasCreditBeenDeducted(true);
+          console.log('Successfully deducted 1.5 credits for interview prep display');
+        }
+      };
+      
+      deductCreditsForInterviewPrep();
+    }
+  }, [interviewData, hasCreditBeenDeducted, currentAnalysis?.id, deductCredits]);
 
   const handleGenerate = async () => {
     console.log('🚀 Interview Prep Generate Button Clicked');
@@ -110,6 +143,7 @@ const InterviewPrep = () => {
       showInsufficientCreditsPopup();
       return;
     }
+
     if (!companyName.trim() || !jobTitle.trim() || !jobDescription.trim()) {
       toast({
         title: "Missing Information",
@@ -118,6 +152,7 @@ const InterviewPrep = () => {
       });
       return;
     }
+
     if (!user?.id) {
       toast({
         title: "Authentication Error",
@@ -126,6 +161,7 @@ const InterviewPrep = () => {
       });
       return;
     }
+
     if (!userProfile?.id) {
       toast({
         title: "Profile Error",
@@ -134,6 +170,7 @@ const InterviewPrep = () => {
       });
       return;
     }
+
     if (isSubmitting || isGenerating) {
       toast({
         title: "Please wait",
@@ -142,29 +179,38 @@ const InterviewPrep = () => {
       });
       return;
     }
+
     try {
       setIsSubmitting(true);
       setInterviewData(null);
+      setHasCreditBeenDeducted(false);
       console.log('✅ Starting interview prep submission process');
       console.log('✅ User profile ID:', userProfile.id);
 
       // Check for existing analysis first
-      const {
-        data: existingAnalysis,
-        error: checkError
-      } = await supabase.from('interview_prep').select('id, interview_questions').eq('user_id', userProfile.id).eq('company_name', companyName.trim()).eq('job_title', jobTitle.trim()).eq('job_description', jobDescription.trim()).not('interview_questions', 'is', null).order('created_at', {
-        ascending: false
-      }).limit(1);
+      const { data: existingAnalysis, error: checkError } = await supabase
+        .from('interview_prep')
+        .select('id, interview_questions')
+        .eq('user_id', userProfile.id)
+        .eq('company_name', companyName.trim())
+        .eq('job_title', jobTitle.trim())
+        .eq('job_description', jobDescription.trim())
+        .not('interview_questions', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
       if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
         const existing = existingAnalysis[0];
         console.log('✅ Found existing interview prep:', existing.id);
+        
         try {
           // Handle both string and object data
-          const parsedData = typeof existing.interview_questions === 'string' ? existing.interview_questions : JSON.stringify(existing.interview_questions);
+          const parsedData = typeof existing.interview_questions === 'string' 
+            ? existing.interview_questions 
+            : JSON.stringify(existing.interview_questions);
           setInterviewData(parsedData);
-          setCurrentAnalysis({
-            id: existing.id
-          });
+          setCurrentAnalysis({ id: existing.id });
+          setHasCreditBeenDeducted(false); // Allow credit deduction for existing results
           setIsSubmitting(false);
           toast({
             title: "Previous Interview Prep Found",
@@ -179,31 +225,38 @@ const InterviewPrep = () => {
 
       // Insert new interview prep record using the profile ID directly
       const insertData = {
-        user_id: userProfile.id,
-        // Use the profile ID directly  
+        user_id: userProfile.id, // Use the profile ID directly  
         company_name: companyName.trim(),
         job_title: jobTitle.trim(),
         job_description: jobDescription.trim()
       };
+
       console.log('📝 Inserting interview prep data:', insertData);
-      const {
-        data: insertedData,
-        error: insertError
-      } = await supabase.from('interview_prep').insert(insertData).select('id').single();
+
+      const { data: insertedData, error: insertError } = await supabase
+        .from('interview_prep')
+        .insert(insertData)
+        .select('id')
+        .single();
+
       if (insertError) {
         console.error('❌ INSERT ERROR:', insertError);
         throw new Error(`Database insert failed: ${insertError.message}`);
       }
+
       if (insertedData?.id) {
         console.log('✅ Interview prep record inserted:', insertedData.id);
         setCurrentAnalysis(insertedData);
         setIsGenerating(true);
+        setHasCreditBeenDeducted(false);
         refetchHistory();
+        
         toast({
           title: "Interview Prep Started!",
           description: "Your personalized interview questions are being generated. Please wait for the results."
         });
       }
+
     } catch (error) {
       console.error('❌ SUBMISSION ERROR:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to generate interview prep';
@@ -224,21 +277,26 @@ const InterviewPrep = () => {
     setInterviewData(null);
     setCurrentAnalysis(null);
     setIsGenerating(false);
+    setHasCreditBeenDeducted(false);
   };
 
   const renderInterviewQuestions = (content: string) => {
     if (!content) return null;
 
     // Simple markdown parsing with smaller text sizes
-    const processedContent = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
-    .replace(/^# (.*$)/gim, '<h1 style="font-size: 1.125rem; font-weight: bold; margin: 0.75rem 0; color: #1e40af;">$1</h1>') // H1 headers - smaller
-    .replace(/^## (.*$)/gim, '<h2 style="font-size: 1rem; font-weight: bold; margin: 0.5rem 0; color: #2563eb;">$1</h2>') // H2 headers - smaller
-    .replace(/^### (.*$)/gim, '<h3 style="font-size: 0.95rem; font-weight: bold; margin: 0.375rem 0; color: #3b82f6;">$1</h3>') // H3 headers - smaller
-    .replace(/\n/g, '<br>'); // Line breaks
+    const processedContent = content
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
+      .replace(/^# (.*$)/gim, '<h1 style="font-size: 1.125rem; font-weight: bold; margin: 0.75rem 0; color: #1e40af;">$1</h1>') // H1 headers - smaller
+      .replace(/^## (.*$)/gim, '<h2 style="font-size: 1rem; font-weight: bold; margin: 0.5rem 0; color: #2563eb;">$1</h2>') // H2 headers - smaller
+      .replace(/^### (.*$)/gim, '<h3 style="font-size: 0.95rem; font-weight: bold; margin: 0.375rem 0; color: #3b82f6;">$1</h3>') // H3 headers - smaller
+      .replace(/\n/g, '<br>'); // Line breaks
 
-    return <div className="text-gray-800 bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words border border-gray-700" dangerouslySetInnerHTML={{
-      __html: processedContent
-    }} />;
+    return (
+      <div 
+        className="text-gray-800 bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words border border-gray-700"
+        dangerouslySetInnerHTML={{ __html: processedContent }}
+      />
+    );
   };
 
   return <Layout>
@@ -274,7 +332,13 @@ const InterviewPrep = () => {
                     
                     🏦 Company Name
                   </label>
-                  <Input value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="e.g., Google, Microsoft, Amazon" disabled={isGenerating || isSubmitting} className="border-gray-300 placeholder-gray-400 bg-black text-white w-full" />
+                  <Input
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    placeholder="e.g., Google, Microsoft, Amazon"
+                    disabled={isGenerating || isSubmitting}
+                    className="border-gray-300 placeholder-gray-400 bg-black text-white w-full"
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -282,7 +346,13 @@ const InterviewPrep = () => {
                     
                     👨‍💼 Job Title
                   </label>
-                  <Input value={jobTitle} onChange={e => setJobTitle(e.target.value)} placeholder="e.g., Senior Software Engineer, Product Manager" disabled={isGenerating || isSubmitting} className="border-gray-300 placeholder-gray-400 bg-black text-white w-full" />
+                  <Input
+                    value={jobTitle}
+                    onChange={(e) => setJobTitle(e.target.value)}
+                    placeholder="e.g., Senior Software Engineer, Product Manager"
+                    disabled={isGenerating || isSubmitting}
+                    className="border-gray-300 placeholder-gray-400 bg-black text-white w-full"
+                  />
                 </div>
               </div>
 
@@ -291,14 +361,29 @@ const InterviewPrep = () => {
                   
                   📋 Job Description
                 </label>
-                <Textarea value={jobDescription} onChange={e => setJobDescription(e.target.value)} placeholder="Paste the complete job description here..." disabled={isGenerating || isSubmitting} className="border-gray-300 placeholder-gray-400 min-h-32 bg-black text-white w-full resize-none" />
+                <Textarea
+                  value={jobDescription}
+                  onChange={(e) => setJobDescription(e.target.value)}
+                  placeholder="Paste the complete job description here..."
+                  disabled={isGenerating || isSubmitting}
+                  className="border-gray-300 placeholder-gray-400 min-h-32 bg-black text-white w-full resize-none"
+                />
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                <Button onClick={handleGenerate} disabled={isGenerating || isSubmitting} className="w-full sm:flex-1 text-white font-medium bg-rose-600 hover:bg-rose-500">
+                <Button
+                  onClick={handleGenerate}
+                  disabled={isGenerating || isSubmitting}
+                  className="w-full sm:flex-1 text-white font-medium bg-rose-600 hover:bg-rose-500"
+                >
                   {isGenerating || isSubmitting ? 'Generating...' : 'Generate Interview Prep'}
                 </Button>
-                <Button onClick={handleReset} variant="outline" disabled={isGenerating || isSubmitting} className="w-full sm:w-auto px-6 border-black text-black hover:bg-gray-100">
+                <Button
+                  onClick={handleReset}
+                  variant="outline"
+                  disabled={isGenerating || isSubmitting}
+                  className="w-full sm:w-auto px-6 border-black text-black hover:bg-gray-100"
+                >
                   Reset
                 </Button>
               </div>
@@ -320,7 +405,12 @@ const InterviewPrep = () => {
                     Interview Prep Result
                   </div>
                   <div className="flex-shrink-0">
-                    <InterviewPrepDownloadActions interviewData={interviewData} jobTitle={jobTitle} companyName={companyName} contrast={true} />
+                    <InterviewPrepDownloadActions 
+                      interviewData={interviewData}
+                      jobTitle={jobTitle}
+                      companyName={companyName}
+                      contrast={true}
+                    />
                   </div>
                 </h3>
 
