@@ -318,14 +318,14 @@ const CoverLetter = () => {
                           {/* Company Name */}
                           <div className="flex-1 space-y-2">
                             <Label htmlFor="company_name" className="text-white font-medium text-base">
-                              Company Name *
+                              🏬 Company Name *
                             </Label>
                             <Input id="company_name" placeholder="e.g. Google, Microsoft" value={formData.company_name} onChange={e => handleInputChange('company_name', e.target.value)} required className="text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
                           </div>
                           {/* Job Title */}
                           <div className="flex-1 space-y-2">
                             <Label htmlFor="job_title" className="text-white font-medium text-base">
-                              Job Title *
+                              👩🏻‍💻 Job Title *
                             </Label>
                             <Input id="job_title" placeholder="e.g. Software Engineer, Marketing Manager" value={formData.job_title} onChange={e => handleInputChange('job_title', e.target.value)} required className="text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
                           </div>
@@ -334,7 +334,7 @@ const CoverLetter = () => {
                         {/* Job Description */}
                         <div className="space-y-2">
                           <Label htmlFor="job_description" className="text-white font-medium text-base">
-                            Job Description *
+                            💼 Job Description *
                           </Label>
                           <Label htmlFor="job_description" className="text-gray-300 font-normal text-sm block">
                             Paste the job description or key requirements
