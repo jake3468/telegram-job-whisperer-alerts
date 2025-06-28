@@ -16,6 +16,8 @@ serve(async (req) => {
   try {
     const { productId } = await req.json()
     
+    console.log('Received request for productId:', productId)
+    
     if (!productId) {
       return new Response(
         JSON.stringify({ error: 'Product ID is required' }),
@@ -57,6 +59,8 @@ serve(async (req) => {
       )
     }
 
+    console.log('User authenticated:', user.id)
+
     // Get product details from database
     const { data: product, error: productError } = await supabase
       .from('payment_products')
@@ -79,7 +83,9 @@ serve(async (req) => {
       )
     }
 
-    // Determine the secret name based on product details
+    console.log('Product found:', product.product_name, product.product_type, product.currency)
+
+    // Determine the secret name based on product details - simplified naming
     let secretName = ''
     
     if (product.product_type === 'subscription') {
@@ -89,23 +95,23 @@ serve(async (req) => {
         secretName = 'PAYMENT_LINK_USD_MONTHLY_SUBSCRIPTION'
       }
     } else {
-      // Credit packs - map by credits amount and currency using your naming convention
+      // Credit packs - use simple naming without parentheses
       const creditAmount = product.credits_amount
       const currency = product.currency
       
       if (currency === 'INR') {
         switch (creditAmount) {
           case 30:
-            secretName = 'PAYMENT_LINK_INR_STARTER (30 credits - ₹99)'
+            secretName = 'PAYMENT_LINK_INR_STARTER'
             break
           case 80:
-            secretName = 'PAYMENT_LINK_INR_LITE (80 credits - ₹199)'
+            secretName = 'PAYMENT_LINK_INR_LITE'
             break
           case 200:
-            secretName = 'PAYMENT_LINK_INR_PRO (200 credits - ₹399)'
+            secretName = 'PAYMENT_LINK_INR_PRO'
             break
           case 500:
-            secretName = 'PAYMENT_LINK_INR_MAX (500 credits - ₹799)'
+            secretName = 'PAYMENT_LINK_INR_MAX'
             break
           default:
             secretName = `PAYMENT_LINK_INR_${creditAmount}_CREDITS`
@@ -113,16 +119,16 @@ serve(async (req) => {
       } else {
         switch (creditAmount) {
           case 30:
-            secretName = 'PAYMENT_LINK_USD_STARTER (30 credits - $2.99)'
+            secretName = 'PAYMENT_LINK_USD_STARTER'
             break
           case 80:
-            secretName = 'PAYMENT_LINK_USD_LITE (80 credits - $4.99)'
+            secretName = 'PAYMENT_LINK_USD_LITE'
             break
           case 200:
-            secretName = 'PAYMENT_LINK_USD_PRO (200 credits - $9.99)'
+            secretName = 'PAYMENT_LINK_USD_PRO'
             break
           case 500:
-            secretName = 'PAYMENT_LINK_USD_MAX (500 credits - $19.99)'
+            secretName = 'PAYMENT_LINK_USD_MAX'
             break
           default:
             secretName = `PAYMENT_LINK_USD_${creditAmount}_CREDITS`
@@ -141,16 +147,86 @@ serve(async (req) => {
 
     if (secretError || !secretData?.decrypted_secret) {
       console.error(`Payment link not found for secret: ${secretName}`, secretError)
+      
+      // Try alternative naming patterns
+      let alternativeSecretName = ''
+      if (product.product_type === 'credit_pack') {
+        if (product.currency === 'INR') {
+          switch (product.credits_amount) {
+            case 30:
+              alternativeSecretName = 'PAYMENT_LINK_INR_STARTER_30_CREDITS'
+              break
+            case 80:
+              alternativeSecretName = 'PAYMENT_LINK_INR_LITE_80_CREDITS'
+              break
+            case 200:
+              alternativeSecretName = 'PAYMENT_LINK_INR_PRO_200_CREDITS'
+              break
+            case 500:
+              alternativeSecretName = 'PAYMENT_LINK_INR_MAX_500_CREDITS'
+              break
+          }
+        } else {
+          switch (product.credits_amount) {
+            case 30:
+              alternativeSecretName = 'PAYMENT_LINK_USD_STARTER_30_CREDITS'
+              break
+            case 80:
+              alternativeSecretName = 'PAYMENT_LINK_USD_LITE_80_CREDITS'
+              break
+            case 200:
+              alternativeSecretName = 'PAYMENT_LINK_USD_PRO_200_CREDITS'
+              break
+            case 500:
+              alternativeSecretName = 'PAYMENT_LINK_USD_MAX_500_CREDITS'
+              break
+          }
+        }
+      }
+      
+      if (alternativeSecretName) {
+        console.log(`Trying alternative secret name: ${alternativeSecretName}`)
+        const { data: altSecretData, error: altSecretError } = await supabase
+          .from('vault.decrypted_secrets')
+          .select('decrypted_secret')
+          .eq('name', alternativeSecretName)
+          .single()
+          
+        if (altSecretData?.decrypted_secret) {
+          const paymentUrl = altSecretData.decrypted_secret
+          console.log(`Payment link found with alternative name: ${alternativeSecretName}`)
+          
+          return new Response(
+            JSON.stringify({ 
+              url: paymentUrl,
+              product: {
+                id: product.product_id,
+                name: product.product_name,
+                price: product.price_amount,
+                currency: product.currency,
+                credits: product.credits_amount
+              }
+            }),
+            { 
+              status: 200, 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+            }
+          )
+        }
+      }
+      
       return new Response(
         JSON.stringify({ 
           error: 'Payment link not configured',
-          details: `Missing payment link for ${secretName}. Please configure this secret in Supabase Vault.`,
+          details: `Missing payment link for product: ${product.product_name}. Expected secret name: ${secretName}. Please configure this secret in Supabase Vault.`,
           secretName: secretName,
+          alternativeSecretName: alternativeSecretName || 'none',
           productDetails: {
             id: product.product_id,
             type: product.product_type,
             credits: product.credits_amount,
-            currency: product.currency
+            currency: product.currency,
+            name: product.product_name
           }
         }),
         { 
