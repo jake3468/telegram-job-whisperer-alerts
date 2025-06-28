@@ -31,12 +31,13 @@ serve(async (req) => {
     // Initialize Supabase client
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Get user from auth header
+    // Get user from auth header - FIXED authentication
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
+      console.error('No authorization header found')
       return new Response(
         JSON.stringify({ error: 'Authorization required' }),
         { 
@@ -47,11 +48,15 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace('Bearer ', '')
+    console.log('Processing token for authentication')
+    
+    // Use service role key to get user
     const { data: { user }, error: userError } = await supabase.auth.getUser(token)
     
     if (userError || !user) {
+      console.error('Authentication failed:', userError?.message)
       return new Response(
-        JSON.stringify({ error: 'Invalid authorization' }),
+        JSON.stringify({ error: 'Invalid authorization', details: userError?.message }),
         { 
           status: 401, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -85,7 +90,7 @@ serve(async (req) => {
 
     console.log('Product found:', product.product_name, product.product_type, product.currency)
 
-    // Determine the secret name based on product details - simplified naming
+    // Determine the secret name based on product details
     let secretName = ''
     
     if (product.product_type === 'subscription') {
@@ -95,7 +100,7 @@ serve(async (req) => {
         secretName = 'PAYMENT_LINK_USD_MONTHLY_SUBSCRIPTION'
       }
     } else {
-      // Credit packs - use simple naming without parentheses
+      // Credit packs
       const creditAmount = product.credits_amount
       const currency = product.currency
       
@@ -148,79 +153,11 @@ serve(async (req) => {
     if (secretError || !secretData?.decrypted_secret) {
       console.error(`Payment link not found for secret: ${secretName}`, secretError)
       
-      // Try alternative naming patterns
-      let alternativeSecretName = ''
-      if (product.product_type === 'credit_pack') {
-        if (product.currency === 'INR') {
-          switch (product.credits_amount) {
-            case 30:
-              alternativeSecretName = 'PAYMENT_LINK_INR_STARTER_30_CREDITS'
-              break
-            case 80:
-              alternativeSecretName = 'PAYMENT_LINK_INR_LITE_80_CREDITS'
-              break
-            case 200:
-              alternativeSecretName = 'PAYMENT_LINK_INR_PRO_200_CREDITS'
-              break
-            case 500:
-              alternativeSecretName = 'PAYMENT_LINK_INR_MAX_500_CREDITS'
-              break
-          }
-        } else {
-          switch (product.credits_amount) {
-            case 30:
-              alternativeSecretName = 'PAYMENT_LINK_USD_STARTER_30_CREDITS'
-              break
-            case 80:
-              alternativeSecretName = 'PAYMENT_LINK_USD_LITE_80_CREDITS'
-              break
-            case 200:
-              alternativeSecretName = 'PAYMENT_LINK_USD_PRO_200_CREDITS'
-              break
-            case 500:
-              alternativeSecretName = 'PAYMENT_LINK_USD_MAX_500_CREDITS'
-              break
-          }
-        }
-      }
-      
-      if (alternativeSecretName) {
-        console.log(`Trying alternative secret name: ${alternativeSecretName}`)
-        const { data: altSecretData, error: altSecretError } = await supabase
-          .from('vault.decrypted_secrets')
-          .select('decrypted_secret')
-          .eq('name', alternativeSecretName)
-          .single()
-          
-        if (altSecretData?.decrypted_secret) {
-          const paymentUrl = altSecretData.decrypted_secret
-          console.log(`Payment link found with alternative name: ${alternativeSecretName}`)
-          
-          return new Response(
-            JSON.stringify({ 
-              url: paymentUrl,
-              product: {
-                id: product.product_id,
-                name: product.product_name,
-                price: product.price_amount,
-                currency: product.currency,
-                credits: product.credits_amount
-              }
-            }),
-            { 
-              status: 200, 
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-            }
-          )
-        }
-      }
-      
       return new Response(
         JSON.stringify({ 
           error: 'Payment link not configured',
           details: `Missing payment link for product: ${product.product_name}. Expected secret name: ${secretName}. Please configure this secret in Supabase Vault.`,
           secretName: secretName,
-          alternativeSecretName: alternativeSecretName || 'none',
           productDetails: {
             id: product.product_id,
             type: product.product_type,
