@@ -48,38 +48,40 @@ serve(async (req) => {
       )
     }
 
-    // Create a Supabase client for user authentication (using the user's token)
-    const userSupabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: {
-            Authorization: authHeader,
-          },
-        },
-      }
-    )
-
-    // Get the authenticated user
-    const { data: { user }, error: authError } = await userSupabase.auth.getUser()
+    // Extract and decode the Clerk JWT directly
+    const token = authHeader.replace('Bearer ', '')
+    console.log('🔐 CHECKOUT SESSION: Processing Clerk JWT token')
     
-    if (authError || !user) {
-      console.error('❌ CHECKOUT SESSION: Authentication failed:', authError?.message)
+    let clerkUserId: string;
+    try {
+      // Decode JWT payload directly
+      const parts = token.split('.')
+      if (parts.length !== 3) {
+        throw new Error('Invalid JWT format')
+      }
+      
+      // Decode the payload (second part)
+      const payload = parts[1]
+      const paddedPayload = payload + '='.repeat((4 - payload.length % 4) % 4)
+      const decodedString = atob(paddedPayload)
+      const claims = JSON.parse(decodedString)
+      
+      clerkUserId = claims.sub
+      if (!clerkUserId) {
+        throw new Error('No user ID in JWT')
+      }
+      
+      console.log('✅ CHECKOUT SESSION: Extracted Clerk user ID:', clerkUserId)
+    } catch (error) {
+      console.error('❌ CHECKOUT SESSION: JWT decode error:', error)
       return new Response(
-        JSON.stringify({ error: 'Authentication failed' }),
+        JSON.stringify({ error: 'Invalid JWT token' }),
         { 
           status: 401, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
     }
-
-    console.log('✅ CHECKOUT SESSION: User authenticated:', user.id)
-
-    // Get the Clerk user ID from user metadata
-    const clerkUserId = user.user_metadata?.clerk_id || user.id
-    console.log('🔍 CHECKOUT SESSION: Using user ID:', clerkUserId)
 
     // Verify user exists in our database using the Clerk ID
     const { data: userData, error: userLookupError } = await supabase
