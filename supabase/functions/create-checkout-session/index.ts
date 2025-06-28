@@ -88,11 +88,11 @@ serve(async (req) => {
       
       if (currency === 'INR') {
         switch (creditAmount) {
-          case 50:
-            secretName = 'PAYMENT_LINK_INR_50_CREDITS'
+          case 30:
+            secretName = 'PAYMENT_LINK_INR_30_CREDITS'
             break
-          case 100:
-            secretName = 'PAYMENT_LINK_INR_100_CREDITS'
+          case 80:
+            secretName = 'PAYMENT_LINK_INR_80_CREDITS'
             break
           case 200:
             secretName = 'PAYMENT_LINK_INR_200_CREDITS'
@@ -105,11 +105,11 @@ serve(async (req) => {
         }
       } else {
         switch (creditAmount) {
-          case 50:
-            secretName = 'PAYMENT_LINK_USD_50_CREDITS'
+          case 30:
+            secretName = 'PAYMENT_LINK_USD_30_CREDITS'
             break
-          case 100:
-            secretName = 'PAYMENT_LINK_USD_100_CREDITS'
+          case 80:
+            secretName = 'PAYMENT_LINK_USD_80_CREDITS'
             break
           case 200:
             secretName = 'PAYMENT_LINK_USD_200_CREDITS'
