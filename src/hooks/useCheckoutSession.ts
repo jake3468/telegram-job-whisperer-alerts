@@ -1,12 +1,13 @@
 
 import { useState } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import { toast } from 'sonner';
 
 export const useCheckoutSession = () => {
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
   const { user } = useUser();
+  const { getToken } = useAuth();
 
   const createCheckoutSession = async (productId: string) => {
     if (!user) {
@@ -28,8 +29,8 @@ export const useCheckoutSession = () => {
     setError(null);
 
     try {
-      // Get Clerk JWT token
-      const clerkToken = await user.getToken();
+      // Get Clerk JWT token using useAuth hook
+      const clerkToken = await getToken();
       if (!clerkToken) {
         throw new Error('Failed to get Clerk authentication token');
       }
