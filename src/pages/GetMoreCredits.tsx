@@ -52,7 +52,6 @@ export default function GetMoreCredits() {
     createCheckoutSession,
     isLoading: isCheckoutLoading
   } = useCheckoutSession();
-  
   const handleSubscribeClick = async () => {
     const subscriptionProduct = subscriptionProducts[0];
     if (!subscriptionProduct) {
@@ -66,7 +65,6 @@ export default function GetMoreCredits() {
       toast.error('Failed to create checkout session');
     }
   };
-  
   const handleCreditPackClick = async (productId: string) => {
     const session = await createCheckoutSession(productId);
     if (session?.url) {
@@ -75,46 +73,32 @@ export default function GetMoreCredits() {
       toast.error('Failed to create checkout session');
     }
   };
-  
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
-  
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-gradient-to-br from-pastel-mint via-pastel-lavender to-pastel-peach flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading...</div>
       </div>;
   }
-  
+
   // Static credit balance calculation
   const currentBalance = credits ? Number(credits.current_balance) : 0;
-
-  return (
-    <Layout>
+  return <Layout>
       <div className="w-full flex flex-col pb-5 sm:pb-8">
         <div className="text-center mb-5 sm:mb-12 px-2 sm:px-4">
-          <h1 className="text-2xl xs:text-3xl sm:text-5xl font-orbitron font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-1 sm:mb-2 drop-shadow tracking-tight animate-fade-in">
-            Flexible Pricing for All Users
-          </h1>
+          <h1 className="text-2xl xs:text-3xl sm:text-5xl font-orbitron font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-1 sm:mb-2 drop-shadow tracking-tight animate-fade-in">Flexible Pricing Plans</h1>
           <p className="text-sm sm:text-lg text-blue-100 font-inter font-light mb-1 sm:mb-2 animate-fade-in">
             Pay only for what you use. Get started with free monthly credits, and upgrade anytime with our credit packs.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
             <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in">
               Current Balance:{" "}
-              {isLoading ? (
-                <span className="font-bold text-cyan-100">Loading...</span>
-              ) : error ? (
-                <span className="font-bold text-rose-300">Error loading</span>
-              ) : credits ? (
-                <span className="font-bold text-cyan-100">
+              {isLoading ? <span className="font-bold text-cyan-100">Loading...</span> : error ? <span className="font-bold text-rose-300">Error loading</span> : credits ? <span className="font-bold text-cyan-100">
                   {currentBalance.toLocaleString()} credits
-                </span>
-              ) : (
-                <span className="font-bold text-yellow-300">No credits found</span>
-              )}
+                </span> : <span className="font-bold text-yellow-300">No credits found</span>}
             </p>
             <div className="flex items-center gap-2">
               <SubscriptionBadge />
@@ -290,6 +274,5 @@ export default function GetMoreCredits() {
           </div>
         </div>
       </div>
-    </Layout>
-  );
+    </Layout>;
 }
