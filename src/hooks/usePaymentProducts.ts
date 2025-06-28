@@ -24,7 +24,21 @@ export const usePaymentProducts = () => {
   const [error, setError] = useState<string | null>(null);
   const { pricingData } = useLocationPricing();
 
+  // Add immediate debug logging for pricingData
+  console.log('💰 PRICING DATA RECEIVED:', {
+    pricingData,
+    region: pricingData?.region,
+    currency: pricingData?.currency,
+    hasPricingData: !!pricingData
+  });
+
   useEffect(() => {
+    console.log('🔄 usePaymentProducts useEffect triggered with pricingData:', {
+      region: pricingData?.region,
+      currency: pricingData?.currency,
+      fullPricingData: pricingData
+    });
+
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
