@@ -16,9 +16,10 @@ serve(async (req) => {
   try {
     const { productId } = await req.json()
     
-    console.log('Received request for productId:', productId)
+    console.log('🚀 CHECKOUT SESSION: Received request for productId:', productId)
     
     if (!productId) {
+      console.error('❌ CHECKOUT SESSION: No productId provided')
       return new Response(
         JSON.stringify({ error: 'Product ID is required' }),
         { 
@@ -28,16 +29,16 @@ serve(async (req) => {
       )
     }
 
-    // Initialize Supabase client
+    // Initialize Supabase client with service role key for vault access
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Get user from auth header - FIXED authentication
+    // Get user from auth header with improved error handling
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
-      console.error('No authorization header found')
+      console.error('❌ CHECKOUT SESSION: No authorization header found')
       return new Response(
         JSON.stringify({ error: 'Authorization required' }),
         { 
@@ -48,13 +49,18 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace('Bearer ', '')
-    console.log('Processing token for authentication')
+    console.log('🔐 CHECKOUT SESSION: Processing authentication token')
     
-    // Use service role key to get user
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token)
+    // Use the anon client to verify the user token, then switch to service role for data access
+    const anonClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    )
+    
+    const { data: { user }, error: userError } = await anonClient.auth.getUser(token)
     
     if (userError || !user) {
-      console.error('Authentication failed:', userError?.message)
+      console.error('❌ CHECKOUT SESSION: Authentication failed:', userError?.message)
       return new Response(
         JSON.stringify({ error: 'Invalid authorization', details: userError?.message }),
         { 
@@ -64,9 +70,10 @@ serve(async (req) => {
       )
     }
 
-    console.log('User authenticated:', user.id)
+    console.log('✅ CHECKOUT SESSION: User authenticated successfully:', user.id)
 
-    // Get product details from database
+    // Get product details from database using service role
+    console.log('🔍 CHECKOUT SESSION: Querying product details for:', productId)
     const { data: product, error: productError } = await supabase
       .from('payment_products')
       .select('*')
@@ -75,7 +82,7 @@ serve(async (req) => {
       .single()
 
     if (productError || !product) {
-      console.error(`Product not found: ${productId}`, productError)
+      console.error('❌ CHECKOUT SESSION: Product not found:', productId, productError)
       return new Response(
         JSON.stringify({ 
           error: 'Product not found',
@@ -88,7 +95,7 @@ serve(async (req) => {
       )
     }
 
-    console.log('Product found:', product.product_name, product.product_type, product.currency)
+    console.log('✅ CHECKOUT SESSION: Product found:', product.product_name, product.product_type, product.currency)
 
     // Determine the secret name based on product details
     let secretName = ''
@@ -141,9 +148,9 @@ serve(async (req) => {
       }
     }
 
-    console.log(`Looking for payment link with secret name: ${secretName}`)
+    console.log(`🔐 CHECKOUT SESSION: Looking for payment link with secret name: ${secretName}`)
 
-    // Get the payment link from vault
+    // Get the payment link from vault using service role
     const { data: secretData, error: secretError } = await supabase
       .from('vault.decrypted_secrets')
       .select('decrypted_secret')
@@ -151,7 +158,7 @@ serve(async (req) => {
       .single()
 
     if (secretError || !secretData?.decrypted_secret) {
-      console.error(`Payment link not found for secret: ${secretName}`, secretError)
+      console.error('❌ CHECKOUT SESSION: Payment link not found for secret:', secretName, secretError)
       
       return new Response(
         JSON.stringify({ 
@@ -174,9 +181,10 @@ serve(async (req) => {
     }
 
     const paymentUrl = secretData.decrypted_secret
+    console.log(`✅ CHECKOUT SESSION: Successfully retrieved payment link for: ${secretName}`)
 
     // Log the checkout session creation
-    console.log(`Checkout session created for user ${user.id}, product ${productId}, using payment link: ${secretName}`)
+    console.log(`🎉 CHECKOUT SESSION: Session created for user ${user.id}, product ${productId}`)
 
     return new Response(
       JSON.stringify({ 
@@ -196,7 +204,7 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Checkout session creation error:', error)
+    console.error('💥 CHECKOUT SESSION: Unexpected error:', error)
     return new Response(
       JSON.stringify({ 
         error: 'Internal server error',
