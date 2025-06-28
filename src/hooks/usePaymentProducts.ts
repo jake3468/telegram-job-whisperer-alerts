@@ -44,21 +44,27 @@ export const usePaymentProducts = () => {
         setIsLoading(true);
         
         console.log('🚀 PAYMENT PRODUCTS HOOK STARTING');
-        console.log('🔍 Fetching products for:', { 
-          region: pricingData.region, 
-          currency: pricingData.currency 
+        console.log('🔍 About to fetch products for:', { 
+          region: pricingData?.region, 
+          currency: pricingData?.currency 
         });
 
         // Validate we have the required data
-        if (!pricingData.region || !pricingData.currency) {
+        if (!pricingData?.region || !pricingData?.currency) {
           console.warn('⚠️ Missing region or currency data:', { 
-            region: pricingData.region, 
-            currency: pricingData.currency 
+            region: pricingData?.region, 
+            currency: pricingData?.currency 
           });
           setIsLoading(false);
           return;
         }
         
+        console.log('🎯 Query parameters:', {
+          is_active: true,
+          region: pricingData.region,
+          currency_code: pricingData.currency
+        });
+
         // Query products for the specific region and currency_code
         const { data, error } = await supabase
           .from('payment_products')
@@ -68,10 +74,10 @@ export const usePaymentProducts = () => {
           .eq('currency_code', pricingData.currency)
           .order('price_amount', { ascending: true });
 
-        console.log('🔍 Query executed with filters:', {
-          is_active: true,
-          region: pricingData.region,
-          currency_code: pricingData.currency
+        console.log('🔍 Database query executed with results:', {
+          data,
+          error,
+          dataLength: data?.length || 0
         });
 
         if (error) {
@@ -140,7 +146,7 @@ export const usePaymentProducts = () => {
     };
 
     // Only fetch when we have a region and currency
-    if (pricingData.region && pricingData.currency) {
+    if (pricingData?.region && pricingData?.currency) {
       console.log('🎬 Triggering fetchProducts with:', {
         region: pricingData.region,
         currency: pricingData.currency
@@ -148,12 +154,12 @@ export const usePaymentProducts = () => {
       fetchProducts();
     } else {
       console.log('⏳ Waiting for pricing data...', {
-        region: pricingData.region,
-        currency: pricingData.currency,
+        region: pricingData?.region,
+        currency: pricingData?.currency,
         hasPricingData: !!pricingData
       });
     }
-  }, [pricingData.region, pricingData.currency]);
+  }, [pricingData?.region, pricingData?.currency]);
 
   const getSubscriptionProducts = () => products.filter(p => p.product_type === 'subscription');
   const getCreditPackProducts = () => products.filter(p => p.product_type === 'credit_pack' && p.product_id !== 'initial_free_credits');
