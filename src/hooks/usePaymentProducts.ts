@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useLocationPricing } from './useLocationPricing';
@@ -28,15 +29,18 @@ export const usePaymentProducts = () => {
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
-        logger.debug('Fetching products for region and currency');
+        logger.debug('Fetching products for region and currency', { 
+          region: pricingData.region, 
+          currency: pricingData.currency 
+        });
         
-        // Query products for the specific region and currency
+        // Query products for the specific region and currency_code
         const { data, error } = await supabase
           .from('payment_products')
           .select('*')
           .eq('is_active', true)
           .eq('region', pricingData.region)
-          .eq('currency_code', pricingData.currency)
+          .eq('currency_code', pricingData.currency) // Use currency_code to match database
           .order('price_amount', { ascending: true });
 
         if (error) {
@@ -45,17 +49,17 @@ export const usePaymentProducts = () => {
           return;
         }
 
-        logger.debug('Payment products fetched successfully');
+        logger.debug('Payment products fetched successfully', { 
+          count: data?.length || 0,
+          region: pricingData.region,
+          currency: pricingData.currency
+        });
 
         // Filter and type-cast the products to ensure they match our interface
         const validProducts = (data || [])
           .filter(product => 
             product.product_type === 'subscription' || 
             product.product_type === 'credit_pack'
-          )
-          .filter(product => 
-            // Ensure currency matches the detected pricing data
-            product.currency_code === pricingData.currency
           )
           .map(product => ({
             id: product.id,
