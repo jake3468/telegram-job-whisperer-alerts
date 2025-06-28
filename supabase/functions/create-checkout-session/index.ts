@@ -181,6 +181,17 @@ serve(async (req) => {
 
     console.log(`🔐 CHECKOUT SESSION: Looking for payment link with secret name: ${secretName}`)
 
+    // DEBUG: Log available environment variables (for debugging only - remove after fixing)
+    console.log('🐛 DEBUG: Checking environment variables...')
+    const allEnvKeys = Object.keys(Deno.env.toObject()).filter(key => 
+      key.startsWith('PAYMENT_LINK_') || key.includes('PAYMENT') || key.includes('LINK')
+    )
+    console.log('🐛 DEBUG: Available payment-related env vars:', allEnvKeys)
+    
+    // Check if the exact secret exists
+    const hasExactSecret = Deno.env.get(secretName)
+    console.log(`🐛 DEBUG: Secret "${secretName}" exists:`, !!hasExactSecret)
+    
     // Get the payment link from vault using Deno.env.get()
     const paymentUrl = Deno.env.get(secretName)
 
@@ -192,6 +203,7 @@ serve(async (req) => {
           error: 'Payment link not configured',
           details: `Missing payment link for product: ${product.product_name}. Expected secret name: ${secretName}. Please configure this secret in Supabase Vault.`,
           secretName: secretName,
+          availablePaymentSecrets: allEnvKeys, // Include debug info
           productDetails: {
             id: product.product_id,
             type: product.product_type,
