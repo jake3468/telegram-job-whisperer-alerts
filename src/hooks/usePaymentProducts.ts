@@ -15,7 +15,6 @@ export interface PaymentProduct {
   currency_code: string;
   region: string;
   is_default_region: boolean;
-  description: string;
   is_active: boolean;
 }
 
@@ -29,7 +28,7 @@ export const usePaymentProducts = () => {
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
-        logger.debug('Fetching products for region and currency', { 
+        console.log('🔍 Fetching products for:', { 
           region: pricingData.region, 
           currency: pricingData.currency 
         });
@@ -40,27 +39,25 @@ export const usePaymentProducts = () => {
           .select('*')
           .eq('is_active', true)
           .eq('region', pricingData.region)
-          .eq('currency_code', pricingData.currency) // Use currency_code to match database
+          .eq('currency_code', pricingData.currency)
           .order('price_amount', { ascending: true });
 
         if (error) {
-          logger.error('Error fetching payment products:', error);
+          console.error('❌ Error fetching payment products:', error);
           setError(error.message);
           return;
         }
 
-        logger.debug('Payment products fetched successfully', { 
-          count: data?.length || 0,
-          region: pricingData.region,
-          currency: pricingData.currency
-        });
+        console.log('📦 Raw products from database:', data);
+        console.log('📊 Total products found:', data?.length || 0);
 
         // Filter and type-cast the products to ensure they match our interface
         const validProducts = (data || [])
-          .filter(product => 
-            product.product_type === 'subscription' || 
-            product.product_type === 'credit_pack'
-          )
+          .filter(product => {
+            const isValidType = product.product_type === 'subscription' || product.product_type === 'credit_pack';
+            console.log(`🔍 Product ${product.product_name}: type=${product.product_type}, valid=${isValidType}`);
+            return isValidType;
+          })
           .map(product => ({
             id: product.id,
             product_id: product.product_id,
@@ -72,14 +69,15 @@ export const usePaymentProducts = () => {
             currency_code: product.currency_code,
             region: product.region,
             is_default_region: product.is_default_region,
-            description: product.description,
             is_active: product.is_active
           }));
 
-        logger.info(`Processed ${validProducts.length} payment products for region: ${pricingData.region}, currency: ${pricingData.currency}`);
+        console.log('✅ Final processed products:', validProducts);
+        console.log('📈 Credit packs found:', validProducts.filter(p => p.product_type === 'credit_pack'));
+        
         setProducts(validProducts);
       } catch (err) {
-        logger.error('Exception fetching payment products:', err);
+        console.error('💥 Exception fetching payment products:', err);
         setError('Failed to fetch payment products');
       } finally {
         setIsLoading(false);
