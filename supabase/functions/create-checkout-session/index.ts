@@ -7,6 +7,38 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Helper function to decode JWT and extract user ID
+function extractClerkUserIdFromJWT(token: string): string | null {
+  try {
+    // JWT tokens have 3 parts separated by dots
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      console.error('❌ CHECKOUT SESSION: Invalid JWT format');
+      return null;
+    }
+
+    // Decode the payload (second part)
+    const payload = parts[1];
+    // Add padding if needed for base64 decoding
+    const paddedPayload = payload + '='.repeat((4 - payload.length % 4) % 4);
+    
+    try {
+      const decodedBytes = Uint8Array.from(atob(paddedPayload), c => c.charCodeAt(0));
+      const decodedString = new TextDecoder().decode(decodedBytes);
+      const claims = JSON.parse(decodedString);
+      
+      console.log('🔍 CHECKOUT SESSION: JWT Claims extracted successfully');
+      return claims.sub || null;
+    } catch (decodeError) {
+      console.error('❌ CHECKOUT SESSION: Failed to decode JWT payload:', decodeError);
+      return null;
+    }
+  } catch (error) {
+    console.error('❌ CHECKOUT SESSION: Error extracting user ID from JWT:', error);
+    return null;
+  }
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -51,18 +83,13 @@ serve(async (req) => {
     const token = authHeader.replace('Bearer ', '')
     console.log('🔐 CHECKOUT SESSION: Processing authentication token')
     
-    // Use the anon client to verify the user token, then switch to service role for data access
-    const anonClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    )
+    // Extract Clerk user ID from JWT token
+    const clerkUserId = extractClerkUserIdFromJWT(token)
     
-    const { data: { user }, error: userError } = await anonClient.auth.getUser(token)
-    
-    if (userError || !user) {
-      console.error('❌ CHECKOUT SESSION: Authentication failed:', userError?.message)
+    if (!clerkUserId) {
+      console.error('❌ CHECKOUT SESSION: Failed to extract user ID from JWT token')
       return new Response(
-        JSON.stringify({ error: 'Invalid authorization', details: userError?.message }),
+        JSON.stringify({ error: 'Invalid authorization token' }),
         { 
           status: 401, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -70,7 +97,27 @@ serve(async (req) => {
       )
     }
 
-    console.log('✅ CHECKOUT SESSION: User authenticated successfully:', user.id)
+    console.log('🔍 CHECKOUT SESSION: Extracted Clerk user ID:', clerkUserId)
+
+    // Verify user exists in our database using the extracted Clerk ID
+    const { data: userData, error: userLookupError } = await supabase
+      .from('users')
+      .select('id, clerk_id, email')
+      .eq('clerk_id', clerkUserId)
+      .single()
+
+    if (userLookupError || !userData) {
+      console.error('❌ CHECKOUT SESSION: User not found in database:', userLookupError?.message)
+      return new Response(
+        JSON.stringify({ error: 'User not found', details: userLookupError?.message }),
+        { 
+          status: 401, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+
+    console.log('✅ CHECKOUT SESSION: User authenticated successfully:', userData.id)
 
     // Get product details from database using service role
     console.log('🔍 CHECKOUT SESSION: Querying product details for:', productId)
@@ -184,7 +231,7 @@ serve(async (req) => {
     console.log(`✅ CHECKOUT SESSION: Successfully retrieved payment link for: ${secretName}`)
 
     // Log the checkout session creation
-    console.log(`🎉 CHECKOUT SESSION: Session created for user ${user.id}, product ${productId}`)
+    console.log(`🎉 CHECKOUT SESSION: Session created for user ${userData.id}, product ${productId}`)
 
     return new Response(
       JSON.stringify({ 
