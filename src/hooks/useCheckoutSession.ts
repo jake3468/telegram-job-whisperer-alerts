@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@clerk/clerk-react';
 
 export const useCheckoutSession = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
   const { user } = useUser();
 
@@ -14,7 +14,8 @@ export const useCheckoutSession = () => {
       return null;
     }
 
-    setIsLoading(true);
+    // Set loading state for this specific product
+    setLoadingStates(prev => ({ ...prev, [productId]: true }));
     setError(null);
 
     try {
@@ -39,9 +40,12 @@ export const useCheckoutSession = () => {
       setError('Failed to create checkout session');
       return null;
     } finally {
-      setIsLoading(false);
+      // Clear loading state for this specific product
+      setLoadingStates(prev => ({ ...prev, [productId]: false }));
     }
   };
+
+  const isLoading = (productId: string) => loadingStates[productId] || false;
 
   return {
     createCheckoutSession,
