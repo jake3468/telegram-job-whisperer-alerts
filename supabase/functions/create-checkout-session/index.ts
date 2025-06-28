@@ -28,7 +28,13 @@ function extractClerkUserIdFromJWT(token: string): string | null {
       const claims = JSON.parse(decodedString);
       
       console.log('🔍 CHECKOUT SESSION: JWT Claims extracted successfully');
-      return claims.sub || null;
+      console.log('🔍 CHECKOUT SESSION: Claims object:', JSON.stringify(claims, null, 2));
+      
+      // Try different possible user ID fields in Clerk tokens
+      const userId = claims.sub || claims.user_id || claims.id;
+      console.log('🔍 CHECKOUT SESSION: Extracted user ID:', userId);
+      
+      return userId || null;
     } catch (decodeError) {
       console.error('❌ CHECKOUT SESSION: Failed to decode JWT payload:', decodeError);
       return null;
@@ -82,6 +88,8 @@ serve(async (req) => {
 
     const token = authHeader.replace('Bearer ', '')
     console.log('🔐 CHECKOUT SESSION: Processing authentication token')
+    console.log('🔐 CHECKOUT SESSION: Token length:', token.length)
+    console.log('🔐 CHECKOUT SESSION: Token prefix:', token.substring(0, 20) + '...')
     
     // Extract Clerk user ID from JWT token
     const clerkUserId = extractClerkUserIdFromJWT(token)
