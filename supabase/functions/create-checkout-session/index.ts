@@ -181,15 +181,11 @@ serve(async (req) => {
 
     console.log(`🔐 CHECKOUT SESSION: Looking for payment link with secret name: ${secretName}`)
 
-    // Get the payment link from vault using service role
-    const { data: secretData, error: secretError } = await supabase
-      .from('vault.decrypted_secrets')
-      .select('decrypted_secret')
-      .eq('name', secretName)
-      .single()
+    // Get the payment link from vault using Deno.env.get()
+    const paymentUrl = Deno.env.get(secretName)
 
-    if (secretError || !secretData?.decrypted_secret) {
-      console.error('❌ CHECKOUT SESSION: Payment link not found for secret:', secretName, secretError)
+    if (!paymentUrl) {
+      console.error('❌ CHECKOUT SESSION: Payment link not found for secret:', secretName)
       
       return new Response(
         JSON.stringify({ 
@@ -211,7 +207,6 @@ serve(async (req) => {
       )
     }
 
-    const paymentUrl = secretData.decrypted_secret
     console.log(`✅ CHECKOUT SESSION: Successfully retrieved payment link for: ${secretName}`)
 
     // Log the checkout session creation
