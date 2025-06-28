@@ -86,7 +86,7 @@ serve(async (req) => {
     // Verify user exists in our database using the Clerk ID
     const { data: userData, error: userLookupError } = await supabase
       .from('users')
-      .select('id, clerk_id, email')
+      .select('id, clerk_id, email, first_name, last_name')
       .eq('clerk_id', clerkUserId)
       .single()
 
@@ -181,18 +181,7 @@ serve(async (req) => {
 
     console.log(`🔐 CHECKOUT SESSION: Looking for payment link with secret name: ${secretName}`)
 
-    // DEBUG: Log available environment variables (for debugging only - remove after fixing)
-    console.log('🐛 DEBUG: Checking environment variables...')
-    const allEnvKeys = Object.keys(Deno.env.toObject()).filter(key => 
-      key.startsWith('PAYMENT_LINK_') || key.includes('PAYMENT') || key.includes('LINK')
-    )
-    console.log('🐛 DEBUG: Available payment-related env vars:', allEnvKeys)
-    
-    // Check if the exact secret exists
-    const hasExactSecret = Deno.env.get(secretName)
-    console.log(`🐛 DEBUG: Secret "${secretName}" exists:`, !!hasExactSecret)
-    
-    // Get the payment link from vault using Deno.env.get()
+    // Get the payment link from environment variables
     const paymentUrl = Deno.env.get(secretName)
 
     if (!paymentUrl) {
@@ -201,9 +190,8 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: 'Payment link not configured',
-          details: `Missing payment link for product: ${product.product_name}. Expected secret name: ${secretName}. Please configure this secret in Supabase Vault.`,
+          details: `Missing payment link for product: ${product.product_name}. Expected secret name: ${secretName}. Please configure this secret in Edge Functions Secrets.`,
           secretName: secretName,
-          availablePaymentSecrets: allEnvKeys, // Include debug info
           productDetails: {
             id: product.product_id,
             type: product.product_type,
@@ -221,12 +209,38 @@ serve(async (req) => {
 
     console.log(`✅ CHECKOUT SESSION: Successfully retrieved payment link for: ${secretName}`)
 
+    // Prepare dynamic URL parameters
+    const fullName = `${userData.first_name || ''} ${userData.last_name || ''}`.trim()
+    const email = userData.email || ''
+
+    // URL encode the parameters properly
+    const encodedFullName = encodeURIComponent(fullName)
+    const encodedEmail = encodeURIComponent(email)
+
+    // Add dynamic parameters to the payment URL
+    let finalPaymentUrl = paymentUrl
+    
+    // Check if URL already has parameters
+    const separator = paymentUrl.includes('?') ? '&' : '?'
+    
+    // Add the dynamic parameters
+    if (fullName) {
+      finalPaymentUrl += `${separator}fullName=${encodedFullName}`
+    }
+    
+    if (email) {
+      const emailSeparator = (paymentUrl.includes('?') || fullName) ? '&' : '?'
+      finalPaymentUrl += `${emailSeparator}email=${encodedEmail}`
+    }
+
+    console.log(`🎯 CHECKOUT SESSION: Final payment URL with dynamic parameters prepared`)
+
     // Log the checkout session creation
     console.log(`🎉 CHECKOUT SESSION: Session created for user ${userData.id}, product ${productId}`)
 
     return new Response(
       JSON.stringify({ 
-        url: paymentUrl,
+        url: finalPaymentUrl,
         product: {
           id: product.product_id,
           name: product.product_name,
