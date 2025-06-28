@@ -75,16 +75,68 @@ serve(async (req) => {
       )
     }
 
-    // Get the secure payment URLs from Supabase secrets
-    const { data: secretsData, error: secretsError } = await supabase
-      .from('vault.decrypted_secrets')
-      .select('name, decrypted_secret')
-      .in('name', ['DODOPAYMENTS_BASE_URL', 'DODOPAYMENTS_REDIRECT_URL'])
+    // Get the payment link from Supabase Vault based on product type and region
+    let secretName = ''
+    
+    // Determine the secret name based on product details
+    if (product.product_type === 'subscription') {
+      secretName = product.currency === 'INR' ? 'PAYMENT_LINK_INR_MONTHLY_SUBSCRIPTION' : 'PAYMENT_LINK_USD_MONTHLY_SUBSCRIPTION'
+    } else {
+      // Credit packs - map by credits amount and currency
+      const creditAmount = product.credits_amount
+      const currency = product.currency
+      
+      if (currency === 'INR') {
+        switch (creditAmount) {
+          case 50:
+            secretName = 'PAYMENT_LINK_INR_50_CREDITS'
+            break
+          case 100:
+            secretName = 'PAYMENT_LINK_INR_100_CREDITS'
+            break
+          case 200:
+            secretName = 'PAYMENT_LINK_INR_200_CREDITS'
+            break
+          case 500:
+            secretName = 'PAYMENT_LINK_INR_500_CREDITS'
+            break
+          default:
+            secretName = `PAYMENT_LINK_INR_${creditAmount}_CREDITS`
+        }
+      } else {
+        switch (creditAmount) {
+          case 50:
+            secretName = 'PAYMENT_LINK_USD_50_CREDITS'
+            break
+          case 100:
+            secretName = 'PAYMENT_LINK_USD_100_CREDITS'
+            break
+          case 200:
+            secretName = 'PAYMENT_LINK_USD_200_CREDITS'
+            break
+          case 500:
+            secretName = 'PAYMENT_LINK_USD_500_CREDITS'
+            break
+          default:
+            secretName = `PAYMENT_LINK_USD_${creditAmount}_CREDITS`
+        }
+      }
+    }
 
-    if (secretsError || !secretsData || secretsData.length === 0) {
-      console.error('Error fetching payment secrets:', secretsError)
+    // Get the payment link from vault
+    const { data: secretData, error: secretError } = await supabase
+      .from('vault.decrypted_secrets')
+      .select('decrypted_secret')
+      .eq('name', secretName)
+      .single()
+
+    if (secretError || !secretData?.decrypted_secret) {
+      console.error(`Payment link not found for secret: ${secretName}`, secretError)
       return new Response(
-        JSON.stringify({ error: 'Payment configuration error' }),
+        JSON.stringify({ 
+          error: 'Payment link not configured',
+          details: `Missing payment link for ${secretName}`
+        }),
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -92,22 +144,14 @@ serve(async (req) => {
       )
     }
 
-    const secrets = Object.fromEntries(
-      secretsData.map(secret => [secret.name, secret.decrypted_secret])
-    )
-
-    const baseUrl = secrets.DODOPAYMENTS_BASE_URL || 'https://test.checkout.dodopayments.com/buy/'
-    const redirectUrl = secrets.DODOPAYMENTS_REDIRECT_URL || 'https://preview--telegram-job-whisperer-alerts.lovable.app/get-more-credits'
-
-    // Generate the checkout URL
-    const checkoutUrl = `${baseUrl}${productId}?quantity=1&redirect_url=${encodeURIComponent(redirectUrl)}`
+    const paymentUrl = secretData.decrypted_secret
 
     // Log the checkout session creation
-    console.log(`Checkout session created for user ${user.id}, product ${productId}`)
+    console.log(`Checkout session created for user ${user.id}, product ${productId}, using payment link: ${secretName}`)
 
     return new Response(
       JSON.stringify({ 
-        url: checkoutUrl,
+        url: paymentUrl,
         product: {
           id: product.product_id,
           name: product.product_name,
@@ -125,7 +169,10 @@ serve(async (req) => {
   } catch (error) {
     console.error('Checkout session creation error:', error)
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ 
+        error: 'Internal server error',
+        details: error.message 
+      }),
       { 
         status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
