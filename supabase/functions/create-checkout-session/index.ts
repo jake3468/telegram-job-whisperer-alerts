@@ -35,10 +35,10 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Get user from auth header - simplified approach
+    // Get the authorization header
     const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      console.error('❌ CHECKOUT SESSION: No authorization header found')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.error('❌ CHECKOUT SESSION: No valid authorization header found')
       return new Response(
         JSON.stringify({ error: 'Authorization required' }),
         { 
@@ -48,42 +48,26 @@ serve(async (req) => {
       )
     }
 
-    const token = authHeader.replace('Bearer ', '')
-    console.log('🔐 CHECKOUT SESSION: Processing authentication token')
-    console.log('🔐 CHECKOUT SESSION: Token length:', token.length)
-    
-    // Try to decode the JWT payload to get the Clerk user ID
-    let clerkUserId: string;
-    try {
-      // JWT tokens have 3 parts separated by dots
-      const parts = token.split('.');
-      if (parts.length !== 3) {
-        throw new Error('Invalid JWT format');
+    // Create a Supabase client for user authentication (using the user's token)
+    const userSupabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: {
+            Authorization: authHeader,
+          },
+        },
       }
+    )
 
-      // Decode the payload (second part)
-      const payload = parts[1];
-      // Add padding if needed for base64 decoding
-      const paddedPayload = payload + '='.repeat((4 - payload.length % 4) % 4);
-      
-      const decodedBytes = Uint8Array.from(atob(paddedPayload), c => c.charCodeAt(0));
-      const decodedString = new TextDecoder().decode(decodedBytes);
-      const claims = JSON.parse(decodedString);
-      
-      console.log('🔍 CHECKOUT SESSION: JWT Claims extracted successfully');
-      
-      // Get the user ID from Clerk JWT (usually in 'sub' field)
-      clerkUserId = claims.sub;
-      
-      if (!clerkUserId) {
-        throw new Error('No user ID found in JWT claims');
-      }
-      
-      console.log('🔍 CHECKOUT SESSION: Extracted Clerk user ID:', clerkUserId);
-    } catch (decodeError) {
-      console.error('❌ CHECKOUT SESSION: Failed to decode JWT:', decodeError);
+    // Get the authenticated user
+    const { data: { user }, error: authError } = await userSupabase.auth.getUser()
+    
+    if (authError || !user) {
+      console.error('❌ CHECKOUT SESSION: Authentication failed:', authError?.message)
       return new Response(
-        JSON.stringify({ error: 'Invalid authorization token' }),
+        JSON.stringify({ error: 'Authentication failed' }),
         { 
           status: 401, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -91,7 +75,13 @@ serve(async (req) => {
       )
     }
 
-    // Verify user exists in our database using the extracted Clerk ID
+    console.log('✅ CHECKOUT SESSION: User authenticated:', user.id)
+
+    // Get the Clerk user ID from user metadata
+    const clerkUserId = user.user_metadata?.clerk_id || user.id
+    console.log('🔍 CHECKOUT SESSION: Using user ID:', clerkUserId)
+
+    // Verify user exists in our database using the Clerk ID
     const { data: userData, error: userLookupError } = await supabase
       .from('users')
       .select('id, clerk_id, email')
