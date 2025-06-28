@@ -1,6 +1,5 @@
 
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@clerk/clerk-react';
 import { toast } from 'sonner';
 
@@ -29,22 +28,31 @@ export const useCheckoutSession = () => {
     setError(null);
 
     try {
-      const { data, error: functionError } = await supabase.functions.invoke('create-checkout-session', {
-        body: { productId }
+      // Get Clerk JWT token
+      const clerkToken = await user.getToken();
+      if (!clerkToken) {
+        throw new Error('Failed to get Clerk authentication token');
+      }
+
+      console.log('🔐 CLIENT: Got Clerk token, length:', clerkToken.length);
+
+      // Make direct fetch request with Clerk token
+      const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/functions/v1/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${clerkToken}`,
+        },
+        body: JSON.stringify({ productId })
       });
 
-      if (functionError) {
-        console.error('Error creating checkout session:', functionError);
-        const errorMsg = functionError.message || 'Failed to create checkout session';
-        setError(errorMsg);
-        toast.error(errorMsg, {
-          action: {
-            label: 'Close',
-            onClick: () => toast.dismiss(),
-          },
-        });
-        return null;
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response from checkout session:', response.status, errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
+
+      const data = await response.json();
 
       if (!data?.url) {
         const errorMsg = 'No checkout URL returned';
@@ -62,7 +70,7 @@ export const useCheckoutSession = () => {
       return data;
     } catch (err) {
       console.error('Exception creating checkout session:', err);
-      const errorMsg = 'Failed to create checkout session';
+      const errorMsg = err instanceof Error ? err.message : 'Failed to create checkout session';
       setError(errorMsg);
       toast.error(errorMsg, {
         action: {
