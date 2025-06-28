@@ -59,7 +59,7 @@ export const useTransactionHistory = () => {
           throw creditError;
         }
 
-        // Get payment records with product details
+        // Get ALL payment records (including failed ones) - removed processed filter
         const { data: paymentRecords, error: paymentError } = await supabase
           .from('payment_records')
           .select(`
@@ -75,7 +75,6 @@ export const useTransactionHistory = () => {
             customer_email
           `)
           .eq('user_id', userProfile.user_id)
-          .eq('processed', true)
           .order('created_at', { ascending: false })
           .limit(50);
 
@@ -117,14 +116,19 @@ export const useTransactionHistory = () => {
           });
         }
 
-        // Add payment records
+        // Add ALL payment records (including failed ones)
         if (paymentRecords) {
           paymentRecords.forEach(payment => {
             const product = productMap.get(payment.product_id);
+            // Show credits awarded only for successful payments, 0 for failed ones
+            const creditsDisplay = payment.status === 'active' || payment.status === 'completed' 
+              ? Number(payment.credits_awarded || 0) 
+              : 0;
+            
             allTransactions.push({
               id: payment.id,
               type: payment.event_type,
-              amount: Number(payment.credits_awarded || 0),
+              amount: creditsDisplay,
               description: `${product?.product_name || 'Product purchase'} - ${payment.status}`,
               date: payment.created_at,
               balanceAfter: null,

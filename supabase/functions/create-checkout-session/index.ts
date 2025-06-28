@@ -210,7 +210,9 @@ serve(async (req) => {
     console.log(`✅ CHECKOUT SESSION: Successfully retrieved payment link for: ${secretName}`)
 
     // Prepare dynamic URL parameters
-    const fullName = `${userData.first_name || ''} ${userData.last_name || ''}`.trim()
+    const firstName = userData.first_name || ''
+    const lastName = userData.last_name || ''
+    const fullName = `${firstName} ${lastName}`.trim()
     const email = userData.email || ''
 
     // URL encode the parameters properly
@@ -223,13 +225,13 @@ serve(async (req) => {
     // Check if URL already has parameters
     const separator = paymentUrl.includes('?') ? '&' : '?'
     
-    // Add the dynamic parameters
-    if (fullName) {
+    // Add the dynamic parameters (only if they have actual content)
+    if (fullName && fullName.length > 0) {
       finalPaymentUrl += `${separator}fullName=${encodedFullName}`
     }
     
-    if (email) {
-      const emailSeparator = (paymentUrl.includes('?') || fullName) ? '&' : '?'
+    if (email && email.length > 0) {
+      const emailSeparator = (paymentUrl.includes('?') || (fullName && fullName.length > 0)) ? '&' : '?'
       finalPaymentUrl += `${emailSeparator}email=${encodedEmail}`
     }
 
