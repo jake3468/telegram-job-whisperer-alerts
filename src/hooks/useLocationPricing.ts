@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { logger } from '@/utils/logger';
 
@@ -42,9 +43,16 @@ export const useLocationPricing = () => {
         
         try {
           logger.debug('Trying primary location service...');
+          
+          // Create AbortController for timeout
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
+          
           const response = await fetch('https://ipapi.co/json/', {
-            timeout: 5000 // 5 second timeout
+            signal: controller.signal
           });
+          
+          clearTimeout(timeoutId);
           
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
@@ -64,9 +72,15 @@ export const useLocationPricing = () => {
           // Fallback to alternative service with better error handling
           try {
             logger.debug('Trying fallback location service...');
+            
+            const controller2 = new AbortController();
+            const timeoutId2 = setTimeout(() => controller2.abort(), 5000);
+            
             const fallbackResponse = await fetch('https://api.ipify.org?format=json', {
-              timeout: 5000
+              signal: controller2.signal
             });
+            
+            clearTimeout(timeoutId2);
             
             if (!fallbackResponse.ok) {
               throw new Error(`HTTP ${fallbackResponse.status}`);
@@ -76,9 +90,14 @@ export const useLocationPricing = () => {
             logger.debug('Fallback IP detected:', ipData);
             
             // Use ipwhois for geolocation
+            const controller3 = new AbortController();
+            const timeoutId3 = setTimeout(() => controller3.abort(), 5000);
+            
             const geoResponse = await fetch(`https://ipwhois.app/json/${ipData.ip}`, {
-              timeout: 5000
+              signal: controller3.signal
             });
+            
+            clearTimeout(timeoutId3);
             
             if (!geoResponse.ok) {
               throw new Error(`HTTP ${geoResponse.status}`);
@@ -94,9 +113,15 @@ export const useLocationPricing = () => {
             // Try one more service as last resort
             try {
               logger.debug('Trying final fallback service...');
+              
+              const controller4 = new AbortController();
+              const timeoutId4 = setTimeout(() => controller4.abort(), 3000);
+              
               const finalResponse = await fetch('https://httpbin.org/ip', {
-                timeout: 3000
+                signal: controller4.signal
               });
+              
+              clearTimeout(timeoutId4);
               
               if (finalResponse.ok) {
                 // This won't give us country, but at least we tried

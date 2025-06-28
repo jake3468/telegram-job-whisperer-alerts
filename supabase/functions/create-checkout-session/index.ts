@@ -82,23 +82,23 @@ serve(async (req) => {
     if (product.product_type === 'subscription') {
       secretName = product.currency === 'INR' ? 'PAYMENT_LINK_INR_MONTHLY_SUBSCRIPTION' : 'PAYMENT_LINK_USD_MONTHLY_SUBSCRIPTION'
     } else {
-      // Credit packs - map by credits amount and currency
+      // Credit packs - map by credits amount and currency with new naming (Starter, Lite, Pro, Max)
       const creditAmount = product.credits_amount
       const currency = product.currency
       
       if (currency === 'INR') {
         switch (creditAmount) {
           case 30:
-            secretName = 'PAYMENT_LINK_INR_30_CREDITS'
+            secretName = 'PAYMENT_LINK_INR_STARTER'
             break
           case 80:
-            secretName = 'PAYMENT_LINK_INR_80_CREDITS'
+            secretName = 'PAYMENT_LINK_INR_LITE'
             break
           case 200:
-            secretName = 'PAYMENT_LINK_INR_200_CREDITS'
+            secretName = 'PAYMENT_LINK_INR_PRO'
             break
           case 500:
-            secretName = 'PAYMENT_LINK_INR_500_CREDITS'
+            secretName = 'PAYMENT_LINK_INR_MAX'
             break
           default:
             secretName = `PAYMENT_LINK_INR_${creditAmount}_CREDITS`
@@ -106,16 +106,16 @@ serve(async (req) => {
       } else {
         switch (creditAmount) {
           case 30:
-            secretName = 'PAYMENT_LINK_USD_30_CREDITS'
+            secretName = 'PAYMENT_LINK_USD_STARTER'
             break
           case 80:
-            secretName = 'PAYMENT_LINK_USD_80_CREDITS'
+            secretName = 'PAYMENT_LINK_USD_LITE'
             break
           case 200:
-            secretName = 'PAYMENT_LINK_USD_200_CREDITS'
+            secretName = 'PAYMENT_LINK_USD_PRO'
             break
           case 500:
-            secretName = 'PAYMENT_LINK_USD_500_CREDITS'
+            secretName = 'PAYMENT_LINK_USD_MAX'
             break
           default:
             secretName = `PAYMENT_LINK_USD_${creditAmount}_CREDITS`
