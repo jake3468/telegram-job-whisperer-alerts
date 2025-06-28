@@ -66,8 +66,12 @@ serve(async (req) => {
       .single()
 
     if (productError || !product) {
+      console.error(`Product not found: ${productId}`, productError)
       return new Response(
-        JSON.stringify({ error: 'Product not found' }),
+        JSON.stringify({ 
+          error: 'Product not found',
+          details: `Product ${productId} not found or inactive`
+        }),
         { 
           status: 404, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -75,30 +79,33 @@ serve(async (req) => {
       )
     }
 
-    // Get the payment link from Supabase Vault based on product type and region
+    // Determine the secret name based on product details
     let secretName = ''
     
-    // Determine the secret name based on product details
     if (product.product_type === 'subscription') {
-      secretName = product.currency === 'INR' ? 'PAYMENT_LINK_INR_MONTHLY_SUBSCRIPTION' : 'PAYMENT_LINK_USD_MONTHLY_SUBSCRIPTION'
+      if (product.currency === 'INR') {
+        secretName = 'PAYMENT_LINK_INR_MONTHLY_SUBSCRIPTION'
+      } else {
+        secretName = 'PAYMENT_LINK_USD_MONTHLY_SUBSCRIPTION'
+      }
     } else {
-      // Credit packs - map by credits amount and currency with new naming (Starter, Lite, Pro, Max)
+      // Credit packs - map by credits amount and currency
       const creditAmount = product.credits_amount
       const currency = product.currency
       
       if (currency === 'INR') {
         switch (creditAmount) {
           case 30:
-            secretName = 'PAYMENT_LINK_INR_STARTER'
+            secretName = 'PAYMENT_LINK_INR_30_CREDITS'
             break
           case 80:
-            secretName = 'PAYMENT_LINK_INR_LITE'
+            secretName = 'PAYMENT_LINK_INR_80_CREDITS'
             break
           case 200:
-            secretName = 'PAYMENT_LINK_INR_PRO'
+            secretName = 'PAYMENT_LINK_INR_200_CREDITS'
             break
           case 500:
-            secretName = 'PAYMENT_LINK_INR_MAX'
+            secretName = 'PAYMENT_LINK_INR_500_CREDITS'
             break
           default:
             secretName = `PAYMENT_LINK_INR_${creditAmount}_CREDITS`
@@ -106,22 +113,24 @@ serve(async (req) => {
       } else {
         switch (creditAmount) {
           case 30:
-            secretName = 'PAYMENT_LINK_USD_STARTER'
+            secretName = 'PAYMENT_LINK_USD_30_CREDITS'
             break
           case 80:
-            secretName = 'PAYMENT_LINK_USD_LITE'
+            secretName = 'PAYMENT_LINK_USD_80_CREDITS'
             break
           case 200:
-            secretName = 'PAYMENT_LINK_USD_PRO'
+            secretName = 'PAYMENT_LINK_USD_200_CREDITS'
             break
           case 500:
-            secretName = 'PAYMENT_LINK_USD_MAX'
+            secretName = 'PAYMENT_LINK_USD_500_CREDITS'
             break
           default:
             secretName = `PAYMENT_LINK_USD_${creditAmount}_CREDITS`
         }
       }
     }
+
+    console.log(`Looking for payment link with secret name: ${secretName}`)
 
     // Get the payment link from vault
     const { data: secretData, error: secretError } = await supabase
@@ -135,7 +144,14 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: 'Payment link not configured',
-          details: `Missing payment link for ${secretName}`
+          details: `Missing payment link for ${secretName}. Please configure this secret in Supabase Vault.`,
+          secretName: secretName,
+          productDetails: {
+            id: product.product_id,
+            type: product.product_type,
+            credits: product.credits_amount,
+            currency: product.currency
+          }
         }),
         { 
           status: 500, 
