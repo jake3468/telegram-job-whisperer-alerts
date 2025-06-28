@@ -28,10 +28,22 @@ export const usePaymentProducts = () => {
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
+        
+        console.log('🚀 PAYMENT PRODUCTS HOOK STARTING');
         console.log('🔍 Fetching products for:', { 
           region: pricingData.region, 
           currency: pricingData.currency 
         });
+
+        // Validate we have the required data
+        if (!pricingData.region || !pricingData.currency) {
+          console.warn('⚠️ Missing region or currency data:', { 
+            region: pricingData.region, 
+            currency: pricingData.currency 
+          });
+          setIsLoading(false);
+          return;
+        }
         
         // Query products for the specific region and currency_code
         const { data, error } = await supabase
@@ -42,6 +54,12 @@ export const usePaymentProducts = () => {
           .eq('currency_code', pricingData.currency)
           .order('price_amount', { ascending: true });
 
+        console.log('🔍 Query executed with filters:', {
+          is_active: true,
+          region: pricingData.region,
+          currency_code: pricingData.currency
+        });
+
         if (error) {
           console.error('❌ Error fetching payment products:', error);
           setError(error.message);
@@ -50,6 +68,28 @@ export const usePaymentProducts = () => {
 
         console.log('📦 Raw products from database:', data);
         console.log('📊 Total products found:', data?.length || 0);
+
+        if (!data || data.length === 0) {
+          console.warn('⚠️ No products found in database for these filters');
+          setProducts([]);
+          setIsLoading(false);
+          return;
+        }
+
+        // Log each product individually
+        data.forEach((product, index) => {
+          console.log(`📋 Product ${index + 1}:`, {
+            id: product.id,
+            product_id: product.product_id,
+            product_name: product.product_name,
+            product_type: product.product_type,
+            credits_amount: product.credits_amount,
+            price_amount: product.price_amount,
+            region: product.region,
+            currency_code: product.currency_code,
+            is_active: product.is_active
+          });
+        });
 
         // Filter and type-cast the products to ensure they match our interface
         const validProducts = (data || [])
@@ -74,6 +114,7 @@ export const usePaymentProducts = () => {
 
         console.log('✅ Final processed products:', validProducts);
         console.log('📈 Credit packs found:', validProducts.filter(p => p.product_type === 'credit_pack'));
+        console.log('🎯 Subscription products found:', validProducts.filter(p => p.product_type === 'subscription'));
         
         setProducts(validProducts);
       } catch (err) {
@@ -86,12 +127,30 @@ export const usePaymentProducts = () => {
 
     // Only fetch when we have a region and currency
     if (pricingData.region && pricingData.currency) {
+      console.log('🎬 Triggering fetchProducts with:', {
+        region: pricingData.region,
+        currency: pricingData.currency
+      });
       fetchProducts();
+    } else {
+      console.log('⏳ Waiting for pricing data...', {
+        region: pricingData.region,
+        currency: pricingData.currency,
+        hasPricingData: !!pricingData
+      });
     }
   }, [pricingData.region, pricingData.currency]);
 
   const getSubscriptionProducts = () => products.filter(p => p.product_type === 'subscription');
   const getCreditPackProducts = () => products.filter(p => p.product_type === 'credit_pack' && p.product_id !== 'initial_free_credits');
+
+  console.log('🏁 usePaymentProducts returning:', {
+    totalProducts: products.length,
+    subscriptionProducts: getSubscriptionProducts().length,
+    creditPackProducts: getCreditPackProducts().length,
+    isLoading,
+    error
+  });
 
   return {
     products,
