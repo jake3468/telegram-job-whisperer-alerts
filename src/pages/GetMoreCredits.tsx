@@ -43,6 +43,7 @@ export default function GetMoreCredits() {
       return;
     }
     
+    console.log('Subscribing with product:', subscriptionProduct.product_id);
     const session = await createCheckoutSession(subscriptionProduct.product_id);
     if (session?.url) {
       window.open(session.url, '_blank');
@@ -52,6 +53,7 @@ export default function GetMoreCredits() {
   };
 
   const handleCreditPackClick = async (productId: string) => {
+    console.log('Buying credit pack with product:', productId);
     const session = await createCheckoutSession(productId);
     if (session?.url) {
       window.open(session.url, '_blank');

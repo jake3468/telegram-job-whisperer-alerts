@@ -14,6 +14,8 @@ export const useCheckoutSession = () => {
       return null;
     }
 
+    console.log('Creating checkout session for product:', productId);
+
     // Set loading state for this specific product
     setLoadingStates(prev => ({ ...prev, [productId]: true }));
     setError(null);
@@ -34,6 +36,7 @@ export const useCheckoutSession = () => {
         return null;
       }
 
+      console.log('Checkout session created successfully:', data);
       return data;
     } catch (err) {
       console.error('Exception creating checkout session:', err);
@@ -45,7 +48,10 @@ export const useCheckoutSession = () => {
     }
   };
 
-  const isLoading = (productId: string) => loadingStates[productId] || false;
+  // Fix: This should be a function call, not a function reference
+  const isLoading = (productId: string) => {
+    return loadingStates[productId] || false;
+  };
 
   return {
     createCheckoutSession,
