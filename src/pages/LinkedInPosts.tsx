@@ -56,6 +56,7 @@ const LinkedInPosts = () => {
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
   const [hasShownResultsToast, setHasShownResultsToast] = useState(false);
+  const [toastShownForPostId, setToastShownForPostId] = useState<string | null>(null);
 
   const toneOptions = [
     { value: 'professional', label: 'Professional & Insightful' },
@@ -133,9 +134,8 @@ const LinkedInPosts = () => {
         console.log('LinkedIn post updated via real-time:', payload);
         
         if (payload.new) {
-          const newData = payload.new as any; // Use any type to access all properties
+          const newData = payload.new as any;
           console.log('New posts data received:', {
-            id: newData.id,
             hasHeading1: Boolean(newData.post_heading_1),
             hasContent1: Boolean(newData.post_content_1),
             hasHeading2: Boolean(newData.post_heading_2),
@@ -144,7 +144,6 @@ const LinkedInPosts = () => {
             hasContent3: Boolean(newData.post_content_3)
           });
           
-          // Extract only the LinkedIn post data fields
           const linkedInPostData: LinkedInPostData = {
             post_heading_1: newData.post_heading_1,
             post_content_1: newData.post_content_1,
@@ -156,26 +155,20 @@ const LinkedInPosts = () => {
           
           setPostsData(linkedInPostData);
           
-          // Check if all posts are ready
-          if (areAllPostsReady(linkedInPostData)) {
+          // Check if all posts are ready and show toast only once per post
+          if (areAllPostsReady(linkedInPostData) && toastShownForPostId !== currentPostId) {
             console.log('All posts are ready! Stopping loading and showing success toast');
             setIsGenerating(false);
+            setToastShownForPostId(currentPostId);
             
-            // Show success toast only once
-            if (!hasShownResultsToast) {
-              setHasShownResultsToast(true);
-              
-              deductCreditsAfterResults(currentPostId).then(success => {
-                if (success) {
-                  toast({
-                    title: "LinkedIn Posts Generated!",
-                    description: "Your 3 LinkedIn post variations have been created successfully."
-                  });
-                }
-              });
-            }
-          } else {
-            console.log('Posts not ready yet, continuing to show loading...');
+            deductCreditsAfterResults(currentPostId).then(success => {
+              if (success) {
+                toast({
+                  title: "LinkedIn Posts Generated!",
+                  description: "Your 3 LinkedIn post variations have been created successfully."
+                });
+              }
+            });
           }
         }
       })
@@ -187,7 +180,7 @@ const LinkedInPosts = () => {
       console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
-  }, [currentPostId, isAuthReady, toast, deductCreditsAfterResults, hasShownResultsToast]);
+  }, [currentPostId, isAuthReady, toast, deductCreditsAfterResults, toastShownForPostId]);
 
   // Check existing data when currentPostId changes
   useEffect(() => {
@@ -210,16 +203,8 @@ const LinkedInPosts = () => {
           }
           
           if (data) {
-            console.log('Found existing post data:', {
-              id: data.id,
-              hasHeading1: Boolean(data.post_heading_1),
-              hasContent1: Boolean(data.post_content_1),
-              hasHeading2: Boolean(data.post_content_2),
-              hasHeading3: Boolean(data.post_heading_3),
-              hasContent3: Boolean(data.post_content_3)
-            });
+            console.log('Found existing post data');
             
-            // Extract only the LinkedIn post data fields
             const linkedInPostData: LinkedInPostData = {
               post_heading_1: data.post_heading_1,
               post_content_1: data.post_content_1,
@@ -231,14 +216,13 @@ const LinkedInPosts = () => {
             
             setPostsData(linkedInPostData);
             
-            // Check if all posts are already ready
+            // Check if all posts are already ready and show toast only once
             if (areAllPostsReady(linkedInPostData)) {
               console.log('Existing data is complete, showing results immediately');
               setIsGenerating(false);
               
-              // Show success toast only once
-              if (!hasShownResultsToast) {
-                setHasShownResultsToast(true);
+              if (toastShownForPostId !== currentPostId) {
+                setToastShownForPostId(currentPostId);
                 
                 deductCreditsAfterResults(currentPostId).then(success => {
                   if (success) {
@@ -249,8 +233,6 @@ const LinkedInPosts = () => {
                   }
                 });
               }
-            } else {
-              console.log('Existing data is incomplete, keeping loading state');
             }
           }
         }, 3, 'check existing post data');
@@ -259,10 +241,10 @@ const LinkedInPosts = () => {
       }
     };
 
-    if (currentPostId && !hasShownResultsToast) {
+    if (currentPostId) {
       checkExistingData();
     }
-  }, [currentPostId, isAuthReady, executeWithRetry, toast, deductCreditsAfterResults, hasShownResultsToast]);
+  }, [currentPostId, isAuthReady, executeWithRetry, toast, deductCreditsAfterResults, toastShownForPostId]);
 
   // Handle input changes
   const handleInputChange = (field: string, value: string) => {
@@ -337,6 +319,7 @@ const LinkedInPosts = () => {
     setPostsData(null);
     setCurrentPostId(null);
     setHasShownResultsToast(false);
+    setToastShownForPostId(null);
 
     try {
       console.log('Creating LinkedIn post with user_profile.id:', userProfile.id);
@@ -397,6 +380,7 @@ const LinkedInPosts = () => {
     setIsGenerating(false);
     setCurrentPostId(null);
     setHasShownResultsToast(false);
+    setToastShownForPostId(null);
   };
 
   // Determine what to show based on data completeness
@@ -409,7 +393,7 @@ const LinkedInPosts = () => {
     shouldShowResults,
     shouldShowLoading,
     isGenerating,
-    hasShownResultsToast
+    toastShownForPostId
   });
 
   return (

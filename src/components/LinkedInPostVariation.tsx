@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -82,7 +81,7 @@ const LinkedInPostVariation = ({
     loadExistingImages();
   }, [postId, variationNumber, isAuthReady, executeWithRetry]);
 
-  // Real-time subscription for image updates - PROPER LOADING STATE MANAGEMENT
+  // Real-time subscription for image updates - FIXED LOADING STATE MANAGEMENT
   useEffect(() => {
     if (!postId || !isAuthReady) return;
 
@@ -105,7 +104,7 @@ const LinkedInPostVariation = ({
             setImageGenerationFailed(false);
           } else if (newImage.image_data && newImage.image_data !== 'generating...' && !newImage.image_data.includes('failed')) {
             console.log(`Image generation completed for variation ${variationNumber}`);
-            setIsLoadingImage(false);
+            setIsLoadingImage(false); // FIXED: Properly stop loading state
             setImageGenerationFailed(false);
             
             // Add the new image to the list
@@ -114,10 +113,9 @@ const LinkedInPostVariation = ({
               return exists ? prev : [...prev, newImage.image_data];
             });
             
-            // Deduct credits ONLY when image is successfully displayed
+            // Show success toast only once
             if (!hasDeductedCredits) {
               setHasDeductedCredits(true);
-              // Call credit deduction logic here if needed
               toast({
                 title: "Image Generated!",
                 description: `LinkedIn post image for variation ${variationNumber} is ready.`
@@ -125,7 +123,7 @@ const LinkedInPostVariation = ({
             }
           } else if (newImage.image_data && newImage.image_data.includes('failed')) {
             console.log(`Image generation failed for variation ${variationNumber}`);
-            setIsLoadingImage(false);
+            setIsLoadingImage(false); // FIXED: Stop loading on failure
             setImageGenerationFailed(true);
             toast({
               title: "Image Generation Failed",
@@ -261,7 +259,7 @@ const LinkedInPostVariation = ({
 
     } catch (err: any) {
       console.error('Error generating image:', err);
-      setIsLoadingImage(false);
+      setIsLoadingImage(false); // FIXED: Stop loading on error
       setImageGenerationFailed(true);
       
       toast({
