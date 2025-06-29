@@ -48,7 +48,7 @@ const LinkedInPostVariation = ({
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
-  const [hasShownImageToast, setHasShownImageToast] = useState(false);
+  const [imageToastShown, setImageToastShown] = useState(false);
 
   // Load existing images for this variation
   useEffect(() => {
@@ -82,7 +82,7 @@ const LinkedInPostVariation = ({
     loadExistingImages();
   }, [postId, variationNumber, isAuthReady, executeWithRetry]);
 
-  // Real-time subscription for image updates
+  // Real-time subscription for image updates - SINGLE TOAST ONLY
   useEffect(() => {
     if (!postId || !isAuthReady) return;
 
@@ -112,9 +112,9 @@ const LinkedInPostVariation = ({
               return exists ? prev : [...prev, newImage.image_data];
             });
             
-            // Show toast only once per variation
-            if (!hasShownImageToast) {
-              setHasShownImageToast(true);
+            // Show toast ONLY ONCE per variation - strict control
+            if (!imageToastShown) {
+              setImageToastShown(true);
               toast({
                 title: "Image Generated!",
                 description: `LinkedIn post image for variation ${variationNumber} is ready.`
@@ -132,7 +132,7 @@ const LinkedInPostVariation = ({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [postId, variationNumber, isAuthReady, toast, hasShownImageToast]);
+  }, [postId, variationNumber, isAuthReady, toast, imageToastShown]);
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -188,7 +188,7 @@ const LinkedInPostVariation = ({
 
     setIsLoadingImage(true);
     setImageGenerationFailed(false);
-    setHasShownImageToast(false); // Reset for new generation
+    setImageToastShown(false); // Reset for new generation
 
     try {
       // Check and deduct credits before generating image
@@ -304,11 +304,11 @@ const LinkedInPostVariation = ({
 
   return (
     <div className="w-full max-w-4xl mx-auto mb-12">
-      {/* Heading Section - Properly Spaced */}
+      {/* Post Heading - Smaller and Clearer */}
       <div className="mb-6">
-        <div className="bg-gradient-to-r from-yellow-400 to-amber-500 text-black px-4 py-3 rounded-lg mb-4">
-          <h3 className="text-lg font-bold text-center break-words">
-            {heading}
+        <div className="bg-gradient-to-r from-yellow-400 to-amber-500 text-black px-4 py-2 rounded-lg mb-4">
+          <h3 className="text-base font-semibold text-center break-words">
+            Post Variation {variationNumber}: {heading}
           </h3>
         </div>
         
@@ -356,7 +356,9 @@ const LinkedInPostVariation = ({
       {/* Generated Images */}
       {generatedImages.length > 0 && (
         <div className="mb-8">
-          <h5 className="text-cyan-400 font-medium text-sm mb-4 text-center">Generated Images ({generatedImages.length}):</h5>
+          <h5 className="text-cyan-400 font-medium text-sm mb-4 text-center">
+            Generated Images for Variation {variationNumber} ({generatedImages.length}):
+          </h5>
           <div className="space-y-6">
             {generatedImages.map((imageData, index) => (
               <div key={index} className="relative w-full max-w-2xl mx-auto">
@@ -387,8 +389,8 @@ const LinkedInPostVariation = ({
         </div>
       )}
 
-      {/* LinkedIn Post Preview - Clean Layout */}
-      <div className="w-full max-w-2xl mx-auto">
+      {/* LinkedIn Post Preview - Properly Contained */}
+      <div className="w-full">
         <LinkedInPostDisplay 
           content={content}
           userProfile={userProfile}
