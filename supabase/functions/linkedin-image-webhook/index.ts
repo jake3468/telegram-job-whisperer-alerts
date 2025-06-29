@@ -64,7 +64,16 @@ serve(async (req) => {
 
     if (!n8nWebhookUrl) {
       console.error('N8N_LINKEDIN_IMAGE_WEBHOOK_URL environment variable not found')
-      throw new Error('N8N webhook URL not configured')
+      
+      // Update the database record to show failed status
+      await supabase
+        .from('linkedin_post_images')
+        .update({ image_data: 'failed - webhook URL not configured' })
+        .eq('post_id', post_id)
+        .eq('variation_number', variation_number)
+        .eq('image_data', 'generating...')
+      
+      throw new Error('N8N webhook URL not configured in environment variables')
     }
 
     console.log('Using N8N webhook URL (first 50 chars):', n8nWebhookUrl.substring(0, 50) + '...')
@@ -97,6 +106,15 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text()
       console.error(`N8N webhook failed: ${response.status} ${response.statusText}`, errorText)
+      
+      // Update the database record to show failed status
+      await supabase
+        .from('linkedin_post_images')
+        .update({ image_data: `failed - webhook error: ${response.status}` })
+        .eq('post_id', post_id)
+        .eq('variation_number', variation_number)
+        .eq('image_data', 'generating...')
+      
       throw new Error(`N8N webhook failed: ${response.statusText}`)
     }
 
@@ -114,7 +132,8 @@ serve(async (req) => {
           success: true, 
           message: 'Image generation triggered successfully',
           triggered: true,
-          variation_number: variation_number
+          variation_number: variation_number,
+          webhook_url_configured: true
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -164,7 +183,8 @@ serve(async (req) => {
           success: true, 
           message: 'Image generation triggered successfully',
           triggered: true,
-          variation_number: variation_number
+          variation_number: variation_number,
+          webhook_url_configured: true
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -177,7 +197,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message 
+        error: error.message,
+        webhook_url_configured: !!Deno.env.get('N8N_LINKEDIN_IMAGE_WEBHOOK_URL')
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
