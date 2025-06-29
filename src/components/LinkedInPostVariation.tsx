@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -80,7 +81,7 @@ const LinkedInPostVariation = ({
     loadExistingImages();
   }, [postId, variationNumber, isAuthReady, executeWithRetry]);
 
-  // Real-time subscription for image updates - FIXED: Immediately reset loading state
+  // Real-time subscription for image updates
   useEffect(() => {
     if (!postId || !isAuthReady) return;
 
@@ -104,7 +105,7 @@ const LinkedInPostVariation = ({
           } else if (newImage.image_data && newImage.image_data !== 'generating...' && !newImage.image_data.includes('failed')) {
             console.log(`Image generation completed for variation ${variationNumber}`);
             
-            // FIXED: IMMEDIATELY stop loading when we get valid image data
+            // FIXED: IMMEDIATELY stop loading and clear all loading states
             setIsLoadingImage(false);
             setImageGenerationFailed(false);
             
@@ -172,6 +173,15 @@ const LinkedInPostVariation = ({
       }
     };
   }, [isLoadingImage, variationNumber, toast]);
+
+  // Additional effect to ensure loading state is reset when images are present
+  useEffect(() => {
+    if (generatedImages.length > 0 && isLoadingImage) {
+      console.log(`Resetting loading state - images are present for variation ${variationNumber}`);
+      setIsLoadingImage(false);
+      setImageGenerationFailed(false);
+    }
+  }, [generatedImages.length, isLoadingImage, variationNumber]);
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -292,7 +302,7 @@ const LinkedInPostVariation = ({
 
     } catch (err: any) {
       console.error('Error generating image:', err);
-      setIsLoadingImage(false); // FIXED: Reset loading state on error
+      setIsLoadingImage(false);
       setImageGenerationFailed(true);
       
       toast({
@@ -373,8 +383,8 @@ const LinkedInPostVariation = ({
         </div>
       </div>
 
-      {/* Loading indicator */}
-      {isLoadingImage && (
+      {/* Loading indicator - FIXED: Only show when loading and no images exist */}
+      {isLoadingImage && generatedImages.length === 0 && (
         <div className="p-4 bg-blue-50 rounded-lg text-center border border-blue-200 mb-6">
           <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading for variation {variationNumber}...</div>
           <div className="text-xs text-blue-500 mt-1">This may take up to 2 minutes</div>
@@ -382,7 +392,7 @@ const LinkedInPostVariation = ({
       )}
 
       {/* Failed generation indicator */}
-      {imageGenerationFailed && (
+      {imageGenerationFailed && generatedImages.length === 0 && (
         <div className="p-4 bg-red-50 rounded-lg text-center border border-red-200 mb-6">
           <div className="text-sm text-red-600 font-medium">Image generation failed for variation {variationNumber}</div>
           <div className="text-xs text-red-500 mt-1">Please try again</div>
