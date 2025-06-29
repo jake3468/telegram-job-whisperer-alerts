@@ -13,9 +13,64 @@ serve(async (req) => {
   }
 
   try {
-    const { post_heading, post_content, variation_number, user_name, post_id, source } = await req.json()
+    const requestBody = await req.json()
+    console.log('LinkedIn image webhook received payload:', requestBody)
 
-    console.log('LinkedIn image webhook called with:', { post_id, variation_number, source })
+    // Extract data from the request - handle both direct calls and webhook router calls
+    let post_heading, post_content, variation_number, user_name, post_id, source
+    
+    if (requestBody.linkedin_image) {
+      // Called from database trigger via webhook router
+      const linkedinImage = requestBody.linkedin_image
+      post_id = linkedinImage.post_id
+      variation_number = linkedinImage.variation_number
+      source = 'database_trigger'
+      
+      // Get post data to extract heading and content
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+      const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      const supabase = createClient(supabaseUrl, supabaseServiceKey)
+      
+      const { data: postData, error: postError } = await supabase
+        .from('job_linkedin')
+        .select('post_heading_1, post_content_1, post_heading_2, post_content_2, post_heading_3, post_content_3')
+        .eq('id', post_id)
+        .single()
+        
+      if (postError) {
+        console.error('Error fetching post data:', postError)
+        throw new Error('Failed to fetch post data')
+      }
+      
+      // Select the appropriate heading and content based on variation number
+      if (variation_number === 1) {
+        post_heading = postData.post_heading_1
+        post_content = postData.post_content_1
+      } else if (variation_number === 2) {
+        post_heading = postData.post_heading_2
+        post_content = postData.post_content_2
+      } else if (variation_number === 3) {
+        post_heading = postData.post_heading_3
+        post_content = postData.post_content_3
+      }
+      
+      // Get user name if available
+      if (requestBody.user) {
+        user_name = `${requestBody.user.first_name || ''} ${requestBody.user.last_name || ''}`.trim() || 'Professional User'
+      } else {
+        user_name = 'Professional User'
+      }
+    } else {
+      // Direct call from frontend
+      post_heading = requestBody.post_heading
+      post_content = requestBody.post_content
+      variation_number = requestBody.variation_number
+      user_name = requestBody.user_name || 'Professional User'
+      post_id = requestBody.post_id
+      source = requestBody.source || 'frontend'
+    }
+
+    console.log('Processing LinkedIn image generation with:', { post_id, variation_number, source })
 
     // Validate required parameters
     if (!post_id || !variation_number) {
@@ -46,22 +101,24 @@ serve(async (req) => {
       source
     })
 
-    // Call the N8N webhook
+    // Call the N8N webhook with the correct payload structure
+    const n8nPayload = {
+      post_heading,
+      post_content,
+      variation_number,
+      user_name,
+      post_id,
+      source,
+      timestamp: new Date().toISOString(),
+      triggered_from: req.headers.get('origin') || 'linkedin-image-webhook'
+    }
+
     const response = await fetch(n8nWebhookUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        post_heading,
-        post_content,
-        variation_number,
-        user_name,
-        post_id,
-        source,
-        timestamp: new Date().toISOString(),
-        triggered_from: req.headers.get('origin') || 'unknown'
-      }),
+      body: JSON.stringify(n8nPayload),
     })
 
     if (!response.ok) {
@@ -142,74 +199,6 @@ serve(async (req) => {
         console.log(`Image stored successfully in database with ID: ${storedImage.id} for variation ${variation_number}`)
       }
       
-      // Broadcast to variation-specific channel
-      const variationChannelName = `linkedin-image-${result.post_id || post_id}-v${variation_number}`
-      console.log(`Broadcasting to variation-specific channel: ${variationChannelName}`)
-      
-      const { error: broadcastError } = await supabase.channel(variationChannelName)
-        .send({
-          type: 'broadcast',
-          event: 'linkedin_image_generated',
-          payload: {
-            success: true,
-            image_data: result.image_data,
-            post_id: result.post_id || post_id,
-            variation_number: variation_number,
-            source: source,
-            stored_image_id: storedImage.id
-          }
-        })
-
-      if (broadcastError) {
-        console.error('Failed to broadcast image data to variation channel:', broadcastError)
-      } else {
-        console.log(`Image data broadcasted successfully to variation ${variation_number} channel`)
-      }
-      
-      // Also broadcast to general post channel for backward compatibility
-      const generalChannelName = `linkedin-image-${result.post_id || post_id}`
-      const { error: generalBroadcastError } = await supabase.channel(generalChannelName)
-        .send({
-          type: 'broadcast',
-          event: 'linkedin_image_generated',
-          payload: {
-            success: true,
-            image_data: result.image_data,
-            post_id: result.post_id || post_id,
-            variation_number: variation_number,
-            source: source,
-            stored_image_id: storedImage.id
-          }
-        })
-
-      if (generalBroadcastError) {
-        console.error('Failed to broadcast to general channel:', generalBroadcastError)
-      } else {
-        console.log('Image data broadcasted to general channel successfully')
-      }
-      
-      // Also broadcast to history channel with variation info
-      const historyChannelName = `linkedin-image-history-${result.post_id || post_id}`
-      const { error: historyBroadcastError } = await supabase.channel(historyChannelName)
-        .send({
-          type: 'broadcast',
-          event: 'linkedin_image_generated',
-          payload: {
-            success: true,
-            image_data: result.image_data,
-            post_id: result.post_id || post_id,
-            variation_number: variation_number,
-            source: source,
-            stored_image_id: storedImage.id
-          }
-        })
-
-      if (historyBroadcastError) {
-        console.error('Failed to broadcast to history channel:', historyBroadcastError)
-      } else {
-        console.log('Image data broadcasted to history channel successfully')
-      }
-
       return new Response(
         JSON.stringify({ 
           success: true, 
