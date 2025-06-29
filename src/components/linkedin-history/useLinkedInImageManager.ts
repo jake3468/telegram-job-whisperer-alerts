@@ -87,7 +87,7 @@ export function useLinkedInImageManager(postId: string | null) {
         schema: 'public',
         table: 'linkedin_post_images',
         filter: `post_id=eq.${postId}`
-      }, (payload) => {
+      }, async (payload) => {
         console.log('LinkedIn image updated via real-time:', payload);
         
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
@@ -102,7 +102,7 @@ export function useLinkedInImageManager(postId: string | null) {
             }
           });
 
-          // Update generating state
+          // Update generating state and handle credit deduction
           if (newImage.image_data !== 'generating...') {
             setIsGenerating(prev => {
               const newState = [...prev];
@@ -111,6 +111,16 @@ export function useLinkedInImageManager(postId: string | null) {
               }
               return newState;
             });
+
+            // DEDUCT CREDITS ONLY AFTER IMAGE IS DISPLAYED
+            if (newImage.image_data && !newImage.image_data.includes('failed')) {
+              try {
+                await checkAndDeductForImage(postId, newImage.variation_number);
+                console.log(`Credits deducted after image display for variation ${newImage.variation_number}`);
+              } catch (error) {
+                console.error('Error deducting credits after image display:', error);
+              }
+            }
 
             toast({
               title: "Image Generated!",
@@ -130,14 +140,13 @@ export function useLinkedInImageManager(postId: string | null) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [postId, isAuthReady, fetchImages, toast]);
+  }, [postId, isAuthReady, fetchImages, toast, checkAndDeductForImage]);
 
   const generateImage = useCallback(async (variationNumber: number) => {
     if (!postId) return;
 
-    // Check and deduct credits before generating image
-    const canProceed = await checkAndDeductForImage(postId, variationNumber);
-    if (!canProceed) {
+    // Only check credits, don't deduct yet
+    if (!await checkAndDeductForImage(postId, variationNumber, true)) {
       return;
     }
 
@@ -149,18 +158,40 @@ export function useLinkedInImageManager(postId: string | null) {
 
     try {
       await executeWithRetry(async () => {
+        // Create placeholder record
         const { error } = await supabase
           .from('linkedin_post_images')
           .insert({
             post_id: postId,
             variation_number: variationNumber,
-            image_data: 'generating...' // Placeholder that will be updated by webhook
+            image_data: 'generating...'
           });
 
         if (error) {
           console.error('Error creating image record:', error);
           throw error;
         }
+
+        // FIXED: Call webhook with proper parameters for history section
+        const webhookResponse = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/functions/v1/linkedin-image-webhook', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+          },
+          body: JSON.stringify({
+            post_id: postId,
+            variation_number: variationNumber,
+            source: 'linkedin_history'
+          })
+        });
+
+        if (!webhookResponse.ok) {
+          const errorText = await webhookResponse.text();
+          console.error('Webhook call failed:', errorText);
+          throw new Error('Failed to trigger image generation webhook');
+        }
+
       }, 3, `generate image for variation ${variationNumber}`);
 
       toast({

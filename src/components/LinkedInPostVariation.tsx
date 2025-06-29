@@ -80,7 +80,7 @@ const LinkedInPostVariation = ({
     loadExistingImages();
   }, [postId, variationNumber, isAuthReady, executeWithRetry]);
 
-  // Real-time subscription for image updates - SIMPLIFIED LOADING LOGIC
+  // Real-time subscription for image updates - FIXED LOADING STATE MANAGEMENT
   useEffect(() => {
     if (!postId || !isAuthReady) return;
 
@@ -114,6 +114,14 @@ const LinkedInPostVariation = ({
               return exists ? prev : [...prev, newImage.image_data];
             });
             
+            // DEDUCT CREDITS ONLY AFTER IMAGE IS DISPLAYED
+            try {
+              await checkAndDeductForImage(postId, variationNumber);
+              console.log(`Credits deducted after image display for variation ${variationNumber}`);
+            } catch (error) {
+              console.error('Error deducting credits after image display:', error);
+            }
+            
             // Show success toast
             toast({
               title: "Image Generated!",
@@ -140,7 +148,7 @@ const LinkedInPostVariation = ({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [postId, variationNumber, isAuthReady, toast]);
+  }, [postId, variationNumber, isAuthReady, toast, checkAndDeductForImage]);
 
   // Add timeout mechanism to reset loading state after 3 minutes
   useEffect(() => {
@@ -218,10 +226,8 @@ const LinkedInPostVariation = ({
       return;
     }
 
-    // FIRST: Deduct credits upfront before starting image generation
-    const creditsDeducted = await checkAndDeductForImage(postId, variationNumber);
-    if (!creditsDeducted) {
-      // Credit check/deduction failed - don't proceed
+    // NO CREDIT DEDUCTION HERE - Only check if user has credits
+    if (!await checkAndDeductForImage(postId, variationNumber, true)) { // Pass true for check-only mode
       return;
     }
 

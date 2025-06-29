@@ -55,7 +55,7 @@ const LinkedInPosts = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
-  const [hasShownToast, setHasShownToast] = useState(false);
+  const [toastShown, setToastShown] = useState(false);
 
   const toneOptions = [
     { value: 'professional', label: 'Professional & Insightful' },
@@ -116,7 +116,7 @@ const LinkedInPosts = () => {
     return hasAllData;
   };
 
-  // Real-time subscription for LinkedIn post updates - ONLY PLACE FOR TOAST
+  // Real-time subscription for LinkedIn post updates - SINGLE SOURCE OF TRUTH FOR TOASTS
   useEffect(() => {
     if (!currentPostId || !isAuthReady) return;
     
@@ -155,10 +155,10 @@ const LinkedInPosts = () => {
           setPostsData(linkedInPostData);
           
           // Check if all posts are ready and show toast only once
-          if (areAllPostsReady(linkedInPostData) && !hasShownToast) {
+          if (areAllPostsReady(linkedInPostData) && !toastShown) {
             console.log('All posts are ready! Stopping loading and showing success toast');
             setIsGenerating(false);
-            setHasShownToast(true);
+            setToastShown(true);
             
             deductCreditsAfterResults(currentPostId).then(success => {
               if (success) {
@@ -179,9 +179,9 @@ const LinkedInPosts = () => {
       console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
-  }, [currentPostId, isAuthReady, toast, deductCreditsAfterResults, hasShownToast]);
+  }, [currentPostId, isAuthReady, toast, deductCreditsAfterResults, toastShown]);
 
-  // Check existing data when currentPostId changes - NO TOAST HERE
+  // Check existing data when currentPostId changes - NO TOAST, NO CREDIT DEDUCTION
   useEffect(() => {
     const checkExistingData = async () => {
       if (!currentPostId || !isAuthReady) return;
@@ -215,14 +215,11 @@ const LinkedInPosts = () => {
             
             setPostsData(linkedInPostData);
             
-            // Check if all posts are already ready - only stop loading, NO TOAST
-            if (areAllPostsReady(linkedInPostData) && !hasShownToast) {
+            // Check if all posts are already ready - only stop loading, NO TOAST, NO CREDIT DEDUCTION
+            if (areAllPostsReady(linkedInPostData)) {
               console.log('Existing data is complete, stopping loading');
               setIsGenerating(false);
-              setHasShownToast(true);
-              
-              // Deduct credits silently without showing toast (toast will come from real-time if needed)
-              deductCreditsAfterResults(currentPostId);
+              setToastShown(true); // Prevent future toasts for existing data
             }
           }
         }, 3, 'check existing post data');
@@ -234,7 +231,7 @@ const LinkedInPosts = () => {
     if (currentPostId) {
       checkExistingData();
     }
-  }, [currentPostId, isAuthReady, executeWithRetry, deductCreditsAfterResults, hasShownToast]);
+  }, [currentPostId, isAuthReady, executeWithRetry]);
 
   // Handle input changes
   const handleInputChange = (field: string, value: string) => {
@@ -308,7 +305,7 @@ const LinkedInPosts = () => {
     setIsGenerating(true);
     setPostsData(null);
     setCurrentPostId(null);
-    setHasShownToast(false); // Reset toast flag on new submission
+    setToastShown(false); // Reset toast flag on new submission
 
     try {
       console.log('Creating LinkedIn post with user_profile.id:', userProfile.id);
@@ -367,7 +364,7 @@ const LinkedInPosts = () => {
     setPostsData(null);
     setIsGenerating(false);
     setCurrentPostId(null);
-    setHasShownToast(false); // Reset toast flag
+    setToastShown(false); // Reset toast flag
   };
 
   // Determine what to show based on data completeness
@@ -380,7 +377,7 @@ const LinkedInPosts = () => {
     shouldShowResults,
     shouldShowLoading,
     isGenerating,
-    hasShownToast
+    toastShown
   });
 
   return (
