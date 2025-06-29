@@ -48,6 +48,7 @@ const LinkedInPostVariation = ({
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
+  const [hasShownImageToast, setHasShownImageToast] = useState(false);
 
   // Load existing images for this variation
   useEffect(() => {
@@ -111,10 +112,14 @@ const LinkedInPostVariation = ({
               return exists ? prev : [...prev, newImage.image_data];
             });
             
-            toast({
-              title: "Image Generated!",
-              description: `LinkedIn post image for variation ${variationNumber} is ready.`
-            });
+            // Show toast only once per variation
+            if (!hasShownImageToast) {
+              setHasShownImageToast(true);
+              toast({
+                title: "Image Generated!",
+                description: `LinkedIn post image for variation ${variationNumber} is ready.`
+              });
+            }
           }
         } else if (payload.eventType === 'DELETE') {
           // Remove the deleted image from the list
@@ -127,7 +132,7 @@ const LinkedInPostVariation = ({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [postId, variationNumber, isAuthReady, toast]);
+  }, [postId, variationNumber, isAuthReady, toast, hasShownImageToast]);
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -183,6 +188,7 @@ const LinkedInPostVariation = ({
 
     setIsLoadingImage(true);
     setImageGenerationFailed(false);
+    setHasShownImageToast(false); // Reset for new generation
 
     try {
       // Check and deduct credits before generating image
@@ -297,108 +303,100 @@ const LinkedInPostVariation = ({
   };
 
   return (
-    <div className="w-full space-y-6">
-      {/* Header Card with Proper Spacing */}
-      <Card className="bg-gray-800 border-cyan-400/20 backdrop-blur-sm w-full">
-        <CardHeader className="pb-4">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-            <CardTitle className="text-cyan-300 font-inter text-base sm:text-lg leading-relaxed flex-1 min-w-0">
-              {heading}
-            </CardTitle>
-            <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0">
-              <Button
-                onClick={() => copyToClipboard(content)}
-                size="sm"
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 h-9 text-sm font-medium w-full sm:w-auto"
-              >
-                <Copy className="w-4 h-4 mr-2" />
-                Copy Post
-              </Button>
-              <Button
-                onClick={handleGenerateImage}
-                size="sm"
-                disabled={isLoadingImage || isDeducting}
-                className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 px-4 py-2 h-9 text-sm font-medium w-full sm:w-auto"
-              >
-                {isLoadingImage || isDeducting ? (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                ) : (
-                  <ImageIcon className="w-4 h-4 mr-2" />
-                )}
-                {isLoadingImage ? 'Generating...' : isDeducting ? 'Processing...' : 'Get Image'}
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
+    <div className="w-full max-w-4xl mx-auto mb-12">
+      {/* Heading Section - Properly Spaced */}
+      <div className="mb-6">
+        <div className="bg-gradient-to-r from-yellow-400 to-amber-500 text-black px-4 py-3 rounded-lg mb-4">
+          <h3 className="text-lg font-bold text-center break-words">
+            {heading}
+          </h3>
+        </div>
         
-        <CardContent className="space-y-6">
-          {/* Loading indicator */}
-          {isLoadingImage && (
-            <div className="p-4 bg-blue-50 rounded-lg text-center border border-blue-200">
-              <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading for variation {variationNumber}...</div>
-              <div className="text-xs text-blue-500 mt-1">This may take up to 2 minutes</div>
-            </div>
-          )}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Button
+            onClick={() => copyToClipboard(content)}
+            size="sm"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 font-medium"
+          >
+            <Copy className="w-4 h-4 mr-2" />
+            Copy Post
+          </Button>
+          <Button
+            onClick={handleGenerateImage}
+            size="sm"
+            disabled={isLoadingImage || isDeducting}
+            className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 px-6 py-2 font-medium"
+          >
+            {isLoadingImage || isDeducting ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <ImageIcon className="w-4 h-4 mr-2" />
+            )}
+            {isLoadingImage ? 'Generating...' : isDeducting ? 'Processing...' : 'Get Image'}
+          </Button>
+        </div>
+      </div>
 
-          {/* Failed generation indicator */}
-          {imageGenerationFailed && (
-            <div className="p-4 bg-red-50 rounded-lg text-center border border-red-200">
-              <div className="text-sm text-red-600 font-medium">Image generation failed for variation {variationNumber}</div>
-              <div className="text-xs text-red-500 mt-1">Please try again</div>
-            </div>
-          )}
+      {/* Loading indicator */}
+      {isLoadingImage && (
+        <div className="p-4 bg-blue-50 rounded-lg text-center border border-blue-200 mb-6">
+          <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading for variation {variationNumber}...</div>
+          <div className="text-xs text-blue-500 mt-1">This may take up to 2 minutes</div>
+        </div>
+      )}
 
-          {/* Generated Images */}
-          {generatedImages.length > 0 && (
-            <div className="space-y-4">
-              <h5 className="text-cyan-300 font-medium text-sm">Generated Images ({generatedImages.length}):</h5>
-              <div className="space-y-4">
-                {generatedImages.map((imageData, index) => (
-                  <div key={index} className="relative w-full">
-                    <div className="w-full max-w-2xl mx-auto">
-                      <img 
-                        src={imageData} 
-                        alt={`Generated LinkedIn post image ${index + 1} for variation ${variationNumber}`}
-                        className="w-full rounded-lg shadow-sm object-contain max-h-96"
-                      />
-                    </div>
-                    <div className="absolute top-3 right-3 flex gap-2">
-                      <Button
-                        onClick={() => copyImageToClipboard(imageData)}
-                        size="sm"
-                        className="bg-black/70 hover:bg-black/80 text-white p-2 h-8 w-8"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        onClick={() => deleteImage(imageData)}
-                        size="sm"
-                        className="bg-red-600/70 hover:bg-red-600/80 text-white p-2 h-8 w-8"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+      {/* Failed generation indicator */}
+      {imageGenerationFailed && (
+        <div className="p-4 bg-red-50 rounded-lg text-center border border-red-200 mb-6">
+          <div className="text-sm text-red-600 font-medium">Image generation failed for variation {variationNumber}</div>
+          <div className="text-xs text-red-500 mt-1">Please try again</div>
+        </div>
+      )}
+
+      {/* Generated Images */}
+      {generatedImages.length > 0 && (
+        <div className="mb-8">
+          <h5 className="text-cyan-400 font-medium text-sm mb-4 text-center">Generated Images ({generatedImages.length}):</h5>
+          <div className="space-y-6">
+            {generatedImages.map((imageData, index) => (
+              <div key={index} className="relative w-full max-w-2xl mx-auto">
+                <img 
+                  src={imageData} 
+                  alt={`Generated LinkedIn post image ${index + 1} for variation ${variationNumber}`}
+                  className="w-full rounded-lg shadow-lg object-contain"
+                />
+                <div className="absolute top-3 right-3 flex gap-2">
+                  <Button
+                    onClick={() => copyImageToClipboard(imageData)}
+                    size="sm"
+                    className="bg-black/70 hover:bg-black/80 text-white p-2 h-8 w-8"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    onClick={() => deleteImage(imageData)}
+                    size="sm"
+                    className="bg-red-600/70 hover:bg-red-600/80 text-white p-2 h-8 w-8"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            ))}
+          </div>
+        </div>
+      )}
 
-      {/* LinkedIn Post Preview - Separate Card with Better Spacing */}
-      <Card className="bg-gray-800 border-cyan-400/20 backdrop-blur-sm w-full">
-        <CardContent className="p-6">
-          <LinkedInPostDisplay 
-            content={content}
-            userProfile={userProfile}
-            userData={userData}
-          />
-        </CardContent>
-      </Card>
+      {/* LinkedIn Post Preview - Clean Layout */}
+      <div className="w-full max-w-2xl mx-auto">
+        <LinkedInPostDisplay 
+          content={content}
+          userProfile={userProfile}
+          userData={userData}
+        />
+      </div>
     </div>
   );
 };
 
 export default LinkedInPostVariation;
-
