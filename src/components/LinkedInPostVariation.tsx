@@ -194,13 +194,12 @@ const LinkedInPostVariation = ({
       console.log(`Generating image for post ${postId}, variation ${variationNumber}`);
       
       await executeWithRetry(async () => {
-        // Insert the generating placeholder in database first
         const { data, error } = await supabase
           .from('linkedin_post_images')
           .insert({
             post_id: postId,
             variation_number: variationNumber,
-            image_data: 'generating...' // Placeholder that will trigger the webhook
+            image_data: 'generating...' // Placeholder that will be updated by webhook
           })
           .select()
           .single();
@@ -211,37 +210,6 @@ const LinkedInPostVariation = ({
         }
 
         console.log('Image generation request created:', data);
-        
-        // Also make a direct call to the webhook to ensure it's triggered
-        // This provides a fallback in case the database trigger doesn't work
-        try {
-          const userName = userData?.first_name && userData?.last_name 
-            ? `${userData.first_name} ${userData.last_name}`
-            : 'Professional User';
-            
-          const webhookResponse = await fetch('/functions/v1/linkedin-image-webhook', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              post_heading: heading,
-              post_content: content,
-              variation_number: variationNumber,
-              user_name: userName,
-              post_id: postId,
-              source: 'frontend_direct'
-            })
-          });
-          
-          if (webhookResponse.ok) {
-            console.log('Direct webhook call successful');
-          } else {
-            console.log('Direct webhook call failed, relying on database trigger');
-          }
-        } catch (webhookError) {
-          console.log('Direct webhook call failed, relying on database trigger:', webhookError);
-        }
       }, 3, `generate image for variation ${variationNumber}`);
       
       toast({

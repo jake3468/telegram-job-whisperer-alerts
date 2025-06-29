@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -418,20 +417,20 @@ const LinkedInPosts = () => {
 
                 <div className="max-w-5xl mx-auto min-w-0">
                   {/* Input Form */}
-                  <Card className="bg-gradient-to-br from-slate-800/90 via-slate-700/90 to-slate-800/90 border-slate-600/20 backdrop-blur-md mb-8 shadow-xl">
+                  <Card className="bg-gradient-to-br from-cyan-400 via-teal-300 to-teal-500 border-white/10 backdrop-blur-md mb-8 shadow-xl">
                     <CardHeader className="pb-6">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div className="min-w-0">
-                          <CardTitle className="font-inter text-lg sm:text-xl flex items-center gap-2 text-slate-100 font-bold drop-shadow">
-                            <Sparkles className="w-5 h-5 text-teal-400 drop-shadow flex-shrink-0" />
+                          <CardTitle className="font-inter text-lg sm:text-xl flex items-center gap-2 text-black font-bold drop-shadow">
+                            <Sparkles className="w-5 h-5 text-black drop-shadow flex-shrink-0" />
                             <span>Create Your Posts</span>
                           </CardTitle>
-                          <CardDescription className="text-slate-300 font-inter mb-0 text-sm sm:text-base">
+                          <CardDescription className="text-black/80 font-inter mb-0 text-sm sm:text-base">
                             Fill in the details to generate 3 LinkedIn post variations
                           </CardDescription>
                         </div>
-                        <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-slate-500/20 flex-shrink-0 text-slate-200 bg-slate-700/50 hover:bg-slate-600/50">
-                          <History className="w-4 h-4 mr-2 text-teal-400" />
+                        <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 flex-shrink-0 text-zinc-950 bg-cyan-600 hover:bg-cyan-500">
+                          <History className="w-4 h-4 mr-2 text-black" />
                           History
                         </Button>
                       </div>
@@ -442,40 +441,40 @@ const LinkedInPosts = () => {
                         
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                           <div className="space-y-2">
-                            <Label htmlFor="topic" className="text-slate-200 font-semibold text-base">💡Topic or Theme *</Label>
-                            <Label htmlFor="topic" className="text-slate-300 font-normal text-sm block">What is the main topic you want to write about?</Label>
-                            <TTextarea id="topic" placeholder="e.g. AI in customer service, Layoffs in tech, Remote work trends" value={formData.topic} onChange={e => handleInputChange('topic', e.target.value)} required className="min-h-[60px] resize-none text-base bg-slate-900/80 border-slate-600/30 text-slate-100 placeholder:text-slate-400 placeholder:text-xs font-medium" />
+                            <Label htmlFor="topic" className="text-black font-semibold text-base">💡Topic or Theme *</Label>
+                            <Label htmlFor="topic" className="text-black/70 font-normal text-sm block">What is the main topic you want to write about?</Label>
+                            <TTextarea id="topic" placeholder="e.g. AI in customer service, Layoffs in tech, Remote work trends" value={formData.topic} onChange={e => handleInputChange('topic', e.target.value)} required className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="opinion" className="text-slate-200 font-semibold text-base">🤔Your Key Point or Opinion</Label>
-                            <Label htmlFor="opinion" className="text-slate-300 font-normal text-sm block">What is your main insight, opinion, or message?</Label>
-                            <TTextarea id="opinion" placeholder="I believe hybrid AI + human support is the future." value={formData.opinion} onChange={e => handleInputChange('opinion', e.target.value)} className="min-h-[60px] resize-none text-base bg-slate-900/80 border-slate-600/30 text-slate-100 placeholder:text-slate-400 placeholder:text-xs font-medium" />
+                            <Label htmlFor="opinion" className="text-black font-semibold text-base">🤔Your Key Point or Opinion</Label>
+                            <Label htmlFor="opinion" className="text-black/70 font-normal text-sm block">What is your main insight, opinion, or message?</Label>
+                            <TTextarea id="opinion" placeholder="I believe hybrid AI + human support is the future." value={formData.opinion} onChange={e => handleInputChange('opinion', e.target.value)} className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                           </div>
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                           <div className="space-y-2">
-                            <Label htmlFor="personal_story" className="text-slate-200 font-semibold text-base">📖Personal Experience or Story</Label>
-                            <Label htmlFor="personal_story" className="text-slate-300 font-normal text-sm block">Do you have a story, data point, or personal experience to include?</Label>
-                            <TTextarea id="personal_story" placeholder="We reduced response time by 40% after implementing AI chat." value={formData.personal_story} onChange={e => handleInputChange('personal_story', e.target.value)} className="min-h-[60px] resize-none text-base bg-slate-900/80 border-slate-600/30 text-slate-100 placeholder:text-slate-400 placeholder:text-xs font-medium" />
+                            <Label htmlFor="personal_story" className="text-black font-semibold text-base">📖Personal Experience or Story</Label>
+                            <Label htmlFor="personal_story" className="text-black/70 font-normal text-sm block">Do you have a story, data point, or personal experience to include?</Label>
+                            <TTextarea id="personal_story" placeholder="We reduced response time by 40% after implementing AI chat." value={formData.personal_story} onChange={e => handleInputChange('personal_story', e.target.value)} className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="audience" className="text-slate-200 font-semibold text-base">👥Target Audience</Label>
-                            <Label htmlFor="audience" className="text-slate-300 font-normal text-sm block">Who are you writing this for?</Label>
-                            <TTextarea id="audience" placeholder="Startup founders, product managers, working moms, new grads…" value={formData.audience} onChange={e => handleInputChange('audience', e.target.value)} className="min-h-[60px] resize-none text-base bg-slate-900/80 border-slate-600/30 text-slate-100 placeholder:text-slate-400 placeholder:text-xs font-medium" />
+                            <Label htmlFor="audience" className="text-black font-semibold text-base">👥Target Audience</Label>
+                            <Label htmlFor="audience" className="text-black/70 font-normal text-sm block">Who are you writing this for?</Label>
+                            <TTextarea id="audience" placeholder="Startup founders, product managers, working moms, new grads…" value={formData.audience} onChange={e => handleInputChange('audience', e.target.value)} className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                           </div>
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="tone" className="text-slate-200 font-semibold text-base">🗣️Tone/Style Preference</Label>
-                          <Label htmlFor="tone" className="text-slate-300 font-normal text-sm block">What tone do you prefer?</Label>
+                          <Label htmlFor="tone" className="text-black font-semibold text-base">🗣️Tone/Style Preference</Label>
+                          <Label htmlFor="tone" className="text-black/70 font-normal text-sm block">What tone do you prefer?</Label>
                           <Select onValueChange={value => handleInputChange('tone', value)}>
-                            <SelectTrigger className="text-base bg-slate-900/80 text-slate-100 border-slate-600/30 font-medium [&>span[data-placeholder]]:text-slate-400">
+                            <SelectTrigger className="text-base bg-black/80 text-white border-teal-300/30 font-medium [&>span[data-placeholder]]:text-white/80">
                               <SelectValue placeholder="Select a tone..." />
                             </SelectTrigger>
-                            <SelectContent className="bg-slate-900/80 border-slate-600/30 text-slate-100">
+                            <SelectContent className="bg-black/80 border-teal-200/30 text-white">
                               {toneOptions.map(option => (
-                                <SelectItem key={option.value} value={option.value} className="font-medium data-[highlighted]:bg-slate-700 data-[highlighted]:text-slate-100">
+                                <SelectItem key={option.value} value={option.value} className="font-medium data-[highlighted]:bg-teal-200 data-[highlighted]:text-black">
                                   {option.label}
                                 </SelectItem>
                               ))}
@@ -492,7 +491,7 @@ const LinkedInPosts = () => {
                             {isSubmitting ? 'Submitting...' : 'Generate LinkedIn Posts'}
                           </Button>
                           
-                          <Button type="button" onClick={resetForm} variant="outline" className="bg-slate-700/50 border-slate-500/25 text-slate-200 hover:bg-slate-600/50 text-base h-12 px-6">
+                          <Button type="button" onClick={resetForm} variant="outline" className="bg-white/10 border-teal-400/25 text-black hover:bg-white/20 text-base h-12 px-6">
                             Reset
                           </Button>
                         </div>
