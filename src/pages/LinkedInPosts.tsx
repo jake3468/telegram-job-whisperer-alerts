@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -137,17 +136,20 @@ const LinkedInPosts = () => {
           
           // Check if all posts are ready and stop loading immediately
           if (areAllPostsReady(newData)) {
-            console.log('All posts are ready! Stopping loading and showing results');
+            console.log('All posts are ready! Stopping loading and deducting credits once');
             setIsGenerating(false);
             
-            // Deduct credits after successful generation
+            // Deduct credits ONLY ONCE after successful generation
             if (currentPostId) {
               const success = await deductCreditsAfterResults(currentPostId);
               if (success) {
+                console.log('Credits successfully deducted, showing success toast');
                 toast({
                   title: "LinkedIn Posts Generated!",
                   description: "Your 3 LinkedIn post variations have been created successfully."
                 });
+              } else {
+                console.log('Credit deduction failed or already processed');
               }
             }
           }
@@ -192,13 +194,16 @@ const LinkedInPosts = () => {
               console.log('Existing data is complete, showing results immediately');
               setIsGenerating(false);
               
-              // Deduct credits for existing complete data
+              // Deduct credits ONLY ONCE for existing complete data
               const success = await deductCreditsAfterResults(currentPostId);
               if (success) {
+                console.log('Credits deducted for existing complete data');
                 toast({
                   title: "LinkedIn Posts Generated!",
                   description: "Your 3 LinkedIn post variations have been created successfully."
                 });
+              } else {
+                console.log('Credits already deducted or deduction failed for existing data');
               }
             }
           }

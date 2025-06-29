@@ -25,12 +25,13 @@ export function useLinkedInPostCreditCheck() {
   const deductCreditsAfterResults = async (postId: string) => {
     // Prevent double deduction for the same post (atomic check)
     if (deductedPosts.has(postId) || deductionInProgress.current.has(postId)) {
-      console.log(`Credits already deducted for post ${postId}, skipping atomic check`);
+      console.log(`Credits already deducted for post ${postId}, skipping deduction`);
       return true;
     }
 
     // Mark as in progress (atomic operation)
     deductionInProgress.current.add(postId);
+    console.log(`Starting credit deduction for post ${postId}`);
 
     try {
       const success = await creditCheck.checkAndDeductCredits(
@@ -38,14 +39,26 @@ export function useLinkedInPostCreditCheck() {
       );
       
       if (success) {
-        console.log(`Successfully deducted 3 credits for LinkedIn post generation (atomic)`);
-        setDeductedPosts(prev => new Set(prev).add(postId));
+        console.log(`Successfully deducted 3 credits for LinkedIn post generation - post ${postId}`);
+        setDeductedPosts(prev => {
+          const newSet = new Set(prev);
+          newSet.add(postId);
+          return newSet;
+        });
+        // Remove from in progress after successful deduction
+        deductionInProgress.current.delete(postId);
+        return true;
+      } else {
+        console.log(`Failed to deduct credits for post ${postId}`);
+        // Remove from in progress on failure
+        deductionInProgress.current.delete(postId);
+        return false;
       }
-      
-      return success;
-    } finally {
-      // Remove from in progress (atomic cleanup)
+    } catch (error) {
+      console.error(`Error during credit deduction for post ${postId}:`, error);
+      // Remove from in progress on error
       deductionInProgress.current.delete(postId);
+      return false;
     }
   };
 
