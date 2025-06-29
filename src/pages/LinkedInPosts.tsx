@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -55,7 +56,7 @@ const LinkedInPosts = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
-  const [hasShownResultsToast, setHasShownResultsToast] = useState(false);
+  const [hasShownSuccessToast, setHasShownSuccessToast] = useState(false);
 
   const toneOptions = [
     { value: 'professional', label: 'Professional & Insightful' },
@@ -92,12 +93,15 @@ const LinkedInPosts = () => {
     fetchUserData();
   }, [user?.id, isAuthReady, executeWithRetry]);
 
-  // Check if all posts are ready
+  // Check if all posts are ready - IMPROVED LOGIC
   const areAllPostsReady = (data: LinkedInPostData) => {
-    const allFieldsPresent = Boolean(
-      data.post_heading_1?.trim() && data.post_content_1?.trim() && 
-      data.post_heading_2?.trim() && data.post_content_2?.trim() && 
-      data.post_heading_3?.trim() && data.post_content_3?.trim()
+    const hasAllData = Boolean(
+      data.post_heading_1?.trim() && 
+      data.post_content_1?.trim() && 
+      data.post_heading_2?.trim() && 
+      data.post_content_2?.trim() && 
+      data.post_heading_3?.trim() && 
+      data.post_content_3?.trim()
     );
     
     console.log('Checking if all posts ready:', {
@@ -107,13 +111,13 @@ const LinkedInPosts = () => {
       post_content_2: Boolean(data.post_content_2?.trim()),
       post_heading_3: Boolean(data.post_heading_3?.trim()),
       post_content_3: Boolean(data.post_content_3?.trim()),
-      allReady: allFieldsPresent
+      allReady: hasAllData
     });
     
-    return allFieldsPresent;
+    return hasAllData;
   };
 
-  // Real-time subscription for LinkedIn post updates - SINGLE SUCCESS TOAST CONTROL
+  // Real-time subscription for LinkedIn post updates - FIXED LOGIC
   useEffect(() => {
     if (!currentPostId || !isAuthReady) return;
     
@@ -122,37 +126,36 @@ const LinkedInPosts = () => {
     const channel = supabase
       .channel(`linkedin-post-updates-${currentPostId}`)
       .on('postgres_changes', {
-        event: '*',
+        event: 'UPDATE',
         schema: 'public', 
         table: 'job_linkedin',
         filter: `id=eq.${currentPostId}`
-      }, async (payload) => {
+      }, (payload) => {
         console.log('LinkedIn post updated via real-time:', payload);
         
-        if (payload.eventType === 'UPDATE' && payload.new) {
+        if (payload.new) {
           const newData = payload.new as LinkedInPostData;
           console.log('New posts data received:', newData);
           
           setPostsData(newData);
           
-          // Check if all posts are ready and show success toast ONLY ONCE
-          if (areAllPostsReady(newData) && !hasShownResultsToast) {
-            console.log('All posts are ready! Stopping loading and showing success toast ONCE');
+          // Check if all posts are ready
+          if (areAllPostsReady(newData)) {
+            console.log('All posts are ready! Stopping loading and showing success toast');
             setIsGenerating(false);
-            setHasShownResultsToast(true);
             
-            // Deduct credits ONLY ONCE after successful generation
-            if (currentPostId) {
-              const success = await deductCreditsAfterResults(currentPostId);
-              if (success) {
-                console.log('Credits successfully deducted, showing single success toast');
-                toast({
-                  title: "LinkedIn Posts Generated!",
-                  description: "Your 3 LinkedIn post variations have been created successfully."
-                });
-              } else {
-                console.log('Credit deduction failed or already processed');
-              }
+            // Show success toast and deduct credits only once
+            if (!hasShownSuccessToast) {
+              setHasShownSuccessToast(true);
+              
+              deductCreditsAfterResults(currentPostId).then(success => {
+                if (success) {
+                  toast({
+                    title: "LinkedIn Posts Generated!",
+                    description: "Your 3 LinkedIn post variations have been created successfully."
+                  });
+                }
+              });
             }
           }
         }
@@ -165,12 +168,12 @@ const LinkedInPosts = () => {
       console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
-  }, [currentPostId, isAuthReady, toast, deductCreditsAfterResults, hasShownResultsToast]);
+  }, [currentPostId, isAuthReady, toast, deductCreditsAfterResults, hasShownSuccessToast]);
 
-  // Check existing data when currentPostId changes - PREVENT DUPLICATE SUCCESS TOASTS
+  // Check existing data when currentPostId changes
   useEffect(() => {
     const checkExistingData = async () => {
-      if (!currentPostId || !isAuthReady || hasShownResultsToast) return;
+      if (!currentPostId || !isAuthReady) return;
       
       console.log('Checking existing data for post ID:', currentPostId);
       
@@ -191,22 +194,23 @@ const LinkedInPosts = () => {
             console.log('Found existing post data:', data);
             setPostsData(data);
             
-            // Check if all posts are already ready - SINGLE SUCCESS TOAST
-            if (areAllPostsReady(data) && !hasShownResultsToast) {
-              console.log('Existing data is complete, showing results immediately with single toast');
+            // Check if all posts are already ready
+            if (areAllPostsReady(data)) {
+              console.log('Existing data is complete, showing results immediately');
               setIsGenerating(false);
-              setHasShownResultsToast(true);
               
-              // Deduct credits ONLY ONCE for existing complete data
-              const success = await deductCreditsAfterResults(currentPostId);
-              if (success) {
-                console.log('Credits deducted for existing complete data - single toast');
-                toast({
-                  title: "LinkedIn Posts Generated!",
-                  description: "Your 3 LinkedIn post variations have been created successfully."
+              // Show success toast and deduct credits only once
+              if (!hasShownSuccessToast) {
+                setHasShownSuccessToast(true);
+                
+                deductCreditsAfterResults(currentPostId).then(success => {
+                  if (success) {
+                    toast({
+                      title: "LinkedIn Posts Generated!",
+                      description: "Your 3 LinkedIn post variations have been created successfully."
+                    });
+                  }
                 });
-              } else {
-                console.log('Credits already deducted or deduction failed for existing data');
               }
             }
           }
@@ -216,10 +220,10 @@ const LinkedInPosts = () => {
       }
     };
 
-    if (currentPostId && isGenerating && !hasShownResultsToast) {
+    if (currentPostId && !hasShownSuccessToast) {
       checkExistingData();
     }
-  }, [currentPostId, isAuthReady, isGenerating, executeWithRetry, toast, deductCreditsAfterResults, hasShownResultsToast]);
+  }, [currentPostId, isAuthReady, executeWithRetry, toast, deductCreditsAfterResults, hasShownSuccessToast]);
 
   // Handle input changes
   const handleInputChange = (field: string, value: string) => {
@@ -293,7 +297,7 @@ const LinkedInPosts = () => {
     setIsGenerating(true);
     setPostsData(null);
     setCurrentPostId(null);
-    setHasShownResultsToast(false); // Reset success toast control for new generation
+    setHasShownSuccessToast(false); // Reset success toast control for new generation
 
     try {
       console.log('Creating LinkedIn post with user_profile.id:', userProfile.id);
@@ -329,7 +333,7 @@ const LinkedInPosts = () => {
     } catch (err: any) {
       console.error('Error creating LinkedIn post:', err);
       setIsGenerating(false);
-      setHasShownResultsToast(false); // Reset on error
+      setHasShownSuccessToast(false); // Reset on error
       const errorMessage = err.message || "Failed to create LinkedIn post. Please try again.";
       toast({
         title: "Error",
@@ -341,7 +345,7 @@ const LinkedInPosts = () => {
     }
   };
 
-  // Reset form - RESET ALL TOAST CONTROLS
+  // Reset form - RESET ALL CONTROLS
   const resetForm = () => {
     setFormData({
       topic: '',
@@ -353,12 +357,20 @@ const LinkedInPosts = () => {
     setPostsData(null);
     setIsGenerating(false);
     setCurrentPostId(null);
-    setHasShownResultsToast(false); // Reset success toast control
+    setHasShownSuccessToast(false); // Reset success toast control
   };
 
-  // Check if we should show results
+  // FIXED: Determine what to show based on data completeness
   const shouldShowResults = postsData && areAllPostsReady(postsData);
   const shouldShowLoading = isGenerating && !shouldShowResults;
+
+  console.log('Display logic:', {
+    postsData: !!postsData,
+    areAllPostsReady: postsData ? areAllPostsReady(postsData) : false,
+    shouldShowResults,
+    shouldShowLoading,
+    isGenerating
+  });
 
   return (
     <SidebarProvider defaultOpen={true}>
