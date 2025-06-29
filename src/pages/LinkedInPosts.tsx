@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -118,7 +117,7 @@ const LinkedInPosts = () => {
     if (!creditsDeducted && !resultProcessed && currentPostId) {
       console.log('Processing complete results and deducting credits (atomic)');
       setResultProcessed(true); // Prevent multiple calls
-      setIsGenerating(false);
+      setIsGenerating(false); // Turn off loading state immediately when results are ready
 
       // Deduct credits after successful result display (atomic operation)
       const success = await deductCreditsAfterResults(currentPostId);
@@ -139,15 +138,14 @@ const LinkedInPosts = () => {
     }
   };
 
-  // Enhanced real-time subscription for LinkedIn post updates (single subscription)
+  // Enhanced real-time subscription for LinkedIn post updates
   useEffect(() => {
     if (!currentPostId || !isAuthReady) return;
     
-    console.log('Setting up single real-time subscription for post ID:', currentPostId);
+    console.log('Setting up real-time subscription for post ID:', currentPostId);
 
-    // Single real-time subscription (no polling to prevent conflicts)
     const channel = supabase
-      .channel('linkedin-post-updates')
+      .channel(`linkedin-post-updates-${currentPostId}`)
       .on('postgres_changes', {
         event: '*',
         schema: 'public', 
@@ -155,13 +153,17 @@ const LinkedInPosts = () => {
         filter: `id=eq.${currentPostId}`
       }, async (payload) => {
         console.log('LinkedIn post updated via real-time:', payload);
-        const newData = payload.new as LinkedInPostData;
         
-        setPostsData(newData);
-        
-        if (areAllPostsReady(newData) && !resultProcessed) {
-          console.log('All posts are ready via real-time, processing results');
-          await processCompleteResults(newData);
+        if (payload.eventType === 'UPDATE' && payload.new) {
+          const newData = payload.new as LinkedInPostData;
+          console.log('Setting new posts data:', newData);
+          setPostsData(newData);
+          
+          // Check if all posts are ready and process results immediately
+          if (areAllPostsReady(newData) && !resultProcessed) {
+            console.log('All posts are ready via real-time, processing results immediately');
+            await processCompleteResults(newData);
+          }
         }
       })
       .subscribe(status => {
@@ -173,6 +175,45 @@ const LinkedInPosts = () => {
       supabase.removeChannel(channel);
     };
   }, [currentPostId, isAuthReady, creditsDeducted, resultProcessed]);
+
+  // Additional effect to check existing data when currentPostId changes
+  useEffect(() => {
+    const checkExistingData = async () => {
+      if (!currentPostId || !isAuthReady) return;
+      
+      try {
+        await executeWithRetry(async () => {
+          const { data, error } = await supabase
+            .from('job_linkedin')
+            .select('*')
+            .eq('id', currentPostId)
+            .single();
+          
+          if (error) {
+            console.error('Error fetching existing post data:', error);
+            return;
+          }
+          
+          if (data) {
+            console.log('Found existing post data:', data);
+            setPostsData(data);
+            
+            // Check if all posts are already ready
+            if (areAllPostsReady(data) && !resultProcessed) {
+              console.log('Existing data is complete, processing results');
+              await processCompleteResults(data);
+            }
+          }
+        }, 3, 'check existing post data');
+      } catch (err) {
+        console.error('Error checking existing data:', err);
+      }
+    };
+
+    if (currentPostId && isGenerating) {
+      checkExistingData();
+    }
+  }, [currentPostId, isAuthReady, isGenerating]);
 
   // Handle input changes
   const handleInputChange = (field: string, value: string) => {
@@ -407,8 +448,8 @@ const LinkedInPosts = () => {
                   </CardContent>
                 </Card>
 
-                {/* Loading State for Post Generation */}
-                {isGenerating && (
+                {/* Loading State for Post Generation - Only show when generating AND no complete results */}
+                {isGenerating && !(postsData && areAllPostsReady(postsData)) && (
                   <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm mb-8 max-w-full">
                     <CardContent className="py-8 flex items-center justify-center">
                       <LoadingMessages type="linkedin" />
@@ -416,8 +457,8 @@ const LinkedInPosts = () => {
                   </Card>
                 )}
 
-                {/* Results Display - Only show when posts are ready AND not generating */}
-                {postsData && areAllPostsReady(postsData) && !isGenerating && (
+                {/* Results Display - Show when posts are ready */}
+                {postsData && areAllPostsReady(postsData) && (
                   <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm max-w-full">
                     <CardHeader className="pb-6">
                       <CardTitle className="font-inter text-lg sm:text-xl flex items-center gap-2 bg-gradient-to-r from-teal-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent drop-shadow font-bold">
