@@ -80,7 +80,7 @@ const LinkedInPostVariation = ({
     loadExistingImages();
   }, [postId, variationNumber, isAuthReady, executeWithRetry]);
 
-  // Real-time subscription for image updates - FIXED LOADING STATE MANAGEMENT
+  // Real-time subscription for image updates - FIXED: Immediately reset loading state
   useEffect(() => {
     if (!postId || !isAuthReady) return;
 
@@ -104,7 +104,7 @@ const LinkedInPostVariation = ({
           } else if (newImage.image_data && newImage.image_data !== 'generating...' && !newImage.image_data.includes('failed')) {
             console.log(`Image generation completed for variation ${variationNumber}`);
             
-            // IMMEDIATELY stop loading when we get valid image data
+            // FIXED: IMMEDIATELY stop loading when we get valid image data
             setIsLoadingImage(false);
             setImageGenerationFailed(false);
             
@@ -138,7 +138,6 @@ const LinkedInPostVariation = ({
             });
           }
         } else if (payload.eventType === 'DELETE') {
-          // Remove the deleted image from the list
           const deletedImage = payload.old;
           setGeneratedImages(prev => prev.filter(img => img !== deletedImage.image_data));
         }
@@ -226,8 +225,8 @@ const LinkedInPostVariation = ({
       return;
     }
 
-    // NO CREDIT DEDUCTION HERE - Only check if user has credits
-    if (!await checkAndDeductForImage(postId, variationNumber, true)) { // Pass true for check-only mode
+    // Only check if user has credits, don't deduct yet
+    if (!await checkAndDeductForImage(postId, variationNumber, true)) {
       return;
     }
 
@@ -293,7 +292,7 @@ const LinkedInPostVariation = ({
 
     } catch (err: any) {
       console.error('Error generating image:', err);
-      setIsLoadingImage(false); // Stop loading on error
+      setIsLoadingImage(false); // FIXED: Reset loading state on error
       setImageGenerationFailed(true);
       
       toast({
