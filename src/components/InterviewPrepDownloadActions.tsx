@@ -79,7 +79,7 @@ const InterviewPrepDownloadActions = ({
           continue;
         }
 
-        // Handle different markdown elements
+        // Handle different markdown elements with specific colors for headings
         if (trimmedLine.startsWith('# ')) {
           // Main heading
           yPosition += 5;
@@ -92,11 +92,21 @@ const InterviewPrepDownloadActions = ({
           // Sub-section heading
           yPosition += 3;
           addFormattedText(trimmedLine.replace('### ', ''), 12, true, '#3b82f6');
-        } else if (trimmedLine.includes('**') && trimmedLine.includes(':**')) {
-          // Question headers or bold sections
+        } else if (trimmedLine.includes('**Question') && trimmedLine.includes(':**')) {
+          // Question headers - Blue color
           const cleanText = trimmedLine.replace(/\*\*(.*?)\*\*/g, '$1');
           yPosition += 3;
-          addFormattedText(cleanText, 11, true, '#dc2626');
+          addFormattedText(cleanText, 11, true, '#2563eb');
+        } else if (trimmedLine.includes('**Your Answer:**')) {
+          // Your Answer headers - Green color
+          const cleanText = trimmedLine.replace(/\*\*(.*?)\*\*/g, '$1');
+          yPosition += 3;
+          addFormattedText(cleanText, 11, true, '#16a34a');
+        } else if (trimmedLine.includes('**Pro Tip:**')) {
+          // Pro Tip headers - Orange color
+          const cleanText = trimmedLine.replace(/\*\*(.*?)\*\*/g, '$1');
+          yPosition += 3;
+          addFormattedText(cleanText, 11, true, '#ea580c');
         } else if (trimmedLine.startsWith('**') && trimmedLine.endsWith('**')) {
           // Other bold text
           const cleanText = trimmedLine.replace(/\*\*/g, '');
@@ -178,7 +188,7 @@ const InterviewPrepDownloadActions = ({
 
       docChildren.push(new Paragraph({ children: [new TextRun({ text: "" })] })); // Empty line
 
-      // Process each line
+      // Process each line with specific colors for headings
       lines.forEach(line => {
         const trimmedLine = line.trim();
         
@@ -220,8 +230,8 @@ const InterviewPrepDownloadActions = ({
               }),
             ],
           }));
-        } else if (trimmedLine.includes('**') && trimmedLine.includes(':**')) {
-          // Question or section headers
+        } else if (trimmedLine.includes('**Question') && trimmedLine.includes(':**')) {
+          // Question headers - Blue color
           const cleanLine = trimmedLine.replace(/\*\*/g, '');
           docChildren.push(new Paragraph({
             children: [
@@ -229,7 +239,33 @@ const InterviewPrepDownloadActions = ({
                 text: cleanLine,
                 bold: true,
                 size: 22,
-                color: "dc2626",
+                color: "2563eb",
+              }),
+            ],
+          }));
+        } else if (trimmedLine.includes('**Your Answer:**')) {
+          // Your Answer headers - Green color
+          const cleanLine = trimmedLine.replace(/\*\*/g, '');
+          docChildren.push(new Paragraph({
+            children: [
+              new TextRun({
+                text: cleanLine,
+                bold: true,
+                size: 22,
+                color: "16a34a",
+              }),
+            ],
+          }));
+        } else if (trimmedLine.includes('**Pro Tip:**')) {
+          // Pro Tip headers - Orange color
+          const cleanLine = trimmedLine.replace(/\*\*/g, '');
+          docChildren.push(new Paragraph({
+            children: [
+              new TextRun({
+                text: cleanLine,
+                bold: true,
+                size: 22,
+                color: "ea580c",
               }),
             ],
           }));
