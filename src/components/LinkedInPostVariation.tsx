@@ -71,6 +71,9 @@ const LinkedInPostVariation = ({
           if (data && data.length > 0) {
             const imageUrls = data.map(img => img.image_data);
             setGeneratedImages(imageUrls);
+            // FIXED: Reset loading state when existing images are loaded
+            setIsLoadingImage(false);
+            setImageGenerationFailed(false);
           }
         }, 3, `load existing images for variation ${variationNumber}`);
       } catch (err) {
@@ -105,15 +108,15 @@ const LinkedInPostVariation = ({
           } else if (newImage.image_data && newImage.image_data !== 'generating...' && !newImage.image_data.includes('failed')) {
             console.log(`Image generation completed for variation ${variationNumber}`);
             
-            // FIXED: IMMEDIATELY stop loading and clear all loading states
-            setIsLoadingImage(false);
-            setImageGenerationFailed(false);
-            
-            // Add the new image to the list
+            // Add the new image to the list first
             setGeneratedImages(prev => {
               const exists = prev.includes(newImage.image_data);
               return exists ? prev : [...prev, newImage.image_data];
             });
+            
+            // FIXED: Reset loading states after updating images
+            setIsLoadingImage(false);
+            setImageGenerationFailed(false);
             
             // DEDUCT CREDITS ONLY AFTER IMAGE IS DISPLAYED
             try {
@@ -174,14 +177,14 @@ const LinkedInPostVariation = ({
     };
   }, [isLoadingImage, variationNumber, toast]);
 
-  // Additional effect to ensure loading state is reset when images are present
+  // FIXED: Ensure loading state is always reset when images are present
   useEffect(() => {
-    if (generatedImages.length > 0 && isLoadingImage) {
-      console.log(`Resetting loading state - images are present for variation ${variationNumber}`);
+    if (generatedImages.length > 0) {
+      console.log(`Images present for variation ${variationNumber}, ensuring loading state is reset`);
       setIsLoadingImage(false);
       setImageGenerationFailed(false);
     }
-  }, [generatedImages.length, isLoadingImage, variationNumber]);
+  }, [generatedImages.length, variationNumber]);
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -383,7 +386,7 @@ const LinkedInPostVariation = ({
         </div>
       </div>
 
-      {/* Loading indicator - FIXED: Only show when loading and no images exist */}
+      {/* FIXED: Loading indicator - Only show when actively loading and no images exist */}
       {isLoadingImage && generatedImages.length === 0 && (
         <div className="p-4 bg-blue-50 rounded-lg text-center border border-blue-200 mb-6">
           <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading for variation {variationNumber}...</div>
