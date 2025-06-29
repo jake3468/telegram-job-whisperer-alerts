@@ -6,8 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { FileText, History, Copy, Sparkles, Menu } from 'lucide-react';
+import { FileText, History, Copy, Sparkles, Menu, BadgeDollarSign } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
@@ -281,9 +282,13 @@ const CoverLetter = () => {
                 {/* Gradient Heading */}
                 <div className="mb-8 text-center">
                   <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-400 via-fuchsia-400 to-fuchsia-600 bg-clip-text mb-2 drop-shadow font-orbitron animate-fade-in md:text-4xl text-pink-500">📝 Cover Letter</h1>
-                  <p className="text-lg font-inter font-light text-white/90">
+                  <p className="text-lg font-inter font-light text-white/90 mb-3">
                     Instantly create stunning <span className="italic text-white/85">Cover Letters</span> for every job
                   </p>
+                  <Badge className="bg-gradient-to-r from-pink-500/20 to-fuchsia-500/20 text-pink-200 border-pink-400/30 text-sm px-3 py-1 font-inter">
+                    <BadgeDollarSign className="w-4 h-4 mr-2" />
+                    Usage Fee: 1.5 credits
+                  </Badge>
                 </div>
 
                 {/* Profile Completion Warning */}
