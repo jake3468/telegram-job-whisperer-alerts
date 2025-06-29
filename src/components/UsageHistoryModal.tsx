@@ -29,6 +29,13 @@ const UsageHistoryModal = () => {
     });
   };
 
+  const formatPaymentAmount = (amount: number, currency: string) => {
+    // Convert both INR and USD from their smallest units to main units
+    const displayAmount = (currency === 'INR' || currency === 'USD') ? amount / 100 : amount;
+    const currencySymbol = currency === 'INR' ? '₹' : '$';
+    return `${currencySymbol}${displayAmount}`;
+  };
+
   const getTransactionTypeDisplay = (type: string, description: string | null) => {
     // Map transaction types to user-friendly names with specific page identification
     const typeMap: Record<string, string> = {
@@ -71,6 +78,16 @@ const UsageHistoryModal = () => {
       'subscription.cancelled': 'Subscription Cancelled'
     };
     return eventMap[eventType] || eventType;
+  };
+
+  const getStatusColor = (status: string) => {
+    if (status === 'active' || status === 'completed') {
+      return 'bg-green-500/20 text-green-300';
+    } else if (status === 'failed') {
+      return 'bg-red-500/20 text-red-300';
+    } else {
+      return 'bg-gray-500/20 text-gray-300';
+    }
   };
 
   const creditTransactions = transactions?.filter(tx => tx.source === 'credit_transaction') || [];
@@ -217,16 +234,12 @@ const UsageHistoryModal = () => {
                           {formatDate(record.date)}
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${
-                            record.status === 'active' || record.status === 'completed'
-                              ? 'bg-green-500/20 text-green-300' 
-                              : 'bg-gray-500/20 text-gray-300'
-                          }`}>
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(record.status)}`}>
                             {record.status}
                           </span>
                           <div className="text-blue-100 text-xs font-mono">
                             {record.paymentDetails?.price_amount && record.currency 
-                              ? `${record.currency === 'INR' ? '₹' : '$'}${record.paymentDetails.price_amount}` 
+                              ? formatPaymentAmount(record.paymentDetails.price_amount, record.currency)
                               : '-'}
                           </div>
                         </div>
@@ -256,17 +269,13 @@ const UsageHistoryModal = () => {
                               {getPaymentEventDisplay(record.type)}
                             </TableCell>
                             <TableCell className="text-blue-100 text-xs">
-                              <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                record.status === 'active' || record.status === 'completed'
-                                  ? 'bg-green-500/20 text-green-300' 
-                                  : 'bg-gray-500/20 text-gray-300'
-                              }`}>
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(record.status)}`}>
                                 {record.status}
                               </span>
                             </TableCell>
                             <TableCell className="text-blue-100 text-right font-mono text-sm">
                               {record.paymentDetails?.price_amount && record.currency 
-                                ? `${record.currency === 'INR' ? '₹' : '$'}${record.paymentDetails.price_amount}` 
+                                ? formatPaymentAmount(record.paymentDetails.price_amount, record.currency)
                                 : '-'}
                             </TableCell>
                             <TableCell className="text-green-400 text-right font-mono text-sm font-bold">

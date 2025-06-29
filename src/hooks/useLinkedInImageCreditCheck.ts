@@ -9,7 +9,17 @@ export function useLinkedInImageCreditCheck() {
     }
   });
 
-  const checkAndDeductForImage = async (postId: string, variationNumber: number) => {
+  const checkAndDeductForImage = async (postId: string, variationNumber: number, checkOnly: boolean = false) => {
+    if (checkOnly) {
+      // Only check if user has credits, don't deduct
+      if (!creditCheck.hasCredits) {
+        creditCheck.showInsufficientCreditsPopup();
+        return false;
+      }
+      return true;
+    }
+
+    // Deduct credits (this happens after image is displayed)
     const success = await creditCheck.checkAndDeductCredits(
       `LinkedIn image generation for post ${postId}, variation ${variationNumber}`
     );

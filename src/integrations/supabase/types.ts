@@ -438,7 +438,6 @@ export type Database = {
           credits_amount: number
           currency: string | null
           currency_code: string | null
-          description: string | null
           id: string
           is_active: boolean
           is_default_region: boolean | null
@@ -455,7 +454,6 @@ export type Database = {
           credits_amount: number
           currency?: string | null
           currency_code?: string | null
-          description?: string | null
           id?: string
           is_active?: boolean
           is_default_region?: boolean | null
@@ -472,7 +470,6 @@ export type Database = {
           credits_amount?: number
           currency?: string | null
           currency_code?: string | null
-          description?: string | null
           id?: string
           is_active?: boolean
           is_default_region?: boolean | null

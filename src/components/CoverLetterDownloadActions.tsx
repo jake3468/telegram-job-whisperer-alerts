@@ -26,16 +26,9 @@ const CoverLetterDownloadActions = ({
     try {
       const doc = new jsPDF();
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(12);
-      doc.setFontSize(16);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Cover Letter', 20, 20);
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'normal');
-      doc.text(`${jobTitle} at ${companyName}`, 20, 35);
       doc.setFontSize(11);
       const splitText = doc.splitTextToSize(coverLetter, 170);
-      doc.text(splitText, 20, 50);
+      doc.text(splitText, 20, 20);
       doc.save(`Cover_Letter_${companyName}_${jobTitle}.pdf`);
       toast({
         title: "Downloaded!",
@@ -57,26 +50,6 @@ const CoverLetterDownloadActions = ({
         sections: [{
           properties: {},
           children: [
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: "Cover Letter",
-                  bold: true,
-                  size: 32,
-                }),
-              ],
-            }),
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: `${jobTitle} at ${companyName}`,
-                  size: 24,
-                }),
-              ],
-            }),
-            new Paragraph({
-              children: [new TextRun({ text: "" })], // Empty line
-            }),
             ...coverLetter.split('\n').map(line =>
               new Paragraph({
                 children: [

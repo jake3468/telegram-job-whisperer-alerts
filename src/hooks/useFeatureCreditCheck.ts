@@ -8,7 +8,7 @@ export const FEATURE_CREDITS = {
   COMPANY_ROLE_ANALYSIS: 3.0,
   INTERVIEW_PREP: 6.0,
   COVER_LETTER: 1.5,
-  LINKEDIN_POST: 3.0,
+  LINKEDIN_POST: 3.0, // Updated to 3.0 credits
   LINKEDIN_IMAGE: 1.5,
   JOB_ALERT: 0, // Free for users
   RESUME_PDF: 1.5

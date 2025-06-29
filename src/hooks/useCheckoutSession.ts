@@ -1,46 +1,94 @@
 
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useUser } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
+import { toast } from 'sonner';
 
 export const useCheckoutSession = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
   const { user } = useUser();
+  const { getToken } = useAuth();
 
   const createCheckoutSession = async (productId: string) => {
     if (!user) {
-      setError('User not authenticated');
+      const errorMsg = 'User not authenticated';
+      setError(errorMsg);
+      toast.error(errorMsg, {
+        action: {
+          label: 'Close',
+          onClick: () => toast.dismiss(),
+        },
+      });
       return null;
     }
 
-    setIsLoading(true);
+    console.log('Creating checkout session for product:', productId);
+
+    // Set loading state for this specific product
+    setLoadingStates(prev => ({ ...prev, [productId]: true }));
     setError(null);
 
     try {
-      const { data, error: functionError } = await supabase.functions.invoke('create-checkout-session', {
-        body: { productId }
+      // Get Clerk JWT token using useAuth hook
+      const clerkToken = await getToken();
+      if (!clerkToken) {
+        throw new Error('Failed to get Clerk authentication token');
+      }
+
+      console.log('🔐 CLIENT: Got Clerk token, length:', clerkToken.length);
+
+      // Make direct fetch request with Clerk token
+      const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/functions/v1/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${clerkToken}`,
+        },
+        body: JSON.stringify({ productId })
       });
 
-      if (functionError) {
-        console.error('Error creating checkout session:', functionError);
-        setError(functionError.message || 'Failed to create checkout session');
-        return null;
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response from checkout session:', response.status, errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
+
+      const data = await response.json();
 
       if (!data?.url) {
-        setError('No checkout URL returned');
+        const errorMsg = 'No checkout URL returned';
+        setError(errorMsg);
+        toast.error(errorMsg, {
+          action: {
+            label: 'Close',
+            onClick: () => toast.dismiss(),
+          },
+        });
         return null;
       }
 
+      console.log('Checkout session created successfully:', data);
       return data;
     } catch (err) {
       console.error('Exception creating checkout session:', err);
-      setError('Failed to create checkout session');
+      const errorMsg = err instanceof Error ? err.message : 'Failed to create checkout session';
+      setError(errorMsg);
+      toast.error(errorMsg, {
+        action: {
+          label: 'Close',
+          onClick: () => toast.dismiss(),
+        },
+      });
       return null;
     } finally {
-      setIsLoading(false);
+      // Clear loading state for this specific product
+      setLoadingStates(prev => ({ ...prev, [productId]: false }));
     }
+  };
+
+  // Fix: This should be a function call, not a function reference
+  const isLoading = (productId: string) => {
+    return loadingStates[productId] || false;
   };
 
   return {

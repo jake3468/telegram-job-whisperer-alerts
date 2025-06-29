@@ -29,88 +29,111 @@ serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+    // Get the post data to extract heading and content
+    let postHeading = post_heading;
+    let postContent = post_content;
+    let userName = user_name;
+
+    if (!postHeading || !postContent) {
+      console.log('Missing post data, fetching from database...')
+      const { data: postData, error: postError } = await supabase
+        .from('job_linkedin')
+        .select(`
+          post_heading_${variation_number},
+          post_content_${variation_number},
+          user_profile!inner(
+            users!inner(first_name, last_name)
+          )
+        `)
+        .eq('id', post_id)
+        .single()
+
+      if (postError) {
+        console.error('Error fetching post data:', postError)
+        throw new Error('Failed to fetch post data')
+      }
+
+      postHeading = postData[`post_heading_${variation_number}`]
+      postContent = postData[`post_content_${variation_number}`]
+      const user = postData.user_profile?.users
+      userName = user ? `${user.first_name} ${user.last_name}` : 'Professional User'
+    }
+
     // Get the N8N webhook URL from environment variables
     const n8nWebhookUrl = Deno.env.get('N8N_LINKEDIN_IMAGE_WEBHOOK_URL')
 
     if (!n8nWebhookUrl) {
       console.error('N8N_LINKEDIN_IMAGE_WEBHOOK_URL environment variable not found')
-      throw new Error('N8N webhook URL not configured')
+      
+      // Update the database record to show failed status
+      await supabase
+        .from('linkedin_post_images')
+        .update({ image_data: 'failed - webhook URL not configured' })
+        .eq('post_id', post_id)
+        .eq('variation_number', variation_number)
+        .eq('image_data', 'generating...')
+      
+      throw new Error('N8N webhook URL not configured in environment variables')
     }
 
-    console.log('Using N8N webhook URL:', n8nWebhookUrl.substring(0, 50) + '...')
+    console.log('Using N8N webhook URL (first 50 chars):', n8nWebhookUrl.substring(0, 50) + '...')
     console.log('Triggering N8N webhook with payload:', {
-      post_heading,
+      post_heading: postHeading,
       variation_number,
-      user_name,
+      user_name: userName,
       post_id,
       source
     })
 
-    // Call the N8N webhook
+    // Call the N8N webhook directly with the correct full URL
     const response = await fetch(n8nWebhookUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        post_heading,
-        post_content,
+        post_heading: postHeading,
+        post_content: postContent,
         variation_number,
-        user_name,
+        user_name: userName,
         post_id,
         source,
         timestamp: new Date().toISOString(),
-        triggered_from: req.headers.get('origin') || 'unknown'
+        triggered_from: req.headers.get('origin') || 'linkedin-image-webhook'
       }),
     })
 
     if (!response.ok) {
       const errorText = await response.text()
       console.error(`N8N webhook failed: ${response.status} ${response.statusText}`, errorText)
+      
+      // Update the database record to show failed status
+      await supabase
+        .from('linkedin_post_images')
+        .update({ image_data: `failed - webhook error: ${response.status}` })
+        .eq('post_id', post_id)
+        .eq('variation_number', variation_number)
+        .eq('image_data', 'generating...')
+      
       throw new Error(`N8N webhook failed: ${response.statusText}`)
     }
 
     const responseText = await response.text()
-    console.log('N8N webhook raw response:', responseText)
+    console.log('N8N webhook response:', responseText)
 
-    // Handle empty response
-    if (!responseText || responseText.trim() === '') {
-      console.log('N8N webhook returned empty response, treating as async trigger')
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: 'Image generation triggered successfully',
-          triggered: true,
-          variation_number: variation_number
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      )
-    }
-
+    // Handle the response and store image if available
     let result
     try {
-      // Try to parse as JSON
-      result = JSON.parse(responseText)
-      
-      // If the result itself is a string, try to parse it again
-      if (typeof result === 'string') {
-        console.log('Response is stringified JSON, parsing again...')
-        result = JSON.parse(result)
-      }
+      result = responseText ? JSON.parse(responseText) : null
     } catch (parseError) {
-      console.error('Failed to parse N8N response:', parseError)
-      console.error('Raw response was:', responseText)
-      
-      // If parsing fails, consider it a successful trigger but no immediate image data
       console.log('N8N webhook triggered successfully, waiting for async response')
       return new Response(
         JSON.stringify({ 
           success: true, 
           message: 'Image generation triggered successfully',
           triggered: true,
-          variation_number: variation_number
+          variation_number: variation_number,
+          webhook_url_configured: true
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -118,17 +141,15 @@ serve(async (req) => {
       )
     }
 
-    console.log('N8N webhook parsed response:', result)
-
     // Check if the response contains image data
     if (result && result.success && result.image_data) {
       console.log(`Image data found for variation ${variation_number}, storing in database...`)
       
-      // Store the image in the database with variation_number
+      // Store the image in the database
       const { data: storedImage, error: storeError } = await supabase
         .from('linkedin_post_images')
         .insert({
-          post_id: result.post_id || post_id,
+          post_id: post_id,
           image_data: result.image_data,
           variation_number: variation_number
         })
@@ -138,78 +159,10 @@ serve(async (req) => {
       if (storeError) {
         console.error('Failed to store image in database:', storeError)
         throw new Error('Failed to store image in database: ' + storeError.message)
-      } else {
-        console.log(`Image stored successfully in database with ID: ${storedImage.id} for variation ${variation_number}`)
-      }
-      
-      // Broadcast to variation-specific channel
-      const variationChannelName = `linkedin-image-${result.post_id || post_id}-v${variation_number}`
-      console.log(`Broadcasting to variation-specific channel: ${variationChannelName}`)
-      
-      const { error: broadcastError } = await supabase.channel(variationChannelName)
-        .send({
-          type: 'broadcast',
-          event: 'linkedin_image_generated',
-          payload: {
-            success: true,
-            image_data: result.image_data,
-            post_id: result.post_id || post_id,
-            variation_number: variation_number,
-            source: source,
-            stored_image_id: storedImage.id
-          }
-        })
-
-      if (broadcastError) {
-        console.error('Failed to broadcast image data to variation channel:', broadcastError)
-      } else {
-        console.log(`Image data broadcasted successfully to variation ${variation_number} channel`)
-      }
-      
-      // Also broadcast to general post channel for backward compatibility
-      const generalChannelName = `linkedin-image-${result.post_id || post_id}`
-      const { error: generalBroadcastError } = await supabase.channel(generalChannelName)
-        .send({
-          type: 'broadcast',
-          event: 'linkedin_image_generated',
-          payload: {
-            success: true,
-            image_data: result.image_data,
-            post_id: result.post_id || post_id,
-            variation_number: variation_number,
-            source: source,
-            stored_image_id: storedImage.id
-          }
-        })
-
-      if (generalBroadcastError) {
-        console.error('Failed to broadcast to general channel:', generalBroadcastError)
-      } else {
-        console.log('Image data broadcasted to general channel successfully')
-      }
-      
-      // Also broadcast to history channel with variation info
-      const historyChannelName = `linkedin-image-history-${result.post_id || post_id}`
-      const { error: historyBroadcastError } = await supabase.channel(historyChannelName)
-        .send({
-          type: 'broadcast',
-          event: 'linkedin_image_generated',
-          payload: {
-            success: true,
-            image_data: result.image_data,
-            post_id: result.post_id || post_id,
-            variation_number: variation_number,
-            source: source,
-            stored_image_id: storedImage.id
-          }
-        })
-
-      if (historyBroadcastError) {
-        console.error('Failed to broadcast to history channel:', historyBroadcastError)
-      } else {
-        console.log('Image data broadcasted to history channel successfully')
       }
 
+      console.log(`Image stored successfully in database with ID: ${storedImage.id}`)
+      
       return new Response(
         JSON.stringify({ 
           success: true, 
@@ -223,14 +176,15 @@ serve(async (req) => {
         }
       )
     } else {
-      console.log(`N8N webhook triggered successfully for variation ${variation_number}, no immediate image data - will wait for async response`)
+      console.log(`N8N webhook triggered successfully for variation ${variation_number}`)
       
       return new Response(
         JSON.stringify({ 
           success: true, 
           message: 'Image generation triggered successfully',
           triggered: true,
-          variation_number: variation_number
+          variation_number: variation_number,
+          webhook_url_configured: true
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -243,7 +197,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message 
+        error: error.message,
+        webhook_url_configured: !!Deno.env.get('N8N_LINKEDIN_IMAGE_WEBHOOK_URL')
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 

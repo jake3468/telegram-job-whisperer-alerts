@@ -148,14 +148,14 @@ const CVBotStatus = ({ onActivationChange }: CVBotStatusProps) => {
               <li>Click the 'Start' button in the chat. If you don't see it, type '<code className="bg-black/30 px-1 rounded text-orange-200">/start</code>' and send it.</li>
               <li>The bot will ask for your "Bot ID" 🔑. Copy the Bot ID (given above) and send it to the bot.</li>
               <li>Once successful, you'll receive a message: "Bot successfully activated! ✅"</li>
-              <li>🎯 You're all set! You can now start talking with the bot and update your resume based on your career goals, job requirements, latest information. No more manual editing! Let our intelligent bot handle all your resume updates, formatting, and customization automatically - just chat with it and get a perfectly crafted resume every time</li>
+              <li>🎯 You're all set! You can now start talking with the bot and update your resume based on your career goals, job requirements, latest information. No more manual editing! Let our intelligent AI bot handle all your resume updates, formatting, and customization automatically - just chat with it and get a perfectly crafted resume every time</li>
               <li>🔔 Make sure the Telegram bot is not muted, so you don't miss important updates.<br />🔄 Refresh this page now to check the bot activation status.</li>
             </ol>
 
             <h3 className="text-lg font-medium text-white mt-6 mb-3 font-inter">📩 What You'll Get from the Bot:</h3>
             
             <ul className="text-sm space-y-2 font-inter text-gray-200 list-disc list-inside">
-              <li><strong>📝 Professional Resume Creation</strong> - Get a perfectly formatted resume (in pdf or docx) tailored to your experience and target job, ready for printing or further styling</li>
+              <li><strong>📝 Professional Resume Creation</strong> - Get a perfectly formatted resume (in pdf) tailored to your experience and target job, ready for printing or further styling</li>
               <li><strong>💼 Job-Specific Optimization</strong> - Your resume will be customized with relevant keywords and skills that match specific job descriptions to increase your chances of getting shortlisted</li>
               <li><strong>📊 Achievement Quantification</strong> - Transform basic job descriptions into impactful statements with metrics and numbers that make your accomplishments stand out to employers</li>
             </ul>
@@ -180,7 +180,7 @@ const CVBotStatus = ({ onActivationChange }: CVBotStatusProps) => {
               
               <p><strong>📊 Confirm quantifiable achievements</strong> – When the bot suggests adding metrics (like "increased efficiency by 30%"), confirm if the numbers are accurate or provide your own estimates.</p>
               
-              <p><strong>📥 Receive your resume in PDF and DOCX format</strong> – After gathering all information and your approval, the bot will generate a clean resume that you can save, print, or style further.</p>
+              <p><strong>📥 Receive your resume in PDF format</strong> – After gathering all information and your approval, the bot will generate a clean resume that you can save, print, or style further.</p>
               
               <p className="mt-4 text-green-200">The entire process is <strong>🗣️ conversational</strong> and <strong>🔄 step-by-step</strong>, designed to help you create a professional, tailored resume easily via Telegram.</p>
             </div>

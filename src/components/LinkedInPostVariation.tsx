@@ -1,11 +1,12 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Copy, ImageIcon, Loader2 } from 'lucide-react';
+import { Copy, ImageIcon, Loader2, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useCreditCheck } from '@/hooks/useCreditCheck';
+import { useLinkedInImageCreditCheck } from '@/hooks/useLinkedInImageCreditCheck';
 import { supabase } from '@/integrations/supabase/client';
+import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 import LinkedInPostDisplay from './LinkedInPostDisplay';
 
 interface UserProfile {
@@ -41,10 +42,149 @@ const LinkedInPostVariation = ({
   postId
 }: LinkedInPostVariationProps) => {
   const { toast } = useToast();
-  const { hasCredits: hasImageCredits, showInsufficientCreditsPopup } = useCreditCheck(0.5);
+  const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
+  const { checkAndDeductForImage, isDeducting } = useLinkedInImageCreditCheck();
+  
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
+
+  // Load existing images for this variation
+  useEffect(() => {
+    const loadExistingImages = async () => {
+      if (!postId || !isAuthReady) return;
+
+      try {
+        await executeWithRetry(async () => {
+          const { data, error } = await supabase
+            .from('linkedin_post_images')
+            .select('image_data')
+            .eq('post_id', postId)
+            .eq('variation_number', variationNumber)
+            .neq('image_data', 'generating...');
+
+          if (error) {
+            console.error('Error loading existing images:', error);
+            return;
+          }
+
+          if (data && data.length > 0) {
+            const imageUrls = data.map(img => img.image_data);
+            setGeneratedImages(imageUrls);
+            // FIXED: Immediately reset loading state when existing images are found
+            setIsLoadingImage(false);
+            setImageGenerationFailed(false);
+          }
+        }, 3, `load existing images for variation ${variationNumber}`);
+      } catch (err) {
+        console.error('Error loading existing images:', err);
+      }
+    };
+
+    loadExistingImages();
+  }, [postId, variationNumber, isAuthReady, executeWithRetry]);
+
+  // Real-time subscription for image updates
+  useEffect(() => {
+    if (!postId || !isAuthReady) return;
+
+    const channel = supabase
+      .channel(`linkedin-image-updates-${postId}-${variationNumber}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'linkedin_post_images',
+        filter: `post_id=eq.${postId}.and.variation_number=eq.${variationNumber}`
+      }, async (payload) => {
+        console.log('LinkedIn image updated via real-time:', payload);
+        
+        if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+          const newImage = payload.new;
+          
+          if (newImage.image_data === 'generating...') {
+            console.log(`Image generation started for variation ${variationNumber}`);
+            setIsLoadingImage(true);
+            setImageGenerationFailed(false);
+          } else if (newImage.image_data && newImage.image_data !== 'generating...' && !newImage.image_data.includes('failed')) {
+            console.log(`Image generation completed for variation ${variationNumber}`);
+            
+            // FIXED: First update images, then immediately reset loading states
+            setGeneratedImages(prev => {
+              const exists = prev.includes(newImage.image_data);
+              return exists ? prev : [...prev, newImage.image_data];
+            });
+            
+            // FIXED: Immediately reset loading states after image is added
+            setIsLoadingImage(false);
+            setImageGenerationFailed(false);
+            
+            // DEDUCT CREDITS ONLY AFTER IMAGE IS DISPLAYED
+            try {
+              await checkAndDeductForImage(postId, variationNumber);
+              console.log(`Credits deducted after image display for variation ${variationNumber}`);
+            } catch (error) {
+              console.error('Error deducting credits after image display:', error);
+            }
+            
+            // Show success toast
+            toast({
+              title: "Image Generated!",
+              description: `LinkedIn post image for variation ${variationNumber} is ready.`
+            });
+          } else if (newImage.image_data && newImage.image_data.includes('failed')) {
+            console.log(`Image generation failed for variation ${variationNumber}`);
+            setIsLoadingImage(false);
+            setImageGenerationFailed(true);
+            toast({
+              title: "Image Generation Failed",
+              description: `Failed to generate image for variation ${variationNumber}. Please try again.`,
+              variant: "destructive"
+            });
+          }
+        } else if (payload.eventType === 'DELETE') {
+          const deletedImage = payload.old;
+          setGeneratedImages(prev => prev.filter(img => img !== deletedImage.image_data));
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [postId, variationNumber, isAuthReady, toast, checkAndDeductForImage]);
+
+  // Add timeout mechanism to reset loading state after 3 minutes
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
+    if (isLoadingImage) {
+      timeoutId = setTimeout(() => {
+        console.log(`Image generation timeout reached for variation ${variationNumber}`);
+        setIsLoadingImage(false);
+        setImageGenerationFailed(true);
+        toast({
+          title: "Image Generation Timeout",
+          description: `Image generation took too long for variation ${variationNumber}. Please try again.`,
+          variant: "destructive"
+        });
+      }, 180000); // 3 minutes timeout
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [isLoadingImage, variationNumber, toast]);
+
+  // FIXED: Force reset loading state whenever images are present
+  useEffect(() => {
+    if (generatedImages.length > 0) {
+      console.log(`Images detected for variation ${variationNumber}, forcing loading state reset`);
+      setIsLoadingImage(false);
+      setImageGenerationFailed(false);
+    }
+  }, [generatedImages.length, variationNumber]);
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -89,12 +229,6 @@ const LinkedInPostVariation = ({
   };
 
   const handleGenerateImage = async () => {
-    // Check credits before proceeding
-    if (!hasImageCredits) {
-      showInsufficientCreditsPopup();
-      return;
-    }
-
     if (!postId) {
       toast({
         title: "Error",
@@ -104,28 +238,65 @@ const LinkedInPostVariation = ({
       return;
     }
 
+    // Only check if user has credits, don't deduct yet
+    if (!await checkAndDeductForImage(postId, variationNumber, true)) {
+      return;
+    }
+
     setIsLoadingImage(true);
     setImageGenerationFailed(false);
 
     try {
       console.log(`Generating image for post ${postId}, variation ${variationNumber}`);
       
-      const { data, error } = await supabase
-        .from('linkedin_post_images')
-        .insert({
-          post_id: postId,
-          variation_number: variationNumber,
-          image_data: 'placeholder' // This will be updated by the webhook
-        })
-        .select()
-        .single();
+      await executeWithRetry(async () => {
+        // Create a placeholder record first
+        const { data, error } = await supabase
+          .from('linkedin_post_images')
+          .insert({
+            post_id: postId,
+            variation_number: variationNumber,
+            image_data: 'generating...'
+          })
+          .select()
+          .single();
 
-      if (error) {
-        console.error('Error creating image record:', error);
-        throw error;
-      }
+        if (error) {
+          console.error('Error creating image record:', error);
+          throw error;
+        }
 
-      console.log('Image generation request created:', data);
+        console.log('Image generation request created:', data);
+
+        // Call the edge function directly with proper full URL and correct payload
+        const userName = userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() : 'Professional User';
+        
+        const webhookResponse = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/functions/v1/linkedin-image-webhook', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+          },
+          body: JSON.stringify({
+            post_id: postId,
+            post_heading: heading,
+            post_content: content,
+            variation_number: variationNumber,
+            user_name: userName,
+            source: 'linkedin_post_variation'
+          })
+        });
+
+        if (!webhookResponse.ok) {
+          const errorText = await webhookResponse.text();
+          console.error('Webhook call failed:', errorText);
+          throw new Error('Failed to trigger image generation webhook');
+        }
+
+        const webhookResult = await webhookResponse.json();
+        console.log('Webhook response:', webhookResult);
+
+      }, 3, `generate image for variation ${variationNumber}`);
       
       toast({
         title: "Image Generation Started",
@@ -134,6 +305,7 @@ const LinkedInPostVariation = ({
 
     } catch (err: any) {
       console.error('Error generating image:', err);
+      setIsLoadingImage(false);
       setImageGenerationFailed(true);
       
       toast({
@@ -141,91 +313,140 @@ const LinkedInPostVariation = ({
         description: "Failed to generate image. Please try again.",
         variant: "destructive"
       });
-    } finally {
-      setIsLoadingImage(false);
+    }
+  };
+
+  const deleteImage = async (imageData: string) => {
+    if (!postId) return;
+
+    try {
+      await executeWithRetry(async () => {
+        const { error } = await supabase
+          .from('linkedin_post_images')
+          .delete()
+          .eq('post_id', postId)
+          .eq('variation_number', variationNumber)
+          .eq('image_data', imageData);
+
+        if (error) {
+          console.error('Error deleting image:', error);
+          throw error;
+        }
+      }, 3, `delete image for variation ${variationNumber}`);
+
+      setGeneratedImages(prev => prev.filter(img => img !== imageData));
+      
+      toast({
+        title: "Image Deleted",
+        description: `Image for variation ${variationNumber} has been deleted.`
+      });
+
+    } catch (err) {
+      console.error('Error deleting image:', err);
+      toast({
+        title: "Error",
+        description: "Failed to delete image. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
   return (
-    <Card className="bg-gray-800 border-cyan-400/20 backdrop-blur-sm">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-cyan-300 font-inter text-base flex items-center justify-between">
-          <span>{heading}</span>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => copyToClipboard(content)}
-              size="sm"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white"
-            >
-              <Copy className="w-3 h-3 mr-1" />
-              Copy
-            </Button>
-            <Button
-              onClick={handleGenerateImage}
-              size="sm"
-              disabled={isLoadingImage || !hasImageCredits}
-              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
-            >
-              {isLoadingImage ? (
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-              ) : (
-                <ImageIcon className="w-3 h-3 mr-1" />
-              )}
-              {isLoadingImage ? 'Generating...' : 'Get Image'}
-            </Button>
-          </div>
-        </CardTitle>
-      </CardHeader>
-      
-      <CardContent className="space-y-4">
-        {/* Loading indicator */}
-        {isLoadingImage && (
-          <div className="p-3 bg-blue-50 rounded-lg text-center border border-blue-200">
-            <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading for variation {variationNumber}...</div>
-            <div className="text-xs text-blue-500 mt-1">This may take up to 2 minutes</div>
-          </div>
-        )}
+    <div className="w-full max-w-4xl mx-auto mb-12">
+      {/* Post Heading - Smaller and Clearer */}
+      <div className="mb-6">
+        <div className="bg-gradient-to-r from-yellow-400 to-amber-500 text-black px-4 py-2 rounded-lg mb-4">
+          <h3 className="text-base font-semibold text-center break-words">
+            Post Variation {variationNumber}: {heading}
+          </h3>
+        </div>
+        
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Button
+            onClick={() => copyToClipboard(content)}
+            size="sm"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 font-medium"
+          >
+            <Copy className="w-4 h-4 mr-2" />
+            Copy Post
+          </Button>
+          <Button
+            onClick={handleGenerateImage}
+            size="sm"
+            disabled={isLoadingImage || isDeducting}
+            className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 px-6 py-2 font-medium"
+          >
+            {isLoadingImage || isDeducting ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <ImageIcon className="w-4 h-4 mr-2" />
+            )}
+            {isLoadingImage ? 'Generating...' : isDeducting ? 'Processing...' : 'Get Image'}
+          </Button>
+        </div>
+      </div>
 
-        {/* Failed generation indicator */}
-        {imageGenerationFailed && (
-          <div className="p-3 bg-red-50 rounded-lg text-center border border-red-200">
-            <div className="text-sm text-red-600 font-medium">Image generation failed for variation {variationNumber}</div>
-            <div className="text-xs text-red-500 mt-1">Please try again</div>
-          </div>
-        )}
+      {/* FIXED: Loading indicator - Only show when actively loading AND no images exist */}
+      {isLoadingImage && generatedImages.length === 0 && (
+        <div className="p-4 bg-blue-50 rounded-lg text-center border border-blue-200 mb-6">
+          <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading for variation {variationNumber}...</div>
+          <div className="text-xs text-blue-500 mt-1">This may take up to 2 minutes</div>
+        </div>
+      )}
 
-        {/* Generated Images */}
-        {generatedImages.length > 0 && (
-          <div className="space-y-3">
-            <h5 className="text-cyan-300 font-medium text-sm">Generated Images ({generatedImages.length}):</h5>
-            <div className="space-y-3">
-              {generatedImages.map((imageData, index) => (
-                <div key={index} className="relative">
-                  <img 
-                    src={imageData} 
-                    alt={`Generated LinkedIn post image ${index + 1} for variation ${variationNumber}`}
-                    className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto rounded-lg shadow-sm object-contain max-h-96"
-                  />
+      {/* Failed generation indicator */}
+      {imageGenerationFailed && generatedImages.length === 0 && (
+        <div className="p-4 bg-red-50 rounded-lg text-center border border-red-200 mb-6">
+          <div className="text-sm text-red-600 font-medium">Image generation failed for variation {variationNumber}</div>
+          <div className="text-xs text-red-500 mt-1">Please try again</div>
+        </div>
+      )}
+
+      {/* Generated Images */}
+      {generatedImages.length > 0 && (
+        <div className="mb-8">
+          <h5 className="text-cyan-400 font-medium text-sm mb-4 text-center">
+            Generated Images for Variation {variationNumber} ({generatedImages.length}):
+          </h5>
+          <div className="space-y-6">
+            {generatedImages.map((imageData, index) => (
+              <div key={index} className="relative w-full max-w-2xl mx-auto">
+                <img 
+                  src={imageData} 
+                  alt={`Generated LinkedIn post image ${index + 1} for variation ${variationNumber}`}
+                  className="w-full rounded-lg shadow-lg object-contain"
+                />
+                <div className="absolute top-3 right-3 flex gap-2">
                   <Button
                     onClick={() => copyImageToClipboard(imageData)}
                     size="sm"
-                    className="absolute top-2 right-2 bg-black/70 hover:bg-black/80 text-white p-1 h-auto min-h-0"
+                    className="bg-black/70 hover:bg-black/80 text-white p-2 h-8 w-8"
                   >
-                    <Copy className="w-3 h-3" />
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    onClick={() => deleteImage(imageData)}
+                    size="sm"
+                    className="bg-red-600/70 hover:bg-red-600/80 text-white p-2 h-8 w-8"
+                  >
+                    <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        )}
-        
-        {/* LinkedIn Post Preview */}
+        </div>
+      )}
+
+      {/* LinkedIn Post Preview - Properly Contained */}
+      <div className="w-full">
         <LinkedInPostDisplay 
           content={content}
           userProfile={userProfile}
+          userData={userData}
         />
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
