@@ -386,7 +386,7 @@ const LinkedInPosts = () => {
     shouldShowResults,
     shouldShowLoading,
     isGenerating,
-    toastShownForPostId
+    hasShownToast
   });
 
   return (
