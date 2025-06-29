@@ -16,7 +16,6 @@ import LoadingMessages from '@/components/LoadingMessages';
 import { useCreditCheck } from '@/hooks/useCreditCheck';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
-
 interface LinkedInPostData {
   post_heading_1: string | null;
   post_content_1: string | null;
@@ -29,7 +28,6 @@ interface UserData {
   first_name: string | null;
   last_name: string | null;
 }
-
 const LinkedInPosts = () => {
   const {
     user
@@ -330,7 +328,7 @@ const LinkedInPosts = () => {
                             Fill in the details to generate 3 LinkedIn post variations
                           </CardDescription>
                         </div>
-                        <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 text-black bg-teal-200 hover:bg-teal-100 flex-shrink-0">
+                        <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 flex-shrink-0 text-zinc-950 bg-cyan-600 hover:bg-cyan-500">
                           <History className="w-4 h-4 mr-2 text-black" />
                           History
                         </Button>
@@ -434,5 +432,4 @@ const LinkedInPosts = () => {
       </div>
     </SidebarProvider>;
 };
-
 export default LinkedInPosts;
