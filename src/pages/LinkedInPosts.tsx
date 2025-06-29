@@ -390,12 +390,12 @@ const LinkedInPosts = () => {
         </div>
       </header>
 
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-[#0e1122] via-[#181526] to-[#21203a]">
+      <div className="min-h-screen flex w-full bg-black">
         <AppSidebar />
         
         <div className="flex-1 flex flex-col pt-28 lg:pt-0 lg:pl-6 min-w-0 bg-zinc-950">
           <main className="flex-1 w-full bg-transparent min-w-0">
-            <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-slate-800 pt-0 flex flex-col">
+            <div className="min-h-screen bg-black pt-0 flex flex-col">
               <div className="container mx-auto px-2 sm:px-4 py-8 bg-transparent rounded-3xl mt-4 mb-8 max-w-6xl w-full min-w-0">
                 {/* Header Section */}
                 <div className="text-center mb-10">

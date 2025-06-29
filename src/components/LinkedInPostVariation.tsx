@@ -194,12 +194,13 @@ const LinkedInPostVariation = ({
       console.log(`Generating image for post ${postId}, variation ${variationNumber}`);
       
       await executeWithRetry(async () => {
+        // Create a placeholder record first
         const { data, error } = await supabase
           .from('linkedin_post_images')
           .insert({
             post_id: postId,
             variation_number: variationNumber,
-            image_data: 'generating...' // Placeholder that will be updated by webhook
+            image_data: 'generating...'
           })
           .select()
           .single();
@@ -210,6 +211,35 @@ const LinkedInPostVariation = ({
         }
 
         console.log('Image generation request created:', data);
+
+        // Now trigger the webhook directly
+        const userName = userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() : 'Professional User';
+        
+        const webhookResponse = await fetch('/functions/v1/linkedin-image-webhook', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+          },
+          body: JSON.stringify({
+            post_id: postId,
+            post_heading: heading,
+            post_content: content,
+            variation_number: variationNumber,
+            user_name: userName,
+            source: 'linkedin_post_variation'
+          })
+        });
+
+        if (!webhookResponse.ok) {
+          const errorText = await webhookResponse.text();
+          console.error('Webhook call failed:', errorText);
+          throw new Error('Failed to trigger image generation webhook');
+        }
+
+        const webhookResult = await webhookResponse.json();
+        console.log('Webhook response:', webhookResult);
+
       }, 3, `generate image for variation ${variationNumber}`);
       
       toast({
