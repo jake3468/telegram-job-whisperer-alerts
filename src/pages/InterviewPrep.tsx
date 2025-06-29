@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MessageSquare, Clock, Building2, Briefcase, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useCreditCheck } from '@/hooks/useCreditCheck';
+import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -31,13 +31,28 @@ const InterviewPrep = () => {
   const [currentAnalysis, setCurrentAnalysis] = useState<any>(null);
   const [interviewData, setInterviewData] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [creditsDeducted, setCreditsDeducted] = useState(false);
   const {
     toast
   } = useToast();
+  
+  // Use the new feature credit check system
   const {
     hasCredits,
+    requiredCredits,
+    isLoading: isCheckingCredits,
+    checkAndDeductCredits,
     showInsufficientCreditsPopup
-  } = useCreditCheck(1.5);
+  } = useFeatureCreditCheck({
+    feature: 'INTERVIEW_PREP',
+    onSuccess: () => {
+      console.log('✅ Credits successfully deducted for Interview Prep');
+    },
+    onInsufficientCredits: () => {
+      console.log('❌ Insufficient credits for Interview Prep');
+    }
+  });
+
   const {
     userProfile
   } = useUserProfile();
@@ -62,7 +77,7 @@ const InterviewPrep = () => {
     enabled: !!userProfile?.id
   });
 
-  // Real-time subscription for interview results with improved detection
+  // Real-time subscription for interview results with credit deduction
   useEffect(() => {
     if (!currentAnalysis?.id) return;
     const channel = supabase.channel('interview-prep-updates').on('postgres_changes', {
@@ -70,21 +85,35 @@ const InterviewPrep = () => {
       schema: 'public',
       table: 'interview_prep',
       filter: `id=eq.${currentAnalysis.id}`
-    }, payload => {
+    }, async (payload) => {
       console.log('Interview prep updated:', payload);
-      if (payload.new.interview_questions) {
+      if (payload.new.interview_questions && !creditsDeducted) {
         try {
           // Handle both string and already parsed data
           const parsedData = typeof payload.new.interview_questions === 'string' ? payload.new.interview_questions : JSON.stringify(payload.new.interview_questions);
 
           // Check if the data is meaningful (not just empty or null)
           if (parsedData && parsedData.trim().length > 0) {
-            setInterviewData(parsedData);
-            setIsGenerating(false);
-            toast({
-              title: "Interview Prep Ready!",
-              description: "Your personalized interview questions have been generated."
-            });
+            // Deduct credits when results are successfully received
+            const creditDeductionSuccess = await checkAndDeductCredits('Interview prep questions generated');
+            
+            if (creditDeductionSuccess) {
+              setInterviewData(parsedData);
+              setIsGenerating(false);
+              setCreditsDeducted(true);
+              toast({
+                title: "Interview Prep Ready!",
+                description: `Your personalized interview questions have been generated. ${requiredCredits} credits deducted.`
+              });
+            } else {
+              // Handle credit deduction failure
+              setIsGenerating(false);
+              toast({
+                title: "Credit Deduction Failed",
+                description: "Unable to deduct credits. Please try again.",
+                variant: "destructive"
+              });
+            }
           }
         } catch (error) {
           console.error('Error processing interview questions:', error);
@@ -100,12 +129,12 @@ const InterviewPrep = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [currentAnalysis?.id, toast]);
+  }, [currentAnalysis?.id, creditsDeducted, checkAndDeductCredits, requiredCredits, toast]);
 
   const handleGenerate = async () => {
     console.log('🚀 Interview Prep Generate Button Clicked');
 
-    // Check credits first
+    // Check credits first (but don't deduct yet)
     if (!hasCredits) {
       showInsufficientCreditsPopup();
       return;
@@ -145,6 +174,7 @@ const InterviewPrep = () => {
     try {
       setIsSubmitting(true);
       setInterviewData(null);
+      setCreditsDeducted(false);
       console.log('✅ Starting interview prep submission process');
       console.log('✅ User profile ID:', userProfile.id);
 
@@ -161,16 +191,31 @@ const InterviewPrep = () => {
         try {
           // Handle both string and object data
           const parsedData = typeof existing.interview_questions === 'string' ? existing.interview_questions : JSON.stringify(existing.interview_questions);
-          setInterviewData(parsedData);
-          setCurrentAnalysis({
-            id: existing.id
-          });
-          setIsSubmitting(false);
-          toast({
-            title: "Previous Interview Prep Found",
-            description: "Using your previous interview prep for this job posting."
-          });
-          return;
+          
+          // Deduct credits for existing result as well
+          const creditDeductionSuccess = await checkAndDeductCredits('Existing interview prep retrieved');
+          
+          if (creditDeductionSuccess) {
+            setInterviewData(parsedData);
+            setCurrentAnalysis({
+              id: existing.id
+            });
+            setCreditsDeducted(true);
+            setIsSubmitting(false);
+            toast({
+              title: "Previous Interview Prep Found",
+              description: `Using your previous interview prep for this job posting. ${requiredCredits} credits deducted.`
+            });
+            return;
+          } else {
+            toast({
+              title: "Credit Deduction Failed",
+              description: "Unable to deduct credits for existing interview prep.",
+              variant: "destructive"
+            });
+            setIsSubmitting(false);
+            return;
+          }
         } catch (error) {
           console.error('Error parsing existing interview questions:', error);
           // Continue with new generation if parsing fails
@@ -201,7 +246,7 @@ const InterviewPrep = () => {
         refetchHistory();
         toast({
           title: "Interview Prep Started!",
-          description: "Your personalized interview questions are being generated. Please wait for the results."
+          description: `Your personalized interview questions are being generated. ${requiredCredits} credits will be deducted when ready.`
         });
       }
     } catch (error) {
@@ -224,6 +269,7 @@ const InterviewPrep = () => {
     setInterviewData(null);
     setCurrentAnalysis(null);
     setIsGenerating(false);
+    setCreditsDeducted(false);
   };
 
   const renderInterviewQuestions = (content: string) => {
@@ -243,22 +289,22 @@ const InterviewPrep = () => {
 
   return <Layout>
       <div className="min-h-screen bg-black text-white">
-        <div className="container mx-auto px-4 pt-2 pb-2 max-w-5xl">
+        <div className="container mx-auto px-2 sm:px-4 pt-2 pb-2 max-w-5xl">
           {/* Header */}
-          <div className="text-center mb-6 sm:mb-8 px-2">
+          <div className="text-center mb-6 sm:mb-8 px-1 sm:px-2">
             <div className="inline-flex items-center gap-3 mb-4">
               
             </div>
             <h1 className="mb-4 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] bg-clip-text text-red-200 font-extrabold sm:text-4xl text-4xl">👔 Interview Prep</h1>
-            <p className="text-gray-300 max-w-2xl mx-auto text-sm sm:text-lg font-light px-4">Your Personal Interview Coach, powered by AI. Get tailored questions with perfect answers, pro tips, and strategic questions to ask your interviewer.</p>
+            <p className="text-gray-300 max-w-2xl mx-auto text-sm sm:text-lg font-light px-2 sm:px-4">Your Personal Interview Coach, powered by AI. Get tailored questions with perfect answers, pro tips, and strategic questions to ask your interviewer.</p>
           </div>
 
           {/* Profile Completion Warning */}
           <ProfileCompletionWarning />
 
-          {/* Form - Always visible */}
-          <Card className="mb-6 sm:mb-8 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] border-0 mx-2 sm:mx-0">
-            <CardHeader className="pb-4">
+          {/* Form - Always visible - Fixed mobile spacing */}
+          <Card className="mb-6 sm:mb-8 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] border-0 mx-1 sm:mx-0">
+            <CardHeader className="pb-4 px-4 sm:px-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <CardTitle className="text-black text-lg sm:text-xl">Interview Preparation Details</CardTitle>
                 <div className="flex-shrink-0">
@@ -266,7 +312,7 @@ const InterviewPrep = () => {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 px-4 sm:px-6">
               {/* Company Name and Job Title in horizontal layout for desktop */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -295,8 +341,8 @@ const InterviewPrep = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                <Button onClick={handleGenerate} disabled={isGenerating || isSubmitting} className="w-full sm:flex-1 text-white font-medium bg-rose-600 hover:bg-rose-500">
-                  {isGenerating || isSubmitting ? 'Generating...' : 'Generate Interview Prep'}
+                <Button onClick={handleGenerate} disabled={isGenerating || isSubmitting || isCheckingCredits} className="w-full sm:flex-1 text-white font-medium bg-rose-600 hover:bg-rose-500">
+                  {isGenerating || isSubmitting ? 'Generating...' : `Generate Interview Prep (${requiredCredits} credits)`}
                 </Button>
                 <Button onClick={handleReset} variant="outline" disabled={isGenerating || isSubmitting} className="w-full sm:w-auto px-6 border-black text-black hover:bg-gray-100">
                   Reset
@@ -306,12 +352,12 @@ const InterviewPrep = () => {
           </Card>
 
           {/* Loading */}
-          {isGenerating && <div className="text-center py-8">
+          {isGenerating && <div className="text-center py-8 px-2">
               <LoadingMessages type="interview_prep" />
             </div>}
 
-          {/* Results - Show below form when available */}
-          {interviewData && <div className="w-full space-y-6">
+          {/* Results - Show below form when available - Fixed mobile spacing */}
+          {interviewData && <div className="w-full space-y-6 px-1 sm:px-0">
               {/* Simple result section matching history format */}
               <div className="rounded-lg p-4 border border-white/10 shadow-inner bg-red-700">
                 <h3 className="text-white font-medium mb-3 flex flex-wrap gap-2 justify-between items-center">
@@ -324,7 +370,7 @@ const InterviewPrep = () => {
                   </div>
                 </h3>
 
-                <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                <div className="bg-gray-900 rounded-lg p-3 sm:p-4 border border-gray-700">
                   <div className="flex justify-between items-start mb-3">
                     <h4 className="text-lime-400 font-semibold">Interview Questions & Answers</h4>
                   </div>
