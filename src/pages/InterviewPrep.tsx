@@ -70,21 +70,78 @@ const InterviewPrep = () => {
         
         if (error) throw error;
         return data || [];
-      });
+      }, 3, 'fetch interview history');
     },
     enabled: !!userProfile?.id && isAuthReady,
-    retry: (failureCount, error) => {
-      // Retry up to 3 times for network/auth errors
-      return failureCount < 3 && (
-        error?.message?.toLowerCase().includes('jwt') ||
-        error?.message?.toLowerCase().includes('network')
-      );
-    }
+    retry: 2
   });
 
-  // Real-time subscription for interview results with enhanced error handling
+  // Function to check for existing completed results on mount
+  const checkForExistingResults = async () => {
+    if (!currentAnalysis?.id || !isAuthReady) return;
+    
+    try {
+      console.log('🔍 Checking for existing results for analysis:', currentAnalysis.id);
+      
+      const result = await executeWithRetry(async () => {
+        const { data, error } = await supabase
+          .from('interview_prep')
+          .select('interview_questions')
+          .eq('id', currentAnalysis.id)
+          .not('interview_questions', 'is', null)
+          .single();
+        
+        if (error) {
+          if (error.code === 'PGRST116') {
+            // No data found, which is fine
+            return null;
+          }
+          throw error;
+        }
+        return data;
+      }, 3, 'check existing results');
+
+      if (result?.interview_questions) {
+        console.log('✅ Found existing completed results');
+        const parsedData = typeof result.interview_questions === 'string' 
+          ? result.interview_questions 
+          : JSON.stringify(result.interview_questions);
+        
+        if (parsedData && parsedData.trim().length > 0) {
+          setInterviewData(parsedData);
+          setIsGenerating(false);
+          
+          // Deduct credits for displaying existing results
+          if (!creditsDeducted) {
+            console.log('🔒 Deducting credits for existing results display');
+            const creditSuccess = await checkAndDeductCredits('Interview prep results displayed');
+            if (creditSuccess) {
+              setCreditsDeducted(true);
+              toast({
+                title: "Interview Prep Ready!",
+                description: `Your interview questions are ready. ${requiredCredits} credits deducted.`
+              });
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error checking for existing results:', error);
+    }
+  };
+
+  // Check for existing results when currentAnalysis changes
+  useEffect(() => {
+    if (currentAnalysis?.id && isAuthReady && !interviewData && !creditsDeducted) {
+      checkForExistingResults();
+    }
+  }, [currentAnalysis?.id, isAuthReady, interviewData, creditsDeducted]);
+
+  // Enhanced real-time subscription with fallback polling
   useEffect(() => {
     if (!currentAnalysis?.id || !isAuthReady) return;
+    
+    console.log('🔄 Setting up real-time subscription for:', currentAnalysis.id);
     
     const channel = supabase
       .channel('interview-prep-updates')
@@ -94,57 +151,58 @@ const InterviewPrep = () => {
         table: 'interview_prep',
         filter: `id=eq.${currentAnalysis.id}`
       }, async (payload) => {
-        console.log('Interview prep updated:', payload);
+        console.log('📡 Interview prep updated via real-time:', payload);
         
-        if (payload.new.interview_questions && !creditsDeducted) {
+        if (payload.new.interview_questions) {
           try {
-            // Handle both string and already parsed data
             const parsedData = typeof payload.new.interview_questions === 'string' 
               ? payload.new.interview_questions 
               : JSON.stringify(payload.new.interview_questions);
 
-            // Check if the data is meaningful (not just empty or null)
             if (parsedData && parsedData.trim().length > 0) {
-              // Deduct credits when results are successfully received using enterprise auth
-              const creditDeductionSuccess = await executeWithRetry(async () => {
-                return await checkAndDeductCredits('Interview prep questions generated');
-              });
+              setInterviewData(parsedData);
+              setIsGenerating(false);
               
-              if (creditDeductionSuccess) {
-                setInterviewData(parsedData);
-                setIsGenerating(false);
-                setCreditsDeducted(true);
-                toast({
-                  title: "Interview Prep Ready!",
-                  description: `Your personalized interview questions have been generated. ${requiredCredits} credits deducted.`
-                });
-              } else {
-                // Handle credit deduction failure
-                setIsGenerating(false);
-                toast({
-                  title: "Processing Complete",
-                  description: "Your interview prep is ready, but there was an issue with credit processing.",
-                  variant: "destructive"
-                });
+              // Deduct credits when results are successfully received
+              if (!creditsDeducted) {
+                console.log('🔒 Deducting credits for real-time results');
+                const creditSuccess = await checkAndDeductCredits('Interview prep questions generated');
+                
+                if (creditSuccess) {
+                  setCreditsDeducted(true);
+                  toast({
+                    title: "Interview Prep Ready!",
+                    description: `Your personalized interview questions have been generated. ${requiredCredits} credits deducted.`
+                  });
+                }
               }
             }
           } catch (error) {
-            console.error('Error processing interview questions:', error);
-            setIsGenerating(false);
-            toast({
-              title: "Processing Error",
-              description: "Your interview prep may be ready, but there was a processing issue. Please check your history.",
-              variant: "destructive"
-            });
+            console.error('❌ Error processing real-time interview questions:', error);
           }
         }
       })
       .subscribe();
+
+    // Fallback polling mechanism in case real-time fails
+    const pollInterval = setInterval(async () => {
+      if (!isGenerating || interviewData || creditsDeducted) {
+        return;
+      }
+      
+      try {
+        console.log('🔄 Fallback polling for results...');
+        await checkForExistingResults();
+      } catch (error) {
+        console.error('❌ Fallback polling error:', error);
+      }
+    }, 5000); // Poll every 5 seconds
     
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(pollInterval);
     };
-  }, [currentAnalysis?.id, creditsDeducted, checkAndDeductCredits, requiredCredits, toast, isAuthReady, executeWithRetry]);
+  }, [currentAnalysis?.id, creditsDeducted, isAuthReady, isGenerating, interviewData]);
 
   const handleGenerate = async () => {
     console.log('🚀 Interview Prep Generate Button Clicked');
@@ -222,12 +280,11 @@ const InterviewPrep = () => {
           console.log('✅ Found existing interview prep:', existing.id);
           
           try {
-            // Handle both string and object data
             const parsedData = typeof existing.interview_questions === 'string' 
               ? existing.interview_questions 
               : JSON.stringify(existing.interview_questions);
             
-            // Deduct credits for existing result as well
+            // Deduct credits for existing result
             const creditDeductionSuccess = await checkAndDeductCredits('Existing interview prep retrieved');
             
             if (creditDeductionSuccess) {
@@ -250,7 +307,6 @@ const InterviewPrep = () => {
             }
           } catch (error) {
             console.error('Error parsing existing interview questions:', error);
-            // Continue with new generation if parsing fails
           }
         }
 
@@ -285,7 +341,7 @@ const InterviewPrep = () => {
             description: `Your personalized interview questions are being generated. ${requiredCredits} credits will be deducted when ready.`
           });
         }
-      });
+      }, 5, 'generate interview prep');
 
     } catch (error) {
       console.error('❌ SUBMISSION ERROR:', error);
@@ -294,7 +350,7 @@ const InterviewPrep = () => {
       // Provide user-friendly error messages
       let friendlyMessage = "There was an issue starting your interview prep. Please try again.";
       if (errorMessage.toLowerCase().includes('jwt') || errorMessage.toLowerCase().includes('expired')) {
-        friendlyMessage = "Your session has expired. Please refresh the page and try again.";
+        friendlyMessage = "Your session needs to be refreshed. Please try again in a moment.";
       } else if (errorMessage.toLowerCase().includes('network')) {
         friendlyMessage = "Network connection issue. Please check your connection and try again.";
       }
