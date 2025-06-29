@@ -5,6 +5,7 @@ import { useFeatureCreditCheck } from './useFeatureCreditCheck';
 export function useLinkedInPostCreditCheck() {
   const [deductedPosts, setDeductedPosts] = useState<Set<string>>(new Set());
   const deductionInProgress = useRef<Set<string>>(new Set());
+  const creditDeductionProcessed = useRef<Set<string>>(new Set()); // Additional safeguard
   
   const creditCheck = useFeatureCreditCheck({
     feature: 'LINKEDIN_POST',
@@ -23,14 +24,17 @@ export function useLinkedInPostCreditCheck() {
   };
 
   const deductCreditsAfterResults = async (postId: string) => {
-    // Prevent double deduction for the same post (atomic check)
-    if (deductedPosts.has(postId) || deductionInProgress.current.has(postId)) {
-      console.log(`Credits already deducted for post ${postId}, skipping deduction`);
+    // Triple-layer protection against duplicate deductions
+    if (deductedPosts.has(postId) || 
+        deductionInProgress.current.has(postId) || 
+        creditDeductionProcessed.current.has(postId)) {
+      console.log(`Credits already processed for post ${postId}, skipping deduction`);
       return true;
     }
 
-    // Mark as in progress (atomic operation)
+    // Mark as processed immediately in all tracking systems
     deductionInProgress.current.add(postId);
+    creditDeductionProcessed.current.add(postId);
     console.log(`Starting credit deduction for post ${postId}`);
 
     try {
@@ -45,19 +49,19 @@ export function useLinkedInPostCreditCheck() {
           newSet.add(postId);
           return newSet;
         });
-        // Remove from in progress after successful deduction
-        deductionInProgress.current.delete(postId);
         return true;
       } else {
         console.log(`Failed to deduct credits for post ${postId}`);
-        // Remove from in progress on failure
+        // Remove from tracking on failure
         deductionInProgress.current.delete(postId);
+        creditDeductionProcessed.current.delete(postId);
         return false;
       }
     } catch (error) {
       console.error(`Error during credit deduction for post ${postId}:`, error);
-      // Remove from in progress on error
+      // Remove from tracking on error
       deductionInProgress.current.delete(postId);
+      creditDeductionProcessed.current.delete(postId);
       return false;
     }
   };

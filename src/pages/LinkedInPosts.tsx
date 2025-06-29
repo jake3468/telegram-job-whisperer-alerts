@@ -55,6 +55,7 @@ const LinkedInPosts = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [creditsDeducted, setCreditsDeducted] = useState(false); // Track if credits were deducted for current generation
 
   const toneOptions = [
     { value: 'professional', label: 'Professional & Insightful' },
@@ -135,9 +136,10 @@ const LinkedInPosts = () => {
           setPostsData(newData);
           
           // Check if all posts are ready and stop loading immediately
-          if (areAllPostsReady(newData)) {
+          if (areAllPostsReady(newData) && !creditsDeducted) {
             console.log('All posts are ready! Stopping loading and deducting credits once');
             setIsGenerating(false);
+            setCreditsDeducted(true); // Mark credits as deducted
             
             // Deduct credits ONLY ONCE after successful generation
             if (currentPostId) {
@@ -163,12 +165,12 @@ const LinkedInPosts = () => {
       console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
-  }, [currentPostId, isAuthReady, toast, deductCreditsAfterResults]);
+  }, [currentPostId, isAuthReady, toast, deductCreditsAfterResults, creditsDeducted]);
 
   // Check existing data when currentPostId changes
   useEffect(() => {
     const checkExistingData = async () => {
-      if (!currentPostId || !isAuthReady) return;
+      if (!currentPostId || !isAuthReady || creditsDeducted) return;
       
       console.log('Checking existing data for post ID:', currentPostId);
       
@@ -193,6 +195,7 @@ const LinkedInPosts = () => {
             if (areAllPostsReady(data)) {
               console.log('Existing data is complete, showing results immediately');
               setIsGenerating(false);
+              setCreditsDeducted(true); // Mark credits as deducted
               
               // Deduct credits ONLY ONCE for existing complete data
               const success = await deductCreditsAfterResults(currentPostId);
@@ -213,10 +216,10 @@ const LinkedInPosts = () => {
       }
     };
 
-    if (currentPostId && isGenerating) {
+    if (currentPostId && isGenerating && !creditsDeducted) {
       checkExistingData();
     }
-  }, [currentPostId, isAuthReady, isGenerating, executeWithRetry, toast, deductCreditsAfterResults]);
+  }, [currentPostId, isAuthReady, isGenerating, executeWithRetry, toast, deductCreditsAfterResults, creditsDeducted]);
 
   // Handle input changes
   const handleInputChange = (field: string, value: string) => {
@@ -290,6 +293,7 @@ const LinkedInPosts = () => {
     setIsGenerating(true);
     setPostsData(null);
     setCurrentPostId(null);
+    setCreditsDeducted(false); // Reset credits deducted flag for new generation
 
     try {
       console.log('Creating LinkedIn post with user_profile.id:', userProfile.id);
@@ -325,6 +329,7 @@ const LinkedInPosts = () => {
     } catch (err: any) {
       console.error('Error creating LinkedIn post:', err);
       setIsGenerating(false);
+      setCreditsDeducted(false); // Reset on error
       const errorMessage = err.message || "Failed to create LinkedIn post. Please try again.";
       toast({
         title: "Error",
@@ -348,6 +353,7 @@ const LinkedInPosts = () => {
     setPostsData(null);
     setIsGenerating(false);
     setCurrentPostId(null);
+    setCreditsDeducted(false); // Reset credits deducted flag
   };
 
   // Check if we should show results
