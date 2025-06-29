@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -275,7 +274,7 @@ const LinkedInPostVariation = ({
             <Button
               onClick={() => copyToClipboard(content)}
               size="sm"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 h-8 text-xs whitespace-nowrap"
             >
               <Copy className="w-3 h-3 mr-1" />
               Copy
@@ -284,7 +283,7 @@ const LinkedInPostVariation = ({
               onClick={handleGenerateImage}
               size="sm"
               disabled={isLoadingImage || isDeducting}
-              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50"
+              className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 px-3 py-1 h-8 text-xs whitespace-nowrap"
             >
               {isLoadingImage || isDeducting ? (
                 <Loader2 className="w-3 h-3 mr-1 animate-spin" />
@@ -348,10 +347,11 @@ const LinkedInPostVariation = ({
           </div>
         )}
         
-        {/* LinkedIn Post Preview */}
+        {/* LinkedIn Post Preview - Pass userData prop */}
         <LinkedInPostDisplay 
           content={content}
           userProfile={userProfile}
+          userData={userData}
         />
       </CardContent>
     </Card>

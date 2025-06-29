@@ -1,7 +1,11 @@
 
+import { useState, useRef } from 'react';
 import { useFeatureCreditCheck } from './useFeatureCreditCheck';
 
 export function useLinkedInPostCreditCheck() {
+  const [deductedPosts, setDeductedPosts] = useState<Set<string>>(new Set());
+  const deductionInProgress = useRef<Set<string>>(new Set());
+  
   const creditCheck = useFeatureCreditCheck({
     feature: 'LINKEDIN_POST',
     onInsufficientCredits: () => {
@@ -19,15 +23,30 @@ export function useLinkedInPostCreditCheck() {
   };
 
   const deductCreditsAfterResults = async (postId: string) => {
-    const success = await creditCheck.checkAndDeductCredits(
-      `LinkedIn post generation completed for post ${postId}`
-    );
-    
-    if (success) {
-      console.log(`Successfully deducted 3 credits for LinkedIn post generation`);
+    // Prevent double deduction for the same post
+    if (deductedPosts.has(postId) || deductionInProgress.current.has(postId)) {
+      console.log(`Credits already deducted for post ${postId}, skipping`);
+      return true;
     }
-    
-    return success;
+
+    // Mark as in progress
+    deductionInProgress.current.add(postId);
+
+    try {
+      const success = await creditCheck.checkAndDeductCredits(
+        `LinkedIn post generation completed for post ${postId}`
+      );
+      
+      if (success) {
+        console.log(`Successfully deducted 3 credits for LinkedIn post generation`);
+        setDeductedPosts(prev => new Set(prev).add(postId));
+      }
+      
+      return success;
+    } finally {
+      // Remove from in progress
+      deductionInProgress.current.delete(postId);
+    }
   };
 
   return {

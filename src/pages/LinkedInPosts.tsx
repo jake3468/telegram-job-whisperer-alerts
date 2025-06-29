@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -406,9 +405,14 @@ const LinkedInPosts = () => {
                   <p className="text-cyan-200 max-w-2xl mx-auto font-inter text-sm sm:text-base lg:text-lg font-light shadow-sm px-4 mb-3">
                     Create engaging LinkedIn posts that showcase your expertise and connect with your professional network
                   </p>
-                  <Badge variant="outline" className="bg-teal-900/30 border-teal-600/50 text-teal-300 font-semibold">
-                    Usage Fee: 3 credits
-                  </Badge>
+                  <div className="flex flex-col items-center gap-2">
+                    <Badge variant="outline" className="bg-teal-900/30 border-teal-600/50 text-teal-300 font-semibold">
+                      Usage Fee: 3 credits
+                    </Badge>
+                    <Badge variant="outline" className="bg-amber-900/30 border-amber-600/50 text-amber-300 font-semibold text-xs">
+                      Images: 1.5 credits each
+                    </Badge>
+                  </div>
                 </div>
 
                 <div className="max-w-5xl mx-auto min-w-0">

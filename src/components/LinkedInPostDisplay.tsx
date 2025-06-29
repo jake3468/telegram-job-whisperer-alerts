@@ -13,16 +13,34 @@ interface UserProfile {
   created_at: string | null;
 }
 
+interface UserData {
+  first_name: string | null;
+  last_name: string | null;
+}
+
 interface LinkedInPostDisplayProps {
   content: string;
   userProfile?: UserProfile | null;
+  userData?: UserData | null;
 }
 
-const LinkedInPostDisplay = ({ content, userProfile }: LinkedInPostDisplayProps) => {
-  const userName = userProfile ? 'Professional User' : 'Professional User';
+const LinkedInPostDisplay = ({ content, userProfile, userData }: LinkedInPostDisplayProps) => {
+  // Get user's actual name from userData
+  const getDisplayName = () => {
+    if (userData?.first_name && userData?.last_name) {
+      return `${userData.first_name} ${userData.last_name}`;
+    } else if (userData?.first_name) {
+      return userData.first_name;
+    } else if (userData?.last_name) {
+      return userData.last_name;
+    }
+    return 'Professional User';
+  };
+
+  const userName = getDisplayName();
 
   return (
-    <Card className="bg-white border border-slate-200 shadow-sm max-w-2xl mx-auto">
+    <Card className="bg-white border border-slate-200 shadow-sm max-w-2xl mx-auto mt-4">
       <CardContent className="p-4">
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
