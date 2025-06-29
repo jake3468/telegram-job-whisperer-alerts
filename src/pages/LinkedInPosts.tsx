@@ -37,7 +37,7 @@ const LinkedInPosts = () => {
   const { user } = useUser();
   const { toast } = useToast();
   const { userProfile } = useUserProfile();
-  const { isComplete } = useUserCompletionStatus();
+  const { isComplete, loading: completionLoading, refetchStatus } = useUserCompletionStatus();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
   const { hasCredits, checkCreditsBeforeGeneration, deductCreditsAfterResults, showInsufficientCreditsPopup } = useLinkedInPostCreditCheck();
   
@@ -236,11 +236,34 @@ const LinkedInPosts = () => {
       return;
     }
 
+    // Refresh profile status before checking
+    if (completionLoading) {
+      toast({
+        title: "Checking Profile Status",
+        description: "Please wait while we verify your profile completion.",
+      });
+      return;
+    }
+
     if (!isComplete) {
       toast({
         title: "Profile Incomplete", 
-        description: "Please complete your profile before creating LinkedIn posts.",
-        variant: "destructive"
+        description: "Please complete your profile (upload resume and add bio) before creating LinkedIn posts. If you've just completed it, try clicking 'Refresh Status' below.",
+        variant: "destructive",
+        action: (
+          <button
+            onClick={async () => {
+              await refetchStatus();
+              toast({
+                title: "Profile Status Refreshed",
+                description: "Your profile completion status has been updated."
+              });
+            }}
+            className="bg-white text-black px-3 py-1 rounded text-sm hover:bg-gray-100"
+          >
+            Refresh Status
+          </button>
+        )
       });
       return;
     }
@@ -436,8 +459,8 @@ const LinkedInPosts = () => {
                       </div>
 
                       <div className="flex flex-col sm:flex-row gap-3 pt-4 max-w-full">
-                        <Button type="submit" disabled={isSubmitting || !formData.topic.trim() || isGenerating || !hasCredits} className="flex-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 hover:from-indigo-600 hover:via-purple-600 hover:to-blue-600 text-white font-semibold text-base h-12 shadow-md rounded-lg min-w-0">
-                          {isSubmitting ? 'Submitting...' : 'Generate LinkedIn Posts'}
+                        <Button type="submit" disabled={isSubmitting || !formData.topic.trim() || isGenerating || !hasCredits || completionLoading} className="flex-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 hover:from-indigo-600 hover:via-purple-600 hover:to-blue-600 text-white font-semibold text-base h-12 shadow-md rounded-lg min-w-0">
+                          {isSubmitting ? 'Submitting...' : completionLoading ? 'Checking Profile...' : 'Generate LinkedIn Posts'}
                         </Button>
                         
                         <Button type="button" onClick={resetForm} variant="outline" className="bg-white/10 border-teal-400/25 text-black hover:bg-white/20 text-base h-12 px-6 flex-shrink-0">
