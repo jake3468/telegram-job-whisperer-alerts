@@ -457,7 +457,7 @@ const JobGuide = () => {
               In-depth breakdown and <span className="italic text-slate-400">insights</span> for your ideal jobs
             </p>
             <Badge variant="outline" className="bg-blue-900/30 border-blue-600/50 text-blue-300 font-semibold">
-              Usage Fee: 1 Credit
+              Usage Fee: 1 credit
             </Badge>
           </div>
 
