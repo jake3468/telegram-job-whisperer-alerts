@@ -55,9 +55,7 @@ const LinkedInPosts = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
-  const [creditsDeducted, setCreditsDeducted] = useState(false);
-  const [hasShownSuccessToast, setHasShownSuccessToast] = useState(false);
-  const [successToastShown, setSuccessToastShown] = useState(false); // Additional control for success toast
+  const [hasShownResultsToast, setHasShownResultsToast] = useState(false);
 
   const toneOptions = [
     { value: 'professional', label: 'Professional & Insightful' },
@@ -94,7 +92,7 @@ const LinkedInPosts = () => {
     fetchUserData();
   }, [user?.id, isAuthReady, executeWithRetry]);
 
-  // Check if all posts are ready (simplified check)
+  // Check if all posts are ready
   const areAllPostsReady = (data: LinkedInPostData) => {
     const allFieldsPresent = Boolean(
       data.post_heading_1?.trim() && data.post_content_1?.trim() && 
@@ -138,11 +136,10 @@ const LinkedInPosts = () => {
           setPostsData(newData);
           
           // Check if all posts are ready and show success toast ONLY ONCE
-          if (areAllPostsReady(newData) && !creditsDeducted && !successToastShown) {
+          if (areAllPostsReady(newData) && !hasShownResultsToast) {
             console.log('All posts are ready! Stopping loading and showing success toast ONCE');
             setIsGenerating(false);
-            setCreditsDeducted(true);
-            setSuccessToastShown(true); // Strict control - only one success toast
+            setHasShownResultsToast(true);
             
             // Deduct credits ONLY ONCE after successful generation
             if (currentPostId) {
@@ -168,12 +165,12 @@ const LinkedInPosts = () => {
       console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
-  }, [currentPostId, isAuthReady, toast, deductCreditsAfterResults, creditsDeducted, successToastShown]);
+  }, [currentPostId, isAuthReady, toast, deductCreditsAfterResults, hasShownResultsToast]);
 
   // Check existing data when currentPostId changes - PREVENT DUPLICATE SUCCESS TOASTS
   useEffect(() => {
     const checkExistingData = async () => {
-      if (!currentPostId || !isAuthReady || creditsDeducted || successToastShown) return;
+      if (!currentPostId || !isAuthReady || hasShownResultsToast) return;
       
       console.log('Checking existing data for post ID:', currentPostId);
       
@@ -195,11 +192,10 @@ const LinkedInPosts = () => {
             setPostsData(data);
             
             // Check if all posts are already ready - SINGLE SUCCESS TOAST
-            if (areAllPostsReady(data) && !successToastShown) {
+            if (areAllPostsReady(data) && !hasShownResultsToast) {
               console.log('Existing data is complete, showing results immediately with single toast');
               setIsGenerating(false);
-              setCreditsDeducted(true);
-              setSuccessToastShown(true); // Prevent multiple success toasts
+              setHasShownResultsToast(true);
               
               // Deduct credits ONLY ONCE for existing complete data
               const success = await deductCreditsAfterResults(currentPostId);
@@ -220,10 +216,10 @@ const LinkedInPosts = () => {
       }
     };
 
-    if (currentPostId && isGenerating && !creditsDeducted && !successToastShown) {
+    if (currentPostId && isGenerating && !hasShownResultsToast) {
       checkExistingData();
     }
-  }, [currentPostId, isAuthReady, isGenerating, executeWithRetry, toast, deductCreditsAfterResults, creditsDeducted, successToastShown]);
+  }, [currentPostId, isAuthReady, isGenerating, executeWithRetry, toast, deductCreditsAfterResults, hasShownResultsToast]);
 
   // Handle input changes
   const handleInputChange = (field: string, value: string) => {
@@ -297,9 +293,7 @@ const LinkedInPosts = () => {
     setIsGenerating(true);
     setPostsData(null);
     setCurrentPostId(null);
-    setCreditsDeducted(false);
-    setHasShownSuccessToast(false);
-    setSuccessToastShown(false); // Reset success toast control for new generation
+    setHasShownResultsToast(false); // Reset success toast control for new generation
 
     try {
       console.log('Creating LinkedIn post with user_profile.id:', userProfile.id);
@@ -335,8 +329,7 @@ const LinkedInPosts = () => {
     } catch (err: any) {
       console.error('Error creating LinkedIn post:', err);
       setIsGenerating(false);
-      setCreditsDeducted(false);
-      setSuccessToastShown(false); // Reset on error
+      setHasShownResultsToast(false); // Reset on error
       const errorMessage = err.message || "Failed to create LinkedIn post. Please try again.";
       toast({
         title: "Error",
@@ -360,9 +353,7 @@ const LinkedInPosts = () => {
     setPostsData(null);
     setIsGenerating(false);
     setCurrentPostId(null);
-    setCreditsDeducted(false);
-    setHasShownSuccessToast(false);
-    setSuccessToastShown(false); // Reset success toast control
+    setHasShownResultsToast(false); // Reset success toast control
   };
 
   // Check if we should show results

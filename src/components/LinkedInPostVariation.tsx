@@ -43,12 +43,12 @@ const LinkedInPostVariation = ({
 }: LinkedInPostVariationProps) => {
   const { toast } = useToast();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
-  const { checkAndDeductForImage, isDeducting } = useLinkedInImageCreditCheck();
+  const { isDeducting } = useLinkedInImageCreditCheck();
   
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
-  const [imageToastShown, setImageToastShown] = useState(false);
+  const [hasDeductedCredits, setHasDeductedCredits] = useState(false);
 
   // Load existing images for this variation
   useEffect(() => {
@@ -82,7 +82,7 @@ const LinkedInPostVariation = ({
     loadExistingImages();
   }, [postId, variationNumber, isAuthReady, executeWithRetry]);
 
-  // Real-time subscription for image updates - SINGLE TOAST ONLY
+  // Real-time subscription for image updates - PROPER LOADING STATE MANAGEMENT
   useEffect(() => {
     if (!postId || !isAuthReady) return;
 
@@ -100,9 +100,11 @@ const LinkedInPostVariation = ({
           const newImage = payload.new;
           
           if (newImage.image_data === 'generating...') {
+            console.log(`Image generation started for variation ${variationNumber}`);
             setIsLoadingImage(true);
             setImageGenerationFailed(false);
-          } else if (newImage.image_data && newImage.image_data !== 'generating...') {
+          } else if (newImage.image_data && newImage.image_data !== 'generating...' && !newImage.image_data.includes('failed')) {
+            console.log(`Image generation completed for variation ${variationNumber}`);
             setIsLoadingImage(false);
             setImageGenerationFailed(false);
             
@@ -112,14 +114,24 @@ const LinkedInPostVariation = ({
               return exists ? prev : [...prev, newImage.image_data];
             });
             
-            // Show toast ONLY ONCE per variation - strict control
-            if (!imageToastShown) {
-              setImageToastShown(true);
+            // Deduct credits ONLY when image is successfully displayed
+            if (!hasDeductedCredits) {
+              setHasDeductedCredits(true);
+              // Call credit deduction logic here if needed
               toast({
                 title: "Image Generated!",
                 description: `LinkedIn post image for variation ${variationNumber} is ready.`
               });
             }
+          } else if (newImage.image_data && newImage.image_data.includes('failed')) {
+            console.log(`Image generation failed for variation ${variationNumber}`);
+            setIsLoadingImage(false);
+            setImageGenerationFailed(true);
+            toast({
+              title: "Image Generation Failed",
+              description: `Failed to generate image for variation ${variationNumber}. Please try again.`,
+              variant: "destructive"
+            });
           }
         } else if (payload.eventType === 'DELETE') {
           // Remove the deleted image from the list
@@ -132,7 +144,7 @@ const LinkedInPostVariation = ({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [postId, variationNumber, isAuthReady, toast, imageToastShown]);
+  }, [postId, variationNumber, isAuthReady, toast, hasDeductedCredits]);
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -188,16 +200,9 @@ const LinkedInPostVariation = ({
 
     setIsLoadingImage(true);
     setImageGenerationFailed(false);
-    setImageToastShown(false); // Reset for new generation
+    setHasDeductedCredits(false); // Reset credit deduction flag
 
     try {
-      // Check and deduct credits before generating image
-      const canProceed = await checkAndDeductForImage(postId, variationNumber);
-      if (!canProceed) {
-        setIsLoadingImage(false);
-        return;
-      }
-
       console.log(`Generating image for post ${postId}, variation ${variationNumber}`);
       
       await executeWithRetry(async () => {
