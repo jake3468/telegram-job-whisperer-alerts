@@ -71,7 +71,7 @@ const LinkedInPostVariation = ({
           if (data && data.length > 0) {
             const imageUrls = data.map(img => img.image_data);
             setGeneratedImages(imageUrls);
-            // FIXED: Reset loading state when existing images are loaded
+            // FIXED: Immediately reset loading state when existing images are found
             setIsLoadingImage(false);
             setImageGenerationFailed(false);
           }
@@ -108,13 +108,13 @@ const LinkedInPostVariation = ({
           } else if (newImage.image_data && newImage.image_data !== 'generating...' && !newImage.image_data.includes('failed')) {
             console.log(`Image generation completed for variation ${variationNumber}`);
             
-            // Add the new image to the list first
+            // FIXED: First update images, then immediately reset loading states
             setGeneratedImages(prev => {
               const exists = prev.includes(newImage.image_data);
               return exists ? prev : [...prev, newImage.image_data];
             });
             
-            // FIXED: Reset loading states after updating images
+            // FIXED: Immediately reset loading states after image is added
             setIsLoadingImage(false);
             setImageGenerationFailed(false);
             
@@ -177,10 +177,10 @@ const LinkedInPostVariation = ({
     };
   }, [isLoadingImage, variationNumber, toast]);
 
-  // FIXED: Ensure loading state is always reset when images are present
+  // FIXED: Force reset loading state whenever images are present
   useEffect(() => {
     if (generatedImages.length > 0) {
-      console.log(`Images present for variation ${variationNumber}, ensuring loading state is reset`);
+      console.log(`Images detected for variation ${variationNumber}, forcing loading state reset`);
       setIsLoadingImage(false);
       setImageGenerationFailed(false);
     }
@@ -386,7 +386,7 @@ const LinkedInPostVariation = ({
         </div>
       </div>
 
-      {/* FIXED: Loading indicator - Only show when actively loading and no images exist */}
+      {/* FIXED: Loading indicator - Only show when actively loading AND no images exist */}
       {isLoadingImage && generatedImages.length === 0 && (
         <div className="p-4 bg-blue-50 rounded-lg text-center border border-blue-200 mb-6">
           <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading for variation {variationNumber}...</div>
