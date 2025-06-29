@@ -303,12 +303,12 @@ const LinkedInPosts = () => {
         </div>
       </header>
 
-      <div className="min-h-screen flex w-full">
+      <div className="min-h-screen flex w-full bg-black">
         <AppSidebar />
         
-        <div className="flex-1 flex flex-col pt-28 lg:pt-0 lg:pl-6 min-w-0 overflow-x-hidden">
-          <main className="flex-1 w-full min-w-0">
-            <div className="min-h-screen bg-black pt-0 flex flex-col max-w-full overflow-x-hidden">
+        <div className="flex-1 flex flex-col pt-28 lg:pt-0 lg:pl-6 min-w-0 overflow-x-hidden bg-black">
+          <main className="flex-1 w-full min-w-0 bg-black">
+            <div className="min-h-screen bg-black overflow-x-hidden">
               <div className="container mx-auto px-2 sm:px-4 py-8 mt-4 mb-8 max-w-6xl w-full min-w-0">
                 {/* Header Section */}
                 <div className="text-center mb-10">
