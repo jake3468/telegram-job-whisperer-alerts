@@ -45,11 +45,11 @@ const ResumeBuilder = () => {
           </span>
         </h1>
         <p className="text-md text-purple-100 font-inter font-light text-lg mb-3">
-          Your personal <span className="italic text-pastel-peach">resume assistant</span> on Telegram — tailor your CV for new roles, job descriptions, or career goals, all through a simple chat
+          Your personal <span className="italic text-pastel-peach">AI resume assistant</span> on Telegram — tailor your CV for new roles, job descriptions, or career goals, all through a simple chat
         </p>
         <Badge className="bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 text-purple-200 border-purple-400/30 text-sm px-3 py-1 font-inter">
           <BadgeDollarSign className="w-4 h-4 mr-2" />
-          Usage Fee: 1.5 credits/resume pdf
+          Usage Fee: 2 credits/resume pdf
         </Badge>
       </div>
 
