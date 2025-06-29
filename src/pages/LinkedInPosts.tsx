@@ -116,7 +116,7 @@ const LinkedInPosts = () => {
     return hasAllData;
   };
 
-  // Real-time subscription for LinkedIn post updates
+  // Real-time subscription for LinkedIn post updates - ONLY PLACE FOR TOAST
   useEffect(() => {
     if (!currentPostId || !isAuthReady) return;
     
@@ -181,7 +181,7 @@ const LinkedInPosts = () => {
     };
   }, [currentPostId, isAuthReady, toast, deductCreditsAfterResults, hasShownToast]);
 
-  // Check existing data when currentPostId changes
+  // Check existing data when currentPostId changes - NO TOAST HERE
   useEffect(() => {
     const checkExistingData = async () => {
       if (!currentPostId || !isAuthReady) return;
@@ -215,20 +215,14 @@ const LinkedInPosts = () => {
             
             setPostsData(linkedInPostData);
             
-            // Check if all posts are already ready - only show toast if not already shown
+            // Check if all posts are already ready - only stop loading, NO TOAST
             if (areAllPostsReady(linkedInPostData) && !hasShownToast) {
-              console.log('Existing data is complete, showing results immediately');
+              console.log('Existing data is complete, stopping loading');
               setIsGenerating(false);
               setHasShownToast(true);
               
-              deductCreditsAfterResults(currentPostId).then(success => {
-                if (success) {
-                  toast({
-                    title: "LinkedIn Posts Generated!",
-                    description: "Your 3 LinkedIn post variations have been created successfully."
-                  });
-                }
-              });
+              // Deduct credits silently without showing toast (toast will come from real-time if needed)
+              deductCreditsAfterResults(currentPostId);
             }
           }
         }, 3, 'check existing post data');

@@ -42,12 +42,11 @@ const LinkedInPostVariation = ({
 }: LinkedInPostVariationProps) => {
   const { toast } = useToast();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
-  const { isDeducting } = useLinkedInImageCreditCheck();
+  const { checkAndDeductForImage, isDeducting } = useLinkedInImageCreditCheck();
   
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
-  const [hasDeductedCredits, setHasDeductedCredits] = useState(false);
 
   // Load existing images for this variation
   useEffect(() => {
@@ -81,7 +80,7 @@ const LinkedInPostVariation = ({
     loadExistingImages();
   }, [postId, variationNumber, isAuthReady, executeWithRetry]);
 
-  // Real-time subscription for image updates - IMPROVED LOADING STATE MANAGEMENT
+  // Real-time subscription for image updates - SIMPLIFIED LOADING LOGIC
   useEffect(() => {
     if (!postId || !isAuthReady) return;
 
@@ -104,7 +103,9 @@ const LinkedInPostVariation = ({
             setImageGenerationFailed(false);
           } else if (newImage.image_data && newImage.image_data !== 'generating...' && !newImage.image_data.includes('failed')) {
             console.log(`Image generation completed for variation ${variationNumber}`);
-            setIsLoadingImage(false); // Stop loading immediately when we get the image
+            
+            // IMMEDIATELY stop loading when we get valid image data
+            setIsLoadingImage(false);
             setImageGenerationFailed(false);
             
             // Add the new image to the list
@@ -113,17 +114,14 @@ const LinkedInPostVariation = ({
               return exists ? prev : [...prev, newImage.image_data];
             });
             
-            // Show success toast only once
-            if (!hasDeductedCredits) {
-              setHasDeductedCredits(true);
-              toast({
-                title: "Image Generated!",
-                description: `LinkedIn post image for variation ${variationNumber} is ready.`
-              });
-            }
+            // Show success toast
+            toast({
+              title: "Image Generated!",
+              description: `LinkedIn post image for variation ${variationNumber} is ready.`
+            });
           } else if (newImage.image_data && newImage.image_data.includes('failed')) {
             console.log(`Image generation failed for variation ${variationNumber}`);
-            setIsLoadingImage(false); // Stop loading on failure
+            setIsLoadingImage(false);
             setImageGenerationFailed(true);
             toast({
               title: "Image Generation Failed",
@@ -142,7 +140,7 @@ const LinkedInPostVariation = ({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [postId, variationNumber, isAuthReady, toast, hasDeductedCredits]);
+  }, [postId, variationNumber, isAuthReady, toast]);
 
   // Add timeout mechanism to reset loading state after 3 minutes
   useEffect(() => {
@@ -220,9 +218,15 @@ const LinkedInPostVariation = ({
       return;
     }
 
+    // FIRST: Deduct credits upfront before starting image generation
+    const creditsDeducted = await checkAndDeductForImage(postId, variationNumber);
+    if (!creditsDeducted) {
+      // Credit check/deduction failed - don't proceed
+      return;
+    }
+
     setIsLoadingImage(true);
     setImageGenerationFailed(false);
-    setHasDeductedCredits(false); // Reset credit deduction flag
 
     try {
       console.log(`Generating image for post ${postId}, variation ${variationNumber}`);
