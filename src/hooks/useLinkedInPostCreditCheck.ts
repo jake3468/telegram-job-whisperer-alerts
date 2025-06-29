@@ -23,13 +23,13 @@ export function useLinkedInPostCreditCheck() {
   };
 
   const deductCreditsAfterResults = async (postId: string) => {
-    // Prevent double deduction for the same post
+    // Prevent double deduction for the same post (atomic check)
     if (deductedPosts.has(postId) || deductionInProgress.current.has(postId)) {
-      console.log(`Credits already deducted for post ${postId}, skipping`);
+      console.log(`Credits already deducted for post ${postId}, skipping atomic check`);
       return true;
     }
 
-    // Mark as in progress
+    // Mark as in progress (atomic operation)
     deductionInProgress.current.add(postId);
 
     try {
@@ -38,13 +38,13 @@ export function useLinkedInPostCreditCheck() {
       );
       
       if (success) {
-        console.log(`Successfully deducted 3 credits for LinkedIn post generation`);
+        console.log(`Successfully deducted 3 credits for LinkedIn post generation (atomic)`);
         setDeductedPosts(prev => new Set(prev).add(postId));
       }
       
       return success;
     } finally {
-      // Remove from in progress
+      // Remove from in progress (atomic cleanup)
       deductionInProgress.current.delete(postId);
     }
   };

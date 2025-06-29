@@ -67,7 +67,7 @@ serve(async (req) => {
       throw new Error('N8N webhook URL not configured')
     }
 
-    console.log('Using N8N webhook URL:', n8nWebhookUrl.substring(0, 50) + '...')
+    console.log('Using N8N webhook URL (first 50 chars):', n8nWebhookUrl.substring(0, 50) + '...')
     console.log('Triggering N8N webhook with payload:', {
       post_heading: postHeading,
       variation_number,
@@ -76,7 +76,7 @@ serve(async (req) => {
       source
     })
 
-    // Call the N8N webhook directly
+    // Call the N8N webhook directly with the correct full URL
     const response = await fetch(n8nWebhookUrl, {
       method: "POST",
       headers: {
@@ -90,7 +90,7 @@ serve(async (req) => {
         post_id,
         source,
         timestamp: new Date().toISOString(),
-        triggered_from: req.headers.get('origin') || 'unknown'
+        triggered_from: req.headers.get('origin') || 'linkedin-image-webhook'
       }),
     })
 

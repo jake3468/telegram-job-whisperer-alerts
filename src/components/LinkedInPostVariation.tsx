@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -212,10 +213,10 @@ const LinkedInPostVariation = ({
 
         console.log('Image generation request created:', data);
 
-        // Now trigger the webhook directly
+        // Call the edge function directly with proper full URL and correct payload
         const userName = userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() : 'Professional User';
         
-        const webhookResponse = await fetch('/functions/v1/linkedin-image-webhook', {
+        const webhookResponse = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/functions/v1/linkedin-image-webhook', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -296,11 +297,11 @@ const LinkedInPostVariation = ({
   };
 
   return (
-    <Card className="bg-gray-800 border-cyan-400/20 backdrop-blur-sm">
+    <Card className="bg-gray-800 border-cyan-400/20 backdrop-blur-sm max-w-full">
       <CardHeader className="pb-4">
-        <CardTitle className="text-cyan-300 font-inter text-base flex items-center justify-between">
-          <span>{heading}</span>
-          <div className="flex gap-2">
+        <CardTitle className="text-cyan-300 font-inter text-base flex items-center justify-between max-w-full">
+          <span className="min-w-0 truncate pr-2">{heading}</span>
+          <div className="flex gap-2 flex-shrink-0">
             <Button
               onClick={() => copyToClipboard(content)}
               size="sm"
@@ -326,7 +327,7 @@ const LinkedInPostVariation = ({
         </CardTitle>
       </CardHeader>
       
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 max-w-full">
         {/* Loading indicator */}
         {isLoadingImage && (
           <div className="p-3 bg-blue-50 rounded-lg text-center border border-blue-200">
@@ -345,11 +346,11 @@ const LinkedInPostVariation = ({
 
         {/* Generated Images */}
         {generatedImages.length > 0 && (
-          <div className="space-y-3">
+          <div className="space-y-3 max-w-full">
             <h5 className="text-cyan-300 font-medium text-sm">Generated Images ({generatedImages.length}):</h5>
-            <div className="space-y-3">
+            <div className="space-y-3 max-w-full">
               {generatedImages.map((imageData, index) => (
-                <div key={index} className="relative">
+                <div key={index} className="relative max-w-full">
                   <img 
                     src={imageData} 
                     alt={`Generated LinkedIn post image ${index + 1} for variation ${variationNumber}`}
