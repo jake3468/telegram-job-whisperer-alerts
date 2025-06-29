@@ -81,7 +81,7 @@ const LinkedInPostVariation = ({
     loadExistingImages();
   }, [postId, variationNumber, isAuthReady, executeWithRetry]);
 
-  // Real-time subscription for image updates - FIXED LOADING STATE MANAGEMENT
+  // Real-time subscription for image updates - IMPROVED LOADING STATE MANAGEMENT
   useEffect(() => {
     if (!postId || !isAuthReady) return;
 
@@ -104,7 +104,7 @@ const LinkedInPostVariation = ({
             setImageGenerationFailed(false);
           } else if (newImage.image_data && newImage.image_data !== 'generating...' && !newImage.image_data.includes('failed')) {
             console.log(`Image generation completed for variation ${variationNumber}`);
-            setIsLoadingImage(false); // FIXED: Properly stop loading state
+            setIsLoadingImage(false); // Stop loading immediately when we get the image
             setImageGenerationFailed(false);
             
             // Add the new image to the list
@@ -123,7 +123,7 @@ const LinkedInPostVariation = ({
             }
           } else if (newImage.image_data && newImage.image_data.includes('failed')) {
             console.log(`Image generation failed for variation ${variationNumber}`);
-            setIsLoadingImage(false); // FIXED: Stop loading on failure
+            setIsLoadingImage(false); // Stop loading on failure
             setImageGenerationFailed(true);
             toast({
               title: "Image Generation Failed",
@@ -143,6 +143,30 @@ const LinkedInPostVariation = ({
       supabase.removeChannel(channel);
     };
   }, [postId, variationNumber, isAuthReady, toast, hasDeductedCredits]);
+
+  // Add timeout mechanism to reset loading state after 3 minutes
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
+    if (isLoadingImage) {
+      timeoutId = setTimeout(() => {
+        console.log(`Image generation timeout reached for variation ${variationNumber}`);
+        setIsLoadingImage(false);
+        setImageGenerationFailed(true);
+        toast({
+          title: "Image Generation Timeout",
+          description: `Image generation took too long for variation ${variationNumber}. Please try again.`,
+          variant: "destructive"
+        });
+      }, 180000); // 3 minutes timeout
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [isLoadingImage, variationNumber, toast]);
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -259,7 +283,7 @@ const LinkedInPostVariation = ({
 
     } catch (err: any) {
       console.error('Error generating image:', err);
-      setIsLoadingImage(false); // FIXED: Stop loading on error
+      setIsLoadingImage(false); // Stop loading on error
       setImageGenerationFailed(true);
       
       toast({
