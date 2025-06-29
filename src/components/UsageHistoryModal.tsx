@@ -30,8 +30,8 @@ const UsageHistoryModal = () => {
   };
 
   const formatPaymentAmount = (amount: number, currency: string) => {
-    // Convert INR from paise to rupees
-    const displayAmount = currency === 'INR' ? amount / 100 : amount;
+    // Convert both INR and USD from their smallest units to main units
+    const displayAmount = (currency === 'INR' || currency === 'USD') ? amount / 100 : amount;
     const currencySymbol = currency === 'INR' ? '₹' : '$';
     return `${currencySymbol}${displayAmount}`;
   };

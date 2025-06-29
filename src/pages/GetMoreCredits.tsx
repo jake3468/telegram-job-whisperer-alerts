@@ -1,3 +1,4 @@
+
 import { useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -128,14 +129,14 @@ export default function GetMoreCredits() {
               duration-500
             `}>
             {/* Free Plan */}
-            <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-blue-400/30 min-h-[340px] sm:min-h-[420px]`}>
-              <CardHeader className="text-center pb-3 pt-4 sm:pb-4 sm:pt-6 px-2 sm:px-4">
-                <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 sm:mb-2 ${planTextColor.free}`}>Free Plan</CardTitle>
+            <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-blue-400/30 min-h-[320px] sm:min-h-[380px]`}>
+              <CardHeader className="text-center pb-2 pt-3 sm:pb-4 sm:pt-6 px-3 sm:px-4">
+                <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 ${planTextColor.free}`}>Free Plan</CardTitle>
                 <div className="text-2xl sm:text-3xl font-extrabold text-blue-100 mt-0.5 mb-0.5">Free</div>
                 <div className="mt-0 text-xs sm:text-sm font-semibold text-blue-300">30 credits/month</div>
               </CardHeader>
-              <CardContent className="grow flex flex-col px-2 sm:px-4 pb-3">
-                <ul className="space-y-1.5 sm:space-y-2 my-2 sm:my-4 flex-grow">
+              <CardContent className="grow flex flex-col px-3 sm:px-4 pb-3">
+                <ul className="space-y-1 sm:space-y-2 my-2 sm:my-4 flex-grow">
                   <li className="flex items-center gap-1 sm:gap-2">
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
                     <span className="text-xs sm:text-sm text-blue-100">Access to all features</span>
@@ -152,7 +153,7 @@ export default function GetMoreCredits() {
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
                     <span className="text-xs sm:text-sm text-blue-100">Perfect for occasional use</span>
                   </li>
-                </ul>
+                </ul>  
                 <div className="mt-auto">
                   <Button 
                     className="w-full py-2 sm:py-2.5 bg-blue-500/90 hover:bg-blue-700 text-white rounded-xl font-orbitron text-xs sm:text-sm shadow border-0" 
@@ -165,14 +166,14 @@ export default function GetMoreCredits() {
             </Card>
 
             {/* Monthly Subscription */}
-            <Card className={`flex flex-col rounded-2xl shadow-2xl border-0 ${planGradientBg.subscription} relative transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-cyan-400/30 min-h-[370px] sm:min-h-[460px]`}>
-              <div className="absolute -top-4 sm:-top-6 left-1/2 -translate-x-1/2 z-10">
+            <Card className={`flex flex-col rounded-2xl shadow-2xl border-0 ${planGradientBg.subscription} relative transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-cyan-400/30 min-h-[350px] sm:min-h-[420px]`}>
+              <div className="absolute -top-3 sm:-top-6 left-1/2 -translate-x-1/2 z-10">
                 <Badge className="bg-gradient-to-r from-blue-400 to-cyan-400 text-white font-orbitron text-xs px-3 sm:px-4 py-0.5 sm:py-1 shadow-xl border-0 tracking-wide">
                   MOST POPULAR
                 </Badge>
               </div>
-              <CardHeader className="text-center pb-3 pt-5 sm:pb-4 sm:pt-8 px-2 sm:px-4">
-                <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 sm:mb-2 ${planTextColor.subscription}`}>Monthly Subscription</CardTitle>
+              <CardHeader className="text-center pb-2 pt-4 sm:pb-4 sm:pt-8 px-3 sm:px-4">
+                <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 ${planTextColor.subscription}`}>Monthly Subscription</CardTitle>
                 <div className="text-2xl sm:text-3xl font-extrabold text-cyan-100 mb-0.5 sm:mb-1 mt-0.5">
                   {subscriptionProducts[0] ? (
                     <>
@@ -190,8 +191,8 @@ export default function GetMoreCredits() {
                   {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits/month` : '300 credits/month'}
                 </div>
               </CardHeader>
-              <CardContent className="grow flex flex-col px-2 sm:px-4 pb-3">
-                <ul className="space-y-1.5 sm:space-y-2 my-2 sm:my-4 flex-grow">
+              <CardContent className="grow flex flex-col px-3 sm:px-4 pb-3">
+                <ul className="space-y-1 sm:space-y-2 my-2 sm:my-4 flex-grow">
                   <li className="flex items-center gap-1 sm:gap-2">
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
                     <span className="text-xs sm:text-sm text-cyan-100">
@@ -235,20 +236,20 @@ export default function GetMoreCredits() {
             </Card>
 
             {/* Credit Packs - Region-specific products only */}
-            <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-indigo-400/30 min-h-[340px] sm:min-h-[420px]`}>
-              <CardHeader className="text-center pb-3 pt-4 sm:pb-4 sm:pt-6 px-2 sm:px-4">
-                <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 sm:mb-2 ${planTextColor.pack}`}>Credit Packs</CardTitle>
+            <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-indigo-400/30 min-h-[320px] sm:min-h-[380px]`}>
+              <CardHeader className="text-center pb-2 pt-3 sm:pb-4 sm:pt-6 px-3 sm:px-4">
+                <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 ${planTextColor.pack}`}>Credit Packs</CardTitle>
                 <div className="text-2xl sm:text-3xl font-extrabold text-[#badbff] mb-0.5 sm:mb-1">
                   Starting {pricingData.currencySymbol}{creditPackProducts.length > 0 ? Math.min(...creditPackProducts.map(p => p.price_amount)) : pricingData.creditPacks[0]?.price}
                 </div>
                 <div className="mt-0 text-xs sm:text-sm font-semibold text-indigo-200">Select your desired amount:</div>
               </CardHeader>
-              <CardContent className="grow flex flex-col px-2 sm:px-4 pb-3">
-                <div className="flex flex-col gap-1.5 sm:gap-2 my-2 sm:my-3 flex-grow">
+              <CardContent className="grow flex flex-col px-3 sm:px-4 pb-3">
+                <div className="flex flex-col gap-1 sm:gap-2 my-2 sm:my-3 flex-grow">
                   {/* Show database products if available, otherwise show static fallback */}
                   {creditPackProducts.length > 0 ? (
                     creditPackProducts.map(pack => (
-                      <div key={pack.product_id} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300 bg-blue-400">
+                      <div key={pack.product_id} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-1.5 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300 bg-blue-400">
                         <span className="text-indigo-100 font-medium text-xs sm:text-sm">{pack.credits_amount} credits</span>
                         <div className="flex items-center gap-2">
                           <span className="text-indigo-50 font-bold text-xs sm:text-sm">{pricingData.currencySymbol}{pack.price_amount}</span>
@@ -270,7 +271,7 @@ export default function GetMoreCredits() {
                   ) : (
                     // Only show fallback if no database products and not loading
                     !isProductsLoading && pricingData.creditPacks.map(pack => (
-                      <div key={pack.credits} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
+                      <div key={pack.credits} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-1.5 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
                         <span className="text-indigo-100 font-medium text-xs sm:text-sm">{pack.credits} credits</span>
                         <div className="flex items-center gap-2">
                           <span className="text-indigo-50 font-bold text-xs sm:text-sm">{pricingData.currencySymbol}{pack.price}</span>
@@ -301,7 +302,7 @@ export default function GetMoreCredits() {
                 </div>
                 
                 {/* Features list */}
-                <ul className="space-y-1 mb-3">
+                <ul className="space-y-1 mb-2">
                   <li className="flex items-center gap-1 sm:gap-2">
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
                     <span className="text-indigo-100 text-[10px] sm:text-xs">No expiration</span>
