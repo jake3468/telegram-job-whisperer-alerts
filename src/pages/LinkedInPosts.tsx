@@ -455,7 +455,7 @@ const LinkedInPosts = () => {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                           <div className="space-y-2">
                             <Label htmlFor="personal_story" className="text-black font-semibold text-base">📖Personal Experience or Story</Label>
-                            <Label htmlFor="personal_story" className="text-black/70 font-normal text-sm block">Do you have a story, data point, or personal experience to include?</Label>
+                            <Label htmlFor="personal_story" className="text-black/70 font-normal text-sm block">Do you have a story/personal experience to include?</Label>
                             <TTextarea id="personal_story" placeholder="We reduced response time by 40% after implementing AI chat." value={formData.personal_story} onChange={e => handleInputChange('personal_story', e.target.value)} className="min-h-[60px] resize-none text-base bg-black/80 border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium" />
                           </div>
                           <div className="space-y-2">
