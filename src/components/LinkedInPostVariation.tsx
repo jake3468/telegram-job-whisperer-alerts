@@ -207,7 +207,7 @@ const LinkedInPostVariation = ({
     }
   };
 
-  // Handle image generation - Fixed to properly call the webhook
+  // Handle image generation - Fixed to properly call the webhook with correct payload
   const handleGenerateImage = async () => {
     if (!postId) {
       toast({
@@ -243,7 +243,7 @@ const LinkedInPostVariation = ({
 
         console.log('✅ Placeholder image record created:', imageRecord);
 
-        // Step 2: Call the linkedin-image-webhook edge function
+        // Step 2: Call the linkedin-image-webhook edge function with the correct payload structure
         console.log('🔗 Calling linkedin-image-webhook edge function...');
         const userName = userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() : 'Professional User';
         
