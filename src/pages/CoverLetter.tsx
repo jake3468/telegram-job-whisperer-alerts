@@ -42,7 +42,7 @@ const CoverLetter = () => {
   const {
     hasCredits,
     showInsufficientCreditsPopup
-  } = useCreditCheck(1.5, true);
+  } = useCreditCheck(1.5);
   const {
     deductCredits
   } = useDeferredCreditDeduction();
