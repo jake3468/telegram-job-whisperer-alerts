@@ -73,7 +73,17 @@ serve(async (req) => {
         .eq('variation_number', variation_number)
         .eq('image_data', 'generating...')
       
-      throw new Error('N8N webhook URL not configured in environment variables')
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'N8N webhook URL not configured in environment variables',
+          webhook_url_configured: false
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+          status: 500 
+        }
+      )
     }
 
     console.log('Using N8N webhook URL (first 50 chars):', n8nWebhookUrl.substring(0, 50) + '...')
@@ -115,7 +125,17 @@ serve(async (req) => {
         .eq('variation_number', variation_number)
         .eq('image_data', 'generating...')
       
-      throw new Error(`N8N webhook failed: ${response.statusText}`)
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: `N8N webhook failed: ${response.statusText}`,
+          webhook_url_configured: true
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+          status: 500 
+        }
+      )
     }
 
     const responseText = await response.text()
@@ -158,7 +178,17 @@ serve(async (req) => {
 
       if (storeError) {
         console.error('Failed to store image in database:', storeError)
-        throw new Error('Failed to store image in database: ' + storeError.message)
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: 'Failed to store image in database: ' + storeError.message,
+            webhook_url_configured: true
+          }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+            status: 500 
+          }
+        )
       }
 
       console.log(`Image stored successfully in database with ID: ${storedImage.id}`)
@@ -169,7 +199,8 @@ serve(async (req) => {
           message: 'Image generated and stored successfully',
           data: result,
           stored_image_id: storedImage.id,
-          variation_number: variation_number
+          variation_number: variation_number,
+          webhook_url_configured: true
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
