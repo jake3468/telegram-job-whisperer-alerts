@@ -173,7 +173,14 @@ export function useLinkedInImageManager(postId: string | null) {
         }
 
         // FIXED: Call webhook with proper parameters including post data from history
-        const webhookBody = {
+        const webhookBody: {
+          post_id: string;
+          variation_number: number;
+          source: string;
+          post_heading?: string;
+          post_content?: string;
+          user_name?: string;
+        } = {
           post_id: postId,
           variation_number: variationNumber,
           source: 'linkedin_history'
