@@ -57,16 +57,8 @@ export function useLinkedInImageManager(postId: string | null) {
 
         if (data) {
           setImages(data);
-          // Update generating states based on fetched data - properly reset loading states
-          setIsGenerating(prev => {
-            const newState = [false, false, false];
-            data.forEach(img => {
-              if (img.variation_number && img.image_data === 'generating...') {
-                newState[img.variation_number - 1] = true;
-              }
-            });
-            return newState;
-          });
+          // Reset generating states properly based on current image data
+          setIsGenerating([false, false, false]);
         }
       }, 3, 'fetch LinkedIn post images');
     } catch (error) {
@@ -100,28 +92,18 @@ export function useLinkedInImageManager(postId: string | null) {
             }
           });
 
-          // Properly update generating state when image generation completes
-          if (newImage.image_data !== 'generating...') {
+          // Handle loading state changes based on image data
+          if (newImage.image_data !== 'generating...' && newImage.variation_number) {
+            // Image generation completed - turn off loading
             setIsGenerating(prev => {
               const newState = [...prev];
-              if (newImage.variation_number) {
-                newState[newImage.variation_number - 1] = false;
-              }
+              newState[newImage.variation_number - 1] = false;
               return newState;
             });
 
             toast({
               title: "Image Generated!",
               description: `LinkedIn post image for variation ${newImage.variation_number} is ready.`
-            });
-          } else if (newImage.image_data === 'generating...') {
-            // Set loading state when generation starts
-            setIsGenerating(prev => {
-              const newState = [...prev];
-              if (newImage.variation_number) {
-                newState[newImage.variation_number - 1] = true;
-              }
-              return newState;
             });
           }
         } else if (payload.eventType === 'DELETE') {
