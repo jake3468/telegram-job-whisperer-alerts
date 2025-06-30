@@ -62,27 +62,16 @@ export const useLinkedInPostTimeoutFallback = ({
           });
 
           if (hasAllPosts) {
-            console.log('⏰ Posts completed, triggering fallback credit deduction');
+            console.log('⏰ Posts completed, triggering fallback completion (NO credit deduction here)');
             
-            // Deduct credits using the correct user ID (userProfileId is now users.id)
-            const { data: deductResult, error: deductError } = await supabase.rpc('deduct_credits', {
-              p_user_id: userProfileId, // This is now the correct users.id
-              p_amount: 3.0,
-              p_feature_used: 'linkedin_post',
-              p_description: `LinkedIn post generation completed for post ${currentPostId} (timeout fallback)`
+            // REMOVED: Credit deduction from timeout fallback to prevent double deduction
+            // The main component will handle credit deduction via real-time updates
+            
+            onPostsReady(data);
+            toast({
+              title: "LinkedIn Posts Generated!",
+              description: "Your 3 LinkedIn post variations have been created successfully."
             });
-
-            if (deductError) {
-              console.error('❌ Fallback credit deduction error:', deductError);
-            } else if (deductResult) {
-              console.log('✅ Fallback credit deduction successful');
-              onCreditsDeducted();
-              onPostsReady(data);
-              toast({
-                title: "LinkedIn Posts Generated!",
-                description: "Your 3 LinkedIn post variations have been created successfully. 3 credits have been deducted."
-              });
-            }
           }
         }
       } catch (error) {

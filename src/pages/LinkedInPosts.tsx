@@ -40,7 +40,7 @@ const LinkedInPosts = () => {
   const { userProfile } = useUserProfile();
   const { isComplete, loading: completionLoading, refetchStatus } = useUserCompletionStatus();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
-  const { hasCredits } = useLinkedInPostCreditCheck(); // Remove refreshCredits since it causes page reload
+  const { hasCredits } = useLinkedInPostCreditCheck();
   
   const [formData, setFormData] = useState({
     topic: '',
@@ -57,6 +57,7 @@ const LinkedInPosts = () => {
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
   const [creditsDeducted, setCreditsDeducted] = useState(false);
+  const [creditDeductionProcessed, setCreditDeductionProcessed] = useState<Set<string>>(new Set());
 
   const toneOptions = [
     { value: 'professional', label: 'Professional & Insightful' },
@@ -117,8 +118,8 @@ const LinkedInPosts = () => {
   };
 
   const deductCreditsForPosts = async (postId: string) => {
-    if (creditsDeducted) {
-      console.log('⚠️ Credits already deducted for this post session');
+    if (creditsDeducted || creditDeductionProcessed.has(postId)) {
+      console.log('⚠️ Credits already deducted for this post session or post ID:', postId);
       return;
     }
 
@@ -129,13 +130,13 @@ const LinkedInPosts = () => {
 
     try {
       console.log('💳 ATTEMPTING CREDIT DEDUCTION:', {
-        userId: userProfile.user_id, // Use userProfile.user_id instead of userProfile.id
+        userId: userProfile.user_id,
         postId: postId,
         amount: 3.0
       });
 
       const { data: deductResult, error: deductError } = await supabase.rpc('deduct_credits', {
-        p_user_id: userProfile.user_id, // Use userProfile.user_id instead of userProfile.id
+        p_user_id: userProfile.user_id,
         p_amount: 3.0,
         p_feature_used: 'linkedin_post',
         p_description: `LinkedIn post generation completed for post ${postId}`
@@ -157,8 +158,7 @@ const LinkedInPosts = () => {
       } else if (deductResult) {
         console.log('✅ Credits successfully deducted for LinkedIn posts');
         setCreditsDeducted(true);
-        
-        
+        setCreditDeductionProcessed(prev => new Set([...prev, postId]));
         
         toast({
           title: "LinkedIn Posts Generated!",
@@ -184,7 +184,7 @@ const LinkedInPosts = () => {
 
   useLinkedInPostTimeoutFallback({
     currentPostId,
-    userProfileId: userProfile?.user_id || null, // Use userProfile.user_id instead of userProfile.id
+    userProfileId: userProfile?.user_id || null,
     isGenerating,
     creditsDeducted,
     onCreditsDeducted: () => setCreditsDeducted(true),
@@ -314,8 +314,6 @@ const LinkedInPosts = () => {
   };
 
   const checkCreditsWithFallback = async (): Promise<boolean> => {
-    
-    
     if (hasCredits) {
       console.log('✅ Credit check passed via hook');
       return true;
@@ -419,6 +417,7 @@ const LinkedInPosts = () => {
     setPostsData(null);
     setCurrentPostId(null);
     setCreditsDeducted(false);
+    setCreditDeductionProcessed(new Set()); // Reset for new generation
 
     try {
       console.log('🚀 Creating LinkedIn post with user_profile.id:', userProfile.id);
@@ -477,6 +476,7 @@ const LinkedInPosts = () => {
     setIsGenerating(false);
     setCurrentPostId(null);
     setCreditsDeducted(false);
+    setCreditDeductionProcessed(new Set());
   };
 
   const shouldShowResults = postsData && areAllPostsReady(postsData);
