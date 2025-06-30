@@ -24,7 +24,7 @@ export const useLinkedInPostTimeoutFallback = ({
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
-    if (!currentPostId || !userProfileId || !isGenerating || creditsDeducted) {
+    if (!currentPostId || !userProfileId || !isGenerating) {
       return;
     }
 
@@ -62,10 +62,7 @@ export const useLinkedInPostTimeoutFallback = ({
           });
 
           if (hasAllPosts) {
-            console.log('⏰ Posts completed, triggering fallback completion (NO credit deduction here)');
-            
-            // REMOVED: Credit deduction from timeout fallback to prevent double deduction
-            // The main component will handle credit deduction via real-time updates
+            console.log('⏰ Posts completed, triggering fallback completion (credits will be deducted by N8N)');
             
             onPostsReady(data);
             toast({
@@ -84,13 +81,13 @@ export const useLinkedInPostTimeoutFallback = ({
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [currentPostId, userProfileId, isGenerating, creditsDeducted, onCreditsDeducted, onPostsReady, toast]);
+  }, [currentPostId, userProfileId, isGenerating, onPostsReady, toast]);
 
-  // Cleanup timeout when credits are deducted
+  // Cleanup timeout when no longer generating
   useEffect(() => {
-    if (creditsDeducted && timeoutRef.current) {
-      console.log('⏰ Credits deducted, clearing timeout fallback');
+    if (!isGenerating && timeoutRef.current) {
+      console.log('⏰ Generation completed, clearing timeout fallback');
       clearTimeout(timeoutRef.current);
     }
-  }, [creditsDeducted]);
+  }, [isGenerating]);
 };
