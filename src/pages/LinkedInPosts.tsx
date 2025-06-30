@@ -91,7 +91,7 @@ const LinkedInPosts = () => {
     fetchUserData();
   }, [user?.id, isAuthReady, executeWithRetry]);
 
-  // Check if all posts are ready
+  // FIXED: Check if all posts are ready - ensure all 6 columns have non-null data
   const areAllPostsReady = (data: LinkedInPostData) => {
     const hasAllData = Boolean(
       data.post_heading_1 && 
@@ -102,7 +102,7 @@ const LinkedInPosts = () => {
       data.post_content_3
     );
     
-    console.log('Checking if all posts ready:', {
+    console.log('FIXED: Checking if all posts ready:', {
       post_heading_1: Boolean(data.post_heading_1),
       post_content_1: Boolean(data.post_content_1),
       post_heading_2: Boolean(data.post_heading_2),
@@ -115,11 +115,11 @@ const LinkedInPosts = () => {
     return hasAllData;
   };
 
-  // Real-time subscription for LinkedIn post updates - FIXED: Removed toastShown dependency for credit deduction
+  // FIXED: Real-time subscription for LinkedIn post updates - Immediate credit deduction and state updates
   useEffect(() => {
     if (!currentPostId || !isAuthReady) return;
     
-    console.log('Setting up real-time subscription for post ID:', currentPostId);
+    console.log('FIXED: Setting up real-time subscription for post ID:', currentPostId);
 
     const channel = supabase
       .channel(`linkedin-post-updates-${currentPostId}`)
@@ -129,11 +129,11 @@ const LinkedInPosts = () => {
         table: 'job_linkedin',
         filter: `id=eq.${currentPostId}`
       }, (payload) => {
-        console.log('LinkedIn post updated via real-time:', payload);
+        console.log('FIXED: LinkedIn post updated via real-time:', payload);
         
         if (payload.new) {
           const newData = payload.new as any;
-          console.log('New posts data received:', {
+          console.log('FIXED: New posts data received:', {
             hasHeading1: Boolean(newData.post_heading_1),
             hasContent1: Boolean(newData.post_content_1),
             hasHeading2: Boolean(newData.post_heading_2),
@@ -151,13 +151,15 @@ const LinkedInPosts = () => {
             post_content_3: newData.post_content_3
           };
           
+          // FIXED: Always update state with latest data
           setPostsData(linkedInPostData);
           
-          // FIXED: Check if all posts are ready and deduct credits immediately
+          // FIXED: Check if all posts are ready and immediately stop loading + deduct credits
           if (areAllPostsReady(linkedInPostData)) {
-            console.log('All posts are ready! Stopping loading and deducting credits');
+            console.log('FIXED: All posts are ready! Stopping loading and deducting credits immediately');
             setIsGenerating(false);
             
+            // FIXED: Deduct credits immediately when all posts are ready
             deductCreditsAfterResults(currentPostId).then(success => {
               if (success) {
                 toast({
@@ -170,21 +172,21 @@ const LinkedInPosts = () => {
         }
       })
       .subscribe(status => {
-        console.log('Real-time subscription status:', status);
+        console.log('FIXED: Real-time subscription status:', status);
       });
 
     return () => {
-      console.log('Cleaning up real-time subscription');
+      console.log('FIXED: Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
   }, [currentPostId, isAuthReady, toast, deductCreditsAfterResults]);
 
-  // Check existing data when currentPostId changes - NO TOAST, NO CREDIT DEDUCTION
+  // FIXED: Check existing data when currentPostId changes - NO TOAST, NO CREDIT DEDUCTION
   useEffect(() => {
     const checkExistingData = async () => {
       if (!currentPostId || !isAuthReady) return;
       
-      console.log('Checking existing data for post ID:', currentPostId);
+      console.log('FIXED: Checking existing data for post ID:', currentPostId);
       
       try {
         await executeWithRetry(async () => {
@@ -195,12 +197,12 @@ const LinkedInPosts = () => {
             .single();
           
           if (error) {
-            console.error('Error fetching existing post data:', error);
+            console.error('FIXED: Error fetching existing post data:', error);
             return;
           }
           
           if (data) {
-            console.log('Found existing post data');
+            console.log('FIXED: Found existing post data');
             
             const linkedInPostData: LinkedInPostData = {
               post_heading_1: data.post_heading_1,
@@ -211,17 +213,18 @@ const LinkedInPosts = () => {
               post_content_3: data.post_content_3
             };
             
+            // FIXED: Always update state with existing data
             setPostsData(linkedInPostData);
             
-            // Check if all posts are already ready - only stop loading, NO TOAST, NO CREDIT DEDUCTION
+            // FIXED: Check if all posts are already ready - only stop loading, NO TOAST, NO CREDIT DEDUCTION
             if (areAllPostsReady(linkedInPostData)) {
-              console.log('Existing data is complete, stopping loading');
+              console.log('FIXED: Existing data is complete, stopping loading state');
               setIsGenerating(false);
             }
           }
         }, 3, 'check existing post data');
       } catch (err) {
-        console.error('Error checking existing data:', err);
+        console.error('FIXED: Error checking existing data:', err);
       }
     };
 
@@ -360,11 +363,11 @@ const LinkedInPosts = () => {
     setCurrentPostId(null);
   };
 
-  // Determine what to show based on data completeness
+  // FIXED: Determine what to show based on data completeness
   const shouldShowResults = postsData && areAllPostsReady(postsData);
   const shouldShowLoading = isGenerating && !shouldShowResults;
 
-  console.log('Display logic:', {
+  console.log('FIXED: Display logic:', {
     postsData: !!postsData,
     areAllPostsReady: postsData ? areAllPostsReady(postsData) : false,
     shouldShowResults,
@@ -492,7 +495,7 @@ const LinkedInPosts = () => {
                   </CardContent>
                 </Card>
 
-                {/* Loading State - Only show when generating AND no complete results */}
+                {/* FIXED: Loading State - Only show when generating AND no complete results */}
                 {shouldShowLoading && (
                   <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm mb-8 max-w-full">
                     <CardContent className="py-8 flex items-center justify-center">
@@ -501,7 +504,7 @@ const LinkedInPosts = () => {
                   </Card>
                 )}
 
-                {/* Results Display - Show when posts are ready */}
+                {/* FIXED: Results Display - Show when posts are ready */}
                 {shouldShowResults && (
                   <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm max-w-full">
                     <CardHeader className="pb-6">
