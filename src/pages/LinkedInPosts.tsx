@@ -40,7 +40,7 @@ const LinkedInPosts = () => {
   const { userProfile } = useUserProfile();
   const { isComplete, loading: completionLoading, refetchStatus } = useUserCompletionStatus();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
-  const { hasCredits, refreshCredits } = useLinkedInPostCreditCheck();
+  const { hasCredits } = useLinkedInPostCreditCheck(); // Remove refreshCredits since it causes page reload
   
   const [formData, setFormData] = useState({
     topic: '',
@@ -158,7 +158,7 @@ const LinkedInPosts = () => {
         console.log('✅ Credits successfully deducted for LinkedIn posts');
         setCreditsDeducted(true);
         
-        refreshCredits();
+        
         
         toast({
           title: "LinkedIn Posts Generated!",
@@ -314,7 +314,7 @@ const LinkedInPosts = () => {
   };
 
   const checkCreditsWithFallback = async (): Promise<boolean> => {
-    await refreshCredits();
+    
     
     if (hasCredits) {
       console.log('✅ Credit check passed via hook');
@@ -331,7 +331,7 @@ const LinkedInPosts = () => {
       const { data: credits, error } = await supabase
         .from('user_credits')
         .select('current_balance')
-        .eq('user_id', userProfile.user_id) // Use userProfile.user_id instead of userProfile.id
+        .eq('user_id', userProfile.user_id)
         .single();
 
       if (error) {

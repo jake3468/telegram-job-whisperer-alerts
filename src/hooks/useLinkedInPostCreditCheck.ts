@@ -3,12 +3,13 @@ import { useCreditCheck } from './useCreditCheck';
 
 export function useLinkedInPostCreditCheck() {
   const requiredCredits = 3.0; // LinkedIn posts require 3 credits
-  const { hasCredits, isLoading, showInsufficientCreditsPopup, creditBalance } = useCreditCheck(requiredCredits);
+  const { hasCredits, isLoading, showInsufficientCreditsPopup, creditBalance, refetch } = useCreditCheck(requiredCredits);
   
-  // Force refresh credits by re-fetching from database
+  // Refresh credits by re-fetching data without page reload
   const refreshCredits = async () => {
-    // Force a re-query by invalidating the cache
-    window.location.reload();
+    if (refetch) {
+      await refetch();
+    }
   };
 
   return {
