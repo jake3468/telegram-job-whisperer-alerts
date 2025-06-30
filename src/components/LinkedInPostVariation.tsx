@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -48,8 +47,9 @@ const LinkedInPostVariation = ({
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
+  const [activeGenerationRequests, setActiveGenerationRequests] = useState<Set<string>>(new Set());
 
-  // Load existing images for this variation
+  // Load existing images for this variation - FIXED: Don't reset loading state arbitrarily
   useEffect(() => {
     const loadExistingImages = async () => {
       if (!postId || !isAuthReady) return;
@@ -71,8 +71,8 @@ const LinkedInPostVariation = ({
           if (data && data.length > 0) {
             const imageUrls = data.map(img => img.image_data);
             setGeneratedImages(imageUrls);
-            // Only reset loading state if we were actually loading
-            if (isLoadingImage) {
+            // FIXED: Only reset loading state if no active requests are pending
+            if (activeGenerationRequests.size === 0) {
               setIsLoadingImage(false);
               setImageGenerationFailed(false);
             }
@@ -84,7 +84,7 @@ const LinkedInPostVariation = ({
     };
 
     loadExistingImages();
-  }, [postId, variationNumber, isAuthReady, executeWithRetry, isLoadingImage]);
+  }, [postId, variationNumber, isAuthReady, executeWithRetry, activeGenerationRequests.size]);
 
   // Real-time subscription for image updates
   useEffect(() => {
@@ -107,6 +107,8 @@ const LinkedInPostVariation = ({
             console.log(`Image generation started for variation ${variationNumber}`);
             setIsLoadingImage(true);
             setImageGenerationFailed(false);
+            // Track this generation request
+            setActiveGenerationRequests(prev => new Set(prev).add(newImage.id));
           } else if (newImage.image_data && newImage.image_data !== 'generating...' && !newImage.image_data.includes('failed')) {
             console.log(`Image generation completed for variation ${variationNumber}`);
             
@@ -116,16 +118,23 @@ const LinkedInPostVariation = ({
               return exists ? prev : [...prev, newImage.image_data];
             });
             
-            // FIXED: Reset loading states only after successful image generation
+            // FIXED: Remove from active requests and reset loading state
+            setActiveGenerationRequests(prev => {
+              const newSet = new Set(prev);
+              newSet.delete(newImage.id);
+              return newSet;
+            });
             setIsLoadingImage(false);
             setImageGenerationFailed(false);
             
-            // DEDUCT CREDITS ONLY AFTER IMAGE IS DISPLAYED
+            // FIXED: Deduct credits exactly once when image is displayed
             try {
-              await checkAndDeductForImage(postId, variationNumber);
-              console.log(`Credits deducted after image display for variation ${variationNumber}`);
+              const success = await checkAndDeductForImage(postId, variationNumber);
+              if (success) {
+                console.log(`Credits deducted for variation ${variationNumber} image`);
+              }
             } catch (error) {
-              console.error('Error deducting credits after image display:', error);
+              console.error('Error deducting credits for image:', error);
             }
             
             // Show success toast
@@ -135,6 +144,11 @@ const LinkedInPostVariation = ({
             });
           } else if (newImage.image_data && newImage.image_data.includes('failed')) {
             console.log(`Image generation failed for variation ${variationNumber}`);
+            setActiveGenerationRequests(prev => {
+              const newSet = new Set(prev);
+              newSet.delete(newImage.id);
+              return newSet;
+            });
             setIsLoadingImage(false);
             setImageGenerationFailed(true);
             toast({
@@ -146,6 +160,11 @@ const LinkedInPostVariation = ({
         } else if (payload.eventType === 'DELETE') {
           const deletedImage = payload.old;
           setGeneratedImages(prev => prev.filter(img => img !== deletedImage.image_data));
+          setActiveGenerationRequests(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(deletedImage.id);
+            return newSet;
+          });
         }
       })
       .subscribe();
@@ -164,6 +183,7 @@ const LinkedInPostVariation = ({
         console.log(`Image generation timeout reached for variation ${variationNumber}`);
         setIsLoadingImage(false);
         setImageGenerationFailed(true);
+        setActiveGenerationRequests(new Set()); // Clear all active requests
         toast({
           title: "Image Generation Timeout",
           description: `Image generation took too long for variation ${variationNumber}. Please try again.`,
@@ -231,7 +251,7 @@ const LinkedInPostVariation = ({
       return;
     }
 
-    // Only check if user has credits, don't deduct yet
+    // FIXED: Only check if user has credits, don't deduct yet (deduction happens after display)
     if (!await checkAndDeductForImage(postId, variationNumber, true)) {
       return;
     }
