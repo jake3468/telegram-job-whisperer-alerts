@@ -93,21 +93,21 @@ const LinkedInPosts = () => {
 
   const areAllPostsReady = (data: LinkedInPostData) => {
     const hasAllData = Boolean(
-      data.post_heading_1 && 
-      data.post_content_1 && 
-      data.post_heading_2 && 
-      data.post_content_2 && 
-      data.post_heading_3 && 
-      data.post_content_3
+      data.post_heading_1 && data.post_heading_1.trim() &&
+      data.post_content_1 && data.post_content_1.trim() && 
+      data.post_heading_2 && data.post_heading_2.trim() &&
+      data.post_content_2 && data.post_content_2.trim() && 
+      data.post_heading_3 && data.post_heading_3.trim() &&
+      data.post_content_3 && data.post_content_3.trim()
     );
     
     console.log('🔍 CHECKING IF ALL POSTS READY:', {
-      post_heading_1: Boolean(data.post_heading_1),
-      post_content_1: Boolean(data.post_content_1),
-      post_heading_2: Boolean(data.post_heading_2),
-      post_content_2: Boolean(data.post_content_2),
-      post_heading_3: Boolean(data.post_heading_3),
-      post_content_3: Boolean(data.post_content_3),
+      post_heading_1: Boolean(data.post_heading_1 && data.post_heading_1.trim()),
+      post_content_1: Boolean(data.post_content_1 && data.post_content_1.trim()),
+      post_heading_2: Boolean(data.post_heading_2 && data.post_heading_2.trim()),
+      post_content_2: Boolean(data.post_content_2 && data.post_content_2.trim()),
+      post_heading_3: Boolean(data.post_heading_3 && data.post_heading_3.trim()),
+      post_content_3: Boolean(data.post_content_3 && data.post_content_3.trim()),
       allReady: hasAllData
     });
     
@@ -152,12 +152,12 @@ const LinkedInPosts = () => {
         if (payload.new) {
           const newData = payload.new as any;
           console.log('📊 New posts data received:', {
-            hasHeading1: Boolean(newData.post_heading_1),
-            hasContent1: Boolean(newData.post_content_1),
-            hasHeading2: Boolean(newData.post_content_2),
-            hasContent2: Boolean(newData.post_content_2),
-            hasHeading3: Boolean(newData.post_content_3),
-            hasContent3: Boolean(newData.post_content_3)
+            hasHeading1: Boolean(newData.post_heading_1 && newData.post_heading_1.trim()),
+            hasContent1: Boolean(newData.post_content_1 && newData.post_content_1.trim()),
+            hasHeading2: Boolean(newData.post_heading_2 && newData.post_heading_2.trim()),
+            hasContent2: Boolean(newData.post_content_2 && newData.post_content_2.trim()),
+            hasHeading3: Boolean(newData.post_heading_3 && newData.post_heading_3.trim()),
+            hasContent3: Boolean(newData.post_content_3 && newData.post_content_3.trim())
           });
           
           const linkedInPostData: LinkedInPostData = {
@@ -169,15 +169,18 @@ const LinkedInPosts = () => {
             post_content_3: newData.post_content_3
           };
           
+          console.log('🔄 Setting posts data:', linkedInPostData);
           setPostsData(linkedInPostData);
           
           if (areAllPostsReady(linkedInPostData)) {
-            console.log('🎉 All posts are ready! Stopping loading (credits will be deducted by N8N)');
+            console.log('🎉 All posts are ready! Stopping loading');
             setIsGenerating(false);
             toast({
               title: "LinkedIn Posts Generated!",
               description: "Your 3 LinkedIn post variations have been created successfully."
             });
+          } else {
+            console.log('⏳ Posts not complete yet, keeping loading state');
           }
         }
       })
@@ -211,7 +214,14 @@ const LinkedInPosts = () => {
           }
           
           if (data) {
-            console.log('📋 Found existing post data');
+            console.log('📋 Found existing post data:', {
+              hasHeading1: Boolean(data.post_heading_1 && data.post_heading_1.trim()),
+              hasContent1: Boolean(data.post_content_1 && data.post_content_1.trim()),
+              hasHeading2: Boolean(data.post_heading_2 && data.post_heading_2.trim()),
+              hasContent2: Boolean(data.post_content_2 && data.post_content_2.trim()),
+              hasHeading3: Boolean(data.post_heading_3 && data.post_heading_3.trim()),
+              hasContent3: Boolean(data.post_content_3 && data.post_content_3.trim())
+            });
             
             const linkedInPostData: LinkedInPostData = {
               post_heading_1: data.post_heading_1,
@@ -222,11 +232,14 @@ const LinkedInPosts = () => {
               post_content_3: data.post_content_3
             };
             
+            console.log('🔄 Setting existing posts data:', linkedInPostData);
             setPostsData(linkedInPostData);
             
             if (areAllPostsReady(linkedInPostData)) {
               console.log('📋 Existing data is complete, stopping loading state');
               setIsGenerating(false);
+            } else {
+              console.log('📋 Existing data is incomplete, keeping loading state');
             }
           }
         }, 3, 'check existing post data');
@@ -412,7 +425,7 @@ const LinkedInPosts = () => {
   const shouldShowResults = postsData && areAllPostsReady(postsData);
   const shouldShowLoading = isGenerating && !shouldShowResults;
 
-  console.log('Display logic:', {
+  console.log('🎯 Display logic:', {
     postsData: !!postsData,
     areAllPostsReady: postsData ? areAllPostsReady(postsData) : false,
     shouldShowResults,
