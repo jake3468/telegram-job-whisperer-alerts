@@ -117,11 +117,14 @@ const LinkedInPostVariation = ({
             setIsLoadingImage(false);
             setImageGenerationFailed(false);
             
-            // FIXED: Simplified credit deduction - direct call when image is displayed
+            // FIXED: Direct credit deduction when image is displayed
             try {
+              console.log(`Attempting to deduct credits for variation ${variationNumber} image`);
               const success = await deductImageCredits(postId, variationNumber);
               if (success) {
-                console.log(`Credits deducted for variation ${variationNumber} image`);
+                console.log(`Successfully deducted credits for variation ${variationNumber} image`);
+              } else {
+                console.log(`Failed to deduct credits for variation ${variationNumber} image`);
               }
             } catch (error) {
               console.error('Error deducting credits for image:', error);
@@ -234,7 +237,7 @@ const LinkedInPostVariation = ({
       return;
     }
 
-    // FIXED: Simplified - just start the generation process
+    // FIXED: Simple generation start
     setIsLoadingImage(true);
     setImageGenerationFailed(false);
 

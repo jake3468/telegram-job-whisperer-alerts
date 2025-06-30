@@ -55,7 +55,6 @@ const LinkedInPosts = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
-  const [creditsDeducted, setCreditsDeducted] = useState(false); // FIXED: Simple flag to track deduction
 
   const toneOptions = [
     { value: 'professional', label: 'Professional & Insightful' },
@@ -151,18 +150,21 @@ const LinkedInPosts = () => {
           
           setPostsData(linkedInPostData);
           
-          if (areAllPostsReady(linkedInPostData) && !creditsDeducted) {
+          // FIXED: Simple direct credit deduction when posts are complete
+          if (areAllPostsReady(linkedInPostData)) {
             console.log('All posts are ready! Stopping loading and deducting credits');
             setIsGenerating(false);
             
             try {
               const success = await deductPostCredits(currentPostId);
               if (success) {
-                setCreditsDeducted(true); // Mark as deducted
+                console.log('Credits successfully deducted for LinkedIn posts');
                 toast({
                   title: "LinkedIn Posts Generated!",
                   description: "Your 3 LinkedIn post variations have been created successfully."
                 });
+              } else {
+                console.log('Failed to deduct credits for LinkedIn posts');
               }
             } catch (error) {
               console.error('Error deducting credits:', error);
@@ -178,7 +180,7 @@ const LinkedInPosts = () => {
       console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
-  }, [currentPostId, isAuthReady, toast, deductPostCredits, creditsDeducted]);
+  }, [currentPostId, isAuthReady, toast, deductPostCredits]);
 
   useEffect(() => {
     const checkExistingData = async () => {
@@ -301,7 +303,6 @@ const LinkedInPosts = () => {
     setIsGenerating(true);
     setPostsData(null);
     setCurrentPostId(null);
-    setCreditsDeducted(false); // FIXED: Reset credits deduction flag
 
     try {
       console.log('Creating LinkedIn post with user_profile.id:', userProfile.id);
@@ -359,7 +360,6 @@ const LinkedInPosts = () => {
     setPostsData(null);
     setIsGenerating(false);
     setCurrentPostId(null);
-    setCreditsDeducted(false); // Reset credits deduction flag
   };
 
   const shouldShowResults = postsData && areAllPostsReady(postsData);
