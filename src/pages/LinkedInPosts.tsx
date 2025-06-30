@@ -39,7 +39,7 @@ const LinkedInPosts = () => {
   const { userProfile } = useUserProfile();
   const { isComplete, loading: completionLoading, refetchStatus } = useUserCompletionStatus();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
-  const { hasCredits, checkCreditsBeforeGeneration, deductCreditsAfterResults, showInsufficientCreditsPopup } = useLinkedInPostCreditCheck();
+  const { hasCredits, deductPostCredits } = useLinkedInPostCreditCheck();
   
   const [formData, setFormData] = useState({
     topic: '',
@@ -55,6 +55,7 @@ const LinkedInPosts = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [creditsDeducted, setCreditsDeducted] = useState(false); // FIXED: Simple flag to track deduction
 
   const toneOptions = [
     { value: 'professional', label: 'Professional & Insightful' },
@@ -63,7 +64,6 @@ const LinkedInPosts = () => {
     { value: 'thoughtful', label: 'Thoughtful & Reflective' }
   ];
 
-  // Fetch user data when component mounts
   useEffect(() => {
     const fetchUserData = async () => {
       if (!user?.id || !isAuthReady) return;
@@ -91,7 +91,6 @@ const LinkedInPosts = () => {
     fetchUserData();
   }, [user?.id, isAuthReady, executeWithRetry]);
 
-  // Check if all posts are ready
   const areAllPostsReady = (data: LinkedInPostData) => {
     const hasAllData = Boolean(
       data.post_heading_1 && 
@@ -115,7 +114,6 @@ const LinkedInPosts = () => {
     return hasAllData;
   };
 
-  // Real-time subscription for LinkedIn post updates with immediate credit deduction
   useEffect(() => {
     if (!currentPostId || !isAuthReady) return;
     
@@ -151,18 +149,16 @@ const LinkedInPosts = () => {
             post_content_3: newData.post_content_3
           };
           
-          // Always update state with latest data
           setPostsData(linkedInPostData);
           
-          // Check if all posts are ready and immediately stop loading + deduct credits
-          if (areAllPostsReady(linkedInPostData)) {
-            console.log('All posts are ready! Stopping loading and deducting credits immediately');
+          if (areAllPostsReady(linkedInPostData) && !creditsDeducted) {
+            console.log('All posts are ready! Stopping loading and deducting credits');
             setIsGenerating(false);
             
-            // Deduct credits immediately when all posts are ready
             try {
-              const success = await deductCreditsAfterResults(currentPostId);
+              const success = await deductPostCredits(currentPostId);
               if (success) {
+                setCreditsDeducted(true); // Mark as deducted
                 toast({
                   title: "LinkedIn Posts Generated!",
                   description: "Your 3 LinkedIn post variations have been created successfully."
@@ -182,9 +178,8 @@ const LinkedInPosts = () => {
       console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
-  }, [currentPostId, isAuthReady, toast, deductCreditsAfterResults]);
+  }, [currentPostId, isAuthReady, toast, deductPostCredits, creditsDeducted]);
 
-  // Check existing data when currentPostId changes - NO TOAST, NO CREDIT DEDUCTION
   useEffect(() => {
     const checkExistingData = async () => {
       if (!currentPostId || !isAuthReady) return;
@@ -216,10 +211,8 @@ const LinkedInPosts = () => {
               post_content_3: data.post_content_3
             };
             
-            // Always update state with existing data
             setPostsData(linkedInPostData);
             
-            // Check if all posts are already ready - only stop loading, NO TOAST, NO CREDIT DEDUCTION
             if (areAllPostsReady(linkedInPostData)) {
               console.log('Existing data is complete, stopping loading state');
               setIsGenerating(false);
@@ -236,7 +229,6 @@ const LinkedInPosts = () => {
     }
   }, [currentPostId, isAuthReady, executeWithRetry]);
 
-  // Handle input changes
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -244,7 +236,6 @@ const LinkedInPosts = () => {
     }));
   };
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -297,8 +288,12 @@ const LinkedInPosts = () => {
       return;
     }
 
-    const canProceed = await checkCreditsBeforeGeneration();
-    if (!canProceed) {
+    if (!hasCredits) {
+      toast({
+        title: "Insufficient Credits",
+        description: "You need 3 credits to generate LinkedIn posts.",
+        variant: "destructive"
+      });
       return;
     }
 
@@ -306,6 +301,7 @@ const LinkedInPosts = () => {
     setIsGenerating(true);
     setPostsData(null);
     setCurrentPostId(null);
+    setCreditsDeducted(false); // FIXED: Reset credits deduction flag
 
     try {
       console.log('Creating LinkedIn post with user_profile.id:', userProfile.id);
@@ -352,7 +348,6 @@ const LinkedInPosts = () => {
     }
   };
 
-  // Reset form
   const resetForm = () => {
     setFormData({
       topic: '',
@@ -364,9 +359,9 @@ const LinkedInPosts = () => {
     setPostsData(null);
     setIsGenerating(false);
     setCurrentPostId(null);
+    setCreditsDeducted(false); // Reset credits deduction flag
   };
 
-  // Determine what to show based on data completeness
   const shouldShowResults = postsData && areAllPostsReady(postsData);
   const shouldShowLoading = isGenerating && !shouldShowResults;
 
@@ -419,7 +414,6 @@ const LinkedInPosts = () => {
                   </div>
                 </div>
 
-                {/* Input Form */}
                 <Card className="bg-gradient-to-br from-cyan-400 via-teal-300 to-teal-500 border-white/10 backdrop-blur-md mb-8 shadow-xl max-w-full">
                   <CardHeader className="pb-6">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -498,7 +492,6 @@ const LinkedInPosts = () => {
                   </CardContent>
                 </Card>
 
-                {/* Loading State - Only show when generating AND no complete results */}
                 {shouldShowLoading && (
                   <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm mb-8 max-w-full">
                     <CardContent className="py-8 flex items-center justify-center">
@@ -507,7 +500,6 @@ const LinkedInPosts = () => {
                   </Card>
                 )}
 
-                {/* Results Display - Show when posts are ready */}
                 {shouldShowResults && (
                   <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm max-w-full">
                     <CardHeader className="pb-6">
@@ -554,7 +546,6 @@ const LinkedInPosts = () => {
                 )}
               </div>
 
-              {/* History Modal */}
               <LinkedInPostsHistoryModal 
                 isOpen={showHistory} 
                 onClose={() => setShowHistory(false)} 

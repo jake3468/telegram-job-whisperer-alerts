@@ -9,17 +9,8 @@ export function useLinkedInPostCreditCheck() {
     }
   });
 
-  const checkCreditsBeforeGeneration = async (): Promise<boolean> => {
-    // Only check if user has credits, don't deduct yet
-    if (!creditCheck.hasCredits) {
-      creditCheck.showInsufficientCreditsPopup();
-      return false;
-    }
-    return true;
-  };
-
-  // Simplified credit deduction after results are ready
-  const deductCreditsAfterResults = async (postId: string) => {
+  // FIXED: Simplified credit deduction when results are ready
+  const deductPostCredits = async (postId: string): Promise<boolean> => {
     console.log(`Deducting credits for LinkedIn post ${postId}`);
 
     const success = await creditCheck.checkAndDeductCredits(
@@ -37,7 +28,6 @@ export function useLinkedInPostCreditCheck() {
 
   return {
     ...creditCheck,
-    checkCreditsBeforeGeneration,
-    deductCreditsAfterResults
+    deductPostCredits
   };
 }

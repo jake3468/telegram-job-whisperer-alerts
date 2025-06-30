@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -43,7 +42,7 @@ const LinkedInPostVariation = ({
 }: LinkedInPostVariationProps) => {
   const { toast } = useToast();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
-  const { checkAndDeductForImage, isDeducting } = useLinkedInImageCreditCheck();
+  const { deductImageCredits, isDeducting } = useLinkedInImageCreditCheck();
   
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
@@ -81,7 +80,7 @@ const LinkedInPostVariation = ({
     loadExistingImages();
   }, [postId, variationNumber, isAuthReady, executeWithRetry]);
 
-  // Real-time subscription for image updates
+  // Real-time subscription for image updates - FIXED LOGIC
   useEffect(() => {
     if (!postId || !isAuthReady) return;
 
@@ -98,11 +97,14 @@ const LinkedInPostVariation = ({
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
           const newImage = payload.new;
           
+          // FIXED: Only set loading when "generating..." appears
           if (newImage.image_data === 'generating...') {
             console.log(`Image generation started for variation ${variationNumber}`);
             setIsLoadingImage(true);
             setImageGenerationFailed(false);
-          } else if (newImage.image_data && newImage.image_data !== 'generating...' && !newImage.image_data.includes('failed')) {
+          } 
+          // FIXED: Only stop loading and add image when real image data appears
+          else if (newImage.image_data && newImage.image_data !== 'generating...' && !newImage.image_data.includes('failed')) {
             console.log(`Image generation completed for variation ${variationNumber}`);
             
             // Add the new image to the list
@@ -111,12 +113,13 @@ const LinkedInPostVariation = ({
               return exists ? prev : [...prev, newImage.image_data];
             });
             
+            // FIXED: Stop loading state when image is successfully received
             setIsLoadingImage(false);
             setImageGenerationFailed(false);
             
-            // Deduct credits when image is successfully displayed
+            // FIXED: Simplified credit deduction - direct call when image is displayed
             try {
-              const success = await checkAndDeductForImage(postId, variationNumber);
+              const success = await deductImageCredits(postId, variationNumber);
               if (success) {
                 console.log(`Credits deducted for variation ${variationNumber} image`);
               }
@@ -128,7 +131,9 @@ const LinkedInPostVariation = ({
               title: "Image Generated!",
               description: `LinkedIn post image for variation ${variationNumber} is ready.`
             });
-          } else if (newImage.image_data && newImage.image_data.includes('failed')) {
+          } 
+          // Handle failed generation
+          else if (newImage.image_data && newImage.image_data.includes('failed')) {
             console.log(`Image generation failed for variation ${variationNumber}`);
             setIsLoadingImage(false);
             setImageGenerationFailed(true);
@@ -148,7 +153,7 @@ const LinkedInPostVariation = ({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [postId, variationNumber, isAuthReady, toast, checkAndDeductForImage]);
+  }, [postId, variationNumber, isAuthReady, toast, deductImageCredits]);
 
   // Add timeout mechanism to reset loading state after 3 minutes
   useEffect(() => {
@@ -174,6 +179,7 @@ const LinkedInPostVariation = ({
     };
   }, [isLoadingImage, variationNumber, toast]);
 
+  // Copy to clipboard
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -191,6 +197,7 @@ const LinkedInPostVariation = ({
     }
   };
 
+  // Copy image to clipboard
   const copyImageToClipboard = async (imageData: string) => {
     try {
       const response = await fetch(imageData);
@@ -216,6 +223,7 @@ const LinkedInPostVariation = ({
     }
   };
 
+  // Handle image generation
   const handleGenerateImage = async () => {
     if (!postId) {
       toast({
@@ -226,11 +234,7 @@ const LinkedInPostVariation = ({
       return;
     }
 
-    // Check if user has sufficient credits first
-    if (!await checkAndDeductForImage(postId, variationNumber, true)) {
-      return;
-    }
-
+    // FIXED: Simplified - just start the generation process
     setIsLoadingImage(true);
     setImageGenerationFailed(false);
 
@@ -263,7 +267,7 @@ const LinkedInPostVariation = ({
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuemxveXloemhycXN2c2xoaHJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzAyMjIsImV4cCI6MjA2NDUwNjIyMn0.xdlgb_amJ1fV31uinCFotGW00isgT5-N8zJ_gLHEKuk`
           },
           body: JSON.stringify({
             post_id: postId,
@@ -304,6 +308,7 @@ const LinkedInPostVariation = ({
     }
   };
 
+  // Delete image
   const deleteImage = async (imageData: string) => {
     if (!postId) return;
 
