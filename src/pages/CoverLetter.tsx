@@ -38,7 +38,7 @@ const CoverLetter = () => {
     isComplete
   } = useUserCompletionStatus();
 
-  // Use check-only mode for initial credit check
+  // Use credit check for 1.5 credits required for cover letters
   const {
     hasCredits,
     showInsufficientCreditsPopup
@@ -138,11 +138,11 @@ const CoverLetter = () => {
     }));
   };
 
-  // Updated handleSubmit to only check credits, not deduct them (N8N will handle deduction)
+  // Updated handleSubmit to check credits before allowing submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Only check credits, don't deduct them (N8N will handle deduction)
+    // Check if user has sufficient credits
     if (!hasCredits) {
       showInsufficientCreditsPopup();
       return;
@@ -252,6 +252,10 @@ const CoverLetter = () => {
       </div>;
   }
 
+  // Check if form is valid and user has credits
+  const isFormValid = formData.job_title.trim() && formData.company_name.trim() && formData.job_description.trim();
+  const canSubmit = isFormValid && hasCredits && !isSubmitting && !isGenerating;
+
   return <SidebarProvider defaultOpen={true}>
       {/* Header for mobile */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
@@ -344,8 +348,16 @@ const CoverLetter = () => {
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                          {/* Generate Cover Letter - takes up majority of the width, Reset is smaller */}
-                          <Button type="submit" disabled={isSubmitting || !formData.job_title.trim() || !formData.company_name.trim() || !formData.job_description.trim() || isGenerating} className="flex-[3] bg-gradient-to-r from-white to-white hover:from-white/80 hover:to-white/80 text-black font-semibold text-base h-12 rounded-lg">
+                          {/* Generate Cover Letter - disabled if no credits */}
+                          <Button 
+                            type="submit" 
+                            disabled={!canSubmit}
+                            className={`flex-[3] font-semibold text-base h-12 rounded-lg ${
+                              canSubmit 
+                                ? "bg-gradient-to-r from-white to-white hover:from-white/80 hover:to-white/80 text-black" 
+                                : "bg-gray-500 text-gray-300 cursor-not-allowed"
+                            }`}
+                          >
                             {isSubmitting ? "Submitting..." : isGenerating ? "Generating..." : "Generate Cover Letter"}
                           </Button>
                           <Button type="button" onClick={resetForm} variant="outline" className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 text-base h-12 px-6 max-sm:w-full" disabled={isGenerating}>
