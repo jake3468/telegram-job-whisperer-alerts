@@ -57,7 +57,7 @@ export function useLinkedInImageManager(postId: string | null) {
 
         if (data) {
           setImages(data);
-          // Update generating states based on fetched data
+          // Update generating states based on fetched data - properly reset loading states
           setIsGenerating(prev => {
             const newState = [false, false, false];
             data.forEach(img => {
@@ -100,7 +100,7 @@ export function useLinkedInImageManager(postId: string | null) {
             }
           });
 
-          // Update generating state - NO CREDIT DEDUCTION (handled by N8N webhook)
+          // Properly update generating state when image generation completes
           if (newImage.image_data !== 'generating...') {
             setIsGenerating(prev => {
               const newState = [...prev];
@@ -113,6 +113,15 @@ export function useLinkedInImageManager(postId: string | null) {
             toast({
               title: "Image Generated!",
               description: `LinkedIn post image for variation ${newImage.variation_number} is ready.`
+            });
+          } else if (newImage.image_data === 'generating...') {
+            // Set loading state when generation starts
+            setIsGenerating(prev => {
+              const newState = [...prev];
+              if (newImage.variation_number) {
+                newState[newImage.variation_number - 1] = true;
+              }
+              return newState;
             });
           }
         } else if (payload.eventType === 'DELETE') {
@@ -133,6 +142,7 @@ export function useLinkedInImageManager(postId: string | null) {
   const generateImage = useCallback(async (variationNumber: number, postData?: any) => {
     if (!postId) return;
 
+    // Set generating state immediately when user clicks
     setIsGenerating(prev => {
       const newState = [...prev];
       newState[variationNumber - 1] = true;
@@ -200,6 +210,7 @@ export function useLinkedInImageManager(postId: string | null) {
 
     } catch (error) {
       console.error('Error generating image:', error);
+      // Reset generating state on error
       setIsGenerating(prev => {
         const newState = [...prev];
         newState[variationNumber - 1] = false;
