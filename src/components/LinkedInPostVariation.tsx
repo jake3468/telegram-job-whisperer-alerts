@@ -71,9 +71,11 @@ const LinkedInPostVariation = ({
           if (data && data.length > 0) {
             const imageUrls = data.map(img => img.image_data);
             setGeneratedImages(imageUrls);
-            // FIXED: Immediately reset loading state when existing images are found
-            setIsLoadingImage(false);
-            setImageGenerationFailed(false);
+            // Only reset loading state if we were actually loading
+            if (isLoadingImage) {
+              setIsLoadingImage(false);
+              setImageGenerationFailed(false);
+            }
           }
         }, 3, `load existing images for variation ${variationNumber}`);
       } catch (err) {
@@ -82,7 +84,7 @@ const LinkedInPostVariation = ({
     };
 
     loadExistingImages();
-  }, [postId, variationNumber, isAuthReady, executeWithRetry]);
+  }, [postId, variationNumber, isAuthReady, executeWithRetry, isLoadingImage]);
 
   // Real-time subscription for image updates
   useEffect(() => {
@@ -108,13 +110,13 @@ const LinkedInPostVariation = ({
           } else if (newImage.image_data && newImage.image_data !== 'generating...' && !newImage.image_data.includes('failed')) {
             console.log(`Image generation completed for variation ${variationNumber}`);
             
-            // FIXED: First update images, then immediately reset loading states
+            // Add the new image to the list
             setGeneratedImages(prev => {
               const exists = prev.includes(newImage.image_data);
               return exists ? prev : [...prev, newImage.image_data];
             });
             
-            // FIXED: Immediately reset loading states after image is added
+            // FIXED: Reset loading states only after successful image generation
             setIsLoadingImage(false);
             setImageGenerationFailed(false);
             
@@ -176,15 +178,6 @@ const LinkedInPostVariation = ({
       }
     };
   }, [isLoadingImage, variationNumber, toast]);
-
-  // FIXED: Force reset loading state whenever images are present
-  useEffect(() => {
-    if (generatedImages.length > 0) {
-      console.log(`Images detected for variation ${variationNumber}, forcing loading state reset`);
-      setIsLoadingImage(false);
-      setImageGenerationFailed(false);
-    }
-  }, [generatedImages.length, variationNumber]);
 
   const copyToClipboard = async (text: string) => {
     try {

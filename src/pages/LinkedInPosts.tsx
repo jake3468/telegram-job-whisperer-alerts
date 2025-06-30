@@ -55,7 +55,6 @@ const LinkedInPosts = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
-  const [toastShown, setToastShown] = useState(false);
 
   const toneOptions = [
     { value: 'professional', label: 'Professional & Insightful' },
@@ -116,7 +115,7 @@ const LinkedInPosts = () => {
     return hasAllData;
   };
 
-  // Real-time subscription for LinkedIn post updates - SINGLE SOURCE OF TRUTH FOR TOASTS
+  // Real-time subscription for LinkedIn post updates - FIXED: Removed toastShown dependency for credit deduction
   useEffect(() => {
     if (!currentPostId || !isAuthReady) return;
     
@@ -154,11 +153,10 @@ const LinkedInPosts = () => {
           
           setPostsData(linkedInPostData);
           
-          // Check if all posts are ready and show toast only once
-          if (areAllPostsReady(linkedInPostData) && !toastShown) {
-            console.log('All posts are ready! Stopping loading and showing success toast');
+          // FIXED: Check if all posts are ready and deduct credits immediately
+          if (areAllPostsReady(linkedInPostData)) {
+            console.log('All posts are ready! Stopping loading and deducting credits');
             setIsGenerating(false);
-            setToastShown(true);
             
             deductCreditsAfterResults(currentPostId).then(success => {
               if (success) {
@@ -179,7 +177,7 @@ const LinkedInPosts = () => {
       console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
-  }, [currentPostId, isAuthReady, toast, deductCreditsAfterResults, toastShown]);
+  }, [currentPostId, isAuthReady, toast, deductCreditsAfterResults]);
 
   // Check existing data when currentPostId changes - NO TOAST, NO CREDIT DEDUCTION
   useEffect(() => {
@@ -219,7 +217,6 @@ const LinkedInPosts = () => {
             if (areAllPostsReady(linkedInPostData)) {
               console.log('Existing data is complete, stopping loading');
               setIsGenerating(false);
-              setToastShown(true); // Prevent future toasts for existing data
             }
           }
         }, 3, 'check existing post data');
@@ -254,7 +251,6 @@ const LinkedInPosts = () => {
       return;
     }
 
-    // Refresh profile status before checking
     if (completionLoading) {
       toast({
         title: "Checking Profile Status",
@@ -295,7 +291,6 @@ const LinkedInPosts = () => {
       return;
     }
 
-    // Check credits before proceeding
     const canProceed = await checkCreditsBeforeGeneration();
     if (!canProceed) {
       return;
@@ -305,7 +300,6 @@ const LinkedInPosts = () => {
     setIsGenerating(true);
     setPostsData(null);
     setCurrentPostId(null);
-    setToastShown(false); // Reset toast flag on new submission
 
     try {
       console.log('Creating LinkedIn post with user_profile.id:', userProfile.id);
@@ -364,7 +358,6 @@ const LinkedInPosts = () => {
     setPostsData(null);
     setIsGenerating(false);
     setCurrentPostId(null);
-    setToastShown(false); // Reset toast flag
   };
 
   // Determine what to show based on data completeness
@@ -376,8 +369,7 @@ const LinkedInPosts = () => {
     areAllPostsReady: postsData ? areAllPostsReady(postsData) : false,
     shouldShowResults,
     shouldShowLoading,
-    isGenerating,
-    toastShown
+    isGenerating
   });
 
   return (

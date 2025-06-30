@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -141,7 +142,7 @@ export function useLinkedInImageManager(postId: string | null) {
     };
   }, [postId, isAuthReady, fetchImages, toast, checkAndDeductForImage]);
 
-  const generateImage = useCallback(async (variationNumber: number) => {
+  const generateImage = useCallback(async (variationNumber: number, postData?: any) => {
     if (!postId) return;
 
     // Only check credits, don't deduct yet
@@ -171,18 +172,27 @@ export function useLinkedInImageManager(postId: string | null) {
           throw error;
         }
 
-        // FIXED: Call webhook with proper parameters for history section
+        // FIXED: Call webhook with proper parameters including post data from history
+        const webhookBody = {
+          post_id: postId,
+          variation_number: variationNumber,
+          source: 'linkedin_history'
+        };
+
+        // Add post content if available from history data
+        if (postData) {
+          webhookBody.post_heading = postData[`post_heading_${variationNumber}`] || '';
+          webhookBody.post_content = postData[`post_content_${variationNumber}`] || '';
+          webhookBody.user_name = 'Professional User'; // Default for history section
+        }
+
         const webhookResponse = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/functions/v1/linkedin-image-webhook', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
           },
-          body: JSON.stringify({
-            post_id: postId,
-            variation_number: variationNumber,
-            source: 'linkedin_history'
-          })
+          body: JSON.stringify(webhookBody)
         });
 
         if (!webhookResponse.ok) {
@@ -216,7 +226,7 @@ export function useLinkedInImageManager(postId: string | null) {
 
   const handleGetImageForPost = useCallback(async (item: any, postNumber: number) => {
     if (!postId) return;
-    await generateImage(postNumber);
+    await generateImage(postNumber, item);
   }, [generateImage, postId]);
 
   const deleteImage = useCallback(async (imageId: string, variationNumber: number) => {
