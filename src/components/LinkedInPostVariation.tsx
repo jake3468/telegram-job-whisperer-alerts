@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -67,6 +68,7 @@ const LinkedInPostVariation = ({
 
           if (data && data.length > 0) {
             const imageUrls = data.map(img => img.image_data);
+            console.log(`🖼️ Loaded ${imageUrls.length} existing images for variation ${variationNumber}`);
             setGeneratedImages(imageUrls);
           }
         }, 3, `load existing images for variation ${variationNumber}`);
@@ -78,9 +80,11 @@ const LinkedInPostVariation = ({
     loadExistingImages();
   }, [postId, variationNumber, isAuthReady, executeWithRetry]);
 
-  // Real-time subscription for image updates
+  // Real-time subscription for image updates - FIXED
   useEffect(() => {
     if (!postId || !isAuthReady) return;
+
+    console.log(`📡 Setting up real-time subscription for post ${postId}, variation ${variationNumber}`);
 
     const channel = supabase
       .channel(`linkedin-image-updates-${postId}-${variationNumber}`)
@@ -88,25 +92,37 @@ const LinkedInPostVariation = ({
         event: '*',
         schema: 'public',
         table: 'linkedin_post_images',
-        filter: `post_id=eq.${postId}.and.variation_number=eq.${variationNumber}`
+        filter: `post_id=eq.${postId}`
       }, async (payload) => {
-        console.log('LinkedIn image updated via real-time:', payload);
+        console.log('📡 LinkedIn image updated via real-time:', payload);
         
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
           const newImage = payload.new;
           
+          // Only process images for this specific variation
+          if (newImage.variation_number !== variationNumber) {
+            console.log(`📡 Ignoring image for variation ${newImage.variation_number}, expecting ${variationNumber}`);
+            return;
+          }
+          
           if (newImage.image_data === 'generating...') {
-            console.log(`Image generation started for variation ${variationNumber}`);
+            console.log(`🔄 Image generation started for variation ${variationNumber}`);
             setIsLoadingImage(true);
             setImageGenerationFailed(false);
           } 
           else if (newImage.image_data && newImage.image_data !== 'generating...' && !newImage.image_data.includes('failed')) {
-            console.log(`Image generation completed for variation ${variationNumber}`);
+            console.log(`✅ Image generation completed for variation ${variationNumber}`);
+            console.log(`🖼️ New image data received:`, newImage.image_data.substring(0, 100) + '...');
             
-            // Add the new image to the list
+            // Add the new image to the list if it's not already there
             setGeneratedImages(prev => {
               const exists = prev.includes(newImage.image_data);
-              return exists ? prev : [...prev, newImage.image_data];
+              if (exists) {
+                console.log(`📡 Image already exists in state`);
+                return prev;
+              }
+              console.log(`📡 Adding new image to state`);
+              return [...prev, newImage.image_data];
             });
             
             setIsLoadingImage(false);
@@ -118,7 +134,7 @@ const LinkedInPostVariation = ({
             });
           } 
           else if (newImage.image_data && newImage.image_data.includes('failed')) {
-            console.log(`Image generation failed for variation ${variationNumber}`);
+            console.log(`❌ Image generation failed for variation ${variationNumber}`);
             setIsLoadingImage(false);
             setImageGenerationFailed(true);
             toast({
@@ -129,12 +145,17 @@ const LinkedInPostVariation = ({
           }
         } else if (payload.eventType === 'DELETE') {
           const deletedImage = payload.old;
-          setGeneratedImages(prev => prev.filter(img => img !== deletedImage.image_data));
+          if (deletedImage.variation_number === variationNumber) {
+            setGeneratedImages(prev => prev.filter(img => img !== deletedImage.image_data));
+          }
         }
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log(`📡 Real-time subscription status for variation ${variationNumber}:`, status);
+      });
 
     return () => {
+      console.log(`🧹 Cleaning up real-time subscription for variation ${variationNumber}`);
       supabase.removeChannel(channel);
     };
   }, [postId, variationNumber, isAuthReady, toast]);
@@ -145,7 +166,7 @@ const LinkedInPostVariation = ({
     
     if (isLoadingImage) {
       timeoutId = setTimeout(() => {
-        console.log(`Image generation timeout reached for variation ${variationNumber}`);
+        console.log(`⏰ Image generation timeout reached for variation ${variationNumber}`);
         setIsLoadingImage(false);
         setImageGenerationFailed(true);
         toast({
@@ -409,6 +430,8 @@ const LinkedInPostVariation = ({
                   src={imageData} 
                   alt={`Generated LinkedIn post image ${index + 1} for variation ${variationNumber}`}
                   className="w-full rounded-lg shadow-lg object-contain"
+                  onLoad={() => console.log(`🖼️ Image ${index + 1} loaded successfully for variation ${variationNumber}`)}
+                  onError={(e) => console.error(`❌ Failed to load image ${index + 1} for variation ${variationNumber}`, e)}
                 />
                 <div className="absolute top-3 right-3 flex gap-2">
                   <Button
