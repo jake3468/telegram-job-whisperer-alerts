@@ -39,7 +39,7 @@ const LinkedInPosts = () => {
   const { userProfile } = useUserProfile();
   const { isComplete, loading: completionLoading, refetchStatus } = useUserCompletionStatus();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
-  const { hasCredits, deductPostCredits } = useLinkedInPostCreditCheck();
+  const { hasCredits } = useLinkedInPostCreditCheck();
   
   const [formData, setFormData] = useState({
     topic: '',
@@ -114,7 +114,7 @@ const LinkedInPosts = () => {
   };
 
   useEffect(() => {
-    if (!currentPostId || !isAuthReady) return;
+    if (!currentPostId || !isAuthReady || !userProfile?.id) return;
     
     console.log('Setting up real-time subscription for post ID:', currentPostId);
 
@@ -150,21 +150,32 @@ const LinkedInPosts = () => {
           
           setPostsData(linkedInPostData);
           
-          // FIXED: Simple direct credit deduction when posts are complete
+          // FIXED: Direct credit deduction using Supabase function when posts are complete
           if (areAllPostsReady(linkedInPostData)) {
             console.log('All posts are ready! Stopping loading and deducting credits');
             setIsGenerating(false);
             
             try {
-              const success = await deductPostCredits(currentPostId);
-              if (success) {
+              console.log('Calling deduct_credits function directly for user:', userProfile.id);
+              
+              // Use the Supabase deduct_credits function directly
+              const { data: deductResult, error: deductError } = await supabase.rpc('deduct_credits', {
+                p_user_id: userProfile.id,
+                p_amount: 3.0,
+                p_feature_used: 'linkedin_post',
+                p_description: `LinkedIn post generation completed for post ${currentPostId}`
+              });
+              
+              if (deductError) {
+                console.error('Error deducting credits:', deductError);
+              } else if (deductResult) {
                 console.log('Credits successfully deducted for LinkedIn posts');
                 toast({
                   title: "LinkedIn Posts Generated!",
                   description: "Your 3 LinkedIn post variations have been created successfully."
                 });
               } else {
-                console.log('Failed to deduct credits for LinkedIn posts');
+                console.log('Failed to deduct credits - insufficient balance');
               }
             } catch (error) {
               console.error('Error deducting credits:', error);
@@ -180,7 +191,7 @@ const LinkedInPosts = () => {
       console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
-  }, [currentPostId, isAuthReady, toast, deductPostCredits]);
+  }, [currentPostId, isAuthReady, toast, userProfile?.id]);
 
   useEffect(() => {
     const checkExistingData = async () => {
