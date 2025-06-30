@@ -207,7 +207,7 @@ const LinkedInPostVariation = ({
     }
   };
 
-  // Handle image generation - Fixed to properly call N8N webhook
+  // Handle image generation - Fixed to properly call the webhook
   const handleGenerateImage = async () => {
     if (!postId) {
       toast({
@@ -218,15 +218,15 @@ const LinkedInPostVariation = ({
       return;
     }
 
+    console.log(`🚀 Starting image generation for post ${postId}, variation ${variationNumber}`);
     setIsLoadingImage(true);
     setImageGenerationFailed(false);
 
     try {
-      console.log(`Generating image for post ${postId}, variation ${variationNumber}`);
-      
       await executeWithRetry(async () => {
-        // Create a placeholder record first
-        const { data, error } = await supabase
+        // Step 1: Create a placeholder record first
+        console.log('📝 Creating placeholder image record...');
+        const { data: imageRecord, error: insertError } = await supabase
           .from('linkedin_post_images')
           .insert({
             post_id: postId,
@@ -236,49 +236,49 @@ const LinkedInPostVariation = ({
           .select()
           .single();
 
-        if (error) {
-          console.error('Error creating image record:', error);
-          throw error;
+        if (insertError) {
+          console.error('❌ Error creating image record:', insertError);
+          throw new Error(`Failed to create image record: ${insertError.message}`);
         }
 
-        console.log('Image generation request created:', data);
+        console.log('✅ Placeholder image record created:', imageRecord);
 
-        // Call the webhook with the correct parameters - this will trigger N8N
+        // Step 2: Call the linkedin-image-webhook edge function
+        console.log('🔗 Calling linkedin-image-webhook edge function...');
         const userName = userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() : 'Professional User';
         
-        const webhookResponse = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/functions/v1/linkedin-image-webhook', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuemxveXloemhycXN2c2xoaHJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzAyMjIsImV4cCI6MjA2NDUwNjIyMn0.xdlgb_amJ1fV31uinCFotGW00isgT5-N8zJ_gLHEKuk`
-          },
-          body: JSON.stringify({
-            post_id: postId,
-            post_heading: heading,
-            post_content: content,
-            variation_number: variationNumber,
-            user_name: userName,
-            source: 'linkedin_post_variation'
-          })
+        const webhookPayload = {
+          post_id: postId,
+          post_heading: heading,
+          post_content: content,
+          variation_number: variationNumber,
+          user_name: userName,
+          source: 'linkedin_post_variation'
+        };
+
+        console.log('📦 Webhook payload:', webhookPayload);
+
+        const { data: webhookData, error: webhookError } = await supabase.functions.invoke('linkedin-image-webhook', {
+          body: webhookPayload
         });
 
-        if (!webhookResponse.ok) {
-          const errorText = await webhookResponse.text();
-          console.error('Webhook call failed:', errorText);
-          throw new Error(`Failed to trigger image generation webhook: ${webhookResponse.status}`);
+        if (webhookError) {
+          console.error('❌ Webhook error:', webhookError);
+          throw new Error(`Webhook failed: ${webhookError.message}`);
         }
 
-        const webhookResult = await webhookResponse.json();
-        console.log('Webhook response:', webhookResult);
+        console.log('✅ Webhook response:', webhookData);
 
-        // Check if the webhook was configured properly
-        if (webhookResult.success === false) {
-          if (!webhookResult.webhook_url_configured) {
+        // Check if webhook was successful
+        if (webhookData && webhookData.success === false) {
+          if (!webhookData.webhook_url_configured) {
             throw new Error('N8N webhook URL not configured');
           } else {
-            throw new Error(webhookResult.error || 'Webhook execution failed');
+            throw new Error(webhookData.error || 'Webhook execution failed');
           }
         }
+
+        console.log('🎉 Image generation webhook triggered successfully');
 
       }, 3, `generate image for variation ${variationNumber}`);
       
@@ -288,7 +288,7 @@ const LinkedInPostVariation = ({
       });
 
     } catch (err: any) {
-      console.error('Error generating image:', err);
+      console.error('❌ Error in handleGenerateImage:', err);
       setIsLoadingImage(false);
       setImageGenerationFailed(true);
       
@@ -298,8 +298,10 @@ const LinkedInPostVariation = ({
         errorMessage = "Image generation service is not configured. Please contact support.";
       } else if (err.message.includes('webhook execution failed')) {
         errorMessage = "Image generation service is temporarily unavailable. Please try again later.";
-      } else if (err.message.includes('Failed to trigger')) {
-        errorMessage = "Unable to start image generation. Please check your connection and try again.";
+      } else if (err.message.includes('Failed to create image record')) {
+        errorMessage = "Database error occurred. Please try again.";
+      } else if (err.message.includes('Webhook failed')) {
+        errorMessage = "Image generation service error. Please try again.";
       }
       
       toast({
