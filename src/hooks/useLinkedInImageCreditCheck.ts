@@ -9,7 +9,7 @@ export function useLinkedInImageCreditCheck() {
     }
   });
 
-  // FIXED: Simplified credit deduction flow
+  // Simplified credit check and deduction flow
   const checkAndDeductForImage = async (postId: string, variationNumber: number, checkOnly: boolean = false) => {
     if (checkOnly) {
       // Only check if user has credits, don't deduct
@@ -20,7 +20,7 @@ export function useLinkedInImageCreditCheck() {
       return true;
     }
 
-    // FIXED: Direct credit deduction when image is displayed
+    // Direct credit deduction when image is displayed
     console.log(`Deducting credits for LinkedIn image - post ${postId}, variation ${variationNumber}`);
     
     const success = await creditCheck.checkAndDeductCredits(

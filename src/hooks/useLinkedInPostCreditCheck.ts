@@ -18,24 +18,19 @@ export function useLinkedInPostCreditCheck() {
     return true;
   };
 
-  // FIXED: Simplified credit deduction - single tracking mechanism
+  // Simplified credit deduction after results are ready
   const deductCreditsAfterResults = async (postId: string) => {
-    console.log(`Attempting to deduct credits for post ${postId}`);
+    console.log(`Deducting credits for LinkedIn post ${postId}`);
 
-    try {
-      const success = await creditCheck.checkAndDeductCredits(
-        `LinkedIn post generation completed for post ${postId}`
-      );
-      
-      if (success) {
-        console.log(`Successfully deducted 3 credits for LinkedIn post generation - post ${postId}`);
-        return true;
-      } else {
-        console.log(`Failed to deduct credits for post ${postId}`);
-        return false;
-      }
-    } catch (error) {
-      console.error(`Error during credit deduction for post ${postId}:`, error);
+    const success = await creditCheck.checkAndDeductCredits(
+      `LinkedIn post generation completed for post ${postId}`
+    );
+    
+    if (success) {
+      console.log(`Successfully deducted 3 credits for LinkedIn post generation - post ${postId}`);
+      return true;
+    } else {
+      console.log(`Failed to deduct credits for post ${postId}`);
       return false;
     }
   };

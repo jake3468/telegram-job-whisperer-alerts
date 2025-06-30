@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -47,9 +48,8 @@ const LinkedInPostVariation = ({
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
-  const [activeGenerationRequests, setActiveGenerationRequests] = useState<Set<string>>(new Set());
 
-  // Load existing images for this variation - FIXED: Don't reset loading state arbitrarily
+  // Load existing images for this variation
   useEffect(() => {
     const loadExistingImages = async () => {
       if (!postId || !isAuthReady) return;
@@ -71,11 +71,6 @@ const LinkedInPostVariation = ({
           if (data && data.length > 0) {
             const imageUrls = data.map(img => img.image_data);
             setGeneratedImages(imageUrls);
-            // FIXED: Only reset loading state if no active requests are pending
-            if (activeGenerationRequests.size === 0) {
-              setIsLoadingImage(false);
-              setImageGenerationFailed(false);
-            }
           }
         }, 3, `load existing images for variation ${variationNumber}`);
       } catch (err) {
@@ -84,7 +79,7 @@ const LinkedInPostVariation = ({
     };
 
     loadExistingImages();
-  }, [postId, variationNumber, isAuthReady, executeWithRetry, activeGenerationRequests.size]);
+  }, [postId, variationNumber, isAuthReady, executeWithRetry]);
 
   // Real-time subscription for image updates
   useEffect(() => {
@@ -107,8 +102,6 @@ const LinkedInPostVariation = ({
             console.log(`Image generation started for variation ${variationNumber}`);
             setIsLoadingImage(true);
             setImageGenerationFailed(false);
-            // Track this generation request
-            setActiveGenerationRequests(prev => new Set(prev).add(newImage.id));
           } else if (newImage.image_data && newImage.image_data !== 'generating...' && !newImage.image_data.includes('failed')) {
             console.log(`Image generation completed for variation ${variationNumber}`);
             
@@ -118,16 +111,10 @@ const LinkedInPostVariation = ({
               return exists ? prev : [...prev, newImage.image_data];
             });
             
-            // FIXED: Remove from active requests and reset loading state
-            setActiveGenerationRequests(prev => {
-              const newSet = new Set(prev);
-              newSet.delete(newImage.id);
-              return newSet;
-            });
             setIsLoadingImage(false);
             setImageGenerationFailed(false);
             
-            // FIXED: Deduct credits exactly once when image is displayed
+            // Deduct credits when image is successfully displayed
             try {
               const success = await checkAndDeductForImage(postId, variationNumber);
               if (success) {
@@ -137,18 +124,12 @@ const LinkedInPostVariation = ({
               console.error('Error deducting credits for image:', error);
             }
             
-            // Show success toast
             toast({
               title: "Image Generated!",
               description: `LinkedIn post image for variation ${variationNumber} is ready.`
             });
           } else if (newImage.image_data && newImage.image_data.includes('failed')) {
             console.log(`Image generation failed for variation ${variationNumber}`);
-            setActiveGenerationRequests(prev => {
-              const newSet = new Set(prev);
-              newSet.delete(newImage.id);
-              return newSet;
-            });
             setIsLoadingImage(false);
             setImageGenerationFailed(true);
             toast({
@@ -160,11 +141,6 @@ const LinkedInPostVariation = ({
         } else if (payload.eventType === 'DELETE') {
           const deletedImage = payload.old;
           setGeneratedImages(prev => prev.filter(img => img !== deletedImage.image_data));
-          setActiveGenerationRequests(prev => {
-            const newSet = new Set(prev);
-            newSet.delete(deletedImage.id);
-            return newSet;
-          });
         }
       })
       .subscribe();
@@ -183,7 +159,6 @@ const LinkedInPostVariation = ({
         console.log(`Image generation timeout reached for variation ${variationNumber}`);
         setIsLoadingImage(false);
         setImageGenerationFailed(true);
-        setActiveGenerationRequests(new Set()); // Clear all active requests
         toast({
           title: "Image Generation Timeout",
           description: `Image generation took too long for variation ${variationNumber}. Please try again.`,
@@ -251,7 +226,7 @@ const LinkedInPostVariation = ({
       return;
     }
 
-    // FIXED: Only check if user has credits, don't deduct yet (deduction happens after display)
+    // Check if user has sufficient credits first
     if (!await checkAndDeductForImage(postId, variationNumber, true)) {
       return;
     }
@@ -281,7 +256,7 @@ const LinkedInPostVariation = ({
 
         console.log('Image generation request created:', data);
 
-        // Call the edge function directly with proper full URL and correct payload
+        // Call the edge function with proper parameters
         const userName = userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() : 'Professional User';
         
         const webhookResponse = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/functions/v1/linkedin-image-webhook', {
@@ -399,7 +374,7 @@ const LinkedInPostVariation = ({
         </div>
       </div>
 
-      {/* FIXED: Loading indicator - Only show when actively loading AND no images exist */}
+      {/* Loading indicator */}
       {isLoadingImage && generatedImages.length === 0 && (
         <div className="p-4 bg-blue-50 rounded-lg text-center border border-blue-200 mb-6">
           <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading for variation {variationNumber}...</div>
@@ -451,7 +426,7 @@ const LinkedInPostVariation = ({
         </div>
       )}
 
-      {/* LinkedIn Post Preview - Properly Contained */}
+      {/* LinkedIn Post Preview */}
       <div className="w-full">
         <LinkedInPostDisplay 
           content={content}
