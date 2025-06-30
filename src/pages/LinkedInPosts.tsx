@@ -40,7 +40,7 @@ const LinkedInPosts = () => {
   const { userProfile } = useUserProfile();
   const { isComplete, loading: completionLoading, refetchStatus } = useUserCompletionStatus();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
-  const { hasCredits } = useLinkedInPostCreditCheck();
+  const { hasCredits, refreshCredits } = useLinkedInPostCreditCheck();
   
   const [formData, setFormData] = useState({
     topic: '',
@@ -116,7 +116,6 @@ const LinkedInPosts = () => {
     return hasAllData;
   };
 
-  // Direct credit deduction function
   const deductCreditsForPosts = async (postId: string) => {
     if (creditsDeducted) {
       console.log('⚠️ Credits already deducted for this post session');
@@ -158,6 +157,9 @@ const LinkedInPosts = () => {
       } else if (deductResult) {
         console.log('✅ Credits successfully deducted for LinkedIn posts');
         setCreditsDeducted(true);
+        
+        refreshCredits();
+        
         toast({
           title: "LinkedIn Posts Generated!",
           description: "Your 3 LinkedIn post variations have been created successfully. 3 credits have been deducted."
@@ -221,6 +223,7 @@ const LinkedInPosts = () => {
             hasHeading1: Boolean(newData.post_heading_1),
             hasContent1: Boolean(newData.post_content_1),
             hasHeading2: Boolean(newData.post_content_2),
+            hasContent2: Boolean(newData.post_content_2),
             hasHeading3: Boolean(newData.post_content_3),
             hasContent3: Boolean(newData.post_content_3)
           });
@@ -228,7 +231,7 @@ const LinkedInPosts = () => {
           const linkedInPostData: LinkedInPostData = {
             post_heading_1: newData.post_heading_1,
             post_content_1: newData.post_content_1,
-            post_heading_2: newData.post_content_2,
+            post_heading_2: newData.post_heading_2,
             post_content_2: newData.post_content_2,
             post_heading_3: newData.post_heading_3,
             post_content_3: newData.post_content_3
@@ -236,7 +239,6 @@ const LinkedInPosts = () => {
           
           setPostsData(linkedInPostData);
           
-          // Check if all posts are ready and deduct credits
           if (areAllPostsReady(linkedInPostData)) {
             console.log('🎉 All posts are ready! Stopping loading and deducting credits');
             setIsGenerating(false);
@@ -279,7 +281,7 @@ const LinkedInPosts = () => {
             const linkedInPostData: LinkedInPostData = {
               post_heading_1: data.post_heading_1,
               post_content_1: data.post_content_1,
-              post_heading_2: data.post_content_2,
+              post_heading_2: data.post_heading_2,
               post_content_2: data.post_content_2,
               post_heading_3: data.post_heading_3,
               post_content_3: data.post_content_3
@@ -309,6 +311,45 @@ const LinkedInPosts = () => {
       ...prev,
       [field]: value
     }));
+  };
+
+  const checkCreditsWithFallback = async (): Promise<boolean> => {
+    await refreshCredits();
+    
+    if (hasCredits) {
+      console.log('✅ Credit check passed via hook');
+      return true;
+    }
+    
+    console.log('⚠️ Hook credit check failed, trying direct database check...');
+    try {
+      if (!userProfile?.id) {
+        console.error('❌ No user profile for direct credit check');
+        return false;
+      }
+
+      const { data: credits, error } = await supabase
+        .from('user_credits')
+        .select('current_balance')
+        .eq('user_id', userProfile.id)
+        .single();
+
+      if (error) {
+        console.error('❌ Direct credit check error:', error);
+        return false;
+      }
+
+      const hasDirectCredits = credits && Number(credits.current_balance) >= 3.0;
+      console.log('💳 Direct credit check result:', {
+        balance: credits?.current_balance,
+        hasCredits: hasDirectCredits
+      });
+
+      return hasDirectCredits;
+    } catch (error) {
+      console.error('❌ Exception in direct credit check:', error);
+      return false;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -363,10 +404,11 @@ const LinkedInPosts = () => {
       return;
     }
 
-    if (!hasCredits) {
+    const hasValidCredits = await checkCreditsWithFallback();
+    if (!hasValidCredits) {
       toast({
         title: "Insufficient Credits",
-        description: "You need 3 credits to generate LinkedIn posts.",
+        description: "You need 3 credits to generate LinkedIn posts. Please check your credit balance or purchase more credits.",
         variant: "destructive"
       });
       return;
@@ -376,7 +418,7 @@ const LinkedInPosts = () => {
     setIsGenerating(true);
     setPostsData(null);
     setCurrentPostId(null);
-    setCreditsDeducted(false); // Reset credits deducted flag
+    setCreditsDeducted(false);
 
     try {
       console.log('🚀 Creating LinkedIn post with user_profile.id:', userProfile.id);
@@ -434,7 +476,7 @@ const LinkedInPosts = () => {
     setPostsData(null);
     setIsGenerating(false);
     setCurrentPostId(null);
-    setCreditsDeducted(false); // Reset credits deducted flag
+    setCreditsDeducted(false);
   };
 
   const shouldShowResults = postsData && areAllPostsReady(postsData);
@@ -450,7 +492,6 @@ const LinkedInPosts = () => {
 
   return (
     <SidebarProvider defaultOpen={true}>
-      {/* Header for mobile */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
         <div className="flex items-center justify-between p-3">
           <SidebarTrigger className="h-12 w-12 bg-white/10 border-fuchsia-400/30 ring-2 ring-fuchsia-400/10 text-fuchsia-200 rounded-2xl shadow-lg hover:bg-fuchsia-700/30 transition-all flex items-center justify-center">
@@ -471,7 +512,6 @@ const LinkedInPosts = () => {
           <main className="flex-1 w-full min-w-0 bg-black">
             <div className="min-h-screen bg-black overflow-x-hidden">
               <div className="container mx-auto px-2 sm:px-4 py-8 mt-4 mb-8 max-w-6xl w-full min-w-0">
-                {/* Header Section */}
                 <div className="text-center mb-10">
                   <h1 className="sm:text-3xl font-orbitron bg-gradient-to-r from-teal-300 via-teal-400 to-cyan-400 bg-clip-text drop-shadow mb-4 tracking-tight font-bold lg:text-4xl text-teal-500 text-4xl">
                     ✍🏻 LinkedIn <span className="italic">Posts</span>
@@ -555,7 +595,7 @@ const LinkedInPosts = () => {
                       </div>
 
                       <div className="flex flex-col sm:flex-row gap-3 pt-4 max-w-full">
-                        <Button type="submit" disabled={isSubmitting || !formData.topic.trim() || isGenerating || !hasCredits || completionLoading} className="flex-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 hover:from-indigo-600 hover:via-purple-600 hover:to-blue-600 text-white font-semibold text-base h-12 shadow-md rounded-lg min-w-0">
+                        <Button type="submit" disabled={isSubmitting || !formData.topic.trim() || isGenerating || completionLoading} className="flex-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 hover:from-indigo-600 hover:via-purple-600 hover:to-blue-600 text-white font-semibold text-base h-12 shadow-md rounded-lg min-w-0">
                           {isSubmitting ? 'Submitting...' : completionLoading ? 'Checking Profile...' : 'Generate LinkedIn Posts'}
                         </Button>
                         
