@@ -20,6 +20,7 @@ import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
 import { validateInput, sanitizeText, isValidForTyping } from '@/utils/sanitize';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
+import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
 
 const JobGuide = () => {
   const {
@@ -56,11 +57,17 @@ const JobGuide = () => {
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const loadingMessages = ["🔍 Analyzing job requirements...", "✨ Crafting personalized insights...", "🚀 Tailoring advice to your profile...", "🎯 Generating strategic recommendations..."];
   
-  // Remove credit-related hooks and state
+  // Use feature credit check specifically for job analysis
   const {
     hasCredits,
+    isLoading: creditsLoading,
     showInsufficientCreditsPopup
-  } = useCreditCheck(1.0);
+  } = useFeatureCreditCheck({
+    feature: 'JOB_ANALYSIS',
+    onInsufficientCredits: () => {
+      console.log('Insufficient credits for job analysis');
+    }
+  });
 
   useCreditWarnings();
 
@@ -234,7 +241,7 @@ const JobGuide = () => {
   const handleSubmit = useCallback(async () => {
     console.log('🚀 Job Guide Submit Button Clicked');
 
-    // Check credits first (but don't deduct)
+    // Check credits first
     if (!hasCredits) {
       showInsufficientCreditsPopup();
       return;
@@ -391,8 +398,8 @@ const JobGuide = () => {
   const isFormValid = Boolean(formData.companyName?.trim() && formData.jobTitle?.trim() && formData.jobDescription?.trim());
   const hasAnyData = isFormValid || jobAnalysisResult;
 
-  // Simplified button disable logic - remove profile completion checks
-  const isButtonDisabled = !isFormValid || isSubmitting || isGenerating || !hasCredits;
+  // Button should be disabled if: form invalid, submitting, generating, no credits, or credits loading
+  const isButtonDisabled = !isFormValid || isSubmitting || isGenerating || !hasCredits || creditsLoading;
 
   // Enhanced debug logging
   console.log('🔍 Form validation debug:', {
@@ -406,6 +413,7 @@ const JobGuide = () => {
     hasResume,
     hasBio,
     hasCredits,
+    creditsLoading,
     isSubmitting,
     isGenerating,
     isButtonDisabled,
