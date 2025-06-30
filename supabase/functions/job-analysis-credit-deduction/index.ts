@@ -48,7 +48,7 @@ serve(async (req) => {
 
     console.log('Looking up job analysis with ID:', job_analysis_id);
 
-    // Step 1: Look up job analysis to get user_id
+    // Step 1: Look up job analysis to get user_id (note: user_id in job_analyses is actually the profile ID)
     const { data: jobAnalysis, error: jobAnalysisError } = await supabase
       .from('job_analyses')
       .select('user_id, id, company_name, job_title')
@@ -69,11 +69,33 @@ serve(async (req) => {
 
     console.log('Found job analysis:', jobAnalysis);
 
-    // Step 2: Check current user credits before attempting deduction
+    // Step 2: Get the actual user_id from user_profile table (jobAnalysis.user_id is profile_id)
+    const { data: userProfile, error: profileError } = await supabase
+      .from('user_profile')
+      .select('user_id')
+      .eq('id', jobAnalysis.user_id)
+      .single();
+
+    if (profileError || !userProfile) {
+      console.error('User profile lookup error:', profileError);
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'User profile not found',
+        profile_id: jobAnalysis.user_id
+      }), { 
+        status: 404, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const actualUserId = userProfile.user_id;
+    console.log('Found actual user_id:', actualUserId);
+
+    // Step 3: Check current user credits before attempting deduction
     const { data: userCredits, error: creditsError } = await supabase
       .from('user_credits')
       .select('current_balance')
-      .eq('user_id', jobAnalysis.user_id)
+      .eq('user_id', actualUserId)
       .single();
 
     if (creditsError || !userCredits) {
@@ -81,7 +103,8 @@ serve(async (req) => {
       return new Response(JSON.stringify({
         success: false,
         error: 'Unable to fetch user credits',
-        user_id: jobAnalysis.user_id
+        user_id: actualUserId,
+        credits_error: creditsError?.message
       }), { 
         status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -93,9 +116,9 @@ serve(async (req) => {
 
     console.log('Current balance:', currentBalance, 'Required:', requiredCredits);
 
-    // Step 3: Check if user has sufficient credits
+    // Step 4: Check if user has sufficient credits
     if (currentBalance < requiredCredits) {
-      console.log('Insufficient credits for user:', jobAnalysis.user_id);
+      console.log('Insufficient credits for user:', actualUserId);
       return new Response(JSON.stringify({
         success: false,
         error: 'Insufficient credits',
@@ -107,12 +130,12 @@ serve(async (req) => {
       });
     }
 
-    // Step 4: Deduct credits using the existing deduct_credits database function
-    console.log('Attempting to deduct credits for user:', jobAnalysis.user_id);
+    // Step 5: Deduct credits using the existing deduct_credits database function
+    console.log('Attempting to deduct credits for user:', actualUserId);
     
     const { data: deductionResult, error: deductionError } = await supabase
       .rpc('deduct_credits', {
-        p_user_id: jobAnalysis.user_id,
+        p_user_id: actualUserId,
         p_amount: requiredCredits,
         p_feature_used: 'job_analysis',
         p_description: `Credits deducted for job analysis - ${jobAnalysis.company_name} ${jobAnalysis.job_title}`
@@ -143,25 +166,26 @@ serve(async (req) => {
       });
     }
 
-    console.log('Credit deduction successful for user:', jobAnalysis.user_id);
+    console.log('Credit deduction successful for user:', actualUserId);
 
-    // Step 5: Get updated balance for response
+    // Step 6: Get updated balance for response
     const { data: updatedCredits, error: updatedCreditsError } = await supabase
       .from('user_credits')
       .select('current_balance')
-      .eq('user_id', jobAnalysis.user_id)
+      .eq('user_id', actualUserId)
       .single();
 
     const newBalance = updatedCreditsError ? currentBalance - requiredCredits : Number(updatedCredits.current_balance);
 
-    // Step 6: Return success response
+    // Step 7: Return success response
     return new Response(JSON.stringify({
       success: true,
       message: 'Credits deducted successfully',
       credits_deducted: requiredCredits,
       previous_balance: currentBalance,
       remaining_balance: newBalance,
-      user_id: jobAnalysis.user_id,
+      user_id: actualUserId,
+      profile_id: jobAnalysis.user_id,
       job_analysis_id: job_analysis_id,
       job_details: {
         company_name: jobAnalysis.company_name,
