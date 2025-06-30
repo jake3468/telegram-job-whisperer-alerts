@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
@@ -22,7 +20,6 @@ import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
 import { validateInput, sanitizeText, isValidForTyping } from '@/utils/sanitize';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
-import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
 
 const JobGuide = () => {
   const {
@@ -56,27 +53,16 @@ const JobGuide = () => {
   const [jobAnalysisResult, setJobAnalysisResult] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState('');
   const [matchScore, setMatchScore] = useState<string | null>(null);
-  const [creditsDeducted, setCreditsDeducted] = useState(false);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const loadingMessages = ["🔍 Analyzing job requirements...", "✨ Crafting personalized insights...", "🚀 Tailoring advice to your profile...", "🎯 Generating strategic recommendations..."];
   
+  // Remove credit-related hooks and state
   const {
     hasCredits,
-    checkAndDeductCredits,
-    isDeducting,
     showInsufficientCreditsPopup
-  } = useFeatureCreditCheck({
-    feature: 'JOB_ANALYSIS',
-    onSuccess: () => {
-      setCreditsDeducted(true);
-    },
-    onInsufficientCredits: () => {
-      setIsGenerating(false);
-      setIsSubmitting(false);
-    }
-  });
+  } = useCreditCheck(1.0);
 
-  useCreditWarnings(); // This shows the warning popups
+  useCreditWarnings();
 
   useEffect(() => {
     if (isLoaded && !user) {
@@ -153,12 +139,6 @@ const JobGuide = () => {
             pollingIntervalRef.current = null;
           }
 
-          // Deduct credits only when results are successfully displayed
-          if (!creditsDeducted) {
-            console.log('🔒 Deducting credits for job analysis results');
-            await checkAndDeductCredits('Job Analysis - Results Generated');
-          }
-
           toast({
             title: "Job Analysis Generated!",
             description: "Your personalized job analysis is ready."
@@ -209,7 +189,7 @@ const JobGuide = () => {
       }
       clearTimeout(timeout);
     };
-  }, [jobAnalysisId, isGenerating, toast, creditsDeducted, checkAndDeductCredits]);
+  }, [jobAnalysisId, isGenerating, toast]);
 
   const handleInputChange = (field: string, value: string) => {
     // Use more lenient validation for real-time typing
@@ -245,7 +225,6 @@ const JobGuide = () => {
     setError(null);
     setIsGenerating(false);
     setIsSubmitting(false);
-    setCreditsDeducted(false);
     toast({
       title: "Data Cleared",
       description: "All form data and results have been cleared."
@@ -255,7 +234,7 @@ const JobGuide = () => {
   const handleSubmit = useCallback(async () => {
     console.log('🚀 Job Guide Submit Button Clicked');
 
-    // Check credits first
+    // Check credits first (but don't deduct)
     if (!hasCredits) {
       showInsufficientCreditsPopup();
       return;
@@ -292,8 +271,7 @@ const JobGuide = () => {
       setError(null);
       setIsSuccess(false);
       setJobAnalysisResult(null);
-      setMatchScore(null); // Clear previous match score
-      setCreditsDeducted(false); // Reset credit deduction flag
+      setMatchScore(null);
       console.log('✅ Starting job analysis submission process');
       console.log('✅ Using user profile:', userProfile?.id);
 
@@ -313,12 +291,6 @@ const JobGuide = () => {
         setMatchScore(existing.match_score || null);
         setJobAnalysisId(existing.id);
         setIsSubmitting(false);
-        
-        // Deduct credits for existing analysis display
-        if (!creditsDeducted) {
-          console.log('🔒 Deducting credits for existing job analysis display');
-          await checkAndDeductCredits('Job Analysis - Existing Results Displayed');
-        }
         
         toast({
           title: "Previous Job Analysis Found",
@@ -340,7 +312,7 @@ const JobGuide = () => {
         error: insertError
       } = await makeAuthenticatedRequest(async () => {
         return await supabase.from('job_analyses').insert(insertData).select('id').single();
-      }, 'insert job analysis', 3); // 3 retries for JWT issues
+      }, 'insert job analysis', 3);
 
       if (insertError) {
         console.error('❌ INSERT ERROR:', insertError);
@@ -368,7 +340,7 @@ const JobGuide = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, isComplete, completionLoading, profileLoading, hasResume, hasBio, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup, userProfile, creditsDeducted, checkAndDeductCredits]);
+  }, [formData, isComplete, completionLoading, profileLoading, hasResume, hasBio, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup, userProfile]);
 
   useEffect(() => {
     const handleHistoryData = (event: any) => {
@@ -549,7 +521,7 @@ const JobGuide = () => {
                 </CardContent>
               </Card>}
 
-            {/* Result Display - Fixed for horizontal scrolling and background issues */}
+            {/* Result Display */}
             {jobAnalysisResult && <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-cyan-900 border border-blue-700 shadow-lg w-full max-w-full overflow-hidden">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-slate-200 font-orbitron text-xl flex items-center gap-2">
@@ -593,4 +565,3 @@ const JobGuide = () => {
 };
 
 export default JobGuide;
-
