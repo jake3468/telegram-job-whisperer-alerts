@@ -18,10 +18,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import CoverLetterDownloadActions from '@/components/CoverLetterDownloadActions';
 import { useCreditCheck } from '@/hooks/useCreditCheck';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
-import { useDeferredCreditDeduction } from '@/hooks/useDeferredCreditDeduction';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
+
 const CoverLetter = () => {
   const {
     user,
@@ -43,9 +43,6 @@ const CoverLetter = () => {
     hasCredits,
     showInsufficientCreditsPopup
   } = useCreditCheck(1.5);
-  const {
-    deductCredits
-  } = useDeferredCreditDeduction();
   useCreditWarnings(); // This shows the warning popups
 
   const [formData, setFormData] = useState({
@@ -58,7 +55,7 @@ const CoverLetter = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentCoverLetterId, setCurrentCoverLetterId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
-  const [creditsDeducted, setCreditsDeducted] = useState(false);
+
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
@@ -83,11 +80,6 @@ const CoverLetter = () => {
           setResult(coverLetterContent);
           setIsGenerating(false);
 
-          // Deduct credits only after successful result display
-          if (!creditsDeducted) {
-            deductCredits(1.5, 'cover_letter', 'Credits deducted for cover letter generation');
-            setCreditsDeducted(true);
-          }
           toast({
             title: "Cover Letter Generated!",
             description: "Your cover letter has been created successfully."
@@ -103,7 +95,7 @@ const CoverLetter = () => {
       console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
-  }, [currentCoverLetterId, toast, creditsDeducted, deductCredits]);
+  }, [currentCoverLetterId, toast]);
 
   // Polling fallback - check for updates every 5 seconds when generating
   useEffect(() => {
@@ -124,11 +116,6 @@ const CoverLetter = () => {
           setResult(data.cover_letter);
           setIsGenerating(false);
 
-          // Deduct credits only after successful result display
-          if (!creditsDeducted) {
-            deductCredits(1.5, 'cover_letter', 'Credits deducted for cover letter generation');
-            setCreditsDeducted(true);
-          }
           toast({
             title: "Cover Letter Generated!",
             description: "Your cover letter has been created successfully."
@@ -142,7 +129,8 @@ const CoverLetter = () => {
       console.log('Cleaning up polling interval');
       clearInterval(pollInterval);
     };
-  }, [isGenerating, currentCoverLetterId, toast, creditsDeducted, deductCredits]);
+  }, [isGenerating, currentCoverLetterId, toast]);
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -150,15 +138,16 @@ const CoverLetter = () => {
     }));
   };
 
-  // Updated handleSubmit to only check credits, not deduct them
+  // Updated handleSubmit to only check credits, not deduct them (N8N will handle deduction)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Only check credits, don't deduct them yet
+    // Only check credits, don't deduct them (N8N will handle deduction)
     if (!hasCredits) {
       showInsufficientCreditsPopup();
       return;
     }
+
     if (!user || !userProfile) {
       toast({
         title: "Authentication Required",
@@ -167,6 +156,7 @@ const CoverLetter = () => {
       });
       return;
     }
+
     if (!isComplete) {
       toast({
         title: "Profile Incomplete",
@@ -175,6 +165,7 @@ const CoverLetter = () => {
       });
       return;
     }
+
     if (!formData.job_title.trim() || !formData.company_name.trim() || !formData.job_description.trim()) {
       toast({
         title: "Missing Information",
@@ -183,11 +174,11 @@ const CoverLetter = () => {
       });
       return;
     }
+
     setIsSubmitting(true);
     setIsGenerating(true);
     setResult('');
     setCurrentCoverLetterId(null);
-    setCreditsDeducted(false); // Reset credit deduction flag
 
     try {
       console.log('Submitting cover letter request...');
@@ -202,14 +193,16 @@ const CoverLetter = () => {
         company_name: formData.company_name,
         job_description: formData.job_description
       }).select().single();
+
       if (error) {
         throw error;
       }
+
       console.log('Cover letter record created with ID:', data.id);
       setCurrentCoverLetterId(data.id);
       toast({
         title: "Request Submitted!",
-        description: "Your cover letter is being generated. Please wait..."
+        description: "Your cover letter is being generated. Credits will be deducted when ready."
       });
     } catch (err: any) {
       console.error('Error creating cover letter:', err);
@@ -224,6 +217,7 @@ const CoverLetter = () => {
       setIsSubmitting(false);
     }
   };
+
   const handleCopyResult = async () => {
     if (!result) return;
     try {
@@ -240,6 +234,7 @@ const CoverLetter = () => {
       });
     }
   };
+
   const resetForm = () => {
     setFormData({
       job_title: '',
@@ -249,13 +244,14 @@ const CoverLetter = () => {
     setResult('');
     setIsGenerating(false);
     setCurrentCoverLetterId(null);
-    setCreditsDeducted(false);
   };
+
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading...</div>
       </div>;
   }
+
   return <SidebarProvider defaultOpen={true}>
       {/* Header for mobile */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
@@ -408,4 +404,5 @@ const CoverLetter = () => {
       </div>
     </SidebarProvider>;
 };
+
 export default CoverLetter;
