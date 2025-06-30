@@ -26,15 +26,26 @@ Deno.serve(async (req) => {
 
     // Parse request body
     const body = await req.json();
-    const { image_id, post_id, variation_number } = body;
+    const { post_id, variation_number } = body;
 
-    console.log('LinkedIn image credit deduction request:', { image_id, post_id, variation_number });
+    console.log('LinkedIn image credit deduction request:', { post_id, variation_number });
 
     // Validate required parameters
-    if (!image_id) {
-      console.error('Missing image_id in request body');
+    if (!post_id) {
+      console.error('Missing post_id in request body');
       return new Response(
-        JSON.stringify({ error: 'image_id is required' }),
+        JSON.stringify({ error: 'post_id is required' }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    if (!variation_number) {
+      console.error('Missing variation_number in request body');
+      return new Response(
+        JSON.stringify({ error: 'variation_number is required' }),
         { 
           status: 400, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -48,37 +59,33 @@ Deno.serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    console.log('Looking up LinkedIn image and user information...');
+    console.log('Looking up LinkedIn post and user information...');
 
-    // Get the LinkedIn image and associated user information
-    const { data: imageData, error: imageError } = await supabase
-      .from('linkedin_post_images')
+    // Get the LinkedIn post and associated user information
+    const { data: postData, error: postError } = await supabase
+      .from('job_linkedin')
       .select(`
         id,
-        post_id,
-        variation_number,
-        job_linkedin:post_id (
+        user_id,
+        topic,
+        user_profile:user_id (
           id,
           user_id,
-          user_profile:user_id (
+          users:user_id (
             id,
-            user_id,
-            users:user_id (
-              id,
-              email,
-              first_name,
-              last_name
-            )
+            email,
+            first_name,
+            last_name
           )
         )
       `)
-      .eq('id', image_id)
+      .eq('id', post_id)
       .single();
 
-    if (imageError) {
-      console.error('Error fetching LinkedIn image:', imageError);
+    if (postError) {
+      console.error('Error fetching LinkedIn post:', postError);
       return new Response(
-        JSON.stringify({ error: 'LinkedIn image not found', details: imageError.message }),
+        JSON.stringify({ error: 'LinkedIn post not found', details: postError.message }),
         { 
           status: 404, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -86,10 +93,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    if (!imageData?.job_linkedin?.user_profile?.users) {
-      console.error('User information not found for image:', image_id);
+    if (!postData?.user_profile?.users) {
+      console.error('User information not found for post:', post_id);
       return new Response(
-        JSON.stringify({ error: 'User information not found for this LinkedIn image' }),
+        JSON.stringify({ error: 'User information not found for this LinkedIn post' }),
         { 
           status: 404, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -97,13 +104,12 @@ Deno.serve(async (req) => {
       );
     }
 
-    const user = imageData.job_linkedin.user_profile.users;
+    const user = postData.user_profile.users;
     console.log('Found user for credit deduction:', { 
       userId: user.id, 
       email: user.email,
-      imageId: image_id,
-      postId: imageData.post_id,
-      variationNumber: imageData.variation_number
+      postId: post_id,
+      variationNumber: variation_number
     });
 
     // Deduct 1.5 credits for LinkedIn image generation
@@ -113,7 +119,7 @@ Deno.serve(async (req) => {
       p_user_id: user.id,
       p_amount: 1.5,
       p_feature_used: 'linkedin_image',
-      p_description: `LinkedIn image generation completed for post ${imageData.post_id}, variation ${imageData.variation_number}`
+      p_description: `LinkedIn image generation completed for post ${post_id}, variation ${variation_number}`
     });
 
     if (deductError) {
@@ -123,7 +129,8 @@ Deno.serve(async (req) => {
           error: 'Failed to deduct credits', 
           details: deductError.message,
           user_id: user.id,
-          image_id: image_id
+          post_id: post_id,
+          variation_number: variation_number
         }),
         { 
           status: 500, 
@@ -139,7 +146,8 @@ Deno.serve(async (req) => {
           error: 'Insufficient credits', 
           message: 'User does not have enough credits for this operation',
           user_id: user.id,
-          image_id: image_id
+          post_id: post_id,
+          variation_number: variation_number
         }),
         { 
           status: 402, 
@@ -158,9 +166,8 @@ Deno.serve(async (req) => {
         credits_deducted: 1.5,
         user_id: user.id,
         user_email: user.email,
-        image_id: image_id,
-        post_id: imageData.post_id,
-        variation_number: imageData.variation_number,
+        post_id: post_id,
+        variation_number: variation_number,
         feature_used: 'linkedin_image'
       }),
       { 
