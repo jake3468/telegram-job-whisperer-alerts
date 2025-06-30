@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -114,7 +113,7 @@ const InterviewPrep = () => {
           // Deduct credits for displaying existing results
           if (!creditsDeducted) {
             console.log('🔒 Deducting credits for existing results display');
-            const creditSuccess = await checkAndDeductCredits('Interview prep results displayed');
+            const creditSuccess = await checkAndDeductCredits();
             if (creditSuccess) {
               setCreditsDeducted(true);
               toast({
@@ -166,7 +165,7 @@ const InterviewPrep = () => {
               // Deduct credits when results are successfully received
               if (!creditsDeducted) {
                 console.log('🔒 Deducting credits for real-time results');
-                const creditSuccess = await checkAndDeductCredits('Interview prep questions generated');
+                const creditSuccess = await checkAndDeductCredits();
                 
                 if (creditSuccess) {
                   setCreditsDeducted(true);
@@ -285,7 +284,7 @@ const InterviewPrep = () => {
               : JSON.stringify(existing.interview_questions);
             
             // Deduct credits for existing result
-            const creditDeductionSuccess = await checkAndDeductCredits('Existing interview prep retrieved');
+            const creditDeductionSuccess = await checkAndDeductCredits();
             
             if (creditDeductionSuccess) {
               setInterviewData(parsedData);
