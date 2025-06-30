@@ -231,8 +231,8 @@ const LinkedInPosts = () => {
           const linkedInPostData: LinkedInPostData = {
             post_heading_1: newData.post_heading_1,
             post_content_1: newData.post_content_1,
-            post_heading_2: newData.post_content_2,
-            post_content_3: newData.post_content_2,
+            post_heading_2: newData.post_heading_2,
+            post_content_2: newData.post_content_2,
             post_heading_3: newData.post_heading_3,
             post_content_3: newData.post_content_3
           };
