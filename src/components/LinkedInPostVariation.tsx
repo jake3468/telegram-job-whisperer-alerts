@@ -263,16 +263,21 @@ const LinkedInPostVariation = ({
         });
 
         if (!webhookResponse.ok) {
-          console.error('Webhook call failed:', await webhookResponse.text());
-          throw new Error('Failed to trigger image generation webhook');
+          const errorText = await webhookResponse.text();
+          console.error('Webhook call failed:', errorText);
+          throw new Error(`Failed to trigger image generation webhook: ${webhookResponse.status}`);
         }
 
         const webhookResult = await webhookResponse.json();
         console.log('Webhook response:', webhookResult);
 
         // Check if the webhook was configured properly
-        if (!webhookResult.webhook_url_configured) {
-          throw new Error('N8N webhook URL not configured');
+        if (webhookResult.success === false) {
+          if (!webhookResult.webhook_url_configured) {
+            throw new Error('N8N webhook URL not configured');
+          } else {
+            throw new Error(webhookResult.error || 'Webhook execution failed');
+          }
         }
 
       }, 3, `generate image for variation ${variationNumber}`);
@@ -291,6 +296,10 @@ const LinkedInPostVariation = ({
       let errorMessage = "Failed to generate image. Please try again.";
       if (err.message.includes('webhook URL not configured')) {
         errorMessage = "Image generation service is not configured. Please contact support.";
+      } else if (err.message.includes('webhook execution failed')) {
+        errorMessage = "Image generation service is temporarily unavailable. Please try again later.";
+      } else if (err.message.includes('Failed to trigger')) {
+        errorMessage = "Unable to start image generation. Please check your connection and try again.";
       }
       
       toast({
