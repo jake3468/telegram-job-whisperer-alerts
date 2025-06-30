@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -208,7 +207,7 @@ const LinkedInPostVariation = ({
     }
   };
 
-  // Handle image generation - NO CREDIT DEDUCTION (handled by N8N webhook)
+  // Handle image generation - Fixed to properly call N8N webhook
   const handleGenerateImage = async () => {
     if (!postId) {
       toast({
@@ -244,7 +243,7 @@ const LinkedInPostVariation = ({
 
         console.log('Image generation request created:', data);
 
-        // Call the edge function with proper parameters
+        // Call the webhook with the correct parameters - this will trigger N8N
         const userName = userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() : 'Professional User';
         
         const webhookResponse = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/functions/v1/linkedin-image-webhook', {
@@ -264,13 +263,17 @@ const LinkedInPostVariation = ({
         });
 
         if (!webhookResponse.ok) {
-          const errorText = await webhookResponse.text();
-          console.error('Webhook call failed:', errorText);
+          console.error('Webhook call failed:', await webhookResponse.text());
           throw new Error('Failed to trigger image generation webhook');
         }
 
         const webhookResult = await webhookResponse.json();
         console.log('Webhook response:', webhookResult);
+
+        // Check if the webhook was configured properly
+        if (!webhookResult.webhook_url_configured) {
+          throw new Error('N8N webhook URL not configured');
+        }
 
       }, 3, `generate image for variation ${variationNumber}`);
       
@@ -284,9 +287,15 @@ const LinkedInPostVariation = ({
       setIsLoadingImage(false);
       setImageGenerationFailed(true);
       
+      // Show more specific error messages
+      let errorMessage = "Failed to generate image. Please try again.";
+      if (err.message.includes('webhook URL not configured')) {
+        errorMessage = "Image generation service is not configured. Please contact support.";
+      }
+      
       toast({
         title: "Error",
-        description: "Failed to generate image. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     }
