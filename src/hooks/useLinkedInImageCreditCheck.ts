@@ -9,25 +9,11 @@ export function useLinkedInImageCreditCheck() {
     }
   });
 
-  // FIXED: Simplified direct credit deduction when image is displayed
-  const deductImageCredits = async (postId: string, variationNumber: number): Promise<boolean> => {
-    console.log(`Deducting credits for LinkedIn image - post ${postId}, variation ${variationNumber}`);
-    
-    const success = await creditCheck.checkAndDeductCredits(
-      `LinkedIn image generation for post ${postId}, variation ${variationNumber}`
-    );
-    
-    if (success) {
-      console.log(`Successfully deducted 1.5 credits for LinkedIn image generation`);
-    } else {
-      console.log(`Failed to deduct credits for LinkedIn image`);
-    }
-    
-    return success;
-  };
-
+  // REMOVED: Credit deduction is now handled by N8N webhook calling the edge function
+  // The frontend only checks if credits are available before generation
+  
   return {
     ...creditCheck,
-    deductImageCredits
+    // Removed deductImageCredits method since credits are deducted server-side
   };
 }

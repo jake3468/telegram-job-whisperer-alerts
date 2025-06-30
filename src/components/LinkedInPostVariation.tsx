@@ -1,9 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Copy, ImageIcon, Loader2, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useLinkedInImageCreditCheck } from '@/hooks/useLinkedInImageCreditCheck';
 import { supabase } from '@/integrations/supabase/client';
 import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 import LinkedInPostDisplay from './LinkedInPostDisplay';
@@ -42,7 +42,6 @@ const LinkedInPostVariation = ({
 }: LinkedInPostVariationProps) => {
   const { toast } = useToast();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
-  const { deductImageCredits, isDeducting } = useLinkedInImageCreditCheck();
   
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
@@ -80,7 +79,7 @@ const LinkedInPostVariation = ({
     loadExistingImages();
   }, [postId, variationNumber, isAuthReady, executeWithRetry]);
 
-  // Real-time subscription for image updates - FIXED LOGIC
+  // Real-time subscription for image updates
   useEffect(() => {
     if (!postId || !isAuthReady) return;
 
@@ -97,13 +96,11 @@ const LinkedInPostVariation = ({
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
           const newImage = payload.new;
           
-          // FIXED: Only set loading when "generating..." appears
           if (newImage.image_data === 'generating...') {
             console.log(`Image generation started for variation ${variationNumber}`);
             setIsLoadingImage(true);
             setImageGenerationFailed(false);
           } 
-          // FIXED: Only stop loading and add image when real image data appears
           else if (newImage.image_data && newImage.image_data !== 'generating...' && !newImage.image_data.includes('failed')) {
             console.log(`Image generation completed for variation ${variationNumber}`);
             
@@ -113,29 +110,14 @@ const LinkedInPostVariation = ({
               return exists ? prev : [...prev, newImage.image_data];
             });
             
-            // FIXED: Stop loading state when image is successfully received
             setIsLoadingImage(false);
             setImageGenerationFailed(false);
-            
-            // FIXED: Direct credit deduction when image is displayed
-            try {
-              console.log(`Attempting to deduct credits for variation ${variationNumber} image`);
-              const success = await deductImageCredits(postId, variationNumber);
-              if (success) {
-                console.log(`Successfully deducted credits for variation ${variationNumber} image`);
-              } else {
-                console.log(`Failed to deduct credits for variation ${variationNumber} image`);
-              }
-            } catch (error) {
-              console.error('Error deducting credits for image:', error);
-            }
             
             toast({
               title: "Image Generated!",
               description: `LinkedIn post image for variation ${variationNumber} is ready.`
             });
           } 
-          // Handle failed generation
           else if (newImage.image_data && newImage.image_data.includes('failed')) {
             console.log(`Image generation failed for variation ${variationNumber}`);
             setIsLoadingImage(false);
@@ -156,7 +138,7 @@ const LinkedInPostVariation = ({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [postId, variationNumber, isAuthReady, toast, deductImageCredits]);
+  }, [postId, variationNumber, isAuthReady, toast]);
 
   // Add timeout mechanism to reset loading state after 3 minutes
   useEffect(() => {
@@ -226,7 +208,7 @@ const LinkedInPostVariation = ({
     }
   };
 
-  // Handle image generation
+  // Handle image generation - NO CREDIT DEDUCTION (handled by N8N webhook)
   const handleGenerateImage = async () => {
     if (!postId) {
       toast({
@@ -237,7 +219,6 @@ const LinkedInPostVariation = ({
       return;
     }
 
-    // FIXED: Simple generation start
     setIsLoadingImage(true);
     setImageGenerationFailed(false);
 
@@ -369,15 +350,15 @@ const LinkedInPostVariation = ({
           <Button
             onClick={handleGenerateImage}
             size="sm"
-            disabled={isLoadingImage || isDeducting}
+            disabled={isLoadingImage}
             className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 px-6 py-2 font-medium"
           >
-            {isLoadingImage || isDeducting ? (
+            {isLoadingImage ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             ) : (
               <ImageIcon className="w-4 h-4 mr-2" />
             )}
-            {isLoadingImage ? 'Generating...' : isDeducting ? 'Processing...' : 'Get Image'}
+            {isLoadingImage ? 'Generating...' : 'Get Image'}
           </Button>
         </div>
       </div>

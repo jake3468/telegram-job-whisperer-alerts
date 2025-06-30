@@ -2,7 +2,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useLinkedInImageCreditCheck } from '@/hooks/useLinkedInImageCreditCheck';
 import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 
 interface LinkedInImageData {
@@ -17,7 +16,6 @@ export function useLinkedInImageManager(postId: string | null) {
   const [isGenerating, setIsGenerating] = useState<boolean[]>([false, false, false]);
   const { toast } = useToast();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
-  const { deductImageCredits, isDeducting } = useLinkedInImageCreditCheck();
 
   // Transform images data to match the expected format
   const generatedImages = {
@@ -102,7 +100,7 @@ export function useLinkedInImageManager(postId: string | null) {
             }
           });
 
-          // Update generating state and handle credit deduction
+          // Update generating state - NO CREDIT DEDUCTION (handled by N8N webhook)
           if (newImage.image_data !== 'generating...') {
             setIsGenerating(prev => {
               const newState = [...prev];
@@ -111,16 +109,6 @@ export function useLinkedInImageManager(postId: string | null) {
               }
               return newState;
             });
-
-            // DEDUCT CREDITS ONLY AFTER IMAGE IS DISPLAYED - using updated method
-            if (newImage.image_data && !newImage.image_data.includes('failed')) {
-              try {
-                await deductImageCredits(postId, newImage.variation_number);
-                console.log(`Credits deducted after image display for variation ${newImage.variation_number}`);
-              } catch (error) {
-                console.error('Error deducting credits after image display:', error);
-              }
-            }
 
             toast({
               title: "Image Generated!",
@@ -140,7 +128,7 @@ export function useLinkedInImageManager(postId: string | null) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [postId, isAuthReady, fetchImages, toast, deductImageCredits]);
+  }, [postId, isAuthReady, fetchImages, toast]);
 
   const generateImage = useCallback(async (variationNumber: number, postData?: any) => {
     if (!postId) return;
@@ -167,7 +155,7 @@ export function useLinkedInImageManager(postId: string | null) {
           throw error;
         }
 
-        // FIXED: Call webhook with proper parameters including post data from history
+        // Call webhook with proper parameters including post data from history
         const webhookBody: {
           post_id: string;
           variation_number: number;
@@ -192,7 +180,7 @@ export function useLinkedInImageManager(postId: string | null) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuemxveXloemhycXN2c2xoaHJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzAyMjIsImV4cCI6MjA2NDUwNjIyMn0.xdlgb_amJ1fV31uinCFotGW00isgT5-N8zJ_gLHEKuk`
           },
           body: JSON.stringify(webhookBody)
         });
@@ -271,7 +259,6 @@ export function useLinkedInImageManager(postId: string | null) {
   return {
     images,
     isGenerating,
-    isDeducting,
     generateImage,
     fetchImages,
     deleteImage,
