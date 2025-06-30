@@ -64,9 +64,9 @@ export const useLinkedInPostTimeoutFallback = ({
           if (hasAllPosts) {
             console.log('⏰ Posts completed, triggering fallback credit deduction');
             
-            // Deduct credits
+            // Deduct credits using the correct user ID (userProfileId is now users.id)
             const { data: deductResult, error: deductError } = await supabase.rpc('deduct_credits', {
-              p_user_id: userProfileId,
+              p_user_id: userProfileId, // This is now the correct users.id
               p_amount: 3.0,
               p_feature_used: 'linkedin_post',
               p_description: `LinkedIn post generation completed for post ${currentPostId} (timeout fallback)`

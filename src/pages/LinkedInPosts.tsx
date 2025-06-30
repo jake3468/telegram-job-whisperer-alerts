@@ -122,20 +122,20 @@ const LinkedInPosts = () => {
       return;
     }
 
-    if (!userProfile?.id) {
-      console.error('❌ No user profile ID available for credit deduction');
+    if (!userProfile?.user_id) {
+      console.error('❌ No user ID available for credit deduction');
       return;
     }
 
     try {
       console.log('💳 ATTEMPTING CREDIT DEDUCTION:', {
-        userId: userProfile.id,
+        userId: userProfile.user_id, // Use userProfile.user_id instead of userProfile.id
         postId: postId,
         amount: 3.0
       });
 
       const { data: deductResult, error: deductError } = await supabase.rpc('deduct_credits', {
-        p_user_id: userProfile.id,
+        p_user_id: userProfile.user_id, // Use userProfile.user_id instead of userProfile.id
         p_amount: 3.0,
         p_feature_used: 'linkedin_post',
         p_description: `LinkedIn post generation completed for post ${postId}`
@@ -184,7 +184,7 @@ const LinkedInPosts = () => {
 
   useLinkedInPostTimeoutFallback({
     currentPostId,
-    userProfileId: userProfile?.id || null,
+    userProfileId: userProfile?.user_id || null, // Use userProfile.user_id instead of userProfile.id
     isGenerating,
     creditsDeducted,
     onCreditsDeducted: () => setCreditsDeducted(true),
@@ -231,8 +231,8 @@ const LinkedInPosts = () => {
           const linkedInPostData: LinkedInPostData = {
             post_heading_1: newData.post_heading_1,
             post_content_1: newData.post_content_1,
-            post_heading_2: newData.post_heading_2,
-            post_content_2: newData.post_content_2,
+            post_heading_2: newData.post_content_2,
+            post_content_3: newData.post_content_2,
             post_heading_3: newData.post_heading_3,
             post_content_3: newData.post_content_3
           };
@@ -323,15 +323,15 @@ const LinkedInPosts = () => {
     
     console.log('⚠️ Hook credit check failed, trying direct database check...');
     try {
-      if (!userProfile?.id) {
-        console.error('❌ No user profile for direct credit check');
+      if (!userProfile?.user_id) {
+        console.error('❌ No user ID for direct credit check');
         return false;
       }
 
       const { data: credits, error } = await supabase
         .from('user_credits')
         .select('current_balance')
-        .eq('user_id', userProfile.id)
+        .eq('user_id', userProfile.user_id) // Use userProfile.user_id instead of userProfile.id
         .single();
 
       if (error) {
