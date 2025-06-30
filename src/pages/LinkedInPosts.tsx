@@ -18,6 +18,7 @@ import LinkedInPostVariation from '@/components/LinkedInPostVariation';
 import LoadingMessages from '@/components/LoadingMessages';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
+import { useLinkedInPostTimeoutFallback } from '@/hooks/useLinkedInPostTimeoutFallback';
 
 interface LinkedInPostData {
   post_heading_1: string | null;
@@ -55,6 +56,7 @@ const LinkedInPosts = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [creditsDeducted, setCreditsDeducted] = useState(false);
 
   const toneOptions = [
     { value: 'professional', label: 'Professional & Insightful' },
@@ -100,23 +102,108 @@ const LinkedInPosts = () => {
       data.post_content_3
     );
     
-    console.log('Checking if all posts ready:', {
+    console.log('🔍 CHECKING IF ALL POSTS READY:', {
       post_heading_1: Boolean(data.post_heading_1),
       post_content_1: Boolean(data.post_content_1),
       post_heading_2: Boolean(data.post_heading_2),
       post_content_2: Boolean(data.post_content_2),
       post_heading_3: Boolean(data.post_heading_3),
       post_content_3: Boolean(data.post_content_3),
-      allReady: hasAllData
+      allReady: hasAllData,
+      creditsAlreadyDeducted: creditsDeducted
     });
     
     return hasAllData;
   };
 
+  // Direct credit deduction function
+  const deductCreditsForPosts = async (postId: string) => {
+    if (creditsDeducted) {
+      console.log('⚠️ Credits already deducted for this post session');
+      return;
+    }
+
+    if (!userProfile?.id) {
+      console.error('❌ No user profile ID available for credit deduction');
+      return;
+    }
+
+    try {
+      console.log('💳 ATTEMPTING CREDIT DEDUCTION:', {
+        userId: userProfile.id,
+        postId: postId,
+        amount: 3.0
+      });
+
+      const { data: deductResult, error: deductError } = await supabase.rpc('deduct_credits', {
+        p_user_id: userProfile.id,
+        p_amount: 3.0,
+        p_feature_used: 'linkedin_post',
+        p_description: `LinkedIn post generation completed for post ${postId}`
+      });
+
+      console.log('💳 CREDIT DEDUCTION RESULT:', {
+        success: deductResult,
+        error: deductError,
+        postId
+      });
+
+      if (deductError) {
+        console.error('❌ Error deducting credits:', deductError);
+        toast({
+          title: "Credit Deduction Failed",
+          description: "There was an error deducting credits. Please contact support.",
+          variant: "destructive"
+        });
+      } else if (deductResult) {
+        console.log('✅ Credits successfully deducted for LinkedIn posts');
+        setCreditsDeducted(true);
+        toast({
+          title: "LinkedIn Posts Generated!",
+          description: "Your 3 LinkedIn post variations have been created successfully. 3 credits have been deducted."
+        });
+      } else {
+        console.log('❌ Failed to deduct credits - insufficient balance');
+        toast({
+          title: "Insufficient Credits",
+          description: "You don't have enough credits to complete this action.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('❌ Exception during credit deduction:', error);
+      toast({
+        title: "Credit Deduction Error",
+        description: "An unexpected error occurred while deducting credits.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  useLinkedInPostTimeoutFallback({
+    currentPostId,
+    userProfileId: userProfile?.id || null,
+    isGenerating,
+    creditsDeducted,
+    onCreditsDeducted: () => setCreditsDeducted(true),
+    onPostsReady: (data) => {
+      const linkedInPostData: LinkedInPostData = {
+        post_heading_1: data.post_heading_1,
+        post_content_1: data.post_content_1,
+        post_heading_2: data.post_heading_2,
+        post_content_2: data.post_content_2,
+        post_heading_3: data.post_heading_3,
+        post_content_3: data.post_content_3
+      };
+      setPostsData(linkedInPostData);
+      setIsGenerating(false);
+    }
+  });
+
   useEffect(() => {
     if (!currentPostId || !isAuthReady || !userProfile?.id) return;
     
-    console.log('Setting up real-time subscription for post ID:', currentPostId);
+    console.log('🔄 Setting up real-time subscription for post ID:', currentPostId);
 
     const channel = supabase
       .channel(`linkedin-post-updates-${currentPostId}`)
@@ -126,23 +213,22 @@ const LinkedInPosts = () => {
         table: 'job_linkedin',
         filter: `id=eq.${currentPostId}`
       }, async (payload) => {
-        console.log('LinkedIn post updated via real-time:', payload);
+        console.log('📡 LinkedIn post updated via real-time:', payload);
         
         if (payload.new) {
           const newData = payload.new as any;
-          console.log('New posts data received:', {
+          console.log('📊 New posts data received:', {
             hasHeading1: Boolean(newData.post_heading_1),
             hasContent1: Boolean(newData.post_content_1),
-            hasHeading2: Boolean(newData.post_heading_2),
-            hasContent2: Boolean(newData.post_content_2),
-            hasHeading3: Boolean(newData.post_heading_3),
+            hasHeading2: Boolean(newData.post_content_2),
+            hasHeading3: Boolean(newData.post_content_3),
             hasContent3: Boolean(newData.post_content_3)
           });
           
           const linkedInPostData: LinkedInPostData = {
             post_heading_1: newData.post_heading_1,
             post_content_1: newData.post_content_1,
-            post_heading_2: newData.post_heading_2,
+            post_heading_2: newData.post_content_2,
             post_content_2: newData.post_content_2,
             post_heading_3: newData.post_heading_3,
             post_content_3: newData.post_content_3
@@ -150,54 +236,29 @@ const LinkedInPosts = () => {
           
           setPostsData(linkedInPostData);
           
-          // FIXED: Direct credit deduction using Supabase function when posts are complete
+          // Check if all posts are ready and deduct credits
           if (areAllPostsReady(linkedInPostData)) {
-            console.log('All posts are ready! Stopping loading and deducting credits');
+            console.log('🎉 All posts are ready! Stopping loading and deducting credits');
             setIsGenerating(false);
-            
-            try {
-              console.log('Calling deduct_credits function directly for user:', userProfile.id);
-              
-              // Use the Supabase deduct_credits function directly
-              const { data: deductResult, error: deductError } = await supabase.rpc('deduct_credits', {
-                p_user_id: userProfile.id,
-                p_amount: 3.0,
-                p_feature_used: 'linkedin_post',
-                p_description: `LinkedIn post generation completed for post ${currentPostId}`
-              });
-              
-              if (deductError) {
-                console.error('Error deducting credits:', deductError);
-              } else if (deductResult) {
-                console.log('Credits successfully deducted for LinkedIn posts');
-                toast({
-                  title: "LinkedIn Posts Generated!",
-                  description: "Your 3 LinkedIn post variations have been created successfully."
-                });
-              } else {
-                console.log('Failed to deduct credits - insufficient balance');
-              }
-            } catch (error) {
-              console.error('Error deducting credits:', error);
-            }
+            await deductCreditsForPosts(currentPostId);
           }
         }
       })
       .subscribe(status => {
-        console.log('Real-time subscription status:', status);
+        console.log('📡 Real-time subscription status:', status);
       });
 
     return () => {
-      console.log('Cleaning up real-time subscription');
+      console.log('🧹 Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
-  }, [currentPostId, isAuthReady, toast, userProfile?.id]);
+  }, [currentPostId, isAuthReady, userProfile?.id, creditsDeducted]);
 
   useEffect(() => {
     const checkExistingData = async () => {
       if (!currentPostId || !isAuthReady) return;
       
-      console.log('Checking existing data for post ID:', currentPostId);
+      console.log('🔍 Checking existing data for post ID:', currentPostId);
       
       try {
         await executeWithRetry(async () => {
@@ -208,17 +269,17 @@ const LinkedInPosts = () => {
             .single();
           
           if (error) {
-            console.error('Error fetching existing post data:', error);
+            console.error('❌ Error fetching existing post data:', error);
             return;
           }
           
           if (data) {
-            console.log('Found existing post data');
+            console.log('📋 Found existing post data');
             
             const linkedInPostData: LinkedInPostData = {
               post_heading_1: data.post_heading_1,
               post_content_1: data.post_content_1,
-              post_heading_2: data.post_heading_2,
+              post_heading_2: data.post_content_2,
               post_content_2: data.post_content_2,
               post_heading_3: data.post_heading_3,
               post_content_3: data.post_content_3
@@ -227,20 +288,21 @@ const LinkedInPosts = () => {
             setPostsData(linkedInPostData);
             
             if (areAllPostsReady(linkedInPostData)) {
-              console.log('Existing data is complete, stopping loading state');
+              console.log('📋 Existing data is complete, stopping loading state');
               setIsGenerating(false);
+              await deductCreditsForPosts(currentPostId);
             }
           }
         }, 3, 'check existing post data');
       } catch (err) {
-        console.error('Error checking existing data:', err);
+        console.error('❌ Error checking existing data:', err);
       }
     };
 
     if (currentPostId) {
       checkExistingData();
     }
-  }, [currentPostId, isAuthReady, executeWithRetry]);
+  }, [currentPostId, isAuthReady, executeWithRetry, creditsDeducted]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -314,9 +376,10 @@ const LinkedInPosts = () => {
     setIsGenerating(true);
     setPostsData(null);
     setCurrentPostId(null);
+    setCreditsDeducted(false); // Reset credits deducted flag
 
     try {
-      console.log('Creating LinkedIn post with user_profile.id:', userProfile.id);
+      console.log('🚀 Creating LinkedIn post with user_profile.id:', userProfile.id);
       
       await executeWithRetry(async () => {
         const { data, error } = await supabase
@@ -333,11 +396,11 @@ const LinkedInPosts = () => {
           .single();
 
         if (error) {
-          console.error('Supabase error:', error);
+          console.error('❌ Supabase error:', error);
           throw error;
         }
 
-        console.log('LinkedIn post created successfully:', data);
+        console.log('✅ LinkedIn post created successfully:', data);
         setCurrentPostId(data.id);
         
         toast({
@@ -347,7 +410,7 @@ const LinkedInPosts = () => {
       }, 3, 'create LinkedIn post');
       
     } catch (err: any) {
-      console.error('Error creating LinkedIn post:', err);
+      console.error('❌ Error creating LinkedIn post:', err);
       setIsGenerating(false);
       const errorMessage = err.message || "Failed to create LinkedIn post. Please try again.";
       toast({
@@ -371,6 +434,7 @@ const LinkedInPosts = () => {
     setPostsData(null);
     setIsGenerating(false);
     setCurrentPostId(null);
+    setCreditsDeducted(false); // Reset credits deducted flag
   };
 
   const shouldShowResults = postsData && areAllPostsReady(postsData);
