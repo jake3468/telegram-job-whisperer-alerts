@@ -17,7 +17,7 @@ export function useLinkedInImageManager(postId: string | null) {
   const [isGenerating, setIsGenerating] = useState<boolean[]>([false, false, false]);
   const { toast } = useToast();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
-  const { checkAndDeductForImage, isDeducting } = useLinkedInImageCreditCheck();
+  const { deductImageCredits, isDeducting } = useLinkedInImageCreditCheck();
 
   // Transform images data to match the expected format
   const generatedImages = {
@@ -112,10 +112,10 @@ export function useLinkedInImageManager(postId: string | null) {
               return newState;
             });
 
-            // DEDUCT CREDITS ONLY AFTER IMAGE IS DISPLAYED
+            // DEDUCT CREDITS ONLY AFTER IMAGE IS DISPLAYED - using updated method
             if (newImage.image_data && !newImage.image_data.includes('failed')) {
               try {
-                await checkAndDeductForImage(postId, newImage.variation_number);
+                await deductImageCredits(postId, newImage.variation_number);
                 console.log(`Credits deducted after image display for variation ${newImage.variation_number}`);
               } catch (error) {
                 console.error('Error deducting credits after image display:', error);
@@ -140,15 +140,10 @@ export function useLinkedInImageManager(postId: string | null) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [postId, isAuthReady, fetchImages, toast, checkAndDeductForImage]);
+  }, [postId, isAuthReady, fetchImages, toast, deductImageCredits]);
 
   const generateImage = useCallback(async (variationNumber: number, postData?: any) => {
     if (!postId) return;
-
-    // Only check credits, don't deduct yet
-    if (!await checkAndDeductForImage(postId, variationNumber, true)) {
-      return;
-    }
 
     setIsGenerating(prev => {
       const newState = [...prev];
@@ -229,7 +224,7 @@ export function useLinkedInImageManager(postId: string | null) {
         variant: "destructive"
       });
     }
-  }, [postId, checkAndDeductForImage, toast, executeWithRetry]);
+  }, [postId, toast, executeWithRetry]);
 
   const handleGetImageForPost = useCallback(async (item: any, postNumber: number) => {
     if (!postId) return;
