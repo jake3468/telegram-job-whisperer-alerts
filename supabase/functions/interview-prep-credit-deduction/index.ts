@@ -112,7 +112,7 @@ serve(async (req) => {
     }
 
     const currentBalance = Number(userCredits.current_balance);
-    const requiredCredits = 2.0;
+    const requiredCredits = 6.0;
 
     console.log('Current balance:', currentBalance, 'Required:', requiredCredits);
 

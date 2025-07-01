@@ -33,11 +33,11 @@ const InterviewPrep = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   
-  // Use credit check for 2.0 credits required for interview prep
+  // Use credit check for 6.0 credits required for interview prep
   const {
     hasCredits,
     showInsufficientCreditsPopup
-  } = useCreditCheck(2.0);
+  } = useCreditCheck(6.0);
   useCreditWarnings(); // This shows the warning popups
 
   const { userProfile } = useUserProfile();
@@ -373,7 +373,7 @@ const InterviewPrep = () => {
             <div className="mt-4 flex justify-center">
               <Badge variant="outline" className="bg-blue-900/20 border-blue-400/30 text-blue-200 px-3 py-1">
                 <CreditCard className="w-4 h-4 mr-2" />
-                Usage Fee: 2.0 credits
+                Usage Fee: 6.0 credits
               </Badge>
             </div>
           </div>
