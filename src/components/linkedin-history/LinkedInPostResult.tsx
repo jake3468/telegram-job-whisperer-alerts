@@ -2,6 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Copy, ImageIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useEffect, useState } from 'react';
 
 interface LinkedInPostItem {
   id: string;
@@ -37,14 +38,61 @@ const LinkedInPostResult = ({
   onCopyImage
 }: LinkedInPostResultProps) => {
   const { toast } = useToast();
+  const [localLoadingState, setLocalLoadingState] = useState(false);
   
   const heading = item[`post_heading_${postNumber}` as keyof LinkedInPostItem] as string;
   const content = item[`post_content_${postNumber}` as keyof LinkedInPostItem] as string;
   const variationImages = generatedImages[postNumber] || [];
-  const isLoadingThisVariation = loadingImage[postNumber] || false;
+  const isLoadingFromManager = loadingImage[postNumber] || false;
   const hasFailedThisVariation = imageGenerationFailed[postNumber] || false;
 
+  // Sync local loading state with manager loading state
+  useEffect(() => {
+    setLocalLoadingState(isLoadingFromManager);
+  }, [isLoadingFromManager]);
+
+  // Reset local loading state when images arrive
+  useEffect(() => {
+    if (variationImages.length > 0 && localLoadingState) {
+      console.log(`🎯 Images detected for variation ${postNumber}, resetting local loading state`);
+      setLocalLoadingState(false);
+    }
+  }, [variationImages.length, localLoadingState, postNumber]);
+
+  // Reset local loading state when generation fails
+  useEffect(() => {
+    if (hasFailedThisVariation && localLoadingState) {
+      console.log(`❌ Generation failed for variation ${postNumber}, resetting local loading state`);
+      setLocalLoadingState(false);
+    }
+  }, [hasFailedThisVariation, localLoadingState, postNumber]);
+
+  const handleGetImage = () => {
+    console.log(`🚀 User clicked Get Image for variation ${postNumber}`);
+    setLocalLoadingState(true);
+    onGetImage(item, postNumber);
+  };
+
+  // Determine the actual loading state (either from manager or local)
+  const isActuallyLoading = isLoadingFromManager || localLoadingState;
+  
+  // Show loading only if we're actually loading AND don't have images yet
+  const shouldShowLoading = isActuallyLoading && variationImages.length === 0;
+  
+  // Show failed only if we failed AND don't have images AND not currently loading
+  const shouldShowFailed = hasFailedThisVariation && variationImages.length === 0 && !isActuallyLoading;
+
   if (!content) return null;
+
+  console.log(`🎯 LinkedInPostResult render - Variation ${postNumber}:`, {
+    isLoadingFromManager,
+    localLoadingState,
+    isActuallyLoading,
+    shouldShowLoading,
+    shouldShowFailed,
+    hasImages: variationImages.length > 0,
+    hasFailedThisVariation
+  });
 
   return (
     <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
@@ -60,32 +108,32 @@ const LinkedInPostResult = ({
             <span className="hidden xs:inline">Copy</span>
           </Button>
           <Button
-            onClick={() => onGetImage(item, postNumber)}
+            onClick={handleGetImage}
             size="sm"
-            disabled={isLoadingThisVariation}
+            disabled={isActuallyLoading}
             className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-6 text-xs px-2 flex items-center gap-1"
           >
             <ImageIcon className="w-3 h-3" />
             <span className="hidden xs:inline">
-              {isLoadingThisVariation ? 'Gen...' : 'Get Image'}
+              {isActuallyLoading ? 'Gen...' : 'Get Image'}
             </span>
             <span className="xs:hidden">
-              {isLoadingThisVariation ? '...' : 'Img'}
+              {isActuallyLoading ? '...' : 'Img'}
             </span>
           </Button>
         </div>
       </div>
 
-      {/* Loading indicator */}
-      {isLoadingThisVariation && (
+      {/* Loading indicator - only show when actually loading and no images */}
+      {shouldShowLoading && (
         <div className="mb-4 p-3 bg-blue-50 rounded-lg text-center border border-blue-200">
           <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading for variation {postNumber}...</div>
           <div className="text-xs text-blue-500 mt-1">This may take up to 2 minutes</div>
         </div>
       )}
 
-      {/* Failed generation indicator */}
-      {hasFailedThisVariation && (
+      {/* Failed generation indicator - only show when failed and no images */}
+      {shouldShowFailed && (
         <div className="mb-4 p-3 bg-red-50 rounded-lg text-center border border-red-200">
           <div className="text-sm text-red-600 font-medium">Image generation failed for variation {postNumber}</div>
           <div className="text-xs text-red-500 mt-1">Please try again</div>
@@ -103,6 +151,15 @@ const LinkedInPostResult = ({
                   src={imageData} 
                   alt={`Generated LinkedIn post image ${index + 1} for variation ${postNumber}`}
                   className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto rounded-lg shadow-sm object-contain max-h-96"
+                  onLoad={() => {
+                    console.log(`🖼️ Image ${index + 1} loaded for variation ${postNumber}`);
+                    // Ensure loading state is reset when image actually loads
+                    setLocalLoadingState(false);
+                  }}
+                  onError={(e) => {
+                    console.error(`❌ Failed to load image ${index + 1} for variation ${postNumber}`, e);
+                    setLocalLoadingState(false);
+                  }}
                 />
                 <Button
                   onClick={() => onCopyImage(imageData)}

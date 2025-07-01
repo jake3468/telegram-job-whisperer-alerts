@@ -1,7 +1,9 @@
+
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
+import { logger } from '@/utils/logger';
 
 interface LinkedInImageData {
   id: string;
@@ -40,8 +42,29 @@ export function useLinkedInImageManager(postId: string | null) {
 
   const hasImages = images.filter(img => img.image_data !== 'generating...' && !img.image_data.includes('failed') && img.image_data.trim()).length > 0;
 
+  // Helper function to check if image data is valid
+  const isValidImageData = (imageData: string): boolean => {
+    return imageData.startsWith('data:image/') || imageData.startsWith('http');
+  };
+
+  // Helper function to reset loading state for a specific variation
+  const resetLoadingForVariation = useCallback((variationNumber: number) => {
+    logger.imageProcessing('loading_state_reset', postId || 'unknown', variationNumber, {
+      previous_loading_state: userTriggeredLoading[variationNumber - 1]
+    });
+    
+    setUserTriggeredLoading(prev => {
+      const newState = [...prev];
+      newState[variationNumber - 1] = false;
+      return newState;
+    });
+  }, [postId, userTriggeredLoading]);
+
   // Reset loading states when switching posts
   useEffect(() => {
+    logger.imageProcessing('post_switch_reset', postId || 'unknown', 0, {
+      previous_loading_states: userTriggeredLoading
+    });
     setUserTriggeredLoading([false, false, false]);
   }, [postId]);
 
@@ -59,7 +82,7 @@ export function useLinkedInImageManager(postId: string | null) {
           .order('updated_at', { ascending: false });
 
         if (error) {
-          console.error('Error fetching images:', error);
+          logger.error('Error fetching images:', error);
           return;
         }
 
@@ -83,12 +106,19 @@ export function useLinkedInImageManager(postId: string | null) {
           }, []);
 
           setImages(uniqueImages);
+
+          // Reset loading states for variations that now have valid images
+          uniqueImages.forEach(img => {
+            if (isValidImageData(img.image_data)) {
+              resetLoadingForVariation(img.variation_number);
+            }
+          });
         }
       }, 3, 'fetch LinkedIn post images');
     } catch (error) {
-      console.error('Error fetching images:', error);
+      logger.error('Error fetching images:', error);
     }
-  }, [postId, isAuthReady, executeWithRetry]);
+  }, [postId, isAuthReady, executeWithRetry, resetLoadingForVariation]);
 
   // Set up real-time subscription for image updates
   useEffect(() => {
@@ -102,7 +132,10 @@ export function useLinkedInImageManager(postId: string | null) {
         table: 'linkedin_post_images',
         filter: `post_id=eq.${postId}`
       }, async (payload) => {
-        console.log('LinkedIn image updated via real-time:', payload);
+        logger.imageProcessing('realtime_update', postId, 0, {
+          event_type: payload.eventType,
+          variation_number: payload.new?.variation_number || payload.old?.variation_number
+        });
         
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
           const newImage = payload.new as LinkedInImageData;
@@ -115,23 +148,22 @@ export function useLinkedInImageManager(postId: string | null) {
             return [...filtered, newImage];
           });
 
-          // Only show success toast for actual completed images, not generating/failed states
-          if (newImage.image_data !== 'generating...' && 
-              !newImage.image_data.includes('failed') && 
-              newImage.image_data.trim() && 
-              newImage.variation_number) {
-            
-            // Reset loading state for this variation when image arrives
-            setUserTriggeredLoading(prev => {
-              const newState = [...prev];
-              newState[newImage.variation_number - 1] = false;
-              return newState;
+          // Check if this is a valid completed image and reset loading state
+          if (isValidImageData(newImage.image_data)) {
+            logger.imageProcessing('valid_image_received', postId, newImage.variation_number, {
+              image_data_type: newImage.image_data.substring(0, 50) + '...'
             });
+            
+            // Reset loading state immediately when valid image arrives
+            resetLoadingForVariation(newImage.variation_number);
 
             toast({
               title: "Image Generated!",
               description: `LinkedIn post image for variation ${newImage.variation_number} is ready.`
             });
+          } else if (newImage.image_data.includes('failed')) {
+            // Reset loading state for failed images too
+            resetLoadingForVariation(newImage.variation_number);
           }
         } else if (payload.eventType === 'DELETE') {
           const deletedImage = payload.old as LinkedInImageData;
@@ -146,10 +178,14 @@ export function useLinkedInImageManager(postId: string | null) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [postId, isAuthReady, fetchImages, toast]);
+  }, [postId, isAuthReady, fetchImages, toast, resetLoadingForVariation]);
 
   const generateImage = useCallback(async (variationNumber: number, postData?: any) => {
     if (!postId) return;
+
+    logger.imageProcessing('generation_started', postId, variationNumber, {
+      user_triggered: true
+    });
 
     // Set user-triggered loading state immediately
     setUserTriggeredLoading(prev => {
@@ -160,6 +196,10 @@ export function useLinkedInImageManager(postId: string | null) {
 
     // Set timeout to reset loading state after 3 minutes if no response
     const timeoutId = setTimeout(() => {
+      logger.imageProcessing('generation_timeout', postId, variationNumber, {
+        timeout_duration: '3_minutes'
+      });
+      
       setUserTriggeredLoading(prev => {
         const newState = [...prev];
         newState[variationNumber - 1] = false;
@@ -207,12 +247,12 @@ export function useLinkedInImageManager(postId: string | null) {
 
         if (!webhookResponse.ok) {
           const errorText = await webhookResponse.text();
-          console.error('Webhook call failed:', errorText);
+          logger.error('Webhook call failed:', errorText);
           throw new Error('Failed to trigger image generation webhook');
         }
 
         const responseData = await webhookResponse.json();
-        console.log('Webhook response:', responseData);
+        logger.imageProcessing('webhook_response', postId, variationNumber, responseData);
 
         // Clear the timeout since webhook call succeeded
         clearTimeout(timeoutId);
@@ -230,7 +270,7 @@ export function useLinkedInImageManager(postId: string | null) {
       });
 
     } catch (error) {
-      console.error('Error generating image:', error);
+      logger.error('Error generating image:', error);
       clearTimeout(timeoutId);
       
       // Reset loading state on error
@@ -271,7 +311,7 @@ export function useLinkedInImageManager(postId: string | null) {
           .eq('id', imageId);
 
         if (error) {
-          console.error('Error deleting image:', error);
+          logger.error('Error deleting image:', error);
           throw error;
         }
       }, 3, `delete image ${imageId}`);
@@ -285,7 +325,7 @@ export function useLinkedInImageManager(postId: string | null) {
       });
 
     } catch (error) {
-      console.error('Error deleting image:', error);
+      logger.error('Error deleting image:', error);
       toast({
         title: "Error",
         description: "Failed to delete image. Please try again.",
