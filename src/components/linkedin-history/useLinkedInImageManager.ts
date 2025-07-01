@@ -1,5 +1,5 @@
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
@@ -16,25 +16,12 @@ export function useLinkedInImageManager(postId: string | null) {
   const [isGenerating, setIsGenerating] = useState<boolean[]>([false, false, false]);
   const { toast } = useToast();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
-  const processedImageIds = useRef<Set<string>>(new Set());
 
-  // Helper function to deduplicate images by image_data content
-  const deduplicateImages = (imageArray: LinkedInImageData[]): LinkedInImageData[] => {
-    const seen = new Set<string>();
-    return imageArray.filter(img => {
-      if (seen.has(img.image_data)) {
-        return false;
-      }
-      seen.add(img.image_data);
-      return true;
-    });
-  };
-
-  // Transform images data to match the expected format with deduplication
+  // Transform images data to match the expected format
   const generatedImages = {
-    1: deduplicateImages(images.filter(img => img.variation_number === 1 && img.image_data !== 'generating...')).map(img => img.image_data),
-    2: deduplicateImages(images.filter(img => img.variation_number === 2 && img.image_data !== 'generating...')).map(img => img.image_data),
-    3: deduplicateImages(images.filter(img => img.variation_number === 3 && img.image_data !== 'generating...')).map(img => img.image_data)
+    1: images.filter(img => img.variation_number === 1 && img.image_data !== 'generating...').map(img => img.image_data),
+    2: images.filter(img => img.variation_number === 2 && img.image_data !== 'generating...').map(img => img.image_data),
+    3: images.filter(img => img.variation_number === 3 && img.image_data !== 'generating...').map(img => img.image_data)
   };
 
   const loadingImage = {
@@ -49,7 +36,7 @@ export function useLinkedInImageManager(postId: string | null) {
     3: false
   };
 
-  const hasImages = deduplicateImages(images.filter(img => img.image_data !== 'generating...')).length > 0;
+  const hasImages = images.filter(img => img.image_data !== 'generating...').length > 0;
 
   // Fetch images when component mounts or postId changes
   const fetchImages = useCallback(async () => {
@@ -69,14 +56,9 @@ export function useLinkedInImageManager(postId: string | null) {
         }
 
         if (data) {
-          // Deduplicate images before setting state
-          const deduplicatedData = deduplicateImages(data);
-          setImages(deduplicatedData);
+          setImages(data);
+          // Reset generating states properly based on current image data
           setIsGenerating([false, false, false]);
-          
-          // Update processed IDs
-          processedImageIds.current.clear();
-          deduplicatedData.forEach(img => processedImageIds.current.add(img.id));
         }
       }, 3, 'fetch LinkedIn post images');
     } catch (error) {
@@ -101,39 +83,18 @@ export function useLinkedInImageManager(postId: string | null) {
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
           const newImage = payload.new as LinkedInImageData;
           
-          // Skip if we've already processed this image
-          if (processedImageIds.current.has(newImage.id)) {
-            return;
-          }
-
-          // Check if an image with the same image_data already exists
-          const isDuplicate = images.some(img => img.image_data === newImage.image_data);
-          if (isDuplicate) {
-            console.log('Skipping duplicate image:', newImage.id);
-            return;
-          }
-
           setImages(prev => {
             const existing = prev.find(img => img.id === newImage.id);
-            let updatedImages;
-            
             if (existing) {
-              updatedImages = prev.map(img => img.id === newImage.id ? newImage : img);
+              return prev.map(img => img.id === newImage.id ? newImage : img);
             } else {
-              updatedImages = [...prev, newImage];
+              return [...prev, newImage];
             }
-            
-            // Deduplicate the final array
-            const deduplicated = deduplicateImages(updatedImages);
-            
-            // Update processed IDs
-            processedImageIds.current.add(newImage.id);
-            
-            return deduplicated;
           });
 
           // Handle loading state changes based on image data
           if (newImage.image_data !== 'generating...' && newImage.variation_number) {
+            // Image generation completed - turn off loading
             setIsGenerating(prev => {
               const newState = [...prev];
               newState[newImage.variation_number - 1] = false;
@@ -148,7 +109,6 @@ export function useLinkedInImageManager(postId: string | null) {
         } else if (payload.eventType === 'DELETE') {
           const deletedImage = payload.old as LinkedInImageData;
           setImages(prev => prev.filter(img => img.id !== deletedImage.id));
-          processedImageIds.current.delete(deletedImage.id);
         }
       })
       .subscribe();
@@ -164,20 +124,6 @@ export function useLinkedInImageManager(postId: string | null) {
   const generateImage = useCallback(async (variationNumber: number, postData?: any) => {
     if (!postId) return;
 
-    // Check if we already have an image for this variation to prevent duplicates
-    const existingImage = images.find(img => 
-      img.variation_number === variationNumber && 
-      img.image_data !== 'generating...'
-    );
-    
-    if (existingImage) {
-      toast({
-        title: "Image Already Exists",
-        description: `An image for variation ${variationNumber} already exists.`
-      });
-      return;
-    }
-
     // Set generating state immediately when user clicks
     setIsGenerating(prev => {
       const newState = [...prev];
@@ -187,18 +133,6 @@ export function useLinkedInImageManager(postId: string | null) {
 
     try {
       await executeWithRetry(async () => {
-        // Check one more time before creating placeholder to avoid race conditions
-        const { data: existingData } = await supabase
-          .from('linkedin_post_images')
-          .select('id')
-          .eq('post_id', postId)
-          .eq('variation_number', variationNumber)
-          .neq('image_data', 'generating...');
-
-        if (existingData && existingData.length > 0) {
-          throw new Error('Image already exists for this variation');
-        }
-
         // Create placeholder record
         const { error } = await supabase
           .from('linkedin_post_images')
@@ -267,13 +201,11 @@ export function useLinkedInImageManager(postId: string | null) {
       
       toast({
         title: "Error",
-        description: error.message.includes('already exists') 
-          ? `Image already exists for variation ${variationNumber}`
-          : "Failed to generate image. Please try again.",
+        description: "Failed to generate image. Please try again.",
         variant: "destructive"
       });
     }
-  }, [postId, toast, executeWithRetry, images]);
+  }, [postId, toast, executeWithRetry]);
 
   const handleGetImageForPost = useCallback(async (item: any, postNumber: number) => {
     if (!postId) return;
@@ -296,7 +228,6 @@ export function useLinkedInImageManager(postId: string | null) {
 
       // Update local state
       setImages(prev => prev.filter(img => img.id !== imageId));
-      processedImageIds.current.delete(imageId);
       setIsGenerating(prev => {
         const newState = [...prev];
         newState[variationNumber - 1] = false;
