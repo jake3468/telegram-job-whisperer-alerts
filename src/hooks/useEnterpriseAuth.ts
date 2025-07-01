@@ -1,7 +1,7 @@
-
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { setClerkToken, setTokenRefreshFunction } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface RequestQueueItem {
   fn: () => Promise<any>;
@@ -12,6 +12,7 @@ interface RequestQueueItem {
 export const useEnterpriseAuth = () => {
   const { user, isLoaded } = useUser();
   const { getToken } = useAuth();
+  const { toast } = useToast();
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const refreshTimeoutRef = useRef<NodeJS.Timeout>();
@@ -143,24 +144,44 @@ export const useEnterpriseAuth = () => {
                           error?.message?.toLowerCase().includes('unauthorized') ||
                           error?.code === 'PGRST301';
         
-        if (isJWTError && attempts < maxRetries) {
-          // If already refreshing, queue the request
-          if (isRefreshing || refreshPromiseRef.current) {
-            return new Promise((resolve, reject) => {
-              requestQueueRef.current.push({
-                fn: requestFn,
-                resolve,
-                reject
-              });
+        if (isJWTError) {
+          // Show user-friendly message for JWT expiration
+          if (attempts === maxRetries) {
+            toast({
+              title: "Session Expired",
+              description: "Please refresh the page to continue.",
+              variant: "destructive",
+              action: (
+                <button
+                  onClick={() => window.location.reload()}
+                  className="bg-white text-black px-3 py-1 rounded text-sm hover:bg-gray-100"
+                >
+                  Refresh Page
+                </button>
+              )
             });
+            throw new Error('Session expired. Please refresh the page.');
           }
           
-          // Try to refresh token
-          const newToken = await refreshToken();
-          if (newToken) {
-            // Wait longer for the token to propagate
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            continue; // Retry the request
+          if (attempts < maxRetries) {
+            // If already refreshing, queue the request
+            if (isRefreshing || refreshPromiseRef.current) {
+              return new Promise((resolve, reject) => {
+                requestQueueRef.current.push({
+                  fn: requestFn,
+                  resolve,
+                  reject
+                });
+              });
+            }
+            
+            // Try to refresh token
+            const newToken = await refreshToken();
+            if (newToken) {
+              // Wait longer for the token to propagate
+              await new Promise(resolve => setTimeout(resolve, 1000));
+              continue; // Retry the request
+            }
           }
         }
         
@@ -175,7 +196,7 @@ export const useEnterpriseAuth = () => {
     }
     
     throw new Error(`Max retries exceeded for ${description}`);
-  }, [refreshToken, isRefreshing]);
+  }, [refreshToken, isRefreshing, toast]);
 
   // Initialize authentication
   useEffect(() => {

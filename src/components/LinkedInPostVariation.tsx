@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Copy, ImageIcon, Loader2, Trash2 } from 'lucide-react';
@@ -5,7 +6,6 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 import LinkedInPostDisplay from './LinkedInPostDisplay';
-import { useN8NImageDisplay } from '@/hooks/useN8NImageDisplay';
 
 interface UserProfile {
   id: string;
@@ -46,13 +46,10 @@ const LinkedInPostVariation = ({
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
 
-  const { n8nImages } = useN8NImageDisplay(postId || '', variationNumber, () => {
-    setIsLoadingImage(false);
-    setImageGenerationFailed(false);
-  });
-
-  // Combine and deduplicate images - ensure each unique image appears only once
-  const allImages = [...new Set([...generatedImages, ...n8nImages])];
+  // Function to deduplicate images
+  const deduplicateImages = (images: string[]): string[] => {
+    return [...new Set(images)];
+  };
 
   const checkAndLoadExistingImages = async () => {
     if (!postId || !isAuthReady) return;
@@ -78,7 +75,7 @@ const LinkedInPostVariation = ({
                    (imageData.startsWith('data:image/') || imageData.startsWith('http')));
           
           if (imageUrls.length > 0) {
-            setGeneratedImages(imageUrls);
+            setGeneratedImages(deduplicateImages(imageUrls));
             setIsLoadingImage(false);
             setImageGenerationFailed(false);
           }
@@ -127,11 +124,8 @@ const LinkedInPostVariation = ({
               setImageGenerationFailed(false);
               
               setGeneratedImages(prev => {
-                // Only add if not already present
-                if (prev.includes(newImage.image_data)) {
-                  return prev;
-                }
-                return [...prev, newImage.image_data];
+                const updated = [...prev, newImage.image_data];
+                return deduplicateImages(updated);
               });
               
               toast({
@@ -281,6 +275,8 @@ const LinkedInPostVariation = ({
         errorMessage = "Image generation service is not configured. Please contact support.";
       } else if (err.message.includes('Edge function execution failed')) {
         errorMessage = "Image generation service is temporarily unavailable. Please try again later.";
+      } else if (err.message.includes('Session expired')) {
+        errorMessage = "Your session has expired. Please refresh the page.";
       }
       
       toast({
@@ -360,7 +356,7 @@ const LinkedInPostVariation = ({
       </div>
 
       {/* Loading indicator */}
-      {isLoadingImage && allImages.length === 0 && (
+      {isLoadingImage && generatedImages.length === 0 && (
         <div className="p-4 bg-blue-50 rounded-lg text-center border border-blue-200 mb-6">
           <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading for variation {variationNumber}...</div>
           <div className="text-xs text-blue-500 mt-1">This may take up to 2 minutes</div>
@@ -368,21 +364,21 @@ const LinkedInPostVariation = ({
       )}
 
       {/* Failed generation indicator */}
-      {imageGenerationFailed && allImages.length === 0 && (
+      {imageGenerationFailed && generatedImages.length === 0 && (
         <div className="p-4 bg-red-50 rounded-lg text-center border border-red-200 mb-6">
           <div className="text-sm text-red-600 font-medium">Image generation failed for variation {variationNumber}</div>
           <div className="text-xs text-red-500 mt-1">Please try again</div>
         </div>
       )}
 
-      {/* Generated Images - Now deduplicated */}
-      {allImages.length > 0 && (
+      {/* Generated Images - Now properly deduplicated */}
+      {generatedImages.length > 0 && (
         <div className="mb-8">
           <h5 className="text-cyan-400 font-medium text-sm mb-4 text-center">
-            Generated Images for Variation {variationNumber} ({allImages.length}):
+            Generated Images for Variation {variationNumber} ({generatedImages.length}):
           </h5>
           <div className="space-y-6">
-            {allImages.map((imageData, index) => (
+            {generatedImages.map((imageData, index) => (
               <div key={`${imageData}-${index}`} className="relative w-full max-w-2xl mx-auto">
                 <img 
                   src={imageData} 
