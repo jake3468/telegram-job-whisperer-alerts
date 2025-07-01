@@ -9,7 +9,7 @@ export const FEATURE_CREDITS = {
   COVER_LETTER: 1.5,
   LINKEDIN_POST: 3.0,
   LINKEDIN_IMAGE: 1.5,
-  JOB_ALERT: 0, // Free for users
+  JOB_ALERT: 1.5, // Changed from 0 to 1.5 to reflect actual cost
   RESUME_PDF: 1.5
 } as const;
 
@@ -29,22 +29,16 @@ export function useFeatureCreditCheck({
   const requiredCredits = FEATURE_CREDITS[feature];
   const { hasCredits, isLoading, showInsufficientCreditsPopup } = useCreditCheck(requiredCredits);
 
-  // For JOB_ANALYSIS and COMPANY_ROLE_ANALYSIS, we only check credits but don't deduct (N8N handles deduction)
+  // For JOB_ANALYSIS, COMPANY_ROLE_ANALYSIS, and JOB_ALERT, we only check credits but don't deduct (N8N handles deduction)
   const checkCreditsOnly = async (): Promise<boolean> => {
-    // If feature is free (JOB_ALERT), always allow
-    if (requiredCredits === 0) {
-      onSuccess?.();
-      return true;
-    }
-
     if (!hasCredits) {
       showInsufficientCreditsPopup();
       onInsufficientCredits?.();
       return false;
     }
 
-    // For job analysis and company analysis, just check credits but don't deduct
-    if (feature === 'JOB_ANALYSIS' || feature === 'COMPANY_ROLE_ANALYSIS') {
+    // For job analysis, company analysis, and job alerts, just check credits but don't deduct
+    if (feature === 'JOB_ANALYSIS' || feature === 'COMPANY_ROLE_ANALYSIS' || feature === 'JOB_ALERT') {
       onSuccess?.();
       return true;
     }
@@ -58,7 +52,7 @@ export function useFeatureCreditCheck({
     hasCredits,
     requiredCredits,
     isLoading,
-    isDeducting: false, // No longer deducting in frontend for job analysis and company analysis
+    isDeducting: false, // No longer deducting in frontend for job analysis, company analysis, and job alerts
     checkAndDeductCredits: checkCreditsOnly,
     showInsufficientCreditsPopup
   };

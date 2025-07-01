@@ -1,4 +1,3 @@
-
 import { useUser } from '@clerk/clerk-react';
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -81,7 +80,7 @@ const JobAlerts = () => {
 
         {/* Usage Cost Badge */}
         <Badge variant="outline" className="bg-orange-900/30 border-orange-600/50 text-orange-300 font-semibold">
-          Usage Fee: 1.5 credits/day/alert
+          Usage Fee: 1.5 credits per alert execution
         </Badge>
       </div>
 
@@ -93,4 +92,5 @@ const JobAlerts = () => {
       </div>
     </Layout>;
 };
+
 export default JobAlerts;
