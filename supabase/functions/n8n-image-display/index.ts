@@ -40,40 +40,38 @@ serve(async (req) => {
 
     console.log(`Processing image display for post ${post_id}, variation ${variation_number}`);
 
-    // First try to delete any existing record to avoid conflicts
-    try {
-      const { error: deleteError } = await supabaseClient
-        .from('linkedin_post_images')
-        .delete()
-        .eq('post_id', post_id)
-        .eq('variation_number', variation_number);
-      
-      if (deleteError) {
-        console.log('No existing record to delete:', deleteError.message);
-      } else {
-        console.log('Deleted existing image record');
-      }
-    } catch (deleteErr) {
-      console.log('Delete operation failed:', deleteErr);
-    }
-
-    // Now insert the new record
-    const { data: insertData, error: insertError } = await supabaseClient
+    // Use upsert to replace existing image atomically - this prevents duplicates
+    const { data: upsertData, error: upsertError } = await supabaseClient
       .from('linkedin_post_images')
-      .insert({
+      .upsert({
         post_id: post_id,
         variation_number: variation_number,
         image_data: image_data
+      }, {
+        onConflict: 'post_id,variation_number',
+        ignoreDuplicates: false
       })
       .select();
 
     let stored_in_db = false;
-    if (insertError) {
-      console.error('Error storing image in database:', insertError);
+    if (upsertError) {
+      console.error('Error upserting image in database:', upsertError);
       
-      // Try one more time with a simple insert
+      // Fallback: try delete + insert approach
       try {
-        const { error: retryError } = await supabaseClient
+        // Delete existing records first
+        const { error: deleteError } = await supabaseClient
+          .from('linkedin_post_images')
+          .delete()
+          .eq('post_id', post_id)
+          .eq('variation_number', variation_number);
+        
+        if (deleteError) {
+          console.log('Delete operation error (may be expected):', deleteError.message);
+        }
+
+        // Insert new record
+        const { error: insertError } = await supabaseClient
           .from('linkedin_post_images')
           .insert({
             post_id: post_id,
@@ -81,18 +79,18 @@ serve(async (req) => {
             image_data: image_data
           });
         
-        if (!retryError) {
+        if (!insertError) {
           stored_in_db = true;
-          console.log('Successfully stored image on retry');
+          console.log('Successfully stored image using fallback method');
         } else {
-          console.error('Retry insert also failed:', retryError);
+          console.error('Fallback insert also failed:', insertError);
         }
-      } catch (retryErr) {
-        console.error('Retry attempt failed:', retryErr);
+      } catch (fallbackErr) {
+        console.error('Fallback method failed:', fallbackErr);
       }
     } else {
       stored_in_db = true;
-      console.log('Successfully stored image in database:', insertData);
+      console.log('Successfully upserted image in database:', upsertData);
     }
 
     // Create a real-time notification payload
