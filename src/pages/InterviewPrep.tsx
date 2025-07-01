@@ -414,15 +414,15 @@ const InterviewPrep = () => {
           {/* Profile Completion Warning */}
           <ProfileCompletionWarning />
 
+          {/* ALWAYS VISIBLE History Button - Fixed Position */}
+          <div className="mb-4 flex justify-end">
+            <InterviewPrepHistoryModal />
+          </div>
+
           {/* Form - Always visible */}
           <Card className="mb-6 sm:mb-8 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] border-0 mx-1 sm:mx-0">
             <CardHeader className="pb-4 px-4 sm:px-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <CardTitle className="text-black text-lg sm:text-xl">Interview Preparation Details</CardTitle>
-                <div className="flex-shrink-0">
-                  <InterviewPrepHistoryModal />
-                </div>
-              </div>
+              <CardTitle className="text-black text-lg sm:text-xl">Interview Preparation Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 px-4 sm:px-6">
               {/* Company Name and Job Title in horizontal layout for desktop */}
