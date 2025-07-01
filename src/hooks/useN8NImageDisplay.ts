@@ -16,13 +16,16 @@ interface UseN8NImageDisplayReturn {
   resetLoadingState: () => void;
 }
 
-export const useN8NImageDisplay = (postId: string, variationNumber: number): UseN8NImageDisplayReturn => {
+export const useN8NImageDisplay = (postId: string, variationNumber: number, onImageReceived?: () => void): UseN8NImageDisplayReturn => {
   const [n8nImages, setN8nImages] = useState<string[]>([]);
   const { toast } = useToast();
 
   const resetLoadingState = () => {
     // This will be called from the component to reset button state
     console.log(`🔄 Resetting loading state for variation ${variationNumber}`);
+    if (onImageReceived) {
+      onImageReceived();
+    }
   };
 
   useEffect(() => {
@@ -51,6 +54,11 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number): Use
             return [...prev, imagePayload.image_data];
           });
 
+          // Reset loading state when image is received
+          if (onImageReceived) {
+            onImageReceived();
+          }
+
           toast({
             title: "Image Ready!",
             description: `LinkedIn post image for variation ${variationNumber} is now available.`
@@ -65,7 +73,7 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number): Use
       console.log(`🧹 Cleaning up N8N image listener for variation ${variationNumber}`);
       supabase.removeChannel(channel);
     };
-  }, [postId, variationNumber, toast]);
+  }, [postId, variationNumber, toast, onImageReceived]);
 
   return { n8nImages, resetLoadingState };
 };

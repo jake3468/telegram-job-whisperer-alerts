@@ -47,8 +47,12 @@ const LinkedInPostVariation = ({
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
 
-  // Add N8N image display hook
-  const { n8nImages } = useN8NImageDisplay(postId || '', variationNumber);
+  // Add N8N image display hook with callback to reset loading state
+  const { n8nImages } = useN8NImageDisplay(postId || '', variationNumber, () => {
+    console.log(`🎯 N8N image received, resetting loading state for variation ${variationNumber}`);
+    setIsLoadingImage(false);
+    setImageGenerationFailed(false);
+  });
 
   // Combine both regular images and N8N images
   const allImages = [...generatedImages, ...n8nImages];

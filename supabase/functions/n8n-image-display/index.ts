@@ -69,7 +69,7 @@ serve(async (req) => {
     // Send real-time notification to the specific channel
     const channelName = `linkedin-image-display-${post_id}-${variation_number}`;
     
-    await supabaseClient
+    const { error: broadcastError } = await supabaseClient
       .channel(channelName)
       .send({
         type: 'broadcast',
@@ -77,7 +77,11 @@ serve(async (req) => {
         payload: notificationPayload
       });
 
-    console.log(`Sent real-time notification to channel: ${channelName}`);
+    if (broadcastError) {
+      console.error('Error sending broadcast:', broadcastError);
+    } else {
+      console.log(`Sent real-time notification to channel: ${channelName}`);
+    }
 
     return new Response(
       JSON.stringify({ 
