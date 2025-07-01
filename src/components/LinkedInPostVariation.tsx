@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -146,11 +147,19 @@ const LinkedInPostVariation = ({
       }, async (payload) => {
         logger.imageProcessing('realtime_update_received', postId, variationNumber, {
           event_type: payload.eventType,
-          variation_in_payload: payload.new?.variation_number || payload.old?.variation_number
+          variation_in_payload: (payload.new as any)?.variation_number || (payload.old as any)?.variation_number
         });
         
         if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
-          const updatedImage = payload.new;
+          const updatedImage = payload.new as any;
+          
+          // Type guard to ensure we have the required properties
+          if (!updatedImage || typeof updatedImage.variation_number !== 'number') {
+            logger.imageProcessing('realtime_invalid_payload', postId, variationNumber, {
+              payload: payload.new
+            });
+            return;
+          }
           
           // Check if this update is for our specific variation
           if (updatedImage.variation_number !== variationNumber) {
@@ -216,8 +225,10 @@ const LinkedInPostVariation = ({
             });
           }
         } else if (payload.eventType === 'DELETE') {
-          const deletedImage = payload.old;
-          if (deletedImage.variation_number === variationNumber) {
+          const deletedImage = payload.old as any;
+          
+          // Type guard for deleted image
+          if (deletedImage && typeof deletedImage.variation_number === 'number' && deletedImage.variation_number === variationNumber) {
             setGeneratedImages(prev => prev.filter(img => img !== deletedImage.image_data));
           }
         }

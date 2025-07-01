@@ -134,11 +134,19 @@ export function useLinkedInImageManager(postId: string | null) {
       }, async (payload) => {
         logger.imageProcessing('realtime_update', postId, 0, {
           event_type: payload.eventType,
-          variation_number: payload.new?.variation_number || payload.old?.variation_number
+          variation_number: (payload.new as any)?.variation_number || (payload.old as any)?.variation_number
         });
         
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
           const newImage = payload.new as LinkedInImageData;
+          
+          // Type guard to ensure we have the required properties
+          if (!newImage || typeof newImage.variation_number !== 'number') {
+            logger.imageProcessing('realtime_invalid_payload', postId, 0, {
+              payload: payload.new
+            });
+            return;
+          }
           
           setImages(prev => {
             // Remove any existing records for this variation to prevent duplicates
@@ -167,7 +175,11 @@ export function useLinkedInImageManager(postId: string | null) {
           }
         } else if (payload.eventType === 'DELETE') {
           const deletedImage = payload.old as LinkedInImageData;
-          setImages(prev => prev.filter(img => img.id !== deletedImage.id));
+          
+          // Type guard for deleted image
+          if (deletedImage && typeof deletedImage.variation_number === 'number') {
+            setImages(prev => prev.filter(img => img.id !== deletedImage.id));
+          }
         }
       })
       .subscribe();
