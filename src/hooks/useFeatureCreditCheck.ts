@@ -9,7 +9,7 @@ export const FEATURE_CREDITS = {
   COVER_LETTER: 1.5,
   LINKEDIN_POST: 3.0,
   LINKEDIN_IMAGE: 1.5,
-  JOB_ALERT: 1.5, // Changed from 0 to 1.5 to reflect actual cost
+  JOB_ALERT: 0.1, // Changed from 1.5 to 0.1 to reflect actual cost per execution
   RESUME_PDF: 1.5
 } as const;
 

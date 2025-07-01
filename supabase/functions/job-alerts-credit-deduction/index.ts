@@ -99,13 +99,13 @@ serve(async (req) => {
       alertId: alert_id 
     })
 
-    // Deduct 1.5 credits using the database function
-    console.log('Attempting to deduct 1.5 credits for job alert execution...')
+    // Deduct 0.1 credits using the database function
+    console.log('Attempting to deduct 0.1 credits for job alert execution...')
     
     const { data: deductionResult, error: deductionError } = await supabaseClient
       .rpc('deduct_credits', {
         p_user_id: user.id,
-        p_amount: 1.5,
+        p_amount: 0.1,
         p_feature_used: 'job_alert_execution',
         p_description: `Job alert executed for ${alertData.job_title} in ${alertData.location}, ${alertData.country}`
       })
@@ -144,13 +144,13 @@ serve(async (req) => {
       )
     }
 
-    console.log('Successfully deducted 1.5 credits for job alert execution')
+    console.log('Successfully deducted 0.1 credits for job alert execution')
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         message: 'Credits deducted successfully for job alert execution',
-        credits_deducted: 1.5,
+        credits_deducted: 0.1,
         user_id: user.id,
         user_email: user.email,
         alert_id: alert_id,
