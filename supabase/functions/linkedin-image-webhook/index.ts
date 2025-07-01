@@ -39,6 +39,17 @@ serve(async (req) => {
 
       if (updateError) {
         console.error('Error updating generating record:', updateError)
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: 'Failed to update generating record',
+            details: updateError.message
+          }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+            status: 500 
+          }
+        )
       }
 
       if (updateResult && updateResult.length > 0) {
@@ -67,6 +78,17 @@ serve(async (req) => {
 
       if (checkError) {
         console.error('Error checking existing records:', checkError)
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: 'Failed to check existing records',
+            details: checkError.message
+          }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+            status: 500 
+          }
+        )
       }
 
       if (existingRecords && existingRecords.length > 0) {
@@ -81,6 +103,17 @@ serve(async (req) => {
 
         if (finalUpdateError) {
           console.error('Error updating existing record:', finalUpdateError)
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              error: 'Failed to update existing record',
+              details: finalUpdateError.message
+            }),
+            { 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+              status: 500 
+            }
+          )
         } else {
           console.log('Successfully updated existing record')
           return new Response(
@@ -95,7 +128,7 @@ serve(async (req) => {
         }
       }
 
-      // Only create new record if no existing record was found
+      // Only create new record if no existing record was found (this should rarely happen)
       console.log('No existing record found, creating new one...')
       
       const { data: insertResult, error: insertError } = await supabase
@@ -276,7 +309,38 @@ serve(async (req) => {
       if (updateError) {
         console.error('Error updating existing generating record:', updateError)
         
-        // If update failed, try to create a new record (fallback)
+        // If update failed, try to update any existing record for this post_id + variation_number
+        const { data: existingRecords, error: checkError } = await supabase
+          .from('linkedin_post_images')
+          .select('id')
+          .eq('post_id', post_id)
+          .eq('variation_number', variation_number)
+          .order('created_at', { ascending: false })
+          .limit(1)
+
+        if (!checkError && existingRecords && existingRecords.length > 0) {
+          const { error: finalUpdateError } = await supabase
+            .from('linkedin_post_images')
+            .update({ image_data: responseData.image_data })
+            .eq('id', existingRecords[0].id)
+
+          if (!finalUpdateError) {
+            console.log('Successfully updated existing record as fallback')
+            return new Response(
+              JSON.stringify({ 
+                success: true, 
+                message: 'Image processed and stored successfully',
+                image_data_received: true,
+                variation_number: variation_number
+              }),
+              { 
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+              }
+            )
+          }
+        }
+        
+        // If all updates failed, create a new record (fallback)
         const { error: insertError } = await supabase
           .from('linkedin_post_images')
           .insert({
