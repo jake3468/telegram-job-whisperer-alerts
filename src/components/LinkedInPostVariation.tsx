@@ -398,12 +398,24 @@ const LinkedInPostVariation = ({
 
     try {
       await executeWithRetry(async () => {
-        // Step 1: CRITICAL - Update existing record to "generating..." state for regeneration
-        logger.imageProcessing('updating_existing_record_to_generating', postId, variationNumber, {
+        // Step 1: CRITICAL - First delete any existing "generating..." records to avoid conflicts
+        logger.imageProcessing('cleaning_generating_records', postId, variationNumber, {
           generation_id: generationId
         });
         
-        // Update the existing record for this post_id and variation_number
+        await supabase
+          .from('linkedin_post_images')
+          .delete()
+          .eq('post_id', postId)
+          .eq('variation_number', variationNumber)
+          .eq('image_data', 'generating...');
+
+        // Step 2: Update existing valid image record to "generating..." OR create new one
+        logger.imageProcessing('updating_to_generating_state', postId, variationNumber, {
+          generation_id: generationId
+        });
+        
+        // Try to update an existing valid image record first
         const { data: updateResult, error: updateError } = await supabase
           .from('linkedin_post_images')
           .update({ 
@@ -412,18 +424,20 @@ const LinkedInPostVariation = ({
           })
           .eq('post_id', postId)
           .eq('variation_number', variationNumber)
-          .select();
+          .neq('image_data', 'generating...') // Don't update records that are already generating
+          .select()
+          .limit(1);
 
-        logger.imageProcessing('update_result', postId, variationNumber, {
+        logger.imageProcessing('update_attempt_result', postId, variationNumber, {
           generation_id: generationId,
           update_error: updateError?.message,
           update_result_count: updateResult?.length || 0,
           has_update_error: !!updateError
         });
 
-        // If no existing record was updated (updateResult is empty), create a new one
+        // If no existing record was updated, create a new one
         if (!updateError && (!updateResult || updateResult.length === 0)) {
-          logger.imageProcessing('no_existing_record_creating_new', postId, variationNumber, {
+          logger.imageProcessing('creating_new_generating_record', postId, variationNumber, {
             generation_id: generationId
           });
           
@@ -449,7 +463,7 @@ const LinkedInPostVariation = ({
           });
         }
 
-        // Step 2: Call edge function
+        // Step 3: Call edge function
         logger.imageProcessing('webhook_call_start', postId, variationNumber, {
           generation_id: generationId
         });
