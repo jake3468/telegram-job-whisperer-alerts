@@ -1,3 +1,4 @@
+
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { setClerkToken, setTokenRefreshFunction } from '@/integrations/supabase/client';
@@ -151,14 +152,10 @@ export const useEnterpriseAuth = () => {
               title: "Session Expired",
               description: "Please refresh the page to continue.",
               variant: "destructive",
-              action: (
-                <button
-                  onClick={() => window.location.reload()}
-                  className="bg-white text-black px-3 py-1 rounded text-sm hover:bg-gray-100"
-                >
-                  Refresh Page
-                </button>
-              )
+              action: {
+                label: "Refresh Page",
+                onClick: () => window.location.reload()
+              }
             });
             throw new Error('Session expired. Please refresh the page.');
           }
