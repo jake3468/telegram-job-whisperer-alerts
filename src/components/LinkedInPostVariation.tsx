@@ -491,7 +491,7 @@ const LinkedInPostVariation = ({
           generation_id: generationId
         });
         
-        // Try to update an existing valid image record first
+        // Try to update an existing valid base64 image record first
         const { data: updateResult, error: updateError } = await supabase
           .from('linkedin_post_images')
           .update({ 
@@ -500,7 +500,7 @@ const LinkedInPostVariation = ({
           })
           .eq('post_id', postId)
           .eq('variation_number', variationNumber)
-          .neq('image_data', 'generating...') // Don't update records that are already generating
+          .like('image_data', 'data:image/%') // Only update existing base64 images
           .select()
           .limit(1);
 
@@ -511,7 +511,7 @@ const LinkedInPostVariation = ({
           has_update_error: !!updateError
         });
 
-        // If no existing record was updated, create a new one
+        // If no existing base64 image was updated, create a new generating record
         if (!updateError && (!updateResult || updateResult.length === 0)) {
           logger.imageProcessing('creating_new_generating_record', postId, variationNumber, {
             generation_id: generationId
