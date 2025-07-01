@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 import LinkedInPostDisplay from './LinkedInPostDisplay';
+import { useN8NImageDisplay } from '@/hooks/useN8NImageDisplay';
 
 interface UserProfile {
   id: string;
@@ -46,6 +46,21 @@ const LinkedInPostVariation = ({
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
+
+  // Add N8N image display hook
+  const { n8nImages } = useN8NImageDisplay(postId || '', variationNumber);
+
+  // Combine both regular images and N8N images
+  const allImages = [...generatedImages, ...n8nImages];
+
+  // Reset loading state when N8N images arrive
+  useEffect(() => {
+    if (n8nImages.length > 0 && isLoadingImage) {
+      console.log(`🎯 N8N images detected, resetting loading state for variation ${variationNumber}`);
+      setIsLoadingImage(false);
+      setImageGenerationFailed(false);
+    }
+  }, [n8nImages.length, isLoadingImage, variationNumber]);
 
   // Function to check and load existing images
   const checkAndLoadExistingImages = async () => {
@@ -267,7 +282,7 @@ const LinkedInPostVariation = ({
     }
   };
 
-  // Handle image generation - Enhanced with immediate state check
+  // Handle image generation - Simplified since N8N will handle display
   const handleGenerateImage = async () => {
     if (!postId) {
       toast({
@@ -280,13 +295,11 @@ const LinkedInPostVariation = ({
 
     console.log(`🚀 Starting image generation for post ${postId}, variation ${variationNumber}`);
     
-    // Reset states before starting generation
     setIsLoadingImage(true);
     setImageGenerationFailed(false);
 
     try {
       await executeWithRetry(async () => {
-        // Call the linkedin-image-webhook edge function with proper parameters
         console.log('🔗 Calling linkedin-image-webhook edge function...');
         const userName = userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() : 'Professional User';
         
@@ -308,7 +321,6 @@ const LinkedInPostVariation = ({
 
         console.log('✅ Edge function response:', webhookResponse);
 
-        // Check if the edge function call was successful
         if (webhookResponse && webhookResponse.success === false) {
           if (!webhookResponse.webhook_url_configured) {
             throw new Error('N8N webhook URL not configured');
@@ -319,17 +331,11 @@ const LinkedInPostVariation = ({
 
         console.log('🎉 Image generation request sent successfully');
 
-        // CRITICAL: Immediately check for existing images after successful webhook call
-        console.log('🔍 Checking for existing images immediately after webhook call...');
-        setTimeout(() => {
-          checkAndLoadExistingImages();
-        }, 1000); // Wait 1 second then check
-
       }, 3, `generate image for variation ${variationNumber}`);
       
       toast({
         title: "Image Generation Started",
-        description: "Your LinkedIn post image is being generated. Please wait..."
+        description: "Your LinkedIn post image is being generated via N8N..."
       });
 
     } catch (err: any) {
@@ -337,14 +343,11 @@ const LinkedInPostVariation = ({
       setIsLoadingImage(false);
       setImageGenerationFailed(true);
       
-      // Show more specific error messages
       let errorMessage = "Failed to generate image. Please try again.";
       if (err.message.includes('webhook URL not configured')) {
         errorMessage = "Image generation service is not configured. Please contact support.";
       } else if (err.message.includes('Edge function execution failed')) {
         errorMessage = "Image generation service is temporarily unavailable. Please try again later.";
-      } else if (err.message.includes('Edge function failed')) {
-        errorMessage = "Image generation service error. Please try again.";
       }
       
       toast({
@@ -427,29 +430,30 @@ const LinkedInPostVariation = ({
       </div>
 
       {/* Loading indicator - only show when loading and no images exist */}
-      {isLoadingImage && generatedImages.length === 0 && (
+      {isLoadingImage && allImages.length === 0 && (
         <div className="p-4 bg-blue-50 rounded-lg text-center border border-blue-200 mb-6">
-          <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading for variation {variationNumber}...</div>
+          <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading via N8N for variation {variationNumber}...</div>
           <div className="text-xs text-blue-500 mt-1">This may take up to 2 minutes</div>
         </div>
       )}
 
       {/* Failed generation indicator - only show when failed and no images exist */}
-      {imageGenerationFailed && generatedImages.length === 0 && (
+      {imageGenerationFailed && allImages.length === 0 && (
         <div className="p-4 bg-red-50 rounded-lg text-center border border-red-200 mb-6">
           <div className="text-sm text-red-600 font-medium">Image generation failed for variation {variationNumber}</div>
           <div className="text-xs text-red-500 mt-1">Please try again</div>
         </div>
       )}
 
-      {/* Generated Images */}
-      {generatedImages.length > 0 && (
+      {/* Generated Images - Show both regular and N8N images */}
+      {allImages.length > 0 && (
         <div className="mb-8">
           <h5 className="text-cyan-400 font-medium text-sm mb-4 text-center">
-            Generated Images for Variation {variationNumber} ({generatedImages.length}):
+            Generated Images for Variation {variationNumber} ({allImages.length}):
+            {n8nImages.length > 0 && <span className="text-green-400 ml-2">✨ N8N: {n8nImages.length}</span>}
           </h5>
           <div className="space-y-6">
-            {generatedImages.map((imageData, index) => (
+            {allImages.map((imageData, index) => (
               <div key={index} className="relative w-full max-w-2xl mx-auto">
                 <img 
                   src={imageData} 
