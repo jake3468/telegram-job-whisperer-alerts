@@ -84,7 +84,7 @@ const JobAlerts = () => {
 
         {/* Usage Cost Badge */}
         <Badge variant="outline" className="bg-orange-900/30 border-orange-600/50 text-orange-300 font-semibold">
-          Usage Fee: 0.1 credits per alert execution
+          Usage Fee: 0.1 credits per alert message
         </Badge>
       </div>
 
