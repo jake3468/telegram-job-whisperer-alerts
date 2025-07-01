@@ -250,7 +250,7 @@ const CoverLetter = () => {
           </SidebarTrigger>
           <div className="flex items-center gap-2">
             <img alt="JobBots Logo" className="h-8 w-8 drop-shadow-lg" src="/lovable-uploads/34030be6-9535-4f5f-8f29-e4493515b5e8.jpg" />
-            <span className="font-orbitron font-extrabold text-2xl bg-gradient-to-r from-sky-300 via-fuchsia-400 to-indigo-300 bg-clip-text text-transparent drop-shadow-sm tracking-wider select-none relative whitespace-nowrap">
+            <span className="font-orbitron font-extrabold text-2xl bg-gradient-to-r from-sky-300 via-fuchsia-400 to-indigo-300 bg-clip-text drop-shadow-sm tracking-wider select-none relative whitespace-nowrap text-gray-50">
               Aspirely.ai
             </span>
           </div>
