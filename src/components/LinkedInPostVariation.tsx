@@ -80,7 +80,7 @@ const LinkedInPostVariation = ({
     loadExistingImages();
   }, [postId, variationNumber, isAuthReady, executeWithRetry]);
 
-  // Real-time subscription for image updates - FIXED to properly filter by variation_number
+  // Real-time subscription for image updates - FIXED to properly handle image data
   useEffect(() => {
     if (!postId || !isAuthReady) return;
 
@@ -110,9 +110,12 @@ const LinkedInPostVariation = ({
             setIsLoadingImage(true);
             setImageGenerationFailed(false);
           } 
-          else if (newImage.image_data && newImage.image_data !== 'generating...' && !newImage.image_data.includes('failed')) {
+          else if (newImage.image_data && 
+                   newImage.image_data !== 'generating...' && 
+                   !newImage.image_data.includes('failed') &&
+                   (newImage.image_data.startsWith('data:image/') || newImage.image_data.startsWith('http'))) {
             console.log(`✅ Image generation completed for variation ${variationNumber}`);
-            console.log(`🖼️ New image data received:`, newImage.image_data.substring(0, 100) + '...');
+            console.log(`🖼️ New image data received (length: ${newImage.image_data.length})`);
             
             // Add the new image to the list if it's not already there
             setGeneratedImages(prev => {
