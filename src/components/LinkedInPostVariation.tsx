@@ -47,9 +47,9 @@ const LinkedInPostVariation = ({
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
 
-  // Add N8N image display hook with callback to reset loading state
+  // Add image display hook with callback to reset loading state
   const { n8nImages } = useN8NImageDisplay(postId || '', variationNumber, () => {
-    console.log(`🎯 N8N image received, resetting loading state for variation ${variationNumber}`);
+    console.log(`🎯 Image received, resetting loading state for variation ${variationNumber}`);
     setIsLoadingImage(false);
     setImageGenerationFailed(false);
   });
@@ -60,7 +60,7 @@ const LinkedInPostVariation = ({
   // Reset loading state when N8N images arrive
   useEffect(() => {
     if (n8nImages.length > 0) {
-      console.log(`🎯 N8N images detected, resetting loading state for variation ${variationNumber}`);
+      console.log(`🎯 Images detected, resetting loading state for variation ${variationNumber}`);
       setIsLoadingImage(false);
       setImageGenerationFailed(false);
     }
@@ -324,7 +324,7 @@ const LinkedInPostVariation = ({
 
         if (webhookResponse && webhookResponse.success === false) {
           if (!webhookResponse.webhook_url_configured) {
-            throw new Error('N8N webhook URL not configured');
+            throw new Error('Image generation service not configured');
           } else {
             throw new Error(webhookResponse.error || 'Edge function execution failed');
           }
@@ -336,7 +336,7 @@ const LinkedInPostVariation = ({
       
       toast({
         title: "Image Generation Started",
-        description: "Your LinkedIn post image is being generated via N8N..."
+        description: "Your LinkedIn post image is being generated..."
       });
 
     } catch (err: any) {
@@ -345,7 +345,7 @@ const LinkedInPostVariation = ({
       setImageGenerationFailed(true);
       
       let errorMessage = "Failed to generate image. Please try again.";
-      if (err.message.includes('webhook URL not configured')) {
+      if (err.message.includes('not configured')) {
         errorMessage = "Image generation service is not configured. Please contact support.";
       } else if (err.message.includes('Edge function execution failed')) {
         errorMessage = "Image generation service is temporarily unavailable. Please try again later.";
@@ -434,7 +434,7 @@ const LinkedInPostVariation = ({
       {/* Loading indicator - only show when loading and no images exist */}
       {isLoadingImage && allImages.length === 0 && (
         <div className="p-4 bg-blue-50 rounded-lg text-center border border-blue-200 mb-6">
-          <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading via N8N for variation {variationNumber}...</div>
+          <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading for variation {variationNumber}...</div>
           <div className="text-xs text-blue-500 mt-1">This may take up to 2 minutes</div>
         </div>
       )}
@@ -447,12 +447,12 @@ const LinkedInPostVariation = ({
         </div>
       )}
 
-      {/* Generated Images - Show both regular and N8N images */}
+      {/* Generated Images - Show both regular and external images */}
       {allImages.length > 0 && (
         <div className="mb-8">
           <h5 className="text-cyan-400 font-medium text-sm mb-4 text-center">
             Generated Images for Variation {variationNumber} ({allImages.length}):
-            {n8nImages.length > 0 && <span className="text-green-400 ml-2">✨ N8N: {n8nImages.length}</span>}
+            {n8nImages.length > 0 && <span className="text-green-400 ml-2">✨ External: {n8nImages.length}</span>}
           </h5>
           <div className="space-y-6">
             {allImages.map((imageData, index) => (

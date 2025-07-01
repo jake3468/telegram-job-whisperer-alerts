@@ -20,7 +20,7 @@ serve(async (req) => {
     );
 
     const body = await req.json();
-    console.log('N8N Image Display webhook called with:', JSON.stringify(body, null, 2));
+    console.log('Image Display webhook called with:', JSON.stringify(body, null, 2));
 
     const { post_id, variation_number, image_data } = body;
 
@@ -40,21 +40,42 @@ serve(async (req) => {
 
     console.log(`Processing image display for post ${post_id}, variation ${variation_number}`);
 
-    // Store the image in the database for persistence and history
-    const { error: insertError } = await supabaseClient
-      .from('linkedin_post_images')
-      .upsert({
-        post_id: post_id,
-        variation_number: variation_number,
-        image_data: image_data
-      }, {
-        onConflict: 'post_id,variation_number',
-        ignoreDuplicates: false
-      });
+    // Store the image in the database - first check if constraint exists
+    let insertError = null;
+    
+    try {
+      // Try to insert/update the image
+      const { error: upsertError } = await supabaseClient
+        .from('linkedin_post_images')
+        .upsert({
+          post_id: post_id,
+          variation_number: variation_number,
+          image_data: image_data
+        }, {
+          onConflict: 'post_id,variation_number'
+        });
+
+      insertError = upsertError;
+    } catch (error) {
+      console.error('Upsert failed, trying simple insert:', error);
+      
+      // If upsert fails due to constraint issues, try simple insert
+      const { error: simpleInsertError } = await supabaseClient
+        .from('linkedin_post_images')
+        .insert({
+          post_id: post_id,
+          variation_number: variation_number,
+          image_data: image_data
+        });
+      
+      insertError = simpleInsertError;
+    }
 
     if (insertError) {
       console.error('Error storing image in database:', insertError);
       // Continue with broadcast even if database storage fails
+    } else {
+      console.log('Successfully stored image in database');
     }
 
     // Create a real-time notification payload
@@ -69,6 +90,8 @@ serve(async (req) => {
     // Send real-time notification to the specific channel
     const channelName = `linkedin-image-display-${post_id}-${variation_number}`;
     
+    console.log(`Attempting to send broadcast to channel: ${channelName}`);
+    
     const { error: broadcastError } = await supabaseClient
       .channel(channelName)
       .send({
@@ -80,7 +103,7 @@ serve(async (req) => {
     if (broadcastError) {
       console.error('Error sending broadcast:', broadcastError);
     } else {
-      console.log(`Sent real-time notification to channel: ${channelName}`);
+      console.log(`Successfully sent real-time notification to channel: ${channelName}`);
     }
 
     return new Response(
@@ -96,7 +119,7 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error in n8n-image-display:', error);
+    console.error('Error in image display handler:', error);
     return new Response(
       JSON.stringify({ 
         success: false, 
