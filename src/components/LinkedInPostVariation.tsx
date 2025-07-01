@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -69,6 +70,10 @@ const LinkedInPostVariation = ({
             const imageUrls = data.map(img => img.image_data);
             console.log(`🖼️ Loaded ${imageUrls.length} existing images for variation ${variationNumber}`);
             setGeneratedImages(imageUrls);
+            
+            // Reset loading states when images are found
+            setIsLoadingImage(false);
+            setImageGenerationFailed(false);
           }
         }, 3, `load existing images for variation ${variationNumber}`);
       } catch (err) {
