@@ -163,7 +163,7 @@ export function useLinkedInImageManager(postId: string | null) {
           .eq('variation_number', variationNumber)
           .eq('image_data', 'generating...');
 
-        // Create new placeholder record - this will be updated by n8n-image-display
+        // Create new placeholder record
         const { error } = await supabase
           .from('linkedin_post_images')
           .insert({

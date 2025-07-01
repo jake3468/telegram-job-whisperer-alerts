@@ -138,10 +138,77 @@ serve(async (req) => {
       )
     }
 
-    const responseText = await response.text()
-    console.log('N8N webhook response:', responseText)
+    // Parse N8N response - expecting format: { success: true, image_data: "data:image/png;base64,...", variation_number: 1, post_id: "xxx" }
+    const responseData = await response.json()
+    console.log('N8N webhook response:', responseData)
 
-    // Always return success for webhook trigger - all final image processing happens in n8n-image-display
+    // Check if N8N returned image data directly
+    if (responseData.success && responseData.image_data) {
+      console.log('N8N returned image data directly, updating database...')
+      
+      // Clean up any existing stuck records first
+      await supabase
+        .from('linkedin_post_images')
+        .delete()
+        .eq('post_id', post_id)
+        .eq('variation_number', variation_number)
+        .eq('image_data', 'generating...')
+
+      // Insert/Update the image record
+      const { data: existingRecords, error: checkError } = await supabase
+        .from('linkedin_post_images')
+        .select('id')
+        .eq('post_id', post_id)
+        .eq('variation_number', variation_number)
+        .neq('image_data', 'generating...')
+
+      if (checkError) {
+        console.error('Error checking existing records:', checkError)
+      }
+
+      if (existingRecords && existingRecords.length > 0) {
+        // Update existing record
+        const { error: updateError } = await supabase
+          .from('linkedin_post_images')
+          .update({ image_data: responseData.image_data })
+          .eq('id', existingRecords[0].id)
+
+        if (updateError) {
+          console.error('Error updating existing record:', updateError)
+        } else {
+          console.log('Successfully updated existing image record')
+        }
+      } else {
+        // Create new record
+        const { error: insertError } = await supabase
+          .from('linkedin_post_images')
+          .insert({
+            post_id: post_id,
+            variation_number: variation_number,
+            image_data: responseData.image_data
+          })
+
+        if (insertError) {
+          console.error('Error creating new record:', insertError)
+        } else {
+          console.log('Successfully created new image record')
+        }
+      }
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'Image processed and stored successfully',
+          image_data_received: true,
+          variation_number: variation_number
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
+    // If no direct image data, return success for webhook trigger
     console.log(`N8N webhook triggered successfully for variation ${variation_number}`)
     
     return new Response(
