@@ -34,7 +34,7 @@ serve(async (req) => {
       
       const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-      // First check current image_data status to prevent overwriting valid images
+      // Check current image_data status - allow overwrites only if current state is "generating..."
       const { data: currentRecord, error: checkError } = await supabase
         .from('linkedin_post_images')
         .select('image_data, id')
@@ -54,7 +54,7 @@ serve(async (req) => {
            currentRecord.image_data.includes('failed') ? 'failed' : 'other') : 'none'
       })
 
-      // Only proceed if there's no existing valid image data
+      // Only proceed if there's no existing valid image data OR if current state is "generating..." (regeneration)
       if (currentRecord && currentRecord.image_data.startsWith('data:image/')) {
         console.log('Valid image already exists, skipping update to prevent overwrite')
         return new Response(
@@ -316,55 +316,8 @@ serve(async (req) => {
       request_source: req.headers.get('x-source') || 'direct'
     })
 
-    // Clean up any existing stuck records and create/update placeholder - but only if no valid image exists
-    try {
-      // Check if there's already a valid image
-      const { data: existingRecord } = await supabase
-        .from('linkedin_post_images')
-        .select('image_data')
-        .eq('post_id', post_id)
-        .eq('variation_number', variation_number)
-        .single()
-
-      if (existingRecord && existingRecord.image_data.startsWith('data:image/')) {
-        console.log('Valid image already exists, skipping webhook trigger to prevent overwrite')
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            message: 'Valid image already exists, webhook trigger skipped',
-            webhook_url_configured: true,
-            protected: true
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
-
-      // First try to update existing record to generating status
-      const { data: updateResult, error: updateError } = await supabase
-        .from('linkedin_post_images')
-        .update({ image_data: 'generating...' })
-        .eq('post_id', post_id)
-        .eq('variation_number', variation_number)
-        .select()
-
-      if (updateError || !updateResult || updateResult.length === 0) {
-        // If no record to update, create new one
-        const { error: insertError } = await supabase
-          .from('linkedin_post_images')
-          .insert({
-            post_id: post_id,
-            variation_number: variation_number,
-            image_data: 'generating...'
-          })
-
-        // Ignore unique constraint violations - record already exists
-        if (insertError && insertError.code !== '23505') {
-          console.error('Error creating placeholder record:', insertError)
-        }
-      }
-    } catch (error) {
-      console.log('Non-critical error managing placeholder record:', error)
-    }
+    // Note: The database should already be updated to "generating..." by the frontend
+    // We don't need to duplicate that logic here
 
     // Call the N8N webhook directly with the correct full URL
     const response = await fetch(n8nWebhookUrl, {
@@ -434,27 +387,6 @@ serve(async (req) => {
     if (responseData.success && responseData.image_data) {
       console.log('N8N returned image data directly in response, updating database...')
       
-      // Check current status before updating to prevent overwriting valid images
-      const { data: currentRecord } = await supabase
-        .from('linkedin_post_images')
-        .select('image_data')
-        .eq('post_id', post_id)
-        .eq('variation_number', variation_number)
-        .single()
-
-      if (currentRecord && currentRecord.image_data.startsWith('data:image/')) {
-        console.log('Valid image already exists, skipping direct response update')
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            message: 'Valid image already exists, direct response update skipped',
-            webhook_url_configured: true,
-            protected: true
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
-
       // Update the existing record with the actual image data
       const { data: updateResult, error: updateError } = await supabase
         .from('linkedin_post_images')

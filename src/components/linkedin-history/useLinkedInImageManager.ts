@@ -206,28 +206,42 @@ export function useLinkedInImageManager(postId: string | null) {
       return newState;
     });
 
-    // Set timeout to reset loading state after 3 minutes if no response
-    const timeoutId = setTimeout(() => {
-      logger.imageProcessing('generation_timeout', postId, variationNumber, {
-        timeout_duration: '3_minutes'
-      });
-      
-      setUserTriggeredLoading(prev => {
-        const newState = [...prev];
-        newState[variationNumber - 1] = false;
-        return newState;
-      });
-      
-      toast({
-        title: "Image Generation Timeout",
-        description: `Image generation took too long for variation ${variationNumber}. Please try again.`,
-        variant: "destructive"
-      });
-    }, 180000); // 3 minutes
-
     try {
       await executeWithRetry(async () => {
-        // Call webhook with proper parameters
+        // Step 1: First update the database to set image_data to "generating..." for regeneration
+        logger.imageProcessing('setting_generating_state', postId, variationNumber);
+        
+        const { data: updateResult, error: updateError } = await supabase
+          .from('linkedin_post_images')
+          .update({ 
+            image_data: 'generating...',
+            updated_at: new Date().toISOString()
+          })
+          .eq('post_id', postId)
+          .eq('variation_number', variationNumber)
+          .select();
+
+        if (updateError || !updateResult || updateResult.length === 0) {
+          // If no existing record to update, create new one with "generating..." state
+          logger.imageProcessing('creating_new_generating_record', postId, variationNumber);
+          
+          const { error: insertError } = await supabase
+            .from('linkedin_post_images')
+            .insert({
+              post_id: postId,
+              variation_number: variationNumber,
+              image_data: 'generating...'
+            });
+
+          if (insertError && insertError.code !== '23505') { // Ignore unique constraint violations
+            logger.error('Error creating generating record:', insertError);
+            throw new Error('Failed to prepare image generation');
+          }
+        }
+
+        logger.imageProcessing('database_updated_to_generating', postId, variationNumber);
+
+        // Step 2: Call webhook with proper parameters
         const webhookBody: {
           post_id: string;
           variation_number: number;
@@ -266,15 +280,31 @@ export function useLinkedInImageManager(postId: string | null) {
         const responseData = await webhookResponse.json();
         logger.imageProcessing('webhook_response', postId, variationNumber, responseData);
 
-        // Clear the timeout since webhook call succeeded
-        clearTimeout(timeoutId);
-
         // If webhook indicates it's not configured, show specific error
         if (!responseData.webhook_url_configured) {
           throw new Error('Image generation service is not configured');
         }
 
       }, 3, `generate image for variation ${variationNumber}`);
+
+      // Set timeout to reset loading state after 3 minutes if no response
+      const timeoutId = setTimeout(() => {
+        logger.imageProcessing('generation_timeout', postId, variationNumber, {
+          timeout_duration: '3_minutes'
+        });
+        
+        setUserTriggeredLoading(prev => {
+          const newState = [...prev];
+          newState[variationNumber - 1] = false;
+          return newState;
+        });
+        
+        toast({
+          title: "Image Generation Timeout",
+          description: `Image generation took too long for variation ${variationNumber}. Please try again.`,
+          variant: "destructive"
+        });
+      }, 180000); // 3 minutes
 
       toast({
         title: "Image Generation Started",
@@ -283,7 +313,6 @@ export function useLinkedInImageManager(postId: string | null) {
 
     } catch (error) {
       logger.error('Error generating image:', error);
-      clearTimeout(timeoutId);
       
       // Reset loading state on error
       setUserTriggeredLoading(prev => {
