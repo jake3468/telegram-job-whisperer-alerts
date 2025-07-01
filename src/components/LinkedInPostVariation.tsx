@@ -51,14 +51,8 @@ const LinkedInPostVariation = ({
   const [isGeneratingState, setIsGeneratingState] = useState(false);
   // Track the current generation to avoid resetting loading state prematurely
   const [currentGenerationId, setCurrentGenerationId] = useState<string | null>(null);
-  // Track last seen image data to detect truly new images
-  const [lastSeenImageData, setLastSeenImageData] = useState<string | null>(null);
-  // Track initial image count to detect regeneration vs first load
-  const [initialImageCount, setInitialImageCount] = useState<number>(0);
-  // Flag to track if we're in regeneration mode
-  const [isRegenerating, setIsRegenerating] = useState(false);
-  // Track images at the start of generation to compare against
-  const [preGenerationImages, setPreGenerationImages] = useState<string[]>([]);
+  // Track images at generation start for comparison
+  const [imagesAtGenerationStart, setImagesAtGenerationStart] = useState<string[]>([]);
 
   // Add N8N image display hook
   const { n8nImages } = useN8NImageDisplay(postId || '', variationNumber);
@@ -74,48 +68,34 @@ const LinkedInPostVariation = ({
   // Only reset loading state when we get a genuinely NEW image during active generation
   useEffect(() => {
     // Only process if we have an active generation
-    if (!currentGenerationId) return;
+    if (!currentGenerationId || !isUserLoadingImage) return;
     
     if (allImages.length > 0) {
-      // Get the most recent image
-      const latestImage = allImages[0];
+      // Check if we have any new images that weren't there when generation started
+      const newImages = allImages.filter(img => 
+        isValidImageData(img) && 
+        img !== 'generating...' && 
+        !imagesAtGenerationStart.includes(img)
+      );
       
-      // Check if this is a valid new image
-      if (isValidImageData(latestImage) && latestImage !== 'generating...') {
-        // For regeneration: only reset if we get a different image than what we had before generation started
-        // For initial generation: reset when we get any valid image
-        let shouldResetLoading = false;
+      if (newImages.length > 0) {
+        logger.imageProcessing('new_image_detected_during_generation', postId || 'unknown', variationNumber, {
+          generation_id: currentGenerationId,
+          new_images_count: newImages.length,
+          new_image_preview: newImages[0].substring(0, 50),
+          was_loading: isUserLoadingImage,
+          was_generating: isGeneratingState
+        });
         
-        if (isRegenerating) {
-          // During regeneration, check if the new image is different from pre-generation images
-          shouldResetLoading = !preGenerationImages.includes(latestImage);
-        } else {
-          // During initial generation, any valid image should reset loading
-          shouldResetLoading = true;
-        }
-        
-        if (shouldResetLoading) {
-          logger.imageProcessing('new_image_detected_during_generation', postId || 'unknown', variationNumber, {
-            generation_id: currentGenerationId,
-            new_image_preview: latestImage.substring(0, 50),
-            was_loading: isUserLoadingImage,
-            was_generating: isGeneratingState,
-            is_regenerating: isRegenerating,
-            different_from_pre_generation: !preGenerationImages.includes(latestImage)
-          });
-          
-          // This is a new image - reset loading states
-          setIsUserLoadingImage(false);
-          setIsGeneratingState(false);
-          setImageGenerationFailed(false);
-          setCurrentGenerationId(null);
-          setLastSeenImageData(latestImage);
-          setIsRegenerating(false);
-          setPreGenerationImages([]);
-        }
+        // This is a genuinely new image - reset loading states
+        setIsUserLoadingImage(false);
+        setIsGeneratingState(false);
+        setImageGenerationFailed(false);
+        setCurrentGenerationId(null);
+        setImagesAtGenerationStart([]);
       }
     }
-  }, [allImages, currentGenerationId, isUserLoadingImage, isGeneratingState, variationNumber, postId, isRegenerating, preGenerationImages]);
+  }, [allImages, currentGenerationId, isUserLoadingImage, isGeneratingState, variationNumber, postId, imagesAtGenerationStart]);
 
   // Function to check and load existing images
   const checkAndLoadExistingImages = useCallback(async () => {
@@ -165,12 +145,6 @@ const LinkedInPostVariation = ({
           });
           
           setGeneratedImages(uniqueImages);
-          setInitialImageCount(uniqueImages.length);
-          
-          // Set the last seen image for comparison
-          if (uniqueImages.length > 0 && !currentGenerationId) {
-            setLastSeenImageData(uniqueImages[0]);
-          }
         }
       }, 3, `check existing images for variation ${variationNumber}`);
     } catch (err) {
@@ -279,8 +253,7 @@ const LinkedInPostVariation = ({
                 setIsGeneratingState(false);
                 setImageGenerationFailed(true);
                 setCurrentGenerationId(null);
-                setIsRegenerating(false);
-                setPreGenerationImages([]);
+                setImagesAtGenerationStart([]);
               }
             }
           } 
@@ -295,8 +268,7 @@ const LinkedInPostVariation = ({
               setIsGeneratingState(false);
               setImageGenerationFailed(true);
               setCurrentGenerationId(null);
-              setIsRegenerating(false);
-              setPreGenerationImages([]);
+              setImagesAtGenerationStart([]);
             }
             
             toast({
@@ -388,24 +360,17 @@ const LinkedInPostVariation = ({
       current_loading_state: isUserLoadingImage,
       current_generating_state: isGeneratingState,
       has_existing_images: allImages.length > 0,
-      generation_id: generationId,
-      initial_image_count: initialImageCount
+      generation_id: generationId
     });
     
-    // Determine if this is a regeneration (we already have images)
-    const isRegenerationRequest = allImages.length > 0;
-    
-    // Store the current images before starting generation for comparison
-    if (isRegenerationRequest) {
-      setPreGenerationImages([...allImages]);
-    }
+    // Store current images for comparison during generation
+    setImagesAtGenerationStart([...allImages]);
     
     // Reset any previous failure state and set loading states immediately
     setImageGenerationFailed(false);
     setIsUserLoadingImage(true);
     setIsGeneratingState(true);
     setCurrentGenerationId(generationId);
-    setIsRegenerating(isRegenerationRequest);
 
     // Set timeout to reset loading state after 3 minutes
     const timeoutId = setTimeout(() => {
@@ -415,20 +380,22 @@ const LinkedInPostVariation = ({
       });
       
       // Only reset if this timeout is for the current generation
-      if (currentGenerationId === generationId) {
-        setIsUserLoadingImage(false);
-        setIsGeneratingState(false);
-        setImageGenerationFailed(true);
-        setCurrentGenerationId(null);
-        setIsRegenerating(false);
-        setPreGenerationImages([]);
-        
-        toast({
-          title: "Image Generation Timeout",
-          description: `Image generation took too long for variation ${variationNumber}. Please try again.`,
-          variant: "destructive"
-        });
-      }
+      setIsUserLoadingImage(prev => {
+        if (currentGenerationId === generationId) {
+          setIsGeneratingState(false);
+          setImageGenerationFailed(true);
+          setCurrentGenerationId(null);
+          setImagesAtGenerationStart([]);
+          
+          toast({
+            title: "Image Generation Timeout",
+            description: `Image generation took too long for variation ${variationNumber}. Please try again.`,
+            variant: "destructive"
+          });
+          return false;
+        }
+        return prev;
+      });
     }, 180000);
 
     try {
@@ -530,8 +497,7 @@ const LinkedInPostVariation = ({
         setIsGeneratingState(false);
         setImageGenerationFailed(true);
         setCurrentGenerationId(null);
-        setIsRegenerating(false);
-        setPreGenerationImages([]);
+        setImagesAtGenerationStart([]);
       }
       
       let errorMessage = "Failed to generate image. Please try again.";
@@ -668,8 +634,7 @@ const LinkedInPostVariation = ({
                       setIsGeneratingState(false);
                       setImageGenerationFailed(true);
                       setCurrentGenerationId(null);
-                      setIsRegenerating(false);
-                      setPreGenerationImages([]);
+                      setImagesAtGenerationStart([]);
                     }
                   }}
                 />
