@@ -40,42 +40,59 @@ serve(async (req) => {
 
     console.log(`Processing image display for post ${post_id}, variation ${variation_number}`);
 
-    // Store the image in the database - first check if constraint exists
-    let insertError = null;
-    
+    // First try to delete any existing record to avoid conflicts
     try {
-      // Try to insert/update the image
-      const { error: upsertError } = await supabaseClient
+      const { error: deleteError } = await supabaseClient
         .from('linkedin_post_images')
-        .upsert({
-          post_id: post_id,
-          variation_number: variation_number,
-          image_data: image_data
-        }, {
-          onConflict: 'post_id,variation_number'
-        });
-
-      insertError = upsertError;
-    } catch (error) {
-      console.error('Upsert failed, trying simple insert:', error);
+        .delete()
+        .eq('post_id', post_id)
+        .eq('variation_number', variation_number);
       
-      // If upsert fails due to constraint issues, try simple insert
-      const { error: simpleInsertError } = await supabaseClient
-        .from('linkedin_post_images')
-        .insert({
-          post_id: post_id,
-          variation_number: variation_number,
-          image_data: image_data
-        });
-      
-      insertError = simpleInsertError;
+      if (deleteError) {
+        console.log('No existing record to delete:', deleteError.message);
+      } else {
+        console.log('Deleted existing image record');
+      }
+    } catch (deleteErr) {
+      console.log('Delete operation failed:', deleteErr);
     }
 
+    // Now insert the new record
+    const { data: insertData, error: insertError } = await supabaseClient
+      .from('linkedin_post_images')
+      .insert({
+        post_id: post_id,
+        variation_number: variation_number,
+        image_data: image_data
+      })
+      .select();
+
+    let stored_in_db = false;
     if (insertError) {
       console.error('Error storing image in database:', insertError);
-      // Continue with broadcast even if database storage fails
+      
+      // Try one more time with a simple insert
+      try {
+        const { error: retryError } = await supabaseClient
+          .from('linkedin_post_images')
+          .insert({
+            post_id: post_id,
+            variation_number: variation_number,
+            image_data: image_data
+          });
+        
+        if (!retryError) {
+          stored_in_db = true;
+          console.log('Successfully stored image on retry');
+        } else {
+          console.error('Retry insert also failed:', retryError);
+        }
+      } catch (retryErr) {
+        console.error('Retry attempt failed:', retryErr);
+      }
     } else {
-      console.log('Successfully stored image in database');
+      stored_in_db = true;
+      console.log('Successfully stored image in database:', insertData);
     }
 
     // Create a real-time notification payload
@@ -111,7 +128,7 @@ serve(async (req) => {
         success: true, 
         message: 'Image display notification sent successfully',
         channel: channelName,
-        stored_in_db: !insertError
+        stored_in_db: stored_in_db
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 

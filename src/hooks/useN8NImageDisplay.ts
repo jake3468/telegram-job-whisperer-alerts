@@ -19,6 +19,8 @@ interface UseN8NImageDisplayReturn {
 
 export const useN8NImageDisplay = (postId: string, variationNumber: number, onImageReceived?: () => void): UseN8NImageDisplayReturn => {
   const [n8nImages, setN8nImages] = useState<string[]>([]);
+  const [pollingAttempts, setPollingAttempts] = useState(0);
+  const [lastPollTime, setLastPollTime] = useState(0);
   const { toast } = useToast();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
 
@@ -29,9 +31,25 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number, onIm
     }
   };
 
-  // Enhanced polling mechanism with proper authentication
+  // Controlled polling with exponential backoff
   const pollForImages = async () => {
     if (!postId || !isAuthReady) return;
+
+    // Prevent excessive polling - max 10 attempts with exponential backoff
+    if (pollingAttempts >= 10) {
+      console.log(`🛑 Max polling attempts reached for variation ${variationNumber}`);
+      return;
+    }
+
+    // Prevent too frequent polling
+    const now = Date.now();
+    const minInterval = Math.min(5000 * Math.pow(1.5, pollingAttempts), 30000); // 5s to 30s max
+    if (now - lastPollTime < minInterval) {
+      return;
+    }
+
+    setLastPollTime(now);
+    setPollingAttempts(prev => prev + 1);
 
     try {
       await executeWithRetry(async () => {
@@ -57,12 +75,14 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number, onIm
               if (onImageReceived) {
                 onImageReceived();
               }
+              // Reset polling attempts when successful
+              setPollingAttempts(0);
               return [...prev, ...newImages];
             }
             return prev;
           });
         }
-      }, 3, `poll for images variation ${variationNumber}`);
+      }, 2, `poll for images variation ${variationNumber}`);
     } catch (err) {
       console.error('Error in polling for images:', err);
     }
@@ -99,6 +119,9 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number, onIm
             onImageReceived();
           }
 
+          // Reset polling attempts on successful broadcast
+          setPollingAttempts(0);
+
           toast({
             title: "Image Ready!",
             description: `LinkedIn post image for variation ${variationNumber} is now available.`
@@ -111,17 +134,23 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number, onIm
         // If subscription succeeds, do initial poll
         if (status === 'SUBSCRIBED') {
           console.log('✅ Real-time subscription active, doing initial poll');
-          pollForImages();
+          setTimeout(() => pollForImages(), 1000); // Small delay for initial poll
         }
         
-        // If subscription fails, start polling as fallback
+        // If subscription fails, start controlled polling as fallback
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
-          console.log('🔄 Real-time failed, starting polling fallback');
+          console.log('🔄 Real-time failed, starting controlled polling fallback');
           
-          // Start aggressive polling as fallback
+          // Start controlled polling with exponential backoff
           const pollInterval = setInterval(() => {
             pollForImages();
-          }, 2000); // Poll every 2 seconds
+          }, 8000); // Start with 8 second intervals
+          
+          // Clean up polling after 5 minutes
+          setTimeout(() => {
+            clearInterval(pollInterval);
+            console.log(`⏰ Stopping polling for variation ${variationNumber} after timeout`);
+          }, 300000); // 5 minutes
           
           // Clean up polling when component unmounts
           return () => clearInterval(pollInterval);
@@ -132,6 +161,7 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number, onIm
     return () => {
       console.log(`🧹 Cleaning up image listener for variation ${variationNumber}`);
       supabase.removeChannel(channel);
+      setPollingAttempts(0);
     };
   }, [postId, variationNumber, toast, onImageReceived, isAuthReady, executeWithRetry]);
 

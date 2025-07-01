@@ -1,6 +1,6 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Copy, ImageIcon, Loader2, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -66,7 +66,7 @@ const LinkedInPostVariation = ({
     }
   }, [n8nImages.length, variationNumber]);
 
-  // Function to check and load existing images
+  // Function to check and load existing images with controlled frequency
   const checkAndLoadExistingImages = async () => {
     if (!postId || !isAuthReady) return;
 
@@ -93,18 +93,18 @@ const LinkedInPostVariation = ({
           setIsLoadingImage(false);
           setImageGenerationFailed(false);
         }
-      }, 3, `check existing images for variation ${variationNumber}`);
+      }, 2, `check existing images for variation ${variationNumber}`);
     } catch (err) {
       console.error('Error checking existing images:', err);
     }
   };
 
-  // Load existing images on component mount
+  // Load existing images on component mount only
   useEffect(() => {
     checkAndLoadExistingImages();
-  }, [postId, variationNumber, isAuthReady, executeWithRetry]);
+  }, [postId, variationNumber, isAuthReady]);
 
-  // Real-time subscription for image updates
+  // Real-time subscription for image updates with improved error handling
   useEffect(() => {
     if (!postId || !isAuthReady) return;
 
@@ -200,22 +200,6 @@ const LinkedInPostVariation = ({
       supabase.removeChannel(channel);
     };
   }, [postId, variationNumber, isAuthReady, toast]);
-
-  // Periodic check for images - enhanced to check immediately after loading starts
-  useEffect(() => {
-    if (!postId || !isAuthReady || !isLoadingImage) return;
-
-    // Check immediately first
-    checkAndLoadExistingImages();
-
-    // Then set up periodic check
-    const intervalId = setInterval(async () => {
-      console.log(`🔍 Periodic check for images - variation ${variationNumber}`);
-      await checkAndLoadExistingImages();
-    }, 3000); // Check every 3 seconds
-
-    return () => clearInterval(intervalId);
-  }, [postId, variationNumber, isAuthReady, isLoadingImage]);
 
   // Add timeout mechanism to reset loading state after 3 minutes
   useEffect(() => {
