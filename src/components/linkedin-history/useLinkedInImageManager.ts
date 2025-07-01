@@ -94,7 +94,7 @@ export function useLinkedInImageManager(postId: string | null) {
 
           // Handle loading state changes based on image data
           if (newImage.image_data !== 'generating...' && newImage.variation_number) {
-            // Image generation completed - turn off loading
+            // Image generation completed - turn off loading for this specific variation
             setIsGenerating(prev => {
               const newState = [...prev];
               newState[newImage.variation_number - 1] = false;
@@ -109,6 +109,15 @@ export function useLinkedInImageManager(postId: string | null) {
         } else if (payload.eventType === 'DELETE') {
           const deletedImage = payload.old as LinkedInImageData;
           setImages(prev => prev.filter(img => img.id !== deletedImage.id));
+          
+          // Reset generating state for deleted image variation
+          if (deletedImage.variation_number) {
+            setIsGenerating(prev => {
+              const newState = [...prev];
+              newState[deletedImage.variation_number - 1] = false;
+              return newState;
+            });
+          }
         }
       })
       .subscribe();
@@ -133,13 +142,16 @@ export function useLinkedInImageManager(postId: string | null) {
 
     try {
       await executeWithRetry(async () => {
-        // Create placeholder record
+        // Create placeholder record using upsert to prevent duplicates
         const { error } = await supabase
           .from('linkedin_post_images')
-          .insert({
+          .upsert({
             post_id: postId,
             variation_number: variationNumber,
             image_data: 'generating...'
+          }, {
+            onConflict: 'post_id,variation_number',
+            ignoreDuplicates: false
           });
 
         if (error) {
@@ -168,19 +180,20 @@ export function useLinkedInImageManager(postId: string | null) {
           webhookBody.user_name = 'Professional User'; // Default for history section
         }
 
-        const webhookResponse = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/functions/v1/linkedin-image-webhook', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuemxveXloemhycXN2c2xoaHJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzAyMjIsImV4cCI6MjA2NDUwNjIyMn0.xdlgb_amJ1fV31uinCFotGW00isgT5-N8zJ_gLHEKuk`
-          },
-          body: JSON.stringify(webhookBody)
+        const { data: webhookResponse, error: webhookError } = await supabase.functions.invoke('linkedin-image-webhook', {
+          body: webhookBody
         });
 
-        if (!webhookResponse.ok) {
-          const errorText = await webhookResponse.text();
-          console.error('Webhook call failed:', errorText);
-          throw new Error('Failed to trigger image generation webhook');
+        if (webhookError) {
+          throw new Error(`Edge function failed: ${webhookError.message}`);
+        }
+
+        if (webhookResponse && webhookResponse.success === false) {
+          if (!webhookResponse.webhook_url_configured) {
+            throw new Error('Image generation service not configured');
+          } else {
+            throw new Error(webhookResponse.error || 'Edge function execution failed');
+          }
         }
 
       }, 3, `generate image for variation ${variationNumber}`);
