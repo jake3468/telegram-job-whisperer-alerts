@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -93,7 +94,7 @@ export function useLinkedInImageManager(postId: string | null) {
             setImages(prev => {
               // Remove any existing records for this variation to prevent duplicates
               const filtered = prev.filter(img => 
-                !(img.post_id === newImage.post_id && img.variation_number === newImage.variation_number)
+                img.variation_number !== newImage.variation_number
               );
               return [...filtered, newImage];
             });

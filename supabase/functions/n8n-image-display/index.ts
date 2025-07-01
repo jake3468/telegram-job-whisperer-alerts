@@ -71,7 +71,7 @@ serve(async (req) => {
       
       const recordToUpdate = existingRecords[0];
       
-      // Update the first record with the new image data
+      // Update the first record with the new image data (removed updated_at field)
       const { data: updated, error: updateError } = await supabaseClient
         .from('linkedin_post_images')
         .update({ image_data: image_data })
