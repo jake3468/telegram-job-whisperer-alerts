@@ -1,23 +1,21 @@
-
 import { Environment } from '@/utils/environment';
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 class Logger {
   private shouldLog(level: LogLevel): boolean {
-    // In production, only log warnings and errors
+    // Only log errors in production to keep console clean
     if (Environment.isProduction()) {
-      return level === 'warn' || level === 'error';
+      return level === 'error';
     }
     
-    // In development, log everything
-    return true;
+    // In development, only log warnings and errors
+    return level === 'warn' || level === 'error';
   }
 
   debug(message: string, ...args: any[]) {
-    if (this.shouldLog('debug')) {
-      console.log(`[DEBUG] ${message}`, ...args);
-    }
+    // Debug logs are disabled for production readiness
+    return;
   }
 
   info(message: string, ...args: any[]) {

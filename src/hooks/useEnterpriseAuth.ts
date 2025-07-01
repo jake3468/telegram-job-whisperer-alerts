@@ -2,7 +2,6 @@
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { setClerkToken, setTokenRefreshFunction } from '@/integrations/supabase/client';
-import { logger } from '@/utils/logger';
 
 interface RequestQueueItem {
   fn: () => Promise<any>;
@@ -116,10 +115,10 @@ export const useEnterpriseAuth = () => {
     return refreshPromise;
   }, [user, getToken, scheduleTokenRefresh]);
 
-  // Enhanced request executor with better error handling and automatic retry - REMOVED CONSOLE LOGS
+  // Enhanced request executor with better error handling and automatic retry
   const executeWithRetry = useCallback(async <T>(
     requestFn: () => Promise<T>,
-    maxRetries: number = 5,
+    maxRetries: number = 3,
     description: string = 'database operation'
   ): Promise<T> => {
     let attempts = 0;
