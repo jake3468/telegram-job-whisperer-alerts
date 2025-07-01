@@ -618,6 +618,9 @@ const LinkedInPostVariation = ({
   const isActuallyLoading = isUserLoadingImage || isGeneratingState;
   const shouldShowLoading = isActuallyLoading;
   const shouldShowFailed = imageGenerationFailed && !isActuallyLoading;
+  
+  // DISABLE button if there are existing images OR if currently loading
+  const shouldDisableButton = allImages.length > 0 || isActuallyLoading;
 
   return (
     <div className="w-full max-w-4xl mx-auto mb-12">
@@ -641,7 +644,7 @@ const LinkedInPostVariation = ({
           <Button
             onClick={handleGenerateImage}
             size="sm"
-            disabled={isActuallyLoading}
+            disabled={shouldDisableButton}
             className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 px-6 py-2 font-medium"
           >
             {isActuallyLoading ? (
@@ -649,7 +652,7 @@ const LinkedInPostVariation = ({
             ) : (
               <ImageIcon className="w-4 h-4 mr-2" />
             )}
-            {isActuallyLoading ? 'Generating...' : 'Get Image'}
+            {isActuallyLoading ? 'Generating...' : allImages.length > 0 ? 'Image Ready' : 'Get Image'}
           </Button>
         </div>
       </div>
