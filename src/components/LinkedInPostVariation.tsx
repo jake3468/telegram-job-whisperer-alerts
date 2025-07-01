@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -80,7 +79,7 @@ const LinkedInPostVariation = ({
     loadExistingImages();
   }, [postId, variationNumber, isAuthReady, executeWithRetry]);
 
-  // Real-time subscription for image updates - FIXED to properly handle image data
+  // Real-time subscription for image updates - FIXED to properly handle all image updates
   useEffect(() => {
     if (!postId || !isAuthReady) return;
 
@@ -92,14 +91,14 @@ const LinkedInPostVariation = ({
         event: '*',
         schema: 'public',
         table: 'linkedin_post_images',
-        filter: `post_id=eq.${postId},variation_number=eq.${variationNumber}`
+        filter: `post_id=eq.${postId}`
       }, async (payload) => {
         console.log('📡 LinkedIn image updated via real-time:', payload);
         
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
           const newImage = payload.new;
           
-          // Double-check variation number (though filter should handle this)
+          // Check if this update is for our specific variation
           if (newImage.variation_number !== variationNumber) {
             console.log(`📡 Ignoring image for variation ${newImage.variation_number}, expecting ${variationNumber}`);
             return;
@@ -112,29 +111,35 @@ const LinkedInPostVariation = ({
           } 
           else if (newImage.image_data && 
                    newImage.image_data !== 'generating...' && 
-                   !newImage.image_data.includes('failed') &&
-                   (newImage.image_data.startsWith('data:image/') || newImage.image_data.startsWith('http'))) {
+                   !newImage.image_data.includes('failed')) {
             console.log(`✅ Image generation completed for variation ${variationNumber}`);
             console.log(`🖼️ New image data received (length: ${newImage.image_data.length})`);
             
-            // Add the new image to the list if it's not already there
-            setGeneratedImages(prev => {
-              const exists = prev.includes(newImage.image_data);
-              if (exists) {
-                console.log(`📡 Image already exists in state`);
-                return prev;
-              }
-              console.log(`📡 Adding new image to state`);
-              return [...prev, newImage.image_data];
-            });
+            // Check if it's a valid image (base64 or URL)
+            const isValidImage = newImage.image_data.startsWith('data:image/') || 
+                                newImage.image_data.startsWith('http') ||
+                                newImage.image_data.length > 1000; // Assume long strings are base64 images
             
-            setIsLoadingImage(false);
-            setImageGenerationFailed(false);
-            
-            toast({
-              title: "Image Generated!",
-              description: `LinkedIn post image for variation ${variationNumber} is ready.`
-            });
+            if (isValidImage) {
+              // Add the new image to the list if it's not already there
+              setGeneratedImages(prev => {
+                const exists = prev.includes(newImage.image_data);
+                if (exists) {
+                  console.log(`📡 Image already exists in state`);
+                  return prev;
+                }
+                console.log(`📡 Adding new image to state`);
+                return [...prev, newImage.image_data];
+              });
+              
+              setIsLoadingImage(false);
+              setImageGenerationFailed(false);
+              
+              toast({
+                title: "Image Generated!",
+                description: `LinkedIn post image for variation ${variationNumber} is ready.`
+              });
+            }
           } 
           else if (newImage.image_data && newImage.image_data.includes('failed')) {
             console.log(`❌ Image generation failed for variation ${variationNumber}`);
