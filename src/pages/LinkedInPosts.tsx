@@ -91,6 +91,12 @@ const LinkedInPosts = () => {
   }, [user?.id, isAuthReady, executeWithRetry]);
 
   const areAllPostsReady = (data: LinkedInPostData) => {
+    // Check if data exists first
+    if (!data) {
+      console.log('No data provided to areAllPostsReady');
+      return false;
+    }
+    
     const hasAllHeadings = Boolean(
       data.post_heading_1 && data.post_heading_1.trim() !== '' &&
       data.post_heading_2 && data.post_heading_2.trim() !== '' &&
@@ -106,10 +112,21 @@ const LinkedInPosts = () => {
     console.log('Checking if posts are ready:', {
       hasAllHeadings,
       hasAllContent,
-      data
+      headings: {
+        h1: data.post_heading_1?.substring(0, 50) + '...',
+        h2: data.post_heading_2?.substring(0, 50) + '...',
+        h3: data.post_heading_3?.substring(0, 50) + '...'
+      },
+      contentLengths: {
+        c1: data.post_content_1?.length || 0,
+        c2: data.post_content_2?.length || 0,
+        c3: data.post_content_3?.length || 0
+      }
     });
     
-    return hasAllHeadings && hasAllContent;
+    const isReady = hasAllHeadings && hasAllContent;
+    console.log('Posts ready result:', isReady);
+    return isReady;
   };
 
   useLinkedInPostTimeoutFallback({
@@ -130,6 +147,7 @@ const LinkedInPosts = () => {
       };
       setPostsData(linkedInPostData);
       if (areAllPostsReady(linkedInPostData)) {
+        console.log('Stopping loading from timeout fallback');
         setIsGenerating(false);
       }
     }
@@ -167,7 +185,7 @@ const LinkedInPosts = () => {
           
           // Check if all posts are ready and stop loading
           if (areAllPostsReady(linkedInPostData)) {
-            console.log('All posts ready, stopping loading');
+            console.log('All posts ready from real-time, stopping loading');
             setIsGenerating(false);
             toast({
               title: "LinkedIn Posts Generated!",
@@ -204,7 +222,16 @@ const LinkedInPosts = () => {
           }
           
           if (data) {
-            console.log('Found existing data:', data);
+            console.log('Found existing data:', {
+              id: data.id,
+              hasHeading1: !!data.post_heading_1,
+              hasContent1: !!data.post_content_1,
+              hasHeading2: !!data.post_heading_2,
+              hasContent2: !!data.post_content_2,
+              hasHeading3: !!data.post_heading_3,
+              hasContent3: !!data.post_content_3
+            });
+            
             const linkedInPostData: LinkedInPostData = {
               post_heading_1: data.post_heading_1,
               post_content_1: data.post_content_1,
@@ -221,7 +248,7 @@ const LinkedInPosts = () => {
               console.log('All posts are ready from existing data, stopping loading state');
               setIsGenerating(false);
             } else {
-              console.log('Posts not yet complete from existing data:', linkedInPostData);
+              console.log('Posts not yet complete from existing data');
             }
           }
         }, 1, 'check existing post data');
@@ -354,6 +381,7 @@ const LinkedInPosts = () => {
           throw error;
         }
 
+        console.log('Created new LinkedIn post with ID:', data.id);
         setCurrentPostId(data.id);
         
         toast({
@@ -392,11 +420,19 @@ const LinkedInPosts = () => {
   const shouldShowLoading = isGenerating && !shouldShowResults;
 
   console.log('Render state:', {
-    postsData,
+    postsData: postsData ? 'exists' : 'null',
     shouldShowResults,
     shouldShowLoading,
     isGenerating,
-    currentPostId
+    currentPostId,
+    postsDataDetails: postsData ? {
+      hasHeading1: !!postsData.post_heading_1,
+      hasContent1: !!postsData.post_content_1,
+      hasHeading2: !!postsData.post_heading_2,
+      hasContent2: !!postsData.post_content_2,
+      hasHeading3: !!postsData.post_heading_3,
+      hasContent3: !!postsData.post_content_3
+    } : 'no data'
   });
 
   return (
