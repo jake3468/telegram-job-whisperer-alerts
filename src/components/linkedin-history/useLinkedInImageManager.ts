@@ -13,21 +13,23 @@ interface LinkedInImageData {
 
 export function useLinkedInImageManager(postId: string | null) {
   const [images, setImages] = useState<LinkedInImageData[]>([]);
-  const [isGenerating, setIsGenerating] = useState<boolean[]>([false, false, false]);
+  // User-action driven loading states - only set when user clicks "Get Image"
+  const [userTriggeredLoading, setUserTriggeredLoading] = useState<boolean[]>([false, false, false]);
   const { toast } = useToast();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
 
-  // Transform images data to match the expected format
+  // Transform images data to match the expected format - only show actual images
   const generatedImages = {
-    1: images.filter(img => img.variation_number === 1 && img.image_data !== 'generating...').map(img => img.image_data),
-    2: images.filter(img => img.variation_number === 2 && img.image_data !== 'generating...').map(img => img.image_data),
-    3: images.filter(img => img.variation_number === 3 && img.image_data !== 'generating...').map(img => img.image_data)
+    1: images.filter(img => img.variation_number === 1 && img.image_data !== 'generating...' && img.image_data.trim()).map(img => img.image_data),
+    2: images.filter(img => img.variation_number === 2 && img.image_data !== 'generating...' && img.image_data.trim()).map(img => img.image_data),
+    3: images.filter(img => img.variation_number === 3 && img.image_data !== 'generating...' && img.image_data.trim()).map(img => img.image_data)
   };
 
+  // Loading state is now purely user-action driven
   const loadingImage = {
-    1: isGenerating[0] || images.some(img => img.variation_number === 1 && img.image_data === 'generating...'),
-    2: isGenerating[1] || images.some(img => img.variation_number === 2 && img.image_data === 'generating...'), 
-    3: isGenerating[2] || images.some(img => img.variation_number === 3 && img.image_data === 'generating...')
+    1: userTriggeredLoading[0],
+    2: userTriggeredLoading[1], 
+    3: userTriggeredLoading[2]
   };
 
   const imageGenerationFailed = {
@@ -36,7 +38,12 @@ export function useLinkedInImageManager(postId: string | null) {
     3: false
   };
 
-  const hasImages = images.filter(img => img.image_data !== 'generating...').length > 0;
+  const hasImages = images.filter(img => img.image_data !== 'generating...' && img.image_data.trim()).length > 0;
+
+  // Reset loading states when switching posts
+  useEffect(() => {
+    setUserTriggeredLoading([false, false, false]);
+  }, [postId]);
 
   // Fetch images when component mounts or postId changes
   const fetchImages = useCallback(async () => {
@@ -48,6 +55,7 @@ export function useLinkedInImageManager(postId: string | null) {
           .from('linkedin_post_images')
           .select('*')
           .eq('post_id', postId)
+          .neq('image_data', 'generating...') // Exclude generating records from UI
           .order('variation_number', { ascending: true });
 
         if (error) {
@@ -57,8 +65,6 @@ export function useLinkedInImageManager(postId: string | null) {
 
         if (data) {
           setImages(data);
-          // Reset generating states properly based on current image data
-          setIsGenerating([false, false, false]);
         }
       }, 3, 'fetch LinkedIn post images');
     } catch (error) {
@@ -83,28 +89,30 @@ export function useLinkedInImageManager(postId: string | null) {
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
           const newImage = payload.new as LinkedInImageData;
           
-          setImages(prev => {
-            const existing = prev.find(img => img.id === newImage.id);
-            if (existing) {
-              return prev.map(img => img.id === newImage.id ? newImage : img);
-            } else {
-              return [...prev, newImage];
+          // Only process actual completed images, not 'generating...' records
+          if (newImage.image_data !== 'generating...' && newImage.image_data.trim()) {
+            setImages(prev => {
+              const existing = prev.find(img => img.id === newImage.id);
+              if (existing) {
+                return prev.map(img => img.id === newImage.id ? newImage : img);
+              } else {
+                return [...prev, newImage];
+              }
+            });
+
+            // Reset loading state for this variation when image arrives
+            if (newImage.variation_number) {
+              setUserTriggeredLoading(prev => {
+                const newState = [...prev];
+                newState[newImage.variation_number - 1] = false;
+                return newState;
+              });
+
+              toast({
+                title: "Image Generated!",
+                description: `LinkedIn post image for variation ${newImage.variation_number} is ready.`
+              });
             }
-          });
-
-          // Handle loading state changes based on image data
-          if (newImage.image_data !== 'generating...' && newImage.variation_number) {
-            // Image generation completed - turn off loading
-            setIsGenerating(prev => {
-              const newState = [...prev];
-              newState[newImage.variation_number - 1] = false;
-              return newState;
-            });
-
-            toast({
-              title: "Image Generated!",
-              description: `LinkedIn post image for variation ${newImage.variation_number} is ready.`
-            });
           }
         } else if (payload.eventType === 'DELETE') {
           const deletedImage = payload.old as LinkedInImageData;
@@ -124,16 +132,39 @@ export function useLinkedInImageManager(postId: string | null) {
   const generateImage = useCallback(async (variationNumber: number, postData?: any) => {
     if (!postId) return;
 
-    // Set generating state immediately when user clicks
-    setIsGenerating(prev => {
+    // Set user-triggered loading state immediately
+    setUserTriggeredLoading(prev => {
       const newState = [...prev];
       newState[variationNumber - 1] = true;
       return newState;
     });
 
+    // Set timeout to reset loading state after 3 minutes if no response
+    const timeoutId = setTimeout(() => {
+      setUserTriggeredLoading(prev => {
+        const newState = [...prev];
+        newState[variationNumber - 1] = false;
+        return newState;
+      });
+      
+      toast({
+        title: "Image Generation Timeout",
+        description: `Image generation took too long for variation ${variationNumber}. Please try again.`,
+        variant: "destructive"
+      });
+    }, 180000); // 3 minutes
+
     try {
       await executeWithRetry(async () => {
-        // Create placeholder record
+        // Clean up any existing stuck records for this variation first
+        await supabase
+          .from('linkedin_post_images')
+          .delete()
+          .eq('post_id', postId)
+          .eq('variation_number', variationNumber)
+          .eq('image_data', 'generating...');
+
+        // Create new placeholder record
         const { error } = await supabase
           .from('linkedin_post_images')
           .insert({
@@ -147,7 +178,7 @@ export function useLinkedInImageManager(postId: string | null) {
           throw error;
         }
 
-        // Call webhook with proper parameters including post data from history
+        // Call webhook with proper parameters
         const webhookBody: {
           post_id: string;
           variation_number: number;
@@ -165,7 +196,7 @@ export function useLinkedInImageManager(postId: string | null) {
         if (postData) {
           webhookBody.post_heading = postData[`post_heading_${variationNumber}`] || '';
           webhookBody.post_content = postData[`post_content_${variationNumber}`] || '';
-          webhookBody.user_name = 'Professional User'; // Default for history section
+          webhookBody.user_name = 'Professional User';
         }
 
         const webhookResponse = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/functions/v1/linkedin-image-webhook', {
@@ -183,6 +214,9 @@ export function useLinkedInImageManager(postId: string | null) {
           throw new Error('Failed to trigger image generation webhook');
         }
 
+        // Clear the timeout since webhook call succeeded
+        clearTimeout(timeoutId);
+
       }, 3, `generate image for variation ${variationNumber}`);
 
       toast({
@@ -192,8 +226,10 @@ export function useLinkedInImageManager(postId: string | null) {
 
     } catch (error) {
       console.error('Error generating image:', error);
-      // Reset generating state on error
-      setIsGenerating(prev => {
+      clearTimeout(timeoutId);
+      
+      // Reset loading state on error
+      setUserTriggeredLoading(prev => {
         const newState = [...prev];
         newState[variationNumber - 1] = false;
         return newState;
@@ -228,11 +264,6 @@ export function useLinkedInImageManager(postId: string | null) {
 
       // Update local state
       setImages(prev => prev.filter(img => img.id !== imageId));
-      setIsGenerating(prev => {
-        const newState = [...prev];
-        newState[variationNumber - 1] = false;
-        return newState;
-      });
 
       toast({
         title: "Image Deleted",
@@ -251,7 +282,7 @@ export function useLinkedInImageManager(postId: string | null) {
 
   return {
     images,
-    isGenerating,
+    isGenerating: userTriggeredLoading,
     generateImage,
     fetchImages,
     deleteImage,
