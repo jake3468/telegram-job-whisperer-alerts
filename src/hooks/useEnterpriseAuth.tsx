@@ -1,3 +1,5 @@
+
+import React from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { setClerkToken, setTokenRefreshFunction } from '@/integrations/supabase/client';
