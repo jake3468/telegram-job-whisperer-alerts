@@ -4,7 +4,6 @@ import { useUser, useAuth } from '@clerk/clerk-react';
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { setClerkToken, setTokenRefreshFunction } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { ToastAction } from '@/components/ui/toast';
 
 interface RequestQueueItem {
   fn: () => Promise<any>;
@@ -153,15 +152,7 @@ export const useEnterpriseAuth = () => {
             toast({
               title: "Session Expired",
               description: "Please refresh the page to continue.",
-              variant: "destructive",
-              action: (
-                <ToastAction 
-                  altText="Refresh Page"
-                  onClick={() => window.location.reload()}
-                >
-                  Refresh Page
-                </ToastAction>
-              )
+              variant: "destructive"
             });
             throw new Error('Session expired. Please refresh the page.');
           }
