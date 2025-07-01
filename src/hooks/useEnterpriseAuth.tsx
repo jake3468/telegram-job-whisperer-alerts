@@ -158,7 +158,7 @@ export const useEnterpriseAuth = () => {
                 <ToastAction onClick={() => window.location.reload()}>
                   Refresh Page
                 </ToastAction>
-              ),
+              )
             });
             throw new Error('Session expired. Please refresh the page.');
           }
