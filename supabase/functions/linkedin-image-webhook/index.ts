@@ -13,10 +13,132 @@ serve(async (req) => {
   }
 
   try {
-    const { post_heading, post_content, variation_number, user_name, post_id, source } = await req.json()
+    const { post_heading, post_content, variation_number, user_name, post_id, source, success, image_data } = await req.json()
 
-    console.log('LinkedIn image webhook called with:', { post_id, variation_number, source })
+    console.log('LinkedIn image webhook called with:', { post_id, variation_number, source, success, has_image_data: !!image_data })
 
+    // Check if this is a direct N8N response with image data
+    if (success && image_data && post_id && variation_number) {
+      console.log('Processing direct N8N image response')
+      
+      // Initialize Supabase client
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+      const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      
+      const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+      console.log('Attempting to update image record:', { post_id, variation_number, image_data_length: image_data.length })
+
+      // First, try to update existing "generating..." record
+      const { data: updateResult, error: updateError } = await supabase
+        .from('linkedin_post_images')
+        .update({ image_data: image_data })
+        .eq('post_id', post_id)
+        .eq('variation_number', variation_number)
+        .eq('image_data', 'generating...')
+        .select()
+
+      if (updateError) {
+        console.error('Error updating generating record:', updateError)
+      } else if (updateResult && updateResult.length > 0) {
+        console.log('Successfully updated existing generating record:', updateResult[0].id)
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            message: 'Image data updated successfully',
+            record_id: updateResult[0].id
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      } else {
+        console.log('No generating record found, checking for any existing record...')
+        
+        // Check if any record exists for this post and variation
+        const { data: existingRecords, error: checkError } = await supabase
+          .from('linkedin_post_images')
+          .select('id, image_data')
+          .eq('post_id', post_id)
+          .eq('variation_number', variation_number)
+
+        if (checkError) {
+          console.error('Error checking existing records:', checkError)
+        } else if (existingRecords && existingRecords.length > 0) {
+          console.log('Found existing record, updating it:', existingRecords[0].id)
+          
+          // Update the existing record
+          const { data: finalUpdateResult, error: finalUpdateError } = await supabase
+            .from('linkedin_post_images')
+            .update({ image_data: image_data })
+            .eq('id', existingRecords[0].id)
+            .select()
+
+          if (finalUpdateError) {
+            console.error('Error updating existing record:', finalUpdateError)
+          } else {
+            console.log('Successfully updated existing record')
+            return new Response(
+              JSON.stringify({ 
+                success: true, 
+                message: 'Image data updated successfully',
+                record_id: existingRecords[0].id
+              }),
+              { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            )
+          }
+        } else {
+          console.log('No existing record found, creating new one...')
+          
+          // Create new record
+          const { data: insertResult, error: insertError } = await supabase
+            .from('linkedin_post_images')
+            .insert({
+              post_id: post_id,
+              variation_number: variation_number,
+              image_data: image_data
+            })
+            .select()
+
+          if (insertError) {
+            console.error('Error creating new record:', insertError)
+            return new Response(
+              JSON.stringify({ 
+                success: false, 
+                error: 'Failed to create image record',
+                details: insertError.message
+              }),
+              { 
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+                status: 500 
+              }
+            )
+          } else {
+            console.log('Successfully created new image record:', insertResult[0].id)
+            return new Response(
+              JSON.stringify({ 
+                success: true, 
+                message: 'Image record created successfully',
+                record_id: insertResult[0].id
+              }),
+              { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            )
+          }
+        }
+      }
+
+      // If we get here, something went wrong
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Failed to save image data - no path succeeded'
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+          status: 500 
+        }
+      )
+    }
+
+    // Handle regular webhook trigger (not direct N8N response)
     // Validate required parameters
     if (!post_id || !variation_number) {
       console.error('Missing required parameters: post_id or variation_number')
@@ -144,7 +266,7 @@ serve(async (req) => {
 
     // Check if N8N returned image data directly
     if (responseData.success && responseData.image_data) {
-      console.log('N8N returned image data directly, updating database...')
+      console.log('N8N returned image data directly in response, updating database...')
       
       // Update the existing "generating..." record with the actual image data
       const { data: updateResult, error: updateError } = await supabase
