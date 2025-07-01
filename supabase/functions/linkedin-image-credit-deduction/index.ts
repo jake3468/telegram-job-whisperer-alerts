@@ -119,7 +119,7 @@ Deno.serve(async (req) => {
       p_user_id: user.id,
       p_amount: 1.5,
       p_feature_used: 'linkedin_image',
-      p_description: `LinkedIn image generation completed for post ${post_id}, variation ${variation_number}`
+      p_description: 'LinkedIn image generation completed'
     });
 
     if (deductError) {

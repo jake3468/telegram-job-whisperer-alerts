@@ -106,7 +106,7 @@ Deno.serve(async (req) => {
       p_user_id: user.id,
       p_amount: 3.0,
       p_feature_used: 'linkedin_post',
-      p_description: `LinkedIn post generation completed for post ${post_id}`
+      p_description: 'LinkedIn post generation completed'
     });
 
     if (deductError) {

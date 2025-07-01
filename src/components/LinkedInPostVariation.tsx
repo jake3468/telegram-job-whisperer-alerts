@@ -80,7 +80,7 @@ const LinkedInPostVariation = ({
     loadExistingImages();
   }, [postId, variationNumber, isAuthReady, executeWithRetry]);
 
-  // Real-time subscription for image updates - FIXED
+  // Real-time subscription for image updates - FIXED to properly filter by variation_number
   useEffect(() => {
     if (!postId || !isAuthReady) return;
 
@@ -92,14 +92,14 @@ const LinkedInPostVariation = ({
         event: '*',
         schema: 'public',
         table: 'linkedin_post_images',
-        filter: `post_id=eq.${postId}`
+        filter: `post_id=eq.${postId},variation_number=eq.${variationNumber}`
       }, async (payload) => {
         console.log('📡 LinkedIn image updated via real-time:', payload);
         
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
           const newImage = payload.new;
           
-          // Only process images for this specific variation
+          // Double-check variation number (though filter should handle this)
           if (newImage.variation_number !== variationNumber) {
             console.log(`📡 Ignoring image for variation ${newImage.variation_number}, expecting ${variationNumber}`);
             return;
