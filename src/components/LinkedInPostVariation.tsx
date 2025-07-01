@@ -398,11 +398,12 @@ const LinkedInPostVariation = ({
 
     try {
       await executeWithRetry(async () => {
-        // Step 1: First update the database to set image_data to "generating..." for regeneration
+        // Step 1: Update existing record OR create new one with "generating..." state
         logger.imageProcessing('setting_generating_state', postId, variationNumber, {
           generation_id: generationId
         });
         
+        // First, try to update existing record
         const { data: updateResult, error: updateError } = await supabase
           .from('linkedin_post_images')
           .update({ 
@@ -416,7 +417,8 @@ const LinkedInPostVariation = ({
         if (updateError || !updateResult || updateResult.length === 0) {
           // If no existing record to update, create new one with "generating..." state
           logger.imageProcessing('creating_new_generating_record', postId, variationNumber, {
-            generation_id: generationId
+            generation_id: generationId,
+            update_error: updateError?.message
           });
           
           const { error: insertError } = await supabase
@@ -431,6 +433,11 @@ const LinkedInPostVariation = ({
             logger.error('Error creating generating record:', insertError);
             throw new Error('Failed to prepare image generation');
           }
+        } else {
+          logger.imageProcessing('existing_record_updated_to_generating', postId, variationNumber, {
+            generation_id: generationId,
+            updated_records: updateResult.length
+          });
         }
 
         logger.imageProcessing('database_updated_to_generating', postId, variationNumber, {
