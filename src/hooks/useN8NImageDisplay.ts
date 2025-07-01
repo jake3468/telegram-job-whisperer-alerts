@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
@@ -19,9 +19,10 @@ interface UseN8NImageDisplayReturn {
 
 export const useN8NImageDisplay = (postId: string, variationNumber: number, onImageReceived?: () => void): UseN8NImageDisplayReturn => {
   const [n8nImages, setN8nImages] = useState<string[]>([]);
-  const [pollingAttempts, setPollingAttempts] = useState(0);
-  const [lastPollTime, setLastPollTime] = useState(0);
+  const [isPollingDisabled, setIsPollingDisabled] = useState(false);
   const [consecutiveFailures, setConsecutiveFailures] = useState(0);
+  const pollingTimeoutRef = useRef<NodeJS.Timeout>();
+  const cleanupRef = useRef<(() => void) | null>(null);
   const { toast } = useToast();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
 
@@ -31,32 +32,11 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number, onIm
     }
   };
 
-  // Controlled polling with exponential backoff and circuit breaker
+  // Single poll attempt with strict failure handling
   const pollForImages = async () => {
-    if (!postId || !isAuthReady) return;
-
-    // Circuit breaker - stop polling after 5 consecutive failures
-    if (consecutiveFailures >= 5) {
+    if (!postId || !isAuthReady || isPollingDisabled || consecutiveFailures >= 3) {
       return;
     }
-
-    // Max 8 polling attempts with longer intervals
-    if (pollingAttempts >= 8) {
-      return;
-    }
-
-    // Exponential backoff: 5s, 7s, 10s, 15s, 22s, 30s...
-    const now = Date.now();
-    const baseInterval = 5000;
-    const backoffMultiplier = Math.pow(1.5, pollingAttempts);
-    const interval = Math.min(baseInterval * backoffMultiplier, 30000);
-    
-    if (now - lastPollTime < interval) {
-      return;
-    }
-
-    setLastPollTime(now);
-    setPollingAttempts(prev => prev + 1);
 
     try {
       await executeWithRetry(async () => {
@@ -80,9 +60,8 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number, onIm
               if (onImageReceived) {
                 onImageReceived();
               }
-              // Reset on success
-              setPollingAttempts(0);
               setConsecutiveFailures(0);
+              setIsPollingDisabled(true); // Stop polling once we get images
               return [...prev, ...newImages];
             }
             return prev;
@@ -90,7 +69,13 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number, onIm
         }
       }, 1, `poll for images variation ${variationNumber}`);
     } catch (err) {
-      setConsecutiveFailures(prev => prev + 1);
+      setConsecutiveFailures(prev => {
+        const newCount = prev + 1;
+        if (newCount >= 3) {
+          setIsPollingDisabled(true); // Disable polling after 3 failures
+        }
+        return newCount;
+      });
     }
   };
 
@@ -117,8 +102,8 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number, onIm
             onImageReceived();
           }
 
-          setPollingAttempts(0);
           setConsecutiveFailures(0);
+          setIsPollingDisabled(true); // Stop polling once we get real-time data
 
           toast({
             title: "Image Ready!",
@@ -128,31 +113,42 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number, onIm
       })
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
-          // Single initial poll after successful subscription
-          setTimeout(() => pollForImages(), 2000);
+          // Single poll attempt after subscription, then stop
+          pollingTimeoutRef.current = setTimeout(() => {
+            pollForImages();
+          }, 3000);
         }
         
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
-          // Start limited polling as fallback
-          const pollInterval = setInterval(() => {
-            pollForImages();
-          }, 10000);
-          
-          // Stop polling after 3 minutes
-          setTimeout(() => {
-            clearInterval(pollInterval);
-          }, 180000);
-          
-          return () => clearInterval(pollInterval);
+          // Only do ONE more poll attempt on channel failure, then give up
+          if (!isPollingDisabled && consecutiveFailures < 2) {
+            pollingTimeoutRef.current = setTimeout(() => {
+              pollForImages();
+            }, 5000);
+          }
         }
       });
 
-    return () => {
+    cleanupRef.current = () => {
       supabase.removeChannel(channel);
-      setPollingAttempts(0);
-      setConsecutiveFailures(0);
+      if (pollingTimeoutRef.current) {
+        clearTimeout(pollingTimeoutRef.current);
+      }
     };
-  }, [postId, variationNumber, toast, onImageReceived, isAuthReady, executeWithRetry]);
+
+    return cleanupRef.current;
+  }, [postId, variationNumber, toast, onImageReceived, isAuthReady, executeWithRetry, isPollingDisabled, consecutiveFailures]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      setConsecutiveFailures(0);
+      setIsPollingDisabled(false);
+      if (pollingTimeoutRef.current) {
+        clearTimeout(pollingTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return { n8nImages, resetLoadingState };
 };
