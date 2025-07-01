@@ -65,7 +65,7 @@ serve(async (req) => {
     if (!n8nWebhookUrl) {
       console.error('N8N_LINKEDIN_IMAGE_WEBHOOK_URL environment variable not found')
       
-      // Update the database record to show failed status
+      // Update any existing generating record to show failed status
       await supabase
         .from('linkedin_post_images')
         .update({ image_data: 'failed - webhook URL not configured' })
@@ -117,7 +117,7 @@ serve(async (req) => {
       const errorText = await response.text()
       console.error(`N8N webhook failed: ${response.status} ${response.statusText}`, errorText)
       
-      // Update the database record to show failed status
+      // Update any existing generating record to show failed status
       await supabase
         .from('linkedin_post_images')
         .update({ image_data: `failed - webhook error: ${response.status}` })
@@ -141,87 +141,21 @@ serve(async (req) => {
     const responseText = await response.text()
     console.log('N8N webhook response:', responseText)
 
-    // Handle the response and store image if available
-    let result
-    try {
-      result = responseText ? JSON.parse(responseText) : null
-    } catch (parseError) {
-      console.log('N8N webhook triggered successfully, waiting for async response')
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: 'Image generation triggered successfully',
-          triggered: true,
-          variation_number: variation_number,
-          webhook_url_configured: true
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      )
-    }
-
-    // Check if the response contains image data
-    if (result && result.success && result.image_data) {
-      console.log(`Image data found for variation ${variation_number}, storing in database...`)
-      
-      // Store the image in the database
-      const { data: storedImage, error: storeError } = await supabase
-        .from('linkedin_post_images')
-        .insert({
-          post_id: post_id,
-          image_data: result.image_data,
-          variation_number: variation_number
-        })
-        .select()
-        .single()
-
-      if (storeError) {
-        console.error('Failed to store image in database:', storeError)
-        return new Response(
-          JSON.stringify({ 
-            success: false, 
-            error: 'Failed to store image in database: ' + storeError.message,
-            webhook_url_configured: true
-          }),
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
-            status: 500 
-          }
-        )
+    // Always return success for webhook trigger - all final image processing happens in n8n-image-display
+    console.log(`N8N webhook triggered successfully for variation ${variation_number}`)
+    
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        message: 'Image generation triggered successfully',
+        triggered: true,
+        variation_number: variation_number,
+        webhook_url_configured: true
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
-
-      console.log(`Image stored successfully in database with ID: ${storedImage.id}`)
-      
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: 'Image generated and stored successfully',
-          data: result,
-          stored_image_id: storedImage.id,
-          variation_number: variation_number,
-          webhook_url_configured: true
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      )
-    } else {
-      console.log(`N8N webhook triggered successfully for variation ${variation_number}`)
-      
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: 'Image generation triggered successfully',
-          triggered: true,
-          variation_number: variation_number,
-          webhook_url_configured: true
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      )
-    }
+    )
 
   } catch (error) {
     console.error('Error in linkedin-image-webhook:', error)

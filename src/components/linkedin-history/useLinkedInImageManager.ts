@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -92,12 +91,11 @@ export function useLinkedInImageManager(postId: string | null) {
           // Only process actual completed images, not 'generating...' records
           if (newImage.image_data !== 'generating...' && newImage.image_data.trim()) {
             setImages(prev => {
-              const existing = prev.find(img => img.id === newImage.id);
-              if (existing) {
-                return prev.map(img => img.id === newImage.id ? newImage : img);
-              } else {
-                return [...prev, newImage];
-              }
+              // Remove any existing records for this variation to prevent duplicates
+              const filtered = prev.filter(img => 
+                !(img.post_id === newImage.post_id && img.variation_number === newImage.variation_number)
+              );
+              return [...filtered, newImage];
             });
 
             // Reset loading state for this variation when image arrives
@@ -164,7 +162,7 @@ export function useLinkedInImageManager(postId: string | null) {
           .eq('variation_number', variationNumber)
           .eq('image_data', 'generating...');
 
-        // Create new placeholder record
+        // Create new placeholder record - this will be updated by n8n-image-display
         const { error } = await supabase
           .from('linkedin_post_images')
           .insert({
@@ -173,7 +171,7 @@ export function useLinkedInImageManager(postId: string | null) {
             image_data: 'generating...'
           });
 
-        if (error) {
+        if (error && error.code !== '23505') { // Ignore unique constraint violations
           console.error('Error creating image record:', error);
           throw error;
         }

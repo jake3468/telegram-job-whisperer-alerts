@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 /**
@@ -61,22 +62,21 @@ export const cleanupStuckLinkedInImageForVariation = async (postId: string, vari
 };
 
 /**
- * Remove duplicate images for a specific post and variation
- * Keeps only the most recent non-generating record
+ * Ensure only one image record exists per post_id + variation_number combination
+ * This function handles edge cases where duplicates might still exist
  */
-export const removeDuplicateLinkedInImages = async (postId: string, variationNumber: number) => {
+export const ensureSingleLinkedInImage = async (postId: string, variationNumber: number) => {
   try {
-    // Get all records for this post and variation
+    // Get all records for this post and variation, ordered by creation date (newest first)
     const { data: allRecords, error: fetchError } = await supabase
       .from('linkedin_post_images')
       .select('id, created_at, image_data')
       .eq('post_id', postId)
       .eq('variation_number', variationNumber)
-      .neq('image_data', 'generating...')
       .order('created_at', { ascending: false });
 
     if (fetchError) {
-      console.error('Error fetching duplicate records:', fetchError);
+      console.error('Error fetching records for deduplication:', fetchError);
       return false;
     }
 
@@ -89,6 +89,8 @@ export const removeDuplicateLinkedInImages = async (postId: string, variationNum
     const recordsToDelete = allRecords.slice(1);
     const idsToDelete = recordsToDelete.map(record => record.id);
 
+    console.log(`Found ${allRecords.length} records for post ${postId}, variation ${variationNumber}. Keeping newest, deleting ${recordsToDelete.length} older records.`);
+
     const { error: deleteError } = await supabase
       .from('linkedin_post_images')
       .delete()
@@ -99,10 +101,18 @@ export const removeDuplicateLinkedInImages = async (postId: string, variationNum
       return false;
     }
 
-    console.log(`🧹 Removed ${recordsToDelete.length} duplicate LinkedIn image records for post ${postId}, variation ${variationNumber}`);
+    console.log(`🧹 Successfully ensured single record for post ${postId}, variation ${variationNumber}`);
     return true;
   } catch (error) {
-    console.error('Exception removing duplicate LinkedIn images:', error);
+    console.error('Exception ensuring single LinkedIn image:', error);
     return false;
   }
+};
+
+/**
+ * Remove duplicate images for a specific post and variation (legacy function - kept for compatibility)
+ * @deprecated Use ensureSingleLinkedInImage instead
+ */
+export const removeDuplicateLinkedInImages = async (postId: string, variationNumber: number) => {
+  return await ensureSingleLinkedInImage(postId, variationNumber);
 };

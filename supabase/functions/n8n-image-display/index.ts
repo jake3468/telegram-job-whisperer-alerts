@@ -40,23 +40,20 @@ serve(async (req) => {
 
     console.log(`Processing image display for post ${post_id}, variation ${variation_number}`);
 
-    // First, update the existing 'generating...' record with the actual image data
-    const { data: updateResult, error: updateError } = await supabaseClient
+    // First check if ANY record exists for this post_id + variation_number combination
+    const { data: existingRecords, error: checkError } = await supabaseClient
       .from('linkedin_post_images')
-      .update({ 
-        image_data: image_data 
-      })
+      .select('id, image_data')
       .eq('post_id', post_id)
       .eq('variation_number', variation_number)
-      .eq('image_data', 'generating...')
-      .select();
+      .order('created_at', { ascending: false });
 
-    if (updateError) {
-      console.error('Error updating existing record:', updateError);
+    if (checkError) {
+      console.error('Error checking existing records:', checkError);
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Failed to update existing record: ' + updateError.message 
+          error: 'Failed to check existing records: ' + checkError.message 
         }),
         { 
           status: 500, 
@@ -65,12 +62,62 @@ serve(async (req) => {
       );
     }
 
-    // Check if we actually updated a record
-    if (!updateResult || updateResult.length === 0) {
-      console.log('No existing generating record found, creating new record');
+    let updateResult = null;
+    let insertResult = null;
+
+    if (existingRecords && existingRecords.length > 0) {
+      // If records exist, update the first one and delete any extras
+      console.log(`Found ${existingRecords.length} existing records, updating the first one`);
       
-      // If no existing record was found, create a new one
-      const { data: insertResult, error: insertError } = await supabaseClient
+      const recordToUpdate = existingRecords[0];
+      
+      // Update the first record with the new image data
+      const { data: updated, error: updateError } = await supabaseClient
+        .from('linkedin_post_images')
+        .update({ image_data: image_data })
+        .eq('id', recordToUpdate.id)
+        .select();
+
+      if (updateError) {
+        console.error('Error updating existing record:', updateError);
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: 'Failed to update existing record: ' + updateError.message 
+          }),
+          { 
+            status: 500, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+
+      updateResult = updated;
+
+      // If there are multiple records, delete the extras
+      if (existingRecords.length > 1) {
+        const extraRecordIds = existingRecords.slice(1).map(r => r.id);
+        console.log(`Deleting ${extraRecordIds.length} duplicate records`);
+        
+        const { error: deleteError } = await supabaseClient
+          .from('linkedin_post_images')
+          .delete()
+          .in('id', extraRecordIds);
+
+        if (deleteError) {
+          console.error('Error deleting duplicate records:', deleteError);
+          // Don't fail the whole operation, just log the error
+        } else {
+          console.log(`Successfully deleted ${extraRecordIds.length} duplicate records`);
+        }
+      }
+
+      console.log('Updated existing record:', updateResult);
+    } else {
+      // No existing record found, create a new one
+      console.log('No existing record found, creating new record');
+      
+      const { data: inserted, error: insertError } = await supabaseClient
         .from('linkedin_post_images')
         .insert({
           post_id: post_id,
@@ -80,22 +127,51 @@ serve(async (req) => {
         .select();
 
       if (insertError) {
-        console.error('Error creating new record:', insertError);
-        return new Response(
-          JSON.stringify({ 
-            success: false, 
-            error: 'Failed to create new record: ' + insertError.message 
-          }),
-          { 
-            status: 500, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-          }
-        );
-      }
+        // Check if it's a unique constraint violation (duplicate)
+        if (insertError.code === '23505') {
+          console.log('Unique constraint violation, record was created by another process. Attempting update instead.');
+          
+          // Try to update the record that was just created
+          const { data: updated, error: updateError } = await supabaseClient
+            .from('linkedin_post_images')
+            .update({ image_data: image_data })
+            .eq('post_id', post_id)
+            .eq('variation_number', variation_number)
+            .select();
 
-      console.log('Created new record:', insertResult);
-    } else {
-      console.log('Updated existing record:', updateResult);
+          if (updateError) {
+            console.error('Error updating after constraint violation:', updateError);
+            return new Response(
+              JSON.stringify({ 
+                success: false, 
+                error: 'Failed to handle duplicate record: ' + updateError.message 
+              }),
+              { 
+                status: 500, 
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+              }
+            );
+          }
+          
+          updateResult = updated;
+          console.log('Successfully updated record after constraint violation');
+        } else {
+          console.error('Error creating new record:', insertError);
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              error: 'Failed to create new record: ' + insertError.message 
+            }),
+            { 
+              status: 500, 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+            }
+          );
+        }
+      } else {
+        insertResult = inserted;
+        console.log('Created new record:', insertResult);
+      }
     }
 
     // Create a real-time notification payload
@@ -106,7 +182,7 @@ serve(async (req) => {
       image_data: image_data,
       user_name: user_name || 'User',
       timestamp: new Date().toISOString(),
-      updated_existing: updateResult && updateResult.length > 0
+      updated_existing: !!updateResult
     };
 
     // Send real-time notification to the specific channel
@@ -127,7 +203,8 @@ serve(async (req) => {
         success: true, 
         message: 'Image processed and updated successfully',
         channel: channelName,
-        updated_existing: updateResult && updateResult.length > 0,
+        updated_existing: !!updateResult,
+        created_new: !!insertResult,
         payload: notificationPayload
       }),
       { 
