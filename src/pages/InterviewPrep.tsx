@@ -103,7 +103,7 @@ const InterviewPrep = () => {
           
           toast({
             title: "Interview Prep Ready!",
-            description: "Your interview questions are ready. Credits were deducted when generated."
+            description: "Your interview questions are ready."
           });
         }
       }
@@ -119,14 +119,14 @@ const InterviewPrep = () => {
     }
   }, [currentAnalysis?.id, isAuthReady, interviewData]);
 
-  // Enhanced real-time subscription with fallback polling
+  // Enhanced real-time subscription with proper channel configuration
   useEffect(() => {
     if (!currentAnalysis?.id || !isAuthReady) return;
     
     console.log('🔄 Setting up real-time subscription for:', currentAnalysis.id);
     
     const channel = supabase
-      .channel('interview-prep-updates')
+      .channel(`interview-prep-${currentAnalysis.id}`)
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
@@ -135,19 +135,23 @@ const InterviewPrep = () => {
       }, async (payload) => {
         console.log('📡 Interview prep updated via real-time:', payload);
         
-        if (payload.new.interview_questions) {
+        if (payload.new && payload.new.interview_questions) {
           try {
-            const parsedData = typeof payload.new.interview_questions === 'string' 
-              ? payload.new.interview_questions 
-              : JSON.stringify(payload.new.interview_questions);
-
+            let parsedData = payload.new.interview_questions;
+            
+            // Handle different data types properly
+            if (typeof parsedData === 'object') {
+              parsedData = JSON.stringify(parsedData);
+            }
+            
             if (parsedData && parsedData.trim().length > 0) {
+              console.log('✅ Setting interview data from real-time update');
               setInterviewData(parsedData);
               setIsGenerating(false);
               
               toast({
                 title: "Interview Prep Ready!",
-                description: "Your personalized interview questions have been generated. Credits will be deducted via N8N."
+                description: "Your personalized interview questions have been generated."
               });
             }
           } catch (error) {
@@ -155,9 +159,11 @@ const InterviewPrep = () => {
           }
         }
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log('📡 Real-time subscription status:', status);
+      });
 
-    // Fallback polling mechanism in case real-time fails
+    // Improved fallback polling mechanism
     const pollInterval = setInterval(async () => {
       if (!isGenerating || interviewData) {
         return;
@@ -169,9 +175,10 @@ const InterviewPrep = () => {
       } catch (error) {
         console.error('❌ Fallback polling error:', error);
       }
-    }, 5000); // Poll every 5 seconds
+    }, 3000); // Poll every 3 seconds
     
     return () => {
+      console.log('🧹 Cleaning up real-time subscription');
       supabase.removeChannel(channel);
       clearInterval(pollInterval);
     };
@@ -297,7 +304,7 @@ const InterviewPrep = () => {
           refetchHistory();
           toast({
             title: "Interview Prep Started!",
-            description: "Your personalized interview questions are being generated. Credits will be deducted when ready."
+            description: "Your personalized interview questions are being generated."
           });
         }
       }, 5, 'generate interview prep');
