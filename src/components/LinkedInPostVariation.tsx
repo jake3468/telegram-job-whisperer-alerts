@@ -54,13 +54,6 @@ const LinkedInPostVariation = ({
 
   const allImages = [...generatedImages, ...n8nImages];
 
-  useEffect(() => {
-    if (n8nImages.length > 0) {
-      setIsLoadingImage(false);
-      setImageGenerationFailed(false);
-    }
-  }, [n8nImages.length, variationNumber]);
-
   const checkAndLoadExistingImages = async () => {
     if (!postId || !isAuthReady) return;
 
@@ -77,10 +70,15 @@ const LinkedInPostVariation = ({
         }
 
         if (data && data.length > 0) {
-          const imageUrls = data.map(img => img.image_data);
-          setGeneratedImages(imageUrls);
-          setIsLoadingImage(false);
-          setImageGenerationFailed(false);
+          const imageUrls = data
+            .map(img => img.image_data)
+            .filter(imageData => imageData && imageData !== 'generating...' && !imageData.includes('failed'));
+          
+          if (imageUrls.length > 0) {
+            setGeneratedImages(imageUrls);
+            setIsLoadingImage(false);
+            setImageGenerationFailed(false);
+          }
         }
       }, 1, `check existing images for variation ${variationNumber}`);
     } catch (err) {
@@ -118,13 +116,10 @@ const LinkedInPostVariation = ({
                    newImage.image_data !== 'generating...' && 
                    !newImage.image_data.includes('failed')) {
             
-            const isValidBase64Image = newImage.image_data.startsWith('data:image/') && 
-                                     newImage.image_data.includes('base64,') &&
-                                     newImage.image_data.length > 5000;
+            const isValidImage = newImage.image_data.startsWith('data:image/') || 
+                                newImage.image_data.startsWith('http');
             
-            const isValidUrl = newImage.image_data.startsWith('http');
-            
-            if (isValidBase64Image || isValidUrl) {
+            if (isValidImage) {
               setIsLoadingImage(false);
               setImageGenerationFailed(false);
               
@@ -382,7 +377,8 @@ const LinkedInPostVariation = ({
         <div className="mb-8">
           <h5 className="text-cyan-400 font-medium text-sm mb-4 text-center">
             Generated Images for Variation {variationNumber} ({allImages.length}):
-            {n8nImages.length > 0 && <span className="text-green-400 ml-2">✨ External: {n8nImages.length}</span>}
+            {n8nImages.length > 0 && <span className="text-green-400 ml-2">✨ N8N: {n8nImages.length}</span>}
+            {generatedImages.length > 0 && <span className="text-blue-400 ml-2">📦 DB: {generatedImages.length}</span>}
           </h5>
           <div className="space-y-6">
             {allImages.map((imageData, index) => (

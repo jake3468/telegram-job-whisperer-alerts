@@ -52,20 +52,27 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number, onIm
         }
 
         if (data && data.length > 0) {
-          const imageUrls = data.map(img => img.image_data);
+          const validImages = data
+            .map(img => img.image_data)
+            .filter(imageData => imageData && 
+                   imageData !== 'generating...' && 
+                   !imageData.includes('failed') &&
+                   (imageData.startsWith('data:image/') || imageData.startsWith('http')));
           
-          setN8nImages(prev => {
-            const newImages = imageUrls.filter(url => !prev.includes(url));
-            if (newImages.length > 0) {
-              if (onImageReceived) {
-                onImageReceived();
+          if (validImages.length > 0) {
+            setN8nImages(prev => {
+              const newImages = validImages.filter(url => !prev.includes(url));
+              if (newImages.length > 0) {
+                if (onImageReceived) {
+                  onImageReceived();
+                }
+                setConsecutiveFailures(0);
+                setIsPollingDisabled(true); // Stop polling once we get images
+                return [...prev, ...newImages];
               }
-              setConsecutiveFailures(0);
-              setIsPollingDisabled(true); // Stop polling once we get images
-              return [...prev, ...newImages];
-            }
-            return prev;
-          });
+              return prev;
+            });
+          }
         }
       }, 1, `poll for images variation ${variationNumber}`);
     } catch (err) {
@@ -90,25 +97,32 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number, onIm
         const imagePayload = payload.payload as N8NImagePayload;
         
         if (imagePayload.post_id === postId && imagePayload.variation_number === variationNumber) {
-          setN8nImages(prev => {
-            const exists = prev.includes(imagePayload.image_data);
-            if (exists) {
-              return prev;
+          const isValidImage = imagePayload.image_data && 
+                              imagePayload.image_data !== 'generating...' &&
+                              !imagePayload.image_data.includes('failed') &&
+                              (imagePayload.image_data.startsWith('data:image/') || imagePayload.image_data.startsWith('http'));
+          
+          if (isValidImage) {
+            setN8nImages(prev => {
+              const exists = prev.includes(imagePayload.image_data);
+              if (exists) {
+                return prev;
+              }
+              return [...prev, imagePayload.image_data];
+            });
+
+            if (onImageReceived) {
+              onImageReceived();
             }
-            return [...prev, imagePayload.image_data];
-          });
 
-          if (onImageReceived) {
-            onImageReceived();
+            setConsecutiveFailures(0);
+            setIsPollingDisabled(true); // Stop polling once we get real-time data
+
+            toast({
+              title: "Image Ready!",
+              description: `LinkedIn post image for variation ${variationNumber} is now available.`
+            });
           }
-
-          setConsecutiveFailures(0);
-          setIsPollingDisabled(true); // Stop polling once we get real-time data
-
-          toast({
-            title: "Image Ready!",
-            description: `LinkedIn post image for variation ${variationNumber} is now available.`
-          });
         }
       })
       .subscribe((status) => {
