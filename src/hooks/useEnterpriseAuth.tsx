@@ -154,11 +154,9 @@ export const useEnterpriseAuth = () => {
               title: "Session Expired",
               description: "Please refresh the page to continue.",
               variant: "destructive",
-              action: (
-                <ToastAction onClick={() => window.location.reload()}>
-                  Refresh Page
-                </ToastAction>
-              )
+              action: React.createElement(ToastAction, {
+                onClick: () => window.location.reload()
+              }, "Refresh Page")
             });
             throw new Error('Session expired. Please refresh the page.');
           }
