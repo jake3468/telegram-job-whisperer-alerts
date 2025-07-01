@@ -155,6 +155,7 @@ export const useEnterpriseAuth = () => {
               description: "Please refresh the page to continue.",
               variant: "destructive",
               action: React.createElement(ToastAction, {
+                altText: "Refresh Page",
                 onClick: () => window.location.reload()
               }, "Refresh Page")
             });
