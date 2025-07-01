@@ -19,21 +19,17 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const { user_id, analysis_id, description } = await req.json()
+    const { analysis_id } = await req.json()
 
-    console.log('Company analysis credit deduction request:', {
-      user_id,
-      analysis_id,
-      description: description || 'Company Analysis - Results Generated'
-    })
+    console.log('Company analysis credit deduction request:', { analysis_id })
 
     // Validate required fields
-    if (!user_id || !analysis_id) {
-      console.error('Missing required fields:', { user_id, analysis_id })
+    if (!analysis_id) {
+      console.error('Missing analysis_id in request body')
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Missing required fields: user_id and analysis_id are required' 
+          error: 'analysis_id is required' 
         }),
         { 
           status: 400,
@@ -42,41 +38,37 @@ serve(async (req) => {
       )
     }
 
-    // Check if user exists
-    const { data: userData, error: userError } = await supabaseClient
-      .from('users')
-      .select('id')
-      .eq('id', user_id)
-      .single()
+    console.log('Looking up company analysis and user information...')
 
-    if (userError || !userData) {
-      console.error('User not found:', userError)
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'User not found' 
-        }),
-        { 
-          status: 404,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      )
-    }
-
-    // Check if analysis exists and belongs to user
+    // Get the company analysis and associated user information
     const { data: analysisData, error: analysisError } = await supabaseClient
       .from('company_role_analyses')
-      .select('id, user_id')
+      .select(`
+        id,
+        user_id,
+        company_name,
+        job_title,
+        user_profile:user_id (
+          id,
+          user_id,
+          users:user_id (
+            id,
+            email,
+            first_name,
+            last_name
+          )
+        )
+      `)
       .eq('id', analysis_id)
-      .eq('user_id', user_id)
       .single()
 
-    if (analysisError || !analysisData) {
-      console.error('Analysis not found or does not belong to user:', analysisError)
+    if (analysisError) {
+      console.error('Error fetching company analysis:', analysisError)
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Analysis not found or access denied' 
+          error: 'Company analysis not found', 
+          details: analysisError.message 
         }),
         { 
           status: 404,
@@ -85,13 +77,36 @@ serve(async (req) => {
       )
     }
 
+    if (!analysisData?.user_profile?.users) {
+      console.error('User information not found for analysis:', analysis_id)
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'User information not found for this company analysis' 
+        }),
+        { 
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
+    const user = analysisData.user_profile.users
+    console.log('Found user for credit deduction:', { 
+      userId: user.id, 
+      email: user.email,
+      analysisId: analysis_id 
+    })
+
     // Deduct 3 credits using the database function
+    console.log('Attempting to deduct 3 credits for company analysis...')
+    
     const { data: deductionResult, error: deductionError } = await supabaseClient
       .rpc('deduct_credits', {
-        p_user_id: user_id,
+        p_user_id: user.id,
         p_amount: 3.0,
         p_feature_used: 'company_analysis',
-        p_description: description || 'Company Analysis - Results Generated'
+        p_description: `Company analysis completed for ${analysisData.company_name} - ${analysisData.job_title}`
       })
 
     if (deductionError) {
@@ -100,7 +115,9 @@ serve(async (req) => {
         JSON.stringify({ 
           success: false, 
           error: 'Failed to deduct credits',
-          details: deductionError.message 
+          details: deductionError.message,
+          user_id: user.id,
+          analysis_id: analysis_id
         }),
         { 
           status: 500,
@@ -110,11 +127,14 @@ serve(async (req) => {
     }
 
     if (!deductionResult) {
-      console.log('Insufficient credits for user:', user_id)
+      console.log('Credit deduction failed - insufficient balance')
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Insufficient credits' 
+          error: 'Insufficient credits',
+          message: 'User does not have enough credits for this operation',
+          user_id: user.id,
+          analysis_id: analysis_id
         }),
         { 
           status: 402,
@@ -123,14 +143,17 @@ serve(async (req) => {
       )
     }
 
-    console.log('Credits deducted successfully for user:', user_id)
+    console.log('Successfully deducted 3 credits for company analysis')
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'Credits deducted successfully',
+        message: 'Credits deducted successfully for company analysis',
         credits_deducted: 3.0,
-        analysis_id: analysis_id
+        user_id: user.id,
+        user_email: user.email,
+        analysis_id: analysis_id,
+        feature_used: 'company_analysis'
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
