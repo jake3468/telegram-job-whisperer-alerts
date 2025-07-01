@@ -62,7 +62,14 @@ const LinkedInPostVariation = ({
 
   // Helper function to check if image data is valid
   const isValidImageData = (imageData: string): boolean => {
-    return imageData.startsWith('data:image/') || imageData.startsWith('http');
+    const isValid = imageData.startsWith('data:image/') || imageData.startsWith('http');
+    console.log('🔍 Image validation check:', {
+      imageDataStart: imageData.substring(0, 50),
+      isValid,
+      postId,
+      variationNumber
+    });
+    return isValid;
   };
 
   // Function to check and load existing images
@@ -85,6 +92,18 @@ const LinkedInPostVariation = ({
         }
 
         if (data && data.length > 0) {
+          console.log('🔍 Raw image data from database:', {
+            postId,
+            variationNumber,
+            records: data.map(img => ({
+              image_data_start: img.image_data.substring(0, 50),
+              image_data_length: img.image_data.length,
+              is_generating: img.image_data === 'generating...',
+              includes_failed: img.image_data.includes('failed'),
+              is_valid: isValidImageData(img.image_data)
+            }))
+          });
+
           // Check if any record is in generating state
           const hasGeneratingRecord = data.some(img => img.image_data === 'generating...');
           
@@ -97,16 +116,38 @@ const LinkedInPostVariation = ({
 
           // Remove duplicates and keep only the most recent unique valid images
           const uniqueImages = data
-            .filter(img => img.image_data.trim() && 
-                          img.image_data !== 'generating...' && 
-                          !img.image_data.includes('failed') && 
-                          isValidImageData(img.image_data))
+            .filter(img => {
+              const isValidImage = img.image_data.trim() && 
+                                 img.image_data !== 'generating...' && 
+                                 !img.image_data.includes('failed') && 
+                                 isValidImageData(img.image_data);
+              
+              console.log('🔍 Image filter check:', {
+                postId,
+                variationNumber,
+                image_data_start: img.image_data.substring(0, 50),
+                has_trim: !!img.image_data.trim(),
+                not_generating: img.image_data !== 'generating...',
+                not_failed: !img.image_data.includes('failed'),
+                is_valid_format: isValidImageData(img.image_data),
+                final_result: isValidImage
+              });
+
+              return isValidImage;
+            })
             .reduce((acc: string[], current) => {
               if (!acc.includes(current.image_data)) {
                 acc.push(current.image_data);
               }
               return acc;
             }, []);
+
+          console.log('🔍 Final processed images:', {
+            postId,
+            variationNumber,
+            unique_images_count: uniqueImages.length,
+            has_generating: hasGeneratingRecord
+          });
 
           logger.imageProcessing('existing_images_loaded', postId, variationNumber, {
             found_count: uniqueImages.length,
@@ -142,6 +183,15 @@ const LinkedInPostVariation = ({
         table: 'linkedin_post_images',
         filter: `post_id=eq.${postId}`
       }, async (payload) => {
+        console.log('🔍 Real-time update received:', {
+          postId,
+          variationNumber,
+          event_type: payload.eventType,
+          payload_variation: (payload.new as any)?.variation_number,
+          image_data_start: (payload.new as any)?.image_data?.substring(0, 50),
+          image_data_length: (payload.new as any)?.image_data?.length
+        });
+
         logger.imageProcessing('realtime_update_received', postId, variationNumber, {
           event_type: payload.eventType,
           variation_in_payload: (payload.new as any)?.variation_number || (payload.old as any)?.variation_number,
@@ -188,6 +238,15 @@ const LinkedInPostVariation = ({
               !updatedImage.image_data.includes('failed') &&
               updatedImage.image_data.trim()) {
             
+            console.log('🔍 Processing completed image:', {
+              postId,
+              variationNumber,
+              image_data_start: updatedImage.image_data.substring(0, 50),
+              image_data_length: updatedImage.image_data.length,
+              is_valid_format: isValidImageData(updatedImage.image_data),
+              current_generation_id: currentGenerationId
+            });
+            
             logger.imageProcessing('realtime_valid_image', postId, variationNumber, {
               image_type: updatedImage.image_data.substring(0, 20),
               current_generation_id: currentGenerationId,
@@ -215,9 +274,18 @@ const LinkedInPostVariation = ({
               setGeneratedImages(prev => {
                 const exists = prev.includes(updatedImage.image_data);
                 if (exists) {
+                  console.log('🔍 Duplicate image detected, not adding');
                   logger.imageProcessing('realtime_duplicate_image', postId, variationNumber);
                   return prev;
                 }
+                
+                console.log('🔍 Adding new image to state:', {
+                  postId,
+                  variationNumber,
+                  should_reset_loading: shouldResetLoadingState,
+                  previous_count: prev.length
+                });
+                
                 logger.imageProcessing('realtime_image_added', postId, variationNumber, {
                   should_reset_loading: shouldResetLoadingState
                 });
@@ -226,6 +294,8 @@ const LinkedInPostVariation = ({
               
               // Reset loading state when we receive a new image (either from active generation or existing)
               if (shouldResetLoadingState || isGeneratingState) {
+                console.log('🔍 Resetting loading state for new image');
+                
                 logger.imageProcessing('loading_state_reset_for_new_image', postId, variationNumber, {
                   generation_id: currentGenerationId,
                   image_timestamp: updatedImage.updated_at || updatedImage.created_at,
@@ -245,6 +315,12 @@ const LinkedInPostVariation = ({
                 });
               }
             } else {
+              console.log('🔍 Invalid image format detected:', {
+                postId,
+                variationNumber,
+                image_data_start: updatedImage.image_data.substring(0, 50)
+              });
+              
               logger.imageProcessing('realtime_invalid_image_format', postId, variationNumber, {
                 image_data_start: updatedImage.image_data.substring(0, 50)
               });
@@ -646,12 +722,14 @@ const LinkedInPostVariation = ({
                   alt={`Generated LinkedIn post image ${index + 1} for variation ${variationNumber}`}
                   className="w-full rounded-lg shadow-lg object-contain"
                   onLoad={() => {
+                    console.log(`🔍 Image ${index + 1} loaded successfully in UI for variation ${variationNumber}`);
                     logger.imageProcessing('image_loaded_in_ui', postId || 'unknown', variationNumber, {
                       image_index: index,
                       generation_id: currentGenerationId
                     });
                   }}
                   onError={(e) => {
+                    console.log(`🔍 Image ${index + 1} failed to load in UI for variation ${variationNumber}:`, e);
                     logger.error(`Failed to load image ${index + 1} for variation ${variationNumber}`, e);
                     if (isActuallyLoading && currentGenerationId) {
                       setIsUserLoadingImage(false);
