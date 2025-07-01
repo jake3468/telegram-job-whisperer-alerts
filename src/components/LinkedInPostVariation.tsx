@@ -228,7 +228,7 @@ const LinkedInPostVariation = ({
     }
   };
 
-  // Handle image generation - Properly calls N8N webhook via edge function
+  // Handle image generation - Fixed to properly call the linkedin-image-webhook edge function
   const handleGenerateImage = async () => {
     if (!postId) {
       toast({
@@ -245,27 +245,7 @@ const LinkedInPostVariation = ({
 
     try {
       await executeWithRetry(async () => {
-        // Step 1: Create a placeholder record first
-        console.log('📝 Creating placeholder image record...');
-        const { data: imageRecord, error: insertError } = await supabase
-          .from('linkedin_post_images')
-          .insert({
-            post_id: postId,
-            variation_number: variationNumber,
-            image_data: 'generating...'
-          })
-          .select()
-          .single();
-
-        if (insertError) {
-          console.error('❌ Error creating image record:', insertError);
-          throw new Error(`Failed to create image record: ${insertError.message}`);
-        }
-
-        console.log('✅ Placeholder image record created:', imageRecord);
-
-        // Step 2: Call the linkedin-image-webhook edge function
-        // This edge function will fetch N8N_LINKEDIN_IMAGE_WEBHOOK_URL secret and call the N8N webhook
+        // Call the linkedin-image-webhook edge function with proper parameters
         console.log('🔗 Calling linkedin-image-webhook edge function...');
         const userName = userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() : 'Professional User';
         
@@ -316,8 +296,6 @@ const LinkedInPostVariation = ({
         errorMessage = "Image generation service is not configured. Please contact support.";
       } else if (err.message.includes('Edge function execution failed')) {
         errorMessage = "Image generation service is temporarily unavailable. Please try again later.";
-      } else if (err.message.includes('Failed to create image record')) {
-        errorMessage = "Database error occurred. Please try again.";
       } else if (err.message.includes('Edge function failed')) {
         errorMessage = "Image generation service error. Please try again.";
       }
