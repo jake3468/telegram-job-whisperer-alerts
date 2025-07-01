@@ -71,10 +71,13 @@ const LinkedInPostVariation = ({
       await executeWithRetry(async () => {
         const { data, error } = await supabase
           .from('linkedin_post_images')
-          .select('image_data')
+          .select('image_data, updated_at, created_at')
           .eq('post_id', postId)
           .eq('variation_number', variationNumber)
-          .neq('image_data', 'generating...');
+          .neq('image_data', 'generating...')
+          .not('image_data', 'like', '%failed%')
+          .order('updated_at', { ascending: false, nullsFirst: false })
+          .order('created_at', { ascending: false });
 
         if (error) {
           console.error('Error loading existing images:', error);
@@ -82,9 +85,18 @@ const LinkedInPostVariation = ({
         }
 
         if (data && data.length > 0) {
-          const imageUrls = data.map(img => img.image_data).filter(img => img.trim());
-          console.log(`🖼️ Found ${imageUrls.length} existing images for variation ${variationNumber}`);
-          setGeneratedImages(imageUrls);
+          // Remove duplicates and keep only the most recent unique images
+          const uniqueImages = data
+            .filter(img => img.image_data.trim())
+            .reduce((acc: string[], current) => {
+              if (!acc.includes(current.image_data)) {
+                acc.push(current.image_data);
+              }
+              return acc;
+            }, []);
+
+          console.log(`🖼️ Found ${uniqueImages.length} existing images for variation ${variationNumber}`);
+          setGeneratedImages(uniqueImages);
         }
       }, 3, `check existing images for variation ${variationNumber}`);
     } catch (err) {
@@ -113,7 +125,7 @@ const LinkedInPostVariation = ({
       }, async (payload) => {
         console.log('📡 LinkedIn image updated via real-time:', payload);
         
-        if (payload.eventType === 'UPDATE') {
+        if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
           const updatedImage = payload.new;
           
           // Check if this update is for our specific variation
@@ -122,7 +134,7 @@ const LinkedInPostVariation = ({
             return;
           }
           
-          // Only process completed images (not 'generating...')
+          // Only process completed images (not 'generating...' or failed)
           if (updatedImage.image_data && 
               updatedImage.image_data !== 'generating...' && 
               !updatedImage.image_data.includes('failed') &&
@@ -144,7 +156,7 @@ const LinkedInPostVariation = ({
               setIsUserLoadingImage(false);
               setImageGenerationFailed(false);
               
-              // Update the existing image in the list (replace generating placeholder)
+              // Update the existing image in the list (avoid duplicates)
               setGeneratedImages(prev => {
                 const exists = prev.includes(updatedImage.image_data);
                 if (exists) {
@@ -152,7 +164,7 @@ const LinkedInPostVariation = ({
                   return prev;
                 }
                 console.log(`📡 Adding updated image to state`);
-                return [...prev, updatedImage.image_data];
+                return [updatedImage.image_data, ...prev.filter(img => img !== updatedImage.image_data)];
               });
               
               toast({
@@ -268,14 +280,6 @@ const LinkedInPostVariation = ({
       await executeWithRetry(async () => {
         console.log('🔗 Calling linkedin-image-webhook edge function...');
         const userName = userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() : 'Professional User';
-        
-        // Clean up any existing stuck records first
-        await supabase
-          .from('linkedin_post_images')
-          .delete()
-          .eq('post_id', postId)
-          .eq('variation_number', variationNumber)
-          .eq('image_data', 'generating...');
         
         const { data: webhookResponse, error: webhookError } = await supabase.functions.invoke('linkedin-image-webhook', {
           body: {
