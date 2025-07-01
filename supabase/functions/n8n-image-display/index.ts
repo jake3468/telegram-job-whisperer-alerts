@@ -22,7 +22,7 @@ serve(async (req) => {
     const body = await req.json();
     console.log('N8N Image Display webhook called with:', JSON.stringify(body, null, 2));
 
-    const { post_id, variation_number, image_data, user_name } = body;
+    const { post_id, variation_number, image_data } = body;
 
     if (!post_id || !variation_number || !image_data) {
       console.error('Missing required parameters: post_id, variation_number, or image_data');
@@ -40,13 +40,29 @@ serve(async (req) => {
 
     console.log(`Processing image display for post ${post_id}, variation ${variation_number}`);
 
+    // Store the image in the database for persistence and history
+    const { error: insertError } = await supabaseClient
+      .from('linkedin_post_images')
+      .upsert({
+        post_id: post_id,
+        variation_number: variation_number,
+        image_data: image_data
+      }, {
+        onConflict: 'post_id,variation_number',
+        ignoreDuplicates: false
+      });
+
+    if (insertError) {
+      console.error('Error storing image in database:', insertError);
+      // Continue with broadcast even if database storage fails
+    }
+
     // Create a real-time notification payload
     const notificationPayload = {
       type: 'linkedin_image_ready',
       post_id: post_id,
       variation_number: variation_number,
       image_data: image_data,
-      user_name: user_name || 'User',
       timestamp: new Date().toISOString()
     };
 
@@ -68,7 +84,7 @@ serve(async (req) => {
         success: true, 
         message: 'Image display notification sent successfully',
         channel: channelName,
-        payload: notificationPayload
+        stored_in_db: !insertError
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 

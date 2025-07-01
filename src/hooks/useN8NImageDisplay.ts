@@ -8,13 +8,22 @@ interface N8NImagePayload {
   post_id: string;
   variation_number: number;
   image_data: string;
-  user_name: string;
   timestamp: string;
 }
 
-export const useN8NImageDisplay = (postId: string, variationNumber: number) => {
+interface UseN8NImageDisplayReturn {
+  n8nImages: string[];
+  resetLoadingState: () => void;
+}
+
+export const useN8NImageDisplay = (postId: string, variationNumber: number): UseN8NImageDisplayReturn => {
   const [n8nImages, setN8nImages] = useState<string[]>([]);
   const { toast } = useToast();
+
+  const resetLoadingState = () => {
+    // This will be called from the component to reset button state
+    console.log(`🔄 Resetting loading state for variation ${variationNumber}`);
+  };
 
   useEffect(() => {
     if (!postId) return;
@@ -43,7 +52,7 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number) => {
           });
 
           toast({
-            title: "Image Ready from N8N!",
+            title: "Image Ready!",
             description: `LinkedIn post image for variation ${variationNumber} is now available.`
           });
         }
@@ -58,5 +67,5 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number) => {
     };
   }, [postId, variationNumber, toast]);
 
-  return { n8nImages };
+  return { n8nImages, resetLoadingState };
 };

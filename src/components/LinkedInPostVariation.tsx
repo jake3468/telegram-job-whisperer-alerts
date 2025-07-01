@@ -55,12 +55,12 @@ const LinkedInPostVariation = ({
 
   // Reset loading state when N8N images arrive
   useEffect(() => {
-    if (n8nImages.length > 0 && isLoadingImage) {
+    if (n8nImages.length > 0) {
       console.log(`🎯 N8N images detected, resetting loading state for variation ${variationNumber}`);
       setIsLoadingImage(false);
       setImageGenerationFailed(false);
     }
-  }, [n8nImages.length, isLoadingImage, variationNumber]);
+  }, [n8nImages.length, variationNumber]);
 
   // Function to check and load existing images
   const checkAndLoadExistingImages = async () => {
@@ -72,8 +72,7 @@ const LinkedInPostVariation = ({
           .from('linkedin_post_images')
           .select('image_data')
           .eq('post_id', postId)
-          .eq('variation_number', variationNumber)
-          .neq('image_data', 'generating...');
+          .eq('variation_number', variationNumber);
 
         if (error) {
           console.error('Error loading existing images:', error);
@@ -85,7 +84,7 @@ const LinkedInPostVariation = ({
           console.log(`🖼️ Found ${imageUrls.length} existing images for variation ${variationNumber}`);
           setGeneratedImages(imageUrls);
           
-          // CRITICAL: Reset loading states when images are found
+          // Reset loading states when images are found
           console.log(`🔄 Resetting loading states after finding images for variation ${variationNumber}`);
           setIsLoadingImage(false);
           setImageGenerationFailed(false);
@@ -282,7 +281,7 @@ const LinkedInPostVariation = ({
     }
   };
 
-  // Handle image generation - Simplified since N8N will handle display
+  // Handle image generation
   const handleGenerateImage = async () => {
     if (!postId) {
       toast({
@@ -301,7 +300,6 @@ const LinkedInPostVariation = ({
     try {
       await executeWithRetry(async () => {
         console.log('🔗 Calling linkedin-image-webhook edge function...');
-        const userName = userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() : 'Professional User';
         
         const { data: webhookResponse, error: webhookError } = await supabase.functions.invoke('linkedin-image-webhook', {
           body: {
@@ -309,7 +307,6 @@ const LinkedInPostVariation = ({
             post_heading: heading,
             post_content: content,
             variation_number: variationNumber,
-            user_name: userName,
             source: 'linkedin_post_variation'
           }
         });
@@ -377,6 +374,7 @@ const LinkedInPostVariation = ({
         }
       }, 3, `delete image for variation ${variationNumber}`);
 
+      // Remove from both state arrays
       setGeneratedImages(prev => prev.filter(img => img !== imageData));
       
       toast({
