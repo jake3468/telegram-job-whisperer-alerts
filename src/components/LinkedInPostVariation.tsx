@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Copy, ImageIcon, Loader2, Trash2 } from 'lucide-react';
@@ -52,7 +51,8 @@ const LinkedInPostVariation = ({
     setImageGenerationFailed(false);
   });
 
-  const allImages = [...generatedImages, ...n8nImages];
+  // Combine and deduplicate images - ensure each unique image appears only once
+  const allImages = [...new Set([...generatedImages, ...n8nImages])];
 
   const checkAndLoadExistingImages = async () => {
     if (!postId || !isAuthReady) return;
@@ -72,7 +72,10 @@ const LinkedInPostVariation = ({
         if (data && data.length > 0) {
           const imageUrls = data
             .map(img => img.image_data)
-            .filter(imageData => imageData && imageData !== 'generating...' && !imageData.includes('failed'));
+            .filter(imageData => imageData && 
+                   imageData !== 'generating...' && 
+                   !imageData.includes('failed') &&
+                   (imageData.startsWith('data:image/') || imageData.startsWith('http')));
           
           if (imageUrls.length > 0) {
             setGeneratedImages(imageUrls);
@@ -124,8 +127,8 @@ const LinkedInPostVariation = ({
               setImageGenerationFailed(false);
               
               setGeneratedImages(prev => {
-                const exists = prev.includes(newImage.image_data);
-                if (exists) {
+                // Only add if not already present
+                if (prev.includes(newImage.image_data)) {
                   return prev;
                 }
                 return [...prev, newImage.image_data];
@@ -372,17 +375,15 @@ const LinkedInPostVariation = ({
         </div>
       )}
 
-      {/* Generated Images */}
+      {/* Generated Images - Now deduplicated */}
       {allImages.length > 0 && (
         <div className="mb-8">
           <h5 className="text-cyan-400 font-medium text-sm mb-4 text-center">
             Generated Images for Variation {variationNumber} ({allImages.length}):
-            {n8nImages.length > 0 && <span className="text-green-400 ml-2">✨ N8N: {n8nImages.length}</span>}
-            {generatedImages.length > 0 && <span className="text-blue-400 ml-2">📦 DB: {generatedImages.length}</span>}
           </h5>
           <div className="space-y-6">
             {allImages.map((imageData, index) => (
-              <div key={index} className="relative w-full max-w-2xl mx-auto">
+              <div key={`${imageData}-${index}`} className="relative w-full max-w-2xl mx-auto">
                 <img 
                   src={imageData} 
                   alt={`Generated LinkedIn post image ${index + 1} for variation ${variationNumber}`}
