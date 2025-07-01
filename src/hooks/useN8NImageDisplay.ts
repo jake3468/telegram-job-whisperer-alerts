@@ -10,6 +10,7 @@ interface N8NImagePayload {
   image_data: string;
   user_name: string;
   timestamp: string;
+  updated_existing?: boolean;
 }
 
 export const useN8NImageDisplay = (postId: string, variationNumber: number) => {
@@ -30,8 +31,10 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number) => {
         const imagePayload = payload.payload as N8NImagePayload;
         
         if (imagePayload.post_id === postId && imagePayload.variation_number === variationNumber) {
-          console.log(`🎯 Adding N8N image for variation ${variationNumber}`);
+          console.log(`🎯 Processing N8N image for variation ${variationNumber}`);
           
+          // Only add to local state if it's not already there
+          // The database update is handled by the n8n-image-display function
           setN8nImages(prev => {
             const exists = prev.includes(imagePayload.image_data);
             if (exists) {

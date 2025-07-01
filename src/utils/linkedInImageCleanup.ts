@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 /**
@@ -57,6 +56,53 @@ export const cleanupStuckLinkedInImageForVariation = async (postId: string, vari
     return true;
   } catch (error) {
     console.error('Exception cleaning up stuck LinkedIn image for variation:', error);
+    return false;
+  }
+};
+
+/**
+ * Remove duplicate images for a specific post and variation
+ * Keeps only the most recent non-generating record
+ */
+export const removeDuplicateLinkedInImages = async (postId: string, variationNumber: number) => {
+  try {
+    // Get all records for this post and variation
+    const { data: allRecords, error: fetchError } = await supabase
+      .from('linkedin_post_images')
+      .select('id, created_at, image_data')
+      .eq('post_id', postId)
+      .eq('variation_number', variationNumber)
+      .neq('image_data', 'generating...')
+      .order('created_at', { ascending: false });
+
+    if (fetchError) {
+      console.error('Error fetching duplicate records:', fetchError);
+      return false;
+    }
+
+    if (!allRecords || allRecords.length <= 1) {
+      console.log('No duplicates found to clean up');
+      return true;
+    }
+
+    // Keep the most recent record, delete the rest
+    const recordsToDelete = allRecords.slice(1);
+    const idsToDelete = recordsToDelete.map(record => record.id);
+
+    const { error: deleteError } = await supabase
+      .from('linkedin_post_images')
+      .delete()
+      .in('id', idsToDelete);
+
+    if (deleteError) {
+      console.error('Error deleting duplicate records:', deleteError);
+      return false;
+    }
+
+    console.log(`🧹 Removed ${recordsToDelete.length} duplicate LinkedIn image records for post ${postId}, variation ${variationNumber}`);
+    return true;
+  } catch (error) {
+    console.error('Exception removing duplicate LinkedIn images:', error);
     return false;
   }
 };

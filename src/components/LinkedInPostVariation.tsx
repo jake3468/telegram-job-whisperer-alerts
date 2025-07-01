@@ -97,7 +97,7 @@ const LinkedInPostVariation = ({
     checkAndLoadExistingImages();
   }, [checkAndLoadExistingImages]);
 
-  // Real-time subscription for image updates
+  // Real-time subscription for image updates from the database
   useEffect(() => {
     if (!postId || !isAuthReady) return;
 
@@ -113,29 +113,29 @@ const LinkedInPostVariation = ({
       }, async (payload) => {
         console.log('📡 LinkedIn image updated via real-time:', payload);
         
-        if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
-          const newImage = payload.new;
+        if (payload.eventType === 'UPDATE') {
+          const updatedImage = payload.new;
           
           // Check if this update is for our specific variation
-          if (newImage.variation_number !== variationNumber) {
-            console.log(`📡 Ignoring image for variation ${newImage.variation_number}, expecting ${variationNumber}`);
+          if (updatedImage.variation_number !== variationNumber) {
+            console.log(`📡 Ignoring image for variation ${updatedImage.variation_number}, expecting ${variationNumber}`);
             return;
           }
           
           // Only process completed images (not 'generating...')
-          if (newImage.image_data && 
-              newImage.image_data !== 'generating...' && 
-              !newImage.image_data.includes('failed') &&
-              newImage.image_data.trim()) {
+          if (updatedImage.image_data && 
+              updatedImage.image_data !== 'generating...' && 
+              !updatedImage.image_data.includes('failed') &&
+              updatedImage.image_data.trim()) {
             
             console.log(`✅ Image generation completed for variation ${variationNumber}`);
             
             // Enhanced validation for base64 images
-            const isValidBase64Image = newImage.image_data.startsWith('data:image/') && 
-                                     newImage.image_data.includes('base64,') &&
-                                     newImage.image_data.length > 5000;
+            const isValidBase64Image = updatedImage.image_data.startsWith('data:image/') && 
+                                     updatedImage.image_data.includes('base64,') &&
+                                     updatedImage.image_data.length > 5000;
             
-            const isValidUrl = newImage.image_data.startsWith('http');
+            const isValidUrl = updatedImage.image_data.startsWith('http');
             
             if (isValidBase64Image || isValidUrl) {
               console.log(`📡 Valid image detected, updating state for variation ${variationNumber}`);
@@ -144,15 +144,15 @@ const LinkedInPostVariation = ({
               setIsUserLoadingImage(false);
               setImageGenerationFailed(false);
               
-              // Add the new image to the list if it's not already there
+              // Update the existing image in the list (replace generating placeholder)
               setGeneratedImages(prev => {
-                const exists = prev.includes(newImage.image_data);
+                const exists = prev.includes(updatedImage.image_data);
                 if (exists) {
                   console.log(`📡 Image already exists in state`);
                   return prev;
                 }
-                console.log(`📡 Adding new image to state`);
-                return [...prev, newImage.image_data];
+                console.log(`📡 Adding updated image to state`);
+                return [...prev, updatedImage.image_data];
               });
               
               toast({
@@ -165,7 +165,7 @@ const LinkedInPostVariation = ({
               setImageGenerationFailed(true);
             }
           } 
-          else if (newImage.image_data && newImage.image_data.includes('failed')) {
+          else if (updatedImage.image_data && updatedImage.image_data.includes('failed')) {
             console.log(`❌ Image generation failed for variation ${variationNumber}`);
             setIsUserLoadingImage(false);
             setImageGenerationFailed(true);

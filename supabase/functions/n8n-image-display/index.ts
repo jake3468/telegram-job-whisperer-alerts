@@ -40,6 +40,64 @@ serve(async (req) => {
 
     console.log(`Processing image display for post ${post_id}, variation ${variation_number}`);
 
+    // First, update the existing 'generating...' record with the actual image data
+    const { data: updateResult, error: updateError } = await supabaseClient
+      .from('linkedin_post_images')
+      .update({ 
+        image_data: image_data 
+      })
+      .eq('post_id', post_id)
+      .eq('variation_number', variation_number)
+      .eq('image_data', 'generating...')
+      .select();
+
+    if (updateError) {
+      console.error('Error updating existing record:', updateError);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Failed to update existing record: ' + updateError.message 
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    // Check if we actually updated a record
+    if (!updateResult || updateResult.length === 0) {
+      console.log('No existing generating record found, creating new record');
+      
+      // If no existing record was found, create a new one
+      const { data: insertResult, error: insertError } = await supabaseClient
+        .from('linkedin_post_images')
+        .insert({
+          post_id: post_id,
+          variation_number: variation_number,
+          image_data: image_data
+        })
+        .select();
+
+      if (insertError) {
+        console.error('Error creating new record:', insertError);
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: 'Failed to create new record: ' + insertError.message 
+          }),
+          { 
+            status: 500, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+
+      console.log('Created new record:', insertResult);
+    } else {
+      console.log('Updated existing record:', updateResult);
+    }
+
     // Create a real-time notification payload
     const notificationPayload = {
       type: 'linkedin_image_ready',
@@ -47,7 +105,8 @@ serve(async (req) => {
       variation_number: variation_number,
       image_data: image_data,
       user_name: user_name || 'User',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      updated_existing: updateResult && updateResult.length > 0
     };
 
     // Send real-time notification to the specific channel
@@ -66,8 +125,9 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'Image display notification sent successfully',
+        message: 'Image processed and updated successfully',
         channel: channelName,
+        updated_existing: updateResult && updateResult.length > 0,
         payload: notificationPayload
       }),
       { 
