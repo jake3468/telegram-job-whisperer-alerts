@@ -29,7 +29,7 @@ export function useFeatureCreditCheck({
   const requiredCredits = FEATURE_CREDITS[feature];
   const { hasCredits, isLoading, showInsufficientCreditsPopup } = useCreditCheck(requiredCredits);
 
-  // For JOB_ANALYSIS, we only check credits but don't deduct (N8N handles deduction)
+  // For JOB_ANALYSIS and COMPANY_ROLE_ANALYSIS, we only check credits but don't deduct (N8N handles deduction)
   const checkCreditsOnly = async (): Promise<boolean> => {
     // If feature is free (JOB_ALERT), always allow
     if (requiredCredits === 0) {
@@ -43,8 +43,8 @@ export function useFeatureCreditCheck({
       return false;
     }
 
-    // For job analysis, just check credits but don't deduct
-    if (feature === 'JOB_ANALYSIS') {
+    // For job analysis and company analysis, just check credits but don't deduct
+    if (feature === 'JOB_ANALYSIS' || feature === 'COMPANY_ROLE_ANALYSIS') {
       onSuccess?.();
       return true;
     }
@@ -58,7 +58,7 @@ export function useFeatureCreditCheck({
     hasCredits,
     requiredCredits,
     isLoading,
-    isDeducting: false, // No longer deducting in frontend for job analysis
+    isDeducting: false, // No longer deducting in frontend for job analysis and company analysis
     checkAndDeductCredits: checkCreditsOnly,
     showInsufficientCreditsPopup
   };
