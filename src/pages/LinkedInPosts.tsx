@@ -92,12 +92,12 @@ const LinkedInPosts = () => {
 
   const areAllPostsReady = (data: LinkedInPostData) => {
     return Boolean(
-      data.post_heading_1 && data.post_heading_1.trim() &&
-      data.post_content_1 && data.post_content_1.trim() && 
-      data.post_heading_2 && data.post_heading_2.trim() &&
-      data.post_content_2 && data.post_content_2.trim() && 
-      data.post_heading_3 && data.post_heading_3.trim() &&
-      data.post_content_3 && data.post_content_3.trim()
+      data.post_heading_1 && data.post_heading_1.trim() !== '' &&
+      data.post_content_1 && data.post_content_1.trim() !== '' && 
+      data.post_heading_2 && data.post_heading_2.trim() !== '' &&
+      data.post_content_2 && data.post_content_2.trim() !== '' && 
+      data.post_heading_3 && data.post_heading_3.trim() !== '' &&
+      data.post_content_3 && data.post_content_3.trim() !== ''
     );
   };
 
@@ -146,6 +146,7 @@ const LinkedInPosts = () => {
           
           setPostsData(linkedInPostData);
           
+          // Check if all posts are ready and stop loading
           if (areAllPostsReady(linkedInPostData)) {
             setIsGenerating(false);
             toast({
@@ -175,6 +176,7 @@ const LinkedInPosts = () => {
             .single();
           
           if (error) {
+            console.error('Error fetching existing post data:', error);
             return;
           }
           
@@ -190,13 +192,17 @@ const LinkedInPosts = () => {
             
             setPostsData(linkedInPostData);
             
+            // Check if all posts are ready and stop loading immediately
             if (areAllPostsReady(linkedInPostData)) {
               setIsGenerating(false);
+              console.log('All posts are ready, stopping loading state');
+            } else {
+              console.log('Posts not yet complete:', linkedInPostData);
             }
           }
         }, 1, 'check existing post data');
       } catch (err) {
-        // Silent fail for existing data check
+        console.error('Error checking existing data:', err);
       }
     };
 
