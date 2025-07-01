@@ -66,6 +66,29 @@ const InterviewPrep = () => {
     retry: 2
   });
 
+  // Function to properly parse interview questions from JSONB
+  const parseInterviewQuestions = (data: any): string | null => {
+    if (!data) return null;
+    
+    try {
+      // If it's already a string, return it
+      if (typeof data === 'string') {
+        return data.trim().length > 0 ? data : null;
+      }
+      
+      // If it's an object, stringify it and check if it's not empty
+      if (typeof data === 'object') {
+        const stringified = JSON.stringify(data);
+        return stringified !== '{}' && stringified !== 'null' ? stringified : null;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error parsing interview questions:', error);
+      return null;
+    }
+  };
+
   // Function to check for existing completed results on mount
   const checkForExistingResults = async () => {
     if (!currentAnalysis?.id || !isAuthReady) return;
@@ -93,11 +116,9 @@ const InterviewPrep = () => {
 
       if (result?.interview_questions) {
         console.log('✅ Found existing completed results');
-        const parsedData = typeof result.interview_questions === 'string' 
-          ? result.interview_questions 
-          : JSON.stringify(result.interview_questions);
+        const parsedData = parseInterviewQuestions(result.interview_questions);
         
-        if (parsedData && parsedData.trim().length > 0) {
+        if (parsedData) {
           setInterviewData(parsedData);
           setIsGenerating(false);
           
@@ -136,26 +157,17 @@ const InterviewPrep = () => {
         console.log('📡 Interview prep updated via real-time:', payload);
         
         if (payload.new && payload.new.interview_questions) {
-          try {
-            let parsedData = payload.new.interview_questions;
+          const parsedData = parseInterviewQuestions(payload.new.interview_questions);
+          
+          if (parsedData) {
+            console.log('✅ Setting interview data from real-time update');
+            setInterviewData(parsedData);
+            setIsGenerating(false);
             
-            // Handle different data types properly
-            if (typeof parsedData === 'object') {
-              parsedData = JSON.stringify(parsedData);
-            }
-            
-            if (parsedData && parsedData.trim().length > 0) {
-              console.log('✅ Setting interview data from real-time update');
-              setInterviewData(parsedData);
-              setIsGenerating(false);
-              
-              toast({
-                title: "Interview Prep Ready!",
-                description: "Your personalized interview questions have been generated."
-              });
-            }
-          } catch (error) {
-            console.error('❌ Error processing real-time interview questions:', error);
+            toast({
+              title: "Interview Prep Ready!",
+              description: "Your personalized interview questions have been generated."
+            });
           }
         }
       })
@@ -343,8 +355,22 @@ const InterviewPrep = () => {
   const renderInterviewQuestions = (content: string) => {
     if (!content) return null;
 
+    // Parse the content if it's JSON
+    let displayContent = content;
+    try {
+      const parsed = JSON.parse(content);
+      if (typeof parsed === 'object' && parsed.content) {
+        displayContent = parsed.content;
+      } else if (typeof parsed === 'string') {
+        displayContent = parsed;
+      }
+    } catch (e) {
+      // If it's not JSON, use as is
+      displayContent = content;
+    }
+
     // Simple markdown parsing with smaller text sizes
-    const processedContent = content
+    const processedContent = displayContent
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
       .replace(/^# (.*$)/gim, '<h1 style="font-size: 1.125rem; font-weight: bold; margin: 0.75rem 0; color: #1e40af;">$1</h1>') // H1 headers - smaller
       .replace(/^## (.*$)/gim, '<h2 style="font-size: 1rem; font-weight: bold; margin: 0.5rem 0; color: #2563eb;">$1</h2>') // H2 headers - smaller
