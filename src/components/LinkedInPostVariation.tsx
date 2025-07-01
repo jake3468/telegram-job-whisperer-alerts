@@ -47,48 +47,46 @@ const LinkedInPostVariation = ({
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
 
-  // Load existing images for this variation
+  // Function to check and load existing images
+  const checkAndLoadExistingImages = async () => {
+    if (!postId || !isAuthReady) return;
+
+    try {
+      await executeWithRetry(async () => {
+        const { data, error } = await supabase
+          .from('linkedin_post_images')
+          .select('image_data')
+          .eq('post_id', postId)
+          .eq('variation_number', variationNumber)
+          .neq('image_data', 'generating...');
+
+        if (error) {
+          console.error('Error loading existing images:', error);
+          return;
+        }
+
+        if (data && data.length > 0) {
+          const imageUrls = data.map(img => img.image_data);
+          console.log(`🖼️ Found ${imageUrls.length} existing images for variation ${variationNumber}`);
+          setGeneratedImages(imageUrls);
+          
+          // CRITICAL: Reset loading states when images are found
+          console.log(`🔄 Resetting loading states after finding images for variation ${variationNumber}`);
+          setIsLoadingImage(false);
+          setImageGenerationFailed(false);
+        }
+      }, 3, `check existing images for variation ${variationNumber}`);
+    } catch (err) {
+      console.error('Error checking existing images:', err);
+    }
+  };
+
+  // Load existing images on component mount
   useEffect(() => {
-    const loadExistingImages = async () => {
-      if (!postId || !isAuthReady) return;
-
-      try {
-        await executeWithRetry(async () => {
-          const { data, error } = await supabase
-            .from('linkedin_post_images')
-            .select('image_data')
-            .eq('post_id', postId)
-            .eq('variation_number', variationNumber)
-            .neq('image_data', 'generating...');
-
-          if (error) {
-            console.error('Error loading existing images:', error);
-            return;
-          }
-
-          if (data && data.length > 0) {
-            const imageUrls = data.map(img => img.image_data);
-            console.log(`🖼️ Loaded ${imageUrls.length} existing images for variation ${variationNumber}`);
-            setGeneratedImages(imageUrls);
-            
-            // CRITICAL: Always reset loading states when images are found
-            console.log(`🔄 Resetting loading states after finding existing images for variation ${variationNumber}`);
-            setIsLoadingImage(false);
-            setImageGenerationFailed(false);
-          }
-        }, 3, `load existing images for variation ${variationNumber}`);
-      } catch (err) {
-        console.error('Error loading existing images:', err);
-        // Reset loading state even on error
-        setIsLoadingImage(false);
-        setImageGenerationFailed(true);
-      }
-    };
-
-    loadExistingImages();
+    checkAndLoadExistingImages();
   }, [postId, variationNumber, isAuthReady, executeWithRetry]);
 
-  // Real-time subscription for image updates - FIXED with proper state management
+  // Real-time subscription for image updates
   useEffect(() => {
     if (!postId || !isAuthReady) return;
 
@@ -122,7 +120,6 @@ const LinkedInPostVariation = ({
                    newImage.image_data !== 'generating...' && 
                    !newImage.image_data.includes('failed')) {
             console.log(`✅ Image generation completed for variation ${variationNumber}`);
-            console.log(`🖼️ New image data received (length: ${newImage.image_data.length})`);
             
             // Enhanced validation for base64 images
             const isValidBase64Image = newImage.image_data.startsWith('data:image/') && 
@@ -135,7 +132,6 @@ const LinkedInPostVariation = ({
               console.log(`📡 Valid image detected, updating state for variation ${variationNumber}`);
               
               // CRITICAL: Reset loading states FIRST before updating images
-              console.log(`🔄 Resetting loading states for variation ${variationNumber}`);
               setIsLoadingImage(false);
               setImageGenerationFailed(false);
               
@@ -187,47 +183,21 @@ const LinkedInPostVariation = ({
     };
   }, [postId, variationNumber, isAuthReady, toast]);
 
-  // Periodic check for images to handle cases where real-time doesn't work
+  // Periodic check for images - enhanced to check immediately after loading starts
   useEffect(() => {
     if (!postId || !isAuthReady || !isLoadingImage) return;
 
+    // Check immediately first
+    checkAndLoadExistingImages();
+
+    // Then set up periodic check
     const intervalId = setInterval(async () => {
       console.log(`🔍 Periodic check for images - variation ${variationNumber}`);
-      
-      try {
-        const { data, error } = await supabase
-          .from('linkedin_post_images')
-          .select('image_data')
-          .eq('post_id', postId)
-          .eq('variation_number', variationNumber)
-          .neq('image_data', 'generating...');
-
-        if (error) {
-          console.error('Error in periodic check:', error);
-          return;
-        }
-
-        if (data && data.length > 0) {
-          const imageUrls = data.map(img => img.image_data);
-          console.log(`🔍 Periodic check found ${imageUrls.length} images for variation ${variationNumber}`);
-          
-          // Reset loading state and update images
-          setIsLoadingImage(false);
-          setImageGenerationFailed(false);
-          setGeneratedImages(imageUrls);
-          
-          toast({
-            title: "Image Generated!",
-            description: `LinkedIn post image for variation ${variationNumber} is ready.`
-          });
-        }
-      } catch (err) {
-        console.error('Error in periodic check:', err);
-      }
-    }, 5000); // Check every 5 seconds
+      await checkAndLoadExistingImages();
+    }, 3000); // Check every 3 seconds
 
     return () => clearInterval(intervalId);
-  }, [postId, variationNumber, isAuthReady, isLoadingImage, toast]);
+  }, [postId, variationNumber, isAuthReady, isLoadingImage]);
 
   // Add timeout mechanism to reset loading state after 3 minutes
   useEffect(() => {
@@ -297,7 +267,7 @@ const LinkedInPostVariation = ({
     }
   };
 
-  // Handle image generation - Enhanced logging for debugging
+  // Handle image generation - Enhanced with immediate state check
   const handleGenerateImage = async () => {
     if (!postId) {
       toast({
@@ -310,7 +280,7 @@ const LinkedInPostVariation = ({
 
     console.log(`🚀 Starting image generation for post ${postId}, variation ${variationNumber}`);
     
-    // CRITICAL: Reset states before starting generation
+    // Reset states before starting generation
     setIsLoadingImage(true);
     setImageGenerationFailed(false);
 
@@ -347,13 +317,19 @@ const LinkedInPostVariation = ({
           }
         }
 
-        console.log('🎉 Image generation webhook triggered successfully via edge function');
+        console.log('🎉 Image generation request sent successfully');
+
+        // CRITICAL: Immediately check for existing images after successful webhook call
+        console.log('🔍 Checking for existing images immediately after webhook call...');
+        setTimeout(() => {
+          checkAndLoadExistingImages();
+        }, 1000); // Wait 1 second then check
 
       }, 3, `generate image for variation ${variationNumber}`);
       
       toast({
         title: "Image Generation Started",
-        description: "Your LinkedIn post image is being generated. This may take up to 2 minutes."
+        description: "Your LinkedIn post image is being generated. Please wait..."
       });
 
     } catch (err: any) {
@@ -450,7 +426,7 @@ const LinkedInPostVariation = ({
         </div>
       </div>
 
-      {/* Loading indicator */}
+      {/* Loading indicator - only show when loading and no images exist */}
       {isLoadingImage && generatedImages.length === 0 && (
         <div className="p-4 bg-blue-50 rounded-lg text-center border border-blue-200 mb-6">
           <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading for variation {variationNumber}...</div>
@@ -458,7 +434,7 @@ const LinkedInPostVariation = ({
         </div>
       )}
 
-      {/* Failed generation indicator */}
+      {/* Failed generation indicator - only show when failed and no images exist */}
       {imageGenerationFailed && generatedImages.length === 0 && (
         <div className="p-4 bg-red-50 rounded-lg text-center border border-red-200 mb-6">
           <div className="text-sm text-red-600 font-medium">Image generation failed for variation {variationNumber}</div>
