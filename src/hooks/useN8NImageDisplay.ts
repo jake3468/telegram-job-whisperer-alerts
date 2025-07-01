@@ -21,30 +21,37 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number, onIm
   const [n8nImages, setN8nImages] = useState<string[]>([]);
   const [pollingAttempts, setPollingAttempts] = useState(0);
   const [lastPollTime, setLastPollTime] = useState(0);
+  const [consecutiveFailures, setConsecutiveFailures] = useState(0);
   const { toast } = useToast();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
 
   const resetLoadingState = () => {
-    console.log(`🔄 Resetting loading state for variation ${variationNumber}`);
     if (onImageReceived) {
       onImageReceived();
     }
   };
 
-  // Controlled polling with exponential backoff
+  // Controlled polling with exponential backoff and circuit breaker
   const pollForImages = async () => {
     if (!postId || !isAuthReady) return;
 
-    // Prevent excessive polling - max 10 attempts with exponential backoff
-    if (pollingAttempts >= 10) {
-      console.log(`🛑 Max polling attempts reached for variation ${variationNumber}`);
+    // Circuit breaker - stop polling after 5 consecutive failures
+    if (consecutiveFailures >= 5) {
       return;
     }
 
-    // Prevent too frequent polling
+    // Max 8 polling attempts with longer intervals
+    if (pollingAttempts >= 8) {
+      return;
+    }
+
+    // Exponential backoff: 5s, 7s, 10s, 15s, 22s, 30s...
     const now = Date.now();
-    const minInterval = Math.min(5000 * Math.pow(1.5, pollingAttempts), 30000); // 5s to 30s max
-    if (now - lastPollTime < minInterval) {
+    const baseInterval = 5000;
+    const backoffMultiplier = Math.pow(1.5, pollingAttempts);
+    const interval = Math.min(baseInterval * backoffMultiplier, 30000);
+    
+    if (now - lastPollTime < interval) {
       return;
     }
 
@@ -60,31 +67,30 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number, onIm
           .eq('variation_number', variationNumber);
 
         if (error) {
-          console.error('Error polling for images:', error);
+          setConsecutiveFailures(prev => prev + 1);
           return;
         }
 
         if (data && data.length > 0) {
           const imageUrls = data.map(img => img.image_data);
-          console.log(`📡 Found ${imageUrls.length} images via polling for variation ${variationNumber}`);
           
           setN8nImages(prev => {
             const newImages = imageUrls.filter(url => !prev.includes(url));
             if (newImages.length > 0) {
-              console.log(`📡 Adding ${newImages.length} new images via polling`);
               if (onImageReceived) {
                 onImageReceived();
               }
-              // Reset polling attempts when successful
+              // Reset on success
               setPollingAttempts(0);
+              setConsecutiveFailures(0);
               return [...prev, ...newImages];
             }
             return prev;
           });
         }
-      }, 2, `poll for images variation ${variationNumber}`);
+      }, 1, `poll for images variation ${variationNumber}`);
     } catch (err) {
-      console.error('Error in polling for images:', err);
+      setConsecutiveFailures(prev => prev + 1);
     }
   };
 
@@ -92,35 +98,27 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number, onIm
     if (!postId || !isAuthReady) return;
 
     const channelName = `linkedin-image-display-${postId}-${variationNumber}`;
-    console.log(`🎯 Setting up image listener for channel: ${channelName}`);
 
     const channel = supabase
       .channel(channelName)
       .on('broadcast', { event: 'image_ready' }, (payload) => {
-        console.log('🎯 Image received via broadcast:', payload);
-        
         const imagePayload = payload.payload as N8NImagePayload;
         
         if (imagePayload.post_id === postId && imagePayload.variation_number === variationNumber) {
-          console.log(`🎯 Adding image for variation ${variationNumber}`);
-          
           setN8nImages(prev => {
             const exists = prev.includes(imagePayload.image_data);
             if (exists) {
-              console.log('🎯 Image already exists in state');
               return prev;
             }
-            console.log('🎯 Adding new image to state');
             return [...prev, imagePayload.image_data];
           });
 
-          // Reset loading state when image is received
           if (onImageReceived) {
             onImageReceived();
           }
 
-          // Reset polling attempts on successful broadcast
           setPollingAttempts(0);
+          setConsecutiveFailures(0);
 
           toast({
             title: "Image Ready!",
@@ -129,39 +127,30 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number, onIm
         }
       })
       .subscribe((status) => {
-        console.log(`🎯 Image channel subscription status for variation ${variationNumber}:`, status);
-        
-        // If subscription succeeds, do initial poll
         if (status === 'SUBSCRIBED') {
-          console.log('✅ Real-time subscription active, doing initial poll');
-          setTimeout(() => pollForImages(), 1000); // Small delay for initial poll
+          // Single initial poll after successful subscription
+          setTimeout(() => pollForImages(), 2000);
         }
         
-        // If subscription fails, start controlled polling as fallback
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
-          console.log('🔄 Real-time failed, starting controlled polling fallback');
-          
-          // Start controlled polling with exponential backoff
+          // Start limited polling as fallback
           const pollInterval = setInterval(() => {
             pollForImages();
-          }, 8000); // Start with 8 second intervals
+          }, 10000);
           
-          // Clean up polling after 5 minutes
+          // Stop polling after 3 minutes
           setTimeout(() => {
             clearInterval(pollInterval);
-            console.log(`⏰ Stopping polling for variation ${variationNumber} after timeout`);
-          }, 300000); // 5 minutes
+          }, 180000);
           
-          // Clean up polling when component unmounts
           return () => clearInterval(pollInterval);
         }
       });
 
-    // Clean up function
     return () => {
-      console.log(`🧹 Cleaning up image listener for variation ${variationNumber}`);
       supabase.removeChannel(channel);
       setPollingAttempts(0);
+      setConsecutiveFailures(0);
     };
   }, [postId, variationNumber, toast, onImageReceived, isAuthReady, executeWithRetry]);
 

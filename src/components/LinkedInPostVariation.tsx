@@ -47,26 +47,20 @@ const LinkedInPostVariation = ({
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
 
-  // Add image display hook with callback to reset loading state
   const { n8nImages } = useN8NImageDisplay(postId || '', variationNumber, () => {
-    console.log(`🎯 Image received, resetting loading state for variation ${variationNumber}`);
     setIsLoadingImage(false);
     setImageGenerationFailed(false);
   });
 
-  // Combine both regular images and N8N images
   const allImages = [...generatedImages, ...n8nImages];
 
-  // Reset loading state when N8N images arrive
   useEffect(() => {
     if (n8nImages.length > 0) {
-      console.log(`🎯 Images detected, resetting loading state for variation ${variationNumber}`);
       setIsLoadingImage(false);
       setImageGenerationFailed(false);
     }
   }, [n8nImages.length, variationNumber]);
 
-  // Function to check and load existing images with controlled frequency
   const checkAndLoadExistingImages = async () => {
     if (!postId || !isAuthReady) return;
 
@@ -79,36 +73,27 @@ const LinkedInPostVariation = ({
           .eq('variation_number', variationNumber);
 
         if (error) {
-          console.error('Error loading existing images:', error);
           return;
         }
 
         if (data && data.length > 0) {
           const imageUrls = data.map(img => img.image_data);
-          console.log(`🖼️ Found ${imageUrls.length} existing images for variation ${variationNumber}`);
           setGeneratedImages(imageUrls);
-          
-          // Reset loading states when images are found
-          console.log(`🔄 Resetting loading states after finding images for variation ${variationNumber}`);
           setIsLoadingImage(false);
           setImageGenerationFailed(false);
         }
-      }, 2, `check existing images for variation ${variationNumber}`);
+      }, 1, `check existing images for variation ${variationNumber}`);
     } catch (err) {
-      console.error('Error checking existing images:', err);
+      // Silent fail for existing image check
     }
   };
 
-  // Load existing images on component mount only
   useEffect(() => {
     checkAndLoadExistingImages();
   }, [postId, variationNumber, isAuthReady]);
 
-  // Real-time subscription for image updates with improved error handling
   useEffect(() => {
     if (!postId || !isAuthReady) return;
-
-    console.log(`📡 Setting up real-time subscription for post ${postId}, variation ${variationNumber}`);
 
     const channel = supabase
       .channel(`linkedin-image-updates-${postId}-${variationNumber}`)
@@ -118,28 +103,21 @@ const LinkedInPostVariation = ({
         table: 'linkedin_post_images',
         filter: `post_id=eq.${postId}`
       }, async (payload) => {
-        console.log('📡 LinkedIn image updated via real-time:', payload);
-        
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
           const newImage = payload.new;
           
-          // Check if this update is for our specific variation
           if (newImage.variation_number !== variationNumber) {
-            console.log(`📡 Ignoring image for variation ${newImage.variation_number}, expecting ${variationNumber}`);
             return;
           }
           
           if (newImage.image_data === 'generating...') {
-            console.log(`🔄 Image generation started for variation ${variationNumber}`);
             setIsLoadingImage(true);
             setImageGenerationFailed(false);
           } 
           else if (newImage.image_data && 
                    newImage.image_data !== 'generating...' && 
                    !newImage.image_data.includes('failed')) {
-            console.log(`✅ Image generation completed for variation ${variationNumber}`);
             
-            // Enhanced validation for base64 images
             const isValidBase64Image = newImage.image_data.startsWith('data:image/') && 
                                      newImage.image_data.includes('base64,') &&
                                      newImage.image_data.length > 5000;
@@ -147,20 +125,14 @@ const LinkedInPostVariation = ({
             const isValidUrl = newImage.image_data.startsWith('http');
             
             if (isValidBase64Image || isValidUrl) {
-              console.log(`📡 Valid image detected, updating state for variation ${variationNumber}`);
-              
-              // CRITICAL: Reset loading states FIRST before updating images
               setIsLoadingImage(false);
               setImageGenerationFailed(false);
               
-              // Add the new image to the list if it's not already there
               setGeneratedImages(prev => {
                 const exists = prev.includes(newImage.image_data);
                 if (exists) {
-                  console.log(`📡 Image already exists in state`);
                   return prev;
                 }
-                console.log(`📡 Adding new image to state`);
                 return [...prev, newImage.image_data];
               });
               
@@ -169,13 +141,11 @@ const LinkedInPostVariation = ({
                 description: `LinkedIn post image for variation ${variationNumber} is ready.`
               });
             } else {
-              console.log(`❌ Invalid image data format for variation ${variationNumber}`);
               setIsLoadingImage(false);
               setImageGenerationFailed(true);
             }
           } 
           else if (newImage.image_data && newImage.image_data.includes('failed')) {
-            console.log(`❌ Image generation failed for variation ${variationNumber}`);
             setIsLoadingImage(false);
             setImageGenerationFailed(true);
             toast({
@@ -191,23 +161,18 @@ const LinkedInPostVariation = ({
           }
         }
       })
-      .subscribe((status) => {
-        console.log(`📡 Real-time subscription status for variation ${variationNumber}:`, status);
-      });
+      .subscribe();
 
     return () => {
-      console.log(`🧹 Cleaning up real-time subscription for variation ${variationNumber}`);
       supabase.removeChannel(channel);
     };
   }, [postId, variationNumber, isAuthReady, toast]);
 
-  // Add timeout mechanism to reset loading state after 3 minutes
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     
     if (isLoadingImage) {
       timeoutId = setTimeout(() => {
-        console.log(`⏰ Image generation timeout reached for variation ${variationNumber}`);
         setIsLoadingImage(false);
         setImageGenerationFailed(true);
         toast({
@@ -215,7 +180,7 @@ const LinkedInPostVariation = ({
           description: `Image generation took too long for variation ${variationNumber}. Please try again.`,
           variant: "destructive"
         });
-      }, 180000); // 3 minutes timeout
+      }, 180000);
     }
 
     return () => {
@@ -225,7 +190,6 @@ const LinkedInPostVariation = ({
     };
   }, [isLoadingImage, variationNumber, toast]);
 
-  // Copy to clipboard
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -234,7 +198,6 @@ const LinkedInPostVariation = ({
         description: "The LinkedIn post has been copied to your clipboard."
       });
     } catch (err) {
-      console.error('Failed to copy text:', err);
       toast({
         title: "Copy failed",
         description: "Please try selecting and copying the text manually.",
@@ -243,7 +206,6 @@ const LinkedInPostVariation = ({
     }
   };
 
-  // Copy image to clipboard
   const copyImageToClipboard = async (imageData: string) => {
     try {
       const response = await fetch(imageData);
@@ -260,7 +222,6 @@ const LinkedInPostVariation = ({
         description: "The image has been copied to your clipboard."
       });
     } catch (err) {
-      console.error('Failed to copy image: ', err);
       toast({
         title: "Copy failed",
         description: "Please try right-clicking and copying the image manually.",
@@ -269,7 +230,6 @@ const LinkedInPostVariation = ({
     }
   };
 
-  // Handle image generation
   const handleGenerateImage = async () => {
     if (!postId) {
       toast({
@@ -280,15 +240,11 @@ const LinkedInPostVariation = ({
       return;
     }
 
-    console.log(`🚀 Starting image generation for post ${postId}, variation ${variationNumber}`);
-    
     setIsLoadingImage(true);
     setImageGenerationFailed(false);
 
     try {
       await executeWithRetry(async () => {
-        console.log('🔗 Calling linkedin-image-webhook edge function...');
-        
         const { data: webhookResponse, error: webhookError } = await supabase.functions.invoke('linkedin-image-webhook', {
           body: {
             post_id: postId,
@@ -300,11 +256,8 @@ const LinkedInPostVariation = ({
         });
 
         if (webhookError) {
-          console.error('❌ Edge function error:', webhookError);
           throw new Error(`Edge function failed: ${webhookError.message}`);
         }
-
-        console.log('✅ Edge function response:', webhookResponse);
 
         if (webhookResponse && webhookResponse.success === false) {
           if (!webhookResponse.webhook_url_configured) {
@@ -314,9 +267,7 @@ const LinkedInPostVariation = ({
           }
         }
 
-        console.log('🎉 Image generation request sent successfully');
-
-      }, 3, `generate image for variation ${variationNumber}`);
+      }, 1, `generate image for variation ${variationNumber}`);
       
       toast({
         title: "Image Generation Started",
@@ -324,7 +275,6 @@ const LinkedInPostVariation = ({
       });
 
     } catch (err: any) {
-      console.error('❌ Error in handleGenerateImage:', err);
       setIsLoadingImage(false);
       setImageGenerationFailed(true);
       
@@ -343,7 +293,6 @@ const LinkedInPostVariation = ({
     }
   };
 
-  // Delete image
   const deleteImage = async (imageData: string) => {
     if (!postId) return;
 
@@ -357,12 +306,10 @@ const LinkedInPostVariation = ({
           .eq('image_data', imageData);
 
         if (error) {
-          console.error('Error deleting image:', error);
           throw error;
         }
-      }, 3, `delete image for variation ${variationNumber}`);
+      }, 1, `delete image for variation ${variationNumber}`);
 
-      // Remove from both state arrays
       setGeneratedImages(prev => prev.filter(img => img !== imageData));
       
       toast({
@@ -371,7 +318,6 @@ const LinkedInPostVariation = ({
       });
 
     } catch (err) {
-      console.error('Error deleting image:', err);
       toast({
         title: "Error",
         description: "Failed to delete image. Please try again.",
@@ -382,7 +328,7 @@ const LinkedInPostVariation = ({
 
   return (
     <div className="w-full max-w-4xl mx-auto mb-12">
-      {/* Post Heading - Smaller and Clearer */}
+      {/* Post Heading */}
       <div className="mb-6">
         <div className="bg-gradient-to-r from-yellow-400 to-amber-500 text-black px-4 py-2 rounded-lg mb-4">
           <h3 className="text-base font-semibold text-center break-words">
@@ -415,7 +361,7 @@ const LinkedInPostVariation = ({
         </div>
       </div>
 
-      {/* Loading indicator - only show when loading and no images exist */}
+      {/* Loading indicator */}
       {isLoadingImage && allImages.length === 0 && (
         <div className="p-4 bg-blue-50 rounded-lg text-center border border-blue-200 mb-6">
           <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading for variation {variationNumber}...</div>
@@ -423,7 +369,7 @@ const LinkedInPostVariation = ({
         </div>
       )}
 
-      {/* Failed generation indicator - only show when failed and no images exist */}
+      {/* Failed generation indicator */}
       {imageGenerationFailed && allImages.length === 0 && (
         <div className="p-4 bg-red-50 rounded-lg text-center border border-red-200 mb-6">
           <div className="text-sm text-red-600 font-medium">Image generation failed for variation {variationNumber}</div>
@@ -431,7 +377,7 @@ const LinkedInPostVariation = ({
         </div>
       )}
 
-      {/* Generated Images - Show both regular and external images */}
+      {/* Generated Images */}
       {allImages.length > 0 && (
         <div className="mb-8">
           <h5 className="text-cyan-400 font-medium text-sm mb-4 text-center">
@@ -445,8 +391,6 @@ const LinkedInPostVariation = ({
                   src={imageData} 
                   alt={`Generated LinkedIn post image ${index + 1} for variation ${variationNumber}`}
                   className="w-full rounded-lg shadow-lg object-contain"
-                  onLoad={() => console.log(`🖼️ Image ${index + 1} loaded successfully for variation ${variationNumber}`)}
-                  onError={(e) => console.error(`❌ Failed to load image ${index + 1} for variation ${variationNumber}`, e)}
                 />
                 <div className="absolute top-3 right-3 flex gap-2">
                   <Button
