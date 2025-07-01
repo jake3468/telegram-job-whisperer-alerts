@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -70,20 +71,24 @@ const LinkedInPostVariation = ({
             console.log(`🖼️ Loaded ${imageUrls.length} existing images for variation ${variationNumber}`);
             setGeneratedImages(imageUrls);
             
-            // Reset loading states when images are found
+            // CRITICAL: Always reset loading states when images are found
+            console.log(`🔄 Resetting loading states after finding existing images for variation ${variationNumber}`);
             setIsLoadingImage(false);
             setImageGenerationFailed(false);
           }
         }, 3, `load existing images for variation ${variationNumber}`);
       } catch (err) {
         console.error('Error loading existing images:', err);
+        // Reset loading state even on error
+        setIsLoadingImage(false);
+        setImageGenerationFailed(true);
       }
     };
 
     loadExistingImages();
   }, [postId, variationNumber, isAuthReady, executeWithRetry]);
 
-  // Real-time subscription for image updates - ENHANCED with better state management
+  // Real-time subscription for image updates - FIXED with proper state management
   useEffect(() => {
     if (!postId || !isAuthReady) return;
 
@@ -119,15 +124,20 @@ const LinkedInPostVariation = ({
             console.log(`✅ Image generation completed for variation ${variationNumber}`);
             console.log(`🖼️ New image data received (length: ${newImage.image_data.length})`);
             
-            // ENHANCED: Better validation for base64 images
+            // Enhanced validation for base64 images
             const isValidBase64Image = newImage.image_data.startsWith('data:image/') && 
                                      newImage.image_data.includes('base64,') &&
-                                     newImage.image_data.length > 5000; // More reasonable threshold for actual images
+                                     newImage.image_data.length > 5000;
             
             const isValidUrl = newImage.image_data.startsWith('http');
             
             if (isValidBase64Image || isValidUrl) {
               console.log(`📡 Valid image detected, updating state for variation ${variationNumber}`);
+              
+              // CRITICAL: Reset loading states FIRST before updating images
+              console.log(`🔄 Resetting loading states for variation ${variationNumber}`);
+              setIsLoadingImage(false);
+              setImageGenerationFailed(false);
               
               // Add the new image to the list if it's not already there
               setGeneratedImages(prev => {
@@ -139,11 +149,6 @@ const LinkedInPostVariation = ({
                 console.log(`📡 Adding new image to state`);
                 return [...prev, newImage.image_data];
               });
-              
-              // CRITICAL: Reset loading states immediately when valid image is received
-              console.log(`🔄 Resetting loading states for variation ${variationNumber}`);
-              setIsLoadingImage(false);
-              setImageGenerationFailed(false);
               
               toast({
                 title: "Image Generated!",
@@ -181,6 +186,48 @@ const LinkedInPostVariation = ({
       supabase.removeChannel(channel);
     };
   }, [postId, variationNumber, isAuthReady, toast]);
+
+  // Periodic check for images to handle cases where real-time doesn't work
+  useEffect(() => {
+    if (!postId || !isAuthReady || !isLoadingImage) return;
+
+    const intervalId = setInterval(async () => {
+      console.log(`🔍 Periodic check for images - variation ${variationNumber}`);
+      
+      try {
+        const { data, error } = await supabase
+          .from('linkedin_post_images')
+          .select('image_data')
+          .eq('post_id', postId)
+          .eq('variation_number', variationNumber)
+          .neq('image_data', 'generating...');
+
+        if (error) {
+          console.error('Error in periodic check:', error);
+          return;
+        }
+
+        if (data && data.length > 0) {
+          const imageUrls = data.map(img => img.image_data);
+          console.log(`🔍 Periodic check found ${imageUrls.length} images for variation ${variationNumber}`);
+          
+          // Reset loading state and update images
+          setIsLoadingImage(false);
+          setImageGenerationFailed(false);
+          setGeneratedImages(imageUrls);
+          
+          toast({
+            title: "Image Generated!",
+            description: `LinkedIn post image for variation ${variationNumber} is ready.`
+          });
+        }
+      } catch (err) {
+        console.error('Error in periodic check:', err);
+      }
+    }, 5000); // Check every 5 seconds
+
+    return () => clearInterval(intervalId);
+  }, [postId, variationNumber, isAuthReady, isLoadingImage, toast]);
 
   // Add timeout mechanism to reset loading state after 3 minutes
   useEffect(() => {
