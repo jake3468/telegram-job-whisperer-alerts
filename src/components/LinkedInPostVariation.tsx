@@ -22,6 +22,13 @@ interface UserData {
   last_name: string | null;
 }
 
+interface LinkedInImageData {
+  id: string;
+  image_data: string;
+  variation_number: number;
+  created_at: string;
+}
+
 interface LinkedInPostVariationProps {
   heading: string;
   content: string;
@@ -42,114 +49,91 @@ const LinkedInPostVariation = ({
   const { toast } = useToast();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
   
-  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
-  const [isLoadingImage, setIsLoadingImage] = useState(false);
-  const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
+  const [images, setImages] = useState<LinkedInImageData[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  // Function to deduplicate images
-  const deduplicateImages = (images: string[]): string[] => {
-    return [...new Set(images)];
-  };
+  // Get images for this specific variation
+  const generatedImages = images
+    .filter(img => img.variation_number === variationNumber && img.image_data !== 'generating...')
+    .map(img => img.image_data);
 
-  const checkAndLoadExistingImages = async () => {
+  const isLoadingImage = isGenerating || images.some(img => 
+    img.variation_number === variationNumber && img.image_data === 'generating...'
+  );
+
+  // Fetch images when component mounts or postId changes
+  const fetchImages = async () => {
     if (!postId || !isAuthReady) return;
 
     try {
       await executeWithRetry(async () => {
         const { data, error } = await supabase
           .from('linkedin_post_images')
-          .select('image_data')
+          .select('*')
           .eq('post_id', postId)
-          .eq('variation_number', variationNumber);
+          .eq('variation_number', variationNumber)
+          .order('created_at', { ascending: false });
 
         if (error) {
+          console.error('Error fetching images:', error);
           return;
         }
 
-        if (data && data.length > 0) {
-          const imageUrls = data
-            .map(img => img.image_data)
-            .filter(imageData => imageData && 
-                   imageData !== 'generating...' && 
-                   !imageData.includes('failed') &&
-                   (imageData.startsWith('data:image/') || imageData.startsWith('http')));
-          
-          if (imageUrls.length > 0) {
-            setGeneratedImages(deduplicateImages(imageUrls));
-            setIsLoadingImage(false);
-            setImageGenerationFailed(false);
-          }
+        if (data) {
+          setImages(data);
         }
-      }, 1, `check existing images for variation ${variationNumber}`);
-    } catch (err) {
-      // Silent fail for existing image check
+      }, 3, 'fetch LinkedIn post images');
+    } catch (error) {
+      console.error('Error fetching images:', error);
     }
   };
 
-  useEffect(() => {
-    checkAndLoadExistingImages();
-  }, [postId, variationNumber, isAuthReady]);
-
+  // Set up real-time subscription for image updates
   useEffect(() => {
     if (!postId || !isAuthReady) return;
 
+    // Initial fetch
+    fetchImages();
+
     const channel = supabase
-      .channel(`linkedin-image-updates-${postId}-${variationNumber}`)
+      .channel(`linkedin-images-${postId}-${variationNumber}`)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
         table: 'linkedin_post_images',
         filter: `post_id=eq.${postId}`
       }, async (payload) => {
+        console.log('LinkedIn image updated via real-time:', payload);
+        
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
-          const newImage = payload.new;
+          const newImage = payload.new as LinkedInImageData;
           
+          // Only process images for this variation
           if (newImage.variation_number !== variationNumber) {
             return;
           }
           
-          if (newImage.image_data === 'generating...') {
-            setIsLoadingImage(true);
-            setImageGenerationFailed(false);
-          } 
-          else if (newImage.image_data && 
-                   newImage.image_data !== 'generating...' && 
-                   !newImage.image_data.includes('failed')) {
-            
-            const isValidImage = newImage.image_data.startsWith('data:image/') || 
-                                newImage.image_data.startsWith('http');
-            
-            if (isValidImage) {
-              setIsLoadingImage(false);
-              setImageGenerationFailed(false);
-              
-              setGeneratedImages(prev => {
-                const updated = [...prev, newImage.image_data];
-                return deduplicateImages(updated);
-              });
-              
-              toast({
-                title: "Image Generated!",
-                description: `LinkedIn post image for variation ${variationNumber} is ready.`
-              });
+          setImages(prev => {
+            const existing = prev.find(img => img.id === newImage.id);
+            if (existing) {
+              return prev.map(img => img.id === newImage.id ? newImage : img);
             } else {
-              setIsLoadingImage(false);
-              setImageGenerationFailed(true);
+              return [...prev, newImage];
             }
-          } 
-          else if (newImage.image_data && newImage.image_data.includes('failed')) {
-            setIsLoadingImage(false);
-            setImageGenerationFailed(true);
+          });
+
+          // Handle loading state changes based on image data
+          if (newImage.image_data !== 'generating...' && newImage.variation_number === variationNumber) {
+            setIsGenerating(false);
             toast({
-              title: "Image Generation Failed",
-              description: `Failed to generate image for variation ${variationNumber}. Please try again.`,
-              variant: "destructive"
+              title: "Image Generated!",
+              description: `LinkedIn post image for variation ${variationNumber} is ready.`
             });
           }
         } else if (payload.eventType === 'DELETE') {
-          const deletedImage = payload.old;
+          const deletedImage = payload.old as LinkedInImageData;
           if (deletedImage.variation_number === variationNumber) {
-            setGeneratedImages(prev => prev.filter(img => img !== deletedImage.image_data));
+            setImages(prev => prev.filter(img => img.id !== deletedImage.id));
           }
         }
       })
@@ -159,28 +143,6 @@ const LinkedInPostVariation = ({
       supabase.removeChannel(channel);
     };
   }, [postId, variationNumber, isAuthReady, toast]);
-
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    
-    if (isLoadingImage) {
-      timeoutId = setTimeout(() => {
-        setIsLoadingImage(false);
-        setImageGenerationFailed(true);
-        toast({
-          title: "Image Generation Timeout",
-          description: `Image generation took too long for variation ${variationNumber}. Please try again.`,
-          variant: "destructive"
-        });
-      }, 180000);
-    }
-
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [isLoadingImage, variationNumber, toast]);
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -232,19 +194,39 @@ const LinkedInPostVariation = ({
       return;
     }
 
-    setIsLoadingImage(true);
-    setImageGenerationFailed(false);
+    // Set generating state immediately when user clicks
+    setIsGenerating(true);
 
     try {
       await executeWithRetry(async () => {
-        const { data: webhookResponse, error: webhookError } = await supabase.functions.invoke('linkedin-image-webhook', {
-          body: {
+        // Create placeholder record using upsert to prevent duplicates
+        const { error } = await supabase
+          .from('linkedin_post_images')
+          .upsert({
             post_id: postId,
-            post_heading: heading,
-            post_content: content,
             variation_number: variationNumber,
-            source: 'linkedin_post_variation'
-          }
+            image_data: 'generating...'
+          }, {
+            onConflict: 'post_id,variation_number',
+            ignoreDuplicates: false
+          });
+
+        if (error) {
+          console.error('Error creating image record:', error);
+          throw error;
+        }
+
+        // Call webhook with proper parameters
+        const webhookBody = {
+          post_id: postId,
+          variation_number: variationNumber,
+          source: 'linkedin_post_variation',
+          post_heading: heading,
+          post_content: content
+        };
+
+        const { data: webhookResponse, error: webhookError } = await supabase.functions.invoke('linkedin-image-webhook', {
+          body: webhookBody
         });
 
         if (webhookError) {
@@ -259,7 +241,7 @@ const LinkedInPostVariation = ({
           }
         }
 
-      }, 1, `generate image for variation ${variationNumber}`);
+      }, 3, `generate image for variation ${variationNumber}`);
       
       toast({
         title: "Image Generation Started",
@@ -267,8 +249,7 @@ const LinkedInPostVariation = ({
       });
 
     } catch (err: any) {
-      setIsLoadingImage(false);
-      setImageGenerationFailed(true);
+      setIsGenerating(false);
       
       let errorMessage = "Failed to generate image. Please try again.";
       if (err.message.includes('not configured')) {
@@ -287,31 +268,31 @@ const LinkedInPostVariation = ({
     }
   };
 
-  const deleteImage = async (imageData: string) => {
-    if (!postId) return;
-
+  const deleteImage = async (imageId: string) => {
     try {
       await executeWithRetry(async () => {
         const { error } = await supabase
           .from('linkedin_post_images')
           .delete()
-          .eq('post_id', postId)
-          .eq('variation_number', variationNumber)
-          .eq('image_data', imageData);
+          .eq('id', imageId);
 
         if (error) {
+          console.error('Error deleting image:', error);
           throw error;
         }
-      }, 1, `delete image for variation ${variationNumber}`);
+      }, 3, `delete image ${imageId}`);
 
-      setGeneratedImages(prev => prev.filter(img => img !== imageData));
-      
+      // Update local state
+      setImages(prev => prev.filter(img => img.id !== imageId));
+      setIsGenerating(false);
+
       toast({
         title: "Image Deleted",
         description: `Image for variation ${variationNumber} has been deleted.`
       });
 
-    } catch (err) {
+    } catch (error) {
+      console.error('Error deleting image:', error);
       toast({
         title: "Error",
         description: "Failed to delete image. Please try again.",
@@ -363,46 +344,43 @@ const LinkedInPostVariation = ({
         </div>
       )}
 
-      {/* Failed generation indicator */}
-      {imageGenerationFailed && generatedImages.length === 0 && (
-        <div className="p-4 bg-red-50 rounded-lg text-center border border-red-200 mb-6">
-          <div className="text-sm text-red-600 font-medium">Image generation failed for variation {variationNumber}</div>
-          <div className="text-xs text-red-500 mt-1">Please try again</div>
-        </div>
-      )}
-
-      {/* Generated Images - Now properly deduplicated */}
+      {/* Generated Images */}
       {generatedImages.length > 0 && (
         <div className="mb-8">
           <h5 className="text-cyan-400 font-medium text-sm mb-4 text-center">
             Generated Images for Variation {variationNumber} ({generatedImages.length}):
           </h5>
           <div className="space-y-6">
-            {generatedImages.map((imageData, index) => (
-              <div key={`${imageData}-${index}`} className="relative w-full max-w-2xl mx-auto">
-                <img 
-                  src={imageData} 
-                  alt={`Generated LinkedIn post image ${index + 1} for variation ${variationNumber}`}
-                  className="w-full rounded-lg shadow-lg object-contain"
-                />
-                <div className="absolute top-3 right-3 flex gap-2">
-                  <Button
-                    onClick={() => copyImageToClipboard(imageData)}
-                    size="sm"
-                    className="bg-black/70 hover:bg-black/80 text-white p-2 h-8 w-8"
-                  >
-                    <Copy className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    onClick={() => deleteImage(imageData)}
-                    size="sm"
-                    className="bg-red-600/70 hover:bg-red-600/80 text-white p-2 h-8 w-8"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+            {generatedImages.map((imageData, index) => {
+              const imageRecord = images.find(img => img.image_data === imageData);
+              return (
+                <div key={`${imageData}-${index}`} className="relative w-full max-w-2xl mx-auto">
+                  <img 
+                    src={imageData} 
+                    alt={`Generated LinkedIn post image ${index + 1} for variation ${variationNumber}`}
+                    className="w-full rounded-lg shadow-lg object-contain"
+                  />
+                  <div className="absolute top-3 right-3 flex gap-2">
+                    <Button
+                      onClick={() => copyImageToClipboard(imageData)}
+                      size="sm"
+                      className="bg-black/70 hover:bg-black/80 text-white p-2 h-8 w-8"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </Button>
+                    {imageRecord && (
+                      <Button
+                        onClick={() => deleteImage(imageRecord.id)}
+                        size="sm"
+                        className="bg-red-600/70 hover:bg-red-600/80 text-white p-2 h-8 w-8"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
