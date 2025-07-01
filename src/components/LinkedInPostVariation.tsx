@@ -327,13 +327,14 @@ const LinkedInPostVariation = ({
 
     logger.imageProcessing('user_generation_trigger', postId, variationNumber, {
       current_loading_state: isUserLoadingImage,
-      current_generating_state: isGeneratingState
+      current_generating_state: isGeneratingState,
+      has_existing_images: allImages.length > 0
     });
     
-    // Set user-triggered loading state immediately
+    // Reset any previous failure state and set loading states immediately
+    setImageGenerationFailed(false);
     setIsUserLoadingImage(true);
     setIsGeneratingState(true);
-    setImageGenerationFailed(false);
 
     // Set timeout to reset loading state after 3 minutes
     const timeoutId = setTimeout(() => {
@@ -524,8 +525,8 @@ const LinkedInPostVariation = ({
         </div>
       </div>
 
-      {/* Loading indicator - only show when user triggered loading and no images exist */}
-      {shouldShowLoading && (
+      {/* Loading indicator - show when user triggered loading regardless of existing images */}
+      {isActuallyLoading && (
         <div className="p-4 bg-blue-50 rounded-lg text-center border border-blue-200 mb-6">
           <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading via N8N for variation {variationNumber}...</div>
           <div className="text-xs text-blue-500 mt-1">This may take up to 2 minutes</div>
