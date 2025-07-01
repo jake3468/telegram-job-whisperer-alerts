@@ -398,12 +398,12 @@ const LinkedInPostVariation = ({
 
     try {
       await executeWithRetry(async () => {
-        // Step 1: Update existing record OR create new one with "generating..." state
-        logger.imageProcessing('setting_generating_state', postId, variationNumber, {
+        // Step 1: CRITICAL - Update existing record to "generating..." state for regeneration
+        logger.imageProcessing('updating_existing_record_to_generating', postId, variationNumber, {
           generation_id: generationId
         });
         
-        // First, try to update existing record
+        // Update the existing record for this post_id and variation_number
         const { data: updateResult, error: updateError } = await supabase
           .from('linkedin_post_images')
           .update({ 
@@ -414,11 +414,17 @@ const LinkedInPostVariation = ({
           .eq('variation_number', variationNumber)
           .select();
 
-        if (updateError || !updateResult || updateResult.length === 0) {
-          // If no existing record to update, create new one with "generating..." state
-          logger.imageProcessing('creating_new_generating_record', postId, variationNumber, {
-            generation_id: generationId,
-            update_error: updateError?.message
+        logger.imageProcessing('update_result', postId, variationNumber, {
+          generation_id: generationId,
+          update_error: updateError?.message,
+          update_result_count: updateResult?.length || 0,
+          has_update_error: !!updateError
+        });
+
+        // If no existing record was updated (updateResult is empty), create a new one
+        if (!updateError && (!updateResult || updateResult.length === 0)) {
+          logger.imageProcessing('no_existing_record_creating_new', postId, variationNumber, {
+            generation_id: generationId
           });
           
           const { error: insertError } = await supabase
@@ -433,16 +439,15 @@ const LinkedInPostVariation = ({
             logger.error('Error creating generating record:', insertError);
             throw new Error('Failed to prepare image generation');
           }
+        } else if (updateError) {
+          logger.error('Error updating existing record to generating:', updateError);
+          throw new Error('Failed to update existing record for regeneration');
         } else {
-          logger.imageProcessing('existing_record_updated_to_generating', postId, variationNumber, {
+          logger.imageProcessing('successfully_updated_existing_record', postId, variationNumber, {
             generation_id: generationId,
             updated_records: updateResult.length
           });
         }
-
-        logger.imageProcessing('database_updated_to_generating', postId, variationNumber, {
-          generation_id: generationId
-        });
 
         // Step 2: Call edge function
         logger.imageProcessing('webhook_call_start', postId, variationNumber, {
