@@ -52,16 +52,19 @@ const JobAlerts = () => {
       return 'UTC';
     }
   }, []);
+  
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
+  
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-gradient-to-br from-pastel-mint via-pastel-lavender to-pastel-peach flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading...</div>
       </div>;
   }
+  
   return <Layout>
       <div className="text-center mb-8">
         <h1 className="text-4xl font-orbitron font-extrabold mb-2 drop-shadow tracking-tight flex items-center justify-center gap-2">
@@ -81,7 +84,7 @@ const JobAlerts = () => {
 
         {/* Usage Cost Badge */}
         <Badge variant="outline" className="bg-orange-900/30 border-orange-600/50 text-orange-300 font-semibold">
-          Usage Fee: 1.5 credits/day/alert
+          Usage Fee: 0.1 credits per alert message
         </Badge>
       </div>
 
@@ -93,4 +96,5 @@ const JobAlerts = () => {
       </div>
     </Layout>;
 };
+
 export default JobAlerts;

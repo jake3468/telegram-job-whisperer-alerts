@@ -90,7 +90,9 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
   };
 
   const hasResult = (item: any) => {
-    return item.interview_questions && item.interview_questions.trim().length > 0;
+    return item.interview_questions && 
+           typeof item.interview_questions === 'string' && 
+           item.interview_questions.trim().length > 0;
   };
 
   const renderInterviewQuestions = (content: string) => {

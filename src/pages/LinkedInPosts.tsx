@@ -18,6 +18,7 @@ import LinkedInPostVariation from '@/components/LinkedInPostVariation';
 import LoadingMessages from '@/components/LoadingMessages';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
+import { useLinkedInPostTimeoutFallback } from '@/hooks/useLinkedInPostTimeoutFallback';
 
 interface LinkedInPostData {
   post_heading_1: string | null;
@@ -39,7 +40,7 @@ const LinkedInPosts = () => {
   const { userProfile } = useUserProfile();
   const { isComplete, loading: completionLoading, refetchStatus } = useUserCompletionStatus();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
-  const { hasCredits, checkCreditsBeforeGeneration, deductCreditsAfterResults, showInsufficientCreditsPopup } = useLinkedInPostCreditCheck();
+  const { hasCredits } = useLinkedInPostCreditCheck();
   
   const [formData, setFormData] = useState({
     topic: '',
@@ -55,7 +56,6 @@ const LinkedInPosts = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
-  const [toastShown, setToastShown] = useState(false);
 
   const toneOptions = [
     { value: 'professional', label: 'Professional & Insightful' },
@@ -64,7 +64,6 @@ const LinkedInPosts = () => {
     { value: 'thoughtful', label: 'Thoughtful & Reflective' }
   ];
 
-  // Fetch user data when component mounts
   useEffect(() => {
     const fetchUserData = async () => {
       if (!user?.id || !isAuthReady) return;
@@ -92,35 +91,53 @@ const LinkedInPosts = () => {
     fetchUserData();
   }, [user?.id, isAuthReady, executeWithRetry]);
 
-  // Check if all posts are ready
   const areAllPostsReady = (data: LinkedInPostData) => {
     const hasAllData = Boolean(
-      data.post_heading_1 && 
-      data.post_content_1 && 
-      data.post_heading_2 && 
-      data.post_content_2 && 
-      data.post_heading_3 && 
-      data.post_content_3
+      data.post_heading_1 && data.post_heading_1.trim() &&
+      data.post_content_1 && data.post_content_1.trim() && 
+      data.post_heading_2 && data.post_heading_2.trim() &&
+      data.post_content_2 && data.post_content_2.trim() && 
+      data.post_heading_3 && data.post_heading_3.trim() &&
+      data.post_content_3 && data.post_content_3.trim()
     );
     
-    console.log('Checking if all posts ready:', {
-      post_heading_1: Boolean(data.post_heading_1),
-      post_content_1: Boolean(data.post_content_1),
-      post_heading_2: Boolean(data.post_heading_2),
-      post_content_2: Boolean(data.post_content_2),
-      post_heading_3: Boolean(data.post_heading_3),
-      post_content_3: Boolean(data.post_content_3),
+    console.log('🔍 CHECKING IF ALL POSTS READY:', {
+      post_heading_1: Boolean(data.post_heading_1 && data.post_heading_1.trim()),
+      post_content_1: Boolean(data.post_content_1 && data.post_content_1.trim()),
+      post_heading_2: Boolean(data.post_heading_2 && data.post_heading_2.trim()),
+      post_content_2: Boolean(data.post_content_2 && data.post_content_2.trim()),
+      post_heading_3: Boolean(data.post_heading_3 && data.post_heading_3.trim()),
+      post_content_3: Boolean(data.post_content_3 && data.post_content_3.trim()),
       allReady: hasAllData
     });
     
     return hasAllData;
   };
 
-  // Real-time subscription for LinkedIn post updates - SINGLE SOURCE OF TRUTH FOR TOASTS
+  useLinkedInPostTimeoutFallback({
+    currentPostId,
+    userProfileId: userProfile?.user_id || null,
+    isGenerating,
+    creditsDeducted: false, // No longer tracking credits in frontend
+    onCreditsDeducted: () => {}, // No longer needed
+    onPostsReady: (data) => {
+      const linkedInPostData: LinkedInPostData = {
+        post_heading_1: data.post_heading_1,
+        post_content_1: data.post_content_1,
+        post_heading_2: data.post_heading_2,
+        post_content_2: data.post_content_2,
+        post_heading_3: data.post_heading_3,
+        post_content_3: data.post_content_3
+      };
+      setPostsData(linkedInPostData);
+      setIsGenerating(false);
+    }
+  });
+
   useEffect(() => {
-    if (!currentPostId || !isAuthReady) return;
+    if (!currentPostId || !isAuthReady || !userProfile?.id) return;
     
-    console.log('Setting up real-time subscription for post ID:', currentPostId);
+    console.log('🔄 Setting up real-time subscription for post ID:', currentPostId);
 
     const channel = supabase
       .channel(`linkedin-post-updates-${currentPostId}`)
@@ -129,18 +146,18 @@ const LinkedInPosts = () => {
         schema: 'public', 
         table: 'job_linkedin',
         filter: `id=eq.${currentPostId}`
-      }, (payload) => {
-        console.log('LinkedIn post updated via real-time:', payload);
+      }, async (payload) => {
+        console.log('📡 LinkedIn post updated via real-time:', payload);
         
         if (payload.new) {
           const newData = payload.new as any;
-          console.log('New posts data received:', {
-            hasHeading1: Boolean(newData.post_heading_1),
-            hasContent1: Boolean(newData.post_content_1),
-            hasHeading2: Boolean(newData.post_heading_2),
-            hasContent2: Boolean(newData.post_content_2),
-            hasHeading3: Boolean(newData.post_heading_3),
-            hasContent3: Boolean(newData.post_content_3)
+          console.log('📊 New posts data received:', {
+            hasHeading1: Boolean(newData.post_heading_1 && newData.post_heading_1.trim()),
+            hasContent1: Boolean(newData.post_content_1 && newData.post_content_1.trim()),
+            hasHeading2: Boolean(newData.post_heading_2 && newData.post_heading_2.trim()),
+            hasContent2: Boolean(newData.post_content_2 && newData.post_content_2.trim()),
+            hasHeading3: Boolean(newData.post_heading_3 && newData.post_heading_3.trim()),
+            hasContent3: Boolean(newData.post_content_3 && newData.post_content_3.trim())
           });
           
           const linkedInPostData: LinkedInPostData = {
@@ -152,41 +169,36 @@ const LinkedInPosts = () => {
             post_content_3: newData.post_content_3
           };
           
+          console.log('🔄 Setting posts data:', linkedInPostData);
           setPostsData(linkedInPostData);
           
-          // Check if all posts are ready and show toast only once
-          if (areAllPostsReady(linkedInPostData) && !toastShown) {
-            console.log('All posts are ready! Stopping loading and showing success toast');
+          if (areAllPostsReady(linkedInPostData)) {
+            console.log('🎉 All posts are ready! Stopping loading');
             setIsGenerating(false);
-            setToastShown(true);
-            
-            deductCreditsAfterResults(currentPostId).then(success => {
-              if (success) {
-                toast({
-                  title: "LinkedIn Posts Generated!",
-                  description: "Your 3 LinkedIn post variations have been created successfully."
-                });
-              }
+            toast({
+              title: "LinkedIn Posts Generated!",
+              description: "Your 3 LinkedIn post variations have been created successfully."
             });
+          } else {
+            console.log('⏳ Posts not complete yet, keeping loading state');
           }
         }
       })
       .subscribe(status => {
-        console.log('Real-time subscription status:', status);
+        console.log('📡 Real-time subscription status:', status);
       });
 
     return () => {
-      console.log('Cleaning up real-time subscription');
+      console.log('🧹 Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
-  }, [currentPostId, isAuthReady, toast, deductCreditsAfterResults, toastShown]);
+  }, [currentPostId, isAuthReady, userProfile?.id, toast]);
 
-  // Check existing data when currentPostId changes - NO TOAST, NO CREDIT DEDUCTION
   useEffect(() => {
     const checkExistingData = async () => {
       if (!currentPostId || !isAuthReady) return;
       
-      console.log('Checking existing data for post ID:', currentPostId);
+      console.log('🔍 Checking existing data for post ID:', currentPostId);
       
       try {
         await executeWithRetry(async () => {
@@ -197,12 +209,19 @@ const LinkedInPosts = () => {
             .single();
           
           if (error) {
-            console.error('Error fetching existing post data:', error);
+            console.error('❌ Error fetching existing post data:', error);
             return;
           }
           
           if (data) {
-            console.log('Found existing post data');
+            console.log('📋 Found existing post data:', {
+              hasHeading1: Boolean(data.post_heading_1 && data.post_heading_1.trim()),
+              hasContent1: Boolean(data.post_content_1 && data.post_content_1.trim()),
+              hasHeading2: Boolean(data.post_heading_2 && data.post_heading_2.trim()),
+              hasContent2: Boolean(data.post_content_2 && data.post_content_2.trim()),
+              hasHeading3: Boolean(data.post_heading_3 && data.post_heading_3.trim()),
+              hasContent3: Boolean(data.post_content_3 && data.post_content_3.trim())
+            });
             
             const linkedInPostData: LinkedInPostData = {
               post_heading_1: data.post_heading_1,
@@ -213,18 +232,19 @@ const LinkedInPosts = () => {
               post_content_3: data.post_content_3
             };
             
+            console.log('🔄 Setting existing posts data:', linkedInPostData);
             setPostsData(linkedInPostData);
             
-            // Check if all posts are already ready - only stop loading, NO TOAST, NO CREDIT DEDUCTION
             if (areAllPostsReady(linkedInPostData)) {
-              console.log('Existing data is complete, stopping loading');
+              console.log('📋 Existing data is complete, stopping loading state');
               setIsGenerating(false);
-              setToastShown(true); // Prevent future toasts for existing data
+            } else {
+              console.log('📋 Existing data is incomplete, keeping loading state');
             }
           }
         }, 3, 'check existing post data');
       } catch (err) {
-        console.error('Error checking existing data:', err);
+        console.error('❌ Error checking existing data:', err);
       }
     };
 
@@ -233,7 +253,6 @@ const LinkedInPosts = () => {
     }
   }, [currentPostId, isAuthReady, executeWithRetry]);
 
-  // Handle input changes
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -241,7 +260,43 @@ const LinkedInPosts = () => {
     }));
   };
 
-  // Handle form submission
+  const checkCreditsWithFallback = async (): Promise<boolean> => {
+    if (hasCredits) {
+      console.log('✅ Credit check passed via hook');
+      return true;
+    }
+    
+    console.log('⚠️ Hook credit check failed, trying direct database check...');
+    try {
+      if (!userProfile?.user_id) {
+        console.error('❌ No user ID for direct credit check');
+        return false;
+      }
+
+      const { data: credits, error } = await supabase
+        .from('user_credits')
+        .select('current_balance')
+        .eq('user_id', userProfile.user_id)
+        .single();
+
+      if (error) {
+        console.error('❌ Direct credit check error:', error);
+        return false;
+      }
+
+      const hasDirectCredits = credits && Number(credits.current_balance) >= 3.0;
+      console.log('💳 Direct credit check result:', {
+        balance: credits?.current_balance,
+        hasCredits: hasDirectCredits
+      });
+
+      return hasDirectCredits;
+    } catch (error) {
+      console.error('❌ Exception in direct credit check:', error);
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -254,7 +309,6 @@ const LinkedInPosts = () => {
       return;
     }
 
-    // Refresh profile status before checking
     if (completionLoading) {
       toast({
         title: "Checking Profile Status",
@@ -295,9 +349,13 @@ const LinkedInPosts = () => {
       return;
     }
 
-    // Check credits before proceeding
-    const canProceed = await checkCreditsBeforeGeneration();
-    if (!canProceed) {
+    const hasValidCredits = await checkCreditsWithFallback();
+    if (!hasValidCredits) {
+      toast({
+        title: "Insufficient Credits",
+        description: "You need 3 credits to generate LinkedIn posts. Please check your credit balance or purchase more credits.",
+        variant: "destructive"
+      });
       return;
     }
 
@@ -305,10 +363,9 @@ const LinkedInPosts = () => {
     setIsGenerating(true);
     setPostsData(null);
     setCurrentPostId(null);
-    setToastShown(false); // Reset toast flag on new submission
 
     try {
-      console.log('Creating LinkedIn post with user_profile.id:', userProfile.id);
+      console.log('🚀 Creating LinkedIn post with user_profile.id:', userProfile.id);
       
       await executeWithRetry(async () => {
         const { data, error } = await supabase
@@ -325,11 +382,11 @@ const LinkedInPosts = () => {
           .single();
 
         if (error) {
-          console.error('Supabase error:', error);
+          console.error('❌ Supabase error:', error);
           throw error;
         }
 
-        console.log('LinkedIn post created successfully:', data);
+        console.log('✅ LinkedIn post created successfully:', data);
         setCurrentPostId(data.id);
         
         toast({
@@ -339,7 +396,7 @@ const LinkedInPosts = () => {
       }, 3, 'create LinkedIn post');
       
     } catch (err: any) {
-      console.error('Error creating LinkedIn post:', err);
+      console.error('❌ Error creating LinkedIn post:', err);
       setIsGenerating(false);
       const errorMessage = err.message || "Failed to create LinkedIn post. Please try again.";
       toast({
@@ -352,7 +409,6 @@ const LinkedInPosts = () => {
     }
   };
 
-  // Reset form
   const resetForm = () => {
     setFormData({
       topic: '',
@@ -364,25 +420,21 @@ const LinkedInPosts = () => {
     setPostsData(null);
     setIsGenerating(false);
     setCurrentPostId(null);
-    setToastShown(false); // Reset toast flag
   };
 
-  // Determine what to show based on data completeness
   const shouldShowResults = postsData && areAllPostsReady(postsData);
   const shouldShowLoading = isGenerating && !shouldShowResults;
 
-  console.log('Display logic:', {
+  console.log('🎯 Display logic:', {
     postsData: !!postsData,
     areAllPostsReady: postsData ? areAllPostsReady(postsData) : false,
     shouldShowResults,
     shouldShowLoading,
-    isGenerating,
-    toastShown
+    isGenerating
   });
 
   return (
     <SidebarProvider defaultOpen={true}>
-      {/* Header for mobile */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
         <div className="flex items-center justify-between p-3">
           <SidebarTrigger className="h-12 w-12 bg-white/10 border-fuchsia-400/30 ring-2 ring-fuchsia-400/10 text-fuchsia-200 rounded-2xl shadow-lg hover:bg-fuchsia-700/30 transition-all flex items-center justify-center">
@@ -403,7 +455,6 @@ const LinkedInPosts = () => {
           <main className="flex-1 w-full min-w-0 bg-black">
             <div className="min-h-screen bg-black overflow-x-hidden">
               <div className="container mx-auto px-2 sm:px-4 py-8 mt-4 mb-8 max-w-6xl w-full min-w-0">
-                {/* Header Section */}
                 <div className="text-center mb-10">
                   <h1 className="sm:text-3xl font-orbitron bg-gradient-to-r from-teal-300 via-teal-400 to-cyan-400 bg-clip-text drop-shadow mb-4 tracking-tight font-bold lg:text-4xl text-teal-500 text-4xl">
                     ✍🏻 LinkedIn <span className="italic">Posts</span>
@@ -421,7 +472,6 @@ const LinkedInPosts = () => {
                   </div>
                 </div>
 
-                {/* Input Form */}
                 <Card className="bg-gradient-to-br from-cyan-400 via-teal-300 to-teal-500 border-white/10 backdrop-blur-md mb-8 shadow-xl max-w-full">
                   <CardHeader className="pb-6">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -488,7 +538,7 @@ const LinkedInPosts = () => {
                       </div>
 
                       <div className="flex flex-col sm:flex-row gap-3 pt-4 max-w-full">
-                        <Button type="submit" disabled={isSubmitting || !formData.topic.trim() || isGenerating || !hasCredits || completionLoading} className="flex-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 hover:from-indigo-600 hover:via-purple-600 hover:to-blue-600 text-white font-semibold text-base h-12 shadow-md rounded-lg min-w-0">
+                        <Button type="submit" disabled={isSubmitting || !formData.topic.trim() || isGenerating || completionLoading} className="flex-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 hover:from-indigo-600 hover:via-purple-600 hover:to-blue-600 text-white font-semibold text-base h-12 shadow-md rounded-lg min-w-0">
                           {isSubmitting ? 'Submitting...' : completionLoading ? 'Checking Profile...' : 'Generate LinkedIn Posts'}
                         </Button>
                         
@@ -500,7 +550,6 @@ const LinkedInPosts = () => {
                   </CardContent>
                 </Card>
 
-                {/* Loading State - Only show when generating AND no complete results */}
                 {shouldShowLoading && (
                   <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm mb-8 max-w-full">
                     <CardContent className="py-8 flex items-center justify-center">
@@ -509,7 +558,6 @@ const LinkedInPosts = () => {
                   </Card>
                 )}
 
-                {/* Results Display - Show when posts are ready */}
                 {shouldShowResults && (
                   <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm max-w-full">
                     <CardHeader className="pb-6">
@@ -556,7 +604,6 @@ const LinkedInPosts = () => {
                 )}
               </div>
 
-              {/* History Modal */}
               <LinkedInPostsHistoryModal 
                 isOpen={showHistory} 
                 onClose={() => setShowHistory(false)} 

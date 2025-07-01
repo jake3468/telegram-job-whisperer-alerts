@@ -65,6 +65,12 @@ verify_jwt = false
 [functions.resume-pdf-credit-deduction]
 verify_jwt = false
 
+[functions.linkedin-credit-deduction]
+verify_jwt = false
+
+[functions.linkedin-image-credit-deduction]
+verify_jwt = false
+
 [functions.user-management]
 verify_jwt = false
 

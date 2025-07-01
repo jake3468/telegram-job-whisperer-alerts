@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MessageSquare, Clock, Building2, Briefcase, FileText, CreditCard } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
+import { useCreditCheck } from '@/hooks/useCreditCheck';
+import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -30,25 +30,14 @@ const InterviewPrep = () => {
   const [currentAnalysis, setCurrentAnalysis] = useState<any>(null);
   const [interviewData, setInterviewData] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [creditsDeducted, setCreditsDeducted] = useState(false);
   const { toast } = useToast();
   
-  // Use the new feature credit check system
+  // Use credit check for 6.0 credits required for interview prep
   const {
     hasCredits,
-    requiredCredits,
-    isLoading: isCheckingCredits,
-    checkAndDeductCredits,
     showInsufficientCreditsPopup
-  } = useFeatureCreditCheck({
-    feature: 'INTERVIEW_PREP',
-    onSuccess: () => {
-      console.log('✅ Credits successfully deducted for Interview Prep');
-    },
-    onInsufficientCredits: () => {
-      console.log('❌ Insufficient credits for Interview Prep');
-    }
-  });
+  } = useCreditCheck(6.0);
+  useCreditWarnings(); // This shows the warning popups
 
   const { userProfile } = useUserProfile();
 
@@ -75,6 +64,29 @@ const InterviewPrep = () => {
     enabled: !!userProfile?.id && isAuthReady,
     retry: 2
   });
+
+  // Function to properly parse interview questions from JSONB
+  const parseInterviewQuestions = (data: any): string | null => {
+    if (!data) return null;
+    
+    try {
+      // If it's already a string, return it
+      if (typeof data === 'string') {
+        return data.trim().length > 0 ? data : null;
+      }
+      
+      // If it's an object, stringify it and check if it's not empty
+      if (typeof data === 'object') {
+        const stringified = JSON.stringify(data);
+        return stringified !== '{}' && stringified !== 'null' ? stringified : null;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error parsing interview questions:', error);
+      return null;
+    }
+  };
 
   // Function to check for existing completed results on mount
   const checkForExistingResults = async () => {
@@ -103,26 +115,16 @@ const InterviewPrep = () => {
 
       if (result?.interview_questions) {
         console.log('✅ Found existing completed results');
-        const parsedData = typeof result.interview_questions === 'string' 
-          ? result.interview_questions 
-          : JSON.stringify(result.interview_questions);
+        const parsedData = parseInterviewQuestions(result.interview_questions);
         
-        if (parsedData && parsedData.trim().length > 0) {
+        if (parsedData) {
           setInterviewData(parsedData);
           setIsGenerating(false);
           
-          // Deduct credits for displaying existing results
-          if (!creditsDeducted) {
-            console.log('🔒 Deducting credits for existing results display');
-            const creditSuccess = await checkAndDeductCredits('Interview prep results displayed');
-            if (creditSuccess) {
-              setCreditsDeducted(true);
-              toast({
-                title: "Interview Prep Ready!",
-                description: `Your interview questions are ready. ${requiredCredits} credits deducted.`
-              });
-            }
-          }
+          toast({
+            title: "Interview Prep Ready!",
+            description: "Your interview questions are ready."
+          });
         }
       }
     } catch (error) {
@@ -132,19 +134,19 @@ const InterviewPrep = () => {
 
   // Check for existing results when currentAnalysis changes
   useEffect(() => {
-    if (currentAnalysis?.id && isAuthReady && !interviewData && !creditsDeducted) {
+    if (currentAnalysis?.id && isAuthReady && !interviewData) {
       checkForExistingResults();
     }
-  }, [currentAnalysis?.id, isAuthReady, interviewData, creditsDeducted]);
+  }, [currentAnalysis?.id, isAuthReady, interviewData]);
 
-  // Enhanced real-time subscription with fallback polling
+  // Enhanced real-time subscription with proper channel configuration
   useEffect(() => {
     if (!currentAnalysis?.id || !isAuthReady) return;
     
     console.log('🔄 Setting up real-time subscription for:', currentAnalysis.id);
     
     const channel = supabase
-      .channel('interview-prep-updates')
+      .channel(`interview-prep-${currentAnalysis.id}`)
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
@@ -153,40 +155,28 @@ const InterviewPrep = () => {
       }, async (payload) => {
         console.log('📡 Interview prep updated via real-time:', payload);
         
-        if (payload.new.interview_questions) {
-          try {
-            const parsedData = typeof payload.new.interview_questions === 'string' 
-              ? payload.new.interview_questions 
-              : JSON.stringify(payload.new.interview_questions);
-
-            if (parsedData && parsedData.trim().length > 0) {
-              setInterviewData(parsedData);
-              setIsGenerating(false);
-              
-              // Deduct credits when results are successfully received
-              if (!creditsDeducted) {
-                console.log('🔒 Deducting credits for real-time results');
-                const creditSuccess = await checkAndDeductCredits('Interview prep questions generated');
-                
-                if (creditSuccess) {
-                  setCreditsDeducted(true);
-                  toast({
-                    title: "Interview Prep Ready!",
-                    description: `Your personalized interview questions have been generated. ${requiredCredits} credits deducted.`
-                  });
-                }
-              }
-            }
-          } catch (error) {
-            console.error('❌ Error processing real-time interview questions:', error);
+        if (payload.new && payload.new.interview_questions) {
+          const parsedData = parseInterviewQuestions(payload.new.interview_questions);
+          
+          if (parsedData) {
+            console.log('✅ Setting interview data from real-time update');
+            setInterviewData(parsedData);
+            setIsGenerating(false);
+            
+            toast({
+              title: "Interview Prep Ready!",
+              description: "Your personalized interview questions have been generated."
+            });
           }
         }
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log('📡 Real-time subscription status:', status);
+      });
 
-    // Fallback polling mechanism in case real-time fails
+    // Improved fallback polling mechanism
     const pollInterval = setInterval(async () => {
-      if (!isGenerating || interviewData || creditsDeducted) {
+      if (!isGenerating || interviewData) {
         return;
       }
       
@@ -196,13 +186,14 @@ const InterviewPrep = () => {
       } catch (error) {
         console.error('❌ Fallback polling error:', error);
       }
-    }, 5000); // Poll every 5 seconds
+    }, 3000); // Poll every 3 seconds
     
     return () => {
+      console.log('🧹 Cleaning up real-time subscription');
       supabase.removeChannel(channel);
       clearInterval(pollInterval);
     };
-  }, [currentAnalysis?.id, creditsDeducted, isAuthReady, isGenerating, interviewData]);
+  }, [currentAnalysis?.id, isAuthReady, isGenerating, interviewData]);
 
   const handleGenerate = async () => {
     console.log('🚀 Interview Prep Generate Button Clicked');
@@ -217,7 +208,7 @@ const InterviewPrep = () => {
       return;
     }
 
-    // Check credits first (but don't deduct yet)
+    // Check credits first
     if (!hasCredits) {
       showInsufficientCreditsPopup();
       return;
@@ -258,7 +249,6 @@ const InterviewPrep = () => {
     try {
       setIsSubmitting(true);
       setInterviewData(null);
-      setCreditsDeducted(false);
       console.log('✅ Starting interview prep submission process');
 
       // Use enterprise auth for all database operations
@@ -284,27 +274,14 @@ const InterviewPrep = () => {
               ? existing.interview_questions 
               : JSON.stringify(existing.interview_questions);
             
-            // Deduct credits for existing result
-            const creditDeductionSuccess = await checkAndDeductCredits('Existing interview prep retrieved');
-            
-            if (creditDeductionSuccess) {
-              setInterviewData(parsedData);
-              setCurrentAnalysis({ id: existing.id });
-              setCreditsDeducted(true);
-              setIsSubmitting(false);
-              toast({
-                title: "Previous Interview Prep Found",
-                description: `Using your previous interview prep for this job posting. ${requiredCredits} credits deducted.`
-              });
-              return;
-            } else {
-              toast({
-                title: "Credit Processing Issue",
-                description: "Found existing interview prep but had trouble processing credits. Please try again."
-              });
-              setIsSubmitting(false);
-              return;
-            }
+            setInterviewData(parsedData);
+            setCurrentAnalysis({ id: existing.id });
+            setIsSubmitting(false);
+            toast({
+              title: "Previous Interview Prep Found",
+              description: "Using your previous interview prep for this job posting."
+            });
+            return;
           } catch (error) {
             console.error('Error parsing existing interview questions:', error);
           }
@@ -338,7 +315,7 @@ const InterviewPrep = () => {
           refetchHistory();
           toast({
             title: "Interview Prep Started!",
-            description: `Your personalized interview questions are being generated. ${requiredCredits} credits will be deducted when ready.`
+            description: "Your personalized interview questions are being generated."
           });
         }
       }, 5, 'generate interview prep');
@@ -372,14 +349,27 @@ const InterviewPrep = () => {
     setInterviewData(null);
     setCurrentAnalysis(null);
     setIsGenerating(false);
-    setCreditsDeducted(false);
   };
 
   const renderInterviewQuestions = (content: string) => {
     if (!content) return null;
 
+    // Parse the content if it's JSON
+    let displayContent = content;
+    try {
+      const parsed = JSON.parse(content);
+      if (typeof parsed === 'object' && parsed.content) {
+        displayContent = parsed.content;
+      } else if (typeof parsed === 'string') {
+        displayContent = parsed;
+      }
+    } catch (e) {
+      // If it's not JSON, use as is
+      displayContent = content;
+    }
+
     // Simple markdown parsing with smaller text sizes
-    const processedContent = content
+    const processedContent = displayContent
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
       .replace(/^# (.*$)/gim, '<h1 style="font-size: 1.125rem; font-weight: bold; margin: 0.75rem 0; color: #1e40af;">$1</h1>') // H1 headers - smaller
       .replace(/^## (.*$)/gim, '<h2 style="font-size: 1rem; font-weight: bold; margin: 0.5rem 0; color: #2563eb;">$1</h2>') // H2 headers - smaller
@@ -393,6 +383,10 @@ const InterviewPrep = () => {
       />
     );
   };
+
+  // Check if form is valid and user has credits
+  const isFormValid = companyName.trim() && jobTitle.trim() && jobDescription.trim();
+  const canSubmit = isFormValid && hasCredits && !isSubmitting && !isGenerating;
 
   return (
     <Layout>
@@ -411,7 +405,7 @@ const InterviewPrep = () => {
             <div className="mt-4 flex justify-center">
               <Badge variant="outline" className="bg-blue-900/20 border-blue-400/30 text-blue-200 px-3 py-1">
                 <CreditCard className="w-4 h-4 mr-2" />
-                Usage Fee: {requiredCredits} credits
+                Usage Fee: 6.0 credits
               </Badge>
             </div>
           </div>
@@ -475,8 +469,12 @@ const InterviewPrep = () => {
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <Button 
                   onClick={handleGenerate} 
-                  disabled={isGenerating || isSubmitting || isCheckingCredits || !isAuthReady} 
-                  className="w-full sm:flex-1 text-white font-medium bg-rose-600 hover:bg-rose-500"
+                  disabled={!canSubmit} 
+                  className={`w-full sm:flex-1 text-white font-medium ${
+                    canSubmit 
+                      ? "bg-rose-600 hover:bg-rose-500" 
+                      : "bg-gray-500 text-gray-300 cursor-not-allowed"
+                  }`}
                 >
                   {isGenerating || isSubmitting ? 'Generating...' : 'Generate Interview Prep'}
                 </Button>

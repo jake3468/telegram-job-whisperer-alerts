@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Building2, MapPin, Briefcase, Loader2, RotateCcw, Calendar, TrendingUp, Shield, Lightbulb, DollarSign, Users, GraduationCap, AlertTriangle, History } from 'lucide-react';
 import { Layout } from '@/components/Layout';
-import { useCreditCheck } from '@/hooks/useCreditCheck';
+import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -17,7 +17,6 @@ import { BulletPointList } from '@/components/BulletPointList';
 import { JSONSectionDisplay } from '@/components/JSONSectionDisplay';
 import { SourcesDisplay } from '@/components/SourcesDisplay';
 import { PremiumAnalysisResults } from '@/components/PremiumAnalysisResults';
-import { useDeferredCreditDeduction } from '@/hooks/useDeferredCreditDeduction';
 import { Badge } from '@/components/ui/badge';
 
 interface CompanyRoleAnalysisData {
@@ -55,16 +54,23 @@ const CompanyRoleAnalysis = () => {
   const [pendingAnalysisId, setPendingAnalysisId] = useState<string | null>(null);
   const [loadingMessages, setLoadingMessages] = useState<string[]>([]);
   const [showRecentResults, setShowRecentResults] = useState(false);
-  const [creditsPendingDeduction, setCreditsPendingDeduction] = useState<string | null>(null);
   const { toast } = useToast();
   const { userProfile } = useUserProfile();
-  const { hasCredits, showInsufficientCreditsPopup } = useCreditCheck(3.0);
-  const { deductCredits, isDeducting } = useDeferredCreditDeduction();
+  
+  // Use the feature credit check hook for checking credits only (no deduction)
+  const { hasCredits, showInsufficientCreditsPopup } = useFeatureCreditCheck({
+    feature: 'COMPANY_ROLE_ANALYSIS',
+    onSuccess: () => {
+      console.log('Credit check passed for company analysis');
+    },
+    onInsufficientCredits: () => {
+      console.log('Insufficient credits for company analysis');
+    }
+  });
 
   // Clear results when component mounts (page refresh/navigation)
   useEffect(() => {
     setShowRecentResults(false);
-    setCreditsPendingDeduction(null);
   }, []);
 
   // Fetch company-role analysis history with authenticated requests
@@ -135,51 +141,18 @@ const CompanyRoleAnalysis = () => {
     );
     
     if (completedAnalysis) {
-      console.log('Found completed analysis, processing credit deduction and showing results');
+      console.log('Found completed analysis, showing results');
       setPendingAnalysisId(null);
       setIsSubmitting(false);
       setLoadingMessages([]);
       setShowRecentResults(true);
 
-      // Only deduct credits if we haven't already deducted for this analysis
-      if (!creditsPendingDeduction || creditsPendingDeduction !== completedAnalysis.id) {
-        console.log('Deducting credits for completed analysis:', completedAnalysis.id);
-        setCreditsPendingDeduction(completedAnalysis.id);
-        
-        deductCredits(3.0, 'company_analysis', 'Company Analysis - Results Generated')
-          .then((success) => {
-            if (success) {
-              console.log('Credits deducted successfully for analysis:', completedAnalysis.id);
-              toast({
-                title: "Analysis Complete!",
-                description: "Your company analysis is ready to view."
-              });
-            } else {
-              console.error('Failed to deduct credits for analysis:', completedAnalysis.id);
-              toast({
-                title: "Credit Deduction Failed",
-                description: "Unable to deduct credits. Please contact support if this persists.",
-                variant: "destructive"
-              });
-            }
-          })
-          .catch((error) => {
-            console.error('Error deducting credits for analysis:', completedAnalysis.id, error);
-            toast({
-              title: "Credit Deduction Error",
-              description: "An error occurred while deducting credits.",
-              variant: "destructive"
-            });
-          });
-      } else {
-        console.log('Credits already deducted for this analysis, showing toast only');
-        toast({
-          title: "Analysis Complete!",
-          description: "Your company analysis is ready to view."
-        });
-      }
+      toast({
+        title: "Analysis Complete!",
+        description: "Your company analysis is ready to view. Credits will be deducted automatically."
+      });
     }
-  }, [analysisHistory, pendingAnalysisId, toast, deductCredits, creditsPendingDeduction]);
+  }, [analysisHistory, pendingAnalysisId, toast]);
 
   // Real-time subscription for analysis updates with enhanced detection
   useEffect(() => {
@@ -270,7 +243,6 @@ const CompanyRoleAnalysis = () => {
 
     setIsSubmitting(true);
     setShowRecentResults(false);
-    setCreditsPendingDeduction(null);
 
     try {
       console.log('Creating company role analysis with data:', {
@@ -310,7 +282,7 @@ const CompanyRoleAnalysis = () => {
       setPendingAnalysisId(data.id);
       toast({
         title: "Analysis Started",
-        description: "Your company-role analysis is being generated. You'll see results shortly!"
+        description: "Your company-role analysis is being generated. Credits will be deducted when results are ready."
       });
 
       // Reset form
@@ -441,7 +413,7 @@ const CompanyRoleAnalysis = () => {
                   <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4">
                     <Button
                       type="submit"
-                      disabled={isSubmitting || isDeducting || !hasCredits}
+                      disabled={isSubmitting}
                       className="w-full lg:flex-1 bg-gradient-to-r from-white via-white to-white hover:from-white/90 hover:via-white/90 hover:to-white/90 text-black font-orbitron font-bold py-4 sm:py-6 text-xs sm:text-base shadow-2xl shadow-gray-300/50 border-0 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isSubmitting ? (
