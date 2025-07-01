@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 
 interface N8NImagePayload {
   type: 'linkedin_image_ready';
@@ -19,6 +20,7 @@ interface UseN8NImageDisplayReturn {
 export const useN8NImageDisplay = (postId: string, variationNumber: number, onImageReceived?: () => void): UseN8NImageDisplayReturn => {
   const [n8nImages, setN8nImages] = useState<string[]>([]);
   const { toast } = useToast();
+  const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
 
   const resetLoadingState = () => {
     console.log(`🔄 Resetting loading state for variation ${variationNumber}`);
@@ -27,45 +29,47 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number, onIm
     }
   };
 
-  // Fallback polling mechanism when real-time fails
+  // Enhanced polling mechanism with proper authentication
   const pollForImages = async () => {
-    if (!postId) return;
+    if (!postId || !isAuthReady) return;
 
     try {
-      const { data, error } = await supabase
-        .from('linkedin_post_images')
-        .select('image_data')
-        .eq('post_id', postId)
-        .eq('variation_number', variationNumber);
+      await executeWithRetry(async () => {
+        const { data, error } = await supabase
+          .from('linkedin_post_images')
+          .select('image_data')
+          .eq('post_id', postId)
+          .eq('variation_number', variationNumber);
 
-      if (error) {
-        console.error('Error polling for images:', error);
-        return;
-      }
+        if (error) {
+          console.error('Error polling for images:', error);
+          return;
+        }
 
-      if (data && data.length > 0) {
-        const imageUrls = data.map(img => img.image_data);
-        console.log(`📡 Found ${imageUrls.length} images via polling for variation ${variationNumber}`);
-        
-        setN8nImages(prev => {
-          const newImages = imageUrls.filter(url => !prev.includes(url));
-          if (newImages.length > 0) {
-            console.log(`📡 Adding ${newImages.length} new images via polling`);
-            if (onImageReceived) {
-              onImageReceived();
+        if (data && data.length > 0) {
+          const imageUrls = data.map(img => img.image_data);
+          console.log(`📡 Found ${imageUrls.length} images via polling for variation ${variationNumber}`);
+          
+          setN8nImages(prev => {
+            const newImages = imageUrls.filter(url => !prev.includes(url));
+            if (newImages.length > 0) {
+              console.log(`📡 Adding ${newImages.length} new images via polling`);
+              if (onImageReceived) {
+                onImageReceived();
+              }
+              return [...prev, ...newImages];
             }
-            return [...prev, ...newImages];
-          }
-          return prev;
-        });
-      }
+            return prev;
+          });
+        }
+      }, 3, `poll for images variation ${variationNumber}`);
     } catch (err) {
       console.error('Error in polling for images:', err);
     }
   };
 
   useEffect(() => {
-    if (!postId) return;
+    if (!postId || !isAuthReady) return;
 
     const channelName = `linkedin-image-display-${postId}-${variationNumber}`;
     console.log(`🎯 Setting up image listener for channel: ${channelName}`);
@@ -104,24 +108,32 @@ export const useN8NImageDisplay = (postId: string, variationNumber: number, onIm
       .subscribe((status) => {
         console.log(`🎯 Image channel subscription status for variation ${variationNumber}:`, status);
         
+        // If subscription succeeds, do initial poll
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ Real-time subscription active, doing initial poll');
+          pollForImages();
+        }
+        
         // If subscription fails, start polling as fallback
-        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
           console.log('🔄 Real-time failed, starting polling fallback');
-          const pollInterval = setInterval(pollForImages, 3000);
+          
+          // Start aggressive polling as fallback
+          const pollInterval = setInterval(() => {
+            pollForImages();
+          }, 2000); // Poll every 2 seconds
           
           // Clean up polling when component unmounts
           return () => clearInterval(pollInterval);
         }
       });
 
-    // Initial poll to check for existing images
-    pollForImages();
-
+    // Clean up function
     return () => {
       console.log(`🧹 Cleaning up image listener for variation ${variationNumber}`);
       supabase.removeChannel(channel);
     };
-  }, [postId, variationNumber, toast, onImageReceived]);
+  }, [postId, variationNumber, toast, onImageReceived, isAuthReady, executeWithRetry]);
 
   return { n8nImages, resetLoadingState };
 };
