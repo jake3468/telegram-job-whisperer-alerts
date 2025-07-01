@@ -17,9 +17,12 @@ export const useClerkSupabaseSync = () => {
         // Set up the token refresh function
         const refreshFunction = async () => {
           try {
+            console.log('[useClerkSupabaseSync] 🔄 Token refresh function called');
             const token = await getToken({ template: 'supabase' });
+            console.log('[useClerkSupabaseSync] ✅ New token obtained from Clerk');
             return token;
           } catch (error) {
+            console.error('[useClerkSupabaseSync] ❌ Failed to get token from Clerk:', error);
             return null;
           }
         };
@@ -33,12 +36,13 @@ export const useClerkSupabaseSync = () => {
         if (token) {
           const success = await setClerkToken(token);
           if (success) {
+            console.log('[useClerkSupabaseSync] ✅ Initial Clerk-Supabase sync completed');
             syncedRef.current = true;
             tokenSetRef.current = true;
           }
         }
       } catch (error) {
-        // Silent error handling
+        console.error('[useClerkSupabaseSync] ❌ Error in token setup:', error);
       }
     };
 
@@ -49,6 +53,7 @@ export const useClerkSupabaseSync = () => {
       setClerkToken(null);
       tokenSetRef.current = false;
       syncedRef.current = false;
+      console.log('[useClerkSupabaseSync] 🔄 User logged out, tokens cleared');
     }
   }, [user, isLoaded, getToken]);
 

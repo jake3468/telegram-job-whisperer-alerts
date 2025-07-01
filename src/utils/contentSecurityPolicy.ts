@@ -33,7 +33,6 @@ class ContentSecurityPolicyManager {
       'connect-src': [
         "'self'",
         'https://fnzloyyhzhrqsvslhhri.supabase.co',
-        'wss://fnzloyyhzhrqsvslhhri.supabase.co', // WebSocket for Supabase realtime
         'https://ipapi.co',
         'https://api.ipify.org',
         'https://ipwhois.app',

@@ -21,6 +21,8 @@ export const fetchUserProfile = async (userId: string, maxAttempts: number = 3) 
   let profileError = null;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    debugLog(`Profile fetch attempt ${attempt}/${maxAttempts}`);
+
     const profileResult = await makeAuthenticatedRequest(async () => {
       return await supabase
         .from('user_profile')
@@ -39,6 +41,7 @@ export const fetchUserProfile = async (userId: string, maxAttempts: number = 3) 
     // Only retry on permission errors and only in development
     if ((profileError.code === '42501' || profileError.message.includes('permission')) && 
         attempt < maxAttempts && Environment.isDevelopment()) {
+      debugLog('Permission error, retrying...');
       await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 200));
     } else {
       break; // Don't retry other errors or in production
