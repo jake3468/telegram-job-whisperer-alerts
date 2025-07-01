@@ -146,40 +146,49 @@ serve(async (req) => {
     if (responseData.success && responseData.image_data) {
       console.log('N8N returned image data directly, updating database...')
       
-      // Clean up any existing stuck records first
-      await supabase
+      // Update the existing "generating..." record with the actual image data
+      const { data: updateResult, error: updateError } = await supabase
         .from('linkedin_post_images')
-        .delete()
+        .update({ image_data: responseData.image_data })
         .eq('post_id', post_id)
         .eq('variation_number', variation_number)
         .eq('image_data', 'generating...')
+        .select()
 
-      // Insert/Update the image record
-      const { data: existingRecords, error: checkError } = await supabase
-        .from('linkedin_post_images')
-        .select('id')
-        .eq('post_id', post_id)
-        .eq('variation_number', variation_number)
-        .neq('image_data', 'generating...')
-
-      if (checkError) {
-        console.error('Error checking existing records:', checkError)
-      }
-
-      if (existingRecords && existingRecords.length > 0) {
-        // Update existing record
-        const { error: updateError } = await supabase
+      if (updateError) {
+        console.error('Error updating existing generating record:', updateError)
+        
+        // If update failed, try to create a new record (fallback)
+        const { error: insertError } = await supabase
           .from('linkedin_post_images')
-          .update({ image_data: responseData.image_data })
-          .eq('id', existingRecords[0].id)
+          .insert({
+            post_id: post_id,
+            variation_number: variation_number,
+            image_data: responseData.image_data
+          })
 
-        if (updateError) {
-          console.error('Error updating existing record:', updateError)
+        if (insertError) {
+          console.error('Error creating fallback record:', insertError)
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              error: 'Failed to save image data',
+              details: insertError.message
+            }),
+            { 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+              status: 500 
+            }
+          )
         } else {
-          console.log('Successfully updated existing image record')
+          console.log('Successfully created fallback image record')
         }
+      } else if (updateResult && updateResult.length > 0) {
+        console.log('Successfully updated existing generating record')
       } else {
-        // Create new record
+        console.log('No generating record found to update, creating new record...')
+        
+        // Create new record if no generating record was found
         const { error: insertError } = await supabase
           .from('linkedin_post_images')
           .insert({
@@ -190,6 +199,17 @@ serve(async (req) => {
 
         if (insertError) {
           console.error('Error creating new record:', insertError)
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              error: 'Failed to create image record',
+              details: insertError.message
+            }),
+            { 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+              status: 500 
+            }
+          )
         } else {
           console.log('Successfully created new image record')
         }
