@@ -24,10 +24,11 @@ export function useLinkedInImageManager(postId: string | null) {
     3: images.filter(img => img.variation_number === 3 && img.image_data !== 'generating...').map(img => img.image_data)
   };
 
+  // Only show loading if actively generating AND no images exist for that variation
   const loadingImage = {
-    1: isGenerating[0] || images.some(img => img.variation_number === 1 && img.image_data === 'generating...'),
-    2: isGenerating[1] || images.some(img => img.variation_number === 2 && img.image_data === 'generating...'), 
-    3: isGenerating[2] || images.some(img => img.variation_number === 3 && img.image_data === 'generating...')
+    1: isGenerating[0] && generatedImages[1].length === 0,
+    2: isGenerating[1] && generatedImages[2].length === 0, 
+    3: isGenerating[2] && generatedImages[3].length === 0
   };
 
   const imageGenerationFailed = {
@@ -37,6 +38,14 @@ export function useLinkedInImageManager(postId: string | null) {
   };
 
   const hasImages = images.filter(img => img.image_data !== 'generating...').length > 0;
+
+  // Reset generating states when postId changes (navigating to different history items)
+  useEffect(() => {
+    if (postId) {
+      setIsGenerating([false, false, false]);
+      setImages([]);
+    }
+  }, [postId]);
 
   // Fetch images when component mounts or postId changes
   const fetchImages = useCallback(async () => {
@@ -57,8 +66,15 @@ export function useLinkedInImageManager(postId: string | null) {
 
         if (data) {
           setImages(data);
-          // Reset generating states properly based on current image data
-          setIsGenerating([false, false, false]);
+          
+          // Reset generating states based on existing images
+          const newGeneratingStates = [false, false, false];
+          data.forEach(img => {
+            if (img.image_data === 'generating...' && img.variation_number >= 1 && img.variation_number <= 3) {
+              newGeneratingStates[img.variation_number - 1] = true;
+            }
+          });
+          setIsGenerating(newGeneratingStates);
         }
       }, 3, 'fetch LinkedIn post images');
     } catch (error) {
@@ -104,6 +120,13 @@ export function useLinkedInImageManager(postId: string | null) {
             toast({
               title: "Image Generated!",
               description: `LinkedIn post image for variation ${newImage.variation_number} is ready.`
+            });
+          } else if (newImage.image_data === 'generating...' && newImage.variation_number) {
+            // Image generation started - turn on loading for this specific variation
+            setIsGenerating(prev => {
+              const newState = [...prev];
+              newState[newImage.variation_number - 1] = true;
+              return newState;
             });
           }
         } else if (payload.eventType === 'DELETE') {
