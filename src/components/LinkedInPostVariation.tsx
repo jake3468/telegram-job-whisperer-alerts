@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -84,7 +83,7 @@ const LinkedInPostVariation = ({
     loadExistingImages();
   }, [postId, variationNumber, isAuthReady, executeWithRetry]);
 
-  // Real-time subscription for image updates - FIXED to properly handle all image updates
+  // Real-time subscription for image updates - ENHANCED with better state management
   useEffect(() => {
     if (!postId || !isAuthReady) return;
 
@@ -120,12 +119,16 @@ const LinkedInPostVariation = ({
             console.log(`✅ Image generation completed for variation ${variationNumber}`);
             console.log(`🖼️ New image data received (length: ${newImage.image_data.length})`);
             
-            // Check if it's a valid image (base64 or URL)
-            const isValidImage = newImage.image_data.startsWith('data:image/') || 
-                                newImage.image_data.startsWith('http') ||
-                                newImage.image_data.length > 1000; // Assume long strings are base64 images
+            // ENHANCED: Better validation for base64 images
+            const isValidBase64Image = newImage.image_data.startsWith('data:image/') && 
+                                     newImage.image_data.includes('base64,') &&
+                                     newImage.image_data.length > 5000; // More reasonable threshold for actual images
             
-            if (isValidImage) {
+            const isValidUrl = newImage.image_data.startsWith('http');
+            
+            if (isValidBase64Image || isValidUrl) {
+              console.log(`📡 Valid image detected, updating state for variation ${variationNumber}`);
+              
               // Add the new image to the list if it's not already there
               setGeneratedImages(prev => {
                 const exists = prev.includes(newImage.image_data);
@@ -137,6 +140,8 @@ const LinkedInPostVariation = ({
                 return [...prev, newImage.image_data];
               });
               
+              // CRITICAL: Reset loading states immediately when valid image is received
+              console.log(`🔄 Resetting loading states for variation ${variationNumber}`);
               setIsLoadingImage(false);
               setImageGenerationFailed(false);
               
@@ -144,6 +149,10 @@ const LinkedInPostVariation = ({
                 title: "Image Generated!",
                 description: `LinkedIn post image for variation ${variationNumber} is ready.`
               });
+            } else {
+              console.log(`❌ Invalid image data format for variation ${variationNumber}`);
+              setIsLoadingImage(false);
+              setImageGenerationFailed(true);
             }
           } 
           else if (newImage.image_data && newImage.image_data.includes('failed')) {
@@ -241,7 +250,7 @@ const LinkedInPostVariation = ({
     }
   };
 
-  // Handle image generation - Fixed to properly call the linkedin-image-webhook edge function
+  // Handle image generation - Enhanced logging for debugging
   const handleGenerateImage = async () => {
     if (!postId) {
       toast({
@@ -253,6 +262,8 @@ const LinkedInPostVariation = ({
     }
 
     console.log(`🚀 Starting image generation for post ${postId}, variation ${variationNumber}`);
+    
+    // CRITICAL: Reset states before starting generation
     setIsLoadingImage(true);
     setImageGenerationFailed(false);
 
