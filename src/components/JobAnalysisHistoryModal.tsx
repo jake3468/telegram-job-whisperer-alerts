@@ -279,10 +279,20 @@ const JobAnalysisHistoryModal = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] max-w-5xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
         <DialogHeader className="flex-shrink-0">
-          <DialogTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
-            <History className="w-4 h-4 sm:w-5 sm:h-5" />
-            Job Analysis History
-          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
+              <History className="w-4 h-4 sm:w-5 sm:h-5" />
+              Job Analysis History
+            </DialogTitle>
+            <Button 
+              onClick={onClose} 
+              size="sm" 
+              variant="ghost"
+              className="text-white/70 hover:text-white h-8 w-8 p-0 hover:bg-white/10"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
           <DialogDescription className="text-white/70 font-inter text-xs sm:text-sm">
             Your history is automatically deleted after 60 days. Found {historyData.length} items.
           </DialogDescription>

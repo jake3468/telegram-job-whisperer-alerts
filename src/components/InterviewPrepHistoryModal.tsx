@@ -215,10 +215,20 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
       </DialogTrigger>
       <DialogContent className="w-[95vw] max-w-5xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
         <DialogHeader className="flex-shrink-0">
-          <DialogTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
-            <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
-            Interview Prep History
-          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-white font-inter flex items-center gap-2 text-base sm:text-lg">
+              <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
+              Interview Prep History
+            </DialogTitle>
+            <Button 
+              onClick={() => setIsOpen(false)} 
+              size="sm" 
+              variant="ghost"
+              className="text-white/70 hover:text-white h-8 w-8 p-0 hover:bg-white/10"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
         </DialogHeader>
         
         <div className="border border-orange-500/30 rounded-lg p-2 sm:p-3 mb-4 flex-shrink-0 font-thin text-gray-950 bg-zinc-950">
