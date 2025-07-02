@@ -12,7 +12,7 @@ interface OnboardingPopupProps {
 export function OnboardingPopup({ isOpen, onClose, onDontShowAgain, userName }: OnboardingPopupProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl bg-gradient-to-br from-purple-900/95 via-blue-900/95 to-indigo-900/95 border-purple-500/30 text-white">
+      <DialogContent className="max-w-md sm:max-w-2xl mx-4 bg-gradient-to-br from-purple-900/95 via-blue-900/95 to-indigo-900/95 border-purple-500/30 text-white">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-purple-300 to-blue-300 bg-clip-text text-transparent flex items-center gap-2">
