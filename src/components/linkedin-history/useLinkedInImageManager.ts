@@ -65,6 +65,19 @@ export function useLinkedInImageManager(postId: string | null) {
 
         if (data) {
           setImages(data);
+          
+          // Reset loading states for variations that have existing images
+          if (data.length > 0) {
+            setUserTriggeredLoading(prev => {
+              const newState = [...prev];
+              data.forEach(img => {
+                if (img.variation_number && img.variation_number >= 1 && img.variation_number <= 3) {
+                  newState[img.variation_number - 1] = false;
+                }
+              });
+              return newState;
+            });
+          }
         }
       }, 3, 'fetch LinkedIn post images');
     } catch (error) {
