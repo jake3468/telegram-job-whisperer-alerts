@@ -4,8 +4,11 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-request-id',
 }
+
+// Global cache to track ongoing requests
+const activeRequests = new Map<string, Promise<Response>>();
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -14,15 +17,25 @@ serve(async (req) => {
 
   try {
     const { post_heading, post_content, variation_number, user_name, post_id, source, success, image_data } = await req.json()
-
+    
+    // Generate a unique request ID for deduplication
+    const requestId = req.headers.get('x-request-id') || `${post_id}-${variation_number}-${Date.now()}-${Math.random()}`
+    
     console.log('LinkedIn image webhook called with:', { 
       post_id, 
       variation_number, 
       source, 
       success, 
       has_image_data: !!image_data,
+      request_id: requestId,
       request_source: req.headers.get('x-source') || 'unknown'
     })
+
+    // Check for duplicate requests
+    if (activeRequests.has(`${post_id}-${variation_number}`)) {
+      console.log('Duplicate request detected, waiting for active request to complete')
+      return await activeRequests.get(`${post_id}-${variation_number}`)!
+    }
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
@@ -30,114 +43,127 @@ serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // CRITICAL: Early protection check - if valid image already exists, don't process anything
+    // CRITICAL: Ultra-early protection check with timestamp validation
     if (post_id && variation_number) {
-      console.log('Checking for existing valid image before processing...')
+      console.log('Performing ultra-early protection check for existing valid image...')
       
       const { data: existingRecord, error: checkError } = await supabase
         .from('linkedin_post_images')
-        .select('image_data, id')
+        .select('image_data, id, updated_at, created_at')
         .eq('post_id', post_id)
         .eq('variation_number', variation_number)
+        .order('updated_at', { ascending: false, nullsFirst: false })
+        .limit(1)
         .single()
 
-      if (!checkError && existingRecord && existingRecord.image_data.startsWith('data:image/')) {
-        console.log('Valid image already exists, preventing any overwrites. Returning success immediately.')
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            message: 'Valid image already exists, protected from overwrite',
-            record_id: existingRecord.id,
-            protected: true
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
+      if (!checkError && existingRecord) {
+        const isValidImage = existingRecord.image_data && 
+                           existingRecord.image_data.startsWith('data:image/') && 
+                           existingRecord.image_data.length > 100
+        
+        console.log('Existing record found:', {
+          has_valid_image: isValidImage,
+          image_data_start: existingRecord.image_data?.substring(0, 50),
+          image_data_length: existingRecord.image_data?.length,
+          updated_at: existingRecord.updated_at,
+          record_age_minutes: existingRecord.updated_at ? 
+            Math.floor((Date.now() - new Date(existingRecord.updated_at).getTime()) / (1000 * 60)) : 'unknown'
+        })
+
+        if (isValidImage) {
+          console.log('PROTECTION: Valid image already exists, preventing any overwrites')
+          return new Response(
+            JSON.stringify({ 
+              success: true, 
+              message: 'Valid image already exists, protected from overwrite',
+              record_id: existingRecord.id,
+              protected: true,
+              request_id: requestId
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          )
+        }
       }
     }
 
-    // Check if this is a direct N8N response with image data
-    if (success && image_data && post_id && variation_number) {
-      console.log('Processing direct N8N image response for post:', post_id, 'variation:', variation_number)
-      
-      // Double-check protection before processing N8N response
-      const { data: currentRecord, error: checkError } = await supabase
-        .from('linkedin_post_images')
-        .select('image_data, id')
-        .eq('post_id', post_id)
-        .eq('variation_number', variation_number)
-        .single()
+    // Wrap the main processing in a promise for deduplication
+    const processingPromise = (async (): Promise<Response> => {
+      try {
+        // Check if this is a direct N8N response with image data (regardless of HTTP status)
+        if (image_data && post_id && variation_number) {
+          console.log('Processing potential N8N image response for post:', post_id, 'variation:', variation_number)
+          
+          // Validate image data format
+          const isValidImageData = image_data && 
+                                 typeof image_data === 'string' && 
+                                 (image_data.startsWith('data:image/') || image_data.startsWith('http')) &&
+                                 image_data.length > 100
 
-      if (!checkError && currentRecord && currentRecord.image_data.startsWith('data:image/')) {
-        console.log('Valid image already exists during N8N processing, skipping update to prevent overwrite')
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            message: 'Valid image already exists, N8N update skipped to prevent overwrite',
-            record_id: currentRecord.id,
-            protected: true
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
-
-      console.log('Current record status:', {
-        exists: !!currentRecord,
-        current_image_data_type: currentRecord ? 
-          (currentRecord.image_data.startsWith('data:image/') ? 'valid_base64' : 
-           currentRecord.image_data === 'generating...' ? 'generating' : 
-           currentRecord.image_data.includes('failed') ? 'failed' : 'other') : 'none'
-      })
-
-      console.log('Attempting to update/insert image record:', { post_id, variation_number })
-
-      // Try to update existing record first, then insert if it doesn't exist
-      const { data: updateResult, error: updateError } = await supabase
-        .from('linkedin_post_images')
-        .update({ 
-          image_data: image_data,
-          updated_at: new Date().toISOString()
-        })
-        .eq('post_id', post_id)
-        .eq('variation_number', variation_number)
-        .select()
-
-      if (updateError) {
-        console.error('Error updating record:', updateError)
-        
-        // If update failed, try to insert new record
-        const { data: insertResult, error: insertError } = await supabase
-          .from('linkedin_post_images')
-          .insert({
-            post_id: post_id,
-            variation_number: variation_number,
-            image_data: image_data
+          console.log('N8N Response Analysis:', {
+            has_image_data: !!image_data,
+            image_data_type: typeof image_data,
+            is_valid_format: isValidImageData,
+            image_data_start: image_data?.substring(0, 50),
+            image_data_length: image_data?.length,
+            success_flag: success
           })
-          .select()
 
-        // Handle unique constraint violation gracefully
-        if (insertError) {
-          if (insertError.code === '23505') {
-            console.log('Record already exists, trying final update...')
+          if (isValidImageData) {
+            console.log('Valid image data detected from N8N, processing update...')
             
-            // Final attempt to update the existing record - but only if it's not already a valid image
-            const { data: finalUpdate, error: finalError } = await supabase
+            // Triple-check protection before processing N8N response
+            const { data: currentRecord, error: checkError } = await supabase
               .from('linkedin_post_images')
-              .update({ 
-                image_data: image_data,
-                updated_at: new Date().toISOString()
-              })
+              .select('image_data, id, updated_at')
               .eq('post_id', post_id)
               .eq('variation_number', variation_number)
-              .not('image_data', 'like', 'data:image/%') // Only update if not already a valid image
+              .order('updated_at', { ascending: false, nullsFirst: false })
+              .limit(1)
+              .single()
+
+            if (!checkError && currentRecord) {
+              const hasValidImage = currentRecord.image_data?.startsWith('data:image/') && 
+                                  currentRecord.image_data.length > 100
+              
+              if (hasValidImage) {
+                console.log('PROTECTION: Valid image already exists during N8N processing, skipping update')
+                return new Response(
+                  JSON.stringify({ 
+                    success: true, 
+                    message: 'Valid image already exists, N8N update skipped to prevent overwrite',
+                    record_id: currentRecord.id,
+                    protected: true,
+                    request_id: requestId
+                  }),
+                  { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+                )
+              }
+            }
+
+            console.log('Proceeding with N8N image update - no existing valid image found')
+
+            // Use upsert with conflict resolution for atomic operation
+            const { data: upsertResult, error: upsertError } = await supabase
+              .from('linkedin_post_images')
+              .upsert({ 
+                post_id: post_id,
+                variation_number: variation_number,
+                image_data: image_data,
+                updated_at: new Date().toISOString()
+              }, {
+                onConflict: 'post_id,variation_number',
+                ignoreDuplicates: false
+              })
               .select()
 
-            if (finalError) {
-              console.error('Final update failed:', finalError)
+            if (upsertError) {
+              console.error('Error upserting image record:', upsertError)
               return new Response(
                 JSON.stringify({ 
                   success: false, 
-                  error: 'Failed to update image record',
-                  details: finalError.message
+                  error: 'Failed to save image data',
+                  details: upsertError.message,
+                  request_id: requestId
                 }),
                 { 
                   headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
@@ -146,459 +172,388 @@ serve(async (req) => {
               )
             }
 
+            console.log('Successfully processed N8N image data')
             return new Response(
               JSON.stringify({ 
                 success: true, 
-                message: 'Image data updated successfully',
-                record_id: finalUpdate?.[0]?.id,
-                updated_existing: true
+                message: 'Image processed and stored successfully from N8N response',
+                image_data_received: true,
+                variation_number: variation_number,
+                request_id: requestId
               }),
               { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             )
           } else {
-            console.error('Error creating new record:', insertError)
-            return new Response(
-              JSON.stringify({ 
-                success: false, 
-                error: 'Failed to create image record',
-                details: insertError.message
-              }),
-              { 
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
-                status: 500 
-              }
-            )
+            console.log('Invalid or missing image data in N8N response')
           }
-        } else {
-          console.log('Successfully created new image record:', insertResult[0].id)
-          return new Response(
-            JSON.stringify({ 
-              success: true, 
-              message: 'Image record created successfully',
-              record_id: insertResult[0].id,
-              created_new: true
-            }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          )
         }
-      }
 
-      if (updateResult && updateResult.length > 0) {
-        console.log('Successfully updated existing record:', updateResult[0].id)
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            message: 'Image data updated successfully',
-            record_id: updateResult[0].id,
-            updated_existing: true
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
-
-      // If no update occurred, create new record
-      console.log('No existing record updated, creating new one...')
-      
-      const { data: insertResult, error: insertError } = await supabase
-        .from('linkedin_post_images')
-        .insert({
-          post_id: post_id,
-          variation_number: variation_number,
-          image_data: image_data
-        })
-        .select()
-
-      if (insertError) {
-        if (insertError.code === '23505') {
-          console.log('Unique constraint violation during insert, record already exists')
-          return new Response(
-            JSON.stringify({ 
-              success: true, 
-              message: 'Image record already exists',
-              duplicate_prevented: true
-            }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          )
+        // Handle regular webhook trigger (not direct N8N response)
+        if (!post_id || !variation_number) {
+          console.error('Missing required parameters: post_id or variation_number')
+          throw new Error('post_id and variation_number are required')
         }
+
+        // CRITICAL: Before processing webhook trigger, check if valid image already exists
+        console.log('Checking for existing valid image before webhook trigger processing...')
         
-        console.error('Error creating new record:', insertError)
-        return new Response(
-          JSON.stringify({ 
-            success: false, 
-            error: 'Failed to create image record',
-            details: insertError.message
-          }),
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
-            status: 500 
-          }
-        )
-      } else {
-        console.log('Successfully created new image record:', insertResult[0].id)
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            message: 'Image record created successfully',
-            record_id: insertResult[0].id,
-            created_new: true
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
-    }
-
-    // Handle regular webhook trigger (not direct N8N response)
-    // Validate required parameters
-    if (!post_id || !variation_number) {
-      console.error('Missing required parameters: post_id or variation_number')
-      throw new Error('post_id and variation_number are required')
-    }
-
-    // CRITICAL: Before processing webhook trigger, check if valid image already exists
-    console.log('Checking for existing valid image before webhook trigger processing...')
-    
-    const { data: existingImageCheck, error: existingImageError } = await supabase
-      .from('linkedin_post_images')
-      .select('image_data, id')
-      .eq('post_id', post_id)
-      .eq('variation_number', variation_number)
-      .single()
-
-    if (!existingImageError && existingImageCheck && existingImageCheck.image_data.startsWith('data:image/')) {
-      console.log('Valid image already exists for this post/variation, skipping webhook trigger to prevent overwrite')
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: 'Valid image already exists, webhook trigger skipped to prevent overwrite',
-          record_id: existingImageCheck.id,
-          protected: true
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    // Get the post data to extract heading and content
-    let postHeading = post_heading;
-    let postContent = post_content;
-    let userName = user_name;
-
-    if (!postHeading || !postContent) {
-      console.log('Missing post data, fetching from database...')
-      const { data: postData, error: postError } = await supabase
-        .from('job_linkedin')
-        .select(`
-          post_heading_${variation_number},
-          post_content_${variation_number},
-          user_profile!inner(
-            users!inner(first_name, last_name)
-          )
-        `)
-        .eq('id', post_id)
-        .single()
-
-      if (postError) {
-        console.error('Error fetching post data:', postError)
-        throw new Error('Failed to fetch post data')
-      }
-
-      postHeading = postData[`post_heading_${variation_number}`]
-      postContent = postData[`post_content_${variation_number}`]
-      const user = postData.user_profile?.users
-      userName = user ? `${user.first_name} ${user.last_name}` : 'Professional User'
-    }
-
-    // Get the N8N webhook URL from environment variables
-    const n8nWebhookUrl = Deno.env.get('N8N_LINKEDIN_IMAGE_WEBHOOK_URL')
-
-    if (!n8nWebhookUrl) {
-      console.error('N8N_LINKEDIN_IMAGE_WEBHOOK_URL environment variable not found')
-      
-      // Only update to failed status if current record is "generating..." - NEVER overwrite valid images
-      const { data: currentRecord } = await supabase
-        .from('linkedin_post_images')
-        .select('image_data')
-        .eq('post_id', post_id)
-        .eq('variation_number', variation_number)
-        .single()
-
-      if (currentRecord && currentRecord.image_data === 'generating...') {
-        console.log('Updating generating state to failed - webhook URL not configured')
-        await supabase
+        const { data: existingImageCheck, error: existingImageError } = await supabase
           .from('linkedin_post_images')
-          .update({ image_data: 'failed - webhook URL not configured' })
+          .select('image_data, id, updated_at')
           .eq('post_id', post_id)
           .eq('variation_number', variation_number)
-          .eq('image_data', 'generating...')
-      } else {
-        console.log('Skipping failure update - current state is not generating')
-      }
-      
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'N8N webhook URL not configured in environment variables',
-          webhook_url_configured: false
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
-          status: 500 
-        }
-      )
-    }
-
-    console.log('Using N8N webhook URL (first 50 chars):', n8nWebhookUrl.substring(0, 50) + '...')
-    console.log('Triggering N8N webhook with payload:', {
-      post_heading: postHeading,
-      variation_number,
-      user_name: userName,
-      post_id,
-      source,
-      request_source: req.headers.get('x-source') || 'direct'
-    })
-
-    // Note: The database should already be updated to "generating..." by the frontend
-    // We don't need to duplicate that logic here
-
-    let responseData;
-    let responseText;
-    let response;
-    
-    try {
-      // Call the N8N webhook directly with the correct full URL
-      response = await fetch(n8nWebhookUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Source": req.headers.get('x-source') || 'supabase-webhook',
-          "X-Request-ID": crypto.randomUUID(),
-        },
-        body: JSON.stringify({
-          post_heading: postHeading,
-          post_content: postContent,
-          variation_number,
-          user_name: userName,
-          post_id,
-          source,
-          timestamp: new Date().toISOString(),
-          triggered_from: req.headers.get('origin') || 'linkedin-image-webhook'
-        }),
-      })
-
-      // Parse response body FIRST, regardless of HTTP status
-      try {
-        responseText = await response.text()
-        console.log('N8N webhook raw response:', { 
-          status: response.status, 
-          statusText: response.statusText,
-          responseText: responseText.substring(0, 200) + '...' // Log first 200 chars
-        })
-        responseData = JSON.parse(responseText)
-      } catch (parseError) {
-        console.error('Failed to parse N8N response as JSON:', parseError, 'Raw response:', responseText)
-        responseData = null
-      }
-
-      // Check for valid image data in response FIRST, regardless of HTTP status
-      if (responseData && responseData.success && responseData.image_data) {
-        console.log('N8N returned valid image data despite HTTP status:', response.status)
-        
-        // Triple-check protection before updating with N8N response
-        const { data: finalCheck } = await supabase
-          .from('linkedin_post_images')
-          .select('image_data')
-          .eq('post_id', post_id)
-          .eq('variation_number', variation_number)
+          .order('updated_at', { ascending: false, nullsFirst: false })
+          .limit(1)
           .single()
 
-        if (finalCheck && finalCheck.image_data.startsWith('data:image/')) {
-          console.log('Valid image detected during final check, aborting N8N update to prevent overwrite')
-          return new Response(
-            JSON.stringify({ 
-              success: true, 
-              message: 'Valid image already exists, N8N response ignored to prevent overwrite',
-              protected: true
-            }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          )
-        }
-        
-        // Update the existing record with the actual image data
-        const { data: updateResult, error: updateError } = await supabase
-          .from('linkedin_post_images')
-          .update({ 
-            image_data: responseData.image_data,
-            updated_at: new Date().toISOString()
-          })
-          .eq('post_id', post_id)
-          .eq('variation_number', variation_number)
-          .select()
-
-        if (updateError) {
-          console.error('Error updating with image data:', updateError)
+        if (!existingImageError && existingImageCheck) {
+          const hasValidImage = existingImageCheck.image_data?.startsWith('data:image/') && 
+                               existingImageCheck.image_data.length > 100
           
-          // Handle unique constraint by trying to insert new record
-          const { error: insertError } = await supabase
-            .from('linkedin_post_images')
-            .insert({
-              post_id: post_id,
-              variation_number: variation_number,
-              image_data: responseData.image_data
-            })
-
-          if (insertError && insertError.code !== '23505') {
-            console.error('Error creating fallback record:', insertError)
+          if (hasValidImage) {
+            console.log('PROTECTION: Valid image already exists for this post/variation, skipping webhook trigger')
             return new Response(
               JSON.stringify({ 
-                success: false, 
-                error: 'Failed to save image data',
-                details: insertError.message
+                success: true, 
+                message: 'Valid image already exists, webhook trigger skipped to prevent overwrite',
+                record_id: existingImageCheck.id,
+                protected: true,
+                request_id: requestId
               }),
-              { 
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
-                status: 500 
-              }
+              { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             )
-          } else {
-            console.log('Successfully handled image data via insert or duplicate prevention')
-          }
-        } else if (updateResult && updateResult.length > 0) {
-          console.log('Successfully updated existing record with image data')
-        } else {
-          console.log('No record updated, creating new one with image data...')
-          
-          // Create new record if no existing record was updated
-          const { error: insertError } = await supabase
-            .from('linkedin_post_images')
-            .insert({
-              post_id: post_id,
-              variation_number: variation_number,
-              image_data: responseData.image_data
-            })
-
-          if (insertError && insertError.code !== '23505') {
-            console.error('Error creating new record with image data:', insertError)
-            return new Response(
-              JSON.stringify({ 
-                success: false, 
-                error: 'Failed to create image record',
-                details: insertError.message
-              }),
-              { 
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
-                status: 500 
-              }
-            )
-          } else {
-            console.log('Successfully handled image data via insert or duplicate prevention')
           }
         }
 
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            message: 'Image processed and stored successfully from N8N response',
-            image_data_received: true,
-            variation_number: variation_number,
-            http_status_was: response.status
-          }),
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        // Get the post data to extract heading and content
+        let postHeading = post_heading;
+        let postContent = post_content;
+        let userName = user_name;
+
+        if (!postHeading || !postContent) {
+          console.log('Missing post data, fetching from database...')
+          const { data: postData, error: postError } = await supabase
+            .from('job_linkedin')
+            .select(`
+              post_heading_${variation_number},
+              post_content_${variation_number},
+              user_profile!inner(
+                users!inner(first_name, last_name)
+              )
+            `)
+            .eq('id', post_id)
+            .single()
+
+          if (postError) {
+            console.error('Error fetching post data:', postError)
+            throw new Error('Failed to fetch post data')
           }
-        )
-      }
 
-      // If HTTP status is not OK AND no valid image data found, then it's a real failure
-      if (!response.ok) {
-        console.error(`N8N webhook failed: ${response.status} ${response.statusText}`, responseText)
-        
-        // Only update to failed status if current record is "generating..." - NEVER overwrite valid images
-        const { data: currentRecord } = await supabase
-          .from('linkedin_post_images')
-          .select('image_data')
-          .eq('post_id', post_id)
-          .eq('variation_number', variation_number)
-          .single()
+          postHeading = postData[`post_heading_${variation_number}`]
+          postContent = postData[`post_content_${variation_number}`]
+          const user = postData.user_profile?.users
+          userName = user ? `${user.first_name} ${user.last_name}` : 'Professional User'
+        }
 
-        if (currentRecord && currentRecord.image_data === 'generating...') {
-          console.log('Updating generating state to failed due to webhook error')
-          await supabase
+        // Get the N8N webhook URL from environment variables
+        const n8nWebhookUrl = Deno.env.get('N8N_LINKEDIN_IMAGE_WEBHOOK_URL')
+
+        if (!n8nWebhookUrl) {
+          console.error('N8N_LINKEDIN_IMAGE_WEBHOOK_URL environment variable not found')
+          
+          // Only update to failed status if current record is "generating..." - NEVER overwrite valid images
+          const { data: currentRecord } = await supabase
             .from('linkedin_post_images')
-            .update({ image_data: `failed - webhook error: ${response.status}` })
+            .select('image_data')
             .eq('post_id', post_id)
             .eq('variation_number', variation_number)
-            .eq('image_data', 'generating...')
-        } else {
-          console.log('Skipping failure update - current state is not generating, may be valid image')
-        }
-        
-        return new Response(
-          JSON.stringify({ 
-            success: false, 
-            error: `N8N webhook failed: ${response.statusText}`,
-            webhook_url_configured: true,
-            status_code: response.status
-          }),
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
-            status: 500 
+            .single()
+
+          if (currentRecord && currentRecord.image_data === 'generating...') {
+            console.log('Safely updating generating state to failed - webhook URL not configured')
+            await supabase
+              .from('linkedin_post_images')
+              .update({ 
+                image_data: 'failed - webhook URL not configured',
+                updated_at: new Date().toISOString()
+              })
+              .eq('post_id', post_id)
+              .eq('variation_number', variation_number)
+              .eq('image_data', 'generating...')  // Additional safety check
+          } else {
+            console.log('Skipping failure update - current state is not generating')
           }
-        )
-      }
-
-      // If successful HTTP response but no direct image data, return success for webhook trigger
-      console.log(`N8N webhook triggered successfully for variation ${variation_number}`)
-      
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: 'Image generation triggered successfully',
-          triggered: true,
-          variation_number: variation_number,
-          webhook_url_configured: true
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              error: 'N8N webhook URL not configured in environment variables',
+              webhook_url_configured: false,
+              request_id: requestId
+            }),
+            { 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+              status: 500 
+            }
+          )
         }
-      )
 
-    } catch (fetchError) {
-      console.error('Error calling N8N webhook:', fetchError)
-      
-      // Only update to failed status if current record is "generating..." - NEVER overwrite valid images
-      const { data: currentRecord } = await supabase
-        .from('linkedin_post_images')
-        .select('image_data')
-        .eq('post_id', post_id)
-        .eq('variation_number', variation_number)
-        .single()
+        console.log('Triggering N8N webhook with enhanced payload')
 
-      if (currentRecord && currentRecord.image_data === 'generating...') {
-        console.log('Updating generating state to failed due to fetch error')
-        await supabase
-          .from('linkedin_post_images')
-          .update({ image_data: `failed - fetch error: ${fetchError.message}` })
-          .eq('post_id', post_id)
-          .eq('variation_number', variation_number)
-          .eq('image_data', 'generating...')
-      } else {
-        console.log('Skipping failure update due to fetch error - current state is not generating')
-      }
-      
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: `Failed to call N8N webhook: ${fetchError.message}`,
-          webhook_url_configured: true
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
-          status: 500 
+        try {
+          // Call the N8N webhook with enhanced error handling
+          const response = await fetch(n8nWebhookUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Source": req.headers.get('x-source') || 'supabase-webhook',
+              "X-Request-ID": requestId,
+            },
+            body: JSON.stringify({
+              post_heading: postHeading,
+              post_content: postContent,
+              variation_number,
+              user_name: userName,
+              post_id,
+              source,
+              timestamp: new Date().toISOString(),
+              triggered_from: req.headers.get('origin') || 'linkedin-image-webhook',
+              request_id: requestId
+            }),
+          })
+
+          // Parse response body FIRST, regardless of HTTP status
+          let responseData = null;
+          let responseText = '';
+          
+          try {
+            responseText = await response.text()
+            console.log('N8N webhook response:', { 
+              status: response.status, 
+              statusText: response.statusText,
+              responseText: responseText.substring(0, 500) + (responseText.length > 500 ? '...' : ''),
+              request_id: requestId
+            })
+            
+            if (responseText.trim()) {
+              responseData = JSON.parse(responseText)
+            }
+          } catch (parseError) {
+            console.error('Failed to parse N8N response as JSON:', parseError, 'Raw response:', responseText.substring(0, 200))
+          }
+
+          // CRITICAL: Check for valid image data in response FIRST, regardless of HTTP status
+          const hasValidImageInResponse = responseData && 
+                                        responseData.image_data && 
+                                        typeof responseData.image_data === 'string' &&
+                                        (responseData.image_data.startsWith('data:image/') || responseData.image_data.startsWith('http')) &&
+                                        responseData.image_data.length > 100
+
+          console.log('N8N Response Analysis:', {
+            http_status: response.status,
+            has_response_data: !!responseData,
+            has_image_data_field: !!(responseData?.image_data),
+            image_data_valid: hasValidImageInResponse,
+            success_flag: responseData?.success,
+            request_id: requestId
+          })
+
+          if (hasValidImageInResponse) {
+            console.log('N8N returned valid image data (ignoring HTTP status):', response.status)
+            
+            // Final protection check before updating with N8N response
+            const { data: finalCheck } = await supabase
+              .from('linkedin_post_images')
+              .select('image_data, updated_at')
+              .eq('post_id', post_id)
+              .eq('variation_number', variation_number)
+              .order('updated_at', { ascending: false, nullsFirst: false })
+              .limit(1)
+              .single()
+
+            const alreadyHasValidImage = finalCheck && 
+                                       finalCheck.image_data?.startsWith('data:image/') && 
+                                       finalCheck.image_data.length > 100
+
+            if (alreadyHasValidImage) {
+              console.log('PROTECTION: Valid image detected during final check, aborting N8N update')
+              return new Response(
+                JSON.stringify({ 
+                  success: true, 
+                  message: 'Valid image already exists, N8N response ignored to prevent overwrite',
+                  protected: true,
+                  request_id: requestId
+                }),
+                { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+              )
+            }
+            
+            // Use atomic upsert operation
+            const { data: updateResult, error: updateError } = await supabase
+              .from('linkedin_post_images')
+              .upsert({ 
+                post_id: post_id,
+                variation_number: variation_number,
+                image_data: responseData.image_data,
+                updated_at: new Date().toISOString()
+              }, {
+                onConflict: 'post_id,variation_number',
+                ignoreDuplicates: false
+              })
+              .select()
+
+            if (updateError) {
+              console.error('Error updating with image data:', updateError)
+              return new Response(
+                JSON.stringify({ 
+                  success: false, 
+                  error: 'Failed to save image data',
+                  details: updateError.message,
+                  request_id: requestId
+                }),
+                { 
+                  headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+                  status: 500 
+                }
+              )
+            }
+
+            console.log('Successfully processed N8N webhook response with valid image data')
+            return new Response(
+              JSON.stringify({ 
+                success: true, 
+                message: 'Image processed and stored successfully from N8N webhook response',
+                image_data_received: true,
+                variation_number: variation_number,
+                http_status_was: response.status,
+                request_id: requestId
+              }),
+              { 
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+              }
+            )
+          }
+
+          // If HTTP status is not OK AND no valid image data found, then it's a real failure
+          if (!response.ok && !hasValidImageInResponse) {
+            console.error(`N8N webhook failed: ${response.status} ${response.statusText}`, responseText.substring(0, 200))
+            
+            // Only update to failed status if current record is "generating..." - NEVER overwrite valid images
+            const { data: currentRecord } = await supabase
+              .from('linkedin_post_images')
+              .select('image_data')
+              .eq('post_id', post_id)
+              .eq('variation_number', variation_number)
+              .single()
+
+            if (currentRecord && currentRecord.image_data === 'generating...') {
+              console.log('Safely updating generating state to failed due to webhook error')
+              await supabase
+                .from('linkedin_post_images')
+                .update({ 
+                  image_data: `failed - webhook error: ${response.status}`,
+                  updated_at: new Date().toISOString()
+                })
+                .eq('post_id', post_id)
+                .eq('variation_number', variation_number)
+                .eq('image_data', 'generating...')  // Additional safety check
+            } else {
+              console.log('Skipping failure update - current state is not generating, may be valid image')
+            }
+            
+            return new Response(
+              JSON.stringify({ 
+                success: false, 
+                error: `N8N webhook failed: ${response.statusText}`,
+                webhook_url_configured: true,
+                status_code: response.status,
+                request_id: requestId
+              }),
+              { 
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+                status: 500 
+              }
+            )
+          }
+
+          // If successful HTTP response but no direct image data, return success for webhook trigger
+          console.log(`N8N webhook triggered successfully for variation ${variation_number}`)
+          
+          return new Response(
+            JSON.stringify({ 
+              success: true, 
+              message: 'Image generation triggered successfully',
+              triggered: true,
+              variation_number: variation_number,
+              webhook_url_configured: true,
+              request_id: requestId
+            }),
+            { 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          )
+
+        } catch (fetchError) {
+          console.error('Error calling N8N webhook:', fetchError)
+          
+          // Only update to failed status if current record is "generating..." - NEVER overwrite valid images
+          const { data: currentRecord } = await supabase
+            .from('linkedin_post_images')
+            .select('image_data')
+            .eq('post_id', post_id)
+            .eq('variation_number', variation_number)
+            .single()
+
+          if (currentRecord && currentRecord.image_data === 'generating...') {
+            console.log('Safely updating generating state to failed due to fetch error')
+            await supabase
+              .from('linkedin_post_images')
+              .update({ 
+                image_data: `failed - fetch error: ${fetchError.message}`,
+                updated_at: new Date().toISOString()
+              })
+              .eq('post_id', post_id)
+              .eq('variation_number', variation_number)
+              .eq('image_data', 'generating...')  // Additional safety check
+          } else {
+            console.log('Skipping failure update due to fetch error - current state is not generating')
+          }
+          
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              error: `Failed to call N8N webhook: ${fetchError.message}`,
+              webhook_url_configured: true,
+              request_id: requestId
+            }),
+            { 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+              status: 500 
+            }
+          )
         }
-      )
+
+      } finally {
+        // Remove from active requests when done
+        activeRequests.delete(`${post_id}-${variation_number}`)
+      }
+    })()
+
+    // Store the promise for deduplication
+    if (post_id && variation_number) {
+      activeRequests.set(`${post_id}-${variation_number}`, processingPromise)
     }
+
+    return await processingPromise
 
   } catch (error) {
     console.error('Error in linkedin-image-webhook:', error)
+    
+    // Clean up active requests on error
+    if (typeof post_id === 'string' && typeof variation_number === 'number') {
+      activeRequests.delete(`${post_id}-${variation_number}`)
+    }
+    
     return new Response(
       JSON.stringify({ 
         success: false, 
