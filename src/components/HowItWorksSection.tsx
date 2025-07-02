@@ -16,7 +16,7 @@ const HowItWorksSection = () => {
     {
       icon: Sparkles,
       title: "AI Analysis",
-      description: "Our AI analyzes your profile and creates personalized tools for your job search.",
+      description: "We use your profile to give you personalized results through our AI-powered tools",
     },
     {
       icon: Rocket,
