@@ -339,53 +339,26 @@ serve(async (req) => {
       }),
     })
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error(`N8N webhook failed: ${response.status} ${response.statusText}`, errorText)
-      
-      // Only update to failed status if current record is "generating..."
-      const { data: currentRecord } = await supabase
-        .from('linkedin_post_images')
-        .select('image_data')
-        .eq('post_id', post_id)
-        .eq('variation_number', variation_number)
-        .single()
-
-      if (currentRecord && currentRecord.image_data === 'generating...') {
-        await supabase
-          .from('linkedin_post_images')
-          .update({ image_data: `failed - webhook error: ${response.status}` })
-          .eq('post_id', post_id)
-          .eq('variation_number', variation_number)
-          .eq('image_data', 'generating...')
-      }
-      
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: `N8N webhook failed: ${response.statusText}`,
-          webhook_url_configured: true,
-          status_code: response.status
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
-          status: 500 
-        }
-      )
+    // CRITICAL FIX: Parse response body FIRST, regardless of HTTP status
+    let responseData;
+    let responseText;
+    
+    try {
+      responseText = await response.text()
+      console.log('N8N webhook raw response:', { 
+        status: response.status, 
+        statusText: response.statusText,
+        responseText: responseText.substring(0, 200) + '...' // Log first 200 chars
+      })
+      responseData = JSON.parse(responseText)
+    } catch (parseError) {
+      console.error('Failed to parse N8N response as JSON:', parseError, 'Raw response:', responseText)
+      responseData = null
     }
 
-    // Parse N8N response - expecting format: { success: true, image_data: "data:image/png;base64,...", variation_number: 1, post_id: "xxx" }
-    const responseData = await response.json()
-    console.log('N8N webhook response received:', { 
-      success: responseData.success, 
-      has_image_data: !!responseData.image_data,
-      response_post_id: responseData.post_id,
-      response_variation: responseData.variation_number
-    })
-
-    // Check if N8N returned image data directly
-    if (responseData.success && responseData.image_data) {
-      console.log('N8N returned image data directly in response, updating database...')
+    // Check for valid image data in response FIRST, regardless of HTTP status
+    if (responseData && responseData.success && responseData.image_data) {
+      console.log('N8N returned valid image data despite HTTP status:', response.status)
       
       // Update the existing record with the actual image data
       const { data: updateResult, error: updateError } = await supabase
@@ -461,9 +434,10 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           success: true, 
-          message: 'Image processed and stored successfully',
+          message: 'Image processed and stored successfully from N8N response',
           image_data_received: true,
-          variation_number: variation_number
+          variation_number: variation_number,
+          http_status_was: response.status
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -471,7 +445,42 @@ serve(async (req) => {
       )
     }
 
-    // If no direct image data, return success for webhook trigger
+    // If HTTP status is not OK AND no valid image data found, then it's a real failure
+    if (!response.ok) {
+      console.error(`N8N webhook failed: ${response.status} ${response.statusText}`, responseText)
+      
+      // Only update to failed status if current record is "generating..."
+      const { data: currentRecord } = await supabase
+        .from('linkedin_post_images')
+        .select('image_data')
+        .eq('post_id', post_id)
+        .eq('variation_number', variation_number)
+        .single()
+
+      if (currentRecord && currentRecord.image_data === 'generating...') {
+        await supabase
+          .from('linkedin_post_images')
+          .update({ image_data: `failed - webhook error: ${response.status}` })
+          .eq('post_id', post_id)
+          .eq('variation_number', variation_number)
+          .eq('image_data', 'generating...')
+      }
+      
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: `N8N webhook failed: ${response.statusText}`,
+          webhook_url_configured: true,
+          status_code: response.status
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+          status: 500 
+        }
+      )
+    }
+
+    // If successful HTTP response but no direct image data, return success for webhook trigger
     console.log(`N8N webhook triggered successfully for variation ${variation_number}`)
     
     return new Response(
