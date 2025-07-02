@@ -43,6 +43,7 @@ const LinkedInPostResult = ({
   const variationImages = generatedImages[postNumber] || [];
   const isLoadingThisVariation = loadingImage[postNumber] || false;
   const hasFailedThisVariation = imageGenerationFailed[postNumber] || false;
+  const hasImagesForThisVariation = variationImages.length > 0;
 
   if (!content) return null;
 
@@ -62,15 +63,15 @@ const LinkedInPostResult = ({
           <Button
             onClick={() => onGetImage(item, postNumber)}
             size="sm"
-            disabled={isLoadingThisVariation}
+            disabled={isLoadingThisVariation || hasImagesForThisVariation}
             className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-6 text-xs px-2 flex items-center gap-1"
           >
             <ImageIcon className="w-3 h-3" />
             <span className="hidden xs:inline">
-              {isLoadingThisVariation ? 'Gen...' : 'Get Image'}
+              {isLoadingThisVariation ? 'Gen...' : hasImagesForThisVariation ? 'Generated' : 'Get Image'}
             </span>
             <span className="xs:hidden">
-              {isLoadingThisVariation ? '...' : 'Img'}
+              {isLoadingThisVariation ? '...' : hasImagesForThisVariation ? 'Done' : 'Img'}
             </span>
           </Button>
         </div>
