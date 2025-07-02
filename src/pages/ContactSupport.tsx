@@ -1,9 +1,14 @@
 
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { ArrowLeft, Mail, Clock, Users, Shield } from 'lucide-react';
 
 const ContactSupport = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="min-h-screen bg-black text-slate-50 font-inter">
