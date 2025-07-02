@@ -92,7 +92,7 @@ export function OnboardingPopup({
           <Button onClick={onClose} className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold text-sm h-9">
             Got it! Let's start! 🚀
           </Button>
-          <Button variant="outline" onClick={onDontShowAgain} className="w-full bg-transparent border-purple-400/30 text-purple-200 hover:bg-purple-800/30 hover:text-white text-sm h-8">
+          <Button variant="outline" onClick={onDontShowAgain} className="w-full border-purple-400/30 text-sm h-8 bg-gray-100 text-gray-900">
             Don't show again
           </Button>
         </div>
