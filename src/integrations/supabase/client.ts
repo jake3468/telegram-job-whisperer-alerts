@@ -31,7 +31,6 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
 // Function to set token refresh function from Clerk
 export const setTokenRefreshFunction = (refreshFn: () => Promise<string | null>) => {
   tokenRefreshFunction = refreshFn;
-  logger.debug('Token refresh function set');
 };
 
 // Enhanced function to refresh JWT token with better error handling
@@ -42,12 +41,10 @@ export const refreshJWTToken = async (): Promise<string | null> => {
       return currentJWTToken; // Return current token if no refresh function
     }
 
-    logger.debug('Refreshing JWT token...');
     const newToken = await tokenRefreshFunction();
     
     if (newToken) {
       currentJWTToken = newToken;
-      logger.debug('JWT token refreshed successfully');
       return newToken;
     } else {
       logger.warn('Failed to refresh JWT token - keeping current token');
@@ -78,8 +75,6 @@ const isTokenExpired = (token: string): boolean => {
 // Enhanced function to set Clerk JWT token  
 export const setClerkToken = async (token: string | null) => {
   try {
-    logger.debug('Setting Clerk JWT token...');
-    
     if (token) {
       // Validate token format before setting
       const parts = token.split('.');
@@ -91,14 +86,6 @@ export const setClerkToken = async (token: string | null) => {
       // Try to decode the payload to validate
       try {
         const payload = JSON.parse(atob(parts[1]));
-        logger.debug('JWT payload validated', logger.sanitizeForLog({
-          sub: payload.sub,
-          iss: payload.iss,
-          aud: payload.aud,
-          exp: payload.exp,
-          iat: payload.iat,
-          role: payload.role
-        }));
         
         // Check if token is expired
         const now = Math.floor(Date.now() / 1000);
@@ -116,11 +103,9 @@ export const setClerkToken = async (token: string | null) => {
       }
 
       currentJWTToken = token;
-      logger.debug('Clerk JWT token stored');
       return true;
     } else {
       currentJWTToken = null;
-      logger.debug('Clerk JWT token cleared');
       return true;
     }
   } catch (error) {
@@ -144,10 +129,8 @@ export const makeAuthenticatedRequest = async <T>(
     try {
       // Always check token before making request
       if (!currentJWTToken) {
-        logger.debug(`No JWT token available, requesting refresh for ${operationType}...`);
         await refreshJWTToken();
       } else if (isTokenExpired(currentJWTToken)) {
-        logger.debug(`Token expired, refreshing before ${operationType}...`);
         await refreshJWTToken();
       }
 
@@ -156,8 +139,6 @@ export const makeAuthenticatedRequest = async <T>(
         throw new Error('Authentication token unavailable');
       }
 
-      logger.debug(`Making authenticated request for: ${operationType} (attempt ${attempt + 1})`);
-      
       // Create a new client instance with JWT headers for this specific request
       const authenticatedClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
         auth: {
@@ -172,8 +153,6 @@ export const makeAuthenticatedRequest = async <T>(
         }
       });
 
-      logger.debug(`Using authenticated client for ${operationType} (attempt ${attempt + 1})`);
-      
       // Replace the global supabase instance temporarily for this operation
       const originalFrom = supabase.from.bind(supabase);
       const originalRpc = supabase.rpc.bind(supabase);
@@ -184,7 +163,6 @@ export const makeAuthenticatedRequest = async <T>(
       
       try {
         const result = await operation();
-        logger.debug(`Successfully completed ${operationType} (attempt ${attempt + 1})`);
         return result;
       } finally {
         // Restore original methods
@@ -197,7 +175,6 @@ export const makeAuthenticatedRequest = async <T>(
       
       // If it's a JWT expired error, refresh token and retry
       if ((error?.code === 'PGRST301' || error?.message?.includes('JWT expired') || error?.message?.includes('expired')) && attempt < maxRetries - 1) {
-        logger.debug(`JWT error detected, refreshing token and retrying...`);
         await refreshJWTToken();
         await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1))); // Exponential backoff
         continue;
@@ -205,7 +182,6 @@ export const makeAuthenticatedRequest = async <T>(
       
       // For network errors, also retry
       if ((error?.message?.includes('fetch') || error?.message?.includes('network')) && attempt < maxRetries - 1) {
-        logger.debug(`Network error detected, retrying in ${1000 * (attempt + 1)}ms...`);
         await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
         continue;
       }
@@ -224,29 +200,10 @@ export const makeAuthenticatedRequest = async <T>(
 // Function to test JWT transmission with direct RPC call
 export const testJWTTransmission = async () => {
   try {
-    logger.debug('Testing JWT transmission with authenticated client...');
-    logger.debug('Current token available:', currentJWTToken ? 'YES' : 'NO');
-    
     // Make direct RPC call using authenticated request
     const { data, error } = await makeAuthenticatedRequest(async () => {
       return await supabase.rpc('debug_user_auth');
     }, 'JWT transmission test');
-    
-    logger.debug('Test result:', logger.sanitizeForLog({
-      data,
-      error,
-      currentToken: currentJWTToken ? 'SET' : 'NOT_SET'
-    }));
-    
-    if (data && data.length > 0) {
-      const result = data[0];
-      logger.debug('Detailed analysis:', logger.sanitizeForLog({
-        clerkIdFromFunction: result.clerk_id,
-        jwtSubFromAuth: result.jwt_sub,
-        authRole: result.auth_role,
-        userExistsInDB: result.user_exists
-      }));
-    }
     
     return { data, error };
   } catch (error) {
@@ -262,6 +219,5 @@ export const createAuthenticatedStorageClient = () => {
     return supabase.storage;
   }
 
-  logger.debug('Using authenticated storage client');
   return supabase.storage;
 };
