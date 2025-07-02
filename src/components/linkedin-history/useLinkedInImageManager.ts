@@ -132,6 +132,22 @@ export function useLinkedInImageManager(postId: string | null) {
   const generateImage = useCallback(async (variationNumber: number, postData?: any) => {
     if (!postId) return;
 
+    // Check if images already exist for this variation
+    const existingImages = images.filter(img => 
+      img.variation_number === variationNumber && 
+      img.image_data !== 'generating...' && 
+      img.image_data.trim()
+    );
+
+    if (existingImages.length > 0) {
+      toast({
+        title: "Image Already Generated",
+        description: `An image has already been generated for variation ${variationNumber}.`,
+        variant: "destructive"
+      });
+      return;
+    }
+
     // Set user-triggered loading state immediately
     setUserTriggeredLoading(prev => {
       const newState = [...prev];
