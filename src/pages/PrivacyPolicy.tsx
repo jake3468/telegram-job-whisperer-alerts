@@ -1,7 +1,12 @@
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 const PrivacyPolicy = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return <div className="min-h-screen bg-black text-slate-50 font-inter">
       <div className="max-w-4xl mx-auto px-4 py-12">
         <button onClick={() => navigate('/')} className="flex items-center gap-2 text-sky-400 hover:text-sky-300 transition-colors mb-8">

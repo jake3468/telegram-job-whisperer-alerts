@@ -672,6 +672,7 @@ export type Database = {
           cv_chat_id: string | null
           id: string
           resume: string | null
+          show_onboarding_popup: boolean
           user_id: string | null
         }
         Insert: {
@@ -683,6 +684,7 @@ export type Database = {
           cv_chat_id?: string | null
           id?: string
           resume?: string | null
+          show_onboarding_popup?: boolean
           user_id?: string | null
         }
         Update: {
@@ -694,6 +696,7 @@ export type Database = {
           cv_chat_id?: string | null
           id?: string
           resume?: string | null
+          show_onboarding_popup?: boolean
           user_id?: string | null
         }
         Relationships: [

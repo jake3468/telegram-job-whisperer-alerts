@@ -9,6 +9,7 @@ export interface UserProfile {
   cv_bot_activated: boolean;
   cv_chat_id: string | null;
   created_at: string | null;
+  show_onboarding_popup: boolean;
 }
 
 export interface UserProfileUpdateData {
@@ -18,4 +19,5 @@ export interface UserProfileUpdateData {
   chat_id?: string | null;
   cv_bot_activated?: boolean;
   cv_chat_id?: string | null;
+  show_onboarding_popup?: boolean;
 }

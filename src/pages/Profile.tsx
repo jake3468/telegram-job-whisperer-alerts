@@ -10,12 +10,15 @@ import ClerkJWTSetupGuide from '@/components/ClerkJWTSetupGuide';
 import { Layout } from '@/components/Layout';
 import { useJWTDebug } from '@/hooks/useJWTDebug';
 import { Environment } from '@/utils/environment';
+import { OnboardingPopup } from '@/components/OnboardingPopup';
+import { useOnboardingPopup } from '@/hooks/useOnboardingPopup';
 
 const Profile = () => {
   const { user, isLoaded } = useUser();
   const navigate = useNavigate();
   const { runComprehensiveJWTTest } = useJWTDebug();
   const [showJWTSetupGuide, setShowJWTSetupGuide] = useState(false);
+  const { showPopup, hidePopup, dontShowAgain } = useOnboardingPopup();
 
   useEffect(() => {
     if (isLoaded && !user) {
@@ -52,7 +55,7 @@ const Profile = () => {
     <Layout>
       <div className="text-center mb-8">
         <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-2">
-          Welcome back, <span className="italic bg-gradient-to-r from-pastel-peach to-pastel-mint bg-clip-text text-transparent">{user.firstName || 'User'}</span>
+          Welcome, <span className="italic bg-gradient-to-r from-pastel-peach to-pastel-mint bg-clip-text text-transparent">{user.firstName || 'User'}</span>
         </h1>
         <p className="text-lg text-gray-100 font-inter font-light">
           Manage your <span className="italic text-pastel-blue">profile</span> information and resume
@@ -75,6 +78,14 @@ const Profile = () => {
       {Environment.isDevelopment() && (
         <JWTDebugPanel />
       )}
+
+      {/* Onboarding Popup */}
+      <OnboardingPopup
+        isOpen={showPopup}
+        onClose={hidePopup}
+        onDontShowAgain={dontShowAgain}
+        userName={user.firstName || undefined}
+      />
     </Layout>
   );
 };
