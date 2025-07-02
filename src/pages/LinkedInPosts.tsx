@@ -19,7 +19,6 @@ import LoadingMessages from '@/components/LoadingMessages';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { useLinkedInPostTimeoutFallback } from '@/hooks/useLinkedInPostTimeoutFallback';
-
 interface LinkedInPostData {
   post_heading_1: string | null;
   post_content_1: string | null;
@@ -28,20 +27,32 @@ interface LinkedInPostData {
   post_heading_3: string | null;
   post_content_3: string | null;
 }
-
 interface UserData {
   first_name: string | null;
   last_name: string | null;
 }
-
 const LinkedInPosts = () => {
-  const { user } = useUser();
-  const { toast } = useToast();
-  const { userProfile } = useUserProfile();
-  const { isComplete, loading: completionLoading, refetchStatus } = useUserCompletionStatus();
-  const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
-  const { hasCredits } = useLinkedInPostCreditCheck();
-  
+  const {
+    user
+  } = useUser();
+  const {
+    toast
+  } = useToast();
+  const {
+    userProfile
+  } = useUserProfile();
+  const {
+    isComplete,
+    loading: completionLoading,
+    refetchStatus
+  } = useUserCompletionStatus();
+  const {
+    executeWithRetry,
+    isAuthReady
+  } = useEnterpriseAuth();
+  const {
+    hasCredits
+  } = useLinkedInPostCreditCheck();
   const [formData, setFormData] = useState({
     topic: '',
     opinion: '',
@@ -49,58 +60,48 @@ const LinkedInPosts = () => {
     audience: '',
     tone: ''
   });
-  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [postsData, setPostsData] = useState<LinkedInPostData | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
-
-  const toneOptions = [
-    { value: 'professional', label: 'Professional & Insightful' },
-    { value: 'conversational', label: 'Conversational & Friendly' },
-    { value: 'bold', label: 'Bold & Opinionated' },
-    { value: 'thoughtful', label: 'Thoughtful & Reflective' }
-  ];
-
+  const toneOptions = [{
+    value: 'professional',
+    label: 'Professional & Insightful'
+  }, {
+    value: 'conversational',
+    label: 'Conversational & Friendly'
+  }, {
+    value: 'bold',
+    label: 'Bold & Opinionated'
+  }, {
+    value: 'thoughtful',
+    label: 'Thoughtful & Reflective'
+  }];
   useEffect(() => {
     const fetchUserData = async () => {
       if (!user?.id || !isAuthReady) return;
-      
       try {
         await executeWithRetry(async () => {
-          const { data, error } = await supabase
-            .from('users')
-            .select('first_name, last_name')
-            .eq('clerk_id', user.id)
-            .single();
-          
+          const {
+            data,
+            error
+          } = await supabase.from('users').select('first_name, last_name').eq('clerk_id', user.id).single();
           if (error) {
             console.error('Error fetching user data:', error);
             return;
           }
-          
           setUserData(data);
         }, 3, 'fetch user data');
       } catch (err) {
         console.error('Error fetching user data:', err);
       }
     };
-
     fetchUserData();
   }, [user?.id, isAuthReady, executeWithRetry]);
-
   const areAllPostsReady = (data: LinkedInPostData) => {
-    const hasAllData = Boolean(
-      data.post_heading_1 && data.post_heading_1.trim() &&
-      data.post_content_1 && data.post_content_1.trim() && 
-      data.post_heading_2 && data.post_heading_2.trim() &&
-      data.post_content_2 && data.post_content_2.trim() && 
-      data.post_heading_3 && data.post_heading_3.trim() &&
-      data.post_content_3 && data.post_content_3.trim()
-    );
-    
+    const hasAllData = Boolean(data.post_heading_1 && data.post_heading_1.trim() && data.post_content_1 && data.post_content_1.trim() && data.post_heading_2 && data.post_heading_2.trim() && data.post_content_2 && data.post_content_2.trim() && data.post_heading_3 && data.post_heading_3.trim() && data.post_content_3 && data.post_content_3.trim());
     console.log('🔍 CHECKING IF ALL POSTS READY:', {
       post_heading_1: Boolean(data.post_heading_1 && data.post_heading_1.trim()),
       post_content_1: Boolean(data.post_content_1 && data.post_content_1.trim()),
@@ -110,17 +111,17 @@ const LinkedInPosts = () => {
       post_content_3: Boolean(data.post_content_3 && data.post_content_3.trim()),
       allReady: hasAllData
     });
-    
     return hasAllData;
   };
-
   useLinkedInPostTimeoutFallback({
     currentPostId,
     userProfileId: userProfile?.user_id || null,
     isGenerating,
-    creditsDeducted: false, // No longer tracking credits in frontend
-    onCreditsDeducted: () => {}, // No longer needed
-    onPostsReady: (data) => {
+    creditsDeducted: false,
+    // No longer tracking credits in frontend
+    onCreditsDeducted: () => {},
+    // No longer needed
+    onPostsReady: data => {
       const linkedInPostData: LinkedInPostData = {
         post_heading_1: data.post_heading_1,
         post_content_1: data.post_content_1,
@@ -133,86 +134,69 @@ const LinkedInPosts = () => {
       setIsGenerating(false);
     }
   });
-
   useEffect(() => {
     if (!currentPostId || !isAuthReady || !userProfile?.id) return;
-    
     console.log('🔄 Setting up real-time subscription for post ID:', currentPostId);
-
-    const channel = supabase
-      .channel(`linkedin-post-updates-${currentPostId}`)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public', 
-        table: 'job_linkedin',
-        filter: `id=eq.${currentPostId}`
-      }, async (payload) => {
-        console.log('📡 LinkedIn post updated via real-time:', payload);
-        
-        if (payload.new) {
-          const newData = payload.new as any;
-          console.log('📊 New posts data received:', {
-            hasHeading1: Boolean(newData.post_heading_1 && newData.post_heading_1.trim()),
-            hasContent1: Boolean(newData.post_content_1 && newData.post_content_1.trim()),
-            hasHeading2: Boolean(newData.post_heading_2 && newData.post_heading_2.trim()),
-            hasContent2: Boolean(newData.post_content_2 && newData.post_content_2.trim()),
-            hasHeading3: Boolean(newData.post_heading_3 && newData.post_heading_3.trim()),
-            hasContent3: Boolean(newData.post_content_3 && newData.post_content_3.trim())
+    const channel = supabase.channel(`linkedin-post-updates-${currentPostId}`).on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'job_linkedin',
+      filter: `id=eq.${currentPostId}`
+    }, async payload => {
+      console.log('📡 LinkedIn post updated via real-time:', payload);
+      if (payload.new) {
+        const newData = payload.new as any;
+        console.log('📊 New posts data received:', {
+          hasHeading1: Boolean(newData.post_heading_1 && newData.post_heading_1.trim()),
+          hasContent1: Boolean(newData.post_content_1 && newData.post_content_1.trim()),
+          hasHeading2: Boolean(newData.post_heading_2 && newData.post_heading_2.trim()),
+          hasContent2: Boolean(newData.post_content_2 && newData.post_content_2.trim()),
+          hasHeading3: Boolean(newData.post_heading_3 && newData.post_heading_3.trim()),
+          hasContent3: Boolean(newData.post_content_3 && newData.post_content_3.trim())
+        });
+        const linkedInPostData: LinkedInPostData = {
+          post_heading_1: newData.post_heading_1,
+          post_content_1: newData.post_content_1,
+          post_heading_2: newData.post_heading_2,
+          post_content_2: newData.post_content_2,
+          post_heading_3: newData.post_heading_3,
+          post_content_3: newData.post_content_3
+        };
+        console.log('🔄 Setting posts data:', linkedInPostData);
+        setPostsData(linkedInPostData);
+        if (areAllPostsReady(linkedInPostData)) {
+          console.log('🎉 All posts are ready! Stopping loading');
+          setIsGenerating(false);
+          toast({
+            title: "LinkedIn Posts Generated!",
+            description: "Your 3 LinkedIn post variations have been created successfully."
           });
-          
-          const linkedInPostData: LinkedInPostData = {
-            post_heading_1: newData.post_heading_1,
-            post_content_1: newData.post_content_1,
-            post_heading_2: newData.post_heading_2,
-            post_content_2: newData.post_content_2,
-            post_heading_3: newData.post_heading_3,
-            post_content_3: newData.post_content_3
-          };
-          
-          console.log('🔄 Setting posts data:', linkedInPostData);
-          setPostsData(linkedInPostData);
-          
-          if (areAllPostsReady(linkedInPostData)) {
-            console.log('🎉 All posts are ready! Stopping loading');
-            setIsGenerating(false);
-            toast({
-              title: "LinkedIn Posts Generated!",
-              description: "Your 3 LinkedIn post variations have been created successfully."
-            });
-          } else {
-            console.log('⏳ Posts not complete yet, keeping loading state');
-          }
+        } else {
+          console.log('⏳ Posts not complete yet, keeping loading state');
         }
-      })
-      .subscribe(status => {
-        console.log('📡 Real-time subscription status:', status);
-      });
-
+      }
+    }).subscribe(status => {
+      console.log('📡 Real-time subscription status:', status);
+    });
     return () => {
       console.log('🧹 Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
   }, [currentPostId, isAuthReady, userProfile?.id, toast]);
-
   useEffect(() => {
     const checkExistingData = async () => {
       if (!currentPostId || !isAuthReady) return;
-      
       console.log('🔍 Checking existing data for post ID:', currentPostId);
-      
       try {
         await executeWithRetry(async () => {
-          const { data, error } = await supabase
-            .from('job_linkedin')
-            .select('*')
-            .eq('id', currentPostId)
-            .single();
-          
+          const {
+            data,
+            error
+          } = await supabase.from('job_linkedin').select('*').eq('id', currentPostId).single();
           if (error) {
             console.error('❌ Error fetching existing post data:', error);
             return;
           }
-          
           if (data) {
             console.log('📋 Found existing post data:', {
               hasHeading1: Boolean(data.post_heading_1 && data.post_heading_1.trim()),
@@ -222,7 +206,6 @@ const LinkedInPosts = () => {
               hasHeading3: Boolean(data.post_heading_3 && data.post_heading_3.trim()),
               hasContent3: Boolean(data.post_content_3 && data.post_content_3.trim())
             });
-            
             const linkedInPostData: LinkedInPostData = {
               post_heading_1: data.post_heading_1,
               post_content_1: data.post_content_1,
@@ -231,10 +214,8 @@ const LinkedInPosts = () => {
               post_heading_3: data.post_heading_3,
               post_content_3: data.post_content_3
             };
-            
             console.log('🔄 Setting existing posts data:', linkedInPostData);
             setPostsData(linkedInPostData);
-            
             if (areAllPostsReady(linkedInPostData)) {
               console.log('📋 Existing data is complete, stopping loading state');
               setIsGenerating(false);
@@ -247,59 +228,48 @@ const LinkedInPosts = () => {
         console.error('❌ Error checking existing data:', err);
       }
     };
-
     if (currentPostId) {
       checkExistingData();
     }
   }, [currentPostId, isAuthReady, executeWithRetry]);
-
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
-
   const checkCreditsWithFallback = async (): Promise<boolean> => {
     if (hasCredits) {
       console.log('✅ Credit check passed via hook');
       return true;
     }
-    
     console.log('⚠️ Hook credit check failed, trying direct database check...');
     try {
       if (!userProfile?.user_id) {
         console.error('❌ No user ID for direct credit check');
         return false;
       }
-
-      const { data: credits, error } = await supabase
-        .from('user_credits')
-        .select('current_balance')
-        .eq('user_id', userProfile.user_id)
-        .single();
-
+      const {
+        data: credits,
+        error
+      } = await supabase.from('user_credits').select('current_balance').eq('user_id', userProfile.user_id).single();
       if (error) {
         console.error('❌ Direct credit check error:', error);
         return false;
       }
-
       const hasDirectCredits = credits && Number(credits.current_balance) >= 3.0;
       console.log('💳 Direct credit check result:', {
         balance: credits?.current_balance,
         hasCredits: hasDirectCredits
       });
-
       return hasDirectCredits;
     } catch (error) {
       console.error('❌ Exception in direct credit check:', error);
       return false;
     }
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!user || !userProfile) {
       toast({
         title: "Authentication Required",
@@ -308,47 +278,38 @@ const LinkedInPosts = () => {
       });
       return;
     }
-
     if (completionLoading) {
       toast({
         title: "Checking Profile Status",
-        description: "Please wait while we verify your profile completion.",
+        description: "Please wait while we verify your profile completion."
       });
       return;
     }
-
     if (!isComplete) {
       toast({
-        title: "Profile Incomplete", 
+        title: "Profile Incomplete",
         description: "Please complete your profile (upload resume and add bio) before creating LinkedIn posts. If you've just completed it, try clicking 'Refresh Status' below.",
         variant: "destructive",
-        action: (
-          <button
-            onClick={async () => {
-              await refetchStatus();
-              toast({
-                title: "Profile Status Refreshed",
-                description: "Your profile completion status has been updated."
-              });
-            }}
-            className="bg-white text-black px-3 py-1 rounded text-sm hover:bg-gray-100"
-          >
+        action: <button onClick={async () => {
+          await refetchStatus();
+          toast({
+            title: "Profile Status Refreshed",
+            description: "Your profile completion status has been updated."
+          });
+        }} className="bg-white text-black px-3 py-1 rounded text-sm hover:bg-gray-100">
             Refresh Status
           </button>
-        )
       });
       return;
     }
-
     if (!formData.topic.trim()) {
       toast({
         title: "Topic Required",
         description: "Please enter a topic for your LinkedIn post.",
-        variant: "destructive" 
+        variant: "destructive"
       });
       return;
     }
-
     const hasValidCredits = await checkCreditsWithFallback();
     if (!hasValidCredits) {
       toast({
@@ -358,43 +319,35 @@ const LinkedInPosts = () => {
       });
       return;
     }
-
     setIsSubmitting(true);
     setIsGenerating(true);
     setPostsData(null);
     setCurrentPostId(null);
-
     try {
       console.log('🚀 Creating LinkedIn post with user_profile.id:', userProfile.id);
-      
       await executeWithRetry(async () => {
-        const { data, error } = await supabase
-          .from('job_linkedin')
-          .insert({
-            user_id: userProfile.id,
-            topic: formData.topic,
-            opinion: formData.opinion || null,
-            personal_story: formData.personal_story || null,
-            audience: formData.audience || null,
-            tone: formData.tone || null
-          })
-          .select()
-          .single();
-
+        const {
+          data,
+          error
+        } = await supabase.from('job_linkedin').insert({
+          user_id: userProfile.id,
+          topic: formData.topic,
+          opinion: formData.opinion || null,
+          personal_story: formData.personal_story || null,
+          audience: formData.audience || null,
+          tone: formData.tone || null
+        }).select().single();
         if (error) {
           console.error('❌ Supabase error:', error);
           throw error;
         }
-
         console.log('✅ LinkedIn post created successfully:', data);
         setCurrentPostId(data.id);
-        
         toast({
           title: "Request Submitted!",
           description: "Your LinkedIn posts are being generated. Please wait..."
         });
       }, 3, 'create LinkedIn post');
-      
     } catch (err: any) {
       console.error('❌ Error creating LinkedIn post:', err);
       setIsGenerating(false);
@@ -408,7 +361,6 @@ const LinkedInPosts = () => {
       setIsSubmitting(false);
     }
   };
-
   const resetForm = () => {
     setFormData({
       topic: '',
@@ -421,10 +373,8 @@ const LinkedInPosts = () => {
     setIsGenerating(false);
     setCurrentPostId(null);
   };
-
   const shouldShowResults = postsData && areAllPostsReady(postsData);
   const shouldShowLoading = isGenerating && !shouldShowResults;
-
   console.log('🎯 Display logic:', {
     postsData: !!postsData,
     areAllPostsReady: postsData ? areAllPostsReady(postsData) : false,
@@ -432,12 +382,10 @@ const LinkedInPosts = () => {
     shouldShowLoading,
     isGenerating
   });
-
-  return (
-    <SidebarProvider defaultOpen={true}>
+  return <SidebarProvider defaultOpen={true}>
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
         <div className="flex items-center justify-between p-3">
-          <SidebarTrigger className="h-12 w-12 bg-white/10 border-fuchsia-400/30 ring-2 ring-fuchsia-400/10 text-fuchsia-200 rounded-2xl shadow-lg hover:bg-fuchsia-700/30 transition-all flex items-center justify-center">
+          <SidebarTrigger className="h-12 w-12 border-fuchsia-400/30 ring-2 ring-fuchsia-400/10 text-fuchsia-200 rounded-2xl shadow-lg transition-all flex items-center justify-center bg-zinc-900 hover:bg-zinc-800">
             <Menu className="w-7 h-7" strokeWidth={2.4} />
             <span className="sr-only">Toggle navigation menu</span>
           </SidebarTrigger>
@@ -498,12 +446,12 @@ const LinkedInPosts = () => {
                         <div className="space-y-2 min-w-0">
                           <Label htmlFor="topic" className="text-black font-semibold text-base">💡Topic or Theme *</Label>
                           <Label htmlFor="topic" className="text-black/70 font-normal text-sm block">What is the main topic you want to write about?</Label>
-                          <TTextarea id="topic" placeholder="e.g. AI in customer service, Layoffs in tech, Remote work trends" value={formData.topic} onChange={(e) => handleInputChange('topic', e.target.value)} required className="min-h-[60px] resize-none text-base border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium bg-gray-950 w-full" />
+                          <TTextarea id="topic" placeholder="e.g. AI in customer service, Layoffs in tech, Remote work trends" value={formData.topic} onChange={e => handleInputChange('topic', e.target.value)} required className="min-h-[60px] resize-none text-base border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium bg-gray-950 w-full" />
                         </div>
                         <div className="space-y-2 min-w-0">
                           <Label htmlFor="opinion" className="text-black font-semibold text-base">🤔Your Key Point or Opinion</Label>
                           <Label htmlFor="opinion" className="text-black/70 font-normal text-sm block">What is your main insight, opinion, or message?</Label>
-                          <TTextarea id="opinion" placeholder="I believe hybrid AI + human support is the future." value={formData.opinion} onChange={(e) => handleInputChange('opinion', e.target.value)} className="min-h-[60px] resize-none text-base border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium bg-gray-950 w-full" />
+                          <TTextarea id="opinion" placeholder="I believe hybrid AI + human support is the future." value={formData.opinion} onChange={e => handleInputChange('opinion', e.target.value)} className="min-h-[60px] resize-none text-base border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium bg-gray-950 w-full" />
                         </div>
                       </div>
 
@@ -511,28 +459,26 @@ const LinkedInPosts = () => {
                         <div className="space-y-2 min-w-0">
                           <Label htmlFor="personal_story" className="text-black font-semibold text-base">📖Personal Experience or Story</Label>
                           <Label htmlFor="personal_story" className="text-black/70 font-normal text-sm block">Do you have a story/personal experience to include?</Label>
-                          <TTextarea id="personal_story" placeholder="We reduced response time by 40% after implementing AI chat." value={formData.personal_story} onChange={(e) => handleInputChange('personal_story', e.target.value)} className="min-h-[60px] resize-none text-base border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium bg-gray-950 w-full" />
+                          <TTextarea id="personal_story" placeholder="We reduced response time by 40% after implementing AI chat." value={formData.personal_story} onChange={e => handleInputChange('personal_story', e.target.value)} className="min-h-[60px] resize-none text-base border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium bg-gray-950 w-full" />
                         </div>
                         <div className="space-y-2 min-w-0">
                           <Label htmlFor="audience" className="text-black font-semibold text-base">👥Target Audience</Label>
                           <Label htmlFor="audience" className="text-black/70 font-normal text-sm block">Who are you writing this for?</Label>
-                          <TTextarea id="audience" placeholder="Startup founders, product managers, working moms, new grads…" value={formData.audience} onChange={(e) => handleInputChange('audience', e.target.value)} className="min-h-[60px] resize-none text-base border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium bg-gray-950 w-full" />
+                          <TTextarea id="audience" placeholder="Startup founders, product managers, working moms, new grads…" value={formData.audience} onChange={e => handleInputChange('audience', e.target.value)} className="min-h-[60px] resize-none text-base border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium bg-gray-950 w-full" />
                         </div>
                       </div>
 
                       <div className="space-y-2 max-w-full">
                         <Label htmlFor="tone" className="text-black font-semibold text-base">🗣️Tone/Style Preference</Label>
                         <Label htmlFor="tone" className="text-black/70 font-normal text-sm block">What tone do you prefer?</Label>
-                        <Select onValueChange={(value) => handleInputChange('tone', value)}>
+                        <Select onValueChange={value => handleInputChange('tone', value)}>
                           <SelectTrigger className="text-base bg-black/80 text-white border-teal-300/30 font-medium [&>span[data-placeholder]]:text-white/80 w-full">
                             <SelectValue placeholder="Select a tone..." />
                           </SelectTrigger>
                           <SelectContent className="bg-black/80 border-teal-200/30 text-white">
-                            {toneOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value} className="font-medium data-[highlighted]:bg-teal-200 data-[highlighted]:text-black">
+                            {toneOptions.map(option => <SelectItem key={option.value} value={option.value} className="font-medium data-[highlighted]:bg-teal-200 data-[highlighted]:text-black">
                                 {option.label}
-                              </SelectItem>
-                            ))}
+                              </SelectItem>)}
                           </SelectContent>
                         </Select>
                       </div>
@@ -550,16 +496,13 @@ const LinkedInPosts = () => {
                   </CardContent>
                 </Card>
 
-                {shouldShowLoading && (
-                  <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm mb-8 max-w-full">
+                {shouldShowLoading && <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm mb-8 max-w-full">
                     <CardContent className="py-8 flex items-center justify-center">
                       <LoadingMessages type="linkedin" />
                     </CardContent>
-                  </Card>
-                )}
+                  </Card>}
 
-                {shouldShowResults && (
-                  <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm max-w-full">
+                {shouldShowResults && <Card className="bg-gray-900 border-teal-400/20 backdrop-blur-sm max-w-full">
                     <CardHeader className="pb-6">
                       <CardTitle className="font-inter text-lg sm:text-xl flex items-center gap-2 bg-gradient-to-r from-teal-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent drop-shadow font-bold">
                         <Share2 className="w-5 h-5 text-teal-400 drop-shadow flex-shrink-0" />
@@ -572,49 +515,21 @@ const LinkedInPosts = () => {
                     
                     <CardContent className="max-w-full">
                       <div className="space-y-12 max-w-full">
-                        <LinkedInPostVariation 
-                          heading={postsData.post_heading_1!} 
-                          content={postsData.post_content_1!} 
-                          userProfile={userProfile} 
-                          userData={userData} 
-                          variationNumber={1} 
-                          postId={currentPostId || undefined} 
-                        />
+                        <LinkedInPostVariation heading={postsData.post_heading_1!} content={postsData.post_content_1!} userProfile={userProfile} userData={userData} variationNumber={1} postId={currentPostId || undefined} />
                         
-                        <LinkedInPostVariation 
-                          heading={postsData.post_heading_2!} 
-                          content={postsData.post_content_2!} 
-                          userProfile={userProfile} 
-                          userData={userData} 
-                          variationNumber={2} 
-                          postId={currentPostId || undefined} 
-                        />
+                        <LinkedInPostVariation heading={postsData.post_heading_2!} content={postsData.post_content_2!} userProfile={userProfile} userData={userData} variationNumber={2} postId={currentPostId || undefined} />
                         
-                        <LinkedInPostVariation 
-                          heading={postsData.post_heading_3!} 
-                          content={postsData.post_content_3!} 
-                          userProfile={userProfile} 
-                          userData={userData} 
-                          variationNumber={3} 
-                          postId={currentPostId || undefined} 
-                        />
+                        <LinkedInPostVariation heading={postsData.post_heading_3!} content={postsData.post_content_3!} userProfile={userProfile} userData={userData} variationNumber={3} postId={currentPostId || undefined} />
                       </div>
                     </CardContent>
-                  </Card>
-                )}
+                  </Card>}
               </div>
 
-              <LinkedInPostsHistoryModal 
-                isOpen={showHistory} 
-                onClose={() => setShowHistory(false)} 
-                gradientColors="from-cyan-400 to-teal-400" 
-              />
+              <LinkedInPostsHistoryModal isOpen={showHistory} onClose={() => setShowHistory(false)} gradientColors="from-cyan-400 to-teal-400" />
             </div>
           </main>
         </div>
       </div>
-    </SidebarProvider>
-  );
+    </SidebarProvider>;
 };
-
 export default LinkedInPosts;
