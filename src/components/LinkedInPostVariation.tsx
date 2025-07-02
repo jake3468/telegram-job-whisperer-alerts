@@ -153,7 +153,8 @@ const LinkedInPostVariation = ({
               // Add new image and mark as having existing images
               setGeneratedImages(prev => {
                 console.log(`📡 Adding new generated image for variation ${variationNumber}`);
-                return [...prev, newImage.image_data];
+                const newImages = [...prev, newImage.image_data];
+                return newImages;
               });
               setHasExistingImages(true); // Disable button after image is generated
               
@@ -181,6 +182,12 @@ const LinkedInPostVariation = ({
           const deletedImage = payload.old;
           if (deletedImage.variation_number === variationNumber) {
             setGeneratedImages(prev => prev.filter(img => img !== deletedImage.image_data));
+            // Update hasExistingImages based on remaining images
+            setGeneratedImages(currentImages => {
+              const updatedImages = currentImages.filter(img => img !== deletedImage.image_data);
+              setHasExistingImages(updatedImages.length > 0);
+              return updatedImages;
+            });
           }
         }
       })
@@ -445,7 +452,7 @@ const LinkedInPostVariation = ({
       {/* Loading indicator - only show when user triggered loading and no images exist */}
       {isUserLoadingImage && allImages.length === 0 && (
         <div className="p-4 bg-blue-50 rounded-lg text-center border border-blue-200 mb-6">
-          <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading via N8N for variation {variationNumber}...</div>
+          <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading for variation {variationNumber}...</div>
           <div className="text-xs text-blue-500 mt-1">This may take up to 2 minutes</div>
         </div>
       )}
