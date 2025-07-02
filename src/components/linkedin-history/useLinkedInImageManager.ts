@@ -40,9 +40,10 @@ export function useLinkedInImageManager(postId: string | null) {
 
   const hasImages = images.filter(img => img.image_data !== 'generating...' && img.image_data.trim()).length > 0;
 
-  // Reset loading states when switching posts
+  // Reset loading states and clear images when switching posts
   useEffect(() => {
     setUserTriggeredLoading([false, false, false]);
+    setImages([]); // Clear images when switching to a different post
   }, [postId]);
 
   // Fetch images when component mounts or postId changes
