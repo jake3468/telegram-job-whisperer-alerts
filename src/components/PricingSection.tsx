@@ -148,30 +148,30 @@ const PricingSection = () => {
               <div className="text-sm font-semibold text-indigo-200">Select your desired amount:</div>
             </CardHeader>
             <CardContent className="grow flex flex-col px-4 pb-4">
-              <div className="flex flex-col gap-2 my-3 flex-grow">
+              <div className="flex flex-col gap-3 my-3 flex-grow">
                 {/* Show database products if available, otherwise show static fallback */}
-                {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
-                      <span className="text-indigo-100 font-medium text-sm">{pack.credits_amount} credits</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-indigo-50 font-bold text-sm">{pricingData.currencySymbol}{pack.price_amount}</span>
-                        <SignUpButton mode="modal">
-                          <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2 py-1 h-auto">
-                            Buy
-                          </Button>
-                        </SignUpButton>
+                {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="bg-gradient-to-br from-[#4f46e5] via-[#6366f1] to-[#8b5cf6] rounded-xl p-4 border-2 border-indigo-300/30 flex justify-between items-center shadow-lg hover:shadow-indigo-400/30 transition-all duration-300 hover:scale-[1.02] hover:border-indigo-300/50">
+                      <div className="flex flex-col">
+                        <span className="text-white font-bold text-base">{pack.credits_amount} credits</span>
+                        <span className="text-indigo-200 font-semibold text-xl">{pricingData.currencySymbol}{pack.price_amount}</span>
                       </div>
+                      <SignUpButton mode="modal">
+                        <Button className="bg-white hover:bg-gray-100 text-indigo-600 font-bold text-base px-6 py-3 h-auto rounded-lg shadow-md hover:shadow-lg transition-all duration-200 min-w-[100px]">
+                          Buy Now
+                        </Button>
+                      </SignUpButton>
                     </div>) :
               // Only show fallback if no database products and not loading
-              !isProductsLoading && pricingData.creditPacks.map(pack => <div key={pack.credits} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
-                      <span className="text-indigo-100 font-medium text-sm">{pack.credits} credits</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-indigo-50 font-bold text-sm">{pricingData.currencySymbol}{pack.price}</span>
-                        <SignUpButton mode="modal">
-                          <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2 py-1 h-auto">
-                            Buy
-                          </Button>
-                        </SignUpButton>
+              !isProductsLoading && pricingData.creditPacks.map(pack => <div key={pack.credits} className="bg-gradient-to-br from-[#4f46e5] via-[#6366f1] to-[#8b5cf6] rounded-xl p-4 border-2 border-indigo-300/30 flex justify-between items-center shadow-lg hover:shadow-indigo-400/30 transition-all duration-300 hover:scale-[1.02] hover:border-indigo-300/50">
+                      <div className="flex flex-col">
+                        <span className="text-white font-bold text-base">{pack.credits} credits</span>
+                        <span className="text-indigo-200 font-semibold text-xl">{pricingData.currencySymbol}{pack.price}</span>
                       </div>
+                      <SignUpButton mode="modal">
+                        <Button className="bg-white hover:bg-gray-100 text-indigo-600 font-bold text-base px-6 py-3 h-auto rounded-lg shadow-md hover:shadow-lg transition-all duration-200 min-w-[100px]">
+                          Buy Now
+                        </Button>
+                      </SignUpButton>
                     </div>)}
                 
                 {/* Loading state */}

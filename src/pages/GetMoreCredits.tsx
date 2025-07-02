@@ -228,26 +228,34 @@ For any payment-related queries, feel free to reach out to us at support@aspirel
                 <div className="mt-0 text-xs sm:text-sm font-semibold text-indigo-200">Select your desired amount:</div>
               </CardHeader>
               <CardContent className="grow flex flex-col px-3 sm:px-4 pb-3">
-                <div className="flex flex-col gap-1 sm:gap-2 my-2 sm:my-3 flex-grow">
+                <div className="flex flex-col gap-2 sm:gap-3 my-2 sm:my-3 flex-grow">
                   {/* Show database products if available, otherwise show static fallback */}
-                  {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-1.5 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300 bg-blue-400">
-                        <span className="text-indigo-100 font-medium text-xs sm:text-sm">{pack.credits_amount} credits</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-indigo-50 font-bold text-xs sm:text-sm">{pricingData.currencySymbol}{pack.price_amount}</span>
-                          <Button size="sm" onClick={() => handleCreditPackClick(pack.product_id)} className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2 py-1 h-auto" disabled={isCheckoutLoading(pack.product_id)}>
-                            {isCheckoutLoading(pack.product_id) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
-                          </Button>
+                  {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="bg-gradient-to-br from-[#4f46e5] via-[#6366f1] to-[#8b5cf6] rounded-xl p-3 sm:p-4 border-2 border-indigo-300/30 flex justify-between items-center shadow-lg hover:shadow-indigo-400/30 transition-all duration-300 hover:scale-[1.02] hover:border-indigo-300/50">
+                        <div className="flex flex-col">
+                          <span className="text-white font-bold text-sm sm:text-base">{pack.credits_amount} credits</span>
+                          <span className="text-indigo-200 font-semibold text-lg sm:text-xl">{pricingData.currencySymbol}{pack.price_amount}</span>
                         </div>
+                        <Button 
+                          onClick={() => handleCreditPackClick(pack.product_id)} 
+                          className="bg-white hover:bg-gray-100 text-indigo-600 font-bold text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3 h-auto rounded-lg shadow-md hover:shadow-lg transition-all duration-200 min-w-[80px] sm:min-w-[100px]" 
+                          disabled={isCheckoutLoading(pack.product_id)}
+                        >
+                          {isCheckoutLoading(pack.product_id) ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Buy Now'}
+                        </Button>
                       </div>) :
                 // Only show fallback if no database products and not loading
-                !isProductsLoading && pricingData.creditPacks.map(pack => <div key={pack.credits} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-1.5 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
-                        <span className="text-indigo-100 font-medium text-xs sm:text-sm">{pack.credits} credits</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-indigo-50 font-bold text-xs sm:text-sm">{pricingData.currencySymbol}{pack.price}</span>
-                          <Button size="sm" onClick={() => handleCreditPackClick(pack.productId)} className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2 py-1 h-auto" disabled={isCheckoutLoading(pack.productId)}>
-                            {isCheckoutLoading(pack.productId) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
-                          </Button>
+                !isProductsLoading && pricingData.creditPacks.map(pack => <div key={pack.credits} className="bg-gradient-to-br from-[#4f46e5] via-[#6366f1] to-[#8b5cf6] rounded-xl p-3 sm:p-4 border-2 border-indigo-300/30 flex justify-between items-center shadow-lg hover:shadow-indigo-400/30 transition-all duration-300 hover:scale-[1.02] hover:border-indigo-300/50">
+                        <div className="flex flex-col">
+                          <span className="text-white font-bold text-sm sm:text-base">{pack.credits} credits</span>
+                          <span className="text-indigo-200 font-semibold text-lg sm:text-xl">{pricingData.currencySymbol}{pack.price}</span>
                         </div>
+                        <Button 
+                          onClick={() => handleCreditPackClick(pack.productId)} 
+                          className="bg-white hover:bg-gray-100 text-indigo-600 font-bold text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3 h-auto rounded-lg shadow-md hover:shadow-lg transition-all duration-200 min-w-[80px] sm:min-w-[100px]" 
+                          disabled={isCheckoutLoading(pack.productId)}
+                        >
+                          {isCheckoutLoading(pack.productId) ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Buy Now'}
+                        </Button>
                       </div>)}
                   
                   {/* Loading state */}
