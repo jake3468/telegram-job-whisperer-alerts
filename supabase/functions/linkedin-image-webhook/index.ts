@@ -14,10 +14,21 @@ serve(async (req) => {
 
   try {
     console.log('LinkedIn image webhook called');
+    console.log('Headers:', req.headers);
+    console.log('Method:', req.method);
 
     // Parse request body
-    const requestBody = await req.json();
-    console.log('Request body keys:', Object.keys(requestBody));
+    let requestBody;
+    try {
+      requestBody = await req.json();
+      console.log('Request body received:', JSON.stringify(requestBody, null, 2));
+    } catch (parseError) {
+      console.error('Failed to parse request body:', parseError);
+      return new Response(
+        JSON.stringify({ success: false, error: 'Invalid JSON in request body' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
 
     // Extract data - handle both frontend and database trigger formats
     let post_id, variation_number, post_heading, post_content, user_name, image_data;
