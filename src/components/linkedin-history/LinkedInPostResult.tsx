@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Copy, ImageIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 
 interface LinkedInPostItem {
   id: string;
@@ -40,59 +40,63 @@ const LinkedInPostResult = ({
   const { toast } = useToast();
   const [localLoadingState, setLocalLoadingState] = useState(false);
   
-  const heading = item[`post_heading_${postNumber}` as keyof LinkedInPostItem] as string;
-  const content = item[`post_content_${postNumber}` as keyof LinkedInPostItem] as string;
-  const variationImages = generatedImages[postNumber] || [];
-  const isLoadingFromManager = loadingImage[postNumber] || false;
-  const hasFailedThisVariation = imageGenerationFailed[postNumber] || false;
+  // Memoize expensive calculations to prevent unnecessary re-renders
+  const { heading, content, variationImages, isLoadingFromManager, hasFailedThisVariation } = useMemo(() => {
+    const heading = item[`post_heading_${postNumber}` as keyof LinkedInPostItem] as string;
+    const content = item[`post_content_${postNumber}` as keyof LinkedInPostItem] as string;
+    const variationImages = generatedImages[postNumber] || [];
+    const isLoadingFromManager = loadingImage[postNumber] || false;
+    const hasFailedThisVariation = imageGenerationFailed[postNumber] || false;
+    
+    return {
+      heading,
+      content,
+      variationImages,
+      isLoadingFromManager,
+      hasFailedThisVariation
+    };
+  }, [item, postNumber, generatedImages, loadingImage, imageGenerationFailed]);
 
-  // Sync local loading state with manager loading state
+  // Memoize display logic to reduce console spam
+  const displayLogic = useMemo(() => {
+    const isActuallyLoading = isLoadingFromManager || localLoadingState;
+    const shouldShowLoading = isActuallyLoading && variationImages.length === 0;
+    const shouldShowFailed = hasFailedThisVariation && variationImages.length === 0 && !isActuallyLoading;
+    
+    return {
+      isActuallyLoading,
+      shouldShowLoading,
+      shouldShowFailed
+    };
+  }, [isLoadingFromManager, localLoadingState, variationImages.length, hasFailedThisVariation]);
+
+  // Sync local loading state with manager loading state - optimized
   useEffect(() => {
-    setLocalLoadingState(isLoadingFromManager);
+    if (isLoadingFromManager !== localLoadingState) {
+      setLocalLoadingState(isLoadingFromManager);
+    }
   }, [isLoadingFromManager]);
 
-  // Reset local loading state when images arrive
+  // Reset local loading state when images arrive - optimized
   useEffect(() => {
     if (variationImages.length > 0 && localLoadingState) {
-      console.log(`🎯 Images detected for variation ${postNumber}, resetting local loading state`);
       setLocalLoadingState(false);
     }
-  }, [variationImages.length, localLoadingState, postNumber]);
+  }, [variationImages.length]);
 
-  // Reset local loading state when generation fails
+  // Reset local loading state when generation fails - optimized
   useEffect(() => {
     if (hasFailedThisVariation && localLoadingState) {
-      console.log(`❌ Generation failed for variation ${postNumber}, resetting local loading state`);
       setLocalLoadingState(false);
     }
-  }, [hasFailedThisVariation, localLoadingState, postNumber]);
+  }, [hasFailedThisVariation]);
 
   const handleGetImage = () => {
-    console.log(`🚀 User clicked Get Image for variation ${postNumber}`);
     setLocalLoadingState(true);
     onGetImage(item, postNumber);
   };
 
-  // Determine the actual loading state (either from manager or local)
-  const isActuallyLoading = isLoadingFromManager || localLoadingState;
-  
-  // Show loading only if we're actually loading AND don't have images yet
-  const shouldShowLoading = isActuallyLoading && variationImages.length === 0;
-  
-  // Show failed only if we failed AND don't have images AND not currently loading
-  const shouldShowFailed = hasFailedThisVariation && variationImages.length === 0 && !isActuallyLoading;
-
   if (!content) return null;
-
-  console.log(`🎯 LinkedInPostResult render - Variation ${postNumber}:`, {
-    isLoadingFromManager,
-    localLoadingState,
-    isActuallyLoading,
-    shouldShowLoading,
-    shouldShowFailed,
-    hasImages: variationImages.length > 0,
-    hasFailedThisVariation
-  });
 
   return (
     <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
@@ -110,22 +114,22 @@ const LinkedInPostResult = ({
           <Button
             onClick={handleGetImage}
             size="sm"
-            disabled={isActuallyLoading}
+            disabled={displayLogic.isActuallyLoading}
             className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 h-6 text-xs px-2 flex items-center gap-1"
           >
             <ImageIcon className="w-3 h-3" />
             <span className="hidden xs:inline">
-              {isActuallyLoading ? 'Gen...' : 'Get Image'}
+              {displayLogic.isActuallyLoading ? 'Gen...' : 'Get Image'}
             </span>
             <span className="xs:hidden">
-              {isActuallyLoading ? '...' : 'Img'}
+              {displayLogic.isActuallyLoading ? '...' : 'Img'}
             </span>
           </Button>
         </div>
       </div>
 
       {/* Loading indicator - only show when actually loading and no images */}
-      {shouldShowLoading && (
+      {displayLogic.shouldShowLoading && (
         <div className="mb-4 p-3 bg-blue-50 rounded-lg text-center border border-blue-200">
           <div className="text-sm text-blue-600 font-medium">LinkedIn post image loading for variation {postNumber}...</div>
           <div className="text-xs text-blue-500 mt-1">This may take up to 2 minutes</div>
@@ -133,7 +137,7 @@ const LinkedInPostResult = ({
       )}
 
       {/* Failed generation indicator - only show when failed and no images */}
-      {shouldShowFailed && (
+      {displayLogic.shouldShowFailed && (
         <div className="mb-4 p-3 bg-red-50 rounded-lg text-center border border-red-200">
           <div className="text-sm text-red-600 font-medium">Image generation failed for variation {postNumber}</div>
           <div className="text-xs text-red-500 mt-1">Please try again</div>
@@ -152,12 +156,11 @@ const LinkedInPostResult = ({
                   alt={`Generated LinkedIn post image ${index + 1} for variation ${postNumber}`}
                   className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto rounded-lg shadow-sm object-contain max-h-96"
                   onLoad={() => {
-                    console.log(`🖼️ Image ${index + 1} loaded for variation ${postNumber}`);
                     // Ensure loading state is reset when image actually loads
                     setLocalLoadingState(false);
                   }}
                   onError={(e) => {
-                    console.error(`❌ Failed to load image ${index + 1} for variation ${postNumber}`, e);
+                    console.error(`Failed to load image ${index + 1} for variation ${postNumber}`, e);
                     setLocalLoadingState(false);
                   }}
                 />
