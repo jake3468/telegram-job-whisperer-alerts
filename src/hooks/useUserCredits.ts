@@ -26,11 +26,8 @@ export const useUserCredits = () => {
     queryFn: async () => {
       // Ensure we have both Clerk user and user profile before proceeding
       if (!isClerkLoaded || !user?.id || !userProfile?.user_id) {
-        console.log('[useUserCredits] Waiting for Clerk user and profile to load');
         throw new Error('Authentication not ready');
       }
-      
-      console.log('[useUserCredits] Fetching credits for user:', userProfile.user_id);
       
       // Proactively refresh JWT token before making request
       await refreshJWTToken();
@@ -50,11 +47,8 @@ export const useUserCredits = () => {
           }, 'fetch user credits');
 
           if (error) {
-            console.error(`[useUserCredits] Error fetching credits (attempt ${retryCount + 1}):`, error);
-            
             // If no record found, try to initialize credits
             if (error.code === 'PGRST116') {
-              console.log('[useUserCredits] No credits record found, initializing...');
               const { data: initResult, error: initError } = await makeAuthenticatedRequest(async () => {
                 return await supabase.rpc('initialize_user_credits', {
                   p_user_id: userProfile.user_id
@@ -72,7 +66,6 @@ export const useUserCredits = () => {
                 }, 'retry fetch user credits');
                   
                 if (!retryError && retryCredits) {
-                  console.log('[useUserCredits] Successfully initialized and fetched credits:', retryCredits);
                   return {
                     ...retryCredits,
                     current_balance: Math.max(Number(retryCredits.current_balance) || 0, 0)
@@ -83,7 +76,6 @@ export const useUserCredits = () => {
             
             // For JWT or auth errors, refresh token and retry
             if (error.code === 'PGRST301' || error.message?.includes('JWT') || error.message?.includes('expired')) {
-              console.log(`[useUserCredits] JWT error detected, refreshing token and retrying (attempt ${retryCount + 1})`);
               await refreshJWTToken();
               retryCount++;
               await new Promise(resolve => setTimeout(resolve, 1000 * retryCount)); // Exponential backoff
@@ -93,7 +85,6 @@ export const useUserCredits = () => {
             // For other errors, also retry with backoff
             retryCount++;
             if (retryCount < maxRetries) {
-              console.log(`[useUserCredits] Retrying after error (attempt ${retryCount + 1})`);
               await new Promise(resolve => setTimeout(resolve, 2000 * retryCount));
               continue;
             }
@@ -102,7 +93,6 @@ export const useUserCredits = () => {
           }
 
           if (credits) {
-            console.log('[useUserCredits] Successfully fetched credits:', credits);
             // Ensure current_balance is never null or undefined and is a valid number
             const safeCredits = {
               ...credits,
@@ -114,11 +104,9 @@ export const useUserCredits = () => {
           throw new Error('No credits data returned from query');
 
         } catch (err) {
-          console.error(`[useUserCredits] Exception during fetch (attempt ${retryCount + 1}):`, err);
           retryCount++;
           
           if (retryCount < maxRetries) {
-            console.log(`[useUserCredits] Retrying after exception (attempt ${retryCount + 1})`);
             await refreshJWTToken(); // Always refresh token on error
             await new Promise(resolve => setTimeout(resolve, 2000 * retryCount));
             continue;
@@ -144,7 +132,6 @@ export const useUserCredits = () => {
 
   // Function to refresh credits data
   const refreshCredits = () => {
-    console.log('[useUserCredits] Manually refreshing credits');
     queryClient.invalidateQueries({ queryKey: ['user_credits', userProfile?.user_id] });
   };
 
