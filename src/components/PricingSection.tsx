@@ -155,7 +155,7 @@ const PricingSection = () => {
                       <div className="flex items-center gap-2">
                         <span className="text-indigo-50 font-bold text-sm">{pricingData.currencySymbol}{pack.price_amount}</span>
                         <SignUpButton mode="modal">
-                          <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2 py-1 h-auto">
+                          <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 h-auto rounded-md">
                             Buy
                           </Button>
                         </SignUpButton>
@@ -167,7 +167,7 @@ const PricingSection = () => {
                       <div className="flex items-center gap-2">
                         <span className="text-indigo-50 font-bold text-sm">{pricingData.currencySymbol}{pack.price}</span>
                         <SignUpButton mode="modal">
-                          <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2 py-1 h-auto">
+                          <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 h-auto rounded-md">
                             Buy
                           </Button>
                         </SignUpButton>
