@@ -94,7 +94,7 @@ export default function GetMoreCredits() {
           <h1 className="text-2xl xs:text-3xl sm:text-5xl font-orbitron font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-1 sm:mb-2 drop-shadow tracking-tight animate-fade-in">
             Flexible Pricing Plans
           </h1>
-          <p className="text-sm sm:text-lg text-blue-100 font-inter font-light mb-1 sm:mb-2 animate-fade-in">Start with free monthly credits and upgrade anytime — either by purchasing flexible credit packs or a monthly subscription.
+          <p className="text-sm text-blue-100 font-inter font-light mb-1 sm:mb-2 animate-fade-in sm:text-base">Start with free monthly credits and upgrade anytime — either by purchasing flexible credit packs or a monthly subscription.
 For any payment-related queries, feel free to reach out to us at support@aspirely.ai — we're here to help! 💬</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
             <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in">
