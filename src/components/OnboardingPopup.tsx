@@ -1,17 +1,19 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { X, FileText, User, Sparkles } from 'lucide-react';
-
 interface OnboardingPopupProps {
   isOpen: boolean;
   onClose: () => void;
   onDontShowAgain: () => void;
   userName?: string;
 }
-
-export function OnboardingPopup({ isOpen, onClose, onDontShowAgain, userName }: OnboardingPopupProps) {
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+export function OnboardingPopup({
+  isOpen,
+  onClose,
+  onDontShowAgain,
+  userName
+}: OnboardingPopupProps) {
+  return <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[90vw] max-w-md max-h-[80vh] overflow-y-auto bg-gradient-to-br from-purple-900/95 via-blue-900/95 to-indigo-900/95 border-purple-500/30 text-white">
         <DialogHeader>
           <div className="flex items-center justify-between">
@@ -19,12 +21,7 @@ export function OnboardingPopup({ isOpen, onClose, onDontShowAgain, userName }: 
               <Sparkles className="w-5 h-5 text-purple-400" />
               Welcome to Aspirely.ai! 🎉
             </DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="text-white/70 hover:text-white hover:bg-white/10 h-8 w-8 p-0"
-            >
+            <Button variant="ghost" size="sm" onClick={onClose} className="text-white/70 hover:text-white h-8 w-8 p-0 bg-red-800 hover:bg-red-700">
               <X className="w-4 h-4" />
             </Button>
           </div>
@@ -92,21 +89,13 @@ export function OnboardingPopup({ isOpen, onClose, onDontShowAgain, userName }: 
         </div>
 
         <div className="flex flex-col gap-2 pt-3 border-t border-purple-500/20">
-          <Button
-            onClick={onClose}
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold text-sm h-9"
-          >
+          <Button onClick={onClose} className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold text-sm h-9">
             Got it! Let's start! 🚀
           </Button>
-          <Button
-            variant="outline"
-            onClick={onDontShowAgain}
-            className="w-full bg-transparent border-purple-400/30 text-purple-200 hover:bg-purple-800/30 hover:text-white text-sm h-8"
-          >
+          <Button variant="outline" onClick={onDontShowAgain} className="w-full bg-transparent border-purple-400/30 text-purple-200 hover:bg-purple-800/30 hover:text-white text-sm h-8">
             Don't show again
           </Button>
         </div>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 }
