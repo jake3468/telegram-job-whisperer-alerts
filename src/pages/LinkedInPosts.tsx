@@ -425,14 +425,6 @@ const LinkedInPosts = () => {
   const shouldShowResults = postsData && areAllPostsReady(postsData);
   const shouldShowLoading = isGenerating && !shouldShowResults;
 
-  console.log('🎯 Display logic:', {
-    postsData: !!postsData,
-    areAllPostsReady: postsData ? areAllPostsReady(postsData) : false,
-    shouldShowResults,
-    shouldShowLoading,
-    isGenerating
-  });
-
   return (
     <SidebarProvider defaultOpen={true}>
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
