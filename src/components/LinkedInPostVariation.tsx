@@ -48,6 +48,8 @@ const LinkedInPostVariation = ({
   // User-triggered loading state - only set when user clicks "Get Image"
   const [isUserLoadingImage, setIsUserLoadingImage] = useState(false);
   const [imageGenerationFailed, setImageGenerationFailed] = useState(false);
+  // Track if images exist for this post_id + variation_number to disable button
+  const [hasExistingImages, setHasExistingImages] = useState(false);
 
   // Add N8N image display hook
   const { n8nImages } = useN8NImageDisplay(postId || '', variationNumber);
@@ -86,6 +88,9 @@ const LinkedInPostVariation = ({
           const imageUrls = data.map(img => img.image_data).filter(img => img.trim());
           console.log(`🖼️ Found ${imageUrls.length} existing images for variation ${variationNumber}`);
           setGeneratedImages(imageUrls);
+          setHasExistingImages(true); // Disable button when images exist
+        } else {
+          setHasExistingImages(false); // Enable button when no images exist
         }
       }, 3, `check existing images for variation ${variationNumber}`);
     } catch (err) {
@@ -145,12 +150,12 @@ const LinkedInPostVariation = ({
               setIsUserLoadingImage(false);
               setImageGenerationFailed(false);
               
-              // Replace all existing images with the new one for this variation (regeneration)
+              // Add new image and mark as having existing images
               setGeneratedImages(prev => {
-                // For regeneration, replace all existing images with the new one
-                console.log(`📡 Replacing images with new generated image for variation ${variationNumber}`);
-                return [newImage.image_data];
+                console.log(`📡 Adding new generated image for variation ${variationNumber}`);
+                return [...prev, newImage.image_data];
               });
+              setHasExistingImages(true); // Disable button after image is generated
               
               toast({
                 title: "Image Generated!",
@@ -244,6 +249,16 @@ const LinkedInPostVariation = ({
       return;
     }
 
+    // Don't allow generation if images already exist
+    if (hasExistingImages) {
+      toast({
+        title: "Image Already Generated",
+        description: "An image has already been generated for this post variation.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     console.log(`🚀 User triggered image generation for post ${postId}, variation ${variationNumber}`);
     
     // Set user-triggered loading state
@@ -266,52 +281,18 @@ const LinkedInPostVariation = ({
         console.log('🔗 Calling linkedin-image-webhook edge function...');
         const userName = userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() : 'Professional User';
         
-        // Check if there's already an existing image for this post_id + variation_number
-        const { data: existingImages, error: checkError } = await supabase
+        // Create a new "generating..." record for this variation
+        const { error: insertError } = await supabase
           .from('linkedin_post_images')
-          .select('id, image_data')
-          .eq('post_id', postId)
-          .eq('variation_number', variationNumber);
+          .insert({
+            post_id: postId,
+            variation_number: variationNumber,
+            image_data: 'generating...'
+          });
 
-        if (checkError) {
-          console.error('Error checking existing images:', checkError);
-          throw checkError;
-        }
-
-        // If there are existing images, update them to "generating..." for regeneration
-        if (existingImages && existingImages.length > 0) {
-          console.log(`🔄 Regenerating image for variation ${variationNumber} - updating existing records to generating...`);
-          
-          // Update all existing records for this post_id + variation_number to "generating..."
-          const { error: updateError } = await supabase
-            .from('linkedin_post_images')
-            .update({ 
-              image_data: 'generating...',
-              updated_at: new Date().toISOString()
-            })
-            .eq('post_id', postId)
-            .eq('variation_number', variationNumber);
-
-          if (updateError) {
-            console.error('Error updating existing image to generating state:', updateError);
-            throw updateError;
-          }
-        } else {
-          console.log(`🆕 Creating new image record for variation ${variationNumber}`);
-          
-          // Create a new "generating..." record if no existing images
-          const { error: insertError } = await supabase
-            .from('linkedin_post_images')
-            .insert({
-              post_id: postId,
-              variation_number: variationNumber,
-              image_data: 'generating...'
-            });
-
-          if (insertError) {
-            console.error('Error creating generating record:', insertError);
-            throw insertError;
-          }
+        if (insertError) {
+          console.error('Error creating generating record:', insertError);
+          throw insertError;
         }
         
         const { data: webhookResponse, error: webhookError } = await supabase.functions.invoke('linkedin-image-webhook', {
@@ -392,6 +373,13 @@ const LinkedInPostVariation = ({
 
       setGeneratedImages(prev => prev.filter(img => img !== imageData));
       
+      // Check if there are any remaining images after deletion
+      setGeneratedImages(prev => {
+        const remainingImages = prev.filter(img => img !== imageData);
+        setHasExistingImages(remainingImages.length > 0);
+        return remainingImages;
+      });
+      
       toast({
         title: "Image Deleted",
         description: `Image for variation ${variationNumber} has been deleted.`
@@ -429,15 +417,25 @@ const LinkedInPostVariation = ({
           <Button
             onClick={handleGenerateImage}
             size="sm"
-            disabled={isUserLoadingImage}
+            disabled={isUserLoadingImage || hasExistingImages}
             className="bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 px-6 py-2 font-medium"
           >
             {isUserLoadingImage ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Generating...
+              </>
+            ) : hasExistingImages ? (
+              <>
+                <ImageIcon className="w-4 h-4 mr-2" />
+                Image Generated
+              </>
             ) : (
-              <ImageIcon className="w-4 h-4 mr-2" />
+              <>
+                <ImageIcon className="w-4 h-4 mr-2" />
+                Get Image
+              </>
             )}
-            {isUserLoadingImage ? 'Generating...' : 'Get Image'}
           </Button>
         </div>
       </div>
