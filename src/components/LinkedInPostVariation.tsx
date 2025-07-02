@@ -145,15 +145,11 @@ const LinkedInPostVariation = ({
               setIsUserLoadingImage(false);
               setImageGenerationFailed(false);
               
-              // Add the new image to the list if it's not already there
+              // Replace all existing images with the new one for this variation (regeneration)
               setGeneratedImages(prev => {
-                const exists = prev.includes(newImage.image_data);
-                if (exists) {
-                  console.log(`📡 Image already exists in state`);
-                  return prev;
-                }
-                console.log(`📡 Adding new image to state`);
-                return [...prev, newImage.image_data];
+                // For regeneration, replace all existing images with the new one
+                console.log(`📡 Replacing images with new generated image for variation ${variationNumber}`);
+                return [newImage.image_data];
               });
               
               toast({
@@ -270,13 +266,53 @@ const LinkedInPostVariation = ({
         console.log('🔗 Calling linkedin-image-webhook edge function...');
         const userName = userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() : 'Professional User';
         
-        // Clean up any existing stuck records first
-        await supabase
+        // Check if there's already an existing image for this post_id + variation_number
+        const { data: existingImages, error: checkError } = await supabase
           .from('linkedin_post_images')
-          .delete()
+          .select('id, image_data')
           .eq('post_id', postId)
-          .eq('variation_number', variationNumber)
-          .eq('image_data', 'generating...');
+          .eq('variation_number', variationNumber);
+
+        if (checkError) {
+          console.error('Error checking existing images:', checkError);
+          throw checkError;
+        }
+
+        // If there are existing images, update them to "generating..." for regeneration
+        if (existingImages && existingImages.length > 0) {
+          console.log(`🔄 Regenerating image for variation ${variationNumber} - updating existing records to generating...`);
+          
+          // Update all existing records for this post_id + variation_number to "generating..."
+          const { error: updateError } = await supabase
+            .from('linkedin_post_images')
+            .update({ 
+              image_data: 'generating...',
+              updated_at: new Date().toISOString()
+            })
+            .eq('post_id', postId)
+            .eq('variation_number', variationNumber);
+
+          if (updateError) {
+            console.error('Error updating existing image to generating state:', updateError);
+            throw updateError;
+          }
+        } else {
+          console.log(`🆕 Creating new image record for variation ${variationNumber}`);
+          
+          // Create a new "generating..." record if no existing images
+          const { error: insertError } = await supabase
+            .from('linkedin_post_images')
+            .insert({
+              post_id: postId,
+              variation_number: variationNumber,
+              image_data: 'generating...'
+            });
+
+          if (insertError) {
+            console.error('Error creating generating record:', insertError);
+            throw insertError;
+          }
+        }
         
         const { data: webhookResponse, error: webhookError } = await supabase.functions.invoke('linkedin-image-webhook', {
           body: {
