@@ -428,12 +428,14 @@ const LinkedInPostVariation = ({
             ) : hasExistingImages ? (
               <>
                 <ImageIcon className="w-4 h-4 mr-2" />
-                Image Generated
+                <span className="hidden sm:inline">Image Generated</span>
+                <span className="sm:hidden">Generated</span>
               </>
             ) : (
               <>
                 <ImageIcon className="w-4 h-4 mr-2" />
-                Get Image
+                <span className="hidden sm:inline">Get Image</span>
+                <span className="sm:hidden">Get Img</span>
               </>
             )}
           </Button>
