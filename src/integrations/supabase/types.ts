@@ -405,7 +405,6 @@ export type Database = {
           id: string
           image_data: string
           post_id: string
-          updated_at: string | null
           variation_number: number | null
         }
         Insert: {
@@ -413,7 +412,6 @@ export type Database = {
           id?: string
           image_data: string
           post_id: string
-          updated_at?: string | null
           variation_number?: number | null
         }
         Update: {
@@ -421,7 +419,6 @@ export type Database = {
           id?: string
           image_data?: string
           post_id?: string
-          updated_at?: string | null
           variation_number?: number | null
         }
         Relationships: [

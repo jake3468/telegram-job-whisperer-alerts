@@ -21,6 +21,7 @@ import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
+
 const CoverLetter = () => {
   const {
     user,
@@ -54,6 +55,7 @@ const CoverLetter = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentCoverLetterId, setCurrentCoverLetterId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
@@ -77,6 +79,7 @@ const CoverLetter = () => {
           console.log('Cover letter content received, updating UI');
           setResult(coverLetterContent);
           setIsGenerating(false);
+
           toast({
             title: "Cover Letter Generated!",
             description: "Your cover letter has been created successfully."
@@ -112,6 +115,7 @@ const CoverLetter = () => {
           console.log('Cover letter found via polling, updating UI');
           setResult(data.cover_letter);
           setIsGenerating(false);
+
           toast({
             title: "Cover Letter Generated!",
             description: "Your cover letter has been created successfully."
@@ -126,6 +130,7 @@ const CoverLetter = () => {
       clearInterval(pollInterval);
     };
   }, [isGenerating, currentCoverLetterId, toast]);
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -142,6 +147,7 @@ const CoverLetter = () => {
       showInsufficientCreditsPopup();
       return;
     }
+
     if (!user || !userProfile) {
       toast({
         title: "Authentication Required",
@@ -150,6 +156,7 @@ const CoverLetter = () => {
       });
       return;
     }
+
     if (!isComplete) {
       toast({
         title: "Profile Incomplete",
@@ -158,6 +165,7 @@ const CoverLetter = () => {
       });
       return;
     }
+
     if (!formData.job_title.trim() || !formData.company_name.trim() || !formData.job_description.trim()) {
       toast({
         title: "Missing Information",
@@ -166,10 +174,12 @@ const CoverLetter = () => {
       });
       return;
     }
+
     setIsSubmitting(true);
     setIsGenerating(true);
     setResult('');
     setCurrentCoverLetterId(null);
+
     try {
       console.log('Submitting cover letter request...');
 
@@ -183,9 +193,11 @@ const CoverLetter = () => {
         company_name: formData.company_name,
         job_description: formData.job_description
       }).select().single();
+
       if (error) {
         throw error;
       }
+
       console.log('Cover letter record created with ID:', data.id);
       setCurrentCoverLetterId(data.id);
       toast({
@@ -205,6 +217,7 @@ const CoverLetter = () => {
       setIsSubmitting(false);
     }
   };
+
   const handleCopyResult = async () => {
     if (!result) return;
     try {
@@ -221,6 +234,7 @@ const CoverLetter = () => {
       });
     }
   };
+
   const resetForm = () => {
     setFormData({
       job_title: '',
@@ -231,6 +245,7 @@ const CoverLetter = () => {
     setIsGenerating(false);
     setCurrentCoverLetterId(null);
   };
+
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading...</div>
@@ -240,6 +255,7 @@ const CoverLetter = () => {
   // Check if form is valid and user has credits
   const isFormValid = formData.job_title.trim() && formData.company_name.trim() && formData.job_description.trim();
   const canSubmit = isFormValid && hasCredits && !isSubmitting && !isGenerating;
+
   return <SidebarProvider defaultOpen={true}>
       {/* Header for mobile */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
@@ -249,8 +265,8 @@ const CoverLetter = () => {
             <span className="sr-only">Toggle navigation menu</span>
           </SidebarTrigger>
           <div className="flex items-center gap-2">
-            <img alt="JobBots Logo" className="h-8 w-8 drop-shadow-lg" src="/lovable-uploads/34030be6-9535-4f5f-8f29-e4493515b5e8.jpg" />
-            <span className="font-orbitron bg-gradient-to-r from-sky-300 via-fuchsia-400 to-indigo-300 bg-clip-text drop-shadow-sm tracking-wider select-none relative whitespace-nowrap text-gray-50 text-lg font-bold">
+            <img src="/lovable-uploads/6239b4a7-4f3c-4902-a936-4216ae26d9af.png" alt="JobBots Logo" className="h-8 w-8 drop-shadow-lg" />
+            <span className="font-orbitron font-extrabold text-2xl bg-gradient-to-r from-sky-300 via-fuchsia-400 to-indigo-300 bg-clip-text text-transparent drop-shadow-sm tracking-wider select-none relative whitespace-nowrap">
               Aspirely.ai
             </span>
           </div>
@@ -333,7 +349,15 @@ const CoverLetter = () => {
 
                         <div className="flex flex-col sm:flex-row gap-3 pt-4">
                           {/* Generate Cover Letter - disabled if no credits */}
-                          <Button type="submit" disabled={!canSubmit} className={`flex-[3] font-semibold text-base h-12 rounded-lg ${canSubmit ? "bg-gradient-to-r from-white to-white hover:from-white/80 hover:to-white/80 text-black" : "bg-gray-500 text-gray-300 cursor-not-allowed"}`}>
+                          <Button 
+                            type="submit" 
+                            disabled={!canSubmit}
+                            className={`flex-[3] font-semibold text-base h-12 rounded-lg ${
+                              canSubmit 
+                                ? "bg-gradient-to-r from-white to-white hover:from-white/80 hover:to-white/80 text-black" 
+                                : "bg-gray-500 text-gray-300 cursor-not-allowed"
+                            }`}
+                          >
                             {isSubmitting ? "Submitting..." : isGenerating ? "Generating..." : "Generate Cover Letter"}
                           </Button>
                           <Button type="button" onClick={resetForm} variant="outline" className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 text-base h-12 px-6 max-sm:w-full" disabled={isGenerating}>
@@ -392,4 +416,5 @@ const CoverLetter = () => {
       </div>
     </SidebarProvider>;
 };
+
 export default CoverLetter;

@@ -16,25 +16,25 @@ class Logger {
 
   debug(message: string, ...args: any[]) {
     if (this.shouldLog('debug')) {
-      console.log(`[DEBUG] ${message}`, ...args.map(arg => this.sanitizeForLog(arg)));
+      console.log(`[DEBUG] ${message}`, ...args);
     }
   }
 
   info(message: string, ...args: any[]) {
     if (this.shouldLog('info')) {
-      console.log(`[INFO] ${message}`, ...args.map(arg => this.sanitizeForLog(arg)));
+      console.log(`[INFO] ${message}`, ...args);
     }
   }
 
   warn(message: string, ...args: any[]) {
     if (this.shouldLog('warn')) {
-      console.warn(`[WARN] ${message}`, ...args.map(arg => this.sanitizeForLog(arg)));
+      console.warn(`[WARN] ${message}`, ...args);
     }
   }
 
   error(message: string, ...args: any[]) {
     if (this.shouldLog('error')) {
-      console.error(`[ERROR] ${message}`, ...args.map(arg => this.sanitizeForLog(arg)));
+      console.error(`[ERROR] ${message}`, ...args);
     }
   }
 
@@ -54,16 +54,6 @@ class Logger {
     });
 
     return sanitized;
-  }
-
-  // New method for webhook-specific logging
-  webhookInfo(operation: string, details: Record<string, any>) {
-    this.info(`Webhook ${operation}:`, this.sanitizeForLog(details));
-  }
-
-  // New method for image processing logging
-  imageProcessing(operation: string, postId: string, variation: number, details?: Record<string, any>) {
-    this.info(`Image ${operation} - Post: ${postId}, Variation: ${variation}`, details ? this.sanitizeForLog(details) : '');
   }
 }
 
