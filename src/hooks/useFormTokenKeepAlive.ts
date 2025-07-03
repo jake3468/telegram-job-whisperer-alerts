@@ -41,15 +41,18 @@ export const useFormTokenKeepAlive = (isFormActive: boolean = true) => {
       return;
     }
 
-    // Refresh token every 45 seconds while form is active
+    // Immediately refresh token when form becomes active
+    silentTokenRefresh();
+
+    // Refresh token every 30 seconds while form is active (more aggressive)
     keepAliveIntervalRef.current = setInterval(async () => {
       const timeSinceLastActivity = Date.now() - lastActivityRef.current;
       
-      // Only refresh if user was active in the last 5 minutes
-      if (timeSinceLastActivity < 5 * 60 * 1000) {
+      // Only refresh if user was active in the last 10 minutes
+      if (timeSinceLastActivity < 10 * 60 * 1000) {
         await silentTokenRefresh();
       }
-    }, 45000); // 45 seconds
+    }, 30000); // 30 seconds
 
     return () => {
       if (keepAliveIntervalRef.current) {
