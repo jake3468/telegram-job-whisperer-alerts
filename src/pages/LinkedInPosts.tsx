@@ -19,6 +19,7 @@ import LoadingMessages from '@/components/LoadingMessages';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { useLinkedInPostTimeoutFallback } from '@/hooks/useLinkedInPostTimeoutFallback';
+import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
 interface LinkedInPostData {
   post_heading_1: string | null;
   post_content_1: string | null;
@@ -66,6 +67,17 @@ const LinkedInPosts = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  
+  // Initialize form token keep-alive - determine if form is active
+  const isFormActive = !isGenerating && !isSubmitting && Boolean(
+    formData.topic.trim() || 
+    formData.opinion.trim() || 
+    formData.personal_story.trim() || 
+    formData.audience.trim() || 
+    formData.tone
+  );
+  
+  const { updateActivity, silentTokenRefresh } = useFormTokenKeepAlive(isFormActive);
   const toneOptions = [{
     value: 'professional',
     label: 'Professional & Insightful'
@@ -237,6 +249,8 @@ const LinkedInPosts = () => {
       ...prev,
       [field]: value
     }));
+    // Update activity timestamp to keep tokens fresh
+    updateActivity();
   };
   const checkCreditsWithFallback = async (): Promise<boolean> => {
     if (hasCredits) {
@@ -323,6 +337,11 @@ const LinkedInPosts = () => {
     setIsGenerating(true);
     setPostsData(null);
     setCurrentPostId(null);
+    
+    // Proactively refresh token before submission to prevent JWT errors
+    console.log('🔐 Refreshing token before form submission...');
+    await silentTokenRefresh();
+    
     try {
       console.log('🚀 Creating LinkedIn post with user_profile.id:', userProfile.id);
       await executeWithRetry(async () => {
