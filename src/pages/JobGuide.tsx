@@ -21,7 +21,6 @@ import { validateInput, sanitizeText, isValidForTyping } from '@/utils/sanitize'
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
 import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
-
 const JobGuide = () => {
   const {
     user,
@@ -56,7 +55,7 @@ const JobGuide = () => {
   const [matchScore, setMatchScore] = useState<string | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const loadingMessages = ["🔍 Analyzing job requirements...", "✨ Crafting personalized insights...", "🚀 Tailoring advice to your profile...", "🎯 Generating strategic recommendations..."];
-  
+
   // Use feature credit check specifically for job analysis
   const {
     hasCredits,
@@ -68,15 +67,12 @@ const JobGuide = () => {
       console.log('Insufficient credits for job analysis');
     }
   });
-
   useCreditWarnings();
-
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
-
   useEffect(() => {
     if (!isGenerating) return;
     let messageIndex = 0;
@@ -87,7 +83,6 @@ const JobGuide = () => {
     }, 3000);
     return () => clearInterval(messageInterval);
   }, [isGenerating]);
-
   useEffect(() => {
     if (!jobAnalysisId || !isGenerating) return;
     console.log('🔄 Starting enhanced polling for job analysis results, ID:', jobAnalysisId);
@@ -145,7 +140,6 @@ const JobGuide = () => {
             clearInterval(pollingIntervalRef.current);
             pollingIntervalRef.current = null;
           }
-
           toast({
             title: "Job Analysis Generated!",
             description: "Your personalized job analysis is ready."
@@ -197,7 +191,6 @@ const JobGuide = () => {
       clearTimeout(timeout);
     };
   }, [jobAnalysisId, isGenerating, toast]);
-
   const handleInputChange = (field: string, value: string) => {
     // Use more lenient validation for real-time typing
     const maxLength = field === 'jobDescription' ? 5000 : 200;
@@ -219,7 +212,6 @@ const JobGuide = () => {
       [field]: cleanValue
     }));
   };
-
   const handleClearData = useCallback(() => {
     setFormData({
       companyName: '',
@@ -237,7 +229,6 @@ const JobGuide = () => {
       description: "All form data and results have been cleared."
     });
   }, [toast]);
-
   const handleSubmit = useCallback(async () => {
     console.log('🚀 Job Guide Submit Button Clicked');
 
@@ -246,7 +237,6 @@ const JobGuide = () => {
       showInsufficientCreditsPopup();
       return;
     }
-
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
         title: "Missing information",
@@ -298,7 +288,6 @@ const JobGuide = () => {
         setMatchScore(existing.match_score || null);
         setJobAnalysisId(existing.id);
         setIsSubmitting(false);
-        
         toast({
           title: "Previous Job Analysis Found",
           description: "Using your previous job analysis for this job posting."
@@ -320,7 +309,6 @@ const JobGuide = () => {
       } = await makeAuthenticatedRequest(async () => {
         return await supabase.from('job_analyses').insert(insertData).select('id').single();
       }, 'insert job analysis', 3);
-
       if (insertError) {
         console.error('❌ INSERT ERROR:', insertError);
         throw new Error(`Database insert failed: ${insertError.message}`);
@@ -348,7 +336,6 @@ const JobGuide = () => {
       setIsSubmitting(false);
     }
   }, [formData, isComplete, completionLoading, profileLoading, hasResume, hasBio, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup, userProfile]);
-
   useEffect(() => {
     const handleHistoryData = (event: any) => {
       const {
@@ -373,7 +360,6 @@ const JobGuide = () => {
     window.addEventListener('useHistoryData', handleHistoryData);
     return () => window.removeEventListener('useHistoryData', handleHistoryData);
   }, []);
-
   const handleCopyResult = async () => {
     if (!jobAnalysisResult) return;
     try {
@@ -419,13 +405,11 @@ const JobGuide = () => {
     isButtonDisabled,
     userProfile: !!userProfile
   });
-
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-slate-400 text-xs">Loading...</div>
       </div>;
   }
-
   return <Layout>
       <div className="min-h-screen w-full flex flex-col overflow-x-hidden bg-black">
         <div className="max-w-4xl mx-auto w-full px-2 pt-2 pb-2 sm:px-6">
@@ -467,7 +451,7 @@ const JobGuide = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Company Name */}
                   <div className="space-y-2">
-                    <label htmlFor="companyName" className="text-slate-200 font-semibold text-base">
+                    <label htmlFor="companyName" className="text-white-200 font-semibold text-base">
                       🏬 Company Name *
                     </label>
                     <Input id="companyName" placeholder="Google, Microsoft" value={formData.companyName} onChange={e => handleInputChange('companyName', e.target.value)} required maxLength={200} className="text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold bg-gray-950" />
@@ -551,11 +535,7 @@ const JobGuide = () => {
                     </div>}
 
                   <div className="w-full overflow-hidden">
-                    <SafeHTMLRenderer 
-                      content={jobAnalysisResult} 
-                      className="whitespace-pre-wrap font-inter text-slate-100 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-blue-900/90 rounded-xl p-3 sm:p-4 md:p-5 shadow-inner mb-3 border border-slate-700 w-full overflow-hidden break-words hyphens-auto [word-break:break-word]" 
-                      maxLength={15000} 
-                    />
+                    <SafeHTMLRenderer content={jobAnalysisResult} className="whitespace-pre-wrap font-inter text-slate-100 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-blue-900/90 rounded-xl p-3 sm:p-4 md:p-5 shadow-inner mb-3 border border-slate-700 w-full overflow-hidden break-words hyphens-auto [word-break:break-word]" maxLength={15000} />
                   </div>
                   
                   <div className="flex flex-col md:flex-row gap-2">
@@ -571,5 +551,4 @@ const JobGuide = () => {
       </div>
     </Layout>;
 };
-
 export default JobGuide;
