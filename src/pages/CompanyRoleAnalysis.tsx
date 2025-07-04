@@ -18,7 +18,6 @@ import { JSONSectionDisplay } from '@/components/JSONSectionDisplay';
 import { SourcesDisplay } from '@/components/SourcesDisplay';
 import { PremiumAnalysisResults } from '@/components/PremiumAnalysisResults';
 import { Badge } from '@/components/ui/badge';
-
 interface CompanyRoleAnalysisData {
   id: string;
   company_name: string;
@@ -44,7 +43,6 @@ interface CompanyRoleAnalysisData {
   created_at: string;
   updated_at: string;
 }
-
 const CompanyRoleAnalysis = () => {
   const [companyName, setCompanyName] = useState('');
   const [location, setLocation] = useState('');
@@ -54,11 +52,18 @@ const CompanyRoleAnalysis = () => {
   const [pendingAnalysisId, setPendingAnalysisId] = useState<string | null>(null);
   const [loadingMessages, setLoadingMessages] = useState<string[]>([]);
   const [showRecentResults, setShowRecentResults] = useState(false);
-  const { toast } = useToast();
-  const { userProfile } = useUserProfile();
-  
+  const {
+    toast
+  } = useToast();
+  const {
+    userProfile
+  } = useUserProfile();
+
   // Use the feature credit check hook for checking credits only (no deduction)
-  const { hasCredits, showInsufficientCreditsPopup } = useFeatureCreditCheck({
+  const {
+    hasCredits,
+    showInsufficientCreditsPopup
+  } = useFeatureCreditCheck({
     feature: 'COMPANY_ROLE_ANALYSIS',
     onSuccess: () => {
       console.log('Credit check passed for company analysis');
@@ -82,21 +87,19 @@ const CompanyRoleAnalysis = () => {
     queryFn: async () => {
       if (!userProfile?.id) return [];
       console.log('Fetching company role analyses for user:', userProfile.id);
-      
       try {
-        const { data, error } = await makeAuthenticatedRequest(async () => {
-          return await supabase
-            .from('company_role_analyses')
-            .select('*')
-            .eq('user_id', userProfile.id)
-            .order('created_at', { ascending: false });
+        const {
+          data,
+          error
+        } = await makeAuthenticatedRequest(async () => {
+          return await supabase.from('company_role_analyses').select('*').eq('user_id', userProfile.id).order('created_at', {
+            ascending: false
+          });
         }, 'fetch company role analyses');
-
         if (error) {
           console.error('Error fetching company-role analysis history:', error);
           return [];
         }
-        
         console.log('Fetched analyses:', data);
         return data as CompanyRoleAnalysisData[];
       } catch (err) {
@@ -111,23 +114,7 @@ const CompanyRoleAnalysis = () => {
 
   // Enhanced helper function to check if analysis has meaningful data
   const hasAnalysisResult = (analysis: CompanyRoleAnalysisData) => {
-    return !!(analysis.research_date || 
-              analysis.local_role_market_context || 
-              (analysis.company_news_updates && analysis.company_news_updates.length > 0) ||
-              (analysis.role_security_score !== null && analysis.role_security_score !== undefined) ||
-              (analysis.role_security_score_breakdown && analysis.role_security_score_breakdown.length > 0) ||
-              analysis.role_security_outlook ||
-              analysis.role_security_automation_risks ||
-              analysis.role_security_departmental_trends ||
-              (analysis.role_experience_score !== null && analysis.role_experience_score !== undefined) ||
-              (analysis.role_experience_score_breakdown && analysis.role_experience_score_breakdown.length > 0) ||
-              analysis.role_experience_specific_insights ||
-              analysis.role_compensation_analysis ||
-              analysis.role_workplace_environment ||
-              analysis.career_development ||
-              analysis.role_specific_considerations ||
-              analysis.interview_and_hiring_insights ||
-              analysis.sources);
+    return !!(analysis.research_date || analysis.local_role_market_context || analysis.company_news_updates && analysis.company_news_updates.length > 0 || analysis.role_security_score !== null && analysis.role_security_score !== undefined || analysis.role_security_score_breakdown && analysis.role_security_score_breakdown.length > 0 || analysis.role_security_outlook || analysis.role_security_automation_risks || analysis.role_security_departmental_trends || analysis.role_experience_score !== null && analysis.role_experience_score !== undefined || analysis.role_experience_score_breakdown && analysis.role_experience_score_breakdown.length > 0 || analysis.role_experience_specific_insights || analysis.role_compensation_analysis || analysis.role_workplace_environment || analysis.career_development || analysis.role_specific_considerations || analysis.interview_and_hiring_insights || analysis.sources);
   };
 
   // Check for completed analysis when data is fetched or pendingAnalysisId changes
@@ -136,17 +123,13 @@ const CompanyRoleAnalysis = () => {
     console.log('Checking for completed analysis with ID:', pendingAnalysisId);
 
     // Find the pending analysis in the fetched data
-    const completedAnalysis = analysisHistory.find(analysis => 
-      analysis.id === pendingAnalysisId && hasAnalysisResult(analysis)
-    );
-    
+    const completedAnalysis = analysisHistory.find(analysis => analysis.id === pendingAnalysisId && hasAnalysisResult(analysis));
     if (completedAnalysis) {
       console.log('Found completed analysis, showing results');
       setPendingAnalysisId(null);
       setIsSubmitting(false);
       setLoadingMessages([]);
       setShowRecentResults(true);
-
       toast({
         title: "Analysis Complete!",
         description: "Your company analysis is ready to view. Credits will be deducted automatically."
@@ -157,31 +140,26 @@ const CompanyRoleAnalysis = () => {
   // Real-time subscription for analysis updates with enhanced detection
   useEffect(() => {
     if (!userProfile?.id || !pendingAnalysisId) return;
-    
     console.log('Setting up real-time subscription for analysis:', pendingAnalysisId);
-    const channel = supabase
-      .channel('company-analysis-updates')
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'company_role_analyses',
-        filter: `id=eq.${pendingAnalysisId}`
-      }, (payload) => {
-        console.log('Real-time update received for company analysis:', payload);
+    const channel = supabase.channel('company-analysis-updates').on('postgres_changes', {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'company_role_analyses',
+      filter: `id=eq.${pendingAnalysisId}`
+    }, payload => {
+      console.log('Real-time update received for company analysis:', payload);
 
-        // Enhanced detection - check if the updated record has meaningful data
-        const updatedData = payload.new as CompanyRoleAnalysisData;
-        if (updatedData && hasAnalysisResult(updatedData)) {
-          console.log('Meaningful analysis data detected via real-time, refreshing data');
+      // Enhanced detection - check if the updated record has meaningful data
+      const updatedData = payload.new as CompanyRoleAnalysisData;
+      if (updatedData && hasAnalysisResult(updatedData)) {
+        console.log('Meaningful analysis data detected via real-time, refreshing data');
 
-          // Analysis has meaningful data, refresh and show results
-          refetchHistory();
-        } else {
-          console.log('Real-time update received but no meaningful data yet, continuing to wait...');
-        }
-      })
-      .subscribe();
-
+        // Analysis has meaningful data, refresh and show results
+        refetchHistory();
+      } else {
+        console.log('Real-time update received but no meaningful data yet, continuing to wait...');
+      }
+    }).subscribe();
     return () => {
       console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
@@ -191,29 +169,15 @@ const CompanyRoleAnalysis = () => {
   // Loading messages effect
   useEffect(() => {
     if (!isSubmitting || !pendingAnalysisId) return;
-    
-    const messages = [
-      "Analyzing company data...",
-      "Researching market trends...",
-      "Evaluating role security...",
-      "Assessing compensation data...",
-      "Analyzing workplace environment...",
-      "Gathering interview insights...",
-      "Compiling sources and references...",
-      "Finalizing analysis report..."
-    ];
-    
+    const messages = ["Analyzing company data...", "Researching market trends...", "Evaluating role security...", "Assessing compensation data...", "Analyzing workplace environment...", "Gathering interview insights...", "Compiling sources and references...", "Finalizing analysis report..."];
     let messageIndex = 0;
     setLoadingMessages([messages[0]]);
-    
     const interval = setInterval(() => {
       messageIndex = (messageIndex + 1) % messages.length;
       setLoadingMessages(prev => [...prev.slice(-2), messages[messageIndex]]);
     }, 3000);
-    
     return () => clearInterval(interval);
   }, [isSubmitting, pendingAnalysisId]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -222,7 +186,6 @@ const CompanyRoleAnalysis = () => {
       showInsufficientCreditsPopup();
       return;
     }
-
     if (!userProfile?.id) {
       toast({
         title: "Profile Required",
@@ -231,7 +194,6 @@ const CompanyRoleAnalysis = () => {
       });
       return;
     }
-
     if (!companyName.trim() || !location.trim() || !jobTitle.trim()) {
       toast({
         title: "Missing Information",
@@ -240,10 +202,8 @@ const CompanyRoleAnalysis = () => {
       });
       return;
     }
-
     setIsSubmitting(true);
     setShowRecentResults(false);
-
     try {
       console.log('Creating company role analysis with data:', {
         user_id: userProfile.id,
@@ -251,20 +211,17 @@ const CompanyRoleAnalysis = () => {
         location: location.trim(),
         job_title: jobTitle.trim()
       });
-
-      const { data, error } = await makeAuthenticatedRequest(async () => {
-        return await supabase
-          .from('company_role_analyses')
-          .insert({
-            user_id: userProfile.id,
-            company_name: companyName.trim(),
-            location: location.trim(),
-            job_title: jobTitle.trim()
-          })
-          .select()
-          .single();
+      const {
+        data,
+        error
+      } = await makeAuthenticatedRequest(async () => {
+        return await supabase.from('company_role_analyses').insert({
+          user_id: userProfile.id,
+          company_name: companyName.trim(),
+          location: location.trim(),
+          job_title: jobTitle.trim()
+        }).select().single();
       }, 'create company role analysis');
-
       if (error) {
         console.error('Error creating company-role analysis:', error);
         toast({
@@ -275,7 +232,6 @@ const CompanyRoleAnalysis = () => {
         setIsSubmitting(false);
         return;
       }
-
       console.log('Company analysis created successfully:', data);
 
       // Set pending analysis ID to track real-time updates
@@ -302,7 +258,6 @@ const CompanyRoleAnalysis = () => {
       setIsSubmitting(false);
     }
   };
-
   const handleReset = () => {
     setCompanyName('');
     setLocation('');
@@ -310,12 +265,8 @@ const CompanyRoleAnalysis = () => {
   };
 
   // Get the most recent completed analysis for display
-  const recentCompletedAnalysis = showRecentResults && analysisHistory && analysisHistory.length > 0 
-    ? analysisHistory.find(analysis => hasAnalysisResult(analysis)) 
-    : null;
-
-  return (
-    <Layout>
+  const recentCompletedAnalysis = showRecentResults && analysisHistory && analysisHistory.length > 0 ? analysisHistory.find(analysis => hasAnalysisResult(analysis)) : null;
+  return <Layout>
       <div className="min-h-screen bg-black px-2 pt-2 pb-2 sm:px-4 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
           {/* Header Section */}
@@ -348,11 +299,7 @@ const CompanyRoleAnalysis = () => {
                       Provide company details to uncover hidden red flags and green lights
                     </p>
                   </div>
-                  <Button 
-                    onClick={() => setIsHistoryOpen(true)} 
-                    variant="outline" 
-                    className="w-full sm:w-auto border-white/50 text-white hover:text-white font-orbitron text-sm sm:text-base flex-shrink-0 bg-emerald-900 hover:bg-emerald-800"
-                  >
+                  <Button onClick={() => setIsHistoryOpen(true)} variant="outline" className="w-full sm:w-auto border-white/50 font-orbitron text-sm sm:text-base flex-shrink-0 bg-zinc-50 text-zinc-950">
                     <History className="w-4 h-4 mr-2" />
                     History
                   </Button>
@@ -366,30 +313,14 @@ const CompanyRoleAnalysis = () => {
                       <Label htmlFor="companyName" className="text-white font-medium flex items-center gap-2 text-sm sm:text-base">
                         🏭 Company Name *
                       </Label>
-                      <Input
-                        id="companyName"
-                        type="text"
-                        placeholder="e.g., Google, Microsoft, Amazon"
-                        value={companyName}
-                        onChange={(e) => setCompanyName(e.target.value)}
-                        required
-                        className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950"
-                      />
+                      <Input id="companyName" type="text" placeholder="e.g., Google, Microsoft, Amazon" value={companyName} onChange={e => setCompanyName(e.target.value)} required className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="location" className="text-white font-medium flex items-center gap-2 text-sm sm:text-base">
                         📍Location *
                       </Label>
-                      <Input
-                        id="location"
-                        type="text"
-                        placeholder="e.g., San Francisco, New York, Remote"
-                        value={location}
-                        onChange={(e) => setLocation(e.target.value)}
-                        required
-                        className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950"
-                      />
+                      <Input id="location" type="text" placeholder="e.g., San Francisco, New York, Remote" value={location} onChange={e => setLocation(e.target.value)} required className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
                     </div>
                   </div>
 
@@ -398,43 +329,22 @@ const CompanyRoleAnalysis = () => {
                     <Label htmlFor="jobTitle" className="text-white font-medium flex items-center gap-2 text-sm sm:text-base">
                       👨🏼‍💻 Job Title *
                     </Label>
-                    <Input
-                      id="jobTitle"
-                      type="text"
-                      placeholder="e.g., Senior Software Engineer, Product Manager, Data Scientist"
-                      value={jobTitle}
-                      onChange={(e) => setJobTitle(e.target.value)}
-                      required
-                      className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950"
-                    />
+                    <Input id="jobTitle" type="text" placeholder="e.g., Senior Software Engineer, Product Manager, Data Scientist" value={jobTitle} onChange={e => setJobTitle(e.target.value)} required className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
                   </div>
 
                   {/* Action Buttons - Desktop: same line, Mobile: stacked */}
                   <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4">
-                    <Button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full lg:flex-1 bg-gradient-to-r from-white via-white to-white hover:from-white/90 hover:via-white/90 hover:to-white/90 text-black font-orbitron font-bold py-4 sm:py-6 text-xs sm:text-base shadow-2xl shadow-gray-300/50 border-0 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isSubmitting ? (
-                        <>
+                    <Button type="submit" disabled={isSubmitting} className="w-full lg:flex-1 bg-gradient-to-r from-white via-white to-white hover:from-white/90 hover:via-white/90 hover:to-white/90 text-black font-orbitron font-bold py-4 sm:py-6 text-xs sm:text-base shadow-2xl shadow-gray-300/50 border-0 disabled:opacity-50 disabled:cursor-not-allowed">
+                      {isSubmitting ? <>
                           <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
                           Analyzing Company & Role...
-                        </>
-                      ) : (
-                        <>
+                        </> : <>
                           <Building2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                           Generate Company Analysis
-                        </>
-                      )}
+                        </>}
                     </Button>
                     
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleReset}
-                      className="w-full lg:w-auto border-white/50 text-white hover:bg-white/20 hover:text-white font-orbitron bg-transparent py-3 sm:py-4 text-sm sm:text-base lg:px-6"
-                    >
+                    <Button type="button" variant="outline" onClick={handleReset} className="w-full lg:w-auto border-white/50 text-white hover:bg-white/20 hover:text-white font-orbitron bg-transparent py-3 sm:py-4 text-sm sm:text-base lg:px-6">
                       <RotateCcw className="w-4 h-4 mr-2" />
                       Reset                   
                     </Button>
@@ -445,8 +355,7 @@ const CompanyRoleAnalysis = () => {
           </div>
 
           {/* Loading Messages - Updated with better contrast and premium styling */}
-          {isSubmitting && pendingAnalysisId && (
-            <div className="space-y-4 px-2">
+          {isSubmitting && pendingAnalysisId && <div className="space-y-4 px-2">
               <Card className="bg-gradient-to-br from-slate-900/95 via-gray-900/95 to-black/95 border-green-400/40 shadow-2xl backdrop-blur-sm">
                 <CardContent className="p-6 sm:p-8">
                   <div className="flex items-center gap-4 mb-6">
@@ -464,26 +373,22 @@ const CompanyRoleAnalysis = () => {
                     </div>
                   </div>
                   <div className="space-y-3">
-                    {loadingMessages.map((message, index) => (
-                      <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-400/20">
+                    {loadingMessages.map((message, index) => <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-400/20">
                         <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full animate-pulse shadow-lg shadow-green-400/50"></div>
                         <span className="text-white font-medium text-sm sm:text-base tracking-wide">
                           {message}
                         </span>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                   <div className="mt-6 w-full bg-gray-800/50 rounded-full h-2 overflow-hidden">
                     <div className="h-full bg-gradient-to-r from-green-400 to-emerald-400 rounded-full animate-pulse"></div>
                   </div>
                 </CardContent>
               </Card>
-            </div>
-          )}
+            </div>}
 
           {/* Results Section - Only show when showRecentResults is true */}
-          {recentCompletedAnalysis && (
-            <div className="space-y-4 px-2">
+          {recentCompletedAnalysis && <div className="space-y-4 px-2">
               <h2 className="text-xl sm:text-2xl font-orbitron font-bold text-white">
                 Latest Analysis Result
               </h2>
@@ -491,19 +396,12 @@ const CompanyRoleAnalysis = () => {
               <div className="grid gap-6">
                 <PremiumAnalysisResults analysis={recentCompletedAnalysis} />
               </div>
-            </div>
-          )}
+            </div>}
         </div>
       </div>
 
       {/* History Modal */}
-      <CompanyRoleAnalysisHistoryModal 
-        isOpen={isHistoryOpen} 
-        onClose={() => setIsHistoryOpen(false)} 
-        gradientColors="from-green-400 via-green-500 to-green-600" 
-      />
-    </Layout>
-  );
+      <CompanyRoleAnalysisHistoryModal isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} gradientColors="from-green-400 via-green-500 to-green-600" />
+    </Layout>;
 };
-
 export default CompanyRoleAnalysis;
