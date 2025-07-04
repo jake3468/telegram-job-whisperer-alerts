@@ -497,7 +497,7 @@ const LinkedInPosts = () => {
                         </Select>
                       </div>
 
-                      <div className="flex flex-col sm:flex-row gap-3 pt-4 max-w-full bg-zinc-50">
+                      <div className="flex flex-col sm:flex-row gap-3 pt-4 max-w-full">
                         <Button type="submit" disabled={isSubmitting || !formData.topic.trim() || isGenerating || completionLoading} className="flex-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 hover:from-indigo-600 hover:via-purple-600 hover:to-blue-600 text-white font-semibold text-base h-12 shadow-md rounded-lg min-w-0">
                           {isSubmitting ? 'Submitting...' : completionLoading ? 'Checking Profile...' : 'Generate LinkedIn Posts'}
                         </Button>
