@@ -67,17 +67,13 @@ const LinkedInPosts = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
-  
+
   // Initialize form token keep-alive - determine if form is active
-  const isFormActive = !isGenerating && !isSubmitting && Boolean(
-    formData.topic.trim() || 
-    formData.opinion.trim() || 
-    formData.personal_story.trim() || 
-    formData.audience.trim() || 
-    formData.tone
-  );
-  
-  const { updateActivity, silentTokenRefresh } = useFormTokenKeepAlive(isFormActive);
+  const isFormActive = !isGenerating && !isSubmitting && Boolean(formData.topic.trim() || formData.opinion.trim() || formData.personal_story.trim() || formData.audience.trim() || formData.tone);
+  const {
+    updateActivity,
+    silentTokenRefresh
+  } = useFormTokenKeepAlive(isFormActive);
   const toneOptions = [{
     value: 'professional',
     label: 'Professional & Insightful'
@@ -337,11 +333,10 @@ const LinkedInPosts = () => {
     setIsGenerating(true);
     setPostsData(null);
     setCurrentPostId(null);
-    
+
     // Proactively refresh token before submission to prevent JWT errors
     console.log('🔐 Refreshing token before form submission...');
     await silentTokenRefresh();
-    
     try {
       console.log('🚀 Creating LinkedIn post with user_profile.id:', userProfile.id);
       await executeWithRetry(async () => {
@@ -451,7 +446,7 @@ const LinkedInPosts = () => {
                           Fill in the details to generate 3 LinkedIn post variations
                         </CardDescription>
                       </div>
-                      <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 flex-shrink-0 text-zinc-950 bg-cyan-600 hover:bg-cyan-500">
+                      <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 flex-shrink-0 bg-zinc-100 text-zinc-950">
                         <History className="w-4 h-4 mr-2 text-black" />
                         History
                       </Button>

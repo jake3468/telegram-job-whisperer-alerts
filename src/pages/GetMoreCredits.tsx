@@ -91,7 +91,7 @@ export default function GetMoreCredits() {
   return <Layout>
       <div className="w-full flex flex-col pb-5 sm:pb-8">
         <div className="text-center mb-5 sm:mb-12 px-2 sm:px-4">
-          <h1 className="text-2xl xs:text-3xl sm:text-5xl font-orbitron font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-1 sm:mb-2 drop-shadow tracking-tight animate-fade-in">
+          <h1 className="text-2xl xs:text-3xl sm:text-5xl font-orbitron font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text mb-1 sm:mb-2 drop-shadow tracking-tight animate-fade-in text-sky-400">
             Flexible Pricing Plans
           </h1>
           <p className="text-sm text-blue-100 font-inter font-light mb-1 sm:mb-2 animate-fade-in sm:text-base">Start with free monthly credits and upgrade anytime — either by purchasing flexible credit packs or a monthly subscription.
@@ -234,12 +234,7 @@ For any payment-related queries, feel free to reach out to us at support@aspirel
                         <span className="text-indigo-100 font-medium text-xs sm:text-sm">{pack.credits_amount} credits</span>
                         <div className="flex items-center gap-2">
                           <span className="text-indigo-50 font-bold text-xs sm:text-sm">{pricingData.currencySymbol}{pack.price_amount}</span>
-                          <Button 
-                            size="sm" 
-                            onClick={() => handleCreditPackClick(pack.product_id)} 
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 h-auto rounded-md" 
-                            disabled={isCheckoutLoading(pack.product_id)}
-                          >
+                          <Button size="sm" onClick={() => handleCreditPackClick(pack.product_id)} className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={isCheckoutLoading(pack.product_id)}>
                             {isCheckoutLoading(pack.product_id) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
                           </Button>
                         </div>
@@ -249,12 +244,7 @@ For any payment-related queries, feel free to reach out to us at support@aspirel
                         <span className="text-indigo-100 font-medium text-xs sm:text-sm">{pack.credits} credits</span>
                         <div className="flex items-center gap-2">
                           <span className="text-indigo-50 font-bold text-xs sm:text-sm">{pricingData.currencySymbol}{pack.price}</span>
-                          <Button 
-                            size="sm" 
-                            onClick={() => handleCreditPackClick(pack.productId)} 
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 h-auto rounded-md" 
-                            disabled={isCheckoutLoading(pack.productId)}
-                          >
+                          <Button size="sm" onClick={() => handleCreditPackClick(pack.productId)} className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={isCheckoutLoading(pack.productId)}>
                             {isCheckoutLoading(pack.productId) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
                           </Button>
                         </div>
