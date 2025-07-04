@@ -294,7 +294,7 @@ const CoverLetter = () => {
                             Fill in the details to generate your personalized cover letter
                           </CardDescription>
                         </div>
-                        <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 text-white bg-pink-700 hover:bg-red-600">
+                        <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 bg-zinc-50 text-gray-950">
                           <History className="w-4 h-4 mr-2" />
                           History
                         </Button>
