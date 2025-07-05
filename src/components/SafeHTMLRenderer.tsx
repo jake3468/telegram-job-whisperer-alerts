@@ -11,9 +11,9 @@ interface SafeHTMLRendererProps {
 export const SafeHTMLRenderer: React.FC<SafeHTMLRendererProps> = ({ 
   content, 
   className = "",
-  maxLength = 10000 
+  maxLength = 50000 // Increased limit for blog posts
 }) => {
-  // Truncate content if too long to prevent DoS
+  // Only truncate if content is extremely long to prevent DoS
   const truncatedContent = content.length > maxLength 
     ? content.substring(0, maxLength) + '...' 
     : content;
