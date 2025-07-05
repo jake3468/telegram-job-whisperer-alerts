@@ -163,7 +163,7 @@ const BlogPost = () => {
             </h1>
 
             {blog.tags && blog.tags.length > 0 && <div className="flex flex-wrap gap-2 mb-6">
-                {blog.tags.map(tag => <Badge key={tag} variant="secondary" className="bg-gray-800 text-gray-300">
+                {blog.tags.map(tag => <Badge key={tag} variant="secondary" className="text-gray-300 bg-blue-950">
                     {tag}
                   </Badge>)}
               </div>}
