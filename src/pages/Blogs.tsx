@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Search, Calendar, User } from 'lucide-react';
+import { Search, Calendar, User, ArrowLeft } from 'lucide-react';
 import AuthHeader from '@/components/AuthHeader';
 import Footer from '@/components/Footer';
 
@@ -87,8 +87,18 @@ const Blogs = () => {
     <div className="min-h-screen bg-black text-white">
       <AuthHeader />
       
+      {/* Back to Home Button */}
+      <div className="pt-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <Link to="/" className="inline-flex items-center text-sky-400 hover:text-sky-300 mb-8 transition-colors">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Home
+          </Link>
+        </div>
+      </div>
+      
       {/* Hero Section */}
-      <div className="pt-20 pb-12 px-4">
+      <div className="pb-12 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-orbitron font-bold mb-6 bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-400 bg-clip-text text-transparent">
             Our Blog
