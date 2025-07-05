@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ArrowLeft, Calendar, User, Share2, Twitter, Linkedin } from 'lucide-react';
 import AuthHeader from '@/components/AuthHeader';
 import Footer from '@/components/Footer';
+import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
 interface Blog {
   id: string;
   title: string;
@@ -188,9 +189,10 @@ const BlogPost = () => {
 
           {/* Blog Content */}
           <div className="prose prose-invert prose-lg max-w-none">
-            <div className="text-gray-300 leading-relaxed whitespace-pre-wrap" dangerouslySetInnerHTML={{
-            __html: blog.content
-          }} />
+            <SafeHTMLRenderer 
+              content={blog.content}
+              className="text-gray-300 leading-relaxed"
+            />
           </div>
 
           {/* Related Blogs */}
