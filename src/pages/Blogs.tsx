@@ -115,7 +115,7 @@ const Blogs = () => {
             <h2 className="text-3xl font-orbitron font-bold mb-8 text-center">Featured Posts</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredBlogs.map(blog => <Card key={blog.id} className="bg-gray-900 border-gray-700 hover:border-sky-500 transition-colors">
-                  <Link to={`/blog/${blog.slug}`}>
+                  <Link to={`/blog/${blog.slug}`} onClick={() => window.scrollTo(0, 0)}>
                     {blog.thumbnail_url && <div className="aspect-video bg-gray-800 rounded-t-lg overflow-hidden">
                         <img src={blog.thumbnail_url} alt={blog.title} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
                       </div>}
@@ -153,7 +153,7 @@ const Blogs = () => {
               <p className="text-xl text-gray-400">No blogs found matching your criteria.</p>
             </div> : <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredBlogs.map(blog => <Card key={blog.id} className="bg-gray-900 border-gray-700 hover:border-sky-500 transition-colors">
-                  <Link to={`/blog/${blog.slug}`}>
+                  <Link to={`/blog/${blog.slug}`} onClick={() => window.scrollTo(0, 0)}>
                     {blog.thumbnail_url && <div className="aspect-video bg-gray-800 rounded-t-lg overflow-hidden">
                         <img src={blog.thumbnail_url} alt={blog.title} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
                       </div>}

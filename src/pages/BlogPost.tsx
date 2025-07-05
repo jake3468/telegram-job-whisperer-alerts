@@ -209,7 +209,7 @@ const BlogPost = () => {
               <h2 className="text-3xl font-orbitron font-bold mb-8 text-center">Related Posts</h2>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {relatedBlogs.map(relatedBlog => <Card key={relatedBlog.id} className="bg-gray-900 border-gray-700 hover:border-sky-500 transition-colors">
-                    <Link to={`/blog/${relatedBlog.slug}`}>
+                    <Link to={`/blog/${relatedBlog.slug}`} onClick={() => window.scrollTo(0, 0)}>
                       {relatedBlog.thumbnail_url && <div className="aspect-video bg-gray-800 rounded-t-lg overflow-hidden">
                           <img src={relatedBlog.thumbnail_url} alt={relatedBlog.title} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
                         </div>}
