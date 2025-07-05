@@ -18,6 +18,8 @@ import Upgrade from "./pages/Upgrade";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import ContactSupport from "./pages/ContactSupport";
+import Blogs from "./pages/Blogs";
+import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +44,8 @@ const AppWithSync = () => {
         <Route path="/job-alerts" element={<JobAlerts />} />
         <Route path="/get-more-credits" element={<GetMoreCredits />} />
         <Route path="/upgrade" element={<Upgrade />} />
+        <Route path="/blogs" element={<Blogs />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/contact-support" element={<ContactSupport />} />
