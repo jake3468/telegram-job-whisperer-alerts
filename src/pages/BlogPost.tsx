@@ -196,7 +196,7 @@ const BlogPost = () => {
             {blog.content ? (
               <SafeHTMLRenderer 
                 content={blog.content}
-                className="text-gray-300 leading-relaxed [&>h2]:text-xl [&>h2]:sm:text-2xl [&>h2]:lg:text-3xl [&>h2]:font-bold [&>h2]:text-white [&>h2]:mb-4 [&>h2]:mt-8 [&>p]:mb-4 [&>p]:text-base [&>p]:sm:text-lg [&>a]:text-blue-400 [&>a]:hover:text-blue-300 [&>a]:underline [&>a]:decoration-blue-400 [&>a]:underline-offset-2 [&>a]:break-words"
+                className="text-gray-300 leading-relaxed [&>h2]:text-xl [&>h2]:sm:text-2xl [&>h2]:lg:text-3xl [&>h2]:font-bold [&>h2]:text-white [&>h2]:mb-4 [&>h2]:mt-8 [&>p]:mb-4 [&>p]:text-base [&>p]:sm:text-lg [&_a]:!text-blue-400 [&_a]:!underline [&_a]:!decoration-blue-400 [&_a]:!underline-offset-2 [&_a]:hover:!text-blue-300 [&_a]:break-words [&_a]:cursor-pointer"
                 maxLength={50000}
               />
             ) : (
