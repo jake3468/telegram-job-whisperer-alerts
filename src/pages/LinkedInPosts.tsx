@@ -117,18 +117,8 @@ const LinkedInPosts = () => {
       console.log('No data provided to areAllPostsReady');
       return false;
     }
-
-    const hasAllHeadings = Boolean(
-      data.post_heading_1 && data.post_heading_1.trim() &&
-      data.post_heading_2 && data.post_heading_2.trim() &&
-      data.post_heading_3 && data.post_heading_3.trim()
-    );
-
-    const hasAllContent = Boolean(
-      data.post_content_1 && data.post_content_1.trim() &&
-      data.post_content_2 && data.post_content_2.trim() &&
-      data.post_content_3 && data.post_content_3.trim()
-    );
+    const hasAllHeadings = Boolean(data.post_heading_1 && data.post_heading_1.trim() && data.post_heading_2 && data.post_heading_2.trim() && data.post_heading_3 && data.post_heading_3.trim());
+    const hasAllContent = Boolean(data.post_content_1 && data.post_content_1.trim() && data.post_content_2 && data.post_content_2.trim() && data.post_content_3 && data.post_content_3.trim());
 
     // Enhanced logging for debugging
     console.log('Checking if posts are ready:', {
@@ -348,7 +338,7 @@ const LinkedInPosts = () => {
       });
       return;
     }
-    
+
     // Clear validation errors if topic is filled
     setValidationErrors({
       topic: ''
@@ -535,7 +525,7 @@ const LinkedInPosts = () => {
                           {isSubmitting ? 'Submitting...' : completionLoading ? 'Checking Profile...' : 'Generate LinkedIn Posts'}
                         </Button>
                         
-                        <Button type="button" onClick={resetForm} variant="outline" className="bg-white/10 border-teal-400/25 text-black hover:bg-white/20 text-base h-12 px-6 flex-shrink-0">
+                        <Button type="button" onClick={resetForm} variant="outline" className="border-teal-400/25 text-base h-12 px-6 flex-shrink-0 text-zinc-50 bg-blue-800 hover:bg-blue-700">
                           Reset
                         </Button>
                       </div>
