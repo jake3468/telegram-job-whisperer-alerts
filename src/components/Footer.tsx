@@ -46,13 +46,16 @@ const Footer = () => {
                 About Us
               </button>
               <Link to="/contact-support" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
-                Contact
+                Contact Support
               </Link>
               <Link to="/privacy-policy" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
-                Privacy
+                Privacy Policy
               </Link>
               <Link to="/terms-of-service" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
-                Terms of use
+                Terms of Service
+              </Link>
+              <Link to="/blogs" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter" onClick={() => window.scrollTo(0, 0)}>
+                Blogs
               </Link>
             </div>
           </div>
@@ -65,9 +68,6 @@ const Footer = () => {
               © {new Date().getFullYear()} Aspirely.ai. All rights reserved.
             </p>
             <div className="flex items-center space-x-6">
-              <Link to="/blogs" className="text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter" onClick={() => window.scrollTo(0, 0)}>
-                Blogs
-              </Link>
               
               
             </div>
