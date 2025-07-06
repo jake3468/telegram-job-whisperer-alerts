@@ -1,16 +1,14 @@
-
 import { Link } from 'react-router-dom';
-
 const Footer = () => {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({
+        behavior: 'smooth'
+      });
     }
   };
-
-  return (
-    <footer className="bg-black py-12 px-4 border-t border-gray-800">
+  return <footer className="bg-black py-12 px-4 border-t border-gray-800">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Company Info */}
@@ -28,22 +26,13 @@ const Footer = () => {
           <div>
             <h3 className="text-white font-semibold text-sm font-inter mb-4">Product</h3>
             <div className="space-y-3">
-              <button
-                onClick={() => scrollToSection('features')}
-                className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter"
-              >
+              <button onClick={() => scrollToSection('features')} className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
                 Features
               </button>
-              <button
-                onClick={() => scrollToSection('how-it-works')}
-                className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter"
-              >
+              <button onClick={() => scrollToSection('how-it-works')} className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
                 How It Works
               </button>
-              <button
-                onClick={() => scrollToSection('pricing')}
-                className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter"
-              >
+              <button onClick={() => scrollToSection('pricing')} className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
                 Pricing
               </button>
             </div>
@@ -53,10 +42,7 @@ const Footer = () => {
           <div>
             <h3 className="text-white font-semibold text-sm font-inter mb-4">Company</h3>
             <div className="space-y-3">
-              <button
-                onClick={() => scrollToSection('about-us')}
-                className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter"
-              >
+              <button onClick={() => scrollToSection('about-us')} className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
                 About Us
               </button>
               <Link to="/contact-support" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
@@ -79,25 +65,15 @@ const Footer = () => {
               © {new Date().getFullYear()} Aspirely.ai. All rights reserved.
             </p>
             <div className="flex items-center space-x-6">
-              <Link 
-                to="/blogs" 
-                className="text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter"
-                onClick={() => window.scrollTo(0, 0)}
-              >
+              <Link to="/blogs" className="text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter" onClick={() => window.scrollTo(0, 0)}>
                 Blogs
               </Link>
-              <Link to="/privacy-policy" className="text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
-                Privacy
-              </Link>
-              <Link to="/contact-support" className="text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
-                Refund
-              </Link>
+              
+              
             </div>
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
