@@ -265,7 +265,9 @@ const CoverLetter = () => {
               <div className="max-w-4xl mx-auto w-full px-3 py-4 sm:px-6 sm:py-6 mt-4">
                 {/* Gradient Heading */}
                 <div className="mb-8 text-center">
-                  <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 via-fuchsia-600 to-rose-600 bg-clip-text mb-2 drop-shadow font-orbitron animate-fade-in md:text-4xl text-transparent">📝 Cover Letter</h1>
+                  <h1 className="text-4xl font-bold mb-2 drop-shadow font-orbitron animate-fade-in md:text-4xl">
+                    📝 <span className="bg-gradient-to-r from-pink-600 via-fuchsia-600 to-rose-600 bg-clip-text text-transparent">Cover Letter</span>
+                  </h1>
                   <p className="text-lg font-inter font-light text-white/90 mb-3">
                     Instantly create stunning <span className="italic text-white/85">Cover Letters</span> for every job
                   </p>
@@ -331,10 +333,10 @@ const CoverLetter = () => {
 
                         <div className="flex flex-col sm:flex-row gap-3 pt-4">
                           {/* Generate Cover Letter - disabled if no credits */}
-                          <Button type="submit" disabled={!canSubmit} className={`flex-[3] font-semibold text-base h-12 rounded-lg ${canSubmit ? "bg-gradient-to-r from-white to-white hover:from-white/80 hover:to-white/80 text-black" : "bg-gray-500 text-gray-300 cursor-not-allowed"}`}>
+                          <Button type="submit" disabled={!canSubmit} className={`flex-[3] font-semibold text-base h-12 rounded-lg ${canSubmit ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg" : "bg-gray-500 text-gray-300 cursor-not-allowed"}`}>
                             {isSubmitting ? "Submitting..." : isGenerating ? "Generating..." : "Generate Cover Letter"}
                           </Button>
-                          <Button type="button" onClick={resetForm} variant="outline" className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 text-base h-12 px-6 max-sm:w-full" disabled={isGenerating}>
+                          <Button type="button" onClick={resetForm} variant="outline" className="flex-1 bg-red-600 hover:bg-red-500 border-red-500 text-white shadow-lg text-base h-12 px-6 max-sm:w-full" disabled={isGenerating}>
                             Reset
                           </Button>
                         </div>
