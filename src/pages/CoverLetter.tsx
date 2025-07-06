@@ -280,8 +280,8 @@ const CoverLetter = () => {
 
                 <div className="space-y-8">
                   {/* Input Form in Gradient Box */}
-                  <Card className="rounded-2xl border-0 bg-gradient-to-br from-rose-700/90 via-fuchsia-800/80 to-pink-700/90 shadow-xl" style={{
-                  boxShadow: '0 2px 32px 0 rgba(150,97,255,0.12)'
+                  <Card className="rounded-2xl border-0 bg-gradient-to-br from-pink-600 via-fuchsia-600 to-rose-600 shadow-2xl shadow-pink-500/40 backdrop-blur-sm ring-1 ring-pink-300/30" style={{
+                  boxShadow: '0 8px 50px 0 rgba(236,72,153,0.4), 0 0 100px 0 rgba(217,70,239,0.2)'
                 }}>
                     <CardHeader className="pb-6">
                       <div className="flex items-center justify-between">
