@@ -82,7 +82,22 @@ const CoverLetter = () => {
         const coverLetterContent = payload.new.cover_letter.trim();
         if (coverLetterContent.length > 0) {
           console.log('Cover letter content received, updating UI');
-          setResult(coverLetterContent);
+          // Clean the content to remove any metadata or extra information
+          const cleanContent = coverLetterContent.split('\n\n').find(paragraph => 
+            paragraph.includes('Dear') || 
+            paragraph.match(/^\w+\s+\d{1,2},\s+\d{4}/) ||
+            paragraph.includes('Sincerely') ||
+            paragraph.length > 100
+          ) ? coverLetterContent.split('\n\n').filter(paragraph => 
+            !paragraph.toLowerCase().includes('generate cover letter') &&
+            !paragraph.toLowerCase().includes('usage fee') &&
+            !paragraph.toLowerCase().includes('credits') &&
+            !paragraph.toLowerCase().includes('bio data') &&
+            !paragraph.toLowerCase().includes('profile') &&
+            paragraph.trim().length > 20
+          ).join('\n\n') : coverLetterContent;
+          
+          setResult(cleanContent);
           setIsGenerating(false);
           toast({
             title: "Cover Letter Generated!",
@@ -117,7 +132,23 @@ const CoverLetter = () => {
         }
         if (data?.cover_letter && data.cover_letter.trim().length > 0) {
           console.log('Cover letter found via polling, updating UI');
-          setResult(data.cover_letter);
+          // Clean the content to remove any metadata or extra information
+          const coverLetterContent = data.cover_letter.trim();
+          const cleanContent = coverLetterContent.split('\n\n').find(paragraph => 
+            paragraph.includes('Dear') || 
+            paragraph.match(/^\w+\s+\d{1,2},\s+\d{4}/) ||
+            paragraph.includes('Sincerely') ||
+            paragraph.length > 100
+          ) ? coverLetterContent.split('\n\n').filter(paragraph => 
+            !paragraph.toLowerCase().includes('generate cover letter') &&
+            !paragraph.toLowerCase().includes('usage fee') &&
+            !paragraph.toLowerCase().includes('credits') &&
+            !paragraph.toLowerCase().includes('bio data') &&
+            !paragraph.toLowerCase().includes('profile') &&
+            paragraph.trim().length > 20
+          ).join('\n\n') : coverLetterContent;
+          
+          setResult(cleanContent);
           setIsGenerating(false);
           toast({
             title: "Cover Letter Generated!",
