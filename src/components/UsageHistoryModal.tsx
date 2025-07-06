@@ -1,24 +1,24 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { History, Loader2, CreditCard, Coins } from 'lucide-react';
+import { History, Loader2, CreditCard, Coins, X } from 'lucide-react';
 import { useTransactionHistory } from '@/hooks/useTransactionHistory';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
 const UsageHistoryModal = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { data: transactions, isLoading, error } = useTransactionHistory();
-
+  const {
+    data: transactions,
+    isLoading,
+    error
+  } = useTransactionHistory();
   const formatAmount = (amount: number) => {
     if (amount > 0) {
       return `+${amount}`;
     }
     return amount.toString();
   };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -28,14 +28,12 @@ const UsageHistoryModal = () => {
       minute: '2-digit'
     });
   };
-
   const formatPaymentAmount = (amount: number, currency: string) => {
     // Convert both INR and USD from their smallest units to main units
-    const displayAmount = (currency === 'INR' || currency === 'USD') ? amount / 100 : amount;
+    const displayAmount = currency === 'INR' || currency === 'USD' ? amount / 100 : amount;
     const currencySymbol = currency === 'INR' ? '₹' : '$';
     return `${currencySymbol}${displayAmount}`;
   };
-
   const getTransactionTypeDisplay = (type: string, description: string | null) => {
     // Map transaction types to user-friendly names with specific page identification
     const typeMap: Record<string, string> = {
@@ -65,10 +63,8 @@ const UsageHistoryModal = () => {
         return 'Job Alerts';
       }
     }
-
     return typeMap[type] || type;
   };
-
   const getPaymentEventDisplay = (eventType: string) => {
     const eventMap: Record<string, string> = {
       'payment.completed': 'Payment Completed',
@@ -79,7 +75,6 @@ const UsageHistoryModal = () => {
     };
     return eventMap[eventType] || eventType;
   };
-
   const getStatusColor = (status: string) => {
     if (status === 'active' || status === 'completed') {
       return 'bg-green-500/20 text-green-300';
@@ -89,40 +84,38 @@ const UsageHistoryModal = () => {
       return 'bg-gray-500/20 text-gray-300';
     }
   };
-
   const creditTransactions = transactions?.filter(tx => tx.source === 'credit_transaction') || [];
   const paymentRecords = transactions?.filter(tx => tx.source === 'payment_record') || [];
-
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+  return <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white font-orbitron text-xs"
-        >
+        <Button variant="outline" size="sm" className="border-white/20 font-orbitron text-xs text-gray-950 bg-stone-100">
           <History className="w-4 h-4 mr-2" />
           Usage History
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-[95vw] sm:max-w-5xl max-h-[90vh] bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 border-blue-400/30">
         <DialogHeader>
-          <DialogTitle className="text-xl font-orbitron font-bold text-blue-100">
-            Transaction History
-          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-xl font-orbitron font-bold text-blue-100">
+              Transaction History
+            </DialogTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsOpen(false)}
+              className="text-blue-200 hover:text-blue-100 hover:bg-blue-800/30"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
         </DialogHeader>
         
-        {isLoading ? (
-          <div className="flex items-center justify-center py-8">
+        {isLoading ? <div className="flex items-center justify-center py-8">
             <Loader2 className="w-6 h-6 animate-spin text-blue-400" />
             <span className="ml-2 text-blue-200">Loading transactions...</span>
-          </div>
-        ) : error ? (
-          <div className="text-center py-8 text-red-300">
+          </div> : error ? <div className="text-center py-8 text-red-300">
             Error loading transaction history
-          </div>
-        ) : (
-          <Tabs defaultValue="credits" className="w-full">
+          </div> : <Tabs defaultValue="credits" className="w-full">
             <TabsList className="grid w-full grid-cols-2 bg-slate-800/50">
               <TabsTrigger value="credits" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-blue-100">
                 <Coins className="w-4 h-4 mr-2" />
@@ -135,23 +128,17 @@ const UsageHistoryModal = () => {
             </TabsList>
             
             <TabsContent value="credits" className="overflow-hidden">
-              {creditTransactions.length === 0 ? (
-                <div className="text-center py-8 text-blue-200">
+              {creditTransactions.length === 0 ? <div className="text-center py-8 text-blue-200">
                   No credit transactions found
-                </div>
-              ) : (
-                <ScrollArea className="h-[50vh] w-full">
+                </div> : <ScrollArea className="h-[50vh] w-full">
                   {/* Mobile View */}
                   <div className="block md:hidden space-y-4">
-                    {creditTransactions.map((transaction) => (
-                      <div key={transaction.id} className="bg-slate-800/40 rounded-lg p-4 border border-blue-400/20">
+                    {creditTransactions.map(transaction => <div key={transaction.id} className="bg-slate-800/40 rounded-lg p-4 border border-blue-400/20">
                         <div className="flex justify-between items-start mb-2">
                           <div className="text-blue-100 text-sm font-medium">
                             {getTransactionTypeDisplay(transaction.type, transaction.description)}
                           </div>
-                          <div className={`text-sm font-bold font-mono ${
-                            transaction.amount > 0 ? 'text-green-400' : 'text-red-400'
-                          }`}>
+                          <div className={`text-sm font-bold font-mono ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
                             {formatAmount(transaction.amount)}
                           </div>
                         </div>
@@ -164,8 +151,7 @@ const UsageHistoryModal = () => {
                         <div className="text-blue-200 text-xs">
                           Balance: {transaction.balanceAfter?.toFixed(1) || '-'}
                         </div>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
 
                   {/* Desktop/Tablet View */}
@@ -181,8 +167,7 @@ const UsageHistoryModal = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {creditTransactions.map((transaction) => (
-                          <TableRow key={transaction.id} className="border-blue-400/20 hover:bg-white/5">
+                        {creditTransactions.map(transaction => <TableRow key={transaction.id} className="border-blue-400/20 hover:bg-white/5">
                             <TableCell className="text-blue-100 text-sm">
                               {formatDate(transaction.date)}
                             </TableCell>
@@ -194,34 +179,26 @@ const UsageHistoryModal = () => {
                                 {transaction.description || (transaction.featureUsed ? `Used for ${transaction.featureUsed}` : '-')}
                               </div>
                             </TableCell>
-                            <TableCell className={`text-right font-mono text-sm font-bold ${
-                              transaction.amount > 0 ? 'text-green-400' : 'text-red-400'
-                            }`}>
+                            <TableCell className={`text-right font-mono text-sm font-bold ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
                               {formatAmount(transaction.amount)}
                             </TableCell>
                             <TableCell className="text-blue-100 text-right font-mono text-sm">
                               {transaction.balanceAfter?.toFixed(1) || '-'}
                             </TableCell>
-                          </TableRow>
-                        ))}
+                          </TableRow>)}
                       </TableBody>
                     </Table>
                   </div>
-                </ScrollArea>
-              )}
+                </ScrollArea>}
             </TabsContent>
             
             <TabsContent value="payments" className="overflow-hidden">
-              {paymentRecords.length === 0 ? (
-                <div className="text-center py-8 text-blue-200">
+              {paymentRecords.length === 0 ? <div className="text-center py-8 text-blue-200">
                   No payment records found
-                </div>
-              ) : (
-                <ScrollArea className="h-[50vh] w-full">
+                </div> : <ScrollArea className="h-[50vh] w-full">
                   {/* Mobile View */}
                   <div className="block md:hidden space-y-4">
-                    {paymentRecords.map((record) => (
-                      <div key={record.id} className="bg-slate-800/40 rounded-lg p-4 border border-blue-400/20">
+                    {paymentRecords.map(record => <div key={record.id} className="bg-slate-800/40 rounded-lg p-4 border border-blue-400/20">
                         <div className="flex justify-between items-start mb-2">
                           <div className="text-blue-100 text-sm font-medium">
                             {getPaymentEventDisplay(record.type)}
@@ -238,13 +215,10 @@ const UsageHistoryModal = () => {
                             {record.status}
                           </span>
                           <div className="text-blue-100 text-xs font-mono">
-                            {record.paymentDetails?.price_amount && record.currency 
-                              ? formatPaymentAmount(record.paymentDetails.price_amount, record.currency)
-                              : '-'}
+                            {record.paymentDetails?.price_amount && record.currency ? formatPaymentAmount(record.paymentDetails.price_amount, record.currency) : '-'}
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
 
                   {/* Desktop/Tablet View */}
@@ -260,8 +234,7 @@ const UsageHistoryModal = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {paymentRecords.map((record) => (
-                          <TableRow key={record.id} className="border-blue-400/20 hover:bg-white/5">
+                        {paymentRecords.map(record => <TableRow key={record.id} className="border-blue-400/20 hover:bg-white/5">
                             <TableCell className="text-blue-100 text-sm">
                               {formatDate(record.date)}
                             </TableCell>
@@ -274,26 +247,19 @@ const UsageHistoryModal = () => {
                               </span>
                             </TableCell>
                             <TableCell className="text-blue-100 text-right font-mono text-sm">
-                              {record.paymentDetails?.price_amount && record.currency 
-                                ? formatPaymentAmount(record.paymentDetails.price_amount, record.currency)
-                                : '-'}
+                              {record.paymentDetails?.price_amount && record.currency ? formatPaymentAmount(record.paymentDetails.price_amount, record.currency) : '-'}
                             </TableCell>
                             <TableCell className="text-green-400 text-right font-mono text-sm font-bold">
                               {record.amount > 0 ? `+${record.amount}` : '-'}
                             </TableCell>
-                          </TableRow>
-                        ))}
+                          </TableRow>)}
                       </TableBody>
                     </Table>
                   </div>
-                </ScrollArea>
-              )}
+                </ScrollArea>}
             </TabsContent>
-          </Tabs>
-        )}
+          </Tabs>}
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 };
-
 export default UsageHistoryModal;

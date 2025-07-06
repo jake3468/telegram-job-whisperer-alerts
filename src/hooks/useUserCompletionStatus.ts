@@ -103,6 +103,14 @@ export const useUserCompletionStatus = (): CompletionStatus & { refetchStatus: (
     return () => clearTimeout(timeoutId);
   }, [user]);
 
+  // Auto-refresh completion status every 30 seconds
+  useEffect(() => {
+    if (!user) return;
+    
+    const intervalId = setInterval(checkUserCompletion, 30000);
+    return () => clearInterval(intervalId);
+  }, [user]);
+
   return {
     ...status,
     refetchStatus

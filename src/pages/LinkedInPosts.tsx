@@ -61,6 +61,9 @@ const LinkedInPosts = () => {
     audience: '',
     tone: ''
   });
+  const [validationErrors, setValidationErrors] = useState({
+    topic: ''
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [postsData, setPostsData] = useState<LinkedInPostData | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -114,18 +117,8 @@ const LinkedInPosts = () => {
       console.log('No data provided to areAllPostsReady');
       return false;
     }
-
-    const hasAllHeadings = Boolean(
-      data.post_heading_1 && data.post_heading_1.trim() &&
-      data.post_heading_2 && data.post_heading_2.trim() &&
-      data.post_heading_3 && data.post_heading_3.trim()
-    );
-
-    const hasAllContent = Boolean(
-      data.post_content_1 && data.post_content_1.trim() &&
-      data.post_content_2 && data.post_content_2.trim() &&
-      data.post_content_3 && data.post_content_3.trim()
-    );
+    const hasAllHeadings = Boolean(data.post_heading_1 && data.post_heading_1.trim() && data.post_heading_2 && data.post_heading_2.trim() && data.post_heading_3 && data.post_heading_3.trim());
+    const hasAllContent = Boolean(data.post_content_1 && data.post_content_1.trim() && data.post_content_2 && data.post_content_2.trim() && data.post_content_3 && data.post_content_3.trim());
 
     // Enhanced logging for debugging
     console.log('Checking if posts are ready:', {
@@ -340,13 +333,16 @@ const LinkedInPosts = () => {
       return;
     }
     if (!formData.topic.trim()) {
-      toast({
-        title: "Topic Required",
-        description: "Please enter a topic for your LinkedIn post.",
-        variant: "destructive"
+      setValidationErrors({
+        topic: 'Please fill in this field.'
       });
       return;
     }
+
+    // Clear validation errors if topic is filled
+    setValidationErrors({
+      topic: ''
+    });
     const hasValidCredits = await checkCreditsWithFallback();
     if (!hasValidCredits) {
       toast({
@@ -525,11 +521,11 @@ const LinkedInPosts = () => {
                       </div>
 
                       <div className="flex flex-col sm:flex-row gap-3 pt-4 max-w-full">
-                        <Button type="submit" disabled={isSubmitting || !formData.topic.trim() || isGenerating || completionLoading} className="flex-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 hover:from-indigo-600 hover:via-purple-600 hover:to-blue-600 text-white font-semibold text-base h-12 shadow-md rounded-lg min-w-0">
+                        <Button type="submit" disabled={isSubmitting || !formData.topic.trim() || isGenerating || completionLoading} className="flex-1 bg-gradient-to-r from-white via-white to-white hover:from-white/90 hover:via-white/90 hover:to-white/90 text-black font-orbitron font-bold text-base h-12 shadow-2xl shadow-gray-300/50 border-0 disabled:opacity-50 disabled:cursor-not-allowed min-w-0">
                           {isSubmitting ? 'Submitting...' : completionLoading ? 'Checking Profile...' : 'Generate LinkedIn Posts'}
                         </Button>
                         
-                        <Button type="button" onClick={resetForm} variant="outline" className="bg-white/10 border-teal-400/25 text-black hover:bg-white/20 text-base h-12 px-6 flex-shrink-0">
+                        <Button type="button" onClick={resetForm} variant="outline" className="border-teal-400/25 text-base h-12 px-6 flex-shrink-0 text-zinc-50 bg-blue-800 hover:bg-blue-700">
                           Reset
                         </Button>
                       </div>

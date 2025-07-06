@@ -21,7 +21,6 @@ import { validateInput, sanitizeText, isValidForTyping } from '@/utils/sanitize'
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
 import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
-
 const JobGuide = () => {
   const {
     user,
@@ -46,6 +45,11 @@ const JobGuide = () => {
     jobTitle: '',
     jobDescription: ''
   });
+  const [validationErrors, setValidationErrors] = useState({
+    companyName: '',
+    jobTitle: '',
+    jobDescription: ''
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +60,7 @@ const JobGuide = () => {
   const [matchScore, setMatchScore] = useState<string | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const loadingMessages = ["🔍 Analyzing job requirements...", "✨ Crafting personalized insights...", "🚀 Tailoring advice to your profile...", "🎯 Generating strategic recommendations..."];
-  
+
   // Use feature credit check specifically for job analysis
   const {
     hasCredits,
@@ -68,15 +72,12 @@ const JobGuide = () => {
       console.log('Insufficient credits for job analysis');
     }
   });
-
   useCreditWarnings();
-
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
-
   useEffect(() => {
     if (!isGenerating) return;
     let messageIndex = 0;
@@ -87,7 +88,6 @@ const JobGuide = () => {
     }, 3000);
     return () => clearInterval(messageInterval);
   }, [isGenerating]);
-
   useEffect(() => {
     if (!jobAnalysisId || !isGenerating) return;
     console.log('🔄 Starting enhanced polling for job analysis results, ID:', jobAnalysisId);
@@ -145,7 +145,6 @@ const JobGuide = () => {
             clearInterval(pollingIntervalRef.current);
             pollingIntervalRef.current = null;
           }
-
           toast({
             title: "Job Analysis Generated!",
             description: "Your personalized job analysis is ready."
@@ -197,7 +196,6 @@ const JobGuide = () => {
       clearTimeout(timeout);
     };
   }, [jobAnalysisId, isGenerating, toast]);
-
   const handleInputChange = (field: string, value: string) => {
     // Use more lenient validation for real-time typing
     const maxLength = field === 'jobDescription' ? 5000 : 200;
@@ -219,7 +217,6 @@ const JobGuide = () => {
       [field]: cleanValue
     }));
   };
-
   const handleClearData = useCallback(() => {
     setFormData({
       companyName: '',
@@ -237,7 +234,6 @@ const JobGuide = () => {
       description: "All form data and results have been cleared."
     });
   }, [toast]);
-
   const handleSubmit = useCallback(async () => {
     console.log('🚀 Job Guide Submit Button Clicked');
 
@@ -246,15 +242,22 @@ const JobGuide = () => {
       showInsufficientCreditsPopup();
       return;
     }
-
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
-      toast({
-        title: "Missing information",
-        description: "Please fill in all fields to get your job analysis.",
-        variant: "destructive"
+      // Set individual field validation errors
+      setValidationErrors({
+        companyName: !formData.companyName.trim() ? 'Please fill in this field.' : '',
+        jobTitle: !formData.jobTitle.trim() ? 'Please fill in this field.' : '',
+        jobDescription: !formData.jobDescription.trim() ? 'Please fill in this field.' : ''
       });
       return;
     }
+
+    // Clear validation errors if all fields are filled
+    setValidationErrors({
+      companyName: '',
+      jobTitle: '',
+      jobDescription: ''
+    });
     if (isSubmitting || isGenerating) {
       toast({
         title: "Please wait",
@@ -298,7 +301,6 @@ const JobGuide = () => {
         setMatchScore(existing.match_score || null);
         setJobAnalysisId(existing.id);
         setIsSubmitting(false);
-        
         toast({
           title: "Previous Job Analysis Found",
           description: "Using your previous job analysis for this job posting."
@@ -320,7 +322,6 @@ const JobGuide = () => {
       } = await makeAuthenticatedRequest(async () => {
         return await supabase.from('job_analyses').insert(insertData).select('id').single();
       }, 'insert job analysis', 3);
-
       if (insertError) {
         console.error('❌ INSERT ERROR:', insertError);
         throw new Error(`Database insert failed: ${insertError.message}`);
@@ -348,7 +349,6 @@ const JobGuide = () => {
       setIsSubmitting(false);
     }
   }, [formData, isComplete, completionLoading, profileLoading, hasResume, hasBio, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup, userProfile]);
-
   useEffect(() => {
     const handleHistoryData = (event: any) => {
       const {
@@ -373,7 +373,6 @@ const JobGuide = () => {
     window.addEventListener('useHistoryData', handleHistoryData);
     return () => window.removeEventListener('useHistoryData', handleHistoryData);
   }, []);
-
   const handleCopyResult = async () => {
     if (!jobAnalysisResult) return;
     try {
@@ -419,13 +418,11 @@ const JobGuide = () => {
     isButtonDisabled,
     userProfile: !!userProfile
   });
-
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-slate-400 text-xs">Loading...</div>
       </div>;
   }
-
   return <Layout>
       <div className="min-h-screen w-full flex flex-col overflow-x-hidden bg-black">
         <div className="max-w-4xl mx-auto w-full px-2 pt-2 pb-2 sm:px-6">
@@ -446,7 +443,7 @@ const JobGuide = () => {
 
           <div className="space-y-8">
             {/* Input Form */}
-            <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-sky-900 border border-blue-700/70 shadow-xl drop-shadow-2xl">
+            <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 border border-blue-400/60 shadow-2xl shadow-blue-400/40 backdrop-blur-sm ring-1 ring-blue-300/20">
               <CardHeader>
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <div>
@@ -465,40 +462,50 @@ const JobGuide = () => {
               </CardHeader>
               <CardContent className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Company Name */}
-                  <div className="space-y-2">
-                    <label htmlFor="companyName" className="text-slate-200 font-semibold text-base">
-                      🏬 Company Name *
-                    </label>
-                    <Input id="companyName" placeholder="Google, Microsoft" value={formData.companyName} onChange={e => handleInputChange('companyName', e.target.value)} required maxLength={200} className="text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold bg-gray-950" />
-                  </div>
-                  {/* Job Title */}
-                  <div className="space-y-2">
-                    <label htmlFor="jobTitle" className="text-slate-200 font-semibold text-base">
-                      👨🏻‍💼 Job Title *
-                    </label>
-                    <Input id="jobTitle" placeholder="Software Engineer, Marketing Manager" value={formData.jobTitle} onChange={e => handleInputChange('jobTitle', e.target.value)} required maxLength={200} className="text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold bg-gray-950" />
-                  </div>
+                   {/* Company Name */}
+                   <div className="space-y-2">
+                     <label htmlFor="companyName" className="text-slate-200 font-semibold text-base">
+                       🏬 Company Name *
+                     </label>
+                     <Input id="companyName" placeholder="Google, Microsoft" value={formData.companyName} onChange={e => handleInputChange('companyName', e.target.value)} required maxLength={200} className="text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold bg-gray-950" />
+                     {validationErrors.companyName && <div className="flex items-center gap-2 text-orange-400 text-sm bg-orange-100/10 border border-orange-400/30 rounded px-3 py-2">
+                         <span className="text-orange-400">⚠</span>
+                         {validationErrors.companyName}
+                       </div>}
+                   </div>
+                   {/* Job Title */}
+                   <div className="space-y-2">
+                     <label htmlFor="jobTitle" className="text-slate-200 font-semibold text-base">
+                       👨🏻‍💼 Job Title *
+                     </label>
+                     <Input id="jobTitle" placeholder="Software Engineer, Marketing Manager" value={formData.jobTitle} onChange={e => handleInputChange('jobTitle', e.target.value)} required maxLength={200} className="text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold bg-gray-950" />
+                     {validationErrors.jobTitle && <div className="flex items-center gap-2 text-orange-400 text-sm bg-orange-100/10 border border-orange-400/30 rounded px-3 py-2">
+                         <span className="text-orange-400">⚠</span>
+                         {validationErrors.jobTitle}
+                       </div>}
+                   </div>
                 </div>
-                {/* Job Description */}
-                <div className="space-y-2">
-                  <label htmlFor="jobDescription" className="text-slate-200 font-semibold text-base">
-                    🧾 Job Description *
-                  </label>
-                  <span className="text-slate-400 font-normal text-xs block mb-2">
-                    Paste in the job description or key requirements
-                  </span>
-                  <Textarea id="jobDescription" placeholder="Paste the job description here..." value={formData.jobDescription} onChange={e => handleInputChange('jobDescription', e.target.value)} required maxLength={5000} className="min-h-[100px] text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold bg-gray-950" />
-                </div>
+                 {/* Job Description */}
+                 <div className="space-y-2">
+                   <label htmlFor="jobDescription" className="text-slate-200 font-semibold text-base">
+                     🧾 Job Description *
+                   </label>
+                   <span className="text-slate-400 font-normal text-xs block mb-2">
+                     Paste in the job description or key requirements
+                   </span>
+                   <Textarea id="jobDescription" placeholder="Paste the job description here..." value={formData.jobDescription} onChange={e => handleInputChange('jobDescription', e.target.value)} required maxLength={5000} className="min-h-[100px] text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold bg-gray-950" />
+                   {validationErrors.jobDescription && <div className="flex items-center gap-2 text-orange-400 text-sm bg-orange-100/10 border border-orange-400/30 rounded px-3 py-2">
+                       <span className="text-orange-400">⚠</span>
+                       {validationErrors.jobDescription}
+                     </div>}
+                 </div>
                 {/* Action Buttons */}
                 <div className="flex flex-col md:flex-row gap-3 pt-4">
-                  <Button onClick={handleSubmit} disabled={isButtonDisabled} className={`flex-1 bg-gradient-to-r from-white via-white to-white hover:from-white/90 hover:to-white/90 text-black font-semibold text-base h-12 shadow-none border border-gray-300 transition-all duration-150
-                      ${isButtonDisabled ? 'opacity-50 cursor-not-allowed' : 'opacity-100'}
-                    `}>
+                  <Button onClick={handleSubmit} disabled={isButtonDisabled} className="flex-1 bg-gradient-to-r from-white via-white to-white hover:from-white/90 hover:via-white/90 hover:to-white/90 text-black font-orbitron font-bold text-base h-12 shadow-2xl shadow-gray-300/50 border-0 disabled:opacity-50 disabled:cursor-not-allowed">
                     {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
                     {isGenerating ? loadingMessage || 'Analyzing...' : 'Generate Job Analysis'}
                   </Button>
-                  <Button onClick={handleClearData} variant="outline" size="sm" className="flex-none min-w-[120px] bg-slate-900/70 border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-slate-200 h-10 px-4 ml-0 md:ml-2" disabled={!hasAnyData}>
+                  <Button onClick={handleClearData} variant="outline" size="sm" className="flex-none min-w-[120px] bg-gradient-to-r from-red-900/80 to-red-800/80 border border-red-500/50 text-red-200 hover:bg-gradient-to-r hover:from-red-800 hover:to-red-700 hover:text-red-100 h-10 px-4 ml-0 md:ml-2 shadow-lg shadow-red-500/10" disabled={!hasAnyData}>
                     <Trash2 className="w-4 h-4 mr-2" />
                     Clear All
                   </Button>
@@ -530,8 +537,8 @@ const JobGuide = () => {
               </Card>}
 
             {/* Result Display */}
-            {jobAnalysisResult && <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-cyan-900 border border-blue-700 shadow-lg w-full max-w-full overflow-hidden">
-                <CardHeader className="pb-4">
+            {jobAnalysisResult && <Card className="bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 border border-emerald-500/50 shadow-2xl shadow-emerald-500/20 w-full max-w-full overflow-hidden">
+                <CardHeader className="pb-4 bg-indigo-500">
                   <CardTitle className="text-slate-200 font-orbitron text-xl flex items-center gap-2">
                     <FileText className="w-5 h-5 text-slate-400" />
                     Your Job Analysis
@@ -540,7 +547,7 @@ const JobGuide = () => {
                     Personalized result for <span className="font-bold text-slate-200">{sanitizeText(formData.jobTitle)}</span> at <span className="font-bold text-slate-200">{sanitizeText(formData.companyName)}</span>
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="w-full max-w-full p-4">
+                <CardContent className="w-full max-w-full p-4 bg-indigo-500">
                   {/* Percentage Meter (Match Score) */}
                   {matchScore && <div className="mb-4 w-full">
                       <div className="w-full max-w-sm mx-auto">
@@ -551,15 +558,11 @@ const JobGuide = () => {
                     </div>}
 
                   <div className="w-full overflow-hidden">
-                    <SafeHTMLRenderer 
-                      content={jobAnalysisResult} 
-                      className="whitespace-pre-wrap font-inter text-slate-100 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-blue-900/90 rounded-xl p-3 sm:p-4 md:p-5 shadow-inner mb-3 border border-slate-700 w-full overflow-hidden break-words hyphens-auto [word-break:break-word]" 
-                      maxLength={15000} 
-                    />
+                    <SafeHTMLRenderer content={jobAnalysisResult} className="whitespace-pre-wrap font-inter text-slate-100 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-blue-900/90 rounded-xl p-3 sm:p-4 md:p-5 shadow-inner mb-3 border border-slate-700 w-full overflow-hidden break-words hyphens-auto [word-break:break-word]" maxLength={15000} />
                   </div>
                   
                   <div className="flex flex-col md:flex-row gap-2">
-                    <Button onClick={handleCopyResult} variant="outline" size="sm" className="flex-none min-w-[120px] bg-slate-900/70 border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-slate-200 h-10 px-4">
+                    <Button onClick={handleCopyResult} variant="outline" size="sm" className="flex-none min-w-[120px] bg-gradient-to-r from-emerald-900/80 to-teal-900/80 border border-emerald-500/50 text-emerald-200 hover:bg-gradient-to-r hover:from-emerald-800 hover:to-teal-800 hover:text-emerald-100 h-10 px-4 shadow-lg shadow-emerald-500/10">
                       <Copy className="w-4 h-4 mr-2" />
                       Copy Result
                     </Button>
@@ -571,5 +574,4 @@ const JobGuide = () => {
       </div>
     </Layout>;
 };
-
 export default JobGuide;
