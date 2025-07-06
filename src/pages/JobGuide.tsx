@@ -46,6 +46,11 @@ const JobGuide = () => {
     jobTitle: '',
     jobDescription: ''
   });
+  const [validationErrors, setValidationErrors] = useState({
+    companyName: '',
+    jobTitle: '',
+    jobDescription: ''
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -248,13 +253,21 @@ const JobGuide = () => {
     }
 
     if (!formData.companyName || !formData.jobTitle || !formData.jobDescription) {
-      toast({
-        title: "Missing information",
-        description: "Please fill in all fields to get your job analysis.",
-        variant: "destructive"
+      // Set individual field validation errors
+      setValidationErrors({
+        companyName: !formData.companyName.trim() ? 'Please fill in this field.' : '',
+        jobTitle: !formData.jobTitle.trim() ? 'Please fill in this field.' : '',
+        jobDescription: !formData.jobDescription.trim() ? 'Please fill in this field.' : ''
       });
       return;
     }
+    
+    // Clear validation errors if all fields are filled
+    setValidationErrors({
+      companyName: '',
+      jobTitle: '',
+      jobDescription: ''
+    });
     if (isSubmitting || isGenerating) {
       toast({
         title: "Please wait",
@@ -465,36 +478,52 @@ const JobGuide = () => {
               </CardHeader>
               <CardContent className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Company Name */}
-                  <div className="space-y-2">
-                    <label htmlFor="companyName" className="text-slate-200 font-semibold text-base">
-                      🏬 Company Name *
-                    </label>
-                    <Input id="companyName" placeholder="Google, Microsoft" value={formData.companyName} onChange={e => handleInputChange('companyName', e.target.value)} required maxLength={200} className="text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold bg-gray-950" />
-                  </div>
-                  {/* Job Title */}
-                  <div className="space-y-2">
-                    <label htmlFor="jobTitle" className="text-slate-200 font-semibold text-base">
-                      👨🏻‍💼 Job Title *
-                    </label>
-                    <Input id="jobTitle" placeholder="Software Engineer, Marketing Manager" value={formData.jobTitle} onChange={e => handleInputChange('jobTitle', e.target.value)} required maxLength={200} className="text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold bg-gray-950" />
-                  </div>
+                   {/* Company Name */}
+                   <div className="space-y-2">
+                     <label htmlFor="companyName" className="text-slate-200 font-semibold text-base">
+                       🏬 Company Name *
+                     </label>
+                     <Input id="companyName" placeholder="Google, Microsoft" value={formData.companyName} onChange={e => handleInputChange('companyName', e.target.value)} required maxLength={200} className="text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold bg-gray-950" />
+                     {validationErrors.companyName && (
+                       <div className="flex items-center gap-2 text-orange-400 text-sm bg-orange-100/10 border border-orange-400/30 rounded px-3 py-2">
+                         <span className="text-orange-400">⚠</span>
+                         {validationErrors.companyName}
+                       </div>
+                     )}
+                   </div>
+                   {/* Job Title */}
+                   <div className="space-y-2">
+                     <label htmlFor="jobTitle" className="text-slate-200 font-semibold text-base">
+                       👨🏻‍💼 Job Title *
+                     </label>
+                     <Input id="jobTitle" placeholder="Software Engineer, Marketing Manager" value={formData.jobTitle} onChange={e => handleInputChange('jobTitle', e.target.value)} required maxLength={200} className="text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold bg-gray-950" />
+                     {validationErrors.jobTitle && (
+                       <div className="flex items-center gap-2 text-orange-400 text-sm bg-orange-100/10 border border-orange-400/30 rounded px-3 py-2">
+                         <span className="text-orange-400">⚠</span>
+                         {validationErrors.jobTitle}
+                       </div>
+                     )}
+                   </div>
                 </div>
-                {/* Job Description */}
-                <div className="space-y-2">
-                  <label htmlFor="jobDescription" className="text-slate-200 font-semibold text-base">
-                    🧾 Job Description *
-                  </label>
-                  <span className="text-slate-400 font-normal text-xs block mb-2">
-                    Paste in the job description or key requirements
-                  </span>
-                  <Textarea id="jobDescription" placeholder="Paste the job description here..." value={formData.jobDescription} onChange={e => handleInputChange('jobDescription', e.target.value)} required maxLength={5000} className="min-h-[100px] text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold bg-gray-950" />
-                </div>
+                 {/* Job Description */}
+                 <div className="space-y-2">
+                   <label htmlFor="jobDescription" className="text-slate-200 font-semibold text-base">
+                     🧾 Job Description *
+                   </label>
+                   <span className="text-slate-400 font-normal text-xs block mb-2">
+                     Paste in the job description or key requirements
+                   </span>
+                   <Textarea id="jobDescription" placeholder="Paste the job description here..." value={formData.jobDescription} onChange={e => handleInputChange('jobDescription', e.target.value)} required maxLength={5000} className="min-h-[100px] text-slate-100 border border-slate-700 shadow-inner focus:border-blue-400 placeholder:text-slate-400 font-semibold bg-gray-950" />
+                   {validationErrors.jobDescription && (
+                     <div className="flex items-center gap-2 text-orange-400 text-sm bg-orange-100/10 border border-orange-400/30 rounded px-3 py-2">
+                       <span className="text-orange-400">⚠</span>
+                       {validationErrors.jobDescription}
+                     </div>
+                   )}
+                 </div>
                 {/* Action Buttons */}
                 <div className="flex flex-col md:flex-row gap-3 pt-4">
-                  <Button onClick={handleSubmit} disabled={isButtonDisabled} className={`flex-1 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-500 hover:via-pink-500 hover:to-blue-500 text-white font-semibold text-base h-12 shadow-lg shadow-purple-500/25 border-0 transition-all duration-300 transform hover:scale-[1.02]
-                      ${isButtonDisabled ? 'bg-gradient-to-r from-gray-600 to-gray-700 text-gray-200 cursor-not-allowed shadow-lg border border-gray-500 hover:scale-100' : 'opacity-100'}
-                    `}>
+                  <Button onClick={handleSubmit} disabled={isButtonDisabled} className="flex-1 bg-gradient-to-r from-white via-white to-white hover:from-white/90 hover:via-white/90 hover:to-white/90 text-black font-orbitron font-bold text-base h-12 shadow-2xl shadow-gray-300/50 border-0 disabled:opacity-50 disabled:cursor-not-allowed">
                     {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
                     {isGenerating ? loadingMessage || 'Analyzing...' : 'Generate Job Analysis'}
                   </Button>

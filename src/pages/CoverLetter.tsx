@@ -49,6 +49,11 @@ const CoverLetter = () => {
     company_name: '',
     job_description: ''
   });
+  const [validationErrors, setValidationErrors] = useState({
+    job_title: '',
+    company_name: '',
+    job_description: ''
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -159,13 +164,21 @@ const CoverLetter = () => {
       return;
     }
     if (!formData.job_title.trim() || !formData.company_name.trim() || !formData.job_description.trim()) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
-        variant: "destructive"
+      // Set individual field validation errors
+      setValidationErrors({
+        job_title: !formData.job_title.trim() ? 'Please fill in this field.' : '',
+        company_name: !formData.company_name.trim() ? 'Please fill in this field.' : '',
+        job_description: !formData.job_description.trim() ? 'Please fill in this field.' : ''
       });
       return;
     }
+    
+    // Clear validation errors if all fields are filled
+    setValidationErrors({
+      job_title: '',
+      company_name: '',
+      job_description: ''
+    });
     setIsSubmitting(true);
     setIsGenerating(true);
     setResult('');
@@ -305,35 +318,53 @@ const CoverLetter = () => {
                         {/* Inputs Row: Company Name and Job Title in one line for desktop, stacked on mobile */}
                         <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
                           {/* Company Name */}
-                          <div className="flex-1 space-y-2">
-                            <Label htmlFor="company_name" className="text-white font-medium text-base">
-                              🏬 Company Name *
-                            </Label>
-                            <Input id="company_name" placeholder="e.g. Google, Microsoft" value={formData.company_name} onChange={e => handleInputChange('company_name', e.target.value)} required className="text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
-                          </div>
+                           <div className="flex-1 space-y-2">
+                             <Label htmlFor="company_name" className="text-white font-medium text-base">
+                               🏬 Company Name *
+                             </Label>
+                             <Input id="company_name" placeholder="e.g. Google, Microsoft" value={formData.company_name} onChange={e => handleInputChange('company_name', e.target.value)} required className="text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
+                             {validationErrors.company_name && (
+                               <div className="flex items-center gap-2 text-orange-400 text-sm bg-orange-100/10 border border-orange-400/30 rounded px-3 py-2">
+                                 <span className="text-orange-400">⚠</span>
+                                 {validationErrors.company_name}
+                               </div>
+                             )}
+                           </div>
                           {/* Job Title */}
-                          <div className="flex-1 space-y-2">
-                            <Label htmlFor="job_title" className="text-white font-medium text-base">
-                              👩🏻‍💻 Job Title *
-                            </Label>
-                            <Input id="job_title" placeholder="e.g. Software Engineer, Marketing Manager" value={formData.job_title} onChange={e => handleInputChange('job_title', e.target.value)} required className="text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
-                          </div>
+                           <div className="flex-1 space-y-2">
+                             <Label htmlFor="job_title" className="text-white font-medium text-base">
+                               👩🏻‍💻 Job Title *
+                             </Label>
+                             <Input id="job_title" placeholder="e.g. Software Engineer, Marketing Manager" value={formData.job_title} onChange={e => handleInputChange('job_title', e.target.value)} required className="text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
+                             {validationErrors.job_title && (
+                               <div className="flex items-center gap-2 text-orange-400 text-sm bg-orange-100/10 border border-orange-400/30 rounded px-3 py-2">
+                                 <span className="text-orange-400">⚠</span>
+                                 {validationErrors.job_title}
+                               </div>
+                             )}
+                           </div>
                         </div>
 
                         {/* Job Description */}
-                        <div className="space-y-2">
-                          <Label htmlFor="job_description" className="text-white font-medium text-base">
-                            💼 Job Description *
-                          </Label>
-                          <Label htmlFor="job_description" className="text-gray-300 font-normal text-sm block">
-                            Paste the job description or key requirements
-                          </Label>
-                          <Textarea id="job_description" placeholder="Paste the job description here..." value={formData.job_description} onChange={e => handleInputChange('job_description', e.target.value)} required className="min-h-[150px] resize-none text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
-                        </div>
+                         <div className="space-y-2">
+                           <Label htmlFor="job_description" className="text-white font-medium text-base">
+                             💼 Job Description *
+                           </Label>
+                           <Label htmlFor="job_description" className="text-gray-300 font-normal text-sm block">
+                             Paste the job description or key requirements
+                           </Label>
+                           <Textarea id="job_description" placeholder="Paste the job description here..." value={formData.job_description} onChange={e => handleInputChange('job_description', e.target.value)} required className="min-h-[150px] resize-none text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
+                           {validationErrors.job_description && (
+                             <div className="flex items-center gap-2 text-orange-400 text-sm bg-orange-100/10 border border-orange-400/30 rounded px-3 py-2">
+                               <span className="text-orange-400">⚠</span>
+                               {validationErrors.job_description}
+                             </div>
+                           )}
+                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-3 pt-4">
                           {/* Generate Cover Letter - disabled if no credits */}
-                          <Button type="submit" disabled={!canSubmit} className={`flex-[3] font-semibold text-base h-12 rounded-lg ${canSubmit ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg" : "bg-gradient-to-r from-gray-600 to-gray-700 text-gray-200 cursor-not-allowed shadow-lg border border-gray-500"}`}>
+                          <Button type="submit" disabled={!canSubmit} className="flex-[3] font-semibold text-base h-12 rounded-lg bg-gradient-to-r from-white via-white to-white hover:from-white/90 hover:via-white/90 hover:to-white/90 text-black font-orbitron shadow-2xl shadow-gray-300/50 border-0 disabled:opacity-50 disabled:cursor-not-allowed">
                             {isSubmitting ? "Submitting..." : isGenerating ? "Generating..." : "Generate Cover Letter"}
                           </Button>
                           <Button type="button" onClick={resetForm} variant="outline" className="flex-1 bg-red-600 hover:bg-red-500 border-red-500 text-white shadow-lg text-base h-12 px-6 max-sm:w-full" disabled={isGenerating}>

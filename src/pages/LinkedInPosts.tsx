@@ -61,6 +61,9 @@ const LinkedInPosts = () => {
     audience: '',
     tone: ''
   });
+  const [validationErrors, setValidationErrors] = useState({
+    topic: ''
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [postsData, setPostsData] = useState<LinkedInPostData | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -340,13 +343,16 @@ const LinkedInPosts = () => {
       return;
     }
     if (!formData.topic.trim()) {
-      toast({
-        title: "Topic Required",
-        description: "Please enter a topic for your LinkedIn post.",
-        variant: "destructive"
+      setValidationErrors({
+        topic: 'Please fill in this field.'
       });
       return;
     }
+    
+    // Clear validation errors if topic is filled
+    setValidationErrors({
+      topic: ''
+    });
     const hasValidCredits = await checkCreditsWithFallback();
     if (!hasValidCredits) {
       toast({
@@ -525,7 +531,7 @@ const LinkedInPosts = () => {
                       </div>
 
                       <div className="flex flex-col sm:flex-row gap-3 pt-4 max-w-full">
-                        <Button type="submit" disabled={isSubmitting || !formData.topic.trim() || isGenerating || completionLoading} className={`flex-1 font-semibold text-base h-12 shadow-md rounded-lg min-w-0 ${(isSubmitting || !formData.topic.trim() || isGenerating || completionLoading) ? "bg-gradient-to-r from-gray-600 to-gray-700 text-gray-200 cursor-not-allowed shadow-lg border border-gray-500" : "bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 hover:from-indigo-600 hover:via-purple-600 hover:to-blue-600 text-white"}`}>
+                        <Button type="submit" disabled={isSubmitting || !formData.topic.trim() || isGenerating || completionLoading} className="flex-1 bg-gradient-to-r from-white via-white to-white hover:from-white/90 hover:via-white/90 hover:to-white/90 text-black font-orbitron font-bold text-base h-12 shadow-2xl shadow-gray-300/50 border-0 disabled:opacity-50 disabled:cursor-not-allowed min-w-0">
                           {isSubmitting ? 'Submitting...' : completionLoading ? 'Checking Profile...' : 'Generate LinkedIn Posts'}
                         </Button>
                         

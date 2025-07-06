@@ -26,6 +26,11 @@ const InterviewPrep = () => {
   const [companyName, setCompanyName] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [jobDescription, setJobDescription] = useState('');
+  const [validationErrors, setValidationErrors] = useState({
+    companyName: '',
+    jobTitle: '',
+    jobDescription: ''
+  });
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentAnalysis, setCurrentAnalysis] = useState<any>(null);
   const [interviewData, setInterviewData] = useState<string | null>(null);
@@ -215,12 +220,21 @@ const InterviewPrep = () => {
     }
 
     if (!companyName.trim() || !jobTitle.trim() || !jobDescription.trim()) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all fields before generating interview prep."
+      // Set individual field validation errors
+      setValidationErrors({
+        companyName: !companyName.trim() ? 'Please fill in this field.' : '',
+        jobTitle: !jobTitle.trim() ? 'Please fill in this field.' : '',
+        jobDescription: !jobDescription.trim() ? 'Please fill in this field.' : ''
       });
       return;
     }
+    
+    // Clear validation errors if all fields are filled
+    setValidationErrors({
+      companyName: '',
+      jobTitle: '',
+      jobDescription: ''
+    });
 
     if (!user?.id) {
       toast({
@@ -426,55 +440,69 @@ const InterviewPrep = () => {
             <CardContent className="space-y-4 px-4 sm:px-6">
               {/* Company Name and Job Title in horizontal layout for desktop */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-black flex items-center gap-2">
-                    🏦 Company Name
-                  </label>
-                  <Input 
-                    value={companyName} 
-                    onChange={(e) => setCompanyName(e.target.value)} 
-                    placeholder="e.g., Google, Microsoft, Amazon" 
-                    disabled={isGenerating || isSubmitting} 
-                    className="border-gray-300 placeholder-gray-400 bg-black text-white w-full" 
-                  />
-                </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-black flex items-center gap-2">
+                     🏦 Company Name
+                   </label>
+                   <Input 
+                     value={companyName} 
+                     onChange={(e) => setCompanyName(e.target.value)} 
+                     placeholder="e.g., Google, Microsoft, Amazon" 
+                     disabled={isGenerating || isSubmitting} 
+                     className="border-gray-300 placeholder-gray-400 bg-black text-white w-full" 
+                   />
+                   {validationErrors.companyName && (
+                     <div className="flex items-center gap-2 text-orange-400 text-sm bg-orange-100/10 border border-orange-400/30 rounded px-3 py-2">
+                       <span className="text-orange-400">⚠</span>
+                       {validationErrors.companyName}
+                     </div>
+                   )}
+                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-black flex items-center gap-2">
-                    👨‍💼 Job Title
-                  </label>
-                  <Input 
-                    value={jobTitle} 
-                    onChange={(e) => setJobTitle(e.target.value)} 
-                    placeholder="e.g., Senior Software Engineer, Product Manager" 
-                    disabled={isGenerating || isSubmitting} 
-                    className="border-gray-300 placeholder-gray-400 bg-black text-white w-full" 
-                  />
-                </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-black flex items-center gap-2">
+                     👨‍💼 Job Title
+                   </label>
+                   <Input 
+                     value={jobTitle} 
+                     onChange={(e) => setJobTitle(e.target.value)} 
+                     placeholder="e.g., Senior Software Engineer, Product Manager" 
+                     disabled={isGenerating || isSubmitting} 
+                     className="border-gray-300 placeholder-gray-400 bg-black text-white w-full" 
+                   />
+                   {validationErrors.jobTitle && (
+                     <div className="flex items-center gap-2 text-orange-400 text-sm bg-orange-100/10 border border-orange-400/30 rounded px-3 py-2">
+                       <span className="text-orange-400">⚠</span>
+                       {validationErrors.jobTitle}
+                     </div>
+                   )}
+                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-black flex items-center gap-2">
-                  📋 Job Description
-                </label>
-                <Textarea 
-                  value={jobDescription} 
-                  onChange={(e) => setJobDescription(e.target.value)} 
-                  placeholder="Paste the complete job description here..." 
-                  disabled={isGenerating || isSubmitting} 
-                  className="border-gray-300 placeholder-gray-400 min-h-32 bg-black text-white w-full resize-none" 
-                />
-              </div>
+               <div className="space-y-2">
+                 <label className="text-sm font-medium text-black flex items-center gap-2">
+                   📋 Job Description
+                 </label>
+                 <Textarea 
+                   value={jobDescription} 
+                   onChange={(e) => setJobDescription(e.target.value)} 
+                   placeholder="Paste the complete job description here..." 
+                   disabled={isGenerating || isSubmitting} 
+                   className="border-gray-300 placeholder-gray-400 min-h-32 bg-black text-white w-full resize-none" 
+                 />
+                 {validationErrors.jobDescription && (
+                   <div className="flex items-center gap-2 text-orange-400 text-sm bg-orange-100/10 border border-orange-400/30 rounded px-3 py-2">
+                     <span className="text-orange-400">⚠</span>
+                     {validationErrors.jobDescription}
+                   </div>
+                 )}
+               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
                  <Button 
                    onClick={handleGenerate} 
                    disabled={!canSubmit} 
-                   className={`w-full sm:flex-1 text-white font-medium ${
-                     canSubmit 
-                       ? "bg-rose-600 hover:bg-rose-500" 
-                       : "bg-gradient-to-r from-gray-600 to-gray-700 text-gray-200 cursor-not-allowed shadow-lg border border-gray-500"
-                   }`}
+                   className="w-full sm:flex-1 bg-gradient-to-r from-white via-white to-white hover:from-white/90 hover:via-white/90 hover:to-white/90 text-black font-orbitron font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-2xl shadow-gray-300/50 border-0"
                  >
                   {isGenerating || isSubmitting ? 'Generating...' : 'Generate Interview Prep'}
                 </Button>
