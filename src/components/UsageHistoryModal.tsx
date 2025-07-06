@@ -88,7 +88,7 @@ const UsageHistoryModal = () => {
   const paymentRecords = transactions?.filter(tx => tx.source === 'payment_record') || [];
   return <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="border-white/20 font-orbitron text-xs text-gray-950 bg-indigo-400 hover:bg-indigo-300">
+        <Button variant="outline" size="sm" className="border-white/20 font-orbitron text-xs text-gray-950 bg-stone-100">
           <History className="w-4 h-4 mr-2" />
           Usage History
         </Button>
