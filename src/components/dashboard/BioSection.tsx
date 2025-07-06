@@ -81,7 +81,7 @@ const BioSection = () => {
           // No gradients, just black/dark
           color: "#fff"
         }} />
-          <Button onClick={handleSaveBio} disabled={saving} className="font-inter font-bold text-xs px-4 py-2 h-9 rounded-lg shadow-lg shadow-emerald-500/20 focus-visible:ring-2 focus-visible:ring-emerald-300 transition-colors text-white bg-emerald-600 hover:bg-emerald-700">
+          <Button onClick={handleSaveBio} disabled={saving} className="font-inter font-bold text-xs px-4 py-2 h-9 rounded-lg shadow-lg shadow-emerald-500/20 focus-visible:ring-2 focus-visible:ring-emerald-300 transition-colors text-white bg-blue-800 hover:bg-blue-700">
             {saving ? 'Saving...' : 'Save Bio'}
           </Button>
         </CardContent>
