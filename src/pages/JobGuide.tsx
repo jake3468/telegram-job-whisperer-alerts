@@ -446,7 +446,7 @@ const JobGuide = () => {
 
           <div className="space-y-8">
             {/* Input Form */}
-            <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-sky-900 border border-blue-700/70 shadow-xl drop-shadow-2xl">
+            <Card className="bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 border border-purple-500/50 shadow-2xl shadow-purple-500/20">
               <CardHeader>
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <div>
@@ -492,13 +492,13 @@ const JobGuide = () => {
                 </div>
                 {/* Action Buttons */}
                 <div className="flex flex-col md:flex-row gap-3 pt-4">
-                  <Button onClick={handleSubmit} disabled={isButtonDisabled} className={`flex-1 bg-gradient-to-r from-white via-white to-white hover:from-white/90 hover:to-white/90 text-black font-semibold text-base h-12 shadow-none border border-gray-300 transition-all duration-150
+                  <Button onClick={handleSubmit} disabled={isButtonDisabled} className={`flex-1 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-500 hover:via-pink-500 hover:to-blue-500 text-white font-semibold text-base h-12 shadow-lg shadow-purple-500/25 border-0 transition-all duration-300 transform hover:scale-[1.02]
                       ${isButtonDisabled ? 'opacity-50 cursor-not-allowed' : 'opacity-100'}
                     `}>
                     {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
                     {isGenerating ? loadingMessage || 'Analyzing...' : 'Generate Job Analysis'}
                   </Button>
-                  <Button onClick={handleClearData} variant="outline" size="sm" className="flex-none min-w-[120px] bg-slate-900/70 border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-slate-200 h-10 px-4 ml-0 md:ml-2" disabled={!hasAnyData}>
+                  <Button onClick={handleClearData} variant="outline" size="sm" className="flex-none min-w-[120px] bg-gradient-to-r from-red-900/80 to-red-800/80 border border-red-500/50 text-red-200 hover:bg-gradient-to-r hover:from-red-800 hover:to-red-700 hover:text-red-100 h-10 px-4 ml-0 md:ml-2 shadow-lg shadow-red-500/10" disabled={!hasAnyData}>
                     <Trash2 className="w-4 h-4 mr-2" />
                     Clear All
                   </Button>
@@ -530,7 +530,7 @@ const JobGuide = () => {
               </Card>}
 
             {/* Result Display */}
-            {jobAnalysisResult && <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-cyan-900 border border-blue-700 shadow-lg w-full max-w-full overflow-hidden">
+            {jobAnalysisResult && <Card className="bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 border border-emerald-500/50 shadow-2xl shadow-emerald-500/20 w-full max-w-full overflow-hidden">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-slate-200 font-orbitron text-xl flex items-center gap-2">
                     <FileText className="w-5 h-5 text-slate-400" />
@@ -559,7 +559,7 @@ const JobGuide = () => {
                   </div>
                   
                   <div className="flex flex-col md:flex-row gap-2">
-                    <Button onClick={handleCopyResult} variant="outline" size="sm" className="flex-none min-w-[120px] bg-slate-900/70 border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-slate-200 h-10 px-4">
+                    <Button onClick={handleCopyResult} variant="outline" size="sm" className="flex-none min-w-[120px] bg-gradient-to-r from-emerald-900/80 to-teal-900/80 border border-emerald-500/50 text-emerald-200 hover:bg-gradient-to-r hover:from-emerald-800 hover:to-teal-800 hover:text-emerald-100 h-10 px-4 shadow-lg shadow-emerald-500/10">
                       <Copy className="w-4 h-4 mr-2" />
                       Copy Result
                     </Button>

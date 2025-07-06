@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { History, Loader2, CreditCard, Coins } from 'lucide-react';
+import { History, Loader2, CreditCard, Coins, X } from 'lucide-react';
 import { useTransactionHistory } from '@/hooks/useTransactionHistory';
 import { ScrollArea } from '@/components/ui/scroll-area';
 const UsageHistoryModal = () => {
@@ -95,9 +95,19 @@ const UsageHistoryModal = () => {
       </DialogTrigger>
       <DialogContent className="max-w-[95vw] sm:max-w-5xl max-h-[90vh] bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 border-blue-400/30">
         <DialogHeader>
-          <DialogTitle className="text-xl font-orbitron font-bold text-blue-100">
-            Transaction History
-          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-xl font-orbitron font-bold text-blue-100">
+              Transaction History
+            </DialogTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsOpen(false)}
+              className="text-blue-200 hover:text-blue-100 hover:bg-blue-800/30"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
         </DialogHeader>
         
         {isLoading ? <div className="flex items-center justify-center py-8">
