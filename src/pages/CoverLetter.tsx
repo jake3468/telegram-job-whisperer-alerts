@@ -34,7 +34,9 @@ const CoverLetter = () => {
     userProfile
   } = useUserProfile();
   const {
-    isComplete
+    isComplete,
+    loading: completionLoading,
+    refetchStatus
   } = useUserCompletionStatus();
 
   // Use credit check for 1.5 credits required for cover letters
@@ -155,68 +157,77 @@ const CoverLetter = () => {
       });
       return;
     }
-    if (!isComplete) {
-      toast({
-        title: "Profile Incomplete",
-        description: "Please complete your profile before creating a cover letter.",
-        variant: "destructive"
-      });
-      return;
-    }
-    if (!formData.job_title.trim() || !formData.company_name.trim() || !formData.job_description.trim()) {
-      // Set individual field validation errors
-      setValidationErrors({
-        job_title: !formData.job_title.trim() ? 'Please fill in this field.' : '',
-        company_name: !formData.company_name.trim() ? 'Please fill in this field.' : '',
-        job_description: !formData.job_description.trim() ? 'Please fill in this field.' : ''
-      });
-      return;
-    }
     
-    // Clear validation errors if all fields are filled
-    setValidationErrors({
-      job_title: '',
-      company_name: '',
-      job_description: ''
-    });
-    setIsSubmitting(true);
-    setIsGenerating(true);
-    setResult('');
-    setCurrentCoverLetterId(null);
-    try {
-      console.log('Submitting cover letter request...');
-
-      // Insert into database
-      const {
-        data,
-        error
-      } = await supabase.from('job_cover_letters').insert({
-        user_id: userProfile.id,
-        job_title: formData.job_title,
-        company_name: formData.company_name,
-        job_description: formData.job_description
-      }).select().single();
-      if (error) {
-        throw error;
+    // Refresh completion status before checking
+    await refetchStatus();
+    
+    // Wait a moment for the status to update
+    setTimeout(async () => {
+      if (!isComplete && !completionLoading) {
+        toast({
+          title: "Profile Incomplete",
+          description: "Please complete both your resume upload and bio in your profile before creating a cover letter. The system will auto-refresh.",
+          variant: "destructive",
+          duration: 8000, // Show for 8 seconds
+        });
+        return;
       }
-      console.log('Cover letter record created with ID:', data.id);
-      setCurrentCoverLetterId(data.id);
-      toast({
-        title: "Request Submitted!",
-        description: "Your cover letter is being generated. Credits will be deducted when ready."
+      
+      if (!formData.job_title.trim() || !formData.company_name.trim() || !formData.job_description.trim()) {
+        // Set individual field validation errors
+        setValidationErrors({
+          job_title: !formData.job_title.trim() ? 'Please fill in this field.' : '',
+          company_name: !formData.company_name.trim() ? 'Please fill in this field.' : '',
+          job_description: !formData.job_description.trim() ? 'Please fill in this field.' : ''
+        });
+        return;
+      }
+      
+      // Clear validation errors if all fields are filled
+      setValidationErrors({
+        job_title: '',
+        company_name: '',
+        job_description: ''
       });
-    } catch (err: any) {
-      console.error('Error creating cover letter:', err);
-      setIsGenerating(false);
+      setIsSubmitting(true);
+      setIsGenerating(true);
+      setResult('');
       setCurrentCoverLetterId(null);
-      toast({
-        title: "Error",
-        description: "Failed to create cover letter. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+      try {
+        console.log('Submitting cover letter request...');
+
+        // Insert into database
+        const {
+          data,
+          error
+        } = await supabase.from('job_cover_letters').insert({
+          user_id: userProfile.id,
+          job_title: formData.job_title,
+          company_name: formData.company_name,
+          job_description: formData.job_description
+        }).select().single();
+        if (error) {
+          throw error;
+        }
+        console.log('Cover letter record created with ID:', data.id);
+        setCurrentCoverLetterId(data.id);
+        toast({
+          title: "Request Submitted!",
+          description: "Your cover letter is being generated. Credits will be deducted when ready."
+        });
+      } catch (err: any) {
+        console.error('Error creating cover letter:', err);
+        setIsGenerating(false);
+        setCurrentCoverLetterId(null);
+        toast({
+          title: "Error",
+          description: "Failed to create cover letter. Please try again.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
+    }, 1000); // Wait 1 second for status to update
   };
   const handleCopyResult = async () => {
     if (!result) return;
