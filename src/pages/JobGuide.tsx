@@ -446,7 +446,7 @@ const JobGuide = () => {
 
           <div className="space-y-8">
             {/* Input Form */}
-            <Card className="bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 border border-purple-500/50 shadow-2xl shadow-purple-500/20">
+            <Card className="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 border border-blue-400/60 shadow-2xl shadow-blue-400/40 backdrop-blur-sm ring-1 ring-blue-300/20">
               <CardHeader>
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <div>
