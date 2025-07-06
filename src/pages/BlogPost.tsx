@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ArrowLeft, Calendar, User, Share2, Twitter, Linkedin } from 'lucide-react';
-import AuthHeader from '@/components/AuthHeader';
+
 import Footer from '@/components/Footer';
 import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
 interface Blog {
@@ -115,8 +115,7 @@ const BlogPost = () => {
   }
   if (notFound || !blog) {
     return <div className="min-h-screen bg-black text-white">
-        <AuthHeader />
-        <div className="pt-20 pb-16 px-4">
+        <div className="pt-8 pb-16 px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl font-orbitron font-bold mb-6">Blog Post Not Found</h1>
             <p className="text-xl text-gray-300 mb-8">
@@ -134,9 +133,7 @@ const BlogPost = () => {
       </div>;
   }
   return <div className="min-h-screen bg-black text-white">
-      <AuthHeader />
-      
-      <div className="pt-20 pb-16 px-4 sm:px-6 lg:px-8">
+      <div className="pt-8 pb-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
           <Link to="/blogs" className="inline-flex items-center text-sky-400 hover:text-sky-300 mb-8">

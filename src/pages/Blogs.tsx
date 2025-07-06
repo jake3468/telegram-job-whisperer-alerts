@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Search, Calendar, User, ArrowLeft } from 'lucide-react';
-import AuthHeader from '@/components/AuthHeader';
+
 import Footer from '@/components/Footer';
 interface Blog {
   id: string;
@@ -69,10 +69,8 @@ const Blogs = () => {
       </div>;
   }
   return <div className="min-h-screen bg-black text-white">
-      <AuthHeader />
-      
       {/* Back to Home Button */}
-      <div className="pt-20 px-4">
+      <div className="pt-8 px-4">
         <div className="max-w-6xl mx-auto">
           <Link to="/" className="inline-flex items-center text-sky-400 hover:text-sky-300 mb-8 transition-colors">
             <ArrowLeft className="w-4 h-4 mr-2" />
