@@ -344,7 +344,7 @@ const CompanyRoleAnalysis = () => {
                         </>}
                     </Button>
                     
-                    <Button type="button" variant="outline" onClick={handleReset} className="w-full lg:w-auto border-white/50 text-white hover:bg-white/20 hover:text-white font-orbitron bg-transparent py-3 sm:py-4 text-sm sm:text-base lg:px-6">
+                    <Button type="button" variant="outline" onClick={handleReset} className="w-full lg:w-auto border-white/50 text-white hover:text-white font-orbitron py-3 sm:py-4 text-sm sm:text-base lg:px-6 bg-emerald-950 hover:bg-emerald-800">
                       <RotateCcw className="w-4 h-4 mr-2" />
                       Reset                   
                     </Button>
