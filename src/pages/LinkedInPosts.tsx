@@ -109,17 +109,44 @@ const LinkedInPosts = () => {
     fetchUserData();
   }, [user?.id, isAuthReady, executeWithRetry]);
   const areAllPostsReady = (data: LinkedInPostData) => {
-    const hasAllData = Boolean(data.post_heading_1 && data.post_heading_1.trim() && data.post_content_1 && data.post_content_1.trim() && data.post_heading_2 && data.post_heading_2.trim() && data.post_content_2 && data.post_content_2.trim() && data.post_heading_3 && data.post_heading_3.trim() && data.post_content_3 && data.post_content_3.trim());
-    console.log('🔍 CHECKING IF ALL POSTS READY:', {
-      post_heading_1: Boolean(data.post_heading_1 && data.post_heading_1.trim()),
-      post_content_1: Boolean(data.post_content_1 && data.post_content_1.trim()),
-      post_heading_2: Boolean(data.post_heading_2 && data.post_heading_2.trim()),
-      post_content_2: Boolean(data.post_content_2 && data.post_content_2.trim()),
-      post_heading_3: Boolean(data.post_heading_3 && data.post_heading_3.trim()),
-      post_content_3: Boolean(data.post_content_3 && data.post_content_3.trim()),
-      allReady: hasAllData
+    // Check if data exists first - CRITICAL FIX for display issue
+    if (!data) {
+      console.log('No data provided to areAllPostsReady');
+      return false;
+    }
+
+    const hasAllHeadings = Boolean(
+      data.post_heading_1 && data.post_heading_1.trim() &&
+      data.post_heading_2 && data.post_heading_2.trim() &&
+      data.post_heading_3 && data.post_heading_3.trim()
+    );
+
+    const hasAllContent = Boolean(
+      data.post_content_1 && data.post_content_1.trim() &&
+      data.post_content_2 && data.post_content_2.trim() &&
+      data.post_content_3 && data.post_content_3.trim()
+    );
+
+    // Enhanced logging for debugging
+    console.log('Checking if posts are ready:', {
+      hasAllHeadings,
+      hasAllContent,
+      headings: {
+        h1: data.post_heading_1?.substring(0, 50) + '...',
+        h2: data.post_heading_2?.substring(0, 50) + '...',
+        h3: data.post_heading_3?.substring(0, 50) + '...'
+      },
+      contentLengths: {
+        c1: data.post_content_1?.length || 0,
+        c2: data.post_content_2?.length || 0,
+        c3: data.post_content_3?.length || 0
+      }
     });
-    return hasAllData;
+
+    // More explicit return logic
+    const isReady = hasAllHeadings && hasAllContent;
+    console.log('Posts ready result:', isReady);
+    return isReady;
   };
   useLinkedInPostTimeoutFallback({
     currentPostId,
