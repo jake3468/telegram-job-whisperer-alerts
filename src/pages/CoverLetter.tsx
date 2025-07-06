@@ -265,7 +265,7 @@ const CoverLetter = () => {
               <div className="max-w-4xl mx-auto w-full px-3 py-4 sm:px-6 sm:py-6 mt-4">
                 {/* Gradient Heading */}
                 <div className="mb-8 text-center">
-                  <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-400 via-fuchsia-400 to-fuchsia-600 bg-clip-text mb-2 drop-shadow font-orbitron animate-fade-in md:text-4xl text-pink-500">📝 Cover Letter</h1>
+                  <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 via-fuchsia-600 to-rose-600 bg-clip-text mb-2 drop-shadow font-orbitron animate-fade-in md:text-4xl text-transparent">📝 Cover Letter</h1>
                   <p className="text-lg font-inter font-light text-white/90 mb-3">
                     Instantly create stunning <span className="italic text-white/85">Cover Letters</span> for every job
                   </p>
@@ -280,9 +280,7 @@ const CoverLetter = () => {
 
                 <div className="space-y-8">
                   {/* Input Form in Gradient Box */}
-                  <Card className="rounded-2xl border-0 bg-gradient-to-br from-pink-600 via-fuchsia-600 to-rose-600 shadow-2xl shadow-pink-500/40 backdrop-blur-sm ring-1 ring-pink-300/30" style={{
-                  boxShadow: '0 8px 50px 0 rgba(236,72,153,0.4), 0 0 100px 0 rgba(217,70,239,0.2)'
-                }}>
+                  <Card className="rounded-2xl border-0 bg-gradient-to-br from-pink-600 via-fuchsia-600 to-rose-600 shadow-xl">
                     <CardHeader className="pb-6">
                       <div className="flex items-center justify-between">
                         <div>
