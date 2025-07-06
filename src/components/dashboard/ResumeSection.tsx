@@ -171,23 +171,24 @@ const ResumeSection = () => {
   };
   return <section className="p-0 rounded-none bg-transparent shadow-none">
       <Card className="
-          rounded-3xl border-2 border-fuchsia-400 
-          bg-gradient-to-b from-[#7438e6]/95 via-[#44377a]/92 to-[#29184d]/95
-          shadow-md transition-all
+          rounded-3xl border-2 border-purple-400/80 
+          bg-gradient-to-br from-purple-600/90 via-purple-700/85 to-purple-900/90
+          shadow-2xl shadow-purple-500/20 transition-all hover:shadow-purple-500/30
+          backdrop-blur-sm
         ">
         <CardHeader className="pb-3">
-          <CardTitle className="text-white font-orbitron flex items-center gap-2 text-lg drop-shadow-[0_2px_6px_rgba(100,74,200,0.4)]">
-            <div className="w-7 h-7 bg-fuchsia-500/40 rounded-full flex items-center justify-center">
-              <FileText className="w-4 h-4 text-white drop-shadow-[0_2px_8px_rgba(255,255,255,0.6)]" />
+          <CardTitle className="text-white font-orbitron flex items-center gap-2 text-lg drop-shadow-[0_2px_8px_rgba(147,51,234,0.6)]">
+            <div className="w-7 h-7 bg-purple-400/60 rounded-full flex items-center justify-center shadow-lg shadow-purple-500/30">
+              <FileText className="w-4 h-4 text-white drop-shadow-[0_2px_8px_rgba(255,255,255,0.8)]" />
             </div>
             <span className="text-white font-bold">Resume</span>
           </CardTitle>
-          <CardDescription className="text-white/90 text-base font-inter font-normal drop-shadow-[0_2px_10px_rgba(80,70,140,0.5)]">Upload your resume (PDF, max 5MB) so our AI can better understand your background and personalize your experience</CardDescription>
+          <CardDescription className="text-white/95 text-base font-inter font-normal drop-shadow-[0_2px_10px_rgba(147,51,234,0.4)]">Upload your resume (PDF, max 5MB) so our AI can better understand your background and personalize your experience</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 pt-0">
           {resumeUrl ? <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-xl border border-white/20 bg-black/70 shadow-inner">
               <div className="flex items-center gap-2 min-w-0">
-                <div className="w-8 h-8 bg-fuchsia-600/45 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-purple-500/60 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple-500/40">
                   <FileText className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-white font-inter font-semibold text-base truncate">resume.pdf</span>
@@ -196,14 +197,14 @@ const ResumeSection = () => {
                 <Trash2 className="w-3 h-3 mr-1" />
                 Delete
               </Button>
-            </div> : <div className="border-2 border-dashed border-white/65 rounded-xl p-5 sm:p-8 text-center cursor-pointer hover:border-fuchsia-300 hover:bg-fuchsia-400/10 transition-all duration-300 bg-black/50 shadow-inner" onClick={triggerFileInput}>
-              <div className="w-14 h-14 bg-fuchsia-600/35 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Upload className="w-7 h-7 text-fuchsia-100" />
+            </div> : <div className="border-2 border-dashed border-white/70 rounded-xl p-5 sm:p-8 text-center cursor-pointer hover:border-purple-300 hover:bg-purple-400/15 transition-all duration-300 bg-black/60 shadow-inner" onClick={triggerFileInput}>
+              <div className="w-14 h-14 bg-purple-500/50 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg shadow-purple-500/30">
+                <Upload className="w-7 h-7 text-purple-100" />
               </div>
               <p className="text-white font-inter mb-4 font-semibold text-base">
                 Click to upload or drag and drop your resume
               </p>
-              <Button disabled={uploading} className="font-inter bg-white text-fuchsia-700 hover:bg-gray-100 font-bold text-xs px-4 py-2 h-9 rounded-lg shadow-md">
+              <Button disabled={uploading} className="font-inter bg-white text-purple-700 hover:bg-purple-50 font-bold text-xs px-4 py-2 h-9 rounded-lg shadow-lg shadow-purple-500/20">
                 {uploading ? 'Uploading...' : 'Upload Resume'}
               </Button>
               <input id="resume-upload" type="file" accept=".pdf" onChange={handleFileUpload} className="hidden" disabled={uploading} />
