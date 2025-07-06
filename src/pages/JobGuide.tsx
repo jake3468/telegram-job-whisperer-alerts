@@ -493,7 +493,7 @@ const JobGuide = () => {
                 {/* Action Buttons */}
                 <div className="flex flex-col md:flex-row gap-3 pt-4">
                   <Button onClick={handleSubmit} disabled={isButtonDisabled} className={`flex-1 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-500 hover:via-pink-500 hover:to-blue-500 text-white font-semibold text-base h-12 shadow-lg shadow-purple-500/25 border-0 transition-all duration-300 transform hover:scale-[1.02]
-                      ${isButtonDisabled ? 'opacity-50 cursor-not-allowed' : 'opacity-100'}
+                      ${isButtonDisabled ? 'bg-gradient-to-r from-gray-600 to-gray-700 text-gray-200 cursor-not-allowed shadow-lg border border-gray-500 hover:scale-100' : 'opacity-100'}
                     `}>
                     {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
                     {isGenerating ? loadingMessage || 'Analyzing...' : 'Generate Job Analysis'}

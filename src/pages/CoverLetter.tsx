@@ -333,7 +333,7 @@ const CoverLetter = () => {
 
                         <div className="flex flex-col sm:flex-row gap-3 pt-4">
                           {/* Generate Cover Letter - disabled if no credits */}
-                          <Button type="submit" disabled={!canSubmit} className={`flex-[3] font-semibold text-base h-12 rounded-lg ${canSubmit ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg" : "bg-gray-500 text-gray-300 cursor-not-allowed"}`}>
+                          <Button type="submit" disabled={!canSubmit} className={`flex-[3] font-semibold text-base h-12 rounded-lg ${canSubmit ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg" : "bg-gradient-to-r from-gray-600 to-gray-700 text-gray-200 cursor-not-allowed shadow-lg border border-gray-500"}`}>
                             {isSubmitting ? "Submitting..." : isGenerating ? "Generating..." : "Generate Cover Letter"}
                           </Button>
                           <Button type="button" onClick={resetForm} variant="outline" className="flex-1 bg-red-600 hover:bg-red-500 border-red-500 text-white shadow-lg text-base h-12 px-6 max-sm:w-full" disabled={isGenerating}>

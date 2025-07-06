@@ -467,15 +467,15 @@ const InterviewPrep = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                <Button 
-                  onClick={handleGenerate} 
-                  disabled={!canSubmit} 
-                  className={`w-full sm:flex-1 text-white font-medium ${
-                    canSubmit 
-                      ? "bg-rose-600 hover:bg-rose-500" 
-                      : "bg-gray-500 text-gray-300 cursor-not-allowed"
-                  }`}
-                >
+                 <Button 
+                   onClick={handleGenerate} 
+                   disabled={!canSubmit} 
+                   className={`w-full sm:flex-1 text-white font-medium ${
+                     canSubmit 
+                       ? "bg-rose-600 hover:bg-rose-500" 
+                       : "bg-gradient-to-r from-gray-600 to-gray-700 text-gray-200 cursor-not-allowed shadow-lg border border-gray-500"
+                   }`}
+                 >
                   {isGenerating || isSubmitting ? 'Generating...' : 'Generate Interview Prep'}
                 </Button>
                 <Button 
