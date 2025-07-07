@@ -18,13 +18,9 @@ const profileItems = [{
 }];
 
 const toolItems = [{
-  title: 'Telegram Job Alerts',
-  url: '/job-alerts',
-  icon: Bell
-}, {
-  title: 'Job Analysis',
-  url: '/job-guide',
-  icon: Target
+  title: 'Resume Bot',
+  url: '/resume-builder',
+  icon: FileUser
 }, {
   title: 'Company Decoder',
   url: '/company-role-analysis',
@@ -34,6 +30,10 @@ const toolItems = [{
   url: '/interview-prep',
   icon: MessageSquare
 }, {
+  title: 'Telegram Job Alerts',
+  url: '/job-alerts',
+  icon: Bell
+}, {
   title: 'Cover Letter',
   url: '/cover-letter',
   icon: FileText
@@ -42,9 +42,9 @@ const toolItems = [{
   url: '/linkedin-posts',
   icon: Share2
 }, {
-  title: 'Resume Bot',
-  url: '/resume-builder',
-  icon: FileUser
+  title: 'Job Analysis',
+  url: '/job-guide',
+  icon: Target
 }];
 
 export function AppSidebar() {
