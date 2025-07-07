@@ -12,6 +12,7 @@ import { useJWTDebug } from '@/hooks/useJWTDebug';
 import { Environment } from '@/utils/environment';
 import { OnboardingPopup } from '@/components/OnboardingPopup';
 import { useOnboardingPopup } from '@/hooks/useOnboardingPopup';
+import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
 
 const Profile = () => {
   const { user, isLoaded } = useUser();
@@ -19,6 +20,9 @@ const Profile = () => {
   const { runComprehensiveJWTTest } = useJWTDebug();
   const [showJWTSetupGuide, setShowJWTSetupGuide] = useState(false);
   const { showPopup, hidePopup, dontShowAgain } = useOnboardingPopup();
+  
+  // Keep tokens fresh while user is on profile page
+  const { updateActivity } = useFormTokenKeepAlive(true);
 
   useEffect(() => {
     if (isLoaded && !user) {
@@ -69,7 +73,7 @@ const Profile = () => {
         </div>
       )}
 
-      <div className="max-w-4xl mx-auto space-y-8 px-4">
+      <div className="max-w-4xl mx-auto space-y-8 px-4" onClick={updateActivity} onKeyDown={updateActivity}>
         <ResumeSection />
         <BioSection />
       </div>
