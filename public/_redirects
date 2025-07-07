@@ -1,2 +1,6 @@
 
+# Force HTTPS redirect
+http://aspirely.ai/*  https://aspirely.ai/:splat  301!
+
+# SPA routing (existing rule)
 /*    /index.html   200
