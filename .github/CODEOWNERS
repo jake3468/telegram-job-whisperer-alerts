@@ -1,0 +1,22 @@
+# Global code ownership - jake3468 owns everything by default
+* @jake3468
+
+# Critical configuration files - require explicit approval
+/.github/ @jake3468
+/package.json @jake3468
+/package-lock.json @jake3468
+/vite.config.ts @jake3468
+/tailwind.config.ts @jake3468
+
+# Database and backend critical files
+/supabase/ @jake3468
+/src/integrations/ @jake3468
+
+# Environment and deployment configurations
+/.env* @jake3468
+/netlify.toml @jake3468
+/public/_redirects @jake3468
+
+# Documentation that affects deployment
+/README.md @jake3468
+/.github/DEPLOYMENT.md @jake3468
