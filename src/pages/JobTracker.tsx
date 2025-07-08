@@ -21,6 +21,7 @@ import {
   useSensor,
   useSensors,
   closestCenter,
+  useDroppable,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -47,6 +48,72 @@ interface EditJobFormData {
   job_description: string;
   job_url: string;
 }
+
+// Droppable Column Component
+const DroppableColumn = ({ 
+  column, 
+  jobs, 
+  onAddJob, 
+  onDeleteJob, 
+  onViewJob,
+  activeJobId 
+}: {
+  column: any;
+  jobs: JobEntry[];
+  onAddJob: () => void;
+  onDeleteJob: (id: string) => void;
+  onViewJob: (job: JobEntry) => void;
+  activeJobId?: string;
+}) => {
+  const { isOver, setNodeRef } = useDroppable({
+    id: column.key,
+  });
+
+  const isDropTarget = isOver && activeJobId;
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg min-w-[280px] flex-shrink-0 transition-all hover:shadow-lg ${
+        isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''
+      }`}
+    >
+      <div className={`${column.headerBg} p-4 rounded-t-lg border-b ${column.borderColor} flex items-center justify-between`}>
+        <h3 className={`font-orbitron font-bold text-sm ${column.textColor}`}>
+          {column.title} ({jobs.length})
+        </h3>
+        {column.canAdd && (
+          <Button
+            size="sm"
+            variant="ghost"
+            className={`${column.textColor} hover:bg-black/10 h-8 w-8 p-0`}
+            onClick={onAddJob}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+
+      <div className={`p-4 min-h-[450px] ${isDropTarget ? 'bg-black/5' : ''} transition-colors`}>
+        <SortableContext
+          items={jobs.map(job => job.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className="space-y-3">
+            {jobs.map(job => (
+              <SortableJobCard
+                key={job.id}
+                job={job}
+                onDelete={onDeleteJob}
+                onView={onViewJob}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </div>
+    </div>
+  );
+};
 
 // Sortable Job Card Component
 const SortableJobCard = ({ job, onDelete, onView }: { 
@@ -174,11 +241,11 @@ const JobTracker = () => {
   );
 
   const columns = [
-    { key: 'saved', title: 'Saved', canAdd: true, bgColor: 'bg-blue-50', textColor: 'text-blue-900', borderColor: 'border-blue-200', headerBg: 'bg-blue-100' },
-    { key: 'applied', title: 'Applied', canAdd: true, bgColor: 'bg-green-50', textColor: 'text-green-900', borderColor: 'border-green-200', headerBg: 'bg-green-100' },
-    { key: 'interview', title: 'Interview', canAdd: true, bgColor: 'bg-yellow-50', textColor: 'text-yellow-900', borderColor: 'border-yellow-200', headerBg: 'bg-yellow-100' },
-    { key: 'rejected', title: 'Rejected', canAdd: false, bgColor: 'bg-red-50', textColor: 'text-red-900', borderColor: 'border-red-200', headerBg: 'bg-red-100' },
-    { key: 'offer', title: 'Offer', canAdd: false, bgColor: 'bg-emerald-50', textColor: 'text-emerald-900', borderColor: 'border-emerald-200', headerBg: 'bg-emerald-700' }
+    { key: 'saved', title: 'Saved', canAdd: true, bgColor: 'bg-blue-50', textColor: 'text-blue-800', borderColor: 'border-blue-200', headerBg: 'bg-blue-100' },
+    { key: 'applied', title: 'Applied', canAdd: true, bgColor: 'bg-green-50', textColor: 'text-green-800', borderColor: 'border-green-200', headerBg: 'bg-green-100' },
+    { key: 'interview', title: 'Interview', canAdd: true, bgColor: 'bg-yellow-50', textColor: 'text-yellow-800', borderColor: 'border-yellow-200', headerBg: 'bg-yellow-100' },
+    { key: 'rejected', title: 'Rejected', canAdd: false, bgColor: 'bg-red-50', textColor: 'text-red-800', borderColor: 'border-red-200', headerBg: 'bg-red-100' },
+    { key: 'offer', title: 'Offer', canAdd: false, bgColor: 'bg-emerald-50', textColor: 'text-emerald-800', borderColor: 'border-emerald-200', headerBg: 'bg-emerald-700' }
   ];
 
   // Auto-refresh every 30 seconds
@@ -478,55 +545,23 @@ const JobTracker = () => {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex gap-4 overflow-x-auto pb-4 max-w-full">
-          {columns.map((column) => (
-            <div
-              key={column.key}
-              id={column.key}
-              className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg min-w-[280px] flex-shrink-0 transition-all hover:shadow-lg`}
-            >
-              <div className={`${column.headerBg} p-4 rounded-t-lg border-b ${column.borderColor} flex items-center justify-between`}>
-                <h3 className={`font-orbitron font-bold text-sm ${column.textColor}`}>
-                  {column.title} ({getJobsByStatus(column.key).length})
-                </h3>
-                {column.canAdd && (
-                  <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                    <DialogTrigger asChild>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className={`${column.textColor} hover:bg-black/10 h-8 w-8 p-0`}
-                        onClick={() => {
-                          setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
-                          setIsModalOpen(true);
-                        }}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </DialogTrigger>
-                  </Dialog>
-                )}
-              </div>
-
-              <div className="p-4 min-h-[450px]">
-                <SortableContext
-                  items={getJobsByStatus(column.key).map(job => job.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="space-y-3">
-                    {getJobsByStatus(column.key).map(job => (
-                      <SortableJobCard
-                        key={job.id}
-                        job={job}
-                        onDelete={deleteJob}
-                        onView={handleViewJob}
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-              </div>
-            </div>
-          ))}
+        <div className="overflow-x-auto overflow-y-hidden">
+          <div className="flex gap-4 pb-4 min-w-max">
+            {columns.map((column) => (
+              <DroppableColumn
+                key={column.key}
+                column={column}
+                jobs={getJobsByStatus(column.key)}
+                onAddJob={() => {
+                  setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
+                  setIsModalOpen(true);
+                }}
+                onDeleteJob={deleteJob}
+                onViewJob={handleViewJob}
+                activeJobId={activeJob?.id}
+              />
+            ))}
+          </div>
         </div>
 
         <DragOverlay>
