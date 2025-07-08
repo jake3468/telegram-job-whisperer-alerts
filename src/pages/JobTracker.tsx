@@ -648,7 +648,7 @@ const JobTracker = () => {
           <div className="text-center">
             <div className="flex items-center justify-center gap-4 mb-4">
               <span className="font-semibold text-4xl">📈</span>
-              <h1 className="font-extrabold text-3xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow md:text-4xl text-left">Job Tracker</h1>
+              <h1 className="font-extrabold text-3xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow md:text-4xl text-center">Job Tracker</h1>
               
               {/* Refresh Button */}
               <Button onClick={handleManualRefresh} variant="ghost" size="sm" className="text-gray-300 hover:text-white hover:bg-gray-800 transition-colors" disabled={loading} title="Refresh job data">
