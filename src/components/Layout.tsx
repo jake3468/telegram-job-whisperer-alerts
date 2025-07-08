@@ -34,7 +34,7 @@ export function Layout({
     }}>
         <AppSidebar />
         {/* Main content area now has padding-top to avoid the fixed mobile header */}
-        <div className="flex-1 flex flex-col bg-transparent pt-28 lg:pt-0">
+        <div className="flex-1 flex flex-col bg-black pt-28 lg:pt-0">
           <main className="flex-1 w-full px-0 py-0 bg-transparent">
             <div className="w-full px-3 sm:px-6">
               {children}
