@@ -561,7 +561,7 @@ const JobTracker = () => {
       <div className="flex flex-col h-screen overflow-hidden bg-gradient-to-br from-black via-gray-950 to-fuchsia-950">
         
         {/* Header section */}
-        <header className="py-6 px-4 shrink-0">
+        <header className="py-6 px-4">
           <div className="text-center">
             <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-4">
               Job Tracker
@@ -569,15 +569,15 @@ const JobTracker = () => {
             <p className="text-gray-100 font-inter font-light text-base max-w-4xl mx-auto leading-relaxed mb-3">
               Drag and drop job applications between columns to track your progress. Click View to see details or add new jobs using the + button.
             </p>
-            <div className="flex items-center justify-center gap-3 text-sm text-gray-300 font-medium">
+            <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-gray-300 font-medium">
               <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs">Saved</span>
-              <span>→</span>
+              <span className="hidden sm:inline">→</span>
               <span className="bg-green-600 text-white px-2 py-1 rounded text-xs">Applied</span>
-              <span>→</span>
+              <span className="hidden sm:inline">→</span>
               <span className="bg-yellow-600 text-white px-2 py-1 rounded text-xs">Interview</span>
-              <span>→</span>
+              <span className="hidden sm:inline">→</span>
               <span className="bg-red-600 text-white px-2 py-1 rounded text-xs">Rejected</span>
-              <span className="text-gray-400">|</span>
+              <span className="text-gray-400 hidden sm:inline">|</span>
               <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded text-xs font-bold">🎉 Offer</span>
             </div>
           </div>
