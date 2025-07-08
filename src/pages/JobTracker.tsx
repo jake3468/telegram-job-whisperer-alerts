@@ -545,19 +545,21 @@ const JobTracker = () => {
       </Layout>;
   }
   return <Layout>
-      <div className="flex flex-col min-h-screen">
+      <div className="min-h-screen">
         {/* Fixed Header - Centered to Full Viewport Width */}
-        <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] text-center mb-8 px-4">
-          <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-2">
-            Job Tracker
-          </h1>
-          <p className="text-gray-100 font-inter font-light text-base max-w-4xl mx-auto">
-            Drag and drop job applications between columns to track your progress. Click View to see details or add new jobs using the + button.
-          </p>
+        <div className="fixed top-0 left-0 right-0 z-10 bg-gradient-to-br from-black via-gray-950 to-fuchsia-950 pt-20 pb-8">
+          <div className="text-center px-4 max-w-full">
+            <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-4">
+              Job Tracker
+            </h1>
+            <p className="text-gray-100 font-inter font-light text-base max-w-4xl mx-auto px-4 leading-relaxed">
+              Drag and drop job applications between columns to track your progress. Click View to see details or add new jobs using the + button.
+            </p>
+          </div>
         </div>
 
-        {/* Kanban Cards Container - Independent Scrollable Section */}
-        <div className="flex-1">
+        {/* Kanban Cards Container - With top margin to account for fixed header */}
+        <div className="pt-40">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <div className="overflow-x-auto overflow-y-hidden">
               <div className="flex gap-4 pb-4 px-4" style={{
