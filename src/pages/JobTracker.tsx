@@ -272,10 +272,61 @@ const JobTracker = () => {
         .from('users')
         .select('id')
         .eq('clerk_id', user?.id)
-        .single();
+        .maybeSingle();
 
-      if (userError || !userData) {
-        console.error('User not found:', userError);
+      if (userError) {
+        console.error('User lookup error:', userError);
+        return;
+      }
+
+      if (!userData) {
+        console.error('User not found in database for clerk_id:', user?.id);
+        // Try to create user if they don't exist
+        const { data: newUser, error: createUserError } = await supabase
+          .from('users')
+          .insert({
+            clerk_id: user.id,
+            email: user.primaryEmailAddress?.emailAddress || '',
+            first_name: user.firstName || '',
+            last_name: user.lastName || ''
+          })
+          .select('id')
+          .single();
+
+        if (createUserError || !newUser) {
+          console.error('Failed to create user:', createUserError);
+          return;
+        }
+
+        // Create user profile
+        const { error: profileError } = await supabase
+          .from('user_profile')
+          .insert({
+            user_id: newUser.id
+          });
+
+        if (profileError) {
+          console.error('Failed to create user profile:', profileError);
+          return;
+        }
+
+        // Use the new user's ID
+        const userUUID = newUser.id;
+        
+        // Get the newly created profile
+        const { data: newProfile, error: newProfileError } = await supabase
+          .from('user_profile')
+          .select('id')
+          .eq('user_id', userUUID)
+          .single();
+
+        if (newProfileError || !newProfile) {
+          console.error('New profile not found:', newProfileError);
+          return;
+        }
+
+        // Fetch jobs with new profile (will be empty for new user)
+        setJobs([]);
         return;
       }
 
@@ -284,10 +335,40 @@ const JobTracker = () => {
         .from('user_profile')
         .select('id')
         .eq('user_id', userData.id)
-        .single();
+        .maybeSingle();
 
-      if (profileError || !userProfile) {
-        console.error('User profile not found:', profileError);
+      if (profileError) {
+        console.error('User profile lookup error:', profileError);
+        return;
+      }
+
+      if (!userProfile) {
+        console.error('User profile not found for user_id:', userData.id);
+        // Create user profile if it doesn't exist
+        const { data: newProfile, error: createProfileError } = await supabase
+          .from('user_profile')
+          .insert({
+            user_id: userData.id
+          })
+          .select('id')
+          .single();
+
+        if (createProfileError || !newProfile) {
+          console.error('Failed to create profile:', createProfileError);
+          return;
+        }
+
+        // Use new profile
+        const profileId = newProfile.id;
+        
+        const { data, error } = await supabase
+          .from('job_tracker')
+          .select('*')
+          .eq('user_id', profileId)
+          .order('order_position', { ascending: true });
+
+        if (error) throw error;
+        setJobs(data || []);
         return;
       }
 
@@ -458,23 +539,37 @@ const JobTracker = () => {
 
     if (!over) return;
 
-    const activeJob = jobs.find(j => j.id === active.id);
-    if (!activeJob) return;
+    const activeJobToMove = jobs.find(j => j.id === active.id);
+    if (!activeJobToMove) return;
 
     // Check if dropped on a column (over.id will be the column key)
     const targetColumn = columns.find(col => col.key === over.id);
-    if (targetColumn && activeJob.status !== targetColumn.key) {
-      try {
-        const targetJobs = jobs.filter(j => j.status === targetColumn.key);
-        const maxOrder = Math.max(...targetJobs.map(j => j.order_position), -1);
+    if (targetColumn && activeJobToMove.status !== targetColumn.key) {
+      // Optimistic update - update UI immediately
+      const targetJobs = jobs.filter(j => j.status === targetColumn.key);
+      const maxOrder = Math.max(...targetJobs.map(j => j.order_position), -1);
+      
+      const updatedJob = {
+        ...activeJobToMove,
+        status: targetColumn.key as JobEntry['status'],
+        order_position: maxOrder + 1
+      };
+      
+      // Update local state immediately for instant feedback
+      setJobs(prevJobs => 
+        prevJobs.map(job => 
+          job.id === activeJobToMove.id ? updatedJob : job
+        )
+      );
 
+      try {
         const { error } = await supabase
           .from('job_tracker')
           .update({
             status: targetColumn.key as JobEntry['status'],
             order_position: maxOrder + 1
           })
-          .eq('id', activeJob.id);
+          .eq('id', activeJobToMove.id);
 
         if (error) throw error;
 
@@ -482,10 +577,14 @@ const JobTracker = () => {
           title: "Success",
           description: `Job moved to ${targetColumn.title}!`
         });
-
-        fetchJobs();
       } catch (error) {
         console.error('Error moving job:', error);
+        // Revert optimistic update on error
+        setJobs(prevJobs => 
+          prevJobs.map(job => 
+            job.id === activeJobToMove.id ? activeJobToMove : job
+          )
+        );
         toast({
           title: "Error",
           description: "Failed to move job.",
@@ -530,8 +629,8 @@ const JobTracker = () => {
 
   return (
     <Layout>
-      {/* Fixed Header - Centered to Page */}
-      <div className="mb-8 text-center w-full">
+      {/* Fixed Header - Centered to Full Page Width */}
+      <div className="container mx-auto px-4 mb-8 text-center">
         <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-2">
           Job Tracker
         </h1>
@@ -540,41 +639,43 @@ const JobTracker = () => {
         </p>
       </div>
 
-      {/* Kanban Cards Container - Separate Horizontal Scroll */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        <div className="w-full overflow-x-auto overflow-y-hidden">
-          <div className="flex gap-4 pb-4" style={{ width: 'max-content' }}>
-            {columns.map((column) => (
-              <DroppableColumn
-                key={column.key}
-                column={column}
-                jobs={getJobsByStatus(column.key)}
-                onAddJob={() => {
-                  setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
-                  setIsModalOpen(true);
-                }}
-                onDeleteJob={deleteJob}
-                onViewJob={handleViewJob}
-                activeJobId={activeJob?.id}
-              />
-            ))}
-          </div>
-        </div>
-
-        <DragOverlay>
-          {activeJob ? (
-            <div className="bg-gray-800 rounded-lg p-4 border border-gray-600 shadow-2xl transform rotate-3 min-w-[280px]">
-              <h4 className="font-bold text-white text-sm font-orbitron">{activeJob.company_name}</h4>
-              <p className="text-gray-300 text-xs">{activeJob.job_title}</p>
+      {/* Kanban Cards Container - Full Width with Horizontal Scroll */}
+      <div className="w-full">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="overflow-x-auto overflow-y-hidden">
+            <div className="flex gap-4 pb-4 px-4" style={{ minWidth: 'calc(280px * 5 + 16px * 4)' }}>
+              {columns.map((column) => (
+                <DroppableColumn
+                  key={column.key}
+                  column={column}
+                  jobs={getJobsByStatus(column.key)}
+                  onAddJob={() => {
+                    setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
+                    setIsModalOpen(true);
+                  }}
+                  onDeleteJob={deleteJob}
+                  onViewJob={handleViewJob}
+                  activeJobId={activeJob?.id}
+                />
+              ))}
             </div>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+          </div>
+
+          <DragOverlay>
+            {activeJob ? (
+              <div className="bg-gray-800 rounded-lg p-4 border border-gray-600 shadow-2xl transform rotate-3 min-w-[280px]">
+                <h4 className="font-bold text-white text-sm font-orbitron">{activeJob.company_name}</h4>
+                <p className="text-gray-300 text-xs">{activeJob.job_title}</p>
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      </div>
 
       {/* Add Job Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
