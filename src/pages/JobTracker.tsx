@@ -545,37 +545,39 @@ const JobTracker = () => {
       </Layout>;
   }
   return <Layout>
-      {/* Fixed Header - Centered to Full Page Width */}
-      <div className="w-full text-center mb-8 px-4">
-        <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-2">
-          Job Tracker
-        </h1>
-        <p className="text-gray-100 font-inter font-light text-base max-w-4xl mx-auto">
-          Drag and drop job applications between columns to track your progress. Click View to see details or add new jobs using the + button.
-        </p>
-      </div>
+      <div className="flex flex-col min-h-screen">
+        {/* Fixed Header - Centered to Full Viewport Width */}
+        <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] text-center mb-8 px-4">
+          <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-2">
+            Job Tracker
+          </h1>
+          <p className="text-gray-100 font-inter font-light text-base max-w-4xl mx-auto">
+            Drag and drop job applications between columns to track your progress. Click View to see details or add new jobs using the + button.
+          </p>
+        </div>
 
-      {/* Kanban Cards Container - Constrained Width with Horizontal Scroll */}
-      <div className="w-full overflow-hidden">
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-          <div className="overflow-x-auto overflow-y-hidden">
-            <div className="flex gap-4 pb-4 px-4" style={{
-            minWidth: 'calc(280px * 5 + 16px * 4)'
-          }}>
-              {columns.map(column => <DroppableColumn key={column.key} column={column} jobs={getJobsByStatus(column.key)} onAddJob={() => {
-              setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
-              setIsModalOpen(true);
-            }} onDeleteJob={deleteJob} onViewJob={handleViewJob} activeJobId={activeJob?.id} />)}
+        {/* Kanban Cards Container - Independent Scrollable Section */}
+        <div className="flex-1">
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+            <div className="overflow-x-auto overflow-y-hidden">
+              <div className="flex gap-4 pb-4 px-4" style={{
+              minWidth: 'calc(280px * 5 + 16px * 4)'
+            }}>
+                {columns.map(column => <DroppableColumn key={column.key} column={column} jobs={getJobsByStatus(column.key)} onAddJob={() => {
+                setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
+                setIsModalOpen(true);
+              }} onDeleteJob={deleteJob} onViewJob={handleViewJob} activeJobId={activeJob?.id} />)}
+              </div>
             </div>
-          </div>
 
-          <DragOverlay>
-            {activeJob ? <div className="bg-gray-800 rounded-lg p-4 border border-gray-600 shadow-2xl transform rotate-3 min-w-[280px]">
-                <h4 className="font-bold text-white text-sm font-orbitron">{activeJob.company_name}</h4>
-                <p className="text-gray-300 text-xs">{activeJob.job_title}</p>
-              </div> : null}
-          </DragOverlay>
-        </DndContext>
+            <DragOverlay>
+              {activeJob ? <div className="bg-gray-800 rounded-lg p-4 border border-gray-600 shadow-2xl transform rotate-3 min-w-[280px]">
+                  <h4 className="font-bold text-white text-sm font-orbitron">{activeJob.company_name}</h4>
+                  <p className="text-gray-300 text-xs">{activeJob.job_title}</p>
+                </div> : null}
+            </DragOverlay>
+          </DndContext>
+        </div>
       </div>
 
       {/* Add Job Modal */}
