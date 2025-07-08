@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, ExternalLink, Trash2, X, Bookmark, Send, Users, XCircle, Trophy } from 'lucide-react';
+import { Plus, ExternalLink, Trash2, X, Bookmark, Send, Users, XCircle, Trophy, GripVertical, RefreshCw, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -80,7 +80,7 @@ const DroppableColumn = ({
     </div>;
 };
 
-// Sortable Job Card Component
+// Sortable Job Card Component with dedicated drag handle
 const SortableJobCard = ({
   job,
   onDelete,
@@ -100,13 +100,30 @@ const SortableJobCard = ({
   } = useSortable({
     id: job.id
   });
+  
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1
   };
-  return <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="bg-gray-800 rounded-lg p-4 border border-gray-600 hover:border-gray-500 transition-all group shadow-lg cursor-grab active:cursor-grabbing">
-      <div className="flex items-start justify-between mb-3">
+
+  return (
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      {...attributes}
+      className="bg-gray-800 rounded-lg p-4 border border-gray-600 hover:border-gray-500 transition-all group shadow-lg relative"
+    >
+      {/* Drag Handle - Only this area is draggable */}
+      <div 
+        {...listeners}
+        className="absolute top-2 right-2 p-1 rounded cursor-grab active:cursor-grabbing hover:bg-gray-700 transition-colors opacity-0 group-hover:opacity-100"
+        title="Drag to move between columns"
+      >
+        <GripVertical className="h-4 w-4 text-gray-400 hover:text-gray-200" />
+      </div>
+
+      <div className="flex items-start justify-between mb-3 pr-8">
         <div className="flex-1">
           <h4 className="font-bold text-sm font-orbitron text-amber-200">{job.company_name}</h4>
           <p className="text-xs font-medium mb-2 text-fuchsia-200">{job.job_title}</p>
@@ -115,30 +132,48 @@ const SortableJobCard = ({
           </p>
         </div>
         <div className="flex gap-1">
-          <Button size="sm" variant="ghost" className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/20" onClick={e => {
-          e.stopPropagation();
-          onDelete(job.id);
-        }}>
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/20" 
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(job.id);
+            }}
+          >
             <Trash2 className="h-3 w-3" />
           </Button>
         </div>
       </div>
 
       <div className="flex items-center justify-between">
-        <Button size="sm" variant="outline" onClick={e => {
-        e.stopPropagation();
-        onView(job);
-      }} className="text-xs border-gray-600 text-gray-300 hover:text-white h-7 px-3 bg-blue-700 hover:bg-blue-600">
+        <Button 
+          size="sm" 
+          variant="outline" 
+          onClick={(e) => {
+            e.stopPropagation();
+            onView(job);
+          }} 
+          className="text-xs border-gray-600 text-gray-300 hover:text-white h-7 px-3 bg-blue-700 hover:bg-blue-600"
+        >
           View
         </Button>
-        {job.job_url && <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-blue-300 hover:text-blue-100 hover:bg-blue-900/20" onClick={e => {
-        e.stopPropagation();
-        window.open(job.job_url, '_blank');
-      }}>
+        {job.job_url && (
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            className="h-6 w-6 p-0 text-blue-300 hover:text-blue-100 hover:bg-blue-900/20" 
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(job.job_url, '_blank');
+            }}
+          >
             <ExternalLink className="h-3 w-3" />
-          </Button>}
+          </Button>
+        )}
       </div>
-    </div>;
+    </div>
+  );
 };
 const JobTracker = () => {
   const {
@@ -151,6 +186,8 @@ const JobTracker = () => {
   } = useToast();
   const [jobs, setJobs] = useState<JobEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<JobEntry | null>(null);
@@ -171,13 +208,13 @@ const JobTracker = () => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 15,
+        distance: 10,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 1000, // 1 second hold required
-        tolerance: 15, // Allow more movement before canceling
+        delay: 300, // 300ms hold for better responsiveness
+        tolerance: 15, // Allow some movement before canceling
       },
     }),
     useSensor(MouseSensor, {
@@ -261,118 +298,147 @@ const JobTracker = () => {
   }, [user, isLoaded, navigate]);
   const fetchJobs = useCallback(async () => {
     if (!user) return;
+    
+    setError(null);
+    console.log(`Fetching jobs for user: ${user.id}, attempt: ${retryCount + 1}`);
+    
     try {
       // First get the user UUID from users table using clerk_id
-      const {
-        data: userData,
-        error: userError
-      } = await supabase.from('users').select('id').eq('clerk_id', user?.id).maybeSingle();
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('clerk_id', user.id)
+        .maybeSingle();
+      
       if (userError) {
         console.error('User lookup error:', userError);
-        return;
+        throw new Error(`User lookup failed: ${userError.message}`);
       }
+      
       if (!userData) {
-        console.error('User not found in database for clerk_id:', user?.id);
+        console.log('User not found, creating new user...');
         // Try to create user if they don't exist
-        const {
-          data: newUser,
-          error: createUserError
-        } = await supabase.from('users').insert({
-          clerk_id: user.id,
-          email: user.primaryEmailAddress?.emailAddress || '',
-          first_name: user.firstName || '',
-          last_name: user.lastName || ''
-        }).select('id').single();
+        const { data: newUser, error: createUserError } = await supabase
+          .from('users')
+          .insert({
+            clerk_id: user.id,
+            email: user.primaryEmailAddress?.emailAddress || '',
+            first_name: user.firstName || '',
+            last_name: user.lastName || ''
+          })
+          .select('id')
+          .single();
+          
         if (createUserError || !newUser) {
           console.error('Failed to create user:', createUserError);
-          return;
+          throw new Error(`User creation failed: ${createUserError?.message}`);
         }
 
-        // Create user profile
-        const {
-          error: profileError
-        } = await supabase.from('user_profile').insert({
-          user_id: newUser.id
-        });
-        if (profileError) {
+        // Create user profile with better error handling
+        const { data: newProfile, error: profileError } = await supabase
+          .from('user_profile')
+          .insert({ user_id: newUser.id })
+          .select('id')
+          .single();
+          
+        if (profileError || !newProfile) {
           console.error('Failed to create user profile:', profileError);
-          return;
+          throw new Error(`Profile creation failed: ${profileError?.message}`);
         }
 
-        // Use the new user's ID
-        const userUUID = newUser.id;
-
-        // Get the newly created profile
-        const {
-          data: newProfile,
-          error: newProfileError
-        } = await supabase.from('user_profile').select('id').eq('user_id', userUUID).single();
-        if (newProfileError || !newProfile) {
-          console.error('New profile not found:', newProfileError);
-          return;
-        }
-
-        // Fetch jobs with new profile (will be empty for new user)
+        console.log('New user and profile created successfully');
         setJobs([]);
+        setError(null);
+        setRetryCount(0);
         return;
       }
 
-      // Then get user profile using the user UUID
-      const {
-        data: userProfile,
-        error: profileError
-      } = await supabase.from('user_profile').select('id').eq('user_id', userData.id).maybeSingle();
+      // Get user profile using the user UUID
+      const { data: userProfile, error: profileError } = await supabase
+        .from('user_profile')
+        .select('id')
+        .eq('user_id', userData.id)
+        .maybeSingle();
+        
       if (profileError) {
         console.error('User profile lookup error:', profileError);
-        return;
+        throw new Error(`Profile lookup failed: ${profileError.message}`);
       }
+      
       if (!userProfile) {
-        console.error('User profile not found for user_id:', userData.id);
+        console.log('Profile not found, creating profile...');
         // Create user profile if it doesn't exist
-        const {
-          data: newProfile,
-          error: createProfileError
-        } = await supabase.from('user_profile').insert({
-          user_id: userData.id
-        }).select('id').single();
+        const { data: newProfile, error: createProfileError } = await supabase
+          .from('user_profile')
+          .insert({ user_id: userData.id })
+          .select('id')
+          .single();
+          
         if (createProfileError || !newProfile) {
           console.error('Failed to create profile:', createProfileError);
-          return;
+          throw new Error(`Profile creation failed: ${createProfileError?.message}`);
         }
 
-        // Use new profile
-        const profileId = newProfile.id;
-        const {
-          data,
-          error
-        } = await supabase.from('job_tracker').select('*').eq('user_id', profileId).order('order_position', {
-          ascending: true
-        });
-        if (error) throw error;
-        setJobs(data || []);
+        console.log('Profile created successfully');
+        setJobs([]);
+        setError(null);
+        setRetryCount(0);
         return;
       }
 
       // Finally get jobs for this user profile
-      const {
-        data,
-        error
-      } = await supabase.from('job_tracker').select('*').eq('user_id', userProfile.id).order('order_position', {
-        ascending: true
-      });
-      if (error) throw error;
+      console.log(`Fetching jobs for profile: ${userProfile.id}`);
+      const { data, error } = await supabase
+        .from('job_tracker')
+        .select('*')
+        .eq('user_id', userProfile.id)
+        .order('order_position', { ascending: true });
+        
+      if (error) {
+        console.error('Job tracker query error:', error);
+        throw new Error(`Job data fetch failed: ${error.message}`);
+      }
+      
+      console.log(`Successfully loaded ${data?.length || 0} jobs`);
       setJobs(data || []);
-    } catch (error) {
+      setError(null);
+      setRetryCount(0);
+      
+    } catch (error: any) {
       console.error('Error fetching jobs:', error);
+      const errorMessage = error.message || 'Failed to load job tracker data';
+      setError(errorMessage);
+      
+      // Retry logic for certain errors
+      if (retryCount < 3 && (
+        errorMessage.includes('JWT') || 
+        errorMessage.includes('expired') || 
+        errorMessage.includes('row-level security')
+      )) {
+        console.log(`Retrying in 2 seconds... (attempt ${retryCount + 1}/3)`);
+        setTimeout(() => {
+          setRetryCount(prev => prev + 1);
+          fetchJobs();
+        }, 2000);
+        return;
+      }
+      
       toast({
-        title: "Error",
-        description: "Failed to load job tracker data.",
+        title: "Error Loading Data",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
       setLoading(false);
     }
-  }, [user, toast]);
+  }, [user, toast, retryCount]);
+
+  // Manual refresh function
+  const handleManualRefresh = useCallback(async () => {
+    setLoading(true);
+    setRetryCount(0);
+    await fetchJobs();
+  }, [fetchJobs]);
   const handleAddJob = async () => {
     if (!formData.company_name || !formData.job_title) {
       toast({
@@ -580,11 +646,44 @@ const JobTracker = () => {
         {/* Header section - scrollable */}
         <header className="py-6 px-4">
           <div className="text-center">
-            <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-4">
-              Job Tracker
-            </h1>
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow">
+                Job Tracker
+              </h1>
+              
+              {/* Refresh Button */}
+              <Button
+                onClick={handleManualRefresh}
+                variant="ghost"
+                size="sm"
+                className="text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
+                disabled={loading}
+                title="Refresh job data"
+              >
+                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              </Button>
+            </div>
+
+            {/* Error Display */}
+            {error && (
+              <div className="bg-red-900/50 border border-red-600 rounded-lg p-3 mb-4 mx-auto max-w-2xl">
+                <div className="flex items-center gap-2 text-red-200">
+                  <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-sm">{error}</span>
+                  <Button
+                    onClick={handleManualRefresh}
+                    variant="ghost"
+                    size="sm"
+                    className="ml-auto text-red-200 hover:text-white hover:bg-red-800/50"
+                  >
+                    Retry
+                  </Button>
+                </div>
+              </div>
+            )}
+
             <p className="text-gray-100 font-inter font-light text-base max-w-4xl mx-auto leading-relaxed mb-3">
-              Drag and drop job applications between columns to track your progress. Click View to see details or add new jobs using the + button.
+              Drag the grip handle (⋮⋮) to move job applications between columns. Use the View button to see details or add new jobs using the + button.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-gray-300 font-medium">
               <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs">Saved</span>
