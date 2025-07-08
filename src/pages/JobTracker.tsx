@@ -54,7 +54,7 @@ const DroppableColumn = ({
     id: column.key
   });
   const isDropTarget = isOver && activeJobId;
-  return <div ref={setNodeRef} className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg flex-1 min-w-[280px] max-w-[400px] flex-shrink-0 transition-all hover:shadow-lg ${isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''}`}>
+  return <div ref={setNodeRef} className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg w-full sm:flex-1 sm:min-w-[280px] sm:max-w-[400px] transition-all hover:shadow-lg ${isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''}`}>
       <div className={`${column.headerBg} p-4 rounded-t-lg border-b ${column.borderColor} flex items-center justify-between`}>
         <div className="flex items-center gap-2">
           <column.icon className="h-4 w-4 text-white" />
@@ -583,11 +583,11 @@ const JobTracker = () => {
           </div>
         </header>
 
-        {/* 3. Main content area with wrapping layout instead of horizontal scroll */}
+        {/* 3. Main content area with proper mobile responsive layout */}
         <main className="flex-1 p-4 overflow-y-auto">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-            {/* Flex wrap layout - columns wrap to new rows instead of horizontal scroll */}
-            <div className="flex flex-wrap gap-4 h-full">
+            {/* Mobile: stack vertically, Desktop: horizontal flex */}
+            <div className="flex flex-col sm:flex-row gap-4 h-full overflow-x-hidden">
               {columns.map(column => (
                 <DroppableColumn
                   key={column.key}
