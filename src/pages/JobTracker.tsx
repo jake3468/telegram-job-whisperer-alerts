@@ -546,17 +546,17 @@ const JobTracker = () => {
   }
   return <Layout>
       {/* Fixed Header - Centered to Full Page Width */}
-      <div className="container mx-auto px-4 mb-8 text-center">
+      <div className="w-full text-center mb-8 px-4">
         <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-2">
           Job Tracker
         </h1>
-        <p className="text-gray-100 font-inter font-light text-base">
+        <p className="text-gray-100 font-inter font-light text-base max-w-4xl mx-auto">
           Drag and drop job applications between columns to track your progress. Click View to see details or add new jobs using the + button.
         </p>
       </div>
 
-      {/* Kanban Cards Container - Full Width with Horizontal Scroll */}
-      <div className="w-full">
+      {/* Kanban Cards Container - Constrained Width with Horizontal Scroll */}
+      <div className="w-full overflow-hidden">
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <div className="overflow-x-auto overflow-y-hidden">
             <div className="flex gap-4 pb-4 px-4" style={{
