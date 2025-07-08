@@ -54,8 +54,7 @@ const DroppableColumn = ({
     id: column.key
   });
   const isDropTarget = isOver && activeJobId;
-  return (
-    <div ref={setNodeRef} className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg w-full md:flex-1 md:min-w-[280px] md:max-w-[320px] transition-all hover:shadow-lg ${isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''}`}>
+  return <div ref={setNodeRef} className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg w-full md:flex-1 md:min-w-[280px] md:max-w-[320px] transition-all hover:shadow-lg ${isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''}`}>
       <div className={`${column.headerBg} p-4 rounded-t-lg border-b ${column.borderColor} flex items-center justify-between`}>
         <div className="flex items-center gap-2">
           <column.icon className="h-4 w-4 text-white" />
@@ -78,8 +77,7 @@ const DroppableColumn = ({
           </div>
         </SortableContext>
       </div>
-    </div>
-  );
+    </div>;
 };
 
 // Sortable Job Card Component with dedicated drag handle
@@ -107,14 +105,13 @@ const SortableJobCard = ({
     transition,
     opacity: isDragging ? 0.5 : 1
   };
-  return (
-    <div ref={setNodeRef} style={style} {...attributes} className="bg-gray-800 rounded-lg p-4 border border-gray-600 hover:border-gray-500 transition-all group shadow-lg relative">
+  return <div ref={setNodeRef} style={style} {...attributes} className="bg-gray-800 rounded-lg p-4 border border-gray-600 hover:border-gray-500 transition-all group shadow-lg relative">
       {/* Drag Handle - Only this area is draggable */}
       <div {...listeners} className="absolute top-2 right-2 p-3 md:p-2 rounded cursor-grab active:cursor-grabbing hover:bg-gray-700 transition-colors bg-gray-700/50 hover:bg-gray-700/70 touch-manipulation select-none" title="Drag to move between columns" style={{
-        touchAction: 'none'
-      }} onTouchStart={e => {
-        e.preventDefault();
-      }}>
+      touchAction: 'none'
+    }} onTouchStart={e => {
+      e.preventDefault();
+    }}>
         <GripVertical className="h-5 w-5 md:h-4 md:w-4 text-gray-200 hover:text-gray-100" />
       </div>
 
@@ -128,9 +125,9 @@ const SortableJobCard = ({
         </div>
         <div className="flex gap-1">
           <Button size="sm" variant="ghost" className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/20" onClick={e => {
-            e.stopPropagation();
-            onDelete(job.id);
-          }}>
+          e.stopPropagation();
+          onDelete(job.id);
+        }}>
             <Trash2 className="h-3 w-3" />
           </Button>
         </div>
@@ -138,20 +135,19 @@ const SortableJobCard = ({
 
       <div className="flex items-center justify-between">
         <Button size="sm" variant="outline" onClick={e => {
-          e.stopPropagation();
-          onView(job);
-        }} className="text-xs border-gray-600 text-gray-300 hover:text-white h-7 px-3 bg-blue-700 hover:bg-blue-600">
+        e.stopPropagation();
+        onView(job);
+      }} className="text-xs border-gray-600 text-gray-300 hover:text-white h-7 px-3 bg-blue-700 hover:bg-blue-600">
           View
         </Button>
         {job.job_url && <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-blue-300 hover:text-blue-100 hover:bg-blue-900/20" onClick={e => {
-          e.stopPropagation();
-          window.open(job.job_url, '_blank');
-        }}>
-          <ExternalLink className="h-3 w-3" />
-        </Button>}
+        e.stopPropagation();
+        window.open(job.job_url, '_blank');
+      }}>
+            <ExternalLink className="h-3 w-3" />
+          </Button>}
       </div>
-    </div>
-  );
+    </div>;
 };
 const JobTracker = () => {
   const {
@@ -673,7 +669,7 @@ const JobTracker = () => {
               Drag the grip handle (⋮⋮) to move job applications between columns. Use the View button to see details or add new jobs using the + button.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-gray-300 font-medium">
-              <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs">Saved</span>
+              <span className="bg-blue-600 text-white px-2 py-1 rounded text-base">Saved</span>
               <span className="hidden sm:inline">→</span>
               <span className="bg-green-600 text-white px-2 py-1 rounded text-xs">Applied</span>
               <span className="hidden sm:inline">→</span>
