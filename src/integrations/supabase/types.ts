@@ -458,6 +458,53 @@ export type Database = {
           },
         ]
       }
+      job_tracker: {
+        Row: {
+          company_name: string
+          created_at: string
+          id: string
+          job_description: string | null
+          job_title: string
+          job_url: string | null
+          order_position: number
+          status: Database["public"]["Enums"]["job_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          id?: string
+          job_description?: string | null
+          job_title: string
+          job_url?: string | null
+          order_position?: number
+          status?: Database["public"]["Enums"]["job_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          id?: string
+          job_description?: string | null
+          job_title?: string
+          job_url?: string | null
+          order_position?: number
+          status?: Database["public"]["Enums"]["job_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_tracker_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       linkedin_post_images: {
         Row: {
           created_at: string
@@ -1072,6 +1119,7 @@ export type Database = {
       }
     }
     Enums: {
+      job_status: "saved" | "applied" | "interview" | "rejected" | "offer"
       job_type: "Remote" | "On-site" | "Hybrid"
     }
     CompositeTypes: {
@@ -1216,6 +1264,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      job_status: ["saved", "applied", "interview", "rejected", "offer"],
       job_type: ["Remote", "On-site", "Hybrid"],
     },
   },
