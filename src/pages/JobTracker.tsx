@@ -54,7 +54,8 @@ const DroppableColumn = ({
     id: column.key
   });
   const isDropTarget = isOver && activeJobId;
-  return <div ref={setNodeRef} className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg w-full md:flex-1 md:min-w-[280px] md:max-w-[320px] transition-all hover:shadow-lg ${isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''}`}>
+  return (
+    <div ref={setNodeRef} className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg w-full md:flex-1 md:min-w-[280px] md:max-w-[320px] transition-all hover:shadow-lg ${isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''}`}>
       <div className={`${column.headerBg} p-4 rounded-t-lg border-b ${column.borderColor} flex items-center justify-between`}>
         <div className="flex items-center gap-2">
           <column.icon className="h-4 w-4 text-white" />
@@ -77,7 +78,8 @@ const DroppableColumn = ({
           </div>
         </SortableContext>
       </div>
-    </div>;
+    </div>
+  );
 };
 
 // Sortable Job Card Component with dedicated drag handle
@@ -100,43 +102,19 @@ const SortableJobCard = ({
   } = useSortable({
     id: job.id
   });
-<<<<<<< HEAD
-  
-=======
->>>>>>> main
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1
   };
-<<<<<<< HEAD
-
   return (
-    <div 
-      ref={setNodeRef} 
-      style={style} 
-      {...attributes}
-      className="bg-gray-800 rounded-lg p-4 border border-gray-600 hover:border-gray-500 transition-all group shadow-lg relative"
-    >
-      {/* Drag Handle - Only this area is draggable */}
-      <div 
-        {...listeners}
-        className="absolute top-2 right-2 p-3 md:p-2 rounded cursor-grab active:cursor-grabbing hover:bg-gray-700 transition-colors bg-gray-700/50 hover:bg-gray-700/70 touch-manipulation select-none"
-        title="Drag to move between columns"
-        style={{ touchAction: 'none' }}
-        onTouchStart={(e) => {
-          e.preventDefault();
-        }}
-      >
-=======
-  return <div ref={setNodeRef} style={style} {...attributes} className="bg-gray-800 rounded-lg p-4 border border-gray-600 hover:border-gray-500 transition-all group shadow-lg relative">
+    <div ref={setNodeRef} style={style} {...attributes} className="bg-gray-800 rounded-lg p-4 border border-gray-600 hover:border-gray-500 transition-all group shadow-lg relative">
       {/* Drag Handle - Only this area is draggable */}
       <div {...listeners} className="absolute top-2 right-2 p-3 md:p-2 rounded cursor-grab active:cursor-grabbing hover:bg-gray-700 transition-colors bg-gray-700/50 hover:bg-gray-700/70 touch-manipulation select-none" title="Drag to move between columns" style={{
-      touchAction: 'none'
-    }} onTouchStart={e => {
-      e.preventDefault();
-    }}>
->>>>>>> main
+        touchAction: 'none'
+      }} onTouchStart={e => {
+        e.preventDefault();
+      }}>
         <GripVertical className="h-5 w-5 md:h-4 md:w-4 text-gray-200 hover:text-gray-100" />
       </div>
 
@@ -149,72 +127,31 @@ const SortableJobCard = ({
           </p>
         </div>
         <div className="flex gap-1">
-<<<<<<< HEAD
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/20" 
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(job.id);
-            }}
-          >
-=======
           <Button size="sm" variant="ghost" className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/20" onClick={e => {
-          e.stopPropagation();
-          onDelete(job.id);
-        }}>
->>>>>>> main
+            e.stopPropagation();
+            onDelete(job.id);
+          }}>
             <Trash2 className="h-3 w-3" />
           </Button>
         </div>
       </div>
 
       <div className="flex items-center justify-between">
-<<<<<<< HEAD
-        <Button 
-          size="sm" 
-          variant="outline" 
-          onClick={(e) => {
-            e.stopPropagation();
-            onView(job);
-          }} 
-          className="text-xs border-gray-600 text-gray-300 hover:text-white h-7 px-3 bg-blue-700 hover:bg-blue-600"
-        >
-          View
-        </Button>
-        {job.job_url && (
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            className="h-6 w-6 p-0 text-blue-300 hover:text-blue-100 hover:bg-blue-900/20" 
-            onClick={(e) => {
-              e.stopPropagation();
-              window.open(job.job_url, '_blank');
-            }}
-          >
-            <ExternalLink className="h-3 w-3" />
-          </Button>
-        )}
-      </div>
-    </div>
-  );
-=======
         <Button size="sm" variant="outline" onClick={e => {
-        e.stopPropagation();
-        onView(job);
-      }} className="text-xs border-gray-600 text-gray-300 hover:text-white h-7 px-3 bg-blue-700 hover:bg-blue-600">
+          e.stopPropagation();
+          onView(job);
+        }} className="text-xs border-gray-600 text-gray-300 hover:text-white h-7 px-3 bg-blue-700 hover:bg-blue-600">
           View
         </Button>
         {job.job_url && <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-blue-300 hover:text-blue-100 hover:bg-blue-900/20" onClick={e => {
-        e.stopPropagation();
-        window.open(job.job_url, '_blank');
-      }}>
-            <ExternalLink className="h-3 w-3" />
-          </Button>}
+          e.stopPropagation();
+          window.open(job.job_url, '_blank');
+        }}>
+          <ExternalLink className="h-3 w-3" />
+        </Button>}
       </div>
-    </div>;
->>>>>>> main
+    </div>
+  );
 };
 const JobTracker = () => {
   const {
@@ -245,26 +182,6 @@ const JobTracker = () => {
     job_description: '',
     job_url: ''
   });
-<<<<<<< HEAD
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 150, // Reduced delay for better mobile responsiveness
-        tolerance: 8, // Reduced tolerance for more accurate touch
-      },
-    }),
-    useSensor(MouseSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    })
-  );
-=======
   const sensors = useSensors(useSensor(PointerSensor, {
     activationConstraint: {
       distance: 8
@@ -280,7 +197,6 @@ const JobTracker = () => {
       distance: 8
     }
   }));
->>>>>>> main
   const columns = [{
     key: 'saved',
     title: 'Saved',
@@ -333,24 +249,14 @@ const JobTracker = () => {
     if (user) {
       fetchJobs();
       const interval = setInterval(fetchJobs, 10000);
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> main
       // Handle page visibility changes
       const handleVisibilityChange = () => {
         if (!document.hidden) {
           fetchJobs();
         }
       };
-<<<<<<< HEAD
-      
       document.addEventListener('visibilitychange', handleVisibilityChange);
-      
-=======
-      document.addEventListener('visibilitychange', handleVisibilityChange);
->>>>>>> main
       return () => {
         clearInterval(interval);
         document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -364,18 +270,6 @@ const JobTracker = () => {
   }, [user, isLoaded, navigate]);
   const fetchJobs = useCallback(async (retryCount = 0) => {
     if (!user) return;
-<<<<<<< HEAD
-    
-    setError(null);
-    console.log(`Fetching jobs for user: ${user.id} (attempt ${retryCount + 1})`);
-    
-    try {
-      // Silent token refresh for JWT expiry issues
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session) {
-        console.log('No active session, attempting refresh...');
-        const { error: refreshError } = await supabase.auth.refreshSession();
-=======
     setError(null);
     console.log(`Fetching jobs for user: ${user.id} (attempt ${retryCount + 1})`);
     try {
@@ -388,7 +282,6 @@ const JobTracker = () => {
         const {
           error: refreshError
         } = await supabase.auth.refreshSession();
->>>>>>> main
         if (refreshError) {
           console.error('Token refresh failed:', refreshError);
           if (retryCount < 2) {
@@ -399,19 +292,10 @@ const JobTracker = () => {
       }
 
       // First get the user UUID from users table using clerk_id
-<<<<<<< HEAD
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('clerk_id', user.id)
-        .maybeSingle();
-      
-=======
       const {
         data: userData,
         error: userError
       } = await supabase.from('users').select('id').eq('clerk_id', user.id).maybeSingle();
->>>>>>> main
       if (userError) {
         console.error('User lookup error:', userError);
         // Don't show JWT/RLS errors to users - handle silently
@@ -424,23 +308,6 @@ const JobTracker = () => {
         }
         throw new Error('Unable to load your profile');
       }
-<<<<<<< HEAD
-      
-      if (!userData) {
-        console.log('User not found, creating new user...');
-        // Try to create user if they don't exist
-        const { data: newUser, error: createUserError } = await supabase
-          .from('users')
-          .insert({
-            clerk_id: user.id,
-            email: user.primaryEmailAddress?.emailAddress || '',
-            first_name: user.firstName || '',
-            last_name: user.lastName || ''
-          })
-          .select('id')
-          .single();
-          
-=======
       if (!userData) {
         console.log('User not found, creating new user...');
         // Try to create user if they don't exist
@@ -453,7 +320,6 @@ const JobTracker = () => {
           first_name: user.firstName || '',
           last_name: user.lastName || ''
         }).select('id').single();
->>>>>>> main
         if (createUserError || !newUser) {
           console.error('Failed to create user:', createUserError);
           // Silent retry for creation issues
@@ -467,21 +333,12 @@ const JobTracker = () => {
         }
 
         // Create user profile with better error handling
-<<<<<<< HEAD
-        const { data: newProfile, error: profileError } = await supabase
-          .from('user_profile')
-          .insert({ user_id: newUser.id })
-          .select('id')
-          .single();
-          
-=======
         const {
           data: newProfile,
           error: profileError
         } = await supabase.from('user_profile').insert({
           user_id: newUser.id
         }).select('id').single();
->>>>>>> main
         if (profileError || !newProfile) {
           console.error('Failed to create user profile:', profileError);
           // Silent retry for profile creation issues
@@ -493,10 +350,6 @@ const JobTracker = () => {
           }
           throw new Error('Unable to complete account setup');
         }
-<<<<<<< HEAD
-
-=======
->>>>>>> main
         console.log('New user and profile created successfully');
         setJobs([]);
         setError(null);
@@ -504,19 +357,10 @@ const JobTracker = () => {
       }
 
       // Get user profile using the user UUID
-<<<<<<< HEAD
-      const { data: userProfile, error: profileError } = await supabase
-        .from('user_profile')
-        .select('id')
-        .eq('user_id', userData.id)
-        .maybeSingle();
-        
-=======
       const {
         data: userProfile,
         error: profileError
       } = await supabase.from('user_profile').select('id').eq('user_id', userData.id).maybeSingle();
->>>>>>> main
       if (profileError) {
         console.error('User profile lookup error:', profileError);
         // Silent retry for JWT/RLS issues
@@ -528,18 +372,6 @@ const JobTracker = () => {
         }
         throw new Error('Unable to access your profile');
       }
-<<<<<<< HEAD
-      
-      if (!userProfile) {
-        console.log('Profile not found, creating profile...');
-        // Create user profile if it doesn't exist
-        const { data: newProfile, error: createProfileError } = await supabase
-          .from('user_profile')
-          .insert({ user_id: userData.id })
-          .select('id')
-          .single();
-          
-=======
       if (!userProfile) {
         console.log('Profile not found, creating profile...');
         // Create user profile if it doesn't exist
@@ -549,7 +381,6 @@ const JobTracker = () => {
         } = await supabase.from('user_profile').insert({
           user_id: userData.id
         }).select('id').single();
->>>>>>> main
         if (createProfileError || !newProfile) {
           console.error('Failed to create profile:', createProfileError);
           // Silent retry for creation issues
@@ -561,10 +392,6 @@ const JobTracker = () => {
           }
           throw new Error('Unable to create your profile');
         }
-<<<<<<< HEAD
-
-=======
->>>>>>> main
         console.log('Profile created successfully');
         setJobs([]);
         setError(null);
@@ -573,21 +400,12 @@ const JobTracker = () => {
 
       // Finally get jobs for this user profile
       console.log(`Fetching jobs for profile: ${userProfile.id}`);
-<<<<<<< HEAD
-      const { data, error } = await supabase
-        .from('job_tracker')
-        .select('*')
-        .eq('user_id', userProfile.id)
-        .order('order_position', { ascending: true });
-        
-=======
       const {
         data,
         error
       } = await supabase.from('job_tracker').select('*').eq('user_id', userProfile.id).order('order_position', {
         ascending: true
       });
->>>>>>> main
       if (error) {
         console.error('Job tracker query error:', error);
         // Silent retry for JWT/RLS issues
@@ -599,17 +417,6 @@ const JobTracker = () => {
         }
         throw new Error('Unable to load your job applications');
       }
-<<<<<<< HEAD
-      
-      console.log(`Successfully loaded ${data?.length || 0} jobs`);
-      setJobs(data || []);
-      setError(null);
-      
-    } catch (error: any) {
-      console.error('Error fetching jobs:', error);
-      const errorMessage = error.message || 'Unable to load job applications';
-      
-=======
       console.log(`Successfully loaded ${data?.length || 0} jobs`);
       setJobs(data || []);
       setError(null);
@@ -617,7 +424,6 @@ const JobTracker = () => {
       console.error('Error fetching jobs:', error);
       const errorMessage = error.message || 'Unable to load job applications';
 
->>>>>>> main
       // Only show user-friendly errors, never technical ones
       if (!errorMessage.includes('JWT') && !errorMessage.includes('expired') && !errorMessage.includes('row-level security')) {
         setError(errorMessage);
@@ -837,12 +643,7 @@ const JobTracker = () => {
         </div>
       </Layout>;
   }
-<<<<<<< HEAD
-  return (
-    <Layout>
-=======
   return <Layout>
->>>>>>> main
       {/* Main container with scrollable content */}
       <div className="flex flex-col min-h-screen bg-gradient-to-br from-black via-gray-950 to-fuchsia-950">
         
@@ -850,42 +651,6 @@ const JobTracker = () => {
         <header className="py-6 px-4">
           <div className="text-center">
             <div className="flex items-center justify-center gap-4 mb-4">
-<<<<<<< HEAD
-              <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow">
-                Job Tracker
-              </h1>
-              
-              {/* Refresh Button */}
-              <Button
-                onClick={handleManualRefresh}
-                variant="ghost"
-                size="sm"
-                className="text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
-                disabled={loading}
-                title="Refresh job data"
-              >
-                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-              </Button>
-            </div>
-
-            {/* Error Display */}
-            {error && (
-              <div className="bg-red-900/50 border border-red-600 rounded-lg p-3 mb-4 mx-auto max-w-2xl">
-                <div className="flex items-center gap-2 text-red-200">
-                  <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                  <span className="text-sm">{error}</span>
-                  <Button
-                    onClick={handleManualRefresh}
-                    variant="ghost"
-                    size="sm"
-                    className="ml-auto text-red-200 hover:text-white hover:bg-red-800/50"
-                  >
-                    Retry
-                  </Button>
-                </div>
-              </div>
-            )}
-=======
               <span className="font-semibold text-3xl">📈</span>
               <h1 className="font-extrabold font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow md:text-4xl text-center text-4xl">Job Tracker</h1>
               
@@ -903,7 +668,6 @@ const JobTracker = () => {
                   </Button>
                 </div>
               </div>}
->>>>>>> main
 
             <p className="text-gray-100 font-inter font-light text-base max-w-4xl mx-auto leading-relaxed mb-3">
               Drag the grip handle (⋮⋮) to move job applications between columns. Use the View button to see details or add new jobs using the + button.
@@ -927,30 +691,6 @@ const JobTracker = () => {
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             {/* Responsive flexbox: stacked on mobile, wrapped on larger screens */}
             <div className="flex flex-col md:flex-row md:flex-wrap gap-4 w-full">
-<<<<<<< HEAD
-              {columns.map(column => (
-                <DroppableColumn
-                  key={column.key}
-                  column={column}
-                  jobs={getJobsByStatus(column.key)}
-                  onAddJob={() => {
-                    setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
-                    setIsModalOpen(true);
-                  }}
-                  onDeleteJob={deleteJob}
-                  onViewJob={handleViewJob}
-                  activeJobId={activeJob?.id}
-                />
-              ))}
-            </div>
-            <DragOverlay>
-              {activeJob ? (
-                <div className="bg-gray-800 rounded-lg p-4 border border-gray-600 shadow-2xl transform rotate-3 w-full max-w-[280px]">
-                  <h4 className="font-bold text-white text-sm font-orbitron">{activeJob.company_name}</h4>
-                  <p className="text-gray-300 text-xs">{activeJob.job_title}</p>
-                </div>
-              ) : null}
-=======
               {columns.map(column => <DroppableColumn key={column.key} column={column} jobs={getJobsByStatus(column.key)} onAddJob={() => {
               setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
               setIsModalOpen(true);
@@ -961,7 +701,6 @@ const JobTracker = () => {
                   <h4 className="font-bold text-white text-sm font-orbitron">{activeJob.company_name}</h4>
                   <p className="text-gray-300 text-xs">{activeJob.job_title}</p>
                 </div> : null}
->>>>>>> main
             </DragOverlay>
           </DndContext>
         </main>
@@ -1068,11 +807,6 @@ const JobTracker = () => {
             </div>}
         </DialogContent>
       </Dialog>
-<<<<<<< HEAD
-    </Layout>
-  );
-=======
     </Layout>;
->>>>>>> main
 };
 export default JobTracker;
