@@ -545,25 +545,21 @@ const JobTracker = () => {
       </Layout>;
   }
   return <Layout>
-      <div className="min-h-screen">
-        {/* Header - Centered to FULL VIEWPORT WIDTH, independent of content below */}
-        <div className="w-full text-center py-8">
-          <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
-            <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-4 text-center">
-              Job Tracker
-            </h1>
-            <div className="px-8">
-              <p className="text-gray-100 font-inter font-light text-base max-w-4xl mx-auto leading-relaxed px-0 text-center">
-                Drag and drop job applications between columns to track your progress. Click View to see details or add new jobs using the + button.
-              </p>
-            </div>
-          </div>
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-950 to-fuchsia-950">
+        {/* Header - Fixed width, no viewport overflow */}
+        <div className="w-full text-center py-8 px-4">
+          <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-4">
+            Job Tracker
+          </h1>
+          <p className="text-gray-100 font-inter font-light text-base max-w-4xl mx-auto leading-relaxed">
+            Drag and drop job applications between columns to track your progress. Click View to see details or add new jobs using the + button.
+          </p>
         </div>
 
-        {/* Kanban Cards Container - Completely independent scrollable section */}
-        <div className="px-4">
+        {/* Kanban Cards Container - Horizontal scroll contained within */}
+        <div className="w-full max-w-full overflow-hidden px-4">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-            <div className="overflow-x-auto overflow-y-hidden">
+            <div className="overflow-x-auto overflow-y-hidden bg-black/20 rounded-lg p-4">
               <div className="flex gap-4 pb-4" style={{
               minWidth: 'calc(280px * 5 + 16px * 4)'
             }}>
