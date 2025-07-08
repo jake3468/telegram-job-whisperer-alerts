@@ -54,7 +54,7 @@ const DroppableColumn = ({
     id: column.key
   });
   const isDropTarget = isOver && activeJobId;
-  return <div ref={setNodeRef} className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg min-w-[280px] flex-shrink-0 transition-all hover:shadow-lg ${isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''}`}>
+  return <div ref={setNodeRef} className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg flex-1 min-w-[280px] max-w-[400px] flex-shrink-0 transition-all hover:shadow-lg ${isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''}`}>
       <div className={`${column.headerBg} p-4 rounded-t-lg border-b ${column.borderColor} flex items-center justify-between`}>
         <h3 className={`font-orbitron font-bold text-sm ${column.textColor}`}>
           {column.title} ({jobs.length})
