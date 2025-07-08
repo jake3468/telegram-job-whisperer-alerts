@@ -187,7 +187,6 @@ const JobTracker = () => {
   const [jobs, setJobs] = useState<JobEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<JobEntry | null>(null);
@@ -300,9 +299,16 @@ const JobTracker = () => {
     if (!user) return;
     
     setError(null);
-    console.log(`Fetching jobs for user: ${user.id}, attempt: ${retryCount + 1}`);
+    console.log(`Fetching jobs for user: ${user.id}`);
     
     try {
+      // Silent token refresh for JWT expiry issues
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        console.log('No active session, attempting refresh...');
+        await supabase.auth.refreshSession();
+      }
+
       // First get the user UUID from users table using clerk_id
       const { data: userData, error: userError } = await supabase
         .from('users')
@@ -312,7 +318,14 @@ const JobTracker = () => {
       
       if (userError) {
         console.error('User lookup error:', userError);
-        throw new Error(`User lookup failed: ${userError.message}`);
+        // Don't show JWT/RLS errors to users - handle silently
+        if (userError.message.includes('JWT') || userError.message.includes('expired') || userError.message.includes('row-level security')) {
+          console.log('Silent authentication issue, retrying...');
+          // Silent retry without user notification
+          setTimeout(() => fetchJobs(), 1000);
+          return;
+        }
+        throw new Error('Unable to load your profile');
       }
       
       if (!userData) {
@@ -331,7 +344,12 @@ const JobTracker = () => {
           
         if (createUserError || !newUser) {
           console.error('Failed to create user:', createUserError);
-          throw new Error(`User creation failed: ${createUserError?.message}`);
+          // Silent retry for creation issues
+          if (createUserError?.message.includes('JWT') || createUserError?.message.includes('expired')) {
+            setTimeout(() => fetchJobs(), 1000);
+            return;
+          }
+          throw new Error('Unable to set up your account');
         }
 
         // Create user profile with better error handling
@@ -343,13 +361,17 @@ const JobTracker = () => {
           
         if (profileError || !newProfile) {
           console.error('Failed to create user profile:', profileError);
-          throw new Error(`Profile creation failed: ${profileError?.message}`);
+          // Silent retry for profile creation issues
+          if (profileError?.message.includes('JWT') || profileError?.message.includes('expired')) {
+            setTimeout(() => fetchJobs(), 1000);
+            return;
+          }
+          throw new Error('Unable to complete account setup');
         }
 
         console.log('New user and profile created successfully');
         setJobs([]);
         setError(null);
-        setRetryCount(0);
         return;
       }
 
@@ -362,7 +384,12 @@ const JobTracker = () => {
         
       if (profileError) {
         console.error('User profile lookup error:', profileError);
-        throw new Error(`Profile lookup failed: ${profileError.message}`);
+        // Silent retry for JWT/RLS issues
+        if (profileError.message.includes('JWT') || profileError.message.includes('expired') || profileError.message.includes('row-level security')) {
+          setTimeout(() => fetchJobs(), 1000);
+          return;
+        }
+        throw new Error('Unable to access your profile');
       }
       
       if (!userProfile) {
@@ -376,13 +403,17 @@ const JobTracker = () => {
           
         if (createProfileError || !newProfile) {
           console.error('Failed to create profile:', createProfileError);
-          throw new Error(`Profile creation failed: ${createProfileError?.message}`);
+          // Silent retry for creation issues
+          if (createProfileError?.message.includes('JWT') || createProfileError?.message.includes('expired')) {
+            setTimeout(() => fetchJobs(), 1000);
+            return;
+          }
+          throw new Error('Unable to create your profile');
         }
 
         console.log('Profile created successfully');
         setJobs([]);
         setError(null);
-        setRetryCount(0);
         return;
       }
 
@@ -396,47 +427,40 @@ const JobTracker = () => {
         
       if (error) {
         console.error('Job tracker query error:', error);
-        throw new Error(`Job data fetch failed: ${error.message}`);
+        // Silent retry for JWT/RLS issues
+        if (error.message.includes('JWT') || error.message.includes('expired') || error.message.includes('row-level security')) {
+          setTimeout(() => fetchJobs(), 1000);
+          return;
+        }
+        throw new Error('Unable to load your job applications');
       }
       
       console.log(`Successfully loaded ${data?.length || 0} jobs`);
       setJobs(data || []);
       setError(null);
-      setRetryCount(0);
       
     } catch (error: any) {
       console.error('Error fetching jobs:', error);
-      const errorMessage = error.message || 'Failed to load job tracker data';
-      setError(errorMessage);
+      const errorMessage = error.message || 'Unable to load job applications';
       
-      // Retry logic for certain errors
-      if (retryCount < 3 && (
-        errorMessage.includes('JWT') || 
-        errorMessage.includes('expired') || 
-        errorMessage.includes('row-level security')
-      )) {
-        console.log(`Retrying in 2 seconds... (attempt ${retryCount + 1}/3)`);
-        setTimeout(() => {
-          setRetryCount(prev => prev + 1);
-          fetchJobs();
-        }, 2000);
-        return;
+      // Only show user-friendly errors, never technical ones
+      if (!errorMessage.includes('JWT') && !errorMessage.includes('expired') && !errorMessage.includes('row-level security')) {
+        setError(errorMessage);
+        toast({
+          title: "Loading Issue",
+          description: errorMessage,
+          variant: "destructive"
+        });
       }
-      
-      toast({
-        title: "Error Loading Data",
-        description: errorMessage,
-        variant: "destructive"
-      });
     } finally {
       setLoading(false);
     }
-  }, [user, toast, retryCount]);
+  }, [user, toast]);
 
   // Manual refresh function
   const handleManualRefresh = useCallback(async () => {
     setLoading(true);
-    setRetryCount(0);
+    setError(null);
     await fetchJobs();
   }, [fetchJobs]);
   const handleAddJob = async () => {
