@@ -181,7 +181,7 @@ const JobTracker = () => {
     title: 'Saved',
     canAdd: true,
     bgColor: 'bg-blue-50',
-    textColor: 'text-blue-800',
+    textColor: 'text-blue-900',
     borderColor: 'border-blue-200',
     headerBg: 'bg-blue-100'
   }, {
@@ -189,7 +189,7 @@ const JobTracker = () => {
     title: 'Applied',
     canAdd: true,
     bgColor: 'bg-green-50',
-    textColor: 'text-green-800',
+    textColor: 'text-green-900',
     borderColor: 'border-green-200',
     headerBg: 'bg-green-100'
   }, {
@@ -197,7 +197,7 @@ const JobTracker = () => {
     title: 'Interview',
     canAdd: true,
     bgColor: 'bg-yellow-50',
-    textColor: 'text-yellow-800',
+    textColor: 'text-yellow-900',
     borderColor: 'border-yellow-200',
     headerBg: 'bg-yellow-100'
   }, {
@@ -205,7 +205,7 @@ const JobTracker = () => {
     title: 'Rejected',
     canAdd: false,
     bgColor: 'bg-red-50',
-    textColor: 'text-red-800',
+    textColor: 'text-red-900',
     borderColor: 'border-red-200',
     headerBg: 'bg-red-100'
   }, {
@@ -213,9 +213,9 @@ const JobTracker = () => {
     title: 'Offer',
     canAdd: false,
     bgColor: 'bg-emerald-50',
-    textColor: 'text-emerald-800',
+    textColor: 'text-emerald-900',
     borderColor: 'border-emerald-200',
-    headerBg: 'bg-emerald-700'
+    headerBg: 'bg-emerald-100'
   }];
 
   // Auto-refresh every 30 seconds
