@@ -54,7 +54,7 @@ const DroppableColumn = ({
     id: column.key
   });
   const isDropTarget = isOver && activeJobId;
-  return <div ref={setNodeRef} className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg w-full transition-all hover:shadow-lg ${isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''}`}>
+  return <div ref={setNodeRef} className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg flex-1 min-w-[280px] max-w-[320px] transition-all hover:shadow-lg ${isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''}`}>
       <div className={`${column.headerBg} p-4 rounded-t-lg border-b ${column.borderColor} flex items-center justify-between`}>
         <div className="flex items-center gap-2">
           <column.icon className="h-4 w-4 text-white" />
@@ -70,7 +70,7 @@ const DroppableColumn = ({
           </div>}
       </div>
 
-      <div className={`p-4 min-h-[450px] ${isDropTarget ? 'bg-black/5' : ''} transition-colors`}>
+      <div className={`p-4 min-h-[450px] bg-gray-900/90 ${isDropTarget ? 'bg-gray-800' : ''} transition-colors`}>
         <SortableContext items={jobs.map(job => job.id)} strategy={verticalListSortingStrategy}>
           <div className="space-y-3">
             {jobs.map(job => <SortableJobCard key={job.id} job={job} onDelete={onDeleteJob} onView={onViewJob} />)}
@@ -589,10 +589,10 @@ const JobTracker = () => {
         </header>
 
         {/* Main content area - responsive grid layout */}
-        <main className="flex-1 p-4 overflow-hidden">
+        <main className="flex-1 p-4 overflow-y-auto overflow-x-hidden">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-            {/* Responsive grid: 1 column on mobile, 2 on tablet, 5 on desktop */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4 h-full overflow-y-auto overflow-x-hidden">
+            {/* Responsive flex layout that wraps columns to new rows */}
+            <div className="flex flex-wrap gap-4 w-full">
               {columns.map(column => (
                 <DroppableColumn
                   key={column.key}
