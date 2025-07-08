@@ -665,7 +665,7 @@ const JobTracker = () => {
                 </div>
               </div>}
 
-            <p className="text-gray-100 font-inter max-w-4xl mx-auto leading-relaxed mb-3 font-extralight text-sm">
+            <p className="text-gray-100 font-inter max-w-4xl mx-auto leading-relaxed mb-3 font-extralight text-base">
               Drag the grip handle (⋮⋮) to move job applications between columns. Use the View button to see details or add new jobs using the + button.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-gray-300 font-medium">
