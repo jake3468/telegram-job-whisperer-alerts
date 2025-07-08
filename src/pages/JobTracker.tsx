@@ -544,40 +544,52 @@ const JobTracker = () => {
         </div>
       </Layout>;
   }
-  return <Layout>
-      <div className="flex flex-col min-h-screen bg-gradient-to-br from-black via-gray-950 to-fuchsia-950">
-        {/* HEADER SECTION - NO HORIZONTAL SCROLLING, TEXT WRAPS */}
-        <div className="text-center py-8 px-4">
-          <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-4">
-            Job Tracker
-          </h1>
-          <p className="text-gray-100 font-inter font-light text-base max-w-4xl mx-auto leading-relaxed px-4 sm:px-8 lg:px-0">
-            Drag and drop job applications between columns to track your progress. Click View to see details or add new jobs using the + button.
-          </p>
-        </div>
-
-        {/* KANBAN CARDS SECTION - ONLY THIS PART SCROLLS HORIZONTALLY */}
-        <div className="flex-grow overflow-hidden">
-          <div className="h-full flex flex-col">
-            <div className="flex-grow px-4 pb-4 overflow-x-auto overflow-y-hidden">
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-                <div className="flex gap-4 w-max h-full">
-                  {columns.map(column => <DroppableColumn key={column.key} column={column} jobs={getJobsByStatus(column.key)} onAddJob={() => {
-                  setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
-                  setIsModalOpen(true);
-                }} onDeleteJob={deleteJob} onViewJob={handleViewJob} activeJobId={activeJob?.id} />)}
-                </div>
-
-                <DragOverlay>
-                  {activeJob ? <div className="bg-gray-800 rounded-lg p-4 border border-gray-600 shadow-2xl transform rotate-3 min-w-[280px]">
-                      <h4 className="font-bold text-white text-sm font-orbitron">{activeJob.company_name}</h4>
-                      <p className="text-gray-300 text-xs">{activeJob.job_title}</p>
-                    </div> : null}
-                </DragOverlay>
-              </DndContext>
-            </div>
+  return (
+    <Layout>
+      <div className="bg-gradient-to-br from-black via-gray-950 to-fuchsia-950 min-h-screen">
+        {/* FIXED HEADER */}
+        <header className="fixed top-0 left-0 right-0 z-10 bg-black/50 backdrop-blur-sm">
+          <div className="text-center py-6 px-4">
+            <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-4">
+              Job Tracker
+            </h1>
+            <p className="text-gray-100 font-inter font-light text-base max-w-4xl mx-auto leading-relaxed">
+              Drag and drop job applications between columns to track your progress. Click View to see details or add new jobs using the + button.
+            </p>
           </div>
-        </div>
+        </header>
+
+        {/* SCROLLABLE KANBAN BOARD CONTENT */}
+        <main className="pt-36"> {/* Padding top to offset for fixed header */}
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+            <div className="px-4 pb-8 overflow-x-auto">
+              <div className="flex gap-4 w-max">
+                {columns.map(column => (
+                  <DroppableColumn
+                    key={column.key}
+                    column={column}
+                    jobs={getJobsByStatus(column.key)}
+                    onAddJob={() => {
+                      setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
+                      setIsModalOpen(true);
+                    }}
+                    onDeleteJob={deleteJob}
+                    onViewJob={handleViewJob}
+                    activeJobId={activeJob?.id}
+                  />
+                ))}
+              </div>
+            </div>
+            <DragOverlay>
+              {activeJob ? (
+                <div className="bg-gray-800 rounded-lg p-4 border border-gray-600 shadow-2xl transform rotate-3 min-w-[280px]">
+                  <h4 className="font-bold text-white text-sm font-orbitron">{activeJob.company_name}</h4>
+                  <p className="text-gray-300 text-xs">{activeJob.job_title}</p>
+                </div>
+              ) : null}
+            </DragOverlay>
+          </DndContext>
+        </main>
       </div>
 
       {/* Add Job Modal */}
@@ -681,6 +693,7 @@ const JobTracker = () => {
             </div>}
         </DialogContent>
       </Dialog>
-    </Layout>;
+    </Layout>
+  );
 };
 export default JobTracker;
