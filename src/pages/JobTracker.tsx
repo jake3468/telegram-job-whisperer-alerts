@@ -545,9 +545,9 @@ const JobTracker = () => {
       </Layout>;
   }
   return <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-black via-gray-950 to-fuchsia-950">
-        {/* Header - Fixed width, no viewport overflow */}
-        <div className="w-full text-center py-8 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-950 to-fuchsia-950 overflow-x-hidden">
+        {/* Header - COMPLETELY FIXED, never moves */}
+        <div className="text-center py-8 px-4">
           <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-4">
             Job Tracker
           </h1>
@@ -556,13 +556,11 @@ const JobTracker = () => {
           </p>
         </div>
 
-        {/* Kanban Cards Container - Horizontal scroll contained within */}
-        <div className="w-full max-w-full overflow-hidden px-4">
+        {/* Kanban Cards - ONLY this scrolls horizontally */}
+        <div className="px-4">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-            <div className="overflow-x-auto overflow-y-hidden bg-black/20 rounded-lg p-4">
-              <div className="flex gap-4 pb-4" style={{
-              minWidth: 'calc(280px * 5 + 16px * 4)'
-            }}>
+            <div className="overflow-x-auto overflow-y-hidden scrollbar-hide">
+              <div className="flex gap-4 pb-4 w-max">
                 {columns.map(column => <DroppableColumn key={column.key} column={column} jobs={getJobsByStatus(column.key)} onAddJob={() => {
                 setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
                 setIsModalOpen(true);
