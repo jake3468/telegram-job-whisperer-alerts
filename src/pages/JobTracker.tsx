@@ -117,10 +117,10 @@ const SortableJobCard = ({
       {/* Drag Handle - Only this area is draggable */}
       <div 
         {...listeners}
-        className="absolute top-2 right-2 p-1 rounded cursor-grab active:cursor-grabbing hover:bg-gray-700 transition-colors opacity-0 group-hover:opacity-100"
+        className="absolute top-2 right-2 p-2 rounded cursor-grab active:cursor-grabbing hover:bg-gray-700 transition-colors bg-gray-700/30 hover:bg-gray-700/50 touch-manipulation"
         title="Drag to move between columns"
       >
-        <GripVertical className="h-4 w-4 text-gray-400 hover:text-gray-200" />
+        <GripVertical className="h-4 w-4 text-gray-300 hover:text-gray-100" />
       </div>
 
       <div className="flex items-start justify-between mb-3 pr-8">
