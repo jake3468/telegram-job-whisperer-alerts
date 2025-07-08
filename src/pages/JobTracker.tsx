@@ -168,20 +168,24 @@ const JobTracker = () => {
     job_description: '',
     job_url: ''
   });
-  const sensors = useSensors(useSensor(PointerSensor, {
-    activationConstraint: {
-      distance: 8
-    }
-  }), useSensor(TouchSensor, {
-    activationConstraint: {
-      delay: 250,
-      tolerance: 5
-    }
-  }), useSensor(MouseSensor, {
-    activationConstraint: {
-      distance: 8
-    }
-  }));
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 10,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 500,
+        tolerance: 8,
+      },
+    }),
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 10,
+      },
+    })
+  );
   const columns = [{
     key: 'saved',
     title: 'Saved',
@@ -229,12 +233,25 @@ const JobTracker = () => {
     headerBg: 'bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700'
   }];
 
-  // Auto-refresh every 30 seconds
+  // Auto-refresh every 10 seconds and on visibility change
   useEffect(() => {
     if (user) {
       fetchJobs();
-      const interval = setInterval(fetchJobs, 30000);
-      return () => clearInterval(interval);
+      const interval = setInterval(fetchJobs, 10000);
+      
+      // Handle page visibility changes
+      const handleVisibilityChange = () => {
+        if (!document.hidden) {
+          fetchJobs();
+        }
+      };
+      
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      
+      return () => {
+        clearInterval(interval);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
     }
   }, [user]);
   useEffect(() => {
@@ -557,10 +574,10 @@ const JobTracker = () => {
   }
   return (
     <Layout>
-      {/* Main container with full height and proper overflow handling */}
-      <div className="flex flex-col h-screen overflow-hidden bg-gradient-to-br from-black via-gray-950 to-fuchsia-950">
+      {/* Main container with scrollable content */}
+      <div className="flex flex-col min-h-screen bg-gradient-to-br from-black via-gray-950 to-fuchsia-950">
         
-        {/* Header section */}
+        {/* Header section - scrollable */}
         <header className="py-6 px-4">
           <div className="text-center">
             <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-4">
@@ -584,7 +601,7 @@ const JobTracker = () => {
         </header>
 
         {/* Main content area - responsive flexbox layout */}
-        <main className="flex-1 p-4 overflow-y-auto overflow-x-hidden">
+        <main className="flex-1 p-4 overflow-x-auto">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             {/* Responsive flexbox: stacked on mobile, wrapped on larger screens */}
             <div className="flex flex-col md:flex-row md:flex-wrap gap-4 w-full">
