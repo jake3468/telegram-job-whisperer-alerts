@@ -544,20 +544,23 @@ const JobTracker = () => {
         </div>
       </Layout>;
   }
-  return <Layout>
-      <div className="flex flex-col min-h-screen">
-        {/* Fixed Header - Centered to Full Viewport Width */}
-        <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] text-center mb-8 px-4">
+  return (
+    <>
+      {/* Fixed Header - Full Viewport Width, Outside Layout Constraints */}
+      <div className="fixed top-0 left-0 w-full bg-gradient-to-br from-black via-gray-950 to-fuchsia-950 z-10 pt-16 pb-8">
+        <div className="text-center">
           <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-2">
             Job Tracker
           </h1>
-          <p className="text-gray-100 font-inter font-light text-base max-w-4xl mx-auto">
+          <p className="text-gray-100 font-inter font-light text-base max-w-4xl mx-auto px-4">
             Drag and drop job applications between columns to track your progress. Click View to see details or add new jobs using the + button.
           </p>
         </div>
+      </div>
 
-        {/* Kanban Cards Container - Independent Scrollable Section */}
-        <div className="flex-1">
+      <Layout>
+        <div className="pt-32"> {/* Add top padding to account for fixed header */}
+          {/* Kanban Cards Container - Independent Scrollable Section */}
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <div className="overflow-x-auto overflow-y-hidden">
               <div className="flex gap-4 pb-4 px-4" style={{
@@ -578,7 +581,7 @@ const JobTracker = () => {
             </DragOverlay>
           </DndContext>
         </div>
-      </div>
+      </Layout>
 
       {/* Add Job Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -681,6 +684,7 @@ const JobTracker = () => {
             </div>}
         </DialogContent>
       </Dialog>
-    </Layout>;
+    </>
+  );
 };
 export default JobTracker;
