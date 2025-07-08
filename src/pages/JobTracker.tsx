@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, ExternalLink, Trash2, X } from 'lucide-react';
+import { Plus, ExternalLink, Trash2, X, Bookmark, Send, Users, XCircle, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -56,9 +56,12 @@ const DroppableColumn = ({
   const isDropTarget = isOver && activeJobId;
   return <div ref={setNodeRef} className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg flex-1 min-w-[280px] max-w-[400px] flex-shrink-0 transition-all hover:shadow-lg ${isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''}`}>
       <div className={`${column.headerBg} p-4 rounded-t-lg border-b ${column.borderColor} flex items-center justify-between`}>
-        <h3 className={`font-orbitron font-bold text-sm ${column.textColor}`}>
-          {column.title} ({jobs.length})
-        </h3>
+        <div className="flex items-center gap-2">
+          <column.icon className="h-4 w-4 text-white" />
+          <h3 className={`font-orbitron font-bold text-sm ${column.textColor}`}>
+            {column.title} ({jobs.length})
+          </h3>
+        </div>
         {column.canAdd && <Button size="sm" variant="ghost" className={`${column.textColor} hover:bg-black/10 h-8 w-8 p-0`} onClick={onAddJob}>
             <Plus className="h-4 w-4" />
           </Button>}
@@ -178,39 +181,44 @@ const JobTracker = () => {
   }));
   const columns = [{
     key: 'saved',
-    title: '💾 Saved',
+    title: 'Saved',
+    icon: Bookmark,
     canAdd: true,
     bgColor: 'bg-blue-50',
-    textColor: 'text-blue-800',
+    textColor: 'text-white',
     borderColor: 'border-blue-200',
     headerBg: 'bg-blue-600'
   }, {
     key: 'applied',
-    title: '📩 Applied',
+    title: 'Applied',
+    icon: Send,
     canAdd: true,
     bgColor: 'bg-green-50',
-    textColor: 'text-green-800',
+    textColor: 'text-white',
     borderColor: 'border-green-200',
     headerBg: 'bg-green-600'
   }, {
     key: 'interview',
-    title: '👔 Interview',
+    title: 'Interview',
+    icon: Users,
     canAdd: true,
     bgColor: 'bg-yellow-50',
-    textColor: 'text-yellow-800',
+    textColor: 'text-white',
     borderColor: 'border-yellow-200',
     headerBg: 'bg-yellow-600'
   }, {
     key: 'rejected',
-    title: '❌ Rejected',
+    title: 'Rejected',
+    icon: XCircle,
     canAdd: false,
     bgColor: 'bg-red-50',
-    textColor: 'text-red-800',
+    textColor: 'text-white',
     borderColor: 'border-red-200',
     headerBg: 'bg-red-600'
   }, {
     key: 'offer',
-    title: '🎉 Offer',
+    title: 'Offer',
+    icon: Trophy,
     canAdd: false,
     bgColor: 'bg-emerald-50',
     textColor: 'text-white',
