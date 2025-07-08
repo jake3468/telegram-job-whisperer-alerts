@@ -184,56 +184,56 @@ const JobTracker = () => {
   }));
   const columns = [{
     key: 'saved',
-    title: 'Stage 1: Saved',
+    title: 'Saved',
     icon: Bookmark,
     canAdd: true,
-    bgColor: 'bg-gray-900/80',
+    bgColor: 'bg-blue-50',
     textColor: 'text-white',
-    borderColor: 'border-blue-500',
+    borderColor: 'border-blue-200',
     headerBg: 'bg-blue-600'
   }, {
     key: 'applied',
-    title: 'Stage 2: Applied',
+    title: 'Applied',
     icon: Send,
     canAdd: true,
-    bgColor: 'bg-gray-900/80',
+    bgColor: 'bg-green-50',
     textColor: 'text-white',
-    borderColor: 'border-teal-500',
-    headerBg: 'bg-teal-600'
+    borderColor: 'border-green-200',
+    headerBg: 'bg-green-600'
   }, {
     key: 'interview',
-    title: 'Stage 3: Interview',
+    title: 'Interview',
     icon: Users,
     canAdd: true,
-    bgColor: 'bg-gray-900/80',
+    bgColor: 'bg-yellow-50',
     textColor: 'text-white',
-    borderColor: 'border-yellow-500',
+    borderColor: 'border-yellow-200',
     headerBg: 'bg-yellow-600'
   }, {
     key: 'rejected',
-    title: 'Stage 4: Rejected',
+    title: 'Rejected',
     icon: XCircle,
     canAdd: false,
-    bgColor: 'bg-gray-900/80',
+    bgColor: 'bg-red-50',
     textColor: 'text-white',
-    borderColor: 'border-red-500',
+    borderColor: 'border-red-200',
     headerBg: 'bg-red-600'
   }, {
     key: 'offer',
-    title: 'Stage 5: Offer',
+    title: 'Offer',
     icon: Trophy,
     canAdd: false,
-    bgColor: 'bg-gray-900/80',
+    bgColor: 'bg-emerald-50',
     textColor: 'text-white',
-    borderColor: 'border-green-500',
-    headerBg: 'bg-gradient-to-r from-green-500 via-emerald-500 to-green-600'
+    borderColor: 'border-yellow-300',
+    headerBg: 'bg-gradient-to-r from-yellow-500 via-orange-500 to-yellow-600'
   }];
 
-  // Auto-refresh every 10 seconds to handle JWT expiry
+  // Auto-refresh every 30 seconds
   useEffect(() => {
     if (user) {
       fetchJobs();
-      const interval = setInterval(fetchJobs, 10000);
+      const interval = setInterval(fetchJobs, 30000);
       return () => clearInterval(interval);
     }
   }, [user]);
@@ -252,11 +252,6 @@ const JobTracker = () => {
       } = await supabase.from('users').select('id').eq('clerk_id', user?.id).maybeSingle();
       if (userError) {
         console.error('User lookup error:', userError);
-        if (userError.code === 'PGRST301') {
-          // JWT expired, user will need to refresh/re-authenticate
-          console.log('JWT expired, skipping data fetch');
-          return;
-        }
         return;
       }
       if (!userData) {
@@ -577,22 +572,22 @@ const JobTracker = () => {
             <div className="flex items-center justify-center gap-3 text-sm text-gray-300 font-medium">
               <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs">Saved</span>
               <span>→</span>
-              <span className="bg-teal-600 text-white px-2 py-1 rounded text-xs">Applied</span>
+              <span className="bg-green-600 text-white px-2 py-1 rounded text-xs">Applied</span>
               <span>→</span>
               <span className="bg-yellow-600 text-white px-2 py-1 rounded text-xs">Interview</span>
               <span>→</span>
               <span className="bg-red-600 text-white px-2 py-1 rounded text-xs">Rejected</span>
               <span className="text-gray-400">|</span>
-              <span className="bg-gradient-to-r from-green-400 to-emerald-500 text-white px-2 py-1 rounded text-xs font-bold">🎉 Offer</span>
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded text-xs font-bold">🎉 Offer</span>
             </div>
           </div>
         </header>
 
         {/* Main content area - responsive grid layout */}
-        <main className="flex-1 p-4 overflow-hidden">
+        <main className="flex-1 p-4 overflow-y-auto">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             {/* Responsive grid: 1 column on mobile, 2 on tablet, 5 on desktop */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4 h-full overflow-y-auto overflow-x-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4 w-full max-w-full">
               {columns.map(column => (
                 <DroppableColumn
                   key={column.key}
