@@ -82,16 +82,37 @@ const JobTracker = () => {
   }, [user]);
   const fetchJobs = async () => {
     try {
-      const {
-        data: userProfile
-      } = await supabase.from('user_profile').select('id').eq('user_id', user?.id).single();
-      if (!userProfile) return;
-      const {
-        data,
-        error
-      } = await supabase.from('job_tracker').select('*').eq('user_id', userProfile.id).order('order_position', {
-        ascending: true
-      });
+      // First get the user UUID from users table using clerk_id
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('clerk_id', user?.id)
+        .single();
+
+      if (userError || !userData) {
+        console.error('User not found:', userError);
+        return;
+      }
+
+      // Then get user profile using the user UUID
+      const { data: userProfile, error: profileError } = await supabase
+        .from('user_profile')
+        .select('id')
+        .eq('user_id', userData.id)
+        .single();
+
+      if (profileError || !userProfile) {
+        console.error('User profile not found:', profileError);
+        return;
+      }
+
+      // Finally get jobs for this user profile
+      const { data, error } = await supabase
+        .from('job_tracker')
+        .select('*')
+        .eq('user_id', userProfile.id)
+        .order('order_position', { ascending: true });
+
       if (error) throw error;
       setJobs(data || []);
     } catch (error) {
@@ -115,14 +136,32 @@ const JobTracker = () => {
       return;
     }
     try {
-      const {
-        data: userProfile
-      } = await supabase.from('user_profile').select('id').eq('user_id', user?.id).single();
-      if (!userProfile) throw new Error('User profile not found');
+      // First get the user UUID from users table using clerk_id
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('clerk_id', user?.id)
+        .single();
+
+      if (userError || !userData) {
+        console.error('User not found:', userError);
+        throw new Error('User not found');
+      }
+
+      // Then get user profile using the user UUID
+      const { data: userProfile, error: profileError } = await supabase
+        .from('user_profile')
+        .select('id')
+        .eq('user_id', userData.id)
+        .single();
+
+      if (profileError || !userProfile) {
+        console.error('User profile not found:', profileError);
+        throw new Error('User profile not found');
+      }
+
       const maxOrder = Math.max(...jobs.filter(job => job.status === selectedStatus).map(job => job.order_position), -1);
-      const {
-        error
-      } = await supabase.from('job_tracker').insert({
+      const { error } = await supabase.from('job_tracker').insert({
         user_id: userProfile.id,
         company_name: formData.company_name,
         job_title: formData.job_title,
