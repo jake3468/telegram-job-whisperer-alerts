@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import ResumeBuilder from "./pages/ResumeBuilder";
 import JobAlerts from "./pages/JobAlerts";
 import GetMoreCredits from "./pages/GetMoreCredits";
+import JobTracker from "./pages/JobTracker";
 import Upgrade from "./pages/Upgrade";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
@@ -43,6 +44,7 @@ const AppWithSync = () => {
         <Route path="/resume-builder" element={<ResumeBuilder />} />
         <Route path="/job-alerts" element={<JobAlerts />} />
         <Route path="/get-more-credits" element={<GetMoreCredits />} />
+        <Route path="/job-tracker" element={<JobTracker />} />
         <Route path="/upgrade" element={<Upgrade />} />
         <Route path="/blogs" element={<Blogs />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
