@@ -223,10 +223,10 @@ const JobTracker = () => {
     title: 'Offer',
     icon: Trophy,
     canAdd: false,
-    bgColor: 'bg-emerald-50',
+    bgColor: 'bg-purple-50',
     textColor: 'text-white',
-    borderColor: 'border-yellow-300',
-    headerBg: 'bg-gradient-to-r from-yellow-500 via-orange-500 to-yellow-600'
+    borderColor: 'border-purple-300',
+    headerBg: 'bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700'
   }];
 
   // Auto-refresh every 30 seconds
@@ -578,7 +578,7 @@ const JobTracker = () => {
               <span className="hidden sm:inline">→</span>
               <span className="bg-red-600 text-white px-2 py-1 rounded text-xs">Rejected</span>
               <span className="text-gray-400 hidden sm:inline">|</span>
-              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded text-xs font-bold">🎉 Offer</span>
+              <span className="bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 text-white px-2 py-1 rounded text-xs font-bold">🎉 Offer</span>
             </div>
           </div>
         </header>
