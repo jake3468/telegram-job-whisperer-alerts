@@ -181,7 +181,7 @@ const JobTracker = () => {
     title: 'Saved',
     canAdd: true,
     bgColor: 'bg-blue-50',
-    textColor: 'text-blue-900',
+    textColor: 'text-blue-800',
     borderColor: 'border-blue-200',
     headerBg: 'bg-blue-100'
   }, {
@@ -189,7 +189,7 @@ const JobTracker = () => {
     title: 'Applied',
     canAdd: true,
     bgColor: 'bg-green-50',
-    textColor: 'text-green-900',
+    textColor: 'text-green-800',
     borderColor: 'border-green-200',
     headerBg: 'bg-green-100'
   }, {
@@ -197,7 +197,7 @@ const JobTracker = () => {
     title: 'Interview',
     canAdd: true,
     bgColor: 'bg-yellow-50',
-    textColor: 'text-yellow-900',
+    textColor: 'text-yellow-800',
     borderColor: 'border-yellow-200',
     headerBg: 'bg-yellow-100'
   }, {
@@ -205,7 +205,7 @@ const JobTracker = () => {
     title: 'Rejected',
     canAdd: false,
     bgColor: 'bg-red-50',
-    textColor: 'text-red-900',
+    textColor: 'text-red-800',
     borderColor: 'border-red-200',
     headerBg: 'bg-red-100'
   }, {
@@ -213,9 +213,9 @@ const JobTracker = () => {
     title: 'Offer',
     canAdd: false,
     bgColor: 'bg-emerald-50',
-    textColor: 'text-emerald-900',
+    textColor: 'text-emerald-800',
     borderColor: 'border-emerald-200',
-    headerBg: 'bg-emerald-100'
+    headerBg: 'bg-emerald-700'
   }];
 
   // Auto-refresh every 30 seconds
@@ -544,23 +544,20 @@ const JobTracker = () => {
         </div>
       </Layout>;
   }
-  return (
-    <>
-      {/* Fixed Header - Full Viewport Width, Outside Layout Constraints */}
-      <div className="fixed top-0 left-0 w-full bg-gradient-to-br from-black via-gray-950 to-fuchsia-950 z-10 pt-16 pb-8">
-        <div className="text-center">
+  return <Layout>
+      <div className="flex flex-col min-h-screen">
+        {/* Fixed Header - Centered to Full Viewport Width */}
+        <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] text-center mb-8 px-4">
           <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-2">
             Job Tracker
           </h1>
-          <p className="text-gray-100 font-inter font-light text-base max-w-4xl mx-auto px-4">
+          <p className="text-gray-100 font-inter font-light text-base max-w-4xl mx-auto">
             Drag and drop job applications between columns to track your progress. Click View to see details or add new jobs using the + button.
           </p>
         </div>
-      </div>
 
-      <Layout>
-        <div className="pt-32"> {/* Add top padding to account for fixed header */}
-          {/* Kanban Cards Container - Independent Scrollable Section */}
+        {/* Kanban Cards Container - Independent Scrollable Section */}
+        <div className="flex-1">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <div className="overflow-x-auto overflow-y-hidden">
               <div className="flex gap-4 pb-4 px-4" style={{
@@ -581,7 +578,7 @@ const JobTracker = () => {
             </DragOverlay>
           </DndContext>
         </div>
-      </Layout>
+      </div>
 
       {/* Add Job Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -684,7 +681,6 @@ const JobTracker = () => {
             </div>}
         </DialogContent>
       </Dialog>
-    </>
-  );
+    </Layout>;
 };
 export default JobTracker;
