@@ -530,7 +530,8 @@ const JobTracker = () => {
 
   return (
     <Layout>
-      <div className="mb-8 text-center">
+      {/* Fixed Header - Centered to Page */}
+      <div className="mb-8 text-center w-full">
         <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-2">
           Job Tracker
         </h1>
@@ -539,14 +540,15 @@ const JobTracker = () => {
         </p>
       </div>
 
+      {/* Kanban Cards Container - Separate Horizontal Scroll */}
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="overflow-x-auto overflow-y-hidden">
-          <div className="flex gap-4 pb-4 min-w-max">
+        <div className="w-full overflow-x-auto overflow-y-hidden">
+          <div className="flex gap-4 pb-4" style={{ width: 'max-content' }}>
             {columns.map((column) => (
               <DroppableColumn
                 key={column.key}
