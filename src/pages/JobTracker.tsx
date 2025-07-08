@@ -561,11 +561,11 @@ const JobTracker = () => {
           </div>
         </header>
 
-        {/* 3. Main content area expands to fill remaining space and handles scrolling */}
-        <main className="flex-1 p-4 overflow-x-auto overflow-y-hidden">
+        {/* 3. Main content area with wrapping layout instead of horizontal scroll */}
+        <main className="flex-1 p-4 overflow-y-auto">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-            {/* w-max and h-full ensure the inner container is wide enough to scroll */}
-            <div className="flex gap-4 w-max h-full">
+            {/* Flex wrap layout - columns wrap to new rows instead of horizontal scroll */}
+            <div className="flex flex-wrap gap-4 h-full">
               {columns.map(column => (
                 <DroppableColumn
                   key={column.key}
