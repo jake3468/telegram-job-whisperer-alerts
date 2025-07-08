@@ -54,7 +54,7 @@ const DroppableColumn = ({
     id: column.key
   });
   const isDropTarget = isOver && activeJobId;
-  return <div ref={setNodeRef} className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg flex-1 min-w-[280px] max-w-[400px] flex-shrink-0 transition-all hover:shadow-lg ${isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''}`}>
+  return <div ref={setNodeRef} className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg w-full sm:flex-1 sm:min-w-[280px] sm:max-w-[400px] transition-all hover:shadow-lg ${isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''}`}>
       <div className={`${column.headerBg} p-4 rounded-t-lg border-b ${column.borderColor} flex items-center justify-between`}>
         <div className="flex items-center gap-2">
           <column.icon className="h-4 w-4 text-white" />
@@ -184,7 +184,7 @@ const JobTracker = () => {
   }));
   const columns = [{
     key: 'saved',
-    title: 'Saved',
+    title: 'Stage 1: Saved',
     icon: Bookmark,
     canAdd: true,
     bgColor: 'bg-blue-50',
@@ -193,16 +193,16 @@ const JobTracker = () => {
     headerBg: 'bg-blue-600'
   }, {
     key: 'applied',
-    title: 'Applied',
+    title: 'Stage 2: Applied',
     icon: Send,
     canAdd: true,
-    bgColor: 'bg-green-50',
+    bgColor: 'bg-teal-50',
     textColor: 'text-white',
-    borderColor: 'border-green-200',
-    headerBg: 'bg-green-600'
+    borderColor: 'border-teal-200',
+    headerBg: 'bg-teal-600'
   }, {
     key: 'interview',
-    title: 'Interview',
+    title: 'Stage 3: Interview',
     icon: Users,
     canAdd: true,
     bgColor: 'bg-yellow-50',
@@ -211,7 +211,7 @@ const JobTracker = () => {
     headerBg: 'bg-yellow-600'
   }, {
     key: 'rejected',
-    title: 'Rejected',
+    title: 'Stage 4: Rejected',
     icon: XCircle,
     canAdd: false,
     bgColor: 'bg-red-50',
@@ -220,20 +220,20 @@ const JobTracker = () => {
     headerBg: 'bg-red-600'
   }, {
     key: 'offer',
-    title: 'Offer',
+    title: 'Stage 5: Offer',
     icon: Trophy,
     canAdd: false,
-    bgColor: 'bg-emerald-50',
+    bgColor: 'bg-green-50',
     textColor: 'text-white',
-    borderColor: 'border-yellow-300',
-    headerBg: 'bg-gradient-to-r from-yellow-500 via-orange-500 to-yellow-600'
+    borderColor: 'border-green-200',
+    headerBg: 'bg-gradient-to-r from-green-500 via-emerald-500 to-green-600'
   }];
 
-  // Auto-refresh every 30 seconds
+  // Auto-refresh every 10 seconds
   useEffect(() => {
     if (user) {
       fetchJobs();
-      const interval = setInterval(fetchJobs, 30000);
+      const interval = setInterval(fetchJobs, 10000);
       return () => clearInterval(interval);
     }
   }, [user]);
@@ -572,13 +572,13 @@ const JobTracker = () => {
             <div className="flex items-center justify-center gap-3 text-sm text-gray-300 font-medium">
               <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs">Saved</span>
               <span>→</span>
-              <span className="bg-green-600 text-white px-2 py-1 rounded text-xs">Applied</span>
+              <span className="bg-teal-600 text-white px-2 py-1 rounded text-xs">Applied</span>
               <span>→</span>
               <span className="bg-yellow-600 text-white px-2 py-1 rounded text-xs">Interview</span>
               <span>→</span>
               <span className="bg-red-600 text-white px-2 py-1 rounded text-xs">Rejected</span>
               <span className="text-gray-400">|</span>
-              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded text-xs font-bold">🎉 Offer</span>
+              <span className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-2 py-1 rounded text-xs font-bold">🎉 Offer</span>
             </div>
           </div>
         </header>
@@ -586,8 +586,8 @@ const JobTracker = () => {
         {/* 3. Main content area with wrapping layout instead of horizontal scroll */}
         <main className="flex-1 p-4 overflow-y-auto">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-            {/* Flex wrap layout - columns wrap to new rows instead of horizontal scroll */}
-            <div className="flex flex-wrap gap-4 h-full">
+            {/* Mobile-first vertical stack, desktop horizontal layout */}
+            <div className="flex flex-col sm:flex-row gap-4 h-full overflow-x-auto">
               {columns.map(column => (
                 <DroppableColumn
                   key={column.key}
