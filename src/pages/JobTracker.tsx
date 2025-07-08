@@ -673,7 +673,7 @@ const JobTracker = () => {
               Drag the grip handle (⋮⋮) to move job applications between columns. Use the View button to see details or add new jobs using the + button.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-gray-300 font-medium">
-              <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs">Saved</span>
+              <span className="bg-blue-600 text-white px-2 py-1 rounded text-base">Saved</span>
               <span className="hidden sm:inline">→</span>
               <span className="bg-green-600 text-white px-2 py-1 rounded text-xs">Applied</span>
               <span className="hidden sm:inline">→</span>
