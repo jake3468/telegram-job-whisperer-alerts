@@ -171,13 +171,13 @@ const JobTracker = () => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 10,
+        distance: 15,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 500,
-        tolerance: 8,
+        delay: 1000, // 1 second hold required
+        tolerance: 15, // Allow more movement before canceling
       },
     }),
     useSensor(MouseSensor, {
