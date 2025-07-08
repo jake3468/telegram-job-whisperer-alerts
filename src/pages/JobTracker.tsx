@@ -117,10 +117,14 @@ const SortableJobCard = ({
       {/* Drag Handle - Only this area is draggable */}
       <div 
         {...listeners}
-        className="absolute top-2 right-2 p-2 rounded cursor-grab active:cursor-grabbing hover:bg-gray-700 transition-colors bg-gray-700/30 hover:bg-gray-700/50 touch-manipulation"
+        className="absolute top-2 right-2 p-3 md:p-2 rounded cursor-grab active:cursor-grabbing hover:bg-gray-700 transition-colors bg-gray-700/50 hover:bg-gray-700/70 touch-manipulation select-none"
         title="Drag to move between columns"
+        style={{ touchAction: 'none' }}
+        onTouchStart={(e) => {
+          e.preventDefault();
+        }}
       >
-        <GripVertical className="h-4 w-4 text-gray-300 hover:text-gray-100" />
+        <GripVertical className="h-5 w-5 md:h-4 md:w-4 text-gray-200 hover:text-gray-100" />
       </div>
 
       <div className="flex items-start justify-between mb-3 pr-8">
@@ -207,18 +211,18 @@ const JobTracker = () => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 10,
+        distance: 8,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 300, // 300ms hold for better responsiveness
-        tolerance: 15, // Allow some movement before canceling
+        delay: 150, // Reduced delay for better mobile responsiveness
+        tolerance: 8, // Reduced tolerance for more accurate touch
       },
     }),
     useSensor(MouseSensor, {
       activationConstraint: {
-        distance: 10,
+        distance: 8,
       },
     })
   );
@@ -295,18 +299,25 @@ const JobTracker = () => {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
-  const fetchJobs = useCallback(async () => {
+  const fetchJobs = useCallback(async (retryCount = 0) => {
     if (!user) return;
     
     setError(null);
-    console.log(`Fetching jobs for user: ${user.id}`);
+    console.log(`Fetching jobs for user: ${user.id} (attempt ${retryCount + 1})`);
     
     try {
       // Silent token refresh for JWT expiry issues
       const { data: sessionData } = await supabase.auth.getSession();
       if (!sessionData.session) {
         console.log('No active session, attempting refresh...');
-        await supabase.auth.refreshSession();
+        const { error: refreshError } = await supabase.auth.refreshSession();
+        if (refreshError) {
+          console.error('Token refresh failed:', refreshError);
+          if (retryCount < 2) {
+            setTimeout(() => fetchJobs(retryCount + 1), 1000);
+            return;
+          }
+        }
       }
 
       // First get the user UUID from users table using clerk_id
@@ -321,9 +332,10 @@ const JobTracker = () => {
         // Don't show JWT/RLS errors to users - handle silently
         if (userError.message.includes('JWT') || userError.message.includes('expired') || userError.message.includes('row-level security')) {
           console.log('Silent authentication issue, retrying...');
-          // Silent retry without user notification
-          setTimeout(() => fetchJobs(), 1000);
-          return;
+          if (retryCount < 3) {
+            setTimeout(() => fetchJobs(retryCount + 1), 1000 * (retryCount + 1));
+            return;
+          }
         }
         throw new Error('Unable to load your profile');
       }
@@ -346,8 +358,10 @@ const JobTracker = () => {
           console.error('Failed to create user:', createUserError);
           // Silent retry for creation issues
           if (createUserError?.message.includes('JWT') || createUserError?.message.includes('expired')) {
-            setTimeout(() => fetchJobs(), 1000);
-            return;
+            if (retryCount < 3) {
+              setTimeout(() => fetchJobs(retryCount + 1), 1000 * (retryCount + 1));
+              return;
+            }
           }
           throw new Error('Unable to set up your account');
         }
@@ -363,8 +377,10 @@ const JobTracker = () => {
           console.error('Failed to create user profile:', profileError);
           // Silent retry for profile creation issues
           if (profileError?.message.includes('JWT') || profileError?.message.includes('expired')) {
-            setTimeout(() => fetchJobs(), 1000);
-            return;
+            if (retryCount < 3) {
+              setTimeout(() => fetchJobs(retryCount + 1), 1000 * (retryCount + 1));
+              return;
+            }
           }
           throw new Error('Unable to complete account setup');
         }
@@ -386,8 +402,10 @@ const JobTracker = () => {
         console.error('User profile lookup error:', profileError);
         // Silent retry for JWT/RLS issues
         if (profileError.message.includes('JWT') || profileError.message.includes('expired') || profileError.message.includes('row-level security')) {
-          setTimeout(() => fetchJobs(), 1000);
-          return;
+          if (retryCount < 3) {
+            setTimeout(() => fetchJobs(retryCount + 1), 1000 * (retryCount + 1));
+            return;
+          }
         }
         throw new Error('Unable to access your profile');
       }
@@ -405,8 +423,10 @@ const JobTracker = () => {
           console.error('Failed to create profile:', createProfileError);
           // Silent retry for creation issues
           if (createProfileError?.message.includes('JWT') || createProfileError?.message.includes('expired')) {
-            setTimeout(() => fetchJobs(), 1000);
-            return;
+            if (retryCount < 3) {
+              setTimeout(() => fetchJobs(retryCount + 1), 1000 * (retryCount + 1));
+              return;
+            }
           }
           throw new Error('Unable to create your profile');
         }
@@ -429,8 +449,10 @@ const JobTracker = () => {
         console.error('Job tracker query error:', error);
         // Silent retry for JWT/RLS issues
         if (error.message.includes('JWT') || error.message.includes('expired') || error.message.includes('row-level security')) {
-          setTimeout(() => fetchJobs(), 1000);
-          return;
+          if (retryCount < 3) {
+            setTimeout(() => fetchJobs(retryCount + 1), 1000 * (retryCount + 1));
+            return;
+          }
         }
         throw new Error('Unable to load your job applications');
       }
