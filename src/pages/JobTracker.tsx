@@ -54,7 +54,7 @@ const DroppableColumn = ({
     id: column.key
   });
   const isDropTarget = isOver && activeJobId;
-  return <div ref={setNodeRef} className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg w-full sm:flex-1 sm:min-w-[280px] sm:max-w-[400px] transition-all hover:shadow-lg ${isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''}`}>
+  return <div ref={setNodeRef} className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg w-full transition-all hover:shadow-lg ${isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''}`}>
       <div className={`${column.headerBg} p-4 rounded-t-lg border-b ${column.borderColor} flex items-center justify-between`}>
         <div className="flex items-center gap-2">
           <column.icon className="h-4 w-4 text-white" />
@@ -557,10 +557,10 @@ const JobTracker = () => {
   }
   return (
     <Layout>
-      {/* 1. Main container uses flexbox to control the layout */}
+      {/* Main container with full height and proper overflow handling */}
       <div className="flex flex-col h-screen overflow-hidden bg-gradient-to-br from-black via-gray-950 to-fuchsia-950">
         
-        {/* 2. Header is now a regular flex item, not fixed */}
+        {/* Header section */}
         <header className="py-6 px-4 shrink-0">
           <div className="text-center">
             <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-4">
@@ -583,11 +583,11 @@ const JobTracker = () => {
           </div>
         </header>
 
-        {/* 3. Main content area with proper mobile responsive layout */}
+        {/* Main content area - responsive grid layout */}
         <main className="flex-1 p-4 overflow-y-auto">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-            {/* Mobile: stack vertically, Desktop: horizontal flex */}
-            <div className="flex flex-col sm:flex-row gap-4 h-full overflow-x-hidden">
+            {/* Responsive grid: 1 column on mobile, 2 on tablet, 5 on desktop */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4 w-full max-w-full">
               {columns.map(column => (
                 <DroppableColumn
                   key={column.key}
@@ -605,7 +605,7 @@ const JobTracker = () => {
             </div>
             <DragOverlay>
               {activeJob ? (
-                <div className="bg-gray-800 rounded-lg p-4 border border-gray-600 shadow-2xl transform rotate-3 min-w-[280px]">
+                <div className="bg-gray-800 rounded-lg p-4 border border-gray-600 shadow-2xl transform rotate-3 w-full max-w-[280px]">
                   <h4 className="font-bold text-white text-sm font-orbitron">{activeJob.company_name}</h4>
                   <p className="text-gray-300 text-xs">{activeJob.job_title}</p>
                 </div>
