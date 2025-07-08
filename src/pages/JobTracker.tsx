@@ -546,10 +546,12 @@ const JobTracker = () => {
   }
   return (
     <Layout>
-      <div className="bg-gradient-to-br from-black via-gray-950 to-fuchsia-950 min-h-screen">
-        {/* FIXED HEADER */}
-        <header className="fixed top-0 left-0 right-0 z-10 bg-black/50 backdrop-blur-sm">
-          <div className="text-center py-6 px-4">
+      {/* 1. Main container uses flexbox to control the layout */}
+      <div className="flex flex-col h-screen overflow-hidden bg-gradient-to-br from-black via-gray-950 to-fuchsia-950">
+        
+        {/* 2. Header is now a regular flex item, not fixed */}
+        <header className="py-6 px-4 shrink-0">
+          <div className="text-center">
             <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-4">
               Job Tracker
             </h1>
@@ -559,26 +561,25 @@ const JobTracker = () => {
           </div>
         </header>
 
-        {/* SCROLLABLE KANBAN BOARD CONTENT */}
-        <main className="pt-36"> {/* Padding top to offset for fixed header */}
+        {/* 3. Main content area expands to fill remaining space and handles scrolling */}
+        <main className="flex-1 p-4 overflow-x-auto overflow-y-hidden">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-            <div className="px-4 pb-8 overflow-x-auto">
-              <div className="flex gap-4 w-max">
-                {columns.map(column => (
-                  <DroppableColumn
-                    key={column.key}
-                    column={column}
-                    jobs={getJobsByStatus(column.key)}
-                    onAddJob={() => {
-                      setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
-                      setIsModalOpen(true);
-                    }}
-                    onDeleteJob={deleteJob}
-                    onViewJob={handleViewJob}
-                    activeJobId={activeJob?.id}
-                  />
-                ))}
-              </div>
+            {/* w-max and h-full ensure the inner container is wide enough to scroll */}
+            <div className="flex gap-4 w-max h-full">
+              {columns.map(column => (
+                <DroppableColumn
+                  key={column.key}
+                  column={column}
+                  jobs={getJobsByStatus(column.key)}
+                  onAddJob={() => {
+                    setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
+                    setIsModalOpen(true);
+                  }}
+                  onDeleteJob={deleteJob}
+                  onViewJob={handleViewJob}
+                  activeJobId={activeJob?.id}
+                />
+              ))}
             </div>
             <DragOverlay>
               {activeJob ? (
