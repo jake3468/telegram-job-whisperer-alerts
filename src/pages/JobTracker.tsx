@@ -178,42 +178,42 @@ const JobTracker = () => {
   }));
   const columns = [{
     key: 'saved',
-    title: 'Saved',
+    title: '💾 Saved',
     canAdd: true,
     bgColor: 'bg-blue-50',
     textColor: 'text-blue-800',
     borderColor: 'border-blue-200',
-    headerBg: 'bg-blue-100'
+    headerBg: 'bg-blue-600'
   }, {
     key: 'applied',
-    title: 'Applied',
+    title: '📩 Applied',
     canAdd: true,
     bgColor: 'bg-green-50',
     textColor: 'text-green-800',
     borderColor: 'border-green-200',
-    headerBg: 'bg-green-100'
+    headerBg: 'bg-green-600'
   }, {
     key: 'interview',
-    title: 'Interview',
+    title: '👔 Interview',
     canAdd: true,
     bgColor: 'bg-yellow-50',
     textColor: 'text-yellow-800',
     borderColor: 'border-yellow-200',
-    headerBg: 'bg-yellow-100'
+    headerBg: 'bg-yellow-600'
   }, {
     key: 'rejected',
-    title: 'Rejected',
+    title: '❌ Rejected',
     canAdd: false,
     bgColor: 'bg-red-50',
     textColor: 'text-red-800',
     borderColor: 'border-red-200',
-    headerBg: 'bg-red-100'
+    headerBg: 'bg-red-600'
   }, {
     key: 'offer',
-    title: 'Offer',
+    title: '🎉 Offer',
     canAdd: false,
     bgColor: 'bg-emerald-50',
-    textColor: 'text-emerald-800',
+    textColor: 'text-white',
     borderColor: 'border-emerald-200',
     headerBg: 'bg-emerald-700'
   }];
