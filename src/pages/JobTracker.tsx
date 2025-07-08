@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, ExternalLink, Trash2, X, Eye } from 'lucide-react';
+import { Plus, ExternalLink, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -16,6 +16,8 @@ import {
   DragOverlay,
   DragStartEvent,
   PointerSensor,
+  TouchSensor,
+  MouseSensor,
   useSensor,
   useSensors,
   closestCenter,
@@ -39,7 +41,7 @@ interface JobEntry {
   updated_at: string;
 }
 
-interface AddJobFormData {
+interface EditJobFormData {
   company_name: string;
   job_title: string;
   job_description: string;
@@ -73,25 +75,17 @@ const SortableJobCard = ({ job, onDelete, onView }: {
       style={style}
       {...attributes}
       {...listeners}
-      className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 backdrop-blur-sm rounded-lg p-4 border border-blue-300/30 hover:border-blue-400/50 hover:from-blue-500/30 hover:to-purple-500/30 transition-all group shadow-lg cursor-grab active:cursor-grabbing"
+      className="bg-gray-800 rounded-lg p-4 border border-gray-600 hover:border-gray-500 transition-all group shadow-lg cursor-grab active:cursor-grabbing"
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <h4 className="font-bold text-white text-sm font-orbitron">{job.company_name}</h4>
-          <p className="text-blue-200 text-xs font-medium">{job.job_title}</p>
+          <p className="text-gray-300 text-xs font-medium mb-2">{job.job_title}</p>
+          <p className="text-gray-400 text-xs">
+            Added: {new Date(job.created_at).toLocaleDateString()}
+          </p>
         </div>
         <div className="flex gap-1">
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 text-blue-300 hover:text-blue-100 hover:bg-blue-900/20" 
-            onClick={(e) => {
-              e.stopPropagation();
-              onView(job);
-            }}
-          >
-            <Eye className="h-3 w-3" />
-          </Button>
           <Button 
             size="sm" 
             variant="ghost" 
@@ -106,16 +100,18 @@ const SortableJobCard = ({ job, onDelete, onView }: {
         </div>
       </div>
 
-      {job.job_description && (
-        <p className="text-gray-300 text-xs mb-3 line-clamp-2 bg-black/20 p-2 rounded">
-          {job.job_description}
-        </p>
-      )}
-
       <div className="flex items-center justify-between">
-        <div className="text-xs text-gray-400">
-          Added: {new Date(job.created_at).toLocaleDateString()}
-        </div>
+        <Button 
+          size="sm" 
+          variant="outline" 
+          className="text-xs bg-transparent border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white h-7 px-3"
+          onClick={(e) => {
+            e.stopPropagation();
+            onView(job);
+          }}
+        >
+          View
+        </Button>
         {job.job_url && (
           <Button 
             size="sm" 
@@ -145,7 +141,13 @@ const JobTracker = () => {
   const [selectedJob, setSelectedJob] = useState<JobEntry | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<'saved' | 'applied' | 'interview'>('saved');
   const [activeJob, setActiveJob] = useState<JobEntry | null>(null);
-  const [formData, setFormData] = useState<AddJobFormData>({
+  const [formData, setFormData] = useState<EditJobFormData>({
+    company_name: '',
+    job_title: '',
+    job_description: '',
+    job_url: ''
+  });
+  const [editFormData, setEditFormData] = useState<EditJobFormData>({
     company_name: '',
     job_title: '',
     job_description: '',
@@ -157,15 +159,26 @@ const JobTracker = () => {
       activationConstraint: {
         distance: 8,
       },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    }),
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
     })
   );
 
   const columns = [
-    { key: 'saved', title: 'Saved', canAdd: true, bgColor: 'bg-blue-50', textColor: 'text-blue-900', borderColor: 'border-blue-200' },
-    { key: 'applied', title: 'Applied', canAdd: true, bgColor: 'bg-green-50', textColor: 'text-green-900', borderColor: 'border-green-200' },
-    { key: 'interview', title: 'Interview', canAdd: true, bgColor: 'bg-yellow-50', textColor: 'text-yellow-900', borderColor: 'border-yellow-200' },
-    { key: 'rejected', title: 'Rejected', canAdd: false, bgColor: 'bg-red-100', textColor: 'text-red-900', borderColor: 'border-red-300' },
-    { key: 'offer', title: 'Offer', canAdd: false, bgColor: 'bg-emerald-600', textColor: 'text-white', borderColor: 'border-emerald-700' }
+    { key: 'saved', title: 'Saved', canAdd: true, bgColor: 'bg-blue-50', textColor: 'text-blue-900', borderColor: 'border-blue-200', headerBg: 'bg-blue-100' },
+    { key: 'applied', title: 'Applied', canAdd: true, bgColor: 'bg-green-50', textColor: 'text-green-900', borderColor: 'border-green-200', headerBg: 'bg-green-100' },
+    { key: 'interview', title: 'Interview', canAdd: true, bgColor: 'bg-yellow-50', textColor: 'text-yellow-900', borderColor: 'border-yellow-200', headerBg: 'bg-yellow-100' },
+    { key: 'rejected', title: 'Rejected', canAdd: false, bgColor: 'bg-red-50', textColor: 'text-red-900', borderColor: 'border-red-200', headerBg: 'bg-red-100' },
+    { key: 'offer', title: 'Offer', canAdd: false, bgColor: 'bg-emerald-50', textColor: 'text-emerald-900', borderColor: 'border-emerald-200', headerBg: 'bg-emerald-700' }
   ];
 
   // Auto-refresh every 30 seconds
@@ -303,6 +316,49 @@ const JobTracker = () => {
     }
   };
 
+  const handleUpdateJob = async () => {
+    if (!selectedJob) return;
+    
+    if (!editFormData.company_name || !editFormData.job_title) {
+      toast({
+        title: "Error",
+        description: "Company name and job title are required.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('job_tracker')
+        .update({
+          company_name: editFormData.company_name,
+          job_title: editFormData.job_title,
+          job_description: editFormData.job_description || null,
+          job_url: editFormData.job_url || null,
+        })
+        .eq('id', selectedJob.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Job updated successfully!"
+      });
+
+      setIsViewModalOpen(false);
+      setSelectedJob(null);
+      fetchJobs();
+    } catch (error) {
+      console.error('Error updating job:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update job.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const deleteJob = async (jobId: string) => {
     try {
       const { error } = await supabase.from('job_tracker').delete().eq('id', jobId);
@@ -378,6 +434,12 @@ const JobTracker = () => {
 
   const handleViewJob = (job: JobEntry) => {
     setSelectedJob(job);
+    setEditFormData({
+      company_name: job.company_name,
+      job_title: job.job_title,
+      job_description: job.job_description || '',
+      job_url: job.job_url || ''
+    });
     setIsViewModalOpen(true);
   };
 
@@ -406,7 +468,7 @@ const JobTracker = () => {
           Job Tracker
         </h1>
         <p className="text-gray-100 font-inter font-light text-base">
-          Drag and drop job applications between columns to track your progress. Click the eye icon to view details or add new jobs using the + button.
+          Drag and drop job applications between columns to track your progress. Click View to see details or add new jobs using the + button.
         </p>
       </div>
 
@@ -416,14 +478,14 @@ const JobTracker = () => {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-7xl mx-auto">
+        <div className="flex gap-4 overflow-x-auto pb-4 max-w-full">
           {columns.map((column) => (
             <div
               key={column.key}
               id={column.key}
-              className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg p-4 min-h-[500px] transition-all hover:shadow-lg`}
+              className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg min-w-[280px] flex-shrink-0 transition-all hover:shadow-lg`}
             >
-              <div className="flex items-center justify-between mb-4">
+              <div className={`${column.headerBg} p-4 rounded-t-lg border-b ${column.borderColor} flex items-center justify-between`}>
                 <h3 className={`font-orbitron font-bold text-sm ${column.textColor}`}>
                   {column.title} ({getJobsByStatus(column.key).length})
                 </h3>
@@ -446,30 +508,32 @@ const JobTracker = () => {
                 )}
               </div>
 
-              <SortableContext
-                items={getJobsByStatus(column.key).map(job => job.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <div className="space-y-3">
-                  {getJobsByStatus(column.key).map(job => (
-                    <SortableJobCard
-                      key={job.id}
-                      job={job}
-                      onDelete={deleteJob}
-                      onView={handleViewJob}
-                    />
-                  ))}
-                </div>
-              </SortableContext>
+              <div className="p-4 min-h-[450px]">
+                <SortableContext
+                  items={getJobsByStatus(column.key).map(job => job.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-3">
+                    {getJobsByStatus(column.key).map(job => (
+                      <SortableJobCard
+                        key={job.id}
+                        job={job}
+                        onDelete={deleteJob}
+                        onView={handleViewJob}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </div>
             </div>
           ))}
         </div>
 
         <DragOverlay>
           {activeJob ? (
-            <div className="bg-gradient-to-br from-blue-500/40 to-purple-500/40 backdrop-blur-sm rounded-lg p-4 border border-blue-300/50 shadow-2xl transform rotate-3">
+            <div className="bg-gray-800 rounded-lg p-4 border border-gray-600 shadow-2xl transform rotate-3 min-w-[280px]">
               <h4 className="font-bold text-white text-sm font-orbitron">{activeJob.company_name}</h4>
-              <p className="text-blue-200 text-xs">{activeJob.job_title}</p>
+              <p className="text-gray-300 text-xs">{activeJob.job_title}</p>
             </div>
           ) : null}
         </DragOverlay>
@@ -533,11 +597,11 @@ const JobTracker = () => {
         </DialogContent>
       </Dialog>
 
-      {/* View Job Modal */}
+      {/* Edit Job Modal */}
       <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
         <DialogContent className="bg-gray-900 border border-gray-700 text-white max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="font-orbitron">Job Details</DialogTitle>
+            <DialogTitle className="font-orbitron">Edit Job Details</DialogTitle>
             <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
               <X className="h-4 w-4" />
               <span className="sr-only">Close</span>
@@ -545,49 +609,59 @@ const JobTracker = () => {
           </DialogHeader>
           {selectedJob && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-gray-400 text-sm">Company</Label>
-                  <p className="text-white font-semibold">{selectedJob.company_name}</p>
-                </div>
-                <div>
-                  <Label className="text-gray-400 text-sm">Position</Label>
-                  <p className="text-white font-semibold">{selectedJob.job_title}</p>
-                </div>
+              <div>
+                <Label htmlFor="edit-company" className="text-white font-orbitron text-sm">Company Name *</Label>
+                <Input
+                  id="edit-company"
+                  value={editFormData.company_name}
+                  onChange={e => setEditFormData(prev => ({ ...prev, company_name: e.target.value }))}
+                  className="bg-gray-800 border-gray-600 text-white"
+                  placeholder="Enter company name"
+                />
               </div>
               <div>
-                <Label className="text-gray-400 text-sm">Status</Label>
-                <p className="text-white font-semibold capitalize">{selectedJob.status}</p>
+                <Label htmlFor="edit-title" className="text-white font-orbitron text-sm">Job Title *</Label>
+                <Input
+                  id="edit-title"
+                  value={editFormData.job_title}
+                  onChange={e => setEditFormData(prev => ({ ...prev, job_title: e.target.value }))}
+                  className="bg-gray-800 border-gray-600 text-white"
+                  placeholder="Enter job title"
+                />
               </div>
-              {selectedJob.job_description && (
-                <div>
-                  <Label className="text-gray-400 text-sm">Description</Label>
-                  <p className="text-gray-300 bg-gray-800/50 p-3 rounded whitespace-pre-wrap">{selectedJob.job_description}</p>
-                </div>
-              )}
-              {selectedJob.job_url && (
-                <div>
-                  <Label className="text-gray-400 text-sm">Job URL</Label>
-                  <a 
-                    href={selectedJob.job_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 underline break-all"
-                  >
-                    {selectedJob.job_url}
-                  </a>
-                </div>
-              )}
+              <div>
+                <Label htmlFor="edit-description" className="text-white font-orbitron text-sm">Job Description</Label>
+                <Textarea
+                  id="edit-description"
+                  value={editFormData.job_description}
+                  onChange={e => setEditFormData(prev => ({ ...prev, job_description: e.target.value }))}
+                  className="bg-gray-800 border-gray-600 text-white min-h-[80px]"
+                  placeholder="Enter job description"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-url" className="text-white font-orbitron text-sm">Job URL</Label>
+                <Input
+                  id="edit-url"
+                  value={editFormData.job_url}
+                  onChange={e => setEditFormData(prev => ({ ...prev, job_url: e.target.value }))}
+                  className="bg-gray-800 border-gray-600 text-white"
+                  placeholder="https://..."
+                />
+              </div>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <Label className="text-gray-400 text-sm">Created</Label>
-                  <p className="text-gray-300">{new Date(selectedJob.created_at).toLocaleString()}</p>
+                  <Label className="text-gray-400 text-sm">Status</Label>
+                  <p className="text-gray-300 capitalize">{selectedJob.status}</p>
                 </div>
                 <div>
-                  <Label className="text-gray-400 text-sm">Last Updated</Label>
-                  <p className="text-gray-300">{new Date(selectedJob.updated_at).toLocaleString()}</p>
+                  <Label className="text-gray-400 text-sm">Created</Label>
+                  <p className="text-gray-300">{new Date(selectedJob.created_at).toLocaleDateString()}</p>
                 </div>
               </div>
+              <Button onClick={handleUpdateJob} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-orbitron">
+                Save Changes
+              </Button>
             </div>
           )}
         </DialogContent>
