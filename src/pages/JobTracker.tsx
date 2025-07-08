@@ -62,9 +62,12 @@ const DroppableColumn = ({
             {column.title} ({jobs.length})
           </h3>
         </div>
-        {column.canAdd && <Button size="sm" variant="ghost" className={`${column.textColor} hover:bg-black/10 h-8 w-8 p-0`} onClick={onAddJob}>
-            <Plus className="h-4 w-4" />
-          </Button>}
+        {column.canAdd && <div className="flex items-center gap-2">
+            {column.key === 'saved' && <span className="text-xs text-white/80 font-medium">Start here →</span>}
+            <Button size="sm" variant="ghost" className={`${column.textColor} hover:bg-black/10 h-8 w-8 p-0`} onClick={onAddJob}>
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>}
       </div>
 
       <div className={`p-4 min-h-[450px] ${isDropTarget ? 'bg-black/5' : ''} transition-colors`}>
@@ -222,8 +225,8 @@ const JobTracker = () => {
     canAdd: false,
     bgColor: 'bg-emerald-50',
     textColor: 'text-white',
-    borderColor: 'border-emerald-200',
-    headerBg: 'bg-emerald-700'
+    borderColor: 'border-yellow-300',
+    headerBg: 'bg-gradient-to-r from-yellow-500 via-orange-500 to-yellow-600'
   }];
 
   // Auto-refresh every 30 seconds
@@ -563,9 +566,20 @@ const JobTracker = () => {
             <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-4">
               Job Tracker
             </h1>
-            <p className="text-gray-100 font-inter font-light text-base max-w-4xl mx-auto leading-relaxed">
+            <p className="text-gray-100 font-inter font-light text-base max-w-4xl mx-auto leading-relaxed mb-3">
               Drag and drop job applications between columns to track your progress. Click View to see details or add new jobs using the + button.
             </p>
+            <div className="flex items-center justify-center gap-3 text-sm text-gray-300 font-medium">
+              <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs">Saved</span>
+              <span>→</span>
+              <span className="bg-green-600 text-white px-2 py-1 rounded text-xs">Applied</span>
+              <span>→</span>
+              <span className="bg-yellow-600 text-white px-2 py-1 rounded text-xs">Interview</span>
+              <span>→</span>
+              <span className="bg-red-600 text-white px-2 py-1 rounded text-xs">Rejected</span>
+              <span className="text-gray-400">|</span>
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded text-xs font-bold">🎉 Offer</span>
+            </div>
           </div>
         </header>
 
