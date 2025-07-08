@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, ArrowLeft, ArrowRight, ExternalLink, Trash2 } from 'lucide-react';
+import { Plus, ArrowLeft, ArrowRight, ExternalLink, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -240,6 +240,10 @@ Click “+ Add” under any column to add a job. Use the → and ← arrows to m
                   <DialogContent className="bg-gray-900 border border-gray-700 text-white">
                     <DialogHeader>
                       <DialogTitle className="font-orbitron">Add New Job</DialogTitle>
+                      <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
+                        <X className="h-4 w-4" />
+                        <span className="sr-only">Close</span>
+                      </DialogClose>
                     </DialogHeader>
                     <div className="space-y-4">
                       <div>
@@ -279,7 +283,7 @@ Click “+ Add” under any column to add a job. Use the → and ← arrows to m
             </div>
 
             <div className="space-y-3">
-              {getJobsByStatus(column.key).map(job => <div key={job.id} className="bg-gray-700/80 rounded-lg p-3 border border-gray-600 hover:border-gray-500 transition-all group">
+              {getJobsByStatus(column.key).map(job => <div key={job.id} className="bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all group shadow-lg">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1">
                       <h4 className="font-bold text-white text-sm font-orbitron">{job.company_name}</h4>
