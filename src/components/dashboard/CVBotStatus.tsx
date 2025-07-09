@@ -1,10 +1,9 @@
 
-import { useState, useEffect } from 'react';
-import { Copy, Check } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Copy, Check, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { useUserProfile } from '@/hooks/useUserProfile';
-import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
+import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 
 interface CVBotStatusProps {
   onActivationChange?: (isActivated: boolean) => void;
@@ -12,13 +11,13 @@ interface CVBotStatusProps {
 
 const CVBotStatus = ({ onActivationChange }: CVBotStatusProps) => {
   const { toast } = useToast();
-  const { userProfile, loading } = useUserProfile();
-  const { hasResume, hasBio, loading: completionLoading } = useUserCompletionStatus();
+  const { userProfile, loading, resumeExists } = useCachedUserProfile();
   const [copiedBotId, setCopiedBotId] = useState(false);
   const [copiedBotName, setCopiedBotName] = useState(false);
 
   // Check if user has both resume and bio data
-  const hasRequiredData = hasResume && hasBio;
+  const hasBio = !!userProfile?.bio;
+  const hasRequiredData = resumeExists && hasBio;
   const isActivated = userProfile?.cv_bot_activated && hasRequiredData;
 
   useEffect(() => {
@@ -52,7 +51,7 @@ const CVBotStatus = ({ onActivationChange }: CVBotStatusProps) => {
     }
   };
 
-  if (loading || completionLoading) {
+  if (loading && !userProfile) {
     return (
       <div className="mb-6 p-4 bg-black/90 rounded-xl">
         <div className="text-white text-sm">Loading bot status...</div>
@@ -74,10 +73,10 @@ const CVBotStatus = ({ onActivationChange }: CVBotStatusProps) => {
             <p className="text-yellow-100 font-inter text-sm mb-3">
               Your bot is activated, but you need to complete your profile first:
             </p>
-            <ul className="text-sm space-y-1 font-inter text-yellow-100 list-disc list-inside mb-3">
-              {!hasBio && <li>Add your bio in the Profile page</li>}
-              {!hasResume && <li>Upload your resume in the Profile page</li>}
-            </ul>
+             <ul className="text-sm space-y-1 font-inter text-yellow-100 list-disc list-inside mb-3">
+               {!hasBio && <li>Add your bio in the Profile page</li>}
+               {!resumeExists && <li>Upload your resume in the Profile page</li>}
+             </ul>
             <p className="text-yellow-100 font-inter text-sm">
               Please go to the <strong>Profile</strong> page and complete these sections to start using your Resume Bot.
             </p>

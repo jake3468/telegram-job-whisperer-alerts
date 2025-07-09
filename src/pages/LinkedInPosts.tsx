@@ -20,6 +20,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { useLinkedInPostTimeoutFallback } from '@/hooks/useLinkedInPostTimeoutFallback';
 import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
+import { useCachedLinkedInPosts } from '@/hooks/useCachedLinkedInPosts';
 interface LinkedInPostData {
   post_heading_1: string | null;
   post_content_1: string | null;
@@ -70,6 +71,14 @@ const LinkedInPosts = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+
+  // Use cached LinkedIn posts hook for instant data display
+  const {
+    data: linkedInHistory,
+    isLoading: historyLoading,
+    isShowingCachedData,
+    refetch: refetchHistory
+  } = useCachedLinkedInPosts();
 
   // Initialize form token keep-alive - determine if form is active
   const isFormActive = !isGenerating && !isSubmitting && Boolean(formData.topic.trim() || formData.opinion.trim() || formData.personal_story.trim() || formData.audience.trim() || formData.tone);
@@ -380,6 +389,7 @@ const LinkedInPosts = () => {
         }
         console.log('✅ LinkedIn post created successfully:', data);
         setCurrentPostId(data.id);
+        refetchHistory(); // Update cache with new entry
         toast({
           title: "Request Submitted!",
           description: "Your LinkedIn posts are being generated. Please wait..."

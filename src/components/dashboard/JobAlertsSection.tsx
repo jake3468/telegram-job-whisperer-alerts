@@ -1,13 +1,12 @@
-import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Bell, Plus, AlertCircle } from 'lucide-react';
+import { Bell, Plus, AlertCircle, RefreshCw } from 'lucide-react';
 import JobAlertForm from './JobAlertForm';
 import JobAlertsList from './JobAlertsList';
 import BotStatus from './BotStatus';
+import { useCachedJobAlertsData } from '@/hooks/useCachedJobAlertsData';
 interface JobAlert {
   id: string;
   country: string;
@@ -29,92 +28,23 @@ const JobAlertsSection = ({
 }: {
   userTimezone: string;
 }) => {
-  const {
-    user
-  } = useUser();
-  const {
-    toast
-  } = useToast();
-  const [alerts, setAlerts] = useState<JobAlert[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const { 
+    alerts, 
+    isActivated, 
+    userProfileId, 
+    loading, 
+    error, 
+    invalidateCache 
+  } = useCachedJobAlertsData();
+  
   const [showForm, setShowForm] = useState(false);
   const [editingAlert, setEditingAlert] = useState<JobAlert | null>(null);
-  const [isActivated, setIsActivated] = useState<boolean>(false);
-  const [userProfileId, setUserProfileId] = useState<string | null>(null);
+  
   const MAX_ALERTS = 5;
   const alertsUsed = alerts.length;
   const alertsRemaining = MAX_ALERTS - alertsUsed;
   const isAtLimit = alertsUsed >= MAX_ALERTS;
-  useEffect(() => {
-    fetchUserProfileAndAlerts();
-  }, [user]);
-  const fetchUserProfileAndAlerts = async () => {
-    if (!user) return;
-    try {
-      console.log('[JobAlertsSection] Starting to fetch user profile and alerts for user:', user.id);
-
-      // Add delay to allow JWT refresh to complete
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // First, get the user's database ID - single attempt
-      const {
-        data: userData,
-        error: userError
-      } = await supabase.from('users').select('id').eq('clerk_id', user.id).maybeSingle();
-      if (userError || !userData) {
-        console.error('[JobAlertsSection] Error fetching user:', userError);
-        // Don't show error toast for authentication issues, just fail silently
-        setLoading(false);
-        return;
-      }
-      console.log('[JobAlertsSection] Found user data:', userData);
-
-      // Get user profile - single attempt
-      const {
-        data: profileData,
-        error: profileError
-      } = await supabase.from('user_profile').select('id').eq('user_id', userData.id).maybeSingle();
-      if (profileError || !profileData) {
-        console.error('[JobAlertsSection] Error fetching user profile:', profileError);
-        setLoading(false);
-        return;
-      }
-      console.log('[JobAlertsSection] Found profile data:', profileData);
-      setUserProfileId(profileData.id);
-
-      // Fetch job alerts using user_profile.id
-      console.log('[JobAlertsSection] Fetching job alerts for profile ID:', profileData.id);
-      const {
-        data,
-        error
-      } = await supabase.from('job_alerts').select('*').eq('user_id', profileData.id).order('created_at', {
-        ascending: false
-      });
-      if (error) {
-        console.error('[JobAlertsSection] Error fetching job alerts:', error);
-        toast({
-          title: "Error loading alerts",
-          description: "There was an error loading your job alerts. Please try refreshing the page.",
-          variant: "destructive"
-        });
-      } else {
-        console.log('[JobAlertsSection] Successfully fetched job alerts:', data);
-        setAlerts(data || []);
-      }
-    } catch (error) {
-      console.error('[JobAlertsSection] Error fetching user profile and alerts:', error);
-      // Don't show error toast for authentication timeouts
-      if (!error.message?.includes('JWT') && !error.message?.includes('timeout')) {
-        toast({
-          title: "Error loading data",
-          description: "There was an error loading your data. Please try refreshing the page.",
-          variant: "destructive"
-        });
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
   const handleCreateAlert = () => {
     if (!isActivated) {
       toast({
@@ -157,11 +87,12 @@ const JobAlertsSection = ({
       return;
     }
     try {
-      const {
-        error
-      } = await supabase.from('job_alerts').delete().eq('id', alertId);
+      const { error } = await supabase.from('job_alerts').delete().eq('id', alertId);
       if (error) throw error;
-      setAlerts(alerts.filter(alert => alert.id !== alertId));
+      
+      // Invalidate cache to refresh data
+      invalidateCache();
+      
       toast({
         title: "Alert deleted",
         description: "Job alert has been removed successfully."
@@ -178,15 +109,19 @@ const JobAlertsSection = ({
   const handleFormSubmit = () => {
     setShowForm(false);
     setEditingAlert(null);
-    fetchUserProfileAndAlerts();
+    // Invalidate cache to refresh data
+    invalidateCache();
   };
+  
   const handleFormCancel = () => {
     setShowForm(false);
     setEditingAlert(null);
   };
-  const handleActivationChange = (activated: boolean) => {
-    setIsActivated(activated);
-  };
+
+  // Manual refresh function - refreshes entire page for persistent issues
+  const handleManualRefresh = useCallback(() => {
+    window.location.reload();
+  }, []);
   if (loading) {
     return <div className="max-w-2xl mx-auto w-full">
         <div className="rounded-3xl bg-black/95 border-2 border-emerald-400 shadow-none p-6 mt-3 min-h-[160px] flex items-center justify-center">
@@ -196,16 +131,34 @@ const JobAlertsSection = ({
   }
   return <section className="rounded-3xl border-2 border-orange-400 bg-gradient-to-b from-orange-900/90 via-[#2b1605]/90 to-[#2b1605]/98 shadow-none p-0">
       <div className="pt-4 px-2 sm:px-6">
+        {/* Manual Refresh Button */}
+        {error && (
+          <div className="mb-4 flex justify-end">
+            <Button
+              onClick={handleManualRefresh}
+              variant="outline"
+              size="sm"
+              className="text-xs bg-yellow-900/20 border-yellow-400/30 text-yellow-300 hover:bg-yellow-800/30"
+            >
+              <RefreshCw className="w-3 h-3 mr-1" />
+              Refresh
+            </Button>
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <div className="min-w-0">
-            <span className="text-2xl font-orbitron bg-gradient-to-r from-orange-300 via-yellow-300 to-pink-400 bg-clip-text text-transparent font-extrabold flex items-center gap-2 drop-shadow">
-              <span className="w-6 h-6 bg-orange-400/70 rounded-full flex items-center justify-center shadow-lg ring-2 ring-orange-300/40">
-                <svg viewBox="0 0 24 24" width={18} height={18}>
-                  <path fill="none" stroke="#fff" strokeWidth="2" d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z" />
-                </svg>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-2xl font-orbitron bg-gradient-to-r from-orange-300 via-yellow-300 to-pink-400 bg-clip-text text-transparent font-extrabold flex items-center gap-2 drop-shadow">
+                <span className="w-6 h-6 bg-orange-400/70 rounded-full flex items-center justify-center shadow-lg ring-2 ring-orange-300/40">
+                  <svg viewBox="0 0 24 24" width={18} height={18}>
+                    <path fill="none" stroke="#fff" strokeWidth="2" d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z" />
+                  </svg>
+                </span>
+                <span>Job Alerts</span>
               </span>
-              <span>Job Alerts</span>
-            </span>
+              
+            </div>
             <p className="text-orange-100 font-inter text-sm font-semibold drop-shadow-none">Set up personalized daily job alerts based on your preferences</p>
             
             {/* Alert Usage Counter */}
@@ -232,7 +185,7 @@ const JobAlertsSection = ({
 
         <div>
           {/* Bot Status Component */}
-          <BotStatus onActivationChange={handleActivationChange} />
+          <BotStatus onActivationChange={() => {}} />
 
           {/* Job Alerts Form and List - Only show when activated */}
           {isActivated && <>

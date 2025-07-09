@@ -26,6 +26,20 @@ const PricingSection = () => {
     creditPackProducts,
     isLoading: isProductsLoading
   } = usePaymentProducts();
+
+  // Prevent rendering if pricing data is not available
+  if (!pricingData) {
+    return (
+      <section className="py-16 sm:py-24 px-4 bg-black">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
+            <span className="ml-3 text-blue-200">Loading pricing...</span>
+          </div>
+        </div>
+      </section>
+    );
+  }
   return <section className="py-16 sm:py-24 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">

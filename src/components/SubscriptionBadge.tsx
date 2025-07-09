@@ -1,15 +1,18 @@
 
 import { Badge } from '@/components/ui/badge';
-import { useUserCredits } from '@/hooks/useUserCredits';
 import { Crown, Sparkles } from 'lucide-react';
 
-const SubscriptionBadge = () => {
-  const { data: credits, isLoading } = useUserCredits();
+interface SubscriptionBadgeProps {
+  credits?: any;
+}
 
-  if (isLoading) {
+const SubscriptionBadge = ({ credits }: SubscriptionBadgeProps) => {
+
+  if (!credits) {
     return (
       <Badge className="bg-gray-500/20 text-gray-300 border-gray-400/30 text-xs px-2 py-1">
-        Loading...
+        <Sparkles className="w-3 h-3 mr-1" />
+        Free Plan
       </Badge>
     );
   }

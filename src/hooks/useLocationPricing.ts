@@ -16,22 +16,33 @@ export interface PricingData {
 }
 
 export const useLocationPricing = () => {
-  const [pricingData, setPricingData] = useState<PricingData>({
-    region: 'global',
-    currency: 'USD',
-    currencySymbol: '$',
-    monthlyPrice: 9.99,
-    creditPacks: [
-      { credits: 30, price: 2.99, productId: 'pdt_global_30_credits' },
-      { credits: 80, price: 4.99, productId: 'pdt_global_80_credits' },
-      { credits: 200, price: 9.99, productId: 'pdt_global_200_credits' },
-      { credits: 500, price: 19.99, productId: 'pdt_global_500_credits' }
-    ],
-    subscriptionProductId: 'pdt_global_monthly_subscription'
-  });
-  
+  // Initialize with null to prevent showing default data before cache check
+  const [pricingData, setPricingData] = useState<PricingData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [userCountry, setUserCountry] = useState<string>('');
+
+  // Check for cached location first to initialize with appropriate defaults
+  const getInitialDefaults = () => {
+    try {
+      const locationCache = localStorage.getItem('aspirely_user_location_cache');
+      if (locationCache) {
+        const parsedLocationCache = JSON.parse(locationCache);
+        const now = Date.now();
+        const LOCATION_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
+        
+        if (now - parsedLocationCache.timestamp < LOCATION_CACHE_DURATION) {
+          const isIndian = parsedLocationCache.country === 'IN';
+          return isIndian ? getIndianPricing() : getGlobalPricing();
+        }
+      }
+    } catch (error) {
+      logger.warn('Failed to check cached location for defaults:', error);
+    }
+    return getGlobalPricing(); // Safe default
+  };
+
+  // Don't initialize with defaults if we have cached data - let cached hook handle it
+  // This prevents USD default from flashing when Indian cache exists
 
   useEffect(() => {
     const detectLocation = async () => {
@@ -142,70 +153,19 @@ export const useLocationPricing = () => {
           // Set pricing based on detected location (case-insensitive comparison)
           if (countryCode === 'in' || countryCode === 'india') {
             logger.info('Setting Indian pricing for country:', countryCode);
-            setPricingData({
-              region: 'IN',
-              currency: 'INR',
-              currencySymbol: '₹',
-              monthlyPrice: 499,
-              creditPacks: [
-                { credits: 30, price: 99, productId: 'pdt_indian_30_credits' },
-                { credits: 80, price: 199, productId: 'pdt_indian_80_credits' },
-                { credits: 200, price: 399, productId: 'pdt_indian_200_credits' },
-                { credits: 500, price: 799, productId: 'pdt_indian_500_credits' }
-              ],
-              subscriptionProductId: 'pdt_indian_monthly_subscription'
-            });
+            setPricingData(getIndianPricing());
           } else {
             logger.debug('Setting international pricing for country:', countryCode);
-            // Keep default USD pricing for non-Indian users
-            setPricingData({
-              region: 'global',
-              currency: 'USD',
-              currencySymbol: '$',
-              monthlyPrice: 9.99,
-              creditPacks: [
-                { credits: 30, price: 2.99, productId: 'pdt_global_30_credits' },
-                { credits: 80, price: 4.99, productId: 'pdt_global_80_credits' },
-                { credits: 200, price: 9.99, productId: 'pdt_global_200_credits' },
-                { credits: 500, price: 19.99, productId: 'pdt_global_500_credits' }
-              ],
-              subscriptionProductId: 'pdt_global_monthly_subscription'
-            });
+            setPricingData(getGlobalPricing());
           }
         } else {
           logger.warn('No valid country code detected, using default USD pricing');
-          // Explicitly set default USD pricing
-          setPricingData({
-            region: 'global',
-            currency: 'USD',
-            currencySymbol: '$',
-            monthlyPrice: 9.99,
-            creditPacks: [
-              { credits: 30, price: 2.99, productId: 'pdt_global_30_credits' },
-              { credits: 80, price: 4.99, productId: 'pdt_global_80_credits' },
-              { credits: 200, price: 9.99, productId: 'pdt_global_200_credits' },
-              { credits: 500, price: 19.99, productId: 'pdt_global_500_credits' }
-            ],
-            subscriptionProductId: 'pdt_global_monthly_subscription'
-          });
+          setPricingData(getGlobalPricing());
         }
         
       } catch (error) {
         logger.error('Location detection completely failed, using default USD pricing:', error);
-        // Explicitly set default USD pricing on any error
-        setPricingData({
-          region: 'global',
-          currency: 'USD',
-          currencySymbol: '$',
-          monthlyPrice: 9.99,
-          creditPacks: [
-            { credits: 30, price: 2.99, productId: 'pdt_global_30_credits' },
-            { credits: 80, price: 4.99, productId: 'pdt_global_80_credits' },
-            { credits: 200, price: 9.99, productId: 'pdt_global_200_credits' },
-            { credits: 500, price: 19.99, productId: 'pdt_global_500_credits' }
-          ],
-          subscriptionProductId: 'pdt_global_monthly_subscription'
-        });
+        setPricingData(getGlobalPricing());
       } finally {
         setIsLoading(false);
       }
@@ -220,3 +180,32 @@ export const useLocationPricing = () => {
     userCountry
   };
 };
+
+// Helper functions to avoid repetition
+const getIndianPricing = (): PricingData => ({
+  region: 'IN',
+  currency: 'INR',
+  currencySymbol: '₹',
+  monthlyPrice: 499,
+  creditPacks: [
+    { credits: 30, price: 99, productId: 'pdt_indian_30_credits' },
+    { credits: 80, price: 199, productId: 'pdt_indian_80_credits' },
+    { credits: 200, price: 399, productId: 'pdt_indian_200_credits' },
+    { credits: 500, price: 799, productId: 'pdt_indian_500_credits' }
+  ],
+  subscriptionProductId: 'pdt_indian_monthly_subscription'
+});
+
+const getGlobalPricing = (): PricingData => ({
+  region: 'global',
+  currency: 'USD',
+  currencySymbol: '$',
+  monthlyPrice: 9.99,
+  creditPacks: [
+    { credits: 30, price: 2.99, productId: 'pdt_global_30_credits' },
+    { credits: 80, price: 4.99, productId: 'pdt_global_80_credits' },
+    { credits: 200, price: 9.99, productId: 'pdt_global_200_credits' },
+    { credits: 500, price: 19.99, productId: 'pdt_global_500_credits' }
+  ],
+  subscriptionProductId: 'pdt_global_monthly_subscription'
+});

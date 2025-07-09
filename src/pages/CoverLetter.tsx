@@ -21,6 +21,7 @@ import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
+import { useCachedCoverLetters } from '@/hooks/useCachedCoverLetters';
 const CoverLetter = () => {
   const {
     user,
@@ -61,6 +62,14 @@ const CoverLetter = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentCoverLetterId, setCurrentCoverLetterId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+
+  // Use cached cover letters hook for instant data display
+  const {
+    data: coverLetterHistory,
+    isLoading: historyLoading,
+    isShowingCachedData,
+    refetch: refetchHistory
+  } = useCachedCoverLetters();
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
@@ -242,6 +251,7 @@ const CoverLetter = () => {
         }
         console.log('Cover letter record created with ID:', data.id);
         setCurrentCoverLetterId(data.id);
+        refetchHistory(); // Update cache with new entry
         toast({
           title: "Request Submitted!",
           description: "Your cover letter is being generated. Credits will be deducted when ready."

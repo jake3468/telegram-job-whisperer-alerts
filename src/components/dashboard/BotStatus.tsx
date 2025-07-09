@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { useUserProfile } from '@/hooks/useUserProfile';
+import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 
 interface BotStatusProps {
   onActivationChange?: (isActivated: boolean) => void;
@@ -10,7 +10,7 @@ interface BotStatusProps {
 
 const BotStatus = ({ onActivationChange }: BotStatusProps) => {
   const { toast } = useToast();
-  const { userProfile, loading } = useUserProfile();
+  const { userProfile, loading } = useCachedUserProfile();
   const [copiedBotId, setCopiedBotId] = useState(false);
   const [copiedBotName, setCopiedBotName] = useState(false);
 

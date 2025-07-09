@@ -243,7 +243,10 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
         <div className="flex-1 overflow-y-auto min-h-0">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="text-white/70 text-sm">Loading history...</div>
+              <div className="text-white/70 text-sm flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white/70"></div>
+                Loading history...
+              </div>
             </div>
           ) : !interviewHistory?.length ? (
             <div className="flex items-center justify-center py-8">

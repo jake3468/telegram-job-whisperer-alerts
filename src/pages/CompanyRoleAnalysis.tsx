@@ -11,6 +11,7 @@ import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/clie
 import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import CompanyRoleAnalysisHistoryModal from '@/components/CompanyRoleAnalysisHistoryModal';
+import { useCachedCompanyAnalyses } from '@/hooks/useCachedCompanyAnalyses';
 import LoadingMessages from '@/components/LoadingMessages';
 import { PercentageMeter } from '@/components/PercentageMeter';
 import { BulletPointList } from '@/components/BulletPointList';
@@ -78,39 +79,13 @@ const CompanyRoleAnalysis = () => {
     setShowRecentResults(false);
   }, []);
 
-  // Fetch company-role analysis history with authenticated requests
+  // Use cached company analysis hook for instant data display
   const {
     data: analysisHistory,
+    isLoading: historyLoading,
+    isShowingCachedData,
     refetch: refetchHistory
-  } = useQuery({
-    queryKey: ['company_role_analyses', userProfile?.id],
-    queryFn: async () => {
-      if (!userProfile?.id) return [];
-      console.log('Fetching company role analyses for user:', userProfile.id);
-      try {
-        const {
-          data,
-          error
-        } = await makeAuthenticatedRequest(async () => {
-          return await supabase.from('company_role_analyses').select('*').eq('user_id', userProfile.id).order('created_at', {
-            ascending: false
-          });
-        }, 'fetch company role analyses');
-        if (error) {
-          console.error('Error fetching company-role analysis history:', error);
-          return [];
-        }
-        console.log('Fetched analyses:', data);
-        return data as CompanyRoleAnalysisData[];
-      } catch (err) {
-        console.error('Exception fetching company-role analysis history:', err);
-        return [];
-      }
-    },
-    enabled: !!userProfile?.id,
-    staleTime: 30000,
-    refetchInterval: 60000
-  });
+  } = useCachedCompanyAnalyses();
 
   // Enhanced helper function to check if analysis has meaningful data
   const hasAnalysisResult = (analysis: CompanyRoleAnalysisData) => {

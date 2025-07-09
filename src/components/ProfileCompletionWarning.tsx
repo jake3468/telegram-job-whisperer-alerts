@@ -1,6 +1,6 @@
 
 import { AlertCircle } from 'lucide-react';
-import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
+import { useCachedUserCompletionStatus } from '@/hooks/useCachedUserCompletionStatus';
 import { useState, useEffect } from 'react';
 
 interface ProfileCompletionWarningProps {
@@ -8,7 +8,7 @@ interface ProfileCompletionWarningProps {
 }
 
 export const ProfileCompletionWarning = ({ className = '' }: ProfileCompletionWarningProps) => {
-  const { hasResume, hasBio, loading } = useUserCompletionStatus();
+  const { hasResume, hasBio, loading } = useCachedUserCompletionStatus();
   const [showWarning, setShowWarning] = useState(false);
 
   useEffect(() => {

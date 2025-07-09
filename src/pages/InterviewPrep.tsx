@@ -16,6 +16,7 @@ import LoadingMessages from '@/components/LoadingMessages';
 import { useUser } from '@clerk/clerk-react';
 import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 import { InterviewPrepHistoryModal } from '@/components/InterviewPrepHistoryModal';
+import { useCachedInterviewPrep } from '@/hooks/useCachedInterviewPrep';
 import InterviewPrepDownloadActions from '@/components/InterviewPrepDownloadActions';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
 
@@ -46,29 +47,13 @@ const InterviewPrep = () => {
 
   const { userProfile } = useUserProfile();
 
-  // Query for existing interview prep data with retry logic
+  // Use cached interview prep hook for instant data display
   const {
     data: interviewHistory,
+    isLoading: historyLoading,
+    isShowingCachedData,
     refetch: refetchHistory
-  } = useQuery({
-    queryKey: ['interview-prep-history', userProfile?.id],
-    queryFn: async () => {
-      if (!userProfile?.id || !isAuthReady) return [];
-      
-      return executeWithRetry(async () => {
-        const { data, error } = await supabase
-          .from('interview_prep')
-          .select('*')
-          .eq('user_id', userProfile.id)
-          .order('created_at', { ascending: false });
-        
-        if (error) throw error;
-        return data || [];
-      }, 3, 'fetch interview history');
-    },
-    enabled: !!userProfile?.id && isAuthReady,
-    retry: 2
-  });
+  } = useCachedInterviewPrep();
 
   // Function to properly parse interview questions from JSONB
   const parseInterviewQuestions = (data: any): string | null => {
