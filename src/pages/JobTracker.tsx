@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useUserInitialization } from '@/hooks/useUserInitialization';
 import { Plus, ExternalLink, Trash2, X, Bookmark, Send, Users, XCircle, Trophy, GripVertical, RefreshCw, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
@@ -158,6 +159,7 @@ const JobTracker = () => {
   const {
     toast
   } = useToast();
+  const { initializeUser } = useUserInitialization();
   const [jobs, setJobs] = useState<JobEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -240,6 +242,13 @@ const JobTracker = () => {
     headerBg: 'bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700'
   }];
 
+  // Initialize user when component mounts
+  useEffect(() => {
+    if (user) {
+      initializeUser();
+    }
+  }, [user, initializeUser]);
+
   // Auto-refresh every 10 seconds and on visibility change
   useEffect(() => {
     if (user) {
@@ -259,176 +268,61 @@ const JobTracker = () => {
       };
     }
   }, [user]);
+
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
-  const fetchJobs = useCallback(async (retryCount = 0) => {
+
+  const fetchJobs = useCallback(async () => {
     if (!user) return;
     setError(null);
-    console.log(`Fetching jobs for user: ${user.id} (attempt ${retryCount + 1})`);
+    
     try {
-      // Silent token refresh for JWT expiry issues
-      const {
-        data: sessionData
-      } = await supabase.auth.getSession();
-      if (!sessionData.session) {
-        console.log('No active session, attempting refresh...');
-        const {
-          error: refreshError
-        } = await supabase.auth.refreshSession();
-        if (refreshError) {
-          console.error('Token refresh failed:', refreshError);
-          if (retryCount < 2) {
-            setTimeout(() => fetchJobs(retryCount + 1), 1000);
-            return;
-          }
-        }
-      }
-
-      // First get the user UUID from users table using clerk_id
-      const {
-        data: userData,
-        error: userError
-      } = await supabase.from('users').select('id').eq('clerk_id', user.id).maybeSingle();
-      if (userError) {
-        console.error('User lookup error:', userError);
-        // Don't show JWT/RLS errors to users - handle silently
-        if (userError.message.includes('JWT') || userError.message.includes('expired') || userError.message.includes('row-level security')) {
-          console.log('Silent authentication issue, retrying...');
-          if (retryCount < 3) {
-            setTimeout(() => fetchJobs(retryCount + 1), 1000 * (retryCount + 1));
-            return;
-          }
-        }
-        throw new Error('Unable to load your profile');
-      }
-      if (!userData) {
-        console.log('User not found, creating new user...');
-        // Try to create user if they don't exist
-        const {
-          data: newUser,
-          error: createUserError
-        } = await supabase.from('users').insert({
-          clerk_id: user.id,
-          email: user.primaryEmailAddress?.emailAddress || '',
-          first_name: user.firstName || '',
-          last_name: user.lastName || ''
-        }).select('id').single();
-        if (createUserError || !newUser) {
-          console.error('Failed to create user:', createUserError);
-          // Silent retry for creation issues
-          if (createUserError?.message.includes('JWT') || createUserError?.message.includes('expired')) {
-            if (retryCount < 3) {
-              setTimeout(() => fetchJobs(retryCount + 1), 1000 * (retryCount + 1));
-              return;
-            }
-          }
-          throw new Error('Unable to set up your account');
-        }
-
-        // Create user profile with better error handling
-        const {
-          data: newProfile,
-          error: profileError
-        } = await supabase.from('user_profile').insert({
-          user_id: newUser.id
-        }).select('id').single();
-        if (profileError || !newProfile) {
-          console.error('Failed to create user profile:', profileError);
-          // Silent retry for profile creation issues
-          if (profileError?.message.includes('JWT') || profileError?.message.includes('expired')) {
-            if (retryCount < 3) {
-              setTimeout(() => fetchJobs(retryCount + 1), 1000 * (retryCount + 1));
-              return;
-            }
-          }
-          throw new Error('Unable to complete account setup');
-        }
-        console.log('New user and profile created successfully');
-        setJobs([]);
-        setError(null);
-        return;
+      // Get the user UUID from users table using clerk_id
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('clerk_id', user.id)
+        .maybeSingle();
+      
+      if (userError || !userData) {
+        throw new Error('Unable to load user data');
       }
 
       // Get user profile using the user UUID
-      const {
-        data: userProfile,
-        error: profileError
-      } = await supabase.from('user_profile').select('id').eq('user_id', userData.id).maybeSingle();
-      if (profileError) {
-        console.error('User profile lookup error:', profileError);
-        // Silent retry for JWT/RLS issues
-        if (profileError.message.includes('JWT') || profileError.message.includes('expired') || profileError.message.includes('row-level security')) {
-          if (retryCount < 3) {
-            setTimeout(() => fetchJobs(retryCount + 1), 1000 * (retryCount + 1));
-            return;
-          }
-        }
-        throw new Error('Unable to access your profile');
-      }
-      if (!userProfile) {
-        console.log('Profile not found, creating profile...');
-        // Create user profile if it doesn't exist
-        const {
-          data: newProfile,
-          error: createProfileError
-        } = await supabase.from('user_profile').insert({
-          user_id: userData.id
-        }).select('id').single();
-        if (createProfileError || !newProfile) {
-          console.error('Failed to create profile:', createProfileError);
-          // Silent retry for creation issues
-          if (createProfileError?.message.includes('JWT') || createProfileError?.message.includes('expired')) {
-            if (retryCount < 3) {
-              setTimeout(() => fetchJobs(retryCount + 1), 1000 * (retryCount + 1));
-              return;
-            }
-          }
-          throw new Error('Unable to create your profile');
-        }
-        console.log('Profile created successfully');
-        setJobs([]);
-        setError(null);
-        return;
+      const { data: userProfile, error: profileError } = await supabase
+        .from('user_profile')
+        .select('id')
+        .eq('user_id', userData.id)
+        .maybeSingle();
+      
+      if (profileError || !userProfile) {
+        throw new Error('Unable to load user profile');
       }
 
-      // Finally get jobs for this user profile
-      console.log(`Fetching jobs for profile: ${userProfile.id}`);
-      const {
-        data,
-        error
-      } = await supabase.from('job_tracker').select('*').eq('user_id', userProfile.id).order('order_position', {
-        ascending: true
-      });
+      // Get jobs for this user profile
+      const { data, error } = await supabase
+        .from('job_tracker')
+        .select('*')
+        .eq('user_id', userProfile.id)
+        .order('order_position', { ascending: true });
+      
       if (error) {
-        console.error('Job tracker query error:', error);
-        // Silent retry for JWT/RLS issues
-        if (error.message.includes('JWT') || error.message.includes('expired') || error.message.includes('row-level security')) {
-          if (retryCount < 3) {
-            setTimeout(() => fetchJobs(retryCount + 1), 1000 * (retryCount + 1));
-            return;
-          }
-        }
-        throw new Error('Unable to load your job applications');
+        throw new Error('Unable to load job applications');
       }
-      console.log(`Successfully loaded ${data?.length || 0} jobs`);
+
       setJobs(data || []);
       setError(null);
     } catch (error: any) {
       console.error('Error fetching jobs:', error);
-      const errorMessage = error.message || 'Unable to load job applications';
-
-      // Only show user-friendly errors, never technical ones
-      if (!errorMessage.includes('JWT') && !errorMessage.includes('expired') && !errorMessage.includes('row-level security')) {
-        setError(errorMessage);
-        toast({
-          title: "Loading Issue",
-          description: errorMessage,
-          variant: "destructive"
-        });
-      }
+      setError(error.message);
+      toast({
+        title: "Loading Issue",
+        description: error.message,
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
