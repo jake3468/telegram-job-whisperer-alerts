@@ -161,8 +161,10 @@ const JobTracker = () => {
   } = useToast();
   const { initializeUser } = useUserInitialization();
   const [jobs, setJobs] = useState<JobEntry[]>([]);
+  const [lastSuccessfulJobs, setLastSuccessfulJobs] = useState<JobEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [connectionIssue, setConnectionIssue] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<JobEntry | null>(null);
@@ -249,23 +251,10 @@ const JobTracker = () => {
     }
   }, [user, initializeUser]);
 
-  // Auto-refresh every 10 seconds and on visibility change
+  // Initial data load
   useEffect(() => {
     if (user) {
       fetchJobs();
-      const interval = setInterval(fetchJobs, 10000);
-
-      // Handle page visibility changes
-      const handleVisibilityChange = () => {
-        if (!document.hidden) {
-          fetchJobs();
-        }
-      };
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-      return () => {
-        clearInterval(interval);
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
-      };
     }
   }, [user]);
 
@@ -275,9 +264,8 @@ const JobTracker = () => {
     }
   }, [user, isLoaded, navigate]);
 
-  const fetchJobs = useCallback(async () => {
+  const fetchJobs = useCallback(async (showErrors = false) => {
     if (!user) return;
-    setError(null);
     
     try {
       // Get the user UUID from users table using clerk_id
@@ -313,26 +301,46 @@ const JobTracker = () => {
         throw new Error('Unable to load job applications');
       }
 
-      setJobs(data || []);
+      // Success - update both current jobs and cache
+      const jobData = data || [];
+      setJobs(jobData);
+      setLastSuccessfulJobs(jobData);
       setError(null);
+      setConnectionIssue(false);
     } catch (error: any) {
       console.error('Error fetching jobs:', error);
-      setError(error.message);
-      toast({
-        title: "Loading Issue",
-        description: error.message,
-        variant: "destructive"
-      });
+      setConnectionIssue(true);
+      
+      // Only show errors when user actively interacts or on initial load
+      if (showErrors) {
+        setError(error.message);
+        toast({
+          title: "Connection Issue",
+          description: "Unable to refresh data. Using last known information.",
+          variant: "destructive"
+        });
+      }
+      
+      // Keep existing data on screen
+      if (lastSuccessfulJobs.length > 0) {
+        setJobs(lastSuccessfulJobs);
+      }
     } finally {
       setLoading(false);
     }
-  }, [user, toast]);
+  }, [user, toast, lastSuccessfulJobs]);
 
   // Manual refresh function
   const handleManualRefresh = useCallback(async () => {
     setLoading(true);
     setError(null);
-    await fetchJobs();
+    setConnectionIssue(false);
+    await fetchJobs(true);
+  }, [fetchJobs]);
+
+  // Refresh on user interactions
+  const refreshOnInteraction = useCallback(() => {
+    fetchJobs(false); // Silent refresh
   }, [fetchJobs]);
   const handleAddJob = async () => {
     if (!formData.company_name || !formData.job_title) {
@@ -387,7 +395,7 @@ const JobTracker = () => {
         job_url: ''
       });
       setIsModalOpen(false);
-      fetchJobs();
+      refreshOnInteraction();
     } catch (error) {
       console.error('Error adding job:', error);
       toast({
@@ -423,7 +431,7 @@ const JobTracker = () => {
       });
       setIsViewModalOpen(false);
       setSelectedJob(null);
-      fetchJobs();
+      refreshOnInteraction();
     } catch (error) {
       console.error('Error updating job:', error);
       toast({
@@ -443,7 +451,7 @@ const JobTracker = () => {
         title: "Success",
         description: "Job deleted successfully!"
       });
-      fetchJobs();
+      refreshOnInteraction();
     } catch (error) {
       console.error('Error deleting job:', error);
       toast({
@@ -544,8 +552,24 @@ const JobTracker = () => {
               <span className="font-semibold text-3xl">📈</span>
               <h1 className="font-extrabold font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow md:text-4xl text-center text-3xl">Job Tracker</h1>
               
-              {/* Refresh Button */}
-              
+              {/* Connection Status Indicator & Refresh Button */}
+              <div className="flex items-center gap-2">
+                {connectionIssue && (
+                  <div className="flex items-center gap-1 text-yellow-400 text-xs bg-yellow-900/30 px-2 py-1 rounded">
+                    <AlertCircle className="h-3 w-3" />
+                    <span>Offline</span>
+                  </div>
+                )}
+                <Button 
+                  onClick={handleManualRefresh} 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0"
+                  title="Refresh data"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
 
             {/* Error Display */}
