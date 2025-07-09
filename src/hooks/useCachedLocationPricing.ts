@@ -60,10 +60,12 @@ export const useCachedLocationPricing = () => {
         }
       }
       
-      // Only set default pricing if no valid cache exists
-      const defaultPricing = getDefaultPricing(defaultRegion);
-      setDisplayData(defaultPricing);
-      logger.debug('Set default pricing based on region:', defaultRegion);
+      // Only set default pricing if no valid cache exists and no location cache either
+      if (!locationCache) {
+        const defaultPricing = getDefaultPricing(defaultRegion);
+        setDisplayData(defaultPricing);
+        logger.debug('Set default pricing based on region (no cache):', defaultRegion);
+      }
       
     } catch (error) {
       logger.warn('Failed to load cached pricing data:', error);

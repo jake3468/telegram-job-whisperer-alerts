@@ -21,6 +21,7 @@ import { validateInput, sanitizeText, isValidForTyping } from '@/utils/sanitize'
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
 import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
+import { useCachedJobAnalyses } from '@/hooks/useCachedJobAnalyses';
 const JobGuide = () => {
   const {
     user,
@@ -60,6 +61,14 @@ const JobGuide = () => {
   const [matchScore, setMatchScore] = useState<string | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const loadingMessages = ["🔍 Analyzing job requirements...", "✨ Crafting personalized insights...", "🚀 Tailoring advice to your profile...", "🎯 Generating strategic recommendations..."];
+
+  // Use cached job analyses hook for instant data display
+  const {
+    data: jobAnalysisHistory,
+    isLoading: historyLoading,
+    isShowingCachedData,
+    refetch: refetchHistory
+  } = useCachedJobAnalyses();
 
   // Use feature credit check specifically for job analysis
   const {
@@ -331,6 +340,7 @@ const JobGuide = () => {
         setJobAnalysisId(insertedData.id);
         setIsSuccess(true);
         setIsGenerating(true);
+        refetchHistory(); // Update cache with new entry
         toast({
           title: "Job Analysis Started!",
           description: "Your personalized job analysis is being created. Please wait for the results."

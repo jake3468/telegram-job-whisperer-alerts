@@ -41,12 +41,8 @@ export const useLocationPricing = () => {
     return getGlobalPricing(); // Safe default
   };
 
-  // Initialize with appropriate defaults based on cached location
-  useEffect(() => {
-    if (!pricingData) {
-      setPricingData(getInitialDefaults());
-    }
-  }, []);
+  // Don't initialize with defaults if we have cached data - let cached hook handle it
+  // This prevents USD default from flashing when Indian cache exists
 
   useEffect(() => {
     const detectLocation = async () => {
