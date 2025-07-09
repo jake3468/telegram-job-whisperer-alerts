@@ -77,10 +77,30 @@ const Profile = () => {
     }
   }, [isLoaded, user, checkJWTSetup]);
 
-  // Manual refresh function - refreshes entire page for persistent issues
+  // Manual refresh function - instant refresh for better UX
   const handleManualRefresh = useCallback(() => {
-    window.location.reload();
-  }, []);
+    try {
+      // For connection issues, immediately force page refresh
+      if (connectionIssue) {
+        window.location.reload();
+        return;
+      }
+      
+      // Otherwise try refreshing data first and fall back if needed
+      checkJWTSetup();
+      
+      // Short timeout for fallback
+      setTimeout(() => {
+        if (connectionIssue) {
+          window.location.reload();
+        }
+      }, 1000);
+    } catch (err) {
+      console.error('Manual refresh failed:', err);
+      // Force page refresh if all else fails
+      window.location.reload();
+    }
+  }, [connectionIssue, checkJWTSetup]);
 
   if (!isLoaded || !user) {
     return (
