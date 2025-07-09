@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
+import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,13 +13,20 @@ const ResumeSection = () => {
   const {
     toast
   } = useToast();
+  const { resumeExists, updateResumeStatus } = useCachedUserProfile();
   const [uploading, setUploading] = useState(false);
   const [resumeUrl, setResumeUrl] = useState<string | null>(null);
   useEffect(() => {
-    if (user) {
+    if (user && !resumeExists) {
+      // Only check for resume if we don't have cached status
       checkExistingResume();
+    } else if (resumeExists && user) {
+      // If we know resume exists, set the URL immediately
+      const fileName = `${user.id}/resume.pdf`;
+      const { data: urlData } = supabase.storage.from('resumes').getPublicUrl(fileName);
+      setResumeUrl(urlData.publicUrl);
     }
-  }, [user]);
+  }, [user, resumeExists]);
   const checkExistingResume = async () => {
     if (!user) return;
     try {
@@ -39,6 +47,9 @@ const ResumeSection = () => {
           data: urlData
         } = supabase.storage.from('resumes').getPublicUrl(fileName);
         setResumeUrl(urlData.publicUrl);
+        updateResumeStatus(true); // Cache that resume exists
+      } else {
+        updateResumeStatus(false); // Cache that resume doesn't exist
       }
     } catch (error) {
       console.error('Error checking existing resume:', error);
@@ -126,6 +137,7 @@ const ResumeSection = () => {
         data
       } = supabase.storage.from('resumes').getPublicUrl(fileName);
       setResumeUrl(data.publicUrl);
+      updateResumeStatus(true); // Cache that resume now exists
       await callResumeWebhook(data.publicUrl, file.name, file.size);
       toast({
         title: "Resume uploaded successfully",
@@ -151,6 +163,7 @@ const ResumeSection = () => {
       } = await supabase.storage.from('resumes').remove([fileName]);
       if (error) throw error;
       setResumeUrl(null);
+      updateResumeStatus(false); // Cache that resume no longer exists
       toast({
         title: "Resume deleted",
         description: "Your resume has been removed."

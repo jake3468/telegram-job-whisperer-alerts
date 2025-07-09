@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { User } from 'lucide-react';
-import { useUserProfile } from '@/hooks/useUserProfile';
+import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
 const BioSection = () => {
   const {
@@ -14,7 +14,7 @@ const BioSection = () => {
     userProfile,
     loading,
     updateUserProfile
-  } = useUserProfile();
+  } = useCachedUserProfile();
   const [bio, setBio] = useState(userProfile?.bio || '');
   const [saving, setSaving] = useState(false);
   
