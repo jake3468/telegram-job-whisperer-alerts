@@ -137,13 +137,12 @@ For any payment-related queries, feel free to reach out to us at support@aspirel
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
             <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in">
               Current Balance:{" "}
-              {isCreditsLoading && !credits ? <span className="font-bold text-cyan-100">Loading...</span> : 
-               credits ? <span className="font-bold text-cyan-100">
+              {credits ? <span className="font-bold text-cyan-100">
                   {currentBalance.toLocaleString()} credits
-                </span> : <span className="font-bold text-yellow-300">No credits found</span>}
+                </span> : <span className="font-bold text-cyan-100">Loading...</span>}
             </p>
             <div className="flex items-center gap-2">
-              <SubscriptionBadge />
+              <SubscriptionBadge credits={credits} />
               <UsageHistoryModal />
             </div>
           </div>

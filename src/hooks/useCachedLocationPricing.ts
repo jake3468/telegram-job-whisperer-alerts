@@ -29,13 +29,52 @@ export const useCachedLocationPricing = () => {
           setDisplayData(pricingData);
           logger.debug('Loaded cached pricing data:', pricingData);
         } else {
-          // Remove expired cache
+          // Remove expired cache and set default pricing
           localStorage.removeItem(CACHE_KEY);
+          setDisplayData({
+            region: 'global',
+            currency: 'USD',
+            currencySymbol: '$',
+            monthlyPrice: 15,
+            subscriptionProductId: 'sub_premium_global',
+            creditPacks: [
+              { credits: 100, price: 15, productId: 'pack_100_global' },
+              { credits: 250, price: 35, productId: 'pack_250_global' },
+              { credits: 500, price: 65, productId: 'pack_500_global' }
+            ]
+          });
         }
+      } else {
+        // Set default pricing when no cache exists
+        setDisplayData({
+          region: 'global',
+          currency: 'USD',
+          currencySymbol: '$',
+          monthlyPrice: 15,
+          subscriptionProductId: 'sub_premium_global',
+          creditPacks: [
+            { credits: 100, price: 15, productId: 'pack_100_global' },
+            { credits: 250, price: 35, productId: 'pack_250_global' },
+            { credits: 500, price: 65, productId: 'pack_500_global' }
+          ]
+        });
       }
     } catch (error) {
       logger.warn('Failed to load cached pricing data:', error);
       localStorage.removeItem(CACHE_KEY);
+      // Set default pricing on error
+      setDisplayData({
+        region: 'global',
+        currency: 'USD',
+        currencySymbol: '$',
+        monthlyPrice: 15,
+        subscriptionProductId: 'sub_premium_global',
+        creditPacks: [
+          { credits: 100, price: 15, productId: 'pack_100_global' },
+          { credits: 250, price: 35, productId: 'pack_250_global' },
+          { credits: 500, price: 65, productId: 'pack_500_global' }
+        ]
+      });
     }
   }, []);
 

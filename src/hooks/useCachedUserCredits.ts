@@ -17,7 +17,13 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 export const useCachedUserCredits = () => {
   const { data: freshData, isLoading, error, ...rest } = useUserCredits();
   const [cachedData, setCachedData] = useState<CachedCreditsData | null>(null);
-  const [displayData, setDisplayData] = useState<any>(null);
+  const [displayData, setDisplayData] = useState<any>({
+    current_balance: 30,
+    subscription_plan: 'free',
+    free_credits: 30,
+    paid_credits: 0,
+    next_reset_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+  });
 
   // Load cached data immediately on mount
   useEffect(() => {
@@ -30,14 +36,15 @@ export const useCachedUserCredits = () => {
         // Use cached data if it's less than cache duration old
         if (now - parsedCache.timestamp < CACHE_DURATION) {
           setCachedData(parsedCache);
-          setDisplayData({
+          const cachedDisplayData = {
             current_balance: parsedCache.current_balance,
             subscription_plan: parsedCache.subscription_plan,
             free_credits: parsedCache.free_credits,
             paid_credits: parsedCache.paid_credits,
             next_reset_date: parsedCache.next_reset_date
-          });
-          logger.debug('Loaded cached credits data:', parsedCache);
+          };
+          setDisplayData(cachedDisplayData);
+          logger.debug('Loaded cached credits data:', cachedDisplayData);
         } else {
           // Remove expired cache
           localStorage.removeItem(CACHE_KEY);
