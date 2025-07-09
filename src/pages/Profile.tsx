@@ -103,32 +103,18 @@ const Profile = () => {
             </p>
           </div>
           
-          <div className="flex items-center gap-2">
-            {/* Connection Status Indicator */}
-            <div className="flex items-center gap-1">
-              {connectionIssue ? (
-                <WifiOff className="w-4 h-4 text-red-400" />
-              ) : (
-                <Wifi className="w-4 h-4 text-green-400" />
-              )}
-              <span className={`text-xs ${connectionIssue ? 'text-red-400' : 'text-green-400'}`}>
-                {connectionIssue ? 'Offline' : 'Online'}
-              </span>
-            </div>
-            
-            {/* Manual Refresh Button */}
-            {connectionIssue && (
-              <Button
-                onClick={handleManualRefresh}
-                variant="outline"
-                size="sm"
-                className="text-xs bg-red-900/20 border-red-400/30 text-red-300 hover:bg-red-800/30"
-              >
-                <RefreshCw className="w-3 h-3 mr-1" />
-                Refresh
-              </Button>
-            )}
-          </div>
+          {/* Manual Refresh Button */}
+          {connectionIssue && (
+            <Button
+              onClick={handleManualRefresh}
+              variant="outline"
+              size="sm"
+              className="text-xs bg-red-900/20 border-red-400/30 text-red-300 hover:bg-red-800/30"
+            >
+              <RefreshCw className="w-3 h-3 mr-1" />
+              Refresh
+            </Button>
+          )}
         </div>
         
         {/* Error Message */}

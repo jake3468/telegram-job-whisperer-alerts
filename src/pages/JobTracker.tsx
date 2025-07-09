@@ -549,14 +549,8 @@ const JobTracker = () => {
               <span className="font-semibold text-3xl">📈</span>
               <h1 className="font-extrabold font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow md:text-4xl text-center text-3xl">Job Tracker</h1>
               
-              {/* Connection Status Indicator & Refresh Button */}
-              <div className="flex items-center gap-2">
-                {connectionIssue && (
-                  <div className="flex items-center gap-1 text-yellow-400 text-xs bg-yellow-900/30 px-2 py-1 rounded">
-                    <AlertCircle className="h-3 w-3" />
-                    <span>Offline</span>
-                  </div>
-                )}
+              {/* Manual Refresh Button */}
+              {connectionIssue && (
                 <Button 
                   onClick={handleManualRefresh} 
                   variant="ghost" 
@@ -566,7 +560,7 @@ const JobTracker = () => {
                 >
                   <RefreshCw className="h-4 w-4" />
                 </Button>
-              </div>
+              )}
             </div>
 
             {/* Error Display */}

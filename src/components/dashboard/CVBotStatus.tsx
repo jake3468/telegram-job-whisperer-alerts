@@ -97,13 +97,9 @@ const CVBotStatus = ({ onActivationChange }: CVBotStatusProps) => {
 
   return (
     <div className="mb-6">
-      {/* Connection Status and Refresh */}
+      {/* Manual Refresh Button */}
       {connectionIssue && (
-        <div className="bg-yellow-800/20 border border-yellow-400/30 rounded-lg p-3 mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <WifiOff className="w-4 h-4 text-yellow-400" />
-            <span className="text-yellow-300 text-sm">Using cached data - Connection issues detected</span>
-          </div>
+        <div className="mb-4 flex justify-end">
           <Button
             onClick={handleManualRefresh}
             variant="outline"

@@ -208,15 +208,9 @@ const JobAlertsSection = ({
   }
   return <section className="rounded-3xl border-2 border-orange-400 bg-gradient-to-b from-orange-900/90 via-[#2b1605]/90 to-[#2b1605]/98 shadow-none p-0">
       <div className="pt-4 px-2 sm:px-6">
-        {/* Connection Status and Error Display */}
+        {/* Manual Refresh Button */}
         {(connectionIssue || error) && (
-          <div className="bg-yellow-800/20 border border-yellow-400/30 rounded-lg p-3 mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <WifiOff className="w-4 h-4 text-yellow-400" />
-              <span className="text-yellow-300 text-sm">
-                {connectionIssue ? 'Offline - Using cached data' : error}
-              </span>
-            </div>
+          <div className="mb-4 flex justify-end">
             <Button
               onClick={handleManualRefresh}
               variant="outline"
@@ -241,17 +235,6 @@ const JobAlertsSection = ({
                 <span>Job Alerts</span>
               </span>
               
-              {/* Connection Status Indicator */}
-              <div className="flex items-center gap-1">
-                {connectionIssue ? (
-                  <WifiOff className="w-4 h-4 text-red-400" />
-                ) : (
-                  <Wifi className="w-4 h-4 text-green-400" />
-                )}
-                <span className={`text-xs ${connectionIssue ? 'text-red-400' : 'text-green-400'}`}>
-                  {connectionIssue ? 'Offline' : 'Online'}
-                </span>
-              </div>
             </div>
             <p className="text-orange-100 font-inter text-sm font-semibold drop-shadow-none">Set up personalized daily job alerts based on your preferences</p>
             

@@ -136,32 +136,18 @@ export default function GetMoreCredits() {
               </h1>
             </div>
             
-            <div className="flex items-center gap-2">
-              {/* Connection Status Indicator */}
-              <div className="flex items-center gap-1">
-                {connectionIssue ? (
-                  <WifiOff className="w-4 h-4 text-red-400" />
-                ) : (
-                  <Wifi className="w-4 h-4 text-green-400" />
-                )}
-                <span className={`text-xs ${connectionIssue ? 'text-red-400' : 'text-green-400'}`}>
-                  {connectionIssue ? 'Offline' : 'Online'}
-                </span>
-              </div>
-              
-              {/* Manual Refresh Button */}
-              {connectionIssue && (
-                <Button
-                  onClick={handleManualRefresh}
-                  variant="outline"
-                  size="sm"
-                  className="text-xs bg-red-900/20 border-red-400/30 text-red-300 hover:bg-red-800/30"
-                >
-                  <RefreshCw className="w-3 h-3 mr-1" />
-                  Refresh
-                </Button>
-              )}
-            </div>
+            {/* Manual Refresh Button */}
+            {connectionIssue && (
+              <Button
+                onClick={handleManualRefresh}
+                variant="outline"
+                size="sm"
+                className="text-xs bg-red-900/20 border-red-400/30 text-red-300 hover:bg-red-800/30"
+              >
+                <RefreshCw className="w-3 h-3 mr-1" />
+                Refresh
+              </Button>
+            )}
           </div>
           <p className="text-blue-100 font-inter font-light mb-1 sm:mb-2 animate-fade-in sm:text-base text-left text-sm">Start with free monthly credits and upgrade anytime — either by purchasing flexible credit packs or a monthly subscription. 
 
@@ -171,7 +157,6 @@ For any payment-related queries, feel free to reach out to us at support@aspirel
             <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in">
               Current Balance:{" "}
               {isLoading ? <span className="font-bold text-cyan-100">Loading...</span> : 
-               connectionIssue && !displayCredits ? <span className="font-bold text-yellow-300">Offline - Using cached data</span> :
                displayCredits ? <span className="font-bold text-cyan-100">
                   {currentBalance.toLocaleString()} credits
                 </span> : <span className="font-bold text-yellow-300">No credits found</span>}
@@ -281,11 +266,11 @@ For any payment-related queries, feel free to reach out to us at support@aspirel
                   </li>
                 </ul>
                  <div className="mt-auto">
-                   <Button onClick={handleSubscribeClick} className="w-full py-2 sm:py-2.5 bg-white hover:bg-yellow-100 text-black font-orbitron text-xs rounded-xl shadow border-0 font-bold transition-colors duration-200" disabled={connectionIssue || isPricingLoading || isProductsLoading || displayProducts.subscriptionProducts[0] && isCheckoutLoading(displayProducts.subscriptionProducts[0].product_id)}>
+                    <Button onClick={handleSubscribeClick} className="w-full py-2 sm:py-2.5 bg-white hover:bg-yellow-100 text-black font-orbitron text-xs rounded-xl shadow border-0 font-bold transition-colors duration-200" disabled={connectionIssue || isPricingLoading || isProductsLoading || displayProducts.subscriptionProducts[0] && isCheckoutLoading(displayProducts.subscriptionProducts[0].product_id)}>
                      {displayProducts.subscriptionProducts[0] && isCheckoutLoading(displayProducts.subscriptionProducts[0].product_id) ? <>
                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
                          Processing...
-                       </> : connectionIssue ? 'Offline' : 'Subscribe Now'}
+                       </> : 'Subscribe Now'}
                    </Button>
                  </div>
               </CardContent>
@@ -307,9 +292,9 @@ For any payment-related queries, feel free to reach out to us at support@aspirel
                          <span className="text-indigo-100 font-medium text-xs sm:text-sm">{pack.credits_amount} credits</span>
                          <div className="flex items-center gap-2">
                            <span className="text-indigo-50 font-bold text-xs sm:text-sm">{displayPricing.currencySymbol}{pack.price_amount}</span>
-                           <Button size="sm" onClick={() => handleCreditPackClick(pack.product_id)} className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={connectionIssue || isCheckoutLoading(pack.product_id)}>
-                             {isCheckoutLoading(pack.product_id) ? <Loader2 className="w-3 h-3 animate-spin" /> : connectionIssue ? 'Offline' : 'Buy'}
-                           </Button>
+                            <Button size="sm" onClick={() => handleCreditPackClick(pack.product_id)} className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={connectionIssue || isCheckoutLoading(pack.product_id)}>
+                              {isCheckoutLoading(pack.product_id) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
+                            </Button>
                          </div>
                        </div>) :
                  // Only show fallback if no database products and not loading
@@ -317,9 +302,9 @@ For any payment-related queries, feel free to reach out to us at support@aspirel
                          <span className="text-indigo-100 font-medium text-xs sm:text-sm">{pack.credits} credits</span>
                          <div className="flex items-center gap-2">
                            <span className="text-indigo-50 font-bold text-xs sm:text-sm">{displayPricing.currencySymbol}{pack.price}</span>
-                           <Button size="sm" onClick={() => handleCreditPackClick(pack.productId)} className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={connectionIssue || isCheckoutLoading(pack.productId)}>
-                             {isCheckoutLoading(pack.productId) ? <Loader2 className="w-3 h-3 animate-spin" /> : connectionIssue ? 'Offline' : 'Buy'}
-                           </Button>
+                            <Button size="sm" onClick={() => handleCreditPackClick(pack.productId)} className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={connectionIssue || isCheckoutLoading(pack.productId)}>
+                              {isCheckoutLoading(pack.productId) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
+                            </Button>
                          </div>
                        </div>)}
                   
