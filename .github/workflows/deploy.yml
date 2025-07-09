@@ -31,7 +31,7 @@ jobs:
         run: |
           COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")
           echo "commit_message=$COMMIT_MESSAGE"
-          if [[ "$COMMIT_MESSAGE" == *"Syncing main branch with production"* ]] || [[ "$COMMIT_MESSAGE" == *"sync"* ]] || [[ "$COMMIT_MESSAGE" == *"Sync"* ]]; then
+          if [[ "$COMMIT_MESSAGE" == *"Merge remote-tracking branch 'origin/production'"* ]] || [[ "$COMMIT_MESSAGE" == *"Syncing main branch with production"* ]] || [[ "$COMMIT_MESSAGE" == *"sync"* ]] || [[ "$COMMIT_MESSAGE" == *"Sync"* ]]; then
             echo "is_sync_commit=true" >> $GITHUB_OUTPUT
             echo "🔄 Detected sync commit, skipping preview deployment"
           else
