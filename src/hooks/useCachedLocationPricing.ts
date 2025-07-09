@@ -82,14 +82,21 @@ export const useCachedLocationPricing = () => {
       try {
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
         setCachedData(cacheData);
-        setDisplayData(freshData);
-        logger.debug('Cached fresh pricing data:', cacheData);
+        
+        // Only update display data if we don't already have cached data showing
+        // This prevents the flash from cached Indian prices to fresh data
+        if (!displayData || displayData.region !== freshData.region) {
+          setDisplayData(freshData);
+          logger.debug('Updated display data with fresh pricing:', freshData);
+        } else {
+          logger.debug('Keeping existing display data to prevent flash, but cached fresh data:', cacheData);
+        }
       } catch (error) {
         logger.warn('Failed to cache pricing data:', error);
         setDisplayData(freshData);
       }
     }
-  }, [freshData, isLoading]);
+  }, [freshData, isLoading, displayData]);
 
   // Cache user location when detected
   useEffect(() => {

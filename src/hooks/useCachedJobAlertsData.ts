@@ -1,0 +1,155 @@
+import { useState, useEffect } from 'react';
+import { useUser } from '@clerk/clerk-react';
+import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/logger';
+
+interface JobAlert {
+  id: string;
+  country: string;
+  location: string;
+  job_title: string;
+  job_type: 'Remote' | 'On-site' | 'Hybrid';
+  alert_frequency: string;
+  preferred_time: string;
+  max_alerts_per_day: number;
+  timezone: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface CachedJobAlertsData {
+  alerts: JobAlert[];
+  isActivated: boolean;
+  userProfileId: string;
+  timestamp: number;
+}
+
+const CACHE_KEY = 'aspirely_job_alerts_cache';
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+
+export const useCachedJobAlertsData = () => {
+  const { user } = useUser();
+  const [alerts, setAlerts] = useState<JobAlert[]>([]);
+  const [isActivated, setIsActivated] = useState<boolean>(false);
+  const [userProfileId, setUserProfileId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Load cached data immediately on mount
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const parsedCache: CachedJobAlertsData = JSON.parse(cached);
+        const now = Date.now();
+        
+        // Use cached data if it's less than cache duration old
+        if (now - parsedCache.timestamp < CACHE_DURATION) {
+          setAlerts(parsedCache.alerts);
+          setIsActivated(parsedCache.isActivated);
+          setUserProfileId(parsedCache.userProfileId);
+          logger.debug('Loaded cached job alerts data:', parsedCache);
+        } else {
+          localStorage.removeItem(CACHE_KEY);
+        }
+      }
+    } catch (error) {
+      logger.warn('Failed to load cached job alerts data:', error);
+      localStorage.removeItem(CACHE_KEY);
+    }
+  }, []);
+
+  // Fetch fresh data
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    
+    fetchJobAlertsData();
+  }, [user]);
+
+  const fetchJobAlertsData = async () => {
+    if (!user) return;
+    
+    try {
+      setError(null);
+      
+      // Get user's database ID
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('clerk_id', user.id)
+        .maybeSingle();
+        
+      if (userError || !userData) {
+        throw new Error('Failed to fetch user data');
+      }
+
+      // Get user profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('user_profile')
+        .select('id, bot_activated')
+        .eq('user_id', userData.id)
+        .maybeSingle();
+        
+      if (profileError || !profileData) {
+        throw new Error('Failed to fetch profile data');
+      }
+
+      // Fetch job alerts
+      const { data: alertsData, error: alertsError } = await supabase
+        .from('job_alerts')
+        .select('*')
+        .eq('user_id', profileData.id)
+        .order('created_at', { ascending: false });
+
+      if (alertsError) {
+        throw new Error('Failed to fetch job alerts');
+      }
+
+      const fetchedAlerts = alertsData || [];
+      const botActivated = profileData.bot_activated || false;
+
+      // Update state
+      setAlerts(fetchedAlerts);
+      setIsActivated(botActivated);
+      setUserProfileId(profileData.id);
+
+      // Cache the data
+      try {
+        const cacheData: CachedJobAlertsData = {
+          alerts: fetchedAlerts,
+          isActivated: botActivated,
+          userProfileId: profileData.id,
+          timestamp: Date.now()
+        };
+        localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+        logger.debug('Cached fresh job alerts data:', cacheData);
+      } catch (cacheError) {
+        logger.warn('Failed to cache job alerts data:', cacheError);
+      }
+
+    } catch (error) {
+      logger.error('Error fetching job alerts data:', error);
+      setError(error instanceof Error ? error.message : 'Unknown error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const invalidateCache = () => {
+    localStorage.removeItem(CACHE_KEY);
+    fetchJobAlertsData();
+  };
+
+  return {
+    alerts,
+    isActivated,
+    userProfileId,
+    loading,
+    error,
+    refetch: fetchJobAlertsData,
+    invalidateCache
+  };
+};

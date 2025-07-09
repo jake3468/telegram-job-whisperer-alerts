@@ -1,13 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useUser } from '@clerk/clerk-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Bell, Plus, AlertCircle, RefreshCw, Wifi, WifiOff } from 'lucide-react';
+import { Bell, Plus, AlertCircle, RefreshCw } from 'lucide-react';
 import JobAlertForm from './JobAlertForm';
 import JobAlertsList from './JobAlertsList';
 import BotStatus from './BotStatus';
+import { useCachedJobAlertsData } from '@/hooks/useCachedJobAlertsData';
 interface JobAlert {
   id: string;
   country: string;
@@ -29,99 +28,23 @@ const JobAlertsSection = ({
 }: {
   userTimezone: string;
 }) => {
-  const {
-    user
-  } = useUser();
-  const {
-    toast
-  } = useToast();
-  const [alerts, setAlerts] = useState<JobAlert[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const { 
+    alerts, 
+    isActivated, 
+    userProfileId, 
+    loading, 
+    error, 
+    invalidateCache 
+  } = useCachedJobAlertsData();
+  
   const [showForm, setShowForm] = useState(false);
   const [editingAlert, setEditingAlert] = useState<JobAlert | null>(null);
-  const [isActivated, setIsActivated] = useState<boolean>(false);
-  const [userProfileId, setUserProfileId] = useState<string | null>(null);
-  
-  // Connection and error state management
-  const [connectionIssue, setConnectionIssue] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [lastSuccessfulAlerts, setLastSuccessfulAlerts] = useState<JobAlert[]>([]);
   
   const MAX_ALERTS = 5;
-  
-  // Use cached data when available
-  const displayAlerts = connectionIssue && lastSuccessfulAlerts.length > 0 ? lastSuccessfulAlerts : alerts;
-  const alertsUsed = displayAlerts.length;
+  const alertsUsed = alerts.length;
   const alertsRemaining = MAX_ALERTS - alertsUsed;
   const isAtLimit = alertsUsed >= MAX_ALERTS;
-  useEffect(() => {
-    fetchUserProfileAndAlerts();
-  }, [user]);
-  const fetchUserProfileAndAlerts = async () => {
-    if (!user) return;
-    try {
-      console.log('[JobAlertsSection] Starting to fetch user profile and alerts for user:', user.id);
-      setError(null);
-      setConnectionIssue(false);
-
-      // Add delay to allow JWT refresh to complete
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // First, get the user's database ID - single attempt
-      const {
-        data: userData,
-        error: userError
-      } = await supabase.from('users').select('id').eq('clerk_id', user.id).maybeSingle();
-      if (userError || !userData) {
-        console.error('[JobAlertsSection] Error fetching user:', userError);
-        setConnectionIssue(true);
-        setError('Failed to fetch user data');
-        setLoading(false);
-        return;
-      }
-      console.log('[JobAlertsSection] Found user data:', userData);
-
-      // Get user profile - single attempt
-      const {
-        data: profileData,
-        error: profileError
-      } = await supabase.from('user_profile').select('id').eq('user_id', userData.id).maybeSingle();
-      if (profileError || !profileData) {
-        console.error('[JobAlertsSection] Error fetching user profile:', profileError);
-        setConnectionIssue(true);
-        setError('Failed to fetch profile data');
-        setLoading(false);
-        return;
-      }
-      console.log('[JobAlertsSection] Found profile data:', profileData);
-      setUserProfileId(profileData.id);
-
-      // Fetch job alerts using user_profile.id
-      console.log('[JobAlertsSection] Fetching job alerts for profile ID:', profileData.id);
-      const {
-        data,
-        error
-      } = await supabase.from('job_alerts').select('*').eq('user_id', profileData.id).order('created_at', {
-        ascending: false
-      });
-      if (error) {
-        console.error('[JobAlertsSection] Error fetching job alerts:', error);
-        setConnectionIssue(true);
-        setError('Failed to fetch job alerts');
-      } else {
-        console.log('[JobAlertsSection] Successfully fetched job alerts:', data);
-        setAlerts(data || []);
-        setLastSuccessfulAlerts(data || []);
-        setConnectionIssue(false);
-      }
-    } catch (error) {
-      console.error('[JobAlertsSection] Error fetching user profile and alerts:', error);
-      setConnectionIssue(true);
-      setError('Connection failed - using cached data where available');
-    } finally {
-      setLoading(false);
-    }
-  };
   const handleCreateAlert = () => {
     if (!isActivated) {
       toast({
@@ -164,11 +87,12 @@ const JobAlertsSection = ({
       return;
     }
     try {
-      const {
-        error
-      } = await supabase.from('job_alerts').delete().eq('id', alertId);
+      const { error } = await supabase.from('job_alerts').delete().eq('id', alertId);
       if (error) throw error;
-      setAlerts(alerts.filter(alert => alert.id !== alertId));
+      
+      // Invalidate cache to refresh data
+      invalidateCache();
+      
       toast({
         title: "Alert deleted",
         description: "Job alert has been removed successfully."
@@ -185,14 +109,13 @@ const JobAlertsSection = ({
   const handleFormSubmit = () => {
     setShowForm(false);
     setEditingAlert(null);
-    fetchUserProfileAndAlerts();
+    // Invalidate cache to refresh data
+    invalidateCache();
   };
+  
   const handleFormCancel = () => {
     setShowForm(false);
     setEditingAlert(null);
-  };
-  const handleActivationChange = (activated: boolean) => {
-    setIsActivated(activated);
   };
 
   // Manual refresh function - refreshes entire page for persistent issues
@@ -209,7 +132,7 @@ const JobAlertsSection = ({
   return <section className="rounded-3xl border-2 border-orange-400 bg-gradient-to-b from-orange-900/90 via-[#2b1605]/90 to-[#2b1605]/98 shadow-none p-0">
       <div className="pt-4 px-2 sm:px-6">
         {/* Manual Refresh Button */}
-        {(connectionIssue || error) && (
+        {error && (
           <div className="mb-4 flex justify-end">
             <Button
               onClick={handleManualRefresh}
@@ -262,7 +185,7 @@ const JobAlertsSection = ({
 
         <div>
           {/* Bot Status Component */}
-          <BotStatus onActivationChange={handleActivationChange} />
+          <BotStatus onActivationChange={() => {}} />
 
           {/* Job Alerts Form and List - Only show when activated */}
           {isActivated && <>
@@ -270,7 +193,7 @@ const JobAlertsSection = ({
                   <JobAlertForm userTimezone={userTimezone} editingAlert={editingAlert} onSubmit={handleFormSubmit} onCancel={handleFormCancel} currentAlertCount={alertsUsed} maxAlerts={MAX_ALERTS} />
                 </div>}
               <div className="flex flex-col gap-4 pb-6 sm:pb-8">
-                <JobAlertsList alerts={displayAlerts} onEdit={handleEditAlert} onDelete={handleDeleteAlert} />
+                <JobAlertsList alerts={alerts} onEdit={handleEditAlert} onDelete={handleDeleteAlert} />
               </div>
             </>}
 
