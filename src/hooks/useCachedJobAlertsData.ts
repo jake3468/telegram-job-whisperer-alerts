@@ -48,6 +48,7 @@ export const useCachedJobAlertsData = () => {
           setAlerts(parsedCache.alerts);
           setIsActivated(parsedCache.isActivated);
           setUserProfileId(parsedCache.userProfileId);
+          setLoading(false); // Mark as loaded since we have cached data
           logger.debug('Loaded cached job alerts data:', parsedCache);
         } else {
           localStorage.removeItem(CACHE_KEY);
@@ -59,15 +60,21 @@ export const useCachedJobAlertsData = () => {
     }
   }, []);
 
-  // Fetch fresh data
+  // Fetch fresh data only when user changes or when explicitly requested
   useEffect(() => {
     if (!user) {
       setLoading(false);
       return;
     }
     
-    fetchJobAlertsData();
-  }, [user]);
+    // Only fetch if we don't have cached data or user has changed
+    const shouldFetch = alerts.length === 0 && !error;
+    if (shouldFetch) {
+      fetchJobAlertsData();
+    } else {
+      setLoading(false);
+    }
+  }, [user?.id]); // Only depend on user ID, not the entire user object
 
   const fetchJobAlertsData = async () => {
     if (!user) return;

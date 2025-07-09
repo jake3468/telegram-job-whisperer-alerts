@@ -53,15 +53,18 @@ export const useCachedLocationPricing = () => {
           const { timestamp, ...pricingData } = parsedCache;
           setDisplayData(pricingData);
           logger.debug('Loaded cached pricing data:', pricingData);
+          return; // Exit early to prevent setting default pricing
         } else {
           // Remove expired cache and set default pricing based on cached location
           localStorage.removeItem(CACHE_KEY);
-          setDisplayData(getDefaultPricing(defaultRegion));
         }
-      } else {
-        // Set default pricing based on cached location when no cache exists
-        setDisplayData(getDefaultPricing(defaultRegion));
       }
+      
+      // Only set default pricing if no valid cache exists
+      const defaultPricing = getDefaultPricing(defaultRegion);
+      setDisplayData(defaultPricing);
+      logger.debug('Set default pricing based on region:', defaultRegion);
+      
     } catch (error) {
       logger.warn('Failed to load cached pricing data:', error);
       localStorage.removeItem(CACHE_KEY);
@@ -83,17 +86,19 @@ export const useCachedLocationPricing = () => {
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
         setCachedData(cacheData);
         
-        // Only update display data if we don't already have cached data showing
-        // This prevents the flash from cached Indian prices to fresh data
+        // Only update display data if region changed or we don't have display data
         if (!displayData || displayData.region !== freshData.region) {
           setDisplayData(freshData);
-          logger.debug('Updated display data with fresh pricing:', freshData);
+          logger.debug('Updated display data with fresh pricing (region changed):', freshData);
         } else {
-          logger.debug('Keeping existing display data to prevent flash, but cached fresh data:', cacheData);
+          logger.debug('Skipping display update - same region. Cached fresh data:', cacheData);
         }
       } catch (error) {
         logger.warn('Failed to cache pricing data:', error);
-        setDisplayData(freshData);
+        // Only update display on cache failure if region is different
+        if (!displayData || displayData.region !== freshData.region) {
+          setDisplayData(freshData);
+        }
       }
     }
   }, [freshData, isLoading, displayData]);
