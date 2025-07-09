@@ -100,10 +100,27 @@ export default function GetMoreCredits() {
     }
   }, [user, isLoaded, navigate]);
 
-  // Manual refresh function - refreshes entire page for persistent issues
+  // Manual refresh function - instant refresh for better UX
   const handleManualRefresh = useCallback(() => {
-    window.location.reload();
-  }, []);
+    try {
+      // For connection issues, immediately force page refresh
+      if (connectionIssue) {
+        window.location.reload();
+        return;
+      }
+      
+      // For cached data scenarios, try refreshing and fall back quickly
+      setTimeout(() => {
+        if (connectionIssue) {
+          window.location.reload();
+        }
+      }, 1000);
+    } catch (err) {
+      console.error('Manual refresh failed:', err);
+      // Force page refresh if all else fails
+      window.location.reload();
+    }
+  }, [connectionIssue]);
 
   // Get display data (cached data is already handled in the hooks)
   const currentBalance = credits ? Number(credits.current_balance) : 0;
