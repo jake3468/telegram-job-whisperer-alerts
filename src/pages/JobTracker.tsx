@@ -648,7 +648,7 @@ const JobTracker = () => {
           <div className="text-center">
             <div className="flex items-center justify-center gap-4 mb-4">
               <span className="font-semibold text-3xl">📈</span>
-              <h1 className="font-extrabold font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow md:text-4xl text-center text-4xl">Job Tracker</h1>
+              <h1 className="font-extrabold font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow md:text-4xl text-center text-3xl">Job Tracker</h1>
               
               {/* Refresh Button */}
               
