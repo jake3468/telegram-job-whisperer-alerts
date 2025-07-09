@@ -25,22 +25,40 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
+      - name: Check if sync commit
+        if: github.ref == 'refs/heads/main'
+        id: check-sync-commit
+        run: |
+          COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")
+          echo "commit_message=$COMMIT_MESSAGE"
+          if [[ "$COMMIT_MESSAGE" == *"Syncing main branch with production"* ]] || [[ "$COMMIT_MESSAGE" == *"sync"* ]] || [[ "$COMMIT_MESSAGE" == *"Sync"* ]]; then
+            echo "is_sync_commit=true" >> $GITHUB_OUTPUT
+            echo "🔄 Detected sync commit, skipping preview deployment"
+          else
+            echo "is_sync_commit=false" >> $GITHUB_OUTPUT
+            echo "✅ Regular commit, proceeding with preview deployment"
+          fi
+      
       - name: Setup Node.js
+        if: github.event_name == 'pull_request' || steps.check-sync-commit.outputs.is_sync_commit != 'true'
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
       
       - name: Install dependencies
+        if: github.event_name == 'pull_request' || steps.check-sync-commit.outputs.is_sync_commit != 'true'
         run: npm install
       
       - name: Build for development
+        if: github.event_name == 'pull_request' || steps.check-sync-commit.outputs.is_sync_commit != 'true'
         env:
           VITE_CLERK_PUBLISHABLE_KEY_DEV: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY_DEV }}
           VITE_CLERK_PUBLISHABLE_KEY_PROD: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY_PROD }}
         run: npm run build
       
       - name: Deploy to Preview (Lovable handles this)
+        if: github.event_name == 'pull_request' || steps.check-sync-commit.outputs.is_sync_commit != 'true'
         run: echo "✅ Preview build triggered from main branch with development Clerk key"
 
   deploy-production:
