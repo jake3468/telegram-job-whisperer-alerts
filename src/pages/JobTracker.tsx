@@ -330,13 +330,10 @@ const JobTracker = () => {
     }
   }, [user, toast, lastSuccessfulJobs]);
 
-  // Manual refresh function
-  const handleManualRefresh = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    setConnectionIssue(false);
-    await fetchJobs(true);
-  }, [fetchJobs]);
+  // Manual refresh function - refreshes entire page for persistent issues
+  const handleManualRefresh = useCallback(() => {
+    window.location.reload();
+  }, []);
 
   // Refresh on user interactions
   const refreshOnInteraction = useCallback(() => {
