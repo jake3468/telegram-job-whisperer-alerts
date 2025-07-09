@@ -263,19 +263,24 @@ const JobTracker = () => {
     }
   }, [user, isLoaded, navigate]);
 
-  // Manual refresh function - enhanced for offline scenarios
+  // Manual refresh function - instant refresh for better UX
   const handleManualRefresh = useCallback(() => {
     try {
-      // Try force refresh first
+      // For inactive state or offline scenarios, immediately force page refresh
+      if (connectionIssue || error) {
+        window.location.reload();
+        return;
+      }
+      
+      // Otherwise try force refresh and immediately fall back if needed
       forceRefresh();
       
-      // If still having issues, provide fallback
+      // Short timeout for fallback
       setTimeout(() => {
         if (connectionIssue || error) {
-          // Force a complete page refresh as last resort
           window.location.reload();
         }
-      }, 5000);
+      }, 1000);
     } catch (err) {
       console.error('Manual refresh failed:', err);
       // Force page refresh if all else fails
