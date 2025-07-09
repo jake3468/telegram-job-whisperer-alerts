@@ -167,7 +167,8 @@ const JobTracker = () => {
     invalidateCache,
     optimisticUpdate,
     optimisticAdd,
-    optimisticDelete
+    optimisticDelete,
+    forceRefresh
   } = useCachedJobTracker();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -262,10 +263,25 @@ const JobTracker = () => {
     }
   }, [user, isLoaded, navigate]);
 
-  // Manual refresh function - uses cache invalidation
+  // Manual refresh function - enhanced for offline scenarios
   const handleManualRefresh = useCallback(() => {
-    invalidateCache();
-  }, [invalidateCache]);
+    try {
+      // Try force refresh first
+      forceRefresh();
+      
+      // If still having issues, provide fallback
+      setTimeout(() => {
+        if (connectionIssue || error) {
+          // Force a complete page refresh as last resort
+          window.location.reload();
+        }
+      }, 5000);
+    } catch (err) {
+      console.error('Manual refresh failed:', err);
+      // Force page refresh if all else fails
+      window.location.reload();
+    }
+  }, [forceRefresh, connectionIssue, error]);
   const handleAddJob = async () => {
     if (!formData.company_name || !formData.job_title) {
       toast({

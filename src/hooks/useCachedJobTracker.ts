@@ -162,6 +162,13 @@ export const useCachedJobTracker = () => {
     setJobs(prevJobs => prevJobs.filter(job => job.id !== jobId));
   };
 
+  const forceRefresh = () => {
+    // Force a full refresh with error showing
+    setError(null);
+    setConnectionIssue(false);
+    fetchJobTrackerData(true);
+  };
+
   return {
     jobs,
     userProfileId,
@@ -172,6 +179,7 @@ export const useCachedJobTracker = () => {
     invalidateCache,
     optimisticUpdate,
     optimisticAdd,
-    optimisticDelete
+    optimisticDelete,
+    forceRefresh
   };
 };
