@@ -21,9 +21,32 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
+      - name: Check branch sync status
+        id: check-sync
+        run: |
+          git fetch --all
+          MAIN_BEHIND=$(git rev-list --count origin/main..origin/production)
+          echo "main_behind=$MAIN_BEHIND" >> $GITHUB_OUTPUT
+          
+          if [ "$MAIN_BEHIND" -gt 0 ]; then
+            echo "⚠️ Main branch is $MAIN_BEHIND commits behind production"
+            echo "This may cause merge conflicts"
+          else
+            echo "✅ Branches are in sync"
+          fi
+      
       - name: Create Pull Request to Production
         if: steps.check-pr.outputs.pr_exists == '0'
         run: |
+          SYNC_WARNING=""
+          if [ "${{ steps.check-sync.outputs.main_behind }}" -gt 0 ]; then
+            SYNC_WARNING="
+          ## ⚠️ Branch Sync Warning
+          Main branch is ${{ steps.check-sync.outputs.main_behind }} commits behind production. This may cause conflicts.
+          Run the Emergency Branch Sync workflow if needed.
+          "
+          fi
+          
           gh pr create \
             --base production \
             --head main \
@@ -32,7 +55,7 @@ jobs:
           ## 📋 Production Deployment
 
           This PR contains the latest changes from the main branch ready for production deployment.
-
+          ${SYNC_WARNING}
           ### 🔍 What's Changed
           - Latest features and fixes from main branch
           - All changes have been tested in development environment
@@ -46,8 +69,9 @@ jobs:
           ### 🚀 Deployment Process
           Once this PR is merged:
           1. Netlify will automatically deploy from the production branch
-          2. Production environment variables will be used
-          3. The live site will be updated
+          2. Main branch will automatically sync with production
+          3. Production environment variables will be used
+          4. The live site will be updated
 
           **Note:** Only merge this PR when you're ready to deploy to production!
           " \

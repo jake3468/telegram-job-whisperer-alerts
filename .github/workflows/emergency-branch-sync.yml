@@ -1,0 +1,83 @@
+name: Emergency Branch Sync Fix
+
+on:
+  workflow_dispatch:
+    inputs:
+      force_sync:
+        description: 'Force sync main with production (true/false)'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+        - 'true'
+        - 'false'
+      confirm_force:
+        description: 'Type "CONFIRM" to proceed with force sync'
+        required: false
+        type: string
+
+jobs:
+  emergency-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate force sync
+        if: github.event.inputs.force_sync == 'true'
+        run: |
+          if [ "${{ github.event.inputs.confirm_force }}" != "CONFIRM" ]; then
+            echo "❌ Force sync requires typing 'CONFIRM' in the confirmation field"
+            exit 1
+          fi
+          echo "✅ Force sync confirmed"
+      
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Emergency sync branches
+        run: |
+          echo "🚨 Starting emergency branch sync..."
+          
+          # Fetch all branches
+          git fetch --all
+          
+          # Show current status
+          echo "Current branch status:"
+          git log --oneline -10 origin/main
+          echo "---"
+          git log --oneline -10 origin/production
+          
+          if [ "${{ github.event.inputs.force_sync }}" = "true" ]; then
+            echo "🔧 Force syncing main with production..."
+            git checkout main
+            git reset --hard origin/production
+            git push --force-with-lease origin main
+            echo "✅ Force sync completed"
+          else
+            echo "🔄 Attempting safe merge sync..."
+            git checkout main
+            git pull origin main
+            git merge origin/production --no-edit
+            git push origin main
+            echo "✅ Safe sync completed"
+          fi
+      
+      - name: Verify sync status
+        run: |
+          echo "🔍 Verifying sync status..."
+          git fetch --all
+          MAIN_COMMIT=$(git rev-parse origin/main)
+          PROD_COMMIT=$(git rev-parse origin/production)
+          
+          if [ "$MAIN_COMMIT" = "$PROD_COMMIT" ]; then
+            echo "✅ Branches are perfectly synced"
+          else
+            echo "ℹ️ Branches have different commits but sync completed"
+            echo "Main: $MAIN_COMMIT"
+            echo "Production: $PROD_COMMIT"
+          fi

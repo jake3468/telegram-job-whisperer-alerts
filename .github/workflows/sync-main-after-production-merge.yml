@@ -1,0 +1,33 @@
+name: Sync Main After Production Merge
+
+on:
+  push:
+    branches: [ production ]
+
+jobs:
+  sync-main:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Sync main with production
+        run: |
+          echo "🔄 Syncing main branch with production after merge..."
+          git checkout main
+          git pull origin main
+          git merge origin/production --no-edit
+          git push origin main
+          echo "✅ Main branch synced successfully"
+      
+      - name: Notify sync completion
+        run: |
+          echo "🎉 Branch sync completed successfully"
+          echo "Main branch is now up-to-date with production"
