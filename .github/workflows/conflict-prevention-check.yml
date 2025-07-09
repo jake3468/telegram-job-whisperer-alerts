@@ -1,0 +1,59 @@
+name: Conflict Prevention Check
+
+on:
+  pull_request:
+    branches: [ production ]
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  check-conflicts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Check for merge conflicts
+        run: |
+          echo "🔍 Checking for potential merge conflicts..."
+          
+          # Fetch the target branch
+          git fetch origin production
+          
+          # Check if merge would be clean
+          git merge-tree $(git merge-base HEAD origin/production) HEAD origin/production > merge_result.txt
+          
+          if [ -s merge_result.txt ]; then
+            echo "⚠️ Potential conflicts detected:"
+            cat merge_result.txt
+            echo ""
+            echo "📋 Conflict Resolution Steps:"
+            echo "1. Run the Emergency Branch Sync workflow with force_sync=true"
+            echo "2. Or manually resolve conflicts in your local branch"
+            echo "3. Re-push your changes"
+          else
+            echo "✅ No conflicts detected - merge should be clean"
+          fi
+      
+      - name: Comment on PR if conflicts found
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ⚠️ Merge Conflicts Detected
+              
+              This PR has potential merge conflicts with the production branch.
+              
+              ### Quick Fix:
+              1. Go to Actions → Emergency Branch Sync Fix
+              2. Set \`force_sync\` to \`true\`
+              3. Type "CONFIRM" in the confirmation field
+              4. Run the workflow
+              5. Update this PR branch
+              
+              The automated sync will resolve the conflicts and prevent future issues.`
+            })
