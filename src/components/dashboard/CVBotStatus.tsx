@@ -1,6 +1,6 @@
 
-import { useState, useEffect } from 'react';
-import { Copy, Check } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Copy, Check, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -16,16 +16,47 @@ const CVBotStatus = ({ onActivationChange }: CVBotStatusProps) => {
   const { hasResume, hasBio, loading: completionLoading } = useUserCompletionStatus();
   const [copiedBotId, setCopiedBotId] = useState(false);
   const [copiedBotName, setCopiedBotName] = useState(false);
+  
+  // Connection and error state management
+  const [connectionIssue, setConnectionIssue] = useState(false);
+  const [lastSuccessfulProfile, setLastSuccessfulProfile] = useState<any>(null);
+  const [lastSuccessfulCompletion, setLastSuccessfulCompletion] = useState<any>(null);
 
-  // Check if user has both resume and bio data
-  const hasRequiredData = hasResume && hasBio;
-  const isActivated = userProfile?.cv_bot_activated && hasRequiredData;
+  // Cache successful data fetches
+  useEffect(() => {
+    if (userProfile && !loading) {
+      setLastSuccessfulProfile(userProfile);
+      setConnectionIssue(false);
+    } else if (loading === false && !userProfile) {
+      setConnectionIssue(true);
+    }
+  }, [userProfile, loading]);
 
   useEffect(() => {
-    if (userProfile) {
+    if ((hasResume !== undefined || hasBio !== undefined) && !completionLoading) {
+      setLastSuccessfulCompletion({ hasResume, hasBio });
+      setConnectionIssue(false);
+    }
+  }, [hasResume, hasBio, completionLoading]);
+
+  // Manual refresh function - refreshes entire page for persistent issues
+  const handleManualRefresh = useCallback(() => {
+    window.location.reload();
+  }, []);
+
+  // Use cached data when available during connection issues
+  const displayProfile = userProfile || lastSuccessfulProfile;
+  const displayCompletion = lastSuccessfulCompletion || { hasResume, hasBio };
+
+  // Check if user has both resume and bio data with cached fallback
+  const hasRequiredData = displayCompletion.hasResume && displayCompletion.hasBio;
+  const isActivated = displayProfile?.cv_bot_activated && hasRequiredData;
+
+  useEffect(() => {
+    if (displayProfile) {
       onActivationChange?.(isActivated || false);
     }
-  }, [userProfile, isActivated, onActivationChange]);
+  }, [displayProfile, isActivated, onActivationChange]);
 
   const copyToClipboard = async (text: string, type: 'botId' | 'botName') => {
     try {
@@ -52,7 +83,7 @@ const CVBotStatus = ({ onActivationChange }: CVBotStatusProps) => {
     }
   };
 
-  if (loading || completionLoading) {
+  if ((loading || completionLoading) && !displayProfile && !lastSuccessfulCompletion) {
     return (
       <div className="mb-6 p-4 bg-black/90 rounded-xl">
         <div className="text-white text-sm">Loading bot status...</div>
@@ -60,12 +91,31 @@ const CVBotStatus = ({ onActivationChange }: CVBotStatusProps) => {
     );
   }
 
-  // Use the user_profile.id as the Bot ID
-  const botId = userProfile?.id || '';
-  const isBotTechnicallyActivated = userProfile?.cv_bot_activated || false;
+  // Use the user_profile.id as the Bot ID with cached fallback
+  const botId = displayProfile?.id || '';
+  const isBotTechnicallyActivated = displayProfile?.cv_bot_activated || false;
 
   return (
     <div className="mb-6">
+      {/* Connection Status and Refresh */}
+      {connectionIssue && (
+        <div className="bg-yellow-800/20 border border-yellow-400/30 rounded-lg p-3 mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <WifiOff className="w-4 h-4 text-yellow-400" />
+            <span className="text-yellow-300 text-sm">Using cached data - Connection issues detected</span>
+          </div>
+          <Button
+            onClick={handleManualRefresh}
+            variant="outline"
+            size="sm"
+            className="text-xs bg-yellow-900/20 border-yellow-400/30 text-yellow-300 hover:bg-yellow-800/30"
+          >
+            <RefreshCw className="w-3 h-3 mr-1" />
+            Refresh
+          </Button>
+        </div>
+      )}
+
       {/* Profile Completion Warning - Show if bot is activated but missing data */}
       {isBotTechnicallyActivated && !hasRequiredData && (
         <div className="bg-yellow-800/40 rounded-lg p-4 text-white border border-yellow-600 mb-4">
@@ -74,10 +124,10 @@ const CVBotStatus = ({ onActivationChange }: CVBotStatusProps) => {
             <p className="text-yellow-100 font-inter text-sm mb-3">
               Your bot is activated, but you need to complete your profile first:
             </p>
-            <ul className="text-sm space-y-1 font-inter text-yellow-100 list-disc list-inside mb-3">
-              {!hasBio && <li>Add your bio in the Profile page</li>}
-              {!hasResume && <li>Upload your resume in the Profile page</li>}
-            </ul>
+             <ul className="text-sm space-y-1 font-inter text-yellow-100 list-disc list-inside mb-3">
+               {!displayCompletion.hasBio && <li>Add your bio in the Profile page</li>}
+               {!displayCompletion.hasResume && <li>Upload your resume in the Profile page</li>}
+             </ul>
             <p className="text-yellow-100 font-inter text-sm">
               Please go to the <strong>Profile</strong> page and complete these sections to start using your Resume Bot.
             </p>

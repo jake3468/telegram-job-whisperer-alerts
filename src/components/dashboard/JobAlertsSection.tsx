@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Bell, Plus, AlertCircle } from 'lucide-react';
+import { Bell, Plus, AlertCircle, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import JobAlertForm from './JobAlertForm';
 import JobAlertsList from './JobAlertsList';
 import BotStatus from './BotStatus';
@@ -41,8 +41,17 @@ const JobAlertsSection = ({
   const [editingAlert, setEditingAlert] = useState<JobAlert | null>(null);
   const [isActivated, setIsActivated] = useState<boolean>(false);
   const [userProfileId, setUserProfileId] = useState<string | null>(null);
+  
+  // Connection and error state management
+  const [connectionIssue, setConnectionIssue] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lastSuccessfulAlerts, setLastSuccessfulAlerts] = useState<JobAlert[]>([]);
+  
   const MAX_ALERTS = 5;
-  const alertsUsed = alerts.length;
+  
+  // Use cached data when available
+  const displayAlerts = connectionIssue && lastSuccessfulAlerts.length > 0 ? lastSuccessfulAlerts : alerts;
+  const alertsUsed = displayAlerts.length;
   const alertsRemaining = MAX_ALERTS - alertsUsed;
   const isAtLimit = alertsUsed >= MAX_ALERTS;
   useEffect(() => {
@@ -52,6 +61,8 @@ const JobAlertsSection = ({
     if (!user) return;
     try {
       console.log('[JobAlertsSection] Starting to fetch user profile and alerts for user:', user.id);
+      setError(null);
+      setConnectionIssue(false);
 
       // Add delay to allow JWT refresh to complete
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -63,7 +74,8 @@ const JobAlertsSection = ({
       } = await supabase.from('users').select('id').eq('clerk_id', user.id).maybeSingle();
       if (userError || !userData) {
         console.error('[JobAlertsSection] Error fetching user:', userError);
-        // Don't show error toast for authentication issues, just fail silently
+        setConnectionIssue(true);
+        setError('Failed to fetch user data');
         setLoading(false);
         return;
       }
@@ -76,6 +88,8 @@ const JobAlertsSection = ({
       } = await supabase.from('user_profile').select('id').eq('user_id', userData.id).maybeSingle();
       if (profileError || !profileData) {
         console.error('[JobAlertsSection] Error fetching user profile:', profileError);
+        setConnectionIssue(true);
+        setError('Failed to fetch profile data');
         setLoading(false);
         return;
       }
@@ -92,25 +106,18 @@ const JobAlertsSection = ({
       });
       if (error) {
         console.error('[JobAlertsSection] Error fetching job alerts:', error);
-        toast({
-          title: "Error loading alerts",
-          description: "There was an error loading your job alerts. Please try refreshing the page.",
-          variant: "destructive"
-        });
+        setConnectionIssue(true);
+        setError('Failed to fetch job alerts');
       } else {
         console.log('[JobAlertsSection] Successfully fetched job alerts:', data);
         setAlerts(data || []);
+        setLastSuccessfulAlerts(data || []);
+        setConnectionIssue(false);
       }
     } catch (error) {
       console.error('[JobAlertsSection] Error fetching user profile and alerts:', error);
-      // Don't show error toast for authentication timeouts
-      if (!error.message?.includes('JWT') && !error.message?.includes('timeout')) {
-        toast({
-          title: "Error loading data",
-          description: "There was an error loading your data. Please try refreshing the page.",
-          variant: "destructive"
-        });
-      }
+      setConnectionIssue(true);
+      setError('Connection failed - using cached data where available');
     } finally {
       setLoading(false);
     }
@@ -187,6 +194,11 @@ const JobAlertsSection = ({
   const handleActivationChange = (activated: boolean) => {
     setIsActivated(activated);
   };
+
+  // Manual refresh function - refreshes entire page for persistent issues
+  const handleManualRefresh = useCallback(() => {
+    window.location.reload();
+  }, []);
   if (loading) {
     return <div className="max-w-2xl mx-auto w-full">
         <div className="rounded-3xl bg-black/95 border-2 border-emerald-400 shadow-none p-6 mt-3 min-h-[160px] flex items-center justify-center">
@@ -196,16 +208,51 @@ const JobAlertsSection = ({
   }
   return <section className="rounded-3xl border-2 border-orange-400 bg-gradient-to-b from-orange-900/90 via-[#2b1605]/90 to-[#2b1605]/98 shadow-none p-0">
       <div className="pt-4 px-2 sm:px-6">
+        {/* Connection Status and Error Display */}
+        {(connectionIssue || error) && (
+          <div className="bg-yellow-800/20 border border-yellow-400/30 rounded-lg p-3 mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <WifiOff className="w-4 h-4 text-yellow-400" />
+              <span className="text-yellow-300 text-sm">
+                {connectionIssue ? 'Offline - Using cached data' : error}
+              </span>
+            </div>
+            <Button
+              onClick={handleManualRefresh}
+              variant="outline"
+              size="sm"
+              className="text-xs bg-yellow-900/20 border-yellow-400/30 text-yellow-300 hover:bg-yellow-800/30"
+            >
+              <RefreshCw className="w-3 h-3 mr-1" />
+              Refresh
+            </Button>
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <div className="min-w-0">
-            <span className="text-2xl font-orbitron bg-gradient-to-r from-orange-300 via-yellow-300 to-pink-400 bg-clip-text text-transparent font-extrabold flex items-center gap-2 drop-shadow">
-              <span className="w-6 h-6 bg-orange-400/70 rounded-full flex items-center justify-center shadow-lg ring-2 ring-orange-300/40">
-                <svg viewBox="0 0 24 24" width={18} height={18}>
-                  <path fill="none" stroke="#fff" strokeWidth="2" d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z" />
-                </svg>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-2xl font-orbitron bg-gradient-to-r from-orange-300 via-yellow-300 to-pink-400 bg-clip-text text-transparent font-extrabold flex items-center gap-2 drop-shadow">
+                <span className="w-6 h-6 bg-orange-400/70 rounded-full flex items-center justify-center shadow-lg ring-2 ring-orange-300/40">
+                  <svg viewBox="0 0 24 24" width={18} height={18}>
+                    <path fill="none" stroke="#fff" strokeWidth="2" d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20z" />
+                  </svg>
+                </span>
+                <span>Job Alerts</span>
               </span>
-              <span>Job Alerts</span>
-            </span>
+              
+              {/* Connection Status Indicator */}
+              <div className="flex items-center gap-1">
+                {connectionIssue ? (
+                  <WifiOff className="w-4 h-4 text-red-400" />
+                ) : (
+                  <Wifi className="w-4 h-4 text-green-400" />
+                )}
+                <span className={`text-xs ${connectionIssue ? 'text-red-400' : 'text-green-400'}`}>
+                  {connectionIssue ? 'Offline' : 'Online'}
+                </span>
+              </div>
+            </div>
             <p className="text-orange-100 font-inter text-sm font-semibold drop-shadow-none">Set up personalized daily job alerts based on your preferences</p>
             
             {/* Alert Usage Counter */}
@@ -240,7 +287,7 @@ const JobAlertsSection = ({
                   <JobAlertForm userTimezone={userTimezone} editingAlert={editingAlert} onSubmit={handleFormSubmit} onCancel={handleFormCancel} currentAlertCount={alertsUsed} maxAlerts={MAX_ALERTS} />
                 </div>}
               <div className="flex flex-col gap-4 pb-6 sm:pb-8">
-                <JobAlertsList alerts={alerts} onEdit={handleEditAlert} onDelete={handleDeleteAlert} />
+                <JobAlertsList alerts={displayAlerts} onEdit={handleEditAlert} onDelete={handleDeleteAlert} />
               </div>
             </>}
 
