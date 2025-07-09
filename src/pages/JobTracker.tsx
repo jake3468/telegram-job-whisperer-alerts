@@ -5,6 +5,7 @@ import { Layout } from '@/components/Layout';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useUserInitialization } from '@/hooks/useUserInitialization';
+import { useCachedJobTracker } from '@/hooks/useCachedJobTracker';
 import { Plus, ExternalLink, Trash2, X, Bookmark, Send, Users, XCircle, Trophy, GripVertical, RefreshCw, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
@@ -151,20 +152,24 @@ const SortableJobCard = ({
     </div>;
 };
 const JobTracker = () => {
-  const {
-    user,
-    isLoaded
-  } = useUser();
+  const { user, isLoaded } = useUser();
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const { initializeUser } = useUserInitialization();
-  const [jobs, setJobs] = useState<JobEntry[]>([]);
-  const [lastSuccessfulJobs, setLastSuccessfulJobs] = useState<JobEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [connectionIssue, setConnectionIssue] = useState(false);
+  
+  // Use cached hook for instant data display
+  const {
+    jobs,
+    userProfileId,
+    loading,
+    error,
+    connectionIssue,
+    invalidateCache,
+    optimisticUpdate,
+    optimisticAdd,
+    optimisticDelete
+  } = useCachedJobTracker();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<JobEntry | null>(null);
@@ -251,94 +256,16 @@ const JobTracker = () => {
     }
   }, [user, initializeUser]);
 
-  // Initial data load
-  useEffect(() => {
-    if (user) {
-      fetchJobs();
-    }
-  }, [user]);
-
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
 
-  const fetchJobs = useCallback(async (showErrors = false) => {
-    if (!user) return;
-    
-    try {
-      // Get the user UUID from users table using clerk_id
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('clerk_id', user.id)
-        .maybeSingle();
-      
-      if (userError || !userData) {
-        throw new Error('Unable to load user data');
-      }
-
-      // Get user profile using the user UUID
-      const { data: userProfile, error: profileError } = await supabase
-        .from('user_profile')
-        .select('id')
-        .eq('user_id', userData.id)
-        .maybeSingle();
-      
-      if (profileError || !userProfile) {
-        throw new Error('Unable to load user profile');
-      }
-
-      // Get jobs for this user profile
-      const { data, error } = await supabase
-        .from('job_tracker')
-        .select('*')
-        .eq('user_id', userProfile.id)
-        .order('order_position', { ascending: true });
-      
-      if (error) {
-        throw new Error('Unable to load job applications');
-      }
-
-      // Success - update both current jobs and cache
-      const jobData = data || [];
-      setJobs(jobData);
-      setLastSuccessfulJobs(jobData);
-      setError(null);
-      setConnectionIssue(false);
-    } catch (error: any) {
-      console.error('Error fetching jobs:', error);
-      setConnectionIssue(true);
-      
-      // Only show errors when user actively interacts or on initial load
-      if (showErrors) {
-        setError(error.message);
-        toast({
-          title: "Connection Issue",
-          description: "Unable to refresh data. Using last known information.",
-          variant: "destructive"
-        });
-      }
-      
-      // Keep existing data on screen
-      if (lastSuccessfulJobs.length > 0) {
-        setJobs(lastSuccessfulJobs);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [user, toast, lastSuccessfulJobs]);
-
-  // Manual refresh function - refreshes entire page for persistent issues
+  // Manual refresh function - uses cache invalidation
   const handleManualRefresh = useCallback(() => {
-    window.location.reload();
-  }, []);
-
-  // Refresh on user interactions
-  const refreshOnInteraction = useCallback(() => {
-    fetchJobs(false); // Silent refresh
-  }, [fetchJobs]);
+    invalidateCache();
+  }, [invalidateCache]);
   const handleAddJob = async () => {
     if (!formData.company_name || !formData.job_title) {
       toast({
@@ -348,43 +275,59 @@ const JobTracker = () => {
       });
       return;
     }
-    try {
-      // First get the user UUID from users table using clerk_id
-      const {
-        data: userData,
-        error: userError
-      } = await supabase.from('users').select('id').eq('clerk_id', user?.id).single();
-      if (userError || !userData) {
-        console.error('User not found:', userError);
-        throw new Error('User not found');
-      }
+    
+    if (!userProfileId) {
+      toast({
+        title: "Error", 
+        description: "User profile not loaded. Please refresh and try again.",
+        variant: "destructive"
+      });
+      return;
+    }
 
-      // Then get user profile using the user UUID
-      const {
-        data: userProfile,
-        error: profileError
-      } = await supabase.from('user_profile').select('id').eq('user_id', userData.id).single();
-      if (profileError || !userProfile) {
-        console.error('User profile not found:', profileError);
-        throw new Error('User profile not found');
-      }
+    try {
       const maxOrder = Math.max(...jobs.filter(job => job.status === selectedStatus).map(job => job.order_position), -1);
-      const {
-        error
-      } = await supabase.from('job_tracker').insert({
-        user_id: userProfile.id,
+      
+      // Create optimistic update first
+      const tempJob: JobEntry = {
+        id: `temp-${Date.now()}`,
+        company_name: formData.company_name,
+        job_title: formData.job_title,
+        job_description: formData.job_description || undefined,
+        job_url: formData.job_url || undefined,
+        status: selectedStatus,
+        order_position: maxOrder + 1,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      optimisticAdd(tempJob);
+
+      const { data, error } = await supabase.from('job_tracker').insert({
+        user_id: userProfileId,
         company_name: formData.company_name,
         job_title: formData.job_title,
         job_description: formData.job_description || null,
         job_url: formData.job_url || null,
         status: selectedStatus,
         order_position: maxOrder + 1
-      });
+      }).select().single();
+      
       if (error) throw error;
+      
+      // Replace temp job with real job
+      if (data) {
+        optimisticUpdate(data);
+      }
+      
+      // Invalidate cache for fresh data on next load
+      invalidateCache();
+      
       toast({
         title: "Success",
         description: "Job added successfully!"
       });
+      
       setFormData({
         company_name: '',
         job_title: '',
@@ -392,9 +335,10 @@ const JobTracker = () => {
         job_url: ''
       });
       setIsModalOpen(false);
-      refreshOnInteraction();
     } catch (error) {
       console.error('Error adding job:', error);
+      // Remove the optimistic update on error
+      optimisticDelete(`temp-${Date.now()}`);
       toast({
         title: "Error",
         description: "Failed to add job.",
@@ -428,7 +372,7 @@ const JobTracker = () => {
       });
       setIsViewModalOpen(false);
       setSelectedJob(null);
-      refreshOnInteraction();
+      invalidateCache();
     } catch (error) {
       console.error('Error updating job:', error);
       toast({
@@ -439,18 +383,24 @@ const JobTracker = () => {
     }
   };
   const deleteJob = async (jobId: string) => {
+    // Optimistic delete first
+    optimisticDelete(jobId);
+    
     try {
-      const {
-        error
-      } = await supabase.from('job_tracker').delete().eq('id', jobId);
+      const { error } = await supabase.from('job_tracker').delete().eq('id', jobId);
       if (error) throw error;
+      
+      // Invalidate cache for fresh data on next load
+      invalidateCache();
+      
       toast({
         title: "Success",
         description: "Job deleted successfully!"
       });
-      refreshOnInteraction();
     } catch (error) {
       console.error('Error deleting job:', error);
+      // Revert optimistic delete on error - re-fetch data
+      invalidateCache();
       toast({
         title: "Error",
         description: "Failed to delete job.",
@@ -488,15 +438,17 @@ const JobTracker = () => {
       };
 
       // Update local state immediately for instant feedback
-      setJobs(prevJobs => prevJobs.map(job => job.id === activeJobToMove.id ? updatedJob : job));
+      optimisticUpdate(updatedJob);
       try {
-        const {
-          error
-        } = await supabase.from('job_tracker').update({
+        const { error } = await supabase.from('job_tracker').update({
           status: targetColumn.key as JobEntry['status'],
           order_position: maxOrder + 1
         }).eq('id', activeJobToMove.id);
         if (error) throw error;
+        
+        // Invalidate cache for fresh data on next load
+        invalidateCache();
+        
         toast({
           title: "Success",
           description: `Job moved to ${targetColumn.title}!`
@@ -504,7 +456,7 @@ const JobTracker = () => {
       } catch (error) {
         console.error('Error moving job:', error);
         // Revert optimistic update on error
-        setJobs(prevJobs => prevJobs.map(job => job.id === activeJobToMove.id ? activeJobToMove : job));
+        optimisticUpdate(activeJobToMove);
         toast({
           title: "Error",
           description: "Failed to move job.",

@@ -48,6 +48,9 @@ export default function GetMoreCredits() {
     isShowingCachedData: isShowingCachedPricing
   } = useCachedLocationPricing();
   
+  // Don't use fresh location pricing that causes flashing
+  // const { pricingData: freshPricing } = useLocationPricing();
+  
   const {
     subscriptionProducts,
     creditPackProducts,

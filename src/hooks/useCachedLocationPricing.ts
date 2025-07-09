@@ -125,9 +125,9 @@ export const useCachedLocationPricing = () => {
 
   return {
     pricingData: displayData,
-    isLoading: isLoading && !cachedData, // Don't show loading if we have cached data
-    userCountry,
-    isShowingCachedData
+    isLoading: isLoading && !displayData, // Don't show loading if we have display data
+    userCountry: freshData ? userCountry : cachedLocation,
+    isShowingCachedData: isLoading && !!cachedData
   };
 };
 
