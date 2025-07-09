@@ -6,6 +6,7 @@ import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGrou
 import { SignedIn, UserButton, useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import CreditBalanceDisplay from './CreditBalanceDisplay';
+import { useCachedLogo } from '@/hooks/useCachedLogo';
 
 const profileItems = [{
   title: 'Profile',
@@ -63,6 +64,9 @@ export function AppSidebar() {
   const location = useLocation();
   const currentPath = location.pathname;
   const isActive = (path: string) => currentPath === path;
+  
+  // Cache the logo to prevent reloading on navigation
+  const cachedLogoUrl = useCachedLogo("/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg");
 
   // Helper to pick best name string
   const getDisplayName = () => {
@@ -84,7 +88,7 @@ export function AppSidebar() {
     ">
       {/* Logo & Name section: hide only on tablet (md to lg), show on mobile and desktop */}
       <SidebarHeader className="flex md:hidden lg:flex py-2 px-3 border-b border-fuchsia-400/15 bg-black/95 relative flex-col items-center gap-1">
-        <img alt="JobBots Logo" src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" className="max-h-10 mb-1 drop-shadow-2xl object-fill" />
+        <img alt="JobBots Logo" src={cachedLogoUrl} className="max-h-10 mb-1 drop-shadow-2xl object-fill" />
         <span className="font-orbitron drop-shadow bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-400 bg-clip-text select-none tracking-widest text-white font-bold min-w-0 truncate text-xl">Aspirely.ai</span>
         {/* X button for mobile - positioned at top right */}
         {isMobile && (

@@ -48,9 +48,6 @@ export default function GetMoreCredits() {
     isShowingCachedData: isShowingCachedPricing
   } = useCachedLocationPricing();
   
-  // Don't use fresh location pricing that causes flashing
-  // const { pricingData: freshPricing } = useLocationPricing();
-  
   const {
     subscriptionProducts,
     creditPackProducts,
@@ -211,16 +208,16 @@ For any payment-related queries, feel free to reach out to us at support@aspirel
               <CardHeader className="text-center pb-2 pt-4 sm:pb-4 sm:pt-8 px-3 sm:px-4">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 ${planTextColor.subscription}`}>Monthly Subscription</CardTitle>
                  <div className="text-2xl sm:text-3xl font-extrabold text-cyan-100 mb-0.5 sm:mb-1 mt-0.5">
-                   {subscriptionProducts[0] ? <>
-                       {pricingData?.currencySymbol}{subscriptionProducts[0].price_amount}
+                   {pricingData && subscriptionProducts[0] ? <>
+                       {pricingData.currencySymbol}{subscriptionProducts[0].price_amount}
                        <span className="text-xs sm:text-base font-bold align-super">/month</span>
-                     </> : <>
-                       {pricingData?.currencySymbol}{pricingData?.monthlyPrice}
+                     </> : pricingData ? <>
+                       {pricingData.currencySymbol}{pricingData.monthlyPrice}
                        <span className="text-xs sm:text-base font-bold align-super">/month</span>
-                     </>}
+                     </> : <span className="text-cyan-200">Loading...</span>}
                  </div>
                  <div className="mt-0 text-xs sm:text-sm font-semibold text-cyan-200">
-                   {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits/month` : '300 credits/month'}
+                   {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits/month` : pricingData ? '300 credits/month' : 'Loading...'}
                  </div>
               </CardHeader>
               <CardContent className="grow flex flex-col px-3 sm:px-4 pb-3">
@@ -264,7 +261,7 @@ For any payment-related queries, feel free to reach out to us at support@aspirel
               <CardHeader className="text-center pb-2 pt-3 sm:pb-4 sm:pt-6 px-3 sm:px-4">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 ${planTextColor.pack}`}>Credit Packs</CardTitle>
                  <div className="text-2xl sm:text-3xl font-extrabold text-[#badbff] mb-0.5 sm:mb-1">
-                   Starting {pricingData?.currencySymbol}{creditPackProducts.length > 0 ? Math.min(...creditPackProducts.map(p => p.price_amount)) : pricingData?.creditPacks[0]?.price}
+                   {pricingData ? `Starting ${pricingData.currencySymbol}${creditPackProducts.length > 0 ? Math.min(...creditPackProducts.map(p => p.price_amount)) : pricingData.creditPacks[0]?.price}` : 'Loading...'}
                  </div>
                 <div className="mt-0 text-xs sm:text-sm font-semibold text-indigo-200">Select your desired amount:</div>
               </CardHeader>
