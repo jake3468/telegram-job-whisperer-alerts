@@ -91,7 +91,7 @@ export default function GetMoreCredits() {
   return <Layout>
       <div className="w-full flex flex-col pb-5 sm:pb-8">
         <div className="text-center mb-5 sm:mb-12 px-2 sm:px-4">
-          <h1 className="text-2xl xs:text-3xl font-orbitron font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text mb-1 sm:mb-2 drop-shadow tracking-tight animate-fade-in text-sky-400 sm:text-4xl">
+          <h1 className="text-2xl xs:text-3xl font-orbitron font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text mb-1 sm:mb-2 drop-shadow tracking-tight animate-fade-in text-sky-400 sm:text-5xl">
             Flexible Pricing Plans
           </h1>
           <p className="text-blue-100 font-inter font-light mb-1 sm:mb-2 animate-fade-in sm:text-base text-left text-sm">Start with free monthly credits and upgrade anytime — either by purchasing flexible credit packs or a monthly subscription. 
