@@ -2,6 +2,7 @@
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { useEffect, useRef, useState } from 'react';
 import { setClerkToken, setTokenRefreshFunction } from '@/integrations/supabase/client';
+import { Environment, debugEnvironment } from '@/utils/environment';
 
 export const useClerkSupabaseSync = () => {
   const { user, isLoaded } = useUser();
@@ -12,6 +13,14 @@ export const useClerkSupabaseSync = () => {
   useEffect(() => {
     const setupTokenRefresh = async () => {
       if (!user || !isLoaded || syncedRef.current) return;
+
+      // Debug environment info
+      debugEnvironment();
+      console.log('[useClerkSupabaseSync] Setup starting:', {
+        userId: user?.id,
+        isLoaded,
+        environment: Environment.getCurrentEnvironment()
+      });
 
       try {
         // Set up the token refresh function
@@ -30,16 +39,25 @@ export const useClerkSupabaseSync = () => {
 
         // Get initial token
         const token = await getToken({ template: 'supabase' });
+        console.log('[useClerkSupabaseSync] Token received:', token ? 'Success' : 'Failed');
         
         if (token) {
           const success = await setClerkToken(token);
+          console.log('[useClerkSupabaseSync] Token set result:', success);
           if (success) {
             syncedRef.current = true;
             tokenSetRef.current = true;
           }
+        } else {
+          console.error('[useClerkSupabaseSync] ❌ No token received from Clerk');
         }
       } catch (error) {
         console.error('[useClerkSupabaseSync] ❌ Error in token setup:', error);
+        console.error('[useClerkSupabaseSync] ❌ Error details:', {
+          message: error.message,
+          stack: error.stack,
+          environment: Environment.getCurrentEnvironment()
+        });
       }
     };
 
