@@ -1,16 +1,24 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+Allow: /blogs
+Allow: /blog/
+Allow: /privacy-policy
+Allow: /terms-of-service
+Allow: /contact-support
+
+# Disallow protected pages that require authentication
+Disallow: /job-guide
+Disallow: /cover-letter
+Disallow: /linkedin-posts
+Disallow: /interview-prep
+Disallow: /company-role-analysis
+Disallow: /resume-builder
+Disallow: /job-alerts
+Disallow: /get-more-credits
+Disallow: /upgrade
+Disallow: /profile
+Disallow: /dashboard
+Disallow: /job-tracker
+Disallow: /ai-mock-interview
 
 Sitemap: https://aspirely.ai/sitemap.xml
