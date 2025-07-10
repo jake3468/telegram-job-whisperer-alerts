@@ -28,6 +28,7 @@ export const useCachedJobAnalyses = () => {
   const { userProfile } = useUserProfile();
   const [cachedData, setCachedData] = useState<JobAnalysisData[]>([]);
   const [isShowingCachedData, setIsShowingCachedData] = useState(false);
+  const [connectionIssue, setConnectionIssue] = useState(false);
 
   // Load cached data immediately on mount
   useEffect(() => {
@@ -57,6 +58,7 @@ export const useCachedJobAnalyses = () => {
   const {
     data: freshData,
     isLoading: isFreshLoading,
+    error,
     refetch
   } = useQuery({
     queryKey: ['job-analyses-history', userProfile?.id],
@@ -88,6 +90,11 @@ export const useCachedJobAnalyses = () => {
     gcTime: CACHE_DURATION, // Keep in cache for 2 hours
   });
 
+  // Connection issue handling
+  useEffect(() => {
+    setConnectionIssue(!!error && cachedData.length > 0);
+  }, [error, cachedData.length]);
+
   // Update cache when fresh data arrives
   useEffect(() => {
     if (freshData && !isFreshLoading) {
@@ -118,6 +125,8 @@ export const useCachedJobAnalyses = () => {
     data,
     isLoading,
     isShowingCachedData: isShowingCachedData && !freshData,
+    connectionIssue,
+    error,
     refetch,
     hasCache: cachedData.length > 0
   };

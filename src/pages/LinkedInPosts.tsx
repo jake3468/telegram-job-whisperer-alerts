@@ -7,7 +7,7 @@ import { Textarea as TTextarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Share2, History, Sparkles, Menu } from 'lucide-react';
+import { Share2, History, Sparkles, Menu, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
@@ -77,6 +77,7 @@ const LinkedInPosts = () => {
     data: linkedInHistory,
     isLoading: historyLoading,
     isShowingCachedData,
+    connectionIssue,
     refetch: refetchHistory
   } = useCachedLinkedInPosts();
 
@@ -479,10 +480,23 @@ const LinkedInPosts = () => {
                           Fill in the details to generate 3 LinkedIn post variations
                         </CardDescription>
                       </div>
-                      <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 flex-shrink-0 bg-zinc-100 text-zinc-950">
-                        <History className="w-4 h-4 mr-2 text-black" />
-                        History
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        {connectionIssue && (
+                          <Button
+                            onClick={() => window.location.reload()}
+                            variant="outline"
+                            size="sm"
+                            className="border-orange-400/30 bg-orange-100/10 text-orange-600 hover:bg-orange-200/20"
+                            title="Connection issue detected. Click to refresh the page."
+                          >
+                            <RefreshCw className="w-4 h-4" />
+                          </Button>
+                        )}
+                        <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 flex-shrink-0 bg-zinc-100 text-zinc-950">
+                          <History className="w-4 h-4 mr-2 text-black" />
+                          History
+                        </Button>
+                      </div>
                     </div>
                   </CardHeader>
 

@@ -27,6 +27,7 @@ export const useCachedCoverLetters = () => {
   const { userProfile } = useUserProfile();
   const [cachedData, setCachedData] = useState<CoverLetterData[]>([]);
   const [isShowingCachedData, setIsShowingCachedData] = useState(false);
+  const [connectionIssue, setConnectionIssue] = useState(false);
 
   // Load cached data immediately on mount
   useEffect(() => {
@@ -56,6 +57,7 @@ export const useCachedCoverLetters = () => {
   const {
     data: freshData,
     isLoading: isFreshLoading,
+    error,
     refetch
   } = useQuery({
     queryKey: ['cover-letters-history', userProfile?.id],
@@ -84,6 +86,11 @@ export const useCachedCoverLetters = () => {
     staleTime: 30000, // Consider data fresh for 30 seconds
     gcTime: CACHE_DURATION, // Keep in cache for 2 hours
   });
+
+  // Connection issue handling
+  useEffect(() => {
+    setConnectionIssue(!!error && cachedData.length > 0);
+  }, [error, cachedData.length]);
 
   // Update cache when fresh data arrives
   useEffect(() => {
@@ -115,6 +122,8 @@ export const useCachedCoverLetters = () => {
     data,
     isLoading,
     isShowingCachedData: isShowingCachedData && !freshData,
+    connectionIssue,
+    error,
     refetch,
     hasCache: cachedData.length > 0
   };
