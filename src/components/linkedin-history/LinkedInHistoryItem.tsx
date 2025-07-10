@@ -1,8 +1,6 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Eye, Trash2, Share2, FileText, Calendar } from 'lucide-react';
-
 interface LinkedInPostItem {
   id: string;
   topic?: string;
@@ -18,14 +16,16 @@ interface LinkedInPostItem {
   post_heading_3?: string;
   post_content_3?: string;
 }
-
 interface LinkedInHistoryItemProps {
   item: LinkedInPostItem;
   onView: (item: LinkedInPostItem) => void;
   onDelete: (itemId: string) => void;
 }
-
-const LinkedInHistoryItem = ({ item, onView, onDelete }: LinkedInHistoryItemProps) => {
+const LinkedInHistoryItem = ({
+  item,
+  onView,
+  onDelete
+}: LinkedInHistoryItemProps) => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -35,9 +35,7 @@ const LinkedInHistoryItem = ({ item, onView, onDelete }: LinkedInHistoryItemProp
       minute: '2-digit'
     });
   };
-
-  return (
-    <div className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-indigo-800">
+  return <div className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-green-600">
       {/* Mobile Layout */}
       <div className="block sm:hidden space-y-2">
         <div className="flex items-start justify-between gap-2">
@@ -58,20 +56,12 @@ const LinkedInHistoryItem = ({ item, onView, onDelete }: LinkedInHistoryItemProp
         </div>
         
         <div className="flex items-center gap-1 pt-2">
-          <Button 
-            onClick={() => onView(item)} 
-            size="sm" 
-            className="flex-1 bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-2 py-1"
-          >
+          <Button onClick={() => onView(item)} size="sm" className="flex-1 bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-2 py-1">
             <Eye className="w-3 h-3 mr-1" />
             View
           </Button>
           
-          <Button 
-            onClick={() => onDelete(item.id)} 
-            size="sm" 
-            className="flex-1 bg-red-600/80 hover:bg-red-600 text-white text-xs px-2 py-1"
-          >
+          <Button onClick={() => onDelete(item.id)} size="sm" className="flex-1 bg-red-600/80 hover:bg-red-600 text-white text-xs px-2 py-1">
             <Trash2 className="w-3 h-3 mr-1" />
             Delete
           </Button>
@@ -98,27 +88,17 @@ const LinkedInHistoryItem = ({ item, onView, onDelete }: LinkedInHistoryItemProp
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
-          <Button 
-            onClick={() => onView(item)} 
-            size="sm" 
-            className="bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-3 py-1"
-          >
+          <Button onClick={() => onView(item)} size="sm" className="bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-3 py-1">
             <Eye className="w-3 h-3 mr-1" />
             View
           </Button>
           
-          <Button 
-            onClick={() => onDelete(item.id)} 
-            size="sm" 
-            className="bg-red-600/80 hover:bg-red-600 text-white text-xs px-3 py-1"
-          >
+          <Button onClick={() => onDelete(item.id)} size="sm" className="bg-red-600/80 hover:bg-red-600 text-white text-xs px-3 py-1">
             <Trash2 className="w-3 h-3 mr-1" />
             Delete
           </Button>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default LinkedInHistoryItem;
