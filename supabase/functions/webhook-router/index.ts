@@ -54,7 +54,8 @@ serve(async (req) => {
         break;
       case 'phone_interview':
         n8nWebhookUrl = Deno.env.get('N8N_PHONE_CALL_INTERVIEW_URL');
-        console.log('Using Phone Interview webhook URL');
+        console.log('Using Phone Interview webhook URL:', n8nWebhookUrl ? 'URL found' : 'URL NOT FOUND');
+        console.log('Available env vars:', Object.keys(Deno.env.toObject()).filter(key => key.includes('N8N')));
         break;
       default:
         console.error('Unknown webhook type:', webhookType);
@@ -66,8 +67,10 @@ serve(async (req) => {
     
     if (!n8nWebhookUrl) {
       console.error(`N8N webhook URL not configured for type: ${webhookType}`);
-      return new Response('Webhook URL not configured', { 
-        status: 500, 
+      console.error('All available environment variables:', Object.keys(Deno.env.toObject()));
+      console.error('N8N related env vars:', Object.keys(Deno.env.toObject()).filter(key => key.includes('N8N')));
+      return new Response(`Webhook URL not configured for type: ${webhookType}. Available N8N vars: ${Object.keys(Deno.env.toObject()).filter(key => key.includes('N8N')).join(', ')}`, { 
+        status: 400, 
         headers: corsHeaders 
       });
     }
