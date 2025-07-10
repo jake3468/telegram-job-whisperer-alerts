@@ -149,7 +149,7 @@ const AIMockInterviewForm = () => {
             <Input
               id="phoneNumber"
               type="tel"
-              placeholder="+1 555-123-4567"
+              placeholder="+1 9551234567"
               value={formData.phoneNumber}
               onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
               className="bg-gray-800/80 border-gray-600/50 text-white placeholder:text-gray-400 focus:border-blue-400 focus:ring-blue-400/20"
