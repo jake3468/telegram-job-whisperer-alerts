@@ -1,20 +1,14 @@
 import { Layout } from "@/components/Layout";
 import AIMockInterviewForm from "@/components/AIMockInterviewForm";
-
 const AIMockInterview = () => {
-  return (
-    <Layout>
+  return <Layout>
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-950 to-purple-950 text-white overflow-hidden">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           {/* Hero Section */}
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center">
-                <span className="text-2xl font-bold">🎯</span>
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                AI Mock Interview
-              </h1>
+              
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">👩🏻 AI Mock Interview</h1>
             </div>
             
             <h2 className="text-xl md:text-2xl text-gray-300 mb-4 leading-relaxed">
@@ -58,8 +52,6 @@ const AIMockInterview = () => {
           </div>
         </div>
       </div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default AIMockInterview;
