@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Building2, MapPin, Briefcase, Loader2, RotateCcw, Calendar, TrendingUp, Shield, Lightbulb, DollarSign, Users, GraduationCap, AlertTriangle, History } from 'lucide-react';
+import { Building2, MapPin, Briefcase, Loader2, RotateCcw, Calendar, TrendingUp, Shield, Lightbulb, DollarSign, Users, GraduationCap, AlertTriangle, History, RefreshCw } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -84,8 +84,13 @@ const CompanyRoleAnalysis = () => {
     data: analysisHistory,
     isLoading: historyLoading,
     isShowingCachedData,
+    connectionIssue,
     refetch: refetchHistory
   } = useCachedCompanyAnalyses();
+
+  const handleManualRefresh = () => {
+    window.location.reload();
+  };
 
   // Enhanced helper function to check if analysis has meaningful data
   const hasAnalysisResult = (analysis: CompanyRoleAnalysisData) => {
@@ -245,7 +250,7 @@ const CompanyRoleAnalysis = () => {
       <div className="min-h-screen bg-black px-2 pt-2 pb-2 sm:px-4 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
           {/* Header Section */}
-          <div className="text-center space-y-3 sm:space-y-4 px-2">
+          <div className="text-center space-y-3 sm:space-y-4 px-2 relative">
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
               <h1 className="sm:text-3xl lg:text-4xl font-orbitron bg-gradient-to-r from-green-400 via-green-500 to-green-600 bg-clip-text text-green-500 text-4xl font-bold">
                 🏢 Company Decoder
@@ -254,6 +259,19 @@ const CompanyRoleAnalysis = () => {
             <p className="text-base sm:text-lg text-white max-w-3xl mx-auto leading-relaxed font-light px-2">
               Smart candidates don't just apply—they investigate. Get the career intelligence that puts you ahead of 99% of applicants.
             </p>
+            
+            {/* Manual Refresh Button */}
+            {connectionIssue && (
+              <Button 
+                onClick={handleManualRefresh} 
+                variant="ghost" 
+                size="sm" 
+                className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0 absolute top-0 right-4"
+                title="Refresh page"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            )}
             
             {/* Usage Cost Badge */}
             <Badge variant="outline" className="bg-green-900/30 border-green-600/50 text-green-300 font-semibold">

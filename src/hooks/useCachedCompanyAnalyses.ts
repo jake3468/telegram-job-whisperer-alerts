@@ -42,6 +42,7 @@ export const useCachedCompanyAnalyses = () => {
   const { userProfile } = useUserProfile();
   const [cachedData, setCachedData] = useState<CompanyRoleAnalysisData[]>([]);
   const [isShowingCachedData, setIsShowingCachedData] = useState(false);
+  const [connectionIssue, setConnectionIssue] = useState(false);
 
   // Load cached data immediately on mount
   useEffect(() => {
@@ -71,6 +72,7 @@ export const useCachedCompanyAnalyses = () => {
   const {
     data: freshData,
     isLoading: isFreshLoading,
+    error,
     refetch
   } = useQuery({
     queryKey: ['company_role_analyses', userProfile?.id],
@@ -88,19 +90,29 @@ export const useCachedCompanyAnalyses = () => {
 
         if (error) {
           console.error('Error fetching company analysis history:', error);
-          return [];
+          throw error;
         }
 
         return data as CompanyRoleAnalysisData[];
       } catch (err) {
         console.error('Exception fetching company analysis history:', err);
-        return [];
+        throw err;
       }
     },
     enabled: !!userProfile?.id,
     staleTime: 30000, // Consider data fresh for 30 seconds
     gcTime: CACHE_DURATION, // Keep in cache for 2 hours
+    retry: 2
   });
+
+  // Handle connection issues
+  useEffect(() => {
+    if (error && !cachedData.length) {
+      setConnectionIssue(true);
+    } else if (freshData) {
+      setConnectionIssue(false);
+    }
+  }, [error, freshData, cachedData.length]);
 
   // Update cache when fresh data arrives
   useEffect(() => {
@@ -132,6 +144,8 @@ export const useCachedCompanyAnalyses = () => {
     data,
     isLoading,
     isShowingCachedData: isShowingCachedData && !freshData,
+    connectionIssue,
+    error,
     refetch,
     hasCache: cachedData.length > 0
   };

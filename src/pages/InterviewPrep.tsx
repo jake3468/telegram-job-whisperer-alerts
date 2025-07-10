@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MessageSquare, Clock, Building2, Briefcase, FileText, CreditCard } from 'lucide-react';
+import { MessageSquare, Clock, Building2, Briefcase, FileText, CreditCard, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useCreditCheck } from '@/hooks/useCreditCheck';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
@@ -52,8 +52,13 @@ const InterviewPrep = () => {
     data: interviewHistory,
     isLoading: historyLoading,
     isShowingCachedData,
+    connectionIssue,
     refetch: refetchHistory
   } = useCachedInterviewPrep();
+
+  const handleManualRefresh = () => {
+    window.location.reload();
+  };
 
   // Function to properly parse interview questions from JSONB
   const parseInterviewQuestions = (data: any): string | null => {
@@ -392,13 +397,26 @@ const InterviewPrep = () => {
       <div className="min-h-screen bg-black text-white">
         <div className="container mx-auto px-2 sm:px-4 pt-2 pb-2 max-w-5xl">
           {/* Header */}
-          <div className="text-center mb-6 sm:mb-8 px-1 sm:px-2">
+          <div className="text-center mb-6 sm:mb-8 px-1 sm:px-2 relative">
             <h1 className="mb-4 bg-gradient-to-r from-[#ddd6f3] to-[#faaca8] bg-clip-text text-red-200 font-extrabold sm:text-4xl text-4xl">
               👔 Interview Prep
             </h1>
             <p className="text-gray-300 max-w-2xl mx-auto text-sm sm:text-lg font-light px-2 sm:px-4">
               Your Personal Interview Coach, powered by AI. Get tailored questions with perfect answers, pro tips, and strategic questions to ask your interviewer.
             </p>
+            
+            {/* Manual Refresh Button */}
+            {connectionIssue && (
+              <Button 
+                onClick={handleManualRefresh} 
+                variant="ghost" 
+                size="sm" 
+                className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0 absolute top-0 right-4"
+                title="Refresh page"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            )}
             
             {/* Usage Fee Badge */}
             <div className="mt-4 flex justify-center">

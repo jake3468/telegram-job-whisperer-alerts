@@ -4,9 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import CVBotStatus from '@/components/dashboard/CVBotStatus';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
-import { FileText, BadgeDollarSign } from 'lucide-react';
+import { FileText, BadgeDollarSign, RefreshCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
+import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 
 const ResumeBuilder = () => {
   const {
@@ -15,9 +17,14 @@ const ResumeBuilder = () => {
   } = useUser();
   const navigate = useNavigate();
   const [isActivated, setIsActivated] = useState<boolean>(false);
+  const { connectionIssue } = useCachedUserProfile();
 
   // Replace useFeatureCreditCheck with the new system
   useCreditWarnings(); // This shows the warning popups
+
+  const handleManualRefresh = () => {
+    window.location.reload();
+  };
 
   useEffect(() => {
     if (isLoaded && !user) {
@@ -71,6 +78,19 @@ const ResumeBuilder = () => {
                   Create and customize professional resumes through intelligent conversation
                 </p>
               </div>
+              
+              {/* Manual Refresh Button */}
+              {connectionIssue && (
+                <Button 
+                  onClick={handleManualRefresh} 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0"
+                  title="Refresh page"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              )}
             </div>
 
             <div>

@@ -22,15 +22,34 @@ const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 
 export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchStatus: () => Promise<void> } => {
   const { user } = useUser();
-  const [status, setStatus] = useState<CompletionStatus>({
-    hasResume: false,
-    hasBio: false,
-    isComplete: false,
-    loading: true,
-    lastChecked: null,
+  const [status, setStatus] = useState<CompletionStatus>(() => {
+    // Initialize with cached data if available
+    if (!user) {
+      return { hasResume: false, hasBio: false, isComplete: false, loading: false, lastChecked: null };
+    }
+
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const parsedCache: CachedCompletionData = JSON.parse(cached);
+        const now = Date.now();
+        
+        // Use cached data if it's for the same user and within cache duration
+        if (parsedCache.userId === user.id && now - parsedCache.timestamp < CACHE_DURATION) {
+          logger.debug('Initialized with cached user completion status:', parsedCache.status);
+          return { ...parsedCache.status, loading: false }; // Ensure loading is false for cached data
+        }
+      }
+    } catch (error) {
+      logger.warn('Failed to initialize with cached user completion status:', error);
+      localStorage.removeItem(CACHE_KEY);
+    }
+
+    // Default state if no valid cache
+    return { hasResume: false, hasBio: false, isComplete: false, loading: true, lastChecked: null };
   });
 
-  // Load cached data immediately on mount
+  // Load cached data immediately on mount (for when user changes)
   useEffect(() => {
     if (!user) {
       setStatus({ hasResume: false, hasBio: false, isComplete: false, loading: false, lastChecked: new Date() });
@@ -45,15 +64,20 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
         
         // Use cached data if it's for the same user and within cache duration
         if (parsedCache.userId === user.id && now - parsedCache.timestamp < CACHE_DURATION) {
-          setStatus(parsedCache.status);
+          setStatus({ ...parsedCache.status, loading: false }); // Ensure loading is false
           logger.debug('Loaded cached user completion status:', parsedCache.status);
+          return; // Don't fetch fresh data if we have valid cache
         } else {
           localStorage.removeItem(CACHE_KEY);
         }
       }
+      
+      // Only set loading to true if we don't have valid cached data
+      setStatus(prev => ({ ...prev, loading: true }));
     } catch (error) {
       logger.warn('Failed to load cached user completion status:', error);
       localStorage.removeItem(CACHE_KEY);
+      setStatus(prev => ({ ...prev, loading: true }));
     }
   }, [user?.id]);
 
@@ -61,12 +85,11 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
   useEffect(() => {
     if (!user) return;
     
-    // Only fetch if we don't have cached data
-    const shouldFetch = status.loading || !status.lastChecked;
-    if (shouldFetch) {
+    // Only fetch if we're actually loading (no valid cache found)
+    if (status.loading) {
       checkUserCompletion();
     }
-  }, [user?.id]);
+  }, [user?.id, status.loading]);
 
   const checkUserCompletion = async (showErrors = false) => {
     if (!user) {
@@ -137,6 +160,14 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
         lastChecked: new Date(),
       };
 
+      console.log('Profile completion check result:', {
+        userId: user.id,
+        hasResume,
+        hasBio,
+        isComplete,
+        timestamp: new Date().toISOString()
+      });
+
       setStatus(newStatus);
 
       // Cache the data
@@ -161,6 +192,9 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
   };
 
   const refetchStatus = async () => {
+    // Invalidate cache first to ensure fresh data
+    localStorage.removeItem(CACHE_KEY);
+    console.log('Invalidated completion status cache, fetching fresh data...');
     await checkUserCompletion(true);
   };
 

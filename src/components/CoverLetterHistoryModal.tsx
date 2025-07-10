@@ -7,7 +7,6 @@ import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, Alert
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import CoverLetterDownloadActions from '@/components/CoverLetterDownloadActions';
-
 interface CoverLetterItem {
   id: string;
   company_name?: string;
@@ -16,43 +15,44 @@ interface CoverLetterItem {
   created_at: string;
   cover_letter?: string;
 }
-
 interface CoverLetterHistoryModalProps {
   isOpen: boolean;
   onClose: () => void;
   gradientColors: string;
 }
-
 const CoverLetterHistoryModal = ({
   isOpen,
   onClose,
   gradientColors
 }: CoverLetterHistoryModalProps) => {
-  const { user } = useUser();
-  const { toast } = useToast();
-  const { userProfile } = useUserProfile();
+  const {
+    user
+  } = useUser();
+  const {
+    toast
+  } = useToast();
+  const {
+    userProfile
+  } = useUserProfile();
   const [historyData, setHistoryData] = useState<CoverLetterItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<CoverLetterItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
-
   useEffect(() => {
     if (isOpen && user && userProfile) {
       fetchHistory();
     }
   }, [isOpen, user, userProfile]);
-
   const fetchHistory = async () => {
     if (!user || !userProfile) return;
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('job_cover_letters')
-        .select('id, company_name, job_title, job_description, created_at, cover_letter')
-        .eq('user_id', userProfile.id)
-        .order('created_at', { ascending: false })
-        .limit(20);
-
+      const {
+        data,
+        error
+      } = await supabase.from('job_cover_letters').select('id, company_name, job_title, job_description, created_at, cover_letter').eq('user_id', userProfile.id).order('created_at', {
+        ascending: false
+      }).limit(20);
       if (error) {
         console.error('Error fetching history:', error);
         throw error;
@@ -67,7 +67,6 @@ const CoverLetterHistoryModal = ({
         created_at: item.created_at,
         cover_letter: item.cover_letter
       }));
-
       setHistoryData(transformedData);
     } catch (err) {
       console.error('Failed to fetch history:', err);
@@ -80,11 +79,9 @@ const CoverLetterHistoryModal = ({
       setIsLoading(false);
     }
   };
-
   const handleCopyResult = async (item: CoverLetterItem) => {
     const result = item.cover_letter;
     if (!result) return;
-    
     try {
       await navigator.clipboard.writeText(result);
       toast({
@@ -100,7 +97,6 @@ const CoverLetterHistoryModal = ({
       });
     }
   };
-
   const handleDelete = async (itemId: string) => {
     if (!userProfile) {
       toast({
@@ -112,13 +108,9 @@ const CoverLetterHistoryModal = ({
     }
     try {
       console.log(`Attempting to delete cover letter item with ID: ${itemId} for user profile: ${userProfile.id}`);
-      
-      const { error } = await supabase
-        .from('job_cover_letters')
-        .delete()
-        .eq('id', itemId)
-        .eq('user_id', userProfile.id);
-      
+      const {
+        error
+      } = await supabase.from('job_cover_letters').delete().eq('id', itemId).eq('user_id', userProfile.id);
       if (error) {
         console.error('Supabase delete error:', error);
         throw error;
@@ -146,7 +138,6 @@ const CoverLetterHistoryModal = ({
       });
     }
   };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -156,24 +147,17 @@ const CoverLetterHistoryModal = ({
       minute: '2-digit'
     });
   };
-
   const hasResult = (item: CoverLetterItem) => {
     return item.cover_letter && item.cover_letter.trim().length > 0;
   };
-
   if (showDetails && selectedItem) {
-    return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
+    return <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-6xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-white font-inter flex items-center gap-2 text-lg">
               <FileText className="w-5 h-5" />
               Cover Letter Details
-              <Button 
-                onClick={() => setShowDetails(false)} 
-                size="sm" 
-                className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm mx-[15px]"
-              >
+              <Button onClick={() => setShowDetails(false)} size="sm" className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm mx-[15px]">
                 <X className="w-4 h-4 mr-1" />
                 Back to List
               </Button>
@@ -216,8 +200,7 @@ const CoverLetterHistoryModal = ({
             </div>
 
             {/* Result Section */}
-            {hasResult(selectedItem) && (
-              <div className="rounded-lg p-4 border border-white/10 shadow-inner bg-red-700">
+            {hasResult(selectedItem) && <div className="rounded-lg p-4 border border-white/10 shadow-inner bg-red-700">
                 <h3 className="text-white font-medium mb-3 flex flex-wrap gap-2 justify-between items-center">
                   <div className="flex items-center gap-2">
                     <FileText className="w-4 h-4" />
@@ -229,23 +212,13 @@ const CoverLetterHistoryModal = ({
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-3">
                     <h4 className="text-lime-400 font-semibold">Cover Letter</h4>
                     <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                      <Button
-                        onClick={() => handleCopyResult(selectedItem)}
-                        size="sm"
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white w-full sm:w-auto"
-                      >
+                      <Button onClick={() => handleCopyResult(selectedItem)} size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white w-full sm:w-auto">
                         <Copy className="w-4 h-4 mr-2" />
                         Copy Result
                       </Button>
-                      {selectedItem.cover_letter && (
-                        <div className="w-full sm:w-auto">
-                          <CoverLetterDownloadActions 
-                            coverLetter={selectedItem.cover_letter}
-                            companyName={selectedItem.company_name || 'Company'}
-                            jobTitle={selectedItem.job_title || 'Position'}
-                          />
-                        </div>
-                      )}
+                      {selectedItem.cover_letter && <div className="w-full sm:w-auto">
+                          <CoverLetterDownloadActions coverLetter={selectedItem.cover_letter} companyName={selectedItem.company_name || 'Company'} jobTitle={selectedItem.job_title || 'Position'} />
+                        </div>}
                     </div>
                   </div>
                   
@@ -253,16 +226,12 @@ const CoverLetterHistoryModal = ({
                     {selectedItem.cover_letter}
                   </div>
                 </div>
-              </div>
-            )}
+              </div>}
           </div>
         </DialogContent>
-      </Dialog>
-    );
+      </Dialog>;
   }
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+  return <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] max-w-5xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
         <DialogHeader className="flex-shrink-0">
           <div className="flex items-center justify-between">
@@ -270,12 +239,7 @@ const CoverLetterHistoryModal = ({
               <History className="w-4 h-4 sm:w-5 sm:h-5" />
               Cover Letter History
             </DialogTitle>
-            <Button 
-              onClick={onClose} 
-              size="sm" 
-              variant="ghost"
-              className="text-white/70 hover:text-white h-8 w-8 p-0 hover:bg-white/10"
-            >
+            <Button onClick={onClose} size="sm" variant="ghost" className="text-white/70 hover:text-white h-8 w-8 p-0 hover:bg-white/10">
               <X className="w-4 h-4" />
             </Button>
           </div>
@@ -294,24 +258,18 @@ const CoverLetterHistoryModal = ({
         </div>
 
         <div className="flex-1 overflow-y-auto min-h-0">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
+          {isLoading ? <div className="flex items-center justify-center py-8">
               <div className="text-white/70 text-sm flex items-center gap-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white/70"></div>
                 Loading history...
               </div>
-            </div>
-          ) : historyData.length === 0 ? (
-            <div className="flex items-center justify-center py-8">
+            </div> : historyData.length === 0 ? <div className="flex items-center justify-center py-8">
               <div className="text-white/70 text-center">
                 <History className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No cover letters found.</p>
               </div>
-            </div>
-          ) : (
-            <div className="space-y-2 sm:space-y-3 pb-4">
-              {historyData.map(item => (
-                <div key={item.id} className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-indigo-800">
+            </div> : <div className="space-y-2 sm:space-y-3 pb-4">
+              {historyData.map(item => <div key={item.id} className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-green-600">
                   {/* Mobile Layout */}
                   <div className="block sm:hidden space-y-2">
                     <div className="flex items-start justify-between gap-2">
@@ -332,23 +290,15 @@ const CoverLetterHistoryModal = ({
                     </div>
                     
                     <div className="flex flex-col gap-2 pt-2 w-full">
-                      <Button 
-                        onClick={() => {
-                          setSelectedItem(item);
-                          setShowDetails(true);
-                        }} 
-                        size="sm" 
-                        className="w-full bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-2 py-1"
-                      >
+                      <Button onClick={() => {
+                  setSelectedItem(item);
+                  setShowDetails(true);
+                }} size="sm" className="w-full bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-2 py-1">
                         <Eye className="w-3 h-3 mr-1" />
                         View
                       </Button>
                       
-                      <Button 
-                        onClick={() => handleDelete(item.id)} 
-                        size="sm" 
-                        className="w-full bg-red-600/80 hover:bg-red-600 text-white text-xs px-2 py-1"
-                      >
+                      <Button onClick={() => handleDelete(item.id)} size="sm" className="w-full bg-red-600/80 hover:bg-red-600 text-white text-xs px-2 py-1">
                         <Trash2 className="w-3 h-3 mr-1" />
                         Delete
                       </Button>
@@ -375,36 +325,24 @@ const CoverLetterHistoryModal = ({
                     </div>
 
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <Button 
-                        onClick={() => {
-                          setSelectedItem(item);
-                          setShowDetails(true);
-                        }} 
-                        size="sm" 
-                        className="bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-3 py-1"
-                      >
+                      <Button onClick={() => {
+                  setSelectedItem(item);
+                  setShowDetails(true);
+                }} size="sm" className="bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-3 py-1">
                         <Eye className="w-3 h-3 mr-1" />
                         View
                       </Button>
                       
-                      <Button 
-                        onClick={() => handleDelete(item.id)} 
-                        size="sm" 
-                        className="bg-red-600/80 hover:bg-red-600 text-white text-xs px-3 py-1"
-                      >
+                      <Button onClick={() => handleDelete(item.id)} size="sm" className="bg-red-600/80 hover:bg-red-600 text-white text-xs px-3 py-1">
                         <Trash2 className="w-3 h-3 mr-1" />
                         Delete
                       </Button>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                </div>)}
+            </div>}
         </div>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 };
-
 export default CoverLetterHistoryModal;

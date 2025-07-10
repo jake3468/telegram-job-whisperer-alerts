@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { FileText, History, Copy, Sparkles, Menu, BadgeDollarSign } from 'lucide-react';
+import { FileText, History, Copy, Sparkles, Menu, BadgeDollarSign, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
@@ -68,6 +68,7 @@ const CoverLetter = () => {
     data: coverLetterHistory,
     isLoading: historyLoading,
     isShowingCachedData,
+    connectionIssue,
     refetch: refetchHistory
   } = useCachedCoverLetters();
   useEffect(() => {
@@ -359,10 +360,23 @@ const CoverLetter = () => {
                             Fill in the details to generate your personalized cover letter
                           </CardDescription>
                         </div>
-                        <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 bg-zinc-50 text-gray-950">
-                          <History className="w-4 h-4 mr-2" />
-                          History
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          {connectionIssue && (
+                            <Button
+                              onClick={() => window.location.reload()}
+                              variant="outline"
+                              size="sm"
+                              className="border-orange-400/30 bg-orange-100/10 text-orange-300 hover:bg-orange-200/20"
+                              title="Connection issue detected. Click to refresh the page."
+                            >
+                              <RefreshCw className="w-4 h-4" />
+                            </Button>
+                          )}
+                          <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 bg-zinc-50 text-gray-950">
+                            <History className="w-4 h-4 mr-2" />
+                            History
+                          </Button>
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-6">

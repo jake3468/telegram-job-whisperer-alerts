@@ -36,6 +36,7 @@ export const useCachedLinkedInPosts = () => {
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
   const [cachedData, setCachedData] = useState<LinkedInPostData[]>([]);
   const [isShowingCachedData, setIsShowingCachedData] = useState(false);
+  const [connectionIssue, setConnectionIssue] = useState(false);
 
   // Load cached data immediately on mount
   useEffect(() => {
@@ -65,6 +66,7 @@ export const useCachedLinkedInPosts = () => {
   const {
     data: freshData,
     isLoading: isFreshLoading,
+    error,
     refetch
   } = useQuery({
     queryKey: ['linkedin-posts-history', userProfile?.id],
@@ -87,6 +89,11 @@ export const useCachedLinkedInPosts = () => {
     gcTime: CACHE_DURATION, // Keep in cache for 2 hours
     retry: 2
   });
+
+  // Connection issue handling
+  useEffect(() => {
+    setConnectionIssue(!!error && cachedData.length > 0);
+  }, [error, cachedData.length]);
 
   // Update cache when fresh data arrives
   useEffect(() => {
@@ -118,6 +125,8 @@ export const useCachedLinkedInPosts = () => {
     data,
     isLoading,
     isShowingCachedData: isShowingCachedData && !freshData,
+    connectionIssue,
+    error,
     refetch,
     hasCache: cachedData.length > 0
   };
