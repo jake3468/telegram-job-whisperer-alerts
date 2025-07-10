@@ -8,11 +8,10 @@ export const useClerkSupabaseSync = () => {
   const { getToken } = useAuth();
   const syncedRef = useRef(false);
   const tokenSetRef = useRef(false);
-  const [syncLoaded, setSyncLoaded] = useState(false);
 
   useEffect(() => {
     const setupTokenRefresh = async () => {
-      if (!user || !isLoaded) return;
+      if (!user || !isLoaded || syncedRef.current) return;
 
       try {
         // Set up the token refresh function
@@ -39,32 +38,23 @@ export const useClerkSupabaseSync = () => {
             tokenSetRef.current = true;
           }
         }
-        
-        setSyncLoaded(true);
       } catch (error) {
         console.error('[useClerkSupabaseSync] ❌ Error in token setup:', error);
-        setSyncLoaded(true); // Set loaded even on error to prevent infinite loading
       }
     };
 
     if (isLoaded && user && !syncedRef.current) {
       setupTokenRefresh();
-    } else if (isLoaded && !user) {
-      // User logged out or not authenticated, clear the token
-      if (tokenSetRef.current) {
-        setClerkToken(null);
-        tokenSetRef.current = false;
-        syncedRef.current = false;
-      }
-      setSyncLoaded(true);
-    } else if (isLoaded) {
-      // Authentication is loaded but no user changes needed
-      setSyncLoaded(true);
+    } else if (isLoaded && !user && tokenSetRef.current) {
+      // User logged out, clear the token
+      setClerkToken(null);
+      tokenSetRef.current = false;
+      syncedRef.current = false;
     }
   }, [user, isLoaded, getToken]);
 
   return { 
-    isLoaded: isLoaded && syncLoaded, 
+    isLoaded: isLoaded, 
     user, 
     isSynced: syncedRef.current 
   };

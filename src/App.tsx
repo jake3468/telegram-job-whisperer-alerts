@@ -52,7 +52,9 @@ const LoadingScreen = () => (
 // Component to initialize Clerk-Supabase sync
 const AppWithSync = () => {
   const { isLoaded } = useAuth();
-  const { isLoaded: syncLoaded } = useClerkSupabaseSync();
+  
+  // Initialize sync in background without blocking UI
+  useClerkSupabaseSync();
   
   // Hide initial loader once React is ready
   useEffect(() => {
@@ -61,13 +63,11 @@ const AppWithSync = () => {
     }
   }, [isLoaded]);
   
-  // Show fast loading screen only if auth isn't loaded yet
+  // Show loading screen only while Clerk auth is loading
+  // Once auth is loaded, show content immediately - don't wait for Supabase sync
   if (!isLoaded) {
     return <LoadingScreen />;
   }
-  
-  // If auth is loaded but sync isn't complete, don't show loading - just continue
-  // This makes the app feel faster
   
   return (
     <>
