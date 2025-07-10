@@ -13,7 +13,9 @@ class ContentSecurityPolicyManager {
         'https://clerk.aspirely.ai',
         'https://*.clerk.accounts.dev',
         'https://*.googletagmanager.com',
-        'https://js.stripe.com'
+        'https://js.stripe.com',
+        'https://challenges.cloudflare.com', // Cloudflare Turnstile
+        'https://*.hcaptcha.com' // Fallback CAPTCHA provider
       ],
       'style-src': [
         "'self'",
@@ -38,12 +40,16 @@ class ContentSecurityPolicyManager {
         'https://ipwhois.app',
         'https://clerk.aspirely.ai',
         'https://*.clerk.accounts.dev',
-        'https://api.stripe.com'
+        'https://api.stripe.com',
+        'https://challenges.cloudflare.com', // Cloudflare Turnstile API
+        'https://*.hcaptcha.com' // Fallback CAPTCHA provider
       ],
       'frame-src': [
         "'self'",
         'https://js.stripe.com',
-        'https://hooks.stripe.com'
+        'https://hooks.stripe.com',
+        'https://challenges.cloudflare.com', // Cloudflare Turnstile iframe
+        'https://*.hcaptcha.com' // Fallback CAPTCHA provider
       ],
       'worker-src': [
         "'self'",
