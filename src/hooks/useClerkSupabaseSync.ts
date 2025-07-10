@@ -1,6 +1,6 @@
 
 import { useUser, useAuth } from '@clerk/clerk-react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { setClerkToken, setTokenRefreshFunction } from '@/integrations/supabase/client';
 
 export const useClerkSupabaseSync = () => {
@@ -8,6 +8,7 @@ export const useClerkSupabaseSync = () => {
   const { getToken } = useAuth();
   const syncedRef = useRef(false);
   const tokenSetRef = useRef(false);
+  const [syncLoaded, setSyncLoaded] = useState(false);
 
   useEffect(() => {
     const setupTokenRefresh = async () => {
@@ -38,20 +39,33 @@ export const useClerkSupabaseSync = () => {
             tokenSetRef.current = true;
           }
         }
+        
+        setSyncLoaded(true);
       } catch (error) {
         console.error('[useClerkSupabaseSync] ❌ Error in token setup:', error);
+        setSyncLoaded(true); // Set loaded even on error to prevent infinite loading
       }
     };
 
     if (isLoaded && user && !syncedRef.current) {
       setupTokenRefresh();
-    } else if (isLoaded && !user && tokenSetRef.current) {
-      // User logged out, clear the token
-      setClerkToken(null);
-      tokenSetRef.current = false;
-      syncedRef.current = false;
+    } else if (isLoaded && !user) {
+      // User logged out or not authenticated, clear the token
+      if (tokenSetRef.current) {
+        setClerkToken(null);
+        tokenSetRef.current = false;
+        syncedRef.current = false;
+      }
+      setSyncLoaded(true);
+    } else if (isLoaded) {
+      // Authentication is loaded but no user changes needed
+      setSyncLoaded(true);
     }
   }, [user, isLoaded, getToken]);
 
-  return { isLoaded, user, isSynced: syncedRef.current };
+  return { 
+    isLoaded: isLoaded && syncLoaded, 
+    user, 
+    isSynced: syncedRef.current 
+  };
 };

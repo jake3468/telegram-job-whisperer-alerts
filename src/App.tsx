@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useClerkSupabaseSync } from "@/hooks/useClerkSupabaseSync";
+import { useAuth } from "@clerk/clerk-react";
 import Index from "./pages/Index";
 import JobGuide from "./pages/JobGuide";
 import CoverLetter from "./pages/CoverLetter";
@@ -26,10 +27,25 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+// Loading component
+const LoadingScreen = () => (
+  <div className="min-h-screen bg-gradient-to-br from-black via-gray-950 to-purple-950 flex items-center justify-center">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
+      <p className="text-white">Loading Aspirely.ai...</p>
+    </div>
+  </div>
+);
+
 // Component to initialize Clerk-Supabase sync
 const AppWithSync = () => {
-  // This hook MUST be called to sync Clerk JWT with Supabase
-  useClerkSupabaseSync();
+  const { isLoaded } = useAuth();
+  const { isLoaded: syncLoaded } = useClerkSupabaseSync();
+  
+  // Show loading screen while authentication is initializing
+  if (!isLoaded || !syncLoaded) {
+    return <LoadingScreen />;
+  }
   
   return (
     <>
