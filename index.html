@@ -166,7 +166,79 @@
   </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Immediate loading screen - appears instantly before React loads -->
+      <div id="initial-loader" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #000000 0%, #1a1a2e 50%, #16213e 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      ">
+        <!-- Logo and branding -->
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+          <img 
+            src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" 
+            alt="Aspirely.ai Logo" 
+            style="height: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);"
+            onerror="this.style.display='none'"
+          />
+          <span style="
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+          ">Aspirely.ai</span>
+        </div>
+        
+        <!-- Animated spinner -->
+        <div style="
+          width: 40px;
+          height: 40px;
+          border: 3px solid rgba(139, 92, 246, 0.2);
+          border-top: 3px solid #8b5cf6;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin-bottom: 16px;
+        "></div>
+        
+        <!-- Loading text -->
+        <p style="
+          color: rgba(255, 255, 255, 0.8);
+          font-size: 16px;
+          font-weight: 500;
+          margin: 0;
+        ">Loading your AI toolkit...</p>
+      </div>
+      
+      <!-- CSS Animation -->
+      <style>
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        #initial-loader {
+          opacity: 1;
+          transition: opacity 0.3s ease-out;
+        }
+        
+        #initial-loader.fade-out {
+          opacity: 0;
+          pointer-events: none;
+        }
+      </style>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
