@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -194,8 +194,19 @@ const AIMockInterviewForm = () => {
       </div>;
   }
   
-  // Show profile completion warning if incomplete
-  const showProfileWarning = !completionLoading && (!hasResume || !hasBio);
+  // Show profile completion warning only after data is loaded and profile is actually incomplete
+  // Add a small buffer to ensure cached data has loaded
+  const [showWarningDelay, setShowWarningDelay] = useState(true);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowWarningDelay(false);
+    }, 100); // Very small delay to ensure cache loads first
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
+  const showProfileWarning = !completionLoading && !showWarningDelay && (!hasResume || !hasBio);
 
   return (
     <div className="space-y-6">
