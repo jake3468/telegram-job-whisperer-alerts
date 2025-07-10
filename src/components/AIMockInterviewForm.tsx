@@ -4,10 +4,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Phone, CheckCircle } from "lucide-react";
+import { Loader2, Phone, CheckCircle, AlertCircle } from "lucide-react";
 import { useCachedUserProfile } from "@/hooks/useCachedUserProfile";
+import { useCachedUserCompletionStatus } from "@/hooks/useCachedUserCompletionStatus";
+import { useCachedGraceInterviewRequests } from "@/hooks/useCachedGraceInterviewRequests";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
+
 interface FormData {
   phoneNumber: string;
   companyName: string;
@@ -25,7 +28,9 @@ const AIMockInterviewForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
-  const { userProfile } = useCachedUserProfile();
+  const { userProfile, loading: profileLoading } = useCachedUserProfile();
+  const { hasResume, hasBio, loading: completionLoading } = useCachedUserCompletionStatus();
+  const { optimisticAdd } = useCachedGraceInterviewRequests();
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -41,6 +46,7 @@ const AIMockInterviewForm = () => {
     
     console.log("Form submission started");
     console.log("User profile:", userProfile);
+    console.log("Profile completion status:", { hasResume, hasBio });
     console.log("Form data:", formData);
     
     if (!userProfile?.id) {
@@ -48,6 +54,20 @@ const AIMockInterviewForm = () => {
       toast({
         title: "Authentication Error",
         description: "Please ensure you're logged in and try again.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check profile completion first
+    if (!hasResume || !hasBio) {
+      const missing = [];
+      if (!hasResume) missing.push("resume");
+      if (!hasBio) missing.push("bio");
+      
+      toast({
+        title: "Complete Your Profile First",
+        description: `Please add your ${missing.join(" and ")} in your profile page before requesting an interview.`,
         variant: "destructive"
       });
       return;
@@ -98,13 +118,17 @@ const AIMockInterviewForm = () => {
         job_description: formData.jobDescription
       });
       
-      const { data, error } = await supabase.from("grace_interview_requests").insert({
-        user_id: userProfile.id,
-        phone_number: phoneNumber,
-        company_name: formData.companyName,
-        job_title: formData.jobTitle,
-        job_description: formData.jobDescription
-      });
+      const { data, error } = await supabase
+        .from("grace_interview_requests")
+        .insert({
+          user_id: userProfile.id,
+          phone_number: phoneNumber,
+          company_name: formData.companyName,
+          job_title: formData.jobTitle,
+          job_description: formData.jobDescription
+        })
+        .select()
+        .single();
       
       if (error) {
         console.error("Supabase error:", error);
@@ -112,6 +136,11 @@ const AIMockInterviewForm = () => {
       }
       
       console.log("Successfully inserted data:", data);
+      
+      // Optimistically add to cache
+      if (data) {
+        optimisticAdd(data);
+      }
       
       setIsSubmitted(true);
       toast({
@@ -129,11 +158,23 @@ const AIMockInterviewForm = () => {
           jobDescription: ""
         });
       }, 5000);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting interview request:", error);
+      
+      // Handle specific error types
+      let errorMessage = "There was an error submitting your request. Please try again.";
+      
+      if (error?.message?.includes("JWT") || error?.message?.includes("expired")) {
+        errorMessage = "Your session has expired. Please refresh the page and try again.";
+      } else if (error?.message?.includes("violates row-level security")) {
+        errorMessage = "Authentication error. Please refresh the page and try again.";
+      } else if (error?.message) {
+        errorMessage = `Error: ${error.message}`;
+      }
+      
       toast({
         title: "Submission Failed",
-        description: `There was an error submitting your request: ${error.message || 'Unknown error'}. Please try again.`,
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -152,7 +193,30 @@ const AIMockInterviewForm = () => {
         </p>
       </div>;
   }
-  return <form onSubmit={handleSubmit} className="space-y-6">
+  
+  // Show profile completion warning if incomplete
+  const showProfileWarning = !completionLoading && (!hasResume || !hasBio);
+
+  return (
+    <div className="space-y-6">
+      {/* Profile Completion Warning */}
+      {showProfileWarning && (
+        <div className="flex items-start gap-3 p-4 bg-yellow-900/30 border border-yellow-600/50 rounded-lg">
+          <AlertCircle className="w-5 h-5 text-yellow-400 mt-0.5 flex-shrink-0" />
+          <div className="text-yellow-100">
+            <p className="font-medium mb-1">Complete your profile for interview access</p>
+            <p className="text-sm text-yellow-200">
+              Please add your {[!hasResume && "resume", !hasBio && "bio"].filter(Boolean).join(" and ")} in your{' '}
+              <a href="/profile" className="underline hover:text-yellow-100 transition-colors">
+                profile page
+              </a>{' '}
+              before requesting an AI mock interview.
+            </p>
+          </div>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
       <div className="border border-purple-500/30 rounded-xl p-8 bg-white shadow-lg shadow-purple-500/20">
         <div className="space-y-6">
           {/* Phone Number */}
@@ -229,7 +293,9 @@ const AIMockInterviewForm = () => {
             </p>}
         </div>
       </div>
-    </form>;
+      </form>
+    </div>
+  );
 };
 
 // Custom styles for react-phone-input-2 to match our dark theme
