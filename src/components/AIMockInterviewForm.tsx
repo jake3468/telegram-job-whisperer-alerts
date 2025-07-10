@@ -235,10 +235,18 @@ const phoneInputStyles = `
     border: 1px solid rgb(55 65 81) !important; /* border-gray-700 */
     border-right: none !important;
     border-radius: 0.5rem 0 0 0.5rem !important;
+    padding: 0 0.75rem !important;
   }
   
   .phone-input-button:hover {
     background-color: rgb(17 24 39) !important; /* bg-gray-900 */
+  }
+  
+  .phone-input-button:focus,
+  .phone-input-button:active,
+  .phone-input-button.open {
+    background-color: rgb(31 41 55) !important; /* Keep dark when active */
+    border-color: rgb(147 51 234) !important; /* Purple border when active */
   }
   
   .phone-input-dropdown {
@@ -248,11 +256,22 @@ const phoneInputStyles = `
     max-height: 200px !important;
     overflow-y: auto !important;
     z-index: 50 !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
   }
   
   .phone-input-dropdown .country {
     color: white !important;
     padding: 0.5rem !important;
+    font-size: 0.875rem !important;
+  }
+  
+  .phone-input-dropdown .country .country-name {
+    color: white !important;
+  }
+  
+  .phone-input-dropdown .country .dial-code {
+    color: white !important;
+    font-weight: 500 !important;
   }
   
   .phone-input-dropdown .country:hover {
@@ -263,17 +282,41 @@ const phoneInputStyles = `
     background-color: rgb(147 51 234) !important; /* bg-purple-500 */
   }
   
+  .phone-input-dropdown .country.preferred {
+    background-color: rgb(17 24 39) !important; /* bg-gray-900 */
+  }
+  
   .phone-input-search {
-    background-color: rgb(31 41 55) !important; /* bg-gray-800 */
-    border: 1px solid rgb(55 65 81) !important; /* border-gray-700 */
-    color: white !important;
+    background-color: white !important; /* White background for search */
+    border: 1px solid rgb(209 213 219) !important; /* border-gray-300 */
+    color: black !important; /* Black text */
     padding: 0.5rem !important;
     margin: 0.5rem !important;
     border-radius: 0.375rem !important;
+    width: calc(100% - 1rem) !important;
+  }
+  
+  .phone-input-search:focus {
+    border-color: rgb(147 51 234) !important; /* Purple border on focus */
+    outline: none !important;
+    box-shadow: 0 0 0 1px rgb(147 51 234 / 0.2) !important;
   }
   
   .phone-input-search::placeholder {
-    color: rgb(156 163 175) !important; /* text-gray-400 */
+    color: rgb(107 114 128) !important; /* text-gray-500 for placeholder */
+  }
+  
+  /* Fix for flag display */
+  .phone-input-button .flag-dropdown {
+    background-color: transparent !important;
+  }
+  
+  .phone-input-button .selected-flag {
+    background-color: transparent !important;
+  }
+  
+  .phone-input-button .selected-flag:hover {
+    background-color: rgb(17 24 39) !important;
   }
 `;
 
