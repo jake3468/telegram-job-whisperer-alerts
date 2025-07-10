@@ -1,6 +1,6 @@
 
 
-import { User, Bell, Target, FileText, X, Share2, CreditCard, FileUser, Building2, MessageSquare, Kanban } from 'lucide-react';
+import { User, Bell, Target, FileText, X, Share2, CreditCard, FileUser, Building2, MessageSquare, Kanban, Phone } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { SignedIn, UserButton, useUser } from '@clerk/clerk-react';
@@ -34,6 +34,10 @@ const toolItems = [{
   title: 'Interview Prep',
   url: '/interview-prep',
   icon: MessageSquare
+}, {
+  title: 'AI Mock Interview',
+  url: '/ai-mock-interview',
+  icon: Phone
 }, {
   title: 'Telegram Job Alerts',
   url: '/job-alerts',
