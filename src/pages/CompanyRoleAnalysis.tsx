@@ -316,7 +316,11 @@ const CompanyRoleAnalysis = () => {
 
                   {/* Action Buttons - Desktop: same line, Mobile: stacked */}
                   <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4">
-                    <Button type="submit" disabled={isSubmitting} className="w-full lg:flex-1 bg-gradient-to-r from-white via-white to-white hover:from-white/90 hover:via-white/90 hover:to-white/90 text-black font-orbitron font-bold py-4 sm:py-6 text-xs sm:text-base shadow-2xl shadow-gray-300/50 border-0 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <Button 
+                      type="submit" 
+                      disabled={isSubmitting || !companyName.trim() || !location.trim() || !jobTitle.trim()} 
+                      className="w-full lg:flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-4 sm:py-6 text-xs sm:text-base transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    >
                       {isSubmitting ? <>
                           <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
                           Analyzing Company & Role...

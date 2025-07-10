@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useClerkSupabaseSync } from "@/hooks/useClerkSupabaseSync";
 import { useAuth } from "@clerk/clerk-react";
 import { useEffect } from "react";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import JobGuide from "./pages/JobGuide";
 import CoverLetter from "./pages/CoverLetter";
@@ -72,25 +73,29 @@ const AppWithSync = () => {
   return (
     <>
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<Index />} />
-        <Route path="/dashboard" element={<Navigate to="/profile" replace />} />
-        <Route path="/job-guide" element={<JobGuide />} />
-        <Route path="/cover-letter" element={<CoverLetter />} />
-        <Route path="/linkedin-posts" element={<LinkedInPosts />} />
-        <Route path="/interview-prep" element={<InterviewPrep />} />
-        <Route path="/company-role-analysis" element={<CompanyRoleAnalysis />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/resume-builder" element={<ResumeBuilder />} />
-        <Route path="/job-alerts" element={<JobAlerts />} />
-        <Route path="/get-more-credits" element={<GetMoreCredits />} />
-        <Route path="/job-tracker" element={<JobTracker />} />
-        <Route path="/ai-mock-interview" element={<AIMockInterview />} />
-        <Route path="/upgrade" element={<Upgrade />} />
         <Route path="/blogs" element={<Blogs />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/contact-support" element={<ContactSupport />} />
+        
+        {/* Protected Routes */}
+        <Route path="/dashboard" element={<Navigate to="/profile" replace />} />
+        <Route path="/job-guide" element={<ProtectedRoute><JobGuide /></ProtectedRoute>} />
+        <Route path="/cover-letter" element={<ProtectedRoute><CoverLetter /></ProtectedRoute>} />
+        <Route path="/linkedin-posts" element={<ProtectedRoute><LinkedInPosts /></ProtectedRoute>} />
+        <Route path="/interview-prep" element={<ProtectedRoute><InterviewPrep /></ProtectedRoute>} />
+        <Route path="/company-role-analysis" element={<ProtectedRoute><CompanyRoleAnalysis /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/resume-builder" element={<ProtectedRoute><ResumeBuilder /></ProtectedRoute>} />
+        <Route path="/job-alerts" element={<ProtectedRoute><JobAlerts /></ProtectedRoute>} />
+        <Route path="/get-more-credits" element={<ProtectedRoute><GetMoreCredits /></ProtectedRoute>} />
+        <Route path="/job-tracker" element={<ProtectedRoute><JobTracker /></ProtectedRoute>} />
+        <Route path="/ai-mock-interview" element={<ProtectedRoute><AIMockInterview /></ProtectedRoute>} />
+        <Route path="/upgrade" element={<ProtectedRoute><Upgrade /></ProtectedRoute>} />
+        
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
