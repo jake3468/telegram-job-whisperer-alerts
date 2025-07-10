@@ -347,12 +347,12 @@ const JobAnalysisHistoryModal = ({
                       <Button onClick={() => {
                   setSelectedItem(item);
                   setShowDetails(true);
-                }} size="sm" className="bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-3 py-1">
+                }} size="sm" className="text-white text-xs px-3 py-1 bg-blue-800 hover:bg-blue-700">
                         <Eye className="w-3 h-3 mr-1" />
                         View
                       </Button>
                       
-                      <Button onClick={() => handleDelete(item.id)} size="sm" className="bg-red-600/80 hover:bg-red-600 text-white text-xs px-3 py-1">
+                      <Button onClick={() => handleDelete(item.id)} size="sm" className="text-white text-xs px-3 py-1 bg-red-800 hover:bg-red-700">
                         <Trash2 className="w-3 h-3 mr-1" />
                         Delete
                       </Button>
