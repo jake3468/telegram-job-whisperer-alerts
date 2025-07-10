@@ -7,7 +7,6 @@ import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, Alert
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { PercentageMeter } from '@/components/PercentageMeter';
-
 interface JobAnalysisItem {
   id: string;
   company_name?: string;
@@ -17,58 +16,61 @@ interface JobAnalysisItem {
   job_match?: string;
   match_score?: string;
 }
-
 interface JobAnalysisHistoryModalProps {
   isOpen: boolean;
   onClose: () => void;
   gradientColors: string;
 }
-
 const JobAnalysisHistoryModal = ({
   isOpen,
   onClose,
   gradientColors
 }: JobAnalysisHistoryModalProps) => {
-  const { user, isLoaded } = useUser();
-  const { toast } = useToast();
-  const { userProfile } = useUserProfile();
+  const {
+    user,
+    isLoaded
+  } = useUser();
+  const {
+    toast
+  } = useToast();
+  const {
+    userProfile
+  } = useUserProfile();
   const [historyData, setHistoryData] = useState<JobAnalysisItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<JobAnalysisItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
-
   useEffect(() => {
     if (isOpen && isLoaded && user && userProfile) {
       console.log('🔄 JobAnalysisHistoryModal: Starting to fetch history');
       fetchHistory();
     }
   }, [isOpen, isLoaded, user, userProfile]);
-
   const fetchHistory = async (isRetry = false) => {
     if (!isLoaded || !user || !userProfile) {
-      console.log('❌ Cannot fetch history: missing requirements', { isLoaded, user: !!user, userProfile: !!userProfile });
+      console.log('❌ Cannot fetch history: missing requirements', {
+        isLoaded,
+        user: !!user,
+        userProfile: !!userProfile
+      });
       return;
     }
-    
     setIsLoading(true);
     try {
       console.log('📡 Fetching job analysis history for user:', userProfile.id);
-      
-      const { data, error } = await supabase
-        .from('job_analyses')
-        .select('id, company_name, job_title, job_description, created_at, job_match, match_score')
-        .eq('user_id', userProfile.id)
-        .order('created_at', { ascending: false })
-        .limit(20);
-
+      const {
+        data,
+        error
+      } = await supabase.from('job_analyses').select('id, company_name, job_title, job_description, created_at, job_match, match_score').eq('user_id', userProfile.id).order('created_at', {
+        ascending: false
+      }).limit(20);
       if (error) {
         console.error('❌ Error fetching history:', error);
-        
+
         // If JWT expired, try to refresh the session
         if (error.message?.includes('JWT expired') || error.code === 'PGRST301') {
           console.log('🔄 JWT expired, attempting to refresh session...');
-          
           if (!isRetry && retryCount < 2) {
             // Wait a moment for potential token refresh, then retry
             setTimeout(() => {
@@ -78,10 +80,8 @@ const JobAnalysisHistoryModal = ({
             return;
           }
         }
-        
         throw error;
       }
-
       console.log('✅ Successfully fetched history:', data?.length || 0, 'items');
       setHistoryData(data || []);
       setRetryCount(0); // Reset retry count on success
@@ -96,11 +96,9 @@ const JobAnalysisHistoryModal = ({
       setIsLoading(false);
     }
   };
-
   const handleCopyResult = async (item: JobAnalysisItem) => {
     const result = item.job_match;
     if (!result) return;
-    
     try {
       await navigator.clipboard.writeText(result);
       toast({
@@ -116,7 +114,6 @@ const JobAnalysisHistoryModal = ({
       });
     }
   };
-
   const handleDelete = async (itemId: string) => {
     if (!userProfile) {
       toast({
@@ -128,13 +125,9 @@ const JobAnalysisHistoryModal = ({
     }
     try {
       console.log(`Attempting to delete job analysis item with ID: ${itemId} for user profile: ${userProfile.id}`);
-      
-      const { error } = await supabase
-        .from('job_analyses')
-        .delete()
-        .eq('id', itemId)
-        .eq('user_id', userProfile.id);
-      
+      const {
+        error
+      } = await supabase.from('job_analyses').delete().eq('id', itemId).eq('user_id', userProfile.id);
       if (error) {
         console.error('Supabase delete error:', error);
         throw error;
@@ -162,7 +155,6 @@ const JobAnalysisHistoryModal = ({
       });
     }
   };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -172,24 +164,17 @@ const JobAnalysisHistoryModal = ({
       minute: '2-digit'
     });
   };
-
   const hasResult = (item: JobAnalysisItem) => {
     return item.job_match && item.job_match.trim().length > 0;
   };
-
   if (showDetails && selectedItem) {
-    return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
+    return <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-6xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-white font-inter flex items-center gap-2 text-lg">
               <FileText className="w-5 h-5" />
               Job Analysis Details
-              <Button 
-                onClick={() => setShowDetails(false)} 
-                size="sm" 
-                className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm mx-[15px]"
-              >
+              <Button onClick={() => setShowDetails(false)} size="sm" className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm mx-[15px]">
                 <X className="w-4 h-4 mr-1" />
                 Back to List
               </Button>
@@ -232,8 +217,7 @@ const JobAnalysisHistoryModal = ({
             </div>
 
             {/* Result Section */}
-            {hasResult(selectedItem) && (
-              <div className="rounded-lg p-4 border border-white/10 shadow-inner bg-red-700">
+            {hasResult(selectedItem) && <div className="rounded-lg p-4 border border-white/10 shadow-inner bg-red-700">
                 <h3 className="text-white font-medium mb-3 flex flex-wrap gap-2 justify-between items-center">
                   <div className="flex items-center gap-2">
                     <FileText className="w-4 h-4" />
@@ -244,39 +228,26 @@ const JobAnalysisHistoryModal = ({
                 <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
                   <div className="flex justify-between items-start mb-3">
                     <h4 className="text-lime-400 font-semibold">Job Analysis Result</h4>
-                    <Button
-                      onClick={() => handleCopyResult(selectedItem)}
-                      size="sm"
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                    >
+                    <Button onClick={() => handleCopyResult(selectedItem)} size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white">
                       <Copy className="w-4 h-4 mr-2" />
                       Copy Result
                     </Button>
                   </div>
                   
-                  {selectedItem.match_score && (
-                    <div className="mb-4">
-                      <PercentageMeter 
-                        score={parseInt(selectedItem.match_score)} 
-                        label="Match Score"
-                      />
-                    </div>
-                  )}
+                  {selectedItem.match_score && <div className="mb-4">
+                      <PercentageMeter score={parseInt(selectedItem.match_score)} label="Match Score" />
+                    </div>}
                   
                   <div className="text-black bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words">
                     {selectedItem.job_match}
                   </div>
                 </div>
-              </div>
-            )}
+              </div>}
           </div>
         </DialogContent>
-      </Dialog>
-    );
+      </Dialog>;
   }
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+  return <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] max-w-5xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
         <DialogHeader className="flex-shrink-0">
           <div className="flex items-center justify-between">
@@ -284,12 +255,7 @@ const JobAnalysisHistoryModal = ({
               <History className="w-4 h-4 sm:w-5 sm:h-5" />
               Job Analysis History
             </DialogTitle>
-            <Button 
-              onClick={onClose} 
-              size="sm" 
-              variant="ghost"
-              className="text-white/70 hover:text-white h-8 w-8 p-0 hover:bg-white/10"
-            >
+            <Button onClick={onClose} size="sm" variant="ghost" className="text-white/70 hover:text-white h-8 w-8 p-0 hover:bg-white/10">
               <X className="w-4 h-4" />
             </Button>
           </div>
@@ -308,31 +274,21 @@ const JobAnalysisHistoryModal = ({
         </div>
 
         <div className="flex-1 overflow-y-auto min-h-0">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
+          {isLoading ? <div className="flex items-center justify-center py-8">
               <div className="text-white/70 text-sm flex items-center gap-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white/70"></div>
                 Loading history...
               </div>
-            </div>
-          ) : historyData.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8">
+            </div> : historyData.length === 0 ? <div className="flex flex-col items-center justify-center py-8">
               <div className="text-white/70 text-center">
                 <History className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No job analyses found.</p>
-                <Button 
-                  onClick={() => fetchHistory()} 
-                  size="sm" 
-                  className="mt-2 bg-blue-600 hover:bg-blue-700"
-                >
+                <Button onClick={() => fetchHistory()} size="sm" className="mt-2 bg-blue-600 hover:bg-blue-700">
                   Retry Loading
                 </Button>
               </div>
-            </div>
-          ) : (
-            <div className="space-y-2 sm:space-y-3 pb-4">
-              {historyData.map(item => (
-                <div key={item.id} className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-indigo-800">
+            </div> : <div className="space-y-2 sm:space-y-3 pb-4">
+              {historyData.map(item => <div key={item.id} className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-blue-500">
                   {/* Mobile Layout */}
                   <div className="block sm:hidden space-y-2">
                     <div className="flex items-start justify-between gap-2">
@@ -353,23 +309,15 @@ const JobAnalysisHistoryModal = ({
                     </div>
                     
                     <div className="flex items-center gap-1 pt-2">
-                      <Button 
-                        onClick={() => {
-                          setSelectedItem(item);
-                          setShowDetails(true);
-                        }} 
-                        size="sm" 
-                        className="flex-1 bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-2 py-1"
-                      >
+                      <Button onClick={() => {
+                  setSelectedItem(item);
+                  setShowDetails(true);
+                }} size="sm" className="flex-1 bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-2 py-1">
                         <Eye className="w-3 h-3 mr-1" />
                         View
                       </Button>
                       
-                      <Button 
-                        onClick={() => handleDelete(item.id)} 
-                        size="sm" 
-                        className="flex-1 bg-red-600/80 hover:bg-red-600 text-white text-xs px-2 py-1"
-                      >
+                      <Button onClick={() => handleDelete(item.id)} size="sm" className="flex-1 bg-red-600/80 hover:bg-red-600 text-white text-xs px-2 py-1">
                         <Trash2 className="w-3 h-3 mr-1" />
                         Delete
                       </Button>
@@ -396,36 +344,24 @@ const JobAnalysisHistoryModal = ({
                     </div>
 
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <Button 
-                        onClick={() => {
-                          setSelectedItem(item);
-                          setShowDetails(true);
-                        }} 
-                        size="sm" 
-                        className="bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-3 py-1"
-                      >
+                      <Button onClick={() => {
+                  setSelectedItem(item);
+                  setShowDetails(true);
+                }} size="sm" className="bg-blue-600/80 hover:bg-blue-600 text-white text-xs px-3 py-1">
                         <Eye className="w-3 h-3 mr-1" />
                         View
                       </Button>
                       
-                      <Button 
-                        onClick={() => handleDelete(item.id)} 
-                        size="sm" 
-                        className="bg-red-600/80 hover:bg-red-600 text-white text-xs px-3 py-1"
-                      >
+                      <Button onClick={() => handleDelete(item.id)} size="sm" className="bg-red-600/80 hover:bg-red-600 text-white text-xs px-3 py-1">
                         <Trash2 className="w-3 h-3 mr-1" />
                         Delete
                       </Button>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                </div>)}
+            </div>}
         </div>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 };
-
 export default JobAnalysisHistoryModal;
