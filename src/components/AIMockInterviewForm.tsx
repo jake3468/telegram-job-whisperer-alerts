@@ -126,7 +126,7 @@ const AIMockInterviewForm = () => {
   }
   return <form onSubmit={handleSubmit} className="space-y-6">
       <div className="backdrop-blur-lg border border-gray-700/50 rounded-xl p-8 bg-white">
-        <div className="space-y-6">
+        <div className="space-y-6 bg-gray-950">
           {/* Phone Number */}
           <div>
             <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-300 mb-2">
