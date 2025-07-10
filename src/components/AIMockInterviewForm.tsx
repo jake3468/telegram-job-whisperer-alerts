@@ -8,6 +8,7 @@ import { Loader2, Phone, CheckCircle, AlertCircle } from "lucide-react";
 import { useCachedUserProfile } from "@/hooks/useCachedUserProfile";
 import { useCachedUserCompletionStatus } from "@/hooks/useCachedUserCompletionStatus";
 import { useCachedGraceInterviewRequests } from "@/hooks/useCachedGraceInterviewRequests";
+import { ProfileCompletionWarning } from "@/components/ProfileCompletionWarning";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 
@@ -194,38 +195,10 @@ const AIMockInterviewForm = () => {
       </div>;
   }
   
-  // Show profile completion warning only after data is loaded and profile is actually incomplete
-  // Add a small buffer to ensure cached data has loaded
-  const [showWarningDelay, setShowWarningDelay] = useState(true);
-  
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowWarningDelay(false);
-    }, 100); // Very small delay to ensure cache loads first
-    
-    return () => clearTimeout(timer);
-  }, []);
-  
-  const showProfileWarning = !completionLoading && !showWarningDelay && (!hasResume || !hasBio);
-
   return (
     <div className="space-y-6">
-      {/* Profile Completion Warning */}
-      {showProfileWarning && (
-        <div className="flex items-start gap-3 p-4 bg-yellow-900/30 border border-yellow-600/50 rounded-lg">
-          <AlertCircle className="w-5 h-5 text-yellow-400 mt-0.5 flex-shrink-0" />
-          <div className="text-yellow-100">
-            <p className="font-medium mb-1">Complete your profile for interview access</p>
-            <p className="text-sm text-yellow-200">
-              Please add your {[!hasResume && "resume", !hasBio && "bio"].filter(Boolean).join(" and ")} in your{' '}
-              <a href="/profile" className="underline hover:text-yellow-100 transition-colors">
-                profile page
-              </a>{' '}
-              before requesting an AI mock interview.
-            </p>
-          </div>
-        </div>
-      )}
+      {/* Profile Completion Warning - Uses the standard component with proper caching */}
+      <ProfileCompletionWarning />
 
       <form onSubmit={handleSubmit} className="space-y-6">
       <div className="border border-purple-500/30 rounded-xl p-8 bg-white shadow-lg shadow-purple-500/20">
