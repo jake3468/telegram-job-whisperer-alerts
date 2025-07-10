@@ -125,39 +125,39 @@ const AIMockInterviewForm = () => {
       </div>;
   }
   return <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="backdrop-blur-lg border border-gray-700/50 rounded-xl p-8 bg-white">
-        <div className="space-y-6 bg-gray-950">
+      <div className="border border-purple-500/30 rounded-xl p-8 bg-white shadow-lg shadow-purple-500/20">
+        <div className="space-y-6">
           {/* Phone Number */}
           <div>
-            <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="phoneNumber" className="block text-sm font-medium text-black mb-2">
               Phone Number (with country code)
             </label>
-            <Input id="phoneNumber" type="tel" placeholder="+1 9551234567" value={formData.phoneNumber} onChange={e => handleInputChange("phoneNumber", e.target.value)} className="bg-gray-800/80 border-gray-600/50 text-white placeholder:text-gray-400 focus:border-blue-400 focus:ring-blue-400/20" required />
+            <Input id="phoneNumber" type="tel" placeholder="+1 9551234567" value={formData.phoneNumber} onChange={e => handleInputChange("phoneNumber", e.target.value)} className="bg-white border-purple-300 text-black placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500/20" required />
           </div>
 
           {/* Company Name */}
           <div>
-            <label htmlFor="companyName" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="companyName" className="block text-sm font-medium text-black mb-2">
               Company Name
             </label>
-            <Input id="companyName" type="text" placeholder="e.g., Google, Microsoft, Startup Inc." value={formData.companyName} onChange={e => handleInputChange("companyName", e.target.value)} className="bg-gray-800/80 border-gray-600/50 text-white placeholder:text-gray-400 focus:border-blue-400 focus:ring-blue-400/20" required />
+            <Input id="companyName" type="text" placeholder="e.g., Google, Microsoft, Startup Inc." value={formData.companyName} onChange={e => handleInputChange("companyName", e.target.value)} className="bg-white border-purple-300 text-black placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500/20" required />
           </div>
 
           {/* Job Title */}
           <div>
-            <label htmlFor="jobTitle" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="jobTitle" className="block text-sm font-medium text-black mb-2">
               Job Title
             </label>
-            <Input id="jobTitle" type="text" placeholder="e.g., Software Engineer, Product Manager, Data Scientist" value={formData.jobTitle} onChange={e => handleInputChange("jobTitle", e.target.value)} className="bg-gray-800/80 border-gray-600/50 text-white placeholder:text-gray-400 focus:border-blue-400 focus:ring-blue-400/20" required />
+            <Input id="jobTitle" type="text" placeholder="e.g., Software Engineer, Product Manager, Data Scientist" value={formData.jobTitle} onChange={e => handleInputChange("jobTitle", e.target.value)} className="bg-white border-purple-300 text-black placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500/20" required />
           </div>
 
           {/* Job Description */}
           <div>
-            <label htmlFor="jobDescription" className="block text-sm font-medium text-gray-300 mb-2">
+            <label htmlFor="jobDescription" className="block text-sm font-medium text-black mb-2">
               Job Description
             </label>
-            <Textarea id="jobDescription" placeholder="Paste the full job description here. Include responsibilities, requirements, and any specific skills mentioned..." value={formData.jobDescription} onChange={e => handleInputChange("jobDescription", e.target.value)} className="bg-gray-800/80 border-gray-600/50 text-white placeholder:text-gray-400 focus:border-blue-400 focus:ring-blue-400/20 min-h-[120px] resize-none" required />
-            <p className="text-xs text-gray-500 mt-1">
+            <Textarea id="jobDescription" placeholder="Paste the full job description here. Include responsibilities, requirements, and any specific skills mentioned..." value={formData.jobDescription} onChange={e => handleInputChange("jobDescription", e.target.value)} className="bg-white border-purple-300 text-black placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500/20 min-h-[120px] resize-none" required />
+            <p className="text-xs text-black mt-1">
               {formData.jobDescription.length}/500+ characters (minimum 50 required)
             </p>
           </div>
@@ -175,7 +175,7 @@ const AIMockInterviewForm = () => {
               </>}
           </Button>
           
-          {!isSubmitting && <p className="text-center text-gray-400 text-sm mt-3">
+          {!isSubmitting && <p className="text-center text-black text-sm mt-3">
               Grace will call you within ~1 minute of submitting
             </p>}
         </div>
