@@ -1,10 +1,10 @@
 
-import { useUserCredits } from '@/hooks/useUserCredits';
+import { useCachedUserCredits } from '@/hooks/useCachedUserCredits';
 import { useSidebar } from '@/components/ui/sidebar';
 import { Loader2 } from 'lucide-react';
 
 const CreditBalanceDisplay = () => {
-  const { data: credits, isLoading, isPending } = useUserCredits();
+  const { data: credits, isLoading, isPending } = useCachedUserCredits();
   const { state } = useSidebar();
 
   // Only show loading on initial load, not on subsequent fetches
