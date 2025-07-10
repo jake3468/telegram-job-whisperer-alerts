@@ -29,23 +29,11 @@ const AIMockInterview = () => {
           {/* Feature highlights */}
           <div className="mt-16 text-center">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="p-6 rounded-lg bg-gray-800/40 border border-gray-700/50">
-                <div className="text-3xl mb-3">📞</div>
-                <h3 className="text-lg font-semibold text-blue-300 mb-2">Instant Call</h3>
-                <p className="text-gray-400 text-sm">Receive your mock interview call within ~1 minute</p>
-              </div>
               
-              <div className="p-6 rounded-lg bg-gray-800/40 border border-gray-700/50">
-                <div className="text-3xl mb-3">🤖</div>
-                <h3 className="text-lg font-semibold text-purple-300 mb-2">AI-Powered</h3>
-                <p className="text-gray-400 text-sm">Grace adapts questions to your specific role and company</p>
-              </div>
               
-              <div className="p-6 rounded-lg bg-gray-800/40 border border-gray-700/50">
-                <div className="text-3xl mb-3">💼</div>
-                <h3 className="text-lg font-semibold text-pink-300 mb-2">Job-Specific</h3>
-                <p className="text-gray-400 text-sm">Tailored questions based on your job description</p>
-              </div>
+              
+              
+              
             </div>
           </div>
         </div>
