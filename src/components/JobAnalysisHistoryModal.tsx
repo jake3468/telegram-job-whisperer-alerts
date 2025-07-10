@@ -288,7 +288,7 @@ const JobAnalysisHistoryModal = ({
                 </Button>
               </div>
             </div> : <div className="space-y-2 sm:space-y-3 pb-4">
-              {historyData.map(item => <div key={item.id} className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-blue-500">
+              {historyData.map(item => <div key={item.id} className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-green-600">
                   {/* Mobile Layout */}
                   <div className="block sm:hidden space-y-2">
                     <div className="flex items-start justify-between gap-2">
