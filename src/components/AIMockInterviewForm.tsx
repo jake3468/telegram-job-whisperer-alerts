@@ -2,18 +2,52 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Phone, CheckCircle } from "lucide-react";
 import { useCachedUserProfile } from "@/hooks/useCachedUserProfile";
 interface FormData {
+  countryCode: string;
   phoneNumber: string;
   companyName: string;
   jobTitle: string;
   jobDescription: string;
 }
+
+// Country codes with names
+const countryCodes = [
+  { code: "1", country: "United States", flag: "🇺🇸" },
+  { code: "44", country: "United Kingdom", flag: "🇬🇧" },
+  { code: "91", country: "India", flag: "🇮🇳" },
+  { code: "86", country: "China", flag: "🇨🇳" },
+  { code: "49", country: "Germany", flag: "🇩🇪" },
+  { code: "33", country: "France", flag: "🇫🇷" },
+  { code: "39", country: "Italy", flag: "🇮🇹" },
+  { code: "34", country: "Spain", flag: "🇪🇸" },
+  { code: "81", country: "Japan", flag: "🇯🇵" },
+  { code: "82", country: "South Korea", flag: "🇰🇷" },
+  { code: "61", country: "Australia", flag: "🇦🇺" },
+  { code: "55", country: "Brazil", flag: "🇧🇷" },
+  { code: "52", country: "Mexico", flag: "🇲🇽" },
+  { code: "7", country: "Russia", flag: "🇷🇺" },
+  { code: "90", country: "Turkey", flag: "🇹🇷" },
+  { code: "966", country: "Saudi Arabia", flag: "🇸🇦" },
+  { code: "971", country: "UAE", flag: "🇦🇪" },
+  { code: "65", country: "Singapore", flag: "🇸🇬" },
+  { code: "60", country: "Malaysia", flag: "🇲🇾" },
+  { code: "66", country: "Thailand", flag: "🇹🇭" },
+  { code: "84", country: "Vietnam", flag: "🇻🇳" },
+  { code: "62", country: "Indonesia", flag: "🇮🇩" },
+  { code: "63", country: "Philippines", flag: "🇵🇭" },
+  { code: "27", country: "South Africa", flag: "🇿🇦" },
+  { code: "20", country: "Egypt", flag: "🇪🇬" },
+  { code: "234", country: "Nigeria", flag: "🇳🇬" },
+  { code: "254", country: "Kenya", flag: "🇰🇪" },
+];
 const AIMockInterviewForm = () => {
   const [formData, setFormData] = useState<FormData>({
+    countryCode: "1",
     phoneNumber: "",
     companyName: "",
     jobTitle: "",
@@ -34,8 +68,13 @@ const AIMockInterviewForm = () => {
     }));
   };
   const validatePhoneNumber = (phone: string) => {
-    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-    return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
+    // Validate that phone number contains only digits and is not empty
+    const phoneRegex = /^[0-9]{6,15}$/;
+    return phoneRegex.test(phone);
+  };
+
+  const getFullPhoneNumber = () => {
+    return `+${formData.countryCode}${formData.phoneNumber}`;
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,7 +99,7 @@ const AIMockInterviewForm = () => {
     if (!validatePhoneNumber(formData.phoneNumber)) {
       toast({
         title: "Invalid Phone Number",
-        description: "Please enter a valid phone number with country code.",
+        description: "Please enter a valid mobile number (6-15 digits only).",
         variant: "destructive"
       });
       return;
@@ -79,7 +118,7 @@ const AIMockInterviewForm = () => {
         error
       } = await supabase.from("grace_interview_requests").insert({
         user_id: userProfile.id,
-        phone_number: formData.phoneNumber,
+        phone_number: getFullPhoneNumber(),
         company_name: formData.companyName,
         job_title: formData.jobTitle,
         job_description: formData.jobDescription
@@ -95,6 +134,7 @@ const AIMockInterviewForm = () => {
       setTimeout(() => {
         setIsSubmitted(false);
         setFormData({
+          countryCode: "1",
           phoneNumber: "",
           companyName: "",
           jobTitle: "",
@@ -130,9 +170,49 @@ const AIMockInterviewForm = () => {
           {/* Phone Number */}
           <div>
             <label htmlFor="phoneNumber" className="block text-sm font-medium text-black mb-2">
-              Phone Number (with country code)
+              Phone Number
             </label>
-            <Input id="phoneNumber" type="tel" placeholder="+1 9551234567" value={formData.phoneNumber} onChange={e => handleInputChange("phoneNumber", e.target.value)} className="bg-white border-purple-300 text-black placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500/20" required />
+            <div className="flex">
+              <div className="flex items-center bg-gray-800 border border-purple-300 rounded-l-lg px-3">
+                <span className="text-white text-sm font-medium">+</span>
+              </div>
+              <Select value={formData.countryCode} onValueChange={(value) => handleInputChange("countryCode", value)}>
+                <SelectTrigger className="bg-gray-800 border-purple-300 text-white w-[200px] rounded-none border-l-0 border-r-0 focus:border-purple-500 focus:ring-purple-500/20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-600 max-h-60">
+                  {countryCodes.map((country) => (
+                    <SelectItem 
+                      key={country.code} 
+                      value={country.code}
+                      className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                    >
+                      <span className="flex items-center gap-2">
+                        <span>{country.flag}</span>
+                        <span>{country.code}</span>
+                        <span className="text-gray-300">{country.country}</span>
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input 
+                id="phoneNumber" 
+                type="tel" 
+                placeholder="1234567890" 
+                value={formData.phoneNumber} 
+                onChange={(e) => {
+                  // Only allow digits
+                  const value = e.target.value.replace(/[^0-9]/g, '');
+                  handleInputChange("phoneNumber", value);
+                }}
+                className="bg-gray-800 border-purple-300 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500/20 rounded-l-none flex-1" 
+                required 
+              />
+            </div>
+            <p className="text-xs text-black mt-1">
+              Enter mobile number without spaces or dashes (e.g., 1234567890)
+            </p>
           </div>
 
           {/* Company Name */}
@@ -140,7 +220,7 @@ const AIMockInterviewForm = () => {
             <label htmlFor="companyName" className="block text-sm font-medium text-black mb-2">
               Company Name
             </label>
-            <Input id="companyName" type="text" placeholder="e.g., Google, Microsoft, Startup Inc." value={formData.companyName} onChange={e => handleInputChange("companyName", e.target.value)} className="bg-white border-purple-300 text-black placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500/20" required />
+            <Input id="companyName" type="text" placeholder="e.g., Google, Microsoft, Startup Inc." value={formData.companyName} onChange={e => handleInputChange("companyName", e.target.value)} className="bg-gray-800 border-purple-300 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500/20" required />
           </div>
 
           {/* Job Title */}
@@ -148,7 +228,7 @@ const AIMockInterviewForm = () => {
             <label htmlFor="jobTitle" className="block text-sm font-medium text-black mb-2">
               Job Title
             </label>
-            <Input id="jobTitle" type="text" placeholder="e.g., Software Engineer, Product Manager, Data Scientist" value={formData.jobTitle} onChange={e => handleInputChange("jobTitle", e.target.value)} className="bg-white border-purple-300 text-black placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500/20" required />
+            <Input id="jobTitle" type="text" placeholder="e.g., Software Engineer, Product Manager, Data Scientist" value={formData.jobTitle} onChange={e => handleInputChange("jobTitle", e.target.value)} className="bg-gray-800 border-purple-300 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500/20" required />
           </div>
 
           {/* Job Description */}
@@ -156,7 +236,7 @@ const AIMockInterviewForm = () => {
             <label htmlFor="jobDescription" className="block text-sm font-medium text-black mb-2">
               Job Description
             </label>
-            <Textarea id="jobDescription" placeholder="Paste the full job description here. Include responsibilities, requirements, and any specific skills mentioned..." value={formData.jobDescription} onChange={e => handleInputChange("jobDescription", e.target.value)} className="bg-white border-purple-300 text-black placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500/20 min-h-[120px] resize-none" required />
+            <Textarea id="jobDescription" placeholder="Paste the full job description here. Include responsibilities, requirements, and any specific skills mentioned..." value={formData.jobDescription} onChange={e => handleInputChange("jobDescription", e.target.value)} className="bg-gray-800 border-purple-300 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500/20 min-h-[120px] resize-none" required />
             <p className="text-xs text-black mt-1">
               {formData.jobDescription.length}/500+ characters (minimum 50 required)
             </p>
