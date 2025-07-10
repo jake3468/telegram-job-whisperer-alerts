@@ -18,6 +18,7 @@ export const useCachedUserProfile = () => {
   const [cachedData, setCachedData] = useState<CachedProfileData | null>(null);
   const [displayProfile, setDisplayProfile] = useState<UserProfile | null>(null);
   const [resumeExists, setResumeExists] = useState<boolean>(false);
+  const [connectionIssue, setConnectionIssue] = useState(false);
 
   // Load cached data immediately on mount
   useEffect(() => {
@@ -58,26 +59,41 @@ export const useCachedUserProfile = () => {
     }
   }, []);
 
-  // Update cache and display data when fresh data arrives
+  // Update displayed data when fresh data is available
   useEffect(() => {
     if (freshProfile) {
-      const cacheData: CachedProfileData = {
+      setConnectionIssue(false);
+      logger.debug('Fresh profile data received:', freshProfile);
+      
+      const resumeStatus = !!freshProfile.resume;
+      const now = Date.now();
+      
+      // Update cached data
+      const newCachedData = {
         profile: freshProfile,
-        resumeExists, // Keep current resume status
-        timestamp: Date.now()
+        resumeExists: resumeStatus,
+        timestamp: now
       };
-
-      try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-        setCachedData(cacheData);
-        setDisplayProfile(freshProfile);
-        logger.debug('Cached fresh profile data:', cacheData);
-      } catch (error) {
-        logger.warn('Failed to cache profile data:', error);
-        setDisplayProfile(freshProfile);
+      
+      setCachedData(newCachedData);
+      setDisplayProfile(freshProfile);
+      setResumeExists(resumeStatus);
+      
+      // Save to localStorage
+      localStorage.setItem(CACHE_KEY, JSON.stringify(newCachedData));
+      localStorage.setItem(RESUME_CACHE_KEY, JSON.stringify({
+        exists: resumeStatus,
+        timestamp: now
+      }));
+    } else if (error && !loading) {
+      // Handle error case - show connection issue if no cached data
+      if (!cachedData) {
+        setConnectionIssue(true);
       }
+      logger.error('Error loading profile:', error);
     }
-  }, [freshProfile, resumeExists]);
+  }, [freshProfile, error, loading, cachedData]);
+
 
   // Enhanced update function that invalidates cache
   const updateUserProfile = async (updates: UserProfileUpdateData) => {
@@ -127,13 +143,14 @@ export const useCachedUserProfile = () => {
   const isShowingCachedData = loading && !!cachedData;
 
   return {
-    userProfile: displayProfile,
+    userProfile: displayProfile!,
     loading: loading && !cachedData, // Don't show loading if we have cached data
     error,
     updateUserProfile,
     refetch,
     resumeExists,
     updateResumeStatus,
+    connectionIssue,
     isShowingCachedData
   };
 };
