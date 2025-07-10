@@ -11,9 +11,7 @@ const AIMockInterview = () => {
               <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">👩🏻 AI Mock Interview</h1>
             </div>
             
-            <h2 className="text-xl md:text-2xl text-gray-300 mb-4 leading-relaxed">
-              Get a Mock Interview Phone Call from Grace
-            </h2>
+            <h2 className="text-xl md:text-2xl text-gray-300 mb-4 leading-relaxed">Get a Mock Interview Phone Call from 👩🏻 Grace</h2>
             
             <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
               Grace, your AI interview assistant from Aspirely AI, will call your phone in about a minute 
