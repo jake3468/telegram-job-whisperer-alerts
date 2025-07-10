@@ -52,6 +52,10 @@ serve(async (req) => {
         n8nWebhookUrl = Deno.env.get('N8N_INTERVIEW_WEBHOOK_URL');
         console.log('Using Interview Prep webhook URL');
         break;
+      case 'phone_interview':
+        n8nWebhookUrl = Deno.env.get('N8N_PHONE_CALL_INTERVIEW_URL');
+        console.log('Using Phone Interview webhook URL');
+        break;
       default:
         console.error('Unknown webhook type:', webhookType);
         return new Response('Unknown webhook type', { 

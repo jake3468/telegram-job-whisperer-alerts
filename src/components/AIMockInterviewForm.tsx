@@ -38,7 +38,13 @@ const AIMockInterviewForm = () => {
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    console.log("Form submission started");
+    console.log("User profile:", userProfile);
+    console.log("Form data:", formData);
+    
     if (!userProfile?.id) {
+      console.error("User profile not found or missing ID");
       toast({
         title: "Authentication Error",
         description: "Please ensure you're logged in and try again.",
@@ -49,6 +55,7 @@ const AIMockInterviewForm = () => {
 
     // Validate form
     if (!formData.phoneNumber || !formData.companyName || !formData.jobTitle || !formData.jobDescription) {
+      console.error("Missing form fields");
       toast({
         title: "Missing Information",
         description: "Please fill in all fields to continue.",
@@ -56,7 +63,9 @@ const AIMockInterviewForm = () => {
       });
       return;
     }
+    
     if (!validatePhoneNumber(formData.phoneNumber)) {
+      console.error("Invalid phone number:", formData.phoneNumber);
       toast({
         title: "Invalid Phone Number",
         description: "Please enter a valid phone number.",
@@ -64,7 +73,9 @@ const AIMockInterviewForm = () => {
       });
       return;
     }
+    
     if (formData.jobDescription.length < 50) {
+      console.error("Job description too short:", formData.jobDescription.length);
       toast({
         title: "Job Description Too Short",
         description: "Please provide a more detailed job description (at least 50 characters).",
@@ -72,18 +83,36 @@ const AIMockInterviewForm = () => {
       });
       return;
     }
+    
     setIsSubmitting(true);
+    
     try {
-      const {
-        error
-      } = await supabase.from("grace_interview_requests").insert({
+      // react-phone-input-2 already includes the + prefix, so we don't need to add it
+      const phoneNumber = formData.phoneNumber.startsWith('+') ? formData.phoneNumber : `+${formData.phoneNumber}`;
+      
+      console.log("Inserting data:", {
         user_id: userProfile.id,
-        phone_number: `+${formData.phoneNumber}`,
+        phone_number: phoneNumber,
         company_name: formData.companyName,
         job_title: formData.jobTitle,
         job_description: formData.jobDescription
       });
-      if (error) throw error;
+      
+      const { data, error } = await supabase.from("grace_interview_requests").insert({
+        user_id: userProfile.id,
+        phone_number: phoneNumber,
+        company_name: formData.companyName,
+        job_title: formData.jobTitle,
+        job_description: formData.jobDescription
+      });
+      
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+      
+      console.log("Successfully inserted data:", data);
+      
       setIsSubmitted(true);
       toast({
         title: "Request Submitted Successfully!",
@@ -104,7 +133,7 @@ const AIMockInterviewForm = () => {
       console.error("Error submitting interview request:", error);
       toast({
         title: "Submission Failed",
-        description: "There was an error submitting your request. Please try again.",
+        description: `There was an error submitting your request: ${error.message || 'Unknown error'}. Please try again.`,
         variant: "destructive"
       });
     } finally {
