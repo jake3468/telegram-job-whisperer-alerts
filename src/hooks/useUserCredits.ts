@@ -119,11 +119,12 @@ export const useUserCredits = () => {
       throw new Error(`Failed to fetch credits after ${maxRetries} attempts`);
     },
     enabled: !!(isClerkLoaded && user?.id && userProfile?.user_id), // Only enable when everything is loaded
-    staleTime: 10000, // Consider data stale after 10 seconds
-    gcTime: 300000, // Keep data cached for 5 minutes (increased from 1 minute)
-    refetchOnWindowFocus: false, // Don't refetch on window focus to prevent flashing
-    refetchOnReconnect: true, // Always refetch on network reconnect
+    staleTime: 5 * 60 * 1000, // Consider data stale after 5 minutes
+    gcTime: 30 * 60 * 1000, // Keep data cached for 30 minutes
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnReconnect: false, // Don't refetch on network reconnect
     refetchOnMount: false, // Don't refetch on component mount if we have cached data
+    refetchInterval: false, // Disable automatic refetching
     retry: false, // Disable React Query's retry since we handle it manually
     retryDelay: 0, // No additional delay since we handle it manually
     // Keep previous data while fetching new data to prevent flashing
