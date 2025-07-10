@@ -87,7 +87,6 @@ const CompanyRoleAnalysis = () => {
     connectionIssue,
     refetch: refetchHistory
   } = useCachedCompanyAnalyses();
-
   const handleManualRefresh = () => {
     window.location.reload();
   };
@@ -261,17 +260,9 @@ const CompanyRoleAnalysis = () => {
             </p>
             
             {/* Manual Refresh Button */}
-            {connectionIssue && (
-              <Button 
-                onClick={handleManualRefresh} 
-                variant="ghost" 
-                size="sm" 
-                className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0 absolute top-0 right-4"
-                title="Refresh page"
-              >
+            {connectionIssue && <Button onClick={handleManualRefresh} variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0 absolute top-0 right-4" title="Refresh page">
                 <RefreshCw className="h-4 w-4" />
-              </Button>
-            )}
+              </Button>}
             
             {/* Usage Cost Badge */}
             <Badge variant="outline" className="bg-green-900/30 border-green-600/50 text-green-300 font-semibold">
@@ -288,9 +279,7 @@ const CompanyRoleAnalysis = () => {
                     <CardTitle className="text-xl sm:text-2xl font-orbitron text-left font-normal text-gray-50">
                       Company & Role Intelligence
                     </CardTitle>
-                    <p className="text-green-100 font-medium mt-2 text-left text-sm sm:text-base">
-                      Provide company details to uncover hidden red flags and green lights
-                    </p>
+                    <p className="text-green-100 font-medium mt-2 text-left text-sm sm:text-base">Enter company details to uncover hidden red flags and green lights — including insights on company news, job security, salary ranges, workplace culture, and interview experiences.</p>
                   </div>
                   <Button onClick={() => setIsHistoryOpen(true)} variant="outline" className="w-full sm:w-auto border-white/50 font-orbitron text-sm sm:text-base flex-shrink-0 bg-zinc-50 text-zinc-950">
                     <History className="w-4 h-4 mr-2" />
