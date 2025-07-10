@@ -160,6 +160,14 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
         lastChecked: new Date(),
       };
 
+      console.log('Profile completion check result:', {
+        userId: user.id,
+        hasResume,
+        hasBio,
+        isComplete,
+        timestamp: new Date().toISOString()
+      });
+
       setStatus(newStatus);
 
       // Cache the data
@@ -184,6 +192,9 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
   };
 
   const refetchStatus = async () => {
+    // Invalidate cache first to ensure fresh data
+    localStorage.removeItem(CACHE_KEY);
+    console.log('Invalidated completion status cache, fetching fresh data...');
     await checkUserCompletion(true);
   };
 
