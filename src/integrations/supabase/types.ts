@@ -222,6 +222,53 @@ export type Database = {
         }
         Relationships: []
       }
+      grace_interview_requests: {
+        Row: {
+          company_name: string
+          created_at: string
+          id: string
+          job_description: string
+          job_title: string
+          phone_number: string
+          processed_at: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          id?: string
+          job_description: string
+          job_title: string
+          phone_number: string
+          processed_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          id?: string
+          job_description?: string
+          job_title?: string
+          phone_number?: string
+          processed_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grace_interview_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       interview_prep: {
         Row: {
           company_name: string

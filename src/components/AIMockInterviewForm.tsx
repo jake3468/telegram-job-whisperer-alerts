@@ -81,8 +81,7 @@ const AIMockInterviewForm = () => {
     setIsSubmitting(true);
 
     try {
-      // Since the table might not be in types yet, we'll use any
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("grace_interview_requests")
         .insert({
           user_id: userProfile.id,
