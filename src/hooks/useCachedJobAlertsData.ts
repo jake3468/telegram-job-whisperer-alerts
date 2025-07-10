@@ -34,6 +34,7 @@ export const useCachedJobAlertsData = () => {
   const [userProfileId, setUserProfileId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [connectionIssue, setConnectionIssue] = useState(false);
 
   // Load cached data immediately on mount
   useEffect(() => {
@@ -140,6 +141,11 @@ export const useCachedJobAlertsData = () => {
     } catch (error) {
       logger.error('Error fetching job alerts data:', error);
       setError(error instanceof Error ? error.message : 'Unknown error occurred');
+      
+      // If we have no cached data, show connection issue
+      if (alerts.length === 0) {
+        setConnectionIssue(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -147,7 +153,19 @@ export const useCachedJobAlertsData = () => {
 
   const invalidateCache = () => {
     localStorage.removeItem(CACHE_KEY);
+    setConnectionIssue(false);
     fetchJobAlertsData();
+  };
+
+  const optimisticAdd = (newAlert: JobAlert) => {
+    setAlerts(prev => [newAlert, ...prev]);
+  };
+
+  const forceRefresh = async () => {
+    setConnectionIssue(false);
+    setError(null);
+    setLoading(true);
+    await fetchJobAlertsData();
   };
 
   return {
@@ -156,7 +174,10 @@ export const useCachedJobAlertsData = () => {
     userProfileId,
     loading,
     error,
+    connectionIssue,
     refetch: fetchJobAlertsData,
-    invalidateCache
+    optimisticAdd,
+    invalidateCache,
+    forceRefresh
   };
 };

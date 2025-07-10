@@ -29,6 +29,7 @@ export const useCachedInterviewPrep = () => {
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
   const [cachedData, setCachedData] = useState<InterviewPrepData[]>([]);
   const [isShowingCachedData, setIsShowingCachedData] = useState(false);
+  const [connectionIssue, setConnectionIssue] = useState(false);
 
   // Load cached data immediately on mount
   useEffect(() => {
@@ -58,6 +59,7 @@ export const useCachedInterviewPrep = () => {
   const {
     data: freshData,
     isLoading: isFreshLoading,
+    error,
     refetch
   } = useQuery({
     queryKey: ['interview-prep-history', userProfile?.id],
@@ -80,6 +82,15 @@ export const useCachedInterviewPrep = () => {
     gcTime: CACHE_DURATION, // Keep in cache for 2 hours
     retry: 2
   });
+
+  // Handle connection issues
+  useEffect(() => {
+    if (error && !cachedData.length) {
+      setConnectionIssue(true);
+    } else if (freshData) {
+      setConnectionIssue(false);
+    }
+  }, [error, freshData, cachedData.length]);
 
   // Update cache when fresh data arrives
   useEffect(() => {
@@ -111,6 +122,8 @@ export const useCachedInterviewPrep = () => {
     data,
     isLoading,
     isShowingCachedData: isShowingCachedData && !freshData,
+    connectionIssue,
+    error,
     refetch,
     hasCache: cachedData.length > 0
   };
