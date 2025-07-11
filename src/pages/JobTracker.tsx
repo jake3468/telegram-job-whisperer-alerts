@@ -124,19 +124,23 @@ const SortableJobCard = ({
     return 'bg-green-600 text-white';
   };
 
-  return <div ref={setNodeRef} style={style} {...attributes} className="bg-gray-800 rounded-lg border border-gray-600 hover:border-gray-500 transition-all group shadow-lg relative flex items-center p-3 min-h-[60px]">
+  return <div ref={setNodeRef} style={style} {...attributes} className="bg-gray-800 rounded-lg border border-gray-600 hover:border-gray-500 transition-all group shadow-lg relative flex items-center p-4 min-h-[60px]">
       {/* Progress Indicator */}
-      <div className={`flex-shrink-0 w-12 h-8 rounded-md flex items-center justify-center text-xs font-bold mr-3 ${getProgressColor(job.checklist_progress)}`}>
+      <div className={`flex-shrink-0 w-12 h-8 rounded-md flex items-center justify-center text-xs font-bold mr-4 ${getProgressColor(job.checklist_progress)}`}>
         {job.checklist_progress}/5
       </div>
 
-      {/* Job Info - Flex grow to take available space */}
-      <div className="flex-1 min-w-0 mr-3">
-        <h4 className="font-bold text-sm font-orbitron text-amber-200 truncate">{job.company_name}</h4>
-        <p className="text-xs font-medium text-fuchsia-200 truncate">{job.job_title}</p>
+      {/* Job Info - Increased space and better text sizing */}
+      <div className="flex-1 min-w-0 mr-4">
+        <h4 className="font-bold text-base font-orbitron text-amber-200 truncate mb-1" title={job.job_title}>
+          {job.job_title}
+        </h4>
+        <p className="text-sm font-medium text-fuchsia-200 truncate" title={job.company_name}>
+          {job.company_name}
+        </p>
       </div>
 
-      {/* Action Buttons */}
+      {/* Action Buttons - Removed delete button */}
       <div className="flex items-center gap-2 flex-shrink-0">
         <Button size="sm" variant="outline" onClick={e => {
           e.stopPropagation();
@@ -151,13 +155,6 @@ const SortableJobCard = ({
         }}>
           <ExternalLink className="h-3 w-3" />
         </Button>}
-
-        <Button size="sm" variant="ghost" className="opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/20" onClick={e => {
-          e.stopPropagation();
-          onDelete(job.id);
-        }}>
-          <Trash2 className="h-3 w-3" />
-        </Button>
 
         {/* Drag Handle - Keep on the right */}
         <div {...listeners} className="p-2 rounded cursor-grab active:cursor-grabbing hover:bg-gray-700 transition-colors bg-gray-700/50 hover:bg-gray-700/70 touch-manipulation select-none" title="Drag to move between columns" style={{
@@ -796,9 +793,19 @@ const JobTracker = () => {
                     <p className="text-gray-300">{new Date(selectedJob.created_at).toLocaleDateString()}</p>
                   </div>
                 </div>
-                <Button onClick={handleUpdateJob} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-orbitron">
-                  Save Changes
-                </Button>
+                <div className="flex gap-3">
+                  <Button onClick={handleUpdateJob} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-orbitron">
+                    Save Changes
+                  </Button>
+                  <Button onClick={() => {
+                    deleteJob(selectedJob.id);
+                    setIsViewModalOpen(false);
+                    setSelectedJob(null);
+                  }} variant="destructive" className="bg-red-700 hover:bg-red-600 text-white font-orbitron">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Job
+                  </Button>
+                </div>
               </div>
             </div>}
         </DialogContent>
