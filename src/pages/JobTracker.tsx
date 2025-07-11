@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useUserInitialization } from '@/hooks/useUserInitialization';
 import { useCachedJobTracker } from '@/hooks/useCachedJobTracker';
-import { Plus, ExternalLink, Trash2, X, Bookmark, Send, Users, XCircle, Trophy, GripVertical, RefreshCw, AlertCircle } from 'lucide-react';
+import { Plus, ExternalLink, Trash2, X, Bookmark, Send, Users, XCircle, Trophy, GripVertical, RefreshCw, AlertCircle, CheckSquare, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -23,8 +23,16 @@ interface JobEntry {
   job_url?: string;
   status: 'saved' | 'applied' | 'interview' | 'rejected' | 'offer';
   order_position: number;
+  checklist_progress: number;
+  checklist_items: ChecklistItem[];
   created_at: string;
   updated_at: string;
+}
+
+interface ChecklistItem {
+  id: string;
+  label: string;
+  completed: boolean;
 }
 interface EditJobFormData {
   company_name: string;
@@ -107,47 +115,58 @@ const SortableJobCard = ({
     transition,
     opacity: isDragging ? 0.5 : 1
   };
-  return <div ref={setNodeRef} style={style} {...attributes} className="bg-gray-800 rounded-lg p-4 border border-gray-600 hover:border-gray-500 transition-all group shadow-lg relative">
-      {/* Drag Handle - Only this area is draggable */}
-      <div {...listeners} className="absolute top-2 right-2 p-3 md:p-2 rounded cursor-grab active:cursor-grabbing hover:bg-gray-700 transition-colors bg-gray-700/50 hover:bg-gray-700/70 touch-manipulation select-none" title="Drag to move between columns" style={{
-      touchAction: 'none'
-    }} onTouchStart={e => {
-      e.preventDefault();
-    }}>
-        <GripVertical className="h-5 w-5 md:h-4 md:w-4 text-gray-200 hover:text-gray-100" />
+
+  // Get progress color based on completion
+  const getProgressColor = (progress: number) => {
+    if (progress === 0) return 'bg-gray-600 text-gray-300';
+    if (progress <= 2) return 'bg-red-600 text-white';
+    if (progress <= 3) return 'bg-yellow-600 text-white';
+    return 'bg-green-600 text-white';
+  };
+
+  return <div ref={setNodeRef} style={style} {...attributes} className="bg-gray-800 rounded-lg border border-gray-600 hover:border-gray-500 transition-all group shadow-lg relative flex items-center p-3 min-h-[60px]">
+      {/* Progress Indicator */}
+      <div className={`flex-shrink-0 w-12 h-8 rounded-md flex items-center justify-center text-xs font-bold mr-3 ${getProgressColor(job.checklist_progress)}`}>
+        {job.checklist_progress}/5
       </div>
 
-      <div className="flex items-start justify-between mb-3 pr-8">
-        <div className="flex-1">
-          <h4 className="font-bold text-sm font-orbitron text-amber-200">{job.company_name}</h4>
-          <p className="text-xs font-medium mb-2 text-fuchsia-200">{job.job_title}</p>
-          <p className="text-gray-400 text-xs">
-            Added: {new Date(job.created_at).toLocaleDateString()}
-          </p>
-        </div>
-        <div className="flex gap-1">
-          <Button size="sm" variant="ghost" className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/20" onClick={e => {
+      {/* Job Info - Flex grow to take available space */}
+      <div className="flex-1 min-w-0 mr-3">
+        <h4 className="font-bold text-sm font-orbitron text-amber-200 truncate">{job.company_name}</h4>
+        <p className="text-xs font-medium text-fuchsia-200 truncate">{job.job_title}</p>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <Button size="sm" variant="outline" onClick={e => {
+          e.stopPropagation();
+          onView(job);
+        }} className="text-xs border-gray-600 text-gray-300 hover:text-white h-7 px-3 bg-blue-700 hover:bg-blue-600">
+          View
+        </Button>
+        
+        {job.job_url && <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-blue-300 hover:text-blue-100 hover:bg-blue-900/20" onClick={e => {
+          e.stopPropagation();
+          window.open(job.job_url, '_blank');
+        }}>
+          <ExternalLink className="h-3 w-3" />
+        </Button>}
+
+        <Button size="sm" variant="ghost" className="opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/20" onClick={e => {
           e.stopPropagation();
           onDelete(job.id);
         }}>
-            <Trash2 className="h-3 w-3" />
-          </Button>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <Button size="sm" variant="outline" onClick={e => {
-        e.stopPropagation();
-        onView(job);
-      }} className="text-xs border-gray-600 text-gray-300 hover:text-white h-7 px-3 bg-blue-700 hover:bg-blue-600">
-          View
+          <Trash2 className="h-3 w-3" />
         </Button>
-        {job.job_url && <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-blue-300 hover:text-blue-100 hover:bg-blue-900/20" onClick={e => {
-        e.stopPropagation();
-        window.open(job.job_url, '_blank');
-      }}>
-            <ExternalLink className="h-3 w-3" />
-          </Button>}
+
+        {/* Drag Handle - Keep on the right */}
+        <div {...listeners} className="p-2 rounded cursor-grab active:cursor-grabbing hover:bg-gray-700 transition-colors bg-gray-700/50 hover:bg-gray-700/70 touch-manipulation select-none" title="Drag to move between columns" style={{
+          touchAction: 'none'
+        }} onTouchStart={e => {
+          e.preventDefault();
+        }}>
+          <GripVertical className="h-4 w-4 text-gray-200 hover:text-gray-100" />
+        </div>
       </div>
     </div>;
 };
@@ -309,6 +328,15 @@ const JobTracker = () => {
     try {
       const maxOrder = Math.max(...jobs.filter(job => job.status === selectedStatus).map(job => job.order_position), -1);
       
+      // Default checklist items
+      const defaultChecklistItems: ChecklistItem[] = [
+        { id: '1', label: 'Research company background', completed: false },
+        { id: '2', label: 'Tailor resume for this role', completed: false },
+        { id: '3', label: 'Prepare cover letter', completed: false },
+        { id: '4', label: 'Practice interview questions', completed: false },
+        { id: '5', label: 'Follow up on application', completed: false }
+      ];
+
       // Create optimistic update first
       const tempJob: JobEntry = {
         id: `temp-${Date.now()}`,
@@ -318,6 +346,8 @@ const JobTracker = () => {
         job_url: formData.job_url || undefined,
         status: selectedStatus,
         order_position: maxOrder + 1,
+        checklist_progress: 0,
+        checklist_items: defaultChecklistItems,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -331,14 +361,22 @@ const JobTracker = () => {
         job_description: formData.job_description || null,
         job_url: formData.job_url || null,
         status: selectedStatus,
-        order_position: maxOrder + 1
+        order_position: maxOrder + 1,
+        checklist_progress: 0,
+        checklist_items: JSON.stringify(defaultChecklistItems)
       }).select().single();
       
       if (error) throw error;
       
       // Replace temp job with real job
       if (data) {
-        optimisticUpdate(data);
+        const transformedJob = {
+          ...data,
+          checklist_items: Array.isArray(data.checklist_items) 
+            ? data.checklist_items as unknown as ChecklistItem[]
+            : JSON.parse(String(data.checklist_items) || '[]') as ChecklistItem[]
+        };
+        optimisticUpdate(transformedJob);
       }
       
       // Invalidate cache for fresh data on next load
@@ -499,6 +537,53 @@ const JobTracker = () => {
     });
     setIsViewModalOpen(true);
   };
+
+  const updateChecklistItem = async (itemId: string, completed: boolean) => {
+    if (!selectedJob) return;
+    
+    // Update the checklist items
+    const updatedChecklistItems = selectedJob.checklist_items.map(item =>
+      item.id === itemId ? { ...item, completed } : item
+    );
+    
+    // Calculate new progress
+    const newProgress = updatedChecklistItems.filter(item => item.completed).length;
+    
+    try {
+      // Update in database
+      const { error } = await supabase
+        .from('job_tracker')
+        .update({
+          checklist_items: JSON.stringify(updatedChecklistItems),
+          checklist_progress: newProgress
+        })
+        .eq('id', selectedJob.id);
+      
+      if (error) throw error;
+      
+      // Update local state
+      const updatedJob = {
+        ...selectedJob,
+        checklist_items: updatedChecklistItems,
+        checklist_progress: newProgress
+      };
+      
+      setSelectedJob(updatedJob);
+      optimisticUpdate(updatedJob);
+      
+      toast({
+        title: "Success",
+        description: "Checklist updated successfully!"
+      });
+    } catch (error) {
+      console.error('Error updating checklist:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update checklist.",
+        variant: "destructive"
+      });
+    }
+  };
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-gradient-to-br from-black via-gray-950 to-fuchsia-950 flex items-center justify-center">
         <div className="text-white text-xs">Loading...</div>
@@ -640,48 +725,81 @@ const JobTracker = () => {
               <span className="sr-only">Close</span>
             </DialogClose>
           </DialogHeader>
-          {selectedJob && <div className="space-y-4">
-              <div>
-                <Label htmlFor="edit-company" className="text-white font-orbitron text-sm">Company Name *</Label>
-                <Input id="edit-company" value={editFormData.company_name} onChange={e => setEditFormData(prev => ({
-              ...prev,
-              company_name: e.target.value
-            }))} className="bg-gray-800 border-gray-600 text-white" placeholder="Enter company name" />
-              </div>
-              <div>
-                <Label htmlFor="edit-title" className="text-white font-orbitron text-sm">Job Title *</Label>
-                <Input id="edit-title" value={editFormData.job_title} onChange={e => setEditFormData(prev => ({
-              ...prev,
-              job_title: e.target.value
-            }))} className="bg-gray-800 border-gray-600 text-white" placeholder="Enter job title" />
-              </div>
-              <div>
-                <Label htmlFor="edit-description" className="text-white font-orbitron text-sm">Job Description</Label>
-                <Textarea id="edit-description" value={editFormData.job_description} onChange={e => setEditFormData(prev => ({
-              ...prev,
-              job_description: e.target.value
-            }))} className="bg-gray-800 border-gray-600 text-white min-h-[80px]" placeholder="Enter job description" />
-              </div>
-              <div>
-                <Label htmlFor="edit-url" className="text-white font-orbitron text-sm">Job URL</Label>
-                <Input id="edit-url" value={editFormData.job_url} onChange={e => setEditFormData(prev => ({
-              ...prev,
-              job_url: e.target.value
-            }))} className="bg-gray-800 border-gray-600 text-white" placeholder="https://..." />
-              </div>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <Label className="text-gray-400 text-sm">Status</Label>
-                  <p className="text-gray-300 capitalize">{selectedJob.status}</p>
+          {selectedJob && <div className="space-y-6">
+              {/* Checklist Section */}
+              <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-600">
+                <div className="flex items-center justify-between mb-4">
+                  <Label className="text-white font-orbitron text-sm">Application Checklist</Label>
+                  <div className="text-xs text-gray-400">
+                    {selectedJob.checklist_progress}/5 completed
+                  </div>
                 </div>
-                <div>
-                  <Label className="text-gray-400 text-sm">Created</Label>
-                  <p className="text-gray-300">{new Date(selectedJob.created_at).toLocaleDateString()}</p>
+                <div className="space-y-3">
+                  {selectedJob.checklist_items.map((item) => (
+                    <div key={item.id} className="flex items-center space-x-3">
+                      <button
+                        onClick={() => updateChecklistItem(item.id, !item.completed)}
+                        className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                          item.completed 
+                            ? 'bg-green-600 border-green-600 text-white' 
+                            : 'border-gray-500 hover:border-gray-400'
+                        }`}
+                      >
+                        {item.completed && <CheckSquare className="h-3 w-3" />}
+                      </button>
+                      <span className={`text-sm ${item.completed ? 'text-gray-400 line-through' : 'text-gray-200'}`}>
+                        {item.label}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <Button onClick={handleUpdateJob} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-orbitron">
-                Save Changes
-              </Button>
+
+              {/* Job Details Section */}
+              <div className="space-y-4">
+                <h3 className="text-white font-orbitron text-lg">Job Details</h3>
+                <div>
+                  <Label htmlFor="edit-company" className="text-white font-orbitron text-sm">Company Name *</Label>
+                  <Input id="edit-company" value={editFormData.company_name} onChange={e => setEditFormData(prev => ({
+                ...prev,
+                company_name: e.target.value
+              }))} className="bg-gray-800 border-gray-600 text-white" placeholder="Enter company name" />
+                </div>
+                <div>
+                  <Label htmlFor="edit-title" className="text-white font-orbitron text-sm">Job Title *</Label>
+                  <Input id="edit-title" value={editFormData.job_title} onChange={e => setEditFormData(prev => ({
+                ...prev,
+                job_title: e.target.value
+              }))} className="bg-gray-800 border-gray-600 text-white" placeholder="Enter job title" />
+                </div>
+                <div>
+                  <Label htmlFor="edit-description" className="text-white font-orbitron text-sm">Job Description</Label>
+                  <Textarea id="edit-description" value={editFormData.job_description} onChange={e => setEditFormData(prev => ({
+                ...prev,
+                job_description: e.target.value
+              }))} className="bg-gray-800 border-gray-600 text-white min-h-[80px]" placeholder="Enter job description" />
+                </div>
+                <div>
+                  <Label htmlFor="edit-url" className="text-white font-orbitron text-sm">Job URL</Label>
+                  <Input id="edit-url" value={editFormData.job_url} onChange={e => setEditFormData(prev => ({
+                ...prev,
+                job_url: e.target.value
+              }))} className="bg-gray-800 border-gray-600 text-white" placeholder="https://..." />
+                </div>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <Label className="text-gray-400 text-sm">Status</Label>
+                    <p className="text-gray-300 capitalize">{selectedJob.status}</p>
+                  </div>
+                  <div>
+                    <Label className="text-gray-400 text-sm">Created</Label>
+                    <p className="text-gray-300">{new Date(selectedJob.created_at).toLocaleDateString()}</p>
+                  </div>
+                </div>
+                <Button onClick={handleUpdateJob} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-orbitron">
+                  Save Changes
+                </Button>
+              </div>
             </div>}
         </DialogContent>
       </Dialog>

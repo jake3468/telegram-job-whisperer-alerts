@@ -3,6 +3,12 @@ import { useUser } from '@clerk/clerk-react';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/logger';
 
+interface ChecklistItem {
+  id: string;
+  label: string;
+  completed: boolean;
+}
+
 interface JobEntry {
   id: string;
   company_name: string;
@@ -11,6 +17,8 @@ interface JobEntry {
   job_url?: string;
   status: 'saved' | 'applied' | 'interview' | 'rejected' | 'offer';
   order_position: number;
+  checklist_progress: number;
+  checklist_items: ChecklistItem[];
   created_at: string;
   updated_at: string;
 }
@@ -112,7 +120,13 @@ export const useCachedJobTracker = () => {
         throw new Error('Unable to load job applications');
       }
 
-      const jobsData = data || [];
+      // Transform the data to match JobEntry interface
+      const jobsData = (data || []).map(job => ({
+        ...job,
+        checklist_items: Array.isArray(job.checklist_items) 
+          ? job.checklist_items as unknown as ChecklistItem[]
+          : JSON.parse(String(job.checklist_items) || '[]') as ChecklistItem[]
+      }));
       
       // Update state
       setJobs(jobsData);

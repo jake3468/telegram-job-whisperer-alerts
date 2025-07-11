@@ -507,6 +507,8 @@ export type Database = {
       }
       job_tracker: {
         Row: {
+          checklist_items: Json
+          checklist_progress: number
           company_name: string
           created_at: string
           id: string
@@ -519,6 +521,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          checklist_items?: Json
+          checklist_progress?: number
           company_name: string
           created_at?: string
           id?: string
@@ -531,6 +535,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          checklist_items?: Json
+          checklist_progress?: number
           company_name?: string
           created_at?: string
           id?: string
