@@ -78,7 +78,7 @@ export const ProfileCompletionWarning = ({ className = '' }: ProfileCompletionWa
         </p>
         {lastChecked && (
           <p className="text-xs text-yellow-300 mt-1">
-            Last checked: {lastChecked.toLocaleTimeString()}
+            Last checked: {new Date(lastChecked).toLocaleTimeString()}
           </p>
         )}
       </div>
