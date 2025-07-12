@@ -153,28 +153,28 @@ const SortableJobCard = ({
     <div 
       ref={setNodeRef} 
       style={style} 
-      className="bg-white rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-all p-3 mb-2"
+      className="bg-white rounded border border-gray-300 shadow-sm hover:shadow-md transition-all p-2 mb-1"
     >
-      {/* Top Section: Job Title + Company + Progress Pill */}
-      <div className="flex justify-between items-start mb-2">
+      {/* Single row layout - everything in one line */}
+      <div className="flex items-center justify-between gap-2">
+        {/* Left: Job Title + Company */}
         <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-sm text-black leading-tight truncate">
-            {job.job_title}
-          </h3>
-          <p className="text-xs text-gray-500 leading-tight truncate">
-            {job.company_name}
-          </p>
+          <div className="flex items-center gap-2">
+            <div className="min-w-0 flex-1">
+              <h3 className="font-bold text-sm text-black leading-tight truncate">
+                {job.job_title} - {job.company_name}
+              </h3>
+            </div>
+            
+            {/* Progress Pill */}
+            <div className={`px-1.5 py-0.5 rounded-full text-xs font-medium text-white flex-shrink-0 ${getProgressColor(job.checklist_progress)}`}>
+              {job.checklist_progress}/5
+            </div>
+          </div>
         </div>
-        
-        {/* Progress Pill */}
-        <div className={`px-1.5 py-0.5 rounded-full text-xs font-medium text-white flex-shrink-0 ml-2 ${getProgressColor(job.checklist_progress)}`}>
-          {job.checklist_progress}/5
-        </div>
-      </div>
 
-      {/* Middle Section: Buttons and Progress */}
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center space-x-1">
+        {/* Right: Actions */}
+        <div className="flex items-center gap-1 flex-shrink-0">
           <Button
             variant="outline"
             size="sm"
@@ -188,9 +188,9 @@ const SortableJobCard = ({
             variant="ghost"
             size="sm"
             onClick={() => setIsChecklistExpanded(!isChecklistExpanded)}
-            className="text-xs px-2 py-1 h-6 text-gray-600 hover:text-gray-800"
+            className="text-xs px-1 py-1 h-6 text-gray-600 hover:text-gray-800"
           >
-            Tasks {isChecklistExpanded ? '▲' : '▼'}
+            {isChecklistExpanded ? '▲' : '▼'}
           </Button>
           
           {job.job_url && (
@@ -203,49 +203,46 @@ const SortableJobCard = ({
               <ExternalLink className="w-3 h-3" />
             </a>
           )}
-        </div>
 
-        {/* Drag Handle */}
-        <div
-          {...attributes}
-          {...listeners}
-          onClick={handleDragAttempt}
-          className={`cursor-grab p-1 ${
-            canDrag 
-              ? "text-gray-400 hover:text-gray-600" 
-              : "text-gray-200 cursor-not-allowed"
-          }`}
-          title={canDrag ? "Drag to move" : "Complete checklist to move"}
-        >
-          <GripVertical className="w-3 h-3" />
+          {/* Drag Handle */}
+          <div
+            {...attributes}
+            {...listeners}
+            onClick={handleDragAttempt}
+            className={`cursor-grab p-1 ${
+              canDrag 
+                ? "text-gray-400 hover:text-gray-600" 
+                : "text-gray-200 cursor-not-allowed"
+            }`}
+            title={canDrag ? "Drag to move" : "Complete checklist to move"}
+          >
+            <GripVertical className="w-3 h-3" />
+          </div>
         </div>
-      </div>
-
-      {/* Progress Text */}
-      <div className="text-xs text-gray-500 mb-2">
-        Progress: {job.checklist_progress}/5
       </div>
 
       {/* Expandable Checklist Dropdown */}
       {isChecklistExpanded && (
-        <div className="border-t pt-2 space-y-1">
-          {job.checklist_items.map((item, index) => (
-            <div key={index} className="flex items-center space-x-2">
-              <button
-                onClick={() => handleChecklistToggle(index)}
-                className={`w-3 h-3 rounded border flex items-center justify-center text-xs flex-shrink-0 ${
-                  item.completed
-                    ? "bg-green-500 border-green-500 text-white"
-                    : "border-gray-300 hover:border-gray-400"
-                }`}
-              >
-                {item.completed && "✓"}
-              </button>
-              <span className={`text-xs leading-tight ${item.completed ? "text-green-600 line-through" : "text-gray-700"}`}>
-                {item.label}
-              </span>
-            </div>
-          ))}
+        <div className="mt-2 pt-2 border-t border-gray-200 bg-gray-50 rounded p-2">
+          <div className="space-y-1">
+            {job.checklist_items.map((item, index) => (
+              <div key={index} className="flex items-center space-x-2">
+                <button
+                  onClick={() => handleChecklistToggle(index)}
+                  className={`w-3 h-3 rounded border flex items-center justify-center text-xs flex-shrink-0 ${
+                    item.completed
+                      ? "bg-green-500 border-green-500 text-white"
+                      : "border-gray-300 hover:border-gray-400"
+                  }`}
+                >
+                  {item.completed && "✓"}
+                </button>
+                <span className={`text-xs leading-tight ${item.completed ? "text-green-600 line-through" : "text-gray-700"}`}>
+                  {item.label}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
