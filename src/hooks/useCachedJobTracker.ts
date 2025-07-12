@@ -16,6 +16,7 @@ interface JobEntry {
   company_researched: boolean;
   cover_letter_prepared: boolean;
   ready_to_apply: boolean;
+  interview_call_received: boolean;
   created_at: string;
   updated_at: string;
 }

@@ -646,6 +646,7 @@ export type Database = {
           cover_letter_prepared: boolean
           created_at: string
           id: string
+          interview_call_received: boolean
           job_description: string | null
           job_role_analyzed: boolean
           job_title: string
@@ -663,6 +664,7 @@ export type Database = {
           cover_letter_prepared?: boolean
           created_at?: string
           id?: string
+          interview_call_received?: boolean
           job_description?: string | null
           job_role_analyzed?: boolean
           job_title: string
@@ -680,6 +682,7 @@ export type Database = {
           cover_letter_prepared?: boolean
           created_at?: string
           id?: string
+          interview_call_received?: boolean
           job_description?: string | null
           job_role_analyzed?: boolean
           job_title?: string

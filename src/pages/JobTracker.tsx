@@ -30,6 +30,7 @@ interface JobEntry {
   company_researched: boolean;
   cover_letter_prepared: boolean;
   ready_to_apply: boolean;
+  interview_call_received: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -109,17 +110,20 @@ const SortableJobCard = ({
     toast
   } = useToast();
   
-  // Calculate progress based on boolean fields
+  // Calculate progress based on status and boolean fields
   const getProgress = () => {
-    if (job.status !== 'saved') return 0;
-    
-    let completed = 0;
-    if (job.resume_updated) completed++;
-    if (job.job_role_analyzed) completed++;
-    if (job.company_researched) completed++;
-    if (job.cover_letter_prepared) completed++;
-    if (job.ready_to_apply) completed++;
-    return completed;
+    if (job.status === 'saved') {
+      let completed = 0;
+      if (job.resume_updated) completed++;
+      if (job.job_role_analyzed) completed++;
+      if (job.company_researched) completed++;
+      if (job.cover_letter_prepared) completed++;
+      if (job.ready_to_apply) completed++;
+      return completed;
+    } else if (job.status === 'applied') {
+      return job.interview_call_received ? 1 : 0;
+    }
+    return 0;
   };
 
   const progress = getProgress();
@@ -144,20 +148,27 @@ const SortableJobCard = ({
   // Check if dragging is allowed (checklist must be complete)
   const canDrag = progress >= 5;
 
-  // Get progress color based on completion
+  // Get progress color based on completion and status
   const getProgressColor = (progress: number) => {
     if (progress === 0) return 'bg-red-500';
-    if (progress >= 1 && progress <= 4) return 'bg-orange-500';
-    return 'bg-green-500';
+    if (job.status === 'saved') {
+      if (progress >= 1 && progress <= 4) return 'bg-orange-500';
+      if (progress === 5) return 'bg-green-500';
+    } else if (job.status === 'applied') {
+      if (progress === 1) return 'bg-green-500';
+    }
+    return 'bg-orange-500';
   };
 
-  // Checklist items for saved jobs
+  // Checklist items based on job status
   const checklistItems = job.status === 'saved' ? [
     { field: 'resume_updated', label: 'Resume updated', completed: job.resume_updated },
     { field: 'job_role_analyzed', label: 'Job role analyzed', completed: job.job_role_analyzed },
     { field: 'company_researched', label: 'Company researched', completed: job.company_researched },
     { field: 'cover_letter_prepared', label: 'Cover letter prepared', completed: job.cover_letter_prepared },
     { field: 'ready_to_apply', label: 'Ready to apply', completed: job.ready_to_apply }
+  ] : job.status === 'applied' ? [
+    { field: 'interview_call_received', label: 'Interview call received', completed: job.interview_call_received }
   ] : [];
 
   const handleChecklistToggle = (field: string) => {
@@ -179,7 +190,7 @@ const SortableJobCard = ({
       <div className="flex items-center justify-between gap-2">
         {/* Left: Progress badge in circle */}
         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 ${getProgressColor(progress)}`}>
-          {progress}/5
+          {progress}/{job.status === 'saved' ? '5' : job.status === 'applied' ? '1' : '0'}
         </div>
         
         {/* Center: Company & Job Title */}
@@ -194,8 +205,8 @@ const SortableJobCard = ({
 
         {/* Right: Dropdown + Actions */}
         <div className="flex items-center gap-1 flex-shrink-0">
-          {/* Only show dropdown arrow for saved jobs with checklist */}
-          {job.status === 'saved' && (
+          {/* Show dropdown arrow for jobs with checklist items */}
+          {(job.status === 'saved' || job.status === 'applied') && (
             <Button variant="ghost" size="sm" onClick={() => setIsChecklistExpanded(!isChecklistExpanded)} className="text-xs px-1 py-1 h-6 text-gray-600 hover:text-gray-800">
               {isChecklistExpanded ? '▲' : '▼'}
             </Button>
@@ -216,8 +227,8 @@ const SortableJobCard = ({
         </div>
       </div>
 
-      {/* Expandable Checklist - only for saved jobs */}
-      {isChecklistExpanded && job.status === 'saved' && (
+      {/* Expandable Checklist - for saved and applied jobs */}
+      {isChecklistExpanded && (job.status === 'saved' || job.status === 'applied') && (
         <div className="mt-2 pt-2 border-t border-gray-200">
           <div className="space-y-1.5">
             {checklistItems.map((item) => (
@@ -413,6 +424,7 @@ const JobTracker = () => {
         company_researched: false,
         cover_letter_prepared: false,
         ready_to_apply: false,
+        interview_call_received: false,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -544,20 +556,22 @@ const JobTracker = () => {
     const activeJobToMove = jobs.find(j => j.id === active.id);
     if (!activeJobToMove) return;
 
-    // Calculate progress for saved jobs
+    // Calculate progress for different job statuses
     const getProgress = (job: JobEntry) => {
-      if (job.status !== 'saved') return 5; // Non-saved jobs can always be moved
-      let completed = 0;
-      if (job.resume_updated) completed++;
-      if (job.job_role_analyzed) completed++;
-      if (job.company_researched) completed++;
-      if (job.cover_letter_prepared) completed++;
-      if (job.ready_to_apply) completed++;
-      return completed;
+      if (job.status === 'saved') {
+        let completed = 0;
+        if (job.resume_updated) completed++;
+        if (job.job_role_analyzed) completed++;
+        if (job.company_researched) completed++;
+        if (job.cover_letter_prepared) completed++;
+        if (job.ready_to_apply) completed++;
+        return completed;
+      }
+      return 5; // Non-saved jobs can always be moved
     };
 
-    // Check if checklist is complete before allowing drag
-    if (getProgress(activeJobToMove) !== 5) {
+    // Check if checklist is complete before allowing drag for saved jobs
+    if (activeJobToMove.status === 'saved' && getProgress(activeJobToMove) !== 5) {
       toast({
         title: "Complete checklist first",
         description: "You must complete all checklist items (5/5) before moving this job to the next stage.",
@@ -626,7 +640,7 @@ const JobTracker = () => {
   // Function to handle checklist updates for cards
   const handleUpdateChecklistItem = async (jobId: string, field: string) => {
     const targetJob = jobs.find(job => job.id === jobId);
-    if (!targetJob || targetJob.status !== 'saved') return;
+    if (!targetJob || (targetJob.status !== 'saved' && targetJob.status !== 'applied')) return;
 
     try {
       // Update in database
@@ -799,26 +813,40 @@ const JobTracker = () => {
           </DialogHeader>
           {selectedJob && <div className="space-y-4 p-1">
               {/* Checklist Section */}
-              {selectedJob.status === 'saved' && (
+              {(selectedJob.status === 'saved' || selectedJob.status === 'applied') && (
                 <div className="bg-gradient-to-r from-green-50 to-emerald-100 rounded-lg p-3 border border-green-200">
                   <div className="flex items-center justify-between mb-3">
-                    <Label className="text-green-800 font-orbitron text-sm font-bold">Application Checklist</Label>
+                    <Label className="text-green-800 font-orbitron text-sm font-bold">
+                      {selectedJob.status === 'saved' ? 'Application Checklist' : 'Applied Status'}
+                    </Label>
                     <div className={`text-xs font-bold px-2 py-1 rounded-full ${
-                      [selectedJob.resume_updated, selectedJob.job_role_analyzed, selectedJob.company_researched, selectedJob.cover_letter_prepared, selectedJob.ready_to_apply].filter(Boolean).length === 5 
-                        ? 'bg-green-500 text-white' 
-                        : 'bg-orange-500 text-white'
+                      selectedJob.status === 'saved' 
+                        ? [selectedJob.resume_updated, selectedJob.job_role_analyzed, selectedJob.company_researched, selectedJob.cover_letter_prepared, selectedJob.ready_to_apply].filter(Boolean).length === 0
+                          ? 'bg-red-500 text-white'
+                          : [selectedJob.resume_updated, selectedJob.job_role_analyzed, selectedJob.company_researched, selectedJob.cover_letter_prepared, selectedJob.ready_to_apply].filter(Boolean).length === 5 
+                            ? 'bg-green-500 text-white' 
+                            : 'bg-orange-500 text-white'
+                        : selectedJob.interview_call_received 
+                          ? 'bg-green-500 text-white' 
+                          : 'bg-red-500 text-white'
                     }`}>
-                      {[selectedJob.resume_updated, selectedJob.job_role_analyzed, selectedJob.company_researched, selectedJob.cover_letter_prepared, selectedJob.ready_to_apply].filter(Boolean).length}/5
+                      {selectedJob.status === 'saved' 
+                        ? `${[selectedJob.resume_updated, selectedJob.job_role_analyzed, selectedJob.company_researched, selectedJob.cover_letter_prepared, selectedJob.ready_to_apply].filter(Boolean).length}/5`
+                        : `${selectedJob.interview_call_received ? 1 : 0}/1`
+                      }
                     </div>
                   </div>
                   <div className="space-y-2">
-                    {[
+                    {(selectedJob.status === 'saved' ? [
                       { field: 'resume_updated', label: 'Resume updated', completed: selectedJob.resume_updated },
                       { field: 'job_role_analyzed', label: 'Job role analyzed', completed: selectedJob.job_role_analyzed },
                       { field: 'company_researched', label: 'Company researched', completed: selectedJob.company_researched },
                       { field: 'cover_letter_prepared', label: 'Cover letter prepared', completed: selectedJob.cover_letter_prepared },
                       { field: 'ready_to_apply', label: 'Ready to apply', completed: selectedJob.ready_to_apply }
-                    ].map((item) => <div key={item.field} className="flex items-center space-x-2">
+                    ] : [
+                      { field: 'interview_call_received', label: 'Interview call received', completed: selectedJob.interview_call_received }
+                    ]).map((item) => (
+                      <div key={item.field} className="flex items-center space-x-2">
                         <Checkbox
                           checked={item.completed}
                           onCheckedChange={() => handleUpdateChecklistItem(selectedJob.id, item.field)}
@@ -827,7 +855,8 @@ const JobTracker = () => {
                         <span className={`text-xs ${item.completed ? 'text-green-600 line-through' : 'text-green-800'}`}>
                           {item.label}
                         </span>
-                      </div>)}
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
