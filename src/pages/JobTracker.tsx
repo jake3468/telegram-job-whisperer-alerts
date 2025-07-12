@@ -146,8 +146,8 @@ const SortableJobCard = ({
 
   // Get progress color based on completion
   const getProgressColor = (progress: number) => {
-    if (progress <= 1) return 'bg-red-500';
-    if (progress <= 3) return 'bg-orange-500';
+    if (progress === 0) return 'bg-red-500';
+    if (progress >= 1 && progress <= 4) return 'bg-orange-500';
     return 'bg-green-500';
   };
 
@@ -789,38 +789,42 @@ const JobTracker = () => {
 
       {/* Edit Job Modal */}
       <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
-        <DialogContent className="bg-white border border-gray-200 text-gray-900 max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="font-orbitron text-gray-900">Job Details</DialogTitle>
-            <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none text-gray-500 hover:text-gray-700">
+        <DialogContent className="bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 text-gray-900 max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg -m-6 mb-4 p-4">
+            <DialogTitle className="font-orbitron text-white text-lg">Job Details</DialogTitle>
+            <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 text-white hover:text-gray-200">
               <X className="h-4 w-4" />
               <span className="sr-only">Close</span>
             </DialogClose>
           </DialogHeader>
-          {selectedJob && <div className="space-y-6">
+          {selectedJob && <div className="space-y-4 p-1">
               {/* Checklist Section */}
               {selectedJob.status === 'saved' && (
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <Label className="text-gray-700 font-orbitron text-sm font-medium">Application Checklist</Label>
-                    <div className="text-xs text-gray-600 font-medium">
-                      {[selectedJob.resume_updated, selectedJob.job_role_analyzed, selectedJob.company_researched, selectedJob.cover_letter_prepared, selectedJob.ready_to_apply].filter(Boolean).length}/5 completed
+                <div className="bg-gradient-to-r from-green-50 to-emerald-100 rounded-lg p-3 border border-green-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <Label className="text-green-800 font-orbitron text-sm font-bold">Application Checklist</Label>
+                    <div className={`text-xs font-bold px-2 py-1 rounded-full ${
+                      [selectedJob.resume_updated, selectedJob.job_role_analyzed, selectedJob.company_researched, selectedJob.cover_letter_prepared, selectedJob.ready_to_apply].filter(Boolean).length === 5 
+                        ? 'bg-green-500 text-white' 
+                        : 'bg-orange-500 text-white'
+                    }`}>
+                      {[selectedJob.resume_updated, selectedJob.job_role_analyzed, selectedJob.company_researched, selectedJob.cover_letter_prepared, selectedJob.ready_to_apply].filter(Boolean).length}/5
                     </div>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {[
                       { field: 'resume_updated', label: 'Resume updated', completed: selectedJob.resume_updated },
                       { field: 'job_role_analyzed', label: 'Job role analyzed', completed: selectedJob.job_role_analyzed },
                       { field: 'company_researched', label: 'Company researched', completed: selectedJob.company_researched },
                       { field: 'cover_letter_prepared', label: 'Cover letter prepared', completed: selectedJob.cover_letter_prepared },
                       { field: 'ready_to_apply', label: 'Ready to apply', completed: selectedJob.ready_to_apply }
-                    ].map((item) => <div key={item.field} className="flex items-center space-x-3">
+                    ].map((item) => <div key={item.field} className="flex items-center space-x-2">
                         <Checkbox
                           checked={item.completed}
                           onCheckedChange={() => handleUpdateChecklistItem(selectedJob.id, item.field)}
                           className={`h-4 w-4 ${item.completed ? 'data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500' : ''}`}
                         />
-                        <span className={`text-sm ${item.completed ? 'text-gray-500 line-through' : 'text-gray-700'}`}>
+                        <span className={`text-xs ${item.completed ? 'text-green-600 line-through' : 'text-green-800'}`}>
                           {item.label}
                         </span>
                       </div>)}
@@ -829,61 +833,64 @@ const JobTracker = () => {
               )}
 
               {/* Job Details Section */}
-              <div className="space-y-4">
-                <h3 className="text-gray-900 font-orbitron text-lg">Job Details</h3>
-                <div>
-                  <Label htmlFor="edit-company" className="text-gray-700 font-orbitron text-sm">Company Name *</Label>
-                  <Input id="edit-company" value={editFormData.company_name} onChange={e => setEditFormData(prev => ({
-                ...prev,
-                company_name: e.target.value
-              }))} className="bg-white border-gray-300 text-gray-900" placeholder="Enter company name" />
-                </div>
-                <div>
-                  <Label htmlFor="edit-title" className="text-gray-700 font-orbitron text-sm">Job Title *</Label>
-                  <Input id="edit-title" value={editFormData.job_title} onChange={e => setEditFormData(prev => ({
-                ...prev,
-                job_title: e.target.value
-              }))} className="bg-white border-gray-300 text-gray-900" placeholder="Enter job title" />
-                </div>
-                <div>
-                  <Label htmlFor="edit-description" className="text-gray-700 font-orbitron text-sm">Job Description</Label>
-                  <Textarea id="edit-description" value={editFormData.job_description} onChange={e => setEditFormData(prev => ({
-                ...prev,
-                job_description: e.target.value
-              }))} className="bg-white border-gray-300 text-gray-900 min-h-[80px]" placeholder="Enter job description" />
-                </div>
-                <div>
-                  <Label htmlFor="edit-url" className="text-gray-700 font-orbitron text-sm">Job URL</Label>
-                  <Input id="edit-url" value={editFormData.job_url} onChange={e => setEditFormData(prev => ({
-                ...prev,
-                job_url: e.target.value
-              }))} className="bg-white border-gray-300 text-gray-900" placeholder="https://..." />
-                </div>
-                <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="bg-gradient-to-r from-slate-50 to-gray-100 rounded-lg p-3 border border-gray-200">
+                <h3 className="text-gray-800 font-orbitron text-sm font-bold mb-3">Job Details</h3>
+                <div className="space-y-3">
                   <div>
-                    <Label className="text-gray-600 text-sm">Status</Label>
-                    <p className="text-gray-900 capitalize font-medium">{selectedJob.status}</p>
+                    <Label htmlFor="edit-company" className="text-gray-700 text-xs font-medium">Company Name *</Label>
+                    <Input id="edit-company" value={editFormData.company_name} onChange={e => setEditFormData(prev => ({
+                  ...prev,
+                  company_name: e.target.value
+                }))} className="bg-white border-gray-300 text-gray-900 text-sm h-8" placeholder="Company name" />
                   </div>
                   <div>
-                    <Label className="text-gray-600 text-sm">Created</Label>
-                    <p className="text-gray-900 font-medium">{new Date(selectedJob.created_at).toLocaleDateString()}</p>
+                    <Label htmlFor="edit-title" className="text-gray-700 text-xs font-medium">Job Title *</Label>
+                    <Input id="edit-title" value={editFormData.job_title} onChange={e => setEditFormData(prev => ({
+                  ...prev,
+                  job_title: e.target.value
+                }))} className="bg-white border-gray-300 text-gray-900 text-sm h-8" placeholder="Job title" />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-description" className="text-gray-700 text-xs font-medium">Job Description</Label>
+                    <Textarea id="edit-description" value={editFormData.job_description} onChange={e => setEditFormData(prev => ({
+                  ...prev,
+                  job_description: e.target.value
+                }))} className="bg-white border-gray-300 text-gray-900 text-sm min-h-[60px]" placeholder="Job description" />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-url" className="text-gray-700 text-xs font-medium">Job URL</Label>
+                    <Input id="edit-url" value={editFormData.job_url} onChange={e => setEditFormData(prev => ({
+                  ...prev,
+                  job_url: e.target.value
+                }))} className="bg-white border-gray-300 text-gray-900 text-sm h-8" placeholder="https://..." />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <div className="bg-blue-100 p-2 rounded border border-blue-200">
+                      <Label className="text-blue-700 font-medium">Status</Label>
+                      <p className="text-blue-900 capitalize font-bold">{selectedJob.status}</p>
+                    </div>
+                    <div className="bg-purple-100 p-2 rounded border border-purple-200">
+                      <Label className="text-purple-700 font-medium">Created</Label>
+                      <p className="text-purple-900 font-bold">{new Date(selectedJob.created_at).toLocaleDateString()}</p>
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-3">
-                  <Button onClick={handleUpdateJob} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-orbitron">
-                    Save Changes
-                  </Button>
-                  <Button onClick={() => {
+              </div>
+              
+              <div className="flex gap-2">
+                <Button onClick={handleUpdateJob} className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-orbitron text-sm h-9">
+                  Save Changes
+                </Button>
+                <Button onClick={() => {
                 deleteJob(selectedJob.id);
                 setIsViewModalOpen(false);
                 setSelectedJob(null);
-              }} variant="destructive" className="bg-red-600 hover:bg-red-700 text-white font-orbitron">
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete Job
+              }} variant="destructive" className="bg-red-600 hover:bg-red-700 text-white font-orbitron text-sm h-9">
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Delete
                   </Button>
                 </div>
-              </div>
-            </div>}
+              </div>}
         </DialogContent>
       </Dialog>
     </Layout>;
