@@ -119,17 +119,17 @@ const UsageHistoryModal = () => {
           </div> : error ? <div className="text-center py-8 text-red-300">
             Error loading transaction history
           </div> : <Tabs defaultValue="credits" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-slate-800/50">
-              <TabsTrigger value="credits" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-blue-100">
-                <Coins className="w-4 h-4 mr-2" />
+            <TabsList className="grid w-full grid-cols-3 bg-slate-800/50 gap-1">
+              <TabsTrigger value="credits" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-blue-100 text-xs px-2">
+                <Coins className="w-3 h-3 mr-1" />
                 Credits ({creditTransactions.filter(tx => tx.featureUsed !== 'AI Mock Interview').length})
               </TabsTrigger>
-              <TabsTrigger value="ai-interviews" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-blue-100">
-                <History className="w-4 h-4 mr-2" />
+              <TabsTrigger value="ai-interviews" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-blue-100 text-xs px-2">
+                <History className="w-3 h-3 mr-1" />
                 AI Interviews ({creditTransactions.filter(tx => tx.featureUsed === 'AI Mock Interview').length})
               </TabsTrigger>
-              <TabsTrigger value="payments" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-blue-100">
-                <CreditCard className="w-4 h-4 mr-2" />
+              <TabsTrigger value="payments" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-blue-100 text-xs px-2">
+                <CreditCard className="w-3 h-3 mr-1" />
                 Payments ({paymentRecords.length})
               </TabsTrigger>
             </TabsList>
@@ -166,30 +166,30 @@ const UsageHistoryModal = () => {
                     <Table className="w-full min-w-[600px]">
                       <TableHeader>
                         <TableRow className="border-blue-400/30 hover:bg-white/5">
-                          <TableHead className="text-blue-200 font-orbitron">Date</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron">Type</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron">Description</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron text-right">Amount</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron text-right">Balance</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron w-[160px]">Date</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron w-[120px]">Type</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron w-[200px]">Description</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron text-right w-[80px]">Amount</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron text-right w-[80px]">Balance</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {creditTransactions.map(transaction => <TableRow key={transaction.id} className="border-blue-400/20 hover:bg-white/5">
-                            <TableCell className="text-blue-100 text-sm">
+                            <TableCell className="text-blue-100 text-sm w-[160px]">
                               {formatDate(transaction.date)}
                             </TableCell>
-                            <TableCell className="text-blue-100 text-sm font-medium">
+                            <TableCell className="text-blue-100 text-sm font-medium w-[120px]">
                               {getTransactionTypeDisplay(transaction.type, transaction.description)}
                             </TableCell>
-                            <TableCell className="text-blue-100 text-xs">
-                              <div className="break-words" title={transaction.description || (transaction.featureUsed ? `Used for ${transaction.featureUsed}` : '-')}>
+                            <TableCell className="text-blue-100 text-xs w-[200px]">
+                              <div className="truncate" title={transaction.description || (transaction.featureUsed ? `Used for ${transaction.featureUsed}` : '-')}>
                                 {transaction.description || (transaction.featureUsed ? `Used for ${transaction.featureUsed}` : '-')}
                               </div>
                             </TableCell>
-                            <TableCell className={`text-right font-mono text-sm font-bold ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                            <TableCell className={`text-right font-mono text-sm font-bold w-[80px] ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
                               {formatAmount(transaction.amount)}
                             </TableCell>
-                            <TableCell className="text-blue-100 text-right font-mono text-sm">
+                            <TableCell className="text-blue-100 text-right font-mono text-sm w-[80px]">
                               {transaction.balanceAfter?.toFixed(1) || '-'}
                             </TableCell>
                           </TableRow>)}
