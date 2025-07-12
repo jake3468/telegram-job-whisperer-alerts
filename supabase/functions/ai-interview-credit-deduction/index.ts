@@ -26,14 +26,14 @@ Deno.serve(async (req) => {
 
   try {
     // Parse request body
-    const { credits_record_id, description } = await req.json();
+    const { grace_interview_requests_id, description } = await req.json();
     
-    console.log('Request data:', { credits_record_id, description });
+    console.log('Request data:', { grace_interview_requests_id, description });
 
     // Validate required fields
-    if (!credits_record_id) {
+    if (!grace_interview_requests_id) {
       return new Response(
-        JSON.stringify({ success: false, error: 'credits_record_id is required' }),
+        JSON.stringify({ success: false, error: 'grace_interview_requests_id is required' }),
         { 
           status: 400, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -47,17 +47,17 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // First, validate that the credits_record_id exists and get the user_id
-    const { data: creditsRecord, error: creditsError } = await supabase
-      .from('ai_interview_credits')
-      .select('user_id, remaining_credits, used_credits, total_credits')
-      .eq('id', credits_record_id)
+    // First, get the grace interview request to find the user_profile_id
+    const { data: graceRequest, error: graceError } = await supabase
+      .from('grace_interview_requests')
+      .select('user_id')
+      .eq('id', grace_interview_requests_id)
       .single();
 
-    if (creditsError || !creditsRecord) {
-      console.error('Credits record not found:', creditsError);
+    if (graceError || !graceRequest) {
+      console.error('Grace interview request not found:', graceError);
       return new Response(
-        JSON.stringify({ success: false, error: 'Invalid credits_record_id' }),
+        JSON.stringify({ success: false, error: 'Invalid grace_interview_requests_id' }),
         { 
           status: 404, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -65,7 +65,43 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log('Found credits record:', creditsRecord);
+    // Get the actual user_id from user_profile
+    const { data: userProfile, error: profileError } = await supabase
+      .from('user_profile')
+      .select('user_id')
+      .eq('id', graceRequest.user_id)
+      .single();
+
+    if (profileError || !userProfile) {
+      console.error('User profile not found:', profileError);
+      return new Response(
+        JSON.stringify({ success: false, error: 'User profile not found' }),
+        { 
+          status: 404, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Get the AI interview credits record for this user
+    const { data: creditsRecord, error: creditsError } = await supabase
+      .from('ai_interview_credits')
+      .select('user_id, remaining_credits, used_credits, total_credits')
+      .eq('user_id', userProfile.user_id)
+      .single();
+
+    if (creditsError || !creditsRecord) {
+      console.error('AI interview credits record not found:', creditsError);
+      return new Response(
+        JSON.stringify({ success: false, error: 'AI interview credits not found for user' }),
+        { 
+          status: 404, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    console.log('Found credits record for user:', creditsRecord);
 
     // Check if user has sufficient credits
     if (creditsRecord.remaining_credits <= 0) {
@@ -85,8 +121,8 @@ Deno.serve(async (req) => {
     // Use the existing database function to deduct credit
     const { data: deductionResult, error: deductionError } = await supabase
       .rpc('use_ai_interview_credit', {
-        p_user_id: creditsRecord.user_id,
-        p_description: description || 'AI mock interview credit deducted via API'
+        p_user_id: userProfile.user_id,
+        p_description: description || `AI mock interview credit deducted for interview ${grace_interview_requests_id}`
       });
 
     if (deductionError || !deductionResult) {
@@ -110,7 +146,7 @@ Deno.serve(async (req) => {
     const { data: updatedCredits, error: updateError } = await supabase
       .from('ai_interview_credits')
       .select('remaining_credits, used_credits, total_credits')
-      .eq('id', credits_record_id)
+      .eq('user_id', userProfile.user_id)
       .single();
 
     if (updateError) {
