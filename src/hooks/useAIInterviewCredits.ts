@@ -23,6 +23,7 @@ export const useAIInterviewCredits = () => {
 
   const fetchCredits = async (isRetry = false) => {
     if (!user || !userProfile?.user_id) {
+      console.log('AIInterviewCredits: Missing user or userProfile', { user: !!user, userProfile: !!userProfile, user_id: userProfile?.user_id });
       setIsLoading(false);
       return;
     }
@@ -33,61 +34,73 @@ export const useAIInterviewCredits = () => {
       }
       setError(null);
 
+      console.log('AIInterviewCredits: Fetching credits for user_id:', userProfile.user_id);
+
       const { data, error: fetchError } = await supabase
         .from('ai_interview_credits')
         .select('*')
-        .maybeSingle();
+        .eq('user_id', userProfile.user_id)
+        .single();
 
       if (fetchError) {
-        // Handle JWT expiration by silently retrying once
-        if (fetchError.message?.includes('JWT') && retryCount < 2) {
+        // Handle specific error cases
+        if (fetchError.code === 'PGRST116') {
+          // No records found, need to initialize
+          logger.info('No AI interview credits found for user, initializing...');
+        } else if (fetchError.message?.includes('JWT') && retryCount < 2) {
+          // Handle JWT expiration by silently retrying once
           logger.info('JWT issue detected, retrying...');
           setRetryCount(prev => prev + 1);
           setTimeout(() => fetchCredits(true), 1000);
           return;
+        } else {
+          logger.error('Error fetching AI interview credits:', fetchError);
+          setError(`Failed to load call data: ${fetchError.message}`);
+          return;
         }
-        
-        logger.error('Error fetching AI interview credits:', fetchError);
-        setError(fetchError.message);
-        return;
       }
 
       if (!data) {
-        // If no credits record exists, try to initialize it
-        logger.info('No AI interview credits found, attempting to initialize...');
+        // Initialize credits for this user
+        logger.info('Initializing AI interview credits for user:', userProfile.user_id);
         
-        const { error: initError } = await supabase.rpc('initialize_ai_interview_credits', {
+        const { data: initResult, error: initError } = await supabase.rpc('initialize_ai_interview_credits', {
           p_user_id: userProfile.user_id
         });
 
         if (initError) {
           logger.error('Error initializing AI interview credits:', initError);
-          setError(initError.message);
+          setError(`Failed to initialize calls: ${initError.message}`);
           return;
         }
 
-        // Fetch again after initialization
+        // Fetch the newly created record
         const { data: newData, error: refetchError } = await supabase
           .from('ai_interview_credits')
           .select('*')
-          .maybeSingle();
+          .eq('user_id', userProfile.user_id)
+          .single();
 
         if (refetchError) {
-          logger.error('Error refetching AI interview credits:', refetchError);
-          setError(refetchError.message);
+          logger.error('Error fetching newly created AI interview credits:', refetchError);
+          setError(`Failed to load new call data: ${refetchError.message}`);
           return;
         }
 
         setCredits(newData);
+        logger.info('Successfully initialized and loaded AI interview credits:', newData);
       } else {
         setCredits(data);
+        logger.debug('Successfully loaded existing AI interview credits:', data);
       }
       
       // Reset retry count on success
       setRetryCount(0);
+      console.log('AIInterviewCredits: Successfully loaded credits:', data || 'newly created');
     } catch (err) {
       logger.error('Unexpected error fetching AI interview credits:', err);
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      setError(`Failed to load call data: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }

@@ -21,21 +21,22 @@ export const AIInterviewCreditsDisplay = ({ onBuyMore }: AIInterviewCreditsDispl
     );
   }
 
-  // Show fallback UI with retry button instead of error for better UX
+  // Show error state with better messaging and retry option
   if (error) {
+    console.error('AIInterviewCreditsDisplay error:', error);
     return (
-      <Card className="p-4 border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
+      <Card className="p-4 border-destructive/20 bg-destructive/5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">
-              <Phone className="h-5 w-5 text-primary" />
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-destructive/10">
+              <Phone className="h-5 w-5 text-destructive" />
             </div>
             <div>
-              <div className="font-semibold text-lg">
-                Interview Calls
+              <div className="font-semibold text-lg text-destructive">
+                Unable to load calls
               </div>
-              <div className="text-sm text-muted-foreground">
-                Unable to load call data
+              <div className="text-sm text-destructive/80">
+                {error.includes('Failed to load') ? 'Connection issue' : 'Please try refreshing'}
               </div>
             </div>
           </div>
