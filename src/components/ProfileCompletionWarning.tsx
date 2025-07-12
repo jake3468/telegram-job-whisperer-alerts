@@ -46,10 +46,26 @@ export const ProfileCompletionWarning = ({ className = '' }: ProfileCompletionWa
   const handleRefresh = async () => {
     setIsRefreshing(true);
     console.log('Manual refresh triggered for profile completion status');
+    
+    // Reset the warning state temporarily to force re-evaluation
+    setShowWarning(false);
+    
     try {
       await refetchStatus();
+      console.log('Refetch completed, new status:', { hasResume, hasBio, loading });
+      
+      // Force a small delay to ensure the status is updated
+      setTimeout(() => {
+        const isIncomplete = !hasResume || !hasBio;
+        setShowWarning(isIncomplete);
+        console.log('After refresh - isIncomplete:', isIncomplete, { hasResume, hasBio });
+      }, 100);
+      
     } catch (error) {
       console.error('Error refreshing profile status:', error);
+      // Restore warning state in case of error
+      const isIncomplete = !hasResume || !hasBio;
+      setShowWarning(isIncomplete);
     } finally {
       setIsRefreshing(false);
     }
