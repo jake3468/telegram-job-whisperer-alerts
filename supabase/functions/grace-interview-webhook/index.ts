@@ -66,9 +66,14 @@ serve(async (req) => {
       feedback_suggestion: requestData.feedback?.suggestion,
       feedback_next_action: requestData.feedback?.nextAction,
       report_generated: requestData.reportGenerated,
-      report_data: requestData.report || null,
+      executive_summary: requestData.report?.executiveSummary || null,
+      overall_scores: requestData.report?.overallScores || null,
+      strengths: requestData.report?.strengths || null,
+      areas_for_improvement: requestData.report?.areasForImprovement || null,
+      detailed_feedback: requestData.report?.detailedFeedback || null,
       actionable_plan: requestData.report?.actionablePlan || null,
       next_steps_priority: requestData.report?.nextStepsPriorityList || null,
+      motivational_message: requestData.report?.motivationalMessage || null,
     };
 
     console.log('💾 Updating database for request:', requestData.requestId);

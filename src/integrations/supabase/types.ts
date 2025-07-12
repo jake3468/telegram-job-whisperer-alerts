@@ -225,9 +225,12 @@ export type Database = {
       grace_interview_requests: {
         Row: {
           actionable_plan: Json | null
+          areas_for_improvement: Json | null
           company_name: string
           completion_percentage: number | null
           created_at: string
+          detailed_feedback: Json | null
+          executive_summary: Json | null
           feedback_message: string | null
           feedback_next_action: string | null
           feedback_suggestion: string | null
@@ -235,21 +238,26 @@ export type Database = {
           interview_status: string | null
           job_description: string
           job_title: string
+          motivational_message: string | null
           next_steps_priority: Json | null
+          overall_scores: Json | null
           phone_number: string
           processed_at: string | null
-          report_data: Json | null
           report_generated: boolean | null
           status: string
+          strengths: Json | null
           time_spent: string | null
           updated_at: string
           user_id: string | null
         }
         Insert: {
           actionable_plan?: Json | null
+          areas_for_improvement?: Json | null
           company_name: string
           completion_percentage?: number | null
           created_at?: string
+          detailed_feedback?: Json | null
+          executive_summary?: Json | null
           feedback_message?: string | null
           feedback_next_action?: string | null
           feedback_suggestion?: string | null
@@ -257,21 +265,26 @@ export type Database = {
           interview_status?: string | null
           job_description: string
           job_title: string
+          motivational_message?: string | null
           next_steps_priority?: Json | null
+          overall_scores?: Json | null
           phone_number: string
           processed_at?: string | null
-          report_data?: Json | null
           report_generated?: boolean | null
           status?: string
+          strengths?: Json | null
           time_spent?: string | null
           updated_at?: string
           user_id?: string | null
         }
         Update: {
           actionable_plan?: Json | null
+          areas_for_improvement?: Json | null
           company_name?: string
           completion_percentage?: number | null
           created_at?: string
+          detailed_feedback?: Json | null
+          executive_summary?: Json | null
           feedback_message?: string | null
           feedback_next_action?: string | null
           feedback_suggestion?: string | null
@@ -279,12 +292,14 @@ export type Database = {
           interview_status?: string | null
           job_description?: string
           job_title?: string
+          motivational_message?: string | null
           next_steps_priority?: Json | null
+          overall_scores?: Json | null
           phone_number?: string
           processed_at?: string | null
-          report_data?: Json | null
           report_generated?: boolean | null
           status?: string
+          strengths?: Json | null
           time_spent?: string | null
           updated_at?: string
           user_id?: string | null
