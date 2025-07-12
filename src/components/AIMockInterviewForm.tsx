@@ -4,11 +4,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Phone, CheckCircle, AlertCircle } from "lucide-react";
+import { Loader2, Phone, CheckCircle, AlertCircle, CreditCard } from "lucide-react";
 import { useCachedUserProfile } from "@/hooks/useCachedUserProfile";
 import { useCachedUserCompletionStatus } from "@/hooks/useCachedUserCompletionStatus";
 import { useCachedGraceInterviewRequests } from "@/hooks/useCachedGraceInterviewRequests";
+import { useAIInterviewCredits } from "@/hooks/useAIInterviewCredits";
 import { ProfileCompletionWarning } from "@/components/ProfileCompletionWarning";
+import { AIInterviewCreditsDisplay } from "@/components/AIInterviewCreditsDisplay";
+import { AIInterviewPurchaseModal } from "@/components/AIInterviewPurchaseModal";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 
@@ -28,10 +31,12 @@ const AIMockInterviewForm = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
   const { toast } = useToast();
   const { userProfile, loading: profileLoading } = useCachedUserProfile();
   const { hasResume, hasBio, loading: completionLoading } = useCachedUserCompletionStatus();
   const { optimisticAdd } = useCachedGraceInterviewRequests();
+  const { credits, hasCredits, useCredit, refetch: refetchCredits, isLoading: creditsLoading } = useAIInterviewCredits();
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -71,6 +76,17 @@ const AIMockInterviewForm = () => {
         description: `Please add your ${missing.join(" and ")} in your profile page before requesting an interview.`,
         variant: "destructive"
       });
+      return;
+    }
+
+    // Check AI interview credits
+    if (!hasCredits) {
+      toast({
+        title: "No Interview Credits",
+        description: "You need AI interview credits to request a call. Purchase credits to continue.",
+        variant: "destructive"
+      });
+      setIsPurchaseModalOpen(true);
       return;
     }
 
@@ -142,6 +158,15 @@ const AIMockInterviewForm = () => {
       if (data) {
         optimisticAdd(data);
       }
+
+      // Deduct AI interview credit after successful submission
+      try {
+        await useCredit(`AI mock interview for ${formData.jobTitle} at ${formData.companyName}`);
+        console.log("AI interview credit deducted successfully");
+      } catch (creditError) {
+        console.error("Error deducting AI interview credit:", creditError);
+        // Don't fail the whole request if credit deduction fails, but log it
+      }
       
       setIsSubmitted(true);
       toast({
@@ -199,6 +224,11 @@ const AIMockInterviewForm = () => {
     <div className="space-y-6">
       {/* Profile Completion Warning - Uses the standard component with proper caching */}
       <ProfileCompletionWarning />
+      
+      {/* AI Interview Credits Display */}
+      <AIInterviewCreditsDisplay 
+        onBuyMore={() => setIsPurchaseModalOpen(true)} 
+      />
 
       <form onSubmit={handleSubmit} className="space-y-6">
       <div className="border border-purple-500/30 rounded-xl p-8 bg-white shadow-lg shadow-purple-500/20">
@@ -262,22 +292,53 @@ const AIMockInterviewForm = () => {
 
         {/* Submit Button */}
         <div className="mt-8">
-          <Button type="submit" disabled={isSubmitting} className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
-            {isSubmitting ? <>
+          <Button 
+            type="submit" 
+            disabled={isSubmitting || !hasCredits || creditsLoading} 
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          >
+            {isSubmitting ? (
+              <>
                 <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                 Submitting Request...
-              </> : <>
+              </>
+            ) : !hasCredits ? (
+              <>
+                <CreditCard className="w-5 h-5 mr-2" />
+                Purchase Credits to Continue
+              </>
+            ) : (
+              <>
                 <Phone className="w-5 h-5 mr-2" />
                 Call My Phone Now
-              </>}
+              </>
+            )}
           </Button>
           
-          {!isSubmitting && <p className="text-center text-black text-sm mt-3">
+          {!isSubmitting && hasCredits && (
+            <p className="text-center text-black text-sm mt-3">
               Grace will call you within ~1 minute of submitting
-            </p>}
+            </p>
+          )}
+          
+          {!hasCredits && !creditsLoading && (
+            <p className="text-center text-orange-600 text-sm mt-3">
+              Purchase AI interview credits to request a call from Grace
+            </p>
+          )}
         </div>
       </div>
       </form>
+
+      {/* Purchase Modal */}
+      <AIInterviewPurchaseModal
+        isOpen={isPurchaseModalOpen}
+        onClose={() => setIsPurchaseModalOpen(false)}
+        onPurchaseSuccess={() => {
+          setIsPurchaseModalOpen(false);
+          refetchCredits();
+        }}
+      />
     </div>
   );
 };
