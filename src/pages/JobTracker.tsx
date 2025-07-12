@@ -48,6 +48,7 @@ const DroppableColumn = ({
   onAddJob,
   onDeleteJob,
   onViewJob,
+  onUpdateChecklist,
   activeJobId
 }: {
   column: any;
@@ -55,6 +56,7 @@ const DroppableColumn = ({
   onAddJob: () => void;
   onDeleteJob: (id: string) => void;
   onViewJob: (job: JobEntry) => void;
+  onUpdateChecklist: (jobId: string, index: number) => void;
   activeJobId?: string;
 }) => {
   const {
@@ -80,27 +82,30 @@ const DroppableColumn = ({
           </div>}
       </div>
 
-      <div className={`p-4 min-h-[450px] ${isDropTarget ? 'bg-black/5' : ''} transition-colors`}>
+      <div className={`p-2 min-h-[450px] ${isDropTarget ? 'bg-black/5' : ''} transition-colors`}>
         <SortableContext items={jobs.map(job => job.id)} strategy={verticalListSortingStrategy}>
-          <div className="space-y-3">
-            {jobs.map(job => <SortableJobCard key={job.id} job={job} onDelete={onDeleteJob} onView={onViewJob} />)}
+          <div className="space-y-1">
+            {jobs.map(job => <SortableJobCard key={job.id} job={job} onDelete={onDeleteJob} onView={onViewJob} onUpdateChecklist={onUpdateChecklist} />)}
           </div>
         </SortableContext>
       </div>
     </div>;
 };
 
-// Sortable Job Card Component with dedicated drag handle
+// Sortable Job Card Component with compact design
 const SortableJobCard = ({
   job,
   onDelete,
-  onView
+  onView,
+  onUpdateChecklist
 }: {
   job: JobEntry;
   onDelete: (id: string) => void;
   onView: (job: JobEntry) => void;
+  onUpdateChecklist: (jobId: string, index: number) => void;
 }) => {
-  const [isChecklistExpanded, setIsChecklistExpanded] = useState(false);
+  const { toast } = useToast();
+  
   const {
     attributes,
     listeners,
@@ -109,7 +114,8 @@ const SortableJobCard = ({
     transition,
     isDragging
   } = useSortable({
-    id: job.id
+    id: job.id,
+    disabled: job.checklist_progress < 5
   });
   
   const style = {
@@ -119,138 +125,120 @@ const SortableJobCard = ({
   };
 
   // Check if dragging is allowed (checklist must be complete)
-  const isDragAllowed = job.checklist_progress === 5;
+  const canDrag = job.checklist_progress >= 5;
 
   // Get progress color based on completion
   const getProgressColor = (progress: number) => {
-    if (progress <= 1) return 'bg-red-500 text-white';
-    if (progress <= 3) return 'bg-orange-500 text-white';
-    return 'bg-green-500 text-white';
+    if (progress <= 1) return 'bg-red-500';
+    if (progress <= 3) return 'bg-orange-500';
+    return 'bg-green-500';
+  };
+
+  const handleChecklistToggle = (index: number) => {
+    onUpdateChecklist(job.id, index);
+  };
+
+  const handleDragAttempt = () => {
+    if (!canDrag) {
+      toast({
+        title: "Complete checklist first",
+        description: "Complete all checklist items to move this application.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
     <div 
       ref={setNodeRef} 
       style={style} 
-      {...attributes} 
-      className={`bg-white rounded-lg border-2 border-gray-900 hover:shadow-lg transition-all group relative ${
-        isDragAllowed ? 'hover:border-gray-700' : 'opacity-75'
-      }`}
+      className="bg-white rounded-lg border border-gray-300 shadow-sm hover:shadow-md transition-all p-2 mb-2"
     >
-      {/* Progress Pill - Top Right Corner */}
-      <div className={`absolute top-2 right-2 px-1.5 py-0.5 rounded-full text-xs font-bold ${getProgressColor(job.checklist_progress)}`}>
-        {job.checklist_progress}/5
+      {/* Top Section: Job Title + Company + Progress Pill */}
+      <div className="flex justify-between items-start mb-1.5">
+        <div className="flex-1 min-w-0">
+          <h3 className="font-bold text-sm text-black leading-tight truncate">
+            {job.job_title}
+          </h3>
+          <p className="text-xs text-gray-500 leading-tight truncate">
+            {job.company_name}
+          </p>
+        </div>
+        
+        {/* Progress Pill */}
+        <div className={`px-1.5 py-0.5 rounded-full text-xs font-medium text-white flex-shrink-0 ml-2 ${getProgressColor(job.checklist_progress)}`}>
+          {job.checklist_progress}/5
+        </div>
       </div>
 
-      {/* Main Card Content */}
-      <div className="p-3 pr-12">
-        {/* Company Name - Priority 1 */}
-        <h3 className="font-bold text-sm text-gray-900 mb-0.5 leading-tight" title={job.company_name}>
-          {job.company_name}
-        </h3>
-        
-        {/* Job Title - Priority 2 */}
-        <h4 className="font-medium text-xs text-gray-700 mb-2 leading-tight" title={job.job_title}>
-          {job.job_title}
-        </h4>
+      {/* Middle Section: Progress Label */}
+      <div className="mb-2">
+        <p className="text-xs text-gray-500">
+          Progress: {job.checklist_progress}/5
+        </p>
+      </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-1 mb-2">
-          <Button 
-            size="sm" 
-            variant="outline" 
-            onClick={(e) => {
-              e.stopPropagation();
-              onView(job);
-            }} 
-            className="text-xs px-2 py-1 h-6 border-gray-300 text-gray-700 hover:text-gray-900 hover:border-gray-400"
+      {/* Checklist Items (Always Visible for Saved status) */}
+      {job.status === 'saved' && (
+        <div className="space-y-1 mb-2">
+          {job.checklist_items.map((item, index) => (
+            <div key={index} className="flex items-center space-x-2">
+              <button
+                onClick={() => handleChecklistToggle(index)}
+                className={`w-3 h-3 rounded border flex items-center justify-center text-xs flex-shrink-0 ${
+                  item.completed
+                    ? "bg-green-500 border-green-500 text-white"
+                    : "border-gray-300 hover:border-gray-400"
+                }`}
+              >
+                {item.completed && "✓"}
+              </button>
+              <span className={`text-xs leading-tight ${item.completed ? "text-green-600 line-through" : "text-gray-700"}`}>
+                {item.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Bottom Section: Actions */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-1">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onView(job)}
+            className="text-xs px-2 py-1 h-6"
           >
             View
           </Button>
           
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsChecklistExpanded(!isChecklistExpanded);
-            }} 
-            className="text-xs px-2 py-1 h-6 text-gray-600 hover:text-gray-800"
-          >
-            {isChecklistExpanded ? 'Hide' : 'Tasks'}
-          </Button>
-
           {job.job_url && (
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              className="h-6 w-6 p-0 text-blue-600 hover:text-blue-800" 
-              onClick={(e) => {
-                e.stopPropagation();
-                window.open(job.job_url, '_blank');
-              }}
+            <a
+              href={job.job_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-gray-600 transition-colors p-1"
             >
-              <ExternalLink className="h-3 w-3" />
-            </Button>
+              <ExternalLink className="w-3 h-3" />
+            </a>
           )}
         </div>
 
-        {/* Expanded Checklist */}
-        {isChecklistExpanded && (
-          <div className="mt-2 p-2 bg-gray-50 rounded-md border">
-            <div className="mb-2">
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-xs font-medium text-gray-600">Progress</span>
-                <span className="text-xs font-medium text-gray-600">{job.checklist_progress}/5</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-1.5">
-                <div 
-                  className={`h-1.5 rounded-full transition-all ${
-                    job.checklist_progress <= 1 ? 'bg-red-500' :
-                    job.checklist_progress <= 3 ? 'bg-orange-500' : 'bg-green-500'
-                  }`}
-                  style={{ width: `${(job.checklist_progress / 5) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-            <div className="space-y-1">
-              {job.checklist_items.map((item) => (
-                <div key={item.id} className="flex items-center gap-2">
-                  {item.completed ? (
-                    <CheckSquare className="h-3 w-3 text-green-500 flex-shrink-0" />
-                  ) : (
-                    <Square className="h-3 w-3 text-gray-400 flex-shrink-0" />
-                  )}
-                  <span className={`text-xs leading-tight ${item.completed ? 'text-gray-700 line-through' : 'text-gray-600'}`}>
-                    {item.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Drag Handle - Bottom Right */}
-      <div className="absolute bottom-2 right-2">
-        {isDragAllowed ? (
-          <div 
-            {...listeners} 
-            className="p-1 rounded cursor-grab active:cursor-grabbing hover:bg-gray-100 transition-colors touch-manipulation select-none" 
-            title="Drag to move between columns"
-            style={{ touchAction: 'none' }}
-            onTouchStart={(e) => e.preventDefault()}
-          >
-            <GripVertical className="h-3 w-3 text-gray-600 hover:text-gray-800" />
-          </div>
-        ) : (
-          <div 
-            className="p-1 rounded cursor-not-allowed opacity-50" 
-            title="Complete checklist to proceed"
-          >
-            <GripVertical className="h-3 w-3 text-gray-400" />
-          </div>
-        )}
+        {/* Drag Handle */}
+        <div
+          {...attributes}
+          {...listeners}
+          onClick={handleDragAttempt}
+          className={`cursor-grab p-1 ${
+            canDrag 
+              ? "text-gray-400 hover:text-gray-600" 
+              : "text-gray-200 cursor-not-allowed"
+          }`}
+          title={canDrag ? "Drag to move" : "Complete checklist to move"}
+        >
+          <GripVertical className="w-3 h-3" />
+        </div>
       </div>
     </div>
   );
@@ -633,6 +621,54 @@ const JobTracker = () => {
     setIsViewModalOpen(true);
   };
 
+  // Function to handle checklist updates for cards
+  const handleUpdateChecklistItem = async (jobId: string, index: number) => {
+    const targetJob = jobs.find(job => job.id === jobId);
+    if (!targetJob) return;
+    
+    // Update the checklist items
+    const updatedChecklistItems = targetJob.checklist_items.map((item, i) =>
+      i === index ? { ...item, completed: !item.completed } : item
+    );
+    
+    // Calculate new progress
+    const newProgress = updatedChecklistItems.filter(item => item.completed).length;
+    
+    try {
+      // Update in database
+      const { error } = await supabase
+        .from('job_tracker')
+        .update({
+          checklist_items: JSON.stringify(updatedChecklistItems),
+          checklist_progress: newProgress
+        })
+        .eq('id', jobId);
+      
+      if (error) throw error;
+      
+      // Update local state
+      const updatedJob = {
+        ...targetJob,
+        checklist_items: updatedChecklistItems,
+        checklist_progress: newProgress
+      };
+      
+      optimisticUpdate(updatedJob);
+      
+      toast({
+        title: "Success",
+        description: "Checklist updated successfully!"
+      });
+    } catch (error) {
+      console.error('Error updating checklist:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update checklist.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const updateChecklistItem = async (itemId: string, completed: boolean) => {
     if (!selectedJob) return;
     
@@ -752,7 +788,7 @@ const JobTracker = () => {
               {columns.map(column => <DroppableColumn key={column.key} column={column} jobs={getJobsByStatus(column.key)} onAddJob={() => {
               setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
               setIsModalOpen(true);
-            }} onDeleteJob={deleteJob} onViewJob={handleViewJob} activeJobId={activeJob?.id} />)}
+            }} onDeleteJob={deleteJob} onViewJob={handleViewJob} onUpdateChecklist={handleUpdateChecklistItem} activeJobId={activeJob?.id} />)}
             </div>
             <DragOverlay>
               {activeJob ? <div className="bg-gray-800 rounded-lg p-4 border border-gray-600 shadow-2xl transform rotate-3 w-full max-w-[280px]">
