@@ -100,6 +100,7 @@ const SortableJobCard = ({
   onDelete: (id: string) => void;
   onView: (job: JobEntry) => void;
 }) => {
+  const [isChecklistExpanded, setIsChecklistExpanded] = useState(false);
   const {
     attributes,
     listeners,
@@ -110,62 +111,149 @@ const SortableJobCard = ({
   } = useSortable({
     id: job.id
   });
+  
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1
   };
 
+  // Check if dragging is allowed (checklist must be complete)
+  const isDragAllowed = job.checklist_progress === 5;
+
   // Get progress color based on completion
   const getProgressColor = (progress: number) => {
-    if (progress === 0) return 'bg-gray-600 text-gray-300';
-    if (progress <= 2) return 'bg-red-600 text-white';
-    if (progress <= 3) return 'bg-yellow-600 text-white';
-    return 'bg-green-600 text-white';
+    if (progress <= 1) return 'bg-red-500 text-white';
+    if (progress <= 3) return 'bg-orange-500 text-white';
+    return 'bg-green-500 text-white';
   };
 
-  return <div ref={setNodeRef} style={style} {...attributes} className="bg-gray-800 rounded-lg border border-gray-600 hover:border-gray-500 transition-all group shadow-lg relative flex items-center p-4 min-h-[60px]">
-      {/* Progress Indicator */}
-      <div className={`flex-shrink-0 w-12 h-8 rounded-md flex items-center justify-center text-xs font-bold mr-4 ${getProgressColor(job.checklist_progress)}`}>
+  return (
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      {...attributes} 
+      className={`bg-white rounded-lg border-2 border-gray-900 hover:shadow-lg transition-all group relative ${
+        isDragAllowed ? 'hover:border-gray-700' : 'opacity-75'
+      }`}
+    >
+      {/* Progress Pill - Top Right Corner */}
+      <div className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-bold ${getProgressColor(job.checklist_progress)}`}>
         {job.checklist_progress}/5
       </div>
 
-      {/* Job Info - Increased space and better text sizing */}
-      <div className="flex-1 min-w-0 mr-4">
-        <h4 className="font-bold text-base font-orbitron text-amber-200 truncate mb-1" title={job.job_title}>
+      {/* Main Card Content */}
+      <div className="p-4 pr-16">
+        {/* Company Name - Priority 1 */}
+        <h3 className="font-bold text-lg text-gray-900 mb-1" title={job.company_name}>
+          {job.company_name}
+        </h3>
+        
+        {/* Job Title - Priority 2 */}
+        <h4 className="font-medium text-base text-gray-700 mb-3" title={job.job_title}>
           {job.job_title}
         </h4>
-        <p className="text-sm font-medium text-fuchsia-200 truncate" title={job.company_name}>
-          {job.company_name}
-        </p>
-      </div>
 
-      {/* Action Buttons - Removed delete button */}
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <Button size="sm" variant="outline" onClick={e => {
-          e.stopPropagation();
-          onView(job);
-        }} className="text-xs border-gray-600 text-gray-300 hover:text-white h-7 px-3 bg-blue-700 hover:bg-blue-600">
-          View
-        </Button>
-        
-        {job.job_url && <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-blue-300 hover:text-blue-100 hover:bg-blue-900/20" onClick={e => {
-          e.stopPropagation();
-          window.open(job.job_url, '_blank');
-        }}>
-          <ExternalLink className="h-3 w-3" />
-        </Button>}
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2 mb-3">
+          <Button 
+            size="sm" 
+            variant="outline" 
+            onClick={(e) => {
+              e.stopPropagation();
+              onView(job);
+            }} 
+            className="text-xs border-gray-300 text-gray-700 hover:text-gray-900 hover:border-gray-400"
+          >
+            View
+          </Button>
+          
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsChecklistExpanded(!isChecklistExpanded);
+            }} 
+            className="text-xs text-gray-600 hover:text-gray-800"
+          >
+            {isChecklistExpanded ? 'Hide' : 'Checklist'}
+          </Button>
 
-        {/* Drag Handle - Keep on the right */}
-        <div {...listeners} className="p-2 rounded cursor-grab active:cursor-grabbing hover:bg-gray-700 transition-colors bg-gray-700/50 hover:bg-gray-700/70 touch-manipulation select-none" title="Drag to move between columns" style={{
-          touchAction: 'none'
-        }} onTouchStart={e => {
-          e.preventDefault();
-        }}>
-          <GripVertical className="h-4 w-4 text-gray-200 hover:text-gray-100" />
+          {job.job_url && (
+            <Button 
+              size="sm" 
+              variant="ghost" 
+              className="h-7 w-7 p-0 text-blue-600 hover:text-blue-800" 
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(job.job_url, '_blank');
+              }}
+            >
+              <ExternalLink className="h-3 w-3" />
+            </Button>
+          )}
         </div>
+
+        {/* Expanded Checklist */}
+        {isChecklistExpanded && (
+          <div className="mt-3 p-3 bg-gray-50 rounded-md border">
+            <div className="mb-2">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-xs font-medium text-gray-600">Progress</span>
+                <span className="text-xs font-medium text-gray-600">{job.checklist_progress}/5</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className={`h-2 rounded-full transition-all ${
+                    job.checklist_progress <= 1 ? 'bg-red-500' :
+                    job.checklist_progress <= 3 ? 'bg-orange-500' : 'bg-green-500'
+                  }`}
+                  style={{ width: `${(job.checklist_progress / 5) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {job.checklist_items.map((item) => (
+                <div key={item.id} className="flex items-center gap-2">
+                  {item.completed ? (
+                    <CheckSquare className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <Square className="h-4 w-4 text-gray-400" />
+                  )}
+                  <span className={`text-sm ${item.completed ? 'text-gray-700 line-through' : 'text-gray-600'}`}>
+                    {item.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-    </div>;
+
+      {/* Drag Handle - Bottom Right */}
+      <div className="absolute bottom-3 right-3">
+        {isDragAllowed ? (
+          <div 
+            {...listeners} 
+            className="p-2 rounded cursor-grab active:cursor-grabbing hover:bg-gray-100 transition-colors touch-manipulation select-none" 
+            title="Drag to move between columns"
+            style={{ touchAction: 'none' }}
+            onTouchStart={(e) => e.preventDefault()}
+          >
+            <GripVertical className="h-4 w-4 text-gray-600 hover:text-gray-800" />
+          </div>
+        ) : (
+          <div 
+            className="p-2 rounded cursor-not-allowed opacity-50" 
+            title="Complete checklist to proceed"
+          >
+            <GripVertical className="h-4 w-4 text-gray-400" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 const JobTracker = () => {
   const { user, isLoaded } = useUser();
@@ -480,6 +568,16 @@ const JobTracker = () => {
     if (!over) return;
     const activeJobToMove = jobs.find(j => j.id === active.id);
     if (!activeJobToMove) return;
+
+    // Check if checklist is complete before allowing drag
+    if (activeJobToMove.checklist_progress !== 5) {
+      toast({
+        title: "Complete checklist first",
+        description: "You must complete all checklist items (5/5) before moving this job to the next stage.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     // Check if dropped on a column (over.id will be the column key)
     const targetColumn = columns.find(col => col.key === over.id);
