@@ -42,10 +42,16 @@ export const useAIInterviewCredits = () => {
       if (!data) {
         // If no credits record exists, try to initialize it
         logger.info('No AI interview credits found, attempting to initialize...');
-        const { data: userProfileData } = await supabase
+        const { data: userProfileData, error: profileError } = await supabase
           .from('user_profile')
           .select('id, user_id')
           .maybeSingle();
+
+        if (profileError) {
+          logger.error('Error fetching user profile:', profileError);
+          setError('Unable to fetch user profile');
+          return;
+        }
 
         if (userProfileData?.user_id) {
           // Call the initialization function
@@ -72,6 +78,10 @@ export const useAIInterviewCredits = () => {
           }
 
           setCredits(newData);
+        } else {
+          logger.error('No user profile found for credit initialization');
+          setError('User profile not found');
+          return;
         }
       } else {
         setCredits(data);

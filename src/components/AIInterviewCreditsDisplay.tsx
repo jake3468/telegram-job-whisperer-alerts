@@ -8,7 +8,7 @@ interface AIInterviewCreditsDisplayProps {
 }
 
 export const AIInterviewCreditsDisplay = ({ onBuyMore }: AIInterviewCreditsDisplayProps) => {
-  const { credits, isLoading, refetch, remainingCredits } = useAIInterviewCredits();
+  const { credits, isLoading, error, refetch, remainingCredits } = useAIInterviewCredits();
 
   if (isLoading) {
     return (
@@ -19,12 +19,43 @@ export const AIInterviewCreditsDisplay = ({ onBuyMore }: AIInterviewCreditsDispl
     );
   }
 
+  if (error) {
+    return (
+      <Card className="p-4 border-destructive/20 bg-destructive/5">
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-destructive">
+            Error loading calls: {error}
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={refetch}
+            className="h-8 w-8 p-0"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        </div>
+      </Card>
+    );
+  }
+
   if (!credits) {
     return (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <RefreshCw className="h-4 w-4 animate-spin" />
-        Setting up your calls...
-      </div>
+      <Card className="p-4 border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            No calls data available
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={refetch}
+            className="h-8 w-8 p-0"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        </div>
+      </Card>
     );
   }
 
