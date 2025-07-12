@@ -31,6 +31,8 @@ interface JobEntry {
   cover_letter_prepared: boolean;
   ready_to_apply: boolean;
   interview_call_received: boolean;
+  interview_prep_guide_received: boolean;
+  ai_mock_interview_attempted: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -122,6 +124,11 @@ const SortableJobCard = ({
       return completed;
     } else if (job.status === 'applied') {
       return job.interview_call_received ? 1 : 0;
+    } else if (job.status === 'interview') {
+      let completed = 0;
+      if (job.interview_prep_guide_received) completed++;
+      if (job.ai_mock_interview_attempted) completed++;
+      return completed;
     }
     return 0;
   };
@@ -129,7 +136,9 @@ const SortableJobCard = ({
   const progress = getProgress();
   
   // Check if dragging is allowed (checklist must be complete)
-  const canDrag = job.status === 'saved' ? progress >= 5 : job.status === 'applied' ? progress >= 1 : false;
+  const canDrag = job.status === 'saved' ? progress >= 5 : 
+                  job.status === 'applied' ? progress >= 1 : 
+                  job.status === 'interview' ? progress >= 2 : false;
   
   const {
     attributes,
@@ -156,6 +165,9 @@ const SortableJobCard = ({
       if (progress === 5) return 'bg-green-500';
     } else if (job.status === 'applied') {
       if (progress === 1) return 'bg-green-500';
+    } else if (job.status === 'interview') {
+      if (progress === 1) return 'bg-orange-500';
+      if (progress === 2) return 'bg-green-500';
     }
     return 'bg-orange-500';
   };
@@ -169,6 +181,9 @@ const SortableJobCard = ({
     { field: 'ready_to_apply', label: 'Ready to apply', completed: job.ready_to_apply }
   ] : job.status === 'applied' ? [
     { field: 'interview_call_received', label: 'Interview call received', completed: job.interview_call_received }
+  ] : job.status === 'interview' ? [
+    { field: 'interview_prep_guide_received', label: 'Did you receive the interview prep guide?', completed: job.interview_prep_guide_received },
+    { field: 'ai_mock_interview_attempted', label: 'Did you attempt the AI mock interview?', completed: job.ai_mock_interview_attempted }
   ] : [];
 
   const handleChecklistToggle = (field: string) => {
@@ -190,7 +205,7 @@ const SortableJobCard = ({
       <div className="flex items-center justify-between gap-2">
         {/* Left: Progress badge in circle */}
         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 ${getProgressColor(progress)}`}>
-          {progress}/{job.status === 'saved' ? '5' : job.status === 'applied' ? '1' : '0'}
+          {progress}/{job.status === 'saved' ? '5' : job.status === 'applied' ? '1' : job.status === 'interview' ? '2' : '0'}
         </div>
         
         {/* Center: Company & Job Title */}
@@ -206,7 +221,7 @@ const SortableJobCard = ({
         {/* Right: Dropdown + Actions */}
         <div className="flex items-center gap-1 flex-shrink-0">
           {/* Show dropdown arrow for jobs with checklist items */}
-          {(job.status === 'saved' || job.status === 'applied') && (
+          {(job.status === 'saved' || job.status === 'applied' || job.status === 'interview') && (
             <Button variant="ghost" size="sm" onClick={() => setIsChecklistExpanded(!isChecklistExpanded)} className="text-xs px-1 py-1 h-6 text-gray-600 hover:text-gray-800">
               {isChecklistExpanded ? '▲' : '▼'}
             </Button>
@@ -227,8 +242,8 @@ const SortableJobCard = ({
         </div>
       </div>
 
-      {/* Expandable Checklist - for saved and applied jobs */}
-      {isChecklistExpanded && (job.status === 'saved' || job.status === 'applied') && (
+      {/* Expandable Checklist - for saved, applied, and interview jobs */}
+      {isChecklistExpanded && (job.status === 'saved' || job.status === 'applied' || job.status === 'interview') && (
         <div className="mt-2 pt-2 border-t border-gray-200">
           <div className="space-y-1.5">
             {checklistItems.map((item) => (
@@ -425,6 +440,8 @@ const JobTracker = () => {
         cover_letter_prepared: false,
         ready_to_apply: false,
         interview_call_received: false,
+        interview_prep_guide_received: false,
+        ai_mock_interview_attempted: false,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -566,15 +583,33 @@ const JobTracker = () => {
         if (job.cover_letter_prepared) completed++;
         if (job.ready_to_apply) completed++;
         return completed;
+      } else if (job.status === 'applied') {
+        return job.interview_call_received ? 1 : 0;
+      } else if (job.status === 'interview') {
+        let completed = 0;
+        if (job.interview_prep_guide_received) completed++;
+        if (job.ai_mock_interview_attempted) completed++;
+        return completed;
       }
-      return 5; // Non-saved jobs can always be moved
+      return 0;
     };
 
-    // Check if checklist is complete before allowing drag for saved jobs
-    if (activeJobToMove.status === 'saved' && getProgress(activeJobToMove) !== 5) {
+    // Check if checklist is complete before allowing drag
+    const progress = getProgress(activeJobToMove);
+    let requiredProgress = 0;
+    
+    if (activeJobToMove.status === 'saved') {
+      requiredProgress = 5;
+    } else if (activeJobToMove.status === 'applied') {
+      requiredProgress = 1;
+    } else if (activeJobToMove.status === 'interview') {
+      requiredProgress = 2;
+    }
+
+    if (progress < requiredProgress) {
       toast({
         title: "Complete checklist first",
-        description: "You must complete all checklist items (5/5) before moving this job to the next stage.",
+        description: `You must complete all checklist items (${progress}/${requiredProgress}) before moving this job.`,
         variant: "destructive"
       });
       return;
@@ -592,6 +627,23 @@ const JobTracker = () => {
         order_position: maxOrder + 1
       };
 
+      // Reset irrelevant checklist items based on target status
+      if (targetColumn.key === 'saved') {
+        // Keep saved items, reset others
+        updatedJob.interview_call_received = false;
+        updatedJob.interview_prep_guide_received = false;
+        updatedJob.ai_mock_interview_attempted = false;
+      } else if (targetColumn.key === 'applied') {
+        // Reset interview items when moving to applied
+        updatedJob.interview_prep_guide_received = false;
+        updatedJob.ai_mock_interview_attempted = false;
+      } else if (targetColumn.key === 'rejected' || targetColumn.key === 'offer') {
+        // Reset all checklist items for final statuses
+        updatedJob.interview_call_received = false;
+        updatedJob.interview_prep_guide_received = false;
+        updatedJob.ai_mock_interview_attempted = false;
+      }
+
       // Update local state immediately for instant feedback
       optimisticUpdate(updatedJob);
       try {
@@ -599,7 +651,10 @@ const JobTracker = () => {
           error
         } = await supabase.from('job_tracker').update({
           status: targetColumn.key as JobEntry['status'],
-          order_position: maxOrder + 1
+          order_position: maxOrder + 1,
+          interview_call_received: updatedJob.interview_call_received,
+          interview_prep_guide_received: updatedJob.interview_prep_guide_received,
+          ai_mock_interview_attempted: updatedJob.ai_mock_interview_attempted
         }).eq('id', activeJobToMove.id);
         if (error) throw error;
 
@@ -640,7 +695,7 @@ const JobTracker = () => {
   // Function to handle checklist updates for cards
   const handleUpdateChecklistItem = async (jobId: string, field: string) => {
     const targetJob = jobs.find(job => job.id === jobId);
-    if (!targetJob || (targetJob.status !== 'saved' && targetJob.status !== 'applied')) return;
+    if (!targetJob || (targetJob.status !== 'saved' && targetJob.status !== 'applied' && targetJob.status !== 'interview')) return;
 
     try {
       // Update in database

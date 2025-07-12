@@ -17,6 +17,8 @@ interface JobEntry {
   cover_letter_prepared: boolean;
   ready_to_apply: boolean;
   interview_call_received: boolean;
+  interview_prep_guide_received: boolean;
+  ai_mock_interview_attempted: boolean;
   created_at: string;
   updated_at: string;
 }

@@ -641,12 +641,14 @@ export type Database = {
       }
       job_tracker: {
         Row: {
+          ai_mock_interview_attempted: boolean
           company_name: string
           company_researched: boolean
           cover_letter_prepared: boolean
           created_at: string
           id: string
           interview_call_received: boolean
+          interview_prep_guide_received: boolean
           job_description: string | null
           job_role_analyzed: boolean
           job_title: string
@@ -659,12 +661,14 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          ai_mock_interview_attempted?: boolean
           company_name: string
           company_researched?: boolean
           cover_letter_prepared?: boolean
           created_at?: string
           id?: string
           interview_call_received?: boolean
+          interview_prep_guide_received?: boolean
           job_description?: string | null
           job_role_analyzed?: boolean
           job_title: string
@@ -677,12 +681,14 @@ export type Database = {
           user_id: string
         }
         Update: {
+          ai_mock_interview_attempted?: boolean
           company_name?: string
           company_researched?: boolean
           cover_letter_prepared?: boolean
           created_at?: string
           id?: string
           interview_call_received?: boolean
+          interview_prep_guide_received?: boolean
           job_description?: string | null
           job_role_analyzed?: boolean
           job_title?: string
