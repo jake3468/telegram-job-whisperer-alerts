@@ -234,9 +234,9 @@ const UsageHistoryModal = () => {
                         <div className="text-blue-100 text-xs mb-2 break-words">
                           {transaction.description}
                         </div>
-                        <div className="text-blue-200 text-xs">
-                          Credits Remaining: {transaction.balanceAfter?.toFixed(0) || '-'}
-                        </div>
+                         <div className="text-blue-200 text-xs">
+                           Calls Remaining: {transaction.balanceAfter?.toFixed(0) || '-'}
+                         </div>
                       </div>)}
                   </div>
 
@@ -248,8 +248,8 @@ const UsageHistoryModal = () => {
                           <TableHead className="text-blue-200 font-orbitron">Date</TableHead>
                           <TableHead className="text-blue-200 font-orbitron">Type</TableHead>
                           <TableHead className="text-blue-200 font-orbitron">Description</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron text-right">Credits</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron text-right">Remaining</TableHead>
+                           <TableHead className="text-blue-200 font-orbitron text-right">Calls</TableHead>
+                           <TableHead className="text-blue-200 font-orbitron text-right">Remaining</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
