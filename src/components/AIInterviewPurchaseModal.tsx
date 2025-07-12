@@ -86,6 +86,15 @@ export const AIInterviewPurchaseModal = ({
     return products.find(p => p.credits_amount === 3) || products[1];
   };
 
+  const getDiscountText = (product: AIInterviewProduct) => {
+    if (product.discount && product.discount > 0) {
+      const perCallSavings = product.savings! / product.credits_amount;
+      const displaySavings = product.currency === 'INR' ? perCallSavings / 100 : perCallSavings / 100;
+      return `Save ${product.discount}% (${currencySymbol}${displaySavings.toFixed(product.currency === 'INR' ? 0 : 2)} per call)`;
+    }
+    return null;
+  };
+
   if (isLoading) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
@@ -162,6 +171,11 @@ export const AIInterviewPurchaseModal = ({
 
                     <div className="text-sm text-muted-foreground">
                       {formatPrice(product.price_amount / product.credits_amount, product.currency)} per interview
+                      {getDiscountText(product) && (
+                        <div className="text-green-600 font-medium mt-1">
+                          {getDiscountText(product)}
+                        </div>
+                      )}
                     </div>
                   </div>
 

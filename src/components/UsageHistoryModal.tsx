@@ -42,7 +42,9 @@ const UsageHistoryModal = () => {
       'free_monthly_reset': 'Monthly Reset',
       'subscription_add': 'Subscription',
       'manual_adjustment': 'Manual Adjustment',
-      'credit_pack_purchase': 'Credit Pack'
+      'credit_pack_purchase': 'Credit Pack',
+      'usage': 'AI Interview Used',
+      'purchase': 'AI Interview Purchase'
     };
 
     // If it's feature usage, try to extract the specific page from description
@@ -84,7 +86,8 @@ const UsageHistoryModal = () => {
       return 'bg-gray-500/20 text-gray-300';
     }
   };
-  const creditTransactions = transactions?.filter(tx => tx.source === 'credit_transaction') || [];
+  const creditTransactions = transactions?.filter(tx => tx.source === 'credit_transaction' && tx.featureUsed !== 'AI Mock Interview') || [];
+  const aiInterviewTransactions = transactions?.filter(tx => tx.source === 'credit_transaction' && tx.featureUsed === 'AI Mock Interview') || [];
   const paymentRecords = transactions?.filter(tx => tx.source === 'payment_record') || [];
   return <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -116,14 +119,18 @@ const UsageHistoryModal = () => {
           </div> : error ? <div className="text-center py-8 text-red-300">
             Error loading transaction history
           </div> : <Tabs defaultValue="credits" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-slate-800/50">
+            <TabsList className="grid w-full grid-cols-3 bg-slate-800/50">
               <TabsTrigger value="credits" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-blue-100">
                 <Coins className="w-4 h-4 mr-2" />
-                Credit Usage ({creditTransactions.length})
+                Credits ({creditTransactions.filter(tx => tx.featureUsed !== 'AI Mock Interview').length})
+              </TabsTrigger>
+              <TabsTrigger value="ai-interviews" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-blue-100">
+                <History className="w-4 h-4 mr-2" />
+                AI Interviews ({creditTransactions.filter(tx => tx.featureUsed === 'AI Mock Interview').length})
               </TabsTrigger>
               <TabsTrigger value="payments" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-blue-100">
                 <CreditCard className="w-4 h-4 mr-2" />
-                Payment History ({paymentRecords.length})
+                Payments ({paymentRecords.length})
               </TabsTrigger>
             </TabsList>
             
@@ -184,6 +191,71 @@ const UsageHistoryModal = () => {
                             </TableCell>
                             <TableCell className="text-blue-100 text-right font-mono text-sm">
                               {transaction.balanceAfter?.toFixed(1) || '-'}
+                            </TableCell>
+                          </TableRow>)}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </ScrollArea>}
+            </TabsContent>
+
+            <TabsContent value="ai-interviews" className="overflow-hidden">
+              {aiInterviewTransactions.length === 0 ? <div className="text-center py-8 text-blue-200">
+                  No AI interview transactions found
+                </div> : <ScrollArea className="h-[50vh] w-full">
+                  {/* Mobile View */}
+                  <div className="block md:hidden space-y-4">
+                    {aiInterviewTransactions.map(transaction => <div key={transaction.id} className="bg-slate-800/40 rounded-lg p-4 border border-blue-400/20">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="text-blue-100 text-sm font-medium">
+                            {getTransactionTypeDisplay(transaction.type, transaction.description)}
+                          </div>
+                          <div className={`text-sm font-bold font-mono ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                            {formatAmount(transaction.amount)}
+                          </div>
+                        </div>
+                        <div className="text-blue-200 text-xs mb-2">
+                          {formatDate(transaction.date)}
+                        </div>
+                        <div className="text-blue-100 text-xs mb-2 break-words">
+                          {transaction.description}
+                        </div>
+                        <div className="text-blue-200 text-xs">
+                          Credits Remaining: {transaction.balanceAfter?.toFixed(0) || '-'}
+                        </div>
+                      </div>)}
+                  </div>
+
+                  {/* Desktop/Tablet View */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <Table className="w-full min-w-[600px]">
+                      <TableHeader>
+                        <TableRow className="border-blue-400/30 hover:bg-white/5">
+                          <TableHead className="text-blue-200 font-orbitron">Date</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron">Type</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron">Description</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron text-right">Credits</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron text-right">Remaining</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {aiInterviewTransactions.map(transaction => <TableRow key={transaction.id} className="border-blue-400/20 hover:bg-white/5">
+                            <TableCell className="text-blue-100 text-sm">
+                              {formatDate(transaction.date)}
+                            </TableCell>
+                            <TableCell className="text-blue-100 text-sm font-medium">
+                              {getTransactionTypeDisplay(transaction.type, transaction.description)}
+                            </TableCell>
+                            <TableCell className="text-blue-100 text-xs">
+                              <div className="break-words" title={transaction.description}>
+                                {transaction.description}
+                              </div>
+                            </TableCell>
+                            <TableCell className={`text-right font-mono text-sm font-bold ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                              {formatAmount(transaction.amount)}
+                            </TableCell>
+                            <TableCell className="text-blue-100 text-right font-mono text-sm">
+                              {transaction.balanceAfter?.toFixed(0) || '-'}
                             </TableCell>
                           </TableRow>)}
                       </TableBody>
