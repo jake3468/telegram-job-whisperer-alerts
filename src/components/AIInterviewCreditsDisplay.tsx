@@ -2,30 +2,33 @@ import { useAIInterviewCredits } from '@/hooks/useAIInterviewCredits';
 import { Phone, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+
 interface AIInterviewCreditsDisplayProps {
   onBuyMore?: () => void;
 }
-export const AIInterviewCreditsDisplay = ({
-  onBuyMore
-}: AIInterviewCreditsDisplayProps) => {
-  const {
-    credits,
-    isLoading,
-    refetch,
-    remainingCredits
-  } = useAIInterviewCredits();
+
+export const AIInterviewCreditsDisplay = ({ onBuyMore }: AIInterviewCreditsDisplayProps) => {
+  const { credits, isLoading, refetch, remainingCredits } = useAIInterviewCredits();
+
   if (isLoading) {
-    return <div className="flex items-center gap-2 text-sm text-muted-foreground">
+    return (
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <RefreshCw className="h-4 w-4 animate-spin" />
         Loading credits...
-      </div>;
+      </div>
+    );
   }
+
   if (!credits) {
-    return <div className="text-sm text-muted-foreground">
+    return (
+      <div className="text-sm text-muted-foreground">
         Credits unavailable
-      </div>;
+      </div>
+    );
   }
-  return <Card className="p-4 border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
+
+  return (
+    <Card className="p-4 border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">
@@ -42,35 +45,54 @@ export const AIInterviewCreditsDisplay = ({
         </div>
         
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={refetch} className="h-8 w-8 p-0">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={refetch}
+            className="h-8 w-8 p-0"
+          >
             <RefreshCw className="h-4 w-4" />
           </Button>
           
-          {remainingCredits === 0 && onBuyMore && <Button onClick={onBuyMore} size="sm" className="bg-primary hover:bg-primary/90">
+          {remainingCredits === 0 && onBuyMore && (
+            <Button
+              onClick={onBuyMore}
+              size="sm"
+              className="bg-primary hover:bg-primary/90"
+            >
               Buy More
-            </Button>}
+            </Button>
+          )}
         </div>
       </div>
       
-      {remainingCredits > 0 && <div className="mt-3">
+      {remainingCredits > 0 && (
+        <div className="mt-3">
           <div className="flex justify-between text-xs text-muted-foreground mb-1">
-            <span>Calls remaining</span>
+            <span>Credits remaining</span>
             <span>{remainingCredits}/{credits.total_credits}</span>
           </div>
           <div className="w-full bg-secondary rounded-full h-2">
-            <div className="bg-primary h-2 rounded-full transition-all duration-300" style={{
-          width: `${remainingCredits / credits.total_credits * 100}%`
-        }} />
+            <div 
+              className="bg-primary h-2 rounded-full transition-all duration-300"
+              style={{ 
+                width: `${(remainingCredits / credits.total_credits) * 100}%` 
+              }}
+            />
           </div>
-        </div>}
+        </div>
+      )}
       
-      {remainingCredits === 0 && <div className="mt-3 p-3 bg-destructive/10 rounded-lg border border-destructive/20">
+      {remainingCredits === 0 && (
+        <div className="mt-3 p-3 bg-destructive/10 rounded-lg border border-destructive/20">
           <p className="text-sm text-destructive font-medium">
             No interview credits remaining
           </p>
           <p className="text-xs text-destructive/80 mt-1">
             Purchase more credits to continue using AI mock interviews
           </p>
-        </div>}
-    </Card>;
+        </div>
+      )}
+    </Card>
+  );
 };
