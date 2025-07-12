@@ -129,7 +129,7 @@ const UsageHistoryModal = () => {
               <TabsTrigger value="ai-interviews" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-blue-100 text-xs px-1 py-2 flex-col gap-1 whitespace-nowrap overflow-hidden">
                 <History className="w-3 h-3 flex-shrink-0" />
                 <span className="truncate text-center">
-                  AI Interviews ({creditTransactions.filter(tx => tx.featureUsed === 'AI Mock Interview').length})
+                  AI Interviews ({aiInterviewTransactions.length})
                 </span>
               </TabsTrigger>
               <TabsTrigger value="payments" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-blue-100 text-xs px-1 py-2 flex-col gap-1 whitespace-nowrap overflow-hidden">

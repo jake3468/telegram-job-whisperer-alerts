@@ -47,6 +47,60 @@ const AIMockInterviewForm = () => {
     // Validate that phone number is not empty and has proper format (react-phone-input-2 handles validation)
     return phone && phone.length >= 8;
   };
+  const validatePhoneNumberUniqueness = async (phoneNumber: string) => {
+    try {
+      // Check if phone number already exists in grace_interview_requests
+      const { data: existingRequest, error } = await supabase
+        .from('grace_interview_requests')
+        .select('user_id, phone_number')
+        .eq('phone_number', phoneNumber)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error checking phone number:", error);
+        throw new Error("Failed to validate phone number");
+      }
+
+      if (existingRequest) {
+        // Phone number exists, check if it belongs to the same user
+        if (existingRequest.user_id !== userProfile?.id) {
+          // Different user - get the email of the existing account
+          const { data: existingUserProfile, error: profileError } = await supabase
+            .from('user_profile')
+            .select('user_id')
+            .eq('id', existingRequest.user_id)
+            .single();
+
+          if (profileError) {
+            console.error("Error fetching user profile:", profileError);
+            throw new Error("Failed to validate phone number");
+          }
+
+          const { data: existingUser, error: userError } = await supabase
+            .from('users')
+            .select('email')
+            .eq('id', existingUserProfile.user_id)
+            .single();
+
+          if (userError) {
+            console.error("Error fetching user email:", userError);
+            throw new Error("Failed to validate phone number");
+          }
+
+          return {
+            isValid: false,
+            message: `This phone number is already registered with another account (${existingUser.email}). Please sign in to that account to access the AI Interview feature.`
+          };
+        }
+      }
+
+      return { isValid: true };
+    } catch (error) {
+      console.error("Phone validation error:", error);
+      throw error;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -126,6 +180,18 @@ const AIMockInterviewForm = () => {
     try {
       // react-phone-input-2 already includes the + prefix, so we don't need to add it
       const phoneNumber = formData.phoneNumber.startsWith('+') ? formData.phoneNumber : `+${formData.phoneNumber}`;
+      
+      // Validate phone number uniqueness
+      const phoneValidation = await validatePhoneNumberUniqueness(phoneNumber);
+      if (!phoneValidation.isValid) {
+        toast({
+          title: "Phone Number Already Registered",
+          description: phoneValidation.message,
+          variant: "destructive"
+        });
+        setIsSubmitting(false);
+        return;
+      }
       
       console.log("Inserting data:", {
         user_id: userProfile.id,
