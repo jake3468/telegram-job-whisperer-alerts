@@ -12,24 +12,37 @@ export const AIInterviewCreditsDisplay = ({ onBuyMore }: AIInterviewCreditsDispl
 
   if (isLoading) {
     return (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <RefreshCw className="h-4 w-4 animate-spin" />
-        Loading calls...
-      </div>
+      <Card className="p-4 border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <RefreshCw className="h-4 w-4 animate-spin" />
+          Loading calls...
+        </div>
+      </Card>
     );
   }
 
+  // Show fallback UI with retry button instead of error for better UX
   if (error) {
     return (
-      <Card className="p-4 border-destructive/20 bg-destructive/5">
+      <Card className="p-4 border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
         <div className="flex items-center justify-between">
-          <div className="text-sm text-destructive">
-            Error loading calls: {error}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">
+              <Phone className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <div className="font-semibold text-lg">
+                Interview Calls
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Checking availability...
+              </div>
+            </div>
           </div>
           <Button
             variant="ghost"
             size="sm"
-            onClick={refetch}
+            onClick={() => refetch()}
             className="h-8 w-8 p-0"
           >
             <RefreshCw className="h-4 w-4" />
@@ -39,17 +52,28 @@ export const AIInterviewCreditsDisplay = ({ onBuyMore }: AIInterviewCreditsDispl
     );
   }
 
+  // Show fallback UI instead of error when no credits data
   if (!credits) {
     return (
       <Card className="p-4 border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
         <div className="flex items-center justify-between">
-          <div className="text-sm text-muted-foreground">
-            No calls data available
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">
+              <Phone className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <div className="font-semibold text-lg">
+                Setting up calls...
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Initializing your interview calls
+              </div>
+            </div>
           </div>
           <Button
             variant="ghost"
             size="sm"
-            onClick={refetch}
+            onClick={() => refetch()}
             className="h-8 w-8 p-0"
           >
             <RefreshCw className="h-4 w-4" />
@@ -80,7 +104,7 @@ export const AIInterviewCreditsDisplay = ({ onBuyMore }: AIInterviewCreditsDispl
           <Button
             variant="ghost"
             size="sm"
-            onClick={refetch}
+            onClick={() => refetch()}
             className="h-8 w-8 p-0"
           >
             <RefreshCw className="h-4 w-4" />

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@clerk/clerk-react';
 import { logger } from '@/utils/logger';
+import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 
 interface AIInterviewCredits {
   id: string;
@@ -14,18 +15,22 @@ interface AIInterviewCredits {
 
 export const useAIInterviewCredits = () => {
   const { user } = useUser();
+  const { userProfile } = useCachedUserProfile();
   const [credits, setCredits] = useState<AIInterviewCredits | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
-  const fetchCredits = async () => {
-    if (!user) {
+  const fetchCredits = async (isRetry = false) => {
+    if (!user || !userProfile?.user_id) {
       setIsLoading(false);
       return;
     }
 
     try {
-      setIsLoading(true);
+      if (!isRetry) {
+        setIsLoading(true);
+      }
       setError(null);
 
       const { data, error: fetchError } = await supabase
@@ -34,6 +39,14 @@ export const useAIInterviewCredits = () => {
         .maybeSingle();
 
       if (fetchError) {
+        // Handle JWT expiration by silently retrying once
+        if (fetchError.message?.includes('JWT') && retryCount < 2) {
+          logger.info('JWT issue detected, retrying...');
+          setRetryCount(prev => prev + 1);
+          setTimeout(() => fetchCredits(true), 1000);
+          return;
+        }
+        
         logger.error('Error fetching AI interview credits:', fetchError);
         setError(fetchError.message);
         return;
@@ -42,50 +55,36 @@ export const useAIInterviewCredits = () => {
       if (!data) {
         // If no credits record exists, try to initialize it
         logger.info('No AI interview credits found, attempting to initialize...');
-        const { data: userProfileData, error: profileError } = await supabase
-          .from('user_profile')
-          .select('id, user_id')
+        
+        const { error: initError } = await supabase.rpc('initialize_ai_interview_credits', {
+          p_user_id: userProfile.user_id
+        });
+
+        if (initError) {
+          logger.error('Error initializing AI interview credits:', initError);
+          setError(initError.message);
+          return;
+        }
+
+        // Fetch again after initialization
+        const { data: newData, error: refetchError } = await supabase
+          .from('ai_interview_credits')
+          .select('*')
           .maybeSingle();
 
-        if (profileError) {
-          logger.error('Error fetching user profile:', profileError);
-          setError('Unable to fetch user profile');
+        if (refetchError) {
+          logger.error('Error refetching AI interview credits:', refetchError);
+          setError(refetchError.message);
           return;
         }
 
-        if (userProfileData?.user_id) {
-          // Call the initialization function
-          const { error: initError } = await supabase.rpc('initialize_ai_interview_credits', {
-            p_user_id: userProfileData.user_id
-          });
-
-          if (initError) {
-            logger.error('Error initializing AI interview credits:', initError);
-            setError(initError.message);
-            return;
-          }
-
-          // Fetch again after initialization
-          const { data: newData, error: refetchError } = await supabase
-            .from('ai_interview_credits')
-            .select('*')
-            .maybeSingle();
-
-          if (refetchError) {
-            logger.error('Error refetching AI interview credits:', refetchError);
-            setError(refetchError.message);
-            return;
-          }
-
-          setCredits(newData);
-        } else {
-          logger.error('No user profile found for credit initialization');
-          setError('User profile not found');
-          return;
-        }
+        setCredits(newData);
       } else {
         setCredits(data);
       }
+      
+      // Reset retry count on success
+      setRetryCount(0);
     } catch (err) {
       logger.error('Unexpected error fetching AI interview credits:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -95,27 +94,18 @@ export const useAIInterviewCredits = () => {
   };
 
   const useCredit = async (description?: string) => {
-    if (!user || !credits) {
+    if (!user || !credits || !userProfile?.user_id) {
       throw new Error('User not authenticated or credits not loaded');
     }
 
     if (credits.remaining_credits < 1) {
-      throw new Error('Insufficient AI interview credits');
+      throw new Error('Insufficient AI interview calls');
     }
 
     try {
-      const { data: userProfileData } = await supabase
-        .from('user_profile')
-        .select('user_id')
-        .maybeSingle();
-
-      if (!userProfileData?.user_id) {
-        throw new Error('User profile not found');
-      }
-
       const { data: success, error: useError } = await supabase.rpc('use_ai_interview_credit', {
-        p_user_id: userProfileData.user_id,
-        p_description: description || 'AI mock interview credit used'
+        p_user_id: userProfile.user_id,
+        p_description: description || 'AI mock interview call used'
       });
 
       if (useError) {
@@ -138,10 +128,10 @@ export const useAIInterviewCredits = () => {
   };
 
   useEffect(() => {
-    if (user) {
+    if (user && userProfile?.user_id) {
       fetchCredits();
     }
-  }, [user]);
+  }, [user, userProfile?.user_id]);
 
   return {
     credits,
