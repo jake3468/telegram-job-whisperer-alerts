@@ -14,15 +14,16 @@ export const AIInterviewCreditsDisplay = ({ onBuyMore }: AIInterviewCreditsDispl
     return (
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <RefreshCw className="h-4 w-4 animate-spin" />
-        Loading credits...
+        Loading calls...
       </div>
     );
   }
 
   if (!credits) {
     return (
-      <div className="text-sm text-muted-foreground">
-        Credits unavailable
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <RefreshCw className="h-4 w-4 animate-spin" />
+        Setting up your calls...
       </div>
     );
   }
@@ -36,7 +37,7 @@ export const AIInterviewCreditsDisplay = ({ onBuyMore }: AIInterviewCreditsDispl
           </div>
           <div>
             <div className="font-semibold text-lg">
-              {remainingCredits} Interview{remainingCredits !== 1 ? 's' : ''} Left
+              {remainingCredits} Call{remainingCredits !== 1 ? 's' : ''} Left
             </div>
             <div className="text-sm text-muted-foreground">
               Used {credits.used_credits} of {credits.total_credits} total calls
@@ -69,7 +70,7 @@ export const AIInterviewCreditsDisplay = ({ onBuyMore }: AIInterviewCreditsDispl
       {remainingCredits > 0 && (
         <div className="mt-3">
           <div className="flex justify-between text-xs text-muted-foreground mb-1">
-            <span>Credits remaining</span>
+            <span>Calls remaining</span>
             <span>{remainingCredits}/{credits.total_credits}</span>
           </div>
           <div className="w-full bg-secondary rounded-full h-2">
@@ -86,10 +87,10 @@ export const AIInterviewCreditsDisplay = ({ onBuyMore }: AIInterviewCreditsDispl
       {remainingCredits === 0 && (
         <div className="mt-3 p-3 bg-destructive/10 rounded-lg border border-destructive/20">
           <p className="text-sm text-destructive font-medium">
-            No interview credits remaining
+            No interview calls remaining
           </p>
           <p className="text-xs text-destructive/80 mt-1">
-            Purchase more credits to continue using AI mock interviews
+            Purchase more calls to continue using AI mock interviews
           </p>
         </div>
       )}

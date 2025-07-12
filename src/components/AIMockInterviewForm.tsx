@@ -79,11 +79,11 @@ const AIMockInterviewForm = () => {
       return;
     }
 
-    // Check AI interview credits
+    // Check AI interview calls
     if (!hasCredits) {
       toast({
-        title: "No Interview Credits",
-        description: "You need AI interview credits to request a call. Purchase credits to continue.",
+        title: "No Interview Calls",
+        description: "You need AI interview calls to request a call. Purchase calls to continue.",
         variant: "destructive"
       });
       setIsPurchaseModalOpen(true);
@@ -305,7 +305,7 @@ const AIMockInterviewForm = () => {
             ) : !hasCredits ? (
               <>
                 <CreditCard className="w-5 h-5 mr-2" />
-                Purchase Credits to Continue
+                Purchase Calls to Continue
               </>
             ) : (
               <>
@@ -323,7 +323,7 @@ const AIMockInterviewForm = () => {
           
           {!hasCredits && !creditsLoading && (
             <p className="text-center text-orange-600 text-sm mt-3">
-              Purchase AI interview credits to request a call from Grace
+              Purchase AI interview calls to request a call from Grace
             </p>
           )}
         </div>
