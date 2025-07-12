@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
-import { supabase } from '@/integrations/supabase/client';
+import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 import { logger } from '@/utils/logger';
 
 interface CompletionStatus {
@@ -22,6 +22,7 @@ const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 
 export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchStatus: () => Promise<void> } => {
   const { user } = useUser();
+  const { userProfile, loading: profileLoading, refetch: refetchProfile } = useCachedUserProfile();
   const [status, setStatus] = useState<CompletionStatus>(() => {
     // Initialize with cached data if available
     if (!user) {
@@ -49,103 +50,32 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
     return { hasResume: false, hasBio: false, isComplete: false, loading: true, lastChecked: null };
   });
 
-  // Load cached data immediately on mount (for when user changes)
+  // Update status based on cached profile data
   useEffect(() => {
     if (!user) {
       setStatus({ hasResume: false, hasBio: false, isComplete: false, loading: false, lastChecked: new Date() });
       return;
     }
 
-    try {
-      const cached = localStorage.getItem(CACHE_KEY);
-      if (cached) {
-        const parsedCache: CachedCompletionData = JSON.parse(cached);
-        const now = Date.now();
-        
-        // Use cached data if it's for the same user and within cache duration
-        if (parsedCache.userId === user.id && now - parsedCache.timestamp < CACHE_DURATION) {
-          setStatus({ ...parsedCache.status, loading: false }); // Ensure loading is false
-          logger.debug('Loaded cached user completion status:', parsedCache.status);
-          return; // Don't fetch fresh data if we have valid cache
-        } else {
-          localStorage.removeItem(CACHE_KEY);
-        }
-      }
-      
-      // Only set loading to true if we don't have valid cached data
+    if (profileLoading) {
       setStatus(prev => ({ ...prev, loading: true }));
-    } catch (error) {
-      logger.warn('Failed to load cached user completion status:', error);
-      localStorage.removeItem(CACHE_KEY);
-      setStatus(prev => ({ ...prev, loading: true }));
-    }
-  }, [user?.id]);
-
-  // Fetch fresh data when needed
-  useEffect(() => {
-    if (!user) return;
-    
-    // Only fetch if we're actually loading (no valid cache found)
-    if (status.loading) {
-      checkUserCompletion();
-    }
-  }, [user?.id, status.loading]);
-
-  const checkUserCompletion = async (showErrors = false) => {
-    if (!user) {
-      setStatus({ hasResume: false, hasBio: false, isComplete: false, loading: false, lastChecked: new Date() });
       return;
     }
 
-    try {
-      setStatus(prev => ({ ...prev, loading: true }));
-
-      // Get user's database ID
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('clerk_id', user.id)
-        .maybeSingle();
-
-      if (userError || !userData) {
-        if (showErrors) {
-          console.warn('User not found in database:', userError?.message);
-        }
-        const fallbackStatus = { hasResume: false, hasBio: false, isComplete: false, loading: false, lastChecked: new Date() };
-        setStatus(fallbackStatus);
-        return;
-      }
-
-      // Check for both resume and bio in user_profile table
-      let hasResume = false;
-      let hasBio = false;
-      
-      try {
-        const { data: profileData, error: profileError } = await supabase
-          .from('user_profile')
-          .select('resume, bio')
-          .eq('user_id', userData.id)
-          .maybeSingle();
-
-        if (profileError) {
-          if (showErrors) {
-            console.warn('Profile check failed:', profileError.message);
-          }
-        } else if (profileData) {
-          hasResume = profileData.resume && profileData.resume.trim().length > 0;
-          hasBio = profileData.bio && profileData.bio.trim().length > 0;
-          
-          logger.debug('Fresh profile data received:', profileData);
-        }
-      } catch (error) {
-        if (showErrors) {
-          console.warn('Profile check failed:', error);
-        }
-        hasResume = false;
-        hasBio = false;
-      }
-
+    if (userProfile) {
+      const hasResume = !!(userProfile.resume && userProfile.resume.trim().length > 0);
+      const hasBio = !!(userProfile.bio && userProfile.bio.trim().length > 0);
       const isComplete = hasResume && hasBio;
+
+      console.log('Profile completion check from cached data:', {
+        userId: user.id,
+        hasResume,
+        hasBio,
+        isComplete,
+        resume: userProfile.resume ? `${userProfile.resume.substring(0, 50)}...` : 'None',
+        bio: userProfile.bio || 'None'
+      });
+
       const newStatus = {
         hasResume,
         hasBio,
@@ -153,14 +83,6 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
         loading: false,
         lastChecked: new Date(),
       };
-
-      console.log('Profile completion check result:', {
-        userId: user.id,
-        hasResume,
-        hasBio,
-        isComplete,
-        timestamp: new Date().toISOString()
-      });
 
       setStatus(newStatus);
 
@@ -172,29 +94,18 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
           userId: user.id
         };
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-        logger.debug('Cached user completion status:', newStatus);
+        logger.debug('Cached user completion status from profile data:', newStatus);
       } catch (cacheError) {
         logger.warn('Failed to cache user completion status:', cacheError);
       }
-
-    } catch (error) {
-      if (showErrors) {
-        console.error('Error checking user completion status:', error);
-      }
-      setStatus({ hasResume: false, hasBio: false, isComplete: false, loading: false, lastChecked: new Date() });
     }
-  };
+  }, [user?.id, userProfile, profileLoading]);
 
   const refetchStatus = async () => {
-    // Invalidate cache first to ensure fresh data
+    // Invalidate cache and force profile refresh
     localStorage.removeItem(CACHE_KEY);
-    console.log('Invalidated completion status cache, fetching fresh data...');
-    await checkUserCompletion(true);
-  };
-
-  const invalidateCache = () => {
-    localStorage.removeItem(CACHE_KEY);
-    checkUserCompletion();
+    console.log('Invalidated completion status cache, forcing profile refresh...');
+    await refetchProfile();
   };
 
   return {

@@ -11,7 +11,12 @@ const AIMockInterview = () => {
     forceRefresh
   } = useCachedGraceInterviewRequests();
   const [isReportsModalOpen, setIsReportsModalOpen] = useState(false);
+  
   const handleManualRefresh = () => {
+    // Clear all caches and reload the page for a complete refresh
+    localStorage.removeItem('aspirely_user_profile_cache');
+    localStorage.removeItem('aspirely_user_completion_status_cache');
+    localStorage.removeItem('aspirely_ai_interview_credits_cache');
     window.location.reload();
   };
   return <Layout>

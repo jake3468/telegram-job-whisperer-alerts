@@ -35,7 +35,7 @@ export const AIInterviewCreditsDisplay = ({ onBuyMore }: AIInterviewCreditsDispl
                 Interview Calls
               </div>
               <div className="text-sm text-muted-foreground">
-                Checking availability...
+                Unable to load call data
               </div>
             </div>
           </div>
@@ -44,6 +44,7 @@ export const AIInterviewCreditsDisplay = ({ onBuyMore }: AIInterviewCreditsDispl
             size="sm"
             onClick={() => refetch()}
             className="h-8 w-8 p-0"
+            title="Refresh call data"
           >
             <RefreshCw className="h-4 w-4" />
           </Button>
@@ -52,7 +53,7 @@ export const AIInterviewCreditsDisplay = ({ onBuyMore }: AIInterviewCreditsDispl
     );
   }
 
-  // Show fallback UI instead of error when no credits data
+  // Show setup UI when initializing
   if (!credits) {
     return (
       <Card className="p-4 border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
@@ -66,7 +67,7 @@ export const AIInterviewCreditsDisplay = ({ onBuyMore }: AIInterviewCreditsDispl
                 Setting up calls...
               </div>
               <div className="text-sm text-muted-foreground">
-                Initializing your interview calls
+                Initializing your free calls
               </div>
             </div>
           </div>
@@ -75,6 +76,7 @@ export const AIInterviewCreditsDisplay = ({ onBuyMore }: AIInterviewCreditsDispl
             size="sm"
             onClick={() => refetch()}
             className="h-8 w-8 p-0"
+            title="Refresh call data"
           >
             <RefreshCw className="h-4 w-4" />
           </Button>
