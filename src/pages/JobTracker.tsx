@@ -135,6 +135,17 @@ const SortableJobCard = ({
     return 'bg-green-500';
   };
 
+  // Default checklist items if not provided
+  const checklistItems = job.checklist_items && job.checklist_items.length > 0 
+    ? job.checklist_items 
+    : [
+        { id: '1', label: 'Resume updated', completed: false },
+        { id: '2', label: 'Job role analyzed', completed: false },
+        { id: '3', label: 'Company researched', completed: false },
+        { id: '4', label: 'Cover letter prepared', completed: false },
+        { id: '5', label: 'Ready to apply', completed: false }
+      ];
+
   const handleChecklistToggle = (index: number) => {
     onUpdateChecklist(job.id, index);
   };
@@ -153,37 +164,27 @@ const SortableJobCard = ({
     <div 
       ref={setNodeRef} 
       style={style} 
-      className="bg-white rounded border border-gray-300 shadow-sm hover:shadow-md transition-all p-2 mb-1"
+      className="bg-white rounded border border-gray-300 shadow-sm hover:shadow-md transition-all py-1.5 px-2 mb-1"
     >
-      {/* Single row layout - everything in one line */}
+      {/* Top section: Progress + Company + Actions */}
       <div className="flex items-center justify-between gap-2">
-        {/* Left: Job Title + Company */}
+        {/* Left: Progress badge in circle */}
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 ${getProgressColor(job.checklist_progress)}`}>
+          {job.checklist_progress}/5
+        </div>
+        
+        {/* Center: Company & Job Title */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <div className="min-w-0 flex-1">
-              <h3 className="font-bold text-sm text-black leading-tight truncate">
-                {job.job_title} - {job.company_name}
-              </h3>
-            </div>
-            
-            {/* Progress Pill */}
-            <div className={`px-1.5 py-0.5 rounded-full text-xs font-medium text-white flex-shrink-0 ${getProgressColor(job.checklist_progress)}`}>
-              {job.checklist_progress}/5
-            </div>
+          <div className="font-bold text-sm text-black leading-tight truncate">
+            {job.company_name}
+          </div>
+          <div className="text-xs text-gray-600 leading-tight truncate">
+            {job.job_title}
           </div>
         </div>
 
-        {/* Right: Actions */}
+        {/* Right: Dropdown + Actions */}
         <div className="flex items-center gap-1 flex-shrink-0">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onView(job)}
-            className="text-xs px-2 py-1 h-6"
-          >
-            View
-          </Button>
-          
           <Button
             variant="ghost"
             size="sm"
@@ -191,6 +192,15 @@ const SortableJobCard = ({
             className="text-xs px-1 py-1 h-6 text-gray-600 hover:text-gray-800"
           >
             {isChecklistExpanded ? '▲' : '▼'}
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onView(job)}
+            className="text-xs px-2 py-1 h-6"
+          >
+            View
           </Button>
           
           {job.job_url && (
@@ -221,15 +231,15 @@ const SortableJobCard = ({
         </div>
       </div>
 
-      {/* Expandable Checklist Dropdown */}
+      {/* Expandable Checklist */}
       {isChecklistExpanded && (
-        <div className="mt-2 pt-2 border-t border-gray-200 bg-gray-50 rounded p-2">
-          <div className="space-y-1">
-            {job.checklist_items.map((item, index) => (
-              <div key={index} className="flex items-center space-x-2">
+        <div className="mt-2 pt-2 border-t border-gray-200">
+          <div className="space-y-1.5">
+            {checklistItems.map((item, index) => (
+              <div key={item.id || index} className="flex items-center space-x-2">
                 <button
                   onClick={() => handleChecklistToggle(index)}
-                  className={`w-3 h-3 rounded border flex items-center justify-center text-xs flex-shrink-0 ${
+                  className={`w-4 h-4 rounded border flex items-center justify-center text-xs flex-shrink-0 ${
                     item.completed
                       ? "bg-green-500 border-green-500 text-white"
                       : "border-gray-300 hover:border-gray-400"
