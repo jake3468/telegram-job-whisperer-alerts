@@ -116,38 +116,32 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
         return;
       }
 
-      // Check for resume with better error handling
+      // Check for both resume and bio in user_profile table
       let hasResume = false;
-      try {
-        const { data: resumeData, error: resumeError } = await supabase.storage
-          .from('resumes')
-          .list(user.id, {
-            limit: 1,
-            search: 'resume.pdf'
-          });
-
-        hasResume = !resumeError && resumeData && resumeData.length > 0;
-      } catch (error) {
-        if (showErrors) {
-          console.warn('Resume check failed:', error);
-        }
-        hasResume = false;
-      }
-
-      // Check for bio with better error handling
       let hasBio = false;
+      
       try {
         const { data: profileData, error: profileError } = await supabase
           .from('user_profile')
-          .select('bio')
+          .select('resume, bio')
           .eq('user_id', userData.id)
           .maybeSingle();
 
-        hasBio = !profileError && profileData?.bio && profileData.bio.trim().length > 0;
+        if (profileError) {
+          if (showErrors) {
+            console.warn('Profile check failed:', profileError.message);
+          }
+        } else if (profileData) {
+          hasResume = profileData.resume && profileData.resume.trim().length > 0;
+          hasBio = profileData.bio && profileData.bio.trim().length > 0;
+          
+          logger.debug('Fresh profile data received:', profileData);
+        }
       } catch (error) {
         if (showErrors) {
-          console.warn('Bio check failed:', error);
+          console.warn('Profile check failed:', error);
         }
+        hasResume = false;
         hasBio = false;
       }
 
