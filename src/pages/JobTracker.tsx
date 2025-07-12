@@ -135,28 +135,24 @@ const SortableJobCard = ({
     return 'bg-green-500';
   };
 
-  // Default checklist items if not provided
-  const checklistItems = job.checklist_items && job.checklist_items.length > 0 ? job.checklist_items : [{
-    id: '1',
-    label: 'Resume updated',
-    completed: false
-  }, {
-    id: '2',
-    label: 'Job role analyzed',
-    completed: false
-  }, {
-    id: '3',
-    label: 'Company researched',
-    completed: false
-  }, {
-    id: '4',
-    label: 'Cover letter prepared',
-    completed: false
-  }, {
-    id: '5',
-    label: 'Ready to apply',
-    completed: false
-  }];
+  // Default checklist items if not provided (only for saved status)
+  const getDefaultChecklistItems = (status: string): ChecklistItem[] => {
+    if (status !== 'saved') {
+      return []; // Empty checklist for non-saved jobs
+    }
+    
+    return [
+      { id: '1', label: 'Resume updated', completed: false },
+      { id: '2', label: 'Job role analyzed', completed: false },
+      { id: '3', label: 'Company researched', completed: false },
+      { id: '4', label: 'Cover letter prepared', completed: false },
+      { id: '5', label: 'Ready to apply', completed: false }
+    ];
+  };
+
+  const checklistItems = job.checklist_items && job.checklist_items.length > 0 
+    ? job.checklist_items 
+    : getDefaultChecklistItems(job.status);
   const handleChecklistToggle = (index: number) => {
     onUpdateChecklist(job.id, index);
   };
@@ -189,9 +185,12 @@ const SortableJobCard = ({
 
         {/* Right: Dropdown + Actions */}
         <div className="flex items-center gap-1 flex-shrink-0">
-          <Button variant="ghost" size="sm" onClick={() => setIsChecklistExpanded(!isChecklistExpanded)} className="text-xs px-1 py-1 h-6 text-gray-600 hover:text-gray-800">
-            {isChecklistExpanded ? '▲' : '▼'}
-          </Button>
+          {/* Only show dropdown arrow for saved jobs with checklist */}
+          {job.status === 'saved' && checklistItems.length > 0 && (
+            <Button variant="ghost" size="sm" onClick={() => setIsChecklistExpanded(!isChecklistExpanded)} className="text-xs px-1 py-1 h-6 text-gray-600 hover:text-gray-800">
+              {isChecklistExpanded ? '▲' : '▼'}
+            </Button>
+          )}
           
           <Button variant="outline" size="sm" onClick={() => onView(job)} className="text-xs px-2 py-1 h-6 bg-pastel-lavender">
             View
@@ -208,10 +207,12 @@ const SortableJobCard = ({
         </div>
       </div>
 
-      {/* Expandable Checklist */}
-      {isChecklistExpanded && <div className="mt-2 pt-2 border-t border-gray-200">
+      {/* Expandable Checklist - only for saved jobs */}
+      {isChecklistExpanded && job.status === 'saved' && checklistItems.length > 0 && (
+        <div className="mt-2 pt-2 border-t border-gray-200">
           <div className="space-y-1.5">
-            {checklistItems.map((item, index) => <div key={item.id || index} className="flex items-center space-x-2">
+            {checklistItems.map((item, index) => (
+              <div key={item.id || index} className="flex items-center space-x-2">
                 <Checkbox
                   checked={item.completed}
                   onCheckedChange={() => handleChecklistToggle(index)}
@@ -220,9 +221,11 @@ const SortableJobCard = ({
                 <span className={`text-xs leading-tight ${item.completed ? "text-gray-500 line-through" : "text-gray-700"}`}>
                   {item.label}
                 </span>
-              </div>)}
+              </div>
+            ))}
           </div>
-        </div>}
+        </div>
+      )}
     </div>;
 };
 const JobTracker = () => {
@@ -386,28 +389,14 @@ const JobTracker = () => {
     try {
       const maxOrder = Math.max(...jobs.filter(job => job.status === selectedStatus).map(job => job.order_position), -1);
 
-      // Default checklist items
-      const defaultChecklistItems: ChecklistItem[] = [{
-        id: '1',
-        label: '✅ Resume updated for this job',
-        completed: false
-      }, {
-        id: '2',
-        label: '✅ Job role analyzed',
-        completed: false
-      }, {
-        id: '3',
-        label: '✅ Company researched',
-        completed: false
-      }, {
-        id: '4',
-        label: '✅ Cover letter prepared',
-        completed: false
-      }, {
-        id: '5',
-        label: '✅ Ready to apply (unlocks drag)',
-        completed: false
-      }];
+      // Default checklist items - only for saved jobs
+      const defaultChecklistItems: ChecklistItem[] = selectedStatus === 'saved' ? [
+        { id: '1', label: 'Resume updated', completed: false },
+        { id: '2', label: 'Job role analyzed', completed: false },
+        { id: '3', label: 'Company researched', completed: false },
+        { id: '4', label: 'Cover letter prepared', completed: false },
+        { id: '5', label: 'Ready to apply', completed: false }
+      ] : [];
 
       // Create optimistic update first
       const tempJob: JobEntry = {
