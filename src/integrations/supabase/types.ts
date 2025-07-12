@@ -14,6 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_interview_credits: {
+        Row: {
+          created_at: string
+          id: string
+          remaining_credits: number
+          total_credits: number
+          updated_at: string
+          used_credits: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          remaining_credits?: number
+          total_credits?: number
+          updated_at?: string
+          used_credits?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          remaining_credits?: number
+          total_credits?: number
+          updated_at?: string
+          used_credits?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_interview_credits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_interview_transactions: {
+        Row: {
+          created_at: string
+          credits_after: number
+          credits_amount: number
+          credits_before: number
+          description: string | null
+          id: string
+          payment_record_id: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits_after: number
+          credits_amount: number
+          credits_before: number
+          description?: string | null
+          id?: string
+          payment_record_id?: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credits_after?: number
+          credits_amount?: number
+          credits_before?: number
+          description?: string | null
+          id?: string
+          payment_record_id?: string | null
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_interview_transactions_payment_record_id_fkey"
+            columns: ["payment_record_id"]
+            isOneToOne: false
+            referencedRelation: "payment_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_interview_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blogs: {
         Row: {
           author_name: string | null
@@ -998,6 +1087,15 @@ export type Database = {
       }
     }
     Functions: {
+      add_ai_interview_credits: {
+        Args: {
+          p_user_id: string
+          p_amount: number
+          p_description?: string
+          p_payment_record_id?: string
+        }
+        Returns: boolean
+      }
       add_credits: {
         Args: {
           p_user_id: string
@@ -1164,6 +1262,10 @@ export type Database = {
         Args: { curlopt: string; value: string }
         Returns: boolean
       }
+      initialize_ai_interview_credits: {
+        Args: { p_user_id: string }
+        Returns: string
+      }
       initialize_user_credits: {
         Args: { p_user_id: string }
         Returns: string
@@ -1218,6 +1320,10 @@ export type Database = {
       urlencode: {
         Args: { data: Json } | { string: string } | { string: string }
         Returns: string
+      }
+      use_ai_interview_credit: {
+        Args: { p_user_id: string; p_description?: string }
+        Returns: boolean
       }
     }
     Enums: {
