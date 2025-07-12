@@ -128,6 +128,9 @@ const SortableJobCard = ({
 
   const progress = getProgress();
   
+  // Check if dragging is allowed (checklist must be complete)
+  const canDrag = job.status === 'saved' ? progress >= 5 : job.status === 'applied' ? progress >= 1 : false;
+  
   const {
     attributes,
     listeners,
@@ -137,16 +140,13 @@ const SortableJobCard = ({
     isDragging
   } = useSortable({
     id: job.id,
-    disabled: progress < 5
+    disabled: !canDrag
   });
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1
   };
-
-  // Check if dragging is allowed (checklist must be complete)
-  const canDrag = progress >= 5;
 
   // Get progress color based on completion and status
   const getProgressColor = (progress: number) => {
@@ -185,7 +185,7 @@ const SortableJobCard = ({
     }
   };
 
-  return <div ref={setNodeRef} style={style} className="bg-white rounded border border-gray-300 shadow-sm hover:shadow-md transition-all py-1.5 px-2 mb-1">
+  return <div ref={setNodeRef} style={style} className="bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition-all duration-200 py-1.5 px-2 mb-1 hover:scale-[1.02]">
       {/* Top section: Progress + Company + Actions */}
       <div className="flex items-center justify-between gap-2">
         {/* Left: Progress badge in circle */}
@@ -216,12 +216,12 @@ const SortableJobCard = ({
             View
           </Button>
           
-          {job.job_url && <a href={job.job_url} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-600 transition-colors p-1">
+          {job.job_url && <a href={job.job_url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 transition-colors p-1" title="Open job posting">
               <ExternalLink className="w-3 h-3" />
             </a>}
 
           {/* Drag Handle */}
-          <div {...attributes} {...listeners} onClick={handleDragAttempt} className={`cursor-grab p-1 ${canDrag ? "text-gray-400 hover:text-gray-600" : "text-gray-200 cursor-not-allowed"}`} title={canDrag ? "Drag to move" : "Complete checklist to move"}>
+          <div {...attributes} {...listeners} onClick={handleDragAttempt} className={`cursor-grab p-1 transition-colors ${canDrag ? "text-gray-600 hover:text-gray-800" : "text-gray-400 cursor-not-allowed"}`} title={canDrag ? "Drag to move" : "Complete checklist to move"}>
             <GripVertical className="w-3 h-3" />
           </div>
         </div>
