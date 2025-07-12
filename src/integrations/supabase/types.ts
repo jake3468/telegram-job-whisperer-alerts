@@ -224,38 +224,68 @@ export type Database = {
       }
       grace_interview_requests: {
         Row: {
+          actionable_plan: Json | null
           company_name: string
+          completion_percentage: number | null
           created_at: string
+          feedback_message: string | null
+          feedback_next_action: string | null
+          feedback_suggestion: string | null
           id: string
+          interview_status: string | null
           job_description: string
           job_title: string
+          next_steps_priority: Json | null
           phone_number: string
           processed_at: string | null
+          report_data: Json | null
+          report_generated: boolean | null
           status: string
+          time_spent: string | null
           updated_at: string
           user_id: string | null
         }
         Insert: {
+          actionable_plan?: Json | null
           company_name: string
+          completion_percentage?: number | null
           created_at?: string
+          feedback_message?: string | null
+          feedback_next_action?: string | null
+          feedback_suggestion?: string | null
           id?: string
+          interview_status?: string | null
           job_description: string
           job_title: string
+          next_steps_priority?: Json | null
           phone_number: string
           processed_at?: string | null
+          report_data?: Json | null
+          report_generated?: boolean | null
           status?: string
+          time_spent?: string | null
           updated_at?: string
           user_id?: string | null
         }
         Update: {
+          actionable_plan?: Json | null
           company_name?: string
+          completion_percentage?: number | null
           created_at?: string
+          feedback_message?: string | null
+          feedback_next_action?: string | null
+          feedback_suggestion?: string | null
           id?: string
+          interview_status?: string | null
           job_description?: string
           job_title?: string
+          next_steps_priority?: Json | null
           phone_number?: string
           processed_at?: string | null
+          report_data?: Json | null
+          report_generated?: boolean | null
           status?: string
+          time_spent?: string | null
           updated_at?: string
           user_id?: string | null
         }

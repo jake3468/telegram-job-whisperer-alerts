@@ -59,6 +59,9 @@ verify_jwt = false
 [functions.linkedin-image-webhook]
 verify_jwt = false
 
+[functions.grace-interview-webhook]
+verify_jwt = false
+
 [functions.resume-pdf-webhook]
 verify_jwt = false
 
