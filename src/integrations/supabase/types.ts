@@ -14,6 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_interview_credits: {
+        Row: {
+          created_at: string
+          id: string
+          remaining_credits: number
+          total_credits: number
+          updated_at: string
+          used_credits: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          remaining_credits?: number
+          total_credits?: number
+          updated_at?: string
+          used_credits?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          remaining_credits?: number
+          total_credits?: number
+          updated_at?: string
+          used_credits?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_interview_credits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_interview_transactions: {
+        Row: {
+          created_at: string
+          credits_after: number
+          credits_amount: number
+          credits_before: number
+          description: string | null
+          id: string
+          payment_record_id: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits_after: number
+          credits_amount: number
+          credits_before: number
+          description?: string | null
+          id?: string
+          payment_record_id?: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credits_after?: number
+          credits_amount?: number
+          credits_before?: number
+          description?: string | null
+          id?: string
+          payment_record_id?: string | null
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_interview_transactions_payment_record_id_fkey"
+            columns: ["payment_record_id"]
+            isOneToOne: false
+            referencedRelation: "payment_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_interview_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blogs: {
         Row: {
           author_name: string | null
@@ -224,38 +313,83 @@ export type Database = {
       }
       grace_interview_requests: {
         Row: {
+          actionable_plan: Json | null
+          areas_for_improvement: Json | null
           company_name: string
+          completion_percentage: number | null
           created_at: string
+          detailed_feedback: Json | null
+          executive_summary: Json | null
+          feedback_message: string | null
+          feedback_next_action: string | null
+          feedback_suggestion: string | null
           id: string
+          interview_status: string | null
           job_description: string
           job_title: string
+          motivational_message: string | null
+          next_steps_priority: Json | null
+          overall_scores: Json | null
           phone_number: string
           processed_at: string | null
+          report_generated: boolean | null
           status: string
+          strengths: Json | null
+          time_spent: string | null
           updated_at: string
           user_id: string | null
         }
         Insert: {
+          actionable_plan?: Json | null
+          areas_for_improvement?: Json | null
           company_name: string
+          completion_percentage?: number | null
           created_at?: string
+          detailed_feedback?: Json | null
+          executive_summary?: Json | null
+          feedback_message?: string | null
+          feedback_next_action?: string | null
+          feedback_suggestion?: string | null
           id?: string
+          interview_status?: string | null
           job_description: string
           job_title: string
+          motivational_message?: string | null
+          next_steps_priority?: Json | null
+          overall_scores?: Json | null
           phone_number: string
           processed_at?: string | null
+          report_generated?: boolean | null
           status?: string
+          strengths?: Json | null
+          time_spent?: string | null
           updated_at?: string
           user_id?: string | null
         }
         Update: {
+          actionable_plan?: Json | null
+          areas_for_improvement?: Json | null
           company_name?: string
+          completion_percentage?: number | null
           created_at?: string
+          detailed_feedback?: Json | null
+          executive_summary?: Json | null
+          feedback_message?: string | null
+          feedback_next_action?: string | null
+          feedback_suggestion?: string | null
           id?: string
+          interview_status?: string | null
           job_description?: string
           job_title?: string
+          motivational_message?: string | null
+          next_steps_priority?: Json | null
+          overall_scores?: Json | null
           phone_number?: string
           processed_at?: string | null
+          report_generated?: boolean | null
           status?: string
+          strengths?: Json | null
+          time_spent?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -507,37 +641,61 @@ export type Database = {
       }
       job_tracker: {
         Row: {
+          ai_mock_interview_attempted: boolean
           company_name: string
+          company_researched: boolean
+          cover_letter_prepared: boolean
           created_at: string
           id: string
+          interview_call_received: boolean
+          interview_prep_guide_received: boolean
           job_description: string | null
+          job_role_analyzed: boolean
           job_title: string
           job_url: string | null
           order_position: number
+          ready_to_apply: boolean
+          resume_updated: boolean
           status: Database["public"]["Enums"]["job_status"]
           updated_at: string
           user_id: string
         }
         Insert: {
+          ai_mock_interview_attempted?: boolean
           company_name: string
+          company_researched?: boolean
+          cover_letter_prepared?: boolean
           created_at?: string
           id?: string
+          interview_call_received?: boolean
+          interview_prep_guide_received?: boolean
           job_description?: string | null
+          job_role_analyzed?: boolean
           job_title: string
           job_url?: string | null
           order_position?: number
+          ready_to_apply?: boolean
+          resume_updated?: boolean
           status?: Database["public"]["Enums"]["job_status"]
           updated_at?: string
           user_id: string
         }
         Update: {
+          ai_mock_interview_attempted?: boolean
           company_name?: string
+          company_researched?: boolean
+          cover_letter_prepared?: boolean
           created_at?: string
           id?: string
+          interview_call_received?: boolean
+          interview_prep_guide_received?: boolean
           job_description?: string | null
+          job_role_analyzed?: boolean
           job_title?: string
           job_url?: string | null
           order_position?: number
+          ready_to_apply?: boolean
+          resume_updated?: boolean
           status?: Database["public"]["Enums"]["job_status"]
           updated_at?: string
           user_id?: string
@@ -947,6 +1105,15 @@ export type Database = {
       }
     }
     Functions: {
+      add_ai_interview_credits: {
+        Args: {
+          p_user_id: string
+          p_amount: number
+          p_description?: string
+          p_payment_record_id?: string
+        }
+        Returns: boolean
+      }
       add_credits: {
         Args: {
           p_user_id: string
@@ -1113,6 +1280,10 @@ export type Database = {
         Args: { curlopt: string; value: string }
         Returns: boolean
       }
+      initialize_ai_interview_credits: {
+        Args: { p_user_id: string }
+        Returns: string
+      }
       initialize_user_credits: {
         Args: { p_user_id: string }
         Returns: string
@@ -1167,6 +1338,10 @@ export type Database = {
       urlencode: {
         Args: { data: Json } | { string: string } | { string: string }
         Returns: string
+      }
+      use_ai_interview_credit: {
+        Args: { p_user_id: string; p_description?: string }
+        Returns: boolean
       }
     }
     Enums: {

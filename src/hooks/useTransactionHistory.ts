@@ -59,6 +59,19 @@ export const useTransactionHistory = () => {
           throw creditError;
         }
 
+        // Get AI interview transactions
+        const { data: aiInterviewTransactions, error: aiError } = await supabase
+          .from('ai_interview_transactions')
+          .select('*')
+          .eq('user_id', userProfile.user_id)
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (aiError) {
+          console.error('[useTransactionHistory] Error fetching AI interview transactions:', aiError);
+          throw aiError;
+        }
+
         // Get ALL payment records (including failed ones) - removed processed filter
         const { data: paymentRecords, error: paymentError } = await supabase
           .from('payment_records')
@@ -111,6 +124,27 @@ export const useTransactionHistory = () => {
               transaction_type: transaction.transaction_type,
               balance_after: Number(transaction.balance_after),
               feature_used: transaction.feature_used,
+              created_at: transaction.created_at
+            });
+          });
+        }
+
+        // Add AI interview transactions
+        if (aiInterviewTransactions) {
+          aiInterviewTransactions.forEach(transaction => {
+            allTransactions.push({
+              id: transaction.id,
+              type: transaction.transaction_type,
+              amount: Number(transaction.credits_amount),
+              description: transaction.description || 'AI Interview Credit',
+              date: transaction.created_at,
+              balanceAfter: Number(transaction.credits_after),
+              featureUsed: 'AI Mock Interview',
+              source: 'credit_transaction',
+              // Include original fields for filtering
+              transaction_type: transaction.transaction_type,
+              balance_after: Number(transaction.credits_after),
+              feature_used: 'AI Mock Interview',
               created_at: transaction.created_at
             });
           });

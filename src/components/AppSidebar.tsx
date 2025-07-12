@@ -13,7 +13,7 @@ const profileItems = [{
   url: '/profile',
   icon: User
 }, {
-  title: 'Get More Credits',
+  title: 'Pricing Plans',
   url: '/get-more-credits',
   icon: CreditCard
 }, {

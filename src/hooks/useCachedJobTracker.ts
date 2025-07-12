@@ -11,6 +11,14 @@ interface JobEntry {
   job_url?: string;
   status: 'saved' | 'applied' | 'interview' | 'rejected' | 'offer';
   order_position: number;
+  resume_updated: boolean;
+  job_role_analyzed: boolean;
+  company_researched: boolean;
+  cover_letter_prepared: boolean;
+  ready_to_apply: boolean;
+  interview_call_received: boolean;
+  interview_prep_guide_received: boolean;
+  ai_mock_interview_attempted: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -112,7 +120,10 @@ export const useCachedJobTracker = () => {
         throw new Error('Unable to load job applications');
       }
 
-      const jobsData = data || [];
+      // Transform the data to match JobEntry interface
+      const jobsData = (data || []).map(job => ({
+        ...job
+      }));
       
       // Update state
       setJobs(jobsData);
