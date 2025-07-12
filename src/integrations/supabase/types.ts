@@ -641,43 +641,52 @@ export type Database = {
       }
       job_tracker: {
         Row: {
-          checklist_items: Json
-          checklist_progress: number
           company_name: string
+          company_researched: boolean
+          cover_letter_prepared: boolean
           created_at: string
           id: string
           job_description: string | null
+          job_role_analyzed: boolean
           job_title: string
           job_url: string | null
           order_position: number
+          ready_to_apply: boolean
+          resume_updated: boolean
           status: Database["public"]["Enums"]["job_status"]
           updated_at: string
           user_id: string
         }
         Insert: {
-          checklist_items?: Json
-          checklist_progress?: number
           company_name: string
+          company_researched?: boolean
+          cover_letter_prepared?: boolean
           created_at?: string
           id?: string
           job_description?: string | null
+          job_role_analyzed?: boolean
           job_title: string
           job_url?: string | null
           order_position?: number
+          ready_to_apply?: boolean
+          resume_updated?: boolean
           status?: Database["public"]["Enums"]["job_status"]
           updated_at?: string
           user_id: string
         }
         Update: {
-          checklist_items?: Json
-          checklist_progress?: number
           company_name?: string
+          company_researched?: boolean
+          cover_letter_prepared?: boolean
           created_at?: string
           id?: string
           job_description?: string | null
+          job_role_analyzed?: boolean
           job_title?: string
           job_url?: string | null
           order_position?: number
+          ready_to_apply?: boolean
+          resume_updated?: boolean
           status?: Database["public"]["Enums"]["job_status"]
           updated_at?: string
           user_id?: string

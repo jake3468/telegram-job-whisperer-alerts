@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useUserInitialization } from '@/hooks/useUserInitialization';
 import { useCachedJobTracker } from '@/hooks/useCachedJobTracker';
-import { Plus, ExternalLink, Trash2, X, Bookmark, Send, Users, XCircle, Trophy, GripVertical, RefreshCw, AlertCircle, CheckSquare, Square } from 'lucide-react';
+import { Plus, ExternalLink, Trash2, X, Bookmark, Send, Users, XCircle, Trophy, GripVertical, RefreshCw, AlertCircle } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, TouchSensor, MouseSensor, useSensor, useSensors, closestCenter, useDroppable } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+
 interface JobEntry {
   id: string;
   company_name: string;
@@ -24,16 +25,15 @@ interface JobEntry {
   job_url?: string;
   status: 'saved' | 'applied' | 'interview' | 'rejected' | 'offer';
   order_position: number;
-  checklist_progress: number;
-  checklist_items: ChecklistItem[];
+  resume_updated: boolean;
+  job_role_analyzed: boolean;
+  company_researched: boolean;
+  cover_letter_prepared: boolean;
+  ready_to_apply: boolean;
   created_at: string;
   updated_at: string;
 }
-interface ChecklistItem {
-  id: string;
-  label: string;
-  completed: boolean;
-}
+
 interface EditJobFormData {
   company_name: string;
   job_title: string;
@@ -56,7 +56,7 @@ const DroppableColumn = ({
   onAddJob: () => void;
   onDeleteJob: (id: string) => void;
   onViewJob: (job: JobEntry) => void;
-  onUpdateChecklist: (jobId: string, index: number) => void;
+  onUpdateChecklist: (jobId: string, field: string) => void;
   activeJobId?: string;
 }) => {
   const {
@@ -102,12 +102,28 @@ const SortableJobCard = ({
   job: JobEntry;
   onDelete: (id: string) => void;
   onView: (job: JobEntry) => void;
-  onUpdateChecklist: (jobId: string, index: number) => void;
+  onUpdateChecklist: (jobId: string, field: string) => void;
 }) => {
   const [isChecklistExpanded, setIsChecklistExpanded] = useState(false);
   const {
     toast
   } = useToast();
+  
+  // Calculate progress based on boolean fields
+  const getProgress = () => {
+    if (job.status !== 'saved') return 0;
+    
+    let completed = 0;
+    if (job.resume_updated) completed++;
+    if (job.job_role_analyzed) completed++;
+    if (job.company_researched) completed++;
+    if (job.cover_letter_prepared) completed++;
+    if (job.ready_to_apply) completed++;
+    return completed;
+  };
+
+  const progress = getProgress();
+  
   const {
     attributes,
     listeners,
@@ -117,7 +133,7 @@ const SortableJobCard = ({
     isDragging
   } = useSortable({
     id: job.id,
-    disabled: job.checklist_progress < 5
+    disabled: progress < 5
   });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -126,7 +142,7 @@ const SortableJobCard = ({
   };
 
   // Check if dragging is allowed (checklist must be complete)
-  const canDrag = job.checklist_progress >= 5;
+  const canDrag = progress >= 5;
 
   // Get progress color based on completion
   const getProgressColor = (progress: number) => {
@@ -135,27 +151,19 @@ const SortableJobCard = ({
     return 'bg-green-500';
   };
 
-  // Default checklist items if not provided (only for saved status)
-  const getDefaultChecklistItems = (status: string): ChecklistItem[] => {
-    if (status !== 'saved') {
-      return []; // Empty checklist for non-saved jobs
-    }
-    
-    return [
-      { id: '1', label: 'Resume updated', completed: false },
-      { id: '2', label: 'Job role analyzed', completed: false },
-      { id: '3', label: 'Company researched', completed: false },
-      { id: '4', label: 'Cover letter prepared', completed: false },
-      { id: '5', label: 'Ready to apply', completed: false }
-    ];
+  // Checklist items for saved jobs
+  const checklistItems = job.status === 'saved' ? [
+    { field: 'resume_updated', label: 'Resume updated', completed: job.resume_updated },
+    { field: 'job_role_analyzed', label: 'Job role analyzed', completed: job.job_role_analyzed },
+    { field: 'company_researched', label: 'Company researched', completed: job.company_researched },
+    { field: 'cover_letter_prepared', label: 'Cover letter prepared', completed: job.cover_letter_prepared },
+    { field: 'ready_to_apply', label: 'Ready to apply', completed: job.ready_to_apply }
+  ] : [];
+
+  const handleChecklistToggle = (field: string) => {
+    onUpdateChecklist(job.id, field);
   };
 
-  const checklistItems = job.checklist_items && job.checklist_items.length > 0 
-    ? job.checklist_items 
-    : getDefaultChecklistItems(job.status);
-  const handleChecklistToggle = (index: number) => {
-    onUpdateChecklist(job.id, index);
-  };
   const handleDragAttempt = () => {
     if (!canDrag) {
       toast({
@@ -165,12 +173,13 @@ const SortableJobCard = ({
       });
     }
   };
+
   return <div ref={setNodeRef} style={style} className="bg-white rounded border border-gray-300 shadow-sm hover:shadow-md transition-all py-1.5 px-2 mb-1">
       {/* Top section: Progress + Company + Actions */}
       <div className="flex items-center justify-between gap-2">
         {/* Left: Progress badge in circle */}
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 ${getProgressColor(job.checklist_progress)}`}>
-          {job.checklist_progress}/5
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 ${getProgressColor(progress)}`}>
+          {progress}/5
         </div>
         
         {/* Center: Company & Job Title */}
@@ -186,7 +195,7 @@ const SortableJobCard = ({
         {/* Right: Dropdown + Actions */}
         <div className="flex items-center gap-1 flex-shrink-0">
           {/* Only show dropdown arrow for saved jobs with checklist */}
-          {job.status === 'saved' && checklistItems.length > 0 && (
+          {job.status === 'saved' && (
             <Button variant="ghost" size="sm" onClick={() => setIsChecklistExpanded(!isChecklistExpanded)} className="text-xs px-1 py-1 h-6 text-gray-600 hover:text-gray-800">
               {isChecklistExpanded ? '▲' : '▼'}
             </Button>
@@ -208,14 +217,14 @@ const SortableJobCard = ({
       </div>
 
       {/* Expandable Checklist - only for saved jobs */}
-      {isChecklistExpanded && job.status === 'saved' && checklistItems.length > 0 && (
+      {isChecklistExpanded && job.status === 'saved' && (
         <div className="mt-2 pt-2 border-t border-gray-200">
           <div className="space-y-1.5">
-            {checklistItems.map((item, index) => (
-              <div key={item.id || index} className="flex items-center space-x-2">
+            {checklistItems.map((item) => (
+              <div key={item.field} className="flex items-center space-x-2">
                 <Checkbox
                   checked={item.completed}
-                  onCheckedChange={() => handleChecklistToggle(index)}
+                  onCheckedChange={() => handleChecklistToggle(item.field)}
                   className={`h-4 w-4 ${item.completed ? 'data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500' : ''}`}
                 />
                 <span className={`text-xs leading-tight ${item.completed ? "text-gray-500 line-through" : "text-gray-700"}`}>
@@ -228,6 +237,7 @@ const SortableJobCard = ({
       )}
     </div>;
 };
+
 const JobTracker = () => {
   const {
     user,
@@ -278,8 +288,7 @@ const JobTracker = () => {
   }), useSensor(TouchSensor, {
     activationConstraint: {
       delay: 150,
-      // Reduced delay for better mobile responsiveness
-      tolerance: 8 // Reduced tolerance for more accurate touch
+      tolerance: 8
     }
   }), useSensor(MouseSensor, {
     activationConstraint: {
@@ -369,6 +378,7 @@ const JobTracker = () => {
       window.location.reload();
     }
   }, [forceRefresh, connectionIssue, error]);
+
   const handleAddJob = async () => {
     if (!formData.company_name || !formData.job_title) {
       toast({
@@ -389,15 +399,6 @@ const JobTracker = () => {
     try {
       const maxOrder = Math.max(...jobs.filter(job => job.status === selectedStatus).map(job => job.order_position), -1);
 
-      // Default checklist items - only for saved jobs
-      const defaultChecklistItems: ChecklistItem[] = selectedStatus === 'saved' ? [
-        { id: '1', label: 'Resume updated', completed: false },
-        { id: '2', label: 'Job role analyzed', completed: false },
-        { id: '3', label: 'Company researched', completed: false },
-        { id: '4', label: 'Cover letter prepared', completed: false },
-        { id: '5', label: 'Ready to apply', completed: false }
-      ] : [];
-
       // Create optimistic update first
       const tempJob: JobEntry = {
         id: `temp-${Date.now()}`,
@@ -407,12 +408,16 @@ const JobTracker = () => {
         job_url: formData.job_url || undefined,
         status: selectedStatus,
         order_position: maxOrder + 1,
-        checklist_progress: 0,
-        checklist_items: defaultChecklistItems,
+        resume_updated: false,
+        job_role_analyzed: false,
+        company_researched: false,
+        cover_letter_prepared: false,
+        ready_to_apply: false,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
       optimisticAdd(tempJob);
+
       const {
         data,
         error
@@ -423,19 +428,13 @@ const JobTracker = () => {
         job_description: formData.job_description || null,
         job_url: formData.job_url || null,
         status: selectedStatus,
-        order_position: maxOrder + 1,
-        checklist_progress: 0,
-        checklist_items: JSON.stringify(defaultChecklistItems)
+        order_position: maxOrder + 1
       }).select().single();
       if (error) throw error;
 
       // Replace temp job with real job
       if (data) {
-        const transformedJob = {
-          ...data,
-          checklist_items: Array.isArray(data.checklist_items) ? data.checklist_items as unknown as ChecklistItem[] : JSON.parse(String(data.checklist_items) || '[]') as ChecklistItem[]
-        };
-        optimisticUpdate(transformedJob);
+        optimisticUpdate(data);
       }
 
       // Invalidate cache for fresh data on next load
@@ -462,6 +461,7 @@ const JobTracker = () => {
       });
     }
   };
+
   const handleUpdateJob = async () => {
     if (!selectedJob) return;
     if (!editFormData.company_name || !editFormData.job_title) {
@@ -498,6 +498,7 @@ const JobTracker = () => {
       });
     }
   };
+
   const deleteJob = async (jobId: string) => {
     // Optimistic delete first
     optimisticDelete(jobId);
@@ -524,6 +525,7 @@ const JobTracker = () => {
       });
     }
   };
+
   const handleDragStart = (event: DragStartEvent) => {
     const {
       active
@@ -531,6 +533,7 @@ const JobTracker = () => {
     const job = jobs.find(j => j.id === active.id);
     setActiveJob(job || null);
   };
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const {
       active,
@@ -541,8 +544,20 @@ const JobTracker = () => {
     const activeJobToMove = jobs.find(j => j.id === active.id);
     if (!activeJobToMove) return;
 
+    // Calculate progress for saved jobs
+    const getProgress = (job: JobEntry) => {
+      if (job.status !== 'saved') return 5; // Non-saved jobs can always be moved
+      let completed = 0;
+      if (job.resume_updated) completed++;
+      if (job.job_role_analyzed) completed++;
+      if (job.company_researched) completed++;
+      if (job.cover_letter_prepared) completed++;
+      if (job.ready_to_apply) completed++;
+      return completed;
+    };
+
     // Check if checklist is complete before allowing drag
-    if (activeJobToMove.checklist_progress !== 5) {
+    if (getProgress(activeJobToMove) !== 5) {
       toast({
         title: "Complete checklist first",
         description: "You must complete all checklist items (5/5) before moving this job to the next stage.",
@@ -592,9 +607,11 @@ const JobTracker = () => {
       }
     }
   };
+
   const getJobsByStatus = (status: string) => {
     return jobs.filter(job => job.status === status);
   };
+
   const handleViewJob = (job: JobEntry) => {
     setSelectedJob(job);
     setEditFormData({
@@ -607,35 +624,32 @@ const JobTracker = () => {
   };
 
   // Function to handle checklist updates for cards
-  const handleUpdateChecklistItem = async (jobId: string, index: number) => {
+  const handleUpdateChecklistItem = async (jobId: string, field: string) => {
     const targetJob = jobs.find(job => job.id === jobId);
-    if (!targetJob) return;
+    if (!targetJob || targetJob.status !== 'saved') return;
 
-    // Update the checklist items
-    const updatedChecklistItems = targetJob.checklist_items.map((item, i) => i === index ? {
-      ...item,
-      completed: !item.completed
-    } : item);
-
-    // Calculate new progress
-    const newProgress = updatedChecklistItems.filter(item => item.completed).length;
     try {
       // Update in database
+      const currentValue = targetJob[field as keyof JobEntry] as boolean;
       const {
         error
       } = await supabase.from('job_tracker').update({
-        checklist_items: JSON.stringify(updatedChecklistItems),
-        checklist_progress: newProgress
+        [field]: !currentValue
       }).eq('id', jobId);
       if (error) throw error;
 
       // Update local state
       const updatedJob = {
         ...targetJob,
-        checklist_items: updatedChecklistItems,
-        checklist_progress: newProgress
+        [field]: !currentValue
       };
       optimisticUpdate(updatedJob);
+      
+      // Also update selectedJob if it's the same job
+      if (selectedJob && selectedJob.id === jobId) {
+        setSelectedJob(updatedJob);
+      }
+      
       toast({
         title: "Success",
         description: "Checklist updated successfully!"
@@ -649,48 +663,7 @@ const JobTracker = () => {
       });
     }
   };
-  const updateChecklistItem = async (itemId: string, completed: boolean) => {
-    if (!selectedJob) return;
 
-    // Update the checklist items
-    const updatedChecklistItems = selectedJob.checklist_items.map(item => item.id === itemId ? {
-      ...item,
-      completed
-    } : item);
-
-    // Calculate new progress
-    const newProgress = updatedChecklistItems.filter(item => item.completed).length;
-    try {
-      // Update in database
-      const {
-        error
-      } = await supabase.from('job_tracker').update({
-        checklist_items: JSON.stringify(updatedChecklistItems),
-        checklist_progress: newProgress
-      }).eq('id', selectedJob.id);
-      if (error) throw error;
-
-      // Update local state
-      const updatedJob = {
-        ...selectedJob,
-        checklist_items: updatedChecklistItems,
-        checklist_progress: newProgress
-      };
-      setSelectedJob(updatedJob);
-      optimisticUpdate(updatedJob);
-      toast({
-        title: "Success",
-        description: "Checklist updated successfully!"
-      });
-    } catch (error) {
-      console.error('Error updating checklist:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update checklist.",
-        variant: "destructive"
-      });
-    }
-  };
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-gradient-to-br from-black via-gray-950 to-fuchsia-950 flex items-center justify-center">
         <div className="text-white text-xs">Loading...</div>
@@ -831,14 +804,20 @@ const JobTracker = () => {
                   <div className="flex items-center justify-between mb-4">
                     <Label className="text-gray-700 font-orbitron text-sm font-medium">Application Checklist</Label>
                     <div className="text-xs text-gray-600 font-medium">
-                      {selectedJob.checklist_progress}/5 completed
+                      {[selectedJob.resume_updated, selectedJob.job_role_analyzed, selectedJob.company_researched, selectedJob.cover_letter_prepared, selectedJob.ready_to_apply].filter(Boolean).length}/5 completed
                     </div>
                   </div>
                   <div className="space-y-3">
-                    {selectedJob.checklist_items.map((item, index) => <div key={item.id} className="flex items-center space-x-3">
+                    {[
+                      { field: 'resume_updated', label: 'Resume updated', completed: selectedJob.resume_updated },
+                      { field: 'job_role_analyzed', label: 'Job role analyzed', completed: selectedJob.job_role_analyzed },
+                      { field: 'company_researched', label: 'Company researched', completed: selectedJob.company_researched },
+                      { field: 'cover_letter_prepared', label: 'Cover letter prepared', completed: selectedJob.cover_letter_prepared },
+                      { field: 'ready_to_apply', label: 'Ready to apply', completed: selectedJob.ready_to_apply }
+                    ].map((item) => <div key={item.field} className="flex items-center space-x-3">
                         <Checkbox
                           checked={item.completed}
-                          onCheckedChange={() => handleUpdateChecklistItem(selectedJob.id, index)}
+                          onCheckedChange={() => handleUpdateChecklistItem(selectedJob.id, item.field)}
                           className={`h-4 w-4 ${item.completed ? 'data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500' : ''}`}
                         />
                         <span className={`text-sm ${item.completed ? 'text-gray-500 line-through' : 'text-gray-700'}`}>
