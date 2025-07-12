@@ -119,18 +119,24 @@ const UsageHistoryModal = () => {
           </div> : error ? <div className="text-center py-8 text-red-300">
             Error loading transaction history
           </div> : <Tabs defaultValue="credits" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-slate-800/50 gap-1">
-              <TabsTrigger value="credits" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-blue-100 text-xs px-2">
-                <Coins className="w-3 h-3 mr-1" />
-                Credits ({creditTransactions.filter(tx => tx.featureUsed !== 'AI Mock Interview').length})
+            <TabsList className="grid w-full grid-cols-3 bg-slate-800/50 gap-1 p-1 h-auto min-h-[48px]">
+              <TabsTrigger value="credits" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-blue-100 text-xs px-1 py-2 flex-col gap-1 whitespace-nowrap overflow-hidden">
+                <Coins className="w-3 h-3 flex-shrink-0" />
+                <span className="truncate text-center">
+                  Credits ({creditTransactions.filter(tx => tx.featureUsed !== 'AI Mock Interview').length})
+                </span>
               </TabsTrigger>
-              <TabsTrigger value="ai-interviews" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-blue-100 text-xs px-2">
-                <History className="w-3 h-3 mr-1" />
-                AI Interviews ({creditTransactions.filter(tx => tx.featureUsed === 'AI Mock Interview').length})
+              <TabsTrigger value="ai-interviews" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-blue-100 text-xs px-1 py-2 flex-col gap-1 whitespace-nowrap overflow-hidden">
+                <History className="w-3 h-3 flex-shrink-0" />
+                <span className="truncate text-center">
+                  AI Interviews ({creditTransactions.filter(tx => tx.featureUsed === 'AI Mock Interview').length})
+                </span>
               </TabsTrigger>
-              <TabsTrigger value="payments" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-blue-100 text-xs px-2">
-                <CreditCard className="w-3 h-3 mr-1" />
-                Payments ({paymentRecords.length})
+              <TabsTrigger value="payments" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-blue-100 text-xs px-1 py-2 flex-col gap-1 whitespace-nowrap overflow-hidden">
+                <CreditCard className="w-3 h-3 flex-shrink-0" />
+                <span className="truncate text-center">
+                  Payments ({paymentRecords.length})
+                </span>
               </TabsTrigger>
             </TabsList>
             
@@ -163,34 +169,42 @@ const UsageHistoryModal = () => {
 
                   {/* Desktop/Tablet View */}
                   <div className="hidden md:block overflow-x-auto">
-                    <Table className="w-full min-w-[600px]">
+                    <Table className="w-full table-fixed">
                       <TableHeader>
                         <TableRow className="border-blue-400/30 hover:bg-white/5">
-                          <TableHead className="text-blue-200 font-orbitron w-[160px]">Date</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron w-[120px]">Type</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron w-[200px]">Description</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron text-right w-[80px]">Amount</TableHead>
-                          <TableHead className="text-blue-200 font-orbitron text-right w-[80px]">Balance</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron" style={{width: '180px'}}>Date</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron" style={{width: '120px'}}>Type</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron" style={{width: '250px'}}>Description</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron text-right" style={{width: '80px'}}>Amount</TableHead>
+                          <TableHead className="text-blue-200 font-orbitron text-right" style={{width: '90px'}}>Balance</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {creditTransactions.map(transaction => <TableRow key={transaction.id} className="border-blue-400/20 hover:bg-white/5">
-                            <TableCell className="text-blue-100 text-sm w-[160px]">
-                              {formatDate(transaction.date)}
+                            <TableCell className="text-blue-100 text-sm" style={{width: '180px'}}>
+                              <div className="truncate">
+                                {formatDate(transaction.date)}
+                              </div>
                             </TableCell>
-                            <TableCell className="text-blue-100 text-sm font-medium w-[120px]">
-                              {getTransactionTypeDisplay(transaction.type, transaction.description)}
+                            <TableCell className="text-blue-100 text-sm font-medium" style={{width: '120px'}}>
+                              <div className="truncate">
+                                {getTransactionTypeDisplay(transaction.type, transaction.description)}
+                              </div>
                             </TableCell>
-                            <TableCell className="text-blue-100 text-xs w-[200px]">
+                            <TableCell className="text-blue-100 text-xs" style={{width: '250px'}}>
                               <div className="truncate" title={transaction.description || (transaction.featureUsed ? `Used for ${transaction.featureUsed}` : '-')}>
                                 {transaction.description || (transaction.featureUsed ? `Used for ${transaction.featureUsed}` : '-')}
                               </div>
                             </TableCell>
-                            <TableCell className={`text-right font-mono text-sm font-bold w-[80px] ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                              {formatAmount(transaction.amount)}
+                            <TableCell className={`text-right font-mono text-sm font-bold ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`} style={{width: '80px'}}>
+                              <div className="truncate">
+                                {formatAmount(transaction.amount)}
+                              </div>
                             </TableCell>
-                            <TableCell className="text-blue-100 text-right font-mono text-sm w-[80px]">
-                              {transaction.balanceAfter?.toFixed(1) || '-'}
+                            <TableCell className="text-blue-100 text-right font-mono text-sm" style={{width: '90px'}}>
+                              <div className="truncate">
+                                {transaction.balanceAfter?.toFixed(1) || '-'}
+                              </div>
                             </TableCell>
                           </TableRow>)}
                       </TableBody>
