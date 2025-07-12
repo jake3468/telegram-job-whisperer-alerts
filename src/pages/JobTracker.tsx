@@ -138,24 +138,24 @@ const SortableJobCard = ({
       }`}
     >
       {/* Progress Pill - Top Right Corner */}
-      <div className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-bold ${getProgressColor(job.checklist_progress)}`}>
+      <div className={`absolute top-2 right-2 px-1.5 py-0.5 rounded-full text-xs font-bold ${getProgressColor(job.checklist_progress)}`}>
         {job.checklist_progress}/5
       </div>
 
       {/* Main Card Content */}
-      <div className="p-4 pr-16">
+      <div className="p-3 pr-12">
         {/* Company Name - Priority 1 */}
-        <h3 className="font-bold text-lg text-gray-900 mb-1" title={job.company_name}>
+        <h3 className="font-bold text-sm text-gray-900 mb-0.5 leading-tight" title={job.company_name}>
           {job.company_name}
         </h3>
         
         {/* Job Title - Priority 2 */}
-        <h4 className="font-medium text-base text-gray-700 mb-3" title={job.job_title}>
+        <h4 className="font-medium text-xs text-gray-700 mb-2 leading-tight" title={job.job_title}>
           {job.job_title}
         </h4>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-1 mb-2">
           <Button 
             size="sm" 
             variant="outline" 
@@ -163,7 +163,7 @@ const SortableJobCard = ({
               e.stopPropagation();
               onView(job);
             }} 
-            className="text-xs border-gray-300 text-gray-700 hover:text-gray-900 hover:border-gray-400"
+            className="text-xs px-2 py-1 h-6 border-gray-300 text-gray-700 hover:text-gray-900 hover:border-gray-400"
           >
             View
           </Button>
@@ -175,16 +175,16 @@ const SortableJobCard = ({
               e.stopPropagation();
               setIsChecklistExpanded(!isChecklistExpanded);
             }} 
-            className="text-xs text-gray-600 hover:text-gray-800"
+            className="text-xs px-2 py-1 h-6 text-gray-600 hover:text-gray-800"
           >
-            {isChecklistExpanded ? 'Hide' : 'Checklist'}
+            {isChecklistExpanded ? 'Hide' : 'Tasks'}
           </Button>
 
           {job.job_url && (
             <Button 
               size="sm" 
               variant="ghost" 
-              className="h-7 w-7 p-0 text-blue-600 hover:text-blue-800" 
+              className="h-6 w-6 p-0 text-blue-600 hover:text-blue-800" 
               onClick={(e) => {
                 e.stopPropagation();
                 window.open(job.job_url, '_blank');
@@ -197,15 +197,15 @@ const SortableJobCard = ({
 
         {/* Expanded Checklist */}
         {isChecklistExpanded && (
-          <div className="mt-3 p-3 bg-gray-50 rounded-md border">
+          <div className="mt-2 p-2 bg-gray-50 rounded-md border">
             <div className="mb-2">
               <div className="flex justify-between items-center mb-1">
                 <span className="text-xs font-medium text-gray-600">Progress</span>
                 <span className="text-xs font-medium text-gray-600">{job.checklist_progress}/5</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-gray-200 rounded-full h-1.5">
                 <div 
-                  className={`h-2 rounded-full transition-all ${
+                  className={`h-1.5 rounded-full transition-all ${
                     job.checklist_progress <= 1 ? 'bg-red-500' :
                     job.checklist_progress <= 3 ? 'bg-orange-500' : 'bg-green-500'
                   }`}
@@ -213,15 +213,15 @@ const SortableJobCard = ({
                 ></div>
               </div>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1">
               {job.checklist_items.map((item) => (
                 <div key={item.id} className="flex items-center gap-2">
                   {item.completed ? (
-                    <CheckSquare className="h-4 w-4 text-green-500" />
+                    <CheckSquare className="h-3 w-3 text-green-500 flex-shrink-0" />
                   ) : (
-                    <Square className="h-4 w-4 text-gray-400" />
+                    <Square className="h-3 w-3 text-gray-400 flex-shrink-0" />
                   )}
-                  <span className={`text-sm ${item.completed ? 'text-gray-700 line-through' : 'text-gray-600'}`}>
+                  <span className={`text-xs leading-tight ${item.completed ? 'text-gray-700 line-through' : 'text-gray-600'}`}>
                     {item.label}
                   </span>
                 </div>
@@ -232,23 +232,23 @@ const SortableJobCard = ({
       </div>
 
       {/* Drag Handle - Bottom Right */}
-      <div className="absolute bottom-3 right-3">
+      <div className="absolute bottom-2 right-2">
         {isDragAllowed ? (
           <div 
             {...listeners} 
-            className="p-2 rounded cursor-grab active:cursor-grabbing hover:bg-gray-100 transition-colors touch-manipulation select-none" 
+            className="p-1 rounded cursor-grab active:cursor-grabbing hover:bg-gray-100 transition-colors touch-manipulation select-none" 
             title="Drag to move between columns"
             style={{ touchAction: 'none' }}
             onTouchStart={(e) => e.preventDefault()}
           >
-            <GripVertical className="h-4 w-4 text-gray-600 hover:text-gray-800" />
+            <GripVertical className="h-3 w-3 text-gray-600 hover:text-gray-800" />
           </div>
         ) : (
           <div 
-            className="p-2 rounded cursor-not-allowed opacity-50" 
+            className="p-1 rounded cursor-not-allowed opacity-50" 
             title="Complete checklist to proceed"
           >
-            <GripVertical className="h-4 w-4 text-gray-400" />
+            <GripVertical className="h-3 w-3 text-gray-400" />
           </div>
         )}
       </div>
@@ -415,11 +415,11 @@ const JobTracker = () => {
       
       // Default checklist items
       const defaultChecklistItems: ChecklistItem[] = [
-        { id: '1', label: 'Research company background', completed: false },
-        { id: '2', label: 'Tailor resume for this role', completed: false },
-        { id: '3', label: 'Prepare cover letter', completed: false },
-        { id: '4', label: 'Practice interview questions', completed: false },
-        { id: '5', label: 'Follow up on application', completed: false }
+        { id: '1', label: '✅ Resume updated for this job', completed: false },
+        { id: '2', label: '✅ Job role analyzed', completed: false },
+        { id: '3', label: '✅ Company researched', completed: false },
+        { id: '4', label: '✅ Cover letter prepared', completed: false },
+        { id: '5', label: '✅ Ready to apply (unlocks drag)', completed: false }
       ];
 
       // Create optimistic update first
