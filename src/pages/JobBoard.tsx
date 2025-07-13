@@ -56,31 +56,31 @@ const JobBoard = () => {
       <div className="min-h-screen p-6">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-white mb-4 font-orbitron">
+          <div className="text-center mb-4 sm:mb-6">
+            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2 sm:mb-4 font-orbitron">
               Job Board
             </h1>
-            <p className="text-gray-300 text-lg">
+            <p className="text-gray-300 text-sm sm:text-lg">
               Discover opportunities tailored to your profile
             </p>
           </div>
 
           {/* Search and Filters */}
-          <div className="bg-black/40 backdrop-blur-sm rounded-xl border border-purple-500/20 p-4 mb-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-black/40 backdrop-blur-sm rounded-xl border border-purple-500/20 p-3 sm:p-4 mb-4 sm:mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input placeholder="Search jobs or companies..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10 bg-gray-800/50 border-gray-700 text-white" />
+                <Input placeholder="Search jobs..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10 bg-gray-800/50 border-gray-700 text-white h-9 sm:h-10 text-sm" />
               </div>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input placeholder="Location..." value={locationFilter} onChange={e => setLocationFilter(e.target.value)} className="pl-10 bg-gray-800/50 border-gray-700 text-white" />
+                <Input placeholder="Location..." value={locationFilter} onChange={e => setLocationFilter(e.target.value)} className="pl-10 bg-gray-800/50 border-gray-700 text-white h-9 sm:h-10 text-sm" />
               </div>
               <div className="relative">
                 <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input placeholder="Job type..." value={jobTypeFilter} onChange={e => setJobTypeFilter(e.target.value)} className="pl-10 bg-gray-800/50 border-gray-700 text-white" />
+                <Input placeholder="Job type..." value={jobTypeFilter} onChange={e => setJobTypeFilter(e.target.value)} className="pl-10 bg-gray-800/50 border-gray-700 text-white h-9 sm:h-10 text-sm" />
               </div>
-              <Button variant="outline" className="border-purple-500/50 text-black bg-slate-50">
+              <Button variant="outline" className="border-purple-500/50 text-black bg-slate-50 h-9 sm:h-10 text-sm">
                 Apply Filters
               </Button>
             </div>
@@ -95,27 +95,59 @@ const JobBoard = () => {
 
           {/* Jobs List */}
           <div className="space-y-3">
-            {filteredJobs.map(job => <div key={job.id} className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer p-3" onClick={() => setSelectedJob(job)}>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                  {/* Top row - Company info and logo */}
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    {job.thumbnail ? <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-8 h-8 rounded-lg object-cover flex-shrink-0" /> : <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Building2 className="h-4 w-4 text-gray-600" />
-                      </div>}
+            {filteredJobs.map(job => <div key={job.id} className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer overflow-hidden" onClick={() => setSelectedJob(job)}>
+                <div className="p-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                    {/* Company info and logo */}
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      {job.thumbnail ? <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-8 h-8 rounded-lg object-cover flex-shrink-0" /> : <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Building2 className="h-4 w-4 text-gray-600" />
+                        </div>}
+                      
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-bold text-gray-900 truncate">{job.title}</h3>
+                        <p className="text-xs text-gray-700 font-medium truncate">{job.company_name}</p>
+                        
+                        {/* Desktop: Location and job type inline */}
+                        <div className="hidden sm:flex items-center gap-2 mt-1 text-xs text-gray-600">
+                          <div className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3 flex-shrink-0" />
+                            <span className="truncate">{job.location || 'Remote'}</span>
+                          </div>
+                          {job.job_type && (
+                            <>
+                              <span>•</span>
+                              <span className="truncate">{job.job_type}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Desktop: Salary */}
+                      <div className="hidden sm:block text-green-600 font-semibold text-sm whitespace-nowrap">
+                        {formatSalary(job.salary)}
+                      </div>
+                    </div>
                     
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-bold text-gray-900 truncate">{job.title}</h3>
-                      <p className="text-xs text-gray-700 font-medium truncate">{job.company_name}</p>
+                    {/* Actions */}
+                    <div className="flex items-center gap-1 flex-shrink-0 sm:ml-4">
+                      <Button onClick={e => {
+                        e.stopPropagation();
+                        setSelectedJob(job);
+                      }} variant="outline" size="sm" className="border-gray-300 text-gray-900 hover:bg-gray-50 text-xs px-2 py-1 h-6">
+                        View
+                      </Button>
+                      <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-6 whitespace-nowrap">
+                        Save
+                      </Button>
                     </div>
                   </div>
                   
-                  {/* Bottom row - Job details and actions */}
-                  <div className="flex items-center justify-between gap-2 w-full sm:w-auto sm:flex-shrink-0">
-                    <div className="flex items-center gap-1 text-xs text-gray-600 min-w-0 flex-1 sm:flex-initial">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3 flex-shrink-0" />
-                        <span className="truncate">{job.location || 'Remote'}</span>
-                      </div>
+                  {/* Mobile: Location, job type and salary */}
+                  <div className="sm:hidden mt-2 space-y-1">
+                    <div className="flex items-center gap-1 text-xs text-gray-600">
+                      <MapPin className="h-3 w-3 flex-shrink-0" />
+                      <span className="truncate">{job.location || 'Remote'}</span>
                       {job.job_type && (
                         <>
                           <span className="mx-1">•</span>
@@ -123,23 +155,9 @@ const JobBoard = () => {
                         </>
                       )}
                     </div>
-                    
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <Button onClick={e => {
-                        e.stopPropagation();
-                        setSelectedJob(job);
-                      }} variant="outline" size="sm" className="border-gray-300 text-gray-900 hover:bg-gray-50 text-xs px-2 py-1 h-6">
-                        View
-                      </Button>
-                      <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-6">
-                        Save
-                      </Button>
+                    <div className="text-green-600 font-semibold text-xs">
+                      {formatSalary(job.salary)}
                     </div>
-                  </div>
-                  
-                  {/* Salary row */}
-                  <div className="text-green-600 font-semibold text-xs truncate sm:hidden">
-                    {formatSalary(job.salary)}
                   </div>
                 </div>
               </div>)}
