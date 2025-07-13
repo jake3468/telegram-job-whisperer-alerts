@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, MapPin, Building2, ExternalLink, X } from 'lucide-react';
+import { Search, MapPin, Building2, ExternalLink, X, RefreshCw } from 'lucide-react';
 import { useJobBoardData } from '@/hooks/useJobBoardData';
 import { Tables } from '@/integrations/supabase/types';
 
@@ -135,7 +135,8 @@ const JobBoard = () => {
     savedToTrackerJobs,
     loading,
     error,
-    saveToTracker
+    saveToTracker,
+    forceRefresh
   } = useJobBoardData();
   
   const [searchTerm, setSearchTerm] = useState('');
@@ -177,10 +178,21 @@ const JobBoard = () => {
   if (error) {
     return (
       <Layout>
-        <div className="p-6">
-          <div className="max-w-6xl mx-auto">
+        <div className="p-3 sm:p-6 w-full overflow-hidden">
+          <div className="max-w-6xl mx-auto w-full overflow-hidden">
             <div className="text-center py-12">
-              <p className="text-red-400">Error loading jobs: {error.message}</p>
+              <div className="mb-4">
+                <RefreshCw className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-300 text-lg mb-2">Unable to load job opportunities</p>
+                <p className="text-gray-400 text-sm mb-6">Please try refreshing to see the latest jobs</p>
+              </div>
+              <Button 
+                onClick={forceRefresh}
+                className="bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2 mx-auto"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Refresh Jobs
+              </Button>
             </div>
           </div>
         </div>
