@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Layout } from '@/components/Layout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -24,11 +24,11 @@ const JobCard = ({ job, onView, onSaveToTracker, showSaved = false }: JobCardPro
   };
 
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer overflow-hidden" onClick={onView}>
-      <div className="p-3">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+    <div className="w-full max-w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer overflow-hidden" onClick={onView}>
+      <div className="p-3 max-w-full">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 max-w-full">
           {/* Company info and logo */}
-          <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-1 min-w-0 max-w-full">
             {job.thumbnail ? (
               <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
             ) : (
@@ -141,17 +141,18 @@ const JobBoard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJob, setSelectedJob] = useState<JobBoardItem | null>(null);
 
-  const filterJobsBySearch = (jobs: JobBoardItem[]) => {
-    if (!searchTerm) return jobs;
+  const filterJobsBySearch = useCallback((jobs: JobBoardItem[]) => {
+    if (!searchTerm.trim()) return jobs;
+    const searchLower = searchTerm.toLowerCase().trim();
     return jobs.filter(job => 
-      job.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      job.company_name.toLowerCase().includes(searchTerm.toLowerCase())
+      job.title.toLowerCase().includes(searchLower) || 
+      job.company_name.toLowerCase().includes(searchLower)
     );
-  };
+  }, [searchTerm]);
 
-  const filteredPostedTodayJobs = filterJobsBySearch(postedTodayJobs);
-  const filteredLast7DaysJobs = filterJobsBySearch(last7DaysJobs);
-  const filteredSavedToTrackerJobs = filterJobsBySearch(savedToTrackerJobs);
+  const filteredPostedTodayJobs = useMemo(() => filterJobsBySearch(postedTodayJobs), [filterJobsBySearch, postedTodayJobs]);
+  const filteredLast7DaysJobs = useMemo(() => filterJobsBySearch(last7DaysJobs), [filterJobsBySearch, last7DaysJobs]);
+  const filteredSavedToTrackerJobs = useMemo(() => filterJobsBySearch(savedToTrackerJobs), [filterJobsBySearch, savedToTrackerJobs]);
 
   const formatSalary = (salary: string | null) => {
     if (!salary) return 'Salary not disclosed';
@@ -189,8 +190,8 @@ const JobBoard = () => {
 
   return (
     <Layout>
-      <div className="p-6">
-        <div className="max-w-6xl mx-auto">
+      <div className="p-3 sm:p-6 max-w-full">
+        <div className="max-w-6xl mx-auto w-full">
           {/* Header */}
           <div className="text-center mb-4 sm:mb-6">
             <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2 sm:mb-4 font-orbitron">
@@ -201,77 +202,110 @@ const JobBoard = () => {
             </p>
           </div>
 
-          {/* Search */}
-          <div className="bg-black/40 backdrop-blur-sm rounded-xl border border-purple-500/20 p-3 sm:p-4 mb-4 sm:mb-6">
-            <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input 
-                placeholder="Search jobs..." 
-                value={searchTerm} 
-                onChange={e => setSearchTerm(e.target.value)} 
-                className="pl-10 bg-gray-800/50 border-gray-700 text-white h-9 sm:h-10 text-sm" 
-              />
-            </div>
-          </div>
-
           {/* Job Sections */}
-          <Tabs defaultValue="posted-today" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="posted-today">Posted Today ({filteredPostedTodayJobs.length})</TabsTrigger>
-              <TabsTrigger value="last-7-days">Last 7 Days ({filteredLast7DaysJobs.length})</TabsTrigger>
-              <TabsTrigger value="saved-to-tracker">Jobs Saved to Tracker ({filteredSavedToTrackerJobs.length})</TabsTrigger>
+          <Tabs defaultValue="posted-today" className="w-full max-w-full">
+            <TabsList className="grid w-full grid-cols-3 mb-4 max-w-full overflow-hidden">
+              <TabsTrigger 
+                value="posted-today" 
+                className="text-xs sm:text-sm px-1 sm:px-3 py-2 truncate data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              >
+                <span className="hidden sm:inline">Posted Today</span>
+                <span className="sm:hidden">Today</span>
+                <span className="ml-1">({filteredPostedTodayJobs.length})</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="last-7-days" 
+                className="text-xs sm:text-sm px-1 sm:px-3 py-2 truncate data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              >
+                <span className="hidden sm:inline">Last 7 Days</span>
+                <span className="sm:hidden">Week</span>
+                <span className="ml-1">({filteredLast7DaysJobs.length})</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="saved-to-tracker" 
+                className="text-xs sm:text-sm px-1 sm:px-3 py-2 truncate data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              >
+                <span className="hidden sm:inline">Saved</span>
+                <span className="sm:hidden">Saved</span>
+                <span className="ml-1">({filteredSavedToTrackerJobs.length})</span>
+              </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="posted-today" className="space-y-3 mt-4">
+            {/* Search */}
+            <div className="bg-black/40 backdrop-blur-sm rounded-xl border border-purple-500/20 p-3 sm:p-4 mb-4 sm:mb-6 max-w-full">
+              <div className="relative w-full max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input 
+                  placeholder="Search by job title or company name..." 
+                  value={searchTerm} 
+                  onChange={e => setSearchTerm(e.target.value)} 
+                  className="pl-10 bg-gray-800/50 border-gray-700 text-white h-9 sm:h-10 text-sm w-full" 
+                />
+              </div>
+            </div>
+
+            <TabsContent value="posted-today" className="space-y-3 mt-4 w-full max-w-full">
               {filteredPostedTodayJobs.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-gray-400 text-lg">No jobs posted today.</p>
+                  <p className="text-gray-400 text-lg">
+                    {searchTerm ? `No jobs matching "${searchTerm}" found in posted today.` : "No jobs posted today."}
+                  </p>
                 </div>
               ) : (
-                filteredPostedTodayJobs.map(job => (
-                  <JobCard 
-                    key={job.id} 
-                    job={job} 
-                    onView={() => setSelectedJob(job)} 
-                    onSaveToTracker={() => saveToTracker(job)} 
-                  />
-                ))
+                <div className="space-y-3 w-full">
+                  {filteredPostedTodayJobs.map(job => (
+                    <JobCard 
+                      key={job.id} 
+                      job={job} 
+                      onView={() => setSelectedJob(job)} 
+                      onSaveToTracker={() => saveToTracker(job)} 
+                    />
+                  ))}
+                </div>
               )}
             </TabsContent>
 
-            <TabsContent value="last-7-days" className="space-y-3 mt-4">
+            <TabsContent value="last-7-days" className="space-y-3 mt-4 w-full max-w-full">
               {filteredLast7DaysJobs.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-gray-400 text-lg">No jobs from the last 7 days.</p>
+                  <p className="text-gray-400 text-lg">
+                    {searchTerm ? `No jobs matching "${searchTerm}" found in last 7 days.` : "No jobs from the last 7 days."}
+                  </p>
                 </div>
               ) : (
-                filteredLast7DaysJobs.map(job => (
-                  <JobCard 
-                    key={job.id} 
-                    job={job} 
-                    onView={() => setSelectedJob(job)} 
-                    onSaveToTracker={() => saveToTracker(job)} 
-                  />
-                ))
+                <div className="space-y-3 w-full">
+                  {filteredLast7DaysJobs.map(job => (
+                    <JobCard 
+                      key={job.id} 
+                      job={job} 
+                      onView={() => setSelectedJob(job)} 
+                      onSaveToTracker={() => saveToTracker(job)} 
+                    />
+                  ))}
+                </div>
               )}
             </TabsContent>
 
-            <TabsContent value="saved-to-tracker" className="space-y-3 mt-4">
+            <TabsContent value="saved-to-tracker" className="space-y-3 mt-4 w-full max-w-full">
               {filteredSavedToTrackerJobs.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-gray-400 text-lg">No jobs saved to tracker yet.</p>
-                  <p className="text-gray-500 mt-2">Save jobs from other sections to see them here.</p>
+                  <p className="text-gray-400 text-lg">
+                    {searchTerm ? `No saved jobs matching "${searchTerm}" found.` : "No jobs saved to tracker yet."}
+                  </p>
+                  {!searchTerm && <p className="text-gray-500 mt-2">Save jobs from other sections to see them here.</p>}
                 </div>
               ) : (
-                filteredSavedToTrackerJobs.map(job => (
-                  <JobCard 
-                    key={job.id} 
-                    job={job} 
-                    onView={() => setSelectedJob(job)} 
-                    onSaveToTracker={() => saveToTracker(job)} 
-                    showSaved 
-                  />
-                ))
+                <div className="space-y-3 w-full">
+                  {filteredSavedToTrackerJobs.map(job => (
+                    <JobCard 
+                      key={job.id} 
+                      job={job} 
+                      onView={() => setSelectedJob(job)} 
+                      onSaveToTracker={() => saveToTracker(job)} 
+                      showSaved 
+                    />
+                  ))}
+                </div>
               )}
             </TabsContent>
           </Tabs>
