@@ -552,6 +552,7 @@ export type Database = {
           location: string | null
           posted_at: string | null
           salary: string | null
+          section: string | null
           thumbnail: string | null
           title: string
           updated_at: string
@@ -573,6 +574,7 @@ export type Database = {
           location?: string | null
           posted_at?: string | null
           salary?: string | null
+          section?: string | null
           thumbnail?: string | null
           title: string
           updated_at?: string
@@ -594,6 +596,7 @@ export type Database = {
           location?: string | null
           posted_at?: string | null
           salary?: string | null
+          section?: string | null
           thumbnail?: string | null
           title?: string
           updated_at?: string
@@ -1193,6 +1196,10 @@ export type Database = {
       bytea_to_text: {
         Args: { data: string }
         Returns: string
+      }
+      categorize_and_cleanup_jobs: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       check_and_insert_cover_letter_execution: {
         Args: {
