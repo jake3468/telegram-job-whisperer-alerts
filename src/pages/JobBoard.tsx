@@ -95,17 +95,12 @@ const JobBoard = () => {
 
           {/* Jobs List */}
           <div className="space-y-3">
-            {filteredJobs.map(job => 
-              <div key={job.id} className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer p-4" onClick={() => setSelectedJob(job)}>
+            {filteredJobs.map(job => <div key={job.id} className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer p-4" onClick={() => setSelectedJob(job)}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3 flex-1">
-                    {job.thumbnail ? (
-                      <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
-                    ) : (
-                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    {job.thumbnail ? <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" /> : <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
                         <Building2 className="h-5 w-5 text-gray-600" />
-                      </div>
-                    )}
+                      </div>}
                     
                     <div className="flex-1 min-w-0">
                       <h3 className="text-base font-bold text-gray-900 truncate">{job.title}</h3>
@@ -116,23 +111,17 @@ const JobBoard = () => {
                           <MapPin className="h-3 w-3" />
                           <span>{job.location || 'Location not specified'}</span>
                         </div>
-                        {job.posted_at && (
-                          <div className="flex items-center gap-1">
+                        {job.posted_at && <div className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />
                             <span>{job.posted_at}</span>
-                          </div>
-                        )}
+                          </div>}
                         <div className="flex items-center gap-2">
-                          {job.job_type && (
-                            <Badge variant="secondary" className="bg-gray-100 text-gray-800 text-xs px-2 py-0">
+                          {job.job_type && <Badge variant="secondary" className="bg-gray-100 text-gray-800 text-xs px-2 py-0">
                               {job.job_type}
-                            </Badge>
-                          )}
-                          {job.via && (
-                            <Badge variant="outline" className="border-gray-300 text-gray-600 text-xs px-2 py-0">
+                            </Badge>}
+                          {job.via && <Badge variant="outline" className="border-gray-300 text-gray-600 text-xs px-2 py-0 bg-fuchsia-200">
                               via {job.via}
-                            </Badge>
-                          )}
+                            </Badge>}
                         </div>
                       </div>
 
@@ -143,15 +132,10 @@ const JobBoard = () => {
                   </div>
                   
                   <div className="flex items-center gap-2 ml-4">
-                    <Button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedJob(job);
-                      }}
-                      variant="outline" 
-                      size="sm"
-                      className="border-gray-300 text-gray-900 hover:bg-gray-50"
-                    >
+                    <Button onClick={e => {
+                  e.stopPropagation();
+                  setSelectedJob(job);
+                }} variant="outline" size="sm" className="border-gray-300 text-gray-900 hover:bg-gray-50">
                       View Details
                     </Button>
                     <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700">
@@ -159,8 +143,7 @@ const JobBoard = () => {
                     </Button>
                   </div>
                 </div>
-              </div>
-            )}
+              </div>)}
           </div>
 
           {filteredJobs.length === 0 && <div className="text-center py-12">
@@ -174,12 +157,7 @@ const JobBoard = () => {
           <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-white border-gray-200">
             {selectedJob && <>
                 <DialogHeader className="relative">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-0 top-0 text-gray-500 hover:text-gray-700"
-                    onClick={() => setSelectedJob(null)}
-                  >
+                  <Button variant="ghost" size="icon" className="absolute right-0 top-0 text-gray-500 hover:text-gray-700" onClick={() => setSelectedJob(null)}>
                     <X className="h-4 w-4" />
                   </Button>
                   <DialogTitle className="text-gray-900 text-2xl font-bold pr-8">
