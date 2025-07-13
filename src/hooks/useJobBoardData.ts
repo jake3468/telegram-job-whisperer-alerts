@@ -96,60 +96,86 @@ export const useJobBoardData = () => {
 
   const saveToTracker = async (job: JobBoardItem) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast.error('Please log in to save jobs');
+      // First check authentication
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        toast.error('Please log in to save jobs to tracker');
         return;
       }
 
-      const { data: userProfile } = await supabase
+      // Get user profile with better error handling
+      const { data: userProfile, error: profileError } = await supabase
         .from('user_profile')
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (!userProfile) {
-        toast.error('User profile not found');
+      if (profileError) {
+        console.error('Error fetching user profile:', profileError);
+        toast.error('Unable to access user profile. Please try again.');
         return;
       }
 
-      // Check if job already exists in tracker
-      const { data: existingJob } = await supabase
+      if (!userProfile) {
+        toast.error('User profile not found. Please complete your profile setup.');
+        return;
+      }
+
+      // Check if job already exists in tracker with better matching
+      const { data: existingJob, error: checkError } = await supabase
         .from('job_tracker')
         .select('id')
         .eq('user_id', userProfile.id)
         .eq('company_name', job.company_name)
         .eq('job_title', job.title)
-        .single();
+        .maybeSingle();
+
+      if (checkError) {
+        console.error('Error checking existing job:', checkError);
+        toast.error('Unable to check if job already exists. Please try again.');
+        return;
+      }
 
       if (existingJob) {
         toast.error('Job already saved to tracker');
         return;
       }
 
-      // Insert new job tracker record
+      // Insert new job tracker record with all required fields
       const { error: insertError } = await supabase
         .from('job_tracker')
         .insert({
           user_id: userProfile.id,
           job_title: job.title,
           company_name: job.company_name,
-          job_description: job.job_description,
-          job_url: job.link_1_link,
-          status: 'saved'
+          job_description: job.job_description || '',
+          job_url: job.link_1_link || '',
+          status: 'saved',
+          order_position: 0,
+          // Set all boolean fields explicitly
+          company_researched: false,
+          job_role_analyzed: false,
+          resume_updated: false,
+          cover_letter_prepared: false,
+          interview_prep_guide_received: false,
+          ai_mock_interview_attempted: false,
+          interview_call_received: false,
+          ready_to_apply: false
         });
 
       if (insertError) {
-        throw insertError;
+        console.error('Error saving job to tracker:', insertError);
+        toast.error(`Failed to save job: ${insertError.message}`);
+        return;
       }
 
       toast.success('Job saved to tracker successfully!');
       // Refresh data to update the saved to tracker section
-      fetchJobs();
+      await fetchJobs();
 
     } catch (err) {
-      console.error('Error saving job to tracker:', err);
-      toast.error('Failed to save job to tracker');
+      console.error('Unexpected error saving job to tracker:', err);
+      toast.error('An unexpected error occurred. Please try again.');
     }
   };
 
