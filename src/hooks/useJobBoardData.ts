@@ -196,8 +196,20 @@ export const useJobBoardData = () => {
       console.log('Job board data refreshed successfully');
     } catch (err) {
       console.error('Force refresh failed:', err);
+      
+      // Check if it's a JWT/auth error and force page reload
+      if (err instanceof Error && (
+        err.message.includes('JWT') || 
+        err.message.includes('expired') || 
+        err.message.includes('unauthorized') ||
+        err.message.includes('PGRST301')
+      )) {
+        console.log('Authentication error detected, reloading page...');
+        window.location.reload();
+        return;
+      }
+      
       setError(err as Error);
-      // Don't reload the page automatically, let the user decide
     } finally {
       setLoading(false);
     }
