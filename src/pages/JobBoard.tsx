@@ -183,61 +183,65 @@ const JobBoard = () => {
 
         {/* Job Details Modal */}
         <Dialog open={!!selectedJob} onOpenChange={() => setSelectedJob(null)}>
-          <DialogContent className="max-w-4xl max-h-[80vh] bg-white border-gray-200 p-0">
+          <DialogContent className="max-w-3xl max-h-[85vh] bg-white border-gray-200 flex flex-col p-0">
             {selectedJob && <>
-                {/* Sticky Header */}
-                <DialogHeader className="sticky top-0 z-10 bg-white border-b p-4 rounded-t-lg">
+                {/* Fixed Header */}
+                <DialogHeader className="flex-shrink-0 bg-white border-b px-6 py-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
-                      <DialogTitle className="text-gray-900 text-lg font-bold mb-1 pr-8">
+                      <DialogTitle className="text-gray-900 text-xl font-bold mb-2 pr-8">
                         {selectedJob.title}
                       </DialogTitle>
-                      <div className="flex items-center gap-2 text-blue-600 text-sm">
+                      <div className="flex items-center gap-2 text-blue-600">
                         <Building2 className="h-4 w-4" />
-                        {selectedJob.company_name}
+                        <span className="font-medium">{selectedJob.company_name}</span>
                       </div>
                     </div>
-                    <Button variant="ghost" size="icon" className="text-gray-500 hover:text-gray-700 ml-2" onClick={() => setSelectedJob(null)}>
-                      <X className="h-4 w-4" />
+                    <Button variant="ghost" size="icon" className="text-gray-500 hover:text-gray-700 flex-shrink-0" onClick={() => setSelectedJob(null)}>
+                      <X className="h-5 w-5" />
                     </Button>
                   </div>
                 </DialogHeader>
                 
                 {/* Scrollable Content */}
-                <div className="overflow-y-auto p-4 space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="bg-blue-50 p-3 rounded-lg">
-                      <h3 className="text-blue-800 font-medium text-sm mb-1">Location</h3>
-                      <p className="text-gray-700 text-sm">{selectedJob.location || 'Not specified'}</p>
+                <div className="flex-1 overflow-y-auto px-6 py-4">
+                  {/* Compact Info Grid */}
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    <div className="bg-blue-50 p-2.5 rounded-md">
+                      <h3 className="text-blue-800 font-medium text-xs mb-1">Location</h3>
+                      <p className="text-gray-700 text-xs">{selectedJob.location || 'Not specified'}</p>
                     </div>
-                    <div className="bg-green-50 p-3 rounded-lg">
-                      <h3 className="text-green-800 font-medium text-sm mb-1">Salary</h3>
-                      <p className="text-green-700 font-medium text-sm">{formatSalary(selectedJob.salary)}</p>
+                    <div className="bg-green-50 p-2.5 rounded-md">
+                      <h3 className="text-green-800 font-medium text-xs mb-1">Salary</h3>
+                      <p className="text-green-700 font-medium text-xs">{formatSalary(selectedJob.salary)}</p>
                     </div>
-                    <div className="bg-purple-50 p-3 rounded-lg">
-                      <h3 className="text-purple-800 font-medium text-sm mb-1">Job Type</h3>
-                      <p className="text-gray-700 text-sm">{selectedJob.job_type || 'Not specified'}</p>
+                    <div className="bg-purple-50 p-2.5 rounded-md">
+                      <h3 className="text-purple-800 font-medium text-xs mb-1">Job Type</h3>
+                      <p className="text-gray-700 text-xs">{selectedJob.job_type || 'Not specified'}</p>
                     </div>
-                    <div className="bg-orange-50 p-3 rounded-lg">
-                      <h3 className="text-orange-800 font-medium text-sm mb-1">Posted</h3>
-                      <p className="text-gray-700 text-sm">{selectedJob.posted_at || 'Recently posted'}</p>
+                    <div className="bg-orange-50 p-2.5 rounded-md">
+                      <h3 className="text-orange-800 font-medium text-xs mb-1">Posted</h3>
+                      <p className="text-gray-700 text-xs">{selectedJob.posted_at || 'Recently posted'}</p>
                     </div>
                   </div>
 
-                  {selectedJob.job_description && <div className="bg-gray-50 p-4 rounded-lg">
-                      <h3 className="text-gray-900 font-medium text-sm mb-2">Job Description</h3>
+                  {/* Job Description */}
+                  {selectedJob.job_description && (
+                    <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                      <h3 className="text-gray-900 font-medium text-sm mb-3">Job Description</h3>
                       <div className="text-gray-700 text-sm whitespace-pre-wrap leading-relaxed">
                         {selectedJob.job_description}
                       </div>
-                    </div>}
+                    </div>
+                  )}
 
-                  {/* Links */}
+                  {/* External Links */}
                   {(selectedJob.link_1_title || selectedJob.link_2_title || selectedJob.link_3_title) && (
-                    <div className="bg-slate-50 p-4 rounded-lg">
+                    <div className="bg-slate-50 p-4 rounded-lg mb-4">
                       <h3 className="text-gray-900 font-medium text-sm mb-3">External Links</h3>
                       <div className="space-y-2">
                         {selectedJob.link_1_title && selectedJob.link_1_link && (
-                          <Button asChild variant="outline" size="sm" className="justify-start border-blue-200 text-blue-700 hover:bg-blue-50 w-full text-sm">
+                          <Button asChild variant="outline" size="sm" className="justify-start border-blue-200 text-blue-700 hover:bg-blue-50 w-full text-xs h-8">
                             <a href={selectedJob.link_1_link} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="h-3 w-3 mr-2" />
                               {selectedJob.link_1_title}
@@ -245,7 +249,7 @@ const JobBoard = () => {
                           </Button>
                         )}
                         {selectedJob.link_2_title && selectedJob.link_2_link && (
-                          <Button asChild variant="outline" size="sm" className="justify-start border-blue-200 text-blue-700 hover:bg-blue-50 w-full text-sm">
+                          <Button asChild variant="outline" size="sm" className="justify-start border-blue-200 text-blue-700 hover:bg-blue-50 w-full text-xs h-8">
                             <a href={selectedJob.link_2_link} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="h-3 w-3 mr-2" />
                               {selectedJob.link_2_title}
@@ -253,7 +257,7 @@ const JobBoard = () => {
                           </Button>
                         )}
                         {selectedJob.link_3_title && selectedJob.link_3_link && (
-                          <Button asChild variant="outline" size="sm" className="justify-start border-blue-200 text-blue-700 hover:bg-blue-50 w-full text-sm">
+                          <Button asChild variant="outline" size="sm" className="justify-start border-blue-200 text-blue-700 hover:bg-blue-50 w-full text-xs h-8">
                             <a href={selectedJob.link_3_link} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="h-3 w-3 mr-2" />
                               {selectedJob.link_3_title}
@@ -264,8 +268,9 @@ const JobBoard = () => {
                     </div>
                   )}
 
+                  {/* Save Button */}
                   <div className="pt-2">
-                    <Button className="w-full bg-blue-600 text-white hover:bg-blue-700 text-sm">
+                    <Button className="w-full bg-blue-600 text-white hover:bg-blue-700 text-sm h-10">
                       Save to Job Tracker
                     </Button>
                   </div>
