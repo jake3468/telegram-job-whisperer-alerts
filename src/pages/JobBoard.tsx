@@ -188,10 +188,11 @@ const JobBoard = () => {
               </div>
               <Button 
                 onClick={forceRefresh}
-                className="bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2 mx-auto"
+                disabled={loading}
+                className="bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2 mx-auto disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <RefreshCw className="h-4 w-4" />
-                Refresh Jobs
+                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                {loading ? 'Refreshing...' : 'Refresh Jobs'}
               </Button>
             </div>
           </div>

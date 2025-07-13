@@ -82,7 +82,13 @@ export const useJobBoardData = () => {
     } catch (err) {
       console.error('Error fetching job board data:', err);
       setError(err as Error);
-      toast.error('Failed to load job opportunities');
+      
+      // Check if it's an authentication error and suggest refresh
+      if (err instanceof Error && (err.message.includes('JWT') || err.message.includes('expired') || err.message.includes('unauthorized'))) {
+        toast.error('Session expired. Please refresh the page to continue.');
+      } else {
+        toast.error('Failed to load job opportunities');
+      }
     } finally {
       setLoading(false);
     }
@@ -147,8 +153,20 @@ export const useJobBoardData = () => {
     }
   };
 
-  const forceRefresh = () => {
-    fetchJobs();
+  const forceRefresh = async () => {
+    // Clear error state immediately and show loading
+    setError(null);
+    setLoading(true);
+    
+    try {
+      // Add a small delay to show loading state
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await fetchJobs();
+    } catch (err) {
+      console.error('Force refresh failed:', err);
+      // If refresh fails, try a simple page reload as fallback
+      window.location.reload();
+    }
   };
 
   useEffect(() => {
