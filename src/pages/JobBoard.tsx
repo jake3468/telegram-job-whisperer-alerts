@@ -244,14 +244,14 @@ const JobBoard = () => {
             </TabsList>
 
             {/* Search */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 p-3 sm:p-4 mb-4 sm:mb-6 w-full overflow-hidden">
-              <div className="relative w-full max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300 h-4 w-4" />
+            <div className="mb-4 sm:mb-6 w-full">
+              <div className="relative w-full max-w-md mx-auto">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 h-5 w-5" />
                 <Input 
                   placeholder="Search by job title or company name..." 
                   value={searchTerm} 
                   onChange={e => setSearchTerm(e.target.value)} 
-                  className="pl-10 bg-white/20 border-white/30 text-white placeholder:text-gray-300 h-9 sm:h-10 text-sm w-full" 
+                  className="pl-11 pr-4 bg-white border-2 border-blue-200 text-gray-900 placeholder:text-gray-500 h-12 text-sm w-full rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" 
                 />
               </div>
             </div>
