@@ -6,7 +6,9 @@ import { toast } from 'sonner';
 type JobBoardItem = Tables<'job_board'>;
 
 export const useJobBoardData = () => {
-  const [jobs, setJobs] = useState<JobBoardItem[]>([]);
+  const [postedTodayJobs, setPostedTodayJobs] = useState<JobBoardItem[]>([]);
+  const [last7DaysJobs, setLast7DaysJobs] = useState<JobBoardItem[]>([]);
+  const [savedJobs, setSavedJobs] = useState<JobBoardItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -15,16 +17,38 @@ export const useJobBoardData = () => {
       setLoading(true);
       setError(null);
 
-      const { data, error: fetchError } = await supabase
+      // Run cleanup and categorization first
+      await supabase.rpc('categorize_and_cleanup_jobs');
+
+      // Fetch jobs by section
+      const { data: postedToday, error: postedTodayError } = await supabase
         .from('job_board')
         .select('*')
+        .eq('section', 'posted_today')
         .order('created_at', { ascending: false });
 
-      if (fetchError) {
-        throw fetchError;
-      }
+      const { data: last7Days, error: last7DaysError } = await supabase
+        .from('job_board')
+        .select('*')
+        .eq('section', 'last_7_days')
+        .order('created_at', { ascending: false });
 
-      setJobs(data || []);
+      // Fetch jobs that are saved to tracker
+      const { data: saved, error: savedError } = await supabase
+        .from('job_board')
+        .select(`
+          *,
+          job_tracker!inner(id)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (postedTodayError) throw postedTodayError;
+      if (last7DaysError) throw last7DaysError;
+      if (savedError) throw savedError;
+
+      setPostedTodayJobs(postedToday || []);
+      setLast7DaysJobs(last7Days || []);
+      setSavedJobs(saved || []);
     } catch (err) {
       console.error('Error fetching job board data:', err);
       setError(err as Error);
@@ -64,7 +88,9 @@ export const useJobBoardData = () => {
   }, []);
 
   return {
-    jobs,
+    postedTodayJobs,
+    last7DaysJobs,
+    savedJobs,
     loading,
     error,
     forceRefresh
