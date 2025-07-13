@@ -35,7 +35,8 @@ const JobAlertsSection = ({
     userProfileId, 
     loading, 
     error, 
-    invalidateCache 
+    invalidateCache,
+    forceRefresh 
   } = useCachedJobAlertsData();
   
   const [showForm, setShowForm] = useState(false);
@@ -118,10 +119,10 @@ const JobAlertsSection = ({
     setEditingAlert(null);
   };
 
-  // Manual refresh function - refreshes entire page for persistent issues
+  // Manual refresh function - uses proper data refetch instead of page reload
   const handleManualRefresh = useCallback(() => {
-    window.location.reload();
-  }, []);
+    forceRefresh();
+  }, [forceRefresh]);
   if (loading) {
     return <div className="max-w-2xl mx-auto w-full">
         <div className="rounded-3xl bg-black/95 border-2 border-emerald-400 shadow-none p-6 mt-3 min-h-[160px] flex items-center justify-center">
