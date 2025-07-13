@@ -29,20 +29,9 @@ const JobBoard = () => {
     if (!salary) return 'Salary not disclosed';
     return salary;
   };
-  const formatPostedAt = (postedAt: string | null) => {
-    if (!postedAt) return 'Recently posted';
-    const date = new Date(postedAt);
-    const now = new Date();
-    const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-    if (diffInDays === 0) return 'Today';
-    if (diffInDays === 1) return 'Yesterday';
-    if (diffInDays < 7) return `${diffInDays} days ago`;
-    if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
-    return `${Math.floor(diffInDays / 30)} months ago`;
-  };
   if (loading) {
     return <Layout>
-        <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-purple-900 p-6">
+        <div className="min-h-screen p-6">
           <div className="max-w-6xl mx-auto">
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
@@ -54,7 +43,7 @@ const JobBoard = () => {
   }
   if (error) {
     return <Layout>
-        <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-purple-900 p-6">
+        <div className="min-h-screen p-6">
           <div className="max-w-6xl mx-auto">
             <div className="text-center py-12">
               <p className="text-red-400">Error loading jobs: {error.message}</p>
@@ -64,7 +53,7 @@ const JobBoard = () => {
       </Layout>;
   }
   return <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-purple-900 p-6">
+      <div className="min-h-screen p-6">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
@@ -104,71 +93,83 @@ const JobBoard = () => {
             </p>
           </div>
 
-          {/* Jobs Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {filteredJobs.map(job => <Card key={job.id} className="bg-black/40 backdrop-blur-sm border-gray-700 hover:border-purple-500/50 transition-all cursor-pointer">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      {job.thumbnail && <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-12 h-12 rounded-lg object-cover bg-gray-800" onError={e => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }} />}
-                      <div>
-                        <CardTitle className="text-white text-lg font-semibold">
-                          {job.title}
-                        </CardTitle>
-                        <div className="flex items-center gap-2 text-gray-300 text-sm mt-1">
-                          <Building2 className="h-4 w-4" />
-                          {job.company_name}
-                        </div>
+          {/* Jobs List */}
+          <div className="space-y-4">
+            {filteredJobs.map(job => 
+              <div key={job.id} className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer p-6" onClick={() => setSelectedJob(job)}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4 flex-1">
+                    {job.thumbnail ? (
+                      <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+                    ) : (
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Building2 className="h-6 w-6 text-gray-600" />
                       </div>
+                    )}
+                    
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg font-bold text-gray-900 truncate">{job.title}</h3>
+                      <p className="text-gray-700 font-medium">{job.company_name}</p>
+                      
+                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                        <div className="flex items-center gap-1">
+                          <MapPin className="h-4 w-4" />
+                          <span>{job.location || 'Location not specified'}</span>
+                        </div>
+                        {job.posted_at && (
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            <span>{job.posted_at}</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center gap-2 mt-2">
+                        {job.job_type && (
+                          <Badge variant="secondary" className="bg-gray-100 text-gray-800">
+                            {job.job_type}
+                          </Badge>
+                        )}
+                        {job.via && (
+                          <Badge variant="outline" className="border-gray-300 text-gray-600">
+                            via {job.via}
+                          </Badge>
+                        )}
+                      </div>
+
+                      <p className="text-green-600 font-semibold mt-2">
+                        {formatSalary(job.salary)}
+                      </p>
+
+                      {job.job_description && (
+                        <p className="text-gray-600 text-sm line-clamp-2 mt-1">
+                          {job.job_description.substring(0, 150)}...
+                        </p>
+                      )}
                     </div>
-                    <Button variant="ghost" size="icon" className="text-gray-400 hover:text-purple-400">
+                  </div>
+                  
+                  <div className="flex items-center gap-2 ml-4">
+                    <Button variant="ghost" size="icon" className="text-gray-600 hover:text-gray-800 hover:bg-gray-100">
                       <Bookmark className="h-4 w-4" />
                     </Button>
+                    <Button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedJob(job);
+                      }}
+                      variant="outline" 
+                      className="border-gray-300 text-gray-900 hover:bg-gray-50"
+                    >
+                      View Details
+                    </Button>
+                    <Button className="bg-blue-600 text-white hover:bg-blue-700">
+                      Save to Tracker
+                    </Button>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-4 text-sm text-gray-300">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="h-4 w-4" />
-                        {job.location || 'Location not specified'}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        {formatPostedAt(job.posted_at)}
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      {job.job_type && <Badge variant="secondary" className="bg-purple-500/20 text-purple-300">
-                          {job.job_type}
-                        </Badge>}
-                      {job.via && <Badge variant="outline" className="border-gray-600 text-gray-400">
-                          via {job.via}
-                        </Badge>}
-                    </div>
-
-                    <p className="text-green-400 font-semibold">
-                      {formatSalary(job.salary)}
-                    </p>
-
-                    {job.job_description && <p className="text-gray-300 text-sm line-clamp-2">
-                        {job.job_description.substring(0, 150)}...
-                      </p>}
-
-                    <div className="flex gap-2 pt-2">
-                      <Button onClick={() => setSelectedJob(job)} variant="outline" className="flex-1 border-purple-500/50 text-white hover:bg-purple-500/20">
-                        View Details
-                      </Button>
-                      <Button className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
-                        Save to Tracker
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>)}
+                </div>
+              </div>
+            )}
           </div>
 
           {filteredJobs.length === 0 && <div className="text-center py-12">
@@ -207,7 +208,7 @@ const JobBoard = () => {
                     </div>
                     <div className="space-y-2">
                       <h3 className="text-white font-semibold">Posted</h3>
-                      <p className="text-gray-300">{formatPostedAt(selectedJob.posted_at)}</p>
+                      <p className="text-gray-300">{selectedJob.posted_at || 'Recently posted'}</p>
                     </div>
                   </div>
 
