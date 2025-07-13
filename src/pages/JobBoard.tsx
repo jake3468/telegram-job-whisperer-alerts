@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
+import { useUser } from '@clerk/clerk-react';
 import { Layout } from '@/components/Layout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -129,6 +130,7 @@ const JobCard = ({ job, onView, onSaveToTracker, showSaved = false }: JobCardPro
 };
 
 const JobBoard = () => {
+  const { user, isLoaded } = useUser(); // Add Clerk authentication
   const {
     postedTodayJobs,
     last7DaysJobs,
@@ -141,6 +143,22 @@ const JobBoard = () => {
   
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJob, setSelectedJob] = useState<JobBoardItem | null>(null);
+
+  // Show loading while Clerk is loading
+  if (!isLoaded) {
+    return (
+      <Layout>
+        <div className="p-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              <p className="text-white mt-4">Loading...</p>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   const filterJobsBySearch = useCallback((jobs: JobBoardItem[]) => {
     if (!searchTerm.trim()) return jobs;
@@ -187,17 +205,19 @@ const JobBoard = () => {
               <h1 className="text-2xl sm:text-4xl font-bold text-white font-orbitron">
                 Job Board
               </h1>
-              {/* Small refresh button - always visible for manual refresh */}
-              <Button 
-                onClick={forceRefresh}
-                disabled={loading}
-                variant="ghost" 
-                size="sm" 
-                className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0" 
-                title="Refresh jobs data"
-              >
-                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-              </Button>
+              {/* Only show refresh button when there's an error */}
+              {error && (
+                <Button 
+                  onClick={forceRefresh}
+                  disabled={loading}
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0" 
+                  title="Refresh jobs data"
+                >
+                  <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                </Button>
+              )}
             </div>
             <p className="text-gray-300 text-sm sm:text-lg">
               Discover opportunities tailored to your profile
