@@ -190,8 +190,8 @@ const JobBoard = () => {
 
   return (
     <Layout>
-      <div className="p-3 sm:p-6 max-w-full">
-        <div className="max-w-6xl mx-auto w-full">
+      <div className="p-3 sm:p-6 w-full overflow-hidden">
+        <div className="max-w-6xl mx-auto w-full overflow-hidden">
           {/* Header */}
           <div className="text-center mb-4 sm:mb-6">
             <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2 sm:mb-4 font-orbitron">
@@ -203,56 +203,56 @@ const JobBoard = () => {
           </div>
 
           {/* Job Sections */}
-          <Tabs defaultValue="posted-today" className="w-full max-w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-4 max-w-full overflow-hidden">
+          <Tabs defaultValue="posted-today" className="w-full overflow-hidden">
+            <TabsList className="grid w-full grid-cols-3 mb-4 overflow-hidden">
               <TabsTrigger 
                 value="posted-today" 
-                className="text-xs sm:text-sm px-1 sm:px-3 py-2 truncate data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+                className="text-xs sm:text-sm px-1 sm:px-2 py-2 truncate data-[state=active]:bg-blue-600 data-[state=active]:text-white overflow-hidden"
               >
-                <span className="hidden sm:inline">Posted Today</span>
-                <span className="sm:hidden">Today</span>
-                <span className="ml-1">({filteredPostedTodayJobs.length})</span>
+                <span className="hidden sm:inline truncate">Posted Today</span>
+                <span className="sm:hidden truncate">Today</span>
+                <span className="ml-1 flex-shrink-0">({filteredPostedTodayJobs.length})</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="last-7-days" 
-                className="text-xs sm:text-sm px-1 sm:px-3 py-2 truncate data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+                className="text-xs sm:text-sm px-1 sm:px-2 py-2 truncate data-[state=active]:bg-blue-600 data-[state=active]:text-white overflow-hidden"
               >
-                <span className="hidden sm:inline">Last 7 Days</span>
-                <span className="sm:hidden">Week</span>
-                <span className="ml-1">({filteredLast7DaysJobs.length})</span>
+                <span className="hidden sm:inline truncate">Last 7 Days</span>
+                <span className="sm:hidden truncate">Week</span>
+                <span className="ml-1 flex-shrink-0">({filteredLast7DaysJobs.length})</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="saved-to-tracker" 
-                className="text-xs sm:text-sm px-1 sm:px-3 py-2 truncate data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+                className="text-xs sm:text-sm px-1 sm:px-2 py-2 truncate data-[state=active]:bg-blue-600 data-[state=active]:text-white overflow-hidden"
               >
-                <span className="hidden sm:inline">Saved</span>
-                <span className="sm:hidden">Saved</span>
-                <span className="ml-1">({filteredSavedToTrackerJobs.length})</span>
+                <span className="hidden sm:inline truncate">Saved</span>
+                <span className="sm:hidden truncate">Saved</span>
+                <span className="ml-1 flex-shrink-0">({filteredSavedToTrackerJobs.length})</span>
               </TabsTrigger>
             </TabsList>
 
             {/* Search */}
-            <div className="bg-black/40 backdrop-blur-sm rounded-xl border border-purple-500/20 p-3 sm:p-4 mb-4 sm:mb-6 max-w-full">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 p-3 sm:p-4 mb-4 sm:mb-6 w-full overflow-hidden">
               <div className="relative w-full max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300 h-4 w-4" />
                 <Input 
                   placeholder="Search by job title or company name..." 
                   value={searchTerm} 
                   onChange={e => setSearchTerm(e.target.value)} 
-                  className="pl-10 bg-gray-800/50 border-gray-700 text-white h-9 sm:h-10 text-sm w-full" 
+                  className="pl-10 bg-white/20 border-white/30 text-white placeholder:text-gray-300 h-9 sm:h-10 text-sm w-full" 
                 />
               </div>
             </div>
 
-            <TabsContent value="posted-today" className="space-y-3 mt-4 w-full max-w-full">
+            <TabsContent value="posted-today" className="space-y-3 mt-4 w-full overflow-hidden">
               {filteredPostedTodayJobs.length === 0 ? (
-                <div className="text-center py-12">
+                <div className="text-center py-12 w-full">
                   <p className="text-gray-400 text-lg">
                     {searchTerm ? `No jobs matching "${searchTerm}" found in posted today.` : "No jobs posted today."}
                   </p>
                 </div>
               ) : (
-                <div className="space-y-3 w-full">
+                <div className="space-y-3 w-full overflow-hidden">
                   {filteredPostedTodayJobs.map(job => (
                     <JobCard 
                       key={job.id} 
@@ -265,15 +265,15 @@ const JobBoard = () => {
               )}
             </TabsContent>
 
-            <TabsContent value="last-7-days" className="space-y-3 mt-4 w-full max-w-full">
+            <TabsContent value="last-7-days" className="space-y-3 mt-4 w-full overflow-hidden">
               {filteredLast7DaysJobs.length === 0 ? (
-                <div className="text-center py-12">
+                <div className="text-center py-12 w-full">
                   <p className="text-gray-400 text-lg">
                     {searchTerm ? `No jobs matching "${searchTerm}" found in last 7 days.` : "No jobs from the last 7 days."}
                   </p>
                 </div>
               ) : (
-                <div className="space-y-3 w-full">
+                <div className="space-y-3 w-full overflow-hidden">
                   {filteredLast7DaysJobs.map(job => (
                     <JobCard 
                       key={job.id} 
@@ -286,16 +286,16 @@ const JobBoard = () => {
               )}
             </TabsContent>
 
-            <TabsContent value="saved-to-tracker" className="space-y-3 mt-4 w-full max-w-full">
+            <TabsContent value="saved-to-tracker" className="space-y-3 mt-4 w-full overflow-hidden">
               {filteredSavedToTrackerJobs.length === 0 ? (
-                <div className="text-center py-12">
+                <div className="text-center py-12 w-full">
                   <p className="text-gray-400 text-lg">
                     {searchTerm ? `No saved jobs matching "${searchTerm}" found.` : "No jobs saved to tracker yet."}
                   </p>
                   {!searchTerm && <p className="text-gray-500 mt-2">Save jobs from other sections to see them here.</p>}
                 </div>
               ) : (
-                <div className="space-y-3 w-full">
+                <div className="space-y-3 w-full overflow-hidden">
                   {filteredSavedToTrackerJobs.map(job => (
                     <JobCard 
                       key={job.id} 
