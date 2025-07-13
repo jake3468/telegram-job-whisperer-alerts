@@ -10,12 +10,12 @@ import { useCachedJobAlertsData } from '@/hooks/useCachedJobAlertsData';
 interface JobAlert {
   id: string;
   country: string;
+  country_name?: string;
   location: string;
   job_title: string;
-  job_type: 'Remote' | 'On-site' | 'Hybrid';
+  job_type: 'full-time' | 'part-time' | 'contract' | 'intern';
   alert_frequency: string;
   preferred_time: string;
-  max_alerts_per_day: number;
   timezone: string;
   created_at: string;
   updated_at: string;
@@ -41,7 +41,7 @@ const JobAlertsSection = ({
   const [showForm, setShowForm] = useState(false);
   const [editingAlert, setEditingAlert] = useState<JobAlert | null>(null);
   
-  const MAX_ALERTS = 5;
+  const MAX_ALERTS = 3;
   const alertsUsed = alerts.length;
   const alertsRemaining = MAX_ALERTS - alertsUsed;
   const isAtLimit = alertsUsed >= MAX_ALERTS;

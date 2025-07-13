@@ -440,13 +440,13 @@ export type Database = {
         Row: {
           alert_frequency: string
           country: string
+          country_name: string | null
           created_at: string
           id: string
           job_title: string
           job_type: Database["public"]["Enums"]["job_type"]
           last_run: string | null
           location: string
-          max_alerts_per_day: number
           preferred_time: string
           timezone: string
           updated_at: string
@@ -455,13 +455,13 @@ export type Database = {
         Insert: {
           alert_frequency: string
           country: string
+          country_name?: string | null
           created_at?: string
           id?: string
           job_title: string
           job_type: Database["public"]["Enums"]["job_type"]
           last_run?: string | null
           location: string
-          max_alerts_per_day?: number
           preferred_time: string
           timezone: string
           updated_at?: string
@@ -470,13 +470,13 @@ export type Database = {
         Update: {
           alert_frequency?: string
           country?: string
+          country_name?: string | null
           created_at?: string
           id?: string
           job_title?: string
           job_type?: Database["public"]["Enums"]["job_type"]
           last_run?: string | null
           location?: string
-          max_alerts_per_day?: number
           preferred_time?: string
           timezone?: string
           updated_at?: string
@@ -1346,7 +1346,7 @@ export type Database = {
     }
     Enums: {
       job_status: "saved" | "applied" | "interview" | "rejected" | "offer"
-      job_type: "Remote" | "On-site" | "Hybrid"
+      job_type: "full-time" | "part-time" | "contract" | "intern"
     }
     CompositeTypes: {
       http_header: {
@@ -1491,7 +1491,7 @@ export const Constants = {
   public: {
     Enums: {
       job_status: ["saved", "applied", "interview", "rejected", "offer"],
-      job_type: ["Remote", "On-site", "Hybrid"],
+      job_type: ["full-time", "part-time", "contract", "intern"],
     },
   },
 } as const

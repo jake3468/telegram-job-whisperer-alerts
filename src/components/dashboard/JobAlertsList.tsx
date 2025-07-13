@@ -4,12 +4,12 @@ import { Edit, Trash2, MapPin, Clock, Bell } from 'lucide-react';
 interface JobAlert {
   id: string;
   country: string;
+  country_name?: string;
   location: string;
   job_title: string;
-  job_type: 'Remote' | 'On-site' | 'Hybrid';
+  job_type: 'full-time' | 'part-time' | 'contract' | 'intern';
   alert_frequency: string;
   preferred_time: string;
-  max_alerts_per_day: number;
   timezone: string;
   created_at: string;
   updated_at: string;
@@ -34,12 +34,14 @@ const JobAlertsList = ({
   // More muted, pastel job type color chips
   const getJobTypeColor = (type: string) => {
     switch (type) {
-      case 'Remote':
+      case 'full-time':
+        return 'bg-green-200 text-green-700';
+      case 'part-time':
+        return 'bg-blue-200 text-blue-700';
+      case 'contract':
         return 'bg-orange-200 text-orange-700';
-      case 'On-site':
-        return 'bg-yellow-200 text-yellow-700';
-      case 'Hybrid':
-        return 'bg-pink-100 text-pink-700';
+      case 'intern':
+        return 'bg-purple-200 text-purple-700';
       default:
         return 'bg-gray-200 text-gray-700';
     }
@@ -69,7 +71,7 @@ const JobAlertsList = ({
                 <div className="grid grid-cols-1 gap-1 text-xs sm:text-sm font-inter">
                   <div className="flex items-center gap-1.5">
                     <MapPin className="w-4 h-4 sm:w-4 sm:h-4 text-orange-700" />
-                    <span className="truncate">{alert.location}, {alert.country}</span>
+                    <span className="truncate">{alert.location}, {alert.country_name || alert.country.toUpperCase()}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Clock className="w-4 h-4 sm:w-4 sm:h-4 text-orange-700" />
@@ -77,10 +79,7 @@ const JobAlertsList = ({
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Bell className="w-4 h-4 sm:w-4 sm:h-4 text-orange-700" />
-                    <span>{alert.alert_frequency}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span>Max {alert.max_alerts_per_day} alerts/day</span>
+                    <span className="capitalize">{alert.alert_frequency}</span>
                   </div>
                 </div>
               </div>
