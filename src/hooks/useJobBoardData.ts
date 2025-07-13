@@ -52,49 +52,33 @@ export const useJobBoardData = () => {
       // Only fetch saved jobs if user is authenticated
       if (session?.user) {
         try {
-          // Step 1: Get current user from auth
-          const { data: authUser } = await supabase.auth.getUser();
-          
-          if (authUser?.user?.id) {
-            // Step 2: Find user in users table
-            const { data: userData, error: userError } = await supabase
-              .from('users')
-              .select('id')
-              .eq('clerk_id', authUser.user.id)
-              .maybeSingle();
+          // Get user profile directly
+          const { data: profileData, error: profileError } = await supabase
+            .from('user_profile')
+            .select('id')
+            .maybeSingle();
 
-            if (userData?.id && !userError) {
-              // Step 3: Find user profile
-              const { data: profileData, error: profileError } = await supabase
-                .from('user_profile')
-                .select('id')
-                .eq('user_id', userData.id)
-                .maybeSingle();
+          if (profileData?.id && !profileError) {
+            // Get job tracker entries
+            const { data: userJobTracker, error: trackerError } = await supabase
+              .from('job_tracker')
+              .select('job_title, company_name')
+              .eq('user_id', profileData.id);
 
-              if (profileData?.id && !profileError) {
-                // Step 4: Get job tracker entries
-                const { data: userJobTracker, error: trackerError } = await supabase
-                  .from('job_tracker')
-                  .select('job_title, company_name')
-                  .eq('user_id', profileData.id);
+            if (!trackerError && userJobTracker && userJobTracker.length > 0) {
+              // Get all job board entries and filter for saved ones
+              const { data: allJobBoard, error: allJobBoardError } = await supabase
+                .from('job_board')
+                .select('*')
+                .order('created_at', { ascending: false });
 
-                if (!trackerError && userJobTracker) {
-                  // Step 5: Get all job board entries
-                  const { data: allJobBoard, error: allJobBoardError } = await supabase
-                    .from('job_board')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                  if (!allJobBoardError && allJobBoard) {
-                    // Step 6: Filter matching entries
-                    saved = allJobBoard.filter(job => 
-                      userJobTracker.some(tracker => 
-                        tracker.job_title === job.title && 
-                        tracker.company_name === job.company_name
-                      )
-                    );
-                  }
-                }
+              if (!allJobBoardError && allJobBoard) {
+                saved = allJobBoard.filter(job => 
+                  userJobTracker.some(tracker => 
+                    tracker.job_title === job.title && 
+                    tracker.company_name === job.company_name
+                  )
+                );
               }
             }
           }

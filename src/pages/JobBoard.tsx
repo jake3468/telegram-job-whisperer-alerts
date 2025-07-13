@@ -10,6 +10,7 @@ import { useJobBoardData } from '@/hooks/useJobBoardData';
 import { Tables } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { Layout } from '@/components/Layout';
 
 type JobBoardItem = Tables<'job_board'>;
 
@@ -170,37 +171,41 @@ export const JobBoard = () => {
 
   if (loading && !isRefreshing) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <h2 className="text-2xl font-semibold mb-2">Loading job opportunities...</h2>
-          <p className="text-muted-foreground">Please wait while we fetch the latest jobs for you.</p>
+      <Layout>
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <h2 className="text-2xl font-semibold mb-2">Loading job opportunities...</h2>
+            <p className="text-muted-foreground">Please wait while we fetch the latest jobs for you.</p>
+          </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h2 className="text-2xl font-semibold mb-2">Unable to load job opportunities</h2>
-          <p className="text-muted-foreground mb-6">
-            There was an issue connecting to our services. Please try refreshing the page.
-          </p>
-          <Button onClick={forceRefresh} variant="outline" className="gap-2">
-            <RefreshCw className="h-4 w-4" />
-            Refresh
-          </Button>
+      <Layout>
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <AlertCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+            <h2 className="text-2xl font-semibold mb-2">Unable to load job opportunities</h2>
+            <p className="text-muted-foreground mb-6">
+              There was an issue connecting to our services. Please try refreshing the page.
+            </p>
+            <Button onClick={forceRefresh} variant="outline" className="gap-2">
+              <RefreshCw className="h-4 w-4" />
+              Refresh
+            </Button>
+          </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto p-4 md:p-6 overflow-hidden">
+    <Layout>
+      <div className="max-w-7xl mx-auto py-6 overflow-hidden">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
@@ -425,7 +430,7 @@ export const JobBoard = () => {
           </Dialog>
         )}
       </div>
-    </div>
+    </Layout>
   );
 };
 
