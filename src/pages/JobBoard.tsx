@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Search, MapPin, Building2, Clock, ExternalLink, Bookmark, Filter } from 'lucide-react';
+import { Search, MapPin, Building2, Clock, ExternalLink, Filter, X } from 'lucide-react';
 import { useJobBoardData } from '@/hooks/useJobBoardData';
 import { Tables } from '@/integrations/supabase/types';
 type JobBoardItem = Tables<'job_board'>;
@@ -94,76 +94,67 @@ const JobBoard = () => {
           </div>
 
           {/* Jobs List */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             {filteredJobs.map(job => 
-              <div key={job.id} className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer p-6" onClick={() => setSelectedJob(job)}>
+              <div key={job.id} className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer p-4" onClick={() => setSelectedJob(job)}>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 flex-1">
+                  <div className="flex items-center gap-3 flex-1">
                     {job.thumbnail ? (
-                      <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+                      <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
                     ) : (
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Building2 className="h-6 w-6 text-gray-600" />
+                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Building2 className="h-5 w-5 text-gray-600" />
                       </div>
                     )}
                     
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-bold text-gray-900 truncate">{job.title}</h3>
-                      <p className="text-gray-700 font-medium">{job.company_name}</p>
+                      <h3 className="text-base font-bold text-gray-900 truncate">{job.title}</h3>
+                      <p className="text-sm text-gray-700 font-medium">{job.company_name}</p>
                       
-                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                      <div className="flex items-center gap-4 mt-1 text-xs text-gray-600">
                         <div className="flex items-center gap-1">
-                          <MapPin className="h-4 w-4" />
+                          <MapPin className="h-3 w-3" />
                           <span>{job.location || 'Location not specified'}</span>
                         </div>
                         {job.posted_at && (
                           <div className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
+                            <Clock className="h-3 w-3" />
                             <span>{job.posted_at}</span>
                           </div>
                         )}
-                      </div>
-                      
-                      <div className="flex items-center gap-2 mt-2">
-                        {job.job_type && (
-                          <Badge variant="secondary" className="bg-gray-100 text-gray-800">
-                            {job.job_type}
-                          </Badge>
-                        )}
-                        {job.via && (
-                          <Badge variant="outline" className="border-gray-300 text-gray-600">
-                            via {job.via}
-                          </Badge>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {job.job_type && (
+                            <Badge variant="secondary" className="bg-gray-100 text-gray-800 text-xs px-2 py-0">
+                              {job.job_type}
+                            </Badge>
+                          )}
+                          {job.via && (
+                            <Badge variant="outline" className="border-gray-300 text-gray-600 text-xs px-2 py-0">
+                              via {job.via}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
 
-                      <p className="text-green-600 font-semibold mt-2">
+                      <p className="text-green-600 font-semibold text-sm mt-1">
                         {formatSalary(job.salary)}
                       </p>
-
-                      {job.job_description && (
-                        <p className="text-gray-600 text-sm line-clamp-2 mt-1">
-                          {job.job_description.substring(0, 150)}...
-                        </p>
-                      )}
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-2 ml-4">
-                    <Button variant="ghost" size="icon" className="text-gray-600 hover:text-gray-800 hover:bg-gray-100">
-                      <Bookmark className="h-4 w-4" />
-                    </Button>
                     <Button 
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedJob(job);
                       }}
                       variant="outline" 
+                      size="sm"
                       className="border-gray-300 text-gray-900 hover:bg-gray-50"
                     >
                       View Details
                     </Button>
-                    <Button className="bg-blue-600 text-white hover:bg-blue-700">
+                    <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700">
                       Save to Tracker
                     </Button>
                   </div>
@@ -180,13 +171,21 @@ const JobBoard = () => {
 
         {/* Job Details Modal */}
         <Dialog open={!!selectedJob} onOpenChange={() => setSelectedJob(null)}>
-          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-gray-900 border-gray-700">
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-white border-gray-200">
             {selectedJob && <>
-                <DialogHeader>
-                  <DialogTitle className="text-white text-2xl font-bold">
+                <DialogHeader className="relative">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 text-gray-500 hover:text-gray-700"
+                    onClick={() => setSelectedJob(null)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                  <DialogTitle className="text-gray-900 text-2xl font-bold pr-8">
                     {selectedJob.title}
                   </DialogTitle>
-                  <div className="flex items-center gap-2 text-gray-300">
+                  <div className="flex items-center gap-2 text-gray-600">
                     <Building2 className="h-5 w-5" />
                     {selectedJob.company_name}
                   </div>
@@ -195,47 +194,47 @@ const JobBoard = () => {
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <h3 className="text-white font-semibold">Location</h3>
-                      <p className="text-gray-300">{selectedJob.location || 'Not specified'}</p>
+                      <h3 className="text-gray-900 font-semibold">Location</h3>
+                      <p className="text-gray-600">{selectedJob.location || 'Not specified'}</p>
                     </div>
                     <div className="space-y-2">
-                      <h3 className="text-white font-semibold">Salary</h3>
-                      <p className="text-green-400 font-semibold">{formatSalary(selectedJob.salary)}</p>
+                      <h3 className="text-gray-900 font-semibold">Salary</h3>
+                      <p className="text-green-600 font-semibold">{formatSalary(selectedJob.salary)}</p>
                     </div>
                     <div className="space-y-2">
-                      <h3 className="text-white font-semibold">Job Type</h3>
-                      <p className="text-gray-300">{selectedJob.job_type || 'Not specified'}</p>
+                      <h3 className="text-gray-900 font-semibold">Job Type</h3>
+                      <p className="text-gray-600">{selectedJob.job_type || 'Not specified'}</p>
                     </div>
                     <div className="space-y-2">
-                      <h3 className="text-white font-semibold">Posted</h3>
-                      <p className="text-gray-300">{selectedJob.posted_at || 'Recently posted'}</p>
+                      <h3 className="text-gray-900 font-semibold">Posted</h3>
+                      <p className="text-gray-600">{selectedJob.posted_at || 'Recently posted'}</p>
                     </div>
                   </div>
 
                   {selectedJob.job_description && <div className="space-y-2">
-                      <h3 className="text-white font-semibold">Job Description</h3>
-                      <div className="text-gray-300 whitespace-pre-wrap bg-gray-800/50 p-4 rounded-lg">
+                      <h3 className="text-gray-900 font-semibold">Job Description</h3>
+                      <div className="text-gray-700 whitespace-pre-wrap bg-gray-50 p-4 rounded-lg border">
                         {selectedJob.job_description}
                       </div>
                     </div>}
 
                   {/* Links */}
                   <div className="space-y-4">
-                    <h3 className="text-white font-semibold">External Links</h3>
+                    <h3 className="text-gray-900 font-semibold">External Links</h3>
                     <div className="grid grid-cols-1 gap-2">
-                      {selectedJob.link_1_title && selectedJob.link_1_link && <Button asChild variant="outline" className="justify-start border-purple-500/50 text-white hover:bg-purple-500/20">
+                      {selectedJob.link_1_title && selectedJob.link_1_link && <Button asChild variant="outline" className="justify-start border-gray-300 text-gray-900 hover:bg-gray-50">
                           <a href={selectedJob.link_1_link} target="_blank" rel="noopener noreferrer">
                             <ExternalLink className="h-4 w-4 mr-2" />
                             {selectedJob.link_1_title}
                           </a>
                         </Button>}
-                      {selectedJob.link_2_title && selectedJob.link_2_link && <Button asChild variant="outline" className="justify-start border-purple-500/50 text-white hover:bg-purple-500/20">
+                      {selectedJob.link_2_title && selectedJob.link_2_link && <Button asChild variant="outline" className="justify-start border-gray-300 text-gray-900 hover:bg-gray-50">
                           <a href={selectedJob.link_2_link} target="_blank" rel="noopener noreferrer">
                             <ExternalLink className="h-4 w-4 mr-2" />
                             {selectedJob.link_2_title}
                           </a>
                         </Button>}
-                      {selectedJob.link_3_title && selectedJob.link_3_link && <Button asChild variant="outline" className="justify-start border-purple-500/50 text-white hover:bg-purple-500/20">
+                      {selectedJob.link_3_title && selectedJob.link_3_link && <Button asChild variant="outline" className="justify-start border-gray-300 text-gray-900 hover:bg-gray-50">
                           <a href={selectedJob.link_3_link} target="_blank" rel="noopener noreferrer">
                             <ExternalLink className="h-4 w-4 mr-2" />
                             {selectedJob.link_3_title}
@@ -245,10 +244,10 @@ const JobBoard = () => {
                   </div>
 
                   <div className="flex gap-3 pt-4">
-                    <Button className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+                    <Button className="flex-1 bg-blue-600 text-white hover:bg-blue-700">
                       Save to Job Tracker
                     </Button>
-                    <Button variant="outline" className="border-purple-500/50 text-white hover:bg-purple-500/20">
+                    <Button variant="outline" className="border-gray-300 text-gray-900 hover:bg-gray-50">
                       Share Job
                     </Button>
                   </div>
