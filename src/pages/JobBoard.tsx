@@ -119,7 +119,7 @@ const JobBoard = () => {
                           {job.job_type && <Badge variant="secondary" className="bg-gray-100 text-gray-800 text-xs px-2 py-0">
                               {job.job_type}
                             </Badge>}
-                          {job.via && <Badge variant="outline" className="border-gray-300 text-gray-600 text-xs px-2 py-0 bg-fuchsia-200">
+                          {job.via && <Badge variant="outline" className="border-gray-300 text-gray-600 text-xs px-2 py-0 bg-slate-50">
                               via {job.via}
                             </Badge>}
                         </div>
