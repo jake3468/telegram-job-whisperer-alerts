@@ -95,51 +95,48 @@ const JobBoard = () => {
 
           {/* Jobs List */}
           <div className="space-y-3">
-            {filteredJobs.map(job => <div key={job.id} className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer p-4" onClick={() => setSelectedJob(job)}>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    {job.thumbnail ? <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" /> : <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Building2 className="h-5 w-5 text-gray-600" />
+            {filteredJobs.map(job => <div key={job.id} className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer p-3 sm:p-4" onClick={() => setSelectedJob(job)}>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                    {job.thumbnail ? <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover flex-shrink-0" /> : <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
                       </div>}
                     
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-base font-bold text-gray-900 truncate">{job.title}</h3>
-                      <p className="text-sm text-gray-700 font-medium truncate">{job.company_name}</p>
+                      <h3 className="text-sm sm:text-base font-bold text-gray-900 truncate">{job.title}</h3>
+                      <p className="text-xs sm:text-sm text-gray-700 font-medium truncate">{job.company_name}</p>
                       
-                      <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-gray-600">
+                      <div className="flex items-center gap-1 sm:gap-2 mt-1 text-xs text-gray-600">
                         <div className="flex items-center gap-1">
                           <MapPin className="h-3 w-3 flex-shrink-0" />
-                          <span className="truncate">{job.location || 'Location not specified'}</span>
+                          <span className="truncate max-w-[80px] sm:max-w-none">{job.location || 'Remote'}</span>
                         </div>
-                        {job.posted_at && <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3 flex-shrink-0" />
-                            <span className="truncate">{job.posted_at}</span>
-                          </div>}
-                        <div className="flex items-center gap-1 flex-wrap">
-                          {job.job_type && <Badge variant="secondary" className="bg-gray-100 text-gray-800 text-xs px-2 py-0 whitespace-nowrap">
-                              {job.job_type}
-                            </Badge>}
-                          {job.via && <Badge variant="outline" className="border-gray-300 text-gray-600 text-xs px-2 py-0 bg-slate-50 whitespace-nowrap">
-                              via {job.via}
-                            </Badge>}
-                        </div>
+                        {job.posted_at && <span className="hidden sm:inline">•</span>}
+                        {job.posted_at && <span className="hidden sm:block truncate">{job.posted_at}</span>}
+                        {job.job_type && <span className="hidden sm:inline">•</span>}
+                        {job.job_type && <Badge variant="secondary" className="bg-gray-100 text-gray-800 text-xs px-1 sm:px-2 py-0 hidden sm:inline-flex">
+                            {job.job_type}
+                          </Badge>}
                       </div>
 
-                      <p className="text-green-600 font-semibold text-sm mt-1 truncate">
+                      <p className="text-green-600 font-semibold text-xs sm:text-sm truncate">
                         {formatSalary(job.salary)}
                       </p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2 flex-shrink-0 self-start sm:self-center">
+                  <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                     <Button onClick={e => {
                   e.stopPropagation();
                   setSelectedJob(job);
-                }} variant="outline" size="sm" className="border-gray-300 text-gray-900 hover:bg-gray-50 text-xs px-2">
-                      View Details
+                }} variant="outline" size="sm" className="border-gray-300 text-gray-900 hover:bg-gray-50 text-xs px-2 py-1 sm:px-3 sm:py-2 h-7 sm:h-8">
+                      Details
                     </Button>
-                    <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 whitespace-nowrap">
+                    <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 sm:px-3 sm:py-2 h-7 sm:h-8 hidden sm:block">
                       Save to Tracker
+                    </Button>
+                    <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-7 sm:hidden">
+                      Save
                     </Button>
                   </div>
                 </div>
