@@ -1,412 +1,284 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { Layout } from '@/components/Layout';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MapPin, Clock, DollarSign, Building2, Search, X } from 'lucide-react';
+import { Search, MapPin, Building2, Clock, ExternalLink, Filter, X } from 'lucide-react';
 import { useJobBoardData } from '@/hooks/useJobBoardData';
 import { Tables } from '@/integrations/supabase/types';
-import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
-
 type JobBoardItem = Tables<'job_board'>;
-
-export const JobBoard = () => {
+const JobBoard = () => {
+  const {
+    jobs,
+    loading,
+    error
+  } = useJobBoardData();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJob, setSelectedJob] = useState<JobBoardItem | null>(null);
-  const [activeTab, setActiveTab] = useState('posted_today');
-  const { postedTodayJobs, last7DaysJobs, savedJobs, loading, error } = useJobBoardData();
-
-  // Filter jobs based on search term
-  const filterJobs = (jobs: JobBoardItem[]) => {
-    return jobs.filter(job => {
-      const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           job.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           (job.job_description && job.job_description.toLowerCase().includes(searchTerm.toLowerCase()));
-      
-      return matchesSearch;
-    });
-  };
-
-  const filteredPostedTodayJobs = filterJobs(postedTodayJobs);
-  const filteredLast7DaysJobs = filterJobs(last7DaysJobs);
-  const filteredSavedJobs = filterJobs(savedJobs);
-
-  const formatSalary = (salary: string | null): string => {
+  const [locationFilter, setLocationFilter] = useState('');
+  const [jobTypeFilter, setJobTypeFilter] = useState('');
+  const filteredJobs = jobs?.filter(job => {
+    const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) || job.company_name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesLocation = !locationFilter || job.location?.toLowerCase().includes(locationFilter.toLowerCase());
+    const matchesJobType = !jobTypeFilter || job.job_type?.toLowerCase().includes(jobTypeFilter.toLowerCase());
+    return matchesSearch && matchesLocation && matchesJobType;
+  }) || [];
+  const formatSalary = (salary: string | null) => {
     if (!salary) return 'Salary not disclosed';
     return salary;
   };
-
-  const handleSaveToTracker = async (job: JobBoardItem) => {
-    try {
-      // Get current user profile
-      const { data: profile } = await supabase
-        .from('user_profile')
-        .select('id')
-        .single();
-
-      if (!profile) {
-        toast.error('Please log in to save jobs');
-        return;
-      }
-
-      const { error } = await supabase
-        .from('job_tracker')
-        .insert({
-          user_id: profile.id,
-          job_title: job.title,
-          company_name: job.company_name,
-          job_description: job.job_description,
-          status: 'saved'
-        });
-
-      if (error) throw error;
-
-      toast.success('Job saved to tracker!');
-      setSelectedJob(null);
-    } catch (error) {
-      console.error('Error saving job:', error);
-      toast.error('Failed to save job to tracker');
-    }
-  };
-
-  const JobCard = ({ job }: { job: JobBoardItem }) => (
-    <Card className="hover:shadow-md transition-shadow duration-200 overflow-hidden">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-start gap-3 min-w-0 flex-1">
-            {job.thumbnail && (
-              <img 
-                src={job.thumbnail} 
-                alt={`${job.company_name} logo`}
-                className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
-              />
-            )}
-            <div className="min-w-0 flex-1">
-              <CardTitle className="text-lg line-clamp-2 leading-tight mb-1">
-                {job.title}
-              </CardTitle>
-              <p className="text-sm text-muted-foreground font-medium">
-                {job.company_name}
-              </p>
-            </div>
-          </div>
-        </div>
-      </CardHeader>
-      
-      <CardContent className="pt-0">
-        <div className="space-y-2 mb-4">
-          {job.location && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <MapPin className="h-4 w-4 flex-shrink-0" />
-              <span className="truncate">{job.location}</span>
-            </div>
-          )}
-          
-          {job.salary && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <DollarSign className="h-4 w-4 flex-shrink-0" />
-              <span className="truncate">{formatSalary(job.salary)}</span>
-            </div>
-          )}
-          
-          <div className="flex items-center justify-between gap-2">
-            {job.job_type && (
-              <Badge variant="secondary" className="text-xs">
-                {job.job_type}
-              </Badge>
-            )}
-            
-            {job.posted_at && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Clock className="h-3 w-3" />
-                <span>{job.posted_at}</span>
-              </div>
-            )}
-          </div>
-        </div>
-        
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setSelectedJob(job)}
-            className="flex-1"
-          >
-            View
-          </Button>
-          <Button 
-            size="sm" 
-            onClick={() => handleSaveToTracker(job)}
-            className="flex-1"
-          >
-            Save to Tracker
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const JobSection = ({ jobs, emptyMessage }: { jobs: JobBoardItem[], emptyMessage: string }) => (
-    <div className="space-y-4">
-      {jobs.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {jobs.map((job) => (
-            <JobCard key={job.id} job={job} />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-12">
-          <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No Jobs Found</h3>
-          <p className="text-muted-foreground">{emptyMessage}</p>
-        </div>
-      )}
-    </div>
-  );
-
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold mb-2">Loading job opportunities...</h2>
-          <p className="text-muted-foreground">Please wait while we fetch the latest jobs for you.</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold mb-2 text-destructive">Error Loading Jobs</h2>
-          <p className="text-muted-foreground mb-4">{error.message}</p>
-          <Button onClick={() => window.location.reload()}>Try Again</Button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto p-4 md:p-6 overflow-hidden">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Job Board</h1>
-          <p className="text-muted-foreground">
-            Discover exciting job opportunities curated just for you
-          </p>
-        </div>
-
-        {/* Search */}
-        <div className="mb-6">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search jobs, companies, or keywords..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+    return <Layout>
+        <div className="min-h-screen p-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              <p className="text-white mt-4">Loading job opportunities...</p>
+            </div>
           </div>
         </div>
+      </Layout>;
+  }
+  if (error) {
+    return <Layout>
+        <div className="min-h-screen p-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center py-12">
+              <p className="text-red-400">Error loading jobs: {error.message}</p>
+            </div>
+          </div>
+        </div>
+      </Layout>;
+  }
+  return <Layout>
+      <div className="min-h-screen p-6">
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-4 sm:mb-6">
+            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2 sm:mb-4 font-orbitron">
+              Job Board
+            </h1>
+            <p className="text-gray-300 text-sm sm:text-lg">
+              Discover opportunities tailored to your profile
+            </p>
+          </div>
 
-        {/* Tabs for different sections */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
-            <TabsTrigger value="posted_today" className="text-sm">
-              Posted Today ({filteredPostedTodayJobs.length})
-            </TabsTrigger>
-            <TabsTrigger value="last_7_days" className="text-sm">
-              Last 7 Days ({filteredLast7DaysJobs.length})
-            </TabsTrigger>
-            <TabsTrigger value="saved_jobs" className="text-sm">
-              Jobs Saved to Tracker ({filteredSavedJobs.length})
-            </TabsTrigger>
-          </TabsList>
+          {/* Search and Filters */}
+          <div className="bg-black/40 backdrop-blur-sm rounded-xl border border-purple-500/20 p-3 sm:p-4 mb-4 sm:mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input placeholder="Search jobs..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10 bg-gray-800/50 border-gray-700 text-white h-9 sm:h-10 text-sm" />
+              </div>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input placeholder="Location..." value={locationFilter} onChange={e => setLocationFilter(e.target.value)} className="pl-10 bg-gray-800/50 border-gray-700 text-white h-9 sm:h-10 text-sm" />
+              </div>
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input placeholder="Job type..." value={jobTypeFilter} onChange={e => setJobTypeFilter(e.target.value)} className="pl-10 bg-gray-800/50 border-gray-700 text-white h-9 sm:h-10 text-sm" />
+              </div>
+              <Button variant="outline" className="border-purple-500/50 text-black bg-slate-50 h-9 sm:h-10 text-sm">
+                Apply Filters
+              </Button>
+            </div>
+          </div>
 
-          <TabsContent value="posted_today" className="mt-6">
-            <JobSection 
-              jobs={filteredPostedTodayJobs}
-              emptyMessage={searchTerm 
-                ? "No jobs posted today match your search terms." 
-                : "No jobs were posted today. Check the other sections!"
-              }
-            />
-          </TabsContent>
+          {/* Job Results */}
+          <div className="mb-4">
+            <p className="text-gray-300">
+              {filteredJobs.length} job{filteredJobs.length !== 1 ? 's' : ''} found
+            </p>
+          </div>
 
-          <TabsContent value="last_7_days" className="mt-6">
-            <JobSection 
-              jobs={filteredLast7DaysJobs}
-              emptyMessage={searchTerm 
-                ? "No jobs from the last 7 days match your search terms." 
-                : "No jobs from the last 7 days. Check back later!"
-              }
-            />
-          </TabsContent>
-
-          <TabsContent value="saved_jobs" className="mt-6">
-            <JobSection 
-              jobs={filteredSavedJobs}
-              emptyMessage={searchTerm 
-                ? "No saved jobs match your search terms." 
-                : "You haven't saved any jobs to your tracker yet. Save some jobs to see them here!"
-              }
-            />
-          </TabsContent>
-        </Tabs>
-
-        {/* Job Details Modal */}
-        {selectedJob && (
-          <Dialog open={!!selectedJob} onOpenChange={() => setSelectedJob(null)}>
-            <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden">
-              {/* Fixed Header */}
-              <div className="sticky top-0 z-10 bg-background border-b p-6">
-                <DialogHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-4 min-w-0 flex-1">
-                      {selectedJob.thumbnail && (
-                        <img 
-                          src={selectedJob.thumbnail} 
-                          alt={`${selectedJob.company_name} logo`}
-                          className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
-                        />
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <DialogTitle className="text-xl font-bold leading-tight pr-8">
-                          {selectedJob.title}
-                        </DialogTitle>
-                        <p className="text-lg text-muted-foreground font-medium mt-1">
-                          {selectedJob.company_name}
-                        </p>
+          {/* Jobs List */}
+          <div className="space-y-3">
+            {filteredJobs.map(job => <div key={job.id} className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer overflow-hidden" onClick={() => setSelectedJob(job)}>
+                <div className="p-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                    {/* Company info and logo */}
+                   <div className="flex items-center gap-2 flex-1 min-w-0">
+                     {job.thumbnail ? <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-8 h-8 rounded-lg object-cover flex-shrink-0" /> : <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Building2 className="h-4 w-4 text-gray-600" />
+                        </div>}
+                      
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-bold text-gray-900 truncate">{job.title}</h3>
+                        <p className="text-xs text-gray-700 font-medium truncate">{job.company_name}</p>
+                        
+                        {/* Desktop: Location, job type, and posted time */}
+                        <div className="hidden sm:flex items-center gap-2 mt-1 text-xs text-gray-600">
+                          <div className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3 flex-shrink-0" />
+                            <span className="truncate">{job.location || 'Remote'}</span>
+                          </div>
+                          {job.job_type && (
+                            <>
+                              <span>•</span>
+                              <span className="truncate">{job.job_type}</span>
+                            </>
+                          )}
+                          {job.posted_at && (
+                            <>
+                              <span>•</span>
+                              <span className="truncate">{job.posted_at}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Desktop: Salary */}
+                      <div className="hidden sm:block text-green-600 font-semibold text-sm whitespace-nowrap mr-2">
+                        {formatSalary(job.salary)}
                       </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setSelectedJob(null)}
-                      className="absolute top-4 right-4"
-                    >
-                      <X className="h-4 w-4" />
+                    
+                    {/* Actions */}
+                    <div className="flex items-center gap-1 flex-shrink-0 sm:ml-4">
+                      <Button onClick={e => {
+                        e.stopPropagation();
+                        setSelectedJob(job);
+                      }} variant="outline" size="sm" className="border-gray-300 text-gray-900 hover:bg-gray-50 text-xs px-2 py-1 h-6">
+                        View
+                      </Button>
+                      <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-6 whitespace-nowrap">
+                        Save to Tracker
+                      </Button>
+                    </div>
+                  </div>
+                  
+                   {/* Mobile: Location, job type, posted_at and salary */}
+                   <div className="sm:hidden mt-2 space-y-1">
+                     <div className="flex items-center gap-1 text-xs text-gray-600">
+                       <MapPin className="h-3 w-3 flex-shrink-0" />
+                       <span className="truncate">{job.location || 'Remote'}</span>
+                       {job.job_type && (
+                         <>
+                           <span className="mx-1">•</span>
+                           <span className="truncate">{job.job_type}</span>
+                         </>
+                       )}
+                       {job.posted_at && (
+                         <>
+                           <span className="mx-1">•</span>
+                           <span className="truncate">{job.posted_at}</span>
+                         </>
+                       )}
+                     </div>
+                     <div className="text-green-600 font-semibold text-xs">
+                       {formatSalary(job.salary)}
+                     </div>
+                   </div>
+                </div>
+              </div>)}
+          </div>
+
+          {filteredJobs.length === 0 && <div className="text-center py-12">
+              <p className="text-gray-400 text-lg">No jobs found matching your criteria.</p>
+              <p className="text-gray-500 mt-2">Try adjusting your search filters.</p>
+            </div>}
+        </div>
+
+        {/* Job Details Modal */}
+        <Dialog open={!!selectedJob} onOpenChange={() => setSelectedJob(null)}>
+          <DialogContent className="max-w-3xl max-h-[85vh] bg-white border-gray-200 flex flex-col p-0">
+            {selectedJob && <>
+                {/* Fixed Header */}
+                <DialogHeader className="flex-shrink-0 bg-white border-b px-6 py-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <DialogTitle className="text-gray-900 text-xl font-bold mb-2 pr-8">
+                        {selectedJob.title}
+                      </DialogTitle>
+                      <div className="flex items-center gap-2 text-blue-600">
+                        <Building2 className="h-4 w-4" />
+                        <span className="font-medium">{selectedJob.company_name}</span>
+                      </div>
+                    </div>
+                    <Button variant="ghost" size="icon" className="text-gray-500 hover:text-gray-700 flex-shrink-0" onClick={() => setSelectedJob(null)}>
+                      <X className="h-5 w-5" />
                     </Button>
                   </div>
                 </DialogHeader>
-              </div>
-
-              {/* Scrollable Content */}
-              <div className="overflow-y-auto max-h-[calc(90vh-140px)]">
-                <div className="p-6">
-                  {/* Job Details */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-                    {selectedJob.location && (
-                      <div className="bg-muted/50 p-3 rounded-lg">
-                        <div className="flex items-center gap-2 text-xs font-medium text-foreground">
-                          <MapPin className="h-3 w-3 text-primary" />
-                          Location
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">{selectedJob.location}</p>
-                      </div>
-                    )}
-                    
-                    {selectedJob.salary && (
-                      <div className="bg-muted/50 p-3 rounded-lg">
-                        <div className="flex items-center gap-2 text-xs font-medium text-foreground">
-                          <DollarSign className="h-3 w-3 text-green-600" />
-                          Salary
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">{formatSalary(selectedJob.salary)}</p>
-                      </div>
-                    )}
-                    
-                    {selectedJob.job_type && (
-                      <div className="bg-muted/50 p-3 rounded-lg">
-                        <div className="flex items-center gap-2 text-xs font-medium text-foreground">
-                          <Building2 className="h-3 w-3 text-blue-600" />
-                          Job Type
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">{selectedJob.job_type}</p>
-                      </div>
-                    )}
-                    
-                    {selectedJob.posted_at && (
-                      <div className="bg-muted/50 p-3 rounded-lg">
-                        <div className="flex items-center gap-2 text-xs font-medium text-foreground">
-                          <Clock className="h-3 w-3 text-orange-600" />
-                          Posted
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">{selectedJob.posted_at}</p>
-                      </div>
-                    )}
+                
+                {/* Scrollable Content */}
+                <div className="flex-1 overflow-y-auto px-6 py-4">
+                  {/* Compact Info Grid */}
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    <div className="bg-blue-50 p-2.5 rounded-md">
+                      <h3 className="text-blue-800 font-medium text-xs mb-1">Location</h3>
+                      <p className="text-gray-700 text-xs">{selectedJob.location || 'Not specified'}</p>
+                    </div>
+                    <div className="bg-green-50 p-2.5 rounded-md">
+                      <h3 className="text-green-800 font-medium text-xs mb-1">Salary</h3>
+                      <p className="text-green-700 font-medium text-xs">{formatSalary(selectedJob.salary)}</p>
+                    </div>
+                    <div className="bg-purple-50 p-2.5 rounded-md">
+                      <h3 className="text-purple-800 font-medium text-xs mb-1">Job Type</h3>
+                      <p className="text-gray-700 text-xs">{selectedJob.job_type || 'Not specified'}</p>
+                    </div>
+                    <div className="bg-orange-50 p-2.5 rounded-md">
+                      <h3 className="text-orange-800 font-medium text-xs mb-1">Posted</h3>
+                      <p className="text-gray-700 text-xs">{selectedJob.posted_at || 'Recently posted'}</p>
+                    </div>
                   </div>
 
                   {/* Job Description */}
                   {selectedJob.job_description && (
-                    <div className="mb-6">
-                      <h3 className="text-base font-semibold mb-3 text-foreground">Job Description</h3>
-                      <div className="prose prose-sm max-w-none text-muted-foreground">
-                        <p className="whitespace-pre-wrap text-xs leading-relaxed">
-                          {selectedJob.job_description}
-                        </p>
+                    <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                      <h3 className="text-gray-900 font-medium text-sm mb-3">Job Description</h3>
+                      <div className="text-gray-700 text-sm whitespace-pre-wrap leading-relaxed">
+                        {selectedJob.job_description}
                       </div>
                     </div>
                   )}
 
                   {/* External Links */}
-                  <div className="space-y-3">
-                    {(selectedJob.link_1_title && selectedJob.link_1_link) && (
-                      <div>
-                        <h4 className="font-medium mb-2 text-sm text-foreground">{selectedJob.link_1_title}</h4>
-                        <Button asChild variant="outline" size="sm">
-                          <a href={selectedJob.link_1_link} target="_blank" rel="noopener noreferrer">
-                            Visit Link
-                          </a>
-                        </Button>
+                  {(selectedJob.link_1_title || selectedJob.link_2_title || selectedJob.link_3_title) && (
+                    <div className="bg-slate-50 p-4 rounded-lg mb-4">
+                      <h3 className="text-gray-900 font-medium text-sm mb-3">External Links</h3>
+                      <div className="space-y-2">
+                        {selectedJob.link_1_title && selectedJob.link_1_link && (
+                          <Button asChild variant="outline" size="sm" className="justify-start border-blue-200 text-blue-700 hover:bg-blue-50 w-full text-xs h-8">
+                            <a href={selectedJob.link_1_link} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-3 w-3 mr-2" />
+                              {selectedJob.link_1_title}
+                            </a>
+                          </Button>
+                        )}
+                        {selectedJob.link_2_title && selectedJob.link_2_link && (
+                          <Button asChild variant="outline" size="sm" className="justify-start border-blue-200 text-blue-700 hover:bg-blue-50 w-full text-xs h-8">
+                            <a href={selectedJob.link_2_link} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-3 w-3 mr-2" />
+                              {selectedJob.link_2_title}
+                            </a>
+                          </Button>
+                        )}
+                        {selectedJob.link_3_title && selectedJob.link_3_link && (
+                          <Button asChild variant="outline" size="sm" className="justify-start border-blue-200 text-blue-700 hover:bg-blue-50 w-full text-xs h-8">
+                            <a href={selectedJob.link_3_link} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-3 w-3 mr-2" />
+                              {selectedJob.link_3_title}
+                            </a>
+                          </Button>
+                        )}
                       </div>
-                    )}
-                    
-                    {(selectedJob.link_2_title && selectedJob.link_2_link) && (
-                      <div>
-                        <h4 className="font-medium mb-2 text-sm text-foreground">{selectedJob.link_2_title}</h4>
-                        <Button asChild variant="outline" size="sm">
-                          <a href={selectedJob.link_2_link} target="_blank" rel="noopener noreferrer">
-                            Visit Link
-                          </a>
-                        </Button>
-                      </div>
-                    )}
-                    
-                    {(selectedJob.link_3_title && selectedJob.link_3_link) && (
-                      <div>
-                        <h4 className="font-medium mb-2 text-sm text-foreground">{selectedJob.link_3_title}</h4>
-                        <Button asChild variant="outline" size="sm">
-                          <a href={selectedJob.link_3_link} target="_blank" rel="noopener noreferrer">
-                            Visit Link
-                          </a>
-                        </Button>
-                      </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
 
-                  {/* Actions */}
-                  <div className="flex gap-3 pt-4 border-t mt-6">
-                    <Button 
-                      onClick={() => handleSaveToTracker(selectedJob)}
-                      className="flex-1"
-                    >
-                      Save to Tracker
+                  {/* Save Button */}
+                  <div className="pt-2">
+                    <Button className="w-full bg-blue-600 text-white hover:bg-blue-700 text-sm h-10">
+                      Save to Job Tracker
                     </Button>
                   </div>
                 </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
+              </>}
+          </DialogContent>
+        </Dialog>
       </div>
-    </div>
-  );
+    </Layout>;
 };
-
 export default JobBoard;
