@@ -1,6 +1,6 @@
 
 
-import { User, Bell, Target, FileText, X, Share2, CreditCard, FileUser, Building2, MessageSquare, Kanban, Phone } from 'lucide-react';
+import { User, Bell, Target, FileText, X, Share2, CreditCard, FileUser, Building2, MessageSquare, Kanban, Phone, Briefcase } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { SignedIn, UserButton, useUser } from '@clerk/clerk-react';
@@ -16,6 +16,10 @@ const profileItems = [{
   title: 'Pricing Plans',
   url: '/get-more-credits',
   icon: CreditCard
+}, {
+  title: 'Job Board',
+  url: '/job-board',
+  icon: Briefcase
 }, {
   title: 'Job Tracker',
   url: '/job-tracker',

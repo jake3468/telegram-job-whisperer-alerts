@@ -18,6 +18,7 @@ import ResumeBuilder from "./pages/ResumeBuilder";
 import JobAlerts from "./pages/JobAlerts";
 import GetMoreCredits from "./pages/GetMoreCredits";
 import JobTracker from "./pages/JobTracker";
+import JobBoard from "./pages/JobBoard";
 import AIMockInterview from "./pages/AIMockInterview";
 import Upgrade from "./pages/Upgrade";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -92,6 +93,7 @@ const AppWithSync = () => {
         <Route path="/resume-builder" element={<ProtectedRoute><ResumeBuilder /></ProtectedRoute>} />
         <Route path="/job-alerts" element={<ProtectedRoute><JobAlerts /></ProtectedRoute>} />
         <Route path="/get-more-credits" element={<ProtectedRoute><GetMoreCredits /></ProtectedRoute>} />
+        <Route path="/job-board" element={<ProtectedRoute><JobBoard /></ProtectedRoute>} />
         <Route path="/job-tracker" element={<ProtectedRoute><JobTracker /></ProtectedRoute>} />
         <Route path="/ai-mock-interview" element={<ProtectedRoute><AIMockInterview /></ProtectedRoute>} />
         <Route path="/upgrade" element={<ProtectedRoute><Upgrade /></ProtectedRoute>} />

@@ -536,6 +536,72 @@ export type Database = {
           },
         ]
       }
+      job_board: {
+        Row: {
+          company_name: string
+          created_at: string
+          id: string
+          job_description: string | null
+          job_type: string | null
+          link_1_link: string | null
+          link_1_title: string | null
+          link_2_link: string | null
+          link_2_title: string | null
+          link_3_link: string | null
+          link_3_title: string | null
+          location: string | null
+          posted_at: string | null
+          salary: string | null
+          thumbnail: string | null
+          title: string
+          updated_at: string
+          user_id: string
+          via: string | null
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          id?: string
+          job_description?: string | null
+          job_type?: string | null
+          link_1_link?: string | null
+          link_1_title?: string | null
+          link_2_link?: string | null
+          link_2_title?: string | null
+          link_3_link?: string | null
+          link_3_title?: string | null
+          location?: string | null
+          posted_at?: string | null
+          salary?: string | null
+          thumbnail?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+          via?: string | null
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          id?: string
+          job_description?: string | null
+          job_type?: string | null
+          link_1_link?: string | null
+          link_1_title?: string | null
+          link_2_link?: string | null
+          link_2_title?: string | null
+          link_3_link?: string | null
+          link_3_title?: string | null
+          location?: string | null
+          posted_at?: string | null
+          salary?: string | null
+          thumbnail?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          via?: string | null
+        }
+        Relationships: []
+      }
       job_cover_letters: {
         Row: {
           company_name: string
@@ -1162,6 +1228,12 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: {
           deleted_interview_prep: number
+        }[]
+      }
+      cleanup_old_job_board_data: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          deleted_jobs: number
         }[]
       }
       cleanup_old_linkedin_data: {
