@@ -33,18 +33,29 @@ export const useJobBoardData = () => {
         .eq('section', 'last_7_days')
         .order('created_at', { ascending: false });
 
-      // Fetch jobs that are saved to tracker
-      const { data: saved, error: savedError } = await supabase
+      // Fetch user's job tracker entries to find saved jobs
+      const { data: userJobTracker, error: trackerError } = await supabase
+        .from('job_tracker')
+        .select('job_title, company_name')
+        .eq('user_id', (await supabase.from('user_profile').select('id').eq('user_id', (await supabase.from('users').select('id').eq('clerk_id', (await supabase.auth.getUser()).data.user?.id || '').single()).data?.id || '').single()).data?.id || '');
+
+      // Find job_board entries that match saved tracker entries
+      const { data: allJobBoard, error: allJobBoardError } = await supabase
         .from('job_board')
-        .select(`
-          *,
-          job_tracker!inner(id)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
+
+      const saved = allJobBoard?.filter(job => 
+        userJobTracker?.some(tracker => 
+          tracker.job_title === job.title && 
+          tracker.company_name === job.company_name
+        )
+      ) || [];
 
       if (postedTodayError) throw postedTodayError;
       if (last7DaysError) throw last7DaysError;
-      if (savedError) throw savedError;
+      if (trackerError) throw trackerError;
+      if (allJobBoardError) throw allJobBoardError;
 
       setPostedTodayJobs(postedToday || []);
       setLast7DaysJobs(last7Days || []);

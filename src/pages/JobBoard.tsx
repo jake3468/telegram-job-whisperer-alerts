@@ -59,6 +59,7 @@ export const JobBoard = () => {
           job_title: job.title,
           company_name: job.company_name,
           job_description: job.job_description,
+          job_url: job.link_1_link,
           status: 'saved'
         });
 
