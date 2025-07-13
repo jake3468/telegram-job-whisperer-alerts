@@ -216,10 +216,10 @@ const JobBoard = () => {
 
           {/* Job Sections */}
           <Tabs defaultValue="posted-today" className="w-full overflow-hidden">
-            <TabsList className="grid w-full grid-cols-3 mb-4 overflow-hidden">
+            <TabsList className="grid w-full grid-cols-3 mb-6 overflow-hidden bg-transparent gap-2 h-auto p-1">
               <TabsTrigger 
                 value="posted-today" 
-                className="text-xs sm:text-sm px-1 sm:px-2 py-2 truncate data-[state=active]:bg-blue-600 data-[state=active]:text-white overflow-hidden"
+                className="text-xs sm:text-sm px-3 sm:px-4 py-3 rounded-full overflow-hidden border border-white/20 bg-transparent text-white hover:bg-white/10 transition-all data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=active]:border-blue-400"
               >
                 <span className="hidden sm:inline truncate">Posted Today</span>
                 <span className="sm:hidden truncate">Today</span>
@@ -227,7 +227,7 @@ const JobBoard = () => {
               </TabsTrigger>
               <TabsTrigger 
                 value="last-7-days" 
-                className="text-xs sm:text-sm px-1 sm:px-2 py-2 truncate data-[state=active]:bg-blue-600 data-[state=active]:text-white overflow-hidden"
+                className="text-xs sm:text-sm px-3 sm:px-4 py-3 rounded-full overflow-hidden border border-white/20 bg-transparent text-white hover:bg-white/10 transition-all data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=active]:border-blue-400"
               >
                 <span className="hidden sm:inline truncate">Last 7 Days</span>
                 <span className="sm:hidden truncate">Week</span>
@@ -235,7 +235,7 @@ const JobBoard = () => {
               </TabsTrigger>
               <TabsTrigger 
                 value="saved-to-tracker" 
-                className="text-xs sm:text-sm px-1 sm:px-2 py-2 truncate data-[state=active]:bg-blue-600 data-[state=active]:text-white overflow-hidden"
+                className="text-xs sm:text-sm px-3 sm:px-4 py-3 rounded-full overflow-hidden border border-white/20 bg-transparent text-white hover:bg-white/10 transition-all data-[state=active]:bg-blue-500 data-[state=active]:text-white data-[state=active]:border-blue-400"
               >
                 <span className="hidden sm:inline truncate">Saved</span>
                 <span className="sm:hidden truncate">Saved</span>
@@ -244,14 +244,16 @@ const JobBoard = () => {
             </TabsList>
 
             {/* Search */}
-            <div className="mb-4 sm:mb-6 w-full">
+            <div className="mb-6 w-full">
               <div className="relative w-full max-w-md mx-auto">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 h-5 w-5" />
+                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-300 text-lg">
+                  🔍
+                </div>
                 <Input 
                   placeholder="Search by job title or company name..." 
                   value={searchTerm} 
                   onChange={e => setSearchTerm(e.target.value)} 
-                  className="pl-11 pr-4 bg-white border-2 border-blue-200 text-gray-900 placeholder:text-gray-500 h-12 text-sm w-full rounded-lg shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" 
+                  className="pl-12 pr-4 bg-gray-800 border border-gray-600 text-white placeholder:text-gray-400 h-12 text-sm w-full rounded-2xl shadow-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-600 transition-all" 
                 />
               </div>
             </div>
