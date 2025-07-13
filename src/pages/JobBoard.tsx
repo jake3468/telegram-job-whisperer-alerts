@@ -175,31 +175,7 @@ const JobBoard = () => {
     );
   }
 
-  if (error) {
-    return (
-      <Layout>
-        <div className="p-3 sm:p-6 w-full overflow-hidden">
-          <div className="max-w-6xl mx-auto w-full overflow-hidden">
-            <div className="text-center py-12">
-              <div className="mb-4">
-                <RefreshCw className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-300 text-lg mb-2">Unable to load job opportunities</p>
-                <p className="text-gray-400 text-sm mb-6">Please try refreshing to see the latest jobs</p>
-              </div>
-              <Button 
-                onClick={forceRefresh}
-                disabled={loading}
-                className="bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2 mx-auto disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                {loading ? 'Refreshing...' : 'Refresh Jobs'}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
+  // Show normal layout with error indicator and refresh button in header
 
   return (
     <Layout>
@@ -207,12 +183,33 @@ const JobBoard = () => {
         <div className="max-w-6xl mx-auto w-full overflow-hidden">
           {/* Header */}
           <div className="text-center mb-4 sm:mb-6">
-            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2 sm:mb-4 font-orbitron">
-              Job Board
-            </h1>
+            <div className="flex items-center justify-center gap-4 mb-2 sm:mb-4">
+              <h1 className="text-2xl sm:text-4xl font-bold text-white font-orbitron">
+                Job Board
+              </h1>
+              {/* Small refresh button - always visible for manual refresh */}
+              <Button 
+                onClick={forceRefresh}
+                disabled={loading}
+                variant="ghost" 
+                size="sm" 
+                className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0" 
+                title="Refresh jobs data"
+              >
+                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              </Button>
+            </div>
             <p className="text-gray-300 text-sm sm:text-lg">
               Discover opportunities tailored to your profile
             </p>
+            {/* Error indicator */}
+            {error && (
+              <div className="bg-red-900/50 border border-red-600 rounded-lg p-3 mt-4 mx-auto max-w-2xl">
+                <div className="flex items-center gap-2 text-red-200 justify-center">
+                  <span className="text-sm">Unable to load job opportunities. Click refresh to retry.</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Job Sections */}

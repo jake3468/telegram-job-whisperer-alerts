@@ -180,18 +180,26 @@ export const useJobBoardData = () => {
   };
 
   const forceRefresh = async () => {
-    // Clear error state immediately and show loading
-    setError(null);
-    setLoading(true);
-    
     try {
-      // Add a small delay to show loading state
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Clear error state immediately and show loading
+      setError(null);
+      setLoading(true);
+      
+      // Clear existing data to force complete refresh
+      setPostedTodayJobs([]);
+      setLast7DaysJobs([]);
+      setSavedToTrackerJobs([]);
+      
+      // Force refresh the data
       await fetchJobs();
+      
+      console.log('Job board data refreshed successfully');
     } catch (err) {
       console.error('Force refresh failed:', err);
-      // If refresh fails, try a simple page reload as fallback
-      window.location.reload();
+      setError(err as Error);
+      // Don't reload the page automatically, let the user decide
+    } finally {
+      setLoading(false);
     }
   };
 
