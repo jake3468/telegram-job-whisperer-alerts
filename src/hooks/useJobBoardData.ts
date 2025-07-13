@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
@@ -11,11 +11,25 @@ export const useJobBoardData = () => {
   const [savedJobs, setSavedJobs] = useState<JobBoardItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [lastFetch, setLastFetch] = useState<number>(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const fetchJobs = async () => {
+  const fetchJobs = useCallback(async (showRefreshingIndicator = false) => {
     try {
-      setLoading(true);
+      if (showRefreshingIndicator) {
+        setIsRefreshing(true);
+      } else {
+        setLoading(true);
+      }
       setError(null);
+
+      // Check authentication state first
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.warn('Session error:', sessionError);
+        // Continue without user-specific data
+      }
 
       // Run cleanup and categorization first
       await supabase.rpc('categorize_and_cleanup_jobs');
@@ -33,48 +47,100 @@ export const useJobBoardData = () => {
         .eq('section', 'last_7_days')
         .order('created_at', { ascending: false });
 
-      // Fetch user's job tracker entries to find saved jobs
-      const { data: userJobTracker, error: trackerError } = await supabase
-        .from('job_tracker')
-        .select('job_title, company_name')
-        .eq('user_id', (await supabase.from('user_profile').select('id').eq('user_id', (await supabase.from('users').select('id').eq('clerk_id', (await supabase.auth.getUser()).data.user?.id || '').single()).data?.id || '').single()).data?.id || '');
+      let saved: JobBoardItem[] = [];
 
-      // Find job_board entries that match saved tracker entries
-      const { data: allJobBoard, error: allJobBoardError } = await supabase
-        .from('job_board')
-        .select('*')
-        .order('created_at', { ascending: false });
+      // Only fetch saved jobs if user is authenticated
+      if (session?.user) {
+        try {
+          // Step 1: Get current user from auth
+          const { data: authUser } = await supabase.auth.getUser();
+          
+          if (authUser?.user?.id) {
+            // Step 2: Find user in users table
+            const { data: userData, error: userError } = await supabase
+              .from('users')
+              .select('id')
+              .eq('clerk_id', authUser.user.id)
+              .maybeSingle();
 
-      const saved = allJobBoard?.filter(job => 
-        userJobTracker?.some(tracker => 
-          tracker.job_title === job.title && 
-          tracker.company_name === job.company_name
-        )
-      ) || [];
+            if (userData?.id && !userError) {
+              // Step 3: Find user profile
+              const { data: profileData, error: profileError } = await supabase
+                .from('user_profile')
+                .select('id')
+                .eq('user_id', userData.id)
+                .maybeSingle();
+
+              if (profileData?.id && !profileError) {
+                // Step 4: Get job tracker entries
+                const { data: userJobTracker, error: trackerError } = await supabase
+                  .from('job_tracker')
+                  .select('job_title, company_name')
+                  .eq('user_id', profileData.id);
+
+                if (!trackerError && userJobTracker) {
+                  // Step 5: Get all job board entries
+                  const { data: allJobBoard, error: allJobBoardError } = await supabase
+                    .from('job_board')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                  if (!allJobBoardError && allJobBoard) {
+                    // Step 6: Filter matching entries
+                    saved = allJobBoard.filter(job => 
+                      userJobTracker.some(tracker => 
+                        tracker.job_title === job.title && 
+                        tracker.company_name === job.company_name
+                      )
+                    );
+                  }
+                }
+              }
+            }
+          }
+        } catch (savedJobsError) {
+          console.warn('Error fetching saved jobs:', savedJobsError);
+          // Continue without saved jobs data
+        }
+      }
 
       if (postedTodayError) throw postedTodayError;
       if (last7DaysError) throw last7DaysError;
-      if (trackerError) throw trackerError;
-      if (allJobBoardError) throw allJobBoardError;
 
       setPostedTodayJobs(postedToday || []);
       setLast7DaysJobs(last7Days || []);
-      setSavedJobs(saved || []);
+      setSavedJobs(saved);
+      setLastFetch(Date.now());
     } catch (err) {
       console.error('Error fetching job board data:', err);
       setError(err as Error);
-      toast.error('Failed to load job opportunities');
+      if (!showRefreshingIndicator) {
+        toast.error('Failed to load job opportunities');
+      }
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
     }
-  };
+  }, []);
 
-  const forceRefresh = () => {
-    fetchJobs();
-  };
+  const forceRefresh = useCallback(() => {
+    fetchJobs(true);
+  }, [fetchJobs]);
+
+  const backgroundRefresh = useCallback(() => {
+    const now = Date.now();
+    const fiveMinutes = 5 * 60 * 1000;
+    
+    if (now - lastFetch > fiveMinutes) {
+      fetchJobs(true);
+    }
+  }, [fetchJobs, lastFetch]);
 
   useEffect(() => {
     fetchJobs();
+
+    // Set up background refresh every 10 minutes
+    const backgroundInterval = setInterval(backgroundRefresh, 10 * 60 * 1000);
 
     // Set up real-time subscription for job board updates
     const channel = supabase
@@ -88,15 +154,16 @@ export const useJobBoardData = () => {
         },
         (payload) => {
           console.log('Job board change detected:', payload);
-          fetchJobs(); // Refresh the data when changes occur
+          fetchJobs(true); // Background refresh when changes occur
         }
       )
       .subscribe();
 
     return () => {
+      clearInterval(backgroundInterval);
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [fetchJobs, backgroundRefresh]);
 
   return {
     postedTodayJobs,
@@ -104,6 +171,7 @@ export const useJobBoardData = () => {
     savedJobs,
     loading,
     error,
+    isRefreshing,
     forceRefresh
   };
 };
