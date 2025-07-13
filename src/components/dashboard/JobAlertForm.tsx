@@ -297,15 +297,13 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
 
         <div className="space-y-1">
           <Label htmlFor="alert_frequency" className="text-white font-inter font-medium text-sm">Alert Frequency</Label>
-          <Select value={formData.alert_frequency} onValueChange={(value) => handleInputChange('alert_frequency', value)}>
-            <SelectTrigger className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-sm h-9">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-gray-800 border-gray-600 backdrop-blur-sm">
-              <SelectItem value="daily" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-sm">Daily</SelectItem>
-              <SelectItem value="weekly" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-sm">Weekly</SelectItem>
-            </SelectContent>
-          </Select>
+          <Input 
+            id="alert_frequency" 
+            value="Daily" 
+            readOnly
+            disabled
+            className="border-2 border-gray-500 text-white font-inter bg-orange-950 text-sm h-9 cursor-not-allowed opacity-75"
+          />
         </div>
 
         <div className="space-y-1">
