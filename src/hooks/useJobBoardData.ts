@@ -244,19 +244,9 @@ export const useJobBoardData = () => {
         .eq('clerk_id', clerkUser.id)
         .maybeSingle();
 
-      if (userError) {
-        console.error('Error fetching user:', userError);
-        // Handle JWT expiration specifically
-        if (userError.code === 'PGRST301' || userError.message?.includes('JWT expired')) {
-          toast.error('Session expired. Please refresh the page and try again.');
-        } else {
-          toast.error('Unable to verify user. Please try logging in again.');
-        }
-        return;
-      }
-
-      if (!users) {
-        toast.error('User not found. Please try logging in again.');
+      if (userError || !users) {
+        // Simple error without technical details
+        setError(new Error('Unable to verify user'));
         return;
       }
 
@@ -266,14 +256,9 @@ export const useJobBoardData = () => {
         .eq('user_id', users.id)
         .single();
 
-      if (profileError) {
-        console.error('Error fetching user profile:', profileError);
-        // Handle JWT expiration specifically
-        if (profileError.code === 'PGRST301' || profileError.message?.includes('JWT expired')) {
-          toast.error('Session expired. Please refresh the page and try again.');
-        } else {
-          toast.error('Unable to verify user profile. Please try again.');
-        }
+      if (profileError || !userProfile) {
+        // Simple error without technical details
+        setError(new Error('Unable to verify user profile'));
         return;
       }
 
@@ -291,7 +276,7 @@ export const useJobBoardData = () => {
 
         if (updateError) {
           console.error('Error updating job_board with job_reference_id:', updateError);
-          toast.error('Failed to prepare job for tracker. Please try again.');
+          setError(new Error('Failed to prepare job for tracker'));
           return;
         }
       }
@@ -306,7 +291,7 @@ export const useJobBoardData = () => {
 
       if (checkError) {
         console.error('Error checking existing job:', checkError);
-        toast.error('Unable to check if job already exists. Please try again.');
+        setError(new Error('Unable to check if job already exists'));
         return;
       }
 
@@ -340,7 +325,7 @@ export const useJobBoardData = () => {
 
       if (insertError) {
         console.error('Error saving job to tracker:', insertError);
-        toast.error(`Failed to add job to tracker: ${insertError.message}`);
+        setError(new Error('Failed to add job to tracker'));
         return;
       }
 
@@ -350,7 +335,7 @@ export const useJobBoardData = () => {
 
     } catch (err) {
       console.error('Unexpected error saving job to tracker:', err);
-      toast.error('An unexpected error occurred. Please try again.');
+      setError(err as Error);
     }
   };
 
