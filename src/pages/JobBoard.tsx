@@ -26,6 +26,20 @@ const JobCard = ({ job, onView, onSaveToTracker, onDelete, section, isAddedToTra
     return salary;
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  // Determine what date to show based on section
+  const getDateToShow = () => {
+    if (section === 'posted-today') {
+      return job.posted_at;
+    } else {
+      // For 'last-7-days' and 'saved', show created_at date only
+      return formatDate(job.created_at);
+    }
+  };
+
   return (
     <div className="w-full max-w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer overflow-hidden" onClick={onView}>
       <div className="p-3 max-w-full">
@@ -44,7 +58,7 @@ const JobCard = ({ job, onView, onSaveToTracker, onDelete, section, isAddedToTra
               <h3 className="text-sm font-bold text-gray-900 truncate">{job.title}</h3>
               <p className="text-xs text-gray-700 font-medium truncate">{job.company_name}</p>
               
-              {/* Desktop: Location, job type, and posted time */}
+              {/* Desktop: Location, job type, and date */}
               <div className="hidden sm:flex items-center gap-2 mt-1 text-xs text-gray-600">
                 <div className="flex items-center gap-1">
                   <MapPin className="h-3 w-3 flex-shrink-0" />
@@ -56,10 +70,10 @@ const JobCard = ({ job, onView, onSaveToTracker, onDelete, section, isAddedToTra
                     <span className="truncate">{job.job_type}</span>
                   </>
                 )}
-                {job.posted_at && (
+                {getDateToShow() && (
                   <>
                     <span>•</span>
-                    <span className="truncate">{job.posted_at}</span>
+                    <span className="truncate">{getDateToShow()}</span>
                   </>
                 )}
               </div>
@@ -121,7 +135,7 @@ const JobCard = ({ job, onView, onSaveToTracker, onDelete, section, isAddedToTra
           </div>
         </div>
         
-        {/* Mobile: Location, job type, posted_at and salary */}
+        {/* Mobile: Location, job type, date and salary */}
         <div className="sm:hidden mt-2 space-y-1">
           <div className="flex items-center gap-1 text-xs text-gray-600">
             <MapPin className="h-3 w-3 flex-shrink-0" />
@@ -132,10 +146,10 @@ const JobCard = ({ job, onView, onSaveToTracker, onDelete, section, isAddedToTra
                 <span className="truncate">{job.job_type}</span>
               </>
             )}
-            {job.posted_at && (
+            {getDateToShow() && (
               <>
                 <span className="mx-1">•</span>
-                <span className="truncate">{job.posted_at}</span>
+                <span className="truncate">{getDateToShow()}</span>
               </>
             )}
           </div>
