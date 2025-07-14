@@ -273,6 +273,9 @@ export const useJobBoardData = () => {
         return;
       }
 
+      // Generate a new job_reference_id for this job-tracker relationship
+      const newJobReferenceId = job.job_reference_id || crypto.randomUUID();
+
       // Insert new job tracker record with all required fields
       const { error: insertError } = await supabase
         .from('job_tracker')
@@ -282,7 +285,7 @@ export const useJobBoardData = () => {
           company_name: job.company_name,
           job_description: job.job_description || '',
           job_url: job.link_1_link || '',
-          job_reference_id: job.job_reference_id,
+          job_reference_id: newJobReferenceId,
           status: 'saved',
           order_position: 0,
           // Set all boolean fields explicitly
@@ -300,6 +303,20 @@ export const useJobBoardData = () => {
         console.error('Error saving job to tracker:', insertError);
         toast.error(`Failed to add job to tracker: ${insertError.message}`);
         return;
+      }
+
+      // Update the job_board record with the job_reference_id if it wasn't set
+      if (!job.job_reference_id) {
+        const { error: updateError } = await supabase
+          .from('job_board')
+          .update({ job_reference_id: newJobReferenceId })
+          .eq('id', job.id)
+          .eq('user_id', userProfile.id);
+
+        if (updateError) {
+          console.error('Error updating job_board with job_reference_id:', updateError);
+          // Don't fail the entire operation for this
+        }
       }
 
       toast.success('Job added to tracker successfully!');
