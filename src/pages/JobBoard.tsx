@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Layout } from '@/components/Layout';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search, MapPin, Building2, ExternalLink, X, RefreshCw, Check, Trash2 } from 'lucide-react';
 import { useJobBoardData } from '@/hooks/useJobBoardData';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { JobBoardOnboardingPopup } from '@/components/JobBoardOnboardingPopup';
 import { Tables } from '@/integrations/supabase/types';
 type JobBoardItem = Tables<'job_board'>;
 interface JobCardProps {
@@ -130,6 +132,7 @@ const JobBoard = () => {
     user,
     isLoaded
   } = useUser(); // Add Clerk authentication
+  const { userProfile, updateUserProfile } = useUserProfile();
   const {
     postedTodayJobs,
     last7DaysJobs,
@@ -145,6 +148,25 @@ const JobBoard = () => {
   } = useJobBoardData();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJob, setSelectedJob] = useState<JobBoardItem | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Handle onboarding popup
+  useEffect(() => {
+    if (userProfile && userProfile.show_job_board_onboarding_popup) {
+      setShowOnboarding(true);
+    }
+  }, [userProfile]);
+
+  const handleCloseOnboarding = () => {
+    setShowOnboarding(false);
+  };
+
+  const handleDontShowOnboardingAgain = async () => {
+    setShowOnboarding(false);
+    if (userProfile) {
+      await updateUserProfile({ show_job_board_onboarding_popup: false });
+    }
+  };
 
   // Manual refresh function - robust error handling like Job Tracker
   const handleManualRefresh = useCallback(() => {
@@ -308,6 +330,13 @@ const JobBoard = () => {
             </TabsContent>
           </Tabs>
         </div>
+
+        {/* Job Board Onboarding Popup */}
+        <JobBoardOnboardingPopup
+          isOpen={showOnboarding}
+          onClose={handleCloseOnboarding}
+          onDontShowAgain={handleDontShowOnboardingAgain}
+        />
 
         {/* Job Details Modal */}
         <Dialog open={!!selectedJob} onOpenChange={() => setSelectedJob(null)}>

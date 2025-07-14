@@ -11,6 +11,7 @@ export interface UserProfile {
   created_at: string | null;
   show_onboarding_popup: boolean;
   show_job_alerts_onboarding_popup: boolean;
+  show_job_board_onboarding_popup: boolean;
 }
 
 export interface UserProfileUpdateData {
@@ -22,4 +23,5 @@ export interface UserProfileUpdateData {
   cv_chat_id?: string | null;
   show_onboarding_popup?: boolean;
   show_job_alerts_onboarding_popup?: boolean;
+  show_job_board_onboarding_popup?: boolean;
 }

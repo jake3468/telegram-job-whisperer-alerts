@@ -1062,6 +1062,7 @@ export type Database = {
           id: string
           resume: string | null
           show_job_alerts_onboarding_popup: boolean
+          show_job_board_onboarding_popup: boolean
           show_onboarding_popup: boolean
           user_id: string | null
         }
@@ -1075,6 +1076,7 @@ export type Database = {
           id?: string
           resume?: string | null
           show_job_alerts_onboarding_popup?: boolean
+          show_job_board_onboarding_popup?: boolean
           show_onboarding_popup?: boolean
           user_id?: string | null
         }
@@ -1088,6 +1090,7 @@ export type Database = {
           id?: string
           resume?: string | null
           show_job_alerts_onboarding_popup?: boolean
+          show_job_board_onboarding_popup?: boolean
           show_onboarding_popup?: boolean
           user_id?: string | null
         }
