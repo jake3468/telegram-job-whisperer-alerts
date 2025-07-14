@@ -246,7 +246,12 @@ export const useJobBoardData = () => {
 
       if (userError) {
         console.error('Error fetching user:', userError);
-        toast.error('Unable to verify user. Please try logging in again.');
+        // Handle JWT expiration specifically
+        if (userError.code === 'PGRST301' || userError.message?.includes('JWT expired')) {
+          toast.error('Session expired. Please refresh the page and try again.');
+        } else {
+          toast.error('Unable to verify user. Please try logging in again.');
+        }
         return;
       }
 
@@ -263,7 +268,12 @@ export const useJobBoardData = () => {
 
       if (profileError) {
         console.error('Error fetching user profile:', profileError);
-        toast.error('Unable to verify user profile. Please try again.');
+        // Handle JWT expiration specifically
+        if (profileError.code === 'PGRST301' || profileError.message?.includes('JWT expired')) {
+          toast.error('Session expired. Please refresh the page and try again.');
+        } else {
+          toast.error('Unable to verify user profile. Please try again.');
+        }
         return;
       }
 
