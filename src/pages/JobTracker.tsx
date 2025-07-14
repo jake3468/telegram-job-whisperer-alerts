@@ -884,7 +884,7 @@ const JobTracker = () => {
 
       {/* Edit Job Modal */}
       <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
-        <DialogContent className="bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 text-gray-900 max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 text-gray-900 max-w-md w-full max-h-[90vh] overflow-y-auto rounded-lg sm:rounded-lg">
           <DialogHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg -m-6 mb-4 p-4">
             <DialogTitle className="font-orbitron text-white text-lg">Job Details</DialogTitle>
             <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 text-white hover:text-gray-200">
@@ -998,22 +998,60 @@ const JobTracker = () => {
 
               {/* Comments Section */}
               <div className="bg-gradient-to-r from-yellow-50 to-amber-100 rounded-lg p-3 border border-yellow-200">
-                <h3 className="text-yellow-800 font-orbitron text-sm font-bold mb-3">Comments</h3>
-                <Textarea value={selectedJob.comments || ''} onChange={e => {
-              const updatedJob = {
-                ...selectedJob,
-                comments: e.target.value
-              };
-              setSelectedJob(updatedJob);
-              // Auto-save after 1 second of no typing
-              if (commentTimer) clearTimeout(commentTimer);
-              const newTimer = setTimeout(async () => {
-                await supabase.from('job_tracker').update({
-                  comments: e.target.value
-                }).eq('id', selectedJob.id);
-              }, 1000);
-              setCommentTimer(newTimer);
-            }} placeholder="Add your notes about this job..." className="border-yellow-300 text-black-900 text-sm min-h-[60px] bg-zinc-100" />
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-yellow-800 font-orbitron text-sm font-bold">Comments</h3>
+                  <Button 
+                    onClick={async () => {
+                      try {
+                        const { error } = await supabase
+                          .from('job_tracker')
+                          .update({ comments: selectedJob.comments })
+                          .eq('id', selectedJob.id);
+                        
+                        if (error) throw error;
+                        
+                        // Update optimistic state
+                        optimisticUpdate(selectedJob);
+                        
+                        toast({
+                          title: "Success",
+                          description: "Comment saved successfully!"
+                        });
+                      } catch (error) {
+                        console.error('Error saving comment:', error);
+                        toast({
+                          title: "Error",
+                          description: "Failed to save comment.",
+                          variant: "destructive"
+                        });
+                      }
+                    }}
+                    size="sm"
+                    className="bg-yellow-600 hover:bg-yellow-700 text-white text-xs h-6 px-2"
+                  >
+                    Save
+                  </Button>
+                </div>
+                <Textarea 
+                  value={selectedJob.comments || ''} 
+                  onChange={e => {
+                    const updatedJob = {
+                      ...selectedJob,
+                      comments: e.target.value
+                    };
+                    setSelectedJob(updatedJob);
+                    // Auto-save after 2 seconds of no typing (backup)
+                    if (commentTimer) clearTimeout(commentTimer);
+                    const newTimer = setTimeout(async () => {
+                      await supabase.from('job_tracker').update({
+                        comments: e.target.value
+                      }).eq('id', selectedJob.id);
+                    }, 2000);
+                    setCommentTimer(newTimer);
+                  }} 
+                  placeholder="Add your notes about this job..." 
+                  className="border-yellow-300 text-gray-900 placeholder:text-gray-500 text-sm min-h-[60px] bg-white/80" 
+                />
               </div>
 
               {/* File Upload Section */}
