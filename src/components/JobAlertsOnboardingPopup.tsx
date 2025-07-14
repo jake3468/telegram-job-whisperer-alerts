@@ -8,8 +8,8 @@ export function JobAlertsOnboardingPopup() {
 
   return (
     <Dialog open={showPopup} onOpenChange={hidePopup}>
-      <DialogContent className="max-w-sm sm:max-w-md mx-4 p-0 overflow-hidden border-orange-200">
-        {/* Header Section with Close Button */}
+      <DialogContent className="max-w-sm sm:max-w-md mx-4 sm:mx-auto p-0 overflow-hidden border-orange-200 max-h-[80vh] w-[calc(100vw-2rem)] sm:w-full flex flex-col">
+        {/* Header Section with Close Button - Fixed */}
         <div className="bg-gradient-to-r from-orange-500 to-amber-500 px-6 py-4 relative">
           <Button 
             variant="ghost" 
@@ -26,35 +26,40 @@ export function JobAlertsOnboardingPopup() {
           </DialogHeader>
         </div>
         
-        {/* Body Section */}
-        <div className="bg-gradient-to-br from-orange-50 to-amber-50 px-6 py-5">
-          <div className="space-y-4 text-orange-800">
-            <p className="text-sm leading-relaxed">
-              We know — setting something up can feel like a chore.<br />
-              You're probably thinking: "Do I really need to do this?"
-            </p>
-            
-            <p className="text-sm leading-relaxed font-medium">
-              Yes. And it takes less than a minute.<br />
-              All you need to do is activate our Telegram Job Alert Bot by following the quick steps on this page.
-            </p>
-            
-            <div className="space-y-2">
-              <p className="text-sm font-medium">Once you're in, you'll unlock:</p>
-              <ul className="text-sm space-y-1 pl-4">
-                <li>🎯 Job alerts based on your desired job title</li>
-                <li>🌍 Filtered by your desired country and location</li>
-                <li>🕒 Delivered at your chosen time — every single day</li>
-                <li>🚀 And it's all blazing fast, laser-targeted, and 100% fluff-free</li>
-              </ul>
+        {/* Scrollable Body Section */}
+        <div className="bg-gradient-to-br from-orange-50 to-amber-50 flex-1 overflow-y-auto">
+          <div className="px-6 py-5">
+            <div className="space-y-4 text-orange-800">
+              <p className="text-sm leading-relaxed">
+                We know — setting something up can feel like a chore.<br />
+                You're probably thinking: "Do I really need to do this?"
+              </p>
+              
+              <p className="text-sm leading-relaxed font-medium">
+                Yes. And it takes less than a minute.<br />
+                All you need to do is activate our Telegram Job Alert Bot by following the quick steps on this page.
+              </p>
+              
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Once you're in, you'll unlock:</p>
+                <ul className="text-sm space-y-1 pl-4">
+                  <li>🎯 Job alerts based on your desired job title</li>
+                  <li>🌍 Filtered by your desired country and location</li>
+                  <li>🕒 Delivered at your chosen time — every single day</li>
+                  <li>🚀 And it's all blazing fast, laser-targeted, and 100% fluff-free</li>
+                </ul>
+              </div>
+              
+              <p className="text-sm leading-relaxed">
+                This isn't just another job alert system — it's your personal AI-powered sidekick that delivers handpicked jobs while you sip your chai ☕.
+              </p>
             </div>
-            
-            <p className="text-sm leading-relaxed">
-              This isn't just another job alert system — it's your personal AI-powered sidekick that delivers handpicked jobs while you sip your chai ☕.
-            </p>
           </div>
-          
-          <div className="flex flex-col gap-3 pt-6">
+        </div>
+        
+        {/* Footer Section with Buttons - Fixed */}
+        <div className="bg-gradient-to-br from-orange-50 to-amber-50 px-6 py-4 border-t border-orange-200/50">
+          <div className="flex flex-col gap-3">
             <Button 
               onClick={hidePopup} 
               className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold"
