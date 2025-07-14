@@ -199,7 +199,15 @@ export const FileUpload = ({ jobId, userProfileId, existingFiles = [], onFilesUp
     } catch {
       // Fallback for old format (plain URL)
       fileUrl = fileData;
-      fileName = fileData.split('/').pop() || 'download';
+      const storageFileName = fileData.split('/').pop() || 'download';
+      // Try to extract original name from storage filename if it contains underscores
+      if (storageFileName.includes('_') && storageFileName.split('_').length > 2) {
+        // Remove timestamp and random part, keep the original filename part
+        const parts = storageFileName.split('_');
+        fileName = parts.slice(2).join('_'); // Everything after timestamp_random_
+      } else {
+        fileName = storageFileName;
+      }
     }
     
     const link = document.createElement('a');
@@ -252,10 +260,14 @@ export const FileUpload = ({ jobId, userProfileId, existingFiles = [], onFilesUp
             } catch {
               // Fallback for old format (plain URL)
               fileUrl = fileData;
-              originalName = fileData.split('/').pop() || `File ${index + 1}`;
-              // For old random filenames, clean them up for display
-              if (originalName.includes('.') && originalName.length > 20) {
-                originalName = originalName.substring(originalName.indexOf('.') + 1);
+              const storageFileName = fileData.split('/').pop() || `File ${index + 1}`;
+              // Try to extract original name from storage filename if it contains underscores
+              if (storageFileName.includes('_') && storageFileName.split('_').length > 2) {
+                // Remove timestamp and random part, keep the original filename part
+                const parts = storageFileName.split('_');
+                originalName = parts.slice(2).join('_'); // Everything after timestamp_random_
+              } else {
+                originalName = storageFileName;
               }
             }
             

@@ -884,15 +884,18 @@ const JobTracker = () => {
 
       {/* Edit Job Modal */}
       <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
-        <DialogContent className="bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 text-gray-900 max-w-md w-full max-h-[90vh] overflow-y-auto rounded-lg sm:rounded-lg">
-          <DialogHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg -m-6 mb-4 p-4">
-            <DialogTitle className="font-orbitron text-white text-lg">Job Details</DialogTitle>
+        <DialogContent className="bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 text-gray-900 w-[95vw] max-w-md h-[90vh] max-h-[600px] overflow-hidden rounded-lg sm:rounded-lg p-0 flex flex-col">
+          <DialogHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg p-4 flex-shrink-0">
+            <DialogTitle className="font-orbitron text-white text-lg pr-8">Job Details</DialogTitle>
             <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 text-white hover:text-gray-200">
               <X className="h-4 w-4" />
               <span className="sr-only">Close</span>
             </DialogClose>
           </DialogHeader>
-          {selectedJob && <div className="space-y-4 p-1">
+          
+          {/* Scrollable content area */}
+          <div className="flex-1 overflow-y-auto p-4">
+          {selectedJob && <div className="space-y-4">
               {/* Checklist Section */}
               {(selectedJob.status === 'saved' || selectedJob.status === 'applied') && <div className="bg-gradient-to-r from-green-50 to-emerald-100 rounded-lg p-3 border border-green-200">
                   <div className="flex items-center justify-between mb-3">
@@ -1111,21 +1114,25 @@ const JobTracker = () => {
                   </div>
                 </div>
               </div>
-              
-              <div className="flex gap-2">
-                <Button onClick={handleUpdateJob} className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-orbitron text-sm h-9">
-                  Save Changes
-                </Button>
-                <Button onClick={() => {
-              deleteJob(selectedJob.id);
-              setIsViewModalOpen(false);
-              setSelectedJob(null);
-            }} variant="destructive" className="bg-red-600 hover:bg-red-700 text-white font-orbitron text-sm h-9">
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    Delete
-                  </Button>
-                </div>
               </div>}
+            </div>
+          
+          {/* Fixed footer with action buttons */}
+          <div className="flex-shrink-0 p-4 border-t border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-100">
+            <div className="flex gap-2">
+              <Button onClick={handleUpdateJob} className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-orbitron text-sm h-9">
+                Save Changes
+              </Button>
+              <Button onClick={() => {
+                deleteJob(selectedJob.id);
+                setIsViewModalOpen(false);
+                setSelectedJob(null);
+              }} variant="destructive" className="bg-red-600 hover:bg-red-700 text-white font-orbitron text-sm h-9">
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Delete
+                </Button>
+              </div>
+            </div>
         </DialogContent>
       </Dialog>
 
