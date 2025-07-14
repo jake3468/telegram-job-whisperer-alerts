@@ -356,7 +356,7 @@ export const useJobBoardData = () => {
         return;
       }
 
-      console.log('Deleting job:', job.id, 'job_reference_id:', job.job_reference_id);
+      console.log('Deleting job from job_board:', job.id);
 
       // Get user profile
       const { data: users, error: userError } = await supabase
@@ -381,75 +381,25 @@ export const useJobBoardData = () => {
         return;
       }
 
-      console.log('User profile ID:', userProfile.id);
+      // Simply delete from job_board only
+      const { error: deleteError, count } = await supabase
+        .from('job_board')
+        .delete({ count: 'exact' })
+        .eq('id', job.id)
+        .eq('user_id', userProfile.id);
 
-      // Check if job is in tracker (has job_reference_id and exists in job_tracker)
-      let isInTracker = false;
-      if (job.job_reference_id) {
-        const { data: trackerJob } = await supabase
-          .from('job_tracker')
-          .select('id')
-          .eq('user_id', userProfile.id)
-          .eq('job_reference_id', job.job_reference_id)
-          .maybeSingle();
-        
-        isInTracker = !!trackerJob;
+      if (deleteError) {
+        console.error('Error deleting job from board:', deleteError);
+        toast.error(`Failed to delete job: ${deleteError.message}`);
+        return;
       }
 
-      if (isInTracker && job.job_reference_id) {
-        // Case 2: Job is in both saved and tracker - remove from tracker only, reset job_reference_id
-        console.log('Job is in tracker, removing from tracker and resetting job_reference_id');
-        
-        const { error: trackerDeleteError } = await supabase
-          .from('job_tracker')
-          .delete()
-          .eq('user_id', userProfile.id)
-          .eq('job_reference_id', job.job_reference_id);
-
-        if (trackerDeleteError) {
-          console.error('Error deleting from job tracker:', trackerDeleteError);
-          toast.error(`Failed to delete from job tracker: ${trackerDeleteError.message}`);
-          return;
-        }
-
-        // Reset job_reference_id to null in job_board (keep the job saved but not tracked)
-        const { error: updateError } = await supabase
-          .from('job_board')
-          .update({ job_reference_id: null })
-          .eq('id', job.id)
-          .eq('user_id', userProfile.id);
-
-        if (updateError) {
-          console.error('Error updating job_board:', updateError);
-          toast.error(`Failed to update job: ${updateError.message}`);
-          return;
-        }
-
-        toast.success('Job removed from tracker but kept saved!');
-      } else {
-        // Case 1: Job is only saved (not in tracker) - delete completely from job_board
-        console.log('Job is only saved, deleting completely from job_board');
-        
-        const { error: deleteError, count: boardCount } = await supabase
-          .from('job_board')
-          .delete({ count: 'exact' })
-          .eq('id', job.id)
-          .eq('user_id', userProfile.id);
-
-        if (deleteError) {
-          console.error('Error deleting job from board:', deleteError);
-          toast.error(`Failed to delete job: ${deleteError.message}`);
-          return;
-        }
-
-        if (boardCount === 0) {
-          toast.error('Job not found or you do not have permission to delete it');
-          return;
-        }
-
-        toast.success('Job deleted successfully!');
+      if (count === 0) {
+        toast.error('Job not found or you do not have permission to delete it');
+        return;
       }
 
+      toast.success('Job removed from saved jobs!');
       await fetchJobs();
 
     } catch (err) {
