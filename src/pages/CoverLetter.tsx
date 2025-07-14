@@ -1,6 +1,6 @@
 import { useUser } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -28,6 +28,7 @@ const CoverLetter = () => {
     isLoaded
   } = useUser();
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     toast
   } = useToast();
@@ -76,6 +77,20 @@ const CoverLetter = () => {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
+
+  // Auto-populate form data if passed via navigation state
+  useEffect(() => {
+    if (location.state?.jobData) {
+      const { company_name, job_title, job_description } = location.state.jobData;
+      setFormData({
+        company_name: company_name || '',
+        job_title: job_title || '',
+        job_description: job_description || ''
+      });
+      // Clear the navigation state after using it
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   // Enhanced real-time subscription for cover letter updates with improved detection
   useEffect(() => {

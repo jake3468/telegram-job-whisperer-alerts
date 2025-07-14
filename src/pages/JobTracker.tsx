@@ -915,23 +915,90 @@ const JobTracker = () => {
                   </div>
                   <div className="space-y-2">
                     {(selectedJob.status === 'saved' ? [
-                      { field: 'resume_updated', label: 'Resume updated', completed: selectedJob.resume_updated },
-                      { field: 'job_role_analyzed', label: 'Job role analyzed', completed: selectedJob.job_role_analyzed },
-                      { field: 'company_researched', label: 'Company researched', completed: selectedJob.company_researched },
-                      { field: 'cover_letter_prepared', label: 'Cover letter prepared', completed: selectedJob.cover_letter_prepared },
-                      { field: 'ready_to_apply', label: 'Ready to apply', completed: selectedJob.ready_to_apply }
+                      { field: 'cover_letter_prepared', label: '✍️ Did you prepare your cover letter?', completed: selectedJob.cover_letter_prepared, page: '/cover-letter' },
+                      { field: 'resume_updated', label: '📄 Did you update your resume?', completed: selectedJob.resume_updated, page: '/job-analysis' },
+                      { field: 'company_researched', label: '🏢 Did you research the company?', completed: selectedJob.company_researched, page: '/company-role-analysis' },
+                      { field: 'job_role_analyzed', label: '🎯 Did you analyze the job role?', completed: selectedJob.job_role_analyzed, page: '/job-analysis' },
+                      { field: 'ready_to_apply', label: '🚀 Are you ready to apply?', completed: selectedJob.ready_to_apply, page: null }
+                    ] : selectedJob.status === 'applied' ? [
+                      { field: 'interview_call_received', label: 'Interview call received', completed: selectedJob.interview_call_received, page: null }
                     ] : [
-                      { field: 'interview_call_received', label: 'Interview call received', completed: selectedJob.interview_call_received }
+                      { field: 'interview_prep_guide_received', label: 'Interview prep guide received', completed: selectedJob.interview_prep_guide_received, page: '/interview-prep' },
+                      { field: 'ai_mock_interview_attempted', label: 'AI mock interview attempted', completed: selectedJob.ai_mock_interview_attempted, page: '/grace-interview' }
                     ]).map((item) => (
-                      <div key={item.field} className="flex items-center space-x-2">
-                        <Checkbox
-                          checked={item.completed}
-                          onCheckedChange={() => handleUpdateChecklistItem(selectedJob.id, item.field)}
-                          className={`h-4 w-4 ${item.completed ? 'data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500' : ''}`}
-                        />
-                        <span className={`text-xs ${item.completed ? 'text-green-600 line-through' : 'text-green-800'}`}>
-                          {item.label}
-                        </span>
+                      <div key={item.field} className="flex items-center justify-between space-x-2">
+                        <div className="flex items-center space-x-2 flex-1">
+                          <Checkbox
+                            checked={item.completed}
+                            onCheckedChange={() => handleUpdateChecklistItem(selectedJob.id, item.field)}
+                            className={`h-4 w-4 ${item.completed ? 'data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500' : ''}`}
+                          />
+                          <span className={`text-xs ${item.completed ? 'text-green-600 line-through' : 'text-green-800'}`}>
+                            {item.label}
+                          </span>
+                        </div>
+                        {item.page && !item.completed && (
+                          <button
+                            onClick={() => {
+                              if (item.page === '/cover-letter') {
+                                navigate(item.page, {
+                                  state: {
+                                    jobData: {
+                                      company_name: selectedJob.company_name,
+                                      job_title: selectedJob.job_title,
+                                      job_description: selectedJob.job_description || ''
+                                    }
+                                  }
+                                });
+                              } else if (item.page === '/job-analysis') {
+                                navigate(item.page, {
+                                  state: {
+                                    jobData: {
+                                      company_name: selectedJob.company_name,
+                                      job_title: selectedJob.job_title,
+                                      job_description: selectedJob.job_description || ''
+                                    }
+                                  }
+                                });
+                              } else if (item.page === '/company-role-analysis') {
+                                navigate(item.page, {
+                                  state: {
+                                    jobData: {
+                                      company_name: selectedJob.company_name,
+                                      job_title: selectedJob.job_title,
+                                      location: 'USA' // Default location
+                                    }
+                                  }
+                                });
+                              } else if (item.page === '/interview-prep') {
+                                navigate(item.page, {
+                                  state: {
+                                    jobData: {
+                                      company_name: selectedJob.company_name,
+                                      job_title: selectedJob.job_title,
+                                      job_description: selectedJob.job_description || ''
+                                    }
+                                  }
+                                });
+                              } else if (item.page === '/grace-interview') {
+                                navigate(item.page, {
+                                  state: {
+                                    jobData: {
+                                      company_name: selectedJob.company_name,
+                                      job_title: selectedJob.job_title,
+                                      job_description: selectedJob.job_description || ''
+                                    }
+                                  }
+                                });
+                              } else {
+                                navigate(item.page);
+                              }
+                            }}
+                            className="text-blue-600 hover:text-blue-800 text-xs font-medium underline"
+                          >
+                            Get it now
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>
