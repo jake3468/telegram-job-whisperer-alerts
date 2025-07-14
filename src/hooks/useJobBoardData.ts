@@ -57,29 +57,28 @@ export const useJobBoardData = () => {
         return;
       }
 
-      // First run cleanup function to categorize and delete old jobs
-      await supabase.rpc('categorize_and_cleanup_jobs');
-
-      // Get user profile using Clerk user ID
+      // Get user data with fallback error handling
       const { data: users, error: userError } = await supabase
         .from('users')
         .select('id')
         .eq('clerk_id', clerkUser.id)
-        .single();
-
-      if (userError || !users) {
-        throw new Error('User not found in database');
-      }
+        .maybeSingle();
 
       const { data: userProfile, error: profileError } = await supabase
         .from('user_profile')
         .select('id')
-        .eq('user_id', users.id)
-        .single();
+        .eq('user_id', users?.id)
+        .maybeSingle();
 
-      if (profileError || !userProfile) {
-        throw new Error('User profile not found');
+      // If user data issues, trigger connection issue instead of failing silently
+      if (userError || profileError || !users || !userProfile) {
+        console.error('User data fetch issue:', { userError, profileError });
+        setConnectionIssue(true);
+        return;
       }
+
+      // First run cleanup function to categorize and delete old jobs
+      await supabase.rpc('categorize_and_cleanup_jobs');
 
       // Fetch job_board data for this user
       const { data: jobBoardData, error: fetchError } = await supabase
@@ -118,22 +117,27 @@ export const useJobBoardData = () => {
         job.is_saved_by_user === true
       );
 
-      // Check tracker status for saved jobs
+      // Check tracker status for saved jobs (with better error handling)
       const trackerStatus: Record<string, boolean> = {};
       if (savedToTracker.length > 0) {
-        const { data: trackerJobs } = await supabase
-          .from('job_tracker')
-          .select('job_reference_id')
-          .eq('user_id', userProfile.id)
-          .not('job_reference_id', 'is', null);
+        try {
+          const { data: trackerJobs } = await supabase
+            .from('job_tracker')
+            .select('job_reference_id')
+            .eq('user_id', userProfile.id)
+            .not('job_reference_id', 'is', null);
 
-        if (trackerJobs) {
-          const trackerJobIds = new Set(trackerJobs.map(tj => tj.job_reference_id));
-          savedToTracker.forEach(job => {
-            if (job.job_reference_id) {
-              trackerStatus[job.job_reference_id] = trackerJobIds.has(job.job_reference_id);
-            }
-          });
+          if (trackerJobs) {
+            const trackerJobIds = new Set(trackerJobs.map(tj => tj.job_reference_id));
+            savedToTracker.forEach(job => {
+              if (job.job_reference_id) {
+                trackerStatus[job.job_reference_id] = trackerJobIds.has(job.job_reference_id);
+              }
+            });
+          }
+        } catch (trackerError) {
+          console.error('Error fetching tracker status:', trackerError);
+          // Don't fail the entire fetch, just continue without tracker status
         }
       }
 
@@ -145,25 +149,7 @@ export const useJobBoardData = () => {
     } catch (err) {
       console.error('Error fetching job board data:', err);
       setError(err as Error);
-      
-      // Check if it's a connection/network issue
-      if (err instanceof Error && (
-        err.message.includes('Failed to fetch') ||
-        err.message.includes('NetworkError') ||
-        err.message.includes('fetch') ||
-        err.message.includes('ECONNREFUSED') ||
-        err.message.includes('timeout')
-      )) {
-        setConnectionIssue(true);
-        toast.error('Connection issue detected. Please check your internet connection.');
-      }
-      // Check if it's an authentication error and suggest refresh
-      else if (err instanceof Error && (err.message.includes('JWT') || err.message.includes('expired') || err.message.includes('unauthorized'))) {
-        setConnectionIssue(true);
-        toast.error('Session expired. Please refresh the page to continue.');
-      } else {
-        toast.error('Failed to load job opportunities');
-      }
+      setConnectionIssue(true);
     } finally {
       setLoading(false);
     }
@@ -245,8 +231,7 @@ export const useJobBoardData = () => {
         .maybeSingle();
 
       if (userError || !users) {
-        // Simple error without technical details
-        setError(new Error('Unable to verify user'));
+        toast.error('Please refresh the page and try again');
         return;
       }
 
@@ -257,8 +242,7 @@ export const useJobBoardData = () => {
         .single();
 
       if (profileError || !userProfile) {
-        // Simple error without technical details
-        setError(new Error('Unable to verify user profile'));
+        toast.error('Please refresh the page and try again');
         return;
       }
 
@@ -276,7 +260,7 @@ export const useJobBoardData = () => {
 
         if (updateError) {
           console.error('Error updating job_board with job_reference_id:', updateError);
-          setError(new Error('Failed to prepare job for tracker'));
+          toast.error('Failed to prepare job for tracker');
           return;
         }
       }
@@ -291,7 +275,7 @@ export const useJobBoardData = () => {
 
       if (checkError) {
         console.error('Error checking existing job:', checkError);
-        setError(new Error('Unable to check if job already exists'));
+        toast.error('Unable to check if job already exists');
         return;
       }
 
@@ -325,7 +309,7 @@ export const useJobBoardData = () => {
 
       if (insertError) {
         console.error('Error saving job to tracker:', insertError);
-        setError(new Error('Failed to add job to tracker'));
+        toast.error('Failed to add job to tracker');
         return;
       }
 
@@ -335,7 +319,7 @@ export const useJobBoardData = () => {
 
     } catch (err) {
       console.error('Unexpected error saving job to tracker:', err);
-      setError(err as Error);
+      toast.error('Please refresh the page and try again');
     }
   };
 
