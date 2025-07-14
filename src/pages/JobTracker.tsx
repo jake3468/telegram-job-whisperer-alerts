@@ -893,7 +893,7 @@ const JobTracker = () => {
 
       {/* Edit Job Modal */}
       <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
-        <DialogContent className="bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 text-gray-900 max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 text-gray-900 max-w-md w-full max-h-[90vh] overflow-y-auto rounded-xl sm:rounded-lg">
           <DialogHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg -m-6 mb-4 p-4">
             <DialogTitle className="font-orbitron text-white text-lg">Job Details</DialogTitle>
             <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 text-white hover:text-gray-200">
@@ -1009,9 +1009,33 @@ const JobTracker = () => {
                     }, 1000);
                     setCommentTimer(newTimer);
                   }}
-                  className="bg-white border-yellow-300 text-gray-900 text-sm min-h-[60px]"
+                  className="bg-gray-50 border-yellow-300 text-gray-900 text-sm min-h-[60px]"
                   placeholder="Add your notes about this job..."
                 />
+                <div className="mt-2 flex justify-end">
+                  <Button
+                    onClick={async () => {
+                      if (commentTimer) clearTimeout(commentTimer);
+                      try {
+                        await supabase.from('job_tracker').update({ comments: selectedJob.comments }).eq('id', selectedJob.id);
+                        toast({
+                          title: "Success",
+                          description: "Comments saved successfully!"
+                        });
+                      } catch (error) {
+                        toast({
+                          title: "Error",
+                          description: "Failed to save comments.",
+                          variant: "destructive"
+                        });
+                      }
+                    }}
+                    size="sm"
+                    className="bg-yellow-600 hover:bg-yellow-700 text-white text-xs"
+                  >
+                    Save Comment
+                  </Button>
+                </div>
               </div>
 
               {/* File Upload Section */}
