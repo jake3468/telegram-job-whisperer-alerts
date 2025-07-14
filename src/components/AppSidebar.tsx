@@ -13,9 +13,9 @@ const profileItems = [{
   url: '/profile',
   icon: User
 }, {
-  title: 'Pricing Plans',
-  url: '/get-more-credits',
-  icon: CreditCard
+  title: 'Create Job Alerts',
+  url: '/job-alerts',
+  icon: Bell
 }, {
   title: 'Job Board',
   url: '/job-board',
@@ -24,6 +24,10 @@ const profileItems = [{
   title: 'Job Tracker',
   url: '/job-tracker',
   icon: Kanban
+}, {
+  title: 'Pricing Plans',
+  url: '/get-more-credits',
+  icon: CreditCard
 }];
 
 const toolItems = [{
@@ -42,10 +46,6 @@ const toolItems = [{
   title: 'AI Mock Interview',
   url: '/ai-mock-interview',
   icon: Phone
-}, {
-  title: 'Telegram Job Alerts',
-  url: '/job-alerts',
-  icon: Bell
 }, {
   title: 'Cover Letter',
   url: '/cover-letter',
