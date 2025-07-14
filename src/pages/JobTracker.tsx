@@ -881,8 +881,8 @@ const JobTracker = () => {
 
       {/* Add Job Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="bg-white border border-gray-200 text-gray-900 w-[90vw] max-w-md mx-4 rounded-xl overflow-hidden p-0">
-          <DialogHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-t-xl">
+        <DialogContent className="bg-white border border-gray-200 text-gray-900 w-[90vw] max-w-md rounded-xl overflow-hidden p-0">
+          <DialogHeader className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-t-xl">
             <DialogTitle className="font-orbitron text-white text-lg pr-8">Add New Job</DialogTitle>
             <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 text-white hover:text-gray-200">
               <X className="h-4 w-4" />
@@ -918,7 +918,7 @@ const JobTracker = () => {
               job_url: e.target.value
             }))} className="bg-white border-gray-300 text-gray-900" placeholder="https://..." />
             </div>
-            <Button onClick={handleAddJob} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-orbitron">
+            <Button onClick={handleAddJob} className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-orbitron">
               Add Job
             </Button>
           </div>
