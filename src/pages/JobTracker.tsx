@@ -139,7 +139,7 @@ const SortableJobCard = ({
   const progress = getProgress();
 
   // Check if dragging is allowed (checklist must be complete)
-  const canDrag = job.status === 'saved' ? progress >= 5 : job.status === 'applied' ? progress >= 1 : job.status === 'interview' ? progress >= 2 : false;
+  const canDrag = job.status === 'saved' ? progress >= 5 : job.status === 'applied' ? progress >= 1 : job.status === 'interview' ? progress >= 2 : job.status === 'rejected' || job.status === 'offer' ? true : false;
   const {
     attributes,
     listeners,
@@ -223,7 +223,7 @@ const SortableJobCard = ({
       <div className="flex items-center justify-between gap-2">
         {/* Left: Progress badge in circle */}
         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 ${getProgressColor(progress)}`}>
-          {progress}/{job.status === 'saved' ? '5' : job.status === 'applied' ? '1' : job.status === 'interview' ? '2' : '0'}
+          {job.status === 'rejected' ? '❌' : job.status === 'offer' ? '🤩' : `${progress}/${job.status === 'saved' ? '5' : job.status === 'applied' ? '1' : job.status === 'interview' ? '2' : '0'}`}
         </div>
         
         {/* Center: Company & Job Title */}
@@ -1042,14 +1042,14 @@ const JobTracker = () => {
                      </div>
                     )}
                     
-                    {/* Tips for Interview status */}
-                    {selectedJob.status === 'interview' && (
-                      <div className="mt-3 p-2 bg-pink-50 border border-pink-200 rounded-lg">
-                        <p className="text-pink-700 text-xs font-medium">
-                          💖 Got an update from the recruiter? You can now move this job to either the 'Offer' or 'Rejected' column. Whatever the outcome, we're cheering you on — and there's always a next step 😊
-                        </p>
-                      </div>
-                    )}
+                     {/* Tips for Interview status */}
+                     {selectedJob.status === 'interview' && (
+                       <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                         <p className="text-blue-700 text-xs font-medium">
+                           💖 Got an update from the recruiter? You can now move this job to either the 'Offer' or 'Rejected' column. Whatever the outcome, we're cheering you on — and there's always a next step 😊
+                         </p>
+                       </div>
+                     )}
                  </div>}
 
               {/* Comments Section */}
