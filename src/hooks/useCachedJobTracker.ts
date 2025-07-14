@@ -41,6 +41,7 @@ export const useCachedJobTracker = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [connectionIssue, setConnectionIssue] = useState(false);
+  const [hasFetched, setHasFetched] = useState(false);
 
   // Load cached data immediately on mount
   useEffect(() => {
@@ -73,14 +74,14 @@ export const useCachedJobTracker = () => {
       return;
     }
     
-    // Only fetch if we don't have cached data or user has changed
-    const shouldFetch = jobs.length === 0 && !error;
+    // Only fetch if we haven't fetched yet and don't have cached data
+    const shouldFetch = !hasFetched && jobs.length === 0 && !error;
     if (shouldFetch) {
       fetchJobTrackerData();
-    } else {
+    } else if (hasFetched || jobs.length > 0) {
       setLoading(false);
     }
-  }, [user?.id]); // Only depend on user ID, not the entire user object
+  }, [user?.id, hasFetched, jobs.length, error]); // Include hasFetched in dependencies
 
   const fetchJobTrackerData = async (showErrors = false) => {
     if (!user) return;
@@ -132,6 +133,7 @@ export const useCachedJobTracker = () => {
       // Update state
       setJobs(jobsData);
       setUserProfileId(userProfile.id);
+      setHasFetched(true);
 
       // Cache the data
       try {
@@ -149,6 +151,7 @@ export const useCachedJobTracker = () => {
     } catch (error: any) {
       logger.error('Error fetching job tracker data:', error);
       setConnectionIssue(true);
+      setHasFetched(true); // Mark as fetched even on error
       
       if (showErrors) {
         setError(error.message);
