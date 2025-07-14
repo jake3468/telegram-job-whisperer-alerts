@@ -64,20 +64,20 @@ export function OnboardingPopup({
               <img 
                 src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" 
                 alt="Aspirely Logo" 
-                className="w-10 h-10 sm:w-16 sm:h-16 rounded-full object-cover"
+                className="w-14 h-14 sm:w-20 sm:h-20 rounded-full object-cover"
               />
-              <h1 className="text-lg sm:text-2xl font-bold italic bg-gradient-to-r from-orange-500 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-xl sm:text-3xl font-bold italic bg-gradient-to-r from-orange-500 to-purple-600 bg-clip-text text-transparent">
                 Aspirely.ai
               </h1>
             </div>
             
-            <h2 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
+            <h2 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
               This Isn't Another Boring Job Site.
             </h2>
-            <p className="text-sm sm:text-lg font-semibold text-gray-900">
+            <p className="text-base sm:text-xl font-semibold text-gray-900">
               Welcome to Aspirely.ai — where we break the rules, rewrite the hiring game, and hand the power back to you.
             </p>
-            <p className="text-xs sm:text-base text-gray-600">
+            <p className="text-sm sm:text-lg text-gray-600">
               You're not here to scroll through clutter. You're here to flip the system. And this is where it begins.
             </p>
           </div>
