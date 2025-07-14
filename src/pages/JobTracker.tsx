@@ -881,15 +881,15 @@ const JobTracker = () => {
 
       {/* Add Job Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="bg-white border border-gray-200 text-gray-900">
-          <DialogHeader>
-            <DialogTitle className="font-orbitron text-gray-900">Add New Job</DialogTitle>
-            <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none text-gray-500 hover:text-gray-700">
+        <DialogContent className="bg-white border border-gray-200 text-gray-900 w-[90vw] max-w-md mx-4 rounded-xl overflow-hidden p-0">
+          <DialogHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-t-xl">
+            <DialogTitle className="font-orbitron text-white text-lg pr-8">Add New Job</DialogTitle>
+            <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 text-white hover:text-gray-200">
               <X className="h-4 w-4" />
               <span className="sr-only">Close</span>
             </DialogClose>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="p-4 space-y-4">
             <div>
               <Label htmlFor="company" className="text-gray-700 font-orbitron text-sm">Company Name *</Label>
               <Input id="company" value={formData.company_name} onChange={e => setFormData(prev => ({
