@@ -207,13 +207,13 @@ export function OnboardingPopup({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="w-[90vw] max-w-2xl h-[85vh] bg-white border border-gray-200 text-gray-900 flex flex-col rounded-2xl">
         <DialogHeader className="shrink-0">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-lg font-bold text-gray-900 flex items-center gap-4">
-              <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between gap-3 sm:gap-4">
+            <DialogTitle className="text-lg font-bold text-gray-900 flex items-center gap-4 min-w-0 flex-1">
+              <div className="flex items-center gap-1 sm:gap-2">
                 {[1, 2, 3, 4].map((step) => (
                   <div key={step} className="flex items-center">
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                      className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-semibold ${
                         step <= currentStep + 1 
                           ? 'bg-purple-500 text-white' 
                           : 'bg-gray-200 text-gray-500'
@@ -223,7 +223,7 @@ export function OnboardingPopup({
                     </div>
                     {step < 4 && (
                       <div 
-                        className={`w-8 h-0.5 mx-1 ${
+                        className={`w-4 sm:w-8 h-0.5 mx-0.5 sm:mx-1 ${
                           step < currentStep + 1 ? 'bg-purple-500' : 'bg-gray-200'
                         }`}
                       />
@@ -236,7 +236,7 @@ export function OnboardingPopup({
               variant="ghost"
               size="sm"
               onClick={handleClose}
-              className="text-gray-500 hover:text-gray-700 h-8 w-8 p-0 hover:bg-gray-100"
+              className="text-gray-500 hover:text-gray-700 h-8 w-8 p-0 hover:bg-gray-100 shrink-0"
             >
               <X className="w-4 h-4" />
             </Button>
