@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { X, ChevronRight, ChevronLeft, FileText, User, Bell, Target } from 'lucide-react';
@@ -17,16 +17,25 @@ export function OnboardingPopup({
   userName
 }: OnboardingPopupProps) {
   const [currentStep, setCurrentStep] = useState(0);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const nextStep = () => {
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
+      // Scroll to top of content
+      setTimeout(() => {
+        contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 0);
     }
   };
 
   const prevStep = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
+      // Scroll to top of content
+      setTimeout(() => {
+        contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 0);
     }
   };
 
@@ -234,7 +243,7 @@ export function OnboardingPopup({
           </div>
         </DialogHeader>
         
-        <div className="flex-1 overflow-y-auto py-4 px-1">
+        <div ref={contentRef} className="flex-1 overflow-y-auto py-4 px-1">
           {renderStepContent()}
         </div>
 
