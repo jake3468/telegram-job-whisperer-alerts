@@ -6,6 +6,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useUserInitialization } from '@/hooks/useUserInitialization';
 import { useCachedJobTracker } from '@/hooks/useCachedJobTracker';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { JobTrackerOnboardingPopup } from '@/components/JobTrackerOnboardingPopup';
 import { Plus, ExternalLink, Trash2, X, Bookmark, Send, Users, XCircle, Trophy, GripVertical, RefreshCw, AlertCircle } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
@@ -276,6 +278,7 @@ const JobTracker = () => {
   const {
     initializeUser
   } = useUserInitialization();
+  const { userProfile, updateUserProfile } = useUserProfile();
 
   // Use cached hook for instant data display
   const {
@@ -295,6 +298,7 @@ const JobTracker = () => {
   const [selectedJob, setSelectedJob] = useState<JobEntry | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<'saved' | 'applied' | 'interview'>('saved');
   const [activeJob, setActiveJob] = useState<JobEntry | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [formData, setFormData] = useState<EditJobFormData>({
     company_name: '',
     job_title: '',
@@ -379,6 +383,24 @@ const JobTracker = () => {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
+
+  // Handle onboarding popup
+  useEffect(() => {
+    if (userProfile && userProfile.show_job_tracker_onboarding_popup) {
+      setShowOnboarding(true);
+    }
+  }, [userProfile]);
+
+  const handleCloseOnboarding = () => {
+    setShowOnboarding(false);
+  };
+
+  const handleDontShowOnboardingAgain = async () => {
+    setShowOnboarding(false);
+    if (userProfile) {
+      await updateUserProfile({ show_job_tracker_onboarding_popup: false });
+    }
+  };
 
   // Manual refresh function - instant refresh for better UX
   const handleManualRefresh = useCallback(() => {
@@ -977,6 +999,13 @@ const JobTracker = () => {
               </div>}
         </DialogContent>
       </Dialog>
+
+      {/* Job Tracker Onboarding Popup */}
+      <JobTrackerOnboardingPopup 
+        isOpen={showOnboarding}
+        onClose={handleCloseOnboarding}
+        onDontShowAgain={handleDontShowOnboardingAgain}
+      />
     </Layout>;
 };
 export default JobTracker;
