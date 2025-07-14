@@ -197,17 +197,11 @@ export const FileUpload = ({ jobId, userProfileId, existingFiles = [], onFilesUp
       fileUrl = parsed.url;
       fileName = parsed.originalName;
     } catch {
-      // Fallback for old format (plain URL)
+      // Fallback for old format (plain URL) - use a generic filename
       fileUrl = fileData;
       const storageFileName = fileData.split('/').pop() || 'download';
-      // Try to extract original name from storage filename if it contains underscores
-      if (storageFileName.includes('_') && storageFileName.split('_').length > 2) {
-        // Remove timestamp and random part, keep the original filename part
-        const parts = storageFileName.split('_');
-        fileName = parts.slice(2).join('_'); // Everything after timestamp_random_
-      } else {
-        fileName = storageFileName;
-      }
+      const extension = storageFileName.split('.').pop() || '';
+      fileName = `download${extension ? `.${extension}` : ''}`;
     }
     
     const link = document.createElement('a');
