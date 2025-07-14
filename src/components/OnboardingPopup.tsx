@@ -40,11 +40,28 @@ export function OnboardingPopup({
     onDontShowAgain();
   };
 
+  const handleLetSGo = () => {
+    setCurrentStep(0);
+    onClose();
+  };
+
   const renderStepContent = () => {
     switch (currentStep) {
       case 0:
         return (
           <div className="text-center space-y-4">
+            {/* Logo and Brand */}
+            <div className="flex flex-col items-center space-y-3 mb-6">
+              <img 
+                src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" 
+                alt="Aspirely Logo" 
+                className="w-16 h-16 rounded-full object-cover"
+              />
+              <h1 className="text-2xl font-bold italic bg-gradient-to-r from-orange-500 to-purple-600 bg-clip-text text-transparent">
+                Aspirely.ai
+              </h1>
+            </div>
+            
             <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
               This Isn't Another Boring Job Site.
             </h2>
@@ -179,7 +196,7 @@ export function OnboardingPopup({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="w-[90vw] max-w-2xl h-[85vh] bg-white border border-gray-200 text-gray-900 flex flex-col">
+      <DialogContent className="w-[90vw] max-w-2xl h-[85vh] bg-white border border-gray-200 text-gray-900 flex flex-col rounded-2xl">
         <DialogHeader className="shrink-0">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-lg font-bold text-gray-900 flex items-center gap-4">
@@ -232,23 +249,23 @@ export function OnboardingPopup({
             Previous
           </Button>
           
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 min-w-0">
             {currentStep === 3 ? (
-              <>
+              <div className="flex flex-col gap-2 w-full max-w-xs mx-auto">
                 <Button
-                  onClick={handleDontShowAgain}
-                  className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-bold px-6"
+                  onClick={handleLetSGo}
+                  className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-bold px-4 py-2 text-sm whitespace-nowrap"
                 >
                   Let's Go — I'm Ready to Flip the Job Hunt 🔥
                 </Button>
                 <Button
                   variant="outline"
                   onClick={handleDontShowAgain}
-                  className="text-sm text-gray-600 border-gray-300 hover:bg-gray-50"
+                  className="text-sm text-gray-600 border-gray-300 hover:bg-gray-50 px-4 py-2"
                 >
                   Don't show this message again
                 </Button>
-              </>
+              </div>
             ) : (
               <Button
                 onClick={nextStep}
