@@ -8,9 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search, MapPin, Building2, ExternalLink, X, RefreshCw, Check, Trash2 } from 'lucide-react';
 import { useJobBoardData } from '@/hooks/useJobBoardData';
 import { Tables } from '@/integrations/supabase/types';
-
 type JobBoardItem = Tables<'job_board'>;
-
 interface JobCardProps {
   job: JobBoardItem;
   onView: () => void;
@@ -19,13 +17,18 @@ interface JobCardProps {
   section: 'posted-today' | 'last-7-days' | 'saved';
   isAddedToTracker?: boolean;
 }
-
-const JobCard = ({ job, onView, onSaveToTracker, onDelete, section, isAddedToTracker = false }: JobCardProps) => {
+const JobCard = ({
+  job,
+  onView,
+  onSaveToTracker,
+  onDelete,
+  section,
+  isAddedToTracker = false
+}: JobCardProps) => {
   const formatSalary = (salary: string | null) => {
     if (!salary) return 'Salary not disclosed';
     return salary;
   };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
   };
@@ -39,20 +42,14 @@ const JobCard = ({ job, onView, onSaveToTracker, onDelete, section, isAddedToTra
       return formatDate(job.created_at);
     }
   };
-
-  return (
-    <div className="w-full max-w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer overflow-hidden" onClick={onView}>
+  return <div className="w-full max-w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer overflow-hidden" onClick={onView}>
       <div className="p-3 max-w-full">
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 max-w-full">
           {/* Company info and logo */}
           <div className="flex items-center gap-2 flex-1 min-w-0 max-w-full">
-            {job.thumbnail ? (
-              <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
-            ) : (
-              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            {job.thumbnail ? <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-8 h-8 rounded-lg object-cover flex-shrink-0" /> : <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
                 <Building2 className="h-4 w-4 text-gray-600" />
-              </div>
-            )}
+              </div>}
             
             <div className="flex-1 min-w-0">
               <h3 className="text-sm font-bold text-gray-900 truncate">{job.title}</h3>
@@ -64,18 +61,14 @@ const JobCard = ({ job, onView, onSaveToTracker, onDelete, section, isAddedToTra
                   <MapPin className="h-3 w-3 flex-shrink-0" />
                   <span className="truncate">{job.location || 'Remote'}</span>
                 </div>
-                {job.job_type && (
-                  <>
+                {job.job_type && <>
                     <span>•</span>
                     <span className="truncate">{job.job_type}</span>
-                  </>
-                )}
-                {getDateToShow() && (
-                  <>
+                  </>}
+                {getDateToShow() && <>
                     <span>•</span>
                     <span className="truncate">{getDateToShow()}</span>
-                  </>
-                )}
+                  </>}
               </div>
             </div>
             
@@ -87,51 +80,27 @@ const JobCard = ({ job, onView, onSaveToTracker, onDelete, section, isAddedToTra
           
           {/* Actions */}
           <div className="flex items-center gap-1 flex-shrink-0 sm:ml-4">
-            <Button 
-              onClick={(e) => {
-                e.stopPropagation();
-                onView();
-              }} 
-              variant="outline" 
-              size="sm" 
-              className="border-gray-300 text-gray-900 hover:bg-gray-50 text-xs px-2 py-1 h-6"
-            >
+            <Button onClick={e => {
+            e.stopPropagation();
+            onView();
+          }} variant="outline" size="sm" className="border-gray-300 text-gray-900 hover:bg-gray-50 text-xs px-2 py-1 h-6">
               View
             </Button>
-            <Button 
-              onClick={(e) => {
-                e.stopPropagation();
-                onSaveToTracker();
-              }}
-              size="sm" 
-              className={isAddedToTracker 
-                ? "bg-green-600 text-white hover:bg-green-700 text-xs px-2 py-1 h-6 whitespace-nowrap cursor-default" 
-                : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-6 whitespace-nowrap"
-              }
-              disabled={isAddedToTracker}
-            >
-              {isAddedToTracker ? (
-                <div className="flex items-center gap-1">
+            <Button onClick={e => {
+            e.stopPropagation();
+            onSaveToTracker();
+          }} size="sm" className={isAddedToTracker ? "bg-green-600 text-white hover:bg-green-700 text-xs px-2 py-1 h-6 whitespace-nowrap cursor-default" : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-6 whitespace-nowrap"} disabled={isAddedToTracker}>
+              {isAddedToTracker ? <div className="flex items-center gap-1">
                   <Check className="h-3 w-3" />
                   <span>Added to Tracker</span>
-                </div>
-              ) : (
-                section === 'saved' ? "Add to Job Tracker" : "Save"
-              )}
+                </div> : section === 'saved' ? "Add to Job Tracker" : "Save"}
             </Button>
-            {section === 'saved' && onDelete && (
-              <Button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete();
-                }}
-                variant="outline"
-                size="sm" 
-                className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs px-2 py-1 h-6"
-              >
+            {section === 'saved' && onDelete && <Button onClick={e => {
+            e.stopPropagation();
+            onDelete();
+          }} variant="outline" size="sm" className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs px-2 py-1 h-6">
                 <Trash2 className="h-3 w-3" />
-              </Button>
-            )}
+              </Button>}
           </div>
         </div>
         
@@ -140,30 +109,27 @@ const JobCard = ({ job, onView, onSaveToTracker, onDelete, section, isAddedToTra
           <div className="flex items-center gap-1 text-xs text-gray-600">
             <MapPin className="h-3 w-3 flex-shrink-0" />
             <span className="truncate">{job.location || 'Remote'}</span>
-            {job.job_type && (
-              <>
+            {job.job_type && <>
                 <span className="mx-1">•</span>
                 <span className="truncate">{job.job_type}</span>
-              </>
-            )}
-            {getDateToShow() && (
-              <>
+              </>}
+            {getDateToShow() && <>
                 <span className="mx-1">•</span>
                 <span className="truncate">{getDateToShow()}</span>
-              </>
-            )}
+              </>}
           </div>
           <div className="text-green-600 font-semibold text-xs">
             {formatSalary(job.salary)}
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 const JobBoard = () => {
-  const { user, isLoaded } = useUser(); // Add Clerk authentication
+  const {
+    user,
+    isLoaded
+  } = useUser(); // Add Clerk authentication
   const {
     postedTodayJobs,
     last7DaysJobs,
@@ -177,7 +143,6 @@ const JobBoard = () => {
     deleteJobFromBoard,
     forceRefresh
   } = useJobBoardData();
-  
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJob, setSelectedJob] = useState<JobBoardItem | null>(null);
 
@@ -208,8 +173,7 @@ const JobBoard = () => {
 
   // Show loading while Clerk is loading
   if (!isLoaded) {
-    return (
-      <Layout>
+    return <Layout>
         <div className="p-6">
           <div className="max-w-6xl mx-auto">
             <div className="text-center py-12">
@@ -218,31 +182,22 @@ const JobBoard = () => {
             </div>
           </div>
         </div>
-      </Layout>
-    );
+      </Layout>;
   }
-
   const filterJobsBySearch = useCallback((jobs: JobBoardItem[]) => {
     if (!searchTerm.trim()) return jobs;
     const searchLower = searchTerm.toLowerCase().trim();
-    return jobs.filter(job => 
-      job.title.toLowerCase().includes(searchLower) || 
-      job.company_name.toLowerCase().includes(searchLower)
-    );
+    return jobs.filter(job => job.title.toLowerCase().includes(searchLower) || job.company_name.toLowerCase().includes(searchLower));
   }, [searchTerm]);
-
   const filteredPostedTodayJobs = useMemo(() => filterJobsBySearch(postedTodayJobs), [filterJobsBySearch, postedTodayJobs]);
   const filteredLast7DaysJobs = useMemo(() => filterJobsBySearch(last7DaysJobs), [filterJobsBySearch, last7DaysJobs]);
   const filteredSavedToTrackerJobs = useMemo(() => filterJobsBySearch(savedToTrackerJobs), [filterJobsBySearch, savedToTrackerJobs]);
-
   const formatSalary = (salary: string | null) => {
     if (!salary) return 'Salary not disclosed';
     return salary;
   };
-
   if (loading) {
-    return (
-      <Layout>
+    return <Layout>
         <div className="p-6">
           <div className="max-w-6xl mx-auto">
             <div className="text-center py-12">
@@ -251,77 +206,52 @@ const JobBoard = () => {
             </div>
           </div>
         </div>
-      </Layout>
-    );
+      </Layout>;
   }
 
   // Show normal layout with error indicator and refresh button in header
 
-  return (
-    <Layout>
+  return <Layout>
       <div className="p-3 sm:p-6 w-full overflow-hidden">
         <div className="max-w-6xl mx-auto w-full overflow-hidden">
           {/* Header */}
           <div className="text-center mb-4 sm:mb-6">
         <div className="flex items-center justify-center gap-4 mb-2 sm:mb-4">
-              <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent">
+              <h1 className="sm:text-4xl font-bold bg-gradient-to-r from-purple-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent text-4xl">
                 Job Board
               </h1>
               {/* Only show refresh button when there's an error */}
-              {error && (
-                <Button 
-                  onClick={handleManualRefresh}
-                  disabled={loading}
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0" 
-                  title="Refresh jobs data"
-                >
+              {error && <Button onClick={handleManualRefresh} disabled={loading} variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0" title="Refresh jobs data">
                   <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                </Button>
-              )}
+                </Button>}
             </div>
             <p className="text-gray-300 text-sm sm:text-lg">
               Discover opportunities tailored to your profile
             </p>
             {/* Error indicator */}
-            {error && (
-              <div className="bg-red-900/50 border border-red-600 rounded-lg p-3 mt-4 mx-auto max-w-2xl">
+            {error && <div className="bg-red-900/50 border border-red-600 rounded-lg p-3 mt-4 mx-auto max-w-2xl">
                 <div className="flex items-center gap-2 text-red-200 justify-center">
                   <span className="text-sm">
-                    {connectionIssue 
-                      ? "Connection issue detected. Click refresh or check your internet connection." 
-                      : "Unable to load job opportunities. Click refresh to retry."
-                    }
+                    {connectionIssue ? "Connection issue detected. Click refresh or check your internet connection." : "Unable to load job opportunities. Click refresh to retry."}
                   </span>
                 </div>
-              </div>
-            )}
+              </div>}
           </div>
 
           {/* Job Sections */}
           <Tabs defaultValue="posted-today" className="w-full overflow-hidden">
             <TabsList className="grid w-full grid-cols-3 mb-6 overflow-hidden bg-white/10 backdrop-blur-sm gap-1 h-auto p-1 border-0 rounded-xl">
-              <TabsTrigger 
-                value="posted-today" 
-                className="text-xs sm:text-sm px-3 sm:px-4 py-3 rounded-lg overflow-hidden bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium"
-              >
+              <TabsTrigger value="posted-today" className="text-xs sm:text-sm px-3 sm:px-4 py-3 rounded-lg overflow-hidden bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium">
                 <span className="hidden sm:inline truncate">Posted Today</span>
                 <span className="sm:hidden truncate">Today</span>
                 <span className="ml-1 flex-shrink-0">({filteredPostedTodayJobs.length})</span>
               </TabsTrigger>
-              <TabsTrigger 
-                value="last-7-days" 
-                className="text-xs sm:text-sm px-3 sm:px-4 py-3 rounded-lg overflow-hidden bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium"
-              >
+              <TabsTrigger value="last-7-days" className="text-xs sm:text-sm px-3 sm:px-4 py-3 rounded-lg overflow-hidden bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium">
                 <span className="hidden sm:inline truncate">Last 7 Days</span>
                 <span className="sm:hidden truncate">Week</span>
                 <span className="ml-1 flex-shrink-0">({filteredLast7DaysJobs.length})</span>
               </TabsTrigger>
-              <TabsTrigger 
-                value="saved-to-tracker" 
-                className="text-xs sm:text-sm px-3 sm:px-4 py-3 rounded-lg overflow-hidden bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium"
-              >
+              <TabsTrigger value="saved-to-tracker" className="text-xs sm:text-sm px-3 sm:px-4 py-3 rounded-lg overflow-hidden bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium">
                 <span className="hidden sm:inline truncate">Saved</span>
                 <span className="sm:hidden truncate">Saved</span>
                 <span className="ml-1 flex-shrink-0">({filteredSavedToTrackerJobs.length})</span>
@@ -334,57 +264,28 @@ const JobBoard = () => {
                 <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-300 text-lg">
                   🔍
                 </div>
-                <Input 
-                  placeholder="Search by job title or company name..." 
-                  value={searchTerm} 
-                  onChange={e => setSearchTerm(e.target.value)} 
-                  className="pl-12 pr-4 bg-gray-800 border border-gray-600 text-white placeholder:text-gray-400 h-12 text-sm w-full rounded-2xl shadow-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-600 transition-all" 
-                />
+                <Input placeholder="Search by job title or company name..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-12 pr-4 bg-gray-800 border border-gray-600 text-white placeholder:text-gray-400 h-12 text-sm w-full rounded-2xl shadow-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-600 transition-all" />
               </div>
             </div>
 
             <TabsContent value="posted-today" className="space-y-3 mt-4 w-full overflow-hidden">
-              {filteredPostedTodayJobs.length === 0 ? (
-                <div className="text-center py-12 w-full">
+              {filteredPostedTodayJobs.length === 0 ? <div className="text-center py-12 w-full">
                   <p className="text-gray-400 text-lg">
                     {searchTerm ? `No jobs matching "${searchTerm}" found in posted today.` : "No jobs posted today."}
                   </p>
-                </div>
-              ) : (
-                <div className="space-y-3 w-full overflow-hidden">
-                  {filteredPostedTodayJobs.map(job => (
-                    <JobCard 
-                      key={job.id} 
-                      job={job} 
-                      onView={() => setSelectedJob(job)} 
-                      onSaveToTracker={() => markJobAsSaved(job)}
-                      section="posted-today"
-                    />
-                  ))}
-                </div>
-              )}
+                </div> : <div className="space-y-3 w-full overflow-hidden">
+                  {filteredPostedTodayJobs.map(job => <JobCard key={job.id} job={job} onView={() => setSelectedJob(job)} onSaveToTracker={() => markJobAsSaved(job)} section="posted-today" />)}
+                </div>}
             </TabsContent>
 
             <TabsContent value="last-7-days" className="space-y-3 mt-4 w-full overflow-hidden">
-              {filteredLast7DaysJobs.length === 0 ? (
-                <div className="text-center py-12 w-full">
+              {filteredLast7DaysJobs.length === 0 ? <div className="text-center py-12 w-full">
                   <p className="text-gray-400 text-lg">
                     {searchTerm ? `No jobs matching "${searchTerm}" found in last 7 days.` : "No jobs from the last 7 days."}
                   </p>
-                </div>
-              ) : (
-                <div className="space-y-3 w-full overflow-hidden">
-                  {filteredLast7DaysJobs.map(job => (
-                    <JobCard 
-                      key={job.id} 
-                      job={job} 
-                      onView={() => setSelectedJob(job)} 
-                      onSaveToTracker={() => markJobAsSaved(job)}
-                      section="last-7-days"
-                    />
-                  ))}
-                </div>
-              )}
+                </div> : <div className="space-y-3 w-full overflow-hidden">
+                  {filteredLast7DaysJobs.map(job => <JobCard key={job.id} job={job} onView={() => setSelectedJob(job)} onSaveToTracker={() => markJobAsSaved(job)} section="last-7-days" />)}
+                </div>}
             </TabsContent>
 
             <TabsContent value="saved-to-tracker" className="space-y-3 mt-4 w-full overflow-hidden">
@@ -396,28 +297,14 @@ const JobBoard = () => {
                 <p className="text-gray-300 text-xs">Jobs you've saved are shown here. Click "Add to Job Tracker" to track your application progress.</p>
               </div>
               
-              {filteredSavedToTrackerJobs.length === 0 ? (
-                <div className="text-center py-12 w-full">
+              {filteredSavedToTrackerJobs.length === 0 ? <div className="text-center py-12 w-full">
                   <p className="text-gray-400 text-lg">
                     {searchTerm ? `No saved jobs matching "${searchTerm}" found.` : "No jobs saved yet."}
                   </p>
                   {!searchTerm && <p className="text-gray-500 mt-2">Save jobs from other sections to see them here.</p>}
-                </div>
-              ) : (
-                <div className="space-y-3 w-full overflow-hidden">
-                  {filteredSavedToTrackerJobs.map(job => (
-                    <JobCard 
-                      key={job.id} 
-                      job={job} 
-                      onView={() => setSelectedJob(job)} 
-                      onSaveToTracker={() => saveToTracker(job)}
-                      onDelete={() => deleteJobFromBoard(job)}
-                      section="saved"
-                      isAddedToTracker={job.job_reference_id ? jobTrackerStatus[job.job_reference_id] : false}
-                    />
-                  ))}
-                </div>
-              )}
+                </div> : <div className="space-y-3 w-full overflow-hidden">
+                  {filteredSavedToTrackerJobs.map(job => <JobCard key={job.id} job={job} onView={() => setSelectedJob(job)} onSaveToTracker={() => saveToTracker(job)} onDelete={() => deleteJobFromBoard(job)} section="saved" isAddedToTracker={job.job_reference_id ? jobTrackerStatus[job.job_reference_id] : false} />)}
+                </div>}
             </TabsContent>
           </Tabs>
         </div>
@@ -425,8 +312,7 @@ const JobBoard = () => {
         {/* Job Details Modal */}
         <Dialog open={!!selectedJob} onOpenChange={() => setSelectedJob(null)}>
           <DialogContent className="max-w-3xl max-h-[85vh] bg-white border-gray-200 flex flex-col p-0">
-            {selectedJob && (
-              <>
+            {selectedJob && <>
                 {/* Fixed Header */}
                 <DialogHeader className="flex-shrink-0 bg-white border-b px-6 py-4">
                   <div className="flex items-start justify-between">
@@ -468,65 +354,49 @@ const JobBoard = () => {
                   </div>
 
                   {/* Job Description */}
-                  {selectedJob.job_description && (
-                    <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                  {selectedJob.job_description && <div className="bg-gray-50 p-4 rounded-lg mb-4">
                       <h3 className="text-gray-900 font-medium text-sm mb-3">Job Description</h3>
                       <div className="text-gray-700 text-sm whitespace-pre-wrap leading-relaxed">
                         {selectedJob.job_description}
                       </div>
-                    </div>
-                  )}
+                    </div>}
 
                   {/* External Links */}
-                  {(selectedJob.link_1_title || selectedJob.link_2_title || selectedJob.link_3_title) && (
-                    <div className="bg-slate-50 p-4 rounded-lg mb-4">
+                  {(selectedJob.link_1_title || selectedJob.link_2_title || selectedJob.link_3_title) && <div className="bg-slate-50 p-4 rounded-lg mb-4">
                       <h3 className="text-gray-900 font-medium text-sm mb-3">External Links</h3>
                       <div className="space-y-2">
-                        {selectedJob.link_1_title && selectedJob.link_1_link && (
-                          <Button asChild variant="outline" size="sm" className="justify-start border-blue-200 text-blue-700 hover:bg-blue-50 w-full text-xs h-8">
+                        {selectedJob.link_1_title && selectedJob.link_1_link && <Button asChild variant="outline" size="sm" className="justify-start border-blue-200 text-blue-700 hover:bg-blue-50 w-full text-xs h-8">
                             <a href={selectedJob.link_1_link} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="h-3 w-3 mr-2" />
                               {selectedJob.link_1_title}
                             </a>
-                          </Button>
-                        )}
-                        {selectedJob.link_2_title && selectedJob.link_2_link && (
-                          <Button asChild variant="outline" size="sm" className="justify-start border-blue-200 text-blue-700 hover:bg-blue-50 w-full text-xs h-8">
+                          </Button>}
+                        {selectedJob.link_2_title && selectedJob.link_2_link && <Button asChild variant="outline" size="sm" className="justify-start border-blue-200 text-blue-700 hover:bg-blue-50 w-full text-xs h-8">
                             <a href={selectedJob.link_2_link} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="h-3 w-3 mr-2" />
                               {selectedJob.link_2_title}
                             </a>
-                          </Button>
-                        )}
-                        {selectedJob.link_3_title && selectedJob.link_3_link && (
-                          <Button asChild variant="outline" size="sm" className="justify-start border-blue-200 text-blue-700 hover:bg-blue-50 w-full text-xs h-8">
+                          </Button>}
+                        {selectedJob.link_3_title && selectedJob.link_3_link && <Button asChild variant="outline" size="sm" className="justify-start border-blue-200 text-blue-700 hover:bg-blue-50 w-full text-xs h-8">
                             <a href={selectedJob.link_3_link} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="h-3 w-3 mr-2" />
                               {selectedJob.link_3_title}
                             </a>
-                          </Button>
-                        )}
+                          </Button>}
                       </div>
-                    </div>
-                  )}
+                    </div>}
 
                   {/* Save Button */}
                   <div className="pt-2">
-                    <Button 
-                      onClick={() => selectedJob && saveToTracker(selectedJob)}
-                      className="w-full bg-blue-600 text-white hover:bg-blue-700 text-sm h-10"
-                    >
+                    <Button onClick={() => selectedJob && saveToTracker(selectedJob)} className="w-full bg-blue-600 text-white hover:bg-blue-700 text-sm h-10">
                       Save to Job Tracker
                     </Button>
                   </div>
                 </div>
-              </>
-            )}
+              </>}
           </DialogContent>
         </Dialog>
       </div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default JobBoard;
