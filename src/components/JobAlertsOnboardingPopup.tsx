@@ -8,7 +8,7 @@ export function JobAlertsOnboardingPopup() {
 
   return (
     <Dialog open={showPopup} onOpenChange={hidePopup}>
-      <DialogContent className="max-w-sm sm:max-w-md mx-4 sm:mx-auto p-0 overflow-hidden border-orange-200 max-h-[80vh] w-[calc(100vw-2rem)] sm:w-full flex flex-col">
+      <DialogContent className="max-w-sm sm:max-w-md p-0 overflow-hidden border-orange-200 max-h-[80vh] w-[calc(100vw-3rem)] sm:w-full flex flex-col mx-auto">
         {/* Header Section with Close Button - Fixed */}
         <div className="bg-gradient-to-r from-orange-500 to-amber-500 px-6 py-4 relative">
           <Button 
