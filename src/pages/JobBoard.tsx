@@ -132,7 +132,10 @@ const JobBoard = () => {
     user,
     isLoaded
   } = useUser(); // Add Clerk authentication
-  const { userProfile, updateUserProfile } = useUserProfile();
+  const {
+    userProfile,
+    updateUserProfile
+  } = useUserProfile();
   const {
     postedTodayJobs,
     last7DaysJobs,
@@ -156,15 +159,15 @@ const JobBoard = () => {
       setShowOnboarding(true);
     }
   }, [userProfile]);
-
   const handleCloseOnboarding = () => {
     setShowOnboarding(false);
   };
-
   const handleDontShowOnboardingAgain = async () => {
     setShowOnboarding(false);
     if (userProfile) {
-      await updateUserProfile({ show_job_board_onboarding_popup: false });
+      await updateUserProfile({
+        show_job_board_onboarding_popup: false
+      });
     }
   };
 
@@ -248,7 +251,7 @@ const JobBoard = () => {
                 </Button>}
             </div>
             <p className="text-gray-300 text-sm sm:text-lg">
-              Browse job alerts received via <span className="italic text-indigo-200">Telegram</span>— all jobs posted today appear here, stay visible for 7 days, and are auto-deleted after that. Save the ones you like and move them to your <span className="italic text-indigo-200">Job Tracker</span> page when you're ready to apply.
+              Browse job alerts received via <span className="italic text-violet-400">Telegram</span>— all jobs posted today appear here, stay visible for 7 days, and are auto-deleted after that. Save the ones you like and move them to your <span className="italic text-indigo-200">Job Tracker</span> page when you're ready to apply.
             </p>
             {/* Error indicator */}
             {error && <div className="bg-red-900/50 border border-red-600 rounded-lg p-3 mt-4 mx-auto max-w-2xl">
@@ -332,11 +335,7 @@ const JobBoard = () => {
         </div>
 
         {/* Job Board Onboarding Popup */}
-        <JobBoardOnboardingPopup
-          isOpen={showOnboarding}
-          onClose={handleCloseOnboarding}
-          onDontShowAgain={handleDontShowOnboardingAgain}
-        />
+        <JobBoardOnboardingPopup isOpen={showOnboarding} onClose={handleCloseOnboarding} onDontShowAgain={handleDontShowOnboardingAgain} />
 
         {/* Job Details Modal */}
         <Dialog open={!!selectedJob} onOpenChange={() => setSelectedJob(null)}>
