@@ -199,11 +199,11 @@ const SortableJobCard = ({
     completed: job.interview_call_received
   }] : job.status === 'interview' ? [{
     field: 'interview_prep_guide_received',
-    label: 'Did you receive the interview prep guide?',
+    label: '📘 Did you receive the Interview prep guide?',
     completed: job.interview_prep_guide_received
   }, {
     field: 'ai_mock_interview_attempted',
-    label: 'Did you attempt the AI mock interview?',
+    label: '🤖 Did you attempt the AI mock phone Interview?',
     completed: job.ai_mock_interview_attempted
   }] : [];
   const handleChecklistToggle = (field: string) => {
@@ -897,13 +897,13 @@ const JobTracker = () => {
           <div className="flex-1 overflow-y-auto p-4">
           {selectedJob && <div className="space-y-4">
               {/* Checklist Section */}
-              {(selectedJob.status === 'saved' || selectedJob.status === 'applied') && <div className="bg-gradient-to-r from-green-50 to-emerald-100 rounded-lg p-3 border border-green-200">
+              {(selectedJob.status === 'saved' || selectedJob.status === 'applied' || selectedJob.status === 'interview') && <div className="bg-gradient-to-r from-green-50 to-emerald-100 rounded-lg p-3 border border-green-200">
                   <div className="flex items-center justify-between mb-3">
                     <Label className="text-green-800 font-orbitron text-sm font-bold">
-                      {selectedJob.status === 'saved' ? 'Application Checklist' : 'Applied Status'}
+                      {selectedJob.status === 'saved' ? 'Application Checklist' : selectedJob.status === 'applied' ? 'Applied Status' : 'Interview Checklist'}
                     </Label>
-                    <div className={`text-xs font-bold px-2 py-1 rounded-full ${selectedJob.status === 'saved' ? [selectedJob.resume_updated, selectedJob.job_role_analyzed, selectedJob.company_researched, selectedJob.cover_letter_prepared, selectedJob.ready_to_apply].filter(Boolean).length === 0 ? 'bg-red-500 text-white' : [selectedJob.resume_updated, selectedJob.job_role_analyzed, selectedJob.company_researched, selectedJob.cover_letter_prepared, selectedJob.ready_to_apply].filter(Boolean).length === 5 ? 'bg-green-500 text-white' : 'bg-orange-500 text-white' : selectedJob.interview_call_received ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
-                      {selectedJob.status === 'saved' ? `${[selectedJob.resume_updated, selectedJob.job_role_analyzed, selectedJob.company_researched, selectedJob.cover_letter_prepared, selectedJob.ready_to_apply].filter(Boolean).length}/5` : `${selectedJob.interview_call_received ? 1 : 0}/1`}
+                    <div className={`text-xs font-bold px-2 py-1 rounded-full ${selectedJob.status === 'saved' ? [selectedJob.resume_updated, selectedJob.job_role_analyzed, selectedJob.company_researched, selectedJob.cover_letter_prepared, selectedJob.ready_to_apply].filter(Boolean).length === 0 ? 'bg-red-500 text-white' : [selectedJob.resume_updated, selectedJob.job_role_analyzed, selectedJob.company_researched, selectedJob.cover_letter_prepared, selectedJob.ready_to_apply].filter(Boolean).length === 5 ? 'bg-green-500 text-white' : 'bg-orange-500 text-white' : selectedJob.status === 'applied' ? selectedJob.interview_call_received ? 'bg-green-500 text-white' : 'bg-red-500 text-white' : [selectedJob.interview_prep_guide_received, selectedJob.ai_mock_interview_attempted].filter(Boolean).length === 0 ? 'bg-red-500 text-white' : [selectedJob.interview_prep_guide_received, selectedJob.ai_mock_interview_attempted].filter(Boolean).length === 2 ? 'bg-green-500 text-white' : 'bg-orange-500 text-white'}`}>
+                      {selectedJob.status === 'saved' ? `${[selectedJob.resume_updated, selectedJob.job_role_analyzed, selectedJob.company_researched, selectedJob.cover_letter_prepared, selectedJob.ready_to_apply].filter(Boolean).length}/5` : selectedJob.status === 'applied' ? `${selectedJob.interview_call_received ? 1 : 0}/1` : `${[selectedJob.interview_prep_guide_received, selectedJob.ai_mock_interview_attempted].filter(Boolean).length}/2`}
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -945,16 +945,16 @@ const JobTracker = () => {
                 linkText: null
               }] : [{
                 field: 'interview_prep_guide_received',
-                label: 'Interview prep guide received',
+                label: '📘 Did you receive the Interview prep guide?',
                 completed: selectedJob.interview_prep_guide_received,
                 page: '/interview-prep',
-                linkText: 'Get it now'
+                linkText: 'Get Prep Guide'
               }, {
                 field: 'ai_mock_interview_attempted',
-                label: 'AI mock interview attempted',
+                label: '🤖 Did you attempt the AI mock phone Interview?',
                 completed: selectedJob.ai_mock_interview_attempted,
-                page: '/grace-interview',
-                linkText: 'Get it now'
+                page: '/ai-mock-interview',
+                linkText: 'Call Phone Now'
               }]).map(item => <div key={item.field} className="flex items-center justify-between space-x-2">
                         <div className="flex items-center space-x-2 flex-1">
                           <Checkbox checked={item.completed} onCheckedChange={() => handleUpdateChecklistItem(selectedJob.id, item.field)} className={`h-4 w-4 ${item.completed ? 'data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500' : ''}`} />
@@ -982,6 +982,22 @@ const JobTracker = () => {
                       }
                     });
                   } else if (item.page === '/job-guide') {
+                    navigate(item.page, {
+                      state: {
+                        companyName: selectedJob.company_name,
+                        jobTitle: selectedJob.job_title,
+                        jobDescription: selectedJob.job_description || ''
+                      }
+                    });
+                  } else if (item.page === '/interview-prep') {
+                    navigate(item.page, {
+                      state: {
+                        companyName: selectedJob.company_name,
+                        jobTitle: selectedJob.job_title,
+                        jobDescription: selectedJob.job_description || ''
+                      }
+                    });
+                  } else if (item.page === '/ai-mock-interview') {
                     navigate(item.page, {
                       state: {
                         companyName: selectedJob.company_name,
@@ -1024,8 +1040,17 @@ const JobTracker = () => {
                          </Link>
                        </div>
                      </div>
-                   )}
-                </div>}
+                    )}
+                    
+                    {/* Tips for Interview status */}
+                    {selectedJob.status === 'interview' && (
+                      <div className="mt-3 p-2 bg-pink-50 border border-pink-200 rounded-lg">
+                        <p className="text-pink-700 text-xs font-medium">
+                          💖 Got an update from the recruiter? You can now move this job to either the 'Offer' or 'Rejected' column. Whatever the outcome, we're cheering you on — and there's always a next step 😊
+                        </p>
+                      </div>
+                    )}
+                 </div>}
 
               {/* Comments Section */}
               <div className="bg-gradient-to-r from-yellow-50 to-amber-100 rounded-lg p-3 border border-yellow-200">
