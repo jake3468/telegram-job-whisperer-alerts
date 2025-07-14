@@ -260,7 +260,7 @@ export const useJobBoardData = () => {
         return;
       }
 
-      const { data: userProfile, error: profileError } = await supabase
+      let { data: userProfile, error: profileError } = await supabase
         .from('user_profile')
         .select('id')
         .eq('user_id', users.id)
@@ -278,8 +278,25 @@ export const useJobBoardData = () => {
       }
 
       if (!userProfile) {
-        toast.error('User profile not found. Please complete your profile setup.');
-        return;
+        // Auto-create user profile if it doesn't exist
+        console.log('User profile not found, creating one...');
+        const { data: newProfile, error: createError } = await supabase
+          .from('user_profile')
+          .insert({
+            user_id: users.id
+          })
+          .select('id')
+          .single();
+
+        if (createError) {
+          console.error('Error creating user profile:', createError);
+          toast.error('Failed to set up user profile. Please try again.');
+          return;
+        }
+
+        // Use the newly created profile
+        userProfile = newProfile;
+        console.log('Created new user profile:', newProfile.id);
       }
 
       // Generate job_reference_id if it doesn't exist (for jobs saved before recent changes)
