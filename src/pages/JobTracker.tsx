@@ -126,9 +126,9 @@ const SortableJobCard = ({
       if (job.cover_letter_prepared) completed++;
       if (job.ready_to_apply) completed++;
       return completed;
-    } else if (job.status === 'applied') {
-      return job.interview_call_received ? 1 : 0;
-    } else if (job.status === 'interview') {
+  } else if (job.status === 'applied') {
+    return job.interview_call_received ? 1 : 0;
+  } else if (job.status === 'interview') {
       let completed = 0;
       if (job.interview_prep_guide_received) completed++;
       if (job.ai_mock_interview_attempted) completed++;
@@ -195,7 +195,7 @@ const SortableJobCard = ({
     completed: job.ready_to_apply
   }] : job.status === 'applied' ? [{
     field: 'interview_call_received',
-    label: 'Interview call received',
+    label: '📞 Did you receive the interview call?',
     completed: job.interview_call_received
   }] : job.status === 'interview' ? [{
     field: 'interview_prep_guide_received',
@@ -939,7 +939,7 @@ const JobTracker = () => {
                 linkText: null
               }] : selectedJob.status === 'applied' ? [{
                 field: 'interview_call_received',
-                label: 'Interview call received',
+                label: '📞 Did you receive the interview call?',
                 completed: selectedJob.interview_call_received,
                 page: null,
                 linkText: null
@@ -996,7 +996,35 @@ const JobTracker = () => {
                             {item.linkText || 'Get it now'}
                           </button>}
                       </div>)}
-                  </div>
+                   </div>
+                   
+                   {/* Tips for Saved status */}
+                   {selectedJob.status === 'saved' && [selectedJob.resume_updated, selectedJob.job_role_analyzed, selectedJob.company_researched, selectedJob.cover_letter_prepared, selectedJob.ready_to_apply].filter(Boolean).length === 5 && (
+                     <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                       <p className="text-blue-700 text-xs font-medium">
+                         ✅ Great! All checklist items completed. You can now drag and drop this job card to the 'Applied' section.
+                       </p>
+                     </div>
+                   )}
+                   
+                   {/* Tips for Applied status */}
+                   {selectedJob.status === 'applied' && (
+                     <div className="mt-3 space-y-2">
+                       <div className="p-2 bg-green-50 border border-green-200 rounded-lg">
+                         <p className="text-green-700 text-xs font-medium">
+                           💡 Once you receive the interview call, you can tick mark above and then move this card to the 'Interview' section to unlock the checklist for interview preparation.
+                         </p>
+                       </div>
+                       <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
+                         <p className="text-blue-700 text-xs font-medium mb-2">
+                           💡 Still waiting on that interview call? Have you posted something impactful on LinkedIn to stand out? Use our AI-powered LinkedIn post generator with custom images to share your ideas, achievements, or insights — and stay visible to recruiters while you wait.
+                         </p>
+                         <Link to="/linkedin-posts" className="text-blue-600 hover:text-blue-800 text-xs font-bold underline">
+                           Create a Post Now 🚀
+                         </Link>
+                       </div>
+                     </div>
+                   )}
                 </div>}
 
               {/* Comments Section */}
