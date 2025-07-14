@@ -89,15 +89,6 @@ const CoverLetter = () => {
       });
       // Clear the navigation state after using it
       window.history.replaceState({}, document.title);
-    } else if (location.state?.companyName || location.state?.jobTitle || location.state?.jobDescription) {
-      // Handle direct navigation from JobTracker
-      setFormData({
-        company_name: location.state.companyName || '',
-        job_title: location.state.jobTitle || '',
-        job_description: location.state.jobDescription || ''
-      });
-      // Clear the navigation state after using it
-      window.history.replaceState({}, document.title);
     }
   }, [location.state]);
 
