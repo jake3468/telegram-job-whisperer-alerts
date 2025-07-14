@@ -15,11 +15,13 @@ export const useJobBoardData = () => {
   const [jobTrackerStatus, setJobTrackerStatus] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [connectionIssue, setConnectionIssue] = useState(false);
 
-  const fetchJobs = async () => {
+  const fetchJobs = async (forceRefresh = false) => {
     try {
       setLoading(true);
       setError(null);
+      setConnectionIssue(false);
 
       // Check if user is logged in
       if (!clerkUser) {
@@ -144,8 +146,20 @@ export const useJobBoardData = () => {
       console.error('Error fetching job board data:', err);
       setError(err as Error);
       
+      // Check if it's a connection/network issue
+      if (err instanceof Error && (
+        err.message.includes('Failed to fetch') ||
+        err.message.includes('NetworkError') ||
+        err.message.includes('fetch') ||
+        err.message.includes('ECONNREFUSED') ||
+        err.message.includes('timeout')
+      )) {
+        setConnectionIssue(true);
+        toast.error('Connection issue detected. Please check your internet connection.');
+      }
       // Check if it's an authentication error and suggest refresh
-      if (err instanceof Error && (err.message.includes('JWT') || err.message.includes('expired') || err.message.includes('unauthorized'))) {
+      else if (err instanceof Error && (err.message.includes('JWT') || err.message.includes('expired') || err.message.includes('unauthorized'))) {
+        setConnectionIssue(true);
         toast.error('Session expired. Please refresh the page to continue.');
       } else {
         toast.error('Failed to load job opportunities');
@@ -431,33 +445,23 @@ export const useJobBoardData = () => {
     try {
       // Clear error state immediately and show loading
       setError(null);
+      setConnectionIssue(false);
       setLoading(true);
       
       // Clear existing data to force complete refresh
       setPostedTodayJobs([]);
       setLast7DaysJobs([]);
       setSavedToTrackerJobs([]);
+      setJobTrackerStatus({});
       
       // Force refresh the data
-      await fetchJobs();
+      await fetchJobs(true);
       
       console.log('Job board data refreshed successfully');
     } catch (err) {
       console.error('Force refresh failed:', err);
-      
-      // Check if it's a JWT/auth error and force page reload
-      if (err instanceof Error && (
-        err.message.includes('JWT') || 
-        err.message.includes('expired') || 
-        err.message.includes('unauthorized') ||
-        err.message.includes('PGRST301')
-      )) {
-        console.log('Authentication error detected, reloading page...');
-        window.location.reload();
-        return;
-      }
-      
       setError(err as Error);
+      setConnectionIssue(true);
     } finally {
       setLoading(false);
     }
@@ -495,6 +499,7 @@ export const useJobBoardData = () => {
     jobTrackerStatus,
     loading,
     error,
+    connectionIssue,
     forceRefresh,
     saveToTracker,
     markJobAsSaved,

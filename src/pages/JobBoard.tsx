@@ -157,6 +157,7 @@ const JobBoard = () => {
     jobTrackerStatus,
     loading,
     error,
+    connectionIssue,
     saveToTracker,
     markJobAsSaved,
     deleteJobFromBoard,
@@ -165,6 +166,31 @@ const JobBoard = () => {
   
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJob, setSelectedJob] = useState<JobBoardItem | null>(null);
+
+  // Manual refresh function - robust error handling like Job Tracker
+  const handleManualRefresh = useCallback(() => {
+    try {
+      // For connection issues or persistent errors, immediately force page refresh
+      if (connectionIssue || error) {
+        window.location.reload();
+        return;
+      }
+
+      // Otherwise try force refresh and immediately fall back if needed
+      forceRefresh();
+
+      // Short timeout for fallback in case refresh doesn't resolve the issue
+      setTimeout(() => {
+        if (connectionIssue || error) {
+          window.location.reload();
+        }
+      }, 1000);
+    } catch (err) {
+      console.error('Manual refresh failed:', err);
+      // Force page refresh if all else fails
+      window.location.reload();
+    }
+  }, [forceRefresh, connectionIssue, error]);
 
   // Show loading while Clerk is loading
   if (!isLoaded) {
@@ -230,7 +256,7 @@ const JobBoard = () => {
               {/* Only show refresh button when there's an error */}
               {error && (
                 <Button 
-                  onClick={forceRefresh}
+                  onClick={handleManualRefresh}
                   disabled={loading}
                   variant="ghost" 
                   size="sm" 
@@ -248,7 +274,12 @@ const JobBoard = () => {
             {error && (
               <div className="bg-red-900/50 border border-red-600 rounded-lg p-3 mt-4 mx-auto max-w-2xl">
                 <div className="flex items-center gap-2 text-red-200 justify-center">
-                  <span className="text-sm">Unable to load job opportunities. Click refresh to retry.</span>
+                  <span className="text-sm">
+                    {connectionIssue 
+                      ? "Connection issue detected. Click refresh or check your internet connection." 
+                      : "Unable to load job opportunities. Click refresh to retry."
+                    }
+                  </span>
                 </div>
               </div>
             )}
