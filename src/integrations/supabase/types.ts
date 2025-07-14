@@ -725,6 +725,7 @@ export type Database = {
           interview_call_received: boolean
           interview_prep_guide_received: boolean
           job_description: string | null
+          job_reference_id: string | null
           job_role_analyzed: boolean
           job_title: string
           job_url: string | null
@@ -745,6 +746,7 @@ export type Database = {
           interview_call_received?: boolean
           interview_prep_guide_received?: boolean
           job_description?: string | null
+          job_reference_id?: string | null
           job_role_analyzed?: boolean
           job_title: string
           job_url?: string | null
@@ -765,6 +767,7 @@ export type Database = {
           interview_call_received?: boolean
           interview_prep_guide_received?: boolean
           job_description?: string | null
+          job_reference_id?: string | null
           job_role_analyzed?: boolean
           job_title?: string
           job_url?: string | null
