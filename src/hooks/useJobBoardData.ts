@@ -319,6 +319,8 @@ export const useJobBoardData = () => {
         return;
       }
 
+      console.log('Deleting job:', job.id, 'job_reference_id:', job.job_reference_id);
+
       // Get user profile
       const { data: users, error: userError } = await supabase
         .from('users')
@@ -342,29 +344,43 @@ export const useJobBoardData = () => {
         return;
       }
 
+      console.log('User profile ID:', userProfile.id);
+
       // First delete from job_tracker if job_reference_id exists
       if (job.job_reference_id) {
-        const { error: trackerDeleteError } = await supabase
+        console.log('Deleting from job_tracker with job_reference_id:', job.job_reference_id);
+        const { error: trackerDeleteError, count } = await supabase
           .from('job_tracker')
-          .delete()
+          .delete({ count: 'exact' })
           .eq('user_id', userProfile.id)
           .eq('job_reference_id', job.job_reference_id);
 
         if (trackerDeleteError) {
           console.error('Error deleting from job tracker:', trackerDeleteError);
+          toast.error(`Failed to delete from job tracker: ${trackerDeleteError.message}`);
+        } else {
+          console.log('Deleted from job_tracker, count:', count);
         }
       }
 
       // Then delete from job_board
-      const { error: deleteError } = await supabase
+      console.log('Deleting from job_board with id:', job.id, 'user_id:', userProfile.id);
+      const { error: deleteError, count: boardCount } = await supabase
         .from('job_board')
-        .delete()
+        .delete({ count: 'exact' })
         .eq('id', job.id)
         .eq('user_id', userProfile.id);
 
       if (deleteError) {
         console.error('Error deleting job from board:', deleteError);
         toast.error(`Failed to delete job: ${deleteError.message}`);
+        return;
+      }
+
+      console.log('Deleted from job_board, count:', boardCount);
+
+      if (boardCount === 0) {
+        toast.error('Job not found or you do not have permission to delete it');
         return;
       }
 
