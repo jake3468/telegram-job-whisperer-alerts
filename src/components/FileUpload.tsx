@@ -189,14 +189,17 @@ export const FileUpload = ({ jobId, userProfileId, existingFiles = [], onFilesUp
   };
 
   const handleFileDownload = (fileData: string) => {
+    console.log('Download fileData:', fileData); // Debug log
     let fileUrl: string;
     let fileName: string;
     
     try {
       const parsed = JSON.parse(fileData);
+      console.log('Parsed data:', parsed); // Debug log
       fileUrl = parsed.url;
       fileName = parsed.originalName;
-    } catch {
+    } catch (error) {
+      console.log('Parse error, using fallback:', error); // Debug log
       // Fallback for old format (plain URL) - use a generic filename
       fileUrl = fileData;
       const storageFileName = fileData.split('/').pop() || 'download';
