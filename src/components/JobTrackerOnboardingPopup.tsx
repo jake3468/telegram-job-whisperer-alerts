@@ -62,9 +62,7 @@ export function JobTrackerOnboardingPopup({
               </h1>
             </div>
             
-            <h2 className="text-sm sm:text-lg font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              From "Saved" to "You're Hired" — Let's Go.
-            </h2>
+            <h2 className="text-sm sm:text-lg font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Job Tracker - From &quot;Saved&quot; to &quot;You're Hired&quot; — Let's Go.</h2>
             
             <div className="text-left bg-gray-50 rounded-lg p-2 sm:p-3 space-y-2">
               <p className="text-gray-700 text-xs">
