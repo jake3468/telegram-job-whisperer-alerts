@@ -60,24 +60,24 @@ export function OnboardingPopup({
         return (
           <div className="text-center space-y-4">
             {/* Logo and Brand */}
-            <div className="flex flex-col items-center space-y-3 mb-6">
+            <div className="flex flex-col items-center space-y-2 mb-4">
               <img 
                 src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" 
                 alt="Aspirely Logo" 
-                className="w-16 h-16 rounded-full object-cover"
+                className="w-10 h-10 sm:w-16 sm:h-16 rounded-full object-cover"
               />
-              <h1 className="text-2xl font-bold italic bg-gradient-to-r from-orange-500 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-lg sm:text-2xl font-bold italic bg-gradient-to-r from-orange-500 to-purple-600 bg-clip-text text-transparent">
                 Aspirely.ai
               </h1>
             </div>
             
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
+            <h2 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
               This Isn't Another Boring Job Site.
             </h2>
-            <p className="text-lg font-semibold text-gray-900">
+            <p className="text-sm sm:text-lg font-semibold text-gray-900">
               Welcome to Aspirely.ai — where we break the rules, rewrite the hiring game, and hand the power back to you.
             </p>
-            <p className="text-gray-600">
+            <p className="text-xs sm:text-base text-gray-600">
               You're not here to scroll through clutter. You're here to flip the system. And this is where it begins.
             </p>
           </div>
@@ -87,25 +87,25 @@ export function OnboardingPopup({
         return (
           <div className="space-y-4">
             <div className="text-center">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3">
                 What you should do now?
               </h2>
             </div>
             
-            <div className="space-y-3">
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h3 className="font-semibold text-purple-600 mb-2">📄 Let's feed the AI.</h3>
-                <p className="text-gray-700 text-sm">
+            <div className="space-y-2">
+              <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                <h3 className="text-sm font-semibold text-purple-600 mb-1">📄 Let's feed the AI.</h3>
+                <p className="text-gray-700 text-xs">
                   Upload your resume so our tools can understand your experience, skills, and background.
                 </p>
               </div>
               
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h3 className="font-semibold text-blue-600 mb-2">💬 Who are you beyond the PDF?</h3>
-                <p className="text-gray-700 text-sm">
+              <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                <h3 className="text-sm font-semibold text-blue-600 mb-1">💬 Who are you beyond the PDF?</h3>
+                <p className="text-gray-700 text-xs">
                   Write a short intro — your story, your strengths, your vibe. Not just "hard-working team player" — tell us the stuff that makes you... you. not just the boring stuff. Brag. Be weird. Be real.
                 </p>
-                <p className="text-purple-600 text-sm mt-2 font-medium">
+                <p className="text-purple-600 text-xs mt-1 font-medium">
                   The better we know you, the better the results. It's quick, and it sets the stage for everything that follows.
                 </p>
               </div>
@@ -117,20 +117,20 @@ export function OnboardingPopup({
         return (
           <div className="space-y-4">
             <div className="text-center">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3">
                 What we offer?
               </h2>
             </div>
             
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 space-y-3">
-              <h3 className="font-semibold text-orange-600">🚨 This is where Aspirely flips the system.</h3>
-              <p className="text-gray-700 text-sm">
+            <div className="bg-gray-50 rounded-lg p-3 border border-gray-200 space-y-2">
+              <h3 className="text-sm font-semibold text-orange-600">🚨 This is where Aspirely flips the system.</h3>
+              <p className="text-gray-700 text-xs">
                 No more random clutter, 3-week-old postings, or irrelevant spam.
               </p>
               
-              <div className="space-y-2">
-                <p className="text-gray-900 font-medium">You get:</p>
-                <ul className="space-y-1 text-sm text-gray-700">
+              <div className="space-y-1">
+                <p className="text-gray-900 text-sm font-medium">You get:</p>
+                <ul className="space-y-0.5 text-xs text-gray-700">
                   <li>🔍 Fresh job postings from the past 24 hours only</li>
                   <li>📍 Filtered by your job title & location</li>
                   <li>🕒 Delivered daily to your Telegram, at your preferred time</li>
@@ -138,7 +138,7 @@ export function OnboardingPopup({
                 </ul>
               </div>
               
-              <p className="text-purple-600 font-medium text-sm">
+              <p className="text-purple-600 font-medium text-xs">
                 Unlike traditional portals, we don't overwhelm you — we give you fresh, relevant jobs, every single day.
               </p>
             </div>
@@ -149,39 +149,39 @@ export function OnboardingPopup({
         return (
           <div className="space-y-4">
             <div className="text-center">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3">
                 What we offer?
               </h2>
             </div>
             
-            <div className="space-y-3">
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h3 className="font-semibold text-green-600 mb-2">🗂️ Welcome to the Job Board</h3>
-                <p className="text-gray-700 text-sm mb-2">
+            <div className="space-y-2">
+              <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                <h3 className="text-sm font-semibold text-green-600 mb-1">🗂️ Welcome to the Job Board</h3>
+                <p className="text-gray-700 text-xs mb-1">
                   Here, you'll only see all your:
                 </p>
-                <ul className="space-y-1 text-sm text-gray-700">
+                <ul className="space-y-0.5 text-xs text-gray-700">
                   <li>📅 Jobs posted today</li>
                   <li>📆 Jobs from the last 7 days</li>
                 </ul>
-                <p className="text-red-600 text-sm mt-2 font-medium">
+                <p className="text-red-600 text-xs mt-1 font-medium">
                   After 7 days, they vanish. Because who hires from ancient listings?
                 </p>
               </div>
               
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <p className="text-gray-700 text-sm mb-2">
+              <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                <p className="text-gray-700 text-xs mb-1">
                   🔖 You can save interesting jobs, apply later, or move them to your Job tracker when you're ready.
                 </p>
                 
-                <h3 className="font-semibold text-blue-600 mb-2">📌 Job Tracker = your personal roadmap to the offer.</h3>
-                <p className="text-gray-700 text-sm mb-2">
+                <h3 className="text-sm font-semibold text-blue-600 mb-1">📌 Job Tracker = your personal roadmap to the offer.</h3>
+                <p className="text-gray-700 text-xs mb-1">
                   The last stop before the offer. When you're ready to apply, move a saved job to your Job Tracker.
                 </p>
                 
-                <div className="space-y-1 text-sm text-gray-700">
-                  <p className="text-gray-900 font-medium">You'll unlock:</p>
-                  <ul className="space-y-1">
+                <div className="space-y-0.5 text-xs text-gray-700">
+                  <p className="text-gray-900 text-sm font-medium">You'll unlock:</p>
+                  <ul className="space-y-0.5">
                     <li>✅ Resume & cover letter checklist</li>
                     <li>🤖 AI mock interviews</li>
                     <li>🔍 Job fit analysis</li>
@@ -190,7 +190,7 @@ export function OnboardingPopup({
                   </ul>
                 </div>
                 
-                <p className="text-purple-600 font-medium text-sm mt-2">
+                <p className="text-purple-600 font-medium text-xs mt-1">
                   No more guessing. Just progress. You don't just apply — you execute. Like a job-hunting assassin.
                 </p>
               </div>

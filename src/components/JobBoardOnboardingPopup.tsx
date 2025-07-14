@@ -58,37 +58,37 @@ export function JobBoardOnboardingPopup({
         return (
           <div className="text-center space-y-4">
             {/* Logo and Brand */}
-            <div className="flex flex-col items-center space-y-3 mb-6">
+            <div className="flex flex-col items-center space-y-2 mb-4">
               <img 
                 src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" 
                 alt="Aspirely Logo" 
-                className="w-16 h-16 rounded-full object-cover"
+                className="w-10 h-10 sm:w-16 sm:h-16 rounded-full object-cover"
               />
-              <h1 className="text-2xl font-bold italic bg-gradient-to-r from-orange-500 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-lg sm:text-2xl font-bold italic bg-gradient-to-r from-orange-500 to-purple-600 bg-clip-text text-transparent">
                 Aspirely.ai
               </h1>
             </div>
             
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <h2 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               Your Job Board — Where Job Alerts Come to Life
             </h2>
             
-            <div className="text-left bg-gray-50 rounded-lg p-4 space-y-3">
-              <p className="text-gray-700">
+            <div className="text-left bg-gray-50 rounded-lg p-3 space-y-2">
+              <p className="text-gray-700 text-xs">
                 This is your personal job hub, powered by AI and tailored to you.
               </p>
-              <p className="text-gray-700">
+              <p className="text-gray-700 text-xs">
                 Every time you receive a job alert via Telegram, it's automatically added to the 'Posted Today' section here — no manual work needed.
               </p>
-              <p className="text-gray-700">
+              <p className="text-gray-700 text-xs">
                 These listings are fresh, relevant, and based on the alerts you've set on the 'Create Job Alerts' page.
               </p>
               
-              <div className="bg-white rounded-md p-3 border-l-4 border-purple-500">
-                <p className="text-purple-700 font-medium text-sm">
+              <div className="bg-white rounded-md p-2 border-l-4 border-purple-500">
+                <p className="text-purple-700 font-medium text-xs">
                   Fresh jobs. No noise. All in one place.
                 </p>
-                <p className="text-purple-600 text-sm">
+                <p className="text-purple-600 text-xs">
                   AI does the hard work. You just focus on discovering and applying.
                 </p>
               </div>
@@ -100,21 +100,21 @@ export function JobBoardOnboardingPopup({
         return (
           <div className="space-y-4">
             <div className="text-center">
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
+              <h2 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-3">
                 Explore. Save. Track. Win.
               </h2>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-base sm:text-xl font-semibold text-gray-900 mb-3">
                 Here's how to use your Job Board
               </h3>
             </div>
             
-            <div className="space-y-4">
-              <div className="bg-gray-50 rounded-lg p-4">
-                <p className="text-gray-700 mb-3">
+            <div className="space-y-2">
+              <div className="bg-gray-50 rounded-lg p-3">
+                <p className="text-gray-700 text-xs mb-2">
                   Your jobs are split into 3 simple tabs:
                 </p>
                 
-                <div className="space-y-2 text-sm">
+                <div className="space-y-1 text-xs">
                   <div className="flex items-center gap-2">
                     <span className="text-purple-600 font-bold">🟣</span>
                     <span className="font-semibold">Posted Today</span>
@@ -133,16 +133,16 @@ export function JobBoardOnboardingPopup({
                 </div>
               </div>
               
-              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                <p className="text-gray-700 font-medium mb-2">You can:</p>
-                <ul className="space-y-1 text-sm text-gray-700">
+              <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                <p className="text-gray-700 text-sm font-medium mb-1">You can:</p>
+                <ul className="space-y-0.5 text-xs text-gray-700">
                   <li>• View full job details & apply externally</li>
                   <li>• Save jobs you like for later</li>
                   <li>• Add to Job Tracker when you're ready to apply — complete with resume checklist, AI mock interviews, job fit analysis, and more</li>
                 </ul>
                 
-                <div className="mt-3 p-3 bg-orange-100 border border-orange-200 rounded-md">
-                  <p className="text-orange-800 font-medium text-sm">
+                <div className="mt-2 p-2 bg-orange-100 border border-orange-200 rounded-md">
+                  <p className="text-orange-800 font-medium text-xs">
                     💡 Check back daily — jobs expire after 7 days, and fresh ones land every day.
                   </p>
                 </div>
