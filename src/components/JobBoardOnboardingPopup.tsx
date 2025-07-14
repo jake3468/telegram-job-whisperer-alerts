@@ -2,13 +2,11 @@ import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { X, ChevronRight, ChevronLeft } from 'lucide-react';
-
 interface JobBoardOnboardingPopupProps {
   isOpen: boolean;
   onClose: () => void;
   onDontShowAgain: () => void;
 }
-
 export function JobBoardOnboardingPopup({
   isOpen,
   onClose,
@@ -16,62 +14,55 @@ export function JobBoardOnboardingPopup({
 }: JobBoardOnboardingPopupProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
-
   const nextStep = () => {
     if (currentStep < 1) {
       setCurrentStep(currentStep + 1);
       // Scroll to top of content
       setTimeout(() => {
-        contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+        contentRef.current?.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
       }, 0);
     }
   };
-
   const prevStep = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
       // Scroll to top of content
       setTimeout(() => {
-        contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+        contentRef.current?.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
       }, 0);
     }
   };
-
   const handleClose = () => {
     setCurrentStep(0);
     onClose();
   };
-
   const handleDontShowAgain = () => {
     setCurrentStep(0);
     onDontShowAgain();
   };
-
   const handleGotIt = () => {
     setCurrentStep(0);
     onClose();
   };
-
   const renderStepContent = () => {
     switch (currentStep) {
       case 0:
-        return (
-          <div className="text-center space-y-4">
+        return <div className="text-center space-y-4">
             {/* Logo and Brand */}
             <div className="flex flex-col items-center space-y-2 mb-4">
-              <img 
-                src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" 
-                alt="Aspirely Logo" 
-                className="w-10 h-10 sm:w-16 sm:h-16 rounded-full object-cover"
-              />
+              <img src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" alt="Aspirely Logo" className="w-10 h-10 sm:w-16 sm:h-16 rounded-full object-cover" />
               <h1 className="text-lg sm:text-2xl font-bold italic bg-gradient-to-r from-orange-500 to-purple-600 bg-clip-text text-transparent">
                 Aspirely.ai
               </h1>
             </div>
             
-            <h2 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              Your Job Board — Where Job Alerts Come to Life
-            </h2>
+            <h2 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Job Board — Where Job Alerts Come to Life</h2>
             
             <div className="text-left bg-gray-50 rounded-lg p-3 space-y-2">
               <p className="text-gray-700 text-xs">
@@ -93,12 +84,9 @@ export function JobBoardOnboardingPopup({
                 </p>
               </div>
             </div>
-          </div>
-        );
-
+          </div>;
       case 1:
-        return (
-          <div className="space-y-4">
+        return <div className="space-y-4">
             <div className="text-center">
               <h2 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-3">
                 Explore. Save. Track. Win.
@@ -148,49 +136,26 @@ export function JobBoardOnboardingPopup({
                 </div>
               </div>
             </div>
-          </div>
-        );
-
+          </div>;
       default:
         return null;
     }
   };
-
-  return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+  return <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="w-[90vw] max-w-2xl h-[85vh] bg-white border border-gray-200 text-gray-900 flex flex-col rounded-2xl">
         <DialogHeader className="shrink-0">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-lg font-bold text-gray-900 flex items-center gap-4">
               <div className="flex items-center gap-2">
-                {[1, 2].map((step) => (
-                  <div key={step} className="flex items-center">
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                        step <= currentStep + 1 
-                          ? 'bg-purple-500 text-white' 
-                          : 'bg-gray-200 text-gray-500'
-                      }`}
-                    >
+                {[1, 2].map(step => <div key={step} className="flex items-center">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${step <= currentStep + 1 ? 'bg-purple-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
                       {step}
                     </div>
-                    {step < 2 && (
-                      <div 
-                        className={`w-8 h-0.5 mx-1 ${
-                          step < currentStep + 1 ? 'bg-purple-500' : 'bg-gray-200'
-                        }`}
-                      />
-                    )}
-                  </div>
-                ))}
+                    {step < 2 && <div className={`w-8 h-0.5 mx-1 ${step < currentStep + 1 ? 'bg-purple-500' : 'bg-gray-200'}`} />}
+                  </div>)}
               </div>
             </DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleClose}
-              className="text-gray-500 hover:text-gray-700 h-8 w-8 p-0 hover:bg-gray-100"
-            >
+            <Button variant="ghost" size="sm" onClick={handleClose} className="text-gray-500 hover:text-gray-700 h-8 w-8 p-0 hover:bg-gray-100">
               <X className="w-4 h-4" />
             </Button>
           </div>
@@ -201,47 +166,27 @@ export function JobBoardOnboardingPopup({
         </div>
 
         <div className="shrink-0 flex items-center justify-between pt-4 border-t border-gray-200">
-          <Button
-            variant="outline"
-            onClick={prevStep}
-            disabled={currentStep === 0}
-            className="flex items-center gap-2 border-gray-300 text-gray-700 disabled:opacity-50 hover:bg-gray-50"
-          >
+          <Button variant="outline" onClick={prevStep} disabled={currentStep === 0} className="flex items-center gap-2 border-gray-300 text-gray-700 disabled:opacity-50 hover:bg-gray-50">
             <ChevronLeft className="w-4 h-4" />
             Previous
           </Button>
           
           <div className="flex flex-col gap-2 min-w-0">
-            {currentStep === 1 ? (
-              <div className="flex flex-col gap-2 items-center w-full">
-                <Button
-                  onClick={handleGotIt}
-                  className="w-full bg-green-500 hover:bg-green-600 text-white font-bold px-4 py-2 text-xs sm:text-sm rounded-lg"
-                >
+            {currentStep === 1 ? <div className="flex flex-col gap-2 items-center w-full">
+                <Button onClick={handleGotIt} className="w-full bg-green-500 hover:bg-green-600 text-white font-bold px-4 py-2 text-xs sm:text-sm rounded-lg">
                   <span className="sm:hidden">Got it 🚀</span>
                   <span className="hidden sm:inline">Got it — Show Me the Jobs 🚀</span>
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleDontShowAgain}
-                  className="w-full text-xs sm:text-sm text-red-600 border-red-300 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg"
-                >
+                <Button variant="outline" onClick={handleDontShowAgain} className="w-full text-xs sm:text-sm text-red-600 border-red-300 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg">
                   <span className="sm:hidden">Don't show again</span>
                   <span className="hidden sm:inline">Don't show this message again</span>
                 </Button>
-              </div>
-            ) : (
-              <Button
-                onClick={nextStep}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold flex items-center gap-2"
-              >
+              </div> : <Button onClick={nextStep} className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold flex items-center gap-2">
                 Next
                 <ChevronRight className="w-4 h-4" />
-              </Button>
-            )}
+              </Button>}
           </div>
         </div>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 }
