@@ -77,7 +77,10 @@ export const FileUpload = ({ jobId, userProfileId, existingFiles = [], onFilesUp
         }
 
         const fileExt = file.name.split('.').pop();
-        const fileName = `${userProfileId}/${jobId}/${Math.random()}.${fileExt}`;
+        const timestamp = Date.now();
+        // Include original filename in the storage path for better organization
+        const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const fileName = `${userProfileId}/${jobId}/${timestamp}_${sanitizedName}`;
 
         const { data, error } = await supabase.storage
           .from('job-tracker-files')
@@ -91,7 +94,9 @@ export const FileUpload = ({ jobId, userProfileId, existingFiles = [], onFilesUp
           .from('job-tracker-files')
           .getPublicUrl(fileName);
 
-        uploadedUrls.push(publicUrl);
+        // Store URL with original filename encoded in JSON format
+        const fileData = JSON.stringify({ url: publicUrl, originalName: file.name });
+        uploadedUrls.push(fileData);
         setFiles(prev => [...prev, { name: file.name, url: publicUrl, size: file.size }]);
       }
 
@@ -131,8 +136,18 @@ export const FileUpload = ({ jobId, userProfileId, existingFiles = [], onFilesUp
     }
   };
 
-  const handleFileDelete = async (fileUrl: string) => {
+  const handleFileDelete = async (fileData: string) => {
     try {
+      // Parse file data to get URL
+      let fileUrl: string;
+      try {
+        const parsed = JSON.parse(fileData);
+        fileUrl = parsed.url;
+      } catch {
+        // Fallback for old format (plain URL)
+        fileUrl = fileData;
+      }
+      
       // Extract file path from URL for deletion
       const urlParts = fileUrl.split('/');
       const filePath = urlParts.slice(-3).join('/'); // userProfileId/jobId/filename
@@ -145,7 +160,7 @@ export const FileUpload = ({ jobId, userProfileId, existingFiles = [], onFilesUp
         console.warn('File deletion warning:', deleteError);
       }
 
-      const updatedFiles = existingFiles.filter(url => url !== fileUrl);
+      const updatedFiles = existingFiles.filter(file => file !== fileData);
       
       // Update job tracker record
       const { error: updateError } = await supabase
@@ -174,7 +189,20 @@ export const FileUpload = ({ jobId, userProfileId, existingFiles = [], onFilesUp
     }
   };
 
-  const handleFileDownload = (fileUrl: string, fileName: string) => {
+  const handleFileDownload = (fileData: string) => {
+    let fileUrl: string;
+    let fileName: string;
+    
+    try {
+      const parsed = JSON.parse(fileData);
+      fileUrl = parsed.url;
+      fileName = parsed.originalName;
+    } catch {
+      // Fallback for old format (plain URL)
+      fileUrl = fileData;
+      fileName = fileData.split('/').pop() || 'download';
+    }
+    
     const link = document.createElement('a');
     link.href = fileUrl;
     link.download = fileName;
@@ -214,22 +242,35 @@ export const FileUpload = ({ jobId, userProfileId, existingFiles = [], onFilesUp
       {existingFiles.length > 0 && (
         <div className="space-y-2">
           <h4 className="text-sm font-medium text-purple-700">Uploaded Files:</h4>
-          {existingFiles.map((fileUrl, index) => {
-            const fileName = fileUrl.split('/').pop() || `File ${index + 1}`;
-            const cleanFileName = fileName.includes('.') ? 
-              fileName.substring(fileName.indexOf('.') + 1) : fileName;
+          {existingFiles.map((fileData, index) => {
+            let fileUrl: string;
+            let originalName: string;
+            
+            try {
+              const parsed = JSON.parse(fileData);
+              fileUrl = parsed.url;
+              originalName = parsed.originalName;
+            } catch {
+              // Fallback for old format (plain URL)
+              fileUrl = fileData;
+              originalName = fileData.split('/').pop() || `File ${index + 1}`;
+              // For old random filenames, clean them up for display
+              if (originalName.includes('.') && originalName.length > 20) {
+                originalName = originalName.substring(originalName.indexOf('.') + 1);
+              }
+            }
             
             return (
-              <div key={fileUrl} className="flex items-center justify-between p-3 bg-white rounded-lg border border-purple-200 shadow-sm">
+              <div key={fileData} className="flex items-center justify-between p-3 bg-white rounded-lg border border-purple-200 shadow-sm">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  {getFileIcon(fileName)}
+                  {getFileIcon(originalName)}
                   <div className="flex-1 min-w-0">
                     <span className="text-sm font-medium text-gray-900 truncate block">
-                      {cleanFileName}
+                      {originalName}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {fileName.toLowerCase().includes('.pdf') ? 'PDF Document' :
-                       fileName.toLowerCase().includes('.doc') ? 'Word Document' : 'Document'}
+                      {originalName.toLowerCase().includes('.pdf') ? 'PDF Document' :
+                       originalName.toLowerCase().includes('.doc') ? 'Word Document' : 'Document'}
                     </span>
                   </div>
                 </div>
@@ -237,7 +278,7 @@ export const FileUpload = ({ jobId, userProfileId, existingFiles = [], onFilesUp
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleFileDownload(fileUrl, cleanFileName)}
+                    onClick={() => handleFileDownload(fileData)}
                     className="h-8 w-8 p-0 text-gray-500 hover:text-blue-600 hover:bg-blue-50"
                     title="Download file"
                   >
@@ -246,7 +287,7 @@ export const FileUpload = ({ jobId, userProfileId, existingFiles = [], onFilesUp
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleFileDelete(fileUrl)}
+                    onClick={() => handleFileDelete(fileData)}
                     className="h-8 w-8 p-0 text-gray-500 hover:text-red-600 hover:bg-red-50"
                     title="Delete file"
                   >
