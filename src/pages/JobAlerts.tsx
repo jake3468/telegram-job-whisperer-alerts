@@ -8,6 +8,7 @@ import { Layout } from '@/components/Layout';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
+import { JobAlertsOnboardingPopup } from '@/components/JobAlertsOnboardingPopup';
 import { Badge } from '@/components/ui/badge';
 
 const JobAlerts = () => {
@@ -90,6 +91,9 @@ const JobAlerts = () => {
 
       {/* Profile Completion Warning */}
       <ProfileCompletionWarning />
+
+      {/* Job Alerts Onboarding Popup */}
+      <JobAlertsOnboardingPopup />
 
       <div className="space-y-8">
         <JobAlertsSection userTimezone={userTimezone} />

@@ -1061,6 +1061,7 @@ export type Database = {
           cv_chat_id: string | null
           id: string
           resume: string | null
+          show_job_alerts_onboarding_popup: boolean
           show_onboarding_popup: boolean
           user_id: string | null
         }
@@ -1073,6 +1074,7 @@ export type Database = {
           cv_chat_id?: string | null
           id?: string
           resume?: string | null
+          show_job_alerts_onboarding_popup?: boolean
           show_onboarding_popup?: boolean
           user_id?: string | null
         }
@@ -1085,6 +1087,7 @@ export type Database = {
           cv_chat_id?: string | null
           id?: string
           resume?: string | null
+          show_job_alerts_onboarding_popup?: boolean
           show_onboarding_popup?: boolean
           user_id?: string | null
         }
