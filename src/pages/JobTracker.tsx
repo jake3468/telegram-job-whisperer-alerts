@@ -176,11 +176,11 @@ const SortableJobCard = ({
 
   // Checklist items based on job status
   const checklistItems = job.status === 'saved' ? [
-    { field: 'resume_updated', label: 'Resume updated', completed: job.resume_updated },
-    { field: 'job_role_analyzed', label: 'Job role analyzed', completed: job.job_role_analyzed },
-    { field: 'company_researched', label: 'Company researched', completed: job.company_researched },
-    { field: 'cover_letter_prepared', label: 'Cover letter prepared', completed: job.cover_letter_prepared },
-    { field: 'ready_to_apply', label: 'Ready to apply', completed: job.ready_to_apply }
+    { field: 'cover_letter_prepared', label: '✍️ Did you prepare your cover letter?', completed: job.cover_letter_prepared },
+    { field: 'resume_updated', label: '📄 Did you update your resume?', completed: job.resume_updated },
+    { field: 'company_researched', label: '🏢 Did you research the company?', completed: job.company_researched },
+    { field: 'job_role_analyzed', label: '🎯 Did you analyze the job role?', completed: job.job_role_analyzed },
+    { field: 'ready_to_apply', label: '🚀 Are you ready to apply?', completed: job.ready_to_apply }
   ] : job.status === 'applied' ? [
     { field: 'interview_call_received', label: 'Interview call received', completed: job.interview_call_received }
   ] : job.status === 'interview' ? [
