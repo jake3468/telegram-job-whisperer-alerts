@@ -89,7 +89,7 @@ const DroppableColumn = ({
           </div>}
       </div>
 
-      <div className={`p-2 min-h-[450px] ${isDropTarget ? 'bg-black/5' : ''} transition-colors`}>
+      <div className={`p-2 h-[450px] overflow-y-auto ${isDropTarget ? 'bg-black/5' : ''} transition-colors`}>
         <SortableContext items={jobs.map(job => job.id)} strategy={verticalListSortingStrategy}>
           <div className="space-y-1">
             {jobs.map(job => <SortableJobCard key={job.id} job={job} onDelete={onDeleteJob} onView={onViewJob} onUpdateChecklist={onUpdateChecklist} />)}
@@ -602,6 +602,47 @@ const JobTracker = () => {
     const activeJobToMove = jobs.find(j => j.id === active.id);
     if (!activeJobToMove) return;
 
+    // Handle reordering within the same column
+    if (over.id === activeJobToMove.status) {
+      // Same column - just reorder
+      const targetJobs = jobs.filter(job => job.status === activeJobToMove.status).sort((a, b) => a.order_position - b.order_position);
+      const activeIndex = targetJobs.findIndex(job => job.id === active.id);
+      const overIndex = targetJobs.findIndex(job => job.id === over.id);
+      
+      if (activeIndex !== overIndex && activeIndex !== -1 && overIndex !== -1) {
+        // Reorder logic - update order_position values
+        const reorderedJobs = [...targetJobs];
+        const [movedItem] = reorderedJobs.splice(activeIndex, 1);
+        reorderedJobs.splice(overIndex, 0, movedItem);
+        
+        // Update order positions
+        reorderedJobs.forEach((job, index) => {
+          const updatedJob = { ...job, order_position: index };
+          optimisticUpdate(updatedJob);
+        });
+        
+        // Update database for all affected jobs
+        try {
+          await Promise.all(
+            reorderedJobs.map((job, index) => 
+              supabase
+                .from('job_tracker')
+                .update({ order_position: index })
+                .eq('id', job.id)
+            )
+          );
+        } catch (error) {
+          console.error('Error reordering jobs:', error);
+          toast({
+            title: "Error",
+            description: "Failed to reorder jobs.",
+            variant: "destructive"
+          });
+        }
+      }
+      return;
+    }
+
     // Calculate progress for different job statuses
     const getProgress = (job: JobEntry) => {
       if (job.status === 'saved') {
@@ -623,7 +664,7 @@ const JobTracker = () => {
       return 0;
     };
 
-    // Check if checklist is complete before allowing drag
+    // Check if checklist is complete before allowing drag (except for rejected/offer columns)
     const progress = getProgress(activeJobToMove);
     let requiredProgress = 0;
     if (activeJobToMove.status === 'saved') {
@@ -633,7 +674,9 @@ const JobTracker = () => {
     } else if (activeJobToMove.status === 'interview') {
       requiredProgress = 2;
     }
-    if (progress < requiredProgress) {
+    
+    // Allow dragging from rejected/offer columns without checklist requirements
+    if (activeJobToMove.status !== 'rejected' && activeJobToMove.status !== 'offer' && progress < requiredProgress) {
       toast({
         title: "Complete checklist first",
         description: `You must complete all checklist items (${progress}/${requiredProgress}) before moving this job.`,
@@ -708,7 +751,7 @@ const JobTracker = () => {
     }
   };
   const getJobsByStatus = (status: string) => {
-    return jobs.filter(job => job.status === status);
+    return jobs.filter(job => job.status === status).sort((a, b) => a.order_position - b.order_position);
   };
   const handleViewJob = (job: JobEntry) => {
     setSelectedJob(job);
