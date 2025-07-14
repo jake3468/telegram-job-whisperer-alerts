@@ -880,7 +880,7 @@ const JobTracker = () => {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="bg-white border border-gray-200 text-gray-900 w-[90vw] max-w-md rounded-xl overflow-hidden p-0">
           <DialogHeader className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-t-xl">
-            <DialogTitle className="font-orbitron text-white text-lg pr-8">Add New Job</DialogTitle>
+            <DialogTitle className="font-orbitron text-white text-lg pr-8 text-center">Add New Job</DialogTitle>
             <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 text-white hover:text-gray-200">
               <X className="h-4 w-4" />
               <span className="sr-only">Close</span>
