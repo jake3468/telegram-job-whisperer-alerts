@@ -22,13 +22,35 @@ interface FormData {
   jobDescription: string;
 }
 
-const AIMockInterviewForm = () => {
+interface PrefillData {
+  companyName: string;
+  jobTitle: string;
+  jobDescription: string;
+}
+
+interface AIMockInterviewFormProps {
+  prefillData?: PrefillData;
+}
+
+const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
   const [formData, setFormData] = useState<FormData>({
     phoneNumber: "",
     companyName: "",
     jobTitle: "",
     jobDescription: ""
   });
+
+  // Update form data when prefillData changes
+  useEffect(() => {
+    if (prefillData) {
+      setFormData(prev => ({
+        ...prev,
+        companyName: prefillData.companyName || prev.companyName,
+        jobTitle: prefillData.jobTitle || prev.jobTitle,
+        jobDescription: prefillData.jobDescription || prev.jobDescription
+      }));
+    }
+  }, [prefillData]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);

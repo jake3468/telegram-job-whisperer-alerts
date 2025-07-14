@@ -19,6 +19,7 @@ import { InterviewPrepHistoryModal } from '@/components/InterviewPrepHistoryModa
 import { useCachedInterviewPrep } from '@/hooks/useCachedInterviewPrep';
 import InterviewPrepDownloadActions from '@/components/InterviewPrepDownloadActions';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
+import { useLocation } from 'react-router-dom';
 
 const InterviewPrep = () => {
   // Use enterprise-level authentication
@@ -46,6 +47,18 @@ const InterviewPrep = () => {
   useCreditWarnings(); // This shows the warning popups
 
   const { userProfile } = useUserProfile();
+  const location = useLocation();
+
+  // Auto-populate form data if passed via navigation state
+  useEffect(() => {
+    if (location.state?.companyName || location.state?.jobTitle || location.state?.jobDescription) {
+      setCompanyName(location.state.companyName || '');
+      setJobTitle(location.state.jobTitle || '');
+      setJobDescription(location.state.jobDescription || '');
+      // Clear the navigation state after using it
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   // Use cached interview prep hook for instant data display
   const {

@@ -5,12 +5,32 @@ import { RefreshCw, History } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCachedGraceInterviewRequests } from "@/hooks/useCachedGraceInterviewRequests";
 import GraceInterviewReportsModal from "@/components/GraceInterviewReportsModal";
+import { useLocation } from "react-router-dom";
 const AIMockInterview = () => {
   const {
     connectionIssue,
     forceRefresh
   } = useCachedGraceInterviewRequests();
   const [isReportsModalOpen, setIsReportsModalOpen] = useState(false);
+  const location = useLocation();
+  const [prefillData, setPrefillData] = useState({
+    companyName: '',
+    jobTitle: '',
+    jobDescription: ''
+  });
+
+  // Auto-populate form data if passed via navigation state
+  useEffect(() => {
+    if (location.state?.companyName || location.state?.jobTitle || location.state?.jobDescription) {
+      setPrefillData({
+        companyName: location.state.companyName || '',
+        jobTitle: location.state.jobTitle || '',
+        jobDescription: location.state.jobDescription || ''
+      });
+      // Clear the navigation state after using it
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
   
   const handleManualRefresh = () => {
     // Clear all caches and reload the page for a complete refresh
@@ -50,7 +70,7 @@ const AIMockInterview = () => {
           {/* Form Section */}
           <div className="flex justify-center">
             <div className="w-full max-w-lg">
-              <AIMockInterviewForm />
+              <AIMockInterviewForm prefillData={prefillData} />
             </div>
           </div>
 
