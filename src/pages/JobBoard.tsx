@@ -243,11 +243,11 @@ const JobBoard = () => {
           <div className="text-center mb-4 sm:mb-6">
         <div className="flex items-center justify-center gap-4 mb-2 sm:mb-4">
               <span>💼</span>
-              <h1 className="sm:text-4xl font-bold bg-gradient-to-r from-purple-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent text-4xl"></h1>Job Board</h1>
+              <h1 className="sm:text-4xl font-bold bg-gradient-to-r from-purple-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent text-4xl">Job Board</h1>
               {/* Only show refresh button when there's an error */}
               {error && <Button onClick={handleManualRefresh} disabled={loading} variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0" title="Refresh jobs data">
                   <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                </Button>}
+                 </Button>}
             </div>
             <p className="text-gray-300 text-sm sm:text-lg">
               Browse job alerts received via <span className="italic text-violet-400">Telegram</span>— all jobs posted today appear here, stay visible for 7 days, and are auto-deleted after that. Save the ones you like and move them to your <span className="italic text-indigo-200">Job Tracker</span> page when you're ready to apply.
