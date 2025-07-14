@@ -78,9 +78,8 @@ export const FileUpload = ({ jobId, userProfileId, existingFiles = [], onFilesUp
 
         const fileExt = file.name.split('.').pop();
         const timestamp = Date.now();
-        // Include original filename in the storage path for better organization
-        const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-        const fileName = `${userProfileId}/${jobId}/${timestamp}_${sanitizedName}`;
+        // Use timestamp + random for storage uniqueness, but preserve original name for user
+        const fileName = `${userProfileId}/${jobId}/${timestamp}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
         const { data, error } = await supabase.storage
           .from('job-tracker-files')
@@ -94,7 +93,7 @@ export const FileUpload = ({ jobId, userProfileId, existingFiles = [], onFilesUp
           .from('job-tracker-files')
           .getPublicUrl(fileName);
 
-        // Store URL with original filename encoded in JSON format
+        // Store URL with original filename (not the storage filename)
         const fileData = JSON.stringify({ url: publicUrl, originalName: file.name });
         uploadedUrls.push(fileData);
         setFiles(prev => [...prev, { name: file.name, url: publicUrl, size: file.size }]);
