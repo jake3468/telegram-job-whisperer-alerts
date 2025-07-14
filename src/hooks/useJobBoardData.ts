@@ -237,12 +237,6 @@ export const useJobBoardData = () => {
         return;
       }
 
-      // Validate that job has job_reference_id (should be set when saved)
-      if (!job.job_reference_id) {
-        toast.error('Please save the job first before adding to tracker');
-        return;
-      }
-
       // Get user from database using Clerk ID
       const { data: users, error: userError } = await supabase
         .from('users')
@@ -278,12 +272,31 @@ export const useJobBoardData = () => {
         return;
       }
 
+      // Generate job_reference_id if it doesn't exist (for jobs saved before recent changes)
+      let jobReferenceId = job.job_reference_id;
+      if (!jobReferenceId) {
+        jobReferenceId = crypto.randomUUID();
+        
+        // Update the job_board record with the new job_reference_id
+        const { error: updateError } = await supabase
+          .from('job_board')
+          .update({ job_reference_id: jobReferenceId })
+          .eq('id', job.id)
+          .eq('user_id', userProfile.id);
+
+        if (updateError) {
+          console.error('Error updating job_board with job_reference_id:', updateError);
+          toast.error('Failed to prepare job for tracker. Please try again.');
+          return;
+        }
+      }
+
       // Check if job already exists in tracker using job_reference_id
       const { data: existingJob, error: checkError } = await supabase
         .from('job_tracker')
         .select('id')
         .eq('user_id', userProfile.id)
-        .eq('job_reference_id', job.job_reference_id)
+        .eq('job_reference_id', jobReferenceId)
         .maybeSingle();
 
       if (checkError) {
@@ -297,7 +310,7 @@ export const useJobBoardData = () => {
         return;
       }
 
-      // Insert new job tracker record using existing job_reference_id
+      // Insert new job tracker record using job_reference_id
       const { error: insertError } = await supabase
         .from('job_tracker')
         .insert({
@@ -306,7 +319,7 @@ export const useJobBoardData = () => {
           company_name: job.company_name,
           job_description: job.job_description || '',
           job_url: job.link_1_link || '',
-          job_reference_id: job.job_reference_id,
+          job_reference_id: jobReferenceId,
           status: 'saved',
           order_position: 0,
           // Set all boolean fields explicitly
