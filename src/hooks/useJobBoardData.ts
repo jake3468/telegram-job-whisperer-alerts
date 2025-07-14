@@ -33,7 +33,7 @@ export const useJobBoardData = () => {
 
       // Get user profile to find saved tracker jobs
       const { data: { user } } = await supabase.auth.getUser();
-      let trackerJobIds: string[] = [];
+      let trackerJobRefIds: string[] = [];
       
       if (user) {
         const { data: userProfile } = await supabase
@@ -45,12 +45,12 @@ export const useJobBoardData = () => {
         if (userProfile) {
           const { data: trackerJobs } = await supabase
             .from('job_tracker')
-            .select('company_name, job_title')
+            .select('job_reference_id')
             .eq('user_id', userProfile.id);
 
           if (trackerJobs) {
-            // Create a Set of job signatures for quick lookup
-            trackerJobIds = trackerJobs.map(job => `${job.company_name}-${job.job_title}`);
+            // Create a Set of job reference IDs for quick lookup
+            trackerJobRefIds = trackerJobs.map(job => job.job_reference_id).filter(Boolean);
           }
         }
       }
@@ -72,7 +72,7 @@ export const useJobBoardData = () => {
       });
 
       const savedToTracker = allJobs.filter(job => 
-        trackerJobIds.includes(`${job.company_name}-${job.title}`)
+        job.is_saved_by_user === true
       );
 
       setPostedTodayJobs(postedToday);
@@ -121,13 +121,12 @@ export const useJobBoardData = () => {
         return;
       }
 
-      // Check if job already exists in tracker with better matching
+      // Check if job already exists in tracker using job_reference_id
       const { data: existingJob, error: checkError } = await supabase
         .from('job_tracker')
         .select('id')
         .eq('user_id', userProfile.id)
-        .eq('company_name', job.company_name)
-        .eq('job_title', job.title)
+        .eq('job_reference_id', job.job_reference_id)
         .maybeSingle();
 
       if (checkError) {
@@ -150,6 +149,7 @@ export const useJobBoardData = () => {
           company_name: job.company_name,
           job_description: job.job_description || '',
           job_url: job.link_1_link || '',
+          job_reference_id: job.job_reference_id,
           status: 'saved',
           order_position: 0,
           // Set all boolean fields explicitly
@@ -175,6 +175,46 @@ export const useJobBoardData = () => {
 
     } catch (err) {
       console.error('Unexpected error saving job to tracker:', err);
+      toast.error('An unexpected error occurred. Please try again.');
+    }
+  };
+
+  const markJobAsSaved = async (jobId: string) => {
+    try {
+      // First check authentication
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        toast.error('Please log in to save jobs');
+        return;
+      }
+
+      // Get user profile
+      const { data: userProfile, error: profileError } = await supabase
+        .from('user_profile')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (profileError || !userProfile) {
+        toast.error('Unable to access user profile. Please try again.');
+        return;
+      }
+
+      // Update job as saved by user
+      const { error: updateError } = await supabase
+        .from('job_board')
+        .update({ is_saved_by_user: true })
+        .eq('id', jobId)
+        .eq('user_id', userProfile.id);
+
+      if (updateError) {
+        console.error('Error marking job as saved:', updateError);
+        toast.error(`Failed to save job: ${updateError.message}`);
+        return;
+      }
+
+    } catch (err) {
+      console.error('Unexpected error marking job as saved:', err);
       toast.error('An unexpected error occurred. Please try again.');
     }
   };
@@ -247,6 +287,7 @@ export const useJobBoardData = () => {
     loading,
     error,
     forceRefresh,
-    saveToTracker
+    saveToTracker,
+    markJobAsSaved
   };
 };

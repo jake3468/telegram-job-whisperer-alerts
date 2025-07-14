@@ -15,10 +15,11 @@ interface JobCardProps {
   job: JobBoardItem;
   onView: () => void;
   onSaveToTracker: () => void;
-  showSaved?: boolean;
+  isSaved?: boolean;
+  isAddedToTracker?: boolean;
 }
 
-const JobCard = ({ job, onView, onSaveToTracker, showSaved = false }: JobCardProps) => {
+const JobCard = ({ job, onView, onSaveToTracker, isSaved = false, isAddedToTracker = false }: JobCardProps) => {
   const formatSalary = (salary: string | null) => {
     if (!salary) return 'Salary not disclosed';
     return salary;
@@ -82,23 +83,17 @@ const JobCard = ({ job, onView, onSaveToTracker, showSaved = false }: JobCardPro
             >
               View
             </Button>
-            {!showSaved && (
-              <Button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSaveToTracker();
-                }}
-                size="sm" 
-                className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-6 whitespace-nowrap"
-              >
-                Save to Tracker
-              </Button>
-            )}
-            {showSaved && (
-              <div className="text-xs text-green-600 font-medium px-2 py-1">
-                Saved
-              </div>
-            )}
+            <Button 
+              onClick={(e) => {
+                e.stopPropagation();
+                onSaveToTracker();
+              }}
+              size="sm" 
+              className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-6 whitespace-nowrap"
+              disabled={isAddedToTracker}
+            >
+              {isAddedToTracker ? "Added to Tracker" : (isSaved ? "Add to Job Tracker" : "Save")}
+            </Button>
           </div>
         </div>
         
@@ -201,8 +196,8 @@ const JobBoard = () => {
         <div className="max-w-6xl mx-auto w-full overflow-hidden">
           {/* Header */}
           <div className="text-center mb-4 sm:mb-6">
-            <div className="flex items-center justify-center gap-4 mb-2 sm:mb-4">
-              <h1 className="text-2xl sm:text-4xl font-bold text-white font-orbitron">
+        <div className="flex items-center justify-center gap-4 mb-2 sm:mb-4">
+              <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent">
                 Job Board
               </h1>
               {/* Only show refresh button when there's an error */}
@@ -334,7 +329,8 @@ const JobBoard = () => {
                       job={job} 
                       onView={() => setSelectedJob(job)} 
                       onSaveToTracker={() => saveToTracker(job)} 
-                      showSaved 
+                       isSaved={job.is_saved_by_user || false}
+                       isAddedToTracker={true}
                     />
                   ))}
                 </div>

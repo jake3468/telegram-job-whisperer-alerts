@@ -541,7 +541,9 @@ export type Database = {
           company_name: string
           created_at: string
           id: string
+          is_saved_by_user: boolean | null
           job_description: string | null
+          job_reference_id: string | null
           job_type: string | null
           link_1_link: string | null
           link_1_title: string | null
@@ -563,7 +565,9 @@ export type Database = {
           company_name: string
           created_at?: string
           id?: string
+          is_saved_by_user?: boolean | null
           job_description?: string | null
+          job_reference_id?: string | null
           job_type?: string | null
           link_1_link?: string | null
           link_1_title?: string | null
@@ -585,7 +589,9 @@ export type Database = {
           company_name?: string
           created_at?: string
           id?: string
+          is_saved_by_user?: boolean | null
           job_description?: string | null
+          job_reference_id?: string | null
           job_type?: string | null
           link_1_link?: string | null
           link_1_title?: string | null
