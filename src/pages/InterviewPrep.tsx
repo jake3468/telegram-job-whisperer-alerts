@@ -19,11 +19,13 @@ import { InterviewPrepHistoryModal } from '@/components/InterviewPrepHistoryModa
 import { useCachedInterviewPrep } from '@/hooks/useCachedInterviewPrep';
 import InterviewPrepDownloadActions from '@/components/InterviewPrepDownloadActions';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
+import { useLocation } from 'react-router-dom';
 
 const InterviewPrep = () => {
   // Use enterprise-level authentication
   const { isAuthReady, executeWithRetry } = useEnterpriseAuth();
   const { user } = useUser();
+  const location = useLocation();
   const [companyName, setCompanyName] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [jobDescription, setJobDescription] = useState('');
@@ -55,6 +57,17 @@ const InterviewPrep = () => {
     connectionIssue,
     refetch: refetchHistory
   } = useCachedInterviewPrep();
+
+  // Auto-populate form data if passed via navigation state
+  useEffect(() => {
+    if (location.state?.companyName || location.state?.jobTitle || location.state?.jobDescription) {
+      setCompanyName(location.state.companyName || '');
+      setJobTitle(location.state.jobTitle || '');
+      setJobDescription(location.state.jobDescription || '');
+      // Clear the navigation state after using it
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const handleManualRefresh = () => {
     window.location.reload();

@@ -80,12 +80,12 @@ const CoverLetter = () => {
 
   // Auto-populate form data if passed via navigation state
   useEffect(() => {
-    if (location.state?.jobData) {
-      const { company_name, job_title, job_description } = location.state.jobData;
+    if (location.state?.companyName || location.state?.jobTitle || location.state?.jobDescription) {
+      const { companyName, jobTitle, jobDescription } = location.state;
       setFormData({
-        company_name: company_name || '',
-        job_title: job_title || '',
-        job_description: job_description || ''
+        company_name: companyName || '',
+        job_title: jobTitle || '',
+        job_description: jobDescription || ''
       });
       // Clear the navigation state after using it
       window.history.replaceState({}, document.title);

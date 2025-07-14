@@ -22,13 +22,33 @@ interface FormData {
   jobDescription: string;
 }
 
-const AIMockInterviewForm = () => {
+interface AIMockInterviewFormProps {
+  prefillData?: {
+    companyName?: string;
+    jobTitle?: string;
+    jobDescription?: string;
+  };
+}
+
+const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
   const [formData, setFormData] = useState<FormData>({
     phoneNumber: "",
     companyName: "",
     jobTitle: "",
     jobDescription: ""
   });
+
+  // Auto-populate form data if prefillData is provided
+  useEffect(() => {
+    if (prefillData?.companyName || prefillData?.jobTitle || prefillData?.jobDescription) {
+      setFormData(prev => ({
+        ...prev,
+        companyName: prefillData.companyName || prev.companyName,
+        jobTitle: prefillData.jobTitle || prev.jobTitle,
+        jobDescription: prefillData.jobDescription || prev.jobDescription
+      }));
+    }
+  }, [prefillData]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
