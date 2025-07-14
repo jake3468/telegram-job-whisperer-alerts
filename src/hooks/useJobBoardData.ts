@@ -200,10 +200,16 @@ export const useJobBoardData = () => {
         return;
       }
 
-      // Update job as saved by user
+      // Generate job_reference_id when saving (this will be used later for job tracker)
+      const jobReferenceId = crypto.randomUUID();
+
+      // Update job as saved by user and set job_reference_id
       const { error: updateError } = await supabase
         .from('job_board')
-        .update({ is_saved_by_user: true })
+        .update({ 
+          is_saved_by_user: true,
+          job_reference_id: jobReferenceId
+        })
         .eq('id', job.id)
         .eq('user_id', userProfile.id);
 
@@ -231,14 +237,26 @@ export const useJobBoardData = () => {
         return;
       }
 
+      // Validate that job has job_reference_id (should be set when saved)
+      if (!job.job_reference_id) {
+        toast.error('Please save the job first before adding to tracker');
+        return;
+      }
+
       // Get user from database using Clerk ID
       const { data: users, error: userError } = await supabase
         .from('users')
         .select('id')
         .eq('clerk_id', clerkUser.id)
-        .single();
+        .maybeSingle();
 
-      if (userError || !users) {
+      if (userError) {
+        console.error('Error fetching user:', userError);
+        toast.error('Unable to verify user. Please try logging in again.');
+        return;
+      }
+
+      if (!users) {
         toast.error('User not found. Please try logging in again.');
         return;
       }
@@ -247,9 +265,15 @@ export const useJobBoardData = () => {
         .from('user_profile')
         .select('id')
         .eq('user_id', users.id)
-        .single();
+        .maybeSingle();
 
-      if (profileError || !userProfile) {
+      if (profileError) {
+        console.error('Error fetching user profile:', profileError);
+        toast.error('Unable to verify user profile. Please try again.');
+        return;
+      }
+
+      if (!userProfile) {
         toast.error('User profile not found. Please complete your profile setup.');
         return;
       }
@@ -273,10 +297,7 @@ export const useJobBoardData = () => {
         return;
       }
 
-      // Generate a new job_reference_id for this job-tracker relationship
-      const newJobReferenceId = job.job_reference_id || crypto.randomUUID();
-
-      // Insert new job tracker record with all required fields
+      // Insert new job tracker record using existing job_reference_id
       const { error: insertError } = await supabase
         .from('job_tracker')
         .insert({
@@ -285,7 +306,7 @@ export const useJobBoardData = () => {
           company_name: job.company_name,
           job_description: job.job_description || '',
           job_url: job.link_1_link || '',
-          job_reference_id: newJobReferenceId,
+          job_reference_id: job.job_reference_id,
           status: 'saved',
           order_position: 0,
           // Set all boolean fields explicitly
@@ -303,20 +324,6 @@ export const useJobBoardData = () => {
         console.error('Error saving job to tracker:', insertError);
         toast.error(`Failed to add job to tracker: ${insertError.message}`);
         return;
-      }
-
-      // Update the job_board record with the job_reference_id if it wasn't set
-      if (!job.job_reference_id) {
-        const { error: updateError } = await supabase
-          .from('job_board')
-          .update({ job_reference_id: newJobReferenceId })
-          .eq('id', job.id)
-          .eq('user_id', userProfile.id);
-
-        if (updateError) {
-          console.error('Error updating job_board with job_reference_id:', updateError);
-          // Don't fail the entire operation for this
-        }
       }
 
       toast.success('Job added to tracker successfully!');
