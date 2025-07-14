@@ -189,22 +189,26 @@ export const FileUpload = ({ jobId, userProfileId, existingFiles = [], onFilesUp
   };
 
   const handleFileDownload = (fileData: string) => {
-    console.log('Download fileData:', fileData); // Debug log
     let fileUrl: string;
     let fileName: string;
     
     try {
       const parsed = JSON.parse(fileData);
-      console.log('Parsed data:', parsed); // Debug log
       fileUrl = parsed.url;
       fileName = parsed.originalName;
-    } catch (error) {
-      console.log('Parse error, using fallback:', error); // Debug log
-      // Fallback for old format (plain URL) - use a generic filename
+    } catch {
+      // Fallback for old format (plain URL) - extract original filename
       fileUrl = fileData;
       const storageFileName = fileData.split('/').pop() || 'download';
-      const extension = storageFileName.split('.').pop() || '';
-      fileName = `download${extension ? `.${extension}` : ''}`;
+      
+      // Use same logic as display: extract original name from storage filename
+      if (storageFileName.includes('_') && storageFileName.split('_').length > 2) {
+        // Remove timestamp and random part, keep the original filename part
+        const parts = storageFileName.split('_');
+        fileName = parts.slice(2).join('_'); // Everything after timestamp_random_
+      } else {
+        fileName = storageFileName;
+      }
     }
     
     const link = document.createElement('a');
