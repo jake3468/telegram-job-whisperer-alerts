@@ -249,21 +249,23 @@ export function OnboardingPopup({
             Previous
           </Button>
           
-          <div className="flex flex-col gap-2 min-w-0">
+          <div className="flex flex-col gap-2 min-w-0 w-full">
             {currentStep === 3 ? (
-              <div className="flex flex-col gap-2 w-full max-w-xs mx-auto">
+              <div className="flex flex-col gap-2 w-full">
                 <Button
                   onClick={handleLetSGo}
-                  className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-bold px-4 py-2 text-sm whitespace-nowrap"
+                  className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-bold px-3 py-2 text-xs sm:text-sm w-full"
                 >
-                  Let's Go — I'm Ready to Flip the Job Hunt 🔥
+                  <span className="sm:hidden">Let's Go 🔥</span>
+                  <span className="hidden sm:inline">Let's Go — I'm Ready to Flip the Job Hunt 🔥</span>
                 </Button>
                 <Button
                   variant="outline"
                   onClick={handleDontShowAgain}
-                  className="text-sm text-gray-600 border-gray-300 hover:bg-gray-50 px-4 py-2"
+                  className="text-xs sm:text-sm text-gray-600 border-gray-300 hover:bg-gray-50 px-3 py-2 w-full"
                 >
-                  Don't show this message again
+                  <span className="sm:hidden">Don't show again</span>
+                  <span className="hidden sm:inline">Don't show this message again</span>
                 </Button>
               </div>
             ) : (
