@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,6 +28,7 @@ const JobGuide = () => {
     isLoaded
   } = useUser();
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     toast
   } = useToast();
@@ -83,6 +84,20 @@ const JobGuide = () => {
     }
   });
   useCreditWarnings();
+  
+  // Handle pre-populated data from job tracker
+  useEffect(() => {
+    if (location.state?.companyName) {
+      setFormData(prev => ({ ...prev, companyName: location.state.companyName }));
+    }
+    if (location.state?.jobTitle) {
+      setFormData(prev => ({ ...prev, jobTitle: location.state.jobTitle }));
+    }
+    if (location.state?.jobDescription) {
+      setFormData(prev => ({ ...prev, jobDescription: location.state.jobDescription }));
+    }
+  }, [location.state]);
+
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');

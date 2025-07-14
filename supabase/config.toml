@@ -59,6 +59,9 @@ verify_jwt = false
 [functions.linkedin-image-webhook]
 verify_jwt = false
 
+[functions.grace-interview-webhook]
+verify_jwt = false
+
 [functions.resume-pdf-webhook]
 verify_jwt = false
 
@@ -75,4 +78,10 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.create-checkout-session]
+verify_jwt = false
+
+[functions.ai-interview-credit-deduction]
+verify_jwt = false
+
+[functions.job-board-webhook]
 verify_jwt = false

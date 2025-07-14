@@ -10,12 +10,12 @@ import { useCachedJobAlertsData } from '@/hooks/useCachedJobAlertsData';
 interface JobAlert {
   id: string;
   country: string;
+  country_name?: string;
   location: string;
   job_title: string;
-  job_type: 'Remote' | 'On-site' | 'Hybrid';
+  job_type: 'full-time' | 'part-time' | 'contract' | 'intern';
   alert_frequency: string;
   preferred_time: string;
-  max_alerts_per_day: number;
   timezone: string;
   created_at: string;
   updated_at: string;
@@ -35,13 +35,14 @@ const JobAlertsSection = ({
     userProfileId, 
     loading, 
     error, 
-    invalidateCache 
+    invalidateCache,
+    forceRefresh 
   } = useCachedJobAlertsData();
   
   const [showForm, setShowForm] = useState(false);
   const [editingAlert, setEditingAlert] = useState<JobAlert | null>(null);
   
-  const MAX_ALERTS = 5;
+  const MAX_ALERTS = 3;
   const alertsUsed = alerts.length;
   const alertsRemaining = MAX_ALERTS - alertsUsed;
   const isAtLimit = alertsUsed >= MAX_ALERTS;
@@ -118,10 +119,10 @@ const JobAlertsSection = ({
     setEditingAlert(null);
   };
 
-  // Manual refresh function - refreshes entire page for persistent issues
+  // Manual refresh function - uses proper data refetch instead of page reload
   const handleManualRefresh = useCallback(() => {
-    window.location.reload();
-  }, []);
+    forceRefresh();
+  }, [forceRefresh]);
   if (loading) {
     return <div className="max-w-2xl mx-auto w-full">
         <div className="rounded-3xl bg-black/95 border-2 border-emerald-400 shadow-none p-6 mt-3 min-h-[160px] flex items-center justify-center">

@@ -46,8 +46,10 @@ export const ProfileCompletionWarning = ({ className = '' }: ProfileCompletionWa
   const handleRefresh = async () => {
     setIsRefreshing(true);
     console.log('Manual refresh triggered for profile completion status');
+    
     try {
       await refetchStatus();
+      console.log('Profile refresh completed');
     } catch (error) {
       console.error('Error refreshing profile status:', error);
     } finally {
@@ -78,7 +80,7 @@ export const ProfileCompletionWarning = ({ className = '' }: ProfileCompletionWa
         </p>
         {lastChecked && (
           <p className="text-xs text-yellow-300 mt-1">
-            Last checked: {lastChecked.toLocaleTimeString()}
+            Last checked: {new Date(lastChecked).toLocaleTimeString()}
           </p>
         )}
       </div>

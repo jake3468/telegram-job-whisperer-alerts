@@ -1,15 +1,42 @@
 import { Layout } from "@/components/Layout";
 import AIMockInterviewForm from "@/components/AIMockInterviewForm";
 import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, History } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCachedGraceInterviewRequests } from "@/hooks/useCachedGraceInterviewRequests";
+import GraceInterviewReportsModal from "@/components/GraceInterviewReportsModal";
+import { useLocation } from "react-router-dom";
 const AIMockInterview = () => {
+  const location = useLocation();
   const {
     connectionIssue,
     forceRefresh
   } = useCachedGraceInterviewRequests();
+  const [isReportsModalOpen, setIsReportsModalOpen] = useState(false);
+  const [prefillData, setPrefillData] = useState<{
+    companyName?: string;
+    jobTitle?: string;
+    jobDescription?: string;
+  }>({});
+  
+  // Auto-populate form data if passed via navigation state
+  useEffect(() => {
+    if (location.state?.companyName || location.state?.jobTitle || location.state?.jobDescription) {
+      setPrefillData({
+        companyName: location.state.companyName || '',
+        jobTitle: location.state.jobTitle || '',
+        jobDescription: location.state.jobDescription || ''
+      });
+      // Clear the navigation state after using it
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
   const handleManualRefresh = () => {
+    // Clear all caches and reload the page for a complete refresh
+    localStorage.removeItem('aspirely_user_profile_cache');
+    localStorage.removeItem('aspirely_user_completion_status_cache');
+    localStorage.removeItem('aspirely_ai_interview_credits_cache');
     window.location.reload();
   };
   return <Layout>
@@ -29,13 +56,21 @@ const AIMockInterview = () => {
             
             <h2 className="text-xl md:text-2xl text-gray-300 mb-4 leading-relaxed">Get a Mock Interview Phone Call from 👩🏻 Grace</h2>
             
-            <p className="text-gray-400 max-w-2xl mx-auto leading-relaxed text-base">Grace, your AI interview assistant from Aspirely AI, will call your phone in about a minute to ask real interview questions based on your job role — and you’ll receive a detailed report right after the call.</p>
+            {/* Reports Button */}
+            <div className="mb-6">
+              <Button onClick={() => setIsReportsModalOpen(true)} variant="outline" className="border-purple-500/30 transition-all duration-300 bg-violet-600 hover:bg-violet-500 text-slate-50">
+                <History className="w-4 h-4 mr-2" />
+                Reports
+              </Button>
+            </div>
+            
+            <p className="text-gray-400 max-w-2xl mx-auto leading-relaxed text-base">Grace, your AI interview assistant from Aspirely AI, will call your phone in about a minute to ask real interview questions based on your job role — and you'll receive a detailed report right after the call.</p>
           </div>
 
           {/* Form Section */}
           <div className="flex justify-center">
             <div className="w-full max-w-lg">
-              <AIMockInterviewForm />
+              <AIMockInterviewForm prefillData={prefillData} />
             </div>
           </div>
 
@@ -50,6 +85,9 @@ const AIMockInterview = () => {
             </div>
           </div>
         </div>
+
+        {/* Reports Modal */}
+        <GraceInterviewReportsModal isOpen={isReportsModalOpen} onClose={() => setIsReportsModalOpen(false)} />
       </div>
     </Layout>;
 };

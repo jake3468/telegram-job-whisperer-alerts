@@ -4,11 +4,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Phone, CheckCircle, AlertCircle } from "lucide-react";
+import { Loader2, Phone, CheckCircle, AlertCircle, CreditCard } from "lucide-react";
 import { useCachedUserProfile } from "@/hooks/useCachedUserProfile";
 import { useCachedUserCompletionStatus } from "@/hooks/useCachedUserCompletionStatus";
 import { useCachedGraceInterviewRequests } from "@/hooks/useCachedGraceInterviewRequests";
+import { useAIInterviewCredits } from "@/hooks/useAIInterviewCredits";
 import { ProfileCompletionWarning } from "@/components/ProfileCompletionWarning";
+import { AIInterviewCreditsDisplay } from "@/components/AIInterviewCreditsDisplay";
+import { AIInterviewPurchaseModal } from "@/components/AIInterviewPurchaseModal";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 
@@ -19,19 +22,41 @@ interface FormData {
   jobDescription: string;
 }
 
-const AIMockInterviewForm = () => {
+interface AIMockInterviewFormProps {
+  prefillData?: {
+    companyName?: string;
+    jobTitle?: string;
+    jobDescription?: string;
+  };
+}
+
+const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
   const [formData, setFormData] = useState<FormData>({
     phoneNumber: "",
     companyName: "",
     jobTitle: "",
     jobDescription: ""
   });
+
+  // Auto-populate form data if prefillData is provided
+  useEffect(() => {
+    if (prefillData?.companyName || prefillData?.jobTitle || prefillData?.jobDescription) {
+      setFormData(prev => ({
+        ...prev,
+        companyName: prefillData.companyName || prev.companyName,
+        jobTitle: prefillData.jobTitle || prev.jobTitle,
+        jobDescription: prefillData.jobDescription || prev.jobDescription
+      }));
+    }
+  }, [prefillData]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
   const { toast } = useToast();
   const { userProfile, loading: profileLoading } = useCachedUserProfile();
   const { hasResume, hasBio, loading: completionLoading } = useCachedUserCompletionStatus();
   const { optimisticAdd } = useCachedGraceInterviewRequests();
+  const { credits, hasCredits, useCredit, refetch: refetchCredits, isLoading: creditsLoading } = useAIInterviewCredits();
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -42,6 +67,60 @@ const AIMockInterviewForm = () => {
     // Validate that phone number is not empty and has proper format (react-phone-input-2 handles validation)
     return phone && phone.length >= 8;
   };
+  const validatePhoneNumberUniqueness = async (phoneNumber: string) => {
+    try {
+      // Check if phone number already exists in grace_interview_requests
+      const { data: existingRequest, error } = await supabase
+        .from('grace_interview_requests')
+        .select('user_id, phone_number')
+        .eq('phone_number', phoneNumber)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error checking phone number:", error);
+        throw new Error("Failed to validate phone number");
+      }
+
+      if (existingRequest) {
+        // Phone number exists, check if it belongs to the same user
+        if (existingRequest.user_id !== userProfile?.id) {
+          // Different user - get the email of the existing account
+          const { data: existingUserProfile, error: profileError } = await supabase
+            .from('user_profile')
+            .select('user_id')
+            .eq('id', existingRequest.user_id)
+            .single();
+
+          if (profileError) {
+            console.error("Error fetching user profile:", profileError);
+            throw new Error("Failed to validate phone number");
+          }
+
+          const { data: existingUser, error: userError } = await supabase
+            .from('users')
+            .select('email')
+            .eq('id', existingUserProfile.user_id)
+            .single();
+
+          if (userError) {
+            console.error("Error fetching user email:", userError);
+            throw new Error("Failed to validate phone number");
+          }
+
+          return {
+            isValid: false,
+            message: `This phone number is already registered with another account (${existingUser.email}). Please sign in to that account to access the AI Interview feature.`
+          };
+        }
+      }
+
+      return { isValid: true };
+    } catch (error) {
+      console.error("Phone validation error:", error);
+      throw error;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -71,6 +150,17 @@ const AIMockInterviewForm = () => {
         description: `Please add your ${missing.join(" and ")} in your profile page before requesting an interview.`,
         variant: "destructive"
       });
+      return;
+    }
+
+    // Check AI interview calls
+    if (!hasCredits) {
+      toast({
+        title: "No Interview Calls",
+        description: "You need AI interview calls to request a call. Purchase calls to continue.",
+        variant: "destructive"
+      });
+      setIsPurchaseModalOpen(true);
       return;
     }
 
@@ -111,6 +201,18 @@ const AIMockInterviewForm = () => {
       // react-phone-input-2 already includes the + prefix, so we don't need to add it
       const phoneNumber = formData.phoneNumber.startsWith('+') ? formData.phoneNumber : `+${formData.phoneNumber}`;
       
+      // Validate phone number uniqueness
+      const phoneValidation = await validatePhoneNumberUniqueness(phoneNumber);
+      if (!phoneValidation.isValid) {
+        toast({
+          title: "Phone Number Already Registered",
+          description: phoneValidation.message,
+          variant: "destructive"
+        });
+        setIsSubmitting(false);
+        return;
+      }
+      
       console.log("Inserting data:", {
         user_id: userProfile.id,
         phone_number: phoneNumber,
@@ -141,6 +243,15 @@ const AIMockInterviewForm = () => {
       // Optimistically add to cache
       if (data) {
         optimisticAdd(data);
+      }
+
+      // Deduct AI interview credit after successful submission
+      try {
+        await useCredit(`AI mock interview for ${formData.jobTitle} at ${formData.companyName}`);
+        console.log("AI interview credit deducted successfully");
+      } catch (creditError) {
+        console.error("Error deducting AI interview credit:", creditError);
+        // Don't fail the whole request if credit deduction fails, but log it
       }
       
       setIsSubmitted(true);
@@ -199,6 +310,11 @@ const AIMockInterviewForm = () => {
     <div className="space-y-6">
       {/* Profile Completion Warning - Uses the standard component with proper caching */}
       <ProfileCompletionWarning />
+      
+      {/* AI Interview Credits Display */}
+      <AIInterviewCreditsDisplay 
+        onBuyMore={() => setIsPurchaseModalOpen(true)} 
+      />
 
       <form onSubmit={handleSubmit} className="space-y-6">
       <div className="border border-purple-500/30 rounded-xl p-8 bg-white shadow-lg shadow-purple-500/20">
@@ -262,22 +378,53 @@ const AIMockInterviewForm = () => {
 
         {/* Submit Button */}
         <div className="mt-8">
-          <Button type="submit" disabled={isSubmitting} className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
-            {isSubmitting ? <>
+          <Button 
+            type="submit" 
+            disabled={isSubmitting || !hasCredits || creditsLoading} 
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          >
+            {isSubmitting ? (
+              <>
                 <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                 Submitting Request...
-              </> : <>
+              </>
+            ) : !hasCredits ? (
+              <>
+                <CreditCard className="w-5 h-5 mr-2" />
+                Purchase Calls to Continue
+              </>
+            ) : (
+              <>
                 <Phone className="w-5 h-5 mr-2" />
                 Call My Phone Now
-              </>}
+              </>
+            )}
           </Button>
           
-          {!isSubmitting && <p className="text-center text-black text-sm mt-3">
+          {!isSubmitting && hasCredits && (
+            <p className="text-center text-black text-sm mt-3">
               Grace will call you within ~1 minute of submitting
-            </p>}
+            </p>
+          )}
+          
+          {!hasCredits && !creditsLoading && (
+            <p className="text-center text-orange-600 text-sm mt-3">
+              Purchase AI interview calls to request a call from Grace
+            </p>
+          )}
         </div>
       </div>
       </form>
+
+      {/* Purchase Modal */}
+      <AIInterviewPurchaseModal
+        isOpen={isPurchaseModalOpen}
+        onClose={() => setIsPurchaseModalOpen(false)}
+        onPurchaseSuccess={() => {
+          setIsPurchaseModalOpen(false);
+          refetchCredits();
+        }}
+      />
     </div>
   );
 };

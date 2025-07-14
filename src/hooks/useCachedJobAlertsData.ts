@@ -6,12 +6,12 @@ import { logger } from '@/utils/logger';
 interface JobAlert {
   id: string;
   country: string;
+  country_name?: string;
   location: string;
   job_title: string;
-  job_type: 'Remote' | 'On-site' | 'Hybrid';
+  job_type: 'full-time' | 'part-time' | 'contract' | 'intern';
   alert_frequency: string;
   preferred_time: string;
-  max_alerts_per_day: number;
   timezone: string;
   created_at: string;
   updated_at: string;

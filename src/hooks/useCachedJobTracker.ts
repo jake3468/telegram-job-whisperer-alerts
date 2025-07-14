@@ -11,6 +11,16 @@ interface JobEntry {
   job_url?: string;
   status: 'saved' | 'applied' | 'interview' | 'rejected' | 'offer';
   order_position: number;
+  resume_updated: boolean;
+  job_role_analyzed: boolean;
+  company_researched: boolean;
+  cover_letter_prepared: boolean;
+  ready_to_apply: boolean;
+  interview_call_received: boolean;
+  interview_prep_guide_received: boolean;
+  ai_mock_interview_attempted: boolean;
+  comments?: string;
+  file_urls?: string[];
   created_at: string;
   updated_at: string;
 }
@@ -31,6 +41,7 @@ export const useCachedJobTracker = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [connectionIssue, setConnectionIssue] = useState(false);
+  const [hasFetched, setHasFetched] = useState(false);
 
   // Load cached data immediately on mount
   useEffect(() => {
@@ -63,14 +74,14 @@ export const useCachedJobTracker = () => {
       return;
     }
     
-    // Only fetch if we don't have cached data or user has changed
-    const shouldFetch = jobs.length === 0 && !error;
+    // Only fetch if we haven't fetched yet and don't have cached data
+    const shouldFetch = !hasFetched && jobs.length === 0 && !error;
     if (shouldFetch) {
       fetchJobTrackerData();
-    } else {
+    } else if (hasFetched || jobs.length > 0) {
       setLoading(false);
     }
-  }, [user?.id]); // Only depend on user ID, not the entire user object
+  }, [user?.id, hasFetched, jobs.length, error]); // Include hasFetched in dependencies
 
   const fetchJobTrackerData = async (showErrors = false) => {
     if (!user) return;
@@ -112,11 +123,17 @@ export const useCachedJobTracker = () => {
         throw new Error('Unable to load job applications');
       }
 
-      const jobsData = data || [];
+      // Transform the data to match JobEntry interface
+      const jobsData: JobEntry[] = (data || []).map(job => ({
+        ...job,
+        file_urls: Array.isArray(job.file_urls) ? job.file_urls.map(url => String(url)) : [],
+        comments: job.comments || undefined
+      }));
       
       // Update state
       setJobs(jobsData);
       setUserProfileId(userProfile.id);
+      setHasFetched(true);
 
       // Cache the data
       try {
@@ -134,6 +151,7 @@ export const useCachedJobTracker = () => {
     } catch (error: any) {
       logger.error('Error fetching job tracker data:', error);
       setConnectionIssue(true);
+      setHasFetched(true); // Mark as fetched even on error
       
       if (showErrors) {
         setError(error.message);
