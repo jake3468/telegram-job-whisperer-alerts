@@ -264,7 +264,7 @@ export const useJobBoardData = () => {
         .from('user_profile')
         .select('id')
         .eq('user_id', users.id)
-        .maybeSingle();
+        .single();
 
       if (profileError) {
         console.error('Error fetching user profile:', profileError);
@@ -274,13 +274,6 @@ export const useJobBoardData = () => {
         } else {
           toast.error('Unable to verify user profile. Please try again.');
         }
-        return;
-      }
-
-      if (!userProfile) {
-        console.error('User profile not found for user:', users.id);
-        console.error('This should not happen for logged-in users');
-        toast.error('User profile sync issue detected. Please contact support.');
         return;
       }
 
