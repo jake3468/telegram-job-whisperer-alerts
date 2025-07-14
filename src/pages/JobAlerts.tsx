@@ -74,7 +74,7 @@ const JobAlerts = () => {
           backgroundClip: 'text',
           color: 'transparent'
         }} className="bg-gradient-to-r from-orange-400 via-yellow-400 to-pink-500 bg-clip-text text-amber-400 text-left">
-            Telegram <span className="italic">Job</span> Alerts
+            Create Telegram <span className="italic">Job</span> Alerts
           </span>
         </h1>
         
