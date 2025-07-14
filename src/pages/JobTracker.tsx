@@ -126,9 +126,9 @@ const SortableJobCard = ({
       if (job.cover_letter_prepared) completed++;
       if (job.ready_to_apply) completed++;
       return completed;
-  } else if (job.status === 'applied') {
-    return job.interview_call_received ? 1 : 0;
-  } else if (job.status === 'interview') {
+    } else if (job.status === 'applied') {
+      return job.interview_call_received ? 1 : 0;
+    } else if (job.status === 'interview') {
       let completed = 0;
       if (job.interview_prep_guide_received) completed++;
       if (job.ai_mock_interview_attempted) completed++;
@@ -608,29 +608,26 @@ const JobTracker = () => {
       const targetJobs = jobs.filter(job => job.status === activeJobToMove.status).sort((a, b) => a.order_position - b.order_position);
       const activeIndex = targetJobs.findIndex(job => job.id === active.id);
       const overIndex = targetJobs.findIndex(job => job.id === over.id);
-      
       if (activeIndex !== overIndex && activeIndex !== -1 && overIndex !== -1) {
         // Reorder logic - update order_position values
         const reorderedJobs = [...targetJobs];
         const [movedItem] = reorderedJobs.splice(activeIndex, 1);
         reorderedJobs.splice(overIndex, 0, movedItem);
-        
+
         // Update order positions
         reorderedJobs.forEach((job, index) => {
-          const updatedJob = { ...job, order_position: index };
+          const updatedJob = {
+            ...job,
+            order_position: index
+          };
           optimisticUpdate(updatedJob);
         });
-        
+
         // Update database for all affected jobs
         try {
-          await Promise.all(
-            reorderedJobs.map((job, index) => 
-              supabase
-                .from('job_tracker')
-                .update({ order_position: index })
-                .eq('id', job.id)
-            )
-          );
+          await Promise.all(reorderedJobs.map((job, index) => supabase.from('job_tracker').update({
+            order_position: index
+          }).eq('id', job.id)));
         } catch (error) {
           console.error('Error reordering jobs:', error);
           toast({
@@ -674,7 +671,7 @@ const JobTracker = () => {
     } else if (activeJobToMove.status === 'interview') {
       requiredProgress = 2;
     }
-    
+
     // Allow dragging from rejected/offer columns without checklist requirements
     if (activeJobToMove.status !== 'rejected' && activeJobToMove.status !== 'offer' && progress < requiredProgress) {
       toast({
@@ -918,9 +915,7 @@ const JobTracker = () => {
               job_url: e.target.value
             }))} className="bg-white border-gray-300 text-gray-900" placeholder="https://..." />
             </div>
-            <Button onClick={handleAddJob} className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-orbitron">
-              Add Job
-            </Button>
+            <Button onClick={handleAddJob} className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-orbitron">Add</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -951,54 +946,54 @@ const JobTracker = () => {
                   </div>
                   <div className="space-y-2">
                     {(selectedJob.status === 'saved' ? [{
-                field: 'cover_letter_prepared',
-                label: '✍️ Did you prepare your cover letter?',
-                completed: selectedJob.cover_letter_prepared,
-                page: '/cover-letter',
-                linkText: 'Get it now'
-              }, {
-                field: 'resume_updated',
-                label: '📄 Did you update your resume?',
-                completed: selectedJob.resume_updated,
-                page: '/resume-builder',
-                linkText: 'Update Now'
-              }, {
-                field: 'company_researched',
-                label: '🏢 Did you research the company?',
-                completed: selectedJob.company_researched,
-                page: '/company-role-analysis',
-                linkText: 'Research Now'
-              }, {
-                field: 'job_role_analyzed',
-                label: '🎯 Did you analyze the job role?',
-                completed: selectedJob.job_role_analyzed,
-                page: '/job-guide',
-                linkText: 'Analyze Now'
-              }, {
-                field: 'ready_to_apply',
-                label: '🚀 Are you ready to apply?',
-                completed: selectedJob.ready_to_apply,
-                page: null,
-                linkText: null
-              }] : selectedJob.status === 'applied' ? [{
-                field: 'interview_call_received',
-                label: '📞 Did you receive the interview call?',
-                completed: selectedJob.interview_call_received,
-                page: null,
-                linkText: null
-              }] : [{
-                field: 'interview_prep_guide_received',
-                label: '📘 Did you receive the Interview prep guide?',
-                completed: selectedJob.interview_prep_guide_received,
-                page: '/interview-prep',
-                linkText: 'Get Prep Guide'
-              }, {
-                field: 'ai_mock_interview_attempted',
-                label: '🤖 Did you attempt the AI mock phone Interview?',
-                completed: selectedJob.ai_mock_interview_attempted,
-                page: '/ai-mock-interview',
-                linkText: 'Call Phone Now'
-              }]).map(item => <div key={item.field} className="flex items-center justify-between space-x-2">
+                  field: 'cover_letter_prepared',
+                  label: '✍️ Did you prepare your cover letter?',
+                  completed: selectedJob.cover_letter_prepared,
+                  page: '/cover-letter',
+                  linkText: 'Get it now'
+                }, {
+                  field: 'resume_updated',
+                  label: '📄 Did you update your resume?',
+                  completed: selectedJob.resume_updated,
+                  page: '/resume-builder',
+                  linkText: 'Update Now'
+                }, {
+                  field: 'company_researched',
+                  label: '🏢 Did you research the company?',
+                  completed: selectedJob.company_researched,
+                  page: '/company-role-analysis',
+                  linkText: 'Research Now'
+                }, {
+                  field: 'job_role_analyzed',
+                  label: '🎯 Did you analyze the job role?',
+                  completed: selectedJob.job_role_analyzed,
+                  page: '/job-guide',
+                  linkText: 'Analyze Now'
+                }, {
+                  field: 'ready_to_apply',
+                  label: '🚀 Are you ready to apply?',
+                  completed: selectedJob.ready_to_apply,
+                  page: null,
+                  linkText: null
+                }] : selectedJob.status === 'applied' ? [{
+                  field: 'interview_call_received',
+                  label: '📞 Did you receive the interview call?',
+                  completed: selectedJob.interview_call_received,
+                  page: null,
+                  linkText: null
+                }] : [{
+                  field: 'interview_prep_guide_received',
+                  label: '📘 Did you receive the Interview prep guide?',
+                  completed: selectedJob.interview_prep_guide_received,
+                  page: '/interview-prep',
+                  linkText: 'Get Prep Guide'
+                }, {
+                  field: 'ai_mock_interview_attempted',
+                  label: '🤖 Did you attempt the AI mock phone Interview?',
+                  completed: selectedJob.ai_mock_interview_attempted,
+                  page: '/ai-mock-interview',
+                  linkText: 'Call Phone Now'
+                }]).map(item => <div key={item.field} className="flex items-center justify-between space-x-2">
                         <div className="flex items-center space-x-2 flex-1">
                           <Checkbox checked={item.completed} onCheckedChange={() => handleUpdateChecklistItem(selectedJob.id, item.field)} className={`h-4 w-4 ${item.completed ? 'data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500' : ''}`} />
                           <span className={`text-xs ${item.completed ? 'text-green-600 line-through' : 'text-green-800'}`}>
@@ -1006,69 +1001,66 @@ const JobTracker = () => {
                           </span>
                         </div>
                         {item.page && !item.completed && <button onClick={() => {
-                  if (item.page === '/cover-letter') {
-                    navigate(item.page, {
-                      state: {
-                        companyName: selectedJob.company_name,
-                        jobTitle: selectedJob.job_title,
-                        jobDescription: selectedJob.job_description || ''
-                      }
-                    });
-                  } else if (item.page === '/resume-builder') {
-                    navigate(item.page);
-                  } else if (item.page === '/company-role-analysis') {
-                    navigate(item.page, {
-                      state: {
-                        companyName: selectedJob.company_name,
-                        jobTitle: selectedJob.job_title,
-                        locationMessage: 'this field needs to be filled'
-                      }
-                    });
-                  } else if (item.page === '/job-guide') {
-                    navigate(item.page, {
-                      state: {
-                        companyName: selectedJob.company_name,
-                        jobTitle: selectedJob.job_title,
-                        jobDescription: selectedJob.job_description || ''
-                      }
-                    });
-                  } else if (item.page === '/interview-prep') {
-                    navigate(item.page, {
-                      state: {
-                        companyName: selectedJob.company_name,
-                        jobTitle: selectedJob.job_title,
-                        jobDescription: selectedJob.job_description || ''
-                      }
-                    });
-                  } else if (item.page === '/ai-mock-interview') {
-                    navigate(item.page, {
-                      state: {
-                        companyName: selectedJob.company_name,
-                        jobTitle: selectedJob.job_title,
-                        jobDescription: selectedJob.job_description || ''
-                      }
-                    });
-                  } else {
-                    navigate(item.page);
-                  }
-                }} className="text-blue-600 hover:text-blue-800 text-xs font-medium underline">
+                    if (item.page === '/cover-letter') {
+                      navigate(item.page, {
+                        state: {
+                          companyName: selectedJob.company_name,
+                          jobTitle: selectedJob.job_title,
+                          jobDescription: selectedJob.job_description || ''
+                        }
+                      });
+                    } else if (item.page === '/resume-builder') {
+                      navigate(item.page);
+                    } else if (item.page === '/company-role-analysis') {
+                      navigate(item.page, {
+                        state: {
+                          companyName: selectedJob.company_name,
+                          jobTitle: selectedJob.job_title,
+                          locationMessage: 'this field needs to be filled'
+                        }
+                      });
+                    } else if (item.page === '/job-guide') {
+                      navigate(item.page, {
+                        state: {
+                          companyName: selectedJob.company_name,
+                          jobTitle: selectedJob.job_title,
+                          jobDescription: selectedJob.job_description || ''
+                        }
+                      });
+                    } else if (item.page === '/interview-prep') {
+                      navigate(item.page, {
+                        state: {
+                          companyName: selectedJob.company_name,
+                          jobTitle: selectedJob.job_title,
+                          jobDescription: selectedJob.job_description || ''
+                        }
+                      });
+                    } else if (item.page === '/ai-mock-interview') {
+                      navigate(item.page, {
+                        state: {
+                          companyName: selectedJob.company_name,
+                          jobTitle: selectedJob.job_title,
+                          jobDescription: selectedJob.job_description || ''
+                        }
+                      });
+                    } else {
+                      navigate(item.page);
+                    }
+                  }} className="text-blue-600 hover:text-blue-800 text-xs font-medium underline">
                             {item.linkText || 'Get it now'}
                           </button>}
                       </div>)}
                    </div>
                    
                    {/* Tips for Saved status */}
-                   {selectedJob.status === 'saved' && [selectedJob.resume_updated, selectedJob.job_role_analyzed, selectedJob.company_researched, selectedJob.cover_letter_prepared, selectedJob.ready_to_apply].filter(Boolean).length === 5 && (
-                     <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                   {selectedJob.status === 'saved' && [selectedJob.resume_updated, selectedJob.job_role_analyzed, selectedJob.company_researched, selectedJob.cover_letter_prepared, selectedJob.ready_to_apply].filter(Boolean).length === 5 && <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
                        <p className="text-blue-700 text-xs font-medium">
                          ✅ Great! All checklist items completed. You can now drag and drop this job card to the 'Applied' section.
                        </p>
-                     </div>
-                   )}
+                     </div>}
                    
                    {/* Tips for Applied status */}
-                   {selectedJob.status === 'applied' && (
-                     <div className="mt-3 space-y-2">
+                   {selectedJob.status === 'applied' && <div className="mt-3 space-y-2">
                        <div className="p-2 bg-green-50 border border-green-200 rounded-lg">
                          <p className="text-green-700 text-xs font-medium">
                            💡 Once you receive the interview call, you can tick mark above and then move this card to the 'Interview' section to unlock the checklist for interview preparation.
@@ -1082,88 +1074,75 @@ const JobTracker = () => {
                            Create a Post Now 🚀
                          </Link>
                        </div>
-                     </div>
-                    )}
+                     </div>}
                     
                      {/* Tips for Interview status */}
-                     {selectedJob.status === 'interview' && (
-                       <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                     {selectedJob.status === 'interview' && <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
                          <p className="text-blue-700 text-xs font-medium">
                            💖 Got an update from the recruiter? You can now move this job to either the 'Offer' or 'Rejected' column. Whatever the outcome, we're cheering you on — and there's always a next step 😊
                          </p>
-                       </div>
-                     )}
+                       </div>}
                  </div>}
 
               {/* Comments Section */}
               <div className="bg-gradient-to-r from-yellow-50 to-amber-100 rounded-lg p-3 border border-yellow-200">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-yellow-800 font-orbitron text-sm font-bold">Comments</h3>
-                  <Button 
-                    onClick={async () => {
-                      try {
-                        const { error } = await supabase
-                          .from('job_tracker')
-                          .update({ comments: selectedJob.comments })
-                          .eq('id', selectedJob.id);
-                        
-                        if (error) throw error;
-                        
-                        // Update optimistic state
-                        optimisticUpdate(selectedJob);
-                        
-                        toast({
-                          title: "Success",
-                          description: "Comment saved successfully!"
-                        });
-                      } catch (error) {
-                        console.error('Error saving comment:', error);
-                        toast({
-                          title: "Error",
-                          description: "Failed to save comment.",
-                          variant: "destructive"
-                        });
-                      }
-                    }}
-                    size="sm"
-                    className="bg-yellow-600 hover:bg-yellow-700 text-white text-xs h-6 px-2"
-                  >
+                  <Button onClick={async () => {
+                  try {
+                    const {
+                      error
+                    } = await supabase.from('job_tracker').update({
+                      comments: selectedJob.comments
+                    }).eq('id', selectedJob.id);
+                    if (error) throw error;
+
+                    // Update optimistic state
+                    optimisticUpdate(selectedJob);
+                    toast({
+                      title: "Success",
+                      description: "Comment saved successfully!"
+                    });
+                  } catch (error) {
+                    console.error('Error saving comment:', error);
+                    toast({
+                      title: "Error",
+                      description: "Failed to save comment.",
+                      variant: "destructive"
+                    });
+                  }
+                }} size="sm" className="bg-yellow-600 hover:bg-yellow-700 text-white text-xs h-6 px-2">
                     Save
                   </Button>
                 </div>
-                <Textarea 
-                  value={selectedJob.comments || ''} 
-                  onChange={e => {
-                    const updatedJob = {
-                      ...selectedJob,
-                      comments: e.target.value
-                    };
-                    setSelectedJob(updatedJob);
-                    // Auto-save after 2 seconds of no typing (backup)
-                    if (commentTimer) clearTimeout(commentTimer);
-                    const newTimer = setTimeout(async () => {
-                      await supabase.from('job_tracker').update({
-                        comments: e.target.value
-                      }).eq('id', selectedJob.id);
-                    }, 2000);
-                    setCommentTimer(newTimer);
-                  }} 
-                  placeholder="Add your notes about this job..." 
-                  className="border-yellow-300 text-gray-900 placeholder:text-gray-500 text-sm min-h-[60px] bg-white/80" 
-                />
+                <Textarea value={selectedJob.comments || ''} onChange={e => {
+                const updatedJob = {
+                  ...selectedJob,
+                  comments: e.target.value
+                };
+                setSelectedJob(updatedJob);
+                // Auto-save after 2 seconds of no typing (backup)
+                if (commentTimer) clearTimeout(commentTimer);
+                const newTimer = setTimeout(async () => {
+                  await supabase.from('job_tracker').update({
+                    comments: e.target.value
+                  }).eq('id', selectedJob.id);
+                }, 2000);
+                setCommentTimer(newTimer);
+              }} placeholder="Add your notes about this job..." className="border-yellow-300 text-gray-900 placeholder:text-gray-500 text-sm min-h-[60px] bg-white/80" />
               </div>
 
               {/* File Upload Section */}
               <div className="bg-gradient-to-r from-purple-50 to-violet-100 rounded-lg p-3 border border-purple-200">
                 <h3 className="text-purple-800 font-orbitron text-sm font-bold mb-3">Files</h3>
                 {userProfileId && <FileUpload jobId={selectedJob.id} userProfileId={userProfileId} existingFiles={selectedJob.file_urls || []} onFilesUpdate={files => {
-              const updatedJob = {
-                ...selectedJob,
-                file_urls: files
-              };
-              setSelectedJob(updatedJob);
-              optimisticUpdate(updatedJob);
-            }} />}
+                const updatedJob = {
+                  ...selectedJob,
+                  file_urls: files
+                };
+                setSelectedJob(updatedJob);
+                optimisticUpdate(updatedJob);
+              }} />}
               </div>
 
               {/* Job Details Section */}
@@ -1173,30 +1152,30 @@ const JobTracker = () => {
                   <div>
                     <Label htmlFor="edit-company" className="text-gray-700 text-xs font-medium">Company Name *</Label>
                     <Input id="edit-company" value={editFormData.company_name} onChange={e => setEditFormData(prev => ({
-                  ...prev,
-                  company_name: e.target.value
-                }))} className="bg-white border-gray-300 text-gray-900 text-sm h-8" placeholder="Company name" />
+                    ...prev,
+                    company_name: e.target.value
+                  }))} className="bg-white border-gray-300 text-gray-900 text-sm h-8" placeholder="Company name" />
                   </div>
                   <div>
                     <Label htmlFor="edit-title" className="text-gray-700 text-xs font-medium">Job Title *</Label>
                     <Input id="edit-title" value={editFormData.job_title} onChange={e => setEditFormData(prev => ({
-                  ...prev,
-                  job_title: e.target.value
-                }))} className="bg-white border-gray-300 text-gray-900 text-sm h-8" placeholder="Job title" />
+                    ...prev,
+                    job_title: e.target.value
+                  }))} className="bg-white border-gray-300 text-gray-900 text-sm h-8" placeholder="Job title" />
                   </div>
                   <div>
                     <Label htmlFor="edit-description" className="text-gray-700 text-xs font-medium">Job Description</Label>
                     <Textarea id="edit-description" value={editFormData.job_description} onChange={e => setEditFormData(prev => ({
-                  ...prev,
-                  job_description: e.target.value
-                }))} className="bg-white border-gray-300 text-gray-900 text-sm min-h-[60px]" placeholder="Job description" />
+                    ...prev,
+                    job_description: e.target.value
+                  }))} className="bg-white border-gray-300 text-gray-900 text-sm min-h-[60px]" placeholder="Job description" />
                   </div>
                   <div>
                     <Label htmlFor="edit-url" className="text-gray-700 text-xs font-medium">Job URL</Label>
                     <Input id="edit-url" value={editFormData.job_url} onChange={e => setEditFormData(prev => ({
-                  ...prev,
-                  job_url: e.target.value
-                }))} className="bg-white border-gray-300 text-gray-900 text-sm h-8" placeholder="https://..." />
+                    ...prev,
+                    job_url: e.target.value
+                  }))} className="bg-white border-gray-300 text-gray-900 text-sm h-8" placeholder="https://..." />
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <div className="bg-blue-100 p-2 rounded border border-blue-200">
@@ -1220,10 +1199,10 @@ const JobTracker = () => {
                 Save Changes
               </Button>
               <Button onClick={() => {
-                deleteJob(selectedJob.id);
-                setIsViewModalOpen(false);
-                setSelectedJob(null);
-              }} variant="destructive" className="bg-red-600 hover:bg-red-700 text-white font-orbitron text-sm h-9">
+              deleteJob(selectedJob.id);
+              setIsViewModalOpen(false);
+              setSelectedJob(null);
+            }} variant="destructive" className="bg-red-600 hover:bg-red-700 text-white font-orbitron text-sm h-9">
                   <Trash2 className="h-4 w-4 mr-1" />
                   Delete
                 </Button>
