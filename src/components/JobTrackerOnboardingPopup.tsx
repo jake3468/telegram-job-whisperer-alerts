@@ -56,31 +56,29 @@ export function JobTrackerOnboardingPopup({
         return <div className="text-center space-y-3 sm:space-y-4">
             {/* Logo and Brand */}
             <div className="flex flex-col items-center space-y-2 mb-3 sm:mb-4">
-              <img src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" alt="Aspirely Logo" className="w-8 h-8 sm:w-12 sm:h-12 rounded-full object-cover" />
-              <h1 className="text-sm sm:text-lg font-bold italic bg-gradient-to-r from-orange-500 to-purple-600 bg-clip-text text-transparent">
+              <img src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" alt="Aspirely Logo" className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover" />
+              <h1 className="text-base sm:text-xl font-bold italic bg-gradient-to-r from-orange-500 to-purple-600 bg-clip-text text-transparent">
                 Aspirely.ai
               </h1>
             </div>
             
-            <h2 className="text-sm sm:text-lg font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              From "Saved" to "You're Hired" — Let's Go.
-            </h2>
+            <h2 className="text-base sm:text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent text-center">Job Tracker - From &quot;Saved&quot; to &quot;You're Hired&quot; </h2>
             
             <div className="text-left bg-gray-50 rounded-lg p-2 sm:p-3 space-y-2">
-              <p className="text-gray-700 text-xs">
+              <p className="text-gray-700 text-sm sm:text-base">
                 This is your job hunt HQ — the place where things get real.
               </p>
-              <p className="text-gray-700 text-xs">
+              <p className="text-gray-700 text-sm sm:text-base">
                 Forget spreadsheets, sticky notes, and crossed fingers.
                 The Job Tracker is where you stop browsing and start executing.
               </p>
-              <p className="text-gray-700 text-xs">
+              <p className="text-gray-700 text-sm sm:text-base">
                 Every job you move here becomes a battle plan —
                 with checklists, AI tools, and progress tracking that'll make you feel unstoppable.
               </p>
               
               <div className="bg-white rounded-md p-2 border-l-4 border-purple-500">
-                <p className="text-purple-700 font-medium text-xs">
+                <p className="text-purple-700 font-medium text-sm sm:text-base">
                   You're not just applying. You're plotting your takeover.
                 </p>
               </div>
