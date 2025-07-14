@@ -75,7 +75,7 @@ const JobAlerts = () => {
         </h1>
         
         <p className="text-md text-orange-100 font-inter font-light mb-4">
-          Get job alerts from the latest <span className="italic text-green-300">24-hour</span> postings — sent to your <span className="italic text-pastel-peach">Telegram</span> and listed under ‘Posted Today’ in your <span className="italic text-pastel-peach">Job Board</span> page
+          Get job alerts from the latest <span className="italic text-indigo-200">24-hour</span> postings — sent to your <span className="italic text-pastel-peach">Telegram</span> and listed under ‘Posted Today’ in your <span className="italic text-pastel-peach">Job Board</span> page
         </p>
 
         {/* Usage Cost Badge */}
