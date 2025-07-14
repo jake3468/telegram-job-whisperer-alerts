@@ -19,6 +19,8 @@ interface JobEntry {
   interview_call_received: boolean;
   interview_prep_guide_received: boolean;
   ai_mock_interview_attempted: boolean;
+  comments?: string;
+  file_urls?: string[];
   created_at: string;
   updated_at: string;
 }
@@ -121,8 +123,10 @@ export const useCachedJobTracker = () => {
       }
 
       // Transform the data to match JobEntry interface
-      const jobsData = (data || []).map(job => ({
-        ...job
+      const jobsData: JobEntry[] = (data || []).map(job => ({
+        ...job,
+        file_urls: Array.isArray(job.file_urls) ? job.file_urls.map(url => String(url)) : [],
+        comments: job.comments || undefined
       }));
       
       // Update state

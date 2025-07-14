@@ -717,10 +717,12 @@ export type Database = {
       job_tracker: {
         Row: {
           ai_mock_interview_attempted: boolean
+          comments: string | null
           company_name: string
           company_researched: boolean
           cover_letter_prepared: boolean
           created_at: string
+          file_urls: Json | null
           id: string
           interview_call_received: boolean
           interview_prep_guide_received: boolean
@@ -738,10 +740,12 @@ export type Database = {
         }
         Insert: {
           ai_mock_interview_attempted?: boolean
+          comments?: string | null
           company_name: string
           company_researched?: boolean
           cover_letter_prepared?: boolean
           created_at?: string
+          file_urls?: Json | null
           id?: string
           interview_call_received?: boolean
           interview_prep_guide_received?: boolean
@@ -759,10 +763,12 @@ export type Database = {
         }
         Update: {
           ai_mock_interview_attempted?: boolean
+          comments?: string | null
           company_name?: string
           company_researched?: boolean
           cover_letter_prepared?: boolean
           created_at?: string
+          file_urls?: Json | null
           id?: string
           interview_call_received?: boolean
           interview_prep_guide_received?: boolean

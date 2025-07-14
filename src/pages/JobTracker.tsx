@@ -15,6 +15,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Link } from 'react-router-dom';
+import { FileUpload } from '@/components/FileUpload';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, TouchSensor, MouseSensor, useSensor, useSensors, closestCenter, useDroppable } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -35,6 +37,8 @@ interface JobEntry {
   interview_call_received: boolean;
   interview_prep_guide_received: boolean;
   ai_mock_interview_attempted: boolean;
+  comments?: string;
+  file_urls?: string[];
   created_at: string;
   updated_at: string;
 }
@@ -299,6 +303,7 @@ const JobTracker = () => {
   const [selectedStatus, setSelectedStatus] = useState<'saved' | 'applied' | 'interview'>('saved');
   const [activeJob, setActiveJob] = useState<JobEntry | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [commentTimer, setCommentTimer] = useState<NodeJS.Timeout | null>(null);
   const [formData, setFormData] = useState<EditJobFormData>({
     company_name: '',
     job_title: '',
@@ -485,7 +490,11 @@ const JobTracker = () => {
 
       // Replace temp job with real job
       if (data) {
-        optimisticUpdate(data);
+        optimisticUpdate({
+          ...data,
+          file_urls: Array.isArray(data.file_urls) ? data.file_urls.map(url => String(url)) : [],
+          comments: data.comments || undefined
+        } as JobEntry);
       }
 
       // Invalidate cache for fresh data on next load
@@ -667,7 +676,11 @@ const JobTracker = () => {
       }
 
       // Update local state immediately for instant feedback
-      optimisticUpdate(updatedJob);
+              optimisticUpdate({
+                ...updatedJob,
+                file_urls: Array.isArray(updatedJob.file_urls) ? updatedJob.file_urls.map(url => String(url)) : [],
+                comments: updatedJob.comments || undefined
+              } as JobEntry);
       try {
         const {
           error
@@ -915,16 +928,16 @@ const JobTracker = () => {
                   </div>
                   <div className="space-y-2">
                     {(selectedJob.status === 'saved' ? [
-                      { field: 'cover_letter_prepared', label: '✍️ Did you prepare your cover letter?', completed: selectedJob.cover_letter_prepared, page: '/cover-letter' },
-                      { field: 'resume_updated', label: '📄 Did you update your resume?', completed: selectedJob.resume_updated, page: '/job-analysis' },
-                      { field: 'company_researched', label: '🏢 Did you research the company?', completed: selectedJob.company_researched, page: '/company-role-analysis' },
-                      { field: 'job_role_analyzed', label: '🎯 Did you analyze the job role?', completed: selectedJob.job_role_analyzed, page: '/job-analysis' },
-                      { field: 'ready_to_apply', label: '🚀 Are you ready to apply?', completed: selectedJob.ready_to_apply, page: null }
+                      { field: 'cover_letter_prepared', label: '✍️ Did you prepare your cover letter?', completed: selectedJob.cover_letter_prepared, page: '/cover-letter', linkText: 'Get it now' },
+                      { field: 'resume_updated', label: '📄 Did you update your resume?', completed: selectedJob.resume_updated, page: '/resume-builder', linkText: 'Update Now' },
+                      { field: 'company_researched', label: '🏢 Did you research the company?', completed: selectedJob.company_researched, page: '/company-role-analysis', linkText: 'Research Now' },
+                      { field: 'job_role_analyzed', label: '🎯 Did you analyze the job role?', completed: selectedJob.job_role_analyzed, page: '/job-guide', linkText: 'Analyze Now' },
+                      { field: 'ready_to_apply', label: '🚀 Are you ready to apply?', completed: selectedJob.ready_to_apply, page: null, linkText: null }
                     ] : selectedJob.status === 'applied' ? [
-                      { field: 'interview_call_received', label: 'Interview call received', completed: selectedJob.interview_call_received, page: null }
+                      { field: 'interview_call_received', label: 'Interview call received', completed: selectedJob.interview_call_received, page: null, linkText: null }
                     ] : [
-                      { field: 'interview_prep_guide_received', label: 'Interview prep guide received', completed: selectedJob.interview_prep_guide_received, page: '/interview-prep' },
-                      { field: 'ai_mock_interview_attempted', label: 'AI mock interview attempted', completed: selectedJob.ai_mock_interview_attempted, page: '/grace-interview' }
+                      { field: 'interview_prep_guide_received', label: 'Interview prep guide received', completed: selectedJob.interview_prep_guide_received, page: '/interview-prep', linkText: 'Get it now' },
+                      { field: 'ai_mock_interview_attempted', label: 'AI mock interview attempted', completed: selectedJob.ai_mock_interview_attempted, page: '/grace-interview', linkText: 'Get it now' }
                     ]).map((item) => (
                       <div key={item.field} className="flex items-center justify-between space-x-2">
                         <div className="flex items-center space-x-2 flex-1">
@@ -943,51 +956,27 @@ const JobTracker = () => {
                               if (item.page === '/cover-letter') {
                                 navigate(item.page, {
                                   state: {
-                                    jobData: {
-                                      company_name: selectedJob.company_name,
-                                      job_title: selectedJob.job_title,
-                                      job_description: selectedJob.job_description || ''
-                                    }
+                                    companyName: selectedJob.company_name,
+                                    jobTitle: selectedJob.job_title,
+                                    jobDescription: selectedJob.job_description || ''
                                   }
                                 });
-                              } else if (item.page === '/job-analysis') {
-                                navigate(item.page, {
-                                  state: {
-                                    jobData: {
-                                      company_name: selectedJob.company_name,
-                                      job_title: selectedJob.job_title,
-                                      job_description: selectedJob.job_description || ''
-                                    }
-                                  }
-                                });
+                              } else if (item.page === '/resume-builder') {
+                                navigate(item.page);
                               } else if (item.page === '/company-role-analysis') {
                                 navigate(item.page, {
                                   state: {
-                                    jobData: {
-                                      company_name: selectedJob.company_name,
-                                      job_title: selectedJob.job_title,
-                                      location: 'USA' // Default location
-                                    }
+                                    companyName: selectedJob.company_name,
+                                    jobTitle: selectedJob.job_title,
+                                    locationMessage: 'this field needs to be filled'
                                   }
                                 });
-                              } else if (item.page === '/interview-prep') {
+                              } else if (item.page === '/job-guide') {
                                 navigate(item.page, {
                                   state: {
-                                    jobData: {
-                                      company_name: selectedJob.company_name,
-                                      job_title: selectedJob.job_title,
-                                      job_description: selectedJob.job_description || ''
-                                    }
-                                  }
-                                });
-                              } else if (item.page === '/grace-interview') {
-                                navigate(item.page, {
-                                  state: {
-                                    jobData: {
-                                      company_name: selectedJob.company_name,
-                                      job_title: selectedJob.job_title,
-                                      job_description: selectedJob.job_description || ''
-                                    }
+                                    companyName: selectedJob.company_name,
+                                    jobTitle: selectedJob.job_title,
+                                    jobDescription: selectedJob.job_description || ''
                                   }
                                 });
                               } else {
@@ -996,7 +985,7 @@ const JobTracker = () => {
                             }}
                             className="text-blue-600 hover:text-blue-800 text-xs font-medium underline"
                           >
-                            Get it now
+                            {item.linkText || 'Get it now'}
                           </button>
                         )}
                       </div>
@@ -1004,6 +993,43 @@ const JobTracker = () => {
                   </div>
                 </div>
               )}
+
+              {/* Comments Section */}
+              <div className="bg-gradient-to-r from-yellow-50 to-amber-100 rounded-lg p-3 border border-yellow-200">
+                <h3 className="text-yellow-800 font-orbitron text-sm font-bold mb-3">Comments</h3>
+                <Textarea
+                  value={selectedJob.comments || ''}
+                  onChange={(e) => {
+                    const updatedJob = { ...selectedJob, comments: e.target.value };
+                    setSelectedJob(updatedJob);
+                    // Auto-save after 1 second of no typing
+                    if (commentTimer) clearTimeout(commentTimer);
+                    const newTimer = setTimeout(async () => {
+                      await supabase.from('job_tracker').update({ comments: e.target.value }).eq('id', selectedJob.id);
+                    }, 1000);
+                    setCommentTimer(newTimer);
+                  }}
+                  className="bg-white border-yellow-300 text-gray-900 text-sm min-h-[60px]"
+                  placeholder="Add your notes about this job..."
+                />
+              </div>
+
+              {/* File Upload Section */}
+              <div className="bg-gradient-to-r from-purple-50 to-violet-100 rounded-lg p-3 border border-purple-200">
+                <h3 className="text-purple-800 font-orbitron text-sm font-bold mb-3">Files</h3>
+                {userProfileId && (
+                  <FileUpload
+                    jobId={selectedJob.id}
+                    userProfileId={userProfileId}
+                    existingFiles={selectedJob.file_urls || []}
+                    onFilesUpdate={(files) => {
+                      const updatedJob = { ...selectedJob, file_urls: files };
+                      setSelectedJob(updatedJob);
+                      optimisticUpdate(updatedJob);
+                    }}
+                  />
+                )}
+              </div>
 
               {/* Job Details Section */}
               <div className="bg-gradient-to-r from-slate-50 to-gray-100 rounded-lg p-3 border border-gray-200">

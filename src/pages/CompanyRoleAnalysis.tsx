@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -45,20 +46,35 @@ interface CompanyRoleAnalysisData {
   updated_at: string;
 }
 const CompanyRoleAnalysis = () => {
+  const location = useLocation();
   const [companyName, setCompanyName] = useState('');
-  const [location, setLocation] = useState('');
+  const [locationField, setLocationField] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [pendingAnalysisId, setPendingAnalysisId] = useState<string | null>(null);
   const [loadingMessages, setLoadingMessages] = useState<string[]>([]);
   const [showRecentResults, setShowRecentResults] = useState(false);
+  const [locationMessage, setLocationMessage] = useState('');
   const {
     toast
   } = useToast();
   const {
     userProfile
   } = useUserProfile();
+
+  // Handle pre-populated data from job tracker
+  useEffect(() => {
+    if (location.state?.companyName) {
+      setCompanyName(location.state.companyName);
+    }
+    if (location.state?.jobTitle) {
+      setJobTitle(location.state.jobTitle);
+    }
+    if (location.state?.locationMessage) {
+      setLocationMessage(location.state.locationMessage);
+    }
+  }, [location.state]);
 
   // Use the feature credit check hook for checking credits only (no deduction)
   const {
@@ -173,21 +189,21 @@ const CompanyRoleAnalysis = () => {
       });
       return;
     }
-    if (!companyName.trim() || !location.trim() || !jobTitle.trim()) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
-        variant: "destructive"
-      });
-      return;
-    }
+      if (!companyName.trim() || !locationField.trim() || !jobTitle.trim()) {
+        toast({
+          title: "Missing Information",
+          description: "Please fill in all required fields.",
+          variant: "destructive"
+        });
+        return;
+      }
     setIsSubmitting(true);
     setShowRecentResults(false);
     try {
       console.log('Creating company role analysis with data:', {
         user_id: userProfile.id,
         company_name: companyName.trim(),
-        location: location.trim(),
+        location: locationField.trim(),
         job_title: jobTitle.trim()
       });
       const {
@@ -197,7 +213,7 @@ const CompanyRoleAnalysis = () => {
         return await supabase.from('company_role_analyses').insert({
           user_id: userProfile.id,
           company_name: companyName.trim(),
-          location: location.trim(),
+          location: locationField.trim(),
           job_title: jobTitle.trim()
         }).select().single();
       }, 'create company role analysis');
@@ -222,7 +238,7 @@ const CompanyRoleAnalysis = () => {
 
       // Reset form
       setCompanyName('');
-      setLocation('');
+      setLocationField('');
       setJobTitle('');
 
       // Refetch history to show the new analysis
@@ -239,8 +255,9 @@ const CompanyRoleAnalysis = () => {
   };
   const handleReset = () => {
     setCompanyName('');
-    setLocation('');
+    setLocationField('');
     setJobTitle('');
+    setLocationMessage('');
   };
 
   // Get the most recent completed analysis for display
@@ -302,7 +319,15 @@ const CompanyRoleAnalysis = () => {
                       <Label htmlFor="location" className="text-white font-medium flex items-center gap-2 text-sm sm:text-base">
                         📍Location *
                       </Label>
-                      <Input id="location" type="text" placeholder="e.g., San Francisco, New York, Remote" value={location} onChange={e => setLocation(e.target.value)} required className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
+                      <Input 
+                        id="location" 
+                        type="text" 
+                        placeholder={locationMessage || "e.g., San Francisco, New York, Remote"} 
+                        value={locationField} 
+                        onChange={e => setLocationField(e.target.value)} 
+                        required 
+                        className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" 
+                      />
                     </div>
                   </div>
 
@@ -318,7 +343,7 @@ const CompanyRoleAnalysis = () => {
                   <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4">
                     <Button 
                       type="submit" 
-                      disabled={isSubmitting || !companyName.trim() || !location.trim() || !jobTitle.trim()} 
+                      disabled={isSubmitting || !companyName.trim() || !locationField.trim() || !jobTitle.trim()} 
                       className="w-full lg:flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-4 sm:py-6 text-xs sm:text-base transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                     >
                       {isSubmitting ? <>
