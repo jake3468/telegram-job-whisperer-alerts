@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, MapPin, Building2, ExternalLink, X, RefreshCw } from 'lucide-react';
+import { Search, MapPin, Building2, ExternalLink, X, RefreshCw, Check, Trash2 } from 'lucide-react';
 import { useJobBoardData } from '@/hooks/useJobBoardData';
 import { Tables } from '@/integrations/supabase/types';
 
@@ -15,11 +15,12 @@ interface JobCardProps {
   job: JobBoardItem;
   onView: () => void;
   onSaveToTracker: () => void;
+  onDelete?: () => void;
   section: 'posted-today' | 'last-7-days' | 'saved';
   isAddedToTracker?: boolean;
 }
 
-const JobCard = ({ job, onView, onSaveToTracker, section, isAddedToTracker = false }: JobCardProps) => {
+const JobCard = ({ job, onView, onSaveToTracker, onDelete, section, isAddedToTracker = false }: JobCardProps) => {
   const formatSalary = (salary: string | null) => {
     if (!salary) return 'Salary not disclosed';
     return salary;
@@ -89,12 +90,34 @@ const JobCard = ({ job, onView, onSaveToTracker, section, isAddedToTracker = fal
                 onSaveToTracker();
               }}
               size="sm" 
-              className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-6 whitespace-nowrap"
+              className={isAddedToTracker 
+                ? "bg-green-600 text-white hover:bg-green-700 text-xs px-2 py-1 h-6 whitespace-nowrap cursor-default" 
+                : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-6 whitespace-nowrap"
+              }
               disabled={isAddedToTracker}
             >
-              {isAddedToTracker ? "Added to Tracker" : 
-               section === 'saved' ? "Add to Job Tracker" : "Save"}
+              {isAddedToTracker ? (
+                <div className="flex items-center gap-1">
+                  <Check className="h-3 w-3" />
+                  <span>Added to Tracker</span>
+                </div>
+              ) : (
+                section === 'saved' ? "Add to Job Tracker" : "Save"
+              )}
             </Button>
+            {section === 'saved' && onDelete && (
+              <Button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete();
+                }}
+                variant="outline"
+                size="sm" 
+                className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs px-2 py-1 h-6"
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            )}
           </div>
         </div>
         
@@ -131,10 +154,12 @@ const JobBoard = () => {
     postedTodayJobs,
     last7DaysJobs,
     savedToTrackerJobs,
+    jobTrackerStatus,
     loading,
     error,
     saveToTracker,
     markJobAsSaved,
+    deleteJobFromBoard,
     forceRefresh
   } = useJobBoardData();
   
@@ -341,7 +366,9 @@ const JobBoard = () => {
                       job={job} 
                       onView={() => setSelectedJob(job)} 
                       onSaveToTracker={() => saveToTracker(job)}
+                      onDelete={() => deleteJobFromBoard(job)}
                       section="saved"
+                      isAddedToTracker={job.job_reference_id ? jobTrackerStatus[job.job_reference_id] : false}
                     />
                   ))}
                 </div>
