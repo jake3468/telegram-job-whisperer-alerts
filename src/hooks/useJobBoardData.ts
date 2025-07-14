@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useUser } from '@clerk/clerk-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
@@ -7,6 +8,7 @@ type JobBoardItem = Tables<'job_board'>;
 type JobTrackerItem = Tables<'job_tracker'>;
 
 export const useJobBoardData = () => {
+  const { user: clerkUser } = useUser();
   const [postedTodayJobs, setPostedTodayJobs] = useState<JobBoardItem[]>([]);
   const [last7DaysJobs, setLast7DaysJobs] = useState<JobBoardItem[]>([]);
   const [savedToTrackerJobs, setSavedToTrackerJobs] = useState<JobBoardItem[]>([]);
@@ -18,59 +20,97 @@ export const useJobBoardData = () => {
       setLoading(true);
       setError(null);
 
+      // Check if user is logged in
+      if (!clerkUser) {
+        // For non-logged in users, still show jobs but without personalization
+        const { data: jobBoardData, error: fetchError } = await supabase
+          .from('job_board')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (fetchError) {
+          throw fetchError;
+        }
+
+        const allJobs = jobBoardData || [];
+        
+        // Categorize jobs for non-logged in users (no saved functionality)
+        const today = new Date();
+        const twentyThreeHoursAgo = new Date(today.getTime() - 23 * 60 * 60 * 1000);
+        const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+        const postedToday = allJobs.filter(job => 
+          new Date(job.created_at) > twentyThreeHoursAgo
+        );
+
+        const lastWeek = allJobs.filter(job => {
+          const createdAt = new Date(job.created_at);
+          return createdAt <= twentyThreeHoursAgo && createdAt > sevenDaysAgo;
+        });
+
+        setPostedTodayJobs(postedToday);
+        setLast7DaysJobs(lastWeek);
+        setSavedToTrackerJobs([]);
+        return;
+      }
+
       // First run cleanup function to categorize and delete old jobs
       await supabase.rpc('categorize_and_cleanup_jobs');
 
-      // Fetch all job_board data
+      // Get user profile using Clerk user ID
+      const { data: users, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('clerk_id', clerkUser.id)
+        .single();
+
+      if (userError || !users) {
+        throw new Error('User not found in database');
+      }
+
+      const { data: userProfile, error: profileError } = await supabase
+        .from('user_profile')
+        .select('id')
+        .eq('user_id', users.id)
+        .single();
+
+      if (profileError || !userProfile) {
+        throw new Error('User profile not found');
+      }
+
+      // Fetch job_board data for this user
       const { data: jobBoardData, error: fetchError } = await supabase
         .from('job_board')
         .select('*')
+        .eq('user_id', userProfile.id)
         .order('created_at', { ascending: false });
 
       if (fetchError) {
         throw fetchError;
       }
 
-      // Get user profile to find saved tracker jobs
-      const { data: { user } } = await supabase.auth.getUser();
-      let trackerJobRefIds: string[] = [];
-      
-      if (user) {
-        const { data: userProfile } = await supabase
-          .from('user_profile')
-          .select('id')
-          .eq('user_id', user.id)
-          .single();
-
-        if (userProfile) {
-          const { data: trackerJobs } = await supabase
-            .from('job_tracker')
-            .select('job_reference_id')
-            .eq('user_id', userProfile.id);
-
-          if (trackerJobs) {
-            // Create a Set of job reference IDs for quick lookup
-            trackerJobRefIds = trackerJobs.map(job => job.job_reference_id).filter(Boolean);
-          }
-        }
-      }
-
       const allJobs = jobBoardData || [];
 
-      // Categorize jobs
+      // Categorize jobs based on time and saved status
       const today = new Date();
       const twentyThreeHoursAgo = new Date(today.getTime() - 23 * 60 * 60 * 1000);
       const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
 
+      // Posted Today: Recent jobs that are NOT saved by user
       const postedToday = allJobs.filter(job => 
-        new Date(job.created_at) > twentyThreeHoursAgo
+        new Date(job.created_at) > twentyThreeHoursAgo && 
+        !job.is_saved_by_user
       );
 
+      // Last 7 Days: Older jobs that are NOT saved by user
       const lastWeek = allJobs.filter(job => {
         const createdAt = new Date(job.created_at);
-        return createdAt <= twentyThreeHoursAgo && createdAt > sevenDaysAgo;
+        return createdAt <= twentyThreeHoursAgo && 
+               createdAt > sevenDaysAgo && 
+               !job.is_saved_by_user;
       });
 
+      // Saved: Jobs marked as saved by user
       const savedToTracker = allJobs.filter(job => 
         job.is_saved_by_user === true
       );
@@ -94,29 +134,87 @@ export const useJobBoardData = () => {
     }
   };
 
-  const saveToTracker = async (job: JobBoardItem) => {
+  const markJobAsSaved = async (job: JobBoardItem) => {
     try {
-      // First check authentication
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) {
-        toast.error('Please log in to save jobs to tracker');
+      // Check Clerk authentication
+      if (!clerkUser) {
+        toast.error('Please log in to save jobs');
         return;
       }
 
-      // Get user profile with better error handling
+      // Get user from database using Clerk ID
+      const { data: users, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('clerk_id', clerkUser.id)
+        .single();
+
+      if (userError || !users) {
+        toast.error('User not found. Please try logging in again.');
+        return;
+      }
+
       const { data: userProfile, error: profileError } = await supabase
         .from('user_profile')
         .select('id')
-        .eq('user_id', user.id)
-        .maybeSingle();
+        .eq('user_id', users.id)
+        .single();
 
-      if (profileError) {
-        console.error('Error fetching user profile:', profileError);
-        toast.error('Unable to access user profile. Please try again.');
+      if (profileError || !userProfile) {
+        toast.error('User profile not found. Please complete your profile setup.');
         return;
       }
 
-      if (!userProfile) {
+      // Update job as saved by user
+      const { error: updateError } = await supabase
+        .from('job_board')
+        .update({ is_saved_by_user: true })
+        .eq('id', job.id)
+        .eq('user_id', userProfile.id);
+
+      if (updateError) {
+        console.error('Error marking job as saved:', updateError);
+        toast.error(`Failed to save job: ${updateError.message}`);
+        return;
+      }
+
+      toast.success('Job saved! Check the Saved section.');
+      // Refresh data to update job sections
+      await fetchJobs();
+
+    } catch (err) {
+      console.error('Unexpected error marking job as saved:', err);
+      toast.error('An unexpected error occurred. Please try again.');
+    }
+  };
+
+  const saveToTracker = async (job: JobBoardItem) => {
+    try {
+      // Check Clerk authentication
+      if (!clerkUser) {
+        toast.error('Please log in to add jobs to tracker');
+        return;
+      }
+
+      // Get user from database using Clerk ID
+      const { data: users, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('clerk_id', clerkUser.id)
+        .single();
+
+      if (userError || !users) {
+        toast.error('User not found. Please try logging in again.');
+        return;
+      }
+
+      const { data: userProfile, error: profileError } = await supabase
+        .from('user_profile')
+        .select('id')
+        .eq('user_id', users.id)
+        .single();
+
+      if (profileError || !userProfile) {
         toast.error('User profile not found. Please complete your profile setup.');
         return;
       }
@@ -136,7 +234,7 @@ export const useJobBoardData = () => {
       }
 
       if (existingJob) {
-        toast.error('Job already saved to tracker');
+        toast.error('Job already added to tracker');
         return;
       }
 
@@ -165,12 +263,12 @@ export const useJobBoardData = () => {
 
       if (insertError) {
         console.error('Error saving job to tracker:', insertError);
-        toast.error(`Failed to save job: ${insertError.message}`);
+        toast.error(`Failed to add job to tracker: ${insertError.message}`);
         return;
       }
 
-      toast.success('Job saved to tracker successfully!');
-      // Refresh data to update the saved to tracker section
+      toast.success('Job added to tracker successfully!');
+      // Refresh data to update sections
       await fetchJobs();
 
     } catch (err) {
@@ -179,45 +277,6 @@ export const useJobBoardData = () => {
     }
   };
 
-  const markJobAsSaved = async (jobId: string) => {
-    try {
-      // First check authentication
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) {
-        toast.error('Please log in to save jobs');
-        return;
-      }
-
-      // Get user profile
-      const { data: userProfile, error: profileError } = await supabase
-        .from('user_profile')
-        .select('id')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (profileError || !userProfile) {
-        toast.error('Unable to access user profile. Please try again.');
-        return;
-      }
-
-      // Update job as saved by user
-      const { error: updateError } = await supabase
-        .from('job_board')
-        .update({ is_saved_by_user: true })
-        .eq('id', jobId)
-        .eq('user_id', userProfile.id);
-
-      if (updateError) {
-        console.error('Error marking job as saved:', updateError);
-        toast.error(`Failed to save job: ${updateError.message}`);
-        return;
-      }
-
-    } catch (err) {
-      console.error('Unexpected error marking job as saved:', err);
-      toast.error('An unexpected error occurred. Please try again.');
-    }
-  };
 
   const forceRefresh = async () => {
     try {

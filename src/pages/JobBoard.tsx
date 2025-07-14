@@ -15,11 +15,11 @@ interface JobCardProps {
   job: JobBoardItem;
   onView: () => void;
   onSaveToTracker: () => void;
-  isSaved?: boolean;
+  section: 'posted-today' | 'last-7-days' | 'saved';
   isAddedToTracker?: boolean;
 }
 
-const JobCard = ({ job, onView, onSaveToTracker, isSaved = false, isAddedToTracker = false }: JobCardProps) => {
+const JobCard = ({ job, onView, onSaveToTracker, section, isAddedToTracker = false }: JobCardProps) => {
   const formatSalary = (salary: string | null) => {
     if (!salary) return 'Salary not disclosed';
     return salary;
@@ -92,7 +92,8 @@ const JobCard = ({ job, onView, onSaveToTracker, isSaved = false, isAddedToTrack
               className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-6 whitespace-nowrap"
               disabled={isAddedToTracker}
             >
-              {isAddedToTracker ? "Added to Tracker" : (isSaved ? "Add to Job Tracker" : "Save")}
+              {isAddedToTracker ? "Added to Tracker" : 
+               section === 'saved' ? "Add to Job Tracker" : "Save"}
             </Button>
           </div>
         </div>
@@ -133,6 +134,7 @@ const JobBoard = () => {
     loading,
     error,
     saveToTracker,
+    markJobAsSaved,
     forceRefresh
   } = useJobBoardData();
   
@@ -285,7 +287,8 @@ const JobBoard = () => {
                       key={job.id} 
                       job={job} 
                       onView={() => setSelectedJob(job)} 
-                      onSaveToTracker={() => saveToTracker(job)} 
+                      onSaveToTracker={() => markJobAsSaved(job)}
+                      section="posted-today"
                     />
                   ))}
                 </div>
@@ -306,7 +309,8 @@ const JobBoard = () => {
                       key={job.id} 
                       job={job} 
                       onView={() => setSelectedJob(job)} 
-                      onSaveToTracker={() => saveToTracker(job)} 
+                      onSaveToTracker={() => markJobAsSaved(job)}
+                      section="last-7-days"
                     />
                   ))}
                 </div>
@@ -314,10 +318,18 @@ const JobBoard = () => {
             </TabsContent>
 
             <TabsContent value="saved-to-tracker" className="space-y-3 mt-4 w-full overflow-hidden">
+              <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-lg p-4 mb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-green-300 font-medium text-sm">Saved Jobs Section</span>
+                </div>
+                <p className="text-gray-300 text-xs">Jobs you've saved are shown here. Click "Add to Job Tracker" to track your application progress.</p>
+              </div>
+              
               {filteredSavedToTrackerJobs.length === 0 ? (
                 <div className="text-center py-12 w-full">
                   <p className="text-gray-400 text-lg">
-                    {searchTerm ? `No saved jobs matching "${searchTerm}" found.` : "No jobs saved to tracker yet."}
+                    {searchTerm ? `No saved jobs matching "${searchTerm}" found.` : "No jobs saved yet."}
                   </p>
                   {!searchTerm && <p className="text-gray-500 mt-2">Save jobs from other sections to see them here.</p>}
                 </div>
@@ -328,9 +340,8 @@ const JobBoard = () => {
                       key={job.id} 
                       job={job} 
                       onView={() => setSelectedJob(job)} 
-                      onSaveToTracker={() => saveToTracker(job)} 
-                       isSaved={job.is_saved_by_user || false}
-                       isAddedToTracker={true}
+                      onSaveToTracker={() => saveToTracker(job)}
+                      section="saved"
                     />
                   ))}
                 </div>
