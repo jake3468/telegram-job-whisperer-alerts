@@ -2,27 +2,22 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { useJobAlertsOnboardingPopup } from '@/hooks/useJobAlertsOnboardingPopup';
 import { X } from 'lucide-react';
-
 export function JobAlertsOnboardingPopup() {
-  const { showPopup, hidePopup, dontShowAgain, isUpdating } = useJobAlertsOnboardingPopup();
-
-  return (
-    <Dialog open={showPopup} onOpenChange={hidePopup}>
+  const {
+    showPopup,
+    hidePopup,
+    dontShowAgain,
+    isUpdating
+  } = useJobAlertsOnboardingPopup();
+  return <Dialog open={showPopup} onOpenChange={hidePopup}>
       <DialogContent className="max-w-sm sm:max-w-md p-0 overflow-hidden border-orange-200 max-h-[80vh] w-[calc(100vw-3rem)] sm:w-full flex flex-col mx-auto rounded-2xl">
         {/* Header Section with Close Button - Fixed */}
         <div className="bg-gradient-to-r from-orange-500 to-amber-500 px-6 py-4 relative">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={hidePopup}
-            className="absolute top-2 right-2 h-8 w-8 text-white hover:bg-white/20"
-          >
+          <Button variant="ghost" size="icon" onClick={hidePopup} className="absolute top-2 right-2 h-8 w-8 text-white hover:bg-white/20">
             <X className="h-4 w-4" />
           </Button>
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold text-white text-center pr-8">
-              🪧 Your Job Hunt Just Got Smarter (and Slightly More Fun)
-            </DialogTitle>
+            <DialogTitle className="text-lg font-bold text-white text-center pr-8">🪧 Your Job Hunt Just Got Smarter using Telegram Job Alerts </DialogTitle>
           </DialogHeader>
         </div>
         
@@ -60,24 +55,15 @@ export function JobAlertsOnboardingPopup() {
         {/* Footer Section with Buttons - Fixed */}
         <div className="bg-gradient-to-br from-orange-50 to-amber-50 px-6 py-4 border-t border-orange-200/50">
           <div className="flex flex-col gap-3">
-            <Button 
-              onClick={hidePopup} 
-              className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold"
-            >
+            <Button onClick={hidePopup} className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold">
               Let's Gooo, Job God Mode 🔥
             </Button>
             
-            <Button 
-              variant="outline" 
-              onClick={dontShowAgain} 
-              disabled={isUpdating}
-              className="w-full border-orange-300 text-orange-700 bg-white hover:bg-orange-50 hover:text-orange-800 font-medium"
-            >
+            <Button variant="outline" onClick={dontShowAgain} disabled={isUpdating} className="w-full border-orange-300 text-orange-700 bg-white hover:bg-orange-50 hover:text-orange-800 font-medium">
               {isUpdating ? 'Updating...' : "Don't show again"}
             </Button>
           </div>
         </div>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 }
