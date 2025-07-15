@@ -102,12 +102,12 @@ const JobCard = ({
         
         {/* Right section: Timestamp + Buttons */}
         <div className="flex-shrink-0 flex flex-col items-end gap-1 sm:gap-2">
-          {/* Timestamp */}
-          {getDateToShow() && (
-            <div className="text-xs text-gray-500 text-right">
-              {getDateToShow()}
-            </div>
-          )}
+           {/* Timestamp */}
+           {getDateToShow() && (
+             <div className="text-xs text-gray-500 text-right truncate max-w-20 sm:max-w-24">
+               {getDateToShow()}
+             </div>
+           )}
           
           {/* Buttons - smaller on mobile */}
           <div className="flex flex-col gap-1">
