@@ -118,7 +118,7 @@ const JobCard = ({
                }} 
                variant="outline" 
                size="sm" 
-               className="text-xs px-2 py-1 h-6 w-12 font-medium rounded-md border-gray-600 text-gray-300 hover:bg-gray-700 hover:border-gray-500 sm:px-3 sm:py-1.5 sm:h-7 sm:w-14"
+               className="text-xs px-2 py-1 h-6 w-12 font-medium rounded-md sm:px-3 sm:py-1.5 sm:h-7 sm:w-14"
              >
                View
              </Button>
