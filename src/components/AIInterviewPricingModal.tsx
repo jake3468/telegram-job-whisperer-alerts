@@ -110,7 +110,7 @@ export const AIInterviewPricingModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="p-0 m-6 w-[calc(100vw-3rem)] sm:m-8 sm:w-[calc(100vw-4rem)] md:m-12 md:w-[calc(100vw-6rem)] lg:m-auto lg:w-[780px] xl:w-[820px] max-w-none max-h-[calc(100vh-3rem)] sm:max-h-[calc(100vh-4rem)] md:max-h-[calc(100vh-6rem)] lg:max-h-fit flex flex-col rounded-2xl bg-gradient-to-br from-background via-background to-primary/5">
+      <DialogContent className="p-0 w-[90vw] sm:w-[85vw] md:w-[80vw] lg:w-[780px] xl:w-[820px] max-w-[90vw] max-h-[90vh] sm:max-h-[85vh] md:max-h-[80vh] lg:max-h-fit flex flex-col rounded-2xl bg-gradient-to-br from-background via-background to-primary/5 border-0">
         {/* Sticky header with close button */}
         <div className="flex-shrink-0 bg-gradient-to-br from-background via-background to-primary/5 p-4 pb-3 border-b border-border/20 rounded-t-2xl">
           {/* Close button - positioned to avoid overlap on mobile */}
