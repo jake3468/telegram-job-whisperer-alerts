@@ -110,7 +110,7 @@ export const AIInterviewPricingModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="mx-2 sm:mx-4 w-[calc(100vw-1rem)] sm:w-[calc(100vw-2rem)] lg:w-[1300px] xl:w-[1400px] max-w-[95vw] max-h-[95vh] overflow-y-auto rounded-2xl bg-gradient-to-br from-background via-background to-primary/5">
+      <DialogContent className="mx-4 w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] lg:w-[900px] xl:w-[1000px] max-w-[calc(100vw-2rem)] max-h-[90vh] overflow-y-auto rounded-2xl bg-gradient-to-br from-background via-background to-primary/5">
         {/* Close button */}
         <button
           onClick={onClose}
@@ -132,9 +132,9 @@ export const AIInterviewPricingModal = ({
           </p>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Pricing cards grid - much better spacing and sizing */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 px-4 lg:px-8">
+        <div className="space-y-4">
+          {/* Pricing cards grid - compact layout */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 px-2">
             {allPlans.map((plan, index) => {
               const isFreePlan = 'isFree' in plan;
               const isMostPopular = !isFreePlan && mostPopular?.id === (plan as AIInterviewProduct).id;
@@ -143,12 +143,12 @@ export const AIInterviewPricingModal = ({
               return (
                 <div 
                   key={isFreePlan ? 'free-plan' : (plan as AIInterviewProduct).id}
-                  className={`relative rounded-2xl border-2 p-6 text-center transition-all duration-300 hover:shadow-xl hover:scale-[1.02] min-h-[520px] flex flex-col justify-between ${
+                  className={`relative rounded-xl border-2 p-4 text-center transition-all duration-300 hover:shadow-lg hover:scale-[1.02] min-h-[320px] flex flex-col justify-between ${
                     isFreePlan 
-                      ? 'border-green-200 bg-gradient-to-br from-green-50 to-green-100/50 shadow-md' 
+                      ? 'border-green-200 bg-gradient-to-br from-green-50 to-green-100/50 shadow-sm' 
                       : isMostPopular 
-                        ? 'border-primary bg-gradient-to-br from-primary/10 via-primary/5 to-background shadow-xl scale-105 ring-2 ring-primary/20' 
-                        : 'border-border bg-gradient-to-br from-background to-secondary/30 hover:border-primary/50 shadow-md'
+                        ? 'border-primary bg-gradient-to-br from-primary/10 via-primary/5 to-background shadow-md scale-105 ring-1 ring-primary/20' 
+                        : 'border-border bg-gradient-to-br from-background to-secondary/30 hover:border-primary/50 shadow-sm'
                   }`}
                 >
                   {/* Top badges */}
@@ -178,30 +178,30 @@ export const AIInterviewPricingModal = ({
                     </div>
                   )}
 
-                  <div className="flex-1 flex flex-col justify-between space-y-6">
+                  <div className="flex-1 flex flex-col justify-between space-y-3">
                     {/* Credits count with icon */}
-                    <div className="space-y-4">
-                      <div className={`text-6xl font-bold ${
+                    <div className="space-y-2">
+                      <div className={`text-4xl font-bold ${
                         isFreePlan ? 'text-green-600' : isMostPopular ? 'text-primary' : 'text-foreground'
                       }`}>
                         {plan.credits_amount}
                       </div>
-                      <div className="text-base text-muted-foreground font-medium">
+                      <div className="text-sm text-muted-foreground font-medium">
                         Interview Call{plan.credits_amount > 1 ? 's' : ''}
                       </div>
                     </div>
 
                     {/* Price display */}
-                    <div className="space-y-3">
+                    <div className="space-y-1">
                       {isFreePlan ? (
-                        <div className="text-4xl font-bold text-green-600">FREE</div>
+                        <div className="text-3xl font-bold text-green-600">FREE</div>
                       ) : (
                         <>
-                          <div className="text-4xl font-bold">
+                          <div className="text-3xl font-bold">
                             {formatPrice(plan.price_amount, plan.currency)}
                           </div>
                           {discount > 0 && (plan as AIInterviewProduct).originalPrice && (
-                            <div className="text-xl text-muted-foreground line-through">
+                            <div className="text-lg text-muted-foreground line-through">
                               {formatPrice((plan as AIInterviewProduct).originalPrice!, plan.currency)}
                             </div>
                           )}
@@ -210,7 +210,7 @@ export const AIInterviewPricingModal = ({
                     </div>
 
                     {/* Per call price */}
-                    <div className="text-base text-muted-foreground bg-secondary/50 rounded-lg px-4 py-3">
+                    <div className="text-sm text-muted-foreground bg-secondary/50 rounded-lg px-3 py-2">
                       {isFreePlan 
                         ? '$0 per interview'
                         : `${formatPrice(plan.price_amount / plan.credits_amount, plan.currency)} per interview`
@@ -219,24 +219,24 @@ export const AIInterviewPricingModal = ({
 
                     {/* Savings highlight */}
                     {!isFreePlan && discount > 0 && (plan as AIInterviewProduct).savings && (
-                      <div className="text-base font-semibold text-green-600 bg-green-50 rounded-lg px-4 py-3">
+                      <div className="text-sm font-semibold text-green-600 bg-green-50 rounded-lg px-3 py-2">
                         💰 Save {formatPrice((plan as AIInterviewProduct).savings!, plan.currency)}
                       </div>
                     )}
 
                     {/* Action button */}
-                    <div className="pt-4">
+                    <div className="pt-2">
                       {isFreePlan ? (
                         <Button 
                           variant="outline" 
-                          className="w-full h-14 bg-green-100 border-green-300 text-green-700 hover:bg-green-200 text-lg font-semibold" 
+                          className="w-full h-10 bg-green-100 border-green-300 text-green-700 hover:bg-green-200 text-base font-semibold" 
                           disabled
                         >
                           ✓ Current Plan
                         </Button>
                       ) : (
                         <Button
-                          className={`w-full h-14 text-lg font-semibold transition-all duration-200 ${
+                          className={`w-full h-10 text-base font-semibold transition-all duration-200 ${
                             isMostPopular 
                               ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl' 
                               : 'bg-foreground hover:bg-foreground/90 text-background shadow-md hover:shadow-lg'

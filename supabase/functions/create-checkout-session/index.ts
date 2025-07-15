@@ -87,19 +87,33 @@ serve(async (req) => {
     logStep("Looking for payment link", { secretName });
 
     // Get payment URL from Supabase secrets
+    logStep("Querying vault for payment link", { secretName });
+    
     const { data: secrets, error: secretError } = await supabaseService
       .from('vault.decrypted_secrets')
       .select('decrypted_secret')
-      .eq('name', secretName)
-      .single();
+      .eq('name', secretName);
 
-    if (secretError || !secrets?.decrypted_secret) {
-      logStep("Payment link not found", { secretName, error: secretError });
-      throw new Error(`Payment configuration missing. Please contact support for ${credits_amount} credits in ${currency_code}.`);
+    logStep("Vault query result", { secrets, secretError, secretsCount: secrets?.length });
+
+    if (secretError) {
+      logStep("Vault query error", { secretError });
+      throw new Error(`Database error accessing payment configuration: ${secretError.message}`);
     }
 
-    let paymentUrl = secrets.decrypted_secret;
-    logStep("Payment URL retrieved", { paymentUrl: paymentUrl.substring(0, 50) + "..." });
+    if (!secrets || secrets.length === 0) {
+      logStep("No secrets found", { secretName });
+      throw new Error(`Payment configuration missing for secret: ${secretName}. Please contact support.`);
+    }
+
+    const paymentSecret = secrets[0];
+    if (!paymentSecret?.decrypted_secret) {
+      logStep("Secret found but empty", { paymentSecret });
+      throw new Error(`Payment configuration is empty for: ${secretName}`);
+    }
+
+    let paymentUrl = paymentSecret.decrypted_secret;
+    logStep("Payment URL retrieved successfully", { paymentUrl: paymentUrl.substring(0, 50) + "..." });
 
     // Add user data to payment URL if available
     if (userDetails && (userDetails.first_name || userDetails.last_name)) {
