@@ -227,19 +227,19 @@ const JobBoard = () => {
   // Show normal layout with error indicator and refresh button in header
 
   return <Layout>
-      <div className="p-3 sm:p-6 w-full overflow-hidden">
-        <div className="max-w-6xl mx-auto w-full overflow-hidden">
+      <div className="p-3 sm:p-6 min-h-screen overflow-x-hidden">
+        <div className="max-w-6xl mx-auto overflow-x-hidden">
           {/* Header */}
           <div className="text-center mb-4 sm:mb-6">
-        <div className="flex items-center justify-center gap-4 mb-2 sm:mb-4">
-              <span className="text-3xl">💼</span>
-              <h1 className="sm:text-4xl font-bold bg-gradient-to-r from-purple-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent text-4xl">Job Board</h1>
+        <div className="flex items-center justify-center gap-2 sm:gap-4 mb-2 sm:mb-4">
+              <span className="text-2xl sm:text-3xl">💼</span>
+              <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent">Job Board</h1>
               {/* Only show refresh button when there's an error */}
               {error && <Button onClick={handleManualRefresh} disabled={loading} variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0" title="Refresh jobs data">
                   <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                  </Button>}
             </div>
-            <p className="text-gray-300 text-sm sm:text-lg">
+            <p className="text-gray-300 text-xs sm:text-lg px-2">
               Browse job alerts received via <span className="italic text-violet-400">Telegram</span>— all jobs posted today appear here, stay visible for 7 days, and are auto-deleted after that. Save the ones you like and move them to your <span className="italic text-indigo-200">Job Tracker</span> page when you're ready to apply.
             </p>
             {/* Error indicator */}
@@ -254,18 +254,18 @@ const JobBoard = () => {
 
           {/* Job Sections */}
           <Tabs defaultValue="posted-today" className="w-full overflow-hidden">
-            <TabsList className="grid w-full grid-cols-3 mb-6 overflow-hidden bg-white/10 backdrop-blur-sm gap-1 h-auto p-1 border-0 rounded-xl">
-              <TabsTrigger value="posted-today" className="text-xs sm:text-sm px-3 sm:px-4 py-3 rounded-lg overflow-hidden bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium">
+            <TabsList className="grid w-full grid-cols-3 mb-6 bg-white/10 backdrop-blur-sm gap-1 h-auto p-1 border-0 rounded-xl overflow-hidden">
+              <TabsTrigger value="posted-today" className="text-xs sm:text-sm px-2 sm:px-4 py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0">
                 <span className="hidden sm:inline truncate">Posted Today</span>
                 <span className="sm:hidden truncate">Today</span>
                 <span className="ml-1 flex-shrink-0">({filteredPostedTodayJobs.length})</span>
               </TabsTrigger>
-              <TabsTrigger value="last-7-days" className="text-xs sm:text-sm px-3 sm:px-4 py-3 rounded-lg overflow-hidden bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium">
+              <TabsTrigger value="last-7-days" className="text-xs sm:text-sm px-2 sm:px-4 py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0">
                 <span className="hidden sm:inline truncate">Last 7 Days</span>
                 <span className="sm:hidden truncate">Week</span>
                 <span className="ml-1 flex-shrink-0">({filteredLast7DaysJobs.length})</span>
               </TabsTrigger>
-              <TabsTrigger value="saved-to-tracker" className="text-xs sm:text-sm px-3 sm:px-4 py-3 rounded-lg overflow-hidden bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium">
+              <TabsTrigger value="saved-to-tracker" className="text-xs sm:text-sm px-2 sm:px-4 py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0">
                 <span className="hidden sm:inline truncate">Saved</span>
                 <span className="sm:hidden truncate">Saved</span>
                 <span className="ml-1 flex-shrink-0">({filteredSavedToTrackerJobs.length})</span>
