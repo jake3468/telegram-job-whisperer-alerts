@@ -44,17 +44,17 @@ const JobCard = ({
       return formatDate(job.created_at);
     }
   };
-  return <div className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer overflow-hidden" onClick={onView}>
-      <div className="p-3">
+  return <div className="w-full max-w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer overflow-hidden" onClick={onView}>
+      <div className="p-2 sm:p-3">
         <div className="flex flex-col gap-2">
           {/* Company info and logo */}
           <div className="flex items-center gap-2 min-w-0">
-            {job.thumbnail ? <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-8 h-8 rounded-lg object-cover flex-shrink-0" /> : <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Building2 className="h-4 w-4 text-gray-600" />
+            {job.thumbnail ? <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg object-cover flex-shrink-0" /> : <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Building2 className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
               </div>}
             
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-bold text-gray-900 truncate">{job.title}</h3>
+              <h3 className="text-xs sm:text-sm font-bold text-gray-900 truncate">{job.title}</h3>
               <p className="text-xs text-gray-700 font-medium truncate">{job.company_name}</p>
             </div>
             
@@ -66,50 +66,50 @@ const JobCard = ({
           
           {/* Location, job type, and date */}
           <div className="flex items-center gap-1 text-xs text-gray-600 flex-wrap">
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 min-w-0">
               <MapPin className="h-3 w-3 flex-shrink-0" />
-              <span className="truncate">{job.location || 'Remote'}</span>
+              <span className="truncate max-w-[100px] sm:max-w-none">{job.location || 'Remote'}</span>
             </div>
             {job.job_type && <>
-                <span>•</span>
-                <span className="truncate">{job.job_type}</span>
+                <span className="flex-shrink-0">•</span>
+                <span className="truncate max-w-[80px] sm:max-w-none">{job.job_type}</span>
               </>}
             {getDateToShow() && <>
-                <span>•</span>
-                <span className="truncate">{getDateToShow()}</span>
+                <span className="flex-shrink-0">•</span>
+                <span className="truncate max-w-[80px] sm:max-w-none">{getDateToShow()}</span>
               </>}
           </div>
           
           {/* Mobile: Salary */}
-          <div className="sm:hidden text-green-600 font-semibold text-xs">
+          <div className="sm:hidden text-green-600 font-semibold text-xs truncate">
             {formatSalary(job.salary)}
           </div>
           
           {/* Actions */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
             <Button onClick={e => {
             e.stopPropagation();
             onView();
-          }} variant="outline" size="sm" className="border-gray-300 text-gray-900 hover:bg-gray-50 text-xs px-3 py-1 h-7 flex-shrink-0">
+          }} variant="outline" size="sm" className="border-gray-300 text-gray-900 hover:bg-gray-50 text-xs px-2 sm:px-3 py-1 h-6 sm:h-7 flex-shrink-0">
               View
             </Button>
             <Button onClick={e => {
             e.stopPropagation();
             onSaveToTracker();
-          }} size="sm" className={isAddedToTracker ? "bg-green-600 text-white hover:bg-green-700 text-xs px-3 py-1 h-7 cursor-default" : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-3 py-1 h-7"} disabled={isAddedToTracker}>
+          }} size="sm" className={isAddedToTracker ? "bg-green-600 text-white hover:bg-green-700 text-xs px-2 sm:px-3 py-1 h-6 sm:h-7 cursor-default" : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 sm:px-3 py-1 h-6 sm:h-7"} disabled={isAddedToTracker}>
               {isAddedToTracker ? <div className="flex items-center gap-1">
                   <Check className="h-3 w-3" />
                   <span className="hidden sm:inline">Added to Tracker</span>
                   <span className="sm:hidden">Added</span>
                 </div> : section === 'saved' ? <>
                   <span className="hidden sm:inline">Add to Job Tracker</span>
-                  <span className="sm:hidden">Add to Tracker</span>
+                  <span className="sm:hidden">Save</span>
                 </> : "Save"}
             </Button>
             {section === 'saved' && onDelete && <Button onClick={e => {
             e.stopPropagation();
             onDelete();
-          }} variant="outline" size="sm" className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs px-3 py-1 h-7 flex-shrink-0">
+          }} variant="outline" size="sm" className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs px-2 sm:px-3 py-1 h-6 sm:h-7 flex-shrink-0">
                 <Trash2 className="h-3 w-3" />
               </Button>}
           </div>
