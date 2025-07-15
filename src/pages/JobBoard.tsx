@@ -48,8 +48,8 @@ const JobCard = ({
   return (
     <div className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer" onClick={onView}>
       <div className="p-3">
-        {/* Top row: Logo, Title/Company, Time */}
-        <div className="flex items-start justify-between gap-3 mb-2">
+        {/* Top row: Logo, Title/Company, Time - more compact */}
+        <div className="flex items-start justify-between gap-3 mb-1">
           <div className="flex items-start gap-3 flex-1 min-w-0">
             {job.thumbnail ? (
               <img 
@@ -64,7 +64,7 @@ const JobCard = ({
             )}
             
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-bold text-gray-900 truncate">{job.title}</h3>
+              <h3 className="text-sm font-bold text-gray-900 truncate leading-tight">{job.title}</h3>
               <p className="text-xs text-gray-700 font-medium truncate">{job.company_name}</p>
             </div>
           </div>
@@ -77,11 +77,11 @@ const JobCard = ({
           )}
         </div>
         
-        {/* Bottom row: Left side info and Right side buttons */}
-        <div className="flex items-start justify-between gap-3">
-          {/* Left side: Location, Job Type, Salary - stacked vertically */}
+        {/* Bottom row: Left side info and Right side buttons - reduced gap */}
+        <div className="flex items-start justify-between gap-2">
+          {/* Left side: Location, Job Type, Salary - more compact */}
           <div className="flex-1 min-w-0">
-            <div className="space-y-1 text-xs text-gray-600">
+            <div className="space-y-0.5 text-xs text-gray-600">
               <div className="flex items-center gap-1">
                 <MapPin className="h-3 w-3 flex-shrink-0" />
                 <span className="truncate">{job.location || 'Remote'}</span>
@@ -99,8 +99,8 @@ const JobCard = ({
             </div>
           </div>
           
-          {/* Right side: Buttons stacked vertically */}
-          <div className="flex flex-col gap-1 flex-shrink-0">
+          {/* Right side: Larger buttons */}
+          <div className="flex flex-col gap-1.5 flex-shrink-0">
             <Button 
               onClick={(e) => {
                 e.stopPropagation();
@@ -108,7 +108,7 @@ const JobCard = ({
               }} 
               variant="outline" 
               size="sm" 
-              className="text-xs px-3 py-1 h-6 min-w-[50px]"
+              className="text-xs px-4 py-2 h-8 min-w-[60px] font-medium"
             >
               View
             </Button>
@@ -122,8 +122,8 @@ const JobCard = ({
                   }} 
                   size="sm" 
                   className={isAddedToTracker 
-                    ? "bg-green-600 text-white hover:bg-green-700 text-xs px-3 py-1 h-6 cursor-default min-w-[50px]" 
-                    : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-3 py-1 h-6 min-w-[50px]"
+                    ? "bg-green-600 text-white hover:bg-green-700 text-xs px-4 py-2 h-8 cursor-default min-w-[60px] font-medium" 
+                    : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-4 py-2 h-8 min-w-[60px] font-medium"
                   } 
                   disabled={isAddedToTracker}
                 >
@@ -136,7 +136,7 @@ const JobCard = ({
                   }} 
                   variant="outline" 
                   size="sm" 
-                  className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs p-1 h-6 w-[50px]"
+                  className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs py-2 h-8 w-[60px] font-medium"
                 >
                   <Trash2 className="h-3 w-3" />
                 </Button>
@@ -148,7 +148,7 @@ const JobCard = ({
                   onSaveToTracker();
                 }} 
                 size="sm" 
-                className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-3 py-1 h-6 min-w-[50px]"
+                className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-4 py-2 h-8 min-w-[60px] font-medium"
               >
                 Save
               </Button>
