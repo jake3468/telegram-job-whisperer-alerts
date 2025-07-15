@@ -135,38 +135,14 @@ serve(async (req) => {
     
     logStep("Looking for payment link", { secretName, product_name, product_type });
 
-    // Get payment URL from Supabase vault using RPC call
-    logStep("Querying vault for payment link using RPC", { secretName });
+    // Get payment URL directly from Edge Functions secrets
+    logStep("Getting payment link from Edge Functions secrets", { secretName });
     
-    // Use RPC to access vault secrets properly
-    const { data: secrets, error: secretError } = await supabaseService
-      .rpc('get_vault_secret', { secret_name: secretName });
+    const paymentUrl = Deno.env.get(secretName);
 
-    logStep("Vault query result", { secrets, secretError });
-
-    if (secretError) {
-      logStep("Vault query error", { secretError });
-      // Fallback: try direct environment variable access
-      const envVarName = secretName.replace('PAYMENT_LINK_', '').replace('_', '_PAYMENT_URL_');
-      const envPaymentUrl = Deno.env.get(envVarName);
-      if (envPaymentUrl) {
-        logStep("Using environment variable fallback", { envVarName });
-        var paymentUrl = envPaymentUrl;
-      } else {
-        throw new Error(`Database error accessing payment configuration: ${secretError.message}`);
-      }
-    } else {
-      if (!secrets) {
-        logStep("No secrets found", { secretName });
-        throw new Error(`Payment configuration missing for secret: ${secretName}. Please contact support.`);
-      }
-
-      if (!secrets) {
-        logStep("Secret found but empty", { secrets });
-        throw new Error(`Payment configuration is empty for: ${secretName}`);
-      }
-
-      var paymentUrl = secrets;
+    if (!paymentUrl) {
+      logStep("Payment link secret not found", { secretName });
+      throw new Error(`Payment configuration missing for secret: ${secretName}. Please contact support.`);
     }
     logStep("Payment URL retrieved successfully", { paymentUrl: paymentUrl.substring(0, 50) + "..." });
 
