@@ -228,7 +228,7 @@ const JobBoard = () => {
 
   return <Layout>
       <div className="min-h-screen overflow-x-hidden w-full">
-        <div className="w-full max-w-none px-4 sm:px-6 mx-auto">
+        <div className="w-full max-w-none px-2 sm:px-6 mx-auto">
           {/* Header */}
           <div className="text-center mb-4 sm:mb-6">
             <div className="flex items-center justify-center gap-2 sm:gap-4 mb-2 sm:mb-4 flex-wrap">
@@ -287,7 +287,7 @@ const JobBoard = () => {
                 </div>
               </div>
 
-              <div className="px-2 sm:px-4">
+              <div className="px-1 sm:px-4">
                 <TabsContent value="posted-today" className="space-y-3 mt-4 w-full">
                   {filteredPostedTodayJobs.length === 0 ? <div className="text-center py-12 w-full">
                       <p className="text-gray-400 text-lg">
@@ -309,7 +309,7 @@ const JobBoard = () => {
                 </TabsContent>
 
                 <TabsContent value="saved-to-tracker" className="space-y-3 mt-4 w-full">
-                  <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-lg p-4 mb-4">
+                  <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-lg p-3 mb-4">
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
                       <span className="text-green-300 font-medium text-sm">Saved Jobs Section</span>
