@@ -31,17 +31,25 @@ const JobCard = ({
     if (!salary) return 'Salary not disclosed';
     return salary;
   };
+
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
+    if (!dateString) return '';
+    // Handle both date objects and string dates
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      // If it's not a valid date, return the original string
+      return dateString;
+    }
+    return date.toLocaleDateString();
   };
 
   // Determine what date to show based on section
   const getDateToShow = () => {
     if (section === 'posted-today' && job.posted_at) {
-      // For posted today, show posted_at if available
-      return formatDate(job.posted_at);
+      // For posted today, show posted_at if available (it's already a string)
+      return job.posted_at;
     } else {
-      // For other sections, show created_at date
+      // For other sections, show formatted created_at date
       return formatDate(job.created_at);
     }
   };
