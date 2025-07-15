@@ -110,13 +110,13 @@ export const AIInterviewPricingModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="mx-4 sm:max-w-[900px] max-h-[95vh] overflow-y-auto rounded-2xl bg-gradient-to-br from-background via-background to-primary/5">
+      <DialogContent className="mx-3 sm:mx-4 w-[calc(100vw-1.5rem)] sm:w-auto sm:max-w-[900px] max-h-[95vh] overflow-y-auto rounded-2xl bg-gradient-to-br from-background via-background to-primary/5">
         <DialogHeader className="pb-2">
-          <DialogTitle className="flex items-center justify-center gap-3 text-2xl font-bold text-primary">
-            <Phone className="h-7 w-7" />
+          <DialogTitle className="flex items-center justify-center gap-3 text-xl sm:text-2xl font-bold text-primary">
+            <Phone className="h-6 w-6 sm:h-7 sm:w-7" />
             AI Mock Interview Pricing
           </DialogTitle>
-          <p className="text-sm text-muted-foreground text-center mt-2">
+          <p className="text-xs sm:text-sm text-muted-foreground text-center mt-2">
             Choose the perfect plan for your interview preparation needs
           </p>
         </DialogHeader>
@@ -290,7 +290,7 @@ export const AIInterviewPricingModal = ({
               💯 All purchases are secure and backed by our satisfaction guarantee
             </div>
             <div className="text-xs text-muted-foreground">
-              🔒 Payment processed securely via Stripe • 📞 Start your interviews immediately
+              🔒 Payment processed securely via Dodo Payments • 📞 Start your interviews immediately
             </div>
           </div>
         </div>
