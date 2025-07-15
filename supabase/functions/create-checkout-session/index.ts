@@ -113,14 +113,23 @@ serve(async (req) => {
       // AI Interview products use credits-based naming
       secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_${credits_amount}_CREDITS`;
     } else {
-      // General credit products use different naming patterns
-      if (product_name && product_name.toLowerCase().includes('pro')) {
+      // General credit products use tier-based naming
+      const productNameLower = product_name.toLowerCase();
+      
+      if (productNameLower.includes('starter')) {
+        secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_STARTER`;
+      } else if (productNameLower.includes('lite')) {
+        secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_LITE`;
+      } else if (productNameLower.includes('pro')) {
         secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_PRO`;
-      } else if (product_name && product_name.toLowerCase().includes('monthly')) {
+      } else if (productNameLower.includes('max')) {
+        secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_MAX`;
+      } else if (productNameLower.includes('monthly subscription')) {
         secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_MONTHLY_SUBSCRIPTION`;
       } else {
-        // Fallback to credits-based naming
-        secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_${credits_amount}_CREDITS`;
+        // Fallback: log warning and use a safe default
+        logStep("WARNING: Unknown product name pattern, using fallback", { product_name });
+        secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_UNKNOWN`;
       }
     }
     
