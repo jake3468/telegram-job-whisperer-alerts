@@ -110,7 +110,7 @@ export const AIInterviewPricingModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="p-0 m-4 w-[calc(100vw-2rem)] sm:m-6 sm:w-[calc(100vw-3rem)] md:m-8 md:w-[calc(100vw-4rem)] lg:m-auto lg:w-[800px] xl:w-[850px] max-w-none max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] md:max-h-[calc(100vh-4rem)] lg:max-h-fit flex flex-col rounded-2xl bg-gradient-to-br from-background via-background to-primary/5">
+      <DialogContent className="p-0 m-6 w-[calc(100vw-3rem)] sm:m-8 sm:w-[calc(100vw-4rem)] md:m-12 md:w-[calc(100vw-6rem)] lg:m-auto lg:w-[780px] xl:w-[820px] max-w-none max-h-[calc(100vh-3rem)] sm:max-h-[calc(100vh-4rem)] md:max-h-[calc(100vh-6rem)] lg:max-h-fit flex flex-col rounded-2xl bg-gradient-to-br from-background via-background to-primary/5">
         {/* Sticky header with close button */}
         <div className="flex-shrink-0 bg-gradient-to-br from-background via-background to-primary/5 p-4 pb-3 border-b border-border/20 rounded-t-2xl">
           {/* Close button - positioned to avoid overlap on mobile */}
@@ -137,9 +137,9 @@ export const AIInterviewPricingModal = ({
 
         {/* Scrollable content area */}
         <div className="flex-1 overflow-y-auto overscroll-contain">
-          <div className="p-4 space-y-3">
+          <div className="p-3 space-y-3">
             {/* Pricing cards grid - scrollable on mobile/tablet, no scroll on desktop */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
             {allPlans.map((plan, index) => {
               const isFreePlan = 'isFree' in plan;
               const isMostPopular = !isFreePlan && mostPopular?.id === (plan as AIInterviewProduct).id;
@@ -148,7 +148,7 @@ export const AIInterviewPricingModal = ({
               return (
                 <div 
                   key={isFreePlan ? 'free-plan' : (plan as AIInterviewProduct).id}
-                  className={`relative rounded-lg border-2 p-3 text-center transition-all duration-300 hover:shadow-lg min-h-[240px] lg:min-h-[220px] flex flex-col justify-between ${
+                  className={`relative rounded-lg border-2 p-2.5 text-center transition-all duration-300 hover:shadow-lg min-h-[200px] sm:min-h-[220px] lg:min-h-[200px] flex flex-col justify-between ${
                     isFreePlan 
                       ? 'border-green-200 bg-gradient-to-br from-green-50 to-green-100/50 shadow-sm' 
                       : isMostPopular 
