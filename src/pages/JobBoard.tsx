@@ -44,11 +44,11 @@ const JobCard = ({
       return formatDate(job.created_at);
     }
   };
-  return <div className="w-full max-w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer overflow-hidden" onClick={onView}>
-      <div className="p-3 max-w-full">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 max-w-full">
+  return <div className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer overflow-hidden" onClick={onView}>
+      <div className="p-3">
+        <div className="flex flex-col gap-2">
           {/* Company info and logo */}
-          <div className="flex items-center gap-2 flex-1 min-w-0 max-w-full">
+          <div className="flex items-center gap-2 min-w-0">
             {job.thumbnail ? <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-8 h-8 rounded-lg object-cover flex-shrink-0" /> : <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
                 <Building2 className="h-4 w-4 text-gray-600" />
               </div>}
@@ -56,72 +56,62 @@ const JobCard = ({
             <div className="flex-1 min-w-0">
               <h3 className="text-sm font-bold text-gray-900 truncate">{job.title}</h3>
               <p className="text-xs text-gray-700 font-medium truncate">{job.company_name}</p>
-              
-              {/* Desktop: Location, job type, and date */}
-              <div className="hidden sm:flex items-center gap-2 mt-1 text-xs text-gray-600">
-                <div className="flex items-center gap-1">
-                  <MapPin className="h-3 w-3 flex-shrink-0" />
-                  <span className="truncate">{job.location || 'Remote'}</span>
-                </div>
-                {job.job_type && <>
-                    <span>•</span>
-                    <span className="truncate">{job.job_type}</span>
-                  </>}
-                {getDateToShow() && <>
-                    <span>•</span>
-                    <span className="truncate">{getDateToShow()}</span>
-                  </>}
-              </div>
             </div>
             
             {/* Desktop: Salary */}
-            <div className="hidden sm:block text-green-600 font-semibold text-sm whitespace-nowrap mr-2">
+            <div className="hidden sm:block text-green-600 font-semibold text-sm">
               {formatSalary(job.salary)}
             </div>
           </div>
           
+          {/* Location, job type, and date */}
+          <div className="flex items-center gap-1 text-xs text-gray-600 flex-wrap">
+            <div className="flex items-center gap-1">
+              <MapPin className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate">{job.location || 'Remote'}</span>
+            </div>
+            {job.job_type && <>
+                <span>•</span>
+                <span className="truncate">{job.job_type}</span>
+              </>}
+            {getDateToShow() && <>
+                <span>•</span>
+                <span className="truncate">{getDateToShow()}</span>
+              </>}
+          </div>
+          
+          {/* Mobile: Salary */}
+          <div className="sm:hidden text-green-600 font-semibold text-xs">
+            {formatSalary(job.salary)}
+          </div>
+          
           {/* Actions */}
-          <div className="flex items-center gap-1 flex-shrink-0 sm:ml-4">
+          <div className="flex items-center gap-2 flex-wrap">
             <Button onClick={e => {
             e.stopPropagation();
             onView();
-          }} variant="outline" size="sm" className="border-gray-300 text-gray-900 hover:bg-gray-50 text-xs px-2 py-1 h-6">
+          }} variant="outline" size="sm" className="border-gray-300 text-gray-900 hover:bg-gray-50 text-xs px-3 py-1 h-7 flex-shrink-0">
               View
             </Button>
             <Button onClick={e => {
             e.stopPropagation();
             onSaveToTracker();
-          }} size="sm" className={isAddedToTracker ? "bg-green-600 text-white hover:bg-green-700 text-xs px-2 py-1 h-6 whitespace-nowrap cursor-default" : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-6 whitespace-nowrap"} disabled={isAddedToTracker}>
+          }} size="sm" className={isAddedToTracker ? "bg-green-600 text-white hover:bg-green-700 text-xs px-3 py-1 h-7 cursor-default" : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-3 py-1 h-7"} disabled={isAddedToTracker}>
               {isAddedToTracker ? <div className="flex items-center gap-1">
                   <Check className="h-3 w-3" />
-                  <span>Added to Tracker</span>
-                </div> : section === 'saved' ? "Add to Job Tracker" : "Save"}
+                  <span className="hidden sm:inline">Added to Tracker</span>
+                  <span className="sm:hidden">Added</span>
+                </div> : section === 'saved' ? <>
+                  <span className="hidden sm:inline">Add to Job Tracker</span>
+                  <span className="sm:hidden">Add to Tracker</span>
+                </> : "Save"}
             </Button>
             {section === 'saved' && onDelete && <Button onClick={e => {
             e.stopPropagation();
             onDelete();
-          }} variant="outline" size="sm" className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs px-2 py-1 h-6">
+          }} variant="outline" size="sm" className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs px-3 py-1 h-7 flex-shrink-0">
                 <Trash2 className="h-3 w-3" />
               </Button>}
-          </div>
-        </div>
-        
-        {/* Mobile: Location, job type, date and salary */}
-        <div className="sm:hidden mt-2 space-y-1">
-          <div className="flex items-center gap-1 text-xs text-gray-600">
-            <MapPin className="h-3 w-3 flex-shrink-0" />
-            <span className="truncate">{job.location || 'Remote'}</span>
-            {job.job_type && <>
-                <span className="mx-1">•</span>
-                <span className="truncate">{job.job_type}</span>
-              </>}
-            {getDateToShow() && <>
-                <span className="mx-1">•</span>
-                <span className="truncate">{getDateToShow()}</span>
-              </>}
-          </div>
-          <div className="text-green-600 font-semibold text-xs">
-            {formatSalary(job.salary)}
           </div>
         </div>
       </div>
@@ -283,8 +273,8 @@ const JobBoard = () => {
             </TabsList>
 
             {/* Search */}
-            <div className="mb-6 w-full">
-              <div className="relative w-full max-w-md mx-auto">
+            <div className="mb-6 w-full px-2">
+              <div className="relative w-full max-w-full sm:max-w-md mx-auto">
                 <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-300 text-lg">
                   🔍
                 </div>
