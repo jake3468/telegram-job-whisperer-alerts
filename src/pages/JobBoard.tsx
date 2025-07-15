@@ -46,50 +46,62 @@ const JobCard = ({
   };
   
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer" onClick={onView}>
-      <div className="p-2">
-        {/* Top row: Logo, Title/Company, Time - exactly like sketch */}
-        <div className="flex items-start justify-between gap-1 mb-1">
-          <div className="flex items-start gap-2 flex-1 min-w-0">
+    <div className="w-full bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={onView}>
+      <div className="p-3 flex gap-3">
+        {/* Left section: Logo + Content */}
+        <div className="flex-1 min-w-0 flex gap-3">
+          {/* Company Logo */}
+          <div className="flex-shrink-0">
             {job.thumbnail ? (
               <img 
                 src={job.thumbnail} 
                 alt={`${job.company_name} logo`} 
-                className="w-8 h-8 rounded object-cover flex-shrink-0" 
+                className="w-10 h-10 rounded-lg object-cover" 
               />
             ) : (
-              <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center flex-shrink-0">
-                <Building2 className="h-3 w-3 text-gray-400" />
+              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                <Building2 className="h-5 w-5 text-gray-400" />
               </div>
             )}
-            
-            <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-bold text-gray-900 truncate leading-tight">{job.title}</h3>
-              <p className="text-xs text-gray-600 truncate leading-tight">{job.company_name}</p>
-            </div>
           </div>
           
-          {/* Time in top-right - smaller to save space */}
+          {/* Content: Title/Company + Details */}
+          <div className="flex-1 min-w-0">
+            {/* Job Title and Company Name */}
+            <div className="mb-2">
+              <h3 className="text-sm font-semibold text-gray-900 truncate leading-tight">{job.title}</h3>
+              <p className="text-xs text-gray-600 truncate leading-tight">{job.company_name}</p>
+            </div>
+            
+            {/* Location, Job Type, Salary - List style */}
+            <div className="space-y-1">
+              <div className="flex items-center text-xs text-gray-600">
+                <span className="w-1 h-1 bg-gray-400 rounded-full mr-2 flex-shrink-0"></span>
+                <span className="truncate">{job.location || 'Remote'}</span>
+              </div>
+              <div className="flex items-center text-xs text-gray-600">
+                <span className="w-1 h-1 bg-gray-400 rounded-full mr-2 flex-shrink-0"></span>
+                <span className="truncate">{job.job_type || 'Full-time'}</span>
+              </div>
+              <div className="flex items-center text-xs text-green-600 font-medium">
+                <span className="w-1 h-1 bg-green-600 rounded-full mr-2 flex-shrink-0"></span>
+                <span className="truncate">{formatSalary(job.salary)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Right section: Timestamp + Buttons */}
+        <div className="flex-shrink-0 flex flex-col items-end gap-2">
+          {/* Timestamp */}
           {getDateToShow() && (
-            <div className="text-xs text-gray-500 flex-shrink-0 text-right">
+            <div className="text-xs text-gray-500 text-right">
               {getDateToShow()}
             </div>
           )}
-        </div>
-        
-        {/* Bottom row: Left side info stacked vertically, Right side buttons */}
-        <div className="flex items-start justify-between gap-1">
-          {/* Left side: Location, Job Type, Salary - stacked exactly like sketch */}
-          <div className="flex-1 min-w-0">
-            <div className="space-y-0.5 text-xs text-gray-600">
-              <div className="truncate">📍 {job.location || 'Remote'}</div>
-              <div className="truncate">💼 {job.job_type || 'Full-time'}</div>
-              <div className="truncate text-green-600 font-medium">💰 {formatSalary(job.salary)}</div>
-            </div>
-          </div>
           
-          {/* Right side: Buttons stacked vertically - larger like sketch */}
-          <div className="flex flex-col gap-1 flex-shrink-0">
+          {/* Buttons */}
+          <div className="flex flex-col gap-1.5">
             <Button 
               onClick={(e) => {
                 e.stopPropagation();
@@ -97,7 +109,7 @@ const JobCard = ({
               }} 
               variant="outline" 
               size="sm" 
-              className="text-xs px-3 py-1.5 h-7 w-16 font-medium"
+              className="text-xs px-4 py-1.5 h-8 w-16 font-medium rounded-md"
             >
               View
             </Button>
@@ -111,8 +123,8 @@ const JobCard = ({
                   }} 
                   size="sm" 
                   className={isAddedToTracker 
-                    ? "bg-green-600 text-white hover:bg-green-700 text-xs px-3 py-1.5 h-7 w-16 cursor-default font-medium" 
-                    : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-3 py-1.5 h-7 w-16 font-medium"
+                    ? "bg-green-600 text-white hover:bg-green-700 text-xs px-4 py-1.5 h-8 w-16 cursor-default font-medium rounded-md" 
+                    : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-4 py-1.5 h-8 w-16 font-medium rounded-md"
                   } 
                   disabled={isAddedToTracker}
                 >
@@ -125,7 +137,7 @@ const JobCard = ({
                   }} 
                   variant="outline" 
                   size="sm" 
-                  className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs py-1.5 h-7 w-16 font-medium"
+                  className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs py-1.5 h-8 w-16 font-medium rounded-md"
                 >
                   <Trash2 className="h-3 w-3" />
                 </Button>
@@ -137,7 +149,7 @@ const JobCard = ({
                   onSaveToTracker();
                 }} 
                 size="sm" 
-                className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-3 py-1.5 h-7 w-16 font-medium"
+                className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-4 py-1.5 h-8 w-16 font-medium rounded-md"
               >
                 Save
               </Button>
