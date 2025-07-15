@@ -110,16 +110,20 @@ export const AIInterviewPricingModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-3xl font-bold text-center">
-            <Phone className="h-8 w-8 text-primary" />
+      <DialogContent className="mx-4 sm:max-w-[900px] max-h-[95vh] overflow-y-auto rounded-2xl bg-gradient-to-br from-background via-background to-primary/5">
+        <DialogHeader className="pb-2">
+          <DialogTitle className="flex items-center justify-center gap-3 text-2xl font-bold text-primary">
+            <Phone className="h-7 w-7" />
             AI Mock Interview Pricing
           </DialogTitle>
+          <p className="text-sm text-muted-foreground text-center mt-2">
+            Choose the perfect plan for your interview preparation needs
+          </p>
         </DialogHeader>
 
-        <div className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="space-y-6">
+          {/* Pricing cards grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {allPlans.map((plan, index) => {
               const isFreePlan = 'isFree' in plan;
               const isMostPopular = !isFreePlan && mostPopular?.id === (plan as AIInterviewProduct).id;
@@ -128,26 +132,27 @@ export const AIInterviewPricingModal = ({
               return (
                 <div 
                   key={isFreePlan ? 'free-plan' : (plan as AIInterviewProduct).id}
-                  className={`relative rounded-2xl border-2 p-6 text-center transition-all duration-300 hover:shadow-lg ${
+                  className={`relative rounded-2xl border-2 p-5 text-center transition-all duration-300 hover:shadow-xl hover:scale-[1.02] ${
                     isFreePlan 
-                      ? 'border-muted bg-muted/20' 
+                      ? 'border-green-200 bg-gradient-to-br from-green-50 to-green-100/50 shadow-md' 
                       : isMostPopular 
-                        ? 'border-primary bg-primary/5 shadow-lg scale-105' 
-                        : 'border-border bg-background hover:border-primary/50'
+                        ? 'border-primary bg-gradient-to-br from-primary/10 via-primary/5 to-background shadow-xl scale-105 ring-2 ring-primary/20' 
+                        : 'border-border bg-gradient-to-br from-background to-secondary/30 hover:border-primary/50 shadow-md'
                   }`}
                 >
-                  {/* Badge for free plan or most popular */}
+                  {/* Top badges */}
                   {isFreePlan && (
                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                      <Badge className="bg-green-100 text-green-800 border border-green-200">
+                      <Badge className="bg-green-500 text-white border-0 shadow-md">
                         Current Plan
                       </Badge>
                     </div>
                   )}
+                  
                   {isMostPopular && (
                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                      <Badge className="bg-primary text-primary-foreground border border-primary">
-                        <Star className="h-3 w-3 mr-1" />
+                      <Badge className="bg-primary text-primary-foreground border-0 shadow-md">
+                        <Star className="h-3 w-3 mr-1 fill-current" />
                         Most Popular
                       </Badge>
                     </div>
@@ -155,25 +160,27 @@ export const AIInterviewPricingModal = ({
 
                   {/* Discount badge */}
                   {!isFreePlan && discount > 0 && (
-                    <div className="absolute -top-3 -right-3">
-                      <Badge className="bg-orange-100 text-orange-800 border border-orange-200">
+                    <div className="absolute -top-2 -right-2">
+                      <Badge className="bg-orange-500 text-white border-0 shadow-md text-xs px-2 py-1">
                         {discount}% OFF
                       </Badge>
                     </div>
                   )}
 
                   <div className="space-y-4">
-                    {/* Credits count */}
+                    {/* Credits count with icon */}
                     <div className="space-y-2">
-                      <div className="text-4xl font-bold text-primary">
+                      <div className={`text-4xl font-bold ${
+                        isFreePlan ? 'text-green-600' : isMostPopular ? 'text-primary' : 'text-foreground'
+                      }`}>
                         {plan.credits_amount}
                       </div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-sm text-muted-foreground font-medium">
                         Interview Call{plan.credits_amount > 1 ? 's' : ''}
                       </div>
                     </div>
 
-                    {/* Price */}
+                    {/* Price display */}
                     <div className="space-y-1">
                       {isFreePlan ? (
                         <div className="text-2xl font-bold text-green-600">FREE</div>
@@ -192,33 +199,37 @@ export const AIInterviewPricingModal = ({
                     </div>
 
                     {/* Per call price */}
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-xs text-muted-foreground bg-secondary/50 rounded-lg px-3 py-1">
                       {isFreePlan 
                         ? '$0 per interview'
                         : `${formatPrice(plan.price_amount / plan.credits_amount, plan.currency)} per interview`
                       }
                     </div>
 
-                    {/* Savings */}
+                    {/* Savings highlight */}
                     {!isFreePlan && discount > 0 && (plan as AIInterviewProduct).savings && (
-                      <div className="text-sm font-medium text-green-600">
-                        Save {formatPrice((plan as AIInterviewProduct).savings!, plan.currency)}
+                      <div className="text-sm font-semibold text-green-600 bg-green-50 rounded-lg px-3 py-1">
+                        💰 Save {formatPrice((plan as AIInterviewProduct).savings!, plan.currency)}
                       </div>
                     )}
 
                     {/* Action button */}
-                    <div className="pt-2">
+                    <div className="pt-3">
                       {isFreePlan ? (
                         <Button 
                           variant="outline" 
-                          className="w-full" 
+                          className="w-full bg-green-100 border-green-300 text-green-700 hover:bg-green-200" 
                           disabled
                         >
-                          Current Plan
+                          ✓ Current Plan
                         </Button>
                       ) : (
                         <Button
-                          className={`w-full ${isMostPopular ? 'bg-primary hover:bg-primary/90' : ''}`}
+                          className={`w-full transition-all duration-200 ${
+                            isMostPopular 
+                              ? 'bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl' 
+                              : 'bg-secondary hover:bg-secondary/80'
+                          }`}
                           disabled={isPurchasing}
                           onClick={() => handlePurchase(plan as AIInterviewProduct)}
                         >
@@ -243,39 +254,44 @@ export const AIInterviewPricingModal = ({
           </div>
 
           {/* Features section */}
-          <div className="mt-8 p-6 bg-muted/30 rounded-xl">
-            <h4 className="font-semibold mb-4 text-center">What's included in every plan:</h4>
+          <div className="bg-gradient-to-r from-secondary/30 to-primary/10 rounded-2xl p-6 border border-border/50">
+            <h4 className="font-semibold mb-4 text-center text-lg">✨ What's included in every plan:</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span>Real phone calls with Grace AI</span>
+                <span className="text-foreground">Real phone calls with Grace AI</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span>Personalized interview questions</span>
+                <span className="text-foreground">Personalized interview questions</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span>Detailed feedback reports</span>
+                <span className="text-foreground">Detailed feedback reports</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span>Performance scoring and analysis</span>
+                <span className="text-foreground">Performance scoring and analysis</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span>Credits never expire</span>
+                <span className="text-foreground">Credits never expire</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span>Secure payment processing</span>
+                <span className="text-foreground">Secure payment processing</span>
               </div>
             </div>
           </div>
 
-          {/* Money back guarantee */}
-          <div className="mt-4 text-center text-sm text-muted-foreground">
-            <span>💯 All purchases are secure and backed by our satisfaction guarantee</span>
+          {/* Trust indicators */}
+          <div className="text-center space-y-2">
+            <div className="text-sm text-muted-foreground">
+              💯 All purchases are secure and backed by our satisfaction guarantee
+            </div>
+            <div className="text-xs text-muted-foreground">
+              🔒 Payment processed securely via Stripe • 📞 Start your interviews immediately
+            </div>
           </div>
         </div>
       </DialogContent>
