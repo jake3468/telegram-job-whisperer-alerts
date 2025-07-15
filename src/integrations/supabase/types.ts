@@ -1332,6 +1332,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_vault_secret: {
+        Args: { secret_name: string }
+        Returns: string
+      }
       http: {
         Args: { request: Database["public"]["CompositeTypes"]["http_request"] }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
