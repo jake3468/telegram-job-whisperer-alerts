@@ -110,9 +110,9 @@ export const AIInterviewPricingModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="p-0 mx-4 w-[calc(100vw-2rem)] sm:mx-6 sm:w-[calc(100vw-3rem)] md:mx-8 md:w-[calc(100vw-4rem)] lg:mx-auto lg:w-[800px] xl:w-[850px] max-w-[calc(100vw-2rem)] sm:max-w-[calc(100vw-3rem)] md:max-w-[calc(100vw-4rem)] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] md:max-h-[calc(100vh-4rem)] lg:max-h-fit overflow-hidden rounded-2xl bg-gradient-to-br from-background via-background to-primary/5">
+      <DialogContent className="p-0 m-4 w-[calc(100vw-2rem)] sm:m-6 sm:w-[calc(100vw-3rem)] md:m-8 md:w-[calc(100vw-4rem)] lg:m-auto lg:w-[800px] xl:w-[850px] max-w-none max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] md:max-h-[calc(100vh-4rem)] lg:max-h-fit flex flex-col rounded-2xl bg-gradient-to-br from-background via-background to-primary/5">
         {/* Sticky header with close button */}
-        <div className="sticky top-0 z-10 bg-gradient-to-br from-background via-background to-primary/5 p-4 pb-3 border-b border-border/20 rounded-t-2xl">
+        <div className="flex-shrink-0 bg-gradient-to-br from-background via-background to-primary/5 p-4 pb-3 border-b border-border/20 rounded-t-2xl">
           {/* Close button - positioned to avoid overlap on mobile */}
           <button
             onClick={onClose}
@@ -136,7 +136,7 @@ export const AIInterviewPricingModal = ({
         </div>
 
         {/* Scrollable content area */}
-        <div className="flex-1 overflow-y-auto lg:overflow-y-visible">
+        <div className="flex-1 overflow-y-auto overscroll-contain">
           <div className="p-4 space-y-3">
             {/* Pricing cards grid - scrollable on mobile/tablet, no scroll on desktop */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
