@@ -37,11 +37,16 @@ serve(async (req) => {
     // Decode Clerk JWT to get user ID
     let clerkUserId;
     try {
-      const payload = JSON.parse(atob(clerkToken.split('.')[1]));
+      const tokenParts = clerkToken.split('.');
+      if (tokenParts.length !== 3) {
+        throw new Error("Malformed JWT token");
+      }
+      const payload = JSON.parse(atob(tokenParts[1]));
       clerkUserId = payload.sub;
-      logStep("Decoded Clerk user ID", { clerkUserId });
+      logStep("Decoded Clerk user ID", { clerkUserId, tokenType: payload.iss });
     } catch (err) {
-      throw new Error("Invalid Clerk JWT token");
+      logStep("JWT decode error", { error: err.message, tokenLength: clerkToken.length });
+      throw new Error(`Invalid Clerk JWT token: ${err.message}`);
     }
 
     if (!clerkUserId) {
@@ -69,9 +74,13 @@ serve(async (req) => {
     logStep("User found", { userId: user.id, email: user.email });
 
     const requestBody = await req.json();
+    logStep("Request body received", { body: requestBody });
+    
     // Handle both productId (from credit system) and product_id (from AI interview system)
-    const product_id = requestBody.product_id || requestBody.productId;
+    const product_id = requestBody.productId || requestBody.product_id;
+    
     if (!product_id) {
+      logStep("Missing product ID", { requestBody });
       throw new Error("Product ID is required");
     }
 
@@ -162,13 +171,21 @@ serve(async (req) => {
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR in create-checkout-session", { message: errorMessage });
+    logStep("ERROR in create-checkout-session", { 
+      message: errorMessage, 
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
     
-    return new Response(JSON.stringify({ 
+    // Return more specific error for debugging
+    const responseError = {
       error: errorMessage,
-      details: "Failed to create checkout session"
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      code: 500,
+      timestamp: new Date().toISOString()
+    };
+    
+    return new Response(JSON.stringify(responseError), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });
   }

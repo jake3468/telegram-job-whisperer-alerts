@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useAIInterviewProducts, AIInterviewProduct } from '@/hooks/useAIInterviewProducts';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/utils/logger';
+import { useAuth } from '@clerk/clerk-react';
 import {
   Dialog,
   DialogContent,
@@ -26,6 +26,7 @@ export const AIInterviewPricingModal = ({
   const [selectedProduct, setSelectedProduct] = useState<AIInterviewProduct | null>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const { toast } = useToast();
+  const { getToken } = useAuth();
 
   const handlePurchase = async (product: AIInterviewProduct) => {
     try {
@@ -34,16 +35,32 @@ export const AIInterviewPricingModal = ({
 
       logger.info('Starting purchase for AI interview pack:', { product_id: product.product_id });
 
-      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-        body: {
-          product_id: product.product_id,
-          quantity: 1
-        }
+      // Get Clerk JWT token using useAuth hook (same as main checkout flow)
+      const clerkToken = await getToken();
+      if (!clerkToken) {
+        throw new Error('Failed to get authentication token');
+      }
+
+      // Use direct fetch with Clerk token (consistent with main flow)
+      const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/functions/v1/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${clerkToken}`,
+        },
+        body: JSON.stringify({ 
+          productId: product.product_id,  // Use productId for consistency
+          quantity: 1 
+        })
       });
 
-      if (error) {
-        throw new Error(error.message);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response from checkout session:', response.status, errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
+
+      const data = await response.json();
 
       if (data?.url) {
         // Open payment page in a new tab
