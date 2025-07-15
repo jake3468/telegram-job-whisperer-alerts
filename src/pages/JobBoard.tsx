@@ -258,8 +258,8 @@ const JobBoard = () => {
   // Show normal layout with error indicator and refresh button in header
 
   return <Layout>
-      <div className="min-h-screen overflow-x-hidden w-full">
-        <div className="w-full max-w-none px-1 sm:px-6 mx-auto">
+      <div className="min-h-screen overflow-hidden w-full">
+        <div className="w-full max-w-4xl px-2 sm:px-6 mx-auto">
           {/* Header */}
           <div className="text-center mb-4 sm:mb-6">
             <div className="flex items-center justify-center gap-2 sm:gap-4 mb-2 sm:mb-4 flex-wrap">
@@ -270,13 +270,13 @@ const JobBoard = () => {
                   <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                  </Button>}
             </div>
-            <div className="px-4">
+            <div className="px-2 sm:px-4">
               <p className="text-gray-300 text-xs sm:text-lg break-words">
                 Browse job alerts received via <span className="italic text-violet-400">Telegram</span>— all jobs posted today appear here, stay visible for 7 days, and are auto-deleted after that. Save the ones you like and move them to your <span className="italic text-indigo-200">Job Tracker</span> page when you're ready to apply.
               </p>
             </div>
             {/* Error indicator */}
-            {error && <div className="bg-red-900/50 border border-red-600 rounded-lg p-3 mt-4 mx-4 max-w-2xl mx-auto">
+            {error && <div className="bg-red-900/50 border border-red-600 rounded-lg p-3 mt-4 mx-2 sm:mx-4 max-w-2xl mx-auto">
                 <div className="flex items-center gap-2 text-red-200 justify-center">
                   <span className="text-sm break-words">
                     {connectionIssue ? "Connection issue detected. Click refresh or check your internet connection." : "Unable to load job opportunities. Click refresh to retry."}
@@ -286,9 +286,9 @@ const JobBoard = () => {
           </div>
 
           {/* Job Sections */}
-          <div className="w-full overflow-x-hidden">
+          <div className="w-full overflow-hidden">
             <Tabs defaultValue="posted-today" className="w-full">
-              <div className="px-1 sm:px-4 mb-6">
+              <div className="px-2 sm:px-4 mb-6">
                 <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm gap-0.5 sm:gap-1 h-auto p-0.5 sm:p-1 border-0 rounded-xl">
                   <TabsTrigger value="posted-today" className="text-[10px] sm:text-sm px-0.5 sm:px-3 py-1.5 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
                     <span className="hidden sm:inline truncate">Posted Today</span>
@@ -309,7 +309,7 @@ const JobBoard = () => {
               </div>
 
               {/* Search */}
-              <div className="mb-6 px-4">
+              <div className="mb-6 px-2 sm:px-4">
                 <div className="relative w-full max-w-md mx-auto">
                   <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-300 text-lg">
                     🔍
@@ -318,13 +318,13 @@ const JobBoard = () => {
                 </div>
               </div>
 
-              <div className="px-1 sm:px-4">
+              <div className="px-2 sm:px-4 overflow-hidden">
                 <TabsContent value="posted-today" className="space-y-3 mt-4 w-full">
                   {filteredPostedTodayJobs.length === 0 ? <div className="text-center py-12 w-full">
                       <p className="text-gray-400 text-lg">
                         {searchTerm ? `No jobs matching "${searchTerm}" found in posted today.` : "No jobs posted today."}
                       </p>
-                    </div> : <div className="space-y-3 w-full">
+                    </div> : <div className="space-y-3 w-full max-w-2xl mx-auto">
                       {filteredPostedTodayJobs.map(job => <JobCard key={job.id} job={job} onView={() => setSelectedJob(job)} onSaveToTracker={() => markJobAsSaved(job)} section="posted-today" />)}
                     </div>}
                 </TabsContent>
@@ -334,13 +334,13 @@ const JobBoard = () => {
                       <p className="text-gray-400 text-lg">
                         {searchTerm ? `No jobs matching "${searchTerm}" found in last 7 days.` : "No jobs from the last 7 days."}
                       </p>
-                    </div> : <div className="space-y-3 w-full">
+                    </div> : <div className="space-y-3 w-full max-w-2xl mx-auto">
                       {filteredLast7DaysJobs.map(job => <JobCard key={job.id} job={job} onView={() => setSelectedJob(job)} onSaveToTracker={() => markJobAsSaved(job)} section="last-7-days" />)}
                     </div>}
                 </TabsContent>
 
                 <TabsContent value="saved-to-tracker" className="space-y-3 mt-4 w-full">
-                  <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-lg p-3 mb-4">
+                  <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-lg p-3 mb-4 max-w-2xl mx-auto">
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
                       <span className="text-green-300 font-medium text-sm">Saved Jobs Section</span>
@@ -353,7 +353,7 @@ const JobBoard = () => {
                         {searchTerm ? `No saved jobs matching "${searchTerm}" found.` : "No jobs saved yet."}
                       </p>
                       {!searchTerm && <p className="text-gray-500 mt-2">Save jobs from other sections to see them here.</p>}
-                    </div> : <div className="space-y-3 w-full">
+                    </div> : <div className="space-y-3 w-full max-w-2xl mx-auto">
                       {filteredSavedToTrackerJobs.map(job => <JobCard key={job.id} job={job} onView={() => setSelectedJob(job)} onSaveToTracker={() => saveToTracker(job)} onDelete={() => deleteJobFromBoard(job)} section="saved" isAddedToTracker={job.job_reference_id ? jobTrackerStatus[job.job_reference_id] : false} />)}
                     </div>}
                 </TabsContent>
