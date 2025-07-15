@@ -110,9 +110,9 @@ export const AIInterviewPricingModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="p-0 m-4 w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] md:w-[calc(100vw-6rem)] lg:w-[800px] xl:w-[850px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)] md:max-h-[calc(100vh-4rem)] lg:max-h-fit overflow-hidden rounded-2xl bg-gradient-to-br from-background via-background to-primary/5">
+      <DialogContent className="p-0 mx-4 w-[calc(100vw-2rem)] sm:mx-6 sm:w-[calc(100vw-3rem)] md:mx-8 md:w-[calc(100vw-4rem)] lg:mx-auto lg:w-[800px] xl:w-[850px] max-w-[calc(100vw-2rem)] sm:max-w-[calc(100vw-3rem)] md:max-w-[calc(100vw-4rem)] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] md:max-h-[calc(100vh-4rem)] lg:max-h-fit overflow-hidden rounded-2xl bg-gradient-to-br from-background via-background to-primary/5">
         {/* Sticky header with close button */}
-        <div className="sticky top-0 z-10 bg-gradient-to-br from-background via-background to-primary/5 p-4 pb-3 border-b border-border/20">
+        <div className="sticky top-0 z-10 bg-gradient-to-br from-background via-background to-primary/5 p-4 pb-3 border-b border-border/20 rounded-t-2xl">
           {/* Close button - positioned to avoid overlap on mobile */}
           <button
             onClick={onClose}
@@ -135,9 +135,11 @@ export const AIInterviewPricingModal = ({
           </DialogHeader>
         </div>
 
-        <div className="overflow-y-auto md:overflow-y-visible p-4 space-y-3">
-          {/* Pricing cards grid - scrollable on mobile/tablet, no scroll on desktop */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        {/* Scrollable content area */}
+        <div className="flex-1 overflow-y-auto lg:overflow-y-visible">
+          <div className="p-4 space-y-3">
+            {/* Pricing cards grid - scrollable on mobile/tablet, no scroll on desktop */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {allPlans.map((plan, index) => {
               const isFreePlan = 'isFree' in plan;
               const isMostPopular = !isFreePlan && mostPopular?.id === (plan as AIInterviewProduct).id;
@@ -265,46 +267,47 @@ export const AIInterviewPricingModal = ({
                 </div>
               );
             })}
-          </div>
+            </div>
 
-          {/* Features section */}
-          <div className="bg-gradient-to-r from-secondary/30 to-primary/10 rounded-lg p-4 border border-border/50">
-            <h4 className="font-semibold mb-3 text-center text-sm lg:text-base">✨ What's included in every plan:</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs lg:text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                <span className="text-foreground">Real phone calls with Grace AI</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                <span className="text-foreground">Personalized interview questions</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                <span className="text-foreground">Detailed feedback reports</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                <span className="text-foreground">Performance scoring and analysis</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                <span className="text-foreground">Credits never expire</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                <span className="text-foreground">Secure payment processing</span>
+            {/* Features section */}
+            <div className="bg-gradient-to-r from-secondary/30 to-primary/10 rounded-lg p-4 border border-border/50">
+              <h4 className="font-semibold mb-3 text-center text-sm lg:text-base">✨ What's included in every plan:</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs lg:text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                  <span className="text-foreground">Real phone calls with Grace AI</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                  <span className="text-foreground">Personalized interview questions</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                  <span className="text-foreground">Detailed feedback reports</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                  <span className="text-foreground">Performance scoring and analysis</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                  <span className="text-foreground">Credits never expire</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                  <span className="text-foreground">Secure payment processing</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Trust indicators */}
-          <div className="text-center space-y-1">
-            <div className="text-xs lg:text-sm text-muted-foreground">
-              💯 All purchases are secure and backed by our satisfaction guarantee
-            </div>
-            <div className="text-xs text-muted-foreground">
-              🔒 Payment processed securely via Dodo Payments • 📞 Start your interviews immediately
+            {/* Trust indicators */}
+            <div className="text-center space-y-1">
+              <div className="text-xs lg:text-sm text-muted-foreground">
+                💯 All purchases are secure and backed by our satisfaction guarantee
+              </div>
+              <div className="text-xs text-muted-foreground">
+                🔒 Payment processed securely via Dodo Payments • 📞 Start your interviews immediately
+              </div>
             </div>
           </div>
         </div>
