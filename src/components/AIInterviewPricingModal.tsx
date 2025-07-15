@@ -110,7 +110,18 @@ export const AIInterviewPricingModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="mx-3 sm:mx-4 w-[calc(100vw-1.5rem)] sm:w-auto sm:max-w-[95vw] lg:max-w-[1200px] xl:max-w-[1400px] max-h-[95vh] overflow-y-auto rounded-2xl bg-gradient-to-br from-background via-background to-primary/5">
+      <DialogContent className="mx-2 sm:mx-4 w-[calc(100vw-1rem)] sm:w-[calc(100vw-2rem)] lg:w-[1300px] xl:w-[1400px] max-w-[95vw] max-h-[95vh] overflow-y-auto rounded-2xl bg-gradient-to-br from-background via-background to-primary/5">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 z-10 rounded-full bg-background/80 p-2 hover:bg-background transition-colors"
+          aria-label="Close modal"
+        >
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
         <DialogHeader className="pb-4">
           <DialogTitle className="flex items-center justify-center gap-3 text-xl sm:text-2xl font-bold text-primary">
             <Phone className="h-6 w-6 sm:h-7 sm:w-7" />
@@ -122,8 +133,8 @@ export const AIInterviewPricingModal = ({
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Pricing cards grid - better spacing and layout */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4 lg:px-8">
+          {/* Pricing cards grid - much better spacing and sizing */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 px-4 lg:px-8">
             {allPlans.map((plan, index) => {
               const isFreePlan = 'isFree' in plan;
               const isMostPopular = !isFreePlan && mostPopular?.id === (plan as AIInterviewProduct).id;
@@ -132,7 +143,7 @@ export const AIInterviewPricingModal = ({
               return (
                 <div 
                   key={isFreePlan ? 'free-plan' : (plan as AIInterviewProduct).id}
-                  className={`relative rounded-2xl border-2 p-6 text-center transition-all duration-300 hover:shadow-xl hover:scale-[1.02] min-h-[450px] flex flex-col justify-between ${
+                  className={`relative rounded-2xl border-2 p-6 text-center transition-all duration-300 hover:shadow-xl hover:scale-[1.02] min-h-[520px] flex flex-col justify-between ${
                     isFreePlan 
                       ? 'border-green-200 bg-gradient-to-br from-green-50 to-green-100/50 shadow-md' 
                       : isMostPopular 
@@ -169,28 +180,28 @@ export const AIInterviewPricingModal = ({
 
                   <div className="flex-1 flex flex-col justify-between space-y-6">
                     {/* Credits count with icon */}
-                    <div className="space-y-3">
-                      <div className={`text-5xl font-bold ${
+                    <div className="space-y-4">
+                      <div className={`text-6xl font-bold ${
                         isFreePlan ? 'text-green-600' : isMostPopular ? 'text-primary' : 'text-foreground'
                       }`}>
                         {plan.credits_amount}
                       </div>
-                      <div className="text-sm text-muted-foreground font-medium">
+                      <div className="text-base text-muted-foreground font-medium">
                         Interview Call{plan.credits_amount > 1 ? 's' : ''}
                       </div>
                     </div>
 
                     {/* Price display */}
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {isFreePlan ? (
-                        <div className="text-3xl font-bold text-green-600">FREE</div>
+                        <div className="text-4xl font-bold text-green-600">FREE</div>
                       ) : (
                         <>
-                          <div className="text-3xl font-bold">
+                          <div className="text-4xl font-bold">
                             {formatPrice(plan.price_amount, plan.currency)}
                           </div>
                           {discount > 0 && (plan as AIInterviewProduct).originalPrice && (
-                            <div className="text-lg text-muted-foreground line-through">
+                            <div className="text-xl text-muted-foreground line-through">
                               {formatPrice((plan as AIInterviewProduct).originalPrice!, plan.currency)}
                             </div>
                           )}
@@ -199,7 +210,7 @@ export const AIInterviewPricingModal = ({
                     </div>
 
                     {/* Per call price */}
-                    <div className="text-sm text-muted-foreground bg-secondary/50 rounded-lg px-4 py-2">
+                    <div className="text-base text-muted-foreground bg-secondary/50 rounded-lg px-4 py-3">
                       {isFreePlan 
                         ? '$0 per interview'
                         : `${formatPrice(plan.price_amount / plan.credits_amount, plan.currency)} per interview`
@@ -208,7 +219,7 @@ export const AIInterviewPricingModal = ({
 
                     {/* Savings highlight */}
                     {!isFreePlan && discount > 0 && (plan as AIInterviewProduct).savings && (
-                      <div className="text-sm font-semibold text-green-600 bg-green-50 rounded-lg px-4 py-2">
+                      <div className="text-base font-semibold text-green-600 bg-green-50 rounded-lg px-4 py-3">
                         💰 Save {formatPrice((plan as AIInterviewProduct).savings!, plan.currency)}
                       </div>
                     )}
@@ -218,14 +229,14 @@ export const AIInterviewPricingModal = ({
                       {isFreePlan ? (
                         <Button 
                           variant="outline" 
-                          className="w-full h-12 bg-green-100 border-green-300 text-green-700 hover:bg-green-200 text-lg" 
+                          className="w-full h-14 bg-green-100 border-green-300 text-green-700 hover:bg-green-200 text-lg font-semibold" 
                           disabled
                         >
                           ✓ Current Plan
                         </Button>
                       ) : (
                         <Button
-                          className={`w-full h-12 text-lg font-semibold transition-all duration-200 ${
+                          className={`w-full h-14 text-lg font-semibold transition-all duration-200 ${
                             isMostPopular 
                               ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl' 
                               : 'bg-foreground hover:bg-foreground/90 text-background shadow-md hover:shadow-lg'

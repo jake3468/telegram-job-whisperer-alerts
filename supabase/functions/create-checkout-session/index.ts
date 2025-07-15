@@ -95,7 +95,7 @@ serve(async (req) => {
 
     if (secretError || !secrets?.decrypted_secret) {
       logStep("Payment link not found", { secretName, error: secretError });
-      throw new Error(`Payment link not configured for ${credits_amount} credits in ${currency_code}`);
+      throw new Error(`Payment configuration missing. Please contact support for ${credits_amount} credits in ${currency_code}.`);
     }
 
     let paymentUrl = secrets.decrypted_secret;
