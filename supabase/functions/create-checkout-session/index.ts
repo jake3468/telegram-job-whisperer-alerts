@@ -146,7 +146,7 @@ serve(async (req) => {
       lookingFor: secretName 
     });
     
-    const paymentUrl = Deno.env.get(secretName);
+    let paymentUrl = Deno.env.get(secretName);
     logStep("Secret retrieval result", { 
       secretName, 
       found: !!paymentUrl, 
