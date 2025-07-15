@@ -73,9 +73,8 @@ export const AIInterviewPricingModal = ({
   };
 
   const formatPrice = (price: number, currency: string) => {
-    // Price is already in the correct format (e.g., 299 for ₹299, 4.99 for $4.99)
-    const displayPrice = currency === 'INR' ? price : price;
-    return `${currencySymbol}${displayPrice.toFixed(currency === 'INR' ? 0 : 2)}`;
+    // Fix price formatting - prices should be displayed as actual amounts like ₹299, $4.99
+    return `${currencySymbol}${currency === 'INR' ? price.toFixed(0) : price.toFixed(2)}`;
   };
 
   // Create free plan entry
@@ -111,7 +110,7 @@ export const AIInterviewPricingModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="mx-3 sm:mx-4 w-[calc(100vw-1.5rem)] sm:w-auto sm:max-w-[95vw] lg:max-w-[1100px] max-h-[95vh] overflow-y-auto rounded-2xl bg-gradient-to-br from-background via-background to-primary/5">
+      <DialogContent className="mx-3 sm:mx-4 w-[calc(100vw-1.5rem)] sm:w-auto sm:max-w-[95vw] lg:max-w-[1200px] xl:max-w-[1400px] max-h-[95vh] overflow-y-auto rounded-2xl bg-gradient-to-br from-background via-background to-primary/5">
         <DialogHeader className="pb-4">
           <DialogTitle className="flex items-center justify-center gap-3 text-xl sm:text-2xl font-bold text-primary">
             <Phone className="h-6 w-6 sm:h-7 sm:w-7" />
@@ -124,7 +123,7 @@ export const AIInterviewPricingModal = ({
 
         <div className="space-y-6">
           {/* Pricing cards grid - better spacing and layout */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4 lg:px-8">
             {allPlans.map((plan, index) => {
               const isFreePlan = 'isFree' in plan;
               const isMostPopular = !isFreePlan && mostPopular?.id === (plan as AIInterviewProduct).id;
@@ -133,7 +132,7 @@ export const AIInterviewPricingModal = ({
               return (
                 <div 
                   key={isFreePlan ? 'free-plan' : (plan as AIInterviewProduct).id}
-                  className={`relative rounded-2xl border-2 p-6 text-center transition-all duration-300 hover:shadow-xl hover:scale-[1.02] min-h-[420px] flex flex-col justify-between ${
+                  className={`relative rounded-2xl border-2 p-6 text-center transition-all duration-300 hover:shadow-xl hover:scale-[1.02] min-h-[450px] flex flex-col justify-between ${
                     isFreePlan 
                       ? 'border-green-200 bg-gradient-to-br from-green-50 to-green-100/50 shadow-md' 
                       : isMostPopular 
@@ -226,10 +225,10 @@ export const AIInterviewPricingModal = ({
                         </Button>
                       ) : (
                         <Button
-                          className={`w-full h-12 text-lg transition-all duration-200 ${
+                          className={`w-full h-12 text-lg font-semibold transition-all duration-200 ${
                             isMostPopular 
-                              ? 'bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl' 
-                              : 'bg-secondary hover:bg-secondary/80'
+                              ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl' 
+                              : 'bg-foreground hover:bg-foreground/90 text-background shadow-md hover:shadow-lg'
                           }`}
                           disabled={isPurchasing}
                           onClick={() => handlePurchase(plan as AIInterviewProduct)}

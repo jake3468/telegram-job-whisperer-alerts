@@ -39,7 +39,9 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const { product_id } = await req.json();
+    const requestBody = await req.json();
+    // Handle both productId (from credit system) and product_id (from AI interview system)
+    const product_id = requestBody.product_id || requestBody.productId;
     if (!product_id) {
       throw new Error("Product ID is required");
     }
