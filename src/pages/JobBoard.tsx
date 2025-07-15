@@ -55,7 +55,7 @@ const JobCard = ({
   };
   
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={onView}>
+    <div className="w-full max-w-full bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden" onClick={onView}>
       <div className="p-2 sm:p-3 flex gap-2 sm:gap-3">
         {/* Left section: Logo + Content */}
         <div className="flex-1 min-w-0 flex gap-2 sm:gap-3">
@@ -101,16 +101,16 @@ const JobCard = ({
         </div>
         
         {/* Right section: Timestamp + Buttons */}
-        <div className="flex-shrink-0 flex flex-col items-end gap-1 sm:gap-2">
+        <div className="flex-shrink-0 flex flex-col items-end gap-1 sm:gap-2 min-w-0">
            {/* Timestamp */}
            {getDateToShow() && (
-             <div className="text-xs text-gray-500 text-right truncate max-w-20 sm:max-w-24">
+             <div className="text-xs text-gray-500 text-right truncate max-w-16 sm:max-w-20">
                {getDateToShow()}
              </div>
            )}
           
            {/* Buttons - smaller on mobile */}
-           <div className="flex flex-col gap-1">
+           <div className="flex flex-col gap-1 min-w-0">
              <Button 
                onClick={(e) => {
                  e.stopPropagation();
@@ -118,7 +118,7 @@ const JobCard = ({
                }} 
                variant="outline" 
                size="sm" 
-               className="text-xs px-2 py-1 h-6 w-12 font-medium rounded-md sm:px-3 sm:py-1.5 sm:h-7 sm:w-14"
+               className="text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md sm:px-3 sm:py-1.5 sm:h-7 sm:w-14 overflow-hidden"
              >
                View
              </Button>
@@ -132,12 +132,12 @@ const JobCard = ({
                    }} 
                    size="sm" 
                    className={isAddedToTracker 
-                     ? "bg-green-600 text-white hover:bg-green-700 text-xs px-2 py-1 h-6 w-12 cursor-default font-medium rounded-md sm:px-3 sm:py-1.5 sm:h-7 sm:w-14" 
-                     : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-6 w-12 font-medium rounded-md sm:px-3 sm:py-1.5 sm:h-7 sm:w-14"
+                     ? "bg-green-600 text-white hover:bg-green-700 text-xs px-1.5 py-1 h-6 w-10 cursor-default font-medium rounded-md sm:px-3 sm:py-1.5 sm:h-7 sm:w-14 overflow-hidden" 
+                     : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md sm:px-3 sm:py-1.5 sm:h-7 sm:w-14 overflow-hidden"
                    } 
                    disabled={isAddedToTracker}
                  >
-                   {isAddedToTracker ? <Check className="h-3 w-3" /> : "Track"}
+                   {isAddedToTracker ? <Check className="h-3 w-3" /> : "Trk"}
                  </Button>
                  <Button 
                    onClick={(e) => {
@@ -146,7 +146,7 @@ const JobCard = ({
                    }} 
                    variant="outline" 
                    size="sm" 
-                   className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs py-1 h-6 w-12 font-medium rounded-md sm:py-1.5 sm:h-7 sm:w-14"
+                   className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs py-1 h-6 w-10 font-medium rounded-md sm:py-1.5 sm:h-7 sm:w-14 overflow-hidden"
                  >
                    <Trash2 className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                  </Button>
@@ -158,7 +158,7 @@ const JobCard = ({
                    onSaveToTracker();
                  }} 
                  size="sm" 
-                 className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-6 w-12 font-medium rounded-md sm:px-3 sm:py-1.5 sm:h-7 sm:w-14"
+                 className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md sm:px-3 sm:py-1.5 sm:h-7 sm:w-14 overflow-hidden"
                >
                  Save
                </Button>
