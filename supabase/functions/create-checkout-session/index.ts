@@ -31,13 +31,42 @@ serve(async (req) => {
       throw new Error("No authorization header provided");
     }
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError) throw new Error(`Authentication error: ${userError.message}`);
-    
-    const user = userData.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    const clerkToken = authHeader.replace("Bearer ", "");
+    logStep("Processing Clerk JWT token", { tokenLength: clerkToken.length });
+
+    // Decode Clerk JWT to get user ID
+    let clerkUserId;
+    try {
+      const payload = JSON.parse(atob(clerkToken.split('.')[1]));
+      clerkUserId = payload.sub;
+      logStep("Decoded Clerk user ID", { clerkUserId });
+    } catch (err) {
+      throw new Error("Invalid Clerk JWT token");
+    }
+
+    if (!clerkUserId) {
+      throw new Error("Clerk user ID not found in token");
+    }
+
+    // Get user details from our users table using service role
+    const supabaseService = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+
+    const { data: user, error: userError } = await supabaseService
+      .from('users')
+      .select('*')
+      .eq('clerk_id', clerkUserId)
+      .single();
+
+    if (userError || !user) {
+      logStep("User not found in database", { clerkUserId, error: userError });
+      throw new Error("User not found. Please ensure your account is properly set up.");
+    }
+
+    logStep("User found", { userId: user.id, email: user.email });
 
     const requestBody = await req.json();
     // Handle both productId (from credit system) and product_id (from AI interview system)
@@ -48,13 +77,7 @@ serve(async (req) => {
 
     logStep("Product ID received", { product_id });
 
-    // Get product details from payment_products table using service role
-    const supabaseService = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } }
-    );
-
+    // Get product details from payment_products table
     const { data: product, error: productError } = await supabaseService
       .from('payment_products')
       .select('*')
@@ -69,16 +92,8 @@ serve(async (req) => {
 
     logStep("Product found", { product });
 
-    // Get user details for pre-filling payment form
-    const { data: userDetails, error: userDetailsError } = await supabaseService
-      .from('users')
-      .select('first_name, last_name, email')
-      .eq('id', user.id)
-      .single();
-
-    if (userDetailsError) {
-      logStep("Could not fetch user details", { error: userDetailsError });
-    }
+    // User details already available from the earlier query
+    const userDetails = user;
 
     // Determine the payment link secret name based on product details
     const { credits_amount, currency_code } = product;

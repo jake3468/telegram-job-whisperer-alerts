@@ -38,7 +38,7 @@ export const AIInterviewPurchaseModal = ({
 
       logger.info('Starting purchase for AI interview pack:', { product_id: product.product_id });
 
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: {
           product_id: product.product_id,
           quantity: 1
