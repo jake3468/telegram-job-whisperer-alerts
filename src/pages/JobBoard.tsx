@@ -47,25 +47,25 @@ const JobCard = ({
   
   return (
     <div className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer" onClick={onView}>
-      <div className="p-3">
-        {/* Top row: Logo, Title/Company, Time - more compact */}
-        <div className="flex items-start justify-between gap-3 mb-1">
-          <div className="flex items-start gap-3 flex-1 min-w-0">
+      <div className="p-2">
+        {/* Top row: Logo, Title/Company, Time */}
+        <div className="flex items-start justify-between gap-2 mb-1">
+          <div className="flex items-start gap-2 flex-1 min-w-0">
             {job.thumbnail ? (
               <img 
                 src={job.thumbnail} 
                 alt={`${job.company_name} logo`} 
-                className="w-8 h-8 rounded-lg object-cover flex-shrink-0" 
+                className="w-7 h-7 rounded object-cover flex-shrink-0" 
               />
             ) : (
-              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Building2 className="h-4 w-4 text-gray-600" />
+              <div className="w-7 h-7 bg-gray-100 rounded flex items-center justify-center flex-shrink-0">
+                <Building2 className="h-3 w-3 text-gray-400" />
               </div>
             )}
             
             <div className="flex-1 min-w-0">
               <h3 className="text-sm font-bold text-gray-900 truncate leading-tight">{job.title}</h3>
-              <p className="text-xs text-gray-700 font-medium truncate">{job.company_name}</p>
+              <p className="text-xs text-gray-700 font-medium truncate leading-tight">{job.company_name}</p>
             </div>
           </div>
           
@@ -77,11 +77,11 @@ const JobCard = ({
           )}
         </div>
         
-        {/* Bottom row: Left side info and Right side buttons - reduced gap */}
-        <div className="flex items-start justify-between gap-2">
-          {/* Left side: Location, Job Type, Salary - more compact */}
+        {/* Bottom row: Left side info and Right side buttons */}
+        <div className="flex items-start justify-between gap-1">
+          {/* Left side: Location, Job Type, Salary */}
           <div className="flex-1 min-w-0">
-            <div className="space-y-0.5 text-xs text-gray-600">
+            <div className="space-y-0 text-xs text-gray-600">
               <div className="flex items-center gap-1">
                 <MapPin className="h-3 w-3 flex-shrink-0" />
                 <span className="truncate">{job.location || 'Remote'}</span>
@@ -99,8 +99,8 @@ const JobCard = ({
             </div>
           </div>
           
-          {/* Right side: Larger buttons */}
-          <div className="flex flex-col gap-1.5 flex-shrink-0">
+          {/* Right side: Buttons */}
+          <div className="flex flex-col gap-1 flex-shrink-0">
             <Button 
               onClick={(e) => {
                 e.stopPropagation();
