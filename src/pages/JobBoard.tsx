@@ -47,20 +47,20 @@ const JobCard = ({
   
   return (
     <div className="w-full bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={onView}>
-      <div className="p-3 flex gap-3">
+      <div className="p-2 sm:p-3 flex gap-2 sm:gap-3">
         {/* Left section: Logo + Content */}
-        <div className="flex-1 min-w-0 flex gap-3">
-          {/* Company Logo */}
+        <div className="flex-1 min-w-0 flex gap-2 sm:gap-3">
+          {/* Company Logo - smaller on mobile */}
           <div className="flex-shrink-0">
             {job.thumbnail ? (
               <img 
                 src={job.thumbnail} 
                 alt={`${job.company_name} logo`} 
-                className="w-10 h-10 rounded-lg object-cover" 
+                className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover" 
               />
             ) : (
-              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                <Building2 className="h-5 w-5 text-gray-400" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
               </div>
             )}
           </div>
@@ -68,23 +68,23 @@ const JobCard = ({
           {/* Content: Title/Company + Details */}
           <div className="flex-1 min-w-0">
             {/* Job Title and Company Name */}
-            <div className="mb-2">
-              <h3 className="text-sm font-semibold text-gray-900 truncate leading-tight">{job.title}</h3>
+            <div className="mb-1 sm:mb-2">
+              <h3 className="text-xs sm:text-sm font-semibold text-gray-900 truncate leading-tight">{job.title}</h3>
               <p className="text-xs text-gray-600 truncate leading-tight">{job.company_name}</p>
             </div>
             
             {/* Location, Job Type, Salary - List style */}
-            <div className="space-y-1">
+            <div className="space-y-0.5 sm:space-y-1">
               <div className="flex items-center text-xs text-gray-600">
-                <span className="w-1 h-1 bg-gray-400 rounded-full mr-2 flex-shrink-0"></span>
+                <span className="w-1 h-1 bg-gray-400 rounded-full mr-1.5 sm:mr-2 flex-shrink-0"></span>
                 <span className="truncate">{job.location || 'Remote'}</span>
               </div>
               <div className="flex items-center text-xs text-gray-600">
-                <span className="w-1 h-1 bg-gray-400 rounded-full mr-2 flex-shrink-0"></span>
+                <span className="w-1 h-1 bg-gray-400 rounded-full mr-1.5 sm:mr-2 flex-shrink-0"></span>
                 <span className="truncate">{job.job_type || 'Full-time'}</span>
               </div>
               <div className="flex items-center text-xs text-green-600 font-medium">
-                <span className="w-1 h-1 bg-green-600 rounded-full mr-2 flex-shrink-0"></span>
+                <span className="w-1 h-1 bg-green-600 rounded-full mr-1.5 sm:mr-2 flex-shrink-0"></span>
                 <span className="truncate">{formatSalary(job.salary)}</span>
               </div>
             </div>
@@ -92,7 +92,7 @@ const JobCard = ({
         </div>
         
         {/* Right section: Timestamp + Buttons */}
-        <div className="flex-shrink-0 flex flex-col items-end gap-2">
+        <div className="flex-shrink-0 flex flex-col items-end gap-1 sm:gap-2">
           {/* Timestamp */}
           {getDateToShow() && (
             <div className="text-xs text-gray-500 text-right">
@@ -100,8 +100,8 @@ const JobCard = ({
             </div>
           )}
           
-          {/* Buttons */}
-          <div className="flex flex-col gap-1.5">
+          {/* Buttons - smaller on mobile */}
+          <div className="flex flex-col gap-1">
             <Button 
               onClick={(e) => {
                 e.stopPropagation();
@@ -109,7 +109,7 @@ const JobCard = ({
               }} 
               variant="outline" 
               size="sm" 
-              className="text-xs px-4 py-1.5 h-8 w-16 font-medium rounded-md"
+              className="text-xs px-2 sm:px-3 py-1 sm:py-1.5 h-6 sm:h-7 w-12 sm:w-14 font-medium rounded-md"
             >
               View
             </Button>
@@ -123,8 +123,8 @@ const JobCard = ({
                   }} 
                   size="sm" 
                   className={isAddedToTracker 
-                    ? "bg-green-600 text-white hover:bg-green-700 text-xs px-4 py-1.5 h-8 w-16 cursor-default font-medium rounded-md" 
-                    : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-4 py-1.5 h-8 w-16 font-medium rounded-md"
+                    ? "bg-green-600 text-white hover:bg-green-700 text-xs px-2 sm:px-3 py-1 sm:py-1.5 h-6 sm:h-7 w-12 sm:w-14 cursor-default font-medium rounded-md" 
+                    : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 sm:px-3 py-1 sm:py-1.5 h-6 sm:h-7 w-12 sm:w-14 font-medium rounded-md"
                   } 
                   disabled={isAddedToTracker}
                 >
@@ -137,9 +137,9 @@ const JobCard = ({
                   }} 
                   variant="outline" 
                   size="sm" 
-                  className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs py-1.5 h-8 w-16 font-medium rounded-md"
+                  className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs py-1 sm:py-1.5 h-6 sm:h-7 w-12 sm:w-14 font-medium rounded-md"
                 >
-                  <Trash2 className="h-3 w-3" />
+                  <Trash2 className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                 </Button>
               </>
             ) : (
@@ -149,7 +149,7 @@ const JobCard = ({
                   onSaveToTracker();
                 }} 
                 size="sm" 
-                className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-4 py-1.5 h-8 w-16 font-medium rounded-md"
+                className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 sm:px-3 py-1 sm:py-1.5 h-6 sm:h-7 w-12 sm:w-14 font-medium rounded-md"
               >
                 Save
               </Button>
