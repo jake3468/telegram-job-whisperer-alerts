@@ -64,20 +64,24 @@ const JobCard = ({
             </div>
           </div>
           
-          {/* Location, job type, and date */}
-          <div className="flex items-center gap-1 text-xs text-gray-600 overflow-hidden">
-            <div className="flex items-center gap-1 min-w-0 flex-shrink-0">
+          {/* Location, job type, and date - mobile: vertical stack, desktop: horizontal */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1 text-xs text-gray-600 overflow-hidden">
+            <div className="flex items-center gap-1 min-w-0">
               <MapPin className="h-3 w-3 flex-shrink-0" />
-              <span className="truncate max-w-[90px] sm:max-w-none">{job.location || 'Remote'}</span>
+              <span className="truncate">{job.location || 'Remote'}</span>
             </div>
-            {job.job_type && <>
-                <span className="flex-shrink-0">•</span>
-                <span className="truncate max-w-[70px] sm:max-w-none">{job.job_type}</span>
-              </>}
-            {getDateToShow() && <>
-                <span className="flex-shrink-0">•</span>
-                <span className="truncate max-w-[60px] sm:max-w-none">{getDateToShow()}</span>
-              </>}
+            {job.job_type && (
+              <div className="flex items-center gap-1 min-w-0">
+                <span className="hidden sm:inline flex-shrink-0">•</span>
+                <span className="truncate">{job.job_type}</span>
+              </div>
+            )}
+            {getDateToShow() && (
+              <div className="flex items-center gap-1 min-w-0">
+                <span className="hidden sm:inline flex-shrink-0">•</span>
+                <span className="truncate">{getDateToShow()}</span>
+              </div>
+            )}
           </div>
           
           {/* Mobile: Salary */}
@@ -228,7 +232,7 @@ const JobBoard = () => {
 
   return <Layout>
       <div className="min-h-screen overflow-x-hidden w-full">
-        <div className="w-full max-w-none px-2 sm:px-6 mx-auto">
+        <div className="w-full max-w-none px-1 sm:px-6 mx-auto">
           {/* Header */}
           <div className="text-center mb-4 sm:mb-6">
             <div className="flex items-center justify-center gap-2 sm:gap-4 mb-2 sm:mb-4 flex-wrap">
@@ -257,22 +261,22 @@ const JobBoard = () => {
           {/* Job Sections */}
           <div className="w-full overflow-x-hidden">
             <Tabs defaultValue="posted-today" className="w-full">
-              <div className="px-2 sm:px-4 mb-6">
-                <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm gap-1 h-auto p-1 border-0 rounded-xl">
-                  <TabsTrigger value="posted-today" className="text-xs sm:text-sm px-1 sm:px-3 py-2 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0">
+              <div className="px-1 sm:px-4 mb-6">
+                <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm gap-0.5 sm:gap-1 h-auto p-0.5 sm:p-1 border-0 rounded-xl">
+                  <TabsTrigger value="posted-today" className="text-[10px] sm:text-sm px-0.5 sm:px-3 py-1.5 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
                     <span className="hidden sm:inline truncate">Posted Today</span>
                     <span className="sm:hidden truncate">Today</span>
-                    <span className="ml-1 flex-shrink-0">({filteredPostedTodayJobs.length})</span>
+                    <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-[9px] sm:text-xs">({filteredPostedTodayJobs.length})</span>
                   </TabsTrigger>
-                  <TabsTrigger value="last-7-days" className="text-xs sm:text-sm px-1 sm:px-3 py-2 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0">
+                  <TabsTrigger value="last-7-days" className="text-[10px] sm:text-sm px-0.5 sm:px-3 py-1.5 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
                     <span className="hidden sm:inline truncate">Last 7 Days</span>
                     <span className="sm:hidden truncate">Week</span>
-                    <span className="ml-1 flex-shrink-0">({filteredLast7DaysJobs.length})</span>
+                    <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-[9px] sm:text-xs">({filteredLast7DaysJobs.length})</span>
                   </TabsTrigger>
-                  <TabsTrigger value="saved-to-tracker" className="text-xs sm:text-sm px-1 sm:px-3 py-2 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0">
+                  <TabsTrigger value="saved-to-tracker" className="text-[10px] sm:text-sm px-0.5 sm:px-3 py-1.5 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
                     <span className="hidden sm:inline truncate">Saved</span>
                     <span className="sm:hidden truncate">Saved</span>
-                    <span className="ml-1 flex-shrink-0">({filteredSavedToTrackerJobs.length})</span>
+                    <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-[9px] sm:text-xs">({filteredSavedToTrackerJobs.length})</span>
                   </TabsTrigger>
                 </TabsList>
               </div>
