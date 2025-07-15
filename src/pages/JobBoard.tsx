@@ -37,10 +37,11 @@ const JobCard = ({
 
   // Determine what date to show based on section
   const getDateToShow = () => {
-    if (section === 'posted-today') {
-      return job.posted_at;
+    if (section === 'posted-today' && job.posted_at) {
+      // For posted today, show posted_at if available
+      return formatDate(job.posted_at);
     } else {
-      // For 'last-7-days' and 'saved', show created_at date only
+      // For other sections, show created_at date
       return formatDate(job.created_at);
     }
   };
