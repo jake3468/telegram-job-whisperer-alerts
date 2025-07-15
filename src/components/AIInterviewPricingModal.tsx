@@ -23,15 +23,13 @@ export const AIInterviewPricingModal = ({
   onClose
 }: AIInterviewPricingModalProps) => {
   const { products, isLoading, currencySymbol } = useAIInterviewProducts();
-  const [selectedProduct, setSelectedProduct] = useState<AIInterviewProduct | null>(null);
-  const [isPurchasing, setIsPurchasing] = useState(false);
+  const [processingProductId, setProcessingProductId] = useState<string | null>(null);
   const { toast } = useToast();
   const { getToken } = useAuth();
 
   const handlePurchase = async (product: AIInterviewProduct) => {
     try {
-      setIsPurchasing(true);
-      setSelectedProduct(product);
+      setProcessingProductId(product.product_id);
 
       logger.info('Starting purchase for AI interview pack:', { product_id: product.product_id });
 
@@ -84,8 +82,7 @@ export const AIInterviewPricingModal = ({
         variant: "destructive",
       });
     } finally {
-      setIsPurchasing(false);
-      setSelectedProduct(null);
+      setProcessingProductId(null);
     }
   };
 
@@ -263,10 +260,10 @@ export const AIInterviewPricingModal = ({
                               ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl' 
                               : 'bg-foreground hover:bg-foreground/90 text-background shadow-md hover:shadow-lg'
                           }`}
-                          disabled={isPurchasing}
+                          disabled={!!processingProductId}
                           onClick={() => handlePurchase(plan as AIInterviewProduct)}
                         >
-                          {isPurchasing && selectedProduct?.id === (plan as AIInterviewProduct).id ? (
+                          {processingProductId === (plan as AIInterviewProduct).product_id ? (
                             <>
                               <Loader2 className="h-5 w-5 mr-2 animate-spin" />
                               Processing...

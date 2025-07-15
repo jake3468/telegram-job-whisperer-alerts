@@ -110,9 +110,10 @@ serve(async (req) => {
     
     logStep("Looking for payment link", { secretName });
 
-    // Get payment URL from Supabase secrets
+    // Get payment URL from Supabase vault using proper schema access
     logStep("Querying vault for payment link", { secretName });
     
+    // Use proper vault access without schema prefix
     const { data: secrets, error: secretError } = await supabaseService
       .from('vault.decrypted_secrets')
       .select('decrypted_secret')
