@@ -48,8 +48,8 @@ const JobCard = ({
   return (
     <div className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer" onClick={onView}>
       <div className="p-3">
-        {/* Top row: Logo, Title/Company, Salary/Time */}
-        <div className="flex items-start justify-between gap-3 mb-3">
+        {/* Top row: Logo, Title/Company, Time */}
+        <div className="flex items-start justify-between gap-3 mb-2">
           <div className="flex items-start gap-3 flex-1 min-w-0">
             {job.thumbnail ? (
               <img 
@@ -64,38 +64,43 @@ const JobCard = ({
             )}
             
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-bold text-gray-900 truncate mb-1">{job.title}</h3>
+              <h3 className="text-sm font-bold text-gray-900 truncate">{job.title}</h3>
               <p className="text-xs text-gray-700 font-medium truncate">{job.company_name}</p>
             </div>
           </div>
           
-          <div className="text-right text-xs text-gray-500 flex-shrink-0 min-w-0">
-            <div className="text-green-600 font-semibold mb-1 truncate">
-              {formatSalary(job.salary)}
+          {/* Time in top-right */}
+          {getDateToShow() && (
+            <div className="text-xs text-gray-500 flex-shrink-0">
+              {getDateToShow()}
             </div>
-            {getDateToShow() && (
-              <div className="truncate">
-                {getDateToShow()}
-              </div>
-            )}
-          </div>
+          )}
         </div>
         
-        {/* Bottom row: Location/Type and Action buttons */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-xs text-gray-600 min-w-0 flex-1">
-            <div className="flex items-center gap-1 min-w-0">
-              <MapPin className="h-3 w-3 flex-shrink-0" />
-              <span className="truncate">{job.location || 'Remote'}</span>
-            </div>
-            {job.job_type && (
-              <div className="bg-gray-100 px-2 py-1 rounded-md text-xs flex-shrink-0">
-                {job.job_type}
+        {/* Bottom row: Left side info and Right side buttons */}
+        <div className="flex items-start justify-between gap-3">
+          {/* Left side: Location, Job Type, Salary - stacked vertically */}
+          <div className="flex-1 min-w-0">
+            <div className="space-y-1 text-xs text-gray-600">
+              <div className="flex items-center gap-1">
+                <MapPin className="h-3 w-3 flex-shrink-0" />
+                <span className="truncate">{job.location || 'Remote'}</span>
               </div>
-            )}
+              {job.job_type && (
+                <div className="flex items-center gap-1">
+                  <span className="w-3 h-3 flex-shrink-0"></span>
+                  <span className="truncate">{job.job_type}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-1">
+                <span className="w-3 h-3 flex-shrink-0"></span>
+                <span className="text-green-600 font-semibold truncate">{formatSalary(job.salary)}</span>
+              </div>
+            </div>
           </div>
           
-          <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Right side: Buttons stacked vertically */}
+          <div className="flex flex-col gap-1 flex-shrink-0">
             <Button 
               onClick={(e) => {
                 e.stopPropagation();
@@ -103,7 +108,7 @@ const JobCard = ({
               }} 
               variant="outline" 
               size="sm" 
-              className="text-xs px-3 py-1 h-7"
+              className="text-xs px-3 py-1 h-6 min-w-[50px]"
             >
               View
             </Button>
@@ -117,16 +122,12 @@ const JobCard = ({
                   }} 
                   size="sm" 
                   className={isAddedToTracker 
-                    ? "bg-green-600 text-white hover:bg-green-700 text-xs px-3 py-1 h-7 cursor-default" 
-                    : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-3 py-1 h-7"
+                    ? "bg-green-600 text-white hover:bg-green-700 text-xs px-3 py-1 h-6 cursor-default min-w-[50px]" 
+                    : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-3 py-1 h-6 min-w-[50px]"
                   } 
                   disabled={isAddedToTracker}
                 >
-                  {isAddedToTracker ? (
-                    <Check className="h-3 w-3" />
-                  ) : (
-                    "Track"
-                  )}
+                  {isAddedToTracker ? <Check className="h-3 w-3" /> : "Track"}
                 </Button>
                 <Button 
                   onClick={(e) => {
@@ -135,7 +136,7 @@ const JobCard = ({
                   }} 
                   variant="outline" 
                   size="sm" 
-                  className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs p-1 h-7 w-7"
+                  className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs p-1 h-6 w-[50px]"
                 >
                   <Trash2 className="h-3 w-3" />
                 </Button>
@@ -147,7 +148,7 @@ const JobCard = ({
                   onSaveToTracker();
                 }} 
                 size="sm" 
-                className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-3 py-1 h-7"
+                className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-3 py-1 h-6 min-w-[50px]"
               >
                 Save
               </Button>
