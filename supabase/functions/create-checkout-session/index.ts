@@ -18,7 +18,7 @@ serve(async (req) => {
   }
 
   try {
-    logStep("Function started");
+    logStep("Function started - v2.1"); // Force redeploy trigger
 
     // Initialize Supabase client with anon key for user authentication
     const supabaseClient = createClient(
@@ -138,11 +138,29 @@ serve(async (req) => {
     // Get payment URL directly from Edge Functions secrets
     logStep("Getting payment link from Edge Functions secrets", { secretName });
     
+    // Add comprehensive debugging for secret access
+    const allEnvKeys = Object.keys(Deno.env.toObject()).filter(key => key.startsWith('PAYMENT_LINK_'));
+    logStep("Available payment link secrets", { 
+      allSecrets: allEnvKeys, 
+      secretName,
+      lookingFor: secretName 
+    });
+    
     const paymentUrl = Deno.env.get(secretName);
+    logStep("Secret retrieval result", { 
+      secretName, 
+      found: !!paymentUrl, 
+      valueLength: paymentUrl ? paymentUrl.length : 0,
+      valuePreview: paymentUrl ? paymentUrl.substring(0, 30) + "..." : "null"
+    });
 
     if (!paymentUrl) {
-      logStep("Payment link secret not found", { secretName });
-      throw new Error(`Payment configuration missing for secret: ${secretName}. Please contact support.`);
+      logStep("Payment link secret not found", { 
+        secretName,
+        availableSecrets: allEnvKeys,
+        exactMatch: allEnvKeys.includes(secretName)
+      });
+      throw new Error(`Payment configuration missing for secret: ${secretName}. Available secrets: ${allEnvKeys.join(', ')}`);
     }
     logStep("Payment URL retrieved successfully", { paymentUrl: paymentUrl.substring(0, 50) + "..." });
 
