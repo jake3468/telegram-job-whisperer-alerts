@@ -105,39 +105,60 @@ serve(async (req) => {
     const userDetails = user;
 
     // Determine the payment link secret name based on product details
-    const { credits_amount, currency_code } = product;
-    const secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_${credits_amount}_CREDITS`;
+    const { credits_amount, currency_code, product_name, product_type } = product;
     
-    logStep("Looking for payment link", { secretName });
+    // Generate secret name based on product type
+    let secretName;
+    if (product_name && product_name.includes('AI Mock Interview')) {
+      // AI Interview products use credits-based naming
+      secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_${credits_amount}_CREDITS`;
+    } else {
+      // General credit products use different naming patterns
+      if (product_name && product_name.toLowerCase().includes('pro')) {
+        secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_PRO`;
+      } else if (product_name && product_name.toLowerCase().includes('monthly')) {
+        secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_MONTHLY_SUBSCRIPTION`;
+      } else {
+        // Fallback to credits-based naming
+        secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_${credits_amount}_CREDITS`;
+      }
+    }
+    
+    logStep("Looking for payment link", { secretName, product_name, product_type });
 
-    // Get payment URL from Supabase vault using proper schema access
-    logStep("Querying vault for payment link", { secretName });
+    // Get payment URL from Supabase vault using RPC call
+    logStep("Querying vault for payment link using RPC", { secretName });
     
-    // Use proper vault access without schema prefix
+    // Use RPC to access vault secrets properly
     const { data: secrets, error: secretError } = await supabaseService
-      .from('vault.decrypted_secrets')
-      .select('decrypted_secret')
-      .eq('name', secretName);
+      .rpc('get_vault_secret', { secret_name: secretName });
 
-    logStep("Vault query result", { secrets, secretError, secretsCount: secrets?.length });
+    logStep("Vault query result", { secrets, secretError });
 
     if (secretError) {
       logStep("Vault query error", { secretError });
-      throw new Error(`Database error accessing payment configuration: ${secretError.message}`);
-    }
+      // Fallback: try direct environment variable access
+      const envVarName = secretName.replace('PAYMENT_LINK_', '').replace('_', '_PAYMENT_URL_');
+      const envPaymentUrl = Deno.env.get(envVarName);
+      if (envPaymentUrl) {
+        logStep("Using environment variable fallback", { envVarName });
+        var paymentUrl = envPaymentUrl;
+      } else {
+        throw new Error(`Database error accessing payment configuration: ${secretError.message}`);
+      }
+    } else {
+      if (!secrets) {
+        logStep("No secrets found", { secretName });
+        throw new Error(`Payment configuration missing for secret: ${secretName}. Please contact support.`);
+      }
 
-    if (!secrets || secrets.length === 0) {
-      logStep("No secrets found", { secretName });
-      throw new Error(`Payment configuration missing for secret: ${secretName}. Please contact support.`);
-    }
+      if (!secrets) {
+        logStep("Secret found but empty", { secrets });
+        throw new Error(`Payment configuration is empty for: ${secretName}`);
+      }
 
-    const paymentSecret = secrets[0];
-    if (!paymentSecret?.decrypted_secret) {
-      logStep("Secret found but empty", { paymentSecret });
-      throw new Error(`Payment configuration is empty for: ${secretName}`);
+      var paymentUrl = secrets;
     }
-
-    let paymentUrl = paymentSecret.decrypted_secret;
     logStep("Payment URL retrieved successfully", { paymentUrl: paymentUrl.substring(0, 50) + "..." });
 
     // Add user data to payment URL if available

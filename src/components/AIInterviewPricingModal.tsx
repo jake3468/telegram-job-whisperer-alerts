@@ -260,7 +260,7 @@ export const AIInterviewPricingModal = ({
                               ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl' 
                               : 'bg-foreground hover:bg-foreground/90 text-background shadow-md hover:shadow-lg'
                           }`}
-                          disabled={!!processingProductId}
+                          disabled={processingProductId === (plan as AIInterviewProduct).product_id}
                           onClick={() => handlePurchase(plan as AIInterviewProduct)}
                         >
                           {processingProductId === (plan as AIInterviewProduct).product_id ? (
