@@ -44,16 +44,16 @@ const JobCard = ({
       return formatDate(job.created_at);
     }
   };
-  return <div className="w-full max-w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer overflow-hidden" onClick={onView}>
-      <div className="p-1 sm:p-3">
-        <div className="flex flex-col gap-1.5 sm:gap-2">
+  return <div className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer" onClick={onView}>
+      <div className="p-2 sm:p-3 w-full">
+        <div className="flex flex-col gap-2 w-full">
           {/* Company info and logo */}
-          <div className="flex items-center gap-2 min-w-0 overflow-hidden">
+          <div className="flex items-center gap-2 w-full">
             {job.thumbnail ? <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg object-cover flex-shrink-0" /> : <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
                 <Building2 className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
               </div>}
             
-            <div className="flex-1 min-w-0 overflow-hidden">
+            <div className="flex-1 min-w-0">
               <h3 className="text-xs sm:text-sm font-bold text-gray-900 truncate">{job.title}</h3>
               <p className="text-xs text-gray-700 font-medium truncate">{job.company_name}</p>
             </div>
@@ -64,37 +64,37 @@ const JobCard = ({
             </div>
           </div>
           
-          {/* Location, job type, and date - mobile: vertical stack, desktop: horizontal */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1 text-xs text-gray-600 overflow-hidden">
-            <div className="flex items-center gap-1 min-w-0">
+          {/* Mobile: Salary */}
+          <div className="sm:hidden text-green-600 font-semibold text-xs">
+            {formatSalary(job.salary)}
+          </div>
+          
+          {/* Location, job type, and date - mobile: vertical stack */}
+          <div className="space-y-1 sm:space-y-0 sm:flex sm:items-center sm:gap-1 text-xs text-gray-600">
+            <div className="flex items-center gap-1">
               <MapPin className="h-3 w-3 flex-shrink-0" />
               <span className="truncate">{job.location || 'Remote'}</span>
             </div>
             {job.job_type && (
-              <div className="flex items-center gap-1 min-w-0">
-                <span className="hidden sm:inline flex-shrink-0">•</span>
+              <div className="flex items-center gap-1 sm:ml-2">
+                <span className="hidden sm:inline">•</span>
                 <span className="truncate">{job.job_type}</span>
               </div>
             )}
             {getDateToShow() && (
-              <div className="flex items-center gap-1 min-w-0">
-                <span className="hidden sm:inline flex-shrink-0">•</span>
+              <div className="flex items-center gap-1 sm:ml-2">
+                <span className="hidden sm:inline">•</span>
                 <span className="truncate">{getDateToShow()}</span>
               </div>
             )}
           </div>
           
-          {/* Mobile: Salary */}
-          <div className="sm:hidden text-green-600 font-semibold text-xs truncate">
-            {formatSalary(job.salary)}
-          </div>
-          
           {/* Actions */}
-          <div className="flex items-center gap-1 sm:gap-2 overflow-hidden">
+          <div className="flex items-center gap-2 w-full">
             <Button onClick={e => {
             e.stopPropagation();
             onView();
-          }} variant="secondary" size="sm" className="text-xs px-2 sm:px-3 py-1 h-6 sm:h-7 flex-shrink-0">
+          }} variant="secondary" size="sm" className="text-xs px-3 py-1 h-7 flex-shrink-0">
               View
             </Button>
             <Button onClick={e => {
