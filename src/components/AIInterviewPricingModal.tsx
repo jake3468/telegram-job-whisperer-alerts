@@ -110,7 +110,7 @@ export const AIInterviewPricingModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="p-0 w-[90vw] sm:w-[85vw] md:w-[80vw] lg:w-[780px] xl:w-[820px] max-w-[90vw] max-h-[90vh] sm:max-h-[85vh] md:max-h-[80vh] lg:max-h-fit flex flex-col rounded-2xl bg-gradient-to-br from-background via-background to-primary/5 border-0">
+      <DialogContent className="p-0 w-[90vw] sm:w-[85vw] md:w-[80vw] lg:w-[780px] xl:w-[820px] max-w-[90vw] max-h-[90vh] sm:max-h-[85vh] md:max-h-[80vh] lg:max-h-fit flex flex-col rounded-xl sm:rounded-2xl bg-gradient-to-br from-background via-background to-primary/5 border-0 overflow-hidden">
         {/* Sticky header with close button */}
         <div className="flex-shrink-0 bg-gradient-to-br from-background via-background to-primary/5 p-4 pb-3 border-b border-border/20 rounded-t-2xl">
           {/* Close button - positioned to avoid overlap on mobile */}
@@ -137,7 +137,7 @@ export const AIInterviewPricingModal = ({
 
         {/* Scrollable content area */}
         <div className="flex-1 overflow-y-auto overscroll-contain">
-          <div className="p-3 space-y-3">
+          <div className="p-3 pb-6 space-y-3">
             {/* Pricing cards grid - scrollable on mobile/tablet, no scroll on desktop */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
             {allPlans.map((plan, index) => {
