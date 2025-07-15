@@ -44,90 +44,119 @@ const JobCard = ({
       return formatDate(job.created_at);
     }
   };
-  return <div className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer" onClick={onView}>
-      <div className="p-3 w-full">
-        {/* Header: Company logo, title, and salary */}
+  
+  return (
+    <div className="w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer" onClick={onView}>
+      <div className="p-3">
+        {/* Top row: Logo, Title/Company, Salary/Time */}
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-start gap-3 flex-1 min-w-0">
-            {job.thumbnail ? <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover flex-shrink-0" /> : <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
-              </div>}
+            {job.thumbnail ? (
+              <img 
+                src={job.thumbnail} 
+                alt={`${job.company_name} logo`} 
+                className="w-8 h-8 rounded-lg object-cover flex-shrink-0" 
+              />
+            ) : (
+              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Building2 className="h-4 w-4 text-gray-600" />
+              </div>
+            )}
             
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm sm:text-base font-bold text-gray-900 truncate mb-1">{job.title}</h3>
-              <p className="text-xs sm:text-sm text-gray-700 font-medium truncate">{job.company_name}</p>
+              <h3 className="text-sm font-bold text-gray-900 truncate mb-1">{job.title}</h3>
+              <p className="text-xs text-gray-700 font-medium truncate">{job.company_name}</p>
             </div>
           </div>
           
-          {/* Salary - always visible on right */}
-          <div className="text-green-600 font-semibold text-xs sm:text-sm text-right flex-shrink-0">
-            {formatSalary(job.salary)}
+          <div className="text-right text-xs text-gray-500 flex-shrink-0 min-w-0">
+            <div className="text-green-600 font-semibold mb-1 truncate">
+              {formatSalary(job.salary)}
+            </div>
+            {getDateToShow() && (
+              <div className="truncate">
+                {getDateToShow()}
+              </div>
+            )}
           </div>
         </div>
         
-        {/* Job details spread across full width */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs sm:text-sm text-gray-600">
-            <div className="flex items-center gap-1">
-              <MapPin className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+        {/* Bottom row: Location/Type and Action buttons */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-xs text-gray-600 min-w-0 flex-1">
+            <div className="flex items-center gap-1 min-w-0">
+              <MapPin className="h-3 w-3 flex-shrink-0" />
               <span className="truncate">{job.location || 'Remote'}</span>
             </div>
             {job.job_type && (
-              <div className="flex items-center gap-1">
-                <span className="hidden sm:inline">•</span>
-                <span className="truncate">{job.job_type}</span>
+              <div className="bg-gray-100 px-2 py-1 rounded-md text-xs flex-shrink-0">
+                {job.job_type}
               </div>
             )}
           </div>
           
-          {/* Date on the right side */}
-          {getDateToShow() && (
-            <div className="text-xs sm:text-sm text-gray-500 flex-shrink-0">
-              {getDateToShow()}
-            </div>
-          )}
-        </div>
-        
-        {/* Actions spread across bottom */}
-        <div className="flex items-center justify-between gap-2">
-          <Button onClick={e => {
-            e.stopPropagation();
-            onView();
-          }} variant="secondary" size="sm" className="text-xs sm:text-sm px-3 py-1.5 flex-shrink-0">
-            View
-          </Button>
-          
-          {/* Save/Action button on the right */}
-          <Button onClick={e => {
-            e.stopPropagation();
-            onSaveToTracker();
-          }} size="sm" className={isAddedToTracker ? "bg-green-600 text-white hover:bg-green-700 text-xs sm:text-sm px-3 py-1.5 cursor-default" : "bg-blue-600 text-white hover:bg-blue-700 text-xs sm:text-sm px-3 py-1.5"} disabled={isAddedToTracker}>
-            {isAddedToTracker ? (
-              <div className="flex items-center gap-1">
-                <Check className="h-3 w-3" />
-                <span className="hidden sm:inline">Added to Tracker</span>
-                <span className="sm:hidden">Added</span>
-              </div>
-            ) : section === 'saved' ? (
-              <>
-                <span className="hidden sm:inline">Add to Job Tracker</span>
-                <span className="sm:hidden">Save</span>
-              </>
-            ) : "Save"}
-          </Button>
-          
-          {/* Delete button for saved section */}
-          {section === 'saved' && onDelete && (
-            <Button onClick={e => {
-              e.stopPropagation();
-              onDelete();
-            }} variant="outline" size="sm" className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs sm:text-sm px-3 py-1.5 flex-shrink-0">
-              <Trash2 className="h-3 w-3" />
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <Button 
+              onClick={(e) => {
+                e.stopPropagation();
+                onView();
+              }} 
+              variant="outline" 
+              size="sm" 
+              className="text-xs px-3 py-1 h-7"
+            >
+              View
             </Button>
-          )}
+            
+            {section === 'saved' && onDelete ? (
+              <>
+                <Button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSaveToTracker();
+                  }} 
+                  size="sm" 
+                  className={isAddedToTracker 
+                    ? "bg-green-600 text-white hover:bg-green-700 text-xs px-3 py-1 h-7 cursor-default" 
+                    : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-3 py-1 h-7"
+                  } 
+                  disabled={isAddedToTracker}
+                >
+                  {isAddedToTracker ? (
+                    <Check className="h-3 w-3" />
+                  ) : (
+                    "Track"
+                  )}
+                </Button>
+                <Button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete();
+                  }} 
+                  variant="outline" 
+                  size="sm" 
+                  className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs p-1 h-7 w-7"
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              </>
+            ) : (
+              <Button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSaveToTracker();
+                }} 
+                size="sm" 
+                className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-3 py-1 h-7"
+              >
+                Save
+              </Button>
+            )}
+          </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 const JobBoard = () => {
   const {
