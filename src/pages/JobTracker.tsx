@@ -824,21 +824,41 @@ const JobTracker = () => {
         setSelectedJob(updatedJob);
       }
       
-      await executeWithRetry(async () => {
-        const { error } = await supabase.from('job_tracker').update({
-          [field]: !currentValue
-        }).eq('id', jobId);
-        if (error) throw error;
-      }, 5, 'update checklist item'); // Increased retries to 5
+      // Perform database update with improved error handling
+      try {
+        await executeWithRetry(async () => {
+          const { error } = await supabase.from('job_tracker').update({
+            [field]: !currentValue
+          }).eq('id', jobId);
+          if (error) throw error;
+        }, 5, 'update checklist item'); // Increased retries to 5
 
-      toast({
-        title: "Success",
-        description: "Checklist updated successfully!"
-      });
+        // Only show success toast if database update succeeded
+        toast({
+          title: "Success",
+          description: "Checklist updated successfully!"
+        });
+      } catch (dbError) {
+        console.error('Database error updating checklist:', dbError);
+        
+        // Revert optimistic update on database error
+        optimisticUpdate(targetJob);
+        if (selectedJob && selectedJob.id === jobId) {
+          setSelectedJob(targetJob);
+        }
+        
+        // Only show error toast for actual database failures
+        toast({
+          title: "Error",
+          description: "Failed to update checklist. Please try again.",
+          variant: "destructive"
+        });
+      }
     } catch (error) {
-      console.error('Error updating checklist:', error);
+      // This catches any unexpected errors in the optimistic update logic
+      console.error('Unexpected error in checklist update:', error);
       
-      // Revert optimistic update on error
+      // Ensure we revert the optimistic update
       optimisticUpdate(targetJob);
       if (selectedJob && selectedJob.id === jobId) {
         setSelectedJob(targetJob);
@@ -846,7 +866,7 @@ const JobTracker = () => {
       
       toast({
         title: "Error",
-        description: "Failed to update checklist. Please try again.",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive"
       });
     }
