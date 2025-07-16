@@ -3,12 +3,14 @@ import { useUser } from '@clerk/clerk-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
+import { useEnterpriseAuth } from './useEnterpriseAuth';
 
 type JobBoardItem = Tables<'job_board'>;
 type JobTrackerItem = Tables<'job_tracker'>;
 
 export const useJobBoardData = () => {
   const { user: clerkUser } = useUser();
+  const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
   const [postedTodayJobs, setPostedTodayJobs] = useState<JobBoardItem[]>([]);
   const [last7DaysJobs, setLast7DaysJobs] = useState<JobBoardItem[]>([]);
   const [savedToTrackerJobs, setSavedToTrackerJobs] = useState<JobBoardItem[]>([]);
@@ -18,14 +20,13 @@ export const useJobBoardData = () => {
   const [connectionIssue, setConnectionIssue] = useState(false);
 
   const fetchJobs = async (forceRefresh = false) => {
-    try {
-      setLoading(true);
-      setError(null);
-      setConnectionIssue(false);
+    if (!clerkUser) {
+      // For non-logged in users, still show jobs but without personalization
+      return executeWithRetry(async () => {
+        setLoading(true);
+        setError(null);
+        setConnectionIssue(false);
 
-      // Check if user is logged in
-      if (!clerkUser) {
-        // For non-logged in users, still show jobs but without personalization
         const { data: jobBoardData, error: fetchError } = await supabase
           .from('job_board')
           .select('*')
@@ -55,7 +56,19 @@ export const useJobBoardData = () => {
         setLast7DaysJobs(lastWeek);
         setSavedToTrackerJobs([]);
         return;
-      }
+      }, 3, 'fetch jobs for non-logged user').catch(err => {
+        console.error('Error fetching job board data:', err);
+        setError(err as Error);
+        setConnectionIssue(true);
+      }).finally(() => {
+        setLoading(false);
+      });
+    }
+
+    return executeWithRetry(async () => {
+      setLoading(true);
+      setError(null);
+      setConnectionIssue(false);
 
       // Get user data with fallback error handling
       const { data: users, error: userError } = await supabase
@@ -73,8 +86,7 @@ export const useJobBoardData = () => {
       // If user data issues, trigger connection issue instead of failing silently
       if (userError || profileError || !users || !userProfile) {
         console.error('User data fetch issue:', { userError, profileError });
-        setConnectionIssue(true);
-        return;
+        throw new Error('User data not found');
       }
 
       // First run cleanup function to categorize and delete old jobs
@@ -146,23 +158,22 @@ export const useJobBoardData = () => {
       setSavedToTrackerJobs(savedToTracker);
       setJobTrackerStatus(trackerStatus);
 
-    } catch (err) {
+    }, 5, 'fetch jobs for logged user').catch(err => {
       console.error('Error fetching job board data:', err);
       setError(err as Error);
       setConnectionIssue(true);
-    } finally {
+    }).finally(() => {
       setLoading(false);
-    }
+    });
   };
 
   const markJobAsSaved = async (job: JobBoardItem) => {
-    try {
-      // Check Clerk authentication
-      if (!clerkUser) {
-        toast.error('Please log in to save jobs');
-        return;
-      }
+    if (!clerkUser) {
+      toast.error('Please log in to save jobs');
+      return;
+    }
 
+    return executeWithRetry(async () => {
       // Get user from database using Clerk ID
       const { data: users, error: userError } = await supabase
         .from('users')
@@ -171,8 +182,7 @@ export const useJobBoardData = () => {
         .single();
 
       if (userError || !users) {
-        toast.error('User not found. Please try logging in again.');
-        return;
+        throw new Error('User not found. Please try logging in again.');
       }
 
       const { data: userProfile, error: profileError } = await supabase
@@ -182,8 +192,7 @@ export const useJobBoardData = () => {
         .single();
 
       if (profileError || !userProfile) {
-        toast.error('User profile not found. Please complete your profile setup.');
-        return;
+        throw new Error('User profile not found. Please complete your profile setup.');
       }
 
       // Generate job_reference_id when saving (this will be used later for job tracker)
@@ -200,29 +209,26 @@ export const useJobBoardData = () => {
         .eq('user_id', userProfile.id);
 
       if (updateError) {
-        console.error('Error marking job as saved:', updateError);
-        toast.error(`Failed to save job: ${updateError.message}`);
-        return;
+        throw updateError;
       }
 
       toast.success('Job saved! Check the Saved section.');
       // Refresh data to update job sections
       await fetchJobs();
 
-    } catch (err) {
-      console.error('Unexpected error marking job as saved:', err);
-      toast.error('An unexpected error occurred. Please try again.');
-    }
+    }, 5, 'mark job as saved').catch(err => {
+      console.error('Error marking job as saved:', err);
+      toast.error('Failed to save job. Please try again.');
+    });
   };
 
   const saveToTracker = async (job: JobBoardItem) => {
-    try {
-      // Check Clerk authentication
-      if (!clerkUser) {
-        toast.error('Please log in to add jobs to tracker');
-        return;
-      }
+    if (!clerkUser) {
+      toast.error('Please log in to add jobs to tracker');
+      return;
+    }
 
+    return executeWithRetry(async () => {
       // Get user from database using Clerk ID
       const { data: users, error: userError } = await supabase
         .from('users')
@@ -231,8 +237,7 @@ export const useJobBoardData = () => {
         .maybeSingle();
 
       if (userError || !users) {
-        toast.error('Please refresh the page and try again');
-        return;
+        throw new Error('User not found');
       }
 
       const { data: userProfile, error: profileError } = await supabase
@@ -242,8 +247,7 @@ export const useJobBoardData = () => {
         .single();
 
       if (profileError || !userProfile) {
-        toast.error('Please refresh the page and try again');
-        return;
+        throw new Error('User profile not found');
       }
 
       // Generate job_reference_id if it doesn't exist (for jobs saved before recent changes)
@@ -259,9 +263,7 @@ export const useJobBoardData = () => {
           .eq('user_id', userProfile.id);
 
         if (updateError) {
-          console.error('Error updating job_board with job_reference_id:', updateError);
-          toast.error('Failed to prepare job for tracker');
-          return;
+          throw new Error('Failed to prepare job for tracker');
         }
       }
 
@@ -274,9 +276,7 @@ export const useJobBoardData = () => {
         .maybeSingle();
 
       if (checkError) {
-        console.error('Error checking existing job:', checkError);
-        toast.error('Unable to check if job already exists');
-        return;
+        throw new Error('Unable to check if job already exists');
       }
 
       if (existingJob) {
@@ -308,28 +308,26 @@ export const useJobBoardData = () => {
         });
 
       if (insertError) {
-        console.error('Error saving job to tracker:', insertError);
-        toast.error('Failed to add job to tracker');
-        return;
+        throw insertError;
       }
 
       toast.success('Job added to tracker successfully!');
       // Refresh data to update sections
       await fetchJobs();
 
-    } catch (err) {
-      console.error('Unexpected error saving job to tracker:', err);
-      toast.error('Please refresh the page and try again');
-    }
+    }, 5, 'save job to tracker').catch(err => {
+      console.error('Error saving job to tracker:', err);
+      toast.error('Failed to add job to tracker. Please try again.');
+    });
   };
 
   const deleteJobFromBoard = async (job: JobBoardItem) => {
-    try {
-      if (!clerkUser) {
-        toast.error('Please log in to delete jobs');
-        return;
-      }
+    if (!clerkUser) {
+      toast.error('Please log in to delete jobs');
+      return;
+    }
 
+    return executeWithRetry(async () => {
       console.log('Deleting job from job_board:', job.id);
 
       // Get user profile
@@ -340,8 +338,7 @@ export const useJobBoardData = () => {
         .single();
 
       if (userError || !users) {
-        toast.error('User not found. Please try logging in again.');
-        return;
+        throw new Error('User not found. Please try logging in again.');
       }
 
       const { data: userProfile, error: profileError } = await supabase
@@ -351,8 +348,7 @@ export const useJobBoardData = () => {
         .single();
 
       if (profileError || !userProfile) {
-        toast.error('User profile not found.');
-        return;
+        throw new Error('User profile not found.');
       }
 
       // Simply delete from job_board only
@@ -363,32 +359,29 @@ export const useJobBoardData = () => {
         .eq('user_id', userProfile.id);
 
       if (deleteError) {
-        console.error('Error deleting job from board:', deleteError);
-        toast.error(`Failed to delete job: ${deleteError.message}`);
-        return;
+        throw deleteError;
       }
 
       if (count === 0) {
-        toast.error('Job not found or you do not have permission to delete it');
-        return;
+        throw new Error('Job not found or you do not have permission to delete it');
       }
 
       toast.success('Job removed from saved jobs!');
       await fetchJobs();
 
-    } catch (err) {
-      console.error('Unexpected error deleting job:', err);
-      toast.error('An unexpected error occurred. Please try again.');
-    }
+    }, 5, 'delete job from board').catch(err => {
+      console.error('Error deleting job:', err);
+      toast.error('Failed to delete job. Please try again.');
+    });
   };
 
   const deleteJobFromTracker = async (jobReferenceId: string) => {
-    try {
-      if (!clerkUser) {
-        toast.error('Please log in to delete jobs');
-        return;
-      }
+    if (!clerkUser) {
+      toast.error('Please log in to delete jobs');
+      return;
+    }
 
+    return executeWithRetry(async () => {
       // Get user profile
       const { data: users, error: userError } = await supabase
         .from('users')
@@ -397,8 +390,7 @@ export const useJobBoardData = () => {
         .single();
 
       if (userError || !users) {
-        toast.error('User not found. Please try logging in again.');
-        return;
+        throw new Error('User not found. Please try logging in again.');
       }
 
       const { data: userProfile, error: profileError } = await supabase
@@ -408,8 +400,7 @@ export const useJobBoardData = () => {
         .single();
 
       if (profileError || !userProfile) {
-        toast.error('User profile not found.');
-        return;
+        throw new Error('User profile not found.');
       }
 
       // Delete from job_tracker
@@ -420,9 +411,7 @@ export const useJobBoardData = () => {
         .eq('job_reference_id', jobReferenceId);
 
       if (trackerDeleteError) {
-        console.error('Error deleting from job tracker:', trackerDeleteError);
-        toast.error(`Failed to delete job from tracker: ${trackerDeleteError.message}`);
-        return;
+        throw trackerDeleteError;
       }
 
       // Delete from job_board if job_reference_id exists
@@ -440,10 +429,10 @@ export const useJobBoardData = () => {
       toast.success('Job deleted from tracker successfully!');
       await fetchJobs();
 
-    } catch (err) {
-      console.error('Unexpected error deleting job from tracker:', err);
-      toast.error('An unexpected error occurred. Please try again.');
-    }
+    }, 5, 'delete job from tracker').catch(err => {
+      console.error('Error deleting job from tracker:', err);
+      toast.error('Failed to delete job from tracker. Please try again.');
+    });
   };
 
   const forceRefresh = async () => {
@@ -473,7 +462,10 @@ export const useJobBoardData = () => {
   };
 
   useEffect(() => {
-    fetchJobs();
+    // Only fetch jobs after authentication is ready
+    if (isAuthReady || !clerkUser) {
+      fetchJobs();
+    }
 
     // Set up real-time subscription for job board updates
     const channel = supabase
@@ -495,7 +487,7 @@ export const useJobBoardData = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [isAuthReady, clerkUser]);
 
   return {
     postedTodayJobs,
