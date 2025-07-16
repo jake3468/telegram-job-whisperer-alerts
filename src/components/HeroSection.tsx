@@ -2,6 +2,7 @@ import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
+import Lottie from 'lottie-react';
 const HeroSection = () => {
   const navigate = useNavigate();
   const {
@@ -11,6 +12,7 @@ const HeroSection = () => {
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [lottieAnimationData, setLottieAnimationData] = useState(null);
   const fullText = 'AI does the boring stuff.\nYou get the Job.';
   useEffect(() => {
     if (isLoaded && user) {
@@ -23,6 +25,21 @@ const HeroSection = () => {
     const img = new Image();
     img.onload = () => setIsImageLoaded(true);
     img.src = '/lovable-uploads/9f89bb0c-b59d-4e5a-8c4d-609218bee6d4.png';
+  }, []);
+
+  // Load Lottie animation
+  useEffect(() => {
+    const loadLottieAnimation = async () => {
+      try {
+        const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json');
+        const animationData = await response.json();
+        setLottieAnimationData(animationData);
+      } catch (error) {
+        console.error('Failed to load Lottie animation:', error);
+      }
+    };
+
+    loadLottieAnimation();
   }, []);
 
   // Optimized typing animation effect
@@ -72,6 +89,24 @@ const HeroSection = () => {
             </span>)}
           <span className="animate-pulse">|</span>
         </h1>
+        
+        {/* Lottie Animation */}
+        {lottieAnimationData && (
+          <div className="flex justify-center my-6 md:my-8">
+            <div className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48">
+              <Lottie 
+                animationData={lottieAnimationData} 
+                loop={true}
+                autoplay={true}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
+                }}
+              />
+            </div>
+          </div>
+        )}
         
         {/* AI Services Badges - Combined Image */}
         <div className="flex justify-center items-center gap-3 mb-4 md:mb-6 opacity-90">
