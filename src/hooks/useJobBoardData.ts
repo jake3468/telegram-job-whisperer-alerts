@@ -214,9 +214,16 @@ export const useJobBoardData = () => {
         }
       }, 5, 'mark job as saved');
 
-      // Success actions outside of retry logic
+      // Success - show message immediately
       toast.success('Job saved! Check the Saved section.');
-      await fetchJobs();
+      
+      // Refresh data with separate error handling
+      try {
+        await fetchJobs();
+      } catch (refreshError) {
+        console.error('Error refreshing job data after save:', refreshError);
+        // Don't show error to user, the main operation succeeded
+      }
     } catch (err) {
       console.error('Error marking job as saved:', err);
       toast.error('Failed to save job. Please try again.');
@@ -318,10 +325,16 @@ export const useJobBoardData = () => {
         shouldShowSuccess = true;
       }, 5, 'save job to tracker');
 
-      // Success actions outside of retry logic
+      // Success actions with separate error handling
       if (shouldShowSuccess) {
         toast.success('Job added to tracker successfully!');
-        await fetchJobs();
+        
+        try {
+          await fetchJobs();
+        } catch (refreshError) {
+          console.error('Error refreshing job data after tracker save:', refreshError);
+          // Don't show error to user, the main operation succeeded
+        }
       }
     } catch (err) {
       console.error('Error saving job to tracker:', err);
@@ -376,9 +389,16 @@ export const useJobBoardData = () => {
         }
       }, 5, 'delete job from board');
 
-      // Success actions outside of retry logic
+      // Success - show message immediately
       toast.success('Job removed from saved jobs!');
-      await fetchJobs();
+      
+      // Refresh data with separate error handling
+      try {
+        await fetchJobs();
+      } catch (refreshError) {
+        console.error('Error refreshing job data after delete:', refreshError);
+        // Don't show error to user, the main operation succeeded
+      }
     } catch (err) {
       console.error('Error deleting job:', err);
       toast.error('Failed to delete job. Please try again.');
@@ -438,9 +458,16 @@ export const useJobBoardData = () => {
         }
       }, 5, 'delete job from tracker');
 
-      // Success actions outside of retry logic
+      // Success - show message immediately
       toast.success('Job deleted from tracker successfully!');
-      await fetchJobs();
+      
+      // Refresh data with separate error handling
+      try {
+        await fetchJobs();
+      } catch (refreshError) {
+        console.error('Error refreshing job data after tracker delete:', refreshError);
+        // Don't show error to user, the main operation succeeded
+      }
     } catch (err) {
       console.error('Error deleting job from tracker:', err);
       toast.error('Failed to delete job from tracker. Please try again.');
