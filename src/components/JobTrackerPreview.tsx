@@ -6,8 +6,8 @@ const JobTrackerPreview = () => {
           <img 
             src="/lovable-uploads/ae14cafd-7775-4b28-9bbf-76fde85f2cf5.png"
             alt="Job Tracker Interface Preview - Manage your job applications with ease"
-            className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-700 ease-out"
-            style={{ objectPosition: '50% 25%' }}
+            className="w-full h-full object-cover hover:scale-105 transition-transform duration-700 ease-out"
+            style={{ objectPosition: '50% 0%' }}
             loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />

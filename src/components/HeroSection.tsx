@@ -74,14 +74,14 @@ const HeroSection = () => {
         </h1>
         
         {/* AI Services Badges - Combined Image */}
-        <div className="flex justify-center items-center gap-3 mb-6 opacity-90">
+        <div className="flex justify-center items-center gap-3 mb-4 md:mb-6 opacity-90">
           <span className="text-gray-300 text-sm font-inter font-medium">Powered by</span>
           <div className="flex items-center">
             <img alt="AI Services - OpenAI, Claude, and Perplexity" className="h-8 object-contain hover:scale-110 transition-transform duration-200" loading="lazy" src="/lovable-uploads/061e42ad-45f4-4e4c-b642-9efff932bddd.png" />
           </div>
         </div>
 
-        <p className="text-lg md:text-xl text-gray-200 mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black">
+        <p className="text-lg md:text-xl text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black">
           Job hunting toolkit that writes your cover letter, preps you for interviews, and even pings you new jobs — all powered by{" "}
           <span className="italic bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent font-medium">
             AI
@@ -103,7 +103,7 @@ const HeroSection = () => {
             Go to Dashboard
           </button>
         </SignedIn>
-        <p className="text-gray-400 text-sm mt-10 font-inter drop-shadow shadow-black">
+        <p className="text-gray-400 text-sm mt-4 md:mt-6 lg:mt-8 font-inter drop-shadow shadow-black">
           No credit card required. Start with 30 free credits today.
         </p>
       </div>
