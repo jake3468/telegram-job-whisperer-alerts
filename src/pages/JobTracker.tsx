@@ -855,7 +855,7 @@ const JobTracker = () => {
         </header>
 
         {/* Main content area - responsive flexbox layout */}
-        <main className="flex-1 p-4 overflow-x-auto">
+        <main className="flex-1 p-4 overflow-x-hidden md:overflow-x-auto">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             {/* Responsive flexbox: stacked on mobile, wrapped on larger screens */}
             <div className="flex flex-col md:flex-row md:flex-wrap gap-4 w-full">
