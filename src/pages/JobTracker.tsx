@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useUserInitialization } from '@/hooks/useUserInitialization';
 import { useCachedJobTracker } from '@/hooks/useCachedJobTracker';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 import { JobTrackerOnboardingPopup } from '@/components/JobTrackerOnboardingPopup';
 import { Plus, ExternalLink, Trash2, X, Bookmark, Send, Users, XCircle, Trophy, GripVertical, RefreshCw, AlertCircle } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -276,6 +277,7 @@ const JobTracker = () => {
     user,
     isLoaded
   } = useUser();
+  const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
   const navigate = useNavigate();
   const {
     toast
@@ -476,19 +478,19 @@ const JobTracker = () => {
         updated_at: new Date().toISOString()
       };
       optimisticAdd(tempJob);
-      const {
-        data,
-        error
-      } = await supabase.from('job_tracker').insert({
-        user_id: userProfileId,
-        company_name: formData.company_name,
-        job_title: formData.job_title,
-        job_description: formData.job_description || null,
-        job_url: formData.job_url || null,
-        status: selectedStatus,
-        order_position: maxOrder + 1
-      }).select().single();
-      if (error) throw error;
+      const data = await executeWithRetry(async () => {
+        const { data, error } = await supabase.from('job_tracker').insert({
+          user_id: userProfileId,
+          company_name: formData.company_name,
+          job_title: formData.job_title,
+          job_description: formData.job_description || null,
+          job_url: formData.job_url || null,
+          status: selectedStatus,
+          order_position: maxOrder + 1
+        }).select().single();
+        if (error) throw error;
+        return data;
+      }, 3, 'add job to tracker');
 
       // Replace temp job with real job
       if (data) {
@@ -534,15 +536,15 @@ const JobTracker = () => {
       return;
     }
     try {
-      const {
-        error
-      } = await supabase.from('job_tracker').update({
-        company_name: editFormData.company_name,
-        job_title: editFormData.job_title,
-        job_description: editFormData.job_description || null,
-        job_url: editFormData.job_url || null
-      }).eq('id', selectedJob.id);
-      if (error) throw error;
+      await executeWithRetry(async () => {
+        const { error } = await supabase.from('job_tracker').update({
+          company_name: editFormData.company_name,
+          job_title: editFormData.job_title,
+          job_description: editFormData.job_description || null,
+          job_url: editFormData.job_url || null
+        }).eq('id', selectedJob.id);
+        if (error) throw error;
+      }, 3, 'update job details');
       toast({
         title: "Success",
         description: "Job updated successfully!"
@@ -563,10 +565,10 @@ const JobTracker = () => {
     // Optimistic delete first
     optimisticDelete(jobId);
     try {
-      const {
-        error
-      } = await supabase.from('job_tracker').delete().eq('id', jobId);
-      if (error) throw error;
+      await executeWithRetry(async () => {
+        const { error } = await supabase.from('job_tracker').delete().eq('id', jobId);
+        if (error) throw error;
+      }, 3, 'delete job from tracker');
 
       // Invalidate cache for fresh data on next load
       invalidateCache();
@@ -623,11 +625,16 @@ const JobTracker = () => {
           optimisticUpdate(updatedJob);
         });
 
-        // Update database for all affected jobs
+        // Update database for all affected jobs using enhanced authentication
         try {
-          await Promise.all(reorderedJobs.map((job, index) => supabase.from('job_tracker').update({
-            order_position: index
-          }).eq('id', job.id)));
+          await executeWithRetry(async () => {
+            await Promise.all(reorderedJobs.map(async (job, index) => {
+              const { error } = await supabase.from('job_tracker').update({
+                order_position: index
+              }).eq('id', job.id);
+              if (error) throw error;
+            }));
+          }, 3, 'reorder jobs in database');
         } catch (error) {
           console.error('Error reordering jobs:', error);
           toast({
@@ -718,16 +725,16 @@ const JobTracker = () => {
         comments: updatedJob.comments || undefined
       } as JobEntry);
       try {
-        const {
-          error
-        } = await supabase.from('job_tracker').update({
-          status: targetColumn.key as JobEntry['status'],
-          order_position: maxOrder + 1,
-          interview_call_received: updatedJob.interview_call_received,
-          interview_prep_guide_received: updatedJob.interview_prep_guide_received,
-          ai_mock_interview_attempted: updatedJob.ai_mock_interview_attempted
-        }).eq('id', activeJobToMove.id);
-        if (error) throw error;
+        await executeWithRetry(async () => {
+          const { error } = await supabase.from('job_tracker').update({
+            status: targetColumn.key as JobEntry['status'],
+            order_position: maxOrder + 1,
+            interview_call_received: updatedJob.interview_call_received,
+            interview_prep_guide_received: updatedJob.interview_prep_guide_received,
+            ai_mock_interview_attempted: updatedJob.ai_mock_interview_attempted
+          }).eq('id', activeJobToMove.id);
+          if (error) throw error;
+        }, 3, 'move job to new column');
 
         // Invalidate cache for fresh data on next load
         invalidateCache();
@@ -766,14 +773,14 @@ const JobTracker = () => {
     const targetJob = jobs.find(job => job.id === jobId);
     if (!targetJob || targetJob.status !== 'saved' && targetJob.status !== 'applied' && targetJob.status !== 'interview') return;
     try {
-      // Update in database
+      // Update in database using enhanced authentication
       const currentValue = targetJob[field as keyof JobEntry] as boolean;
-      const {
-        error
-      } = await supabase.from('job_tracker').update({
-        [field]: !currentValue
-      }).eq('id', jobId);
-      if (error) throw error;
+      await executeWithRetry(async () => {
+        const { error } = await supabase.from('job_tracker').update({
+          [field]: !currentValue
+        }).eq('id', jobId);
+        if (error) throw error;
+      }, 3, 'update checklist item');
 
       // Update local state
       const updatedJob = {

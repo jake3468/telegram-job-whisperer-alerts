@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useEnterpriseAuth } from './useEnterpriseAuth';
 import { logger } from '@/utils/logger';
 
 interface JobEntry {
@@ -36,6 +37,7 @@ const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
 export const useCachedJobTracker = () => {
   const { user } = useUser();
+  const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
   const [jobs, setJobs] = useState<JobEntry[]>([]);
   const [userProfileId, setUserProfileId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -69,7 +71,7 @@ export const useCachedJobTracker = () => {
 
   // Fetch fresh data only when user changes or when explicitly requested
   useEffect(() => {
-    if (!user) {
+    if (!user || !isAuthReady) {
       setLoading(false);
       return;
     }
@@ -81,47 +83,58 @@ export const useCachedJobTracker = () => {
     } else if (hasFetched || jobs.length > 0) {
       setLoading(false);
     }
-  }, [user?.id, hasFetched, jobs.length, error]); // Include hasFetched in dependencies
+  }, [user?.id, hasFetched, jobs.length, error, isAuthReady]); // Include isAuthReady
 
   const fetchJobTrackerData = async (showErrors = false) => {
-    if (!user) return;
+    if (!user || !isAuthReady) return;
     
     try {
       setError(null);
       setConnectionIssue(false);
       
-      // Get the user UUID from users table using clerk_id
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('clerk_id', user.id)
-        .maybeSingle();
+      // Get the user UUID from users table using enhanced authentication
+      const userData = await executeWithRetry(async () => {
+        const { data, error } = await supabase
+          .from('users')
+          .select('id')
+          .eq('clerk_id', user.id)
+          .maybeSingle();
+        
+        if (error) throw error;
+        return data;
+      }, 3, 'fetch user data for job tracker');
       
-      if (userError || !userData) {
+      if (!userData) {
         throw new Error('Unable to load user data');
       }
 
-      // Get user profile using the user UUID
-      const { data: userProfile, error: profileError } = await supabase
-        .from('user_profile')
-        .select('id')
-        .eq('user_id', userData.id)
-        .maybeSingle();
+      // Get user profile using enhanced authentication
+      const userProfile = await executeWithRetry(async () => {
+        const { data, error } = await supabase
+          .from('user_profile')
+          .select('id')
+          .eq('user_id', userData.id)
+          .maybeSingle();
+        
+        if (error) throw error;
+        return data;
+      }, 3, 'fetch user profile for job tracker');
       
-      if (profileError || !userProfile) {
+      if (!userProfile) {
         throw new Error('Unable to load user profile');
       }
 
-      // Get jobs for this user profile
-      const { data, error } = await supabase
-        .from('job_tracker')
-        .select('*')
-        .eq('user_id', userProfile.id)
-        .order('order_position', { ascending: true });
-      
-      if (error) {
-        throw new Error('Unable to load job applications');
-      }
+      // Get jobs for this user profile using enhanced authentication
+      const data = await executeWithRetry(async () => {
+        const { data, error } = await supabase
+          .from('job_tracker')
+          .select('*')
+          .eq('user_id', userProfile.id)
+          .order('order_position', { ascending: true });
+        
+        if (error) throw error;
+        return data;
+      }, 3, 'fetch job tracker data');
 
       // Transform the data to match JobEntry interface
       const jobsData: JobEntry[] = (data || []).map(job => ({
