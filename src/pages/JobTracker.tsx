@@ -73,7 +73,7 @@ const DroppableColumn = ({
     id: column.key
   });
   const isDropTarget = isOver && activeJobId;
-  return <div ref={setNodeRef} className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg w-full md:flex-1 md:min-w-[280px] md:max-w-[320px] transition-all hover:shadow-lg ${isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''}`}>
+  return <div ref={setNodeRef} className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg w-full min-w-0 md:flex-1 md:min-w-[280px] md:max-w-[320px] transition-all hover:shadow-lg overflow-hidden ${isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''}`}>
       <div className={`${column.headerBg} p-4 rounded-t-lg border-b ${column.borderColor} flex items-center justify-between`}>
         <div className="flex items-center gap-2">
           <column.icon className="h-4 w-4 text-white" />
@@ -218,16 +218,16 @@ const SortableJobCard = ({
       });
     }
   };
-  return <div ref={setNodeRef} style={style} className="bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition-all duration-200 py-1.5 px-2 mb-1 hover:scale-[1.02]">
+  return <div ref={setNodeRef} style={style} className="bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition-all duration-200 py-1.5 px-2 mb-1 hover:scale-[1.02] min-w-0 w-full overflow-hidden">
       {/* Top section: Progress + Company + Actions */}
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center gap-2 min-w-0">
         {/* Left: Progress badge in circle */}
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 ${getProgressColor(progress)}`}>
+        <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 ${getProgressColor(progress)}`}>
           {job.status === 'rejected' ? '❌' : job.status === 'offer' ? '🤩' : `${progress}/${job.status === 'saved' ? '5' : job.status === 'applied' ? '1' : job.status === 'interview' ? '2' : '0'}`}
         </div>
         
         {/* Center: Company & Job Title */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 overflow-hidden">
           <div className="font-bold text-sm text-black leading-tight truncate">
             {job.company_name}
           </div>
@@ -237,33 +237,34 @@ const SortableJobCard = ({
         </div>
 
         {/* Right: Dropdown + Actions */}
-        <div className="flex items-center gap-1 flex-shrink-0">
+        <div className="flex items-center gap-1 flex-shrink-0 max-w-[120px] sm:max-w-none overflow-hidden">
           {/* Show dropdown arrow for jobs with checklist items */}
-          {(job.status === 'saved' || job.status === 'applied' || job.status === 'interview') && <Button variant="ghost" size="sm" onClick={() => setIsChecklistExpanded(!isChecklistExpanded)} className="text-xs px-1 py-1 h-6 text-gray-600 hover:text-gray-800">
+          {(job.status === 'saved' || job.status === 'applied' || job.status === 'interview') && <Button variant="ghost" size="sm" onClick={() => setIsChecklistExpanded(!isChecklistExpanded)} className="text-xs px-1 py-1 h-6 text-gray-600 hover:text-gray-800 hidden sm:flex">
               {isChecklistExpanded ? '▲' : '▼'}
             </Button>}
           
-          <Button variant="outline" size="sm" onClick={() => onView(job)} className="text-xs px-2 py-1 h-6 bg-pastel-lavender">
-            View
+          <Button variant="outline" size="sm" onClick={() => onView(job)} className="text-xs px-1 sm:px-2 py-1 h-6 bg-pastel-lavender flex-shrink-0">
+            <span className="hidden sm:inline">View</span>
+            <span className="sm:hidden">V</span>
           </Button>
           
-          {job.job_url && <a href={job.job_url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 transition-colors p-1" title="Open job posting">
+          {job.job_url && <a href={job.job_url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 transition-colors p-1 flex-shrink-0" title="Open job posting">
               <ExternalLink className="w-3 h-3" />
             </a>}
 
           {/* Drag Handle */}
-          <div {...attributes} {...listeners} onClick={handleDragAttempt} className={`cursor-grab p-1 transition-colors ${canDrag ? "text-gray-600 hover:text-gray-800" : "text-gray-400 cursor-not-allowed"}`} title={canDrag ? "Drag to move" : "Complete checklist to move"}>
+          <div {...attributes} {...listeners} onClick={handleDragAttempt} className={`cursor-grab p-1 transition-colors flex-shrink-0 ${canDrag ? "text-gray-600 hover:text-gray-800" : "text-gray-400 cursor-not-allowed"}`} title={canDrag ? "Drag to move" : "Complete checklist to move"}>
             <GripVertical className="w-3 h-3" />
           </div>
         </div>
       </div>
 
       {/* Expandable Checklist - for saved, applied, and interview jobs */}
-      {isChecklistExpanded && (job.status === 'saved' || job.status === 'applied' || job.status === 'interview') && <div className="mt-2 pt-2 border-t border-gray-200">
+      {isChecklistExpanded && (job.status === 'saved' || job.status === 'applied' || job.status === 'interview') && <div className="mt-2 pt-2 border-t border-gray-200 min-w-0">
           <div className="space-y-1.5">
-            {checklistItems.map(item => <div key={item.field} className="flex items-center space-x-2">
-                <Checkbox checked={item.completed} onCheckedChange={() => handleChecklistToggle(item.field)} className={`h-4 w-4 ${item.completed ? 'data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500' : ''}`} />
-                <span className={`text-xs leading-tight ${item.completed ? "text-gray-500 line-through" : "text-gray-700"}`}>
+            {checklistItems.map(item => <div key={item.field} className="flex items-center space-x-2 min-w-0">
+                <Checkbox checked={item.completed} onCheckedChange={() => handleChecklistToggle(item.field)} className={`h-4 w-4 flex-shrink-0 ${item.completed ? 'data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500' : ''}`} />
+                <span className={`text-xs leading-tight flex-1 min-w-0 ${item.completed ? "text-gray-500 line-through" : "text-gray-700"}`}>
                   {item.label}
                 </span>
               </div>)}
@@ -858,7 +859,7 @@ const JobTracker = () => {
         <main className="flex-1 p-4 overflow-x-hidden md:overflow-x-auto">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             {/* Responsive flexbox: stacked on mobile, wrapped on larger screens */}
-            <div className="flex flex-col md:flex-row md:flex-wrap gap-4 w-full">
+            <div className="flex flex-col md:flex-row md:flex-wrap gap-2 sm:gap-4 w-full min-w-0">
               {columns.map(column => <DroppableColumn key={column.key} column={column} jobs={getJobsByStatus(column.key)} onAddJob={() => {
               setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
               setIsModalOpen(true);
