@@ -105,15 +105,15 @@ export const useJobBoardData = () => {
 
       const allJobs = jobBoardData || [];
 
-      // Categorize jobs based on database section column and saved status
-      // Posted Today: Jobs with section='posted_today' that are NOT saved by user
+      // Categorize jobs based on database section column
+      // Posted Today: Jobs with section='posted_today' (including saved ones)
       const postedToday = allJobs.filter(job => 
-        job.section === 'posted_today' && !job.is_saved_by_user
+        job.section === 'posted_today'
       );
 
-      // Last 7 Days: Jobs with section='last_7_days' that are NOT saved by user
+      // Last 7 Days: Jobs with section='last_7_days' (including saved ones)
       const lastWeek = allJobs.filter(job => 
-        job.section === 'last_7_days' && !job.is_saved_by_user
+        job.section === 'last_7_days'
       );
 
       // Saved: Jobs marked as saved by user (regardless of section)
