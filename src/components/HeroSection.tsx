@@ -55,7 +55,7 @@ const HeroSection = () => {
   const goToDashboard = () => {
     navigate('/dashboard');
   };
-  return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-8 overflow-hidden bg-black">
+  return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-2 overflow-hidden bg-black">
       {/* Optimized Background with loading state */}
       <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-500 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`} aria-hidden="true" style={{
       background: isImageLoaded ? `url('/lovable-uploads/9f89bb0c-b59d-4e5a-8c4d-609218bee6d4.png') center top / cover no-repeat` : 'transparent',
@@ -130,7 +130,7 @@ const HeroSection = () => {
             Go to Dashboard
           </button>
         </SignedIn>
-        <p className="text-gray-400 text-sm mt-4 md:mt-6 lg:mt-8 font-inter drop-shadow shadow-black">
+        <p className="text-gray-400 text-sm mt-2 font-inter drop-shadow shadow-black">
           No credit card required. Start with 30 free credits today.
         </p>
       </div>
