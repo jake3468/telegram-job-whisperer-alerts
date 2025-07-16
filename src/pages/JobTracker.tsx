@@ -228,24 +228,23 @@ const SortableJobCard = ({
         
         {/* Center: Company & Job Title */}
         <div className="flex-1 min-w-0 overflow-hidden">
-          <div className="font-bold text-sm text-black leading-tight truncate">
+          <div className="font-bold text-sm text-black leading-tight break-words">
             {job.company_name}
           </div>
-          <div className="text-xs text-gray-600 leading-tight truncate">
+          <div className="text-xs text-gray-600 leading-tight break-words">
             {job.job_title}
           </div>
         </div>
 
         {/* Right: Dropdown + Actions */}
-        <div className="flex items-center gap-1 flex-shrink-0 max-w-[120px] sm:max-w-none overflow-hidden">
+        <div className="flex items-center gap-1 flex-shrink-0 overflow-hidden">
           {/* Show dropdown arrow for jobs with checklist items */}
-          {(job.status === 'saved' || job.status === 'applied' || job.status === 'interview') && <Button variant="ghost" size="sm" onClick={() => setIsChecklistExpanded(!isChecklistExpanded)} className="text-xs px-1 py-1 h-6 text-gray-600 hover:text-gray-800 hidden sm:flex">
+          {(job.status === 'saved' || job.status === 'applied' || job.status === 'interview') && <Button variant="ghost" size="sm" onClick={() => setIsChecklistExpanded(!isChecklistExpanded)} className="text-xs px-1 py-1 h-6 text-gray-600 hover:text-gray-800">
               {isChecklistExpanded ? '▲' : '▼'}
             </Button>}
           
-          <Button variant="outline" size="sm" onClick={() => onView(job)} className="text-xs px-1 sm:px-2 py-1 h-6 bg-pastel-lavender flex-shrink-0">
-            <span className="hidden sm:inline">View</span>
-            <span className="sm:hidden">V</span>
+          <Button variant="outline" size="sm" onClick={() => onView(job)} className="text-xs px-2 py-1 h-6 bg-pastel-lavender flex-shrink-0">
+            View
           </Button>
           
           {job.job_url && <a href={job.job_url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 transition-colors p-1 flex-shrink-0" title="Open job posting">
