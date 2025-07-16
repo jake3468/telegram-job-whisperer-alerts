@@ -105,26 +105,18 @@ export const useJobBoardData = () => {
 
       const allJobs = jobBoardData || [];
 
-      // Categorize jobs based on time and saved status
-      const today = new Date();
-      const twentyThreeHoursAgo = new Date(today.getTime() - 23 * 60 * 60 * 1000);
-      const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-
-      // Posted Today: Recent jobs that are NOT saved by user
+      // Categorize jobs based on database section column and saved status
+      // Posted Today: Jobs with section='posted_today' that are NOT saved by user
       const postedToday = allJobs.filter(job => 
-        new Date(job.created_at) > twentyThreeHoursAgo && 
-        !job.is_saved_by_user
+        job.section === 'posted_today' && !job.is_saved_by_user
       );
 
-      // Last 7 Days: Older jobs that are NOT saved by user
-      const lastWeek = allJobs.filter(job => {
-        const createdAt = new Date(job.created_at);
-        return createdAt <= twentyThreeHoursAgo && 
-               createdAt > sevenDaysAgo && 
-               !job.is_saved_by_user;
-      });
+      // Last 7 Days: Jobs with section='last_7_days' that are NOT saved by user
+      const lastWeek = allJobs.filter(job => 
+        job.section === 'last_7_days' && !job.is_saved_by_user
+      );
 
-      // Saved: Jobs marked as saved by user
+      // Saved: Jobs marked as saved by user (regardless of section)
       const savedToTracker = allJobs.filter(job => 
         job.is_saved_by_user === true
       );
