@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { AlertCircle, FileText, Sparkles, Loader2, CheckCircle, Trash2, Building, Briefcase, Copy, History, RefreshCw } from 'lucide-react';
 import AuthHeader from '@/components/AuthHeader';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
-import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 import { Layout } from '@/components/Layout';
 import JobAnalysisHistory from '@/components/JobAnalysisHistory';
 import { PercentageMeter } from '@/components/PercentageMeter';
@@ -22,6 +22,7 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
 import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
 import { useCachedJobAnalyses } from '@/hooks/useCachedJobAnalyses';
+import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 const JobGuide = () => {
   const {
     user,
@@ -42,6 +43,7 @@ const JobGuide = () => {
     userProfile,
     loading: profileLoading
   } = useUserProfile();
+  const { isAuthReady, executeWithRetry } = useEnterpriseAuth();
   const [formData, setFormData] = useState({
     companyName: '',
     jobTitle: '',
@@ -122,42 +124,21 @@ const JobGuide = () => {
       try {
         console.log('📡 Polling attempt', retryCount + 1, 'for analysis ID:', jobAnalysisId);
 
-        // Use authenticated request for polling
-        const {
-          data,
-          error
-        } = await makeAuthenticatedRequest(async () => {
-          return await supabase.from('job_analyses').select('job_match, match_score').eq('id', jobAnalysisId).maybeSingle();
-        }, 'poll job analysis results');
-        if (error) {
-          console.error('❌ Error polling for results:', error);
-
-          // Handle JWT expiration by retrying with a delay
-          if (error.message?.includes('JWT expired') || error.code === 'PGRST301') {
-            console.log('🔄 JWT expired, retrying after delay...');
-            retryCount++;
-            if (retryCount < maxRetries) {
-              // Wait a bit longer for token refresh and retry
-              setTimeout(() => {
-                pollForResults();
-              }, 2000);
-              return;
-            } else {
-              console.log('❌ Max retries reached for JWT refresh');
-              throw new Error('Authentication failed after retries');
-            }
-          }
-          throw error;
-        }
+        // Use enterprise auth for bulletproof polling
+        const data = await executeWithRetry(async () => {
+          const { data, error } = await supabase.from('job_analyses').select('job_match, match_score').eq('id', jobAnalysisId).maybeSingle();
+          if (error) throw error;
+          return data;
+        }, 3, 'poll job analysis results');
+        
+        // Reset retry count on successful response
+        retryCount = 0;
         console.log('📊 Polling response:', {
           hasJobMatch: !!data?.job_match,
           jobMatchLength: data?.job_match?.length,
           matchScore: data?.match_score,
           retryCount
         });
-
-        // Reset retry count on successful response
-        retryCount = 0;
 
         // Check if we have actual content (not just empty strings)
         if (data?.job_match && data.job_match.trim().length > 0) {
@@ -177,7 +158,8 @@ const JobGuide = () => {
         }
       } catch (err) {
         console.error('❌ Polling error:', err);
-
+        retryCount++;
+        
         // If we've exhausted retries, stop polling and show error
         if (retryCount >= maxRetries) {
           if (pollingIntervalRef.current) {
@@ -262,6 +244,16 @@ const JobGuide = () => {
   const handleSubmit = useCallback(async () => {
     console.log('🚀 Job Guide Submit Button Clicked');
 
+    // Check auth readiness first
+    if (!isAuthReady) {
+      toast({
+        title: "Preparing Authentication",
+        description: "Please wait while we prepare your session...",
+        variant: "default"
+      });
+      return;
+    }
+
     // Check credits first
     if (!hasCredits) {
       showInsufficientCreditsPopup();
@@ -310,16 +302,15 @@ const JobGuide = () => {
       console.log('✅ Starting job analysis submission process');
       console.log('✅ Using user profile:', userProfile?.id);
 
-      // Check for existing analysis using authenticated request
-      const {
-        data: existingAnalysis,
-        error: checkError
-      } = await makeAuthenticatedRequest(async () => {
-        return await supabase.from('job_analyses').select('id, job_match, match_score').eq('user_id', userProfile?.id).eq('company_name', formData.companyName).eq('job_title', formData.jobTitle).eq('job_description', formData.jobDescription).not('job_match', 'is', null).order('created_at', {
+      // Check for existing analysis using enterprise auth
+      const existingAnalysis = await executeWithRetry(async () => {
+        const { data, error } = await supabase.from('job_analyses').select('id, job_match, match_score').eq('user_id', userProfile?.id).eq('company_name', formData.companyName).eq('job_title', formData.jobTitle).eq('job_description', formData.jobDescription).not('job_match', 'is', null).order('created_at', {
           ascending: false
         }).limit(1);
-      }, 'check existing analysis');
-      if (!checkError && existingAnalysis && existingAnalysis.length > 0) {
+        if (error) throw error;
+        return data;
+      }, 3, 'check existing analysis');
+      if (existingAnalysis && existingAnalysis.length > 0) {
         const existing = existingAnalysis[0];
         console.log('✅ Found existing job analysis:', existing.id);
         setJobAnalysisResult(existing.job_match);
@@ -333,7 +324,7 @@ const JobGuide = () => {
         return;
       }
 
-      // Insert new analysis record using authenticated request
+      // Insert new analysis record using enterprise auth
       const insertData = {
         user_id: userProfile?.id,
         company_name: formData.companyName,
@@ -341,22 +332,23 @@ const JobGuide = () => {
         job_description: formData.jobDescription
       };
       console.log('📝 Inserting job analysis data:', insertData);
-      const {
-        data: insertedData,
-        error: insertError
-      } = await makeAuthenticatedRequest(async () => {
-        return await supabase.from('job_analyses').insert(insertData).select('id').single();
-      }, 'insert job analysis', 3);
-      if (insertError) {
-        console.error('❌ INSERT ERROR:', insertError);
-        throw new Error(`Database insert failed: ${insertError.message}`);
-      }
+      
+      const insertedData = await executeWithRetry(async () => {
+        const { data, error } = await supabase.from('job_analyses').insert(insertData).select('id').single();
+        if (error) throw error;
+        return data;
+      }, 3, 'insert job analysis');
       if (insertedData?.id) {
         console.log('✅ Job analysis record inserted:', insertedData.id);
         setJobAnalysisId(insertedData.id);
         setIsSuccess(true);
         setIsGenerating(true);
-        refetchHistory(); // Update cache with new entry
+        
+        // Update cache with enterprise auth
+        await executeWithRetry(async () => {
+          refetchHistory();
+        }, 2, 'refetch job analysis history');
+        
         toast({
           title: "Job Analysis Started!",
           description: "Your personalized job analysis is being created. Please wait for the results."
@@ -374,7 +366,7 @@ const JobGuide = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, isComplete, completionLoading, profileLoading, hasResume, hasBio, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup, userProfile]);
+  }, [formData, isComplete, completionLoading, profileLoading, hasResume, hasBio, user, toast, isSubmitting, isGenerating, hasCredits, showInsufficientCreditsPopup, userProfile, isAuthReady, executeWithRetry]);
   useEffect(() => {
     const handleHistoryData = (event: any) => {
       const {
@@ -423,8 +415,8 @@ const JobGuide = () => {
   const isFormValid = Boolean(formData.companyName?.trim() && formData.jobTitle?.trim() && formData.jobDescription?.trim());
   const hasAnyData = isFormValid || jobAnalysisResult;
 
-  // Button should be disabled if: form invalid, submitting, generating, no credits, or credits loading
-  const isButtonDisabled = !isFormValid || isSubmitting || isGenerating || !hasCredits || creditsLoading;
+  // Button should be disabled if: form invalid, submitting, generating, no credits, credits loading, or auth not ready
+  const isButtonDisabled = !isFormValid || isSubmitting || isGenerating || !hasCredits || creditsLoading || !isAuthReady;
 
   // Enhanced debug logging
   console.log('🔍 Form validation debug:', {
@@ -448,6 +440,19 @@ const JobGuide = () => {
     return <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-slate-400 text-xs">Loading...</div>
       </div>;
+  }
+
+  // Show loading state while auth is preparing
+  if (!isAuthReady) {
+    return <Layout>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-500 mx-auto" />
+          <div className="text-lg text-white font-orbitron">Preparing authentication...</div>
+          <div className="text-sm text-gray-400">Setting up secure access to your job analysis</div>
+        </div>
+      </div>
+    </Layout>;
   }
   return <Layout>
       <div className="min-h-screen w-full flex flex-col overflow-x-hidden bg-black">

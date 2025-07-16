@@ -8,7 +8,7 @@ import { Building2, MapPin, Briefcase, Loader2, RotateCcw, Calendar, TrendingUp,
 import { Layout } from '@/components/Layout';
 import { useFeatureCreditCheck } from '@/hooks/useFeatureCreditCheck';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
 import CompanyRoleAnalysisHistoryModal from '@/components/CompanyRoleAnalysisHistoryModal';
@@ -20,6 +20,7 @@ import { JSONSectionDisplay } from '@/components/JSONSectionDisplay';
 import { SourcesDisplay } from '@/components/SourcesDisplay';
 import { PremiumAnalysisResults } from '@/components/PremiumAnalysisResults';
 import { Badge } from '@/components/ui/badge';
+import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 interface CompanyRoleAnalysisData {
   id: string;
   company_name: string;
@@ -62,6 +63,7 @@ const CompanyRoleAnalysis = () => {
   const {
     userProfile
   } = useUserProfile();
+  const { isAuthReady, executeWithRetry } = useEnterpriseAuth();
 
   // Handle pre-populated data from job tracker
   useEffect(() => {
@@ -134,32 +136,40 @@ const CompanyRoleAnalysis = () => {
 
   // Real-time subscription for analysis updates with enhanced detection
   useEffect(() => {
-    if (!userProfile?.id || !pendingAnalysisId) return;
+    if (!userProfile?.id || !pendingAnalysisId || !isAuthReady) return;
     console.log('Setting up real-time subscription for analysis:', pendingAnalysisId);
-    const channel = supabase.channel('company-analysis-updates').on('postgres_changes', {
-      event: 'UPDATE',
-      schema: 'public',
-      table: 'company_role_analyses',
-      filter: `id=eq.${pendingAnalysisId}`
-    }, payload => {
-      console.log('Real-time update received for company analysis:', payload);
+    
+    const setupSubscription = async () => {
+      await executeWithRetry(async () => {
+        const channel = supabase.channel('company-analysis-updates').on('postgres_changes', {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'company_role_analyses',
+          filter: `id=eq.${pendingAnalysisId}`
+        }, payload => {
+          console.log('Real-time update received for company analysis:', payload);
 
-      // Enhanced detection - check if the updated record has meaningful data
-      const updatedData = payload.new as CompanyRoleAnalysisData;
-      if (updatedData && hasAnalysisResult(updatedData)) {
-        console.log('Meaningful analysis data detected via real-time, refreshing data');
+          // Enhanced detection - check if the updated record has meaningful data
+          const updatedData = payload.new as CompanyRoleAnalysisData;
+          if (updatedData && hasAnalysisResult(updatedData)) {
+            console.log('Meaningful analysis data detected via real-time, refreshing data');
 
-        // Analysis has meaningful data, refresh and show results
-        refetchHistory();
-      } else {
-        console.log('Real-time update received but no meaningful data yet, continuing to wait...');
-      }
-    }).subscribe();
-    return () => {
-      console.log('Cleaning up real-time subscription');
-      supabase.removeChannel(channel);
+            // Analysis has meaningful data, refresh and show results
+            refetchHistory();
+          } else {
+            console.log('Real-time update received but no meaningful data yet, continuing to wait...');
+          }
+        }).subscribe();
+        
+        return () => {
+          console.log('Cleaning up real-time subscription');
+          supabase.removeChannel(channel);
+        };
+      }, 3, 'setup real-time subscription');
     };
-  }, [userProfile?.id, pendingAnalysisId, refetchHistory]);
+
+    setupSubscription();
+  }, [userProfile?.id, pendingAnalysisId, refetchHistory, isAuthReady, executeWithRetry]);
 
   // Loading messages effect
   useEffect(() => {
@@ -175,6 +185,16 @@ const CompanyRoleAnalysis = () => {
   }, [isSubmitting, pendingAnalysisId]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check auth readiness first
+    if (!isAuthReady) {
+      toast({
+        title: "Preparing Authentication",
+        description: "Please wait while we prepare your session...",
+        variant: "default"
+      });
+      return;
+    }
 
     // Check credits before proceeding
     if (!hasCredits) {
@@ -199,6 +219,7 @@ const CompanyRoleAnalysis = () => {
       }
     setIsSubmitting(true);
     setShowRecentResults(false);
+    
     try {
       console.log('Creating company role analysis with data:', {
         user_id: userProfile.id,
@@ -206,27 +227,19 @@ const CompanyRoleAnalysis = () => {
         location: locationField.trim(),
         job_title: jobTitle.trim()
       });
-      const {
-        data,
-        error
-      } = await makeAuthenticatedRequest(async () => {
-        return await supabase.from('company_role_analyses').insert({
+      
+      const data = await executeWithRetry(async () => {
+        const { data, error } = await supabase.from('company_role_analyses').insert({
           user_id: userProfile.id,
           company_name: companyName.trim(),
           location: locationField.trim(),
           job_title: jobTitle.trim()
         }).select().single();
-      }, 'create company role analysis');
-      if (error) {
-        console.error('Error creating company-role analysis:', error);
-        toast({
-          title: "Error",
-          description: "Failed to create company-role analysis. Please try again.",
-          variant: "destructive"
-        });
-        setIsSubmitting(false);
-        return;
-      }
+        
+        if (error) throw error;
+        return data;
+      }, 3, 'create company role analysis');
+
       console.log('Company analysis created successfully:', data);
 
       // Set pending analysis ID to track real-time updates
@@ -242,12 +255,15 @@ const CompanyRoleAnalysis = () => {
       setJobTitle('');
 
       // Refetch history to show the new analysis
-      refetchHistory();
+      await executeWithRetry(async () => {
+        refetchHistory();
+      }, 2, 'refetch analysis history');
+      
     } catch (error) {
       console.error('Error submitting company-role analysis:', error);
       toast({
         title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        description: "Failed to create company-role analysis. Please try again.",
         variant: "destructive"
       });
       setIsSubmitting(false);
@@ -262,6 +278,19 @@ const CompanyRoleAnalysis = () => {
 
   // Get the most recent completed analysis for display
   const recentCompletedAnalysis = showRecentResults && analysisHistory && analysisHistory.length > 0 ? analysisHistory.find(analysis => hasAnalysisResult(analysis)) : null;
+  // Show loading state while auth is preparing
+  if (!isAuthReady) {
+    return <Layout>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="w-8 h-8 animate-spin text-green-500 mx-auto" />
+          <div className="text-lg text-white font-orbitron">Preparing authentication...</div>
+          <div className="text-sm text-gray-400">Setting up secure access to your company analysis</div>
+        </div>
+      </div>
+    </Layout>;
+  }
+
   return <Layout>
       <div className="min-h-screen bg-black px-2 pt-2 pb-2 sm:px-4 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
