@@ -109,20 +109,20 @@ const JobCard = ({
           
            {/* Mobile: Buttons stacked vertically */}
            <div className="md:hidden flex flex-col gap-1 min-w-0">
-             <Button onClick={e => {
+              <Button onClick={e => {
             e.stopPropagation();
             onView();
-          }} variant="outline" size="sm" className="text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md overflow-hidden text-black bg-fuchsia-400 hover:bg-fuchsia-300">
-               View
-             </Button>
+          }} variant="outline" size="sm" className="text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md overflow-hidden bg-gray-100 hover:bg-gray-200 text-gray-800 border-gray-300">
+                View
+              </Button>
              
              {section === 'saved' && onDelete ? <>
-                 <Button onClick={e => {
+                  <Button onClick={e => {
               e.stopPropagation();
               onSaveToTracker();
-            }} size="sm" className={isAddedToTracker ? "bg-green-600 text-white hover:bg-green-700 text-xs px-1.5 py-1 h-6 w-10 cursor-default font-medium rounded-md overflow-hidden" : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md overflow-hidden"} disabled={isAddedToTracker}>
-                   {isAddedToTracker ? <Check className="h-3 w-3" /> : "Trk"}
-                 </Button>
+            }} size="sm" className={isAddedToTracker ? "bg-green-600 text-white hover:bg-green-700 text-xs px-1.5 py-1 h-6 w-12 cursor-default font-medium rounded-md overflow-hidden" : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-1.5 py-1 h-6 w-12 font-medium rounded-md overflow-hidden"} disabled={isAddedToTracker}>
+                    {isAddedToTracker ? <Check className="h-3 w-3" /> : "Track"}
+                  </Button>
                  <Button onClick={e => {
               e.stopPropagation();
               onDelete();
@@ -137,14 +137,14 @@ const JobCard = ({
                </Button>}
            </div>
 
-           {/* Desktop/Tablet: Buttons in horizontal row */}
-           <div className="hidden md:flex flex-row gap-1 min-w-0">
-             <Button onClick={e => {
+           {/* Desktop: Buttons in horizontal row, Tablet: Vertical for saved section */}
+           <div className={`hidden md:flex gap-1 min-w-0 ${section === 'saved' ? 'md:flex-col lg:flex-row' : 'flex-row'}`}>
+              <Button onClick={e => {
             e.stopPropagation();
             onView();
-          }} variant="outline" size="sm" className="text-xs px-2 py-1 h-7 font-medium rounded-md">
-               View
-             </Button>
+          }} variant="outline" size="sm" className="text-xs px-2 py-1 h-7 font-medium rounded-md bg-gray-100 hover:bg-gray-200 text-gray-800 border-gray-300">
+                View
+              </Button>
              
              {section === 'saved' && onDelete ? <>
                  <Button onClick={e => {
@@ -316,8 +316,8 @@ const JobBoard = () => {
               <div className="px-2 sm:px-4 mb-6">
                 <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm gap-0.5 sm:gap-1 h-auto p-0.5 sm:p-1 border-0 rounded-xl">
                   <TabsTrigger value="posted-today" className="text-[10px] sm:text-sm px-0.5 sm:px-3 py-1.5 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
-                    <span className="hidden sm:inline truncate">Posted Today</span>
-                    <span className="sm:hidden truncate">Today</span>
+                    <span className="hidden lg:inline truncate">Posted Today</span>
+                    <span className="lg:hidden truncate">Today</span>
                     <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-[9px] sm:text-xs">({filteredPostedTodayJobs.length})</span>
                   </TabsTrigger>
                   <TabsTrigger value="last-7-days" className="text-[10px] sm:text-sm px-0.5 sm:px-3 py-1.5 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
