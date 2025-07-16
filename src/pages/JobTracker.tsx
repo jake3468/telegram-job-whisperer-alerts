@@ -73,7 +73,7 @@ const DroppableColumn = ({
     id: column.key
   });
   const isDropTarget = isOver && activeJobId;
-  return <div ref={setNodeRef} className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg w-full md:flex-1 md:min-w-0 transition-all hover:shadow-lg ${isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''}`}>
+  return <div ref={setNodeRef} className={`${column.bgColor} ${column.borderColor} border-2 rounded-lg w-full md:flex-1 md:min-w-[280px] md:max-w-[320px] transition-all hover:shadow-lg ${isDropTarget ? 'ring-2 ring-blue-400 ring-opacity-50 bg-opacity-70' : ''}`}>
       <div className={`${column.headerBg} p-4 rounded-t-lg border-b ${column.borderColor} flex items-center justify-between`}>
         <div className="flex items-center gap-2">
           <column.icon className="h-4 w-4 text-white" />
@@ -855,7 +855,7 @@ const JobTracker = () => {
         </header>
 
         {/* Main content area - responsive flexbox layout */}
-        <main className="flex-1 p-4 overflow-x-hidden">
+        <main className="flex-1 p-4 overflow-x-auto">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             {/* Responsive flexbox: stacked on mobile, wrapped on larger screens */}
             <div className="flex flex-col md:flex-row md:flex-wrap gap-4 w-full">
