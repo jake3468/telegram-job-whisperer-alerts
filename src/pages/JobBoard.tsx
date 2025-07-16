@@ -31,7 +31,6 @@ const JobCard = ({
     if (!salary) return 'Salary not disclosed';
     return salary;
   };
-
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
     // Handle both date objects and string dates
@@ -53,25 +52,15 @@ const JobCard = ({
       return formatDate(job.created_at);
     }
   };
-  
-  return (
-    <div className="w-full max-w-full bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden" onClick={onView}>
+  return <div className="w-full max-w-full bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden" onClick={onView}>
       <div className="p-2 sm:p-3 flex gap-2 sm:gap-3">
         {/* Left section: Logo + Content */}
         <div className="flex-1 min-w-0 flex gap-2 sm:gap-3">
           {/* Company Logo - smaller on mobile */}
           <div className="flex-shrink-0">
-            {job.thumbnail ? (
-              <img 
-                src={job.thumbnail} 
-                alt={`${job.company_name} logo`} 
-                className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover" 
-              />
-            ) : (
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+            {job.thumbnail ? <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover" /> : <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded-lg flex items-center justify-center">
                 <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
-              </div>
-            )}
+              </div>}
           </div>
           
           {/* Content: Title/Company + Details */}
@@ -114,134 +103,75 @@ const JobCard = ({
         {/* Right section: Timestamp + Buttons */}
         <div className="flex-shrink-0 flex flex-col items-end gap-1 sm:gap-2 min-w-0">
            {/* Timestamp */}
-           {getDateToShow() && (
-             <div className="text-xs text-gray-500 text-right truncate max-w-16 sm:max-w-20">
+           {getDateToShow() && <div className="text-xs text-gray-500 text-right truncate max-w-16 sm:max-w-20">
                {getDateToShow()}
-             </div>
-           )}
+             </div>}
           
            {/* Mobile: Buttons stacked vertically */}
            <div className="md:hidden flex flex-col gap-1 min-w-0">
-             <Button 
-               onClick={(e) => {
-                 e.stopPropagation();
-                 onView();
-               }} 
-               variant="outline" 
-               size="sm" 
-               className="text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md overflow-hidden"
-             >
+             <Button onClick={e => {
+            e.stopPropagation();
+            onView();
+          }} variant="outline" size="sm" className="text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md overflow-hidden text-black bg-yellow-300 hover:bg-yellow-200">
                View
              </Button>
              
-             {section === 'saved' && onDelete ? (
-               <>
-                 <Button 
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     onSaveToTracker();
-                   }} 
-                   size="sm" 
-                   className={isAddedToTracker 
-                     ? "bg-green-600 text-white hover:bg-green-700 text-xs px-1.5 py-1 h-6 w-10 cursor-default font-medium rounded-md overflow-hidden" 
-                     : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md overflow-hidden"
-                   } 
-                   disabled={isAddedToTracker}
-                 >
+             {section === 'saved' && onDelete ? <>
+                 <Button onClick={e => {
+              e.stopPropagation();
+              onSaveToTracker();
+            }} size="sm" className={isAddedToTracker ? "bg-green-600 text-white hover:bg-green-700 text-xs px-1.5 py-1 h-6 w-10 cursor-default font-medium rounded-md overflow-hidden" : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md overflow-hidden"} disabled={isAddedToTracker}>
                    {isAddedToTracker ? <Check className="h-3 w-3" /> : "Trk"}
                  </Button>
-                 <Button 
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     onDelete();
-                   }} 
-                   variant="outline" 
-                   size="sm" 
-                   className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs py-1 h-6 w-10 font-medium rounded-md overflow-hidden"
-                 >
+                 <Button onClick={e => {
+              e.stopPropagation();
+              onDelete();
+            }} variant="outline" size="sm" className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs py-1 h-6 w-10 font-medium rounded-md overflow-hidden">
                    <Trash2 className="h-2.5 w-2.5" />
                  </Button>
-               </>
-             ) : (
-               <Button 
-                 onClick={(e) => {
-                   e.stopPropagation();
-                   onSaveToTracker();
-                 }} 
-                 size="sm" 
-                 className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md overflow-hidden"
-               >
+               </> : <Button onClick={e => {
+            e.stopPropagation();
+            onSaveToTracker();
+          }} size="sm" className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md overflow-hidden">
                  Save
-               </Button>
-             )}
+               </Button>}
            </div>
 
            {/* Desktop/Tablet: Buttons in horizontal row */}
            <div className="hidden md:flex flex-row gap-1 min-w-0">
-             <Button 
-               onClick={(e) => {
-                 e.stopPropagation();
-                 onView();
-               }} 
-               variant="outline" 
-               size="sm" 
-               className="text-xs px-2 py-1 h-7 font-medium rounded-md"
-             >
+             <Button onClick={e => {
+            e.stopPropagation();
+            onView();
+          }} variant="outline" size="sm" className="text-xs px-2 py-1 h-7 font-medium rounded-md">
                View
              </Button>
              
-             {section === 'saved' && onDelete ? (
-               <>
-                 <Button 
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     onSaveToTracker();
-                   }} 
-                   size="sm" 
-                   className={isAddedToTracker 
-                     ? "bg-green-600 text-white hover:bg-green-700 text-xs px-2 py-1 h-7 cursor-default font-medium rounded-md flex items-center gap-1" 
-                     : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-7 font-medium rounded-md"
-                   } 
-                   disabled={isAddedToTracker}
-                 >
-                   {isAddedToTracker ? (
-                     <>
+             {section === 'saved' && onDelete ? <>
+                 <Button onClick={e => {
+              e.stopPropagation();
+              onSaveToTracker();
+            }} size="sm" className={isAddedToTracker ? "bg-green-600 text-white hover:bg-green-700 text-xs px-2 py-1 h-7 cursor-default font-medium rounded-md flex items-center gap-1" : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-7 font-medium rounded-md"} disabled={isAddedToTracker}>
+                   {isAddedToTracker ? <>
                        <Check className="h-3 w-3" />
                        <span>Added to Job Tracker</span>
-                     </>
-                   ) : (
-                     "Add to Job Tracker"
-                   )}
+                     </> : "Add to Job Tracker"}
                  </Button>
-                 <Button 
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     onDelete();
-                   }} 
-                   variant="outline" 
-                   size="sm" 
-                   className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs px-2 py-1 h-7 font-medium rounded-md"
-                 >
+                 <Button onClick={e => {
+              e.stopPropagation();
+              onDelete();
+            }} variant="outline" size="sm" className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs px-2 py-1 h-7 font-medium rounded-md">
                    <Trash2 className="h-3 w-3" />
                  </Button>
-               </>
-             ) : (
-               <Button 
-                 onClick={(e) => {
-                   e.stopPropagation();
-                   onSaveToTracker();
-                 }} 
-                 size="sm" 
-                 className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-7 font-medium rounded-md"
-               >
+               </> : <Button onClick={e => {
+            e.stopPropagation();
+            onSaveToTracker();
+          }} size="sm" className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-7 font-medium rounded-md">
                  Save
-               </Button>
-             )}
+               </Button>}
            </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
 const JobBoard = () => {
   const {
