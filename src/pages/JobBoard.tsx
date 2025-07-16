@@ -112,7 +112,7 @@ const JobCard = ({
              <Button onClick={e => {
             e.stopPropagation();
             onView();
-          }} variant="outline" size="sm" className="text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md overflow-hidden text-black bg-yellow-300 hover:bg-yellow-200">
+          }} variant="outline" size="sm" className="text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md overflow-hidden text-black bg-fuchsia-400 hover:bg-fuchsia-300">
                View
              </Button>
              
