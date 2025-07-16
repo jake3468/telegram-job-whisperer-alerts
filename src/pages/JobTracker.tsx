@@ -454,6 +454,14 @@ const JobTracker = () => {
       });
       return;
     }
+    if (!isAuthReady) {
+      toast({
+        title: "Please wait",
+        description: "Authentication is loading. Please try again in a moment.",
+        variant: "destructive"
+      });
+      return;
+    }
     try {
       const maxOrder = Math.max(...jobs.filter(job => job.status === selectedStatus).map(job => job.order_position), -1);
 
@@ -535,6 +543,14 @@ const JobTracker = () => {
       });
       return;
     }
+    if (!isAuthReady) {
+      toast({
+        title: "Please wait",
+        description: "Authentication is loading. Please try again in a moment.",
+        variant: "destructive"
+      });
+      return;
+    }
     try {
       await executeWithRetry(async () => {
         const { error } = await supabase.from('job_tracker').update({
@@ -562,6 +578,15 @@ const JobTracker = () => {
     }
   };
   const deleteJob = async (jobId: string) => {
+    if (!isAuthReady) {
+      toast({
+        title: "Please wait",
+        description: "Authentication is loading. Please try again in a moment.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     // Optimistic delete first
     optimisticDelete(jobId);
     try {
@@ -771,37 +796,57 @@ const JobTracker = () => {
   // Function to handle checklist updates for cards
   const handleUpdateChecklistItem = async (jobId: string, field: string) => {
     const targetJob = jobs.find(job => job.id === jobId);
-    if (!targetJob || targetJob.status !== 'saved' && targetJob.status !== 'applied' && targetJob.status !== 'interview') return;
+    if (!targetJob || (targetJob.status !== 'saved' && targetJob.status !== 'applied' && targetJob.status !== 'interview')) return;
+    
+    // Check if authentication is ready
+    if (!isAuthReady) {
+      toast({
+        title: "Please wait",
+        description: "Authentication is loading. Please try again in a moment.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     try {
       // Update in database using enhanced authentication
       const currentValue = targetJob[field as keyof JobEntry] as boolean;
-      await executeWithRetry(async () => {
-        const { error } = await supabase.from('job_tracker').update({
-          [field]: !currentValue
-        }).eq('id', jobId);
-        if (error) throw error;
-      }, 3, 'update checklist item');
-
-      // Update local state
+      
+      // First perform optimistic update for immediate UI feedback
       const updatedJob = {
         ...targetJob,
         [field]: !currentValue
       };
       optimisticUpdate(updatedJob);
-
+      
       // Also update selectedJob if it's the same job
       if (selectedJob && selectedJob.id === jobId) {
         setSelectedJob(updatedJob);
       }
+      
+      await executeWithRetry(async () => {
+        const { error } = await supabase.from('job_tracker').update({
+          [field]: !currentValue
+        }).eq('id', jobId);
+        if (error) throw error;
+      }, 5, 'update checklist item'); // Increased retries to 5
+
       toast({
         title: "Success",
         description: "Checklist updated successfully!"
       });
     } catch (error) {
       console.error('Error updating checklist:', error);
+      
+      // Revert optimistic update on error
+      optimisticUpdate(targetJob);
+      if (selectedJob && selectedJob.id === jobId) {
+        setSelectedJob(targetJob);
+      }
+      
       toast({
         title: "Error",
-        description: "Failed to update checklist.",
+        description: "Failed to update checklist. Please try again.",
         variant: "destructive"
       });
     }
@@ -811,6 +856,16 @@ const JobTracker = () => {
         <div className="text-white text-xs">Loading...</div>
       </div>;
   }
+  
+  // Show loading state if authentication is not ready
+  if (!isAuthReady) {
+    return <Layout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-white text-xs">Preparing secure connection...</div>
+        </div>
+      </Layout>;
+  }
+  
   if (loading) {
     return <Layout>
         <div className="flex items-center justify-center min-h-[400px]">

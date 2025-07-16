@@ -86,7 +86,12 @@ export const useCachedJobTracker = () => {
   }, [user?.id, hasFetched, jobs.length, error, isAuthReady]); // Include isAuthReady
 
   const fetchJobTrackerData = async (showErrors = false) => {
-    if (!user || !isAuthReady) return;
+    if (!user || !isAuthReady) {
+      console.log('🔒 Job tracker fetch skipped - auth not ready:', { user: !!user, isAuthReady });
+      return;
+    }
+    
+    console.log('🚀 Starting job tracker data fetch with enhanced auth...');
     
     try {
       setError(null);
@@ -156,13 +161,20 @@ export const useCachedJobTracker = () => {
           timestamp: Date.now()
         };
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-        logger.debug('Cached fresh job tracker data:', cacheData);
+        logger.debug('✅ Job tracker data loaded successfully:', { jobCount: jobsData.length, userProfileId: userProfile.id });
       } catch (cacheError) {
         logger.warn('Failed to cache job tracker data:', cacheError);
       }
 
     } catch (error: any) {
-      logger.error('Error fetching job tracker data:', error);
+      logger.error('❌ Error fetching job tracker data:', error);
+      console.error('Job tracker fetch error details:', {
+        errorMessage: error.message,
+        errorCode: error.code,
+        user: user?.id,
+        isAuthReady,
+        showErrors
+      });
       setConnectionIssue(true);
       setHasFetched(true); // Mark as fetched even on error
       
