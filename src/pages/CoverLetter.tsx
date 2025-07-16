@@ -343,14 +343,38 @@ const CoverLetter = () => {
       </div>;
   }
 
-  // Show professional authentication loading state
+  // Show professional authentication loading state within the page layout
   if (!isAuthReady && !isRefreshing) {
-    return <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-fuchsia-400 mx-auto"></div>
-          <div className="text-fuchsia-200 text-sm font-medium">Preparing authentication...</div>
+    return <SidebarProvider defaultOpen={true}>
+      {/* Header for mobile */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
+        <div className="flex items-center justify-between p-3">
+          <SidebarTrigger className="h-12 w-12 border-fuchsia-400/30 ring-2 ring-fuchsia-400/10 text-fuchsia-200 rounded-2xl shadow-lg transition-all flex items-center justify-center bg-stone-900 hover:bg-stone-800">
+            <Menu className="w-7 h-7" strokeWidth={2.4} />
+            <span className="sr-only">Toggle navigation menu</span>
+          </SidebarTrigger>
+          <div className="flex items-center gap-2">
+            <img alt="JobBots Logo" className="h-8 w-8 drop-shadow-lg" src="/lovable-uploads/dad64682-0078-40c3-9d4a-ca375a807903.jpg" />
+            <span className="font-orbitron bg-gradient-to-r from-sky-300 via-fuchsia-400 to-indigo-300 bg-clip-text drop-shadow-sm tracking-wider select-none relative whitespace-nowrap text-lg font-bold text-white">
+              Aspirely.ai
+            </span>
+          </div>
         </div>
-      </div>;
+      </header>
+      <div className="min-h-screen flex w-full">
+        <AppSidebar />
+        <div className="flex-1 flex flex-col pt-28 lg:pt-0 lg:pl-6 bg-zinc-950">
+          <main className="flex-1 w-full bg-transparent">
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="text-center space-y-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-fuchsia-400 mx-auto"></div>
+                <div className="text-fuchsia-200 text-sm font-medium">Preparing authentication...</div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </SidebarProvider>;
   }
 
   // Check if form is valid and user has credits
