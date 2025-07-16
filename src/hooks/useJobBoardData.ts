@@ -89,8 +89,8 @@ export const useJobBoardData = () => {
         throw new Error('User data not found');
       }
 
-      // First run cleanup function to categorize and delete old jobs
-      await supabase.rpc('categorize_and_cleanup_jobs');
+      // Note: Cleanup function now runs automatically every hour via cron job
+      // No need to run it manually on every fetch
 
       // Fetch job_board data for this user
       const { data: jobBoardData, error: fetchError } = await supabase
