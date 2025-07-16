@@ -368,7 +368,7 @@ const JobBoard = () => {
                       <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
                       <span className="text-green-300 font-medium text-sm">Saved Jobs Section</span>
                     </div>
-                    <p className="text-gray-300 text-xs">Jobs you've saved are shown here. Click "Add to Job Tracker" to track your application progress.</p>
+                    <p className="text-gray-300 text-xs">Jobs you've saved are shown here. Click &quot;Add to Job Tracker/Track&quot; to track your application progress.</p>
                   </div>
                   
                   {filteredSavedToTrackerJobs.length === 0 ? <div className="text-center py-12 w-full">
