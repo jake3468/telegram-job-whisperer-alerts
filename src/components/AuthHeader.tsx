@@ -67,7 +67,7 @@ const AuthHeader = () => {
               </SignInButton>
               <SignUpButton mode="modal">
                 <button className="rounded-xl bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-500 text-white px-6 py-2 shadow-lg hover:from-sky-500 hover:to-indigo-600 transition-all duration-200 font-inter font-semibold text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-fuchsia-400 focus:ring-offset-2">
-                  Sign Up
+                  Create Account
                 </button>
               </SignUpButton>
             </div>
