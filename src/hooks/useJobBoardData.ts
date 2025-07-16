@@ -173,53 +173,54 @@ export const useJobBoardData = () => {
       return;
     }
 
-    return executeWithRetry(async () => {
-      // Get user from database using Clerk ID
-      const { data: users, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('clerk_id', clerkUser.id)
-        .single();
+    try {
+      await executeWithRetry(async () => {
+        // Get user from database using Clerk ID
+        const { data: users, error: userError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('clerk_id', clerkUser.id)
+          .single();
 
-      if (userError || !users) {
-        throw new Error('User not found. Please try logging in again.');
-      }
+        if (userError || !users) {
+          throw new Error('User not found. Please try logging in again.');
+        }
 
-      const { data: userProfile, error: profileError } = await supabase
-        .from('user_profile')
-        .select('id')
-        .eq('user_id', users.id)
-        .single();
+        const { data: userProfile, error: profileError } = await supabase
+          .from('user_profile')
+          .select('id')
+          .eq('user_id', users.id)
+          .single();
 
-      if (profileError || !userProfile) {
-        throw new Error('User profile not found. Please complete your profile setup.');
-      }
+        if (profileError || !userProfile) {
+          throw new Error('User profile not found. Please complete your profile setup.');
+        }
 
-      // Generate job_reference_id when saving (this will be used later for job tracker)
-      const jobReferenceId = crypto.randomUUID();
+        // Generate job_reference_id when saving (this will be used later for job tracker)
+        const jobReferenceId = crypto.randomUUID();
 
-      // Update job as saved by user and set job_reference_id
-      const { error: updateError } = await supabase
-        .from('job_board')
-        .update({ 
-          is_saved_by_user: true,
-          job_reference_id: jobReferenceId
-        })
-        .eq('id', job.id)
-        .eq('user_id', userProfile.id);
+        // Update job as saved by user and set job_reference_id
+        const { error: updateError } = await supabase
+          .from('job_board')
+          .update({ 
+            is_saved_by_user: true,
+            job_reference_id: jobReferenceId
+          })
+          .eq('id', job.id)
+          .eq('user_id', userProfile.id);
 
-      if (updateError) {
-        throw updateError;
-      }
+        if (updateError) {
+          throw updateError;
+        }
+      }, 5, 'mark job as saved');
 
+      // Success actions outside of retry logic
       toast.success('Job saved! Check the Saved section.');
-      // Refresh data to update job sections
       await fetchJobs();
-
-    }, 5, 'mark job as saved').catch(err => {
+    } catch (err) {
       console.error('Error marking job as saved:', err);
       toast.error('Failed to save job. Please try again.');
-    });
+    }
   };
 
   const saveToTracker = async (job: JobBoardItem) => {
@@ -228,97 +229,104 @@ export const useJobBoardData = () => {
       return;
     }
 
-    return executeWithRetry(async () => {
-      // Get user from database using Clerk ID
-      const { data: users, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('clerk_id', clerkUser.id)
-        .maybeSingle();
+    try {
+      let shouldShowSuccess = false;
 
-      if (userError || !users) {
-        throw new Error('User not found');
-      }
+      await executeWithRetry(async () => {
+        // Get user from database using Clerk ID
+        const { data: users, error: userError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('clerk_id', clerkUser.id)
+          .maybeSingle();
 
-      const { data: userProfile, error: profileError } = await supabase
-        .from('user_profile')
-        .select('id')
-        .eq('user_id', users.id)
-        .single();
-
-      if (profileError || !userProfile) {
-        throw new Error('User profile not found');
-      }
-
-      // Generate job_reference_id if it doesn't exist (for jobs saved before recent changes)
-      let jobReferenceId = job.job_reference_id;
-      if (!jobReferenceId) {
-        jobReferenceId = crypto.randomUUID();
-        
-        // Update the job_board record with the new job_reference_id
-        const { error: updateError } = await supabase
-          .from('job_board')
-          .update({ job_reference_id: jobReferenceId })
-          .eq('id', job.id)
-          .eq('user_id', userProfile.id);
-
-        if (updateError) {
-          throw new Error('Failed to prepare job for tracker');
+        if (userError || !users) {
+          throw new Error('User not found');
         }
+
+        const { data: userProfile, error: profileError } = await supabase
+          .from('user_profile')
+          .select('id')
+          .eq('user_id', users.id)
+          .single();
+
+        if (profileError || !userProfile) {
+          throw new Error('User profile not found');
+        }
+
+        // Generate job_reference_id if it doesn't exist (for jobs saved before recent changes)
+        let jobReferenceId = job.job_reference_id;
+        if (!jobReferenceId) {
+          jobReferenceId = crypto.randomUUID();
+          
+          // Update the job_board record with the new job_reference_id
+          const { error: updateError } = await supabase
+            .from('job_board')
+            .update({ job_reference_id: jobReferenceId })
+            .eq('id', job.id)
+            .eq('user_id', userProfile.id);
+
+          if (updateError) {
+            throw new Error('Failed to prepare job for tracker');
+          }
+        }
+
+        // Check if job already exists in tracker using job_reference_id
+        const { data: existingJob, error: checkError } = await supabase
+          .from('job_tracker')
+          .select('id')
+          .eq('user_id', userProfile.id)
+          .eq('job_reference_id', jobReferenceId)
+          .maybeSingle();
+
+        if (checkError) {
+          throw new Error('Unable to check if job already exists');
+        }
+
+        if (existingJob) {
+          toast.error('Job already added to tracker');
+          return;
+        }
+
+        // Insert new job tracker record using job_reference_id
+        const { error: insertError } = await supabase
+          .from('job_tracker')
+          .insert({
+            user_id: userProfile.id,
+            job_title: job.title,
+            company_name: job.company_name,
+            job_description: job.job_description || '',
+            job_url: job.link_1_link || '',
+            job_reference_id: jobReferenceId,
+            status: 'saved',
+            order_position: 0,
+            // Set all boolean fields explicitly
+            company_researched: false,
+            job_role_analyzed: false,
+            resume_updated: false,
+            cover_letter_prepared: false,
+            interview_prep_guide_received: false,
+            ai_mock_interview_attempted: false,
+            interview_call_received: false,
+            ready_to_apply: false
+          });
+
+        if (insertError) {
+          throw insertError;
+        }
+
+        shouldShowSuccess = true;
+      }, 5, 'save job to tracker');
+
+      // Success actions outside of retry logic
+      if (shouldShowSuccess) {
+        toast.success('Job added to tracker successfully!');
+        await fetchJobs();
       }
-
-      // Check if job already exists in tracker using job_reference_id
-      const { data: existingJob, error: checkError } = await supabase
-        .from('job_tracker')
-        .select('id')
-        .eq('user_id', userProfile.id)
-        .eq('job_reference_id', jobReferenceId)
-        .maybeSingle();
-
-      if (checkError) {
-        throw new Error('Unable to check if job already exists');
-      }
-
-      if (existingJob) {
-        toast.error('Job already added to tracker');
-        return;
-      }
-
-      // Insert new job tracker record using job_reference_id
-      const { error: insertError } = await supabase
-        .from('job_tracker')
-        .insert({
-          user_id: userProfile.id,
-          job_title: job.title,
-          company_name: job.company_name,
-          job_description: job.job_description || '',
-          job_url: job.link_1_link || '',
-          job_reference_id: jobReferenceId,
-          status: 'saved',
-          order_position: 0,
-          // Set all boolean fields explicitly
-          company_researched: false,
-          job_role_analyzed: false,
-          resume_updated: false,
-          cover_letter_prepared: false,
-          interview_prep_guide_received: false,
-          ai_mock_interview_attempted: false,
-          interview_call_received: false,
-          ready_to_apply: false
-        });
-
-      if (insertError) {
-        throw insertError;
-      }
-
-      toast.success('Job added to tracker successfully!');
-      // Refresh data to update sections
-      await fetchJobs();
-
-    }, 5, 'save job to tracker').catch(err => {
+    } catch (err) {
       console.error('Error saving job to tracker:', err);
       toast.error('Failed to add job to tracker. Please try again.');
-    });
+    }
   };
 
   const deleteJobFromBoard = async (job: JobBoardItem) => {
@@ -327,52 +335,54 @@ export const useJobBoardData = () => {
       return;
     }
 
-    return executeWithRetry(async () => {
-      console.log('Deleting job from job_board:', job.id);
+    try {
+      await executeWithRetry(async () => {
+        console.log('Deleting job from job_board:', job.id);
 
-      // Get user profile
-      const { data: users, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('clerk_id', clerkUser.id)
-        .single();
+        // Get user profile
+        const { data: users, error: userError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('clerk_id', clerkUser.id)
+          .single();
 
-      if (userError || !users) {
-        throw new Error('User not found. Please try logging in again.');
-      }
+        if (userError || !users) {
+          throw new Error('User not found. Please try logging in again.');
+        }
 
-      const { data: userProfile, error: profileError } = await supabase
-        .from('user_profile')
-        .select('id')
-        .eq('user_id', users.id)
-        .single();
+        const { data: userProfile, error: profileError } = await supabase
+          .from('user_profile')
+          .select('id')
+          .eq('user_id', users.id)
+          .single();
 
-      if (profileError || !userProfile) {
-        throw new Error('User profile not found.');
-      }
+        if (profileError || !userProfile) {
+          throw new Error('User profile not found.');
+        }
 
-      // Simply delete from job_board only
-      const { error: deleteError, count } = await supabase
-        .from('job_board')
-        .delete({ count: 'exact' })
-        .eq('id', job.id)
-        .eq('user_id', userProfile.id);
+        // Simply delete from job_board only
+        const { error: deleteError, count } = await supabase
+          .from('job_board')
+          .delete({ count: 'exact' })
+          .eq('id', job.id)
+          .eq('user_id', userProfile.id);
 
-      if (deleteError) {
-        throw deleteError;
-      }
+        if (deleteError) {
+          throw deleteError;
+        }
 
-      if (count === 0) {
-        throw new Error('Job not found or you do not have permission to delete it');
-      }
+        if (count === 0) {
+          throw new Error('Job not found or you do not have permission to delete it');
+        }
+      }, 5, 'delete job from board');
 
+      // Success actions outside of retry logic
       toast.success('Job removed from saved jobs!');
       await fetchJobs();
-
-    }, 5, 'delete job from board').catch(err => {
+    } catch (err) {
       console.error('Error deleting job:', err);
       toast.error('Failed to delete job. Please try again.');
-    });
+    }
   };
 
   const deleteJobFromTracker = async (jobReferenceId: string) => {
@@ -381,58 +391,60 @@ export const useJobBoardData = () => {
       return;
     }
 
-    return executeWithRetry(async () => {
-      // Get user profile
-      const { data: users, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('clerk_id', clerkUser.id)
-        .single();
+    try {
+      await executeWithRetry(async () => {
+        // Get user profile
+        const { data: users, error: userError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('clerk_id', clerkUser.id)
+          .single();
 
-      if (userError || !users) {
-        throw new Error('User not found. Please try logging in again.');
-      }
+        if (userError || !users) {
+          throw new Error('User not found. Please try logging in again.');
+        }
 
-      const { data: userProfile, error: profileError } = await supabase
-        .from('user_profile')
-        .select('id')
-        .eq('user_id', users.id)
-        .single();
+        const { data: userProfile, error: profileError } = await supabase
+          .from('user_profile')
+          .select('id')
+          .eq('user_id', users.id)
+          .single();
 
-      if (profileError || !userProfile) {
-        throw new Error('User profile not found.');
-      }
+        if (profileError || !userProfile) {
+          throw new Error('User profile not found.');
+        }
 
-      // Delete from job_tracker
-      const { error: trackerDeleteError } = await supabase
-        .from('job_tracker')
-        .delete()
-        .eq('user_id', userProfile.id)
-        .eq('job_reference_id', jobReferenceId);
+        // Delete from job_tracker
+        const { error: trackerDeleteError } = await supabase
+          .from('job_tracker')
+          .delete()
+          .eq('user_id', userProfile.id)
+          .eq('job_reference_id', jobReferenceId);
 
-      if (trackerDeleteError) {
-        throw trackerDeleteError;
-      }
+        if (trackerDeleteError) {
+          throw trackerDeleteError;
+        }
 
-      // Delete from job_board if job_reference_id exists
-      const { error: boardDeleteError } = await supabase
-        .from('job_board')
-        .delete()
-        .eq('user_id', userProfile.id)
-        .eq('job_reference_id', jobReferenceId);
+        // Delete from job_board if job_reference_id exists
+        const { error: boardDeleteError } = await supabase
+          .from('job_board')
+          .delete()
+          .eq('user_id', userProfile.id)
+          .eq('job_reference_id', jobReferenceId);
 
-      if (boardDeleteError) {
-        console.error('Error deleting from job board:', boardDeleteError);
-        // Don't show error for this as the main action was successful
-      }
+        if (boardDeleteError) {
+          console.error('Error deleting from job board:', boardDeleteError);
+          // Don't show error for this as the main action was successful
+        }
+      }, 5, 'delete job from tracker');
 
+      // Success actions outside of retry logic
       toast.success('Job deleted from tracker successfully!');
       await fetchJobs();
-
-    }, 5, 'delete job from tracker').catch(err => {
+    } catch (err) {
       console.error('Error deleting job from tracker:', err);
       toast.error('Failed to delete job from tracker. Please try again.');
-    });
+    }
   };
 
   const forceRefresh = async () => {
