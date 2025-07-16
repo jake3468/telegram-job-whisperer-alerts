@@ -29,16 +29,14 @@ const PricingSection = () => {
 
   // Prevent rendering if pricing data is not available
   if (!pricingData) {
-    return (
-      <section className="py-16 sm:py-24 px-4 bg-black">
+    return <section className="py-16 sm:py-24 px-4 bg-black">
         <div className="max-w-7xl mx-auto text-center">
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
             <span className="ml-3 text-blue-200">Loading pricing...</span>
           </div>
         </div>
-      </section>
-    );
+      </section>;
   }
   return <section className="py-16 sm:py-24 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
@@ -164,7 +162,7 @@ const PricingSection = () => {
             <CardContent className="grow flex flex-col px-4 pb-4">
               <div className="flex flex-col gap-2 my-3 flex-grow">
                 {/* Show database products if available, otherwise show static fallback */}
-                {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="bg-gray-100 rounded-lg p-2.5 border border-gray-200 flex justify-between items-center shadow hover:shadow-md transition duration-300">
+                {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="rounded-lg p-2.5 border border-gray-200 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-blue-100">
                       <span className="text-gray-800 font-medium text-sm">{pack.credits_amount} credits</span>
                       <div className="flex items-center gap-2">
                         <span className="text-gray-900 font-bold text-sm">{pricingData.currencySymbol}{pack.price_amount}</span>
