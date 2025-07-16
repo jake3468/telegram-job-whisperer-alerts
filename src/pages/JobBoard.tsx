@@ -108,11 +108,11 @@ const JobCard = ({
              </div>}
           
            {/* Mobile: Buttons stacked vertically */}
-           <div className="md:hidden flex flex-col gap-1 min-w-0">
+           <div className="md:hidden flex flex-col gap-1 min-w-0 w-16">
               <Button onClick={e => {
             e.stopPropagation();
             onView();
-          }} variant="outline" size="sm" className="text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md overflow-hidden bg-gray-100 hover:bg-gray-200 text-gray-800 border-gray-300">
+          }} variant="outline" size="sm" className="text-xs px-1.5 py-1 h-6 w-full font-medium rounded-md overflow-hidden bg-gray-100 hover:bg-gray-200 text-gray-800 border-gray-300">
                 View
               </Button>
              
@@ -120,19 +120,19 @@ const JobCard = ({
                   <Button onClick={e => {
               e.stopPropagation();
               onSaveToTracker();
-            }} size="sm" className={isAddedToTracker ? "bg-green-600 text-white hover:bg-green-700 text-xs px-1.5 py-1 h-6 w-12 cursor-default font-medium rounded-md overflow-hidden" : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-1.5 py-1 h-6 w-12 font-medium rounded-md overflow-hidden"} disabled={isAddedToTracker}>
+            }} size="sm" className={isAddedToTracker ? "bg-green-600 text-white hover:bg-green-700 text-xs px-1.5 py-1 h-6 w-full cursor-default font-medium rounded-md overflow-hidden" : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-1.5 py-1 h-6 w-full font-medium rounded-md overflow-hidden"} disabled={isAddedToTracker}>
                     {isAddedToTracker ? <Check className="h-3 w-3" /> : "Track"}
                   </Button>
                  <Button onClick={e => {
               e.stopPropagation();
               onDelete();
-            }} variant="outline" size="sm" className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs py-1 h-6 w-10 font-medium rounded-md overflow-hidden">
+            }} variant="outline" size="sm" className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs py-1 h-6 w-full font-medium rounded-md overflow-hidden">
                    <Trash2 className="h-2.5 w-2.5" />
                  </Button>
                </> : <Button onClick={e => {
             e.stopPropagation();
             onSaveToTracker();
-          }} size="sm" className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md overflow-hidden">
+          }} size="sm" className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-1.5 py-1 h-6 w-full font-medium rounded-md overflow-hidden">
                  Save
                </Button>}
            </div>
@@ -288,15 +288,15 @@ const JobBoard = () => {
           {/* Header */}
           <div className="text-center mb-4 sm:mb-6">
             <div className="flex items-center justify-center gap-2 sm:gap-4 mb-2 sm:mb-4 flex-wrap">
-              <span className="text-2xl sm:text-3xl">💼</span>
-              <h1 className="text-xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent">Job Board</h1>
+              <span className="text-3xl sm:text-3xl">💼</span>
+              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent">Job Board</h1>
               {/* Only show refresh button when there's an error */}
               {error && <Button onClick={handleManualRefresh} disabled={loading} variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0" title="Refresh jobs data">
                   <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                  </Button>}
             </div>
             <div className="px-2 sm:px-4">
-              <p className="text-gray-300 text-xs sm:text-lg break-words">
+              <p className="text-gray-300 text-sm sm:text-lg break-words">
                 Browse job alerts received via <span className="italic text-violet-400">Telegram</span>— all jobs posted today appear here, stay visible for 7 days, and are auto-deleted after that. Save the ones you like and move them to your <span className="italic text-indigo-200">Job Tracker</span> page when you're ready to apply.
               </p>
             </div>
@@ -315,20 +315,20 @@ const JobBoard = () => {
             <Tabs defaultValue="posted-today" className="w-full">
               <div className="px-2 sm:px-4 mb-6">
                 <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm gap-0.5 sm:gap-1 h-auto p-0.5 sm:p-1 border-0 rounded-xl">
-                  <TabsTrigger value="posted-today" className="text-[10px] sm:text-sm px-0.5 sm:px-3 py-1.5 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
+                  <TabsTrigger value="posted-today" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
                     <span className="hidden lg:inline truncate">Posted Today</span>
                     <span className="lg:hidden truncate">Today</span>
-                    <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-[9px] sm:text-xs">({filteredPostedTodayJobs.length})</span>
+                    <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({filteredPostedTodayJobs.length})</span>
                   </TabsTrigger>
-                  <TabsTrigger value="last-7-days" className="text-[10px] sm:text-sm px-0.5 sm:px-3 py-1.5 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
+                  <TabsTrigger value="last-7-days" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
                     <span className="hidden sm:inline truncate">Last 7 Days</span>
                     <span className="sm:hidden truncate">Week</span>
-                    <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-[9px] sm:text-xs">({filteredLast7DaysJobs.length})</span>
+                    <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({filteredLast7DaysJobs.length})</span>
                   </TabsTrigger>
-                  <TabsTrigger value="saved-to-tracker" className="text-[10px] sm:text-sm px-0.5 sm:px-3 py-1.5 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
+                  <TabsTrigger value="saved-to-tracker" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
                     <span className="hidden sm:inline truncate">Saved</span>
                     <span className="sm:hidden truncate">Saved</span>
-                    <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-[9px] sm:text-xs">({filteredSavedToTrackerJobs.length})</span>
+                    <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({filteredSavedToTrackerJobs.length})</span>
                   </TabsTrigger>
                 </TabsList>
               </div>
@@ -336,9 +336,7 @@ const JobBoard = () => {
               {/* Search */}
               <div className="mb-6 px-2 sm:px-4">
                 <div className="relative w-full max-w-md mx-auto">
-                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-300 text-lg">
-                    🔍
-                  </div>
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <Input placeholder="Search by job title or company name..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-12 pr-4 bg-gray-800 border border-gray-600 text-white placeholder:text-gray-400 h-12 text-sm w-full rounded-2xl shadow-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-600 transition-all" />
                 </div>
               </div>
