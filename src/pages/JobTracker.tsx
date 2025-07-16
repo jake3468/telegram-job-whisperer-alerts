@@ -855,10 +855,10 @@ const JobTracker = () => {
         </header>
 
         {/* Main content area - responsive flexbox layout */}
-        <main className="flex-1 p-4 overflow-x-auto">
+        <main className="flex-1 p-4">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-            {/* Responsive flexbox: stacked on mobile, wrapped on larger screens */}
-            <div className="flex flex-col md:flex-row md:flex-wrap gap-4 w-full">
+            {/* Responsive flexbox: stacked on mobile, horizontal scroll on larger screens */}
+            <div className="flex flex-col gap-4 w-full md:flex-row md:overflow-x-auto md:min-w-fit">
               {columns.map(column => <DroppableColumn key={column.key} column={column} jobs={getJobsByStatus(column.key)} onAddJob={() => {
               setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
               setIsModalOpen(true);
