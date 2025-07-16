@@ -63,21 +63,49 @@ export const useCachedJobAlertsData = () => {
     }
   }, []);
 
-  // Fetch fresh data only when user changes or when explicitly requested
+  // Fetch fresh data when user changes or auth becomes ready
   useEffect(() => {
     if (!user) {
       setLoading(false);
       return;
     }
     
-    // Only fetch if we don't have cached data or user has changed
-    const shouldFetch = alerts.length === 0 && !error;
-    if (shouldFetch) {
-      fetchJobAlertsData();
-    } else {
-      setLoading(false);
+    // Don't fetch if we already have cached data that's not expired
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      try {
+        const parsedCache: CachedJobAlertsData = JSON.parse(cached);
+        const now = Date.now();
+        if (now - parsedCache.timestamp < CACHE_DURATION) {
+          // We have valid cached data, no need to fetch
+          setLoading(false);
+          return;
+        }
+      } catch {
+        // Invalid cache, continue to fetch
+      }
     }
-  }, [user?.id]); // Only depend on user ID, not the entire user object
+    
+    // Fetch data when auth is ready
+    if (isAuthReady) {
+      fetchJobAlertsData();
+    }
+  }, [user?.id, isAuthReady]); // Depend on both user ID and auth readiness
+
+  // Fallback: if loading for too long and no data, set loading to false
+  useEffect(() => {
+    if (loading && user) {
+      const timeout = setTimeout(() => {
+        if (loading && alerts.length === 0 && !userProfileId) {
+          logger.warn('Loading timeout reached, showing empty state');
+          setLoading(false);
+          setError('Loading took too long. Please try refreshing the page.');
+        }
+      }, 10000); // 10 second timeout
+
+      return () => clearTimeout(timeout);
+    }
+  }, [loading, user, alerts.length, userProfileId]);
 
   const fetchJobAlertsData = async () => {
     if (!user) return;
