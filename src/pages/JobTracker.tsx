@@ -219,7 +219,7 @@ const SortableJobCard = ({
       });
     }
   };
-  return <div ref={setNodeRef} style={style} className="bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition-all duration-200 py-1.5 px-2 mb-1 hover:scale-[1.02] min-w-0 w-full overflow-hidden">
+  return <div ref={setNodeRef} style={style} className="bg-white rounded-lg border-2 border-gray-400 shadow-md hover:shadow-lg transition-all duration-200 py-1.5 px-2 mb-1 hover:scale-[1.02] min-w-0 w-full overflow-hidden">
       {/* Top section: Progress + Company + Actions */}
       <div className="flex items-center gap-2 min-w-0">
         {/* Left: Progress badge in circle */}
