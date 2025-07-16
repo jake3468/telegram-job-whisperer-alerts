@@ -38,7 +38,6 @@ const HeroSection = () => {
         console.error('Failed to load Lottie animation:', error);
       }
     };
-
     loadLottieAnimation();
   }, []);
 
@@ -91,22 +90,15 @@ const HeroSection = () => {
         </h1>
         
         {/* Lottie Animation */}
-        {lottieAnimationData && (
-          <div className="flex justify-center mt-2 mb-4">
+        {lottieAnimationData && <div className="flex justify-center mt-2 mb-4">
             <div className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48">
-              <Lottie 
-                animationData={lottieAnimationData} 
-                loop={true}
-                autoplay={true}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
-                }}
-              />
+              <Lottie animationData={lottieAnimationData} loop={true} autoplay={true} style={{
+            width: '100%',
+            height: '100%',
+            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
+          }} />
             </div>
-          </div>
-        )}
+          </div>}
         
         {/* AI Services Badges - Combined Image */}
         <div className="flex justify-center items-center gap-3 mb-4 md:mb-6 opacity-90">
@@ -116,7 +108,7 @@ const HeroSection = () => {
           </div>
         </div>
 
-        <p className="text-lg md:text-xl text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black">
+        <p className="md:text-xl text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-sm">
           Job hunting toolkit that writes your cover letter, preps you for interviews, and even pings you new jobs — all powered by{" "}
           <span className="italic bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent font-medium">
             AI
