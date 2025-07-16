@@ -30,7 +30,7 @@ export default function GetMoreCredits() {
     isLoaded
   } = useUser();
   const navigate = useNavigate();
-  
+
   // Use cached hooks for instant data display
   const {
     data: credits,
@@ -38,23 +38,21 @@ export default function GetMoreCredits() {
     error: creditsError,
     isShowingCachedData: isShowingCachedCredits
   } = useCachedUserCredits();
-  
-  const { userProfile } = useUserProfile();
-  
+  const {
+    userProfile
+  } = useUserProfile();
   const {
     pricingData,
     isLoading: isPricingLoading,
     userCountry,
     isShowingCachedData: isShowingCachedPricing
   } = useCachedLocationPricing();
-  
   const {
     subscriptionProducts,
     creditPackProducts,
     isLoading: isProductsLoading,
     isShowingCachedData: isShowingCachedProducts
   } = useCachedPaymentProducts(pricingData?.region, pricingData?.currency);
-  
   const {
     createCheckoutSession,
     isLoading: isCheckoutLoading
@@ -108,7 +106,7 @@ export default function GetMoreCredits() {
         window.location.reload();
         return;
       }
-      
+
       // For cached data scenarios, try refreshing and fall back quickly
       setTimeout(() => {
         if (connectionIssue) {
@@ -135,17 +133,10 @@ export default function GetMoreCredits() {
             </div>
             
             {/* Manual Refresh Button */}
-            {connectionIssue && (
-              <Button
-                onClick={handleManualRefresh}
-                variant="outline"
-                size="sm"
-                className="text-xs bg-red-900/20 border-red-400/30 text-red-300 hover:bg-red-800/30"
-              >
+            {connectionIssue && <Button onClick={handleManualRefresh} variant="outline" size="sm" className="text-xs bg-red-900/20 border-red-400/30 text-red-300 hover:bg-red-800/30">
                 <RefreshCw className="w-3 h-3 mr-1" />
                 Refresh
-              </Button>
-            )}
+              </Button>}
           </div>
           <p className="text-blue-100 font-inter font-light mb-1 sm:mb-2 animate-fade-in sm:text-base text-left text-sm">Start with free monthly credits and upgrade anytime — either by purchasing flexible credit packs or a monthly subscription. 
 
@@ -285,8 +276,7 @@ For any payment-related queries, feel free to reach out to us at support@aspirel
               <CardContent className="grow flex flex-col px-3 sm:px-4 pb-3">
                  <div className="flex flex-col gap-1 sm:gap-2 my-2 sm:my-3 flex-grow">
                    {/* Show database products if available, otherwise show static fallback */}
-                   {creditPackProducts.length > 0 ? creditPackProducts.map(pack => 
-                     <div key={pack.product_id} className="bg-gray-50 border border-gray-200 rounded-lg p-2 sm:p-2.5 flex justify-between items-center shadow hover:shadow-gray-300/50 transition duration-300">
+                   {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="border border-gray-200 rounded-lg p-2 sm:p-2.5 flex justify-between items-center shadow hover:shadow-gray-300/50 transition duration-300 bg-blue-100">
                        <span className="text-gray-700 font-medium text-xs sm:text-sm">{pack.credits_amount} credits</span>
                        <div className="flex items-center gap-2">
                          <span className="text-gray-900 font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price_amount}</span>
@@ -295,9 +285,8 @@ For any payment-related queries, feel free to reach out to us at support@aspirel
                          </Button>
                        </div>
                      </div>) :
-                 // Only show fallback if no database products and not loading
-                 !isProductsLoading && pricingData?.creditPacks.map(pack => 
-                   <div key={pack.credits} className="bg-gray-50 border border-gray-200 rounded-lg p-2 sm:p-2.5 flex justify-between items-center shadow hover:shadow-gray-300/50 transition duration-300">
+                // Only show fallback if no database products and not loading
+                !isProductsLoading && pricingData?.creditPacks.map(pack => <div key={pack.credits} className="bg-gray-50 border border-gray-200 rounded-lg p-2 sm:p-2.5 flex justify-between items-center shadow hover:shadow-gray-300/50 transition duration-300">
                      <span className="text-gray-700 font-medium text-xs sm:text-sm">{pack.credits} credits</span>
                      <div className="flex items-center gap-2">
                        <span className="text-gray-900 font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price}</span>
