@@ -78,23 +78,34 @@ const JobCard = ({
           <div className="flex-1 min-w-0">
             {/* Job Title and Company Name */}
             <div className="mb-1 sm:mb-2">
-              <h3 className="text-xs sm:text-sm font-semibold text-gray-900 truncate leading-tight">{job.title}</h3>
-              <p className="text-xs text-gray-600 truncate leading-tight">{job.company_name}</p>
+              <h3 className="text-xs sm:text-sm font-semibold text-gray-900 break-words leading-tight">{job.title}</h3>
+              <p className="text-xs text-gray-600 break-words leading-tight">{job.company_name}</p>
             </div>
             
-            {/* Location, Job Type, Salary - List style */}
-            <div className="space-y-0.5 sm:space-y-1">
+            {/* Location, Job Type, Salary - Mobile: List style, Desktop: Single line */}
+            <div className="md:hidden space-y-0.5">
               <div className="flex items-center text-xs text-gray-600">
-                <span className="w-1 h-1 bg-gray-400 rounded-full mr-1.5 sm:mr-2 flex-shrink-0"></span>
-                <span className="truncate">{job.location || 'Remote'}</span>
+                <span className="w-1 h-1 bg-gray-400 rounded-full mr-1.5 flex-shrink-0"></span>
+                <span className="break-words">{job.location || 'Remote'}</span>
               </div>
               <div className="flex items-center text-xs text-gray-600">
-                <span className="w-1 h-1 bg-gray-400 rounded-full mr-1.5 sm:mr-2 flex-shrink-0"></span>
-                <span className="truncate">{job.job_type || 'Full-time'}</span>
+                <span className="w-1 h-1 bg-gray-400 rounded-full mr-1.5 flex-shrink-0"></span>
+                <span className="break-words">{job.job_type || 'Full-time'}</span>
               </div>
               <div className="flex items-center text-xs text-green-600 font-medium">
-                <span className="w-1 h-1 bg-green-600 rounded-full mr-1.5 sm:mr-2 flex-shrink-0"></span>
-                <span className="truncate">{formatSalary(job.salary)}</span>
+                <span className="w-1 h-1 bg-green-600 rounded-full mr-1.5 flex-shrink-0"></span>
+                <span className="break-words">{formatSalary(job.salary)}</span>
+              </div>
+            </div>
+            
+            {/* Desktop/Tablet: Single line with dots */}
+            <div className="hidden md:block">
+              <div className="text-xs text-gray-600 break-words">
+                <span>{job.location || 'Remote'}</span>
+                <span className="mx-2">•</span>
+                <span>{job.job_type || 'Full-time'}</span>
+                <span className="mx-2">•</span>
+                <span className="text-green-600 font-medium">{formatSalary(job.salary)}</span>
               </div>
             </div>
           </div>
@@ -109,8 +120,8 @@ const JobCard = ({
              </div>
            )}
           
-           {/* Buttons - smaller on mobile */}
-           <div className="flex flex-col gap-1 min-w-0">
+           {/* Mobile: Buttons stacked vertically */}
+           <div className="md:hidden flex flex-col gap-1 min-w-0">
              <Button 
                onClick={(e) => {
                  e.stopPropagation();
@@ -118,7 +129,7 @@ const JobCard = ({
                }} 
                variant="outline" 
                size="sm" 
-               className="text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md sm:px-3 sm:py-1.5 sm:h-7 sm:w-14 overflow-hidden"
+               className="text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md overflow-hidden"
              >
                View
              </Button>
@@ -132,8 +143,8 @@ const JobCard = ({
                    }} 
                    size="sm" 
                    className={isAddedToTracker 
-                     ? "bg-green-600 text-white hover:bg-green-700 text-xs px-1.5 py-1 h-6 w-10 cursor-default font-medium rounded-md sm:px-3 sm:py-1.5 sm:h-7 sm:w-14 overflow-hidden" 
-                     : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md sm:px-3 sm:py-1.5 sm:h-7 sm:w-14 overflow-hidden"
+                     ? "bg-green-600 text-white hover:bg-green-700 text-xs px-1.5 py-1 h-6 w-10 cursor-default font-medium rounded-md overflow-hidden" 
+                     : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md overflow-hidden"
                    } 
                    disabled={isAddedToTracker}
                  >
@@ -146,9 +157,9 @@ const JobCard = ({
                    }} 
                    variant="outline" 
                    size="sm" 
-                   className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs py-1 h-6 w-10 font-medium rounded-md sm:py-1.5 sm:h-7 sm:w-14 overflow-hidden"
+                   className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs py-1 h-6 w-10 font-medium rounded-md overflow-hidden"
                  >
-                   <Trash2 className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                   <Trash2 className="h-2.5 w-2.5" />
                  </Button>
                </>
              ) : (
@@ -158,7 +169,70 @@ const JobCard = ({
                    onSaveToTracker();
                  }} 
                  size="sm" 
-                 className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md sm:px-3 sm:py-1.5 sm:h-7 sm:w-14 overflow-hidden"
+                 className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-1.5 py-1 h-6 w-10 font-medium rounded-md overflow-hidden"
+               >
+                 Save
+               </Button>
+             )}
+           </div>
+
+           {/* Desktop/Tablet: Buttons in horizontal row */}
+           <div className="hidden md:flex flex-row gap-1 min-w-0">
+             <Button 
+               onClick={(e) => {
+                 e.stopPropagation();
+                 onView();
+               }} 
+               variant="outline" 
+               size="sm" 
+               className="text-xs px-2 py-1 h-7 font-medium rounded-md"
+             >
+               View
+             </Button>
+             
+             {section === 'saved' && onDelete ? (
+               <>
+                 <Button 
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     onSaveToTracker();
+                   }} 
+                   size="sm" 
+                   className={isAddedToTracker 
+                     ? "bg-green-600 text-white hover:bg-green-700 text-xs px-2 py-1 h-7 cursor-default font-medium rounded-md flex items-center gap-1" 
+                     : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-7 font-medium rounded-md"
+                   } 
+                   disabled={isAddedToTracker}
+                 >
+                   {isAddedToTracker ? (
+                     <>
+                       <Check className="h-3 w-3" />
+                       <span>Added to Job Tracker</span>
+                     </>
+                   ) : (
+                     "Add to Job Tracker"
+                   )}
+                 </Button>
+                 <Button 
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     onDelete();
+                   }} 
+                   variant="outline" 
+                   size="sm" 
+                   className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs px-2 py-1 h-7 font-medium rounded-md"
+                 >
+                   <Trash2 className="h-3 w-3" />
+                 </Button>
+               </>
+             ) : (
+               <Button 
+                 onClick={(e) => {
+                   e.stopPropagation();
+                   onSaveToTracker();
+                 }} 
+                 size="sm" 
+                 className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-7 font-medium rounded-md"
                >
                  Save
                </Button>
