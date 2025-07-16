@@ -118,11 +118,9 @@ const Profile = () => {
       window.location.reload();
     }
   }, [connectionIssue, checkJWTSetup]);
-  if (!isLoaded || !user || !isAuthReady) {
+  if (!isLoaded || !user) {
     return <div className="min-h-screen bg-gradient-to-br from-pastel-peach via-pastel-blue to-pastel-mint flex items-center justify-center">
-        <div className="text-fuchsia-900 text-xs">
-          {!isLoaded || !user ? 'Loading user...' : 'Preparing authentication...'}
-        </div>
+        <div className="text-fuchsia-900 text-xs">Loading user...</div>
       </div>;
   }
   return <Layout>
@@ -155,11 +153,20 @@ const Profile = () => {
           <ClerkJWTSetupGuide />
         </div>}
 
-      <div className="max-w-4xl mx-auto space-y-8 px-4" onClick={updateActivity} onKeyDown={updateActivity}>
-        {/* Profile sections - show even during connection issues for better UX */}
-        <ResumeSection />
-        <BioSection />
-      </div>
+      {!isAuthReady ? (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center space-y-3">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-fuchsia-400 mx-auto"></div>
+            <p className="text-gray-300 text-sm">Preparing authentication...</p>
+          </div>
+        </div>
+      ) : (
+        <div className="max-w-4xl mx-auto space-y-8 px-4" onClick={updateActivity} onKeyDown={updateActivity}>
+          {/* Profile sections - show even during connection issues for better UX */}
+          <ResumeSection />
+          <BioSection />
+        </div>
+      )}
       
       {/* JWT Debug Panel - only in development */}
       {Environment.isDevelopment() && <JWTDebugPanel />}

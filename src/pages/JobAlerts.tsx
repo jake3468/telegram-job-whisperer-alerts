@@ -58,11 +58,9 @@ const JobAlerts = () => {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
-  if (!isLoaded || !user || !isAuthReady) {
+  if (!isLoaded || !user) {
     return <div className="min-h-screen bg-gradient-to-br from-pastel-mint via-pastel-lavender to-pastel-peach flex items-center justify-center">
-        <div className="text-fuchsia-900 text-xs">
-          {!isLoaded || !user ? 'Loading user...' : 'Preparing authentication...'}
-        </div>
+        <div className="text-fuchsia-900 text-xs">Loading user...</div>
       </div>;
   }
   return <Layout>
@@ -94,9 +92,18 @@ const JobAlerts = () => {
       {/* Job Alerts Onboarding Popup */}
       <JobAlertsOnboardingPopup />
 
-      <div className="space-y-8">
-        <JobAlertsSection userTimezone={userTimezone} />
-      </div>
+      {!isAuthReady ? (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center space-y-3">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-400 mx-auto"></div>
+            <p className="text-gray-300 text-sm">Preparing authentication...</p>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-8">
+          <JobAlertsSection userTimezone={userTimezone} />
+        </div>
+      )}
     </Layout>;
 };
 export default JobAlerts;
