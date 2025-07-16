@@ -164,24 +164,24 @@ const PricingSection = () => {
             <CardContent className="grow flex flex-col px-4 pb-4">
               <div className="flex flex-col gap-2 my-3 flex-grow">
                 {/* Show database products if available, otherwise show static fallback */}
-                {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
-                      <span className="text-indigo-100 font-medium text-sm">{pack.credits_amount} credits</span>
+                {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="bg-gray-100 rounded-lg p-2.5 border border-gray-200 flex justify-between items-center shadow hover:shadow-md transition duration-300">
+                      <span className="text-gray-800 font-medium text-sm">{pack.credits_amount} credits</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-indigo-50 font-bold text-sm">{pricingData.currencySymbol}{pack.price_amount}</span>
+                        <span className="text-gray-900 font-bold text-sm">{pricingData.currencySymbol}{pack.price_amount}</span>
                         <SignUpButton mode="modal">
-                          <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 h-auto rounded-md">
+                          <Button size="sm" className="bg-gray-800 hover:bg-gray-900 text-white text-xs px-3 py-1 h-auto rounded-md">
                             Buy
                           </Button>
                         </SignUpButton>
                       </div>
                     </div>) :
               // Only show fallback if no database products and not loading
-              !isProductsLoading && pricingData.creditPacks.map(pack => <div key={pack.credits} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
-                      <span className="text-indigo-100 font-medium text-sm">{pack.credits} credits</span>
+              !isProductsLoading && pricingData.creditPacks.map(pack => <div key={pack.credits} className="bg-gray-100 rounded-lg p-2.5 border border-gray-200 flex justify-between items-center shadow hover:shadow-md transition duration-300">
+                      <span className="text-gray-800 font-medium text-sm">{pack.credits} credits</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-indigo-50 font-bold text-sm">{pricingData.currencySymbol}{pack.price}</span>
+                        <span className="text-gray-900 font-bold text-sm">{pricingData.currencySymbol}{pack.price}</span>
                         <SignUpButton mode="modal">
-                          <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 h-auto rounded-md">
+                          <Button size="sm" className="bg-gray-800 hover:bg-gray-900 text-white text-xs px-3 py-1 h-auto rounded-md">
                             Buy
                           </Button>
                         </SignUpButton>
