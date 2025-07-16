@@ -135,10 +135,14 @@ const JobAlertsSection = ({
   const handleManualRefresh = useCallback(() => {
     forceRefresh();
   }, [forceRefresh]);
-  if (loading) {
+  // Show fast initial loading state, then content even if auth is still loading
+  if (loading && !userProfileId) {
     return <div className="max-w-2xl mx-auto w-full">
         <div className="rounded-3xl bg-black/95 border-2 border-emerald-400 shadow-none p-6 mt-3 min-h-[160px] flex items-center justify-center">
-          <div className="text-emerald-100 text-xs">Loading...</div>
+          <div className="text-center space-y-3">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-400 mx-auto"></div>
+            <div className="text-emerald-100 text-xs">Loading job alerts...</div>
+          </div>
         </div>
       </div>;
   }
