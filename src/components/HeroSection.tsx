@@ -66,7 +66,7 @@ const HeroSection = () => {
       <div className="absolute inset-0 z-10 bg-black/60" aria-hidden="true" />
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
-        <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-2 leading-tight font-inter drop-shadow-xl min-h-[160px] sm:min-h-[200px]">
+        <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-1 leading-tight font-inter drop-shadow-xl">
           {displayedText.split('\n').map((line, index) => <span key={index}>
               {line.split(' ').map((word, wordIndex) => {
             if (word === 'AI') {
@@ -92,7 +92,7 @@ const HeroSection = () => {
         
         {/* Lottie Animation */}
         {lottieAnimationData && (
-          <div className="flex justify-center my-6 md:my-8">
+          <div className="flex justify-center mt-2 mb-4">
             <div className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48">
               <Lottie 
                 animationData={lottieAnimationData} 
