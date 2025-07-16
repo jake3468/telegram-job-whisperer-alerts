@@ -39,7 +39,7 @@ const HeroSection = () => {
   const goToDashboard = () => {
     navigate('/dashboard');
   };
-  return <section className="relative min-h-[80vh] sm:min-h-screen flex flex-col items-center justify-center px-4 pt-28 sm:pt-32 overflow-hidden bg-black">
+  return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-8 overflow-hidden bg-black">
       {/* Optimized Background with loading state */}
       <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-500 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`} aria-hidden="true" style={{
       background: isImageLoaded ? `url('/lovable-uploads/9f89bb0c-b59d-4e5a-8c4d-609218bee6d4.png') center top / cover no-repeat` : 'transparent',
@@ -48,8 +48,8 @@ const HeroSection = () => {
     }} />
       <div className="absolute inset-0 z-10 bg-black/60" aria-hidden="true" />
       
-      <div className="text-center max-w-4xl mx-auto z-20 mt-10 sm:mt-0 relative">
-        <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-2 leading-tight font-inter drop-shadow-xl min-h-[200px] sm:min-h-[240px]">
+      <div className="text-center max-w-4xl mx-auto z-20 relative">
+        <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-2 leading-tight font-inter drop-shadow-xl min-h-[160px] sm:min-h-[200px]">
           {displayedText.split('\n').map((line, index) => <span key={index}>
               {line.split(' ').map((word, wordIndex) => {
             if (word === 'AI') {
@@ -81,7 +81,7 @@ const HeroSection = () => {
           </div>
         </div>
 
-        <p className="text-lg md:text-xl text-gray-200 mb-12 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black">
+        <p className="text-lg md:text-xl text-gray-200 mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black">
           Job hunting toolkit that writes your cover letter, preps you for interviews, and even pings you new jobs — all powered by{" "}
           <span className="italic bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent font-medium">
             AI
