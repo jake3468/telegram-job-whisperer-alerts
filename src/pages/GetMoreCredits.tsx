@@ -14,6 +14,7 @@ import { useCachedLocationPricing } from '@/hooks/useCachedLocationPricing';
 import { useCachedPaymentProducts } from '@/hooks/useCachedPaymentProducts';
 import { useCheckoutSession } from '@/hooks/useCheckoutSession';
 import { toast } from 'sonner';
+import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 const planGradientBg = {
   free: "bg-white border border-gray-200",
   subscription: "bg-gradient-to-br from-[#2563eb] via-[#3893ec] to-[#1872ba] dark:from-[#274299] dark:via-[#3177c7] dark:to-[#1b466c]",
@@ -57,6 +58,7 @@ export default function GetMoreCredits() {
     createCheckoutSession,
     isLoading: isCheckoutLoading
   } = useCheckoutSession();
+  const { isAuthReady } = useEnterpriseAuth();
 
   // Connection and error state management
   const [connectionIssue, setConnectionIssue] = useState(false);
@@ -70,6 +72,11 @@ export default function GetMoreCredits() {
     }
   }, [credits, creditsError]);
   const handleSubscribeClick = async () => {
+    if (!isAuthReady) {
+      toast.error('Please wait, authentication is loading...');
+      return;
+    }
+
     const subscriptionProduct = subscriptionProducts[0];
     if (!subscriptionProduct) {
       toast.error('Subscription product not available');
@@ -84,6 +91,11 @@ export default function GetMoreCredits() {
     }
   };
   const handleCreditPackClick = async (productId: string) => {
+    if (!isAuthReady) {
+      toast.error('Please wait, authentication is loading...');
+      return;
+    }
+
     console.log('Buying credit pack with product:', productId);
     const session = await createCheckoutSession(productId);
     if (session?.url) {
@@ -254,8 +266,8 @@ For any payment-related queries, feel free to reach out to us at support@aspirel
                   </li>
                 </ul>
                  <div className="mt-auto">
-                   <Button onClick={handleSubscribeClick} className="w-full py-2 sm:py-2.5 bg-white hover:bg-yellow-100 text-black font-orbitron text-xs rounded-xl shadow border-0 font-bold transition-colors duration-200" disabled={connectionIssue || isPricingLoading || isProductsLoading || subscriptionProducts[0] && isCheckoutLoading(subscriptionProducts[0].product_id)}>
-                     {subscriptionProducts[0] && isCheckoutLoading(subscriptionProducts[0].product_id) ? <>
+                   <Button onClick={handleSubscribeClick} className="w-full py-2 sm:py-2.5 bg-white hover:bg-yellow-100 text-black font-orbitron text-xs rounded-xl shadow border-0 font-bold transition-colors duration-200" disabled={!isAuthReady || connectionIssue || isPricingLoading || isProductsLoading || subscriptionProducts[0] && isCheckoutLoading(subscriptionProducts[0].product_id)}>
+                     {!isAuthReady ? 'Please wait...' : subscriptionProducts[0] && isCheckoutLoading(subscriptionProducts[0].product_id) ? <>
                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
                          Processing...
                        </> : 'Subscribe Now'}
@@ -280,9 +292,9 @@ For any payment-related queries, feel free to reach out to us at support@aspirel
                        <span className="text-gray-700 font-medium text-xs sm:text-sm">{pack.credits_amount} credits</span>
                        <div className="flex items-center gap-2">
                          <span className="text-gray-900 font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price_amount}</span>
-                         <Button size="sm" onClick={() => handleCreditPackClick(pack.product_id)} className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={connectionIssue || isCheckoutLoading(pack.product_id)}>
-                           {isCheckoutLoading(pack.product_id) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
-                         </Button>
+                          <Button size="sm" onClick={() => handleCreditPackClick(pack.product_id)} className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={!isAuthReady || connectionIssue || isCheckoutLoading(pack.product_id)}>
+                            {!isAuthReady ? '...' : isCheckoutLoading(pack.product_id) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
+                          </Button>
                        </div>
                      </div>) :
                 // Only show fallback if no database products and not loading
@@ -290,9 +302,9 @@ For any payment-related queries, feel free to reach out to us at support@aspirel
                      <span className="text-gray-700 font-medium text-xs sm:text-sm">{pack.credits} credits</span>
                      <div className="flex items-center gap-2">
                        <span className="text-gray-900 font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price}</span>
-                       <Button size="sm" onClick={() => handleCreditPackClick(pack.productId)} className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={connectionIssue || isCheckoutLoading(pack.productId)}>
-                         {isCheckoutLoading(pack.productId) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
-                       </Button>
+                        <Button size="sm" onClick={() => handleCreditPackClick(pack.productId)} className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={!isAuthReady || connectionIssue || isCheckoutLoading(pack.productId)}>
+                          {!isAuthReady ? '...' : isCheckoutLoading(pack.productId) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
+                        </Button>
                      </div>
                    </div>)}
                   

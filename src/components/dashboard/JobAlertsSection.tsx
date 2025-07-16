@@ -35,8 +35,11 @@ const JobAlertsSection = ({
     userProfileId, 
     loading, 
     error, 
+    isAuthReady,
     invalidateCache,
-    forceRefresh 
+    forceRefresh,
+    deleteJobAlert,
+    executeWithRetry
   } = useCachedJobAlertsData();
   
   const [showForm, setShowForm] = useState(false);
@@ -87,9 +90,18 @@ const JobAlertsSection = ({
       });
       return;
     }
+
+    if (!isAuthReady) {
+      toast({
+        title: "Please wait",
+        description: "Authentication is loading, please try again in a moment.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
-      const { error } = await supabase.from('job_alerts').delete().eq('id', alertId);
-      if (error) throw error;
+      await deleteJobAlert(alertId);
       
       // Invalidate cache to refresh data
       invalidateCache();

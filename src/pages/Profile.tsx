@@ -1,6 +1,7 @@
 import { useUser } from '@clerk/clerk-react';
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 import AuthHeader from '@/components/AuthHeader';
 import ResumeSection from '@/components/dashboard/ResumeSection';
 import BioSection from '@/components/dashboard/BioSection';
@@ -20,6 +21,7 @@ const Profile = () => {
     isLoaded
   } = useUser();
   const navigate = useNavigate();
+  const { isAuthReady, executeWithRetry } = useEnterpriseAuth();
   const {
     runComprehensiveJWTTest
   } = useJWTDebug();
@@ -46,14 +48,23 @@ const Profile = () => {
     }
   }, [user, isLoaded, navigate]);
 
-  // JWT setup check with error handling
+  // Enhanced JWT setup check with enterprise auth retry logic
   const checkJWTSetup = useCallback(async () => {
-    if (!isLoaded || !user) return;
+    if (!isLoaded || !user || !isAuthReady) return;
+    
     try {
       setError(null);
       setConnectionIssue(false);
+      
       if (Environment.isDevelopment()) {
-        const testResult = await runComprehensiveJWTTest();
+        const testResult = await executeWithRetry(
+          async () => {
+            return await runComprehensiveJWTTest();
+          },
+          2,
+          'JWT comprehensive test'
+        );
+        
         setLastJWTTestResult(testResult);
 
         // Show setup guide if JWT is not properly configured
@@ -61,6 +72,7 @@ const Profile = () => {
           setShowJWTSetupGuide(true);
         }
       }
+      
       setProfileDataLoaded(true);
     } catch (error) {
       console.error('JWT setup check failed:', error);
@@ -72,15 +84,15 @@ const Profile = () => {
         setProfileDataLoaded(true); // Allow graceful degradation
       }
     }
-  }, [isLoaded, user, runComprehensiveJWTTest, lastJWTTestResult]);
+  }, [isLoaded, user, isAuthReady, runComprehensiveJWTTest, lastJWTTestResult, executeWithRetry]);
 
-  // Initial setup check
+  // Initial setup check with auth readiness
   useEffect(() => {
-    if (isLoaded && user) {
+    if (isLoaded && user && isAuthReady) {
       // Reduced delay for faster loading
       setTimeout(checkJWTSetup, 500);
     }
-  }, [isLoaded, user, checkJWTSetup]);
+  }, [isLoaded, user, isAuthReady, checkJWTSetup]);
 
   // Manual refresh function - instant refresh for better UX
   const handleManualRefresh = useCallback(() => {
@@ -106,9 +118,11 @@ const Profile = () => {
       window.location.reload();
     }
   }, [connectionIssue, checkJWTSetup]);
-  if (!isLoaded || !user) {
+  if (!isLoaded || !user || !isAuthReady) {
     return <div className="min-h-screen bg-gradient-to-br from-pastel-peach via-pastel-blue to-pastel-mint flex items-center justify-center">
-        <div className="text-fuchsia-900 text-xs">Loading...</div>
+        <div className="text-fuchsia-900 text-xs">
+          {!isLoaded || !user ? 'Loading user...' : 'Preparing authentication...'}
+        </div>
       </div>;
   }
   return <Layout>

@@ -6,6 +6,7 @@ import JobAlertsSection from '@/components/dashboard/JobAlertsSection';
 import { Layout } from '@/components/Layout';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
+import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
 import { JobAlertsOnboardingPopup } from '@/components/JobAlertsOnboardingPopup';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +16,7 @@ const JobAlerts = () => {
     isLoaded
   } = useUser();
   const navigate = useNavigate();
+  const { isAuthReady } = useEnterpriseAuth();
 
   // CRITICAL: Ensure Clerk-Supabase sync runs on this page
   useClerkSupabaseSync();
@@ -56,9 +58,11 @@ const JobAlerts = () => {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
-  if (!isLoaded || !user) {
+  if (!isLoaded || !user || !isAuthReady) {
     return <div className="min-h-screen bg-gradient-to-br from-pastel-mint via-pastel-lavender to-pastel-peach flex items-center justify-center">
-        <div className="text-fuchsia-900 text-xs">Loading...</div>
+        <div className="text-fuchsia-900 text-xs">
+          {!isLoaded || !user ? 'Loading user...' : 'Preparing authentication...'}
+        </div>
       </div>;
   }
   return <Layout>

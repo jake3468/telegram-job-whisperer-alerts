@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/logger';
+import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 
 interface JobAlert {
   id: string;
@@ -29,6 +30,7 @@ const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
 export const useCachedJobAlertsData = () => {
   const { user } = useUser();
+  const { isAuthReady, executeWithRetry } = useEnterpriseAuth();
   const [alerts, setAlerts] = useState<JobAlert[]>([]);
   const [isActivated, setIsActivated] = useState<boolean>(false);
   const [userProfileId, setUserProfileId] = useState<string | null>(null);
@@ -80,56 +82,70 @@ export const useCachedJobAlertsData = () => {
   const fetchJobAlertsData = async () => {
     if (!user) return;
     
+    if (!isAuthReady) {
+      logger.debug('[JobAlertsData] Authentication not ready, waiting...');
+      return;
+    }
+    
     try {
       setError(null);
       
-      // Get user's database ID
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('clerk_id', user.id)
-        .maybeSingle();
-        
-      if (userError || !userData) {
-        throw new Error('Failed to fetch user data');
-      }
+      const result = await executeWithRetry(
+        async () => {
+          // Get user's database ID
+          const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('id')
+            .eq('clerk_id', user.id)
+            .maybeSingle();
+            
+          if (userError || !userData) {
+            throw new Error('Failed to fetch user data');
+          }
 
-      // Get user profile
-      const { data: profileData, error: profileError } = await supabase
-        .from('user_profile')
-        .select('id, bot_activated')
-        .eq('user_id', userData.id)
-        .maybeSingle();
-        
-      if (profileError || !profileData) {
-        throw new Error('Failed to fetch profile data');
-      }
+          // Get user profile
+          const { data: profileData, error: profileError } = await supabase
+            .from('user_profile')
+            .select('id, bot_activated')
+            .eq('user_id', userData.id)
+            .maybeSingle();
+            
+          if (profileError || !profileData) {
+            throw new Error('Failed to fetch profile data');
+          }
 
-      // Fetch job alerts
-      const { data: alertsData, error: alertsError } = await supabase
-        .from('job_alerts')
-        .select('*')
-        .eq('user_id', profileData.id)
-        .order('created_at', { ascending: false });
+          // Fetch job alerts
+          const { data: alertsData, error: alertsError } = await supabase
+            .from('job_alerts')
+            .select('*')
+            .eq('user_id', profileData.id)
+            .order('created_at', { ascending: false });
 
-      if (alertsError) {
-        throw new Error('Failed to fetch job alerts');
-      }
+          if (alertsError) {
+            throw new Error('Failed to fetch job alerts');
+          }
 
-      const fetchedAlerts = alertsData || [];
-      const botActivated = profileData.bot_activated || false;
+          return {
+            alerts: alertsData || [],
+            botActivated: profileData.bot_activated || false,
+            userProfileId: profileData.id
+          };
+        },
+        3,
+        'Fetching job alerts data'
+      );
 
       // Update state
-      setAlerts(fetchedAlerts);
-      setIsActivated(botActivated);
-      setUserProfileId(profileData.id);
+      setAlerts(result.alerts);
+      setIsActivated(result.botActivated);
+      setUserProfileId(result.userProfileId);
 
       // Cache the data
       try {
         const cacheData: CachedJobAlertsData = {
-          alerts: fetchedAlerts,
-          isActivated: botActivated,
-          userProfileId: profileData.id,
+          alerts: result.alerts,
+          isActivated: result.botActivated,
+          userProfileId: result.userProfileId,
           timestamp: Date.now()
         };
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
@@ -168,6 +184,31 @@ export const useCachedJobAlertsData = () => {
     await fetchJobAlertsData();
   };
 
+  // Enhanced delete function with retry logic
+  const deleteJobAlert = async (alertId: string) => {
+    if (!isAuthReady) {
+      throw new Error('Authentication not ready, please wait...');
+    }
+
+    return await executeWithRetry(
+      async () => {
+        const { error } = await supabase
+          .from('job_alerts')
+          .delete()
+          .eq('id', alertId);
+        
+        if (error) throw error;
+        
+        // Optimistically remove from local state
+        setAlerts(prev => prev.filter(alert => alert.id !== alertId));
+        
+        return true;
+      },
+      3,
+      `Deleting job alert ${alertId}`
+    );
+  };
+
   return {
     alerts,
     isActivated,
@@ -175,9 +216,12 @@ export const useCachedJobAlertsData = () => {
     loading,
     error,
     connectionIssue,
+    isAuthReady,
     refetch: fetchJobAlertsData,
     optimisticAdd,
     invalidateCache,
-    forceRefresh
+    forceRefresh,
+    deleteJobAlert,
+    executeWithRetry
   };
 };
