@@ -12,6 +12,7 @@ import { FileText, History, Copy, Sparkles, Menu, BadgeDollarSign, RefreshCw } f
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserCompletionStatus } from '@/hooks/useUserCompletionStatus';
+import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 import CoverLetterHistoryModal from '@/components/CoverLetterHistoryModal';
 import LoadingMessages from '@/components/LoadingMessages';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -40,6 +41,11 @@ const CoverLetter = () => {
     loading: completionLoading,
     refetchStatus
   } = useUserCompletionStatus();
+  const {
+    executeWithRetry,
+    isAuthReady,
+    isRefreshing
+  } = useEnterpriseAuth();
 
   // Use credit check for 1.5 credits required for cover letters
   const {
@@ -94,92 +100,109 @@ const CoverLetter = () => {
 
   // Enhanced real-time subscription for cover letter updates with improved detection
   useEffect(() => {
-    if (!currentCoverLetterId) return;
+    if (!currentCoverLetterId || !isAuthReady) return;
     console.log('Setting up real-time subscription for cover letter ID:', currentCoverLetterId);
-    const channel = supabase.channel(`cover-letter-${currentCoverLetterId}`).on('postgres_changes', {
-      event: 'UPDATE',
-      schema: 'public',
-      table: 'job_cover_letters',
-      filter: `id=eq.${currentCoverLetterId}`
-    }, payload => {
-      console.log('Real-time update received:', payload);
-      if (payload.new && payload.new.cover_letter) {
-        const coverLetterContent = payload.new.cover_letter.trim();
-        if (coverLetterContent.length > 0) {
-          console.log('Cover letter content received, updating UI');
-          // Clean the content to remove any metadata or extra information
-          const cleanContent = coverLetterContent.split('\n\n').find(paragraph => 
-            paragraph.includes('Dear') || 
-            paragraph.match(/^\w+\s+\d{1,2},\s+\d{4}/) ||
-            paragraph.includes('Sincerely') ||
-            paragraph.length > 100
-          ) ? coverLetterContent.split('\n\n').filter(paragraph => 
-            !paragraph.toLowerCase().includes('generate cover letter') &&
-            !paragraph.toLowerCase().includes('usage fee') &&
-            !paragraph.toLowerCase().includes('credits') &&
-            !paragraph.toLowerCase().includes('bio data') &&
-            !paragraph.toLowerCase().includes('profile') &&
-            paragraph.trim().length > 20
-          ).join('\n\n') : coverLetterContent;
-          
-          setResult(cleanContent);
-          setIsGenerating(false);
-          toast({
-            title: "Cover Letter Generated!",
-            description: "Your cover letter has been created successfully."
+    
+    let channel: any;
+    
+    const setupRealTime = async () => {
+      try {
+        await executeWithRetry(async () => {
+          channel = supabase.channel(`cover-letter-${currentCoverLetterId}`).on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'job_cover_letters',
+            filter: `id=eq.${currentCoverLetterId}`
+          }, payload => {
+            console.log('Real-time update received:', payload);
+            if (payload.new && payload.new.cover_letter) {
+              const coverLetterContent = payload.new.cover_letter.trim();
+              if (coverLetterContent.length > 0) {
+                console.log('Cover letter content received, updating UI');
+                // Clean the content to remove any metadata or extra information
+                const cleanContent = coverLetterContent.split('\n\n').find(paragraph => 
+                  paragraph.includes('Dear') || 
+                  paragraph.match(/^\w+\s+\d{1,2},\s+\d{4}/) ||
+                  paragraph.includes('Sincerely') ||
+                  paragraph.length > 100
+                ) ? coverLetterContent.split('\n\n').filter(paragraph => 
+                  !paragraph.toLowerCase().includes('generate cover letter') &&
+                  !paragraph.toLowerCase().includes('usage fee') &&
+                  !paragraph.toLowerCase().includes('credits') &&
+                  !paragraph.toLowerCase().includes('bio data') &&
+                  !paragraph.toLowerCase().includes('profile') &&
+                  paragraph.trim().length > 20
+                ).join('\n\n') : coverLetterContent;
+                
+                setResult(cleanContent);
+                setIsGenerating(false);
+                toast({
+                  title: "Cover Letter Generated!",
+                  description: "Your cover letter has been created successfully."
+                });
+              }
+            }
+          }).subscribe(status => {
+            console.log('Subscription status:', status);
           });
-        }
+        }, 3, 'setup real-time subscription');
+      } catch (error) {
+        console.error('Error setting up real-time subscription:', error);
       }
-    }).subscribe(status => {
-      console.log('Subscription status:', status);
-    });
+    };
+
+    setupRealTime();
 
     // Cleanup function
     return () => {
-      console.log('Cleaning up real-time subscription');
-      supabase.removeChannel(channel);
+      if (channel) {
+        console.log('Cleaning up real-time subscription');
+        supabase.removeChannel(channel);
+      }
     };
-  }, [currentCoverLetterId, toast]);
+  }, [currentCoverLetterId, isAuthReady, executeWithRetry, toast]);
 
   // Polling fallback - check for updates every 5 seconds when generating
   useEffect(() => {
-    if (!isGenerating || !currentCoverLetterId) return;
+    if (!isGenerating || !currentCoverLetterId || !isAuthReady) return;
     const pollInterval = setInterval(async () => {
       console.log('Polling for cover letter updates...');
       try {
-        const {
-          data,
-          error
-        } = await supabase.from('job_cover_letters').select('cover_letter').eq('id', currentCoverLetterId).single();
-        if (error) {
-          console.error('Error polling for updates:', error);
-          return;
-        }
-        if (data?.cover_letter && data.cover_letter.trim().length > 0) {
-          console.log('Cover letter found via polling, updating UI');
-          // Clean the content to remove any metadata or extra information
-          const coverLetterContent = data.cover_letter.trim();
-          const cleanContent = coverLetterContent.split('\n\n').find(paragraph => 
-            paragraph.includes('Dear') || 
-            paragraph.match(/^\w+\s+\d{1,2},\s+\d{4}/) ||
-            paragraph.includes('Sincerely') ||
-            paragraph.length > 100
-          ) ? coverLetterContent.split('\n\n').filter(paragraph => 
-            !paragraph.toLowerCase().includes('generate cover letter') &&
-            !paragraph.toLowerCase().includes('usage fee') &&
-            !paragraph.toLowerCase().includes('credits') &&
-            !paragraph.toLowerCase().includes('bio data') &&
-            !paragraph.toLowerCase().includes('profile') &&
-            paragraph.trim().length > 20
-          ).join('\n\n') : coverLetterContent;
-          
-          setResult(cleanContent);
-          setIsGenerating(false);
-          toast({
-            title: "Cover Letter Generated!",
-            description: "Your cover letter has been created successfully."
-          });
-        }
+        await executeWithRetry(async () => {
+          const {
+            data,
+            error
+          } = await supabase.from('job_cover_letters').select('cover_letter').eq('id', currentCoverLetterId).single();
+          if (error) {
+            console.error('Error polling for updates:', error);
+            return;
+          }
+          if (data?.cover_letter && data.cover_letter.trim().length > 0) {
+            console.log('Cover letter found via polling, updating UI');
+            // Clean the content to remove any metadata or extra information
+            const coverLetterContent = data.cover_letter.trim();
+            const cleanContent = coverLetterContent.split('\n\n').find(paragraph => 
+              paragraph.includes('Dear') || 
+              paragraph.match(/^\w+\s+\d{1,2},\s+\d{4}/) ||
+              paragraph.includes('Sincerely') ||
+              paragraph.length > 100
+            ) ? coverLetterContent.split('\n\n').filter(paragraph => 
+              !paragraph.toLowerCase().includes('generate cover letter') &&
+              !paragraph.toLowerCase().includes('usage fee') &&
+              !paragraph.toLowerCase().includes('credits') &&
+              !paragraph.toLowerCase().includes('bio data') &&
+              !paragraph.toLowerCase().includes('profile') &&
+              paragraph.trim().length > 20
+            ).join('\n\n') : coverLetterContent;
+            
+            setResult(cleanContent);
+            setIsGenerating(false);
+            toast({
+              title: "Cover Letter Generated!",
+              description: "Your cover letter has been created successfully."
+            });
+          }
+        }, 3, 'poll for cover letter updates');
       } catch (error) {
         console.error('Polling error:', error);
       }
@@ -188,7 +211,7 @@ const CoverLetter = () => {
       console.log('Cleaning up polling interval');
       clearInterval(pollInterval);
     };
-  }, [isGenerating, currentCoverLetterId, toast]);
+  }, [isGenerating, currentCoverLetterId, isAuthReady, executeWithRetry, toast]);
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -252,26 +275,28 @@ const CoverLetter = () => {
       try {
         console.log('Submitting cover letter request...');
 
-        // Insert into database
-        const {
-          data,
-          error
-        } = await supabase.from('job_cover_letters').insert({
-          user_id: userProfile.id,
-          job_title: formData.job_title,
-          company_name: formData.company_name,
-          job_description: formData.job_description
-        }).select().single();
-        if (error) {
-          throw error;
-        }
-        console.log('Cover letter record created with ID:', data.id);
-        setCurrentCoverLetterId(data.id);
-        refetchHistory(); // Update cache with new entry
-        toast({
-          title: "Request Submitted!",
-          description: "Your cover letter is being generated. Credits will be deducted when ready."
-        });
+        // Insert into database with enterprise auth
+        await executeWithRetry(async () => {
+          const {
+            data,
+            error
+          } = await supabase.from('job_cover_letters').insert({
+            user_id: userProfile.id,
+            job_title: formData.job_title,
+            company_name: formData.company_name,
+            job_description: formData.job_description
+          }).select().single();
+          if (error) {
+            throw error;
+          }
+          console.log('Cover letter record created with ID:', data.id);
+          setCurrentCoverLetterId(data.id);
+          refetchHistory(); // Update cache with new entry
+          toast({
+            title: "Request Submitted!",
+            description: "Your cover letter is being generated. Credits will be deducted when ready."
+          });
+        }, 3, 'create cover letter');
       } catch (err: any) {
         console.error('Error creating cover letter:', err);
         setIsGenerating(false);
@@ -315,6 +340,16 @@ const CoverLetter = () => {
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading...</div>
+      </div>;
+  }
+
+  // Show professional authentication loading state
+  if (!isAuthReady && !isRefreshing) {
+    return <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-fuchsia-400 mx-auto"></div>
+          <div className="text-fuchsia-200 text-sm font-medium">Preparing authentication...</div>
+        </div>
       </div>;
   }
 

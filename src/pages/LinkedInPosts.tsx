@@ -50,7 +50,8 @@ const LinkedInPosts = () => {
   } = useUserCompletionStatus();
   const {
     executeWithRetry,
-    isAuthReady
+    isAuthReady,
+    isRefreshing
   } = useEnterpriseAuth();
   const {
     hasCredits
@@ -175,52 +176,69 @@ const LinkedInPosts = () => {
   useEffect(() => {
     if (!currentPostId || !isAuthReady || !userProfile?.id) return;
     console.log('🔄 Setting up real-time subscription for post ID:', currentPostId);
-    const channel = supabase.channel(`linkedin-post-updates-${currentPostId}`).on('postgres_changes', {
-      event: '*',
-      schema: 'public',
-      table: 'job_linkedin',
-      filter: `id=eq.${currentPostId}`
-    }, async payload => {
-      console.log('📡 LinkedIn post updated via real-time:', payload);
-      if (payload.new) {
-        const newData = payload.new as any;
-        console.log('📊 New posts data received:', {
-          hasHeading1: Boolean(newData.post_heading_1 && newData.post_heading_1.trim()),
-          hasContent1: Boolean(newData.post_content_1 && newData.post_content_1.trim()),
-          hasHeading2: Boolean(newData.post_heading_2 && newData.post_heading_2.trim()),
-          hasContent2: Boolean(newData.post_content_2 && newData.post_content_2.trim()),
-          hasHeading3: Boolean(newData.post_heading_3 && newData.post_heading_3.trim()),
-          hasContent3: Boolean(newData.post_content_3 && newData.post_content_3.trim())
-        });
-        const linkedInPostData: LinkedInPostData = {
-          post_heading_1: newData.post_heading_1,
-          post_content_1: newData.post_content_1,
-          post_heading_2: newData.post_heading_2,
-          post_content_2: newData.post_content_2,
-          post_heading_3: newData.post_heading_3,
-          post_content_3: newData.post_content_3
-        };
-        console.log('🔄 Setting posts data:', linkedInPostData);
-        setPostsData(linkedInPostData);
-        if (areAllPostsReady(linkedInPostData)) {
-          console.log('🎉 All posts are ready! Stopping loading');
-          setIsGenerating(false);
-          toast({
-            title: "LinkedIn Posts Generated!",
-            description: "Your 3 LinkedIn post variations have been created successfully."
+    
+    let channel: any;
+    
+    const setupRealTime = async () => {
+      try {
+        await executeWithRetry(async () => {
+          channel = supabase.channel(`linkedin-post-updates-${currentPostId}`).on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'job_linkedin',
+            filter: `id=eq.${currentPostId}`
+          }, async payload => {
+            console.log('📡 LinkedIn post updated via real-time:', payload);
+            if (payload.new) {
+              const newData = payload.new as any;
+              console.log('📊 New posts data received:', {
+                hasHeading1: Boolean(newData.post_heading_1 && newData.post_heading_1.trim()),
+                hasContent1: Boolean(newData.post_content_1 && newData.post_content_1.trim()),
+                hasHeading2: Boolean(newData.post_heading_2 && newData.post_heading_2.trim()),
+                hasContent2: Boolean(newData.post_content_2 && newData.post_content_2.trim()),
+                hasHeading3: Boolean(newData.post_heading_3 && newData.post_heading_3.trim()),
+                hasContent3: Boolean(newData.post_content_3 && newData.post_content_3.trim())
+              });
+              const linkedInPostData: LinkedInPostData = {
+                post_heading_1: newData.post_heading_1,
+                post_content_1: newData.post_content_1,
+                post_heading_2: newData.post_heading_2,
+                post_content_2: newData.post_content_2,
+                post_heading_3: newData.post_heading_3,
+                post_content_3: newData.post_content_3
+              };
+              console.log('🔄 Setting posts data:', linkedInPostData);
+              setPostsData(linkedInPostData);
+              if (areAllPostsReady(linkedInPostData)) {
+                console.log('🎉 All posts are ready! Stopping loading');
+                setIsGenerating(false);
+                toast({
+                  title: "LinkedIn Posts Generated!",
+                  description: "Your 3 LinkedIn post variations have been created successfully."
+                });
+              } else {
+                console.log('⏳ Posts not complete yet, keeping loading state');
+              }
+            }
+          }).subscribe(status => {
+            console.log('📡 Real-time subscription status:', status);
           });
-        } else {
-          console.log('⏳ Posts not complete yet, keeping loading state');
-        }
+        }, 3, 'setup LinkedIn real-time subscription');
+      } catch (error) {
+        console.error('Error setting up real-time subscription:', error);
       }
-    }).subscribe(status => {
-      console.log('📡 Real-time subscription status:', status);
-    });
-    return () => {
-      console.log('🧹 Cleaning up real-time subscription');
-      supabase.removeChannel(channel);
     };
-  }, [currentPostId, isAuthReady, userProfile?.id, toast]);
+
+    setupRealTime();
+    
+    // Cleanup function
+    return () => {
+      if (channel) {
+        console.log('🧹 Cleaning up real-time subscription');
+        supabase.removeChannel(channel);
+      }
+    };
+  }, [currentPostId, isAuthReady, userProfile?.id, executeWithRetry, toast]);
   useEffect(() => {
     const checkExistingData = async () => {
       if (!currentPostId || !isAuthReady) return;
@@ -423,13 +441,24 @@ const LinkedInPosts = () => {
   };
   const shouldShowResults = postsData && areAllPostsReady(postsData);
   const shouldShowLoading = isGenerating && !shouldShowResults;
-  console.log('🎯 Display logic:', {
+    console.log('🎯 Display logic:', {
     postsData: !!postsData,
     areAllPostsReady: postsData ? areAllPostsReady(postsData) : false,
     shouldShowResults,
     shouldShowLoading,
     isGenerating
   });
+
+  // Show professional authentication loading state
+  if (!isAuthReady && !isRefreshing) {
+    return <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-400 mx-auto"></div>
+          <div className="text-teal-200 text-sm font-medium">Preparing authentication...</div>
+        </div>
+      </div>;
+  }
+
   return <SidebarProvider defaultOpen={true}>
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
         <div className="flex items-center justify-between p-3">
