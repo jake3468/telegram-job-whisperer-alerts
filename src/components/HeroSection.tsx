@@ -47,7 +47,7 @@ const HeroSection = () => {
       const timeout = setTimeout(() => {
         setDisplayedText(prev => prev + fullText[currentIndex]);
         setCurrentIndex(prev => prev + 1);
-      }, 60); // Slightly faster animation
+      }, 120); // Slower typing animation
 
       return () => clearTimeout(timeout);
     }
@@ -65,7 +65,7 @@ const HeroSection = () => {
       <div className="absolute inset-0 z-10 bg-black/60" aria-hidden="true" />
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
-        <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-1 leading-tight font-inter drop-shadow-xl">
+        <h1 className="text-2xl md:text-4xl font-extrabold text-white mb-1 leading-tight font-inter drop-shadow-xl">
           {displayedText.split('\n').map((line, index) => <span key={index}>
               {line.split(' ').map((word, wordIndex) => {
             if (word === 'AI') {
@@ -91,7 +91,7 @@ const HeroSection = () => {
         
         {/* Lottie Animation */}
         {lottieAnimationData && <div className="flex justify-center mt-2 mb-4">
-            <div className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48">
+            <div className="w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64">
               <Lottie animationData={lottieAnimationData} loop={true} autoplay={true} style={{
             width: '100%',
             height: '100%',

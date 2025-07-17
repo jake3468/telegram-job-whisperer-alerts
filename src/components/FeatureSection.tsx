@@ -97,18 +97,18 @@ const FeatureSection = ({
           </div>}
       </div>
     </div>;
-  return <section className="py-2 md:py-4 px-4 bg-black">
+  return <section className="py-1 md:py-2 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-3 md:p-6">
+        <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-2 md:p-4">
           {/* Mobile Layout */}
-          <div className="lg:hidden space-y-3">
+          <div className="lg:hidden space-y-2">
             {mobileHeaderSection}
             {animationSection}
             {mobileContentSection}
           </div>
           
           {/* Desktop Layout */}
-          <div className={`hidden lg:grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center ${isReversed ? 'lg:grid-flow-col-dense' : ''}`}>
+          <div className={`hidden lg:grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center ${isReversed ? 'lg:grid-flow-col-dense' : ''}`}>
             {isReversed ? <>
                 <div className={isReversed ? 'lg:col-start-2' : ''}>{animationSection}</div>
                 <div className={isReversed ? 'lg:col-start-1' : ''}>{desktopContentSection}</div>
