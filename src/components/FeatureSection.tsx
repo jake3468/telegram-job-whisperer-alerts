@@ -46,15 +46,15 @@ const FeatureSection = ({
   }, [lottieUrl]);
 
   const contentSection = (
-    <div className="flex flex-col justify-center space-y-6">
+    <div className="flex flex-col justify-center space-y-4">
       <div>
-        <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 font-inter">
+        <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3 font-inter">
           {title}
         </h3>
-        <p className="text-xl md:text-2xl text-gray-300 mb-6 font-inter font-light">
+        <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-4 font-inter font-light">
           {subheading}
         </p>
-        <p className="text-base md:text-lg text-gray-400 leading-relaxed font-inter">
+        <p className="text-base md:text-lg text-gray-700 dark:text-gray-400 leading-relaxed font-inter">
           {description}
         </p>
       </div>
@@ -83,7 +83,7 @@ const FeatureSection = ({
 
   const animationSection = (
     <div className="flex items-center justify-center">
-      <div className="w-full max-w-md lg:max-w-lg">
+      <div className="w-full max-w-sm md:max-w-md lg:max-w-lg">
         {LottieComponent && animationData ? (
           <LottieComponent
             animationData={animationData}
@@ -101,9 +101,10 @@ const FeatureSection = ({
   );
 
   return (
-    <section className="py-16 md:py-24 px-4 bg-black">
+    <section className="py-8 md:py-12 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
-        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center ${isReversed ? 'lg:grid-flow-col-dense' : ''}`}>
+        <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-6 md:p-8">
+          <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center ${isReversed ? 'lg:grid-flow-col-dense' : ''}`}>
           {isReversed ? (
             <>
               <div className={isReversed ? 'lg:col-start-2' : ''}>{animationSection}</div>
@@ -115,6 +116,7 @@ const FeatureSection = ({
               {animationSection}
             </>
           )}
+        </div>
         </div>
       </div>
     </section>
