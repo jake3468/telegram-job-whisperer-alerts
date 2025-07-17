@@ -463,7 +463,19 @@ const JobTracker = () => {
       return;
     }
     try {
-      const maxOrder = Math.max(...jobs.filter(job => job.status === selectedStatus).map(job => job.order_position), -1);
+      // Get the next order position using database function for consistency
+      const { data: nextPosition, error: positionError } = await executeWithRetry(async () => {
+        return await supabase.rpc('get_next_order_position', {
+          p_user_id: userProfileId,
+          p_status: selectedStatus
+        });
+      }, 3, 'get next order position');
+
+      if (positionError) {
+        throw new Error(`Failed to get order position: ${positionError.message}`);
+      }
+
+      const orderPosition = nextPosition || 0;
 
       // Create optimistic update first
       const tempJob: JobEntry = {
@@ -473,7 +485,7 @@ const JobTracker = () => {
         job_description: formData.job_description || undefined,
         job_url: formData.job_url || undefined,
         status: selectedStatus,
-        order_position: maxOrder + 1,
+        order_position: orderPosition,
         resume_updated: false,
         job_role_analyzed: false,
         company_researched: false,
@@ -494,7 +506,7 @@ const JobTracker = () => {
           job_description: formData.job_description || null,
           job_url: formData.job_url || null,
           status: selectedStatus,
-          order_position: maxOrder + 1
+          order_position: orderPosition
         }).select().single();
         if (error) throw error;
         return data;
@@ -717,43 +729,56 @@ const JobTracker = () => {
     // Check if dropped on a column (over.id will be the column key)
     const targetColumn = columns.find(col => col.key === over.id);
     if (targetColumn && activeJobToMove.status !== targetColumn.key) {
-      // Optimistic update - update UI immediately
-      const targetJobs = jobs.filter(j => j.status === targetColumn.key);
-      const maxOrder = Math.max(...targetJobs.map(j => j.order_position), -1);
-      const updatedJob = {
-        ...activeJobToMove,
-        status: targetColumn.key as JobEntry['status'],
-        order_position: maxOrder + 1
-      };
-
-      // Reset irrelevant checklist items based on target status
-      if (targetColumn.key === 'saved') {
-        // Keep saved items, reset others
-        updatedJob.interview_call_received = false;
-        updatedJob.interview_prep_guide_received = false;
-        updatedJob.ai_mock_interview_attempted = false;
-      } else if (targetColumn.key === 'applied') {
-        // Reset interview items when moving to applied
-        updatedJob.interview_prep_guide_received = false;
-        updatedJob.ai_mock_interview_attempted = false;
-      } else if (targetColumn.key === 'rejected' || targetColumn.key === 'offer') {
-        // Reset all checklist items for final statuses
-        updatedJob.interview_call_received = false;
-        updatedJob.interview_prep_guide_received = false;
-        updatedJob.ai_mock_interview_attempted = false;
-      }
-
-      // Update local state immediately for instant feedback
-      optimisticUpdate({
-        ...updatedJob,
-        file_urls: Array.isArray(updatedJob.file_urls) ? updatedJob.file_urls.map(url => String(url)) : [],
-        comments: updatedJob.comments || undefined
-      } as JobEntry);
       try {
+        // Get the next order position using database function for consistency
+        const { data: nextPosition, error: positionError } = await executeWithRetry(async () => {
+          return await supabase.rpc('get_next_order_position', {
+            p_user_id: userProfileId,
+            p_status: targetColumn.key as 'saved' | 'applied' | 'interview' | 'rejected' | 'offer'
+          });
+        }, 3, 'get next order position for drag drop');
+
+        if (positionError) {
+          throw new Error(`Failed to get order position: ${positionError.message}`);
+        }
+
+        const orderPosition = nextPosition || 0;
+        
+        // Optimistic update - update UI immediately  
+        const updatedJob = {
+          ...activeJobToMove,
+          status: targetColumn.key as 'saved' | 'applied' | 'interview' | 'rejected' | 'offer',
+          order_position: orderPosition
+        };
+
+        // Reset irrelevant checklist items based on target status
+        if (targetColumn.key === 'saved') {
+          // Keep saved items, reset others
+          updatedJob.interview_call_received = false;
+          updatedJob.interview_prep_guide_received = false;
+          updatedJob.ai_mock_interview_attempted = false;
+        } else if (targetColumn.key === 'applied') {
+          // Reset interview items when moving to applied
+          updatedJob.interview_prep_guide_received = false;
+          updatedJob.ai_mock_interview_attempted = false;
+        } else if (targetColumn.key === 'rejected' || targetColumn.key === 'offer') {
+          // Reset all checklist items for final statuses
+          updatedJob.interview_call_received = false;
+          updatedJob.interview_prep_guide_received = false;
+          updatedJob.ai_mock_interview_attempted = false;
+        }
+
+        // Update local state immediately for instant feedback
+        optimisticUpdate({
+          ...updatedJob,
+          file_urls: Array.isArray(updatedJob.file_urls) ? updatedJob.file_urls.map(url => String(url)) : [],
+          comments: updatedJob.comments || undefined
+        } as JobEntry);
+
         await executeWithRetry(async () => {
           const { error } = await supabase.from('job_tracker').update({
-            status: targetColumn.key as JobEntry['status'],
-            order_position: maxOrder + 1,
+            status: targetColumn.key as 'saved' | 'applied' | 'interview' | 'rejected' | 'offer',
+            order_position: orderPosition,
             interview_call_received: updatedJob.interview_call_received,
             interview_prep_guide_received: updatedJob.interview_prep_guide_received,
             ai_mock_interview_attempted: updatedJob.ai_mock_interview_attempted

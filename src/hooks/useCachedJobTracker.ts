@@ -35,6 +35,63 @@ interface CachedJobTrackerData {
 const CACHE_KEY = 'aspirely_job_tracker_cache';
 const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
+// Helper function to validate and fix order position conflicts
+const validateAndFixOrderPositions = async (jobs: JobEntry[], userProfileId: string): Promise<JobEntry[]> => {
+  const statusGroups = jobs.reduce((groups, job) => {
+    if (!groups[job.status]) {
+      groups[job.status] = [];
+    }
+    groups[job.status].push(job);
+    return groups;
+  }, {} as Record<string, JobEntry[]>);
+
+  // Check for conflicts and fix them if found
+  let hasConflicts = false;
+  for (const [status, statusJobs] of Object.entries(statusGroups)) {
+    const positionCounts = statusJobs.reduce((counts, job) => {
+      counts[job.order_position] = (counts[job.order_position] || 0) + 1;
+      return counts;
+    }, {} as Record<number, number>);
+
+    // If any position appears more than once, we have conflicts
+    if (Object.values(positionCounts).some(count => count > 1)) {
+      hasConflicts = true;
+      break;
+    }
+  }
+
+  if (hasConflicts) {
+    logger.warn('Order position conflicts detected, rebalancing...', { userProfileId });
+    try {
+      // Call the database function to rebalance positions
+      await supabase.rpc('rebalance_job_tracker_order_positions');
+      
+      // Refetch the data to get the corrected positions
+      const { data: correctedData, error } = await supabase
+        .from('job_tracker')
+        .select('*')
+        .eq('user_id', userProfileId)
+        .order('order_position', { ascending: true });
+
+      if (error) throw error;
+
+      const correctedJobs: JobEntry[] = (correctedData || []).map(job => ({
+        ...job,
+        file_urls: Array.isArray(job.file_urls) ? job.file_urls.map(url => String(url)) : [],
+        comments: job.comments || undefined
+      }));
+
+      logger.debug('Order positions rebalanced successfully');
+      return correctedJobs;
+    } catch (error) {
+      logger.error('Failed to rebalance order positions:', error);
+      return jobs; // Return original data if rebalancing fails
+    }
+  }
+
+  return jobs;
+};
+
 export const useCachedJobTracker = () => {
   const { user } = useUser();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
@@ -148,20 +205,23 @@ export const useCachedJobTracker = () => {
         comments: job.comments || undefined
       }));
       
+      // Validate and fix any order position conflicts
+      const validatedJobs = await validateAndFixOrderPositions(jobsData, userProfile.id);
+      
       // Update state
-      setJobs(jobsData);
+      setJobs(validatedJobs);
       setUserProfileId(userProfile.id);
       setHasFetched(true);
 
       // Cache the data
       try {
         const cacheData: CachedJobTrackerData = {
-          jobs: jobsData,
+          jobs: validatedJobs,
           userProfileId: userProfile.id,
           timestamp: Date.now()
         };
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-        logger.debug('✅ Job tracker data loaded successfully:', { jobCount: jobsData.length, userProfileId: userProfile.id });
+        logger.debug('✅ Job tracker data loaded successfully:', { jobCount: validatedJobs.length, userProfileId: userProfile.id });
       } catch (cacheError) {
         logger.warn('Failed to cache job tracker data:', cacheError);
       }
