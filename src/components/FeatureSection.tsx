@@ -99,7 +99,7 @@ const FeatureSection = ({
     </div>;
   return <section className="py-1 md:py-2 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-2 md:p-4">
+        <div className="bg-gray-50 dark:bg-gray-900 rounded-3xl p-2 md:p-4">
           {/* Mobile Layout */}
           <div className="lg:hidden space-y-2">
             {mobileHeaderSection}

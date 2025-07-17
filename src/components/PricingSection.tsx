@@ -38,10 +38,10 @@ const PricingSection = () => {
         </div>
       </section>;
   }
-  return <section className="py-16 sm:py-24 px-4 bg-black">
+  return <section className="py-8 md:py-12 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-5xl font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-4 font-inter">Pricing Plans</h2>
+        <div className="text-center mb-6">
+          <h2 className="text-3xl sm:text-5xl font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-2 font-inter">Pricing Plans</h2>
           <p className="text-lg text-blue-100 font-inter font-light mb-6">
             Pay only for what you use. Get started with free monthly credits, and upgrade anytime.
           </p>
