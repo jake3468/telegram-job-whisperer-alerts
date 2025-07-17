@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { SignUpButton } from "@clerk/clerk-react";
 import { ArrowRight } from "lucide-react";
-
 interface FeatureSectionProps {
   title: string;
   subheading: string;
@@ -11,7 +10,6 @@ interface FeatureSectionProps {
   isReversed?: boolean;
   isComingSoon?: boolean;
 }
-
 const FeatureSection = ({
   title,
   subheading,
@@ -22,15 +20,12 @@ const FeatureSection = ({
   isComingSoon = false
 }: FeatureSectionProps) => {
   const [LottieComponent, setLottieComponent] = useState<React.ComponentType<any> | null>(null);
-  
   useEffect(() => {
     import('lottie-react').then(module => {
       setLottieComponent(() => module.default);
     });
   }, []);
-  
   const [animationData, setAnimationData] = useState(null);
-  
   useEffect(() => {
     const fetchAnimation = async () => {
       try {
@@ -45,106 +40,64 @@ const FeatureSection = ({
   }, [lottieUrl]);
 
   // Mobile: header section (title + subheading only)
-  const mobileHeaderSection = (
-    <div className="lg:hidden">
-      <h3 className="text-2xl md:text-3xl font-extrabold mb-3 font-inter text-primary leading-tight">
+  const mobileHeaderSection = <div className="lg:hidden">
+      <h3 className="text-2xl md:text-3xl mb-2 font-inter text-indigo-700 font-bold">
         {title}
       </h3>
-      <p className="text-lg mb-4 font-inter font-medium text-muted-foreground leading-relaxed border-l-4 border-primary/30 pl-4">
+      <p className="mb-3 font-inter font-light text-neutral-950 text-sm">
         {subheading}
       </p>
-    </div>
-  );
+    </div>;
 
   // Mobile: content section (description + button only)
-  const mobileContentSection = (
-    <div className="lg:hidden flex flex-col space-y-4">
-      <p className="text-base leading-relaxed font-inter text-foreground/80 bg-muted/50 p-4 rounded-lg border">
+  const mobileContentSection = <div className="lg:hidden flex flex-col space-y-3">
+      <p className="leading-relaxed font-inter text-neutral-950 text-xs">
         {description}
       </p>
-      {isComingSoon ? (
-        <button 
-          type="button" 
-          disabled 
-          className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75"
-        >
+      {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75">
           Coming Soon
-        </button>
-      ) : (
-        <SignUpButton mode="modal">
-          <button 
-            type="button" 
-            className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
-          >
+        </button> : <SignUpButton mode="modal">
+          <button type="button" className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
             {buttonText}
             <ArrowRight className="w-4 h-4" />
           </button>
-        </SignUpButton>
-      )}
-    </div>
-  );
+        </SignUpButton>}
+    </div>;
 
   // Desktop: full content section
-  const desktopContentSection = (
-    <div className="hidden lg:flex flex-col justify-center space-y-6">
+  const desktopContentSection = <div className="hidden lg:flex flex-col justify-center space-y-4">
       <div>
-        <h3 className="text-3xl lg:text-4xl xl:text-5xl font-extrabold mb-4 font-inter text-primary leading-tight">
+        <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-blue-700">
           {title}
         </h3>
-        <p className="text-xl lg:text-2xl mb-6 font-inter font-semibold text-muted-foreground leading-relaxed border-l-4 border-primary/30 pl-6">
+        <p className="md:text-xl mb-4 font-inter font-light text-base text-neutral-950">
           {subheading}
         </p>
-        <p className="text-lg lg:text-xl leading-relaxed font-inter text-foreground/80 bg-muted/50 p-6 rounded-lg border shadow-sm">
+        <p className="md:text-lg leading-relaxed font-inter text-sm text-neutral-950">
           {description}
         </p>
       </div>
       
-      {isComingSoon ? (
-        <button 
-          type="button" 
-          disabled 
-          className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75"
-        >
+      {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75">
           Coming Soon
-        </button>
-      ) : (
-        <SignUpButton mode="modal">
-          <button 
-            type="button" 
-            className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
-          >
+        </button> : <SignUpButton mode="modal">
+          <button type="button" className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
             {buttonText}
             <ArrowRight className="w-5 h-5" />
           </button>
-        </SignUpButton>
-      )}
-    </div>
-  );
-
-  const animationSection = (
-    <div className="flex items-center justify-center">
+        </SignUpButton>}
+    </div>;
+  const animationSection = <div className="flex items-center justify-center">
       <div className="w-full max-w-48 lg:max-w-md">
-        {LottieComponent && animationData ? (
-          <LottieComponent 
-            animationData={animationData} 
-            loop={true} 
-            autoplay={true} 
-            style={{
-              width: '100%',
-              height: 'auto'
-            }} 
-          />
-        ) : (
-          <div className="w-full h-40 lg:h-80 bg-gray-800 rounded-lg flex items-center justify-center">
+        {LottieComponent && animationData ? <LottieComponent animationData={animationData} loop={true} autoplay={true} style={{
+        width: '100%',
+        height: 'auto'
+      }} /> : <div className="w-full h-40 lg:h-80 bg-gray-800 rounded-lg flex items-center justify-center">
             <div className="text-gray-400">Loading animation...</div>
-          </div>
-        )}
+          </div>}
       </div>
-    </div>
-  );
-
-  return (
-    <section className="py-2 md:py-4 px-4 bg-black">
+    </div>;
+  return <section className="py-2 md:py-4 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
         <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-3 md:p-6">
           {/* Mobile Layout */}
@@ -156,22 +109,16 @@ const FeatureSection = ({
           
           {/* Desktop Layout */}
           <div className={`hidden lg:grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center ${isReversed ? 'lg:grid-flow-col-dense' : ''}`}>
-            {isReversed ? (
-              <>
+            {isReversed ? <>
                 <div className={isReversed ? 'lg:col-start-2' : ''}>{animationSection}</div>
                 <div className={isReversed ? 'lg:col-start-1' : ''}>{desktopContentSection}</div>
-              </>
-            ) : (
-              <>
+              </> : <>
                 {desktopContentSection}
                 {animationSection}
-              </>
-            )}
+              </>}
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default FeatureSection;
