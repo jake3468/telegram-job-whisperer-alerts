@@ -53,7 +53,7 @@ const PricingSection = () => {
           </div>
         </div>
 
-        <div className="grid gap-6 lg:gap-8 grid-cols-1 lg:grid-cols-3 items-stretch max-w-6xl mx-auto">
+        <div className="grid gap-8 lg:gap-8 grid-cols-1 lg:grid-cols-3 items-stretch max-w-6xl mx-auto">
           {/* Free Plan */}
           <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-blue-400/30 min-h-[420px]`}>
             <CardHeader className="text-center pb-4 pt-6 px-4">
@@ -91,7 +91,7 @@ const PricingSection = () => {
           </Card>
 
           {/* Monthly Subscription */}
-          <Card className={`flex flex-col rounded-2xl shadow-2xl border-0 ${planGradientBg.subscription} relative transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-cyan-400/30 min-h-[460px]`}>
+          <Card className={`flex flex-col rounded-2xl shadow-2xl border-0 ${planGradientBg.subscription} relative transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-cyan-400/30 min-h-[460px] mt-8 lg:mt-0`}>
             <div className="absolute -top-6 left-1/2 -translate-x-1/2 z-10">
               <Badge className="bg-gradient-to-r from-blue-400 to-cyan-400 text-white font-inter text-xs px-4 py-1 shadow-xl border-0 tracking-wide font-semibold">
                 MOST POPULAR

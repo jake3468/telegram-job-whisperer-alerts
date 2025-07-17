@@ -56,7 +56,17 @@ const ToolsSection = () => {
           isReversed={true}
         />
 
-        {/* LinkedIn Post Generator - Fifth Feature */}
+        {/* Company Research & Role Decoder - Fifth Feature */}
+        <FeatureSection
+          title="Company Research & Role Decoder"
+          subheading="One search. Full clarity. Know where you're heading before you apply."
+          description="Get detailed insights on any company, job title, and location — from salaries and growth opportunities to work culture, promotion timelines, and automation risks. Explore employee reviews from platforms like Glassdoor and Indeed, recent company news, role demand in the market, and career development potential. Access real interview questions, stage breakdowns, and prep guides, all in one place. Informed decisions start here."
+          lottieUrl="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Business%20Analytics.json"
+          buttonText="Research Company"
+          isReversed={false}
+        />
+
+        {/* LinkedIn Post Generator - Sixth Feature */}
         <FeatureSection
           title="LinkedIn Post Generator"
           subheading="Turn your thoughts into scroll-stopping content."
