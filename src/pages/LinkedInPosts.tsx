@@ -176,9 +176,7 @@ const LinkedInPosts = () => {
   useEffect(() => {
     if (!currentPostId || !isAuthReady || !userProfile?.id) return;
     console.log('🔄 Setting up real-time subscription for post ID:', currentPostId);
-    
     let channel: any;
-    
     const setupRealTime = async () => {
       try {
         await executeWithRetry(async () => {
@@ -228,9 +226,8 @@ const LinkedInPosts = () => {
         console.error('Error setting up real-time subscription:', error);
       }
     };
-
     setupRealTime();
-    
+
     // Cleanup function
     return () => {
       if (channel) {
@@ -441,7 +438,7 @@ const LinkedInPosts = () => {
   };
   const shouldShowResults = postsData && areAllPostsReady(postsData);
   const shouldShowLoading = isGenerating && !shouldShowResults;
-    console.log('🎯 Display logic:', {
+  console.log('🎯 Display logic:', {
     postsData: !!postsData,
     areAllPostsReady: postsData ? areAllPostsReady(postsData) : false,
     shouldShowResults,
@@ -479,7 +476,6 @@ const LinkedInPosts = () => {
       </div>
     </SidebarProvider>;
   }
-
   return <SidebarProvider defaultOpen={true}>
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
         <div className="flex items-center justify-between p-3">
@@ -505,7 +501,7 @@ const LinkedInPosts = () => {
                   <h1 className="sm:text-3xl font-orbitron bg-gradient-to-r from-teal-300 via-teal-400 to-cyan-400 bg-clip-text drop-shadow mb-4 tracking-tight font-bold lg:text-4xl text-teal-500 text-4xl">
                     ✍🏻 LinkedIn <span className="italic">Posts</span>
                   </h1>
-                  <p className="text-cyan-200 max-w-2xl mx-auto font-inter text-sm sm:text-base lg:text-lg font-light shadow-sm px-4 mb-3">
+                  <p className="max-w-2xl mx-auto font-inter text-sm sm:text-base font-light shadow-sm px-4 mb-3 text-slate-50 lg:text-base">
                     Create engaging LinkedIn posts that showcase your expertise and connect with your professional network
                   </p>
                   <div className="flex flex-col items-center gap-2">
@@ -531,17 +527,9 @@ const LinkedInPosts = () => {
                         </CardDescription>
                       </div>
                       <div className="flex items-center gap-2">
-                        {connectionIssue && (
-                          <Button
-                            onClick={() => window.location.reload()}
-                            variant="outline"
-                            size="sm"
-                            className="border-orange-400/30 bg-orange-100/10 text-orange-600 hover:bg-orange-200/20"
-                            title="Connection issue detected. Click to refresh the page."
-                          >
+                        {connectionIssue && <Button onClick={() => window.location.reload()} variant="outline" size="sm" className="border-orange-400/30 bg-orange-100/10 text-orange-600 hover:bg-orange-200/20" title="Connection issue detected. Click to refresh the page.">
                             <RefreshCw className="w-4 h-4" />
-                          </Button>
-                        )}
+                          </Button>}
                         <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 flex-shrink-0 bg-zinc-100 text-zinc-950">
                           <History className="w-4 h-4 mr-2 text-black" />
                           History
