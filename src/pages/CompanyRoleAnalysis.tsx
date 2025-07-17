@@ -63,7 +63,10 @@ const CompanyRoleAnalysis = () => {
   const {
     userProfile
   } = useUserProfile();
-  const { isAuthReady, executeWithRetry } = useEnterpriseAuth();
+  const {
+    isAuthReady,
+    executeWithRetry
+  } = useEnterpriseAuth();
 
   // Handle pre-populated data from job tracker
   useEffect(() => {
@@ -138,7 +141,6 @@ const CompanyRoleAnalysis = () => {
   useEffect(() => {
     if (!userProfile?.id || !pendingAnalysisId || !isAuthReady) return;
     console.log('Setting up real-time subscription for analysis:', pendingAnalysisId);
-    
     const setupSubscription = async () => {
       await executeWithRetry(async () => {
         const channel = supabase.channel('company-analysis-updates').on('postgres_changes', {
@@ -160,14 +162,12 @@ const CompanyRoleAnalysis = () => {
             console.log('Real-time update received but no meaningful data yet, continuing to wait...');
           }
         }).subscribe();
-        
         return () => {
           console.log('Cleaning up real-time subscription');
           supabase.removeChannel(channel);
         };
       }, 3, 'setup real-time subscription');
     };
-
     setupSubscription();
   }, [userProfile?.id, pendingAnalysisId, refetchHistory, isAuthReady, executeWithRetry]);
 
@@ -209,17 +209,16 @@ const CompanyRoleAnalysis = () => {
       });
       return;
     }
-      if (!companyName.trim() || !locationField.trim() || !jobTitle.trim()) {
-        toast({
-          title: "Missing Information",
-          description: "Please fill in all required fields.",
-          variant: "destructive"
-        });
-        return;
-      }
+    if (!companyName.trim() || !locationField.trim() || !jobTitle.trim()) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
     setIsSubmitting(true);
     setShowRecentResults(false);
-    
     try {
       console.log('Creating company role analysis with data:', {
         user_id: userProfile.id,
@@ -227,19 +226,19 @@ const CompanyRoleAnalysis = () => {
         location: locationField.trim(),
         job_title: jobTitle.trim()
       });
-      
       const data = await executeWithRetry(async () => {
-        const { data, error } = await supabase.from('company_role_analyses').insert({
+        const {
+          data,
+          error
+        } = await supabase.from('company_role_analyses').insert({
           user_id: userProfile.id,
           company_name: companyName.trim(),
           location: locationField.trim(),
           job_title: jobTitle.trim()
         }).select().single();
-        
         if (error) throw error;
         return data;
       }, 3, 'create company role analysis');
-
       console.log('Company analysis created successfully:', data);
 
       // Set pending analysis ID to track real-time updates
@@ -258,7 +257,6 @@ const CompanyRoleAnalysis = () => {
       await executeWithRetry(async () => {
         refetchHistory();
       }, 2, 'refetch analysis history');
-      
     } catch (error) {
       console.error('Error submitting company-role analysis:', error);
       toast({
@@ -290,7 +288,6 @@ const CompanyRoleAnalysis = () => {
       </div>
     </Layout>;
   }
-
   return <Layout>
       <div className="min-h-screen bg-black px-2 pt-2 pb-2 sm:px-4 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
@@ -325,7 +322,7 @@ const CompanyRoleAnalysis = () => {
                     <CardTitle className="text-xl sm:text-2xl font-orbitron text-left font-normal text-gray-50">
                       Company & Role Intelligence
                     </CardTitle>
-                    <p className="text-green-100 font-medium mt-2 text-left text-sm sm:text-base">Enter company details to uncover hidden red flags and green lights — including insights on company news, job security, salary ranges, workplace culture, and interview experiences.</p>
+                    <p className="text-green-100 font-medium mt-2 text-left text-sm sm:text-sm">Enter company details to uncover hidden red flags and green lights — including insights on company news, job security, salary ranges, workplace culture, and interview experiences.</p>
                   </div>
                   <Button onClick={() => setIsHistoryOpen(true)} variant="outline" className="w-full sm:w-auto border-white/50 font-orbitron text-sm sm:text-base flex-shrink-0 bg-zinc-50 text-zinc-950">
                     <History className="w-4 h-4 mr-2" />
@@ -348,15 +345,7 @@ const CompanyRoleAnalysis = () => {
                       <Label htmlFor="location" className="text-white font-medium flex items-center gap-2 text-sm sm:text-base">
                         📍Location *
                       </Label>
-                      <Input 
-                        id="location" 
-                        type="text" 
-                        placeholder={locationMessage || "e.g., San Francisco, New York, Remote"} 
-                        value={locationField} 
-                        onChange={e => setLocationField(e.target.value)} 
-                        required 
-                        className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" 
-                      />
+                      <Input id="location" type="text" placeholder={locationMessage || "e.g., San Francisco, New York, Remote"} value={locationField} onChange={e => setLocationField(e.target.value)} required className="border-green-300 text-white placeholder:text-gray-500 focus:border-green-500 focus:ring-green-500/20 h-10 sm:h-12 w-full text-sm sm:text-base bg-zinc-950" />
                     </div>
                   </div>
 
@@ -370,11 +359,7 @@ const CompanyRoleAnalysis = () => {
 
                   {/* Action Buttons - Desktop: same line, Mobile: stacked */}
                   <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 pt-2 sm:pt-4">
-                    <Button 
-                      type="submit" 
-                      disabled={isSubmitting || !companyName.trim() || !locationField.trim() || !jobTitle.trim()} 
-                      className="w-full lg:flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-4 sm:py-6 text-xs sm:text-base transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                    >
+                    <Button type="submit" disabled={isSubmitting || !companyName.trim() || !locationField.trim() || !jobTitle.trim()} className="w-full lg:flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-4 sm:py-6 text-xs sm:text-base transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
                       {isSubmitting ? <>
                           <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
                           Analyzing Company & Role...
