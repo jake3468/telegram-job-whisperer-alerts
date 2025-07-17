@@ -14,15 +14,16 @@ import { useCachedLocationPricing } from '@/hooks/useCachedLocationPricing';
 import { useCachedPaymentProducts } from '@/hooks/useCachedPaymentProducts';
 import { useCheckoutSession } from '@/hooks/useCheckoutSession';
 import { toast } from 'sonner';
+import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 const planGradientBg = {
-  free: "bg-black border border-blue-400/30",
+  free: "bg-white border border-gray-200",
   subscription: "bg-gradient-to-br from-[#2563eb] via-[#3893ec] to-[#1872ba] dark:from-[#274299] dark:via-[#3177c7] dark:to-[#1b466c]",
-  pack: "bg-black border border-indigo-400/30"
+  pack: "bg-white border border-gray-200"
 };
 const planTextColor = {
-  free: "text-blue-100",
+  free: "text-gray-800",
   subscription: "text-cyan-100",
-  pack: "text-indigo-100"
+  pack: "text-gray-800"
 };
 export default function GetMoreCredits() {
   const {
@@ -30,7 +31,7 @@ export default function GetMoreCredits() {
     isLoaded
   } = useUser();
   const navigate = useNavigate();
-  
+
   // Use cached hooks for instant data display
   const {
     data: credits,
@@ -38,27 +39,28 @@ export default function GetMoreCredits() {
     error: creditsError,
     isShowingCachedData: isShowingCachedCredits
   } = useCachedUserCredits();
-  
-  const { userProfile } = useUserProfile();
-  
+  const {
+    userProfile
+  } = useUserProfile();
   const {
     pricingData,
     isLoading: isPricingLoading,
     userCountry,
     isShowingCachedData: isShowingCachedPricing
   } = useCachedLocationPricing();
-  
   const {
     subscriptionProducts,
     creditPackProducts,
     isLoading: isProductsLoading,
     isShowingCachedData: isShowingCachedProducts
   } = useCachedPaymentProducts(pricingData?.region, pricingData?.currency);
-  
   const {
     createCheckoutSession,
     isLoading: isCheckoutLoading
   } = useCheckoutSession();
+  const {
+    isAuthReady
+  } = useEnterpriseAuth();
 
   // Connection and error state management
   const [connectionIssue, setConnectionIssue] = useState(false);
@@ -72,6 +74,10 @@ export default function GetMoreCredits() {
     }
   }, [credits, creditsError]);
   const handleSubscribeClick = async () => {
+    if (!isAuthReady) {
+      toast.error('Please wait, authentication is loading...');
+      return;
+    }
     const subscriptionProduct = subscriptionProducts[0];
     if (!subscriptionProduct) {
       toast.error('Subscription product not available');
@@ -86,6 +92,10 @@ export default function GetMoreCredits() {
     }
   };
   const handleCreditPackClick = async (productId: string) => {
+    if (!isAuthReady) {
+      toast.error('Please wait, authentication is loading...');
+      return;
+    }
     console.log('Buying credit pack with product:', productId);
     const session = await createCheckoutSession(productId);
     if (session?.url) {
@@ -108,7 +118,7 @@ export default function GetMoreCredits() {
         window.location.reload();
         return;
       }
-      
+
       // For cached data scenarios, try refreshing and fall back quickly
       setTimeout(() => {
         if (connectionIssue) {
@@ -135,22 +145,12 @@ export default function GetMoreCredits() {
             </div>
             
             {/* Manual Refresh Button */}
-            {connectionIssue && (
-              <Button
-                onClick={handleManualRefresh}
-                variant="outline"
-                size="sm"
-                className="text-xs bg-red-900/20 border-red-400/30 text-red-300 hover:bg-red-800/30"
-              >
+            {connectionIssue && <Button onClick={handleManualRefresh} variant="outline" size="sm" className="text-xs bg-red-900/20 border-red-400/30 text-red-300 hover:bg-red-800/30">
                 <RefreshCw className="w-3 h-3 mr-1" />
                 Refresh
-              </Button>
-            )}
+              </Button>}
           </div>
-          <p className="text-blue-100 font-inter font-light mb-1 sm:mb-2 animate-fade-in sm:text-base text-left text-sm">Start with free monthly credits and upgrade anytime — either by purchasing flexible credit packs or a monthly subscription. 
-
-
-For any payment-related queries, feel free to reach out to us at support@aspirely.ai — we're here to help! 💬</p>
+          <p className="text-blue-100 font-inter font-light mb-1 sm:mb-2 animate-fade-in sm:text-base text-left text-sm">💬 Start with free monthly credits and upgrade anytime - either by purchasing flexible credit packs or a monthly subscription. For any payment-related queries, feel free to reach out to us at &quot;support@aspirely.ai&quot; we're here to help! </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
             <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in">
               Current Balance:{" "}
@@ -185,30 +185,30 @@ For any payment-related queries, feel free to reach out to us at support@aspirel
             <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-blue-400/30 min-h-[320px] sm:min-h-[380px]`}>
               <CardHeader className="text-center pb-2 pt-3 sm:pb-4 sm:pt-6 px-3 sm:px-4">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 ${planTextColor.free}`}>Free Plan</CardTitle>
-                <div className="text-2xl sm:text-3xl font-extrabold text-blue-100 mt-0.5 mb-0.5">Free</div>
-                <div className="mt-0 text-xs sm:text-sm font-semibold text-blue-300">30 credits/month</div>
+                <div className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-0.5 mb-0.5">Free</div>
+                <div className="mt-0 text-xs sm:text-sm font-semibold text-gray-600">30 credits/month</div>
               </CardHeader>
               <CardContent className="grow flex flex-col px-3 sm:px-4 pb-3">
                 <ul className="space-y-1 sm:space-y-2 my-2 sm:my-4 flex-grow">
                   <li className="flex items-center gap-1 sm:gap-2">
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-blue-100">Access to all features</span>
+                    <span className="text-xs sm:text-sm text-gray-700">Access to all features</span>
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-blue-100">30 credits every month</span>
+                    <span className="text-xs sm:text-sm text-gray-700">30 credits every month</span>
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-blue-100">Auto-renewal</span>
+                    <span className="text-xs sm:text-sm text-gray-700">Auto-renewal</span>
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-blue-100">Perfect for occasional use</span>
+                    <span className="text-xs sm:text-sm text-gray-700">Perfect for occasional use</span>
                   </li>
                 </ul>  
                 <div className="mt-auto">
-                  <Button className="w-full py-2 sm:py-2.5 bg-blue-500/90 hover:bg-blue-700 text-white rounded-xl font-orbitron text-xs sm:text-sm shadow border-0" disabled>
+                  <Button className="w-full py-2 sm:py-2.5 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-orbitron text-xs sm:text-sm shadow border-0" disabled>
                     Current Plan
                   </Button>
                 </div>
@@ -263,8 +263,8 @@ For any payment-related queries, feel free to reach out to us at support@aspirel
                   </li>
                 </ul>
                  <div className="mt-auto">
-                   <Button onClick={handleSubscribeClick} className="w-full py-2 sm:py-2.5 bg-white hover:bg-yellow-100 text-black font-orbitron text-xs rounded-xl shadow border-0 font-bold transition-colors duration-200" disabled={connectionIssue || isPricingLoading || isProductsLoading || subscriptionProducts[0] && isCheckoutLoading(subscriptionProducts[0].product_id)}>
-                     {subscriptionProducts[0] && isCheckoutLoading(subscriptionProducts[0].product_id) ? <>
+                   <Button onClick={handleSubscribeClick} className="w-full py-2 sm:py-2.5 bg-white hover:bg-yellow-100 text-black font-orbitron text-xs rounded-xl shadow border-0 font-bold transition-colors duration-200" disabled={!isAuthReady || connectionIssue || isPricingLoading || isProductsLoading || subscriptionProducts[0] && isCheckoutLoading(subscriptionProducts[0].product_id)}>
+                     {!isAuthReady ? 'Please wait...' : subscriptionProducts[0] && isCheckoutLoading(subscriptionProducts[0].product_id) ? <>
                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
                          Processing...
                        </> : 'Subscribe Now'}
@@ -277,40 +277,38 @@ For any payment-related queries, feel free to reach out to us at support@aspirel
             <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-indigo-400/30 min-h-[320px] sm:min-h-[380px]`}>
               <CardHeader className="text-center pb-2 pt-3 sm:pb-4 sm:pt-6 px-3 sm:px-4">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 ${planTextColor.pack}`}>Credit Packs</CardTitle>
-                 <div className="text-2xl sm:text-3xl font-extrabold text-[#badbff] mb-0.5 sm:mb-1">
+                 <div className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-0.5 sm:mb-1">
                    {pricingData ? `Starting ${pricingData.currencySymbol}${creditPackProducts.length > 0 ? Math.min(...creditPackProducts.map(p => p.price_amount)) : pricingData.creditPacks[0]?.price}` : 'Loading...'}
                  </div>
-                <div className="mt-0 text-xs sm:text-sm font-semibold text-indigo-200">Select your desired amount:</div>
+                <div className="mt-0 text-xs sm:text-sm font-semibold text-gray-600">Select your desired amount:</div>
               </CardHeader>
               <CardContent className="grow flex flex-col px-3 sm:px-4 pb-3">
                  <div className="flex flex-col gap-1 sm:gap-2 my-2 sm:my-3 flex-grow">
                    {/* Show database products if available, otherwise show static fallback */}
-                   {creditPackProducts.length > 0 ? creditPackProducts.map(pack => 
-                     <div key={pack.product_id} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
-                       <span className="text-indigo-100 font-medium text-xs sm:text-sm">{pack.credits_amount} credits</span>
+                   {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="border border-gray-200 rounded-lg p-2 sm:p-2.5 flex justify-between items-center shadow hover:shadow-gray-300/50 transition duration-300 bg-blue-100">
+                       <span className="text-gray-700 font-medium text-xs sm:text-sm">{pack.credits_amount} credits</span>
                        <div className="flex items-center gap-2">
-                         <span className="text-indigo-50 font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price_amount}</span>
-                         <Button size="sm" onClick={() => handleCreditPackClick(pack.product_id)} className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={connectionIssue || isCheckoutLoading(pack.product_id)}>
-                           {isCheckoutLoading(pack.product_id) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
-                         </Button>
+                         <span className="text-gray-900 font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price_amount}</span>
+                          <Button size="sm" onClick={() => handleCreditPackClick(pack.product_id)} className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={!isAuthReady || connectionIssue || isCheckoutLoading(pack.product_id)}>
+                            {!isAuthReady ? '...' : isCheckoutLoading(pack.product_id) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
+                          </Button>
                        </div>
                      </div>) :
-                 // Only show fallback if no database products and not loading
-                 !isProductsLoading && pricingData?.creditPacks.map(pack => 
-                   <div key={pack.credits} className="bg-gradient-to-r from-[#385494] via-[#3d6dbb] to-[#4478d6] rounded-lg p-2 sm:p-2.5 border border-indigo-400 flex justify-between items-center shadow hover:shadow-indigo-400/15 transition duration-300">
-                     <span className="text-indigo-100 font-medium text-xs sm:text-sm">{pack.credits} credits</span>
+                // Only show fallback if no database products and not loading
+                !isProductsLoading && pricingData?.creditPacks.map(pack => <div key={pack.credits} className="bg-gray-50 border border-gray-200 rounded-lg p-2 sm:p-2.5 flex justify-between items-center shadow hover:shadow-gray-300/50 transition duration-300">
+                     <span className="text-gray-700 font-medium text-xs sm:text-sm">{pack.credits} credits</span>
                      <div className="flex items-center gap-2">
-                       <span className="text-indigo-50 font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price}</span>
-                       <Button size="sm" onClick={() => handleCreditPackClick(pack.productId)} className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={connectionIssue || isCheckoutLoading(pack.productId)}>
-                         {isCheckoutLoading(pack.productId) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
-                       </Button>
+                       <span className="text-gray-900 font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price}</span>
+                        <Button size="sm" onClick={() => handleCreditPackClick(pack.productId)} className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={!isAuthReady || connectionIssue || isCheckoutLoading(pack.productId)}>
+                          {!isAuthReady ? '...' : isCheckoutLoading(pack.productId) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
+                        </Button>
                      </div>
                    </div>)}
                   
                   {/* Loading state */}
                   {isProductsLoading && <div className="flex items-center justify-center py-4">
                       <Loader2 className="w-4 h-4 animate-spin text-indigo-300" />
-                      <span className="ml-2 text-indigo-200 text-xs">Loading credit packs...</span>
+                      <span className="ml-2 text-gray-600 text-xs">Loading credit packs...</span>
                     </div>}
                 </div>
                 
@@ -318,15 +316,15 @@ For any payment-related queries, feel free to reach out to us at support@aspirel
                 <ul className="space-y-1 mb-2">
                   <li className="flex items-center gap-1 sm:gap-2">
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-indigo-100 text-[10px] sm:text-xs">No expiration</span>
+                    <span className="text-gray-700 text-[10px] sm:text-xs">No expiration</span>
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-indigo-100 text-[10px] sm:text-xs">Instant activation</span>
+                    <span className="text-gray-700 text-[10px] sm:text-xs">Instant activation</span>
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-indigo-100 text-[10px] sm:text-xs">Secure payment</span>
+                    <span className="text-gray-700 text-[10px] sm:text-xs">Secure payment</span>
                   </li>
                 </ul>
               </CardContent>

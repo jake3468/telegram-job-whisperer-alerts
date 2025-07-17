@@ -26,10 +26,10 @@ const HowItWorksSection = () => {
   ];
 
   return (
-    <section id="how-it-works" className="bg-black py-20 px-4">
+    <section id="how-it-works" className="bg-black py-12 md:py-16 px-4">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-semibold text-white mb-4 font-inter">
+        <div className="text-center mb-8">
+          <h2 className="text-4xl md:text-5xl font-semibold text-white mb-2 font-inter">
             How It Works
           </h2>
           <p className="text-xl text-gray-400 font-inter font-light">
@@ -78,7 +78,7 @@ const HowItWorksSection = () => {
           </div>
 
           {/* Call to action */}
-          <div className="text-center mt-16">
+          <div className="text-center mt-8">
             <p className="text-gray-400 text-lg mb-6 font-inter">
               Ready to transform your job search?
             </p>

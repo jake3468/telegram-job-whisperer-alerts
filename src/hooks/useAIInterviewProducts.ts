@@ -39,7 +39,7 @@ export const useAIInterviewProducts = () => {
         .select('*')
         .eq('is_active', true)
         .like('product_name', '%AI Mock Interview%')
-        .or(`region.eq.${pricingData.region},region.eq.global`)
+        .or(`region.eq.${pricingData.region === 'IN' ? 'india' : 'global'},region.eq.global`)
         .eq('currency_code', pricingData.currency)
         .order('credits_amount', { ascending: true });
 

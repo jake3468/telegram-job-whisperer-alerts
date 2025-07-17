@@ -1,273 +1,217 @@
-
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+};
+
+const logStep = (step: string, details?: any) => {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  console.log(`[CREATE-CHECKOUT-SESSION] ${step}${detailsStr}`);
+};
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { productId } = await req.json()
-    
-    console.log('🚀 CHECKOUT SESSION: Received request for productId:', productId)
-    
-    if (!productId) {
-      console.error('❌ CHECKOUT SESSION: No productId provided')
-      return new Response(
-        JSON.stringify({ error: 'Product ID is required' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
+    logStep("Function started - v2.1"); // Force redeploy trigger
+
+    // Initialize Supabase client with anon key for user authentication
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+    );
+
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      throw new Error("No authorization header provided");
     }
 
-    // Initialize Supabase client with service role key for vault access
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    const clerkToken = authHeader.replace("Bearer ", "");
+    logStep("Processing Clerk JWT token", { tokenLength: clerkToken.length });
 
-    // Get the authorization header
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.error('❌ CHECKOUT SESSION: No valid authorization header found')
-      return new Response(
-        JSON.stringify({ error: 'Authorization required' }),
-        { 
-          status: 401, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
-    }
-
-    // Extract and decode the Clerk JWT directly
-    const token = authHeader.replace('Bearer ', '')
-    console.log('🔐 CHECKOUT SESSION: Processing Clerk JWT token')
-    
-    let clerkUserId: string;
+    // Decode Clerk JWT to get user ID
+    let clerkUserId;
     try {
-      // Decode JWT payload directly
-      const parts = token.split('.')
-      if (parts.length !== 3) {
-        throw new Error('Invalid JWT format')
+      const tokenParts = clerkToken.split('.');
+      if (tokenParts.length !== 3) {
+        throw new Error("Malformed JWT token");
       }
-      
-      // Decode the payload (second part)
-      const payload = parts[1]
-      const paddedPayload = payload + '='.repeat((4 - payload.length % 4) % 4)
-      const decodedString = atob(paddedPayload)
-      const claims = JSON.parse(decodedString)
-      
-      clerkUserId = claims.sub
-      if (!clerkUserId) {
-        throw new Error('No user ID in JWT')
-      }
-      
-      console.log('✅ CHECKOUT SESSION: Extracted Clerk user ID:', clerkUserId)
-    } catch (error) {
-      console.error('❌ CHECKOUT SESSION: JWT decode error:', error)
-      return new Response(
-        JSON.stringify({ error: 'Invalid JWT token' }),
-        { 
-          status: 401, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
+      const payload = JSON.parse(atob(tokenParts[1]));
+      clerkUserId = payload.sub;
+      logStep("Decoded Clerk user ID", { clerkUserId, tokenType: payload.iss });
+    } catch (err) {
+      logStep("JWT decode error", { error: err.message, tokenLength: clerkToken.length });
+      throw new Error(`Invalid Clerk JWT token: ${err.message}`);
     }
 
-    // Verify user exists in our database using the Clerk ID
-    const { data: userData, error: userLookupError } = await supabase
+    if (!clerkUserId) {
+      throw new Error("Clerk user ID not found in token");
+    }
+
+    // Get user details from our users table using service role
+    const supabaseService = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+
+    const { data: user, error: userError } = await supabaseService
       .from('users')
-      .select('id, clerk_id, email, first_name, last_name')
+      .select('*')
       .eq('clerk_id', clerkUserId)
-      .single()
+      .single();
 
-    if (userLookupError || !userData) {
-      console.error('❌ CHECKOUT SESSION: User not found in database:', userLookupError?.message)
-      return new Response(
-        JSON.stringify({ error: 'User not found', details: userLookupError?.message }),
-        { 
-          status: 401, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
+    if (userError || !user) {
+      logStep("User not found in database", { clerkUserId, error: userError });
+      throw new Error("User not found. Please ensure your account is properly set up.");
     }
 
-    console.log('✅ CHECKOUT SESSION: User authenticated successfully:', userData.id)
+    logStep("User found", { userId: user.id, email: user.email });
 
-    // Get product details from database using service role
-    console.log('🔍 CHECKOUT SESSION: Querying product details for:', productId)
-    const { data: product, error: productError } = await supabase
+    const requestBody = await req.json();
+    logStep("Request body received", { body: requestBody });
+    
+    // Handle both productId (from credit system) and product_id (from AI interview system)
+    const product_id = requestBody.productId || requestBody.product_id;
+    
+    if (!product_id) {
+      logStep("Missing product ID", { requestBody });
+      throw new Error("Product ID is required");
+    }
+
+    logStep("Product ID received", { product_id });
+
+    // Get product details from payment_products table
+    const { data: product, error: productError } = await supabaseService
       .from('payment_products')
       .select('*')
-      .eq('product_id', productId)
+      .eq('product_id', product_id)
       .eq('is_active', true)
-      .single()
+      .single();
 
     if (productError || !product) {
-      console.error('❌ CHECKOUT SESSION: Product not found:', productId, productError)
-      return new Response(
-        JSON.stringify({ 
-          error: 'Product not found',
-          details: `Product ${productId} not found or inactive`
-        }),
-        { 
-          status: 404, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
+      logStep("Product not found", { product_id, error: productError });
+      throw new Error("Product not found");
     }
 
-    console.log('✅ CHECKOUT SESSION: Product found:', product.product_name, product.product_type, product.currency)
+    logStep("Product found", { product });
 
-    // Determine the secret name based on product details
-    let secretName = ''
+    // User details already available from the earlier query
+    const userDetails = user;
+
+    // Determine the payment link secret name based on product details
+    const { credits_amount, currency_code, product_name, product_type } = product;
     
-    if (product.product_type === 'subscription') {
-      if (product.currency === 'INR') {
-        secretName = 'PAYMENT_LINK_INR_MONTHLY_SUBSCRIPTION'
-      } else {
-        secretName = 'PAYMENT_LINK_USD_MONTHLY_SUBSCRIPTION'
-      }
+    // Generate secret name based on product type
+    let secretName;
+    if (product_name && product_name.includes('AI Mock Interview')) {
+      // AI Interview products use credits-based naming
+      secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_${credits_amount}_CREDITS`;
     } else {
-      // Credit packs
-      const creditAmount = product.credits_amount
-      const currency = product.currency
+      // General credit products use tier-based naming
+      const productNameLower = product_name.toLowerCase();
       
-      if (currency === 'INR') {
-        switch (creditAmount) {
-          case 30:
-            secretName = 'PAYMENT_LINK_INR_STARTER'
-            break
-          case 80:
-            secretName = 'PAYMENT_LINK_INR_LITE'
-            break
-          case 200:
-            secretName = 'PAYMENT_LINK_INR_PRO'
-            break
-          case 500:
-            secretName = 'PAYMENT_LINK_INR_MAX'
-            break
-          default:
-            secretName = `PAYMENT_LINK_INR_${creditAmount}_CREDITS`
-        }
+      if (productNameLower.includes('starter')) {
+        secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_STARTER`;
+      } else if (productNameLower.includes('lite')) {
+        secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_LITE`;
+      } else if (productNameLower.includes('pro')) {
+        secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_PRO`;
+      } else if (productNameLower.includes('max')) {
+        secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_MAX`;
+      } else if (productNameLower.includes('monthly subscription')) {
+        secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_MONTHLY_SUBSCRIPTION`;
       } else {
-        switch (creditAmount) {
-          case 30:
-            secretName = 'PAYMENT_LINK_USD_STARTER'
-            break
-          case 80:
-            secretName = 'PAYMENT_LINK_USD_LITE'
-            break
-          case 200:
-            secretName = 'PAYMENT_LINK_USD_PRO'
-            break
-          case 500:
-            secretName = 'PAYMENT_LINK_USD_MAX'
-            break
-          default:
-            secretName = `PAYMENT_LINK_USD_${creditAmount}_CREDITS`
-        }
+        // Fallback: log warning and use a safe default
+        logStep("WARNING: Unknown product name pattern, using fallback", { product_name });
+        secretName = `PAYMENT_LINK_${currency_code.toUpperCase()}_UNKNOWN`;
       }
     }
+    
+    logStep("Looking for payment link", { secretName, product_name, product_type });
 
-    console.log(`🔐 CHECKOUT SESSION: Looking for payment link with secret name: ${secretName}`)
-
-    // Get the payment link from environment variables
-    const paymentUrl = Deno.env.get(secretName)
+    // Get payment URL directly from Edge Functions secrets
+    logStep("Getting payment link from Edge Functions secrets", { secretName });
+    
+    // Add comprehensive debugging for secret access
+    const allEnvKeys = Object.keys(Deno.env.toObject()).filter(key => key.startsWith('PAYMENT_LINK_'));
+    logStep("Available payment link secrets", { 
+      allSecrets: allEnvKeys, 
+      secretName,
+      lookingFor: secretName 
+    });
+    
+    let paymentUrl = Deno.env.get(secretName);
+    logStep("Secret retrieval result", { 
+      secretName, 
+      found: !!paymentUrl, 
+      valueLength: paymentUrl ? paymentUrl.length : 0,
+      valuePreview: paymentUrl ? paymentUrl.substring(0, 30) + "..." : "null"
+    });
 
     if (!paymentUrl) {
-      console.error('❌ CHECKOUT SESSION: Payment link not found for secret:', secretName)
+      logStep("Payment link secret not found", { 
+        secretName,
+        availableSecrets: allEnvKeys,
+        exactMatch: allEnvKeys.includes(secretName)
+      });
+      throw new Error(`Payment configuration missing for secret: ${secretName}. Available secrets: ${allEnvKeys.join(', ')}`);
+    }
+    logStep("Payment URL retrieved successfully", { paymentUrl: paymentUrl.substring(0, 50) + "..." });
+
+    // Add user data to payment URL if available
+    if (userDetails && (userDetails.first_name || userDetails.last_name)) {
+      const fullName = `${userDetails.first_name || ''} ${userDetails.last_name || ''}`.trim();
       
-      return new Response(
-        JSON.stringify({ 
-          error: 'Payment link not configured',
-          details: `Missing payment link for product: ${product.product_name}. Expected secret name: ${secretName}. Please configure this secret in Edge Functions Secrets.`,
-          secretName: secretName,
-          productDetails: {
-            id: product.product_id,
-            type: product.product_type,
-            credits: product.credits_amount,
-            currency: product.currency,
-            name: product.product_name
-          }
-        }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
-    }
-
-    console.log(`✅ CHECKOUT SESSION: Successfully retrieved payment link for: ${secretName}`)
-
-    // Prepare dynamic URL parameters
-    const firstName = userData.first_name || ''
-    const lastName = userData.last_name || ''
-    const fullName = `${firstName} ${lastName}`.trim()
-    const email = userData.email || ''
-
-    // URL encode the parameters properly
-    const encodedFullName = encodeURIComponent(fullName)
-    const encodedEmail = encodeURIComponent(email)
-
-    // Add dynamic parameters to the payment URL
-    let finalPaymentUrl = paymentUrl
-    
-    // Check if URL already has parameters
-    const separator = paymentUrl.includes('?') ? '&' : '?'
-    
-    // Add the dynamic parameters (only if they have actual content)
-    if (fullName && fullName.length > 0) {
-      finalPaymentUrl += `${separator}fullName=${encodedFullName}`
-    }
-    
-    if (email && email.length > 0) {
-      const emailSeparator = (paymentUrl.includes('?') || (fullName && fullName.length > 0)) ? '&' : '?'
-      finalPaymentUrl += `${emailSeparator}email=${encodedEmail}`
-    }
-
-    console.log(`🎯 CHECKOUT SESSION: Final payment URL with dynamic parameters prepared`)
-
-    // Log the checkout session creation
-    console.log(`🎉 CHECKOUT SESSION: Session created for user ${userData.id}, product ${productId}`)
-
-    return new Response(
-      JSON.stringify({ 
-        url: finalPaymentUrl,
-        product: {
-          id: product.product_id,
-          name: product.product_name,
-          price: product.price_amount,
-          currency: product.currency,
-          credits: product.credits_amount
-        }
-      }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      // Add query parameters for pre-filling
+      const urlObj = new URL(paymentUrl);
+      if (fullName) {
+        urlObj.searchParams.set('prefill_name', fullName);
       }
-    )
+      if (userDetails.email) {
+        urlObj.searchParams.set('prefill_email', userDetails.email);
+      }
+      
+      paymentUrl = urlObj.toString();
+      logStep("Payment URL with user data", { fullName, email: userDetails.email });
+    }
+
+    return new Response(JSON.stringify({ 
+      url: paymentUrl,
+      product: {
+        name: product.product_name,
+        credits: product.credits_amount,
+        price: product.price_amount,
+        currency: product.currency_code
+      }
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    });
 
   } catch (error) {
-    console.error('💥 CHECKOUT SESSION: Unexpected error:', error)
-    return new Response(
-      JSON.stringify({ 
-        error: 'Internal server error',
-        details: error.message 
-      }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    )
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logStep("ERROR in create-checkout-session", { 
+      message: errorMessage, 
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
+    
+    // Return more specific error for debugging
+    const responseError = {
+      error: errorMessage,
+      code: 500,
+      timestamp: new Date().toISOString()
+    };
+    
+    return new Response(JSON.stringify(responseError), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+    });
   }
-})
+});

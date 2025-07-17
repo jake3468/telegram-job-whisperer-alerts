@@ -67,7 +67,14 @@ export const useCachedPaymentProducts = (currentRegion?: string, currentCurrency
         setDisplayProducts(products);
         setDisplaySubscriptionProducts(subscriptionProducts);
         setDisplayCreditPackProducts(creditPackProducts);
-        logger.debug('Cached fresh products data:', cacheData);
+        
+        // Only log once when data actually changes, not on every render
+        const cacheKey = `${currentRegion}_${currentCurrency}_${products.length}`;
+        const lastLoggedKey = sessionStorage.getItem('last_products_log');
+        if (lastLoggedKey !== cacheKey) {
+          logger.debug('Cached fresh products data:', cacheData);
+          sessionStorage.setItem('last_products_log', cacheKey);
+        }
       } catch (error) {
         logger.warn('Failed to cache products data:', error);
         setDisplayProducts(products);

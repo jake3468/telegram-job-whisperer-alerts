@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useAIInterviewProducts, AIInterviewProduct } from '@/hooks/useAIInterviewProducts';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/utils/logger';
+import { useAuth } from '@clerk/clerk-react';
 import {
   Dialog,
   DialogContent,
@@ -27,27 +27,42 @@ export const AIInterviewPurchaseModal = ({
   onPurchaseSuccess 
 }: AIInterviewPurchaseModalProps) => {
   const { products, isLoading, currencySymbol } = useAIInterviewProducts();
-  const [selectedProduct, setSelectedProduct] = useState<AIInterviewProduct | null>(null);
-  const [isPurchasing, setIsPurchasing] = useState(false);
+  const [processingProductId, setProcessingProductId] = useState<string | null>(null);
   const { toast } = useToast();
+  const { getToken } = useAuth();
 
   const handlePurchase = async (product: AIInterviewProduct) => {
     try {
-      setIsPurchasing(true);
-      setSelectedProduct(product);
+      setProcessingProductId(product.product_id);
 
       logger.info('Starting purchase for AI interview pack:', { product_id: product.product_id });
 
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          product_id: product.product_id,
-          quantity: 1
-        }
+      // Get Clerk JWT token using useAuth hook (same as main checkout flow)
+      const clerkToken = await getToken();
+      if (!clerkToken) {
+        throw new Error('Failed to get authentication token');
+      }
+
+      // Use direct fetch with Clerk token (consistent with main flow)
+      const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/functions/v1/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${clerkToken}`,
+        },
+        body: JSON.stringify({ 
+          productId: product.product_id,  // Use productId for consistency
+          quantity: 1 
+        })
       });
 
-      if (error) {
-        throw new Error(error.message);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response from checkout session:', response.status, errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
+
+      const data = await response.json();
 
       if (data?.url) {
         // Open Stripe checkout in a new tab
@@ -72,8 +87,7 @@ export const AIInterviewPurchaseModal = ({
         variant: "destructive",
       });
     } finally {
-      setIsPurchasing(false);
-      setSelectedProduct(null);
+      setProcessingProductId(null);
     }
   };
 
@@ -83,7 +97,9 @@ export const AIInterviewPurchaseModal = ({
   };
 
   const getPopularProduct = () => {
-    return products.find(p => p.credits_amount === 3) || products[1];
+    // Find product with most credits or middle product
+    const sortedByCredits = [...products].sort((a, b) => b.credits_amount - a.credits_amount);
+    return sortedByCredits[Math.floor(sortedByCredits.length / 2)] || sortedByCredits[0];
   };
 
   const getDiscountText = (product: AIInterviewProduct) => {
@@ -122,7 +138,7 @@ export const AIInterviewPurchaseModal = ({
 
         <div className="space-y-4 mt-6">
           {products.map((product) => {
-            const isPopular = product.credits_amount === 3;
+            const isPopular = getPopularProduct()?.id === product.id;
             const discount = product.discount || 0;
             
             return (
@@ -131,7 +147,7 @@ export const AIInterviewPurchaseModal = ({
                 className={`p-6 cursor-pointer transition-all hover:shadow-lg ${
                   isPopular ? 'ring-2 ring-primary border-primary' : 'border-border'
                 }`}
-                onClick={() => !isPurchasing && handlePurchase(product)}
+                onClick={() => !processingProductId && handlePurchase(product)}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
@@ -181,14 +197,14 @@ export const AIInterviewPurchaseModal = ({
 
                   <div className="flex flex-col items-end gap-2">
                     <Button
-                      disabled={isPurchasing}
+                      disabled={!!processingProductId}
                       className="min-w-[120px]"
                       onClick={(e) => {
                         e.stopPropagation();
                         handlePurchase(product);
                       }}
                     >
-                      {isPurchasing && selectedProduct?.id === product.id ? (
+                      {processingProductId === product.product_id ? (
                         <>
                           <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                           Processing...

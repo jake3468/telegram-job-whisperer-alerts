@@ -32,97 +32,143 @@ const JobCard = ({
     return salary;
   };
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
+    if (!dateString) return '';
+    // Handle both date objects and string dates
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      // If it's not a valid date, return the original string
+      return dateString;
+    }
+    return date.toLocaleDateString();
   };
 
   // Determine what date to show based on section
   const getDateToShow = () => {
-    if (section === 'posted-today') {
+    if (section === 'posted-today' && job.posted_at) {
+      // For posted today, show posted_at if available (it's already a string)
       return job.posted_at;
     } else {
-      // For 'last-7-days' and 'saved', show created_at date only
+      // For other sections, show formatted created_at date
       return formatDate(job.created_at);
     }
   };
-  return <div className="w-full max-w-full bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-all cursor-pointer overflow-hidden" onClick={onView}>
-      <div className="p-3 max-w-full">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 max-w-full">
-          {/* Company info and logo */}
-          <div className="flex items-center gap-2 flex-1 min-w-0 max-w-full">
-            {job.thumbnail ? <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-8 h-8 rounded-lg object-cover flex-shrink-0" /> : <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Building2 className="h-4 w-4 text-gray-600" />
+  return <div className="w-full max-w-full bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden" onClick={onView}>
+      <div className="p-2 sm:p-3 flex gap-2 sm:gap-3">
+        {/* Left section: Logo + Content */}
+        <div className="flex-1 min-w-0 flex gap-2 sm:gap-3">
+          {/* Company Logo - smaller on mobile */}
+          <div className="flex-shrink-0">
+            {job.thumbnail ? <img src={job.thumbnail} alt={`${job.company_name} logo`} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover" /> : <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
               </div>}
+          </div>
+          
+          {/* Content: Title/Company + Details */}
+          <div className="flex-1 min-w-0">
+            {/* Job Title and Company Name */}
+            <div className="mb-1 sm:mb-2">
+              <h3 className="text-xs sm:text-sm font-semibold text-gray-900 break-words leading-tight">{job.title}</h3>
+              <p className="text-xs text-gray-600 break-words leading-tight">{job.company_name}</p>
+            </div>
             
-            <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-bold text-gray-900 truncate">{job.title}</h3>
-              <p className="text-xs text-gray-700 font-medium truncate">{job.company_name}</p>
-              
-              {/* Desktop: Location, job type, and date */}
-              <div className="hidden sm:flex items-center gap-2 mt-1 text-xs text-gray-600">
-                <div className="flex items-center gap-1">
-                  <MapPin className="h-3 w-3 flex-shrink-0" />
-                  <span className="truncate">{job.location || 'Remote'}</span>
-                </div>
-                {job.job_type && <>
-                    <span>•</span>
-                    <span className="truncate">{job.job_type}</span>
-                  </>}
-                {getDateToShow() && <>
-                    <span>•</span>
-                    <span className="truncate">{getDateToShow()}</span>
-                  </>}
+            {/* Location, Job Type, Salary - Mobile: List style, Desktop: Single line */}
+            <div className="md:hidden space-y-0.5">
+              <div className="flex items-center text-xs text-gray-600">
+                <span className="w-1 h-1 bg-gray-400 rounded-full mr-1.5 flex-shrink-0"></span>
+                <span className="break-words">{job.location || 'Remote'}</span>
+              </div>
+              <div className="flex items-center text-xs text-gray-600">
+                <span className="w-1 h-1 bg-gray-400 rounded-full mr-1.5 flex-shrink-0"></span>
+                <span className="break-words">{job.job_type || 'Full-time'}</span>
+              </div>
+              <div className="flex items-center text-xs text-green-600 font-medium">
+                <span className="w-1 h-1 bg-green-600 rounded-full mr-1.5 flex-shrink-0"></span>
+                <span className="break-words">{formatSalary(job.salary)}</span>
               </div>
             </div>
             
-            {/* Desktop: Salary */}
-            <div className="hidden sm:block text-green-600 font-semibold text-sm whitespace-nowrap mr-2">
-              {formatSalary(job.salary)}
+            {/* Desktop/Tablet: Single line with dots */}
+            <div className="hidden md:block">
+              <div className="text-xs text-gray-600 break-words">
+                <span>{job.location || 'Remote'}</span>
+                <span className="mx-2">•</span>
+                <span>{job.job_type || 'Full-time'}</span>
+                <span className="mx-2">•</span>
+                <span className="text-green-600 font-medium">{formatSalary(job.salary)}</span>
+              </div>
             </div>
-          </div>
-          
-          {/* Actions */}
-          <div className="flex items-center gap-1 flex-shrink-0 sm:ml-4">
-            <Button onClick={e => {
-            e.stopPropagation();
-            onView();
-          }} variant="outline" size="sm" className="border-gray-300 text-gray-900 hover:bg-gray-50 text-xs px-2 py-1 h-6">
-              View
-            </Button>
-            <Button onClick={e => {
-            e.stopPropagation();
-            onSaveToTracker();
-          }} size="sm" className={isAddedToTracker ? "bg-green-600 text-white hover:bg-green-700 text-xs px-2 py-1 h-6 whitespace-nowrap cursor-default" : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-6 whitespace-nowrap"} disabled={isAddedToTracker}>
-              {isAddedToTracker ? <div className="flex items-center gap-1">
-                  <Check className="h-3 w-3" />
-                  <span>Added to Tracker</span>
-                </div> : section === 'saved' ? "Add to Job Tracker" : "Save"}
-            </Button>
-            {section === 'saved' && onDelete && <Button onClick={e => {
-            e.stopPropagation();
-            onDelete();
-          }} variant="outline" size="sm" className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs px-2 py-1 h-6">
-                <Trash2 className="h-3 w-3" />
-              </Button>}
           </div>
         </div>
         
-        {/* Mobile: Location, job type, date and salary */}
-        <div className="sm:hidden mt-2 space-y-1">
-          <div className="flex items-center gap-1 text-xs text-gray-600">
-            <MapPin className="h-3 w-3 flex-shrink-0" />
-            <span className="truncate">{job.location || 'Remote'}</span>
-            {job.job_type && <>
-                <span className="mx-1">•</span>
-                <span className="truncate">{job.job_type}</span>
-              </>}
-            {getDateToShow() && <>
-                <span className="mx-1">•</span>
-                <span className="truncate">{getDateToShow()}</span>
-              </>}
-          </div>
-          <div className="text-green-600 font-semibold text-xs">
-            {formatSalary(job.salary)}
-          </div>
+        {/* Right section: Timestamp + Buttons */}
+        <div className="flex-shrink-0 flex flex-col items-end gap-1 sm:gap-2 min-w-0">
+           {/* Timestamp */}
+           {getDateToShow() && <div className="text-xs text-gray-500 text-right truncate max-w-16 sm:max-w-20">
+               {getDateToShow()}
+             </div>}
+          
+           {/* Mobile: Buttons stacked vertically */}
+           <div className="md:hidden flex flex-col gap-1 min-w-0 w-16">
+              <Button onClick={e => {
+            e.stopPropagation();
+            onView();
+          }} variant="outline" size="sm" className="text-xs px-1.5 py-1 h-6 w-full font-medium rounded-md overflow-hidden bg-gray-100 hover:bg-gray-200 text-gray-800 border-gray-300">
+                View
+              </Button>
+             
+             {section === 'saved' && onDelete ? <>
+                  <Button onClick={e => {
+              e.stopPropagation();
+              onSaveToTracker();
+            }} size="sm" className={isAddedToTracker ? "bg-green-600 text-white hover:bg-green-700 text-xs px-1.5 py-1 h-6 w-full cursor-default font-medium rounded-md overflow-hidden" : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-1.5 py-1 h-6 w-full font-medium rounded-md overflow-hidden"} disabled={isAddedToTracker}>
+                    {isAddedToTracker ? <Check className="h-3 w-3" /> : "Track"}
+                  </Button>
+                 <Button onClick={e => {
+              e.stopPropagation();
+              onDelete();
+            }} variant="outline" size="sm" className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs py-1 h-6 w-full font-medium rounded-md overflow-hidden">
+                   <Trash2 className="h-2.5 w-2.5" />
+                 </Button>
+               </> : <Button onClick={e => {
+            e.stopPropagation();
+            onSaveToTracker();
+          }} size="sm" className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-1.5 py-1 h-6 w-full font-medium rounded-md overflow-hidden">
+                 Save
+               </Button>}
+           </div>
+
+           {/* Desktop: Buttons in horizontal row, Tablet: Vertical for saved section */}
+           <div className={`hidden md:flex gap-1 min-w-0 ${section === 'saved' ? 'md:flex-col lg:flex-row' : 'flex-row'}`}>
+              <Button onClick={e => {
+            e.stopPropagation();
+            onView();
+          }} variant="outline" size="sm" className="text-xs px-2 py-1 h-7 font-medium rounded-md bg-gray-100 hover:bg-gray-200 text-gray-800 border-gray-300">
+                View
+              </Button>
+             
+             {section === 'saved' && onDelete ? <>
+                 <Button onClick={e => {
+              e.stopPropagation();
+              onSaveToTracker();
+            }} size="sm" className={isAddedToTracker ? "bg-green-600 text-white hover:bg-green-700 text-xs px-2 py-1 h-7 cursor-default font-medium rounded-md flex items-center gap-1" : "bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-7 font-medium rounded-md"} disabled={isAddedToTracker}>
+                   {isAddedToTracker ? <>
+                       <Check className="h-3 w-3" />
+                       <span>Added to Job Tracker</span>
+                     </> : "Add to Job Tracker"}
+                 </Button>
+                 <Button onClick={e => {
+              e.stopPropagation();
+              onDelete();
+            }} variant="outline" size="sm" className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 text-xs px-2 py-1 h-7 font-medium rounded-md">
+                   <Trash2 className="h-3 w-3" />
+                 </Button>
+               </> : <Button onClick={e => {
+            e.stopPropagation();
+            onSaveToTracker();
+          }} size="sm" className="bg-blue-600 text-white hover:bg-blue-700 text-xs px-2 py-1 h-7 font-medium rounded-md">
+                 Save
+               </Button>}
+           </div>
         </div>
       </div>
     </div>;
@@ -237,25 +283,27 @@ const JobBoard = () => {
   // Show normal layout with error indicator and refresh button in header
 
   return <Layout>
-      <div className="p-3 sm:p-6 w-full overflow-hidden">
-        <div className="max-w-6xl mx-auto w-full overflow-hidden">
+      <div className="min-h-screen overflow-hidden w-full">
+        <div className="w-full max-w-4xl px-2 sm:px-6 mx-auto">
           {/* Header */}
           <div className="text-center mb-4 sm:mb-6">
-        <div className="flex items-center justify-center gap-4 mb-2 sm:mb-4">
-              <span className="text-3xl">💼</span>
-              <h1 className="sm:text-4xl font-bold bg-gradient-to-r from-purple-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent text-4xl">Job Board</h1>
+            <div className="flex items-center justify-center gap-2 sm:gap-4 mb-2 sm:mb-4 flex-wrap">
+              <span className="text-3xl sm:text-3xl">💼</span>
+              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent">Job Board</h1>
               {/* Only show refresh button when there's an error */}
               {error && <Button onClick={handleManualRefresh} disabled={loading} variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0" title="Refresh jobs data">
                   <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                  </Button>}
             </div>
-            <p className="text-gray-300 text-sm sm:text-lg">
-              Browse job alerts received via <span className="italic text-violet-400">Telegram</span>— all jobs posted today appear here, stay visible for 7 days, and are auto-deleted after that. Save the ones you like and move them to your <span className="italic text-indigo-200">Job Tracker</span> page when you're ready to apply.
-            </p>
+            <div className="px-2 sm:px-4">
+              <p className="text-gray-300 text-sm sm:text-lg break-words">
+                Browse job alerts received via <span className="italic text-violet-400">Telegram</span>— all jobs posted today appear here, stay visible for 7 days, and are auto-deleted after that. Save the ones you like and move them to your <span className="italic text-indigo-200">Job Tracker</span> page when you're ready to apply.
+              </p>
+            </div>
             {/* Error indicator */}
-            {error && <div className="bg-red-900/50 border border-red-600 rounded-lg p-3 mt-4 mx-auto max-w-2xl">
+            {error && <div className="bg-red-900/50 border border-red-600 rounded-lg p-3 mt-4 mx-2 sm:mx-4 max-w-2xl mx-auto">
                 <div className="flex items-center gap-2 text-red-200 justify-center">
-                  <span className="text-sm">
+                  <span className="text-sm break-words">
                     {connectionIssue ? "Connection issue detected. Click refresh or check your internet connection." : "Unable to load job opportunities. Click refresh to retry."}
                   </span>
                 </div>
@@ -263,74 +311,78 @@ const JobBoard = () => {
           </div>
 
           {/* Job Sections */}
-          <Tabs defaultValue="posted-today" className="w-full overflow-hidden">
-            <TabsList className="grid w-full grid-cols-3 mb-6 overflow-hidden bg-white/10 backdrop-blur-sm gap-1 h-auto p-1 border-0 rounded-xl">
-              <TabsTrigger value="posted-today" className="text-xs sm:text-sm px-3 sm:px-4 py-3 rounded-lg overflow-hidden bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium">
-                <span className="hidden sm:inline truncate">Posted Today</span>
-                <span className="sm:hidden truncate">Today</span>
-                <span className="ml-1 flex-shrink-0">({filteredPostedTodayJobs.length})</span>
-              </TabsTrigger>
-              <TabsTrigger value="last-7-days" className="text-xs sm:text-sm px-3 sm:px-4 py-3 rounded-lg overflow-hidden bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium">
-                <span className="hidden sm:inline truncate">Last 7 Days</span>
-                <span className="sm:hidden truncate">Week</span>
-                <span className="ml-1 flex-shrink-0">({filteredLast7DaysJobs.length})</span>
-              </TabsTrigger>
-              <TabsTrigger value="saved-to-tracker" className="text-xs sm:text-sm px-3 sm:px-4 py-3 rounded-lg overflow-hidden bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium">
-                <span className="hidden sm:inline truncate">Saved</span>
-                <span className="sm:hidden truncate">Saved</span>
-                <span className="ml-1 flex-shrink-0">({filteredSavedToTrackerJobs.length})</span>
-              </TabsTrigger>
-            </TabsList>
-
-            {/* Search */}
-            <div className="mb-6 w-full">
-              <div className="relative w-full max-w-md mx-auto">
-                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-300 text-lg">
-                  🔍
-                </div>
-                <Input placeholder="Search by job title or company name..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-12 pr-4 bg-gray-800 border border-gray-600 text-white placeholder:text-gray-400 h-12 text-sm w-full rounded-2xl shadow-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-600 transition-all" />
+          <div className="w-full overflow-hidden">
+            <Tabs defaultValue="posted-today" className="w-full">
+              <div className="px-2 sm:px-4 mb-6">
+                <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm gap-0.5 sm:gap-1 h-auto p-0.5 sm:p-1 border-0 rounded-xl">
+                  <TabsTrigger value="posted-today" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
+                    <span className="hidden lg:inline truncate">Posted Today</span>
+                    <span className="lg:hidden truncate">Today</span>
+                    <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({filteredPostedTodayJobs.length})</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="last-7-days" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
+                    <span className="hidden sm:inline truncate">Last 7 Days</span>
+                    <span className="sm:hidden truncate">Week</span>
+                    <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({filteredLast7DaysJobs.length})</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="saved-to-tracker" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
+                    <span className="hidden sm:inline truncate">Saved</span>
+                    <span className="sm:hidden truncate">Saved</span>
+                    <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({filteredSavedToTrackerJobs.length})</span>
+                  </TabsTrigger>
+                </TabsList>
               </div>
-            </div>
 
-            <TabsContent value="posted-today" className="space-y-3 mt-4 w-full overflow-hidden">
-              {filteredPostedTodayJobs.length === 0 ? <div className="text-center py-12 w-full">
-                  <p className="text-gray-400 text-lg">
-                    {searchTerm ? `No jobs matching "${searchTerm}" found in posted today.` : "No jobs posted today."}
-                  </p>
-                </div> : <div className="space-y-3 w-full overflow-hidden">
-                  {filteredPostedTodayJobs.map(job => <JobCard key={job.id} job={job} onView={() => setSelectedJob(job)} onSaveToTracker={() => markJobAsSaved(job)} section="posted-today" />)}
-                </div>}
-            </TabsContent>
-
-            <TabsContent value="last-7-days" className="space-y-3 mt-4 w-full overflow-hidden">
-              {filteredLast7DaysJobs.length === 0 ? <div className="text-center py-12 w-full">
-                  <p className="text-gray-400 text-lg">
-                    {searchTerm ? `No jobs matching "${searchTerm}" found in last 7 days.` : "No jobs from the last 7 days."}
-                  </p>
-                </div> : <div className="space-y-3 w-full overflow-hidden">
-                  {filteredLast7DaysJobs.map(job => <JobCard key={job.id} job={job} onView={() => setSelectedJob(job)} onSaveToTracker={() => markJobAsSaved(job)} section="last-7-days" />)}
-                </div>}
-            </TabsContent>
-
-            <TabsContent value="saved-to-tracker" className="space-y-3 mt-4 w-full overflow-hidden">
-              <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-lg p-4 mb-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-green-300 font-medium text-sm">Saved Jobs Section</span>
+              {/* Search */}
+              <div className="mb-6 px-2 sm:px-4">
+                <div className="relative w-full max-w-md mx-auto">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input placeholder="Search by job title or company name..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-12 pr-4 bg-gray-800 border border-gray-600 text-white placeholder:text-gray-400 h-12 text-sm w-full rounded-2xl shadow-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-600 transition-all" />
                 </div>
-                <p className="text-gray-300 text-xs">Jobs you've saved are shown here. Click "Add to Job Tracker" to track your application progress.</p>
               </div>
-              
-              {filteredSavedToTrackerJobs.length === 0 ? <div className="text-center py-12 w-full">
-                  <p className="text-gray-400 text-lg">
-                    {searchTerm ? `No saved jobs matching "${searchTerm}" found.` : "No jobs saved yet."}
-                  </p>
-                  {!searchTerm && <p className="text-gray-500 mt-2">Save jobs from other sections to see them here.</p>}
-                </div> : <div className="space-y-3 w-full overflow-hidden">
-                  {filteredSavedToTrackerJobs.map(job => <JobCard key={job.id} job={job} onView={() => setSelectedJob(job)} onSaveToTracker={() => saveToTracker(job)} onDelete={() => deleteJobFromBoard(job)} section="saved" isAddedToTracker={job.job_reference_id ? jobTrackerStatus[job.job_reference_id] : false} />)}
-                </div>}
-            </TabsContent>
-          </Tabs>
+
+              <div className="px-2 sm:px-4 overflow-hidden">
+                <TabsContent value="posted-today" className="space-y-3 mt-4 w-full">
+                  {filteredPostedTodayJobs.length === 0 ? <div className="text-center py-12 w-full">
+                      <p className="text-gray-400 text-lg">
+                        {searchTerm ? `No jobs matching "${searchTerm}" found in posted today.` : "No jobs posted today."}
+                      </p>
+                    </div> : <div className="space-y-3 w-full max-w-2xl mx-auto">
+                      {filteredPostedTodayJobs.map(job => <JobCard key={job.id} job={job} onView={() => setSelectedJob(job)} onSaveToTracker={() => markJobAsSaved(job)} section="posted-today" />)}
+                    </div>}
+                </TabsContent>
+
+                <TabsContent value="last-7-days" className="space-y-3 mt-4 w-full">
+                  {filteredLast7DaysJobs.length === 0 ? <div className="text-center py-12 w-full">
+                      <p className="text-gray-400 text-lg">
+                        {searchTerm ? `No jobs matching "${searchTerm}" found in last 7 days.` : "No jobs from the last 7 days."}
+                      </p>
+                    </div> : <div className="space-y-3 w-full max-w-2xl mx-auto">
+                      {filteredLast7DaysJobs.map(job => <JobCard key={job.id} job={job} onView={() => setSelectedJob(job)} onSaveToTracker={() => markJobAsSaved(job)} section="last-7-days" />)}
+                    </div>}
+                </TabsContent>
+
+                <TabsContent value="saved-to-tracker" className="space-y-3 mt-4 w-full">
+                  <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-lg p-3 mb-4 max-w-2xl mx-auto">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                      <span className="text-green-300 font-medium text-sm">Saved Jobs Section</span>
+                    </div>
+                    <p className="text-gray-300 text-xs">Jobs you've saved are shown here. Click &quot;Add to Job Tracker/Track&quot; to track your application progress.</p>
+                  </div>
+                  
+                  {filteredSavedToTrackerJobs.length === 0 ? <div className="text-center py-12 w-full">
+                      <p className="text-gray-400 text-lg">
+                        {searchTerm ? `No saved jobs matching "${searchTerm}" found.` : "No jobs saved yet."}
+                      </p>
+                      {!searchTerm && <p className="text-gray-500 mt-2">Save jobs from other sections to see them here.</p>}
+                    </div> : <div className="space-y-3 w-full max-w-2xl mx-auto">
+                      {filteredSavedToTrackerJobs.map(job => <JobCard key={job.id} job={job} onView={() => setSelectedJob(job)} onSaveToTracker={() => saveToTracker(job)} onDelete={() => deleteJobFromBoard(job)} section="saved" isAddedToTracker={job.job_reference_id ? jobTrackerStatus[job.job_reference_id] : false} />)}
+                    </div>}
+                </TabsContent>
+              </div>
+            </Tabs>
+          </div>
         </div>
 
         {/* Job Board Onboarding Popup */}

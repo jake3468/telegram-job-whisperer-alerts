@@ -1332,6 +1332,17 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_next_order_position: {
+        Args: {
+          p_user_id: string
+          p_status: Database["public"]["Enums"]["job_status"]
+        }
+        Returns: number
+      }
+      get_vault_secret: {
+        Args: { secret_name: string }
+        Returns: string
+      }
       http: {
         Args: { request: Database["public"]["CompositeTypes"]["http_request"] }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
@@ -1420,6 +1431,10 @@ export type Database = {
           p_raw_payload?: Json
         }
         Returns: Json
+      }
+      rebalance_job_tracker_order_positions: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       reset_monthly_credits: {
         Args: Record<PropertyKey, never>

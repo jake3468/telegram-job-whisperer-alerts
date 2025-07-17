@@ -66,8 +66,8 @@ const AuthHeader = () => {
                 </button>
               </SignInButton>
               <SignUpButton mode="modal">
-                <button className="rounded-xl bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-500 text-white px-6 py-2 shadow-lg hover:from-sky-500 hover:to-indigo-600 transition-all duration-200 font-inter font-semibold text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-fuchsia-400 focus:ring-offset-2">
-                  Sign Up
+                <button className="rounded-xl bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white px-6 py-2 shadow-lg hover:from-blue-600 hover:to-blue-800 transition-all duration-200 font-inter font-semibold text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+                  Create Account
                 </button>
               </SignUpButton>
             </div>
@@ -119,10 +119,10 @@ const AuthHeader = () => {
               </SignInButton>
               <SignUpButton mode="modal">
                 <button 
-                  className="w-full rounded-xl bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-500 text-white px-6 py-3 shadow-lg hover:from-sky-500 hover:to-indigo-600 transition-all duration-200 font-inter font-semibold text-base focus:outline-none focus:ring-2 focus:ring-fuchsia-400 focus:ring-offset-2"
+                  className="w-full rounded-xl bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white px-6 py-3 shadow-lg hover:from-blue-600 hover:to-blue-800 transition-all duration-200 font-inter font-semibold text-base focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Sign Up
+                  Create Account
                 </button>
               </SignUpButton>
             </SignedOut>

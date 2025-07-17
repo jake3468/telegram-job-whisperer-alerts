@@ -1,177 +1,86 @@
 
-import { BellRing, ScanSearch, FileText, Linkedin, LayoutDashboard, ArrowRight, Building2, Bot, Plus } from "lucide-react";
-import { SignUpButton } from "@clerk/clerk-react";
-
-// EVEN MORE desaturated, softened pastel backgrounds and muted buttons/icons for less vibrancy
-const tools = [
-  {
-    icon: BellRing,
-    title: "Telegram Job Alerts",
-    description: "Get instant job notifications tailored to your profile, directly on Telegram.",
-    cardBg: "bg-[#e8b6c6]", // soft, muted pink (was blue)
-    buttonBg: "bg-[#a4687a] hover:bg-[#7e4f60] focus:bg-[#7e4f60]", // muted pink for button
-    buttonText: "text-white",
-    iconColor: "text-pink-800 bg-white/90", // muted pink icon
-  },
-  {
-    icon: ScanSearch,
-    title: "Job Analysis",
-    description: "Analyze job descriptions against your resume to identify key skills and gaps.",
-    cardBg: "bg-[#aecfc1]",
-    buttonBg: "bg-[#12714a] hover:bg-[#0b4d34] focus:bg-[#0b4d34]",
-    buttonText: "text-white",
-    iconColor: "text-green-800 bg-white/90",
-  },
-  {
-    icon: Building2,
-    title: "Company Decoder",
-    description: "Get deep insights into company culture, values, and what they're really looking for.",
-    cardBg: "bg-[#c8d4e8]",
-    buttonBg: "bg-[#4a6791] hover:bg-[#344861] focus:bg-[#344861]",
-    buttonText: "text-white",
-    iconColor: "text-blue-800 bg-white/90",
-  },
-  {
-    icon: LayoutDashboard,
-    title: "Interview Prep",
-    description: "Know the Company. Nail the Interview. Ask Like a Pro.",
-    cardBg: "bg-[#7daab8]",
-    buttonBg: "bg-[#145671] hover:bg-[#0a3544] focus:bg-[#0a3544]",
-    buttonText: "text-white",
-    iconColor: "text-sky-900 bg-white/90",
-  },
-  {
-    icon: FileText,
-    title: "Cover Letter",
-    description: "Generate personalized cover letters in seconds for any job application.",
-    cardBg: "bg-[#e7b891]",
-    buttonBg: "bg-[#a4501e] hover:bg-[#74360e] focus:bg-[#74360e]",
-    buttonText: "text-white",
-    iconColor: "text-orange-800 bg-white/90",
-  },
-  {
-    icon: Linkedin,
-    title: "LinkedIn Posts",
-    description: "Create engaging LinkedIn posts to boost your professional presence.",
-    cardBg: "bg-[#b6a4c9]",
-    buttonBg: "bg-[#765696] hover:bg-[#543a6a] focus:bg-[#543a6a]",
-    buttonText: "text-white",
-    iconColor: "text-purple-800 bg-white/90",
-  },
-  {
-    icon: Bot,
-    title: "Telegram Resume Bot",
-    description: "Automated resume optimization and job matching through our intelligent Telegram bot.",
-    cardBg: "bg-[#d4c8a8]",
-    buttonBg: "bg-[#8b7355] hover:bg-[#6b5642] focus:bg-[#6b5642]",
-    buttonText: "text-white",
-    iconColor: "text-yellow-800 bg-white/90",
-  },
-  {
-    icon: Plus,
-    title: "More Features",
-    description: "We're constantly building new AI-powered tools to supercharge your job search. Stay tuned!",
-    cardBg: "bg-gray-900",
-    buttonBg: "bg-gray-700 hover:bg-gray-600 focus:bg-gray-600",
-    buttonText: "text-white",
-    iconColor: "text-gray-300 bg-gray-800",
-    isComingSoon: true,
-  },
-];
+import FeatureSection from "./FeatureSection";
 
 const ToolsSection = () => {
   return (
-    <section id="features" className="relative bg-black py-14 px-2 sm:py-16 sm:px-4">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12 sm:mb-16">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-white mb-4 font-inter">
-            Unlock Your Career Potential
-          </h2>
-          <p className="text-base sm:text-xl text-gray-400 font-inter font-light">
-            Explore our AI-powered tools designed to streamline your job search.
+    <section id="features" className="relative bg-black">
+      {/* Header Section */}
+      <div className="max-w-7xl mx-auto px-4 py-4 text-center">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-white mb-2 font-inter">
+          Unlock Your Career Potential
+        </h2>
+        <p className="text-base sm:text-xl text-gray-400 font-inter font-light">
+          Explore our AI-powered tools designed to streamline your job search.
+        </p>
+      </div>
+
+      {/* Feature Sections */}
+      <div className="space-y-0">
+        {/* Telegram Job Alerts - First Feature */}
+        <FeatureSection
+          title="Telegram Job Alerts"
+          subheading="Get only jobs posted in the last 24 hours — matched to your role & location. Before anyone else."
+          description="Our intelligent job alert system monitors thousands of job boards 24/7 and sends you personalized notifications directly to your Telegram. No more endless scrolling through irrelevant job postings. Get real-time alerts for positions that match your skills, experience level, and location preferences. Set up multiple alerts for different roles and never miss your dream opportunity again."
+          lottieUrl="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Notifications.json"
+          buttonText="Set Up Alerts"
+          isReversed={false}
+        />
+
+        {/* Job Tracker - Second Feature */}
+        <FeatureSection
+          title="Job Tracker"
+          subheading="Ditch the spreadsheets. Take control of your job hunt."
+          description="Stay organized and focused throughout your job search. Each saved job includes a tailored AI-powered checklist with resume suggestions, mock interview preparation, and company insights. Easily manage applications by moving them through stages like Interested, Applied, and Interviewing. Maintain clarity, reduce guesswork, and keep your momentum going."
+          lottieUrl="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//business%20workshop.json"
+          buttonText="Start Tracking"
+          isReversed={true}
+        />
+
+        {/* AI Mock Phone Interview - Third Feature */}
+        <FeatureSection
+          title="AI Mock Phone Interview"
+          subheading="Ditch the mirror pep talks. Get real practice that actually prepares you."
+          description="Practice real interviews over a phone call with Grace, our AI interviewer. Just enter your number and job description to get a role-specific mock call. After the call, receive a report with scores, feedback, and a personalized practice guide to help you improve instantly."
+          lottieUrl="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Interview%20_%20Get%20Ready%20to%20work-%20Job%20Recruitment%20(isometric-hiring-process).json"
+          buttonText="Start Interview"
+          isReversed={false}
+        />
+
+        {/* Resume & Cover Letter Builder - Fourth Feature */}
+        <FeatureSection
+          title="Resume & Cover Letter Builder"
+          subheading="One click. Two essentials. Everything tailored to the job you want."
+          description="Generate a polished, ATS-friendly resume and a personalized cover letter instantly. Both are tailored to your desired role, newly acquired skills, and experience. Customize for any job in seconds and create multiple versions without starting from scratch. Smart, fast, and built to impress."
+          lottieUrl="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//resume%20cv.json"
+          buttonText="Build Resume"
+          isReversed={true}
+        />
+
+        {/* Company Research & Role Decoder - Fifth Feature */}
+        <FeatureSection
+          title="Company Research & Role Decoder"
+          subheading="One search. Full clarity. Know where you're heading before you apply."
+          description="Get detailed insights on any company, job title, and location — from salaries and growth opportunities to work culture, promotion timelines, and automation risks. Explore employee reviews from platforms like Glassdoor and Indeed, recent company news, role demand in the market, and career development potential. Access real interview questions, stage breakdowns, and prep guides, all in one place. Informed decisions start here."
+          lottieUrl="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Business%20Analytics.json"
+          buttonText="Research Company"
+          isReversed={false}
+        />
+
+        {/* LinkedIn Post Generator - Sixth Feature */}
+        <FeatureSection
+          title="LinkedIn Post Generator"
+          subheading="Turn your thoughts into scroll-stopping content."
+          description="Get three ready-to-post LinkedIn drafts based on your topic, opinion, story, target audience, and tone. Whether you're sharing a lesson, an insight, or a bold take, your post is tailored to sound like you — not a bot. You can even generate matching visuals in one click to bring your post to life."
+          lottieUrl="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//linkedin%20icon.json"
+          buttonText="Generate Post"
+          isReversed={false}
+        />
+
+        {/* Placeholder for other features - to be added later */}
+        <div className="py-16 px-4 text-center">
+          <p className="text-gray-400 font-inter">
+            More features coming soon...
           </p>
-        </div>
-        <div
-          className="
-            grid 
-            gap-4 sm:gap-6 md:gap-8
-            grid-cols-1 
-            sm:grid-cols-2 
-            lg:grid-cols-3
-            xl:grid-cols-4
-            justify-center
-          ">
-          {tools.map((tool) => (
-            <div
-              key={tool.title}
-              className={`
-                ${tool.cardBg}
-                rounded-2xl
-                shadow-lg
-                flex flex-col 
-                items-start
-                justify-between
-                p-4 sm:p-5 md:p-6
-                min-h-[180px] sm:min-h-[200px] md:min-h-[250px]
-                relative
-                group
-                transition-all
-                duration-300
-                border border-black/10
-                ${tool.isComingSoon ? 'border-gray-600' : ''}
-              `}
-              style={{
-                boxShadow: "0 4px 16px 0 rgba(31,38,135,0.08)",
-              }}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className={`p-2 rounded-full ${tool.iconColor} shadow-sm flex items-center justify-center`}>
-                  <tool.icon className={`w-7 h-7`} />
-                </div>
-              </div>
-              <div>
-                <div className="mb-1">
-                  <h3 className={`text-lg sm:text-xl md:text-2xl font-semibold font-inter ${tool.isComingSoon ? 'text-white' : 'text-black'}`}>
-                    {tool.title}
-                  </h3>
-                </div>
-                <p className={`mb-4 text-sm sm:text-base font-inter font-normal leading-relaxed ${tool.isComingSoon ? 'text-gray-300' : 'text-black/80'}`}>
-                  {tool.description}
-                </p>
-              </div>
-              {tool.isComingSoon ? (
-                <button
-                  type="button"
-                  disabled
-                  className={`mt-auto rounded-full w-full py-2 px-3 sm:py-3 sm:px-5 flex items-center justify-center gap-2 font-inter text-sm sm:text-base font-bold shadow-md transition-all duration-200 focus:outline-none ${tool.buttonBg} ${tool.buttonText} cursor-not-allowed opacity-75`}
-                  style={{
-                    letterSpacing: "0.025em",
-                  }}
-                >
-                  Coming Soon
-                </button>
-              ) : (
-                <SignUpButton mode="modal">
-                  <button
-                    type="button"
-                    className={`mt-auto rounded-full w-full py-2 px-3 sm:py-3 sm:px-5 flex items-center justify-center gap-2 font-inter text-sm sm:text-base font-bold shadow-md transition-all duration-200 focus:outline-none focus:ring-2 ${tool.buttonBg} ${tool.buttonText} z-20`}
-                    style={{
-                      letterSpacing: "0.025em",
-                    }}
-                  >
-                    {tool.title === "Interview Prep" ? "Start Prep" :
-                      tool.title === "Job Analysis" ? "Analyze Jobs" :
-                        tool.title === "Cover Letter" ? "Create Letters" :
-                          tool.title === "Telegram Job Alerts" ? "Set Up Alerts" :
-                            tool.title === "LinkedIn Posts" ? "Generate Posts" :
-                              tool.title === "Company Decoder" ? "Decode Companies" :
-                                tool.title === "Telegram Resume Bot" ? "Start Bot" : "Get Started"}
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </button>
-                </SignUpButton>
-              )}
-            </div>
-          ))}
         </div>
       </div>
     </section>

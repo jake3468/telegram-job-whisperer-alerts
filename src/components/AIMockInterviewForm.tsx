@@ -11,7 +11,7 @@ import { useCachedGraceInterviewRequests } from "@/hooks/useCachedGraceInterview
 import { useAIInterviewCredits } from "@/hooks/useAIInterviewCredits";
 import { ProfileCompletionWarning } from "@/components/ProfileCompletionWarning";
 import { AIInterviewCreditsDisplay } from "@/components/AIInterviewCreditsDisplay";
-import { AIInterviewPurchaseModal } from "@/components/AIInterviewPurchaseModal";
+import { AIInterviewPricingModal } from "@/components/AIInterviewPricingModal";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 
@@ -51,7 +51,7 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
   }, [prefillData]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
+  const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
   const { toast } = useToast();
   const { userProfile, loading: profileLoading } = useCachedUserProfile();
   const { hasResume, hasBio, loading: completionLoading } = useCachedUserCompletionStatus();
@@ -67,7 +67,7 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
     // Validate that phone number is not empty and has proper format (react-phone-input-2 handles validation)
     return phone && phone.length >= 8;
   };
-  const validatePhoneNumberUniqueness = async (phoneNumber: string) => {
+  const validatePhoneNumberUniqueness = async (phoneNumber: string, retryCount = 0) => {
     try {
       // Check if phone number already exists in grace_interview_requests
       const { data: existingRequest, error } = await supabase
@@ -78,6 +78,16 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
 
       if (error) {
         console.error("Error checking phone number:", error);
+        
+        // Handle JWT/session errors with automatic retry
+        if ((error.message?.includes('JWT') || error.message?.includes('expired') || error.message?.includes('token')) && retryCount < 2) {
+          console.log(`JWT/session error detected, refreshing token and retrying (attempt ${retryCount + 1})`);
+          
+          // Wait a bit and retry with fresh session
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          return validatePhoneNumberUniqueness(phoneNumber, retryCount + 1);
+        }
+        
         throw new Error("Failed to validate phone number");
       }
 
@@ -160,7 +170,7 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
         description: "You need AI interview calls to request a call. Purchase calls to continue.",
         variant: "destructive"
       });
-      setIsPurchaseModalOpen(true);
+      setIsPricingModalOpen(true);
       return;
     }
 
@@ -201,7 +211,7 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
       // react-phone-input-2 already includes the + prefix, so we don't need to add it
       const phoneNumber = formData.phoneNumber.startsWith('+') ? formData.phoneNumber : `+${formData.phoneNumber}`;
       
-      // Validate phone number uniqueness
+      // Validate phone number uniqueness with retry logic
       const phoneValidation = await validatePhoneNumberUniqueness(phoneNumber);
       if (!phoneValidation.isValid) {
         toast({
@@ -245,14 +255,9 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
         optimisticAdd(data);
       }
 
-      // Deduct AI interview credit after successful submission
-      try {
-        await useCredit(`AI mock interview for ${formData.jobTitle} at ${formData.companyName}`);
-        console.log("AI interview credit deducted successfully");
-      } catch (creditError) {
-        console.error("Error deducting AI interview credit:", creditError);
-        // Don't fail the whole request if credit deduction fails, but log it
-      }
+      // NOTE: Credit deduction is now handled by N8N calling the ai-interview-credit-deduction edge function
+      // This prevents duplicate credit deductions and ensures credits are only deducted when the actual call is made
+      console.log("Interview request submitted successfully. Credit will be deducted when call is made by N8N.");
       
       setIsSubmitted(true);
       toast({
@@ -273,11 +278,15 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
     } catch (error: any) {
       console.error("Error submitting interview request:", error);
       
-      // Handle specific error types
+      // Handle specific error types with improved session management
       let errorMessage = "There was an error submitting your request. Please try again.";
       
-      if (error?.message?.includes("JWT") || error?.message?.includes("expired")) {
+      if (error?.message?.includes("JWT") || error?.message?.includes("expired") || error?.message?.includes("token")) {
         errorMessage = "Your session has expired. Please refresh the page and try again.";
+        // Optionally trigger a page refresh after a delay
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
       } else if (error?.message?.includes("violates row-level security")) {
         errorMessage = "Authentication error. Please refresh the page and try again.";
       } else if (error?.message) {
@@ -313,7 +322,7 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
       
       {/* AI Interview Credits Display */}
       <AIInterviewCreditsDisplay 
-        onBuyMore={() => setIsPurchaseModalOpen(true)} 
+        onBuyMore={() => setIsPricingModalOpen(true)} 
       />
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -416,14 +425,10 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
       </div>
       </form>
 
-      {/* Purchase Modal */}
-      <AIInterviewPurchaseModal
-        isOpen={isPurchaseModalOpen}
-        onClose={() => setIsPurchaseModalOpen(false)}
-        onPurchaseSuccess={() => {
-          setIsPurchaseModalOpen(false);
-          refetchCredits();
-        }}
+      {/* Pricing Modal */}
+      <AIInterviewPricingModal
+        isOpen={isPricingModalOpen}
+        onClose={() => setIsPricingModalOpen(false)}
       />
     </div>
   );

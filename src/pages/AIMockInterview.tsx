@@ -1,10 +1,11 @@
 import { Layout } from "@/components/Layout";
 import AIMockInterviewForm from "@/components/AIMockInterviewForm";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, History } from "lucide-react";
+import { RefreshCw, History, DollarSign } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCachedGraceInterviewRequests } from "@/hooks/useCachedGraceInterviewRequests";
 import GraceInterviewReportsModal from "@/components/GraceInterviewReportsModal";
+import { AIInterviewPricingModal } from "@/components/AIInterviewPricingModal";
 import { useLocation } from "react-router-dom";
 const AIMockInterview = () => {
   const location = useLocation();
@@ -13,12 +14,13 @@ const AIMockInterview = () => {
     forceRefresh
   } = useCachedGraceInterviewRequests();
   const [isReportsModalOpen, setIsReportsModalOpen] = useState(false);
+  const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
   const [prefillData, setPrefillData] = useState<{
     companyName?: string;
     jobTitle?: string;
     jobDescription?: string;
   }>({});
-  
+
   // Auto-populate form data if passed via navigation state
   useEffect(() => {
     if (location.state?.companyName || location.state?.jobTitle || location.state?.jobDescription) {
@@ -31,7 +33,6 @@ const AIMockInterview = () => {
       window.history.replaceState({}, document.title);
     }
   }, [location.state]);
-
   const handleManualRefresh = () => {
     // Clear all caches and reload the page for a complete refresh
     localStorage.removeItem('aspirely_user_profile_cache');
@@ -56,15 +57,19 @@ const AIMockInterview = () => {
             
             <h2 className="text-xl md:text-2xl text-gray-300 mb-4 leading-relaxed">Get a Mock Interview Phone Call from 👩🏻 Grace</h2>
             
-            {/* Reports Button */}
-            <div className="mb-6">
+            {/* Action Buttons */}
+            <div className="mb-6 flex flex-wrap gap-3 justify-center">
               <Button onClick={() => setIsReportsModalOpen(true)} variant="outline" className="border-purple-500/30 transition-all duration-300 bg-violet-600 hover:bg-violet-500 text-slate-50">
                 <History className="w-4 h-4 mr-2" />
                 Reports
               </Button>
+              <Button onClick={() => setIsPricingModalOpen(true)} variant="outline" className="border-green-500/30 transition-all duration-300 bg-green-600 hover:bg-green-500 text-slate-50">
+                <DollarSign className="w-4 h-4 mr-2" />
+                Pricing
+              </Button>
             </div>
             
-            <p className="text-gray-400 max-w-2xl mx-auto leading-relaxed text-base">Grace, your AI interview assistant from Aspirely AI, will call your phone in about a minute to ask real interview questions based on your job role — and you'll receive a detailed report right after the call.</p>
+            <p className="text-gray-400 max-w-2xl mx-auto leading-relaxed text-base text-left">Grace, your AI interview assistant from Aspirely AI, will call your phone in about a minute to ask real interview questions based on your job role — and you'll receive a detailed report right after the call.</p>
           </div>
 
           {/* Form Section */}
@@ -88,6 +93,9 @@ const AIMockInterview = () => {
 
         {/* Reports Modal */}
         <GraceInterviewReportsModal isOpen={isReportsModalOpen} onClose={() => setIsReportsModalOpen(false)} />
+        
+        {/* Pricing Modal */}
+        <AIInterviewPricingModal isOpen={isPricingModalOpen} onClose={() => setIsPricingModalOpen(false)} />
       </div>
     </Layout>;
 };

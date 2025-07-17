@@ -2,18 +2,31 @@
 import { useState } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { toast } from 'sonner';
+import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 
 export const useCheckoutSession = () => {
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
   const { user } = useUser();
   const { getToken } = useAuth();
+  const { isAuthReady, executeWithRetry } = useEnterpriseAuth();
 
   const createCheckoutSession = async (productId: string) => {
     if (!user) {
       const errorMsg = 'User not authenticated';
       setError(errorMsg);
       toast.error(errorMsg, {
+        action: {
+          label: 'Close',
+          onClick: () => toast.dismiss(),
+        },
+      });
+      return null;
+    }
+
+    if (!isAuthReady) {
+      console.log('[CheckoutSession] Authentication not ready, waiting...');
+      toast.error('Please wait, authentication is loading...', {
         action: {
           label: 'Close',
           onClick: () => toast.dismiss(),
@@ -29,46 +42,46 @@ export const useCheckoutSession = () => {
     setError(null);
 
     try {
-      // Get Clerk JWT token using useAuth hook
-      const clerkToken = await getToken();
-      if (!clerkToken) {
-        throw new Error('Failed to get Clerk authentication token');
-      }
+      const result = await executeWithRetry(
+        async () => {
+          // Get Clerk JWT token using useAuth hook
+          const clerkToken = await getToken();
+          if (!clerkToken) {
+            throw new Error('Failed to get Clerk authentication token');
+          }
 
-      console.log('🔐 CLIENT: Got Clerk token, length:', clerkToken.length);
+          console.log('🔐 CLIENT: Got Clerk token, creating checkout session');
 
-      // Make direct fetch request with Clerk token
-      const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/functions/v1/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${clerkToken}`,
+          // Make direct fetch request with Clerk token
+          const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/functions/v1/create-checkout-session', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${clerkToken}`,
+            },
+            body: JSON.stringify({ productId })
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Error response from checkout session:', response.status, errorText);
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
+          }
+
+          const data = await response.json();
+
+          if (!data?.url) {
+            throw new Error('No checkout URL returned from server');
+          }
+
+          console.log('Checkout session created successfully');
+          return data;
         },
-        body: JSON.stringify({ productId })
-      });
+        5,
+        `Creating checkout session for product ${productId}`
+      );
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error response from checkout session:', response.status, errorText);
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
-      }
-
-      const data = await response.json();
-
-      if (!data?.url) {
-        const errorMsg = 'No checkout URL returned';
-        setError(errorMsg);
-        toast.error(errorMsg, {
-          action: {
-            label: 'Close',
-            onClick: () => toast.dismiss(),
-          },
-        });
-        return null;
-      }
-
-      console.log('Checkout session created successfully:', data);
-      return data;
+      return result;
     } catch (err) {
       console.error('Exception creating checkout session:', err);
       const errorMsg = err instanceof Error ? err.message : 'Failed to create checkout session';

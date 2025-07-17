@@ -50,7 +50,8 @@ const LinkedInPosts = () => {
   } = useUserCompletionStatus();
   const {
     executeWithRetry,
-    isAuthReady
+    isAuthReady,
+    isRefreshing
   } = useEnterpriseAuth();
   const {
     hasCredits
@@ -175,52 +176,66 @@ const LinkedInPosts = () => {
   useEffect(() => {
     if (!currentPostId || !isAuthReady || !userProfile?.id) return;
     console.log('🔄 Setting up real-time subscription for post ID:', currentPostId);
-    const channel = supabase.channel(`linkedin-post-updates-${currentPostId}`).on('postgres_changes', {
-      event: '*',
-      schema: 'public',
-      table: 'job_linkedin',
-      filter: `id=eq.${currentPostId}`
-    }, async payload => {
-      console.log('📡 LinkedIn post updated via real-time:', payload);
-      if (payload.new) {
-        const newData = payload.new as any;
-        console.log('📊 New posts data received:', {
-          hasHeading1: Boolean(newData.post_heading_1 && newData.post_heading_1.trim()),
-          hasContent1: Boolean(newData.post_content_1 && newData.post_content_1.trim()),
-          hasHeading2: Boolean(newData.post_heading_2 && newData.post_heading_2.trim()),
-          hasContent2: Boolean(newData.post_content_2 && newData.post_content_2.trim()),
-          hasHeading3: Boolean(newData.post_heading_3 && newData.post_heading_3.trim()),
-          hasContent3: Boolean(newData.post_content_3 && newData.post_content_3.trim())
-        });
-        const linkedInPostData: LinkedInPostData = {
-          post_heading_1: newData.post_heading_1,
-          post_content_1: newData.post_content_1,
-          post_heading_2: newData.post_heading_2,
-          post_content_2: newData.post_content_2,
-          post_heading_3: newData.post_heading_3,
-          post_content_3: newData.post_content_3
-        };
-        console.log('🔄 Setting posts data:', linkedInPostData);
-        setPostsData(linkedInPostData);
-        if (areAllPostsReady(linkedInPostData)) {
-          console.log('🎉 All posts are ready! Stopping loading');
-          setIsGenerating(false);
-          toast({
-            title: "LinkedIn Posts Generated!",
-            description: "Your 3 LinkedIn post variations have been created successfully."
+    let channel: any;
+    const setupRealTime = async () => {
+      try {
+        await executeWithRetry(async () => {
+          channel = supabase.channel(`linkedin-post-updates-${currentPostId}`).on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'job_linkedin',
+            filter: `id=eq.${currentPostId}`
+          }, async payload => {
+            console.log('📡 LinkedIn post updated via real-time:', payload);
+            if (payload.new) {
+              const newData = payload.new as any;
+              console.log('📊 New posts data received:', {
+                hasHeading1: Boolean(newData.post_heading_1 && newData.post_heading_1.trim()),
+                hasContent1: Boolean(newData.post_content_1 && newData.post_content_1.trim()),
+                hasHeading2: Boolean(newData.post_heading_2 && newData.post_heading_2.trim()),
+                hasContent2: Boolean(newData.post_content_2 && newData.post_content_2.trim()),
+                hasHeading3: Boolean(newData.post_heading_3 && newData.post_heading_3.trim()),
+                hasContent3: Boolean(newData.post_content_3 && newData.post_content_3.trim())
+              });
+              const linkedInPostData: LinkedInPostData = {
+                post_heading_1: newData.post_heading_1,
+                post_content_1: newData.post_content_1,
+                post_heading_2: newData.post_heading_2,
+                post_content_2: newData.post_content_2,
+                post_heading_3: newData.post_heading_3,
+                post_content_3: newData.post_content_3
+              };
+              console.log('🔄 Setting posts data:', linkedInPostData);
+              setPostsData(linkedInPostData);
+              if (areAllPostsReady(linkedInPostData)) {
+                console.log('🎉 All posts are ready! Stopping loading');
+                setIsGenerating(false);
+                toast({
+                  title: "LinkedIn Posts Generated!",
+                  description: "Your 3 LinkedIn post variations have been created successfully."
+                });
+              } else {
+                console.log('⏳ Posts not complete yet, keeping loading state');
+              }
+            }
+          }).subscribe(status => {
+            console.log('📡 Real-time subscription status:', status);
           });
-        } else {
-          console.log('⏳ Posts not complete yet, keeping loading state');
-        }
+        }, 3, 'setup LinkedIn real-time subscription');
+      } catch (error) {
+        console.error('Error setting up real-time subscription:', error);
       }
-    }).subscribe(status => {
-      console.log('📡 Real-time subscription status:', status);
-    });
-    return () => {
-      console.log('🧹 Cleaning up real-time subscription');
-      supabase.removeChannel(channel);
     };
-  }, [currentPostId, isAuthReady, userProfile?.id, toast]);
+    setupRealTime();
+
+    // Cleanup function
+    return () => {
+      if (channel) {
+        console.log('🧹 Cleaning up real-time subscription');
+        supabase.removeChannel(channel);
+      }
+    };
+  }, [currentPostId, isAuthReady, userProfile?.id, executeWithRetry, toast]);
   useEffect(() => {
     const checkExistingData = async () => {
       if (!currentPostId || !isAuthReady) return;
@@ -399,10 +414,9 @@ const LinkedInPosts = () => {
     } catch (err: any) {
       console.error('❌ Error creating LinkedIn post:', err);
       setIsGenerating(false);
-      const errorMessage = err.message || "Failed to create LinkedIn post. Please try again.";
       toast({
         title: "Error",
-        description: errorMessage,
+        description: "Please refresh the page to continue",
         variant: "destructive"
       });
     } finally {
@@ -430,6 +444,37 @@ const LinkedInPosts = () => {
     shouldShowLoading,
     isGenerating
   });
+
+  // Show professional authentication loading state within the page layout
+  if (!isAuthReady && !isRefreshing) {
+    return <SidebarProvider defaultOpen={true}>
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
+        <div className="flex items-center justify-between p-3">
+          <SidebarTrigger className="h-12 w-12 border-fuchsia-400/30 ring-2 ring-fuchsia-400/10 text-fuchsia-200 rounded-2xl shadow-lg transition-all flex items-center justify-center bg-zinc-900 hover:bg-zinc-800">
+            <Menu className="w-7 h-7" strokeWidth={2.4} />
+            <span className="sr-only">Toggle navigation menu</span>
+          </SidebarTrigger>
+          <div className="flex items-center gap-2">
+            <img alt="Aspirely Logo" src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" className="max-h-8 drop-shadow-2xl object-fill" />
+            <span className="font-orbitron drop-shadow bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-400 bg-clip-text text-white font-bold min-w-0 truncate text-lg">Aspirely.ai</span>
+          </div>
+        </div>
+      </header>
+      <div className="min-h-screen flex w-full bg-black">
+        <AppSidebar />
+        <div className="flex-1 flex flex-col pt-28 lg:pt-0 lg:pl-6 min-w-0 overflow-x-hidden bg-black">
+          <main className="flex-1 w-full min-w-0 bg-black">
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="text-center space-y-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-400 mx-auto"></div>
+                <div className="text-teal-200 text-sm font-medium">Preparing authentication...</div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </SidebarProvider>;
+  }
   return <SidebarProvider defaultOpen={true}>
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
         <div className="flex items-center justify-between p-3">
@@ -455,7 +500,7 @@ const LinkedInPosts = () => {
                   <h1 className="sm:text-3xl font-orbitron bg-gradient-to-r from-teal-300 via-teal-400 to-cyan-400 bg-clip-text drop-shadow mb-4 tracking-tight font-bold lg:text-4xl text-teal-500 text-4xl">
                     ✍🏻 LinkedIn <span className="italic">Posts</span>
                   </h1>
-                  <p className="text-cyan-200 max-w-2xl mx-auto font-inter text-sm sm:text-base lg:text-lg font-light shadow-sm px-4 mb-3">
+                  <p className="max-w-2xl mx-auto font-inter text-sm sm:text-base font-light shadow-sm px-4 mb-3 text-slate-50 lg:text-base">
                     Create engaging LinkedIn posts that showcase your expertise and connect with your professional network
                   </p>
                   <div className="flex flex-col items-center gap-2">
@@ -481,17 +526,9 @@ const LinkedInPosts = () => {
                         </CardDescription>
                       </div>
                       <div className="flex items-center gap-2">
-                        {connectionIssue && (
-                          <Button
-                            onClick={() => window.location.reload()}
-                            variant="outline"
-                            size="sm"
-                            className="border-orange-400/30 bg-orange-100/10 text-orange-600 hover:bg-orange-200/20"
-                            title="Connection issue detected. Click to refresh the page."
-                          >
+                        {connectionIssue && <Button onClick={() => window.location.reload()} variant="outline" size="sm" className="border-orange-400/30 bg-orange-100/10 text-orange-600 hover:bg-orange-200/20" title="Connection issue detected. Click to refresh the page.">
                             <RefreshCw className="w-4 h-4" />
-                          </Button>
-                        )}
+                          </Button>}
                         <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 flex-shrink-0 bg-zinc-100 text-zinc-950">
                           <History className="w-4 h-4 mr-2 text-black" />
                           History
@@ -507,12 +544,12 @@ const LinkedInPosts = () => {
                         <div className="space-y-2 min-w-0">
                           <Label htmlFor="topic" className="text-black font-semibold text-base">💡Topic or Theme *</Label>
                           <Label htmlFor="topic" className="text-black/70 font-normal text-sm block">What is the main topic you want to write about?</Label>
-                          <TTextarea id="topic" placeholder="e.g. AI in customer service, Layoffs in tech, Remote work trends" value={formData.topic} onChange={e => handleInputChange('topic', e.target.value)} required className="min-h-[60px] resize-none text-base border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium bg-gray-950 w-full" />
+                          <TTextarea id="topic" placeholder="e.g. AI in customer service, Layoffs in tech, Remote work trends" value={formData.topic} onChange={e => handleInputChange('topic', e.target.value)} required className="min-h-[60px] resize-none text-base border-teal-300/30 text-white placeholder:text-white/40 placeholder:text-xs font-medium bg-gray-950 w-full" />
                         </div>
                         <div className="space-y-2 min-w-0">
                           <Label htmlFor="opinion" className="text-black font-semibold text-base">🤔Your Key Point or Opinion</Label>
                           <Label htmlFor="opinion" className="text-black/70 font-normal text-sm block">What is your main insight, opinion, or message?</Label>
-                          <TTextarea id="opinion" placeholder="I believe hybrid AI + human support is the future." value={formData.opinion} onChange={e => handleInputChange('opinion', e.target.value)} className="min-h-[60px] resize-none text-base border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium bg-gray-950 w-full" />
+                          <TTextarea id="opinion" placeholder="I believe hybrid AI + human support is the future." value={formData.opinion} onChange={e => handleInputChange('opinion', e.target.value)} className="min-h-[60px] resize-none text-base border-teal-300/30 text-white placeholder:text-white/40 placeholder:text-xs font-medium bg-gray-950 w-full" />
                         </div>
                       </div>
 
@@ -520,12 +557,12 @@ const LinkedInPosts = () => {
                         <div className="space-y-2 min-w-0">
                           <Label htmlFor="personal_story" className="text-black font-semibold text-base">📖Personal Experience or Story</Label>
                           <Label htmlFor="personal_story" className="text-black/70 font-normal text-sm block">Do you have a story/personal experience to include?</Label>
-                          <TTextarea id="personal_story" placeholder="We reduced response time by 40% after implementing AI chat." value={formData.personal_story} onChange={e => handleInputChange('personal_story', e.target.value)} className="min-h-[60px] resize-none text-base border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium bg-gray-950 w-full" />
+                          <TTextarea id="personal_story" placeholder="We reduced response time by 40% after implementing AI chat." value={formData.personal_story} onChange={e => handleInputChange('personal_story', e.target.value)} className="min-h-[60px] resize-none text-base border-teal-300/30 text-white placeholder:text-white/40 placeholder:text-xs font-medium bg-gray-950 w-full" />
                         </div>
                         <div className="space-y-2 min-w-0">
                           <Label htmlFor="audience" className="text-black font-semibold text-base">👥Target Audience</Label>
                           <Label htmlFor="audience" className="text-black/70 font-normal text-sm block">Who are you writing this for?</Label>
-                          <TTextarea id="audience" placeholder="Startup founders, product managers, working moms, new grads…" value={formData.audience} onChange={e => handleInputChange('audience', e.target.value)} className="min-h-[60px] resize-none text-base border-teal-300/30 text-white placeholder:text-white/80 placeholder:text-xs font-medium bg-gray-950 w-full" />
+                          <TTextarea id="audience" placeholder="Startup founders, product managers, working moms, new grads…" value={formData.audience} onChange={e => handleInputChange('audience', e.target.value)} className="min-h-[60px] resize-none text-base border-teal-300/30 text-white placeholder:text-white/40 placeholder:text-xs font-medium bg-gray-950 w-full" />
                         </div>
                       </div>
 
