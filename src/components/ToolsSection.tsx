@@ -46,6 +46,26 @@ const ToolsSection = () => {
           isReversed={false}
         />
 
+        {/* Resume & Cover Letter Builder - Fourth Feature */}
+        <FeatureSection
+          title="Resume & Cover Letter Builder"
+          subheading="One click. Two essentials. Everything tailored to the job you want."
+          description="Generate a polished, ATS-friendly resume and a personalized cover letter instantly. Both are tailored to your desired role, newly acquired skills, and experience. Customize for any job in seconds and create multiple versions without starting from scratch. Smart, fast, and built to impress."
+          lottieUrl="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//resume%20cv.json"
+          buttonText="Build Resume"
+          isReversed={true}
+        />
+
+        {/* LinkedIn Post Generator - Fifth Feature */}
+        <FeatureSection
+          title="LinkedIn Post Generator"
+          subheading="Turn your thoughts into scroll-stopping content."
+          description="Get three ready-to-post LinkedIn drafts based on your topic, opinion, story, target audience, and tone. Whether you're sharing a lesson, an insight, or a bold take, your post is tailored to sound like you — not a bot. You can even generate matching visuals in one click to bring your post to life."
+          lottieUrl="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//linkedin%20icon.json"
+          buttonText="Generate Post"
+          isReversed={false}
+        />
+
         {/* Placeholder for other features - to be added later */}
         <div className="py-16 px-4 text-center">
           <p className="text-gray-400 font-inter">
