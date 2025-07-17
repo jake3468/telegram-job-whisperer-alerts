@@ -20,7 +20,7 @@ const AIMockInterview = () => {
     jobTitle?: string;
     jobDescription?: string;
   }>({});
-  
+
   // Auto-populate form data if passed via navigation state
   useEffect(() => {
     if (location.state?.companyName || location.state?.jobTitle || location.state?.jobDescription) {
@@ -33,7 +33,6 @@ const AIMockInterview = () => {
       window.history.replaceState({}, document.title);
     }
   }, [location.state]);
-
   const handleManualRefresh = () => {
     // Clear all caches and reload the page for a complete refresh
     localStorage.removeItem('aspirely_user_profile_cache');
@@ -70,7 +69,7 @@ const AIMockInterview = () => {
               </Button>
             </div>
             
-            <p className="text-gray-400 max-w-2xl mx-auto leading-relaxed text-base">Grace, your AI interview assistant from Aspirely AI, will call your phone in about a minute to ask real interview questions based on your job role — and you'll receive a detailed report right after the call.</p>
+            <p className="text-gray-400 max-w-2xl mx-auto leading-relaxed text-base text-left">Grace, your AI interview assistant from Aspirely AI, will call your phone in about a minute to ask real interview questions based on your job role — and you'll receive a detailed report right after the call.</p>
           </div>
 
           {/* Form Section */}
