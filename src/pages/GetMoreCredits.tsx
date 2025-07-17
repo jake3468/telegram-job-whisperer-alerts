@@ -58,7 +58,9 @@ export default function GetMoreCredits() {
     createCheckoutSession,
     isLoading: isCheckoutLoading
   } = useCheckoutSession();
-  const { isAuthReady } = useEnterpriseAuth();
+  const {
+    isAuthReady
+  } = useEnterpriseAuth();
 
   // Connection and error state management
   const [connectionIssue, setConnectionIssue] = useState(false);
@@ -76,7 +78,6 @@ export default function GetMoreCredits() {
       toast.error('Please wait, authentication is loading...');
       return;
     }
-
     const subscriptionProduct = subscriptionProducts[0];
     if (!subscriptionProduct) {
       toast.error('Subscription product not available');
@@ -95,7 +96,6 @@ export default function GetMoreCredits() {
       toast.error('Please wait, authentication is loading...');
       return;
     }
-
     console.log('Buying credit pack with product:', productId);
     const session = await createCheckoutSession(productId);
     if (session?.url) {
@@ -150,10 +150,7 @@ export default function GetMoreCredits() {
                 Refresh
               </Button>}
           </div>
-          <p className="text-blue-100 font-inter font-light mb-1 sm:mb-2 animate-fade-in sm:text-base text-left text-sm">Start with free monthly credits and upgrade anytime — either by purchasing flexible credit packs or a monthly subscription. 
-
-
-For any payment-related queries, feel free to reach out to us at support@aspirely.ai — we're here to help! 💬</p>
+          <p className="text-blue-100 font-inter font-light mb-1 sm:mb-2 animate-fade-in sm:text-base text-left text-sm">💬 Start with free monthly credits and upgrade anytime - either by purchasing flexible credit packs or a monthly subscription. For any payment-related queries, feel free to reach out to us at &quot;support@aspirely.ai&quot; we're here to help! </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
             <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in">
               Current Balance:{" "}
