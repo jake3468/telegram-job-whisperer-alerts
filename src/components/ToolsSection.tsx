@@ -26,6 +26,16 @@ const ToolsSection = () => {
           isReversed={false}
         />
 
+        {/* Job Tracker - Second Feature */}
+        <FeatureSection
+          title="Job Tracker"
+          subheading="Ditch the spreadsheets. Take control of your job hunt."
+          description="You're not just applying — you're chasing what's next. With Aspirely, every job you save comes with an instant, AI-powered checklist — resume tweaks, mock interviews, company insights — all lined up, ready to go. Drag jobs across stages like Interested, Applied, and Interviewing — and actually feel progress. No mess. No stress. Just momentum."
+          lottieUrl="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//business%20workshop.json"
+          buttonText="Start Tracking"
+          isReversed={true}
+        />
+
         {/* Placeholder for other features - to be added later */}
         <div className="py-16 px-4 text-center">
           <p className="text-gray-400 font-inter">
