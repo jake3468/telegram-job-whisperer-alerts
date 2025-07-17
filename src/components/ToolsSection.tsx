@@ -21,7 +21,7 @@ const ToolsSection = () => {
           title="Telegram Job Alerts"
           subheading="Get only jobs posted in the last 24 hours — matched to your role & location. Before anyone else."
           description="Our intelligent job alert system monitors thousands of job boards 24/7 and sends you personalized notifications directly to your Telegram. No more endless scrolling through irrelevant job postings. Get real-time alerts for positions that match your skills, experience level, and location preferences. Set up multiple alerts for different roles and never miss your dream opportunity again."
-          lottieUrl="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations/Notifications.json"
+          lottieUrl="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//alerts%20job.json"
           buttonText="Set Up Alerts"
           isReversed={false}
         />
