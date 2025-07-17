@@ -383,7 +383,7 @@ const CoverLetter = () => {
                     📝 <span className="bg-gradient-to-r from-pink-600 via-fuchsia-600 to-rose-600 bg-clip-text text-transparent">Cover Letter</span>
                   </h1>
                   <p className="font-inter font-light text-white/90 mb-3 text-center text-sm">
-                    Instantly create stunning <span className="italic text-white/85">Cover Letters</span> for every job
+                    Instantly create stunning <span className="italic text-white/85">Cover Letters</span> for every job — and download them as PDF or DOCX in seconds.
                   </p>
                   <Badge className="bg-gradient-to-r from-pink-500/20 to-fuchsia-500/20 text-pink-200 border-pink-400/30 text-sm px-3 py-1 font-inter">
                     <BadgeDollarSign className="w-4 h-4 mr-2" />
