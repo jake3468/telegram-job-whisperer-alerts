@@ -47,10 +47,10 @@ const FeatureSection = ({
   // Mobile: header section (title + subheading only)
   const mobileHeaderSection = (
     <div className="lg:hidden">
-      <h3 className="text-2xl md:text-3xl font-bold mb-2 font-inter text-blue-700">
+      <h3 className="text-2xl md:text-3xl font-extrabold mb-3 font-inter text-primary leading-tight">
         {title}
       </h3>
-      <p className="text-base mb-3 font-inter font-light text-neutral-950">
+      <p className="text-lg mb-4 font-inter font-medium text-muted-foreground leading-relaxed border-l-4 border-primary/30 pl-4">
         {subheading}
       </p>
     </div>
@@ -58,8 +58,8 @@ const FeatureSection = ({
 
   // Mobile: content section (description + button only)
   const mobileContentSection = (
-    <div className="lg:hidden flex flex-col space-y-3">
-      <p className="text-sm leading-relaxed font-inter text-neutral-950">
+    <div className="lg:hidden flex flex-col space-y-4">
+      <p className="text-base leading-relaxed font-inter text-foreground/80 bg-muted/50 p-4 rounded-lg border">
         {description}
       </p>
       {isComingSoon ? (
@@ -86,15 +86,15 @@ const FeatureSection = ({
 
   // Desktop: full content section
   const desktopContentSection = (
-    <div className="hidden lg:flex flex-col justify-center space-y-4">
+    <div className="hidden lg:flex flex-col justify-center space-y-6">
       <div>
-        <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-blue-700">
+        <h3 className="text-3xl lg:text-4xl xl:text-5xl font-extrabold mb-4 font-inter text-primary leading-tight">
           {title}
         </h3>
-        <p className="md:text-xl mb-4 font-inter font-light text-base text-neutral-950">
+        <p className="text-xl lg:text-2xl mb-6 font-inter font-semibold text-muted-foreground leading-relaxed border-l-4 border-primary/30 pl-6">
           {subheading}
         </p>
-        <p className="md:text-lg leading-relaxed font-inter text-sm text-neutral-950">
+        <p className="text-lg lg:text-xl leading-relaxed font-inter text-foreground/80 bg-muted/50 p-6 rounded-lg border shadow-sm">
           {description}
         </p>
       </div>

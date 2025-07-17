@@ -36,6 +36,16 @@ const ToolsSection = () => {
           isReversed={true}
         />
 
+        {/* AI Mock Phone Interview - Third Feature */}
+        <FeatureSection
+          title="📞 AI Mock Phone Interview"
+          subheading="Ditch the mirror pep talks. Get real practice that actually prepares you."
+          description="Just enter your number and the job you're targeting. Grace, Aspirely's AI interviewer, will call you for a realistic mock interview — no downloads, no awkward video calls. Right after the session, you'll receive a full breakdown: ✅ Section-wise scores 💡 Actionable tips and suggestions 📘 A personalized practice guide with targeted exercises, resume polish ideas, and prep tailored to your role. Train smart, speak with confidence, and show up ready when it really counts. Because the best way to ace your next interview… is to train like it's already happening."
+          lottieUrl="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Interview%20_%20Get%20Ready%20to%20work-%20Job%20Recruitment%20(isometric-hiring-process).json"
+          buttonText="Start Interview"
+          isReversed={false}
+        />
+
         {/* Placeholder for other features - to be added later */}
         <div className="py-16 px-4 text-center">
           <p className="text-gray-400 font-inter">
