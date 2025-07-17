@@ -4,31 +4,23 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
-// https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
     watch: {
-      // Ignore node_modules and other large directories
+      // Only ignore the most problematic directories
       ignored: [
         "**/node_modules/**",
         "**/.git/**",
-        "**/dist/**",
-        "**/coverage/**",
-        "**/.next/**",
-        "**/.nuxt/**",
-        "**/.cache/**",
-        "**/tmp/**",
-        "**/temp/**"
+        "**/dist/**"
       ],
-      // Use polling for file watching to reduce file handles
-      usePolling: true,
-      interval: 1000
+      // Remove polling as it can cause issues in development
+      usePolling: false
     },
+    // Remove strict file system restrictions for development
     fs: {
-      // Restrict file access to project directory
-      strict: true
+      strict: false
     }
   },
   plugins: [
@@ -41,29 +33,22 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // Optimize dependencies to reduce file watching overhead
+  // Simplified optimizeDeps to reduce startup overhead
   optimizeDeps: {
     include: [
       "react",
       "react-dom",
-      "@tanstack/react-query",
       "@clerk/clerk-react",
-      "lucide-react",
       "lottie-react"
-    ],
-    exclude: [
-      // Exclude large packages that don't need optimization
-      "@supabase/supabase-js"
     ]
   },
   build: {
-    // Reduce build overhead
     sourcemap: mode === 'development',
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
-          ui: ['@radix-ui/react-dialog', '@radix-ui/react-toast', '@radix-ui/react-select']
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-toast']
         }
       }
     }
