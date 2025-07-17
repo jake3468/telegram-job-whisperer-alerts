@@ -87,7 +87,11 @@ const CoverLetter = () => {
   // Auto-populate form data if passed via navigation state
   useEffect(() => {
     if (location.state?.companyName || location.state?.jobTitle || location.state?.jobDescription) {
-      const { companyName, jobTitle, jobDescription } = location.state;
+      const {
+        companyName,
+        jobTitle,
+        jobDescription
+      } = location.state;
       setFormData({
         company_name: companyName || '',
         job_title: jobTitle || '',
@@ -102,9 +106,7 @@ const CoverLetter = () => {
   useEffect(() => {
     if (!currentCoverLetterId || !isAuthReady) return;
     console.log('Setting up real-time subscription for cover letter ID:', currentCoverLetterId);
-    
     let channel: any;
-    
     const setupRealTime = async () => {
       try {
         await executeWithRetry(async () => {
@@ -120,20 +122,7 @@ const CoverLetter = () => {
               if (coverLetterContent.length > 0) {
                 console.log('Cover letter content received, updating UI');
                 // Clean the content to remove any metadata or extra information
-                const cleanContent = coverLetterContent.split('\n\n').find(paragraph => 
-                  paragraph.includes('Dear') || 
-                  paragraph.match(/^\w+\s+\d{1,2},\s+\d{4}/) ||
-                  paragraph.includes('Sincerely') ||
-                  paragraph.length > 100
-                ) ? coverLetterContent.split('\n\n').filter(paragraph => 
-                  !paragraph.toLowerCase().includes('generate cover letter') &&
-                  !paragraph.toLowerCase().includes('usage fee') &&
-                  !paragraph.toLowerCase().includes('credits') &&
-                  !paragraph.toLowerCase().includes('bio data') &&
-                  !paragraph.toLowerCase().includes('profile') &&
-                  paragraph.trim().length > 20
-                ).join('\n\n') : coverLetterContent;
-                
+                const cleanContent = coverLetterContent.split('\n\n').find(paragraph => paragraph.includes('Dear') || paragraph.match(/^\w+\s+\d{1,2},\s+\d{4}/) || paragraph.includes('Sincerely') || paragraph.length > 100) ? coverLetterContent.split('\n\n').filter(paragraph => !paragraph.toLowerCase().includes('generate cover letter') && !paragraph.toLowerCase().includes('usage fee') && !paragraph.toLowerCase().includes('credits') && !paragraph.toLowerCase().includes('bio data') && !paragraph.toLowerCase().includes('profile') && paragraph.trim().length > 20).join('\n\n') : coverLetterContent;
                 setResult(cleanContent);
                 setIsGenerating(false);
                 toast({
@@ -150,7 +139,6 @@ const CoverLetter = () => {
         console.error('Error setting up real-time subscription:', error);
       }
     };
-
     setupRealTime();
 
     // Cleanup function
@@ -181,20 +169,7 @@ const CoverLetter = () => {
             console.log('Cover letter found via polling, updating UI');
             // Clean the content to remove any metadata or extra information
             const coverLetterContent = data.cover_letter.trim();
-            const cleanContent = coverLetterContent.split('\n\n').find(paragraph => 
-              paragraph.includes('Dear') || 
-              paragraph.match(/^\w+\s+\d{1,2},\s+\d{4}/) ||
-              paragraph.includes('Sincerely') ||
-              paragraph.length > 100
-            ) ? coverLetterContent.split('\n\n').filter(paragraph => 
-              !paragraph.toLowerCase().includes('generate cover letter') &&
-              !paragraph.toLowerCase().includes('usage fee') &&
-              !paragraph.toLowerCase().includes('credits') &&
-              !paragraph.toLowerCase().includes('bio data') &&
-              !paragraph.toLowerCase().includes('profile') &&
-              paragraph.trim().length > 20
-            ).join('\n\n') : coverLetterContent;
-            
+            const cleanContent = coverLetterContent.split('\n\n').find(paragraph => paragraph.includes('Dear') || paragraph.match(/^\w+\s+\d{1,2},\s+\d{4}/) || paragraph.includes('Sincerely') || paragraph.length > 100) ? coverLetterContent.split('\n\n').filter(paragraph => !paragraph.toLowerCase().includes('generate cover letter') && !paragraph.toLowerCase().includes('usage fee') && !paragraph.toLowerCase().includes('credits') && !paragraph.toLowerCase().includes('bio data') && !paragraph.toLowerCase().includes('profile') && paragraph.trim().length > 20).join('\n\n') : coverLetterContent;
             setResult(cleanContent);
             setIsGenerating(false);
             toast({
@@ -236,10 +211,10 @@ const CoverLetter = () => {
       });
       return;
     }
-    
+
     // Refresh completion status before checking
     await refetchStatus();
-    
+
     // Wait a moment for the status to update
     setTimeout(async () => {
       if (!isComplete && !completionLoading) {
@@ -247,11 +222,10 @@ const CoverLetter = () => {
           title: "Profile Incomplete",
           description: "Please complete both your resume upload and bio in your profile before creating a cover letter. The system will auto-refresh.",
           variant: "destructive",
-          duration: 8000, // Show for 8 seconds
+          duration: 8000 // Show for 8 seconds
         });
         return;
       }
-      
       if (!formData.job_title.trim() || !formData.company_name.trim() || !formData.job_description.trim()) {
         // Set individual field validation errors
         setValidationErrors({
@@ -261,7 +235,7 @@ const CoverLetter = () => {
         });
         return;
       }
-      
+
       // Clear validation errors if all fields are filled
       setValidationErrors({
         job_title: '',
@@ -382,7 +356,7 @@ const CoverLetter = () => {
   const canSubmit = isFormValid && hasCredits && !isSubmitting && !isGenerating;
   return <SidebarProvider defaultOpen={true}>
       {/* Header for mobile */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30 text-left">
         <div className="flex items-center justify-between p-3">
           <SidebarTrigger className="h-12 w-12 border-fuchsia-400/30 ring-2 ring-fuchsia-400/10 text-fuchsia-200 rounded-2xl shadow-lg transition-all flex items-center justify-center bg-stone-900 hover:bg-stone-800">
             <Menu className="w-7 h-7" strokeWidth={2.4} />
@@ -408,8 +382,8 @@ const CoverLetter = () => {
                   <h1 className="text-4xl font-bold mb-2 drop-shadow font-orbitron animate-fade-in md:text-4xl">
                     📝 <span className="bg-gradient-to-r from-pink-600 via-fuchsia-600 to-rose-600 bg-clip-text text-transparent">Cover Letter</span>
                   </h1>
-                  <p className="text-lg font-inter font-light text-white/90 mb-3">
-                    Instantly create stunning <span className="italic text-white/85">Cover Letters</span> for every job — and download them as PDF or DOCX in seconds.
+                  <p className="font-inter font-light text-white/90 mb-3 text-sm text-center">
+                    Instantly create stunning <span className="italic text-white/85">Cover Letters</span> for every job
                   </p>
                   <Badge className="bg-gradient-to-r from-pink-500/20 to-fuchsia-500/20 text-pink-200 border-pink-400/30 text-sm px-3 py-1 font-inter">
                     <BadgeDollarSign className="w-4 h-4 mr-2" />
@@ -435,17 +409,9 @@ const CoverLetter = () => {
                           </CardDescription>
                         </div>
                         <div className="flex items-center gap-2">
-                          {connectionIssue && (
-                            <Button
-                              onClick={() => window.location.reload()}
-                              variant="outline"
-                              size="sm"
-                              className="border-orange-400/30 bg-orange-100/10 text-orange-300 hover:bg-orange-200/20"
-                              title="Connection issue detected. Click to refresh the page."
-                            >
+                          {connectionIssue && <Button onClick={() => window.location.reload()} variant="outline" size="sm" className="border-orange-400/30 bg-orange-100/10 text-orange-300 hover:bg-orange-200/20" title="Connection issue detected. Click to refresh the page.">
                               <RefreshCw className="w-4 h-4" />
-                            </Button>
-                          )}
+                            </Button>}
                           <Button onClick={() => setShowHistory(true)} variant="outline" size="sm" className="border-white/20 bg-zinc-50 text-gray-950">
                             <History className="w-4 h-4 mr-2" />
                             History
@@ -463,12 +429,10 @@ const CoverLetter = () => {
                                🏬 Company Name *
                              </Label>
                              <Input id="company_name" placeholder="e.g. Google, Microsoft" value={formData.company_name} onChange={e => handleInputChange('company_name', e.target.value)} required className="text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
-                             {validationErrors.company_name && (
-                               <div className="flex items-center gap-2 text-orange-400 text-sm bg-orange-100/10 border border-orange-400/30 rounded px-3 py-2">
+                             {validationErrors.company_name && <div className="flex items-center gap-2 text-orange-400 text-sm bg-orange-100/10 border border-orange-400/30 rounded px-3 py-2">
                                  <span className="text-orange-400">⚠</span>
                                  {validationErrors.company_name}
-                               </div>
-                             )}
+                               </div>}
                            </div>
                           {/* Job Title */}
                            <div className="flex-1 space-y-2">
@@ -476,12 +440,10 @@ const CoverLetter = () => {
                                👩🏻‍💻 Job Title *
                              </Label>
                              <Input id="job_title" placeholder="e.g. Software Engineer, Marketing Manager" value={formData.job_title} onChange={e => handleInputChange('job_title', e.target.value)} required className="text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
-                             {validationErrors.job_title && (
-                               <div className="flex items-center gap-2 text-orange-400 text-sm bg-orange-100/10 border border-orange-400/30 rounded px-3 py-2">
+                             {validationErrors.job_title && <div className="flex items-center gap-2 text-orange-400 text-sm bg-orange-100/10 border border-orange-400/30 rounded px-3 py-2">
                                  <span className="text-orange-400">⚠</span>
                                  {validationErrors.job_title}
-                               </div>
-                             )}
+                               </div>}
                            </div>
                         </div>
 
@@ -494,12 +456,10 @@ const CoverLetter = () => {
                              Paste the job description or key requirements
                            </Label>
                            <Textarea id="job_description" placeholder="Paste the job description here..." value={formData.job_description} onChange={e => handleInputChange('job_description', e.target.value)} required className="min-h-[150px] resize-none text-base bg-black text-white placeholder:text-white/60 border-white/15" disabled={isGenerating} />
-                           {validationErrors.job_description && (
-                             <div className="flex items-center gap-2 text-orange-400 text-sm bg-orange-100/10 border border-orange-400/30 rounded px-3 py-2">
+                           {validationErrors.job_description && <div className="flex items-center gap-2 text-orange-400 text-sm bg-orange-100/10 border border-orange-400/30 rounded px-3 py-2">
                                <span className="text-orange-400">⚠</span>
                                {validationErrors.job_description}
-                             </div>
-                           )}
+                             </div>}
                          </div>
 
                         <div className="flex flex-col sm:flex-row gap-3 pt-4">
@@ -507,7 +467,7 @@ const CoverLetter = () => {
                           <Button type="submit" disabled={!canSubmit} className="flex-[3] font-semibold text-base h-12 rounded-lg bg-gradient-to-r from-white via-white to-white hover:from-white/90 hover:via-white/90 hover:to-white/90 text-black font-orbitron shadow-2xl shadow-gray-300/50 border-0 disabled:opacity-50 disabled:cursor-not-allowed">
                             {isSubmitting ? "Submitting..." : isGenerating ? "Generating..." : "Generate Cover Letter"}
                           </Button>
-                          <Button type="button" onClick={resetForm} variant="outline" className="flex-1 bg-red-600 hover:bg-red-500 border-red-500 text-white shadow-lg text-base h-12 px-6 max-sm:w-full" disabled={isGenerating}>
+                          <Button type="button" onClick={resetForm} variant="outline" disabled={isGenerating} className="flex-1 border-red-500 text-white shadow-lg text-base h-12 px-6 max-sm:w-full bg-indigo-900 hover:bg-indigo-800">
                             Reset
                           </Button>
                         </div>
