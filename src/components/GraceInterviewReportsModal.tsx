@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { History, Phone, Calendar, Trash2, Eye, X, AlertCircle, Clock, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { PremiumInterviewReportDisplay } from './PremiumInterviewReportDisplay';
 interface GraceInterviewRequest {
   id: string;
   phone_number: string;
@@ -156,150 +157,27 @@ const GraceInterviewReportsModal = ({
   };
   if (showDetails && selectedItem) {
     return <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-6xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
-          <DialogHeader className="flex-shrink-0">
-            <DialogTitle className="text-white font-inter flex items-center gap-2 text-lg">
-              <Phone className="w-5 h-5" />
-              Interview Report Details
-              <Button onClick={() => setShowDetails(false)} size="sm" className="ml-auto bg-white/20 hover:bg-white/30 text-white border-white/20 text-sm mx-[15px]">
+        <DialogContent className="max-w-[95vw] w-full h-[95vh] overflow-hidden bg-white border-gray-200 flex flex-col p-0">
+          <DialogHeader className="flex-shrink-0 px-4 py-3 border-b border-gray-200 bg-gray-50">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-gray-900 font-inter flex items-center gap-2 text-lg">
+                <Phone className="w-5 h-5" />
+                Interview Report Details
+              </DialogTitle>
+              <Button 
+                onClick={() => setShowDetails(false)} 
+                size="sm" 
+                variant="ghost"
+                className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              >
                 <X className="w-4 h-4 mr-1" />
                 Back to List
               </Button>
-            </DialogTitle>
+            </div>
           </DialogHeader>
           
-          <div className="flex-1 overflow-y-auto space-y-6 mt-4">
-            {/* Request Details */}
-            <div className="rounded-lg p-4 border border-white/10 bg-blue-800">
-              <h3 className="text-white font-medium mb-4 flex items-center gap-2">
-                <Phone className="w-4 h-4" />
-                Interview Request Details
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-cyan-200 text-sm font-semibold">Company:</label>
-                  <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
-                    <p className="text-white text-sm">{selectedItem.company_name}</p>
-                  </div>
-                </div>
-                <div>
-                  <label className="text-cyan-200 text-sm font-semibold">Job Title:</label>
-                  <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
-                    <p className="text-white text-sm">{selectedItem.job_title}</p>
-                  </div>
-                </div>
-                <div>
-                  <label className="text-cyan-200 text-sm font-semibold">Phone Number:</label>
-                  <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
-                    <p className="text-white text-sm">{selectedItem.phone_number}</p>
-                  </div>
-                </div>
-                <div>
-                  <label className="text-cyan-200 text-sm font-semibold">Created:</label>
-                  <div className="rounded p-3 mt-1 bg-black/80 border border-cyan-300/20">
-                    <p className="text-white text-sm">{formatDate(selectedItem.created_at)}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Interview Status */}
-            {selectedItem.interview_status && <div className="rounded-lg p-4 border border-white/10 bg-purple-800">
-                <h3 className="text-white font-medium mb-4 flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  Interview Status
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="text-purple-200 text-sm font-semibold">Status:</label>
-                    <div className="rounded p-3 mt-1 bg-black/80 border border-purple-300/20 flex items-center gap-2">
-                      {getStatusIcon(selectedItem.interview_status)}
-                      <span className={`text-sm ${getStatusColor(selectedItem.interview_status)}`}>
-                        {formatStatusText(selectedItem.interview_status)}
-                      </span>
-                    </div>
-                  </div>
-                  {selectedItem.completion_percentage !== null && <div>
-                      <label className="text-purple-200 text-sm font-semibold">Completion:</label>
-                      <div className="rounded p-3 mt-1 bg-black/80 border border-purple-300/20">
-                        <p className="text-white text-sm">{selectedItem.completion_percentage}%</p>
-                      </div>
-                    </div>}
-                  {selectedItem.time_spent && <div>
-                      <label className="text-purple-200 text-sm font-semibold">Time Spent:</label>
-                      <div className="rounded p-3 mt-1 bg-black/80 border border-purple-300/20">
-                        <p className="text-white text-sm">{selectedItem.time_spent}</p>
-                      </div>
-                    </div>}
-                </div>
-              </div>}
-
-            {/* Feedback Section */}
-            {(selectedItem.feedback_message || selectedItem.feedback_suggestion || selectedItem.feedback_next_action) && <div className="rounded-lg p-4 border border-white/10 bg-green-800">
-                <h3 className="text-white font-medium mb-4 flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4" />
-                  Feedback
-                </h3>
-                <div className="space-y-4">
-                  {selectedItem.feedback_message && <div>
-                      <label className="text-green-200 text-sm font-semibold">Message:</label>
-                      <div className="rounded p-3 mt-1 bg-black/80 border border-green-300/20">
-                        <p className="text-white text-sm">{selectedItem.feedback_message}</p>
-                      </div>
-                    </div>}
-                  {selectedItem.feedback_suggestion && <div>
-                      <label className="text-green-200 text-sm font-semibold">Suggestion:</label>
-                      <div className="rounded p-3 mt-1 bg-black/80 border border-green-300/20">
-                        <p className="text-white text-sm">{selectedItem.feedback_suggestion}</p>
-                      </div>
-                    </div>}
-                  {selectedItem.feedback_next_action && <div>
-                      <label className="text-green-200 text-sm font-semibold">Next Action:</label>
-                      <div className="rounded p-3 mt-1 bg-black/80 border border-green-300/20">
-                        <p className="text-white text-sm">{selectedItem.feedback_next_action}</p>
-                      </div>
-                    </div>}
-                </div>
-              </div>}
-
-            {/* Actionable Plan */}
-            {selectedItem.actionable_plan && <div className="rounded-lg p-4 border border-white/10 bg-orange-800">
-                <h3 className="text-white font-medium mb-4 flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4" />
-                  Actionable Plan
-                </h3>
-                <div className="rounded p-3 bg-black/80 border border-orange-300/20">
-                  <pre className="text-white text-sm whitespace-pre-wrap">
-                    {JSON.stringify(selectedItem.actionable_plan, null, 2)}
-                  </pre>
-                </div>
-              </div>}
-
-            {/* Next Steps Priority */}
-            {selectedItem.next_steps_priority && <div className="rounded-lg p-4 border border-white/10 bg-red-800">
-                <h3 className="text-white font-medium mb-4 flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4" />
-                  Next Steps Priority
-                </h3>
-                <div className="rounded p-3 bg-black/80 border border-red-300/20">
-                  <pre className="text-white text-sm whitespace-pre-wrap">
-                    {JSON.stringify(selectedItem.next_steps_priority, null, 2)}
-                  </pre>
-                </div>
-              </div>}
-
-            {/* Complete Report Data */}
-            {selectedItem.report_data && <div className="rounded-lg p-4 border border-white/10 bg-gray-800">
-                <h3 className="text-white font-medium mb-4 flex items-center gap-2">
-                  <History className="w-4 h-4" />
-                  Complete Report Data
-                </h3>
-                <div className="rounded p-3 bg-black/80 border border-gray-300/20 max-h-96 overflow-y-auto">
-                  <pre className="text-white text-xs whitespace-pre-wrap">
-                    {JSON.stringify(selectedItem.report_data, null, 2)}
-                  </pre>
-                </div>
-              </div>}
+          <div className="flex-1 overflow-y-auto">
+            <PremiumInterviewReportDisplay report={selectedItem} />
           </div>
         </DialogContent>
       </Dialog>;
