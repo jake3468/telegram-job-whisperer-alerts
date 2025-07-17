@@ -93,7 +93,24 @@ const DroppableColumn = ({
       <div className={`p-2 h-[450px] overflow-y-auto ${isDropTarget ? 'bg-black/5' : ''} transition-colors`}>
         <SortableContext items={jobs.map(job => job.id)} strategy={verticalListSortingStrategy}>
           <div className="space-y-1">
-            {jobs.map(job => <SortableJobCard key={job.id} job={job} onDelete={onDeleteJob} onView={onViewJob} onUpdateChecklist={onUpdateChecklist} />)}
+            {jobs.map((job, index) => {
+              console.log(`[DEBUG] Rendering job ${index + 1}/${jobs.length} for column ${column.key}:`, {
+                id: job.id,
+                company: job.company_name,
+                title: job.job_title,
+                position: job.order_position
+              });
+              
+              return (
+                <SortableJobCard 
+                  key={`${job.id}-${job.status}-${job.order_position}`} 
+                  job={job} 
+                  onDelete={onDeleteJob} 
+                  onView={onViewJob} 
+                  onUpdateChecklist={onUpdateChecklist} 
+                />
+              );
+            })}
           </div>
         </SortableContext>
       </div>
@@ -229,10 +246,12 @@ const SortableJobCard = ({
         
         {/* Center: Company & Job Title */}
         <div className="flex-1 min-w-0 overflow-hidden">
-          <div className="font-bold text-sm text-black leading-tight break-words">
+          <div className="font-bold text-sm text-black leading-tight break-words hyphens-auto" 
+               style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
             {job.company_name}
           </div>
-          <div className="text-xs text-gray-600 leading-tight break-words">
+          <div className="text-xs text-gray-600 leading-tight break-words hyphens-auto"
+               style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
             {job.job_title}
           </div>
         </div>
@@ -805,7 +824,15 @@ const JobTracker = () => {
     }
   };
   const getJobsByStatus = (status: string) => {
-    return jobs.filter(job => job.status === status).sort((a, b) => a.order_position - b.order_position);
+    const filteredJobs = jobs.filter(job => job.status === status).sort((a, b) => a.order_position - b.order_position);
+    console.log(`[DEBUG] getJobsByStatus for "${status}":`, filteredJobs.length, 'jobs');
+    console.log(`[DEBUG] Jobs for status "${status}":`, filteredJobs.map(j => ({ 
+      id: j.id, 
+      company: j.company_name, 
+      position: j.order_position,
+      title: j.job_title 
+    })));
+    return filteredJobs;
   };
   const handleViewJob = (job: JobEntry) => {
     setSelectedJob(job);
@@ -929,10 +956,10 @@ const JobTracker = () => {
               <span className="font-semibold text-3xl">📈</span>
               <h1 className="font-extrabold font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow md:text-4xl text-center text-3xl">Job Tracker</h1>
               
-              {/* Manual Refresh Button */}
-              {connectionIssue && <Button onClick={handleManualRefresh} variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0" title="Refresh data">
-                  <RefreshCw className="h-4 w-4" />
-                </Button>}
+              {/* Manual Refresh Button - Always visible for debugging */}
+              <Button onClick={handleManualRefresh} variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0" title="Refresh data">
+                <RefreshCw className="h-4 w-4" />
+              </Button>
             </div>
 
             {/* Error Display */}

@@ -142,13 +142,23 @@ export const useCachedJobTracker = () => {
     }
   }, [user?.id, hasFetched, jobs.length, error, isAuthReady]); // Include isAuthReady
 
+  // Add sanitization helper function
+  const sanitizeText = (text: string): string => {
+    if (!text) return '';
+    return text
+      .trim()
+      .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+      .replace(/[^\w\s-.,()&]/g, '') // Remove special characters except basic ones
+      .substring(0, 200); // Limit length to prevent rendering issues
+  };
+
   const fetchJobTrackerData = async (showErrors = false) => {
     if (!user || !isAuthReady) {
       console.log('🔒 Job tracker fetch skipped - auth not ready:', { user: !!user, isAuthReady });
       return;
     }
     
-    console.log('🚀 Starting job tracker data fetch with enhanced auth...');
+    console.log('[DEBUG] 🚀 Starting job tracker data fetch with enhanced auth...');
     
     try {
       setError(null);
@@ -170,6 +180,8 @@ export const useCachedJobTracker = () => {
         throw new Error('Unable to load user data');
       }
 
+      console.log('[DEBUG] Found user data:', userData.id);
+
       // Get user profile using enhanced authentication
       const userProfile = await executeWithRetry(async () => {
         const { data, error } = await supabase
@@ -186,6 +198,8 @@ export const useCachedJobTracker = () => {
         throw new Error('Unable to load user profile');
       }
 
+      console.log('[DEBUG] Found user profile:', userProfile.id);
+
       // Get jobs for this user profile using enhanced authentication
       const data = await executeWithRetry(async () => {
         const { data, error } = await supabase
@@ -198,15 +212,39 @@ export const useCachedJobTracker = () => {
         return data;
       }, 3, 'fetch job tracker data');
 
-      // Transform the data to match JobEntry interface
+      console.log('[DEBUG] Raw job data from database:', data);
+      console.log('[DEBUG] Total jobs fetched:', data?.length || 0);
+
+      // Log jobs by status for debugging
+      if (data) {
+        const jobsByStatus = data.reduce((acc: Record<string, any[]>, job) => {
+          if (!acc[job.status]) acc[job.status] = [];
+          acc[job.status].push(job);
+          return acc;
+        }, {});
+        
+        Object.entries(jobsByStatus).forEach(([status, jobs]) => {
+          console.log(`[DEBUG] Status "${status}": ${jobs.length} jobs`, 
+            jobs.map(j => ({ id: j.id, company: j.company_name, position: j.order_position })));
+        });
+      }
+
+      // Transform and sanitize the data to match JobEntry interface
       const jobsData: JobEntry[] = (data || []).map(job => ({
         ...job,
+        company_name: sanitizeText(job.company_name),
+        job_title: sanitizeText(job.job_title),
+        job_description: job.job_description ? sanitizeText(job.job_description) : undefined,
         file_urls: Array.isArray(job.file_urls) ? job.file_urls.map(url => String(url)) : [],
         comments: job.comments || undefined
       }));
+
+      console.log('[DEBUG] Jobs after sanitization:', jobsData.length);
       
       // Validate and fix any order position conflicts
       const validatedJobs = await validateAndFixOrderPositions(jobsData, userProfile.id);
+      
+      console.log('[DEBUG] Validated jobs after order position fix:', validatedJobs.length);
       
       // Update state
       setJobs(validatedJobs);
@@ -222,6 +260,7 @@ export const useCachedJobTracker = () => {
         };
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
         logger.debug('✅ Job tracker data loaded successfully:', { jobCount: validatedJobs.length, userProfileId: userProfile.id });
+        console.log('[DEBUG] Job tracker data cached successfully with', validatedJobs.length, 'jobs');
       } catch (cacheError) {
         logger.warn('Failed to cache job tracker data:', cacheError);
       }
@@ -258,7 +297,15 @@ export const useCachedJobTracker = () => {
   };
 
   const optimisticAdd = (newJob: JobEntry) => {
-    setJobs(prevJobs => [...prevJobs, newJob]);
+    console.log('[DEBUG] Adding new job optimistically:', newJob);
+    setJobs(prevJobs => {
+      const updatedJobs = [...prevJobs, newJob];
+      console.log('[DEBUG] Jobs after optimistic add:', updatedJobs.length);
+      return updatedJobs;
+    });
+    // Invalidate cache when adding new job to force fresh data
+    localStorage.removeItem(CACHE_KEY);
+    console.log('[DEBUG] Cache invalidated after adding new job');
   };
 
   const optimisticDelete = (jobId: string) => {
@@ -266,9 +313,12 @@ export const useCachedJobTracker = () => {
   };
 
   const forceRefresh = () => {
+    console.log('[DEBUG] Force refresh triggered - clearing cache and refetching');
     // Force a full refresh with error showing
     setError(null);
     setConnectionIssue(false);
+    localStorage.removeItem(CACHE_KEY);
+    setHasFetched(false); // Reset fetch status to force refetch
     fetchJobTrackerData(true);
   };
 
