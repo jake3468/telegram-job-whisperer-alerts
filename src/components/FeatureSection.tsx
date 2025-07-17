@@ -61,7 +61,7 @@ const FeatureSection = ({
         </SignUpButton>}
     </div>;
   const animationSection = <div className="flex items-center justify-center">
-      <div className="w-full max-w-sm md:max-w-md lg:max-w-lg">
+      <div className="w-full max-w-xs md:max-w-sm lg:max-w-md">
         {LottieComponent && animationData ? <LottieComponent animationData={animationData} loop={true} autoplay={true} style={{
         width: '100%',
         height: 'auto'
@@ -70,9 +70,9 @@ const FeatureSection = ({
           </div>}
       </div>
     </div>;
-  return <section className="py-8 md:py-12 px-4 bg-black">
+  return <section className="py-4 md:py-8 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-6 md:p-8">
+        <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-4 md:p-6">
           <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center ${isReversed ? 'lg:grid-flow-col-dense' : ''}`}>
           {isReversed ? <>
               <div className={isReversed ? 'lg:col-start-2' : ''}>{animationSection}</div>

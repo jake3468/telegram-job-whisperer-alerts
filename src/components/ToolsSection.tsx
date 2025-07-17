@@ -5,7 +5,7 @@ const ToolsSection = () => {
   return (
     <section id="features" className="relative bg-black">
       {/* Header Section */}
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+      <div className="max-w-7xl mx-auto px-4 py-8 text-center">
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-white mb-4 font-inter">
           Unlock Your Career Potential
         </h2>
