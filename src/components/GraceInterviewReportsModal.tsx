@@ -157,7 +157,7 @@ const GraceInterviewReportsModal = ({
   };
   if (showDetails && selectedItem) {
     return <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-[95vw] w-full h-[95vh] overflow-hidden bg-white border-gray-200 flex flex-col p-0">
+        <DialogContent className="max-w-[95vw] w-full h-[95vh] overflow-hidden bg-white border-gray-200 flex flex-col p-0 rounded-2xl">
           <DialogHeader className="flex-shrink-0 px-4 py-3 border-b border-gray-200 bg-gray-50">
             <div className="flex items-center justify-between">
               <DialogTitle className="text-gray-900 font-inter flex items-center gap-2 text-lg">
@@ -178,7 +178,7 @@ const GraceInterviewReportsModal = ({
       </Dialog>;
   }
   return <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-5xl h-[90vh] overflow-hidden bg-white border-gray-200 flex flex-col">
+      <DialogContent className="w-[95vw] max-w-5xl h-[90vh] overflow-hidden bg-white border-gray-200 flex flex-col rounded-2xl">
         <DialogHeader className="flex-shrink-0 border-b border-gray-100 pb-4">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-gray-900 font-inter flex items-center gap-2 text-base sm:text-lg font-semibold">

@@ -360,7 +360,7 @@ const JobGuide = () => {
       setError(errorMessage);
       toast({
         title: "Generation Failed",
-        description: "There was an error generating your job analysis. Please try again.",
+        description: "Please refresh the page to continue",
         variant: "destructive"
       });
     } finally {

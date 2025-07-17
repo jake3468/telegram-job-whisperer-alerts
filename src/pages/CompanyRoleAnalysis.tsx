@@ -261,7 +261,7 @@ const CompanyRoleAnalysis = () => {
       console.error('Error submitting company-role analysis:', error);
       toast({
         title: "Error",
-        description: "Failed to create company-role analysis. Please try again.",
+        description: "Please refresh the page to continue",
         variant: "destructive"
       });
       setIsSubmitting(false);

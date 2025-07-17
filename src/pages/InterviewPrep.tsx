@@ -310,16 +310,9 @@ const InterviewPrep = () => {
       console.error('❌ SUBMISSION ERROR:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to generate interview prep';
 
-      // Provide user-friendly error messages
-      let friendlyMessage = "There was an issue starting your interview prep. Please try again.";
-      if (errorMessage.toLowerCase().includes('jwt') || errorMessage.toLowerCase().includes('expired')) {
-        friendlyMessage = "Your session needs to be refreshed. Please try again in a moment.";
-      } else if (errorMessage.toLowerCase().includes('network')) {
-        friendlyMessage = "Network connection issue. Please check your connection and try again.";
-      }
       toast({
         title: "Generation Failed",
-        description: friendlyMessage,
+        description: "Please refresh the page to continue",
         variant: "destructive"
       });
     } finally {

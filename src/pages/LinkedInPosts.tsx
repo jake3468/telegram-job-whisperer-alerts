@@ -414,10 +414,9 @@ const LinkedInPosts = () => {
     } catch (err: any) {
       console.error('❌ Error creating LinkedIn post:', err);
       setIsGenerating(false);
-      const errorMessage = err.message || "Failed to create LinkedIn post. Please try again.";
       toast({
         title: "Error",
-        description: errorMessage,
+        description: "Please refresh the page to continue",
         variant: "destructive"
       });
     } finally {

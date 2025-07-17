@@ -277,7 +277,7 @@ const CoverLetter = () => {
         setCurrentCoverLetterId(null);
         toast({
           title: "Error",
-          description: "Failed to create cover letter. Please try again.",
+          description: "Please refresh the page to continue",
           variant: "destructive"
         });
       } finally {
