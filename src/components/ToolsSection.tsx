@@ -30,7 +30,7 @@ const ToolsSection = () => {
         <FeatureSection
           title="Job Tracker"
           subheading="Ditch the spreadsheets. Take control of your job hunt."
-          description="You're not just applying — you're chasing what's next. With Aspirely, every job you save comes with an instant, AI-powered checklist — resume tweaks, mock interviews, company insights — all lined up, ready to go. Drag jobs across stages like Interested, Applied, and Interviewing — and actually feel progress. No mess. No stress. Just momentum."
+          description="Stay organized and focused throughout your job search. Each saved job includes a tailored AI-powered checklist with resume suggestions, mock interview preparation, and company insights. Easily manage applications by moving them through stages like Interested, Applied, and Interviewing. Maintain clarity, reduce guesswork, and keep your momentum going."
           lottieUrl="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//business%20workshop.json"
           buttonText="Start Tracking"
           isReversed={true}
@@ -38,9 +38,9 @@ const ToolsSection = () => {
 
         {/* AI Mock Phone Interview - Third Feature */}
         <FeatureSection
-          title="📞 AI Mock Phone Interview"
+          title="AI Mock Phone Interview"
           subheading="Ditch the mirror pep talks. Get real practice that actually prepares you."
-          description="Just enter your number and the job you're targeting. Grace, Aspirely's AI interviewer, will call you for a realistic mock interview — no downloads, no awkward video calls. Right after the session, you'll receive a full breakdown: ✅ Section-wise scores 💡 Actionable tips and suggestions 📘 A personalized practice guide with targeted exercises, resume polish ideas, and prep tailored to your role. Train smart, speak with confidence, and show up ready when it really counts. Because the best way to ace your next interview… is to train like it's already happening."
+          description="Practice real interviews over a phone call with Grace, our AI interviewer. Just enter your number and job description to get a role-specific mock call. After the call, receive a report with scores, feedback, and a personalized practice guide to help you improve instantly."
           lottieUrl="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Interview%20_%20Get%20Ready%20to%20work-%20Job%20Recruitment%20(isometric-hiring-process).json"
           buttonText="Start Interview"
           isReversed={false}
