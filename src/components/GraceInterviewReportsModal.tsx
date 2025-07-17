@@ -263,7 +263,7 @@ const GraceInterviewReportsModal = ({
 
                   {/* Desktop Layout */}
                   <div className="hidden sm:block">
-                    <div className="p-4 bg-blue-100">
+                    <div className="p-4 bg-sky-100">
                       <div className="flex items-center justify-between gap-4">
                         <div className="flex items-center gap-4 flex-1 min-w-0">
                           <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
