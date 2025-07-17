@@ -164,12 +164,7 @@ const GraceInterviewReportsModal = ({
                 <Phone className="w-5 h-5" />
                 Interview Report Details
               </DialogTitle>
-              <Button 
-                onClick={() => setShowDetails(false)} 
-                size="sm" 
-                variant="ghost"
-                className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-              >
+              <Button onClick={() => setShowDetails(false)} size="sm" variant="ghost" className="text-gray-600 hover:text-gray-900 hover:bg-gray-100">
                 <X className="w-4 h-4 mr-1" />
                 Back to List
               </Button>
@@ -268,7 +263,7 @@ const GraceInterviewReportsModal = ({
 
                   {/* Desktop Layout */}
                   <div className="hidden sm:block">
-                    <div className="p-4">
+                    <div className="p-4 bg-blue-100">
                       <div className="flex items-center justify-between gap-4">
                         <div className="flex items-center gap-4 flex-1 min-w-0">
                           <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -298,9 +293,9 @@ const GraceInterviewReportsModal = ({
 
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <Button onClick={() => {
-                    setSelectedItem(item);
-                    setShowDetails(true);
-                  }} size="sm" className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4">
+                      setSelectedItem(item);
+                      setShowDetails(true);
+                    }} size="sm" className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4">
                             <Eye className="w-4 h-4 mr-1.5" />
                             View Report
                           </Button>
