@@ -215,7 +215,7 @@ const GraceInterviewReportsModal = ({
               {historyData.map(item => <div key={item.id} className="rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
                   {/* Mobile Layout */}
                   <div className="block sm:hidden">
-                    <div className="p-4 space-y-3">
+                    <div className="p-4 space-y-3 bg-sky-100">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-2">
