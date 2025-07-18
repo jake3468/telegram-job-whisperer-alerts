@@ -98,7 +98,7 @@ export function OnboardingPopup({
       case 2:
         return <div className="space-y-4">
             <div className="text-center">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 text-left">What we offer (can be explore this after)?</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 text-left">What we offer (you can be explore this after)?</h2>
             </div>
             
             <div className="bg-gray-50 rounded-lg p-3 border border-gray-200 space-y-2">
