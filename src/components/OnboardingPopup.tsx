@@ -98,13 +98,11 @@ export function OnboardingPopup({
       case 2:
         return <div className="space-y-4">
             <div className="text-center">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3">
-                What we offer?
-              </h2>
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 text-left">What we offer (can be explore this after)?</h2>
             </div>
             
             <div className="bg-gray-50 rounded-lg p-3 border border-gray-200 space-y-2">
-              <h3 className="text-sm font-semibold text-orange-600">🚨 This is where Aspirely flips the system.</h3>
+              <h3 className="text-sm font-semibold text-orange-600">🚨 Aspirely.ai is flipping the traditional job board system.</h3>
               <p className="text-gray-700 text-xs">
                 No more random clutter, 3-week-old postings, or irrelevant spam.
               </p>
