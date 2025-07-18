@@ -92,12 +92,22 @@ export const usePaymentProducts = () => {
   }, [pricingData?.region, pricingData?.currency]);
 
   const getSubscriptionProducts = () => products.filter(p => p.product_type === 'subscription');
-  const getCreditPackProducts = () => products.filter(p => p.product_type === 'credit_pack' && p.product_id !== 'initial_free_credits');
+  const getCreditPackProducts = () => products.filter(p => 
+    p.product_type === 'credit_pack' && 
+    p.product_id !== 'initial_free_credits' &&
+    !p.product_name.toLowerCase().includes('ai mock interview') &&
+    p.credits_amount > 10 // Exclude small credit amounts (1, 3, 5) that are for AI interviews
+  );
+  const getAIInterviewProducts = () => products.filter(p => 
+    p.product_type === 'credit_pack' && 
+    (p.product_name.toLowerCase().includes('ai mock interview') || p.credits_amount <= 10)
+  );
 
   return {
     products,
     subscriptionProducts: getSubscriptionProducts(),
     creditPackProducts: getCreditPackProducts(),
+    aiInterviewProducts: getAIInterviewProducts(),
     isLoading,
     error
   };
