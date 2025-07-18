@@ -9,11 +9,9 @@ const HeroSection = () => {
     user,
     isLoaded
   } = useUser();
-  const [displayedText, setDisplayedText] = useState('');
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
-  const fullText = 'Get a phone call from AI. Face a 10-min mock interview.\nGet ripped apart (and better).';
+  const fullText = 'Get a phone call from AI. Face a 10-min mock interview.\nGet ripped apart.';
   useEffect(() => {
     if (isLoaded && user) {
       navigate('/dashboard');
@@ -41,17 +39,6 @@ const HeroSection = () => {
     loadLottieAnimation();
   }, []);
 
-  // Optimized typing animation effect
-  useEffect(() => {
-    if (currentIndex < fullText.length) {
-      const timeout = setTimeout(() => {
-        setDisplayedText(prev => prev + fullText[currentIndex]);
-        setCurrentIndex(prev => prev + 1);
-      }, 80); // Faster typing animation
-
-      return () => clearTimeout(timeout);
-    }
-  }, [currentIndex, fullText]);
   const goToDashboard = () => {
     navigate('/dashboard');
   };
@@ -66,38 +53,35 @@ const HeroSection = () => {
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
         <h1 className="text-2xl md:text-4xl font-extrabold text-white mb-1 leading-tight font-inter drop-shadow-xl">
-          {displayedText.split('\n').map((line, index) => <span key={index}>
+          {fullText.split('\n').map((line, index) => 
+            <span key={index}>
               {line.split(' ').map((word, wordIndex) => {
-            const cleanWord = word.replace(/[.,]/g, ''); // Remove punctuation for matching
-            const punctuation = word.match(/[.,]/g)?.[0] || '';
-            
-            if (cleanWord === 'AI') {
-              return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent">
-                      {wordIndex === 0 ? 'AI' : ' AI'}{punctuation}
-                    </span>;
-            } else if (cleanWord === 'mock') {
-              return <span key={wordIndex} className="italic bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent">
-                      {wordIndex === 0 ? 'mock' : ' mock'}{punctuation}
-                    </span>;
-            } else if (cleanWord === 'interview') {
-              return <span key={wordIndex} className="italic bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent">
-                      {wordIndex === 0 ? 'interview' : ' interview'}{punctuation}
-                    </span>;
-            } else if (cleanWord === 'ripped') {
-              return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-red-400 to-orange-500 bg-clip-text text-transparent">
-                      {wordIndex === 0 ? 'ripped' : ' ripped'}{punctuation}
-                    </span>;
-            } else if (cleanWord === 'better') {
-              return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
-                      {wordIndex === 0 ? 'better' : ' better'}{punctuation}
-                    </span>;
-            } else {
-              return <span key={wordIndex}>{wordIndex === 0 ? word : ` ${word}`}</span>;
-            }
-          })}
+                const cleanWord = word.replace(/[.,]/g, ''); // Remove punctuation for matching
+                const punctuation = word.match(/[.,]/g)?.[0] || '';
+                
+                if (cleanWord === 'AI') {
+                  return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent">
+                          {wordIndex === 0 ? 'AI' : ' AI'}{punctuation}
+                        </span>;
+                } else if (cleanWord === 'mock') {
+                  return <span key={wordIndex} className="italic bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent">
+                          {wordIndex === 0 ? 'mock' : ' mock'}{punctuation}
+                        </span>;
+                } else if (cleanWord === 'interview') {
+                  return <span key={wordIndex} className="italic bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent">
+                          {wordIndex === 0 ? 'interview' : ' interview'}{punctuation}
+                        </span>;
+                } else if (cleanWord === 'ripped') {
+                  return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-red-400 to-orange-500 bg-clip-text text-transparent">
+                          {wordIndex === 0 ? 'ripped' : ' ripped'}{punctuation}
+                        </span>;
+                } else {
+                  return <span key={wordIndex}>{wordIndex === 0 ? word : ` ${word}`}</span>;
+                }
+              })}
               {index === 0 && <br className="hidden sm:block" />}
-            </span>)}
-          <span className="animate-pulse">|</span>
+            </span>
+          )}
         </h1>
         
         {/* Lottie Animation */}
@@ -120,11 +104,7 @@ const HeroSection = () => {
         </div>
 
         <p className="md:text-xl text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-sm">
-          Job hunting toolkit that writes your cover letter, preps you for interviews, and even pings you new jobs — all powered by{" "}
-          <span className="italic bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent font-medium">
-            AI
-          </span>
-          . Weirdly effective.
+          From brutal AI interviews on your phone to perfect resumes and job alerts — Aspirely makes job hunting actually work.
         </p>
         
         <SignedOut>
