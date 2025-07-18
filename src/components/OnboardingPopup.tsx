@@ -82,17 +82,13 @@ export function OnboardingPopup({
             
             <div className="space-y-2">
               <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                <h3 className="text-sm font-semibold text-purple-600 mb-1">📄 Let's feed the AI.</h3>
-                <p className="text-gray-700 text-xs">
-                  Upload your resume so our tools can understand your experience, skills, and background.
-                </p>
+                <h3 className="text-sm font-semibold text-purple-600 mb-1">📄 First let's feed the AI.</h3>
+                <p className="text-gray-700 text-xs">Upload your resume after you close this popup message , so that our tools can understand your experience, skills, and background.</p>
               </div>
               
               <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                 <h3 className="text-sm font-semibold text-blue-600 mb-1">💬 Who are you beyond the PDF?</h3>
-                <p className="text-gray-700 text-xs">
-                  Write a short intro — your story, your strengths, your vibe. Not just "hard-working team player" — tell us the stuff that makes you... you. not just the boring stuff. Brag. Be weird. Be real.
-                </p>
+                <p className="text-gray-700 text-xs">Then, write a short intro — your story, your strengths, your vibe. Not just "hard-working team player" — tell us the stuff that makes you... you. not just the boring stuff. Brag. Be weird. Be real.</p>
                 <p className="text-purple-600 text-xs mt-1 font-medium">
                   The better we know you, the better the results. It's quick, and it sets the stage for everything that follows.
                 </p>
