@@ -71,7 +71,7 @@ const BioSection = () => {
             </div>
             <span className="text-white font-bold">About You</span>
           </CardTitle>
-          <CardDescription className="text-emerald-50 font-inter font-normal drop-shadow-[0_2px_10px_rgba(16,185,129,0.4)] text-sm">Tell us a bit about yourself — it helps our AI tailor tools to your unique profile.</CardDescription>
+          <CardDescription className="text-emerald-50 font-inter font-normal drop-shadow-[0_2px_10px_rgba(16,185,129,0.4)] text-base">Tell us a bit about yourself — it helps our AI tailor tools to your unique profile.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 pt-0">
           <Textarea value={bio} onChange={e => {
