@@ -131,7 +131,7 @@ const Profile = () => {
               Welcome, <span className="italic bg-gradient-to-r from-pastel-peach to-pastel-mint bg-clip-text text-transparent">{user.firstName || 'User'}</span>
             </h1>
             <p className="text-lg text-gray-100 font-inter font-light">
-              Add your <span className="italic text-emerald-200">current resume</span> and <span className="italic text-pastel-blue">bio details</span> on this page. Once you're done, go to the 'Create Job Alerts' page to set up personalized job alerts.
+              Add your <span className="italic text-emerald-200">current resume</span> and <span className="italic text-pastel-blue">bio details</span> on this page. Once you're done, go to the <span className="italic text-pastel-blue">'Create Job Alerts'</span> page to set up personalized job alerts.
             </p>
           </div>
           
