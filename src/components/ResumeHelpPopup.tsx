@@ -40,7 +40,7 @@ export const ResumeHelpPopup: React.FC<ResumeHelpPopupProps> = ({
             <p>If your current resume feels really outdated or boring, no worries 😉. You can even start fresh.</p>
             
             <p>
-              Unlike platforms where you have to manually fill out long forms, our <em className="bg-purple-100">Telegram AI Resume Bot</em> lets you build or upgrade your resume through a simple, human-like chat.
+              Unlike platforms where you have to manually fill out long forms, go ahead and use our <em className="bg-purple-100">Telegram AI Resume Bot</em>. It lets you build or upgrade your resume through a simple, human-like chat.
             </p>
             
             <p>
