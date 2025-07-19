@@ -16,6 +16,7 @@ import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
 import { ResumeHelpPopup } from '@/components/ResumeHelpPopup';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Wifi, WifiOff } from 'lucide-react';
+import { useUserProfile } from '@/hooks/useUserProfile';
 const Profile = () => {
   const {
     user,
@@ -26,6 +27,7 @@ const Profile = () => {
     isAuthReady,
     executeWithRetry
   } = useEnterpriseAuth();
+  const { userProfile } = useUserProfile();
   const {
     runComprehensiveJWTTest
   } = useJWTDebug();
@@ -211,7 +213,11 @@ const Profile = () => {
       <OnboardingPopup isOpen={showPopup} onClose={hidePopup} onDontShowAgain={dontShowAgain} userName={user.firstName || undefined} />
       
       {/* Resume Help Popup */}
-      <ResumeHelpPopup isOpen={showResumeHelp} onClose={() => setShowResumeHelp(false)} />
+      <ResumeHelpPopup 
+        isOpen={showResumeHelp} 
+        onClose={() => setShowResumeHelp(false)} 
+        userProfileId={userProfile?.id}
+      />
     </Layout>;
 };
 export default Profile;
