@@ -157,7 +157,7 @@ const Profile = () => {
           {/* Step 1: Resume Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-sky-400 to-fuchsia-400 rounded-full flex items-center justify-center font-bold text-white text-sm shadow-lg">
+              <div className="w-8 h-8 bg-gradient-to-br from-sky-700 to-fuchsia-700 rounded-full flex items-center justify-center font-bold text-white text-sm shadow-lg">
                 1
               </div>
               <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-sky-400 to-fuchsia-400 bg-clip-text text-transparent">
@@ -170,7 +170,7 @@ const Profile = () => {
           {/* Step 2: Bio Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-pastel-lavender to-pastel-mint rounded-full flex items-center justify-center font-bold text-white text-sm shadow-lg bg-teal-800">
+              <div className="w-8 h-8 bg-gradient-to-br from-teal-700 to-emerald-700 rounded-full flex items-center justify-center font-bold text-white text-sm shadow-lg">
                 2
               </div>
               <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-pastel-lavender to-pastel-mint bg-clip-text text-transparent">
@@ -192,7 +192,7 @@ const Profile = () => {
             </div>
             <div className="rounded-3xl border-2 border-amber-400/50 bg-gradient-to-br from-amber-900/20 via-orange-900/10 to-yellow-900/20 p-6">
               <p className="text-amber-100 font-inter text-base mb-4">
-                Set up personalized job alerts to get notifications about the latest job postings from the past 24 hours directly to your Telegram.
+                Set up personalized job alerts to get notifications about the latest job postings from the past 24 hours directly to your Telegram. You can navigate to the 'Create Job Alerts' page by clicking the button below or by using the hamburger sidebar menu at the top of the page.
               </p>
               <Button onClick={() => navigate('/job-alerts')} className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter">
                 Go to Create Job Alerts

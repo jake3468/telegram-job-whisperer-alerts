@@ -11,7 +11,7 @@ const HeroSection = () => {
   } = useUser();
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
-  const fullText = 'Get a phone call from AI. Face a 10-min mock interview.\nGet ripped apart.';
+  const fullText = 'Sick of LinkedIn, Indeed, and the same old job boards?\nThink you\'re ready for interviews? Let an AI call your phone for 10 min and prove you wrong.';
   useEffect(() => {
     if (isLoaded && user) {
       navigate('/dashboard');
@@ -59,21 +59,21 @@ const HeroSection = () => {
                 const cleanWord = word.replace(/[.,]/g, ''); // Remove punctuation for matching
                 const punctuation = word.match(/[.,]/g)?.[0] || '';
                 
-                if (cleanWord === 'AI') {
+                if (cleanWord === 'LinkedIn' || cleanWord === 'Indeed') {
+                  return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
+                          {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
+                        </span>;
+                } else if (cleanWord === 'AI') {
                   return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent">
                           {wordIndex === 0 ? 'AI' : ' AI'}{punctuation}
                         </span>;
-                } else if (cleanWord === 'mock') {
+                } else if (cleanWord === 'interviews') {
                   return <span key={wordIndex} className="italic bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent">
-                          {wordIndex === 0 ? 'mock' : ' mock'}{punctuation}
+                          {wordIndex === 0 ? 'interviews' : ' interviews'}{punctuation}
                         </span>;
-                } else if (cleanWord === 'interview') {
-                  return <span key={wordIndex} className="italic bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent">
-                          {wordIndex === 0 ? 'interview' : ' interview'}{punctuation}
-                        </span>;
-                } else if (cleanWord === 'ripped') {
+                } else if (cleanWord === 'wrong') {
                   return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-red-400 to-orange-500 bg-clip-text text-transparent">
-                          {wordIndex === 0 ? 'ripped' : ' ripped'}{punctuation}
+                          {wordIndex === 0 ? 'wrong' : ' wrong'}{punctuation}
                         </span>;
                 } else {
                   return <span key={wordIndex}>{wordIndex === 0 ? word : ` ${word}`}</span>;
@@ -104,7 +104,7 @@ const HeroSection = () => {
         </div>
 
         <p className="md:text-xl text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-sm">
-          From brutal AI interviews on your phone to perfect resumes and job alerts — Aspirely makes job hunting actually work.
+          No robotic voices or scripts — just a human-sounding AI that calls your phone, interviews you like a real recruiter, and tells you exactly where you fail. Then, instantly generate standout resumes and cover letters, decode your fit for any company, and track job listings with smarter prep that actually gets you hired.
         </p>
         
         <SignedOut>
