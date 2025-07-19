@@ -11,7 +11,7 @@ const HeroSection = () => {
   } = useUser();
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
-  const fullText = 'Tired of LinkedIn and Indeed?\nThink you\'re ready for interviews? Let an AI call your phone for 10 minutes and prove you wrong.';
+  const fullText = 'LinkedIn and Indeed work for recruiters. We work for you.';
   useEffect(() => {
     if (isLoaded && user) {
       navigate('/dashboard');
@@ -63,18 +63,6 @@ const HeroSection = () => {
                   return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
                           {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
                         </span>;
-                } else if (cleanWord === 'AI') {
-                  return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent">
-                          {wordIndex === 0 ? 'AI' : ' AI'}{punctuation}
-                        </span>;
-                } else if (cleanWord === 'interviews') {
-                  return <span key={wordIndex} className="italic bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent">
-                          {wordIndex === 0 ? 'interviews' : ' interviews'}{punctuation}
-                        </span>;
-                } else if (cleanWord === 'wrong') {
-                  return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-red-400 to-orange-500 bg-clip-text text-transparent">
-                          {wordIndex === 0 ? 'wrong' : ' wrong'}{punctuation}
-                        </span>;
                 } else {
                   return <span key={wordIndex}>{wordIndex === 0 ? word : ` ${word}`}</span>;
                 }
@@ -104,9 +92,7 @@ const HeroSection = () => {
         </div>
 
         <p className="md:text-xl text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-sm">
-          No robotic voices. No scripts. Just a human-sounding AI that interviews you like a real recruiter and tells you exactly where you fail.
-          <br />
-          Then build powerful resumes, decode company fit, and track jobs — all in one brutally honest platform that actually helps you get hired.
+          Get a real phone call mock interview from a human-sounding AI — no robotic voice, no scripts. Instantly build powerful resumes and cover letters, decode job fit, track your entire job hunt, and get job postings from the last 24 hours — because by day two, there are already 3000 applicants. We're built for candidates, not recruiters.
         </p>
         
         <SignedOut>
