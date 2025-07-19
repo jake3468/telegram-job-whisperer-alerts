@@ -132,7 +132,7 @@ const Profile = () => {
               Welcome, <span className="italic bg-gradient-to-r from-pastel-peach to-pastel-mint bg-clip-text text-transparent">{user.firstName || 'User'}</span>
             </h1>
             <p className="text-gray-100 font-inter font-light text-left text-base">
-              Complete these 3 simple steps to get started with your job search. Add your <span className="italic text-yellow-200">resume</span> and <span className="italic text-pastel-blue">bio</span>, then set up personalized <span className="italic text-amber-200">job alerts</span>.
+              Complete the below 3 simple steps to get started with your job search. Add your <span className="italic text-yellow-200">resume</span> and <span className="italic text-pastel-blue">bio</span>, then set up personalized <span className="italic text-amber-200">job alerts</span>.
             </p>
           </div>
           
