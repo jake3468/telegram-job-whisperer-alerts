@@ -22,11 +22,14 @@ interface JobAlert {
 }
 interface JobAlertsSectionProps {
   userTimezone: string;
+  updateActivity?: () => void;
 }
 const JobAlertsSection = ({
-  userTimezone
+  userTimezone,
+  updateActivity
 }: {
   userTimezone: string;
+  updateActivity?: () => void;
 }) => {
   const { toast } = useToast();
   const { 
@@ -50,6 +53,7 @@ const JobAlertsSection = ({
   const alertsRemaining = MAX_ALERTS - alertsUsed;
   const isAtLimit = alertsUsed >= MAX_ALERTS;
   const handleCreateAlert = () => {
+    updateActivity?.();
     if (!isActivated) {
       toast({
         title: "Bot not activated",
@@ -70,6 +74,7 @@ const JobAlertsSection = ({
     setShowForm(true);
   };
   const handleEditAlert = (alert: JobAlert) => {
+    updateActivity?.();
     if (!isActivated) {
       toast({
         title: "Bot not activated",
@@ -82,6 +87,7 @@ const JobAlertsSection = ({
     setShowForm(true);
   };
   const handleDeleteAlert = async (alertId: string) => {
+    updateActivity?.();
     if (!isActivated) {
       toast({
         title: "Bot not activated",
@@ -207,7 +213,7 @@ const JobAlertsSection = ({
           {/* Job Alerts Form and List - Only show when activated */}
           {isActivated && <>
               {showForm && <div className="mb-6 rounded-2xl bg-gradient-to-br from-orange-900/95 via-[#3c1c01]/90 to-[#2b1605]/95 border border-orange-500/70 shadow-lg p-2 sm:p-4">
-                  <JobAlertForm userTimezone={userTimezone} editingAlert={editingAlert} onSubmit={handleFormSubmit} onCancel={handleFormCancel} currentAlertCount={alertsUsed} maxAlerts={MAX_ALERTS} />
+                  <JobAlertForm userTimezone={userTimezone} editingAlert={editingAlert} onSubmit={handleFormSubmit} onCancel={handleFormCancel} currentAlertCount={alertsUsed} maxAlerts={MAX_ALERTS} updateActivity={updateActivity} />
                 </div>}
               <div className="flex flex-col gap-4 pb-6 sm:pb-8">
                 <JobAlertsList alerts={alerts} onEdit={handleEditAlert} onDelete={handleDeleteAlert} />
