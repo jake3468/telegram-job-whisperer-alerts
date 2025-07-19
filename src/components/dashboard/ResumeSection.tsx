@@ -13,7 +13,10 @@ const ResumeSection = () => {
   const {
     toast
   } = useToast();
-  const { resumeExists, updateResumeStatus } = useCachedUserProfile();
+  const {
+    resumeExists,
+    updateResumeStatus
+  } = useCachedUserProfile();
   const [uploading, setUploading] = useState(false);
   const [resumeUrl, setResumeUrl] = useState<string | null>(null);
   useEffect(() => {
@@ -23,7 +26,9 @@ const ResumeSection = () => {
     } else if (resumeExists && user) {
       // If we know resume exists, set the URL immediately
       const fileName = `${user.id}/resume.pdf`;
-      const { data: urlData } = supabase.storage.from('resumes').getPublicUrl(fileName);
+      const {
+        data: urlData
+      } = supabase.storage.from('resumes').getPublicUrl(fileName);
       setResumeUrl(urlData.publicUrl);
     }
   }, [user, resumeExists]);
@@ -196,7 +201,7 @@ const ResumeSection = () => {
             </div>
             <span className="text-white font-bold">Resume</span>
           </CardTitle>
-          <CardDescription className="text-white/95 text-base font-inter font-normal drop-shadow-[0_2px_10px_rgba(147,51,234,0.4)]">Upload your resume (PDF, max 5MB) so our AI can better understand your background and personalize your experience</CardDescription>
+          <CardDescription className="text-white/95 font-inter font-normal drop-shadow-[0_2px_10px_rgba(147,51,234,0.4)] text-sm">Upload your resume (PDF, max 5MB) so our AI can better understand your background and personalize your experience</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 pt-0">
           {resumeUrl ? <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-xl border border-white/20 bg-black/70 shadow-inner">

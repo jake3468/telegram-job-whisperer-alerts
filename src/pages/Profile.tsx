@@ -21,7 +21,10 @@ const Profile = () => {
     isLoaded
   } = useUser();
   const navigate = useNavigate();
-  const { isAuthReady, executeWithRetry } = useEnterpriseAuth();
+  const {
+    isAuthReady,
+    executeWithRetry
+  } = useEnterpriseAuth();
   const {
     runComprehensiveJWTTest
   } = useJWTDebug();
@@ -51,20 +54,13 @@ const Profile = () => {
   // Enhanced JWT setup check with enterprise auth retry logic
   const checkJWTSetup = useCallback(async () => {
     if (!isLoaded || !user || !isAuthReady) return;
-    
     try {
       setError(null);
       setConnectionIssue(false);
-      
       if (Environment.isDevelopment()) {
-        const testResult = await executeWithRetry(
-          async () => {
-            return await runComprehensiveJWTTest();
-          },
-          2,
-          'JWT comprehensive test'
-        );
-        
+        const testResult = await executeWithRetry(async () => {
+          return await runComprehensiveJWTTest();
+        }, 2, 'JWT comprehensive test');
         setLastJWTTestResult(testResult);
 
         // Show setup guide if JWT is not properly configured
@@ -72,7 +68,6 @@ const Profile = () => {
           setShowJWTSetupGuide(true);
         }
       }
-      
       setProfileDataLoaded(true);
     } catch (error) {
       console.error('JWT setup check failed:', error);
@@ -131,7 +126,7 @@ const Profile = () => {
               Welcome, <span className="italic bg-gradient-to-r from-pastel-peach to-pastel-mint bg-clip-text text-transparent">{user.firstName || 'User'}</span>
             </h1>
             <p className="text-lg text-gray-100 font-inter font-light">
-              Add your <span className="italic text-emerald-200">current resume</span> and <span className="italic text-pastel-blue">bio details</span> on this page. Once you're done, go to the 'Create Job Alerts' page to set up personalized job alerts.
+              Complete these 3 simple steps to get started with your job search. Add your <span className="italic text-yellow-200">resume</span> and <span className="italic text-pastel-blue">bio</span>, then set up personalized <span className="italic text-amber-200">job alerts</span>.
             </p>
           </div>
           
@@ -153,20 +148,56 @@ const Profile = () => {
           <ClerkJWTSetupGuide />
         </div>}
 
-      {!isAuthReady ? (
-        <div className="flex items-center justify-center min-h-[400px]">
+      {!isAuthReady ? <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center space-y-3">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-fuchsia-400 mx-auto"></div>
             <p className="text-gray-300 text-sm">Preparing authentication...</p>
           </div>
-        </div>
-      ) : (
-        <div className="max-w-4xl mx-auto space-y-8 px-4" onClick={updateActivity} onKeyDown={updateActivity}>
-          {/* Profile sections - show even during connection issues for better UX */}
-          <ResumeSection />
-          <BioSection />
-        </div>
-      )}
+        </div> : <div className="max-w-4xl mx-auto space-y-8 px-4" onClick={updateActivity} onKeyDown={updateActivity}>
+          {/* Step 1: Resume Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 bg-gradient-to-br from-sky-700 to-fuchsia-700 rounded-full flex items-center justify-center font-bold text-white text-sm shadow-lg">
+                1
+              </div>
+              <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-sky-400 to-fuchsia-400 bg-clip-text text-transparent">
+                Add Your Resume
+              </h2>
+            </div>
+            <ResumeSection />
+          </div>
+
+          {/* Step 2: Bio Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 bg-gradient-to-br from-teal-700 to-emerald-700 rounded-full flex items-center justify-center font-bold text-white text-sm shadow-lg">
+                2
+              </div>
+              <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-pastel-lavender to-pastel-mint bg-clip-text text-transparent">
+                Add Your Bio
+              </h2>
+            </div>
+            <BioSection />
+          </div>
+
+          {/* Step 3: Job Alerts */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-400 rounded-full flex items-center justify-center font-bold text-white text-sm shadow-lg">
+                3
+              </div>
+              <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+                Create Job Alerts
+              </h2>
+            </div>
+            <div className="rounded-3xl border-2 border-amber-400/50 bg-gradient-to-br from-amber-900/20 via-orange-900/10 to-yellow-900/20 p-6">
+              <p className="text-amber-100 font-inter text-base mb-4">Set up personalized job alerts to get notifications about the latest job postings from the past 24 hours directly to your Telegram. You can navigate to the 'Create Job Alerts' page by clicking the button below, or by using the sidebar menu button at the top left corner of this page.</p>
+              <Button onClick={() => navigate('/job-alerts')} className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter">
+                Go to Create Job Alerts
+              </Button>
+            </div>
+          </div>
+        </div>}
       
       {/* JWT Debug Panel - only in development */}
       {Environment.isDevelopment() && <JWTDebugPanel />}

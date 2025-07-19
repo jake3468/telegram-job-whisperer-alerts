@@ -17,7 +17,7 @@ export function OnboardingPopup({
   const [currentStep, setCurrentStep] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
   const nextStep = () => {
-    if (currentStep < 3) {
+    if (currentStep < 1) {
       setCurrentStep(currentStep + 1);
       // Scroll to top of content
       setTimeout(() => {
@@ -122,54 +122,6 @@ export function OnboardingPopup({
               </p>
             </div>
           </div>;
-      case 3:
-        return <div className="space-y-4">
-            <div className="text-center">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 text-left">What we offer (you can be explore this later)?</h2>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                <h3 className="text-sm font-semibold text-green-600 mb-1">🗂️ Job Board</h3>
-                <p className="text-gray-700 text-xs mb-1">
-                  Here, you'll only see all your:
-                </p>
-                <ul className="space-y-0.5 text-xs text-gray-700">
-                  <li>📅 Jobs posted today</li>
-                  <li>📆 Jobs from the last 7 days</li>
-                </ul>
-                <p className="text-red-600 text-xs mt-1 font-medium">
-                  After 7 days, they vanish. Because who hires from ancient listings?
-                </p>
-              </div>
-              
-              <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                <p className="text-gray-700 text-xs mb-1">
-                  🔖 You can save interesting jobs, apply later, or move them to your Job tracker when you're ready.
-                </p>
-                
-                <h3 className="text-sm font-semibold text-blue-600 mb-1">📌 Job Tracker = your personal roadmap to the offer.</h3>
-                <p className="text-gray-700 text-xs mb-1">
-                  The last stop before the offer. When you're ready to apply, move a saved job to your Job Tracker.
-                </p>
-                
-                <div className="space-y-0.5 text-xs text-gray-700">
-                  <p className="text-gray-900 text-sm font-medium">You'll unlock:</p>
-                  <ul className="space-y-0.5">
-                    <li>✅ Resume & cover letter checklist</li>
-                    <li>🤖 AI mock interviews</li>
-                    <li>🔍 Job fit analysis</li>
-                    <li>🕵️‍♀️ Company decoder</li>
-                    <li>📆 Follow-up tracking</li>
-                  </ul>
-                </div>
-                
-                <p className="text-purple-600 font-medium text-xs mt-1">
-                  No more guessing. Just progress. You don't just apply — you execute. Like a job-hunting assassin.
-                </p>
-              </div>
-            </div>
-          </div>;
       default:
         return null;
     }
@@ -180,11 +132,11 @@ export function OnboardingPopup({
           <div className="flex items-center justify-between gap-3 sm:gap-4">
             <DialogTitle className="text-lg font-bold text-gray-900 flex items-center gap-4 min-w-0 flex-1">
               <div className="flex items-center gap-1 sm:gap-2">
-                {[1, 2, 3, 4].map(step => <div key={step} className="flex items-center">
+                {[1, 2].map(step => <div key={step} className="flex items-center">
                     <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-semibold ${step <= currentStep + 1 ? 'bg-purple-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
                       {step}
                     </div>
-                    {step < 4 && <div className={`w-4 sm:w-8 h-0.5 mx-0.5 sm:mx-1 ${step < currentStep + 1 ? 'bg-purple-500' : 'bg-gray-200'}`} />}
+                    {step < 2 && <div className={`w-4 sm:w-8 h-0.5 mx-0.5 sm:mx-1 ${step < currentStep + 1 ? 'bg-purple-500' : 'bg-gray-200'}`} />}
                   </div>)}
               </div>
             </DialogTitle>
@@ -205,7 +157,7 @@ export function OnboardingPopup({
           </Button>
           
           <div className="flex flex-col gap-2 min-w-0">
-            {currentStep === 3 ? <div className="flex flex-col gap-2 items-center w-full">
+            {currentStep === 1 ? <div className="flex flex-col gap-2 items-center w-full">
                 <Button onClick={handleLetSGo} className="w-full bg-green-500 hover:bg-green-600 text-white font-bold px-4 py-2 text-xs sm:text-sm rounded-lg">
                   <span className="sm:hidden">Let's Go 🔥</span>
                   <span className="hidden sm:inline">Let's Go 🔥</span>

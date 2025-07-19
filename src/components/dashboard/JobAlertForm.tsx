@@ -31,9 +31,10 @@ interface JobAlertFormProps {
   onCancel: () => void;
   currentAlertCount: number;
   maxAlerts: number;
+  updateActivity?: () => void;
 }
 
-const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentAlertCount, maxAlerts }: JobAlertFormProps) => {
+const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentAlertCount, maxAlerts, updateActivity }: JobAlertFormProps) => {
   const { user } = useUser();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -71,6 +72,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    updateActivity?.();
     if (!user) return;
 
     // Check alert limit for new alerts (not for editing existing ones)
@@ -174,6 +176,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   };
 
   const handleInputChange = (field: string, value: string | number) => {
+    updateActivity?.();
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -181,6 +184,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   };
 
   const handleCountryChange = (countryCode: string, countryName: string) => {
+    updateActivity?.();
     setFormData(prev => ({
       ...prev,
       country: countryCode,
@@ -194,7 +198,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4" onClick={updateActivity} onKeyDown={updateActivity}>
       {/* Alert limit warning for new alerts */}
       {!editingAlert && currentAlertCount >= maxAlerts - 1 && (
         <div className="bg-yellow-900/50 border border-yellow-500/50 rounded-lg p-3 mb-4">

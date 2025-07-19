@@ -10,6 +10,7 @@ import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
 import { JobAlertsOnboardingPopup } from '@/components/JobAlertsOnboardingPopup';
 import { Badge } from '@/components/ui/badge';
+import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
 const JobAlerts = () => {
   const {
     user,
@@ -23,6 +24,9 @@ const JobAlerts = () => {
 
   // Replace useFeatureCreditCheck with the new system
   useCreditWarnings(); // This shows the warning popups
+
+  // Keep tokens fresh and track activity on Job Alerts page
+  const { updateActivity } = useFormTokenKeepAlive(true);
 
   // Memoize timezone to prevent unnecessary re-renders and ensure IANA format
   const userTimezone = useMemo(() => {
@@ -64,7 +68,7 @@ const JobAlerts = () => {
       </div>;
   }
   return <Layout>
-      <div className="text-center mb-8">
+      <div className="text-center mb-8" onClick={updateActivity}>
         <h1 className="text-4xl font-orbitron font-extrabold mb-2 drop-shadow tracking-tight flex items-center justify-center gap-2">
           <span>⏰</span>
           <span style={{
@@ -92,8 +96,8 @@ const JobAlerts = () => {
       {/* Job Alerts Onboarding Popup */}
       <JobAlertsOnboardingPopup />
 
-      <div className="space-y-8">
-        <JobAlertsSection userTimezone={userTimezone} />
+      <div className="space-y-8" onClick={updateActivity} onKeyDown={updateActivity}>
+        <JobAlertsSection userTimezone={userTimezone} updateActivity={updateActivity} />
       </div>
     </Layout>;
 };
