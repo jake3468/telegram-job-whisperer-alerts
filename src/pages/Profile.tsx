@@ -196,7 +196,7 @@ const Profile = () => {
               </h2>
             </div>
             <div className="rounded-3xl border-2 border-amber-400/50 bg-gradient-to-br from-amber-900/20 via-orange-900/10 to-yellow-900/20 p-6">
-              <p className="text-amber-100 font-inter text-base mb-4">Set up personalized job alerts to get notifications about the latest job postings from the past 24 hours directly to your Telegram. You can navigate to the 'Create Job Alerts' page by clicking the button below, or by using the sidebar menu button at the top left corner of this page.</p>
+              <p className="text-amber-100 font-inter mb-4 text-base">Set up personalized job alerts to get notifications about the latest job postings from the past 24 hours directly to your Telegram. You can navigate to the 'Create Job Alerts' page by clicking the button below, or by using the sidebar menu button at the top left corner of this page.</p>
               <Button onClick={() => navigate('/job-alerts')} className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter">
                 Go to Create Job Alerts
               </Button>
