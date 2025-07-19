@@ -189,40 +189,40 @@ const ResumeSection = () => {
   };
   return <section className="p-0 rounded-none bg-transparent shadow-none">
       <Card className="
-          rounded-3xl border border-slate-700/50 
-          bg-gradient-to-br from-slate-900/95 via-slate-800/90 to-slate-900/95
-          shadow-2xl shadow-slate-900/50 transition-all hover:shadow-slate-700/40
-          backdrop-blur-sm hover:border-slate-600/50
+          rounded-3xl border border-amber-500/30 
+          bg-gradient-to-br from-amber-900/20 via-orange-900/15 to-amber-900/20
+          shadow-2xl shadow-amber-900/20 transition-all hover:shadow-amber-700/30
+          backdrop-blur-sm hover:border-amber-400/50
         ">
         <CardHeader className="pb-4">
-          <CardTitle className="text-slate-100 font-orbitron flex items-center gap-3 text-lg">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+          <CardTitle className="text-amber-100 font-orbitron flex items-center gap-3 text-lg">
+            <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg">
               <FileText className="w-4 h-4 text-white" />
             </div>
-            <span className="text-slate-100 font-bold">Resume</span>
+            <span className="text-amber-100 font-bold">Resume</span>
           </CardTitle>
-          <CardDescription className="text-slate-300 font-inter font-normal text-base leading-relaxed">Upload your resume (PDF, max 5MB) so our AI can better understand your background and personalize your experience</CardDescription>
+          <CardDescription className="text-amber-200 font-inter font-normal text-base leading-relaxed">Upload your resume (PDF, max 5MB) so our AI can better understand your background and personalize your experience</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 pt-0">
-          {resumeUrl ? <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 rounded-xl border border-slate-600/50 bg-slate-800/80 shadow-lg">
+          {resumeUrl ? <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 rounded-xl border border-amber-500/30 bg-amber-900/20 shadow-lg">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-9 h-9 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                <div className="w-9 h-9 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
                   <FileText className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-slate-100 font-inter font-semibold text-base truncate">resume.pdf</span>
+                <span className="text-amber-100 font-inter font-semibold text-base truncate">resume.pdf</span>
               </div>
               <Button variant="destructive" size="sm" onClick={handleDeleteResume} className="font-inter bg-red-600 hover:bg-red-700 transition-all text-sm px-6 py-2 h-9 flex-shrink-0 rounded-lg shadow-lg border border-red-500/50">
                 <Trash2 className="w-4 h-4 mr-2" />
                 Delete
               </Button>
-            </div> : <div className="border-2 border-dashed border-slate-600/60 rounded-xl p-6 sm:p-8 text-center cursor-pointer hover:border-blue-400/70 hover:bg-slate-800/60 transition-all duration-300 bg-slate-800/40" onClick={triggerFileInput}>
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            </div> : <div className="border-2 border-dashed border-amber-500/40 rounded-xl p-6 sm:p-8 text-center cursor-pointer hover:border-amber-400/70 hover:bg-amber-900/30 transition-all duration-300 bg-amber-900/10" onClick={triggerFileInput}>
+              <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <Upload className="w-8 h-8 text-white" />
               </div>
-              <p className="text-slate-200 font-inter mb-5 font-medium text-base">
+              <p className="text-amber-200 font-inter mb-5 font-medium text-base">
                 Click to upload or drag and drop your resume
               </p>
-              <Button disabled={uploading} className="font-inter bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold text-sm px-6 py-2 h-10 rounded-lg shadow-lg border border-blue-500/30">
+              <Button disabled={uploading} className="font-inter bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold text-sm px-6 py-2 h-10 rounded-lg shadow-lg border border-amber-500/30">
                 {uploading ? 'Uploading...' : 'Upload Resume'}
               </Button>
               <input id="resume-upload" type="file" accept=".pdf" onChange={handleFileUpload} className="hidden" disabled={uploading} />
