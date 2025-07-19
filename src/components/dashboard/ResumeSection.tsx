@@ -201,7 +201,7 @@ const ResumeSection = () => {
             </div>
             <span className="text-white font-bold">Resume</span>
           </CardTitle>
-          <CardDescription className="text-white/95 font-inter font-normal drop-shadow-[0_2px_10px_rgba(147,51,234,0.4)] text-sm">Upload your resume (PDF, max 5MB) so our AI can better understand your background and personalize your experience</CardDescription>
+          <CardDescription className="text-white/95 font-inter font-normal drop-shadow-[0_2px_10px_rgba(147,51,234,0.4)] text-base">Upload your resume (PDF, max 5MB) so our AI can better understand your background and personalize your experience</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 pt-0">
           {resumeUrl ? <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-xl border border-white/20 bg-black/70 shadow-inner">
