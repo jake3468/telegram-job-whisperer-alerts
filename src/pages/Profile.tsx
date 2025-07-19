@@ -21,7 +21,10 @@ const Profile = () => {
     isLoaded
   } = useUser();
   const navigate = useNavigate();
-  const { isAuthReady, executeWithRetry } = useEnterpriseAuth();
+  const {
+    isAuthReady,
+    executeWithRetry
+  } = useEnterpriseAuth();
   const {
     runComprehensiveJWTTest
   } = useJWTDebug();
@@ -51,20 +54,13 @@ const Profile = () => {
   // Enhanced JWT setup check with enterprise auth retry logic
   const checkJWTSetup = useCallback(async () => {
     if (!isLoaded || !user || !isAuthReady) return;
-    
     try {
       setError(null);
       setConnectionIssue(false);
-      
       if (Environment.isDevelopment()) {
-        const testResult = await executeWithRetry(
-          async () => {
-            return await runComprehensiveJWTTest();
-          },
-          2,
-          'JWT comprehensive test'
-        );
-        
+        const testResult = await executeWithRetry(async () => {
+          return await runComprehensiveJWTTest();
+        }, 2, 'JWT comprehensive test');
         setLastJWTTestResult(testResult);
 
         // Show setup guide if JWT is not properly configured
@@ -72,7 +68,6 @@ const Profile = () => {
           setShowJWTSetupGuide(true);
         }
       }
-      
       setProfileDataLoaded(true);
     } catch (error) {
       console.error('JWT setup check failed:', error);
@@ -131,7 +126,7 @@ const Profile = () => {
               Welcome, <span className="italic bg-gradient-to-r from-pastel-peach to-pastel-mint bg-clip-text text-transparent">{user.firstName || 'User'}</span>
             </h1>
             <p className="text-lg text-gray-100 font-inter font-light">
-              Add your <span className="italic text-emerald-200">current resume</span> and <span className="italic text-pastel-blue">bio details</span> on this page. Once you're done, go to the <span className="italic text-pastel-blue">'Create Job Alerts'</span> page to set up personalized job alerts.
+              Add your <span className="italic text-amber-200">current resume</span> and <span className="italic text-pastel-blue">bio details</span> on this page. Once you're done, go to the <span className="italic text-pastel-blue">'Create Job Alerts'</span> page to set up personalized job alerts.
             </p>
           </div>
           
@@ -153,20 +148,16 @@ const Profile = () => {
           <ClerkJWTSetupGuide />
         </div>}
 
-      {!isAuthReady ? (
-        <div className="flex items-center justify-center min-h-[400px]">
+      {!isAuthReady ? <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center space-y-3">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-fuchsia-400 mx-auto"></div>
             <p className="text-gray-300 text-sm">Preparing authentication...</p>
           </div>
-        </div>
-      ) : (
-        <div className="max-w-4xl mx-auto space-y-8 px-4" onClick={updateActivity} onKeyDown={updateActivity}>
+        </div> : <div className="max-w-4xl mx-auto space-y-8 px-4" onClick={updateActivity} onKeyDown={updateActivity}>
           {/* Profile sections - show even during connection issues for better UX */}
           <ResumeSection />
           <BioSection />
-        </div>
-      )}
+        </div>}
       
       {/* JWT Debug Panel - only in development */}
       {Environment.isDevelopment() && <JWTDebugPanel />}
