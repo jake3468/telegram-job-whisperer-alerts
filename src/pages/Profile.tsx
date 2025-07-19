@@ -163,16 +163,9 @@ const Profile = () => {
                 <div className="w-8 h-8 bg-gradient-to-br from-sky-700 to-fuchsia-700 rounded-full flex items-center justify-center font-bold text-white text-sm shadow-lg">
                   1
                 </div>
-                <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-sky-400 to-fuchsia-400 bg-clip-text text-transparent">
-                  Add Your Resume
-                </h2>
+                <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-sky-400 to-fuchsia-400 bg-clip-text text-transparent">Add Current Resume</h2>
               </div>
-              <Button 
-                onClick={() => setShowResumeHelp(true)}
-                variant="outline"
-                size="sm"
-                className="text-xs text-sky-300 border-sky-400/30 hover:bg-sky-900/20 hover:border-sky-400/50"
-              >
+              <Button onClick={() => setShowResumeHelp(true)} variant="outline" size="sm" className="text-xs text-sky-300 border-sky-400/30 hover:bg-sky-900/20 hover:border-sky-400/50">
                 Need help fixing your resume?
               </Button>
             </div>
