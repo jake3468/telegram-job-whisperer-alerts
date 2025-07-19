@@ -165,9 +165,7 @@ const Profile = () => {
               </h2>
             </div>
             <div className="mb-6">
-              <p className="text-gray-200 font-inter mb-4 text-xs">
-                Upload your existing resume below - and if it feels really outdated or boring, no worries 😉. Unlike platforms where you have to manually fill out long forms, our AI Resume Bot lets you build or upgrade your resume through a simple, human-like chat. Just answer a few smart questions, and get a polished, modern PDF tailored to your goals effortlessly.
-              </p>
+              <p className="text-gray-200 font-inter mb-4 text-xs">Upload your existing resume below - if it feels really outdated or boring, no worries 😉. Unlike platforms where you have to manually fill out long forms, our AI Resume Bot lets you build or upgrade your resume through a simple, human-like chat. Just answer a few smart questions, and get a polished, modern PDF tailored to your goals effortlessly.</p>
               <Button onClick={() => navigate('/resume-builder')} className="bg-gradient-to-r from-sky-500 to-fuchsia-500 hover:from-sky-600 hover:to-fuchsia-600 text-white font-semibold font-inter mb-4">
                 Go to Resume Bot
               </Button>
