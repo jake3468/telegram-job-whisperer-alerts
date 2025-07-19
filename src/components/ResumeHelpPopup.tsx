@@ -48,7 +48,7 @@ export const ResumeHelpPopup: React.FC<ResumeHelpPopupProps> = ({
             </p>
             
             <p>
-              Unlike platforms where you have to manually fill out long forms, our Telegram AI Resume Bot lets you build or upgrade your resume through a simple, human-like chat.
+              Unlike platforms where you have to manually fill out long forms, our <em>Telegram AI Resume Bot</em> lets you build or upgrade your resume through a simple, human-like chat.
             </p>
             
             <p>
@@ -66,7 +66,7 @@ export const ResumeHelpPopup: React.FC<ResumeHelpPopupProps> = ({
                   </code>
                   <button
                     onClick={handleCopyUserId}
-                    className="p-1 hover:bg-gray-100 rounded transition-colors"
+                    className="p-1 hover:bg-gray-100 rounded transition-colors flex-shrink-0"
                     title="Copy user ID"
                   >
                     <Copy className="w-4 h-4 text-gray-500" />
