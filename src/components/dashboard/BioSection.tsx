@@ -63,32 +63,32 @@ const BioSection = () => {
       </Card>;
   }
   return <section className="p-0 rounded-none bg-transparent shadow-none">
-      <Card className="rounded-3xl border-2 border-emerald-400/80 bg-gradient-to-br from-emerald-600/90 via-emerald-700/85 to-emerald-900/90 shadow-2xl shadow-emerald-500/20 transition-all hover:shadow-emerald-500/30 backdrop-blur-sm">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-white font-orbitron flex items-center gap-2 text-lg drop-shadow-[0_2px_8px_rgba(16,185,129,0.6)]">
-            <div className="w-7 h-7 bg-emerald-400/60 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30">
-              <User className="w-4 h-4 text-white drop-shadow-[0_2px_8px_rgba(255,255,255,0.8)]" />
+      <Card className="rounded-3xl border border-slate-700/50 bg-gradient-to-br from-slate-900/95 via-slate-800/90 to-slate-900/95 shadow-2xl shadow-slate-900/50 backdrop-blur-sm hover:border-slate-600/50 transition-all">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-slate-100 font-orbitron flex items-center gap-3 text-lg">
+            <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center shadow-lg">
+              <User className="w-4 h-4 text-white" />
             </div>
-            <span className="text-white font-bold">About You</span>
+            <span className="text-slate-100 font-bold">About You</span>
           </CardTitle>
-          <CardDescription className="text-emerald-50 font-inter font-normal drop-shadow-[0_2px_10px_rgba(16,185,129,0.4)] text-sm">Tell us a bit about yourself — it helps our AI tailor tools to your unique profile.</CardDescription>
+          <CardDescription className="text-slate-300 font-inter font-normal text-base leading-relaxed">Tell us a bit about yourself — it helps our AI tailor tools to your unique profile.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3 pt-0">
+        <CardContent className="space-y-5 pt-0">
           <Textarea value={bio} onChange={e => {
           setBio(e.target.value);
           updateActivity(); // Track user activity when typing
         }} onFocus={updateActivity} // Track activity when user focuses the field
         placeholder="I enjoy working with startups and exploring AI. My ambition is to build something impactful that people genuinely find value in." rows={4} className="
-              min-h-[100px]
-              border-2 border-emerald-200/40
-              placeholder-gray-400 font-inter text-gray-100
-              focus-visible:border-emerald-200 hover:border-emerald-300
+              min-h-[140px]
+              border border-slate-600/50
+              placeholder:text-slate-400 font-inter text-slate-100
+              focus:border-emerald-400/70 focus:ring-emerald-400/30 hover:border-slate-500/70
               text-base resize-none
-              bg-gray-900/90
-              shadow-inner
+              bg-slate-800/60
+              shadow-lg rounded-xl
               transition-all
             " />
-          <Button onClick={handleSaveBio} disabled={saving} className="font-inter font-bold text-xs px-4 py-2 h-9 rounded-lg shadow-lg shadow-emerald-500/20 focus-visible:ring-2 focus-visible:ring-emerald-300 transition-colors text-white bg-blue-800 hover:bg-blue-700">
+          <Button onClick={handleSaveBio} disabled={saving} className="w-full sm:w-auto font-inter bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold py-2 px-8 rounded-lg shadow-lg border border-emerald-500/30">
             {saving ? 'Saving...' : 'Save Bio'}
           </Button>
         </CardContent>
