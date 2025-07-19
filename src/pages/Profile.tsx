@@ -13,6 +13,7 @@ import { Environment } from '@/utils/environment';
 import { OnboardingPopup } from '@/components/OnboardingPopup';
 import { useOnboardingPopup } from '@/hooks/useOnboardingPopup';
 import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
+import { ResumeHelpPopup } from '@/components/ResumeHelpPopup';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Wifi, WifiOff } from 'lucide-react';
 const Profile = () => {
@@ -45,6 +46,7 @@ const Profile = () => {
   const [error, setError] = useState<string | null>(null);
   const [lastJWTTestResult, setLastJWTTestResult] = useState<any>(null);
   const [profileDataLoaded, setProfileDataLoaded] = useState(false);
+  const [showResumeHelp, setShowResumeHelp] = useState(false);
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
@@ -156,18 +158,22 @@ const Profile = () => {
         </div> : <div className="max-w-4xl mx-auto space-y-8 px-4" onClick={updateActivity} onKeyDown={updateActivity}>
           {/* Step 1: Resume Section */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-sky-700 to-fuchsia-700 rounded-full flex items-center justify-center font-bold text-white text-sm shadow-lg">
-                1
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-sky-700 to-fuchsia-700 rounded-full flex items-center justify-center font-bold text-white text-sm shadow-lg">
+                  1
+                </div>
+                <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-sky-400 to-fuchsia-400 bg-clip-text text-transparent">
+                  Add Your Resume
+                </h2>
               </div>
-              <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-sky-400 to-fuchsia-400 bg-clip-text text-transparent">
-                Add Your Resume
-              </h2>
-            </div>
-            <div className="mb-6">
-              <p className="text-gray-200 font-inter mb-4 text-xs">Upload your existing resume below - if it feels really outdated or boring, no worries 😉. Unlike platforms where you have to manually fill out long forms, our AI Resume Bot lets you build or upgrade your resume through a simple, human-like chat. Just answer a few smart questions, and get a polished, modern PDF tailored to your goals effortlessly.</p>
-              <Button onClick={() => navigate('/resume-builder')} className="bg-gradient-to-r from-sky-500 to-fuchsia-500 hover:from-sky-600 hover:to-fuchsia-600 text-white font-semibold font-inter mb-4">
-                Go to Resume Bot
+              <Button 
+                onClick={() => setShowResumeHelp(true)}
+                variant="outline"
+                size="sm"
+                className="text-xs text-sky-300 border-sky-400/30 hover:bg-sky-900/20 hover:border-sky-400/50"
+              >
+                Need help fixing your resume?
               </Button>
             </div>
             <ResumeSection />
@@ -210,6 +216,9 @@ const Profile = () => {
 
       {/* Onboarding Popup */}
       <OnboardingPopup isOpen={showPopup} onClose={hidePopup} onDontShowAgain={dontShowAgain} userName={user.firstName || undefined} />
+      
+      {/* Resume Help Popup */}
+      <ResumeHelpPopup isOpen={showResumeHelp} onClose={() => setShowResumeHelp(false)} />
     </Layout>;
 };
 export default Profile;
