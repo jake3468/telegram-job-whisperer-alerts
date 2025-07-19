@@ -11,7 +11,7 @@ const HeroSection = () => {
   } = useUser();
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
-  const fullText = 'Sick of LinkedIn, Indeed, and the same old job boards?\nThink you\'re ready for interviews? Let an AI call your phone for 10 min and prove you wrong.';
+  const fullText = 'Tired of LinkedIn and Indeed?\nThink you\'re ready for interviews? Let an AI call your phone for 10 minutes and prove you wrong.';
   useEffect(() => {
     if (isLoaded && user) {
       navigate('/dashboard');
@@ -104,7 +104,9 @@ const HeroSection = () => {
         </div>
 
         <p className="md:text-xl text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-sm">
-          No robotic voices or scripts — just a human-sounding AI that calls your phone, interviews you like a real recruiter, and tells you exactly where you fail. Then, instantly generate standout resumes and cover letters, decode your fit for any company, and track job listings with smarter prep that actually gets you hired.
+          No robotic voices. No scripts. Just a human-sounding AI that interviews you like a real recruiter and tells you exactly where you fail.
+          <br />
+          Then build powerful resumes, decode company fit, and track jobs — all in one brutally honest platform that actually helps you get hired.
         </p>
         
         <SignedOut>
