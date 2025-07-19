@@ -15,8 +15,9 @@ import { useOnboardingPopup } from '@/hooks/useOnboardingPopup';
 import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
 import { ResumeHelpPopup } from '@/components/ResumeHelpPopup';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Wifi, WifiOff } from 'lucide-react';
+import { RefreshCw, Wifi, WifiOff, Copy } from 'lucide-react';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useToast } from '@/hooks/use-toast';
 const Profile = () => {
   const {
     user,
@@ -51,6 +52,7 @@ const Profile = () => {
   const [lastJWTTestResult, setLastJWTTestResult] = useState<any>(null);
   const [profileDataLoaded, setProfileDataLoaded] = useState(false);
   const [showResumeHelp, setShowResumeHelp] = useState(false);
+  const { toast } = useToast();
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
@@ -119,6 +121,25 @@ const Profile = () => {
       window.location.reload();
     }
   }, [connectionIssue, checkJWTSetup]);
+
+  // Copy user profile ID to clipboard
+  const copyUserProfileId = async () => {
+    if (userProfile?.id) {
+      try {
+        await navigator.clipboard.writeText(userProfile.id);
+        toast({
+          title: "Copied!",
+          description: "Your Bot ID has been copied to clipboard",
+        });
+      } catch (err) {
+        toast({
+          title: "Copy failed",
+          description: "Please manually copy the Bot ID",
+          variant: "destructive",
+        });
+      }
+    }
+  };
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-gradient-to-br from-pastel-peach via-pastel-blue to-pastel-mint flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading user...</div>
@@ -190,7 +211,7 @@ const Profile = () => {
           {/* Step 3: Job Alerts */}
           <div className="space-y-4">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-400 rounded-full flex items-center justify-center font-bold text-white text-sm shadow-lg">
+              <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-400 rounded-full flex items-center justify-center font-bold text-black text-sm shadow-lg border-2 border-amber-300">
                 3
               </div>
               <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
@@ -198,12 +219,39 @@ const Profile = () => {
               </h2>
             </div>
             <div className="rounded-3xl border-2 border-amber-400/50 bg-gradient-to-br from-amber-900/20 via-orange-900/10 to-yellow-900/20 p-6">
-              <p className="text-amber-100 font-inter mb-4 text-base">Set up personalized job alerts and get updates from the last 24 hours 🔥 delivered straight to your Telegram everyday just for you, based on your preferences.
-
-
-No outdated listings, no clutter. Only fresh, relevant jobs posted in the past 24 hours — something no other platform offers. Click the button below to create your alert, or use the 'Create Job Alerts' option in the sidebar menu at the top left.</p>
-              <Button onClick={() => navigate('/job-alerts')} className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter">
-                Go to Create Job Alerts
+              <div className="text-amber-100 font-inter mb-4 text-base space-y-2">
+                <p>Set up personalized job alerts and get updates from the last 24 hours 🔥 delivered straight to your Telegram everyday just for you, based on your preferences.</p>
+                <p>No outdated listings, no clutter.</p>
+                <p>Only fresh, relevant jobs posted in the past 24 hours — something no other platform offers.</p>
+                <p>Click the button below to activate the Telegram Job Alert Bot and create your personalized job alerts.</p>
+              </div>
+              
+              {userProfile?.id && (
+                <div className="mb-4 p-4 bg-amber-900/30 rounded-lg border border-amber-400/30">
+                  <p className="text-amber-100 font-inter text-sm mb-2">
+                    When the bot asks for your Bot ID, copy and paste this:
+                  </p>
+                  <div className="flex items-center gap-2 bg-black/30 rounded-lg p-3">
+                    <code className="text-amber-200 font-mono text-sm flex-1 break-all">
+                      {userProfile.id}
+                    </code>
+                    <Button
+                      onClick={copyUserProfileId}
+                      variant="ghost"
+                      size="sm"
+                      className="text-amber-200 hover:text-amber-100 hover:bg-amber-900/30"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              <Button 
+                onClick={() => window.open('https://t.me/Job_AI_update_bot', '_blank')} 
+                className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter"
+              >
+                Activate my Job Alerts
               </Button>
             </div>
           </div>
