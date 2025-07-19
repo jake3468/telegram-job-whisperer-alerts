@@ -17,9 +17,12 @@ const BioSection = () => {
   } = useCachedUserProfile();
   const [bio, setBio] = useState(userProfile?.bio || '');
   const [saving, setSaving] = useState(false);
-  
+
   // Keep tokens fresh while user is interacting with bio form
-  const { updateActivity, silentTokenRefresh } = useFormTokenKeepAlive(true);
+  const {
+    updateActivity,
+    silentTokenRefresh
+  } = useFormTokenKeepAlive(true);
   React.useEffect(() => {
     if (userProfile?.bio) {
       setBio(userProfile.bio);
@@ -30,7 +33,6 @@ const BioSection = () => {
     try {
       // Refresh token before making the save request
       await silentTokenRefresh();
-      
       const {
         error
       } = await updateUserProfile({
@@ -69,19 +71,14 @@ const BioSection = () => {
             </div>
             <span className="text-white font-bold">About You</span>
           </CardTitle>
-          <CardDescription className="text-white/95 text-base font-inter font-normal drop-shadow-[0_2px_10px_rgba(16,185,129,0.4)]">Tell us a bit about yourself — it helps our AI tailor tools to your unique profile.</CardDescription>
+          <CardDescription className="text-white/95 font-inter font-normal drop-shadow-[0_2px_10px_rgba(16,185,129,0.4)] text-sm">Tell us a bit about yourself — it helps our AI tailor tools to your unique profile.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 pt-0">
-          <Textarea 
-            value={bio} 
-            onChange={(e) => {
-              setBio(e.target.value);
-              updateActivity(); // Track user activity when typing
-            }}
-            onFocus={updateActivity} // Track activity when user focuses the field
-            placeholder="I enjoy working with startups and exploring AI. My ambition is to build something impactful that people genuinely find value in." 
-            rows={4} 
-            className="
+          <Textarea value={bio} onChange={e => {
+          setBio(e.target.value);
+          updateActivity(); // Track user activity when typing
+        }} onFocus={updateActivity} // Track activity when user focuses the field
+        placeholder="I enjoy working with startups and exploring AI. My ambition is to build something impactful that people genuinely find value in." rows={4} className="
               min-h-[100px]
               border-2 border-white/30
               placeholder-white/85 font-inter text-white
@@ -90,15 +87,13 @@ const BioSection = () => {
               bg-black
               shadow-inner
               transition-all
-            " 
-            style={{
-              backgroundColor: "#101113",
-              // A very dark, near-black (almost pure black)
-              backgroundImage: "none",
-              // No gradients, just black/dark
-              color: "#fff"
-            }} 
-          />
+            " style={{
+          backgroundColor: "#101113",
+          // A very dark, near-black (almost pure black)
+          backgroundImage: "none",
+          // No gradients, just black/dark
+          color: "#fff"
+        }} />
           <Button onClick={handleSaveBio} disabled={saving} className="font-inter font-bold text-xs px-4 py-2 h-9 rounded-lg shadow-lg shadow-emerald-500/20 focus-visible:ring-2 focus-visible:ring-emerald-300 transition-colors text-white bg-blue-800 hover:bg-blue-700">
             {saving ? 'Saving...' : 'Save Bio'}
           </Button>
