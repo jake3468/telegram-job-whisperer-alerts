@@ -11,7 +11,7 @@ const HeroSection = () => {
   } = useUser();
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
-  const fullText = 'LinkedIn and Indeed work for recruiters. We work for you.';
+  const fullText = 'LinkedIn and Naukri work for recruiters. We work for you.';
   useEffect(() => {
     if (isLoaded && user) {
       navigate('/dashboard');
@@ -59,8 +59,12 @@ const HeroSection = () => {
                 const cleanWord = word.replace(/[.,]/g, ''); // Remove punctuation for matching
                 const punctuation = word.match(/[.,]/g)?.[0] || '';
                 
-                if (cleanWord === 'LinkedIn' || cleanWord === 'Indeed') {
+                if (cleanWord === 'LinkedIn') {
                   return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
+                          {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
+                        </span>;
+                } else if (cleanWord === 'Naukri') {
+                  return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
                           {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
                         </span>;
                 } else {
