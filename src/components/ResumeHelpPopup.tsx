@@ -42,7 +42,7 @@ export const ResumeHelpPopup: React.FC<ResumeHelpPopupProps> = ({
             </p>
             
             <p>
-              Unlike platforms where you have to manually fill out long forms, our <em>Telegram AI Resume Bot</em> lets you build or upgrade your resume through a simple, human-like chat.
+              Unlike platforms where you have to manually fill out long forms, our <em className="bg-purple-100">Telegram AI Resume Bot</em> lets you build or upgrade your resume through a simple, human-like chat.
             </p>
             
             <p>
