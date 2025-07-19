@@ -166,7 +166,7 @@ const Profile = () => {
             </div>
             <ResumeSection />
             <div className="mt-4 mb-6">
-              <Button onClick={() => setShowResumeHelp(true)} variant="outline" size="sm" className="text-sky-900 border-sky-200 hover:text-sky-950 hover:border-sky-300 bg-purple-500 hover:bg-purple-400">
+              <Button onClick={() => setShowResumeHelp(true)} variant="outline" size="sm" className="border-sky-200 hover:border-sky-300 text-white bg-purple-800 hover:bg-purple-700">
                 Need help fixing your current resume ?
               </Button>
             </div>
