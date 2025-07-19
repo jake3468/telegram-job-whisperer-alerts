@@ -164,12 +164,12 @@ const Profile = () => {
               </div>
               <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-sky-400 to-fuchsia-400 bg-clip-text text-transparent">Add Current Resume</h2>
             </div>
-            <div className="mb-4">
+            <ResumeSection />
+            <div className="mt-4 mb-6">
               <Button onClick={() => setShowResumeHelp(true)} variant="outline" size="sm" className="bg-sky-50 text-sky-900 border-sky-200 hover:bg-sky-100 hover:text-sky-950 hover:border-sky-300">
                 Need help fixing your current resume ?
               </Button>
             </div>
-            <ResumeSection />
           </div>
 
           {/* Step 2: Bio Section */}
