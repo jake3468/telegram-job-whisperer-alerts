@@ -158,15 +158,15 @@ const Profile = () => {
         </div> : <div className="max-w-4xl mx-auto space-y-8 px-4" onClick={updateActivity} onKeyDown={updateActivity}>
           {/* Step 1: Resume Section */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-sky-700 to-fuchsia-700 rounded-full flex items-center justify-center font-bold text-white text-sm shadow-lg">
-                  1
-                </div>
-                <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-sky-400 to-fuchsia-400 bg-clip-text text-transparent">Add Current Resume</h2>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 bg-gradient-to-br from-sky-700 to-fuchsia-700 rounded-full flex items-center justify-center font-bold text-white text-sm shadow-lg">
+                1
               </div>
-              <Button onClick={() => setShowResumeHelp(true)} variant="outline" size="sm" className="text-xs text-sky-300 border-sky-400/30 hover:bg-sky-900/20 hover:border-sky-400/50">
-                Need help fixing your resume?
+              <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-sky-400 to-fuchsia-400 bg-clip-text text-transparent">Add Current Resume</h2>
+            </div>
+            <div className="mb-4">
+              <Button onClick={() => setShowResumeHelp(true)} variant="outline" size="sm" className="bg-sky-50 text-sky-900 border-sky-200 hover:bg-sky-100 hover:text-sky-950 hover:border-sky-300">
+                Need help fixing your current resume ?
               </Button>
             </div>
             <ResumeSection />
