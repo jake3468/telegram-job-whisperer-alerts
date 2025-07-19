@@ -13,8 +13,11 @@ import { Environment } from '@/utils/environment';
 import { OnboardingPopup } from '@/components/OnboardingPopup';
 import { useOnboardingPopup } from '@/hooks/useOnboardingPopup';
 import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
+import { ResumeHelpPopup } from '@/components/ResumeHelpPopup';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Wifi, WifiOff } from 'lucide-react';
+import { RefreshCw, Wifi, WifiOff, Copy } from 'lucide-react';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { useToast } from '@/hooks/use-toast';
 const Profile = () => {
   const {
     user,
@@ -25,6 +28,9 @@ const Profile = () => {
     isAuthReady,
     executeWithRetry
   } = useEnterpriseAuth();
+  const {
+    userProfile
+  } = useUserProfile();
   const {
     runComprehensiveJWTTest
   } = useJWTDebug();
@@ -45,6 +51,8 @@ const Profile = () => {
   const [error, setError] = useState<string | null>(null);
   const [lastJWTTestResult, setLastJWTTestResult] = useState<any>(null);
   const [profileDataLoaded, setProfileDataLoaded] = useState(false);
+  const [showResumeHelp, setShowResumeHelp] = useState(false);
+  const { toast } = useToast();
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
@@ -113,6 +121,25 @@ const Profile = () => {
       window.location.reload();
     }
   }, [connectionIssue, checkJWTSetup]);
+
+  // Copy user profile ID to clipboard
+  const copyUserProfileId = async () => {
+    if (userProfile?.id) {
+      try {
+        await navigator.clipboard.writeText(userProfile.id);
+        toast({
+          title: "Copied!",
+          description: "Your Bot ID has been copied to clipboard",
+        });
+      } catch (err) {
+        toast({
+          title: "Copy failed",
+          description: "Please manually copy the Bot ID",
+          variant: "destructive",
+        });
+      }
+    }
+  };
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-gradient-to-br from-pastel-peach via-pastel-blue to-pastel-mint flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading user...</div>
@@ -125,8 +152,8 @@ const Profile = () => {
             <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-2">
               Welcome, <span className="italic bg-gradient-to-r from-pastel-peach to-pastel-mint bg-clip-text text-transparent">{user.firstName || 'User'}</span>
             </h1>
-            <p className="text-lg text-gray-100 font-inter font-light">
-              Complete these 3 simple steps to get started with your job search. Add your <span className="italic text-yellow-200">resume</span> and <span className="italic text-pastel-blue">bio</span>, then set up personalized <span className="italic text-amber-200">job alerts</span>.
+            <p className="text-gray-100 font-inter font-light text-left text-base">
+              Complete the below 3 simple steps to get started with your job search. Add your <span className="italic text-yellow-200">resume</span> and <span className="italic text-pastel-blue">bio</span>, then set up personalized <span className="italic text-amber-200">job alerts</span>.
             </p>
           </div>
           
@@ -160,17 +187,12 @@ const Profile = () => {
               <div className="w-8 h-8 bg-gradient-to-br from-sky-700 to-fuchsia-700 rounded-full flex items-center justify-center font-bold text-white text-sm shadow-lg">
                 1
               </div>
-              <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-sky-400 to-fuchsia-400 bg-clip-text text-transparent">
-                Add Your Resume
-              </h2>
-            </div>
-            <div className="mb-6">
-              <p className="text-gray-200 font-inter mb-4 text-xs">Upload your existing resume below - if it feels really outdated or boring, no worries 😉. Unlike platforms where you have to manually fill out long forms, our AI Resume Bot lets you build or upgrade your resume through a simple, human-like chat. Just answer a few smart questions, and get a polished, modern PDF tailored to your goals effortlessly.</p>
-              <Button onClick={() => navigate('/resume-builder')} className="bg-gradient-to-r from-sky-500 to-fuchsia-500 hover:from-sky-600 hover:to-fuchsia-600 text-white font-semibold font-inter mb-4">
-                Go to Resume Bot
-              </Button>
+              <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-sky-400 to-fuchsia-400 bg-clip-text text-transparent">Add Current Resume</h2>
             </div>
             <ResumeSection />
+            <div className="mt-4 mb-6">
+              <Button onClick={() => setShowResumeHelp(true)} variant="outline" size="sm" className="border-sky-200 hover:border-sky-300 text-white bg-black">Need help fixing your resume ?</Button>
+            </div>
           </div>
 
           {/* Step 2: Bio Section */}
@@ -189,7 +211,7 @@ const Profile = () => {
           {/* Step 3: Job Alerts */}
           <div className="space-y-4">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-400 rounded-full flex items-center justify-center font-bold text-white text-sm shadow-lg">
+              <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-400 rounded-full flex items-center justify-center font-bold text-black text-sm shadow-lg border-2 border-amber-300">
                 3
               </div>
               <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
@@ -197,9 +219,39 @@ const Profile = () => {
               </h2>
             </div>
             <div className="rounded-3xl border-2 border-amber-400/50 bg-gradient-to-br from-amber-900/20 via-orange-900/10 to-yellow-900/20 p-6">
-              <p className="text-amber-100 font-inter text-base mb-4">Set up personalized job alerts to get notifications about the latest job postings from the past 24 hours directly to your Telegram. You can navigate to the 'Create Job Alerts' page by clicking the button below, or by using the sidebar menu button at the top left corner of this page.</p>
-              <Button onClick={() => navigate('/job-alerts')} className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter">
-                Go to Create Job Alerts
+              <div className="text-amber-100 font-inter mb-4 text-base space-y-2">
+                <p>Set up personalized job alerts and get updates from the last 24 hours 🔥 delivered straight to your Telegram everyday just for you, based on your preferences.</p>
+                <p>No outdated listings, no clutter.</p>
+                <p>Only fresh, relevant jobs posted in the past 24 hours — something no other platform offers.</p>
+                <p>Click the button below to activate the Telegram Job Alert Bot and create your personalized job alerts.</p>
+              </div>
+              
+              {userProfile?.id && (
+                <div className="mb-4 p-4 bg-amber-900/30 rounded-lg border border-amber-400/30">
+                  <p className="text-amber-100 font-inter text-sm mb-2">
+                    When the bot asks for your Bot ID, copy and paste this:
+                  </p>
+                  <div className="flex items-center gap-2 bg-black/30 rounded-lg p-3">
+                    <code className="text-amber-200 font-mono text-sm flex-1 break-all">
+                      {userProfile.id}
+                    </code>
+                    <Button
+                      onClick={copyUserProfileId}
+                      variant="ghost"
+                      size="sm"
+                      className="text-amber-200 hover:text-amber-100 hover:bg-amber-900/30"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              <Button 
+                onClick={() => window.open('https://t.me/Job_AI_update_bot', '_blank')} 
+                className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter"
+              >
+                Activate my Job Alerts
               </Button>
             </div>
           </div>
@@ -210,6 +262,9 @@ const Profile = () => {
 
       {/* Onboarding Popup */}
       <OnboardingPopup isOpen={showPopup} onClose={hidePopup} onDontShowAgain={dontShowAgain} userName={user.firstName || undefined} />
+      
+      {/* Resume Help Popup */}
+      <ResumeHelpPopup isOpen={showResumeHelp} onClose={() => setShowResumeHelp(false)} userProfileId={userProfile?.id} />
     </Layout>;
 };
 export default Profile;
