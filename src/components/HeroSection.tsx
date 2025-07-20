@@ -3,27 +3,24 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import Lottie from 'lottie-react';
+import { lazy, Suspense } from 'react';
+
+// Lazy load particles for performance
+const Particles = lazy(() => import('./Particles'));
 const HeroSection = () => {
   const navigate = useNavigate();
   const {
     user,
     isLoaded
   } = useUser();
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
-  const fullText = 'LinkedIn and Naukri work for recruiters. We work for you.';
+  const [showParticles, setShowParticles] = useState(false);
+  const fullText = 'Yeah, finally — a premium job hunt tool for top 0.1% candidates';
   useEffect(() => {
     if (isLoaded && user) {
       navigate('/dashboard');
     }
   }, [user, isLoaded, navigate]);
-
-  // Preload background image
-  useEffect(() => {
-    const img = new Image();
-    img.onload = () => setIsImageLoaded(true);
-    img.src = '/lovable-uploads/9f89bb0c-b59d-4e5a-8c4d-609218bee6d4.png';
-  }, []);
 
   // Load Lottie animation
   useEffect(() => {
@@ -32,48 +29,54 @@ const HeroSection = () => {
         const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json');
         const animationData = await response.json();
         setLottieAnimationData(animationData);
+
+        // Load particles after main content is ready
+        setTimeout(() => setShowParticles(true), 100);
       } catch (error) {
         console.error('Failed to load Lottie animation:', error);
+        // Still show particles even if Lottie fails
+        setTimeout(() => setShowParticles(true), 100);
       }
     };
     loadLottieAnimation();
   }, []);
-
   const goToDashboard = () => {
     navigate('/dashboard');
   };
   return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-2 overflow-hidden bg-black">
-      {/* Optimized Background with loading state */}
-      <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-500 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`} aria-hidden="true" style={{
-      background: isImageLoaded ? `url('/lovable-uploads/9f89bb0c-b59d-4e5a-8c4d-609218bee6d4.png') center top / cover no-repeat` : 'transparent',
-      maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
-      WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)'
-    }} />
-      <div className="absolute inset-0 z-10 bg-black/60" aria-hidden="true" />
+      {/* Animated Cosmic Stars Background - Lazy Loaded */}
+      {showParticles && <div className="absolute inset-0 z-0">
+          <Suspense fallback={null}>
+            <Particles particleColors={['#ffffff', '#ffffff']} particleCount={500} particleSpread={8} speed={0.08} particleBaseSize={80} moveParticlesOnHover={false} alphaParticles={false} disableRotation={false} />
+          </Suspense>
+        </div>}
+      <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
-        <h1 className="text-2xl md:text-4xl font-extrabold text-white mb-1 leading-tight font-inter drop-shadow-xl">
-          {fullText.split('\n').map((line, index) => 
-            <span key={index}>
-              {line.split(' ').map((word, wordIndex) => {
-                const cleanWord = word.replace(/[.,]/g, ''); // Remove punctuation for matching
-                const punctuation = word.match(/[.,]/g)?.[0] || '';
-                
-                if (cleanWord === 'LinkedIn') {
-                  return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
-                          {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
-                        </span>;
-                } else if (cleanWord === 'Naukri') {
-                  return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
-                          {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
-                        </span>;
-                } else {
-                  return <span key={wordIndex}>{wordIndex === 0 ? word : ` ${word}`}</span>;
-                }
-              })}
-              {index === 0 && <br className="hidden sm:block" />}
-            </span>
-          )}
+        <h1 className="text-2xl md:text-4xl font-extrabold text-white mb-1 leading-tight font-inter drop-shadow-xl animate-fade-in">
+          {fullText.split(' ').map((word, wordIndex) => {
+          const cleanWord = word.replace(/[.,—]/g, ''); // Remove punctuation for matching
+          const punctuation = word.match(/[.,—]/g)?.[0] || '';
+          if (cleanWord === 'Yeah') {
+            return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">
+                        {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
+                      </span>;
+          } else if (cleanWord === 'finally') {
+            return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">
+                        {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
+                      </span>;
+          } else if (cleanWord === 'premium') {
+            return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500 bg-clip-text text-transparent">
+                        {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
+                      </span>;
+          } else if (cleanWord === 'top' || cleanWord === '0.1%') {
+            return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-purple-400 via-pink-500 to-rose-500 bg-clip-text text-transparent">
+                        {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
+                      </span>;
+          } else {
+            return <span key={wordIndex}>{wordIndex === 0 ? word : ` ${word}`}</span>;
+          }
+        })}
         </h1>
         
         {/* Lottie Animation */}
@@ -95,9 +98,7 @@ const HeroSection = () => {
           </div>
         </div>
 
-        <p className="md:text-xl text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-sm">
-          Get a real phone call mock interview from a human-sounding AI — no robotic voice, no scripts. Instantly build powerful resumes and cover letters, decode job fit, track your entire job hunt, and get job postings from the last 24 hours — because by day two, there are already 3000 applicants. We're built for candidates, not recruiters.
-        </p>
+        <p className="text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-left md:text-base text-sm">Everything you need for your job hunt - all in one place, no clutter. Apply in the first 24 hours, before 3000 others do. Build resumes, cover letters, decode job fit, and prep with real phone call mock interviews -  all powered by the most advanced AI.</p>
         
         <SignedOut>
           <div className="flex justify-center">
