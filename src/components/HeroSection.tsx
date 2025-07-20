@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import Lottie from 'lottie-react';
-import Particles from './Particles';
+import { lazy, Suspense } from 'react';
+
+// Lazy load particles for performance
+const Particles = lazy(() => import('./Particles'));
 const HeroSection = () => {
   const navigate = useNavigate();
   const {
@@ -11,6 +14,7 @@ const HeroSection = () => {
     isLoaded
   } = useUser();
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
+  const [showParticles, setShowParticles] = useState(false);
   const fullText = 'Yeah, finally — a premium job hunt tool for top 0.1% candidates';
   useEffect(() => {
     if (isLoaded && user) {
@@ -25,8 +29,13 @@ const HeroSection = () => {
         const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json');
         const animationData = await response.json();
         setLottieAnimationData(animationData);
+        
+        // Load particles after main content is ready
+        setTimeout(() => setShowParticles(true), 100);
       } catch (error) {
         console.error('Failed to load Lottie animation:', error);
+        // Still show particles even if Lottie fails
+        setTimeout(() => setShowParticles(true), 100);
       }
     };
     loadLottieAnimation();
@@ -35,10 +44,23 @@ const HeroSection = () => {
     navigate('/dashboard');
   };
   return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-2 overflow-hidden bg-black">
-      {/* Animated Cosmic Stars Background */}
-      <div className="absolute inset-0 z-0">
-        <Particles particleColors={['#ffffff', '#ffffff']} particleCount={200} particleSpread={10} speed={0.1} particleBaseSize={100} moveParticlesOnHover={false} alphaParticles={false} disableRotation={false} />
-      </div>
+      {/* Animated Cosmic Stars Background - Lazy Loaded */}
+      {showParticles && (
+        <div className="absolute inset-0 z-0">
+          <Suspense fallback={null}>
+            <Particles 
+              particleColors={['#ffffff', '#ffffff']} 
+              particleCount={100} 
+              particleSpread={8} 
+              speed={0.08} 
+              particleBaseSize={80} 
+              moveParticlesOnHover={false} 
+              alphaParticles={false} 
+              disableRotation={false} 
+            />
+          </Suspense>
+        </div>
+      )}
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
