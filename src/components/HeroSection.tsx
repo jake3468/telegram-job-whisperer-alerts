@@ -38,6 +38,7 @@ const HeroSection = () => {
     };
     loadLottieAnimation();
   }, []);
+
   const goToDashboard = () => {
     navigate('/dashboard');
   };
@@ -52,24 +53,27 @@ const HeroSection = () => {
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
         <h1 className="text-2xl md:text-4xl font-extrabold text-white mb-1 leading-tight font-inter drop-shadow-xl">
-          {fullText.split('\n').map((line, index) => <span key={index}>
+          {fullText.split('\n').map((line, index) => 
+            <span key={index}>
               {line.split(' ').map((word, wordIndex) => {
-            const cleanWord = word.replace(/[.,]/g, ''); // Remove punctuation for matching
-            const punctuation = word.match(/[.,]/g)?.[0] || '';
-            if (cleanWord === 'LinkedIn') {
-              return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
+                const cleanWord = word.replace(/[.,]/g, ''); // Remove punctuation for matching
+                const punctuation = word.match(/[.,]/g)?.[0] || '';
+                
+                if (cleanWord === 'LinkedIn') {
+                  return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
                           {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
                         </span>;
-            } else if (cleanWord === 'Naukri') {
-              return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
+                } else if (cleanWord === 'Naukri') {
+                  return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
                           {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
                         </span>;
-            } else {
-              return <span key={wordIndex}>{wordIndex === 0 ? word : ` ${word}`}</span>;
-            }
-          })}
+                } else {
+                  return <span key={wordIndex}>{wordIndex === 0 ? word : ` ${word}`}</span>;
+                }
+              })}
               {index === 0 && <br className="hidden sm:block" />}
-            </span>)}
+            </span>
+          )}
         </h1>
         
         {/* Lottie Animation */}
@@ -91,7 +95,9 @@ const HeroSection = () => {
           </div>
         </div>
 
-        <p className="md:text-xl text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-xs text-left">Get a real phone call mock interview with a human-like AI. No robotic voice, no scripts. Instantly build strong resumes and cover letters, decode job fit, track your job hunt, and get fresh job postings from the last 24 hours. By day two, you're already competing with 3000 people. We’re built for candidates, not recruiters.</p>
+        <p className="md:text-xl text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-sm">
+          Get job postings from the last 24 hours so you can apply before it’s too late. By day two, a job already has 3000 applicants. Build powerful resumes and cover letters, decode job fit, track your hunt, and train with a real phone call mock interview from a human-like AI. No robotic voices. No scripts. Built for candidates, not recruiters.
+        </p>
         
         <SignedOut>
           <div className="flex justify-center">
