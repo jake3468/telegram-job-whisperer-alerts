@@ -29,7 +29,7 @@ const HeroSection = () => {
         const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json');
         const animationData = await response.json();
         setLottieAnimationData(animationData);
-        
+
         // Load particles after main content is ready
         setTimeout(() => setShowParticles(true), 100);
       } catch (error) {
@@ -45,49 +45,38 @@ const HeroSection = () => {
   };
   return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-2 overflow-hidden bg-black">
       {/* Animated Cosmic Stars Background - Lazy Loaded */}
-      {showParticles && (
-        <div className="absolute inset-0 z-0">
+      {showParticles && <div className="absolute inset-0 z-0">
           <Suspense fallback={null}>
-            <Particles 
-              particleColors={['#ffffff', '#ffffff']} 
-              particleCount={100} 
-              particleSpread={8} 
-              speed={0.08} 
-              particleBaseSize={80} 
-              moveParticlesOnHover={false} 
-              alphaParticles={false} 
-              disableRotation={false} 
-            />
+            <Particles particleColors={['#ffffff', '#ffffff']} particleCount={100} particleSpread={8} speed={0.08} particleBaseSize={80} moveParticlesOnHover={false} alphaParticles={false} disableRotation={false} />
           </Suspense>
-        </div>
-      )}
+        </div>}
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
         <h1 className="text-2xl md:text-4xl font-extrabold text-white mb-1 leading-tight font-inter drop-shadow-xl animate-fade-in">
           {fullText.split(' ').map((word, wordIndex) => {
-            const cleanWord = word.replace(/[.,—]/g, ''); // Remove punctuation for matching
-            const punctuation = word.match(/[.,—]/g)?.[0] || '';
-            if (cleanWord === 'Yeah') {
-              return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">
+          const cleanWord = word.replace(/[.,—]/g, ''); // Remove punctuation for matching
+          const punctuation = word.match(/[.,—]/g)?.[0] || '';
+          if (cleanWord === 'Yeah') {
+            return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">
                         {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
                       </span>;
-            } else if (cleanWord === 'finally') {
-              return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">
+          } else if (cleanWord === 'finally') {
+            return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">
                         {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
                       </span>;
-            } else if (cleanWord === 'premium') {
-              return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500 bg-clip-text text-transparent">
+          } else if (cleanWord === 'premium') {
+            return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500 bg-clip-text text-transparent">
                         {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
                       </span>;
-            } else if (cleanWord === 'top' || cleanWord === '0.1%') {
-              return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-purple-400 via-pink-500 to-rose-500 bg-clip-text text-transparent">
+          } else if (cleanWord === 'top' || cleanWord === '0.1%') {
+            return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-purple-400 via-pink-500 to-rose-500 bg-clip-text text-transparent">
                         {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
                       </span>;
-            } else {
-              return <span key={wordIndex}>{wordIndex === 0 ? word : ` ${word}`}</span>;
-            }
-          })}
+          } else {
+            return <span key={wordIndex}>{wordIndex === 0 ? word : ` ${word}`}</span>;
+          }
+        })}
         </h1>
         
         {/* Lottie Animation */}
@@ -109,7 +98,7 @@ const HeroSection = () => {
           </div>
         </div>
 
-        <p className="text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-left md:text-sm text-sm">Everything you need for your job hunt - all in one place, no clutter. We help you apply in the first 24 hours - before 3000 others do. Build resumes, decode job fit, and prep with real AI mock interviews.</p>
+        <p className="text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-left text-sm md:text-base">Everything you need for your job hunt - all in one place, no clutter. We help you apply in the first 24 hours - before 3000 others do. Build resumes, decode job fit, and prep with real AI mock interviews.</p>
         
         <SignedOut>
           <div className="flex justify-center">
