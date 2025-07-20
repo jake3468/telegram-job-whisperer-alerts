@@ -11,7 +11,7 @@ const HeroSection = () => {
     isLoaded
   } = useUser();
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
-  const fullText = 'LinkedIn and Naukri work for recruiters. We work for you.';
+  const fullText = 'Yeah, finally — a premium job hunt tool for top 0.1% candidates';
   useEffect(() => {
     if (isLoaded && user) {
       navigate('/dashboard');
@@ -42,25 +42,30 @@ const HeroSection = () => {
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
-        <h1 className="text-2xl md:text-4xl font-extrabold text-white mb-1 leading-tight font-inter drop-shadow-xl">
-          {fullText.split('\n').map((line, index) => <span key={index}>
-              {line.split(' ').map((word, wordIndex) => {
-            const cleanWord = word.replace(/[.,]/g, ''); // Remove punctuation for matching
-            const punctuation = word.match(/[.,]/g)?.[0] || '';
-            if (cleanWord === 'LinkedIn') {
-              return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
-                          {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
-                        </span>;
-            } else if (cleanWord === 'Naukri') {
-              return <span key={wordIndex} className="italic font-extrabold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
-                          {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
-                        </span>;
+        <h1 className="text-2xl md:text-4xl font-extrabold text-white mb-1 leading-tight font-inter drop-shadow-xl animate-fade-in">
+          {fullText.split(' ').map((word, wordIndex) => {
+            const cleanWord = word.replace(/[.,—]/g, ''); // Remove punctuation for matching
+            const punctuation = word.match(/[.,—]/g)?.[0] || '';
+            if (cleanWord === 'Yeah') {
+              return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">
+                        {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
+                      </span>;
+            } else if (cleanWord === 'finally') {
+              return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">
+                        {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
+                      </span>;
+            } else if (cleanWord === 'premium') {
+              return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500 bg-clip-text text-transparent">
+                        {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
+                      </span>;
+            } else if (cleanWord === 'top' || cleanWord === '0.1%') {
+              return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-purple-400 via-pink-500 to-rose-500 bg-clip-text text-transparent">
+                        {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
+                      </span>;
             } else {
               return <span key={wordIndex}>{wordIndex === 0 ? word : ` ${word}`}</span>;
             }
           })}
-              {index === 0 && <br className="hidden sm:block" />}
-            </span>)}
         </h1>
         
         {/* Lottie Animation */}
