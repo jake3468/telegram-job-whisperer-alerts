@@ -37,16 +37,7 @@ const HeroSection = () => {
   return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-2 overflow-hidden bg-black">
       {/* Animated Cosmic Stars Background */}
       <div className="absolute inset-0 z-0">
-        <Particles
-          particleColors={['#ffffff', '#ffffff']}
-          particleCount={200}
-          particleSpread={10}
-          speed={0.1}
-          particleBaseSize={100}
-          moveParticlesOnHover={false}
-          alphaParticles={false}
-          disableRotation={false}
-        />
+        <Particles particleColors={['#ffffff', '#ffffff']} particleCount={200} particleSpread={10} speed={0.1} particleBaseSize={100} moveParticlesOnHover={false} alphaParticles={false} disableRotation={false} />
       </div>
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
@@ -91,7 +82,7 @@ const HeroSection = () => {
           </div>
         </div>
 
-        <p className="text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-xs text-left md:text-sm">Get a real phone call mock interview with a human-like AI. No robotic voice, no scripts. Instantly build strong resumes and cover letters, decode job fit, track your job hunt, and get fresh job postings from the last 24 hours. By day two, you're already competing with 3000 people. We’re built for candidates, not recruiters.</p>
+        <p className="text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-left md:text-sm text-sm">Everything you need for your job hunt - all in one place, no clutter. We help you apply in the first 24 hours - before 3000 others do. Build resumes, decode job fit, and prep with real AI mock interviews.</p>
         
         <SignedOut>
           <div className="flex justify-center">
