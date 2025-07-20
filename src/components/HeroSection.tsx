@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import Lottie from 'lottie-react';
+import Particles from './Particles';
 const HeroSection = () => {
   const navigate = useNavigate();
   const {
     user,
     isLoaded
   } = useUser();
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
   const fullText = 'LinkedIn and Naukri work for recruiters. We work for you.';
   useEffect(() => {
@@ -17,13 +17,6 @@ const HeroSection = () => {
       navigate('/dashboard');
     }
   }, [user, isLoaded, navigate]);
-
-  // Preload background image
-  useEffect(() => {
-    const img = new Image();
-    img.onload = () => setIsImageLoaded(true);
-    img.src = '/lovable-uploads/9f89bb0c-b59d-4e5a-8c4d-609218bee6d4.png';
-  }, []);
 
   // Load Lottie animation
   useEffect(() => {
@@ -42,13 +35,20 @@ const HeroSection = () => {
     navigate('/dashboard');
   };
   return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-2 overflow-hidden bg-black">
-      {/* Optimized Background with loading state */}
-      <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-500 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`} aria-hidden="true" style={{
-      background: isImageLoaded ? `url('/lovable-uploads/9f89bb0c-b59d-4e5a-8c4d-609218bee6d4.png') center top / cover no-repeat` : 'transparent',
-      maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
-      WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)'
-    }} />
-      <div className="absolute inset-0 z-10 bg-black/60" aria-hidden="true" />
+      {/* Animated Cosmic Stars Background */}
+      <div className="absolute inset-0 z-0">
+        <Particles
+          particleColors={['#ffffff', '#ffffff']}
+          particleCount={200}
+          particleSpread={10}
+          speed={0.1}
+          particleBaseSize={100}
+          moveParticlesOnHover={false}
+          alphaParticles={false}
+          disableRotation={false}
+        />
+      </div>
+      <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
         <h1 className="text-2xl md:text-4xl font-extrabold text-white mb-1 leading-tight font-inter drop-shadow-xl">
