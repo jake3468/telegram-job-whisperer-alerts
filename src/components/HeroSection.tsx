@@ -47,7 +47,7 @@ const HeroSection = () => {
       {/* Animated Cosmic Stars Background - Lazy Loaded */}
       {showParticles && <div className="absolute inset-0 z-0">
           <Suspense fallback={null}>
-            <Particles particleColors={['#ffffff', '#ffffff']} particleCount={100} particleSpread={8} speed={0.08} particleBaseSize={80} moveParticlesOnHover={false} alphaParticles={false} disableRotation={false} />
+            <Particles particleColors={['#ffffff', '#ffffff']} particleCount={500} particleSpread={8} speed={0.08} particleBaseSize={80} moveParticlesOnHover={false} alphaParticles={false} disableRotation={false} />
           </Suspense>
         </div>}
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
