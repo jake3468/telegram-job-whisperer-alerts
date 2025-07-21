@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { logger } from '@/utils/logger';
+import { debugLogger } from '@/utils/debugUtils';
 
 export interface PricingData {
   region: 'IN' | 'global';
@@ -15,163 +15,76 @@ export interface PricingData {
   subscriptionProductId: string;
 }
 
+// Cache for location data to prevent repeated API calls
+const LOCATION_CACHE_KEY = 'aspirely_location_pricing_cache';
+const LOCATION_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+let locationDetectionPromise: Promise<PricingData> | null = null;
+
 export const useLocationPricing = () => {
-  // Initialize with null to prevent showing default data before cache check
   const [pricingData, setPricingData] = useState<PricingData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [userCountry, setUserCountry] = useState<string>('');
 
-  // Check for cached location first to initialize with appropriate defaults
-  const getInitialDefaults = () => {
-    try {
-      const locationCache = localStorage.getItem('aspirely_user_location_cache');
-      if (locationCache) {
-        const parsedLocationCache = JSON.parse(locationCache);
-        const now = Date.now();
-        const LOCATION_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
-        
-        if (now - parsedLocationCache.timestamp < LOCATION_CACHE_DURATION) {
-          const isIndian = parsedLocationCache.country === 'IN';
-          return isIndian ? getIndianPricing() : getGlobalPricing();
-        }
-      }
-    } catch (error) {
-      logger.warn('Failed to check cached location for defaults:', error);
-    }
-    return getGlobalPricing(); // Safe default
-  };
-
-  // Don't initialize with defaults if we have cached data - let cached hook handle it
-  // This prevents USD default from flashing when Indian cache exists
-
   useEffect(() => {
-    const detectLocation = async () => {
+    const detectLocationAndSetPricing = async () => {
       try {
-        logger.debug('Starting location detection...');
-        
-        // Primary IP detection service with better error handling
-        let locationData = null;
-        
-        try {
-          logger.debug('Trying primary location service...');
-          
-          // Create AbortController for timeout
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 5000);
-          
-          const response = await fetch('https://ipapi.co/json/', {
-            signal: controller.signal
-          });
-          
-          clearTimeout(timeoutId);
-          
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
-          
-          locationData = await response.json();
-          logger.debug('Primary location service response:', locationData);
-          
-          // Check if the response contains error
-          if (locationData.error) {
-            throw new Error(`Location service error: ${locationData.reason}`);
-          }
-          
-        } catch (error) {
-          logger.warn('Primary location service failed:', error);
-          
-          // Fallback to alternative service with better error handling
+        // Check cache first
+        const cachedData = localStorage.getItem(LOCATION_CACHE_KEY);
+        if (cachedData) {
           try {
-            logger.debug('Trying fallback location service...');
+            const parsedCache = JSON.parse(cachedData);
+            const now = Date.now();
             
-            const controller2 = new AbortController();
-            const timeoutId2 = setTimeout(() => controller2.abort(), 5000);
-            
-            const fallbackResponse = await fetch('https://api.ipify.org?format=json', {
-              signal: controller2.signal
-            });
-            
-            clearTimeout(timeoutId2);
-            
-            if (!fallbackResponse.ok) {
-              throw new Error(`HTTP ${fallbackResponse.status}`);
+            if (now - parsedCache.timestamp < LOCATION_CACHE_DURATION) {
+              debugLogger.log('Using cached location pricing data');
+              setPricingData(parsedCache.pricingData);
+              setUserCountry(parsedCache.userCountry);
+              setIsLoading(false);
+              return;
             }
-            
-            const ipData = await fallbackResponse.json();
-            logger.debug('Fallback IP detected:', ipData);
-            
-            // Use ipwhois for geolocation
-            const controller3 = new AbortController();
-            const timeoutId3 = setTimeout(() => controller3.abort(), 5000);
-            
-            const geoResponse = await fetch(`https://ipwhois.app/json/${ipData.ip}`, {
-              signal: controller3.signal
-            });
-            
-            clearTimeout(timeoutId3);
-            
-            if (!geoResponse.ok) {
-              throw new Error(`HTTP ${geoResponse.status}`);
-            }
-            
-            const geoData = await geoResponse.json();
-            locationData = { country_code: geoData.country_code };
-            logger.debug('Fallback location data obtained:', locationData);
-            
-          } catch (fallbackError) {
-            logger.warn('Fallback location service also failed:', fallbackError);
-            
-            // Try one more service as last resort
-            try {
-              logger.debug('Trying final fallback service...');
-              
-              const controller4 = new AbortController();
-              const timeoutId4 = setTimeout(() => controller4.abort(), 3000);
-              
-              const finalResponse = await fetch('https://httpbin.org/ip', {
-                signal: controller4.signal
-              });
-              
-              clearTimeout(timeoutId4);
-              
-              if (finalResponse.ok) {
-                // This won't give us country, but at least we tried
-                logger.debug('Final service responded, but no country detection available');
-              }
-            } catch (finalError) {
-              logger.warn('All location services failed');
-            }
+          } catch (error) {
+            debugLogger.warn('Failed to parse cached location data:', error);
+            localStorage.removeItem(LOCATION_CACHE_KEY);
           }
         }
+
+        // If already detecting location, wait for that promise
+        if (locationDetectionPromise) {
+          const result = await locationDetectionPromise;
+          setPricingData(result);
+          setIsLoading(false);
+          return;
+        }
+
+        // Start location detection
+        locationDetectionPromise = detectLocationWithFallback();
+        const result = await locationDetectionPromise;
         
-        // Process the location data
-        if (locationData?.country_code) {
-          const countryCode = locationData.country_code.toLowerCase();
-          setUserCountry(countryCode);
-          logger.info('Location detected successfully:', countryCode);
-          
-          // Set pricing based on detected location (case-insensitive comparison)
-          if (countryCode === 'in' || countryCode === 'india') {
-            logger.info('Setting Indian pricing for country:', countryCode);
-            setPricingData(getIndianPricing());
-          } else {
-            logger.debug('Setting international pricing for country:', countryCode);
-            setPricingData(getGlobalPricing());
-          }
-        } else {
-          logger.warn('No valid country code detected, using default USD pricing');
-          setPricingData(getGlobalPricing());
+        setPricingData(result);
+        setIsLoading(false);
+        
+        // Cache the result
+        try {
+          const cacheData = {
+            pricingData: result,
+            userCountry: result.region === 'IN' ? 'in' : 'global',
+            timestamp: Date.now()
+          };
+          localStorage.setItem(LOCATION_CACHE_KEY, JSON.stringify(cacheData));
+        } catch (error) {
+          debugLogger.warn('Failed to cache location pricing data:', error);
         }
         
       } catch (error) {
-        logger.error('Location detection completely failed, using default USD pricing:', error);
+        debugLogger.error('Error in location detection:', error);
         setPricingData(getGlobalPricing());
-      } finally {
         setIsLoading(false);
+      } finally {
+        locationDetectionPromise = null;
       }
     };
 
-    detectLocation();
+    detectLocationAndSetPricing();
   }, []);
 
   return {
@@ -179,6 +92,59 @@ export const useLocationPricing = () => {
     isLoading,
     userCountry
   };
+};
+
+const detectLocationWithFallback = async (): Promise<PricingData> => {
+  try {
+    debugLogger.log('Starting location detection...');
+    
+    // Try primary service with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    
+    const response = await fetch('https://ipapi.co/json/', {
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    
+    const locationData = await response.json();
+    
+    if (locationData.error) {
+      throw new Error(`Location service error: ${locationData.reason}`);
+    }
+    
+    const countryCode = locationData.country_code?.toLowerCase();
+    
+    if (countryCode === 'in') {
+      debugLogger.log('Setting Indian pricing for country:', countryCode);
+      return getIndianPricing();
+    } else {
+      debugLogger.log('Setting international pricing for country:', countryCode);
+      return getGlobalPricing();
+    }
+    
+  } catch (error) {
+    debugLogger.warn('Primary location service failed, using fallback:', error);
+    
+    try {
+      // Simple fallback - check timezone
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (timezone.includes('Kolkata') || timezone.includes('Asia/Calcutta')) {
+        debugLogger.log('Using timezone-based detection for India');
+        return getIndianPricing();
+      }
+    } catch (timezoneError) {
+      debugLogger.warn('Timezone detection failed:', timezoneError);
+    }
+    
+    debugLogger.log('Using default global pricing');
+    return getGlobalPricing();
+  }
 };
 
 // Helper functions to avoid repetition
