@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { countries } from '@/data/countries';
 import { useCachedJobAlertsData } from '@/hooks/useCachedJobAlertsData';
@@ -38,8 +39,9 @@ interface JobAlertFormProps {
 const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentAlertCount, maxAlerts, updateActivity }: JobAlertFormProps) => {
   const { user } = useUser();
   const { toast } = useToast();
-  const { executeWithRetry, optimisticAdd } = useCachedJobAlertsData();
+  const { executeWithRetry, optimisticAdd, isAuthReady } = useCachedJobAlertsData();
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [countryOpen, setCountryOpen] = useState(false);
   const [formData, setFormData] = useState({
     country: '',
@@ -75,40 +77,73 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     updateActivity?.();
-    if (!user) return;
-
-    // Check alert limit for new alerts (not for editing existing ones)
-    if (!editingAlert && currentAlertCount >= 3) {
+    
+    if (!user) {
       toast({
-        title: "Alert limit reached",
-        description: "You can only create up to 3 job alerts. Please delete an existing alert to create a new one.",
+        title: "Authentication required",
+        description: "Please sign in to create job alerts.",
         variant: "destructive"
       });
       return;
     }
 
+    // Check alert limit for new alerts
+    if (!editingAlert && currentAlertCount >= maxAlerts) {
+      toast({
+        title: "Alert limit reached",
+        description: `You can only create up to ${maxAlerts} job alerts. Please delete an existing alert to create a new one.`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Wait for authentication to be ready
+    if (!isAuthReady) {
+      toast({
+        title: "Please wait",
+        description: "Authentication is loading, please try again in a moment.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setSubmitting(true);
     setLoading(true);
     
     try {
       const result = await executeWithRetry(
         async () => {
-          // Get the user's profile ID (not the users table ID)
+          // Get the user's profile ID
           const { data: userData, error: userError } = await supabase
             .from('users')
             .select('id')
             .eq('clerk_id', user.id)
             .maybeSingle();
 
-          if (userError || !userData) throw new Error('Failed to fetch user data');
+          if (userError) {
+            console.error('User fetch error:', userError);
+            throw new Error('Authentication failed. Please try signing in again.');
+          }
+          
+          if (!userData) {
+            throw new Error('User profile not found. Please try refreshing the page.');
+          }
 
-          // Get the user_profile record to use its ID as the foreign key
+          // Get the user_profile record
           const { data: profileData, error: profileError } = await supabase
             .from('user_profile')
             .select('id')
             .eq('user_id', userData.id)
             .maybeSingle();
 
-          if (profileError || !profileData) throw new Error('Failed to fetch profile data');
+          if (profileError) {
+            console.error('Profile fetch error:', profileError);
+            throw new Error('Profile data not found. Please try refreshing the page.');
+          }
+          
+          if (!profileData) {
+            throw new Error('User profile not found. Please try refreshing the page.');
+          }
 
           if (editingAlert) {
             // Update existing alert
@@ -126,10 +161,14 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
               })
               .eq('id', editingAlert.id);
 
-            if (error) throw error;
+            if (error) {
+              console.error('Update error:', error);
+              throw new Error('Failed to update alert. Please try again.');
+            }
+            
             return { type: 'update' };
           } else {
-            // Create new alert with optimistic data
+            // Create new alert
             const newAlertData = {
               user_id: profileData.id,
               country: formData.country.toLowerCase(),
@@ -149,56 +188,65 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
               .single();
 
             if (error) {
-              // Handle the specific case of hitting the 3-alert limit
+              console.error('Insert error:', error);
               if (error.message && error.message.includes('Maximum of 3 job alerts allowed')) {
                 throw new Error('ALERT_LIMIT_REACHED');
               }
-              throw error;
+              throw new Error('Failed to create alert. Please try again.');
             }
 
             return { type: 'create', data };
           }
         },
-        3,
+        5, // Increased retry attempts
         editingAlert ? 'Updating job alert' : 'Creating job alert'
       );
 
-      // Handle success based on operation type
+      // Handle success
       if (result.type === 'update') {
         toast({
-          title: "Alert updated",
-          description: "Job alert has been updated successfully.",
+          title: "Success",
+          description: "Job alert updated successfully.",
         });
       } else {
-        // Optimistically add the new alert
+        // Add optimistic update
         if (result.data) {
           optimisticAdd(result.data);
         }
         
         toast({
-          title: "Alert created",
-          description: "Job alert has been created successfully.",
+          title: "Success",
+          description: "Job alert created successfully.",
         });
       }
 
       onSubmit();
     } catch (error) {
-      console.error('Error saving job alert:', error);
+      console.error('Form submission error:', error);
       
-      if (error instanceof Error && error.message === 'ALERT_LIMIT_REACHED') {
-        toast({
-          title: "Alert limit reached",
-          description: "You can only create up to 3 job alerts. Please delete an existing alert to create a new one.",
-          variant: "destructive"
-        });
+      if (error instanceof Error) {
+        if (error.message === 'ALERT_LIMIT_REACHED') {
+          toast({
+            title: "Alert limit reached",
+            description: `You can only create up to ${maxAlerts} job alerts. Please delete an existing alert to create a new one.`,
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Unable to save",
+            description: error.message || "Please check your connection and try again.",
+            variant: "destructive",
+          });
+        }
       } else {
         toast({
-          title: "Save failed",
-          description: error instanceof Error ? error.message : "There was an error saving the job alert. Please try again.",
+          title: "Unable to save",
+          description: "Please check your connection and try again.",
           variant: "destructive",
         });
       }
     } finally {
+      setSubmitting(false);
       setLoading(false);
     }
   };
@@ -226,11 +274,11 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4" onClick={updateActivity} onKeyDown={updateActivity}>
-      {/* Alert limit warning for new alerts */}
+    <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3" onClick={updateActivity} onKeyDown={updateActivity}>
+      {/* Alert limit warning */}
       {!editingAlert && currentAlertCount >= maxAlerts - 1 && (
-        <div className="bg-yellow-900/50 border border-yellow-500/50 rounded-lg p-2 sm:p-3 mb-3 sm:mb-4">
-          <p className="text-yellow-200 text-xs sm:text-sm">
+        <div className="bg-yellow-900/50 border border-yellow-500/50 rounded-lg p-2 mb-3">
+          <p className="text-yellow-200 text-xs">
             {currentAlertCount === maxAlerts - 1 
               ? `You're creating your last alert (${currentAlertCount + 1}/${maxAlerts}).`
               : `You have reached the maximum limit of ${maxAlerts} alerts.`
@@ -239,28 +287,28 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-2 sm:gap-3">
+      <div className="space-y-2 sm:space-y-3">
         <div className="space-y-1">
-          <Label htmlFor="country" className="text-white font-inter font-medium text-xs sm:text-sm">Country</Label>
+          <Label htmlFor="country" className="text-white font-inter font-medium text-xs">Country</Label>
           <Popover open={countryOpen} onOpenChange={setCountryOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 role="combobox"
                 aria-expanded={countryOpen}
-                className="w-full justify-between border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs sm:text-sm h-7 sm:h-9"
+                className="w-full justify-between border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs h-8"
               >
                 {formData.country
                   ? getCountryDisplayValue(formData.country)
                   : "Select country..."}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-full p-0 z-50" align="start">
               <Command className="bg-gray-800 border-gray-600">
-                <CommandInput placeholder="Search by country name..." className="text-white text-xs sm:text-sm" />
+                <CommandInput placeholder="Search country..." className="text-white text-xs" />
                 <CommandList>
-                  <CommandEmpty className="text-gray-300 text-xs sm:text-sm">No country found.</CommandEmpty>
+                  <CommandEmpty className="text-gray-300 text-xs">No country found.</CommandEmpty>
                   <CommandGroup>
                     {countries.map((country) => (
                        <CommandItem
@@ -270,11 +318,11 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
                            handleCountryChange(country.code, country.name);
                            setCountryOpen(false);
                          }}
-                         className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-xs sm:text-sm"
+                         className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-xs"
                        >
                          <Check
                            className={cn(
-                             "mr-2 h-3 w-3 sm:h-4 sm:w-4",
+                             "mr-2 h-3 w-3",
                              formData.country === country.code ? "opacity-100" : "opacity-0"
                            )}
                          />
@@ -289,64 +337,64 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="location" className="text-white font-inter font-medium text-xs sm:text-sm">Location</Label>
+          <Label htmlFor="location" className="text-white font-inter font-medium text-xs">Location</Label>
           <Input 
             id="location" 
             value={formData.location} 
             onChange={(e) => handleInputChange('location', e.target.value)} 
             placeholder="e.g., New York, NY" 
             required 
-            className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs sm:text-sm h-7 sm:h-9"
+            className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs h-8"
           />
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="job_title" className="text-white font-inter font-medium text-xs sm:text-sm">Job Title</Label>
+          <Label htmlFor="job_title" className="text-white font-inter font-medium text-xs">Job Title</Label>
           <Input 
             id="job_title" 
             value={formData.job_title} 
             onChange={(e) => handleInputChange('job_title', e.target.value)} 
             placeholder="e.g., Software Engineer" 
             required 
-            className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs sm:text-sm h-7 sm:h-9"
+            className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs h-8"
           />
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="job_type" className="text-white font-inter font-medium text-xs sm:text-sm">Job Type</Label>
+          <Label htmlFor="job_type" className="text-white font-inter font-medium text-xs">Job Type</Label>
           <Select value={formData.job_type} onValueChange={(value) => handleInputChange('job_type', value)}>
-            <SelectTrigger className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs sm:text-sm h-7 sm:h-9">
+            <SelectTrigger className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs h-8">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-gray-800 border-gray-600 backdrop-blur-sm z-50">
-              <SelectItem value="full-time" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-xs sm:text-sm">Full-time</SelectItem>
-              <SelectItem value="part-time" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-xs sm:text-sm">Part-time</SelectItem>
-              <SelectItem value="contract" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-xs sm:text-sm">Contract</SelectItem>
-              <SelectItem value="intern" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-xs sm:text-sm">Intern</SelectItem>
+              <SelectItem value="full-time" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-xs">Full-time</SelectItem>
+              <SelectItem value="part-time" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-xs">Part-time</SelectItem>
+              <SelectItem value="contract" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-xs">Contract</SelectItem>
+              <SelectItem value="intern" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-xs">Intern</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="alert_frequency" className="text-white font-inter font-medium text-xs sm:text-sm">Alert Frequency</Label>
+          <Label htmlFor="alert_frequency" className="text-white font-inter font-medium text-xs">Alert Frequency</Label>
           <Input 
             id="alert_frequency" 
             value="Daily" 
             readOnly
             disabled
-            className="border-2 border-gray-500 text-white font-inter bg-orange-950 text-xs sm:text-sm h-7 sm:h-9 cursor-not-allowed opacity-75"
+            className="border-2 border-gray-500 text-white font-inter bg-orange-950 text-xs h-8 cursor-not-allowed opacity-75"
           />
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="preferred_time" className="text-white font-inter font-medium text-xs sm:text-sm">Preferred Time</Label>
+          <Label htmlFor="preferred_time" className="text-white font-inter font-medium text-xs">Preferred Time</Label>
           <Select value={formData.preferred_time} onValueChange={(value) => handleInputChange('preferred_time', value)}>
-            <SelectTrigger className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs sm:text-sm h-7 sm:h-9">
+            <SelectTrigger className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs h-8">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-gray-800 border-gray-600 max-h-48 backdrop-blur-sm z-50">
               {timeOptions.map((time) => (
-                <SelectItem key={time} value={time} className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-xs sm:text-sm">
+                <SelectItem key={time} value={time} className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-xs">
                   {time}
                 </SelectItem>
               ))}
@@ -355,30 +403,38 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="timezone" className="text-white font-inter font-medium text-xs sm:text-sm">Timezone</Label>
+          <Label htmlFor="timezone" className="text-white font-inter font-medium text-xs">Timezone</Label>
           <Input 
             id="timezone" 
             value={formData.timezone} 
             readOnly
             placeholder="Auto-detected" 
-            className="border-2 border-gray-500 text-white font-inter bg-orange-950 text-xs sm:text-sm h-7 sm:h-9 cursor-not-allowed opacity-75"
+            className="border-2 border-gray-500 text-white font-inter bg-orange-950 text-xs h-8 cursor-not-allowed opacity-75"
           />
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-2 pt-3 sm:pt-4 sticky bottom-0 bg-gradient-to-br from-orange-900/95 via-[#3c1c01]/90 to-[#2b1605]/95 pb-2 sm:pb-0">
+      <div className="flex flex-col gap-2 pt-3 sticky bottom-0 bg-gradient-to-br from-orange-900/95 via-[#3c1c01]/90 to-[#2b1605]/95 pb-2">
         <Button 
           type="submit" 
-          disabled={loading || (!editingAlert && currentAlertCount >= 3)} 
-          className="font-inter bg-pastel-lavender hover:bg-pastel-lavender/80 text-black font-medium text-xs sm:text-sm px-2 py-1 h-7 sm:h-9 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={loading || submitting || (!editingAlert && currentAlertCount >= maxAlerts)} 
+          className="w-full font-inter bg-pastel-lavender hover:bg-pastel-lavender/80 text-black font-medium text-xs px-3 py-2 h-8 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? 'Saving...' : editingAlert ? 'Update Alert' : 'Create Alert'}
+          {submitting ? (
+            <>
+              <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            editingAlert ? 'Update Alert' : 'Create Alert'
+          )}
         </Button>
         <Button 
           type="button" 
           variant="outline" 
           onClick={onCancel} 
-          className="font-inter border-gray-500 hover:border-gray-400 text-gray-950 bg-pastel-peach text-xs sm:text-sm px-2 py-1 h-7 sm:h-9"
+          disabled={submitting}
+          className="w-full font-inter border-gray-500 hover:border-gray-400 text-gray-950 bg-pastel-peach text-xs px-3 py-2 h-8"
         >
           Cancel
         </Button>

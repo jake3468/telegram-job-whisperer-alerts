@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -26,7 +27,8 @@ interface CachedJobAlertsData {
 }
 
 const CACHE_KEY = 'aspirely_job_alerts_cache';
-const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes for fresh data
+const BACKGROUND_REFRESH_INTERVAL = 3 * 60 * 1000; // 3 minutes like professional sites
 
 export const useCachedJobAlertsData = () => {
   const { user } = useUser();
@@ -51,7 +53,7 @@ export const useCachedJobAlertsData = () => {
           setAlerts(parsedCache.alerts);
           setIsActivated(parsedCache.isActivated);
           setUserProfileId(parsedCache.userProfileId);
-          setLoading(false); // Mark as loaded since we have cached data
+          setLoading(false);
           logger.debug('Loaded cached job alerts data:', parsedCache);
         } else {
           localStorage.removeItem(CACHE_KEY);
@@ -63,6 +65,23 @@ export const useCachedJobAlertsData = () => {
     }
   }, []);
 
+  // Professional token refresh every 5 minutes
+  useEffect(() => {
+    if (!user || !isAuthReady) return;
+
+    const tokenRefreshInterval = setInterval(async () => {
+      try {
+        // Trigger a silent token refresh
+        await user.getToken({ skipCache: true });
+        logger.debug('Token refreshed silently');
+      } catch (error) {
+        logger.warn('Token refresh failed:', error);
+      }
+    }, 5 * 60 * 1000); // 5 minutes
+
+    return () => clearInterval(tokenRefreshInterval);
+  }, [user, isAuthReady]);
+
   // Fetch fresh data when user changes or auth becomes ready
   useEffect(() => {
     if (!user) {
@@ -70,14 +89,13 @@ export const useCachedJobAlertsData = () => {
       return;
     }
     
-    // Don't fetch if we already have cached data that's not expired
+    // Don't fetch if we already have fresh cached data
     const cached = localStorage.getItem(CACHE_KEY);
     if (cached) {
       try {
         const parsedCache: CachedJobAlertsData = JSON.parse(cached);
         const now = Date.now();
         if (now - parsedCache.timestamp < CACHE_DURATION) {
-          // We have valid cached data, no need to fetch
           setLoading(false);
           return;
         }
@@ -86,13 +104,24 @@ export const useCachedJobAlertsData = () => {
       }
     }
     
-    // Fetch data when auth is ready
     if (isAuthReady) {
       fetchJobAlertsData();
     }
-  }, [user?.id, isAuthReady]); // Depend on both user ID and auth readiness
+  }, [user?.id, isAuthReady]);
 
-  // Fallback: if loading for too long and no data, set loading to false
+  // Background auto-refresh like professional sites (Google, Amazon)
+  useEffect(() => {
+    if (!user || !isAuthReady) return;
+
+    const backgroundRefreshInterval = setInterval(() => {
+      // Silent background refresh
+      fetchJobAlertsData(true);
+    }, BACKGROUND_REFRESH_INTERVAL);
+
+    return () => clearInterval(backgroundRefreshInterval);
+  }, [user?.id, isAuthReady]);
+
+  // Fallback timeout for loading state
   useEffect(() => {
     if (loading && user) {
       const timeout = setTimeout(() => {
@@ -101,13 +130,13 @@ export const useCachedJobAlertsData = () => {
           setLoading(false);
           setError('Loading took too long. Please try refreshing the page.');
         }
-      }, 10000); // 10 second timeout
+      }, 8000); // 8 second timeout
 
       return () => clearTimeout(timeout);
     }
   }, [loading, user, alerts.length, userProfileId]);
 
-  const fetchJobAlertsData = useCallback(async () => {
+  const fetchJobAlertsData = useCallback(async (silent = false) => {
     if (!user) return;
     
     if (!isAuthReady) {
@@ -116,10 +145,19 @@ export const useCachedJobAlertsData = () => {
     }
     
     try {
-      setError(null);
+      if (!silent) {
+        setError(null);
+        setConnectionIssue(false);
+      }
       
       const result = await executeWithRetry(
         async () => {
+          // Get fresh token
+          const token = await user.getToken({ skipCache: true });
+          if (!token) {
+            throw new Error('Authentication token not available');
+          }
+
           // Get user's database ID
           const { data: userData, error: userError } = await supabase
             .from('users')
@@ -127,8 +165,13 @@ export const useCachedJobAlertsData = () => {
             .eq('clerk_id', user.id)
             .maybeSingle();
             
-          if (userError || !userData) {
+          if (userError) {
+            logger.error('User fetch error:', userError);
             throw new Error('Failed to fetch user data');
+          }
+          
+          if (!userData) {
+            throw new Error('User not found in database');
           }
 
           // Get user profile
@@ -138,8 +181,13 @@ export const useCachedJobAlertsData = () => {
             .eq('user_id', userData.id)
             .maybeSingle();
             
-          if (profileError || !profileData) {
+          if (profileError) {
+            logger.error('Profile fetch error:', profileError);
             throw new Error('Failed to fetch profile data');
+          }
+          
+          if (!profileData) {
+            throw new Error('User profile not found');
           }
 
           // Fetch job alerts
@@ -150,6 +198,7 @@ export const useCachedJobAlertsData = () => {
             .order('created_at', { ascending: false });
 
           if (alertsError) {
+            logger.error('Alerts fetch error:', alertsError);
             throw new Error('Failed to fetch job alerts');
           }
 
@@ -159,7 +208,7 @@ export const useCachedJobAlertsData = () => {
             userProfileId: profileData.id
           };
         },
-        3,
+        5, // 5 retry attempts with exponential backoff
         'Fetching job alerts data'
       );
 
@@ -184,44 +233,21 @@ export const useCachedJobAlertsData = () => {
 
     } catch (error) {
       logger.error('Error fetching job alerts data:', error);
-      setError(error instanceof Error ? error.message : 'Unknown error occurred');
       
-      // If we have no cached data, show connection issue
-      if (alerts.length === 0) {
-        setConnectionIssue(true);
+      if (!silent) {
+        setError(error instanceof Error ? error.message : 'Unknown error occurred');
+        
+        // Only show connection issue if we have no cached data
+        if (alerts.length === 0) {
+          setConnectionIssue(true);
+        }
       }
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
   }, [user, isAuthReady, executeWithRetry, alerts.length]);
-
-  // Background auto-refresh every 15 minutes (like professional websites)
-  useEffect(() => {
-    if (!user || !isAuthReady) return;
-
-    const refreshInterval = setInterval(() => {
-      const cached = localStorage.getItem(CACHE_KEY);
-      if (cached) {
-        try {
-          const parsedCache: CachedJobAlertsData = JSON.parse(cached);
-          const now = Date.now();
-          // Only refresh if cache is older than 10 minutes
-          if (now - parsedCache.timestamp > 10 * 60 * 1000) {
-            logger.debug('Background refresh triggered');
-            fetchJobAlertsData();
-          }
-        } catch {
-          // Invalid cache, refresh
-          fetchJobAlertsData();
-        }
-      } else {
-        // No cache, refresh
-        fetchJobAlertsData();
-      }
-    }, 15 * 60 * 1000); // 15 minutes
-
-    return () => clearInterval(refreshInterval);
-  }, [user?.id, isAuthReady, fetchJobAlertsData]);
 
   const invalidateCache = () => {
     localStorage.removeItem(CACHE_KEY);
