@@ -39,13 +39,10 @@ const JobTracker = () => {
     jobs,
     loading,
     error,
-    addJob,
-    updateJob,
-    deleteJob,
-    updateJobStatus,
-    reorderJobs,
-    isUpdating,
-    refetch
+    refetch,
+    optimisticUpdate,
+    optimisticAdd,
+    optimisticDelete
   } = useCachedJobTracker();
 
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -74,7 +71,29 @@ const JobTracker = () => {
     }
 
     try {
-      await addJob(formData);
+      const newJob: JobEntry = {
+        id: crypto.randomUUID(),
+        company_name: formData.company_name,
+        job_title: formData.job_title,
+        job_description: formData.job_description,
+        job_url: formData.job_url,
+        status: 'saved',
+        order_position: 0,
+        resume_updated: false,
+        job_role_analyzed: false,
+        company_researched: false,
+        cover_letter_prepared: false,
+        ready_to_apply: false,
+        interview_call_received: false,
+        interview_prep_guide_received: false,
+        ai_mock_interview_attempted: false,
+        comments: formData.comments,
+        file_urls: [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      optimisticAdd(newJob);
       setFormData({
         company_name: '',
         job_title: '',
@@ -117,7 +136,8 @@ const JobTracker = () => {
     const targetColumn = columns.find(col => overId.includes(col));
     
     if (targetColumn && activeJob.status !== targetColumn) {
-      updateJobStatus(activeJob.id, targetColumn as JobEntry['status']);
+      const updatedJob = { ...activeJob, status: targetColumn as JobEntry['status'] };
+      optimisticUpdate(updatedJob);
     }
   };
 
@@ -177,7 +197,7 @@ const JobTracker = () => {
   const handleDeleteJob = async (jobId: string) => {
     updateActivity?.();
     try {
-      await deleteJob(jobId);
+      optimisticDelete(jobId);
       toast({
         title: "Job deleted",
         description: "The job has been removed from your tracker."
@@ -255,7 +275,11 @@ const JobTracker = () => {
           </p>
         </div>
 
-        <JobTrackerOnboardingPopup />
+        <JobTrackerOnboardingPopup 
+          isOpen={false}
+          onClose={() => {}}
+          onDontShowAgain={() => {}}
+        />
 
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="flex-1 max-w-md">
@@ -399,7 +423,13 @@ const JobTracker = () => {
                                   onView={handleViewJob}
                                   onEdit={handleEditJob}
                                   onDelete={handleDeleteJob}
-                                  onStatusChange={updateJobStatus}
+                                  onStatusChange={(jobId, status) => {
+                                    const job = jobs.find(j => j.id === jobId);
+                                    if (job) {
+                                      const updatedJob = { ...job, status };
+                                      optimisticUpdate(updatedJob);
+                                    }
+                                  }}
                                   updateActivity={updateActivity}
                                 />
                               );
