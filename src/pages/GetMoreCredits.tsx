@@ -228,13 +228,13 @@ export default function GetMoreCredits() {
                    {pricingData && subscriptionProducts[0] ? <>
                        {pricingData.currencySymbol}{subscriptionProducts[0].price_amount}
                        <span className="text-xs sm:text-base font-bold align-super">/month</span>
-                     </> : pricingData ? <>
-                       {pricingData.currencySymbol}{pricingData.monthlyPrice}
-                       <span className="text-xs sm:text-base font-bold align-super">/month</span>
-                     </> : <span className="text-cyan-200">Loading...</span>}
+                      </> : pricingData ? <>
+                        {pricingData.currencySymbol}{pricingData.plans.premium.monthly.price}
+                        <span className="text-xs sm:text-base font-bold align-super">/month</span>
+                      </> : <span className="text-cyan-200">Loading...</span>}
                  </div>
                  <div className="mt-0 text-xs sm:text-sm font-semibold text-cyan-200">
-                   {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits/month` : pricingData ? '300 credits/month' : 'Loading...'}
+                   {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits/month` : pricingData ? `${pricingData.plans.premium.monthly.credits} credits/month` : 'Loading...'}
                  </div>
               </CardHeader>
               <CardContent className="grow flex flex-col px-3 sm:px-4 pb-3">
@@ -242,7 +242,7 @@ export default function GetMoreCredits() {
                    <li className="flex items-center gap-1 sm:gap-2">
                      <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
                      <span className="text-xs sm:text-sm text-cyan-100">
-                       {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits every month` : '300 credits every month'}
+                       {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits every month` : pricingData ? `${pricingData.plans.premium.monthly.credits} credits every month` : 'Loading...'}
                      </span>
                    </li>
                   <li className="flex items-center gap-1 sm:gap-2">
@@ -278,7 +278,7 @@ export default function GetMoreCredits() {
               <CardHeader className="text-center pb-2 pt-3 sm:pb-4 sm:pt-6 px-3 sm:px-4">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 ${planTextColor.pack}`}>Credit Packs</CardTitle>
                  <div className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-0.5 sm:mb-1">
-                   {pricingData ? `Starting ${pricingData.currencySymbol}${creditPackProducts.length > 0 ? Math.min(...creditPackProducts.map(p => p.price_amount)) : pricingData.creditPacks[0]?.price}` : 'Loading...'}
+                   {pricingData ? `Starting ${pricingData.currencySymbol}${creditPackProducts.length > 0 ? Math.min(...creditPackProducts.map(p => p.price_amount)) : pricingData.credits.pack50.price}` : 'Loading...'}
                  </div>
                 <div className="mt-0 text-xs sm:text-sm font-semibold text-gray-600">Select your desired amount:</div>
               </CardHeader>
@@ -295,15 +295,15 @@ export default function GetMoreCredits() {
                        </div>
                      </div>) :
                 // Only show fallback if no database products and not loading
-                !isProductsLoading && pricingData?.creditPacks.map(pack => <div key={pack.credits} className="bg-gray-50 border border-gray-200 rounded-lg p-2 sm:p-2.5 flex justify-between items-center shadow hover:shadow-gray-300/50 transition duration-300">
-                     <span className="text-gray-700 font-medium text-xs sm:text-sm">{pack.credits} credits</span>
-                     <div className="flex items-center gap-2">
-                       <span className="text-gray-900 font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price}</span>
-                        <Button size="sm" onClick={() => handleCreditPackClick(pack.productId)} className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={!isAuthReady || connectionIssue || isCheckoutLoading(pack.productId)}>
-                          {!isAuthReady ? '...' : isCheckoutLoading(pack.productId) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
-                        </Button>
-                     </div>
-                   </div>)}
+                 !isProductsLoading && pricingData && Object.entries(pricingData.credits).map(([key, pack]: [string, { credits: number; price: number }]) => <div key={key} className="bg-gray-50 border border-gray-200 rounded-lg p-2 sm:p-2.5 flex justify-between items-center shadow hover:shadow-gray-300/50 transition duration-300">
+                      <span className="text-gray-700 font-medium text-xs sm:text-sm">{pack.credits} credits</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-900 font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price}</span>
+                         <Button size="sm" onClick={() => handleCreditPackClick(`pack_${pack.credits}_${pricingData.currency.toLowerCase()}`)} className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={!isAuthReady || connectionIssue || isCheckoutLoading(`pack_${pack.credits}_${pricingData.currency.toLowerCase()}`)}>
+                           {!isAuthReady ? '...' : isCheckoutLoading(`pack_${pack.credits}_${pricingData.currency.toLowerCase()}`) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
+                         </Button>
+                      </div>
+                    </div>)}
                   
                   {/* Loading state */}
                   {isProductsLoading && <div className="flex items-center justify-center py-4">
