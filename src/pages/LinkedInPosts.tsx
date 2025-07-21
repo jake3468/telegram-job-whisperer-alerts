@@ -448,7 +448,7 @@ const LinkedInPosts = () => {
   // Show professional authentication loading state within the page layout
   if (!isAuthReady && !isRefreshing) {
     return <SidebarProvider defaultOpen={true}>
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-2xl shadow-2xl border-b border-white/25">
         <div className="flex items-center justify-between p-3">
           <SidebarTrigger className="h-12 w-12 border-fuchsia-400/30 ring-2 ring-fuchsia-400/10 text-fuchsia-200 rounded-2xl shadow-lg transition-all flex items-center justify-center bg-zinc-900 hover:bg-zinc-800">
             <Menu className="w-7 h-7" strokeWidth={2.4} />
@@ -476,7 +476,7 @@ const LinkedInPosts = () => {
     </SidebarProvider>;
   }
   return <SidebarProvider defaultOpen={true}>
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-2xl shadow-2xl border-b border-white/25">
         <div className="flex items-center justify-between p-3">
           <SidebarTrigger className="h-12 w-12 border-fuchsia-400/30 ring-2 ring-fuchsia-400/10 text-fuchsia-200 rounded-2xl shadow-lg transition-all flex items-center justify-center bg-zinc-900 hover:bg-zinc-800">
             <Menu className="w-7 h-7" strokeWidth={2.4} />
