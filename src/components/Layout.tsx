@@ -1,3 +1,4 @@
+
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Menu } from 'lucide-react';
@@ -14,7 +15,7 @@ export function Layout({ children }: LayoutProps) {
     } as React.CSSProperties}>
       {/* Header for mobile/tablet - with logo and name in top right */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-2xl shadow-2xl border-b border-white/25">
-        <div className="flex items-center justify-between p-3">
+        <div className="flex items-center justify-between px-3 py-4">
           <SidebarTrigger className="text-white p-2 rounded-lg hover:bg-white/10 transition-colors duration-200">
             <Menu size={24} />
             <span className="sr-only">Toggle navigation menu</span>
