@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 const PrivacyPolicy = () => {
   const navigate = useNavigate();
 
@@ -8,6 +9,35 @@ const PrivacyPolicy = () => {
     window.scrollTo(0, 0);
   }, []);
   return <div className="min-h-screen bg-black text-slate-50 font-inter">
+      <Helmet>
+        <title>Privacy Policy - Aspirely.ai | AI-Powered Job Hunting Platform</title>
+        <meta name="description" content="Aspirely.ai Privacy Policy - Learn how we collect, use, and protect your data in our AI-powered job hunting platform. Comprehensive data handling and user rights information." />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://aspirely.ai/privacy-policy" />
+        <meta property="og:title" content="Privacy Policy - Aspirely.ai" />
+        <meta property="og:description" content="Comprehensive privacy policy for Aspirely.ai covering data collection, Google OAuth integration, and user rights." />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content="https://aspirely.ai/privacy-policy" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Privacy Policy",
+            "description": "Aspirely.ai Privacy Policy covering data collection, Google user data handling, and user rights",
+            "url": "https://aspirely.ai/privacy-policy",
+            "isPartOf": {
+              "@type": "WebSite",
+              "name": "Aspirely.ai",
+              "url": "https://aspirely.ai"
+            },
+            "dateModified": new Date().toISOString(),
+            "publisher": {
+              "@type": "Organization",
+              "name": "Aspirely.ai"
+            }
+          })}
+        </script>
+      </Helmet>
       <div className="max-w-4xl mx-auto px-4 py-12">
         <button onClick={() => navigate('/')} className="flex items-center gap-2 text-sky-400 hover:text-sky-300 transition-colors mb-8">
           <ArrowLeft size={20} />
@@ -43,21 +73,20 @@ const PrivacyPolicy = () => {
                 <li><strong>Professional Information:</strong> Resume content, work experience, education details, skills, and job preferences</li>
                 <li><strong>Location Data:</strong> Geographic location information for personalized job alerts and location-based pricing</li>
                 <li><strong>Payment Information:</strong> Billing details and payment method information (processed securely through our payment processor)</li>
-                
               </ul>
 
-              
-              
+              <h3 className="text-xl font-medium text-sky-400 mb-3">2.2 Google User Data Collection</h3>
+              <p className="text-gray-300 mb-4">When you sign in with Google OAuth, we collect the following Google user data:</p>
               <ul className="list-disc list-inside text-gray-300 space-y-2 mb-6">
-                
-                
-                
-                
-                
-                
+                <li><strong>Basic Profile Information:</strong> Your name, email address, and profile picture from your Google account</li>
+                <li><strong>Google Account ID:</strong> Unique identifier from Google to manage your account authentication</li>
+                <li><strong>Email Verification Status:</strong> Whether your Google email is verified to ensure account security</li>
               </ul>
+              <p className="text-gray-300 mb-6">
+                <strong>Important:</strong> We only request the minimum necessary Google user data required for authentication and account creation. We do not access your Google Drive, Gmail, Calendar, or any other Google services beyond basic profile information.
+              </p>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">2.2 Generated Content</h3>
+              <h3 className="text-xl font-medium text-sky-400 mb-3">2.3 Generated Content</h3>
               <p className="text-gray-300">
                 We store the content generated through our AI tools, including cover letters, interview preparation materials, LinkedIn posts, and job analyses, to provide you with access to your history and improve our services.
               </p>
@@ -67,7 +96,19 @@ const PrivacyPolicy = () => {
               <h2 className="text-2xl font-semibold text-white mb-4">3. How We Use Your Information</h2>
               <p className="text-gray-300 mb-4">We use the collected information for the following purposes:</p>
               
-              <h3 className="text-xl font-medium text-sky-400 mb-3">3.1 Service Delivery</h3>
+              <h3 className="text-xl font-medium text-sky-400 mb-3">3.1 Google User Data Usage</h3>
+              <p className="text-gray-300 mb-4">We use Google user data specifically and exclusively for:</p>
+              <ul className="list-disc list-inside text-gray-300 space-y-2 mb-6">
+                <li><strong>Account Authentication:</strong> To securely sign you into your Aspirely.ai account</li>
+                <li><strong>Account Creation:</strong> To create and maintain your user profile on our platform</li>
+                <li><strong>Communication:</strong> To send you service-related notifications using your Google email address</li>
+                <li><strong>User Identification:</strong> To personalize your experience and maintain your account across sessions</li>
+              </ul>
+              <p className="text-gray-300 mb-6">
+                <strong>We do NOT use Google user data for:</strong> advertising, selling to third parties, determining creditworthiness, lending purposes, or any purposes unrelated to providing our core job hunting services.
+              </p>
+
+              <h3 className="text-xl font-medium text-sky-400 mb-3">3.2 Service Delivery</h3>
               <ul className="list-disc list-inside text-gray-300 space-y-2 mb-6">
                 <li>Generate personalized cover letters using Claude (by Anthropic)</li>
                 <li>Create tailored interview preparation materials using Claude (by Anthropic)</li>
@@ -77,7 +118,7 @@ const PrivacyPolicy = () => {
                 <li>Provide resume building and updating services through our Telegram bot using OpenAI</li>
               </ul>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">3.2 Platform Operations</h3>
+              <h3 className="text-xl font-medium text-sky-400 mb-3">3.3 Platform Operations</h3>
               <ul className="list-disc list-inside text-gray-300 space-y-2 mb-6">
                 <li>Process payments and manage subscriptions through DodoPayments</li>
                 <li>Provide customer support and respond to inquiries</li>
@@ -86,7 +127,7 @@ const PrivacyPolicy = () => {
                 <li>Ensure security and prevent fraud</li>
               </ul>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">3.3 Personalization and Analytics</h3>
+              <h3 className="text-xl font-medium text-sky-400 mb-3">3.4 Personalization and Analytics</h3>
               <ul className="list-disc list-inside text-gray-300 space-y-2">
                 <li>Analyze usage patterns to improve our AI models</li>
                 <li>Customize your experience based on preferences</li>
@@ -98,7 +139,15 @@ const PrivacyPolicy = () => {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-white mb-4">4. Information Sharing and Disclosure</h2>
               
-              <h3 className="text-xl font-medium text-sky-400 mb-3">4.1 Third-Party AI Services</h3>
+              <h3 className="text-xl font-medium text-sky-400 mb-3">4.1 Google User Data Sharing</h3>
+              <p className="text-gray-300 mb-4">
+                <strong>We do NOT share, transfer, or disclose your Google user data to any third parties.</strong> Your Google profile information remains secure within our platform and is only used for the purposes outlined in Section 3.1 above.
+              </p>
+              <p className="text-gray-300 mb-6">
+                <strong>We do NOT sell your Google user data.</strong> We are committed to protecting your privacy and will never monetize your Google account information.
+              </p>
+
+              <h3 className="text-xl font-medium text-sky-400 mb-3">4.2 Third-Party AI Services</h3>
               <p className="text-gray-300 mb-4">To provide our core services, we share your data with the following service providers under strict data processing agreements:</p>
               <ul className="list-disc list-inside text-gray-300 space-y-2 mb-6">
                 <li><strong>OpenAI:</strong> For job analysis, job alerts personalization, LinkedIn content generation, and resume bot functionality</li>
@@ -106,23 +155,26 @@ const PrivacyPolicy = () => {
                 <li><strong>Perplexity AI:</strong> For company analysis and LinkedIn content research</li>
                 <li><strong>RapidAPI:</strong> For job searching and aggregation services</li>
               </ul>
+              <p className="text-gray-300 mb-6">
+                <strong>Important:</strong> We do not share your Google user data with these AI service providers. Only job-related content and professional information you explicitly provide is shared with these services for processing.
+              </p>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">4.2 Workflow Automation</h3>
+              <h3 className="text-xl font-medium text-sky-400 mb-3">4.3 Workflow Automation</h3>
               <p className="text-gray-300 mb-4">
                 We use n8n for workflow automation, which may process your data to coordinate between different services and deliver seamless experiences.
               </p>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">4.3 Communication Platforms</h3>
+              <h3 className="text-xl font-medium text-sky-400 mb-3">4.4 Communication Platforms</h3>
               <p className="text-gray-300 mb-4">
                 We use Telegram to deliver job alerts and provide resume bot services. Your interaction data with these bots is processed to provide personalized responses.
               </p>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">4.4 Payment Processing</h3>
+              <h3 className="text-xl font-medium text-sky-400 mb-3">4.5 Payment Processing</h3>
               <p className="text-gray-300 mb-4">
                 Payment information is processed by DodoPayments, our secure payment processor. We do not store complete payment card information on our servers.
               </p>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">4.5 Legal Requirements</h3>
+              <h3 className="text-xl font-medium text-sky-400 mb-3">4.6 Legal Requirements</h3>
               <p className="text-gray-300">
                 We may disclose your information if required by law, legal process, or to protect the rights, property, or safety of Aspirely.ai, our users, or others.
               </p>
@@ -130,14 +182,25 @@ const PrivacyPolicy = () => {
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-white mb-4">5. Data Retention and Deletion</h2>
+              
+              <h3 className="text-xl font-medium text-sky-400 mb-3">5.1 Google User Data Retention</h3>
               <p className="text-gray-300 mb-4">
-                We retain your personal information for as long as your account remains active or as needed to provide you services. When you delete your account, we will:
+                We retain your Google user data (name, email, profile picture, and account ID) only for as long as your Aspirely.ai account remains active. When you:
+              </p>
+              <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
+                <li><strong>Delete your account:</strong> Your Google user data is immediately removed from our active systems</li>
+                <li><strong>Disconnect Google OAuth:</strong> We will delete your Google profile information within 24 hours</li>
+                <li><strong>Request data deletion:</strong> We will delete your Google user data within 48 hours of your request</li>
+              </ul>
+              
+              <h3 className="text-xl font-medium text-sky-400 mb-3">5.2 General Data Retention</h3>
+              <p className="text-gray-300 mb-4">
+                For other personal information, we retain your data for as long as your account remains active or as needed to provide you services. When you delete your account, we will:
               </p>
               <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
                 <li>Delete your personal information from our active databases within 30 days</li>
                 <li>Remove your generated content (cover letters, interview prep materials, etc.)</li>
                 <li>Anonymize any remaining data used for analytics purposes</li>
-                
               </ul>
               <p className="text-gray-300">
                 Some information may be retained in backup systems for up to 90 days for security and recovery purposes, after which it will be permanently deleted.
@@ -146,15 +209,30 @@ const PrivacyPolicy = () => {
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-white mb-4">6. Data Security</h2>
+              
+              <h3 className="text-xl font-medium text-sky-400 mb-3">6.1 Google User Data Protection</h3>
               <p className="text-gray-300 mb-4">
-                We implement industry-standard security measures to protect your information:
+                We implement enhanced security measures specifically for Google user data:
               </p>
               <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
-                <li>Encryption of data in transit and at rest</li>
+                <li><strong>OAuth 2.0 Secure Authentication:</strong> Using Google's secure OAuth 2.0 protocol for authentication</li>
+                <li><strong>Encrypted Storage:</strong> Your Google user data is encrypted both in transit and at rest</li>
+                <li><strong>Access Controls:</strong> Limited access to Google user data only for essential account functions</li>
+                <li><strong>No Third-Party Sharing:</strong> Google user data is never shared with external services</li>
+                <li><strong>Regular Security Audits:</strong> Continuous monitoring for unauthorized access attempts</li>
+              </ul>
+
+              <h3 className="text-xl font-medium text-sky-400 mb-3">6.2 General Security Measures</h3>
+              <p className="text-gray-300 mb-4">
+                We implement industry-standard security measures to protect all your information:
+              </p>
+              <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
+                <li>Encryption of data in transit and at rest using AES-256 encryption</li>
                 <li>Regular security audits and vulnerability assessments</li>
-                <li>Access controls and authentication mechanisms</li>
+                <li>Multi-factor authentication and access controls</li>
                 <li>Secure API integrations with third-party services</li>
                 <li>Regular backups and disaster recovery procedures</li>
+                <li>Secure hosting infrastructure with DDoS protection</li>
               </ul>
               <p className="text-gray-300">
                 While we strive to protect your information, no method of transmission over the internet or electronic storage is 100% secure. We cannot guarantee absolute security but continuously work to improve our security measures.
