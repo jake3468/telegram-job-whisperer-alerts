@@ -1032,7 +1032,7 @@ const JobTracker = () => {
               {columns.map(column => <DroppableColumn key={column.key} column={column} jobs={getJobsByStatus(column.key)} onAddJob={() => {
               setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
               setIsModalOpen(true);
-            }} onDeleteJob={deleteJob} onViewJob={handleViewJob} onUpdateChecklist={handleUpdateChecklistItem} activeJobId={activeJob?.id} />)}
+            }} onDeleteJob={handleDeleteJob} onViewJob={handleViewJob} onUpdateChecklist={handleUpdateChecklistItem} activeJobId={activeJob?.id} />)}
             </div>
             <DragOverlay>
               {activeJob ? <div className="bg-gray-800 rounded-lg p-4 border border-gray-600 shadow-2xl transform rotate-3 w-full max-w-[280px]">
