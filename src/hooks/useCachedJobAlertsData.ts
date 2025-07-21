@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/logger';
 import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
@@ -32,6 +32,7 @@ const BACKGROUND_REFRESH_INTERVAL = 3 * 60 * 1000; // 3 minutes like professiona
 
 export const useCachedJobAlertsData = () => {
   const { user } = useUser();
+  const { getToken } = useAuth();
   const { isAuthReady, executeWithRetry } = useEnterpriseAuth();
   const [alerts, setAlerts] = useState<JobAlert[]>([]);
   const [isActivated, setIsActivated] = useState<boolean>(false);
@@ -72,7 +73,7 @@ export const useCachedJobAlertsData = () => {
     const tokenRefreshInterval = setInterval(async () => {
       try {
         // Trigger a silent token refresh
-        await user.getToken({ skipCache: true });
+        await getToken({ skipCache: true });
         logger.debug('Token refreshed silently');
       } catch (error) {
         logger.warn('Token refresh failed:', error);
@@ -153,7 +154,7 @@ export const useCachedJobAlertsData = () => {
       const result = await executeWithRetry(
         async () => {
           // Get fresh token
-          const token = await user.getToken({ skipCache: true });
+          const token = await getToken({ skipCache: true });
           if (!token) {
             throw new Error('Authentication token not available');
           }
