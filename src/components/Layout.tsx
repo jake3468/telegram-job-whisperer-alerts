@@ -1,6 +1,5 @@
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
-import { Menu } from 'lucide-react';
 import React from 'react';
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,10 +11,14 @@ export function Layout({
     "--sidebar-width": "clamp(220px, 20vw, 295px)"
   } as React.CSSProperties}>
       {/* Header for mobile/tablet - with logo and name in top right */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-2xl shadow-2xl border-b border-white/10">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-2xl shadow-2xl border-b border-white/25">
         <div className="flex items-center justify-between p-3">
           <SidebarTrigger className="h-12 w-12 border-white/20 ring-2 ring-white/5 text-white rounded-2xl shadow-xl transition-all flex items-center justify-center bg-black hover:bg-zinc-800 hover:ring-white/10">
-            <Menu className="w-7 h-7" strokeWidth={2} />
+            <div className="flex flex-col gap-1">
+              <div className="w-5 h-0.5 bg-white rounded-full transition-all"></div>
+              <div className="w-5 h-0.5 bg-white rounded-full transition-all"></div>
+              <div className="w-5 h-0.5 bg-white rounded-full transition-all"></div>
+            </div>
             <span className="sr-only">Toggle navigation menu</span>
           </SidebarTrigger>
           <div className="flex items-center gap-2">
