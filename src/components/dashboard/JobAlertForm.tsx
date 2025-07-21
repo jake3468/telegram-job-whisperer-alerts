@@ -198,11 +198,11 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4" onClick={updateActivity} onKeyDown={updateActivity}>
+    <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4" onClick={updateActivity} onKeyDown={updateActivity}>
       {/* Alert limit warning for new alerts */}
       {!editingAlert && currentAlertCount >= maxAlerts - 1 && (
-        <div className="bg-yellow-900/50 border border-yellow-500/50 rounded-lg p-3 mb-4">
-          <p className="text-yellow-200 text-sm">
+        <div className="bg-yellow-900/50 border border-yellow-500/50 rounded-lg p-2 sm:p-3 mb-3 sm:mb-4">
+          <p className="text-yellow-200 text-xs sm:text-sm">
             {currentAlertCount === maxAlerts - 1 
               ? `You're creating your last alert (${currentAlertCount + 1}/${maxAlerts}).`
               : `You have reached the maximum limit of ${maxAlerts} alerts.`
@@ -211,16 +211,16 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+      <div className="grid grid-cols-1 gap-2 sm:gap-3 md:grid-cols-2 md:gap-4">
         <div className="space-y-1">
-          <Label htmlFor="country" className="text-white font-inter font-medium text-sm">Country</Label>
+          <Label htmlFor="country" className="text-white font-inter font-medium text-xs sm:text-sm">Country</Label>
           <Popover open={countryOpen} onOpenChange={setCountryOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 role="combobox"
                 aria-expanded={countryOpen}
-                className="w-full justify-between border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-sm h-9"
+                className="w-full justify-between border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs sm:text-sm h-8 sm:h-9"
               >
                 {formData.country
                   ? getCountryDisplayValue(formData.country)
@@ -228,27 +228,13 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-full p-0" align="start">
-              <Command className="bg-gray-800 border-gray-600" shouldFilter={false}>
-                <CommandInput placeholder="Search by country name..." className="text-white" />
+            <PopoverContent className="w-full p-0 z-50" align="start">
+              <Command className="bg-gray-800 border-gray-600">
+                <CommandInput placeholder="Search by country name..." className="text-white text-xs sm:text-sm" />
                 <CommandList>
-                  <CommandEmpty className="text-gray-300">No country found.</CommandEmpty>
+                  <CommandEmpty className="text-gray-300 text-xs sm:text-sm">No country found.</CommandEmpty>
                   <CommandGroup>
-                    {countries
-                      .filter((country) => {
-                        const searchTerm = document.querySelector('[cmdk-input]')?.getAttribute('value')?.toLowerCase() || '';
-                        return country.name.toLowerCase().includes(searchTerm) || 
-                               country.code.toLowerCase().includes(searchTerm);
-                      })
-                      .sort((a, b) => {
-                        const searchTerm = document.querySelector('[cmdk-input]')?.getAttribute('value')?.toLowerCase() || '';
-                        const aNameMatch = a.name.toLowerCase().includes(searchTerm);
-                        const bNameMatch = b.name.toLowerCase().includes(searchTerm);
-                        if (aNameMatch && !bNameMatch) return -1;
-                        if (!aNameMatch && bNameMatch) return 1;
-                        return a.name.localeCompare(b.name);
-                      })
-                      .map((country) => (
+                    {countries.map((country) => (
                        <CommandItem
                          key={country.code}
                          value={`${country.name} ${country.code}`}
@@ -256,11 +242,11 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
                            handleCountryChange(country.code, country.name);
                            setCountryOpen(false);
                          }}
-                         className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black"
+                         className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-xs sm:text-sm"
                        >
                          <Check
                            className={cn(
-                             "mr-2 h-4 w-4",
+                             "mr-2 h-3 w-3 sm:h-4 sm:w-4",
                              formData.country === country.code ? "opacity-100" : "opacity-0"
                            )}
                          />
@@ -275,64 +261,64 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="location" className="text-white font-inter font-medium text-sm">Location</Label>
+          <Label htmlFor="location" className="text-white font-inter font-medium text-xs sm:text-sm">Location</Label>
           <Input 
             id="location" 
             value={formData.location} 
             onChange={(e) => handleInputChange('location', e.target.value)} 
             placeholder="e.g., New York, NY" 
             required 
-            className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-sm h-9"
+            className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs sm:text-sm h-8 sm:h-9"
           />
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="job_title" className="text-white font-inter font-medium text-sm">Job Title</Label>
+          <Label htmlFor="job_title" className="text-white font-inter font-medium text-xs sm:text-sm">Job Title</Label>
           <Input 
             id="job_title" 
             value={formData.job_title} 
             onChange={(e) => handleInputChange('job_title', e.target.value)} 
             placeholder="e.g., Software Engineer" 
             required 
-            className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-sm h-9"
+            className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs sm:text-sm h-8 sm:h-9"
           />
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="job_type" className="text-white font-inter font-medium text-sm">Job Type</Label>
+          <Label htmlFor="job_type" className="text-white font-inter font-medium text-xs sm:text-sm">Job Type</Label>
           <Select value={formData.job_type} onValueChange={(value) => handleInputChange('job_type', value)}>
-            <SelectTrigger className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-sm h-9">
+            <SelectTrigger className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs sm:text-sm h-8 sm:h-9">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-gray-800 border-gray-600 backdrop-blur-sm">
-              <SelectItem value="full-time" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-sm">Full-time</SelectItem>
-              <SelectItem value="part-time" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-sm">Part-time</SelectItem>
-              <SelectItem value="contract" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-sm">Contract</SelectItem>
-              <SelectItem value="intern" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-sm">Intern</SelectItem>
+            <SelectContent className="bg-gray-800 border-gray-600 backdrop-blur-sm z-50">
+              <SelectItem value="full-time" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-xs sm:text-sm">Full-time</SelectItem>
+              <SelectItem value="part-time" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-xs sm:text-sm">Part-time</SelectItem>
+              <SelectItem value="contract" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-xs sm:text-sm">Contract</SelectItem>
+              <SelectItem value="intern" className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-xs sm:text-sm">Intern</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="alert_frequency" className="text-white font-inter font-medium text-sm">Alert Frequency</Label>
+          <Label htmlFor="alert_frequency" className="text-white font-inter font-medium text-xs sm:text-sm">Alert Frequency</Label>
           <Input 
             id="alert_frequency" 
             value="Daily" 
             readOnly
             disabled
-            className="border-2 border-gray-500 text-white font-inter bg-orange-950 text-sm h-9 cursor-not-allowed opacity-75"
+            className="border-2 border-gray-500 text-white font-inter bg-orange-950 text-xs sm:text-sm h-8 sm:h-9 cursor-not-allowed opacity-75"
           />
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="preferred_time" className="text-white font-inter font-medium text-sm">Preferred Time</Label>
+          <Label htmlFor="preferred_time" className="text-white font-inter font-medium text-xs sm:text-sm">Preferred Time</Label>
           <Select value={formData.preferred_time} onValueChange={(value) => handleInputChange('preferred_time', value)}>
-            <SelectTrigger className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-sm h-9">
+            <SelectTrigger className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs sm:text-sm h-8 sm:h-9">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-gray-800 border-gray-600 max-h-48 backdrop-blur-sm">
+            <SelectContent className="bg-gray-800 border-gray-600 max-h-48 backdrop-blur-sm z-50">
               {timeOptions.map((time) => (
-                <SelectItem key={time} value={time} className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-sm">
+                <SelectItem key={time} value={time} className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black text-xs sm:text-sm">
                   {time}
                 </SelectItem>
               ))}
@@ -340,24 +326,23 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
           </Select>
         </div>
 
-
         <div className="space-y-1">
-          <Label htmlFor="timezone" className="text-white font-inter font-medium text-sm">Timezone</Label>
+          <Label htmlFor="timezone" className="text-white font-inter font-medium text-xs sm:text-sm">Timezone</Label>
           <Input 
             id="timezone" 
             value={formData.timezone} 
             readOnly
             placeholder="Auto-detected" 
-            className="border-2 border-gray-500 text-white font-inter bg-orange-950 text-sm h-9 cursor-not-allowed opacity-75"
+            className="border-2 border-gray-500 text-white font-inter bg-orange-950 text-xs sm:text-sm h-8 sm:h-9 cursor-not-allowed opacity-75"
           />
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2">
+      <div className="flex flex-col sm:flex-row gap-2 pt-3 sm:pt-4 sticky bottom-0 bg-gradient-to-br from-orange-900/95 via-[#3c1c01]/90 to-[#2b1605]/95 pb-2 sm:pb-0">
         <Button 
           type="submit" 
           disabled={loading || (!editingAlert && currentAlertCount >= 3)} 
-          className="font-inter bg-pastel-lavender hover:bg-pastel-lavender/80 text-black font-medium text-sm px-4 py-2 h-9 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="font-inter bg-pastel-lavender hover:bg-pastel-lavender/80 text-black font-medium text-xs sm:text-sm px-3 py-2 h-8 sm:h-9 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Saving...' : editingAlert ? 'Update Alert' : 'Create Alert'}
         </Button>
@@ -365,7 +350,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
           type="button" 
           variant="outline" 
           onClick={onCancel} 
-          className="font-inter border-gray-500 hover:border-gray-400 text-gray-950 bg-pastel-peach text-sm px-4 py-2 h-9"
+          className="font-inter border-gray-500 hover:border-gray-400 text-gray-950 bg-pastel-peach text-xs sm:text-sm px-3 py-2 h-8 sm:h-9"
         >
           Cancel
         </Button>
