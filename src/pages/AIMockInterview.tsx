@@ -69,7 +69,7 @@ const AIMockInterview = () => {
               </Button>
             </div>
             
-            <p className="text-gray-400 max-w-2xl mx-auto leading-relaxed text-base text-left">Grace, your AI interview assistant from Aspirely AI, will call your phone in about a minute to ask real interview questions based on your job role — and you'll receive a detailed report right after the call.</p>
+            <p className="text-gray-400 max-w-2xl mx-auto leading-relaxed text-left text-sm">Grace, your AI interview assistant from Aspirely AI, will call your phone in about a minute to ask real interview questions based on your job role — and you'll receive a detailed report right after the call.</p>
           </div>
 
           {/* Form Section */}
