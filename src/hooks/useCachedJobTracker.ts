@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -53,7 +54,6 @@ const validateAndFixOrderPositions = async (jobs: JobEntry[], userProfileId: str
       return counts;
     }, {} as Record<number, number>);
 
-    // If any position appears more than once, we have conflicts
     if (Object.values(positionCounts).some(count => count > 1)) {
       hasConflicts = true;
       break;
@@ -61,12 +61,9 @@ const validateAndFixOrderPositions = async (jobs: JobEntry[], userProfileId: str
   }
 
   if (hasConflicts) {
-    logger.warn('Order position conflicts detected, rebalancing...', { userProfileId });
     try {
-      // Call the database function to rebalance positions
       await supabase.rpc('rebalance_job_tracker_order_positions');
       
-      // Refetch the data to get the corrected positions
       const { data: correctedData, error } = await supabase
         .from('job_tracker')
         .select('*')
@@ -81,11 +78,10 @@ const validateAndFixOrderPositions = async (jobs: JobEntry[], userProfileId: str
         comments: job.comments || undefined
       }));
 
-      logger.debug('Order positions rebalanced successfully');
       return correctedJobs;
     } catch (error) {
-      logger.error('Failed to rebalance order positions:', error);
-      return jobs; // Return original data if rebalancing fails
+      // Silent error handling for order position rebalancing
+      return jobs;
     }
   }
 
@@ -110,61 +106,53 @@ export const useCachedJobTracker = () => {
         const parsedCache: CachedJobTrackerData = JSON.parse(cached);
         const now = Date.now();
         
-        // Use cached data if it's less than cache duration old
         if (now - parsedCache.timestamp < CACHE_DURATION) {
           setJobs(parsedCache.jobs);
           setUserProfileId(parsedCache.userProfileId);
-          setLoading(false); // Mark as loaded since we have cached data
-          logger.debug('Loaded cached job tracker data:', parsedCache);
+          setLoading(false);
         } else {
           localStorage.removeItem(CACHE_KEY);
         }
       }
     } catch (error) {
-      logger.warn('Failed to load cached job tracker data:', error);
       localStorage.removeItem(CACHE_KEY);
     }
   }, []);
 
-  // Fetch fresh data only when user changes or when explicitly requested
+  // Fetch fresh data only when needed
   useEffect(() => {
     if (!user || !isAuthReady) {
       setLoading(false);
       return;
     }
     
-    // Only fetch if we haven't fetched yet and don't have cached data
     const shouldFetch = !hasFetched && jobs.length === 0 && !error;
     if (shouldFetch) {
       fetchJobTrackerData();
     } else if (hasFetched || jobs.length > 0) {
       setLoading(false);
     }
-  }, [user?.id, hasFetched, jobs.length, error, isAuthReady]); // Include isAuthReady
+  }, [user?.id, hasFetched, jobs.length, error, isAuthReady]);
 
-  // Add sanitization helper function
   const sanitizeText = (text: string): string => {
     if (!text) return '';
     return text
       .trim()
-      .replace(/\s+/g, ' ') // Replace multiple spaces with single space
-      .replace(/[^\w\s-.,()&]/g, '') // Remove special characters except basic ones
-      .substring(0, 200); // Limit length to prevent rendering issues
+      .replace(/\s+/g, ' ')
+      .replace(/[^\w\s-.,()&]/g, '')
+      .substring(0, 200);
   };
 
   const fetchJobTrackerData = async (showErrors = false) => {
     if (!user || !isAuthReady) {
-      console.log('🔒 Job tracker fetch skipped - auth not ready:', { user: !!user, isAuthReady });
       return;
     }
-    
-    console.log('[DEBUG] 🚀 Starting job tracker data fetch with enhanced auth...');
     
     try {
       setError(null);
       setConnectionIssue(false);
       
-      // Get the user UUID from users table using enhanced authentication
+      // Get the user UUID from users table
       const userData = await executeWithRetry(async () => {
         const { data, error } = await supabase
           .from('users')
@@ -180,9 +168,7 @@ export const useCachedJobTracker = () => {
         throw new Error('Unable to load user data');
       }
 
-      console.log('[DEBUG] Found user data:', userData.id);
-
-      // Get user profile using enhanced authentication
+      // Get user profile
       const userProfile = await executeWithRetry(async () => {
         const { data, error } = await supabase
           .from('user_profile')
@@ -198,9 +184,7 @@ export const useCachedJobTracker = () => {
         throw new Error('Unable to load user profile');
       }
 
-      console.log('[DEBUG] Found user profile:', userProfile.id);
-
-      // Get jobs for this user profile using enhanced authentication
+      // Get jobs for this user profile
       const data = await executeWithRetry(async () => {
         const { data, error } = await supabase
           .from('job_tracker')
@@ -212,24 +196,7 @@ export const useCachedJobTracker = () => {
         return data;
       }, 3, 'fetch job tracker data');
 
-      console.log('[DEBUG] Raw job data from database:', data);
-      console.log('[DEBUG] Total jobs fetched:', data?.length || 0);
-
-      // Log jobs by status for debugging
-      if (data) {
-        const jobsByStatus = data.reduce((acc: Record<string, any[]>, job) => {
-          if (!acc[job.status]) acc[job.status] = [];
-          acc[job.status].push(job);
-          return acc;
-        }, {});
-        
-        Object.entries(jobsByStatus).forEach(([status, jobs]) => {
-          console.log(`[DEBUG] Status "${status}": ${jobs.length} jobs`, 
-            jobs.map(j => ({ id: j.id, company: j.company_name, position: j.order_position })));
-        });
-      }
-
-      // Transform and sanitize the data to match JobEntry interface
+      // Transform and sanitize the data
       const jobsData: JobEntry[] = (data || []).map(job => ({
         ...job,
         company_name: sanitizeText(job.company_name),
@@ -239,12 +206,8 @@ export const useCachedJobTracker = () => {
         comments: job.comments || undefined
       }));
 
-      console.log('[DEBUG] Jobs after sanitization:', jobsData.length);
-      
-      // Validate and fix any order position conflicts
+      // Validate and fix order positions
       const validatedJobs = await validateAndFixOrderPositions(jobsData, userProfile.id);
-      
-      console.log('[DEBUG] Validated jobs after order position fix:', validatedJobs.length);
       
       // Update state
       setJobs(validatedJobs);
@@ -259,26 +222,21 @@ export const useCachedJobTracker = () => {
           timestamp: Date.now()
         };
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-        logger.debug('✅ Job tracker data loaded successfully:', { jobCount: validatedJobs.length, userProfileId: userProfile.id });
-        console.log('[DEBUG] Job tracker data cached successfully with', validatedJobs.length, 'jobs');
       } catch (cacheError) {
-        logger.warn('Failed to cache job tracker data:', cacheError);
+        // Silent cache error handling
       }
 
     } catch (error: any) {
-      logger.error('❌ Error fetching job tracker data:', error);
-      console.error('Job tracker fetch error details:', {
-        errorMessage: error.message,
-        errorCode: error.code,
-        user: user?.id,
-        isAuthReady,
-        showErrors
-      });
       setConnectionIssue(true);
-      setHasFetched(true); // Mark as fetched even on error
+      setHasFetched(true);
       
       if (showErrors) {
-        setError(error.message);
+        // Only show user-friendly error messages
+        if (error?.message?.includes('refresh the page')) {
+          setError(error.message);
+        } else {
+          setError('Unable to load job data. Please refresh the page.');
+        }
       }
     } finally {
       setLoading(false);
@@ -297,15 +255,11 @@ export const useCachedJobTracker = () => {
   };
 
   const optimisticAdd = (newJob: JobEntry) => {
-    console.log('[DEBUG] Adding new job optimistically:', newJob);
     setJobs(prevJobs => {
       const updatedJobs = [...prevJobs, newJob];
-      console.log('[DEBUG] Jobs after optimistic add:', updatedJobs.length);
       return updatedJobs;
     });
-    // Invalidate cache when adding new job to force fresh data
     localStorage.removeItem(CACHE_KEY);
-    console.log('[DEBUG] Cache invalidated after adding new job');
   };
 
   const optimisticDelete = (jobId: string) => {
@@ -313,12 +267,10 @@ export const useCachedJobTracker = () => {
   };
 
   const forceRefresh = () => {
-    console.log('[DEBUG] Force refresh triggered - clearing cache and refetching');
-    // Force a full refresh with error showing
     setError(null);
     setConnectionIssue(false);
     localStorage.removeItem(CACHE_KEY);
-    setHasFetched(false); // Reset fetch status to force refetch
+    setHasFetched(false);
     fetchJobTrackerData(true);
   };
 

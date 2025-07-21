@@ -19,7 +19,7 @@ export const useEnterpriseAuth = () => {
   const lastTokenRef = useRef<string | null>(null);
   const refreshPromiseRef = useRef<Promise<string | null> | null>(null);
 
-  // More aggressive proactive token refresh - refresh 5 minutes before expiration
+  // More conservative token refresh - refresh 3 minutes before expiration
   const scheduleTokenRefresh = useCallback(async () => {
     if (!user || !getToken) return;
 
@@ -32,8 +32,8 @@ export const useEnterpriseAuth = () => {
         const currentTime = Date.now();
         const timeUntilExpiry = expirationTime - currentTime;
         
-        // Schedule refresh 5 minutes before expiration (more aggressive)
-        const refreshTime = Math.max(timeUntilExpiry - (5 * 60 * 1000), 10000); // At least 10 seconds
+        // Schedule refresh 3 minutes before expiration (more conservative)
+        const refreshTime = Math.max(timeUntilExpiry - (3 * 60 * 1000), 30000); // At least 30 seconds
         
         if (refreshTimeoutRef.current) {
           clearTimeout(refreshTimeoutRef.current);
@@ -42,15 +42,13 @@ export const useEnterpriseAuth = () => {
         refreshTimeoutRef.current = setTimeout(async () => {
           await refreshToken();
         }, refreshTime);
-        
-        console.log(`[EnterpriseAuth] Token refresh scheduled in ${Math.round(refreshTime / 1000)} seconds`);
       }
     } catch (error) {
-      console.error('[EnterpriseAuth] Error scheduling token refresh:', error);
+      // Silent error handling - don't log token refresh scheduling errors
     }
   }, [user, getToken]);
 
-  // Enhanced token refresh with promise deduplication and exponential backoff
+  // Enhanced token refresh with silent error handling
   const refreshToken = useCallback(async (): Promise<string | null> => {
     if (!user || !getToken) return null;
     
@@ -59,7 +57,6 @@ export const useEnterpriseAuth = () => {
       return refreshPromiseRef.current;
     }
     
-    console.log('[EnterpriseAuth] Starting token refresh');
     setIsRefreshing(true);
     
     const refreshPromise = (async () => {
@@ -74,7 +71,6 @@ export const useEnterpriseAuth = () => {
             const success = await setClerkToken(token);
             if (success) {
               lastTokenRef.current = token;
-              console.log('[EnterpriseAuth] Token refreshed successfully');
               
               // Process queued requests
               const queuedRequests = [...requestQueueRef.current];
@@ -98,7 +94,6 @@ export const useEnterpriseAuth = () => {
           return token;
         } catch (error) {
           retryCount++;
-          console.error(`[EnterpriseAuth] Token refresh attempt ${retryCount} failed:`, error);
           
           if (retryCount < maxRetries) {
             // Exponential backoff: wait 1s, 2s, 4s
@@ -108,7 +103,6 @@ export const useEnterpriseAuth = () => {
         }
       }
       
-      console.error('[EnterpriseAuth] All token refresh attempts failed');
       return null;
     })();
     
@@ -121,10 +115,10 @@ export const useEnterpriseAuth = () => {
     return refreshPromise;
   }, [user, getToken, scheduleTokenRefresh]);
 
-  // Enhanced request executor with better error handling and automatic retry
+  // Enhanced request executor with silent JWT error handling
   const executeWithRetry = useCallback(async <T>(
     requestFn: () => Promise<T>,
-    maxRetries: number = 5,
+    maxRetries: number = 3,
     description: string = 'database operation'
   ): Promise<T> => {
     let attempts = 0;
@@ -133,14 +127,12 @@ export const useEnterpriseAuth = () => {
       try {
         // If currently refreshing, wait for it to complete
         if (refreshPromiseRef.current) {
-          console.log(`[EnterpriseAuth] Waiting for token refresh to complete for ${description}`);
           await refreshPromiseRef.current;
           // Add delay to ensure token propagation
           await new Promise(resolve => setTimeout(resolve, 500));
         }
         
         const result = await requestFn();
-        console.log(`[EnterpriseAuth] ${description} succeeded on attempt ${attempts + 1}`);
         return result;
       } catch (error: any) {
         attempts++;
@@ -151,18 +143,11 @@ export const useEnterpriseAuth = () => {
                           error?.message?.toLowerCase().includes('unauthorized') ||
                           error?.code === 'PGRST301';
         
-        console.log(`[EnterpriseAuth] ${description} failed on attempt ${attempts}:`, {
-          isJWTError,
-          errorMessage: error?.message,
-          errorCode: error?.code
-        });
-        
         if (isJWTError && attempts < maxRetries) {
-          console.log(`[EnterpriseAuth] JWT error detected for ${description}, attempting refresh (attempt ${attempts}/${maxRetries})`);
+          // Silent JWT error handling - don't log these errors
           
           // If already refreshing, queue the request
           if (isRefreshing || refreshPromiseRef.current) {
-            console.log(`[EnterpriseAuth] Queueing ${description} request during token refresh`);
             return new Promise((resolve, reject) => {
               requestQueueRef.current.push({
                 fn: requestFn,
@@ -175,15 +160,18 @@ export const useEnterpriseAuth = () => {
           // Try to refresh token
           const newToken = await refreshToken();
           if (newToken) {
-            // Wait longer for the token to propagate
+            // Wait for the token to propagate
             await new Promise(resolve => setTimeout(resolve, 1000));
             continue; // Retry the request
           }
         }
         
-        // If not a JWT error or max retries reached, throw the error
+        // For non-JWT errors or max retries reached, throw a user-friendly error
         if (attempts >= maxRetries) {
-          console.error(`[EnterpriseAuth] ${description} failed after ${maxRetries} attempts`);
+          // Convert technical errors to user-friendly messages
+          if (isJWTError) {
+            throw new Error('Please refresh the page to continue');
+          }
           throw error;
         }
         
@@ -192,7 +180,7 @@ export const useEnterpriseAuth = () => {
       }
     }
     
-    throw new Error(`Max retries exceeded for ${description}`);
+    throw new Error(`Operation failed after ${maxRetries} attempts`);
   }, [refreshToken, isRefreshing]);
 
   // Initialize authentication
@@ -207,12 +195,9 @@ export const useEnterpriseAuth = () => {
         // Set up the token refresh function
         const refreshFunction = async () => {
           try {
-            console.log('[EnterpriseAuth] Token refresh function called');
             const token = await getToken({ template: 'supabase', skipCache: true });
-            console.log('[EnterpriseAuth] New token obtained from Clerk');
             return token;
           } catch (error) {
-            console.error('[EnterpriseAuth] Failed to get token from Clerk:', error);
             return null;
           }
         };
@@ -228,11 +213,9 @@ export const useEnterpriseAuth = () => {
             lastTokenRef.current = token;
             setIsAuthReady(true);
             scheduleTokenRefresh();
-            console.log('[EnterpriseAuth] Initial authentication setup completed');
           }
         }
       } catch (error) {
-        console.error('[EnterpriseAuth] Error in authentication initialization:', error);
         setIsAuthReady(false);
       }
     };
@@ -257,7 +240,6 @@ export const useEnterpriseAuth = () => {
       if (refreshTimeoutRef.current) {
         clearTimeout(refreshTimeoutRef.current);
       }
-      console.log('[EnterpriseAuth] User logged out, authentication cleared');
     }
   }, [user, isAuthReady]);
 

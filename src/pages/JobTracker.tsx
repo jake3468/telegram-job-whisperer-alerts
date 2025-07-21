@@ -556,11 +556,10 @@ const JobTracker = () => {
     }
   };
   const handleUpdateJob = async () => {
-    if (!selectedJob) return;
-    if (!editFormData.company_name || !editFormData.job_title) {
+    if (!selectedJob) {
       toast({
         title: "Error",
-        description: "Company name and job title are required.",
+        description: "No job selected for update.",
         variant: "destructive"
       });
       return;
@@ -568,11 +567,18 @@ const JobTracker = () => {
     if (!isAuthReady || !userProfileId) {
       toast({
         title: "Please wait",
-        description: "Authentication is loading. Please try again in a moment.",
-        variant: "destructive"
+        description: "Loading your data. Please try again in a moment.",
+        variant: "default"
       });
       return;
     }
+
+    // Show loading state
+    const loadingToast = toast({
+      title: "Updating job...",
+      description: "Please wait while we save your changes.",
+      duration: 0
+    });
 
     try {
       await executeWithRetry(async () => {
@@ -584,15 +590,12 @@ const JobTracker = () => {
         }).eq('id', selectedJob.id).eq('user_id', userProfileId);
         
         if (error) {
-          console.error('Database error details:', {
-            message: error.message,
-            details: error.details,
-            hint: error.hint,
-            code: error.code
-          });
           throw error;
         }
       }, 3, 'update job details');
+      
+      // Dismiss loading toast
+      loadingToast.dismiss();
       
       toast({
         title: "Success",
@@ -602,53 +605,83 @@ const JobTracker = () => {
       setSelectedJob(null);
       invalidateCache();
     } catch (error: any) {
-      console.error('Error updating job:', error);
+      // Dismiss loading toast
+      loadingToast.dismiss();
       
-      let errorMessage = "Failed to update job.";
+      // Enterprise-grade error handling - user-friendly messages only
+      let errorMessage = "Unable to update job. Please try again.";
+      
       if (error?.code === 'PGRST116') {
-        errorMessage = "No job found or you don't have permission to update this job.";
-      } else if (error?.message) {
-        errorMessage = `Update failed: ${error.message}`;
+        errorMessage = "Job not found. Please refresh the page.";
+      } else if (error?.message?.includes('refresh the page')) {
+        errorMessage = error.message;
       }
       
       toast({
-        title: "Error",
+        title: "Update Failed",
         description: errorMessage,
         variant: "destructive"
       });
     }
   };
-  const deleteJob = async (jobId: string) => {
-    if (!isAuthReady) {
+  const handleDeleteJob = async () => {
+    if (!selectedJob) return;
+    
+    if (!isAuthReady || !userProfileId) {
       toast({
         title: "Please wait",
-        description: "Authentication is loading. Please try again in a moment.",
-        variant: "destructive"
+        description: "Loading your data. Please try again in a moment.",
+        variant: "default"
       });
       return;
     }
-    
-    // Optimistic delete first
-    optimisticDelete(jobId);
+
+    // Show loading state
+    const loadingToast = toast({
+      title: "Deleting job...",
+      description: "Please wait while we remove this job.",
+      duration: 0
+    });
+
     try {
       await executeWithRetry(async () => {
-        const { error } = await supabase.from('job_tracker').delete().eq('id', jobId);
-        if (error) throw error;
-      }, 3, 'delete job from tracker');
-
-      // Invalidate cache for fresh data on next load
-      invalidateCache();
+        const { error } = await supabase
+          .from('job_tracker')
+          .delete()
+          .eq('id', selectedJob.id)
+          .eq('user_id', userProfileId);
+        
+        if (error) {
+          throw error;
+        }
+      }, 3, 'delete job');
+      
+      // Dismiss loading toast
+      loadingToast.dismiss();
+      
       toast({
         title: "Success",
         description: "Job deleted successfully!"
       });
-    } catch (error) {
-      console.error('Error deleting job:', error);
-      // Revert optimistic delete on error - re-fetch data
+      
+      optimisticDelete(selectedJob.id);
+      setIsViewModalOpen(false);
+      setSelectedJob(null);
       invalidateCache();
+    } catch (error: any) {
+      // Dismiss loading toast
+      loadingToast.dismiss();
+      
+      // Enterprise-grade error handling
+      let errorMessage = "Unable to delete job. Please try again.";
+      
+      if (error?.message?.includes('refresh the page')) {
+        errorMessage = error.message;
+      }
+      
       toast({
-        title: "Error",
-        description: "Failed to delete job.",
+        title: "Delete Failed",
+        description: errorMessage,
         variant: "destructive"
       });
     }
@@ -1334,7 +1367,7 @@ const JobTracker = () => {
                 Save Changes
               </Button>
               <Button onClick={() => {
-              deleteJob(selectedJob.id);
+              handleDeleteJob();
               setIsViewModalOpen(false);
               setSelectedJob(null);
             }} variant="destructive" className="bg-red-600 hover:bg-red-700 text-white font-orbitron text-sm h-9">
