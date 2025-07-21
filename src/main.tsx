@@ -3,6 +3,10 @@ import { createRoot } from 'react-dom/client'
 import { ClerkProvider } from '@clerk/clerk-react'
 import App from './App.tsx'
 import './index.css'
+import { securityHeaders } from '@/utils/securityHeaders'
+
+// Initialize security headers
+securityHeaders.setSecurityHeaders();
 
 // Environment detection
 const isProduction = window.location.hostname === 'aspirely.ai';
