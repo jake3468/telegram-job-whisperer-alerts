@@ -53,7 +53,7 @@ const JobAlertModal = ({
       <DialogContent className="left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[calc(100vw-32px)] max-w-[calc(100vw-32px)] sm:max-w-2xl max-h-[90vh] flex flex-col bg-gradient-to-br from-orange-900/95 via-[#3c1c01]/90 to-[#2b1605]/95 border-2 border-orange-500/70 rounded-2xl p-0">
         {/* Fixed Header */}
         <DialogHeader className="flex-shrink-0 p-3 sm:p-4 pb-2 relative">
-          <DialogTitle className="text-sm sm:text-lg font-orbitron font-bold bg-gradient-to-r from-orange-300 via-yellow-300 to-pink-400 bg-clip-text text-transparent pr-8">
+          <DialogTitle className="text-xl sm:text-2xl md:text-3xl font-orbitron font-bold bg-gradient-to-r from-orange-300 via-yellow-300 to-pink-400 bg-clip-text text-transparent pr-8 tracking-wide drop-shadow-lg">
             {editingAlert ? 'Edit Job Alert' : 'Create New Job Alert'}
           </DialogTitle>
           <DialogClose 
