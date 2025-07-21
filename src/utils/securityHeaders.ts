@@ -30,6 +30,20 @@ class SecurityHeadersManager {
   };
 
   setSecurityHeaders(): void {
+    // Use requestIdleCallback for non-blocking initialization
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      window.requestIdleCallback(() => {
+        this.applySecurityHeaders();
+      });
+    } else {
+      // Fallback for browsers without requestIdleCallback
+      setTimeout(() => {
+        this.applySecurityHeaders();
+      }, 0);
+    }
+  }
+
+  private applySecurityHeaders(): void {
     // Apply CSP via meta tag if not already present
     if (typeof document !== 'undefined' && !document.querySelector('meta[http-equiv="Content-Security-Policy"]')) {
       const meta = document.createElement('meta');

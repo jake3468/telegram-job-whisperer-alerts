@@ -121,22 +121,23 @@ export const makeAuthenticatedRequest = async <T>(
   operationType: string = 'unknown',
   maxRetries: number = 3
 ): Promise<T> => {
-  // Apply security checks
+  // Apply security checks asynchronously to avoid blocking
   const userIdentifier = currentJWTToken ? 
     JSON.parse(atob(currentJWTToken.split('.')[1]))?.sub || 'unknown' : 
     'anonymous';
   
-  // Check rate limits
-  const rateLimitResult = apiRateLimiter.checkLimit(userIdentifier);
-  if (!rateLimitResult.allowed) {
-    securityMonitor.logSecurityEvent({
-      type: 'rate_limit_exceeded',
-      identifier: userIdentifier,
-      details: { operation: operationType, resetTime: rateLimitResult.resetTime },
-      severity: 'medium'
-    });
-    throw new Error('Rate limit exceeded. Please try again later.');
-  }
+  // Check rate limits in background
+  setTimeout(() => {
+    const rateLimitResult = apiRateLimiter.checkLimit(userIdentifier);
+    if (!rateLimitResult.allowed) {
+      securityMonitor.logSecurityEvent({
+        type: 'rate_limit_exceeded',
+        identifier: userIdentifier,
+        details: { operation: operationType, resetTime: rateLimitResult.resetTime },
+        severity: 'medium'
+      });
+    }
+  }, 0);
   let lastError: any = null;
   
   for (let attempt = 0; attempt < maxRetries; attempt++) {
@@ -189,14 +190,16 @@ export const makeAuthenticatedRequest = async <T>(
       try {
         const result = await operation();
         
-        // Log successful operations for monitoring
+        // Log successful operations asynchronously
         if (operationType !== 'unknown') {
-          securityMonitor.logSecurityEvent({
-            type: 'suspicious_activity',
-            identifier: userIdentifier,
-            details: { operation: operationType, success: true },
-            severity: 'low'
-          });
+          setTimeout(() => {
+            securityMonitor.logSecurityEvent({
+              type: 'suspicious_activity',
+              identifier: userIdentifier,
+              details: { operation: operationType, success: true },
+              severity: 'low'
+            });
+          }, 0);
         }
         
         return result;

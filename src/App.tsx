@@ -60,9 +60,16 @@ const AppWithSync = () => {
   
   // Hide initial loader once React is ready
   useEffect(() => {
-    if (isLoaded) {
-      hideInitialLoader();
-    }
+    // Use requestAnimationFrame for smoother transition
+    const hideLoader = () => {
+      if (isLoaded) {
+        requestAnimationFrame(() => {
+          hideInitialLoader();
+        });
+      }
+    };
+    
+    hideLoader();
   }, [isLoaded]);
   
   // Show loading screen only while Clerk auth is loading
