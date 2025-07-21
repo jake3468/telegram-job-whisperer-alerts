@@ -222,10 +222,10 @@ const Profile = () => {
             </div>
             <div className="rounded-3xl border-2 border-amber-400/50 bg-gradient-to-br from-amber-900/20 via-orange-900/10 to-yellow-900/20 p-6">
               <div className="text-amber-100 font-inter mb-4 text-base space-y-2">
-                <p>Set up personalized job alerts and get updates from the last 24 hours 🔥 delivered straight to your Telegram everyday just for you, based on your preferences.</p>
+                <p className="text-sm">Set up personalized job alerts and get updates from the last 24 hours 🔥 delivered straight to your Telegram everyday just for you, based on your preferences.</p>
                 <p className="text-sm">No outdated listings, no clutter.</p>
-                <p>Only fresh, relevant jobs posted in the past 24 hours — something no other platform offers.</p>
-                <p>Click the button below to activate the Telegram Job Alert Bot and create your personalized job alerts.</p>
+                <p className="text-sm">Only fresh, relevant jobs posted in the past 24 hours — something no other platform offers.</p>
+                <p className="text-sm">Click the button below to activate the Telegram Job Alert Bot and create your personalized job alerts.</p>
               </div>
               
               {userProfile?.id && <div className="mb-4 p-4 bg-amber-900/30 rounded-lg border border-amber-400/30">
