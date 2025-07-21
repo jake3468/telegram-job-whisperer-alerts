@@ -12,10 +12,10 @@ export function Layout({
     "--sidebar-width": "clamp(220px, 20vw, 295px)"
   } as React.CSSProperties}>
       {/* Header for mobile/tablet - with logo and name in top right */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-2xl shadow-2xl border-b border-white/10">
         <div className="flex items-center justify-between p-3">
-          <SidebarTrigger className="h-12 w-12 border-fuchsia-400/30 ring-2 ring-fuchsia-400/10 text-fuchsia-200 rounded-2xl shadow-lg transition-all flex items-center justify-center bg-zinc-900 hover:bg-zinc-800">
-            <Menu className="w-7 h-7" strokeWidth={2.4} />
+          <SidebarTrigger className="h-12 w-12 border-white/20 ring-2 ring-white/5 text-white rounded-2xl shadow-xl transition-all flex items-center justify-center bg-black hover:bg-zinc-800 hover:ring-white/10">
+            <Menu className="w-7 h-7" strokeWidth={2} />
             <span className="sr-only">Toggle navigation menu</span>
           </SidebarTrigger>
           <div className="flex items-center gap-2">
