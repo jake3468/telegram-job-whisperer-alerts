@@ -98,7 +98,7 @@ export const useCachedUserProfile = () => {
       }
       logger.error('Error loading profile:', error);
     }
-  }, [freshProfile, error, loading, cachedData]);
+  }, [freshProfile, error, loading]); // Removed cachedData from dependencies to prevent infinite loop
 
 
   // Enhanced update function that invalidates cache
