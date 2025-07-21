@@ -23,20 +23,33 @@ const HeroSection = () => {
     }
   }, [user, isLoaded, navigate]);
 
-  // Load Lottie animation
+  // Load Lottie animation with caching
   useEffect(() => {
     const loadLottieAnimation = async () => {
       try {
+        // Check cache first
+        const cacheKey = 'hero_lottie_animation';
+        const cached = sessionStorage.getItem(cacheKey);
+        
+        if (cached) {
+          setLottieAnimationData(JSON.parse(cached));
+          setTimeout(() => setShowParticles(true), 50);
+          return;
+        }
+
         const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json');
         const animationData = await response.json();
+        
+        // Cache for future use
+        sessionStorage.setItem(cacheKey, JSON.stringify(animationData));
         setLottieAnimationData(animationData);
 
         // Load particles after main content is ready
-        setTimeout(() => setShowParticles(true), 100);
+        setTimeout(() => setShowParticles(true), 50);
       } catch (error) {
         console.error('Failed to load Lottie animation:', error);
         // Still show particles even if Lottie fails
-        setTimeout(() => setShowParticles(true), 100);
+        setTimeout(() => setShowParticles(true), 50);
       }
     };
     loadLottieAnimation();
