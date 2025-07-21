@@ -6,6 +6,10 @@ Allow: /privacy-policy
 Allow: /terms-of-service
 Allow: /contact-support
 
+# Important pages for verification
+Allow: /privacy-policy
+Allow: /terms-of-service
+
 # Disallow protected pages that require authentication
 Disallow: /job-guide
 Disallow: /cover-letter
