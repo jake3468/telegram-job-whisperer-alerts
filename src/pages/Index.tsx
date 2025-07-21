@@ -11,24 +11,8 @@ import Footer from "@/components/Footer";
 import SecurityHeaders from "@/components/SecurityHeaders";
 
 const Index = () => {
-  // JSON-LD structured data for Google verification
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Aspirely.ai",
-    "description": "AI-powered career platform for finding and creating your perfect career path with advanced job matching and personalized guidance.",
-    "url": typeof window !== 'undefined' ? window.location.origin : "",
-    "privacyPolicy": typeof window !== 'undefined' ? `${window.location.origin}/privacy-policy` : "",
-    "termsOfService": typeof window !== 'undefined' ? `${window.location.origin}/terms-of-service` : ""
-  };
-
   return (
     <div className="min-h-screen bg-black font-inter text-slate-50">
-      {/* Structured Data for Google verification */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
       <SecurityHeaders />
       <AuthHeader />
       <HeroSection />

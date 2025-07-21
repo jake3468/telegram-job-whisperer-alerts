@@ -1,6 +1,6 @@
 
 import { SignedIn, SignedOut, SignInButton, SignUpButton } from '@clerk/clerk-react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 
@@ -28,11 +28,6 @@ const AuthHeader = () => {
     { label: 'FAQ', id: 'faq' },
   ];
 
-  const legalLinks = [
-    { label: 'Privacy Policy', path: '/privacy-policy' },
-    { label: 'Terms of Service', path: '/terms-of-service' },
-  ];
-
   return (
     // Blended navbar with transparent background
     <header className="w-full backdrop-blur-md bg-black/30 fixed top-0 left-0 right-0 z-50 border-b border-sky-600/20 shadow-[0_6px_24px_0px_rgba(16,118,238,0.05)]">
@@ -55,16 +50,6 @@ const AuthHeader = () => {
             >
               {item.label}
             </button>
-          ))}
-          {/* Legal Links - prominently displayed for Google verification */}
-          {legalLinks.map((link) => (
-            <Link
-              key={link.path}
-              to={link.path}
-              className="text-white hover:text-sky-300 transition-colors duration-200 font-inter font-medium text-base border-l border-gray-600 pl-6 first:border-l-0 first:pl-0"
-            >
-              {link.label}
-            </Link>
           ))}
         </nav>
 
@@ -117,18 +102,6 @@ const AuthHeader = () => {
               >
                 {item.label}
               </button>
-            ))}
-            
-            {/* Legal Links - prominently displayed for mobile */}
-            {legalLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className="w-full text-left text-white hover:text-sky-300 transition-colors duration-200 font-inter font-medium text-base py-2 px-2 rounded hover:bg-white/5"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {link.label}
-              </Link>
             ))}
             
             {/* Divider */}
