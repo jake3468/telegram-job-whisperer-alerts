@@ -492,10 +492,10 @@ const LinkedInPosts = () => {
       <div className="min-h-screen flex w-full bg-black">
         <AppSidebar />
         
-        <div className="flex-1 flex flex-col pt-28 lg:pt-0 lg:pl-6 min-w-0 overflow-x-hidden bg-black">
+        <div className="flex-1 flex flex-col pt-20 lg:pt-0 lg:pl-6 min-w-0 overflow-x-hidden bg-black">
           <main className="flex-1 w-full min-w-0 bg-black">
             <div className="min-h-screen bg-black overflow-x-hidden">
-              <div className="container mx-auto px-2 sm:px-4 py-8 mt-4 mb-8 max-w-6xl w-full min-w-0">
+              <div className="container mx-auto px-2 sm:px-4 py-4 mb-8 max-w-6xl w-full min-w-0">
                 <div className="text-center mb-10">
                   <h1 className="sm:text-3xl font-orbitron bg-gradient-to-r from-teal-300 via-teal-400 to-cyan-400 bg-clip-text drop-shadow mb-4 tracking-tight font-bold lg:text-4xl text-teal-500 text-4xl">
                     ✍🏻 LinkedIn <span className="italic">Posts</span>
