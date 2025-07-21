@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Bell, Plus, AlertCircle, RefreshCw } from 'lucide-react';
-import JobAlertForm from './JobAlertForm';
+import JobAlertModal from './JobAlertModal';
 import JobAlertsList from './JobAlertsList';
 import BotStatus from './BotStatus';
 import { useCachedJobAlertsData } from '@/hooks/useCachedJobAlertsData';
@@ -45,7 +45,7 @@ const JobAlertsSection = ({
     executeWithRetry
   } = useCachedJobAlertsData();
   
-  const [showForm, setShowForm] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [editingAlert, setEditingAlert] = useState<JobAlert | null>(null);
   
   const MAX_ALERTS = 3;
@@ -71,7 +71,7 @@ const JobAlertsSection = ({
       return;
     }
     setEditingAlert(null);
-    setShowForm(true);
+    setShowModal(true);
   };
   const handleEditAlert = (alert: JobAlert) => {
     updateActivity?.();
@@ -84,7 +84,7 @@ const JobAlertsSection = ({
       return;
     }
     setEditingAlert(alert);
-    setShowForm(true);
+    setShowModal(true);
   };
   const handleDeleteAlert = async (alertId: string) => {
     updateActivity?.();
@@ -125,15 +125,14 @@ const JobAlertsSection = ({
       });
     }
   };
-  const handleFormSubmit = () => {
-    setShowForm(false);
+  const handleModalSubmit = () => {
     setEditingAlert(null);
     // Invalidate cache to refresh data
     invalidateCache();
   };
   
-  const handleFormCancel = () => {
-    setShowForm(false);
+  const handleModalClose = () => {
+    setShowModal(false);
     setEditingAlert(null);
   };
 
@@ -198,7 +197,7 @@ const JobAlertsSection = ({
               </div>}
           </div>
 
-          {isActivated && !showForm && <div className="flex items-center mt-2 sm:mt-0">
+          {isActivated && <div className="flex items-center mt-2 sm:mt-0">
               <Button onClick={handleCreateAlert} disabled={isAtLimit} className={`font-bold px-4 py-2 rounded-lg shadow-sm transition text-orange-950 ${isAtLimit ? 'bg-gray-400 cursor-not-allowed opacity-50' : 'bg-gradient-to-tr from-orange-200 via-yellow-100 to-orange-300 hover:bg-orange-100 hover:from-yellow-200'}`}>
                 <Plus className="w-4 h-4 mr-2" /> 
                 {isAtLimit ? 'Limit Reached' : 'Add Alert'}
@@ -210,15 +209,22 @@ const JobAlertsSection = ({
           {/* Bot Status Component */}
           <BotStatus onActivationChange={() => {}} />
 
-          {/* Job Alerts Form and List - Only show when activated */}
-          {isActivated && <>
-              {showForm && <div className="mb-6 rounded-2xl bg-gradient-to-br from-orange-900/95 via-[#3c1c01]/90 to-[#2b1605]/95 border border-orange-500/70 shadow-lg p-2 sm:p-4">
-                  <JobAlertForm userTimezone={userTimezone} editingAlert={editingAlert} onSubmit={handleFormSubmit} onCancel={handleFormCancel} currentAlertCount={alertsUsed} maxAlerts={MAX_ALERTS} updateActivity={updateActivity} />
-                </div>}
-              <div className="flex flex-col gap-4 pb-6 sm:pb-8">
-                <JobAlertsList alerts={alerts} onEdit={handleEditAlert} onDelete={handleDeleteAlert} />
-              </div>
-            </>}
+          {/* Job Alerts List - Only show when activated */}
+          {isActivated && <div className="flex flex-col gap-4 pb-6 sm:pb-8">
+              <JobAlertsList alerts={alerts} onEdit={handleEditAlert} onDelete={handleDeleteAlert} />
+            </div>}
+
+          {/* Job Alert Modal */}
+          <JobAlertModal
+            isOpen={showModal}
+            onClose={handleModalClose}
+            userTimezone={userTimezone}
+            editingAlert={editingAlert}
+            onSubmit={handleModalSubmit}
+            currentAlertCount={alertsUsed}
+            maxAlerts={MAX_ALERTS}
+            updateActivity={updateActivity}
+          />
 
           {!isActivated && <div className="text-center py-6">
               <Bell className="w-10 h-10 text-orange-400 mx-auto mb-3" />

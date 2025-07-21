@@ -229,17 +229,31 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-full p-0" align="start">
-              <Command className="bg-gray-800 border-gray-600">
-                <CommandInput placeholder="Search country..." className="text-white" />
+              <Command className="bg-gray-800 border-gray-600" shouldFilter={false}>
+                <CommandInput placeholder="Search by country name..." className="text-white" />
                 <CommandList>
                   <CommandEmpty className="text-gray-300">No country found.</CommandEmpty>
                   <CommandGroup>
-                    {countries.map((country) => (
+                    {countries
+                      .filter((country) => {
+                        const searchTerm = document.querySelector('[cmdk-input]')?.getAttribute('value')?.toLowerCase() || '';
+                        return country.name.toLowerCase().includes(searchTerm) || 
+                               country.code.toLowerCase().includes(searchTerm);
+                      })
+                      .sort((a, b) => {
+                        const searchTerm = document.querySelector('[cmdk-input]')?.getAttribute('value')?.toLowerCase() || '';
+                        const aNameMatch = a.name.toLowerCase().includes(searchTerm);
+                        const bNameMatch = b.name.toLowerCase().includes(searchTerm);
+                        if (aNameMatch && !bNameMatch) return -1;
+                        if (!aNameMatch && bNameMatch) return 1;
+                        return a.name.localeCompare(b.name);
+                      })
+                      .map((country) => (
                        <CommandItem
                          key={country.code}
-                         value={country.code}
-                         onSelect={(value) => {
-                           handleCountryChange(value, country.name);
+                         value={`${country.name} ${country.code}`}
+                         onSelect={() => {
+                           handleCountryChange(country.code, country.name);
                            setCountryOpen(false);
                          }}
                          className="text-white hover:bg-white hover:text-black focus:bg-white focus:text-black"

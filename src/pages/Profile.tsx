@@ -228,10 +228,11 @@ const Profile = () => {
                 <p className="text-sm">Click the button below to activate the Telegram Job Alert Bot and create your personalized job alerts.</p>
               </div>
               
-              {userProfile?.id && <div className="mb-4 p-4 bg-amber-900/30 rounded-lg border border-amber-400/30">
-                  <p className="text-amber-100 font-inter mb-2 text-sm">
-                    When the bot asks for your Bot ID, copy and paste this:
-                  </p>
+              <div className="mb-4 p-4 bg-amber-900/30 rounded-lg border border-amber-400/30">
+                <p className="text-amber-100 font-inter mb-2 text-sm">
+                  When the bot asks for your Bot ID, copy and paste this:
+                </p>
+                {userProfile?.id ? (
                   <div className="flex items-center gap-2 bg-black/30 rounded-lg p-3">
                     <code className="text-amber-200 font-mono text-sm flex-1 break-all">
                       {userProfile.id}
@@ -240,7 +241,18 @@ const Profile = () => {
                       <Copy className="w-4 h-4" />
                     </Button>
                   </div>
-                </div>}
+                ) : (
+                  <div className="flex items-center gap-2 bg-black/30 rounded-lg p-3">
+                    <div className="flex items-center gap-2 flex-1">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-amber-200"></div>
+                      <span className="text-amber-200 text-sm">Loading your Bot ID...</span>
+                    </div>
+                    <Button onClick={() => window.location.reload()} variant="ghost" size="sm" className="text-amber-200 hover:text-amber-100 hover:bg-amber-900/30">
+                      <RefreshCw className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
               
               <Button onClick={() => window.open('https://t.me/Job_AI_update_bot', '_blank')} className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter text-base">
                 Activate my Job Alerts
