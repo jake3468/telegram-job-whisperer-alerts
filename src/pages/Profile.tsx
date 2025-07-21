@@ -232,17 +232,14 @@ const Profile = () => {
                 <p className="text-amber-100 font-inter mb-2 text-sm">
                   When the bot asks for your Bot ID, copy and paste this:
                 </p>
-                {userProfile?.id ? (
-                  <div className="flex items-center gap-2 bg-black/30 rounded-lg p-3">
+                {userProfile?.id ? <div className="flex items-center gap-2 bg-black/30 rounded-lg p-3">
                     <code className="text-amber-200 font-mono text-sm flex-1 break-all">
                       {userProfile.id}
                     </code>
                     <Button onClick={copyUserProfileId} variant="ghost" size="sm" className="text-amber-200 hover:text-amber-100 hover:bg-amber-900/30">
                       <Copy className="w-4 h-4" />
                     </Button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 bg-black/30 rounded-lg p-3">
+                  </div> : <div className="flex items-center gap-2 bg-black/30 rounded-lg p-3">
                     <div className="flex items-center gap-2 flex-1">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-amber-200"></div>
                       <span className="text-amber-200 text-sm">Loading your Bot ID...</span>
@@ -250,11 +247,10 @@ const Profile = () => {
                     <Button onClick={() => window.location.reload()} variant="ghost" size="sm" className="text-amber-200 hover:text-amber-100 hover:bg-amber-900/30">
                       <RefreshCw className="w-4 h-4" />
                     </Button>
-                  </div>
-                )}
+                  </div>}
               </div>
               
-              <Button onClick={() => window.open('https://t.me/Job_AI_update_bot', '_blank')} className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter text-base">
+              <Button onClick={() => window.open('https://t.me/Job_AI_update_bot', '_blank')} className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter text-sm">
                 Activate my Job Alerts
               </Button>
             </div>
