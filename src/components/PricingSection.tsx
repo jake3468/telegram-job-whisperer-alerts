@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, Globe, Loader2 } from 'lucide-react';
-import { useLocationPricing, PricingData } from '@/hooks/useLocationPricing';
+import { useLocationPricing } from '@/hooks/useLocationPricing';
 import { usePaymentProducts } from '@/hooks/usePaymentProducts';
 const planGradientBg = {
   free: "bg-white border border-gray-200",
@@ -104,12 +104,12 @@ const PricingSection = () => {
                     {pricingData.currencySymbol}{subscriptionProducts[0].price_amount}
                     <span className="text-base font-bold align-super">/month</span>
                   </> : <>
-                    {pricingData.currencySymbol}{pricingData.plans.premium.monthly.price}
+                    {pricingData.currencySymbol}{pricingData.monthlyPrice}
                     <span className="text-base font-bold align-super">/month</span>
                   </>}
               </div>
               <div className="text-sm font-semibold text-cyan-200">
-                {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits/month` : `${pricingData.plans.premium.monthly.credits} credits/month`}
+                {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits/month` : '300 credits/month'}
               </div>
             </CardHeader>
             <CardContent className="grow flex flex-col px-4 pb-4">
@@ -117,7 +117,7 @@ const PricingSection = () => {
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
                   <span className="text-sm text-cyan-100">
-                    {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits every month` : `${pricingData.plans.premium.monthly.credits} credits every month`}
+                    {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits every month` : '300 credits every month'}
                   </span>
                 </li>
                 <li className="flex items-center gap-2">
@@ -155,7 +155,7 @@ const PricingSection = () => {
             <CardHeader className="text-center pb-4 pt-6 px-4">
               <CardTitle className={`text-xl font-bold mb-2 ${planTextColor.pack} font-inter`}>Credit Packs</CardTitle>
               <div className="text-3xl font-extrabold text-gray-900 mb-1">
-                Starting {pricingData.currencySymbol}{creditPackProducts.length > 0 ? Math.min(...creditPackProducts.map(p => p.price_amount)) : pricingData.credits.pack50.price}
+                Starting {pricingData.currencySymbol}{creditPackProducts.length > 0 ? Math.min(...creditPackProducts.map(p => p.price_amount)) : pricingData.creditPacks[0]?.price}
               </div>
               <div className="text-sm font-semibold text-gray-600">Select your desired amount:</div>
             </CardHeader>
@@ -174,7 +174,7 @@ const PricingSection = () => {
                       </div>
                     </div>) :
               // Only show fallback if no database products and not loading
-              !isProductsLoading && Object.entries(pricingData.credits).map(([key, pack]: [string, { credits: number; price: number }]) => <div key={key} className="bg-gray-100 rounded-lg p-2.5 border border-gray-200 flex justify-between items-center shadow hover:shadow-md transition duration-300">
+              !isProductsLoading && pricingData.creditPacks.map(pack => <div key={pack.credits} className="bg-gray-100 rounded-lg p-2.5 border border-gray-200 flex justify-between items-center shadow hover:shadow-md transition duration-300">
                       <span className="text-gray-800 font-medium text-sm">{pack.credits} credits</span>
                       <div className="flex items-center gap-2">
                         <span className="text-gray-900 font-bold text-sm">{pricingData.currencySymbol}{pack.price}</span>
