@@ -27,8 +27,9 @@ interface CachedJobAlertsData {
 }
 
 const CACHE_KEY = 'aspirely_job_alerts_cache';
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes for fresh data
-const BACKGROUND_REFRESH_INTERVAL = 3 * 60 * 1000; // 3 minutes like professional sites
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes for fresh data
+const BACKGROUND_REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes - professional standard
+let isRefreshing = false; // Request deduplication flag
 
 export const useCachedJobAlertsData = () => {
   const { user } = useUser();
@@ -66,22 +67,24 @@ export const useCachedJobAlertsData = () => {
     }
   }, []);
 
-  // Professional token refresh every 5 minutes
+  // Professional token refresh every 25 minutes (not 5 minutes!)
   useEffect(() => {
     if (!user || !isAuthReady) return;
 
     const tokenRefreshInterval = setInterval(async () => {
       try {
-        // Trigger a silent token refresh
-        await getToken({ skipCache: true });
-        logger.debug('Token refreshed silently');
+        // Only refresh if user is active and no pending operations
+        if (document.visibilityState === 'visible') {
+          await getToken({ skipCache: true });
+          logger.debug('Scheduled token refresh completed');
+        }
       } catch (error) {
-        logger.warn('Token refresh failed:', error);
+        logger.warn('Scheduled token refresh failed:', error);
       }
-    }, 5 * 60 * 1000); // 5 minutes
+    }, 25 * 60 * 1000); // 25 minutes - professional standard
 
     return () => clearInterval(tokenRefreshInterval);
-  }, [user, isAuthReady]);
+  }, [user?.id, isAuthReady, getToken]);
 
   // Fetch fresh data when user changes or auth becomes ready
   useEffect(() => {
@@ -141,9 +144,15 @@ export const useCachedJobAlertsData = () => {
     if (!user) return;
     
     if (!isAuthReady) {
-      logger.debug('[JobAlertsData] Authentication not ready, waiting...');
       return;
     }
+    
+    // Request deduplication - prevent multiple simultaneous requests
+    if (isRefreshing) {
+      return;
+    }
+    
+    isRefreshing = true;
     
     try {
       if (!silent) {
@@ -153,11 +162,11 @@ export const useCachedJobAlertsData = () => {
       
       const result = await executeWithRetry(
         async () => {
-          // Get fresh token
-          const token = await getToken({ skipCache: true });
-          if (!token) {
-            throw new Error('Authentication token not available');
-          }
+          // Don't refresh token unnecessarily - Clerk handles this automatically
+          // const token = await getToken({ skipCache: true });
+          // if (!token) {
+          //   throw new Error('Authentication token not available');
+          // }
 
           // Get user's database ID
           const { data: userData, error: userError } = await supabase
@@ -244,6 +253,7 @@ export const useCachedJobAlertsData = () => {
         }
       }
     } finally {
+      isRefreshing = false; // Reset deduplication flag
       if (!silent) {
         setLoading(false);
       }

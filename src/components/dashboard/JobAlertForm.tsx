@@ -115,8 +115,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
       // Professional-grade operation with retry logic
       const result = await executeWithRetry(
         async () => {
-          // Ensure fresh authentication token
-          await getToken({ skipCache: true });
+          // Clerk automatically handles token refresh - no need to force it
 
           if (editingAlert) {
             // Update existing alert - streamlined operation
