@@ -93,24 +93,15 @@ const DroppableColumn = ({
       <div className={`p-2 h-[450px] overflow-y-auto ${isDropTarget ? 'bg-black/5' : ''} transition-colors`}>
         <SortableContext items={jobs.map(job => job.id)} strategy={verticalListSortingStrategy}>
           <div className="space-y-1">
-            {jobs.map((job, index) => {
-              console.log(`[DEBUG] Rendering job ${index + 1}/${jobs.length} for column ${column.key}:`, {
-                id: job.id,
-                company: job.company_name,
-                title: job.job_title,
-                position: job.order_position
-              });
-              
-              return (
-                <SortableJobCard 
-                  key={`${job.id}-${job.status}-${job.order_position}`} 
-                  job={job} 
-                  onDelete={onDeleteJob} 
-                  onView={onViewJob} 
-                  onUpdateChecklist={onUpdateChecklist} 
-                />
-              );
-            })}
+            {jobs.map((job, index) => (
+              <SortableJobCard 
+                key={`${job.id}-${job.status}-${job.order_position}`} 
+                job={job} 
+                onDelete={onDeleteJob} 
+                onView={onViewJob} 
+                onUpdateChecklist={onUpdateChecklist} 
+              />
+            ))}
           </div>
         </SortableContext>
       </div>
@@ -825,13 +816,6 @@ const JobTracker = () => {
   };
   const getJobsByStatus = (status: string) => {
     const filteredJobs = jobs.filter(job => job.status === status).sort((a, b) => a.order_position - b.order_position);
-    console.log(`[DEBUG] getJobsByStatus for "${status}":`, filteredJobs.length, 'jobs');
-    console.log(`[DEBUG] Jobs for status "${status}":`, filteredJobs.map(j => ({ 
-      id: j.id, 
-      company: j.company_name, 
-      position: j.order_position,
-      title: j.job_title 
-    })));
     return filteredJobs;
   };
   const handleViewJob = (job: JobEntry) => {
