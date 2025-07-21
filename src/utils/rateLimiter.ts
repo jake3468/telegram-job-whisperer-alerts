@@ -1,52 +1,103 @@
+import { securityMonitor } from './securityMonitor';
+
+interface RateLimitConfig {
+  maxRequests: number;
+  windowMs: number;
+  keyGenerator?: (identifier: string) => string;
+}
 
 interface RateLimitEntry {
   count: number;
   resetTime: number;
+  blocked: boolean;
 }
 
 class RateLimiter {
   private store = new Map<string, RateLimitEntry>();
+  private config: RateLimitConfig;
 
-  isRateLimited(
-    identifier: string, 
-    limit: number = 10, 
-    windowMs: number = 60000
-  ): boolean {
+  constructor(config: RateLimitConfig) {
+    this.config = {
+      keyGenerator: (id) => id,
+      ...config
+    };
+
+    // Clean up expired entries every minute
+    setInterval(() => this.cleanup(), 60000);
+  }
+
+  checkLimit(identifier: string): { allowed: boolean; resetTime: number; remaining: number } {
+    const key = this.config.keyGenerator!(identifier);
     const now = Date.now();
-    const entry = this.store.get(identifier);
+    const entry = this.store.get(key);
 
-    // If no entry or window has expired, create new entry
     if (!entry || now > entry.resetTime) {
-      this.store.set(identifier, { count: 1, resetTime: now + windowMs });
-      return false;
+      // Create new entry or reset expired entry
+      const newEntry: RateLimitEntry = {
+        count: 1,
+        resetTime: now + this.config.windowMs,
+        blocked: false
+      };
+      this.store.set(key, newEntry);
+
+      return {
+        allowed: true,
+        resetTime: newEntry.resetTime,
+        remaining: this.config.maxRequests - 1
+      };
     }
 
-    // If limit exceeded, return true (rate limited)
-    if (entry.count >= limit) {
-      return true;
+    // Check if already blocked
+    if (entry.blocked) {
+      securityMonitor.logSecurityEvent({
+        type: 'rate_limit_exceeded',
+        identifier,
+        details: { 
+          attempts: entry.count,
+          windowMs: this.config.windowMs,
+          maxRequests: this.config.maxRequests
+        },
+        severity: 'medium'
+      });
+
+      return {
+        allowed: false,
+        resetTime: entry.resetTime,
+        remaining: 0
+      };
     }
 
-    // Increment count
     entry.count++;
-    return false;
+
+    if (entry.count > this.config.maxRequests) {
+      entry.blocked = true;
+      
+      securityMonitor.logSecurityEvent({
+        type: 'rate_limit_exceeded',
+        identifier,
+        details: { 
+          attempts: entry.count,
+          windowMs: this.config.windowMs,
+          maxRequests: this.config.maxRequests
+        },
+        severity: 'high'
+      });
+
+      return {
+        allowed: false,
+        resetTime: entry.resetTime,
+        remaining: 0
+      };
+    }
+
+    return {
+      allowed: true,
+      resetTime: entry.resetTime,
+      remaining: this.config.maxRequests - entry.count
+    };
   }
 
-  getRemainingAttempts(
-    identifier: string, 
-    limit: number = 10
-  ): number {
-    const entry = this.store.get(identifier);
-    if (!entry) return limit;
-    return Math.max(0, limit - entry.count);
-  }
-
-  getResetTime(identifier: string): number | null {
-    const entry = this.store.get(identifier);
-    return entry ? entry.resetTime : null;
-  }
-
-  // Clean up expired entries periodically
-  cleanup(): void {
+  private cleanup(): void {
     const now = Date.now();
     for (const [key, entry] of this.store.entries()) {
       if (now > entry.resetTime) {
@@ -54,13 +105,27 @@ class RateLimiter {
       }
     }
   }
+
+  reset(identifier: string): void {
+    const key = this.config.keyGenerator!(identifier);
+    this.store.delete(key);
+  }
 }
 
-export const rateLimiter = new RateLimiter();
+// Create rate limiters for different operations
+export const apiRateLimiter = new RateLimiter({
+  maxRequests: 100,
+  windowMs: 15 * 60 * 1000 // 15 minutes
+});
 
-// Cleanup expired entries every 5 minutes
-if (typeof window !== 'undefined') {
-  setInterval(() => {
-    rateLimiter.cleanup();
-  }, 5 * 60 * 1000);
-}
+export const authRateLimiter = new RateLimiter({
+  maxRequests: 5,
+  windowMs: 5 * 60 * 1000 // 5 minutes
+});
+
+export const paymentRateLimiter = new RateLimiter({
+  maxRequests: 10,
+  windowMs: 60 * 1000 // 1 minute
+});
+
+export { RateLimiter };

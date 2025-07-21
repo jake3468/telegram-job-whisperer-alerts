@@ -4,6 +4,10 @@ import { ClerkProvider } from '@clerk/clerk-react'
 import App from './App.tsx'
 import './index.css'
 
+// Temporarily disable security headers for debugging
+// import { securityHeaders } from '@/utils/securityHeaders'
+// securityHeaders.setSecurityHeaders();
+
 // Environment detection
 const isProduction = window.location.hostname === 'aspirely.ai';
 const isLovablePreview = window.location.hostname.includes('lovable.app');

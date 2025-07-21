@@ -1,5 +1,4 @@
 import { logger } from './logger';
-import { rateLimiter } from './rateLimiter';
 
 interface SecurityEvent {
   type: 'suspicious_activity' | 'rate_limit_exceeded' | 'invalid_input' | 'potential_attack';

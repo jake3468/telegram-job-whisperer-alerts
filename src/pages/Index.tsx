@@ -8,11 +8,15 @@ import HowItWorksSection from "@/components/HowItWorksSection";
 import PricingSection from "@/components/PricingSection";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
-import SecurityHeaders from "@/components/SecurityHeaders";
+// Temporarily disable SecurityHeaders for debugging
+// import SecurityHeaders from "@/components/SecurityHeaders";
 import { useEffect } from "react";
 
 const Index = () => {
+  console.log('Index page rendering');
+  
   useEffect(() => {
+    console.log('Index page mounted');
     // Add JSON-LD structured data for better Google crawlability
     const script = document.createElement('script');
     script.type = 'application/ld+json';
@@ -40,7 +44,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-black font-inter text-slate-50">
-      <SecurityHeaders />
+      {/* <SecurityHeaders /> - Temporarily disabled for debugging */}
       <AuthHeader />
       <HeroSection />
       <JobTrackerPreview />

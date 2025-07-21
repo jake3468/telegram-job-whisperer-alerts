@@ -966,6 +966,24 @@ export type Database = {
           },
         ]
       }
+      resume_chat_history_new: {
+        Row: {
+          id: number
+          message: Json
+          session_id: string
+        }
+        Insert: {
+          id?: number
+          message: Json
+          session_id: string
+        }
+        Update: {
+          id?: number
+          message?: Json
+          session_id?: string
+        }
+        Relationships: []
+      }
       subscription_tracking: {
         Row: {
           cancelled_at: string | null

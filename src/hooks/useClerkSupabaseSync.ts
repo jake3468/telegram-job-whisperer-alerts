@@ -14,22 +14,17 @@ export const useClerkSupabaseSync = () => {
     const setupTokenRefresh = async () => {
       if (!user || !isLoaded || syncedRef.current) return;
 
-      // Debug environment info
-      debugEnvironment();
-      console.log('[useClerkSupabaseSync] Setup starting:', {
-        userId: user?.id,
-        isLoaded,
-        environment: Environment.getCurrentEnvironment()
-      });
+      console.log('Setting up Clerk-Supabase sync for user:', user.id);
 
       try {
         // Set up the token refresh function
         const refreshFunction = async () => {
           try {
             const token = await getToken({ template: 'supabase' });
+            console.log('Token refreshed:', token ? 'Success' : 'Failed');
             return token;
           } catch (error) {
-            console.error('[useClerkSupabaseSync] ❌ Failed to get token from Clerk:', error);
+            console.error('Failed to get token from Clerk:', error);
             return null;
           }
         };
@@ -39,29 +34,24 @@ export const useClerkSupabaseSync = () => {
 
         // Get initial token
         const token = await getToken({ template: 'supabase' });
-        console.log('[useClerkSupabaseSync] Token received:', token ? 'Success' : 'Failed');
         
         if (token) {
           const success = await setClerkToken(token);
-          console.log('[useClerkSupabaseSync] Token set result:', success);
+          console.log('Initial token set:', success);
           if (success) {
             syncedRef.current = true;
             tokenSetRef.current = true;
           }
-        } else {
-          console.error('[useClerkSupabaseSync] ❌ No token received from Clerk');
         }
       } catch (error) {
-        console.error('[useClerkSupabaseSync] ❌ Error in token setup:', error);
-        console.error('[useClerkSupabaseSync] ❌ Error details:', {
-          message: error.message,
-          stack: error.stack,
-          environment: Environment.getCurrentEnvironment()
-        });
+        console.error('Error in token setup:', error);
+        // Don't block the UI even if sync fails
+        syncedRef.current = true;
       }
     };
 
     if (isLoaded && user && !syncedRef.current) {
+      // Setup sync but don't block the UI
       setupTokenRefresh();
     } else if (isLoaded && !user && tokenSetRef.current) {
       // User logged out, clear the token

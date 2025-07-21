@@ -53,23 +53,30 @@ const LoadingScreen = () => (
 
 // Component to initialize Clerk-Supabase sync
 const AppWithSync = () => {
-  const { isLoaded } = useAuth();
+  const { isLoaded, isSignedIn } = useAuth();
   
   // Initialize sync in background without blocking UI
   useClerkSupabaseSync();
   
   // Hide initial loader once React is ready
   useEffect(() => {
+    console.log('App state:', { isLoaded, isSignedIn });
+    
     if (isLoaded) {
-      hideInitialLoader();
+      // Small delay to ensure smooth transition
+      setTimeout(() => {
+        hideInitialLoader();
+      }, 100);
     }
-  }, [isLoaded]);
+  }, [isLoaded, isSignedIn]);
   
   // Show loading screen only while Clerk auth is loading
-  // Once auth is loaded, show content immediately - don't wait for Supabase sync
   if (!isLoaded) {
+    console.log('Showing loading screen - auth not loaded');
     return <LoadingScreen />;
   }
+  
+  console.log('Rendering routes - auth loaded:', { isLoaded, isSignedIn });
   
   return (
     <>
@@ -104,16 +111,20 @@ const AppWithSync = () => {
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AppWithSync />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  console.log('App component rendering');
+  
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppWithSync />
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

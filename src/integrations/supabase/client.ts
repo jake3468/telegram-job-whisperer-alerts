@@ -3,6 +3,9 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 import { logger } from '@/utils/logger';
+import { securityMonitor } from '@/utils/securityMonitor';
+import { apiRateLimiter } from '@/utils/rateLimiter';
+import { securityHeaders } from '@/utils/securityHeaders';
 
 const SUPABASE_URL = "https://fnzloyyhzhrqsvslhhri.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuemxveXloemhycXN2c2xoaHJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzAyMjIsImV4cCI6MjA2NDUwNjIyMn0.xdlgb_amJ1fV31uinCFotGW00isgT5-N8zJ_gLHEKuk";
@@ -118,6 +121,23 @@ export const makeAuthenticatedRequest = async <T>(
   operationType: string = 'unknown',
   maxRetries: number = 3
 ): Promise<T> => {
+  // Apply security checks asynchronously to avoid blocking
+  const userIdentifier = currentJWTToken ? 
+    JSON.parse(atob(currentJWTToken.split('.')[1]))?.sub || 'unknown' : 
+    'anonymous';
+  
+  // Check rate limits in background
+  setTimeout(() => {
+    const rateLimitResult = apiRateLimiter.checkLimit(userIdentifier);
+    if (!rateLimitResult.allowed) {
+      securityMonitor.logSecurityEvent({
+        type: 'rate_limit_exceeded',
+        identifier: userIdentifier,
+        details: { operation: operationType, resetTime: rateLimitResult.resetTime },
+        severity: 'medium'
+      });
+    }
+  }, 0);
   let lastError: any = null;
   
   for (let attempt = 0; attempt < maxRetries; attempt++) {
@@ -169,6 +189,19 @@ export const makeAuthenticatedRequest = async <T>(
       
       try {
         const result = await operation();
+        
+        // Log successful operations asynchronously
+        if (operationType !== 'unknown') {
+          setTimeout(() => {
+            securityMonitor.logSecurityEvent({
+              type: 'suspicious_activity',
+              identifier: userIdentifier,
+              details: { operation: operationType, success: true },
+              severity: 'low'
+            });
+          }, 0);
+        }
+        
         return result;
       } finally {
         // Restore original methods

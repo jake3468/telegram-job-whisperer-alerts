@@ -1,5 +1,5 @@
 
-import { rateLimiter } from './rateLimiter';
+import { apiRateLimiter } from './rateLimiter';
 import { securityMonitor } from './securityMonitor';
 import { xssProtection } from './xssProtection';
 import { corsValidator } from './corsValidator';
@@ -26,7 +26,8 @@ class ApiSecurityMiddleware {
     const { method, url, headers, body, userAgent, ip } = context;
 
     // 1. Rate limiting check
-    if (rateLimiter.isRateLimited(identifier, 60, 60000)) { // 60 requests per minute
+    const rateLimitResult = apiRateLimiter.checkLimit(identifier);
+    if (!rateLimitResult.allowed) {
       securityMonitor.logSecurityEvent({
         type: 'rate_limit_exceeded',
         identifier,

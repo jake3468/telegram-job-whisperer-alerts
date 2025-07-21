@@ -1,3 +1,4 @@
+
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -118,18 +119,20 @@ const HeroSection = () => {
           No credit card required. Start with 30 free credits today.
         </p>
         
-        {/* Privacy Policy Link for Google OAuth Verification */}
-        <p className="text-gray-500 text-xs mt-3 font-inter">
-          By using Aspirely, you agree to our{' '}
-          <a href="/privacy-policy" className="text-gray-400 hover:text-gray-300 underline transition-colors">
-            Privacy Policy
-          </a>
-          {' '}and{' '}
-          <a href="/terms-of-service" className="text-gray-400 hover:text-gray-300 underline transition-colors">
-            Terms of Service
-          </a>
-          .
-        </p>
+        {/* More prominent Privacy Policy Link for Google OAuth Verification */}
+        <div className="mt-4 mb-2">
+          <p className="text-gray-300 text-sm font-inter font-medium">
+            By using Aspirely.ai, you agree to our{' '}
+            <a href="/privacy-policy" className="text-white hover:text-gray-200 underline transition-colors font-semibold">
+              Privacy Policy
+            </a>
+            {' '}and{' '}
+            <a href="/terms-of-service" className="text-white hover:text-gray-200 underline transition-colors font-semibold">
+              Terms of Service
+            </a>
+            .
+          </p>
+        </div>
       </div>
     </section>;
 };
