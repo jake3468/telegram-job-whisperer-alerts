@@ -15,9 +15,11 @@ export function Layout({ children }: LayoutProps) {
       {/* Header for mobile/tablet - with logo and name in top right */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-2xl shadow-2xl border-b border-white/25">
         <div className="flex items-center justify-between p-3">
-          <SidebarTrigger className="text-white p-2 rounded-lg hover:bg-white/10 transition-colors duration-200">
-            <Menu size={24} />
-            <span className="sr-only">Toggle navigation menu</span>
+          <SidebarTrigger asChild>
+            <button className="text-white p-2 rounded-lg hover:bg-white/10 transition-colors duration-200">
+              <Menu size={24} />
+              <span className="sr-only">Toggle navigation menu</span>
+            </button>
           </SidebarTrigger>
           <div className="flex items-center gap-2">
             <img alt="JobBots Logo" src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" className="max-h-8 drop-shadow-2xl object-fill" />
