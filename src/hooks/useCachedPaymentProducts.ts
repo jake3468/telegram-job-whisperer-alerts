@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { usePaymentProducts, PaymentProduct } from './usePaymentProducts';
 import { logger } from '@/utils/logger';
 
@@ -20,6 +21,9 @@ export const useCachedPaymentProducts = (currentRegion?: string, currentCurrency
   const [displayProducts, setDisplayProducts] = useState<PaymentProduct[]>([]);
   const [displaySubscriptionProducts, setDisplaySubscriptionProducts] = useState<PaymentProduct[]>([]);
   const [displayCreditPackProducts, setDisplayCreditPackProducts] = useState<PaymentProduct[]>([]);
+  
+  // Use ref to track if we've already processed this data combination
+  const lastProcessedRef = useRef<string>('');
 
   // Load cached data immediately on mount
   useEffect(() => {
@@ -49,8 +53,18 @@ export const useCachedPaymentProducts = (currentRegion?: string, currentCurrency
     }
   }, [currentRegion, currentCurrency]);
 
+  // Create a stable identifier for the current data state
+  const currentDataId = useMemo(() => {
+    return `${currentRegion}_${currentCurrency}_${products.length}_${subscriptionProducts.length}_${creditPackProducts.length}_${isLoading}`;
+  }, [currentRegion, currentCurrency, products.length, subscriptionProducts.length, creditPackProducts.length, isLoading]);
+
   // Update cache and display data when fresh data arrives
   useEffect(() => {
+    // Prevent processing the same data combination multiple times
+    if (lastProcessedRef.current === currentDataId) {
+      return;
+    }
+
     if (products.length > 0 && !isLoading && currentRegion && currentCurrency) {
       const cacheData: CachedProductsData = {
         products,
@@ -68,7 +82,7 @@ export const useCachedPaymentProducts = (currentRegion?: string, currentCurrency
         setDisplaySubscriptionProducts(subscriptionProducts);
         setDisplayCreditPackProducts(creditPackProducts);
         
-        // Only log once when data actually changes, not on every render
+        // Only log once when data actually changes
         const cacheKey = `${currentRegion}_${currentCurrency}_${products.length}`;
         const lastLoggedKey = sessionStorage.getItem('last_products_log');
         if (lastLoggedKey !== cacheKey) {
@@ -81,8 +95,11 @@ export const useCachedPaymentProducts = (currentRegion?: string, currentCurrency
         setDisplaySubscriptionProducts(subscriptionProducts);
         setDisplayCreditPackProducts(creditPackProducts);
       }
+
+      // Mark this data combination as processed
+      lastProcessedRef.current = currentDataId;
     }
-  }, [products, subscriptionProducts, creditPackProducts, isLoading, currentRegion, currentCurrency]);
+  }, [currentDataId, products, subscriptionProducts, creditPackProducts, isLoading, currentRegion, currentCurrency]);
 
   // Determine if we're showing cached data
   const isShowingCachedData = isLoading && !!cachedData;
