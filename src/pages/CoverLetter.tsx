@@ -23,6 +23,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
 import { useCachedCoverLetters } from '@/hooks/useCachedCoverLetters';
+
 const CoverLetter = () => {
   const {
     user,
@@ -78,6 +79,7 @@ const CoverLetter = () => {
     connectionIssue,
     refetch: refetchHistory
   } = useCachedCoverLetters();
+
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
@@ -187,6 +189,7 @@ const CoverLetter = () => {
       clearInterval(pollInterval);
     };
   }, [isGenerating, currentCoverLetterId, isAuthReady, executeWithRetry, toast]);
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -285,6 +288,7 @@ const CoverLetter = () => {
       }
     }, 1000); // Wait 1 second for status to update
   };
+
   const handleCopyResult = async () => {
     if (!result) return;
     try {
@@ -301,6 +305,7 @@ const CoverLetter = () => {
       });
     }
   };
+
   const resetForm = () => {
     setFormData({
       job_title: '',
@@ -311,6 +316,7 @@ const CoverLetter = () => {
     setIsGenerating(false);
     setCurrentCoverLetterId(null);
   };
+
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading...</div>
@@ -337,7 +343,7 @@ const CoverLetter = () => {
       </header>
       <div className="min-h-screen flex w-full">
         <AppSidebar />
-        <div className="flex-1 flex flex-col pt-28 lg:pt-0 lg:pl-6 bg-zinc-950">
+        <div className="flex-1 flex flex-col pt-20 lg:pt-0 lg:pl-6 bg-zinc-950">
           <main className="flex-1 w-full bg-transparent">
             <div className="flex items-center justify-center min-h-[400px]">
               <div className="text-center space-y-4">
@@ -354,6 +360,7 @@ const CoverLetter = () => {
   // Check if form is valid and user has credits
   const isFormValid = formData.job_title.trim() && formData.company_name.trim() && formData.job_description.trim();
   const canSubmit = isFormValid && hasCredits && !isSubmitting && !isGenerating;
+
   return <SidebarProvider defaultOpen={true}>
       {/* Header for mobile */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-2xl shadow-2xl border-b border-white/25 text-left">
@@ -372,11 +379,11 @@ const CoverLetter = () => {
       </header>
       <div className="min-h-screen flex w-full">
         <AppSidebar />
-        <div className="flex-1 flex flex-col pt-28 lg:pt-0 lg:pl-6 bg-zinc-950">
+        <div className="flex-1 flex flex-col pt-20 lg:pt-0 lg:pl-6 bg-zinc-950">
           <main className="flex-1 w-full bg-transparent">
             <div className="min-h-screen w-full flex flex-col">
               {/* Header Section */}
-              <div className="max-w-4xl mx-auto w-full px-3 py-4 sm:px-6 sm:py-6 mt-4">
+              <div className="max-w-4xl mx-auto w-full px-3 py-2 sm:px-6">
                 {/* Gradient Heading */}
                 <div className="mb-8 text-center">
                   <h1 className="text-4xl font-bold mb-2 drop-shadow font-orbitron animate-fade-in md:text-4xl">
@@ -523,4 +530,5 @@ const CoverLetter = () => {
       </div>
     </SidebarProvider>;
 };
+
 export default CoverLetter;
