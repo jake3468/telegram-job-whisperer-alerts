@@ -94,12 +94,13 @@ const DroppableColumn = ({
         <SortableContext items={jobs.map(job => job.id)} strategy={verticalListSortingStrategy}>
           <div className="space-y-1">
             {jobs.map((job, index) => {
-              console.log(`[DEBUG] Rendering job ${index + 1}/${jobs.length} for column ${column.key}:`, {
-                id: job.id,
-                company: job.company_name,
-                title: job.job_title,
-                position: job.order_position
-              });
+              // Reduced logging to prevent console spam
+              if (process.env.NODE_ENV === 'development' && Math.random() < 0.1) {
+                console.log(`[DEBUG] Rendering job ${index + 1}/${jobs.length} for column ${column.key}:`, {
+                  id: job.id,
+                  company: job.company_name
+                });
+              }
               
               return (
                 <SortableJobCard 
@@ -825,13 +826,10 @@ const JobTracker = () => {
   };
   const getJobsByStatus = (status: string) => {
     const filteredJobs = jobs.filter(job => job.status === status).sort((a, b) => a.order_position - b.order_position);
-    console.log(`[DEBUG] getJobsByStatus for "${status}":`, filteredJobs.length, 'jobs');
-    console.log(`[DEBUG] Jobs for status "${status}":`, filteredJobs.map(j => ({ 
-      id: j.id, 
-      company: j.company_name, 
-      position: j.order_position,
-      title: j.job_title 
-    })));
+    // Reduced logging frequency to prevent console spam
+    if (process.env.NODE_ENV === 'development' && Math.random() < 0.05) {
+      console.log(`[DEBUG] getJobsByStatus for "${status}":`, filteredJobs.length, 'jobs');
+    }
     return filteredJobs;
   };
   const handleViewJob = (job: JobEntry) => {
