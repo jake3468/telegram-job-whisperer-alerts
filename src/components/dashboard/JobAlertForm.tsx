@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -38,8 +38,9 @@ interface JobAlertFormProps {
 
 const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentAlertCount, maxAlerts, updateActivity }: JobAlertFormProps) => {
   const { user } = useUser();
+  const { getToken } = useAuth();
   const { toast } = useToast();
-  const { executeWithRetry, optimisticAdd, isAuthReady } = useCachedJobAlertsData();
+  const { executeWithRetry, optimisticAdd, isAuthReady, userProfileId } = useCachedJobAlertsData();
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [countryOpen, setCountryOpen] = useState(false);
@@ -78,11 +79,21 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
     e.preventDefault();
     updateActivity?.();
     
-    if (!user) {
+    // Professional-grade validation
+    if (!user || !isAuthReady) {
+      // Show loading state instead of error for better UX
       toast({
-        title: "Authentication required",
-        description: "Please sign in to create job alerts.",
-        variant: "destructive"
+        title: "Initializing...",
+        description: "Please wait a moment while we prepare your session.",
+      });
+      return;
+    }
+
+    // Use cached userProfileId for better performance
+    if (!userProfileId) {
+      toast({
+        title: "Initializing...",
+        description: "Loading your profile data...",
       });
       return;
     }
@@ -97,56 +108,18 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
       return;
     }
 
-    // Wait for authentication to be ready
-    if (!isAuthReady) {
-      toast({
-        title: "Please wait",
-        description: "Authentication is loading, please try again in a moment.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     setSubmitting(true);
     setLoading(true);
     
     try {
+      // Professional-grade operation with retry logic
       const result = await executeWithRetry(
         async () => {
-          // Get the user's profile ID
-          const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('id')
-            .eq('clerk_id', user.id)
-            .maybeSingle();
-
-          if (userError) {
-            console.error('User fetch error:', userError);
-            throw new Error('Authentication failed. Please try signing in again.');
-          }
-          
-          if (!userData) {
-            throw new Error('User profile not found. Please try refreshing the page.');
-          }
-
-          // Get the user_profile record
-          const { data: profileData, error: profileError } = await supabase
-            .from('user_profile')
-            .select('id')
-            .eq('user_id', userData.id)
-            .maybeSingle();
-
-          if (profileError) {
-            console.error('Profile fetch error:', profileError);
-            throw new Error('Profile data not found. Please try refreshing the page.');
-          }
-          
-          if (!profileData) {
-            throw new Error('User profile not found. Please try refreshing the page.');
-          }
+          // Ensure fresh authentication token
+          await getToken({ skipCache: true });
 
           if (editingAlert) {
-            // Update existing alert
+            // Update existing alert - streamlined operation
             const { error } = await supabase
               .from('job_alerts')
               .update({
@@ -162,15 +135,14 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
               .eq('id', editingAlert.id);
 
             if (error) {
-              console.error('Update error:', error);
-              throw new Error('Failed to update alert. Please try again.');
+              throw new Error('UPDATE_FAILED');
             }
             
             return { type: 'update' };
           } else {
-            // Create new alert
+            // Create new alert - streamlined operation using cached userProfileId
             const newAlertData = {
-              user_id: profileData.id,
+              user_id: userProfileId,
               country: formData.country.toLowerCase(),
               country_name: formData.country_name,
               location: formData.location,
@@ -188,60 +160,77 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
               .single();
 
             if (error) {
-              console.error('Insert error:', error);
               if (error.message && error.message.includes('Maximum of 3 job alerts allowed')) {
                 throw new Error('ALERT_LIMIT_REACHED');
               }
-              throw new Error('Failed to create alert. Please try again.');
+              throw new Error('CREATE_FAILED');
             }
 
             return { type: 'create', data };
           }
         },
-        5, // Increased retry attempts
+        7, // More aggressive retry attempts
         editingAlert ? 'Updating job alert' : 'Creating job alert'
       );
 
-      // Handle success
+      // Handle success with professional messaging
       if (result.type === 'update') {
         toast({
-          title: "Success",
-          description: "Job alert updated successfully.",
+          title: "Alert Updated",
+          description: "Your job alert has been updated successfully.",
         });
       } else {
-        // Add optimistic update
+        // Optimistic UI update for immediate feedback
         if (result.data) {
           optimisticAdd(result.data);
         }
         
         toast({
-          title: "Success",
-          description: "Job alert created successfully.",
+          title: "Alert Created",
+          description: "Your job alert is now active and monitoring for opportunities.",
         });
       }
 
       onSubmit();
     } catch (error) {
+      // Professional error handling - never show technical errors to users
       console.error('Form submission error:', error);
       
       if (error instanceof Error) {
-        if (error.message === 'ALERT_LIMIT_REACHED') {
-          toast({
-            title: "Alert limit reached",
-            description: `You can only create up to ${maxAlerts} job alerts. Please delete an existing alert to create a new one.`,
-            variant: "destructive"
-          });
-        } else {
-          toast({
-            title: "Unable to save",
-            description: error.message || "Please check your connection and try again.",
-            variant: "destructive",
-          });
+        switch (error.message) {
+          case 'ALERT_LIMIT_REACHED':
+            toast({
+              title: "Alert limit reached",
+              description: `You can only create up to ${maxAlerts} job alerts. Please delete an existing alert to create a new one.`,
+              variant: "destructive"
+            });
+            break;
+          case 'UPDATE_FAILED':
+            toast({
+              title: "Unable to update",
+              description: "Please check your connection and try again.",
+              variant: "destructive",
+            });
+            break;
+          case 'CREATE_FAILED':
+            toast({
+              title: "Unable to create alert",
+              description: "Please check your connection and try again.",
+              variant: "destructive",
+            });
+            break;
+          default:
+            // Never show technical authentication errors - provide professional message
+            toast({
+              title: "Temporary issue",
+              description: "Please wait a moment and try again. If the issue persists, please refresh the page.",
+              variant: "destructive",
+            });
         }
       } else {
         toast({
-          title: "Unable to save",
-          description: "Please check your connection and try again.",
+          title: "Temporary issue",
+          description: "Please wait a moment and try again.",
           variant: "destructive",
         });
       }
