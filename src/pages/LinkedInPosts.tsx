@@ -448,7 +448,7 @@ const LinkedInPosts = () => {
   // Show professional authentication loading state within the page layout
   if (!isAuthReady && !isRefreshing) {
     return <SidebarProvider defaultOpen={true}>
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-2xl shadow-2xl border-b border-white/25">
         <div className="flex items-center justify-between p-3">
           <SidebarTrigger className="h-12 w-12 border-fuchsia-400/30 ring-2 ring-fuchsia-400/10 text-fuchsia-200 rounded-2xl shadow-lg transition-all flex items-center justify-center bg-zinc-900 hover:bg-zinc-800">
             <Menu className="w-7 h-7" strokeWidth={2.4} />
@@ -476,7 +476,7 @@ const LinkedInPosts = () => {
     </SidebarProvider>;
   }
   return <SidebarProvider defaultOpen={true}>
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-sky-900/90 via-fuchsia-900/90 to-indigo-900/85 backdrop-blur-2xl shadow-2xl border-b border-fuchsia-400/30">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-2xl shadow-2xl border-b border-white/25">
         <div className="flex items-center justify-between p-3">
           <SidebarTrigger className="h-12 w-12 border-fuchsia-400/30 ring-2 ring-fuchsia-400/10 text-fuchsia-200 rounded-2xl shadow-lg transition-all flex items-center justify-center bg-zinc-900 hover:bg-zinc-800">
             <Menu className="w-7 h-7" strokeWidth={2.4} />
@@ -492,10 +492,10 @@ const LinkedInPosts = () => {
       <div className="min-h-screen flex w-full bg-black">
         <AppSidebar />
         
-        <div className="flex-1 flex flex-col pt-28 lg:pt-0 lg:pl-6 min-w-0 overflow-x-hidden bg-black">
+        <div className="flex-1 flex flex-col pt-20 lg:pt-0 lg:pl-6 min-w-0 overflow-x-hidden bg-black">
           <main className="flex-1 w-full min-w-0 bg-black">
             <div className="min-h-screen bg-black overflow-x-hidden">
-              <div className="container mx-auto px-2 sm:px-4 py-8 mt-4 mb-8 max-w-6xl w-full min-w-0">
+              <div className="container mx-auto px-2 sm:px-4 py-4 mb-8 max-w-6xl w-full min-w-0">
                 <div className="text-center mb-10">
                   <h1 className="sm:text-3xl font-orbitron bg-gradient-to-r from-teal-300 via-teal-400 to-cyan-400 bg-clip-text drop-shadow mb-4 tracking-tight font-bold lg:text-4xl text-teal-500 text-4xl">
                     ✍🏻 LinkedIn <span className="italic">Posts</span>

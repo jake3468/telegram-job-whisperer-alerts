@@ -1,3 +1,4 @@
+
 import { Layout } from "@/components/Layout";
 import AIMockInterviewForm from "@/components/AIMockInterviewForm";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { useCachedGraceInterviewRequests } from "@/hooks/useCachedGraceInterview
 import GraceInterviewReportsModal from "@/components/GraceInterviewReportsModal";
 import { AIInterviewPricingModal } from "@/components/AIInterviewPricingModal";
 import { useLocation } from "react-router-dom";
+
 const AIMockInterview = () => {
   const location = useLocation();
   const {
@@ -33,6 +35,7 @@ const AIMockInterview = () => {
       window.history.replaceState({}, document.title);
     }
   }, [location.state]);
+
   const handleManualRefresh = () => {
     // Clear all caches and reload the page for a complete refresh
     localStorage.removeItem('aspirely_user_profile_cache');
@@ -40,9 +43,10 @@ const AIMockInterview = () => {
     localStorage.removeItem('aspirely_ai_interview_credits_cache');
     window.location.reload();
   };
+
   return <Layout>
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-950 to-purple-950 text-white overflow-hidden">
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="container mx-auto px-4 py-4 max-w-4xl">
           {/* Hero Section */}
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-3 mb-6 relative">
@@ -69,7 +73,7 @@ const AIMockInterview = () => {
               </Button>
             </div>
             
-            <p className="text-gray-400 max-w-2xl mx-auto leading-relaxed text-base text-left">Grace, your AI interview assistant from Aspirely AI, will call your phone in about a minute to ask real interview questions based on your job role — and you'll receive a detailed report right after the call.</p>
+            <p className="text-gray-400 max-w-2xl mx-auto leading-relaxed text-left text-sm">Grace, your AI interview assistant from Aspirely AI, will call your phone in about a minute to ask real interview questions based on your job role — and you'll receive a detailed report right after the call.</p>
           </div>
 
           {/* Form Section */}
@@ -99,4 +103,5 @@ const AIMockInterview = () => {
       </div>
     </Layout>;
 };
+
 export default AIMockInterview;

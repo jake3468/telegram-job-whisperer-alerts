@@ -63,16 +63,22 @@ export const useCachedUserProfile = () => {
   useEffect(() => {
     if (freshProfile) {
       setConnectionIssue(false);
-      logger.debug('Fresh profile data received:', freshProfile);
+      // Only log once every 5 minutes to prevent spam
+      const lastLogTime = localStorage.getItem('profile_last_log');
+      const now = Date.now();
+      if (!lastLogTime || now - parseInt(lastLogTime) > 5 * 60 * 1000) {
+        logger.debug('Fresh profile data received:', freshProfile.id);
+        localStorage.setItem('profile_last_log', now.toString());
+      }
       
       const resumeStatus = !!freshProfile.resume;
-      const now = Date.now();
+      const profileNow = Date.now();
       
       // Update cached data
       const newCachedData = {
         profile: freshProfile,
         resumeExists: resumeStatus,
-        timestamp: now
+        timestamp: profileNow
       };
       
       setCachedData(newCachedData);
@@ -83,7 +89,7 @@ export const useCachedUserProfile = () => {
       localStorage.setItem(CACHE_KEY, JSON.stringify(newCachedData));
       localStorage.setItem(RESUME_CACHE_KEY, JSON.stringify({
         exists: resumeStatus,
-        timestamp: now
+        timestamp: profileNow
       }));
     } else if (error && !loading) {
       // Handle error case - show connection issue if no cached data
@@ -92,7 +98,7 @@ export const useCachedUserProfile = () => {
       }
       logger.error('Error loading profile:', error);
     }
-  }, [freshProfile, error, loading, cachedData]);
+  }, [freshProfile, error, loading]); // Removed cachedData from dependencies to prevent infinite loop
 
 
   // Enhanced update function that invalidates cache

@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useLocationPricing } from './useLocationPricing';
 import { logger } from '@/utils/logger';
@@ -23,7 +23,6 @@ export const usePaymentProducts = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { pricingData } = useLocationPricing();
-
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -91,23 +90,35 @@ export const usePaymentProducts = () => {
     }
   }, [pricingData?.region, pricingData?.currency]);
 
-  const getSubscriptionProducts = () => products.filter(p => p.product_type === 'subscription');
-  const getCreditPackProducts = () => products.filter(p => 
-    p.product_type === 'credit_pack' && 
-    p.product_id !== 'initial_free_credits' &&
-    !p.product_name.toLowerCase().includes('ai mock interview') &&
-    p.credits_amount > 10 // Exclude small credit amounts (1, 3, 5) that are for AI interviews
+  // Memoize the filtered arrays to prevent recreation on every render
+  const subscriptionProducts = useMemo(() => 
+    products.filter(p => p.product_type === 'subscription'), 
+    [products]
   );
-  const getAIInterviewProducts = () => products.filter(p => 
-    p.product_type === 'credit_pack' && 
-    (p.product_name.toLowerCase().includes('ai mock interview') || p.credits_amount <= 10)
+
+  const creditPackProducts = useMemo(() => 
+    products.filter(p => 
+      p.product_type === 'credit_pack' && 
+      p.product_id !== 'initial_free_credits' &&
+      !p.product_name.toLowerCase().includes('ai mock interview') &&
+      p.credits_amount > 10 // Exclude small credit amounts (1, 3, 5) that are for AI interviews
+    ), 
+    [products]
+  );
+
+  const aiInterviewProducts = useMemo(() => 
+    products.filter(p => 
+      p.product_type === 'credit_pack' && 
+      (p.product_name.toLowerCase().includes('ai mock interview') || p.credits_amount <= 10)
+    ), 
+    [products]
   );
 
   return {
     products,
-    subscriptionProducts: getSubscriptionProducts(),
-    creditPackProducts: getCreditPackProducts(),
-    aiInterviewProducts: getAIInterviewProducts(),
+    subscriptionProducts,
+    creditPackProducts,
+    aiInterviewProducts,
     isLoading,
     error
   };

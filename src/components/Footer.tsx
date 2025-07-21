@@ -1,4 +1,6 @@
+
 import { Link } from 'react-router-dom';
+
 const Footer = () => {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -8,9 +10,11 @@ const Footer = () => {
       });
     }
   };
-  return <footer className="bg-black py-12 px-4 border-t border-gray-800">
+
+  return (
+    <footer className="bg-black py-12 px-4 border-t border-gray-800">
       <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
           {/* Company Info */}
           <div className="md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
@@ -48,15 +52,22 @@ const Footer = () => {
               <Link to="/contact-support" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
                 Contact Support
               </Link>
-              <Link to="/privacy-policy" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
-                Privacy Policy
-              </Link>
-              <Link to="/terms-of-service" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
-                Terms of Service
-              </Link>
               <Link to="/blogs" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter" onClick={() => window.scrollTo(0, 0)}>
                 Blogs
               </Link>
+            </div>
+          </div>
+
+          {/* Legal Section - Using standard HTML anchor tags for better crawlability */}
+          <div>
+            <h3 className="text-white font-semibold text-sm font-inter mb-4">Legal</h3>
+            <div className="space-y-3">
+              <a href="/privacy-policy" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
+                Privacy Policy
+              </a>
+              <a href="/terms-of-service" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
+                Terms of Service
+              </a>
             </div>
           </div>
         </div>
@@ -74,6 +85,8 @@ const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>;
+    </footer>
+  );
 };
+
 export default Footer;

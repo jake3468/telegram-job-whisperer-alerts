@@ -9,8 +9,35 @@ import PricingSection from "@/components/PricingSection";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 import SecurityHeaders from "@/components/SecurityHeaders";
+import { useEffect } from "react";
 
 const Index = () => {
+  useEffect(() => {
+    // Add JSON-LD structured data for better Google crawlability
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.innerHTML = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Aspirely.ai",
+      "url": window.location.origin,
+      "description": "The AI-powered platform for finding and creating your perfect career path with advanced job matching and personalized guidance.",
+      "privacyPolicy": `${window.location.origin}/privacy-policy`,
+      "termsOfService": `${window.location.origin}/terms-of-service`,
+      "publisher": {
+        "@type": "Organization",
+        "name": "Aspirely.ai",
+        "url": window.location.origin
+      }
+    });
+    
+    document.head.appendChild(script);
+    
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-black font-inter text-slate-50">
       <SecurityHeaders />

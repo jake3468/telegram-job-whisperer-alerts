@@ -93,24 +93,15 @@ const DroppableColumn = ({
       <div className={`p-2 h-[450px] overflow-y-auto ${isDropTarget ? 'bg-black/5' : ''} transition-colors`}>
         <SortableContext items={jobs.map(job => job.id)} strategy={verticalListSortingStrategy}>
           <div className="space-y-1">
-            {jobs.map((job, index) => {
-              console.log(`[DEBUG] Rendering job ${index + 1}/${jobs.length} for column ${column.key}:`, {
-                id: job.id,
-                company: job.company_name,
-                title: job.job_title,
-                position: job.order_position
-              });
-              
-              return (
-                <SortableJobCard 
-                  key={`${job.id}-${job.status}-${job.order_position}`} 
-                  job={job} 
-                  onDelete={onDeleteJob} 
-                  onView={onViewJob} 
-                  onUpdateChecklist={onUpdateChecklist} 
-                />
-              );
-            })}
+            {jobs.map((job, index) => (
+              <SortableJobCard 
+                key={`${job.id}-${job.status}-${job.order_position}`} 
+                job={job} 
+                onDelete={onDeleteJob} 
+                onView={onViewJob} 
+                onUpdateChecklist={onUpdateChecklist} 
+              />
+            ))}
           </div>
         </SortableContext>
       </div>
@@ -565,23 +556,30 @@ const JobTracker = () => {
     }
   };
   const handleUpdateJob = async () => {
-    if (!selectedJob) return;
-    if (!editFormData.company_name || !editFormData.job_title) {
+    if (!selectedJob) {
       toast({
         title: "Error",
-        description: "Company name and job title are required.",
+        description: "No job selected for update.",
         variant: "destructive"
       });
       return;
     }
-    if (!isAuthReady) {
+    if (!isAuthReady || !userProfileId) {
       toast({
         title: "Please wait",
-        description: "Authentication is loading. Please try again in a moment.",
-        variant: "destructive"
+        description: "Loading your data. Please try again in a moment.",
+        variant: "default"
       });
       return;
     }
+
+    // Show loading state
+    const loadingToast = toast({
+      title: "Updating job...",
+      description: "Please wait while we save your changes.",
+      duration: 0
+    });
+
     try {
       await executeWithRetry(async () => {
         const { error } = await supabase.from('job_tracker').update({
@@ -589,9 +587,16 @@ const JobTracker = () => {
           job_title: editFormData.job_title,
           job_description: editFormData.job_description || null,
           job_url: editFormData.job_url || null
-        }).eq('id', selectedJob.id);
-        if (error) throw error;
+        }).eq('id', selectedJob.id).eq('user_id', userProfileId);
+        
+        if (error) {
+          throw error;
+        }
       }, 3, 'update job details');
+      
+      // Dismiss loading toast
+      loadingToast.dismiss();
+      
       toast({
         title: "Success",
         description: "Job updated successfully!"
@@ -599,46 +604,84 @@ const JobTracker = () => {
       setIsViewModalOpen(false);
       setSelectedJob(null);
       invalidateCache();
-    } catch (error) {
-      console.error('Error updating job:', error);
+    } catch (error: any) {
+      // Dismiss loading toast
+      loadingToast.dismiss();
+      
+      // Enterprise-grade error handling - user-friendly messages only
+      let errorMessage = "Unable to update job. Please try again.";
+      
+      if (error?.code === 'PGRST116') {
+        errorMessage = "Job not found. Please refresh the page.";
+      } else if (error?.message?.includes('refresh the page')) {
+        errorMessage = error.message;
+      }
+      
       toast({
-        title: "Error",
-        description: "Failed to update job.",
+        title: "Update Failed",
+        description: errorMessage,
         variant: "destructive"
       });
     }
   };
-  const deleteJob = async (jobId: string) => {
-    if (!isAuthReady) {
+  const handleDeleteJob = async () => {
+    if (!selectedJob) return;
+    
+    if (!isAuthReady || !userProfileId) {
       toast({
         title: "Please wait",
-        description: "Authentication is loading. Please try again in a moment.",
-        variant: "destructive"
+        description: "Loading your data. Please try again in a moment.",
+        variant: "default"
       });
       return;
     }
-    
-    // Optimistic delete first
-    optimisticDelete(jobId);
+
+    // Show loading state
+    const loadingToast = toast({
+      title: "Deleting job...",
+      description: "Please wait while we remove this job.",
+      duration: 0
+    });
+
     try {
       await executeWithRetry(async () => {
-        const { error } = await supabase.from('job_tracker').delete().eq('id', jobId);
-        if (error) throw error;
-      }, 3, 'delete job from tracker');
-
-      // Invalidate cache for fresh data on next load
-      invalidateCache();
+        const { error } = await supabase
+          .from('job_tracker')
+          .delete()
+          .eq('id', selectedJob.id)
+          .eq('user_id', userProfileId);
+        
+        if (error) {
+          throw error;
+        }
+      }, 3, 'delete job');
+      
+      // Dismiss loading toast
+      loadingToast.dismiss();
+      
       toast({
         title: "Success",
         description: "Job deleted successfully!"
       });
-    } catch (error) {
-      console.error('Error deleting job:', error);
-      // Revert optimistic delete on error - re-fetch data
+      
+      optimisticDelete(selectedJob.id);
+      setIsViewModalOpen(false);
+      setSelectedJob(null);
       invalidateCache();
+    } catch (error: any) {
+      // Dismiss loading toast
+      loadingToast.dismiss();
+      
+      // Enterprise-grade error handling
+      let errorMessage = "Unable to delete job. Please try again.";
+      
+      if (error?.message?.includes('refresh the page')) {
+        errorMessage = error.message;
+      }
+      
       toast({
-        title: "Error",
-        description: "Failed to delete job.",
+        title: "Delete Failed",
+        description: errorMessage,
         variant: "destructive"
       });
     }
@@ -825,13 +868,6 @@ const JobTracker = () => {
   };
   const getJobsByStatus = (status: string) => {
     const filteredJobs = jobs.filter(job => job.status === status).sort((a, b) => a.order_position - b.order_position);
-    console.log(`[DEBUG] getJobsByStatus for "${status}":`, filteredJobs.length, 'jobs');
-    console.log(`[DEBUG] Jobs for status "${status}":`, filteredJobs.map(j => ({ 
-      id: j.id, 
-      company: j.company_name, 
-      position: j.order_position,
-      title: j.job_title 
-    })));
     return filteredJobs;
   };
   const handleViewJob = (job: JobEntry) => {
@@ -996,7 +1032,7 @@ const JobTracker = () => {
               {columns.map(column => <DroppableColumn key={column.key} column={column} jobs={getJobsByStatus(column.key)} onAddJob={() => {
               setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
               setIsModalOpen(true);
-            }} onDeleteJob={deleteJob} onViewJob={handleViewJob} onUpdateChecklist={handleUpdateChecklistItem} activeJobId={activeJob?.id} />)}
+            }} onDeleteJob={handleDeleteJob} onViewJob={handleViewJob} onUpdateChecklist={handleUpdateChecklistItem} activeJobId={activeJob?.id} />)}
             </div>
             <DragOverlay>
               {activeJob ? <div className="bg-gray-800 rounded-lg p-4 border border-gray-600 shadow-2xl transform rotate-3 w-full max-w-[280px]">
@@ -1331,7 +1367,7 @@ const JobTracker = () => {
                 Save Changes
               </Button>
               <Button onClick={() => {
-              deleteJob(selectedJob.id);
+              handleDeleteJob();
               setIsViewModalOpen(false);
               setSelectedJob(null);
             }} variant="destructive" className="bg-red-600 hover:bg-red-700 text-white font-orbitron text-sm h-9">

@@ -7,7 +7,6 @@ import { Layout } from '@/components/Layout';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
 import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
-import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
 import { JobAlertsOnboardingPopup } from '@/components/JobAlertsOnboardingPopup';
 import { Badge } from '@/components/ui/badge';
 import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
@@ -89,9 +88,6 @@ const JobAlerts = () => {
           Usage Fee: 0.1 credits per alert message
         </Badge>
       </div>
-
-      {/* Profile Completion Warning */}
-      <ProfileCompletionWarning />
 
       {/* Job Alerts Onboarding Popup */}
       <JobAlertsOnboardingPopup />
