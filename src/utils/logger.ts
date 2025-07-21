@@ -4,36 +4,24 @@ import { Environment } from '@/utils/environment';
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 class Logger {
-  private logCounts: Map<string, number> = new Map();
-  private maxLogsPerMessage = 3;
-
   private shouldLog(level: LogLevel): boolean {
     // In production, only log warnings and errors
     if (Environment.isProduction()) {
       return level === 'warn' || level === 'error';
     }
     
-    // In development, log everything but with rate limiting
-    return true;
-  }
-
-  private rateLimit(message: string): boolean {
-    const count = this.logCounts.get(message) || 0;
-    if (count >= this.maxLogsPerMessage) {
-      return false;
-    }
-    this.logCounts.set(message, count + 1);
+    // In development, log everything
     return true;
   }
 
   debug(message: string, ...args: any[]) {
-    if (this.shouldLog('debug') && this.rateLimit(message)) {
+    if (this.shouldLog('debug')) {
       console.log(`[DEBUG] ${message}`, ...args);
     }
   }
 
   info(message: string, ...args: any[]) {
-    if (this.shouldLog('info') && this.rateLimit(message)) {
+    if (this.shouldLog('info')) {
       console.log(`[INFO] ${message}`, ...args);
     }
   }
@@ -47,15 +35,6 @@ class Logger {
   error(message: string, ...args: any[]) {
     if (this.shouldLog('error')) {
       console.error(`[ERROR] ${message}`, ...args);
-    }
-  }
-
-  // Reset counts for specific messages
-  reset(message?: string) {
-    if (message) {
-      this.logCounts.delete(message);
-    } else {
-      this.logCounts.clear();
     }
   }
 

@@ -140,7 +140,7 @@ export const useCachedJobTracker = () => {
     } else if (hasFetched || jobs.length > 0) {
       setLoading(false);
     }
-  }, [user?.id, isAuthReady]); // Removed hasFetched and jobs.length to prevent infinite loop
+  }, [user?.id, hasFetched, jobs.length, error, isAuthReady]); // Include isAuthReady
 
   // Add sanitization helper function
   const sanitizeText = (text: string): string => {
