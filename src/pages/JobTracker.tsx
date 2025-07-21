@@ -565,7 +565,7 @@ const JobTracker = () => {
       });
       return;
     }
-    if (!isAuthReady) {
+    if (!isAuthReady || !userProfileId) {
       toast({
         title: "Please wait",
         description: "Authentication is loading. Please try again in a moment.",
@@ -573,6 +573,7 @@ const JobTracker = () => {
       });
       return;
     }
+
     try {
       await executeWithRetry(async () => {
         const { error } = await supabase.from('job_tracker').update({
@@ -580,9 +581,19 @@ const JobTracker = () => {
           job_title: editFormData.job_title,
           job_description: editFormData.job_description || null,
           job_url: editFormData.job_url || null
-        }).eq('id', selectedJob.id);
-        if (error) throw error;
+        }).eq('id', selectedJob.id).eq('user_id', userProfileId);
+        
+        if (error) {
+          console.error('Database error details:', {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+          });
+          throw error;
+        }
       }, 3, 'update job details');
+      
       toast({
         title: "Success",
         description: "Job updated successfully!"
@@ -590,11 +601,19 @@ const JobTracker = () => {
       setIsViewModalOpen(false);
       setSelectedJob(null);
       invalidateCache();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating job:', error);
+      
+      let errorMessage = "Failed to update job.";
+      if (error?.code === 'PGRST116') {
+        errorMessage = "No job found or you don't have permission to update this job.";
+      } else if (error?.message) {
+        errorMessage = `Update failed: ${error.message}`;
+      }
+      
       toast({
         title: "Error",
-        description: "Failed to update job.",
+        description: errorMessage,
         variant: "destructive"
       });
     }
