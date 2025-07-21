@@ -14,6 +14,7 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
 // Store the current JWT token and refresh function
 let currentJWTToken: string | null = null;
 let tokenRefreshFunction: (() => Promise<string | null>) | null = null;
+let clientInstance: any = null; // Cache client instance to prevent multiple instances
 
 // Create a single Supabase client instance to prevent multiple client warnings
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
@@ -139,19 +140,31 @@ export const makeAuthenticatedRequest = async <T>(
         throw new Error('Authentication token unavailable');
       }
 
-      // Create a new client instance with JWT headers for this specific request
-      const authenticatedClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false, // We handle this manually
-        },
-        global: {
-          headers: {
-            'Authorization': `Bearer ${currentJWTToken}`,
-            'apikey': SUPABASE_PUBLISHABLE_KEY
+      // Reuse cached client instance or create new one to prevent multiple instances
+      if (!clientInstance) {
+        clientInstance = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+          auth: {
+            persistSession: false,
+            autoRefreshToken: false, // We handle this manually
+          },
+          global: {
+            headers: {
+              'Authorization': `Bearer ${currentJWTToken}`,
+              'apikey': SUPABASE_PUBLISHABLE_KEY
+            }
           }
-        }
-      });
+        });
+      } else {
+        // Update headers on existing client
+        clientInstance.supabaseKey = SUPABASE_PUBLISHABLE_KEY;
+        clientInstance.supabaseUrl = SUPABASE_URL;
+        clientInstance.auth.headers = {
+          'Authorization': `Bearer ${currentJWTToken}`,
+          'apikey': SUPABASE_PUBLISHABLE_KEY
+        };
+      }
+      
+      const authenticatedClient = clientInstance;
 
       // Replace the global supabase instance temporarily for this operation
       const originalFrom = supabase.from.bind(supabase);

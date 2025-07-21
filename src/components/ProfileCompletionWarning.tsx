@@ -1,7 +1,7 @@
 
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { useCachedUserCompletionStatus } from '@/hooks/useCachedUserCompletionStatus';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 
 interface ProfileCompletionWarningProps {
@@ -13,43 +13,25 @@ export const ProfileCompletionWarning = ({ className = '' }: ProfileCompletionWa
   const [showWarning, setShowWarning] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  useEffect(() => {
-    // Add debugging
-    console.log('ProfileCompletionWarning - Status check:', {
-      loading,
-      hasResume,
-      hasBio,
-      lastChecked,
-      showWarning
-    });
+  // Memoize the incomplete status to prevent unnecessary re-renders
+  const isIncomplete = useMemo(() => !hasResume || !hasBio, [hasResume, hasBio]);
 
+  useEffect(() => {
     // Only show warning after loading is complete and profile is actually incomplete
-    // Add extra delay to ensure all authentication is settled
     if (!loading) {
       const timer = setTimeout(() => {
-        const isIncomplete = !hasResume || !hasBio;
         setShowWarning(isIncomplete);
-        
-        // Additional debugging
-        if (isIncomplete) {
-          console.log('Profile incomplete - Missing:', {
-            resume: !hasResume,
-            bio: !hasBio
-          });
-        }
       }, 500);
 
       return () => clearTimeout(timer);
     }
-  }, [loading, hasResume, hasBio, lastChecked]);
+  }, [loading, isIncomplete]); // Removed lastChecked to prevent constant re-renders
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    console.log('Manual refresh triggered for profile completion status');
     
     try {
       await refetchStatus();
-      console.log('Profile refresh completed');
     } catch (error) {
       console.error('Error refreshing profile status:', error);
     } finally {

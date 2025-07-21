@@ -67,14 +67,15 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
       const hasBio = !!(userProfile.bio && userProfile.bio.trim().length > 0);
       const isComplete = hasResume && hasBio;
 
-      console.log('Profile completion check from cached data:', {
-        userId: user.id,
-        hasResume,
-        hasBio,
-        isComplete,
-        resume: userProfile.resume ? `${userProfile.resume.substring(0, 50)}...` : 'None',
-        bio: userProfile.bio || 'None'
-      });
+      // Only log in development environment
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Profile completion check from cached data:', {
+          userId: user.id,
+          hasResume,
+          hasBio,
+          isComplete
+        });
+      }
 
       const newStatus = {
         hasResume,
@@ -104,7 +105,6 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
   const refetchStatus = async () => {
     // Invalidate cache and force profile refresh
     localStorage.removeItem(CACHE_KEY);
-    console.log('Invalidated completion status cache, forcing profile refresh...');
     await refetchProfile();
   };
 
