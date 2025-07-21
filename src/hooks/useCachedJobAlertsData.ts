@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/logger';
@@ -107,7 +107,7 @@ export const useCachedJobAlertsData = () => {
     }
   }, [loading, user, alerts.length, userProfileId]);
 
-  const fetchJobAlertsData = async () => {
+  const fetchJobAlertsData = useCallback(async () => {
     if (!user) return;
     
     if (!isAuthReady) {
@@ -193,7 +193,35 @@ export const useCachedJobAlertsData = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, isAuthReady, executeWithRetry, alerts.length]);
+
+  // Background auto-refresh every 15 minutes (like professional websites)
+  useEffect(() => {
+    if (!user || !isAuthReady) return;
+
+    const refreshInterval = setInterval(() => {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        try {
+          const parsedCache: CachedJobAlertsData = JSON.parse(cached);
+          const now = Date.now();
+          // Only refresh if cache is older than 10 minutes
+          if (now - parsedCache.timestamp > 10 * 60 * 1000) {
+            logger.debug('Background refresh triggered');
+            fetchJobAlertsData();
+          }
+        } catch {
+          // Invalid cache, refresh
+          fetchJobAlertsData();
+        }
+      } else {
+        // No cache, refresh
+        fetchJobAlertsData();
+      }
+    }, 15 * 60 * 1000); // 15 minutes
+
+    return () => clearInterval(refreshInterval);
+  }, [user?.id, isAuthReady, fetchJobAlertsData]);
 
   const invalidateCache = () => {
     localStorage.removeItem(CACHE_KEY);
