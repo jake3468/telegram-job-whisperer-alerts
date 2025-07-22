@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
@@ -15,7 +16,7 @@ interface ResumeSectionProps {
 const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
   const { user } = useUser();
   const { toast } = useToast();
-  const { resumeExists, updateResumeStatus, updateUserProfile } = useCachedUserProfile();
+  const { userProfile, resumeExists, updateResumeStatus, updateUserProfile } = useCachedUserProfile();
   const [uploading, setUploading] = useState(false);
   const [resumeUrl, setResumeUrl] = useState<string | null>(null);
 
@@ -256,6 +257,45 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
     }
   };
 
+  // Helper function to format upload date
+  const formatUploadDate = (dateString: string | null) => {
+    if (!dateString) return 'Uploaded recently';
+    
+    try {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+      
+      if (diffInHours < 1) {
+        return 'Uploaded recently';
+      } else if (diffInHours < 24) {
+        return `Uploaded ${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+      } else {
+        const diffInDays = Math.floor(diffInHours / 24);
+        if (diffInDays < 7) {
+          return `Uploaded ${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+        } else {
+          return `Uploaded on ${date.toLocaleDateString()}`;
+        }
+      }
+    } catch {
+      return 'Uploaded recently';
+    }
+  };
+
+  // Get display filename - use actual filename if available, otherwise default
+  const getDisplayFilename = () => {
+    if (userProfile?.resume_filename) {
+      return userProfile.resume_filename;
+    }
+    return 'resume.pdf';
+  };
+
+  // Get display upload date
+  const getDisplayUploadDate = () => {
+    return formatUploadDate(userProfile?.resume_uploaded_at || null);
+  };
+
   return (
     <section className="p-0 rounded-none bg-transparent shadow-none">
       <Card className="
@@ -282,10 +322,10 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
                 </div>
                 <div className="min-w-0 flex-1">
                   <span className="text-white font-inter font-medium text-sm break-words block leading-tight">
-                    resume.pdf
+                    {getDisplayFilename()}
                   </span>
                   <span className="text-white/70 text-xs">
-                    Uploaded recently
+                    {getDisplayUploadDate()}
                   </span>
                 </div>
               </div>
