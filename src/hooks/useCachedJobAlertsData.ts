@@ -28,7 +28,7 @@ interface CachedJobAlertsData {
 }
 
 const CACHE_KEY = 'aspirely_job_alerts_cache';
-const CACHE_VERSION = 'v4'; // Force fresh start with comprehensive debugging
+const CACHE_VERSION = 'v5'; // Fixed RLS policies
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes for fresh data
 const BACKGROUND_REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes - professional standard
 let isRefreshing = false; // Request deduplication flag
@@ -96,10 +96,7 @@ export const useCachedJobAlertsData = () => {
 
   // Fetch fresh data when user changes or auth becomes ready
   useEffect(() => {
-    console.log('[JobAlerts] Effect triggered - user:', !!user, 'isAuthReady:', isAuthReady);
-    
     if (!user) {
-      console.log('[JobAlerts] No user, setting loading to false');
       setLoading(false);
       return;
     }
@@ -114,21 +111,16 @@ export const useCachedJobAlertsData = () => {
         if (parsedCache.version !== CACHE_VERSION) {
           localStorage.removeItem(CACHE_KEY);
         } else if (now - parsedCache.timestamp < CACHE_DURATION) {
-          console.log('[JobAlerts] Using fresh cached data, skipping fetch');
           setLoading(false);
           return;
         }
       } catch {
         // Invalid cache, continue to fetch
-        console.log('[JobAlerts] Invalid cache, will fetch fresh data');
       }
     }
     
     if (isAuthReady) {
-      console.log('[JobAlerts] Auth ready, fetching data');
       fetchJobAlertsData();
-    } else {
-      console.log('[JobAlerts] Auth not ready yet');
     }
   }, [user?.id, isAuthReady]);
 
@@ -160,23 +152,15 @@ export const useCachedJobAlertsData = () => {
   }, [loading, user, alerts.length, userProfileId]);
 
   const fetchJobAlertsData = useCallback(async (silent = false) => {
-    if (!user) {
-      console.log('[JobAlerts] No user, skipping fetch');
-      return;
-    }
-    
-    if (!isAuthReady) {
-      console.log('[JobAlerts] Auth not ready, skipping fetch');
+    if (!user || !isAuthReady) {
       return;
     }
     
     // Request deduplication - prevent multiple simultaneous requests
     if (isRefreshing) {
-      console.log('[JobAlerts] Already refreshing, skipping fetch');
       return;
     }
     
-    console.log('[JobAlerts] Starting data fetch, silent:', silent);
     isRefreshing = true;
     
     try {
@@ -185,50 +169,30 @@ export const useCachedJobAlertsData = () => {
         setConnectionIssue(false);
       }
       
-      console.log('[JobAlerts] Executing with retry...');
       const result = await executeWithRetry(
         async () => {
-          console.log('[JobAlerts] Inside executeWithRetry callback');
           return await makeAuthenticatedRequest(async () => {
-            console.log('[JobAlerts] Inside makeAuthenticatedRequest callback');
             const { supabase } = await import('@/integrations/supabase/client');
             
-            // Debug authentication state
-            const session = await supabase.auth.getSession();
-            console.log('[JobAlerts] Current session:', session);
-            const user = await supabase.auth.getUser();
-            console.log('[JobAlerts] Current user:', user);
-            
-            console.log('[JobAlerts] Fetching user profile...');
-            // Simplified approach - let RLS policies handle user filtering
-            // The RLS policies will automatically filter based on JWT token
-            
-            // First get user profile (needed for profile ID and bot status)
+            // Get user profile - RLS will filter automatically
             const { data: profileData, error: profileError } = await supabase
               .from('user_profile')
               .select('id, bot_activated')
               .single();
               
             if (profileError) {
-              console.error('[JobAlerts] Profile fetch error:', profileError);
               throw profileError;
             }
 
-            console.log('[JobAlerts] Profile data:', profileData);
-
-            console.log('[JobAlerts] Fetching job alerts for profile:', profileData.id);
-            // Fetch job alerts - RLS will automatically filter for current user
+            // Fetch job alerts - RLS policies will filter automatically
             const { data: alertsData, error: alertsError } = await supabase
               .from('job_alerts')
               .select('*')
               .order('created_at', { ascending: false });
 
             if (alertsError) {
-              console.error('[JobAlerts] Alerts fetch error:', alertsError);
               throw alertsError;
             }
-
-            console.log('[JobAlerts] Alerts data received:', alertsData);
 
             return {
               alerts: alertsData || [],
@@ -240,8 +204,6 @@ export const useCachedJobAlertsData = () => {
         5, // 5 retry attempts with exponential backoff
         'Fetching job alerts data'
       );
-
-      console.log('[JobAlerts] Final result:', result);
 
       // Update state
       setAlerts(result.alerts);
@@ -258,14 +220,11 @@ export const useCachedJobAlertsData = () => {
           version: CACHE_VERSION
         };
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-        console.log('[JobAlerts] Cached fresh job alerts data:', cacheData);
       } catch (cacheError) {
-        console.warn('[JobAlerts] Failed to cache job alerts data:', cacheError);
+        logger.warn('Failed to cache job alerts data:', cacheError);
       }
 
     } catch (error) {
-      console.error('[JobAlerts] Error fetching job alerts data:', error);
-      
       if (!silent) {
         setError(error instanceof Error ? error.message : 'Unknown error occurred');
         
@@ -279,7 +238,6 @@ export const useCachedJobAlertsData = () => {
       if (!silent) {
         setLoading(false);
       }
-      console.log('[JobAlerts] Data fetch completed');
     }
   }, [user, isAuthReady, executeWithRetry, alerts.length]);
 
