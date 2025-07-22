@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { RefreshCw, Copy } from 'lucide-react';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useToast } from '@/hooks/use-toast';
+import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
 
 
 const Profile = () => {
@@ -29,6 +30,8 @@ const Profile = () => {
   const { showPopup, hidePopup, dontShowAgain } = useOnboardingPopup();
   const { toast } = useToast();
 
+  // Enhanced token management for the entire Profile page
+  const { updateActivity } = useFormTokenKeepAlive(true);
 
   // Connection and error state management
   const [connectionIssue, setConnectionIssue] = useState(false);
@@ -84,6 +87,7 @@ const Profile = () => {
 
   // Manual refresh function - enhanced with token refresh
   const handleManualRefresh = useCallback(() => {
+    updateActivity(); // Track user activity
     try {
       if (connectionIssue) {
         window.location.reload();
@@ -101,10 +105,11 @@ const Profile = () => {
       console.error('Manual refresh failed:', err);
       window.location.reload();
     }
-  }, [connectionIssue, checkJWTSetup]);
+  }, [connectionIssue, checkJWTSetup, updateActivity]);
 
   // Copy user profile ID to clipboard
   const copyUserProfileId = async () => {
+    updateActivity(); // Track user activity
     if (userProfile?.id) {
       try {
         await navigator.clipboard.writeText(userProfile.id);
@@ -132,7 +137,7 @@ const Profile = () => {
 
   return (
     <Layout>
-      <div className="text-center mb-8">
+      <div className="text-center mb-8" onClick={updateActivity}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex-1">
             <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-2">
@@ -183,7 +188,7 @@ const Profile = () => {
           </div>
         </div>
       ) : (
-        <div className="max-w-4xl mx-auto space-y-8 px-4">
+        <div className="max-w-4xl mx-auto space-y-8 px-4" onClick={updateActivity} onKeyDown={updateActivity}>
           {/* Step 1: Resume Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-3 mb-4">
@@ -192,10 +197,13 @@ const Profile = () => {
               </div>
               <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-sky-400 to-fuchsia-400 bg-clip-text text-transparent">Add Current Resume</h2>
             </div>
-            <ResumeSection />
+            <ResumeSection updateActivity={updateActivity} />
             <div className="mt-4 mb-6 text-center">
               <Button 
-                onClick={() => setShowResumeHelp(true)} 
+                onClick={() => {
+                  updateActivity();
+                  setShowResumeHelp(true);
+                }} 
                 variant="outline" 
                 size="sm" 
                 className="border-sky-200 hover:border-sky-300 text-white bg-black"
@@ -215,7 +223,7 @@ const Profile = () => {
                 Add Your Bio
               </h2>
             </div>
-            <ProfessionalBioSection />
+            <ProfessionalBioSection updateActivity={updateActivity} />
           </div>
 
           {/* Step 3: Job Alerts */}
@@ -261,7 +269,10 @@ const Profile = () => {
                       <span className="text-amber-200 text-sm">Loading your Bot ID...</span>
                     </div>
                     <Button 
-                      onClick={() => window.location.reload()} 
+                      onClick={() => {
+                        updateActivity();
+                        window.location.reload();
+                      }} 
                       variant="ghost" 
                       size="sm" 
                       className="text-amber-200 hover:text-amber-100 hover:bg-amber-900/30"
@@ -273,7 +284,10 @@ const Profile = () => {
               </div>
               
               <Button 
-                onClick={() => window.open('https://t.me/Job_AI_update_bot', '_blank')} 
+                onClick={() => {
+                  updateActivity();
+                  window.open('https://t.me/Job_AI_update_bot', '_blank');
+                }} 
                 className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter text-sm"
               >
                 Activate my Job Alerts

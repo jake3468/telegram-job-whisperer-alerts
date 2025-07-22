@@ -1,3 +1,4 @@
+
 import { useUser } from '@clerk/clerk-react';
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +11,7 @@ import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 import { JobAlertsOnboardingPopup } from '@/components/JobAlertsOnboardingPopup';
 import { Badge } from '@/components/ui/badge';
 import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
+
 const JobAlerts = () => {
   const {
     user,
@@ -56,16 +58,19 @@ const JobAlerts = () => {
       return 'UTC';
     }
   }, []);
+  
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
+  
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-gradient-to-br from-pastel-mint via-pastel-lavender to-pastel-peach flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading user...</div>
       </div>;
   }
+  
   return <Layout>
       <div className="text-center mb-8" onClick={updateActivity}>
         <h1 className="text-4xl font-orbitron font-extrabold mb-2 drop-shadow tracking-tight flex items-center justify-center gap-2">
@@ -80,7 +85,7 @@ const JobAlerts = () => {
         </h1>
         
         <p className="text-md text-orange-100 font-inter font-light mb-4">
-          Get job alerts from the latest <span className="italic text-indigo-200">24-hour</span> postings — sent to your <span className="italic text-pastel-peach">Telegram</span> and listed under ‘Posted Today’ in your <span className="italic text-pastel-peach">Job Board</span> page
+          Get job alerts from the latest <span className="italic text-indigo-200">24-hour</span> postings — sent to your <span className="italic text-pastel-peach">Telegram</span> and listed under 'Posted Today' in your <span className="italic text-pastel-peach">Job Board</span> page
         </p>
 
         {/* Usage Cost Badge */}
@@ -97,4 +102,5 @@ const JobAlerts = () => {
       </div>
     </Layout>;
 };
+
 export default JobAlerts;
