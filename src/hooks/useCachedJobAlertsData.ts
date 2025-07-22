@@ -28,7 +28,7 @@ interface CachedJobAlertsData {
 }
 
 const CACHE_KEY = 'aspirely_job_alerts_cache';
-const CACHE_VERSION = 'v3'; // Force fresh start with comprehensive debugging
+const CACHE_VERSION = 'v4'; // Force fresh start with comprehensive debugging
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes for fresh data
 const BACKGROUND_REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes - professional standard
 let isRefreshing = false; // Request deduplication flag
@@ -192,6 +192,12 @@ export const useCachedJobAlertsData = () => {
           return await makeAuthenticatedRequest(async () => {
             console.log('[JobAlerts] Inside makeAuthenticatedRequest callback');
             const { supabase } = await import('@/integrations/supabase/client');
+            
+            // Debug authentication state
+            const session = await supabase.auth.getSession();
+            console.log('[JobAlerts] Current session:', session);
+            const user = await supabase.auth.getUser();
+            console.log('[JobAlerts] Current user:', user);
             
             console.log('[JobAlerts] Fetching user profile...');
             // Simplified approach - let RLS policies handle user filtering
