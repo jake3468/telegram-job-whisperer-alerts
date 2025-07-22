@@ -28,7 +28,7 @@ interface CachedJobAlertsData {
 }
 
 const CACHE_KEY = 'aspirely_job_alerts_cache';
-const CACHE_VERSION = 'v2'; // Updated version to invalidate old cache
+const CACHE_VERSION = 'v3'; // Force fresh start with comprehensive debugging
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes for fresh data
 const BACKGROUND_REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes - professional standard
 let isRefreshing = false; // Request deduplication flag
@@ -96,7 +96,10 @@ export const useCachedJobAlertsData = () => {
 
   // Fetch fresh data when user changes or auth becomes ready
   useEffect(() => {
+    console.log('[JobAlerts] Effect triggered - user:', !!user, 'isAuthReady:', isAuthReady);
+    
     if (!user) {
+      console.log('[JobAlerts] No user, setting loading to false');
       setLoading(false);
       return;
     }
@@ -111,16 +114,21 @@ export const useCachedJobAlertsData = () => {
         if (parsedCache.version !== CACHE_VERSION) {
           localStorage.removeItem(CACHE_KEY);
         } else if (now - parsedCache.timestamp < CACHE_DURATION) {
+          console.log('[JobAlerts] Using fresh cached data, skipping fetch');
           setLoading(false);
           return;
         }
       } catch {
         // Invalid cache, continue to fetch
+        console.log('[JobAlerts] Invalid cache, will fetch fresh data');
       }
     }
     
     if (isAuthReady) {
+      console.log('[JobAlerts] Auth ready, fetching data');
       fetchJobAlertsData();
+    } else {
+      console.log('[JobAlerts] Auth not ready yet');
     }
   }, [user?.id, isAuthReady]);
 
@@ -152,17 +160,23 @@ export const useCachedJobAlertsData = () => {
   }, [loading, user, alerts.length, userProfileId]);
 
   const fetchJobAlertsData = useCallback(async (silent = false) => {
-    if (!user) return;
+    if (!user) {
+      console.log('[JobAlerts] No user, skipping fetch');
+      return;
+    }
     
     if (!isAuthReady) {
+      console.log('[JobAlerts] Auth not ready, skipping fetch');
       return;
     }
     
     // Request deduplication - prevent multiple simultaneous requests
     if (isRefreshing) {
+      console.log('[JobAlerts] Already refreshing, skipping fetch');
       return;
     }
     
+    console.log('[JobAlerts] Starting data fetch, silent:', silent);
     isRefreshing = true;
     
     try {
@@ -171,11 +185,15 @@ export const useCachedJobAlertsData = () => {
         setConnectionIssue(false);
       }
       
+      console.log('[JobAlerts] Executing with retry...');
       const result = await executeWithRetry(
         async () => {
+          console.log('[JobAlerts] Inside executeWithRetry callback');
           return await makeAuthenticatedRequest(async () => {
+            console.log('[JobAlerts] Inside makeAuthenticatedRequest callback');
             const { supabase } = await import('@/integrations/supabase/client');
             
+            console.log('[JobAlerts] Fetching user profile...');
             // Simplified approach - let RLS policies handle user filtering
             // The RLS policies will automatically filter based on JWT token
             
@@ -186,10 +204,13 @@ export const useCachedJobAlertsData = () => {
               .single();
               
             if (profileError) {
-              logger.error('Profile fetch error:', profileError);
+              console.error('[JobAlerts] Profile fetch error:', profileError);
               throw profileError;
             }
 
+            console.log('[JobAlerts] Profile data:', profileData);
+
+            console.log('[JobAlerts] Fetching job alerts for profile:', profileData.id);
             // Fetch job alerts - RLS will automatically filter for current user
             const { data: alertsData, error: alertsError } = await supabase
               .from('job_alerts')
@@ -197,9 +218,11 @@ export const useCachedJobAlertsData = () => {
               .order('created_at', { ascending: false });
 
             if (alertsError) {
-              logger.error('Alerts fetch error:', alertsError);
+              console.error('[JobAlerts] Alerts fetch error:', alertsError);
               throw alertsError;
             }
+
+            console.log('[JobAlerts] Alerts data received:', alertsData);
 
             return {
               alerts: alertsData || [],
@@ -211,6 +234,8 @@ export const useCachedJobAlertsData = () => {
         5, // 5 retry attempts with exponential backoff
         'Fetching job alerts data'
       );
+
+      console.log('[JobAlerts] Final result:', result);
 
       // Update state
       setAlerts(result.alerts);
@@ -227,13 +252,13 @@ export const useCachedJobAlertsData = () => {
           version: CACHE_VERSION
         };
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-        logger.debug('Cached fresh job alerts data:', cacheData);
+        console.log('[JobAlerts] Cached fresh job alerts data:', cacheData);
       } catch (cacheError) {
-        logger.warn('Failed to cache job alerts data:', cacheError);
+        console.warn('[JobAlerts] Failed to cache job alerts data:', cacheError);
       }
 
     } catch (error) {
-      logger.error('Error fetching job alerts data:', error);
+      console.error('[JobAlerts] Error fetching job alerts data:', error);
       
       if (!silent) {
         setError(error instanceof Error ? error.message : 'Unknown error occurred');
@@ -248,6 +273,7 @@ export const useCachedJobAlertsData = () => {
       if (!silent) {
         setLoading(false);
       }
+      console.log('[JobAlerts] Data fetch completed');
     }
   }, [user, isAuthReady, executeWithRetry, alerts.length]);
 
