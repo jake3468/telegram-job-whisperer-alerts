@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
 import { useEnterpriseAPIClient } from '@/hooks/useEnterpriseAPIClient';
+import { useEnhancedTokenManagerIntegration } from '@/hooks/useEnhancedTokenManagerIntegration';
 import { supabase } from '@/integrations/supabase/client';
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -43,6 +43,10 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   const { toast } = useToast();
   const { optimisticAdd, isAuthReady, userProfileId } = useCachedJobAlertsData();
   const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
+  
+  // Enhanced session manager integration (same as Bio Section)
+  const sessionManager = useEnhancedTokenManagerIntegration();
+  
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [countryOpen, setCountryOpen] = useState(false);
@@ -79,7 +83,13 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateActivity?.();
+    
+    // Enhanced session manager activity tracking
+    if (sessionManager?.updateActivity) {
+      sessionManager.updateActivity();
+    } else if (updateActivity) {
+      updateActivity();
+    }
     
     // Basic validation
     if (!user || !isAuthReady) {
@@ -96,6 +106,22 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
         description: "Loading your profile data...",
       });
       return;
+    }
+
+    // Session manager validation (same as Bio Section)
+    if (sessionManager && !sessionManager.isTokenValid()) {
+      console.log('[JobAlertForm] Token validation failed, refreshing...');
+      try {
+        await sessionManager.refreshToken();
+      } catch (error) {
+        console.error('[JobAlertForm] Token refresh failed:', error);
+        toast({
+          title: "Session expired",
+          description: "Please refresh the page and try again.",
+          variant: "destructive"
+        });
+        return;
+      }
     }
 
     // Check alert limit for new alerts
@@ -228,7 +254,13 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   };
 
   const handleInputChange = (field: string, value: string | number) => {
-    updateActivity?.();
+    // Enhanced session manager activity tracking
+    if (sessionManager?.updateActivity) {
+      sessionManager.updateActivity();
+    } else if (updateActivity) {
+      updateActivity();
+    }
+    
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -236,7 +268,13 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   };
 
   const handleCountryChange = (countryCode: string, countryName: string) => {
-    updateActivity?.();
+    // Enhanced session manager activity tracking
+    if (sessionManager?.updateActivity) {
+      sessionManager.updateActivity();
+    } else if (updateActivity) {
+      updateActivity();
+    }
+    
     setFormData(prev => ({
       ...prev,
       country: countryCode,
@@ -249,8 +287,17 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
     return country ? `${country.name} (${country.code})` : countryValue;
   };
 
+  // Enhanced form interaction handlers
+  const handleFormInteraction = () => {
+    if (sessionManager?.updateActivity) {
+      sessionManager.updateActivity();
+    } else if (updateActivity) {
+      updateActivity();
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3" onClick={updateActivity} onKeyDown={updateActivity}>
+    <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3" onClick={handleFormInteraction} onKeyDown={handleFormInteraction}>
       {/* Alert limit warning */}
       {!editingAlert && currentAlertCount >= maxAlerts - 1 && (
         <div className="bg-yellow-900/50 border border-yellow-500/50 rounded-lg p-2 mb-3">
