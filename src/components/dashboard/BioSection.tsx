@@ -1,110 +1,243 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
-import { User } from 'lucide-react';
-import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
+import { Loader2, Save, Edit3 } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 import { useEnhancedTokenManagerIntegration } from '@/hooks/useEnhancedTokenManagerIntegration';
+import { useEnterpriseAPIClient } from '@/hooks/useEnterpriseAPIClient';
+import { supabase } from '@/integrations/supabase/client';
 
-const BioSection = () => {
+interface UserProfile {
+  id: string;
+  bio: string | null;
+  user_id: string;
+  resume: string | null;
+  created_at: string;
+}
+
+export const BioSection = () => {
+  const [bio, setBio] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [initialBio, setInitialBio] = useState(''); // Track initial value
+
   const { toast } = useToast();
-  const { userProfile, loading, updateUserProfile } = useCachedUserProfile();
-  const [bio, setBio] = useState(userProfile?.bio || '');
-  const [saving, setSaving] = useState(false);
-
-  // Keep tokens fresh while user is interacting with bio form
   const sessionManager = useEnhancedTokenManagerIntegration();
-  
-  React.useEffect(() => {
-    if (userProfile?.bio) {
-      setBio(userProfile.bio);
-    }
-  }, [userProfile]);
+  const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
 
-  const handleSaveBio = async () => {
-    setSaving(true);
-    try {
-      // Refresh token before making the save request using simplified interface
-      if (sessionManager) {
-        await sessionManager.refreshToken(true);
+  // Load bio data on component mount
+  useEffect(() => {
+    const loadBioData = async () => {
+      if (!sessionManager) {
+        console.log('[BioSection] Waiting for session manager...');
+        return;
       }
-      
-      const { error } = await updateUserProfile({ bio });
-      
-      if (error) {
-        throw new Error(error);
+
+      console.log('[BioSection] Loading bio data...');
+      setIsLoading(true);
+
+      try {
+        const result = await makeAuthenticatedRequest(async () => {
+          console.log('[BioSection] Making authenticated request for user profile...');
+          const { data, error } = await supabase
+            .from('user_profile')
+            .select('*')
+            .single();
+
+          if (error) {
+            console.error('[BioSection] Error fetching user profile:', error);
+            throw error;
+          }
+
+          console.log('[BioSection] User profile data:', data);
+          return data;
+        });
+
+        if (result) {
+          const userBio = result.bio || '';
+          setBio(userBio);
+          setInitialBio(userBio);
+          console.log('[BioSection] Bio loaded successfully:', userBio);
+        }
+      } catch (error) {
+        console.error('[BioSection] Error loading bio:', error);
+        toast({
+          title: "Error loading bio",
+          description: "Please try refreshing the page",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
       }
-      
+    };
+
+    loadBioData();
+  }, [sessionManager, makeAuthenticatedRequest, toast]);
+
+  // Track changes to the bio
+  useEffect(() => {
+    setHasChanges(bio !== initialBio);
+  }, [bio, initialBio]);
+
+  // Update activity when user interacts
+  const handleBioChange = (value: string) => {
+    setBio(value);
+    if (sessionManager) {
+      sessionManager.updateActivity();
+    }
+  };
+
+  const handleSave = async () => {
+    if (!sessionManager) {
       toast({
-        title: "Bio updated",
-        description: "Your bio has been saved successfully."
+        title: "Authentication required",
+        description: "Please refresh the page and try again",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    sessionManager.updateActivity();
+
+    try {
+      console.log('[BioSection] Saving bio...');
+      
+      await makeAuthenticatedRequest(async () => {
+        const { error } = await supabase
+          .from('user_profile')
+          .update({ bio: bio.trim() })
+          .single();
+
+        if (error) {
+          console.error('[BioSection] Error saving bio:', error);
+          throw error;
+        }
+
+        console.log('[BioSection] Bio saved successfully');
+      });
+
+      setInitialBio(bio);
+      setHasChanges(false);
+      setIsEditing(false);
+
+      toast({
+        title: "Bio saved successfully",
+        description: "Your bio has been updated",
       });
     } catch (error) {
       console.error('[BioSection] Save error:', error);
       toast({
         title: "Save failed",
-        description: "There was an error saving your bio.",
-        variant: "destructive"
+        description: "Please try again",
+        variant: "destructive",
       });
     } finally {
-      setSaving(false);
+      setIsSaving(false);
     }
   };
 
-  if (loading) {
+  const handleEdit = () => {
+    setIsEditing(true);
+    if (sessionManager) {
+      sessionManager.updateActivity();
+    }
+  };
+
+  const handleCancel = () => {
+    setBio(initialBio);
+    setIsEditing(false);
+    setHasChanges(false);
+  };
+
+  if (isLoading) {
     return (
-      <Card className="border-2 border-emerald-400 shadow-none">
-        <CardContent className="p-4">
-          <div className="text-white text-xs">Loading...</div>
-        </CardContent>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            Loading Bio...
+          </CardTitle>
+        </CardHeader>
       </Card>
     );
   }
 
   return (
-    <section className="p-0 rounded-none bg-transparent shadow-none">
-      <Card className="rounded-3xl border-2 border-emerald-400/80 bg-gradient-to-br from-emerald-600/90 via-emerald-700/85 to-emerald-900/90 shadow-2xl shadow-emerald-500/20 transition-all hover:shadow-emerald-500/30 backdrop-blur-sm">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-white font-orbitron flex items-center gap-2 text-lg drop-shadow-[0_2px_8px_rgba(16,185,129,0.6)]">
-            <div className="w-7 h-7 bg-emerald-400/60 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30">
-              <User className="w-4 h-4 text-white drop-shadow-[0_2px_8px_rgba(255,255,255,0.8)]" />
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          Professional Bio
+          {!isEditing && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleEdit}
+              className="flex items-center gap-2"
+            >
+              <Edit3 className="h-4 w-4" />
+              Edit
+            </Button>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {isEditing ? (
+          <>
+            <Textarea
+              value={bio}
+              onChange={(e) => handleBioChange(e.target.value)}
+              placeholder="Tell us about your professional background, skills, and career goals..."
+              className="min-h-32 resize-none"
+              maxLength={1000}
+            />
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">
+                {bio.length}/1000 characters
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCancel}
+                  disabled={isSaving}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleSave}
+                  disabled={isSaving || !hasChanges}
+                  className="flex items-center gap-2"
+                >
+                  {isSaving ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4" />
+                  )}
+                  {isSaving ? 'Saving...' : 'Save Bio'}
+                </Button>
+              </div>
             </div>
-            <span className="text-white font-bold">About You</span>
-          </CardTitle>
-          <CardDescription className="text-emerald-50 font-inter font-normal drop-shadow-[0_2px_10px_rgba(16,185,129,0.4)] text-sm">
-            Tell us a bit about yourself — it helps our AI tailor tools to your unique profile.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3 pt-0">
-          <Textarea 
-            value={bio} 
-            onChange={e => {
-              setBio(e.target.value);
-              if (sessionManager) {
-                sessionManager.updateActivity(); // Track user activity when typing
-              }
-            }} 
-            onFocus={() => {
-              if (sessionManager) {
-                sessionManager.updateActivity(); // Track activity when user focuses the field
-              }
-            }}
-            placeholder="I enjoy working with startups and exploring AI. My ambition is to build something impactful that people genuinely find value in." 
-            rows={4} 
-            className="min-h-[100px] border-2 border-emerald-200/40 placeholder-gray-400 font-inter text-gray-100 focus-visible:border-emerald-200 hover:border-emerald-300 text-base resize-none shadow-inner transition-all bg-black" 
-          />
-          <Button 
-            onClick={handleSaveBio} 
-            disabled={saving} 
-            className="font-inter font-bold text-xs px-4 py-2 h-9 rounded-lg shadow-lg shadow-emerald-500/20 focus-visible:ring-2 focus-visible:ring-emerald-300 transition-colors text-white bg-blue-800 hover:bg-blue-700"
-          >
-            {saving ? 'Saving...' : 'Save Bio'}
-          </Button>
-        </CardContent>
-      </Card>
-    </section>
+          </>
+        ) : (
+          <div className="space-y-4">
+            {bio ? (
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                {bio}
+              </p>
+            ) : (
+              <p className="text-muted-foreground text-sm italic">
+                No bio added yet. Click "Edit" to add your professional bio.
+              </p>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
-
-export default BioSection;

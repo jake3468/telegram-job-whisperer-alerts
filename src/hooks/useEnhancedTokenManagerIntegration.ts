@@ -20,20 +20,12 @@ export const useEnhancedTokenManagerIntegration = () => {
     };
   }, [sessionManager]);
 
-  // Return a simplified interface that components can use easily
+  // Return the session manager interface directly (it already has proper method signatures)
   return sessionManager ? {
-    refreshToken: async (forceRefresh = false) => {
-      return await sessionManager.refreshToken(forceRefresh);
-    },
-    updateActivity: () => {
-      sessionManager.updateActivity();
-    },
-    isTokenValid: () => {
-      return sessionManager.isTokenValid();
-    },
-    getCurrentToken: () => {
-      return sessionManager.getCurrentToken();
-    },
+    refreshToken: sessionManager.refreshToken, // This already handles parameters internally
+    updateActivity: sessionManager.updateActivity,
+    isTokenValid: sessionManager.isTokenValid,
+    getCurrentToken: sessionManager.getCurrentToken,
     sessionStats: sessionManager.sessionStats
   } : null;
 };

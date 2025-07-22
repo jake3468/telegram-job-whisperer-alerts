@@ -6,14 +6,14 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://fnzloyyhzhrqsvslhhri.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuemxveXloemhycXN2c2xoaHJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzAyMjIsImV4cCI6MjA2NDUwNjIyMn0.xdlgb_amJ1fV31uinCFotGW00isgT5-N8zJ_gLHEKuk";
 
-// Enterprise session management
+// Enterprise session manager
 let enterpriseSessionManager: any = null;
 
 // Supabase client with proper session management
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    persistSession: true, // Enable basic persistence for fallback
-    autoRefreshToken: false, // Keep disabled to let enterprise manager handle
+    persistSession: true,
+    autoRefreshToken: false, // Let enterprise manager handle
     detectSessionInUrl: false,
   },
   global: {
@@ -26,7 +26,7 @@ export const setEnterpriseSessionManager = (manager: any) => {
   enterpriseSessionManager = manager;
 };
 
-// Enterprise-grade authenticated request with silent recovery
+// Enterprise-grade authenticated request with proper token handling
 export const makeAuthenticatedRequest = async <T>(
   operation: () => Promise<T>,
   options: {
@@ -44,6 +44,7 @@ export const makeAuthenticatedRequest = async <T>(
       let token: string | null = null;
       
       if (enterpriseSessionManager?.refreshToken) {
+        // Call refreshToken with proper parameters - it handles getToken internally
         token = await enterpriseSessionManager.refreshToken();
       }
 
@@ -51,7 +52,7 @@ export const makeAuthenticatedRequest = async <T>(
         throw new Error('Authentication required');
       }
 
-      // Create an authenticated client for this operation
+      // Create a fresh authenticated client for this specific operation
       const authenticatedClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
         auth: {
           persistSession: false,
@@ -65,16 +66,14 @@ export const makeAuthenticatedRequest = async <T>(
         }
       });
 
-      // Temporarily replace global supabase methods with authenticated versions
-      const originalFrom = supabase.from.bind(supabase);
-      const originalRpc = supabase.rpc.bind(supabase);
-      const originalStorage = supabase.storage;
+      // Execute operation with the authenticated client by temporarily replacing methods
+      const originalFrom = supabase.from;
+      const originalRpc = supabase.rpc;
       
       try {
-        // Override with authenticated client methods
+        // Temporarily replace methods with authenticated versions
         (supabase as any).from = authenticatedClient.from.bind(authenticatedClient);
         (supabase as any).rpc = authenticatedClient.rpc.bind(authenticatedClient);
-        (supabase as any).storage = authenticatedClient.storage;
         
         // Execute operation with authenticated client
         const result = await operation();
@@ -83,7 +82,6 @@ export const makeAuthenticatedRequest = async <T>(
         // Always restore original methods
         (supabase as any).from = originalFrom;
         (supabase as any).rpc = originalRpc;
-        (supabase as any).storage = originalStorage;
       }
     } catch (error: any) {
       lastError = error;
