@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useUserProfile } from './useUserProfile';
 import { logger } from '@/utils/logger';
