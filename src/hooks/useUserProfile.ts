@@ -54,6 +54,15 @@ export const useUserProfile = () => {
       return;
     }
 
+    // Add timeout to prevent infinite loading
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+      debugLog('Profile fetch timed out after 30 seconds');
+      setError('Loading took too long. Please refresh the page.');
+      setLoading(false);
+    }, 30000); // 30 second timeout
+
     try {
       setError(null);
       debugLog('Starting user profile fetch for:', user.id);
@@ -130,9 +139,16 @@ export const useUserProfile = () => {
       setUserProfile(profileData);
       setError(null);
     } catch (error) {
+      // Check if this was a timeout abort
+      if (error instanceof Error && error.name === 'AbortError') {
+        debugLog('Profile fetch was aborted due to timeout');
+        return; // Don't set error again, timeout handler already did
+      }
+      
       debugLog('Error in fetchUserProfile:', error);
       setError(getUserFriendlyErrorMessage(error));
     } finally {
+      clearTimeout(timeoutId);
       setLoading(false);
     }
   };

@@ -32,6 +32,7 @@ class EnterpriseSessionManager {
   private requestQueue: RequestQueue[] = [];
   private heartbeatInterval: NodeJS.Timeout | null = null;
   private activityListeners: (() => void)[] = [];
+  private debounceTimer: NodeJS.Timeout | null = null;
 
   // Dynamic token expiry calculation (10-15% buffer)
   calculateTokenBuffer(tokenExpiry: number): number {
@@ -67,10 +68,19 @@ class EnterpriseSessionManager {
     this.state.lastActivity = Date.now();
   }
 
+  // Debounced token validation to prevent race conditions
+  private debouncedValidityCheck(): boolean {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
+    
+    return this.isTokenValid();
+  }
+
   // Enterprise-grade token refresh with queue management
   async refreshToken(getToken: () => Promise<string | null>, forceRefresh = false): Promise<string | null> {
-    // Return cached token if valid and not forcing refresh
-    if (!forceRefresh && this.isTokenValid()) {
+    // Return cached token if valid and not forcing refresh (with debounced check)
+    if (!forceRefresh && this.debouncedValidityCheck()) {
       return this.state.token;
     }
 
