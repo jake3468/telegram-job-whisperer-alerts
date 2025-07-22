@@ -7,8 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useEnterpriseAPIClient } from '@/hooks/useEnterpriseAPIClient';
+import { supabase } from '@/integrations/supabase/client';
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { countries } from '@/data/countries';
@@ -41,6 +42,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   const { getToken } = useAuth();
   const { toast } = useToast();
   const { executeWithRetry, optimisticAdd, isAuthReady, userProfileId } = useCachedJobAlertsData();
+  const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [countryOpen, setCountryOpen] = useState(false);
@@ -118,28 +120,32 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
           // Clerk automatically handles token refresh - no need to force it
 
           if (editingAlert) {
-            // Update existing alert - streamlined operation
-            const { error } = await supabase
-              .from('job_alerts')
-              .update({
-                country: formData.country.toLowerCase(),
-                country_name: formData.country_name,
-                location: formData.location,
-                job_title: formData.job_title,
-                job_type: formData.job_type,
-                alert_frequency: formData.alert_frequency,
-                preferred_time: formData.preferred_time,
-                timezone: formData.timezone
-              })
-              .eq('id', editingAlert.id);
+            // Update existing alert using authenticated request
+            const result = await makeAuthenticatedRequest(async () => {
+              const { error } = await supabase
+                .from('job_alerts')
+                .update({
+                  country: formData.country.toLowerCase(),
+                  country_name: formData.country_name,
+                  location: formData.location,
+                  job_title: formData.job_title,
+                  job_type: formData.job_type,
+                  alert_frequency: formData.alert_frequency,
+                  preferred_time: formData.preferred_time,
+                  timezone: formData.timezone
+                })
+                .eq('id', editingAlert.id);
 
-            if (error) {
-              throw new Error('UPDATE_FAILED');
-            }
+              if (error) {
+                throw new Error('UPDATE_FAILED');
+              }
+              
+              return { type: 'update' };
+            });
             
-            return { type: 'update' };
+            return result;
           } else {
-            // Create new alert - streamlined operation using cached userProfileId
+            // Create new alert using authenticated request
             const newAlertData = {
               user_id: userProfileId,
               country: formData.country.toLowerCase(),
@@ -152,20 +158,24 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
               timezone: formData.timezone
             };
 
-            const { data, error } = await supabase
-              .from('job_alerts')
-              .insert(newAlertData)
-              .select()
-              .single();
+            const result = await makeAuthenticatedRequest(async () => {
+              const { data, error } = await supabase
+                .from('job_alerts')
+                .insert(newAlertData)
+                .select()
+                .single();
 
-            if (error) {
-              if (error.message && error.message.includes('Maximum of 3 job alerts allowed')) {
-                throw new Error('ALERT_LIMIT_REACHED');
+              if (error) {
+                if (error.message && error.message.includes('Maximum of 3 job alerts allowed')) {
+                  throw new Error('ALERT_LIMIT_REACHED');
+                }
+                throw new Error('CREATE_FAILED');
               }
-              throw new Error('CREATE_FAILED');
-            }
 
-            return { type: 'create', data };
+              return { type: 'create', data };
+            });
+
+            return result;
           }
         },
         7, // More aggressive retry attempts
@@ -180,8 +190,8 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
         });
       } else {
         // Optimistic UI update for immediate feedback
-        if (result.data) {
-          optimisticAdd(result.data);
+        if (result && 'data' in result && result.data) {
+          optimisticAdd(result.data as any);
         }
         
         toast({
