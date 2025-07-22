@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { User } from 'lucide-react';
 import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
-import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
+import { useEnhancedTokenManagerIntegration } from '@/hooks/useEnhancedTokenManagerIntegration';
 const BioSection = () => {
   const {
     toast
@@ -19,10 +19,7 @@ const BioSection = () => {
   const [saving, setSaving] = useState(false);
 
   // Keep tokens fresh while user is interacting with bio form
-  const {
-    updateActivity,
-    silentTokenRefresh
-  } = useFormTokenKeepAlive(true);
+  const sessionManager = useEnhancedTokenManagerIntegration();
   React.useEffect(() => {
     if (userProfile?.bio) {
       setBio(userProfile.bio);
@@ -32,7 +29,9 @@ const BioSection = () => {
     setSaving(true);
     try {
       // Refresh token before making the save request
-      await silentTokenRefresh();
+      if (sessionManager) {
+        await sessionManager.refreshToken(true);
+      }
       const {
         error
       } = await updateUserProfile({
@@ -76,8 +75,14 @@ const BioSection = () => {
         <CardContent className="space-y-3 pt-0">
           <Textarea value={bio} onChange={e => {
           setBio(e.target.value);
-          updateActivity(); // Track user activity when typing
-        }} onFocus={updateActivity} // Track activity when user focuses the field
+          if (sessionManager) {
+            sessionManager.updateActivity(); // Track user activity when typing
+          }
+        }} onFocus={() => {
+          if (sessionManager) {
+            sessionManager.updateActivity(); // Track activity when user focuses the field
+          }
+        }}
         placeholder="I enjoy working with startups and exploring AI. My ambition is to build something impactful that people genuinely find value in." rows={4} className="min-h-[100px] border-2 border-emerald-200/40 placeholder-gray-400 font-inter text-gray-100 focus-visible:border-emerald-200 hover:border-emerald-300 text-base resize-none shadow-inner transition-all bg-black" />
           <Button onClick={handleSaveBio} disabled={saving} className="font-inter font-bold text-xs px-4 py-2 h-9 rounded-lg shadow-lg shadow-emerald-500/20 focus-visible:ring-2 focus-visible:ring-emerald-300 transition-colors text-white bg-blue-800 hover:bg-blue-700">
             {saving ? 'Saving...' : 'Save Bio'}
