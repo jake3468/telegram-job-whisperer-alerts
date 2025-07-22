@@ -6,7 +6,7 @@ import { Environment } from '@/utils/environment';
 import { UserProfile, UserProfileUpdateData } from '@/types/userProfile';
 import { createUserProfileDebugger } from '@/utils/userProfileDebug';
 import { getUserFriendlyErrorMessage } from '@/utils/errorMessages';
-import { useEnhancedTokenManager } from './useEnhancedTokenManager';
+import { useEnterpriseAPIClient } from './useEnterpriseAPIClient';
 import { 
   fetchUserFromDatabase, 
   fetchUserProfile as fetchUserProfileFromService, 
@@ -22,29 +22,9 @@ export const useUserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { initializeUser } = useUserInitialization();
-  const { refreshToken, isTokenValid } = useEnhancedTokenManager();
+  const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
 
-  // Enhanced token refresh using enterprise token manager
-  const refreshTokenSilently = async (): Promise<boolean> => {
-    try {
-      if (!user) return false;
-      
-      debugLog('Refreshing token using enhanced token manager...');
-      const token = await refreshToken(true); // Force refresh
-      
-      if (token) {
-        debugLog('Token refreshed successfully via enhanced manager');
-        return true;
-      }
-      
-      return false;
-    } catch (error) {
-      debugLog('Enhanced token refresh failed:', error);
-      return false;
-    }
-  };
-
-  // Check if error is related to authentication/JWT
+  // Check if error is related to authentication/JWT (for logging)
   const isAuthError = (error: any): boolean => {
     const errorMessage = typeof error === 'string' ? error : error?.message || '';
     const lowerMessage = errorMessage.toLowerCase();
@@ -78,8 +58,10 @@ export const useUserProfile = () => {
       setError(null);
       debugLog('Starting user profile fetch for:', user.id);
 
-      // No artificial delays - fetch immediately
-      const { data: userData, error: userError } = await fetchUserFromDatabase(user.id);
+      // Enterprise-grade authenticated request
+      const { data: userData, error: userError } = await makeAuthenticatedRequest(
+        () => fetchUserFromDatabase(user.id)
+      );
       debugLog('User lookup result:', userData ? 'Found' : 'Not found');
 
       let finalUserData = userData;
@@ -96,8 +78,10 @@ export const useUserProfile = () => {
           return;
         }
 
-        // Fetch user data after initialization
-        const { data: newUserData, error: newUserError } = await fetchUserFromDatabase(user.id);
+        // Fetch user data after initialization with enterprise authentication
+        const { data: newUserData, error: newUserError } = await makeAuthenticatedRequest(
+          () => fetchUserFromDatabase(user.id)
+        );
 
         if (newUserError || !newUserData) {
           debugLog('Error fetching user after initialization:', newUserError);
@@ -121,9 +105,10 @@ export const useUserProfile = () => {
         return;
       }
 
-      // Get user profile - simplified, no retry logic in production
-      const maxAttempts = Environment.isProduction() ? 1 : 2;
-      const { data: profileData, error: profileError } = await fetchUserProfileFromService(finalUserData.id, maxAttempts);
+      // Get user profile with enterprise authentication
+      const { data: profileData, error: profileError } = await makeAuthenticatedRequest(
+        () => fetchUserProfileFromService(finalUserData.id, 1)
+      );
 
       debugLog('Profile lookup result:', profileData ? 'Accessible' : 'Not accessible');
       
@@ -161,50 +146,19 @@ export const useUserProfile = () => {
     try {
       debugLog('Attempting profile update for:', userProfile.id);
       
-      // Enterprise-grade token management - only refresh if actually needed
-      debugLog('Proceeding with API call - token will be validated at request level');
+      // Enterprise-grade authenticated request with automatic retry and silent recovery
+      const result = await makeAuthenticatedRequest(
+        () => updateUserProfileInDatabase(userProfile.id, updates)
+      );
       
-      // First attempt
-      const { error: firstError } = await updateUserProfileInDatabase(userProfile.id, updates);
-
-      if (!firstError) {
-        // Success on first attempt
-        setUserProfile(prev => prev ? { ...prev, ...updates } : null);
-        debugLog('Profile updated successfully');
-        return { error: null };
+      if (result.error) {
+        throw new Error(result.error.message || 'Update failed');
       }
 
-      // Check if it's an authentication error that we can retry
-      if (isAuthError(firstError)) {
-        debugLog('Authentication error detected, attempting silent token refresh...');
-        
-        const tokenRefreshed = await refreshTokenSilently();
-        
-        if (tokenRefreshed) {
-          debugLog('Token refreshed, retrying profile update...');
-          
-          // Retry the operation after token refresh
-          const { error: retryError } = await updateUserProfileInDatabase(userProfile.id, updates);
-          
-          if (!retryError) {
-            // Success on retry
-            setUserProfile(prev => prev ? { ...prev, ...updates } : null);
-            debugLog('Profile updated successfully after token refresh');
-            return { error: null };
-          }
-          
-          // Even retry failed
-          debugLog('Profile update failed even after token refresh:', retryError);
-          return { error: getUserFriendlyErrorMessage(retryError) };
-        } else {
-          debugLog('Token refresh failed');
-          return { error: 'Please refresh the page and try again.' };
-        }
-      }
-
-      // Non-auth error, return user-friendly message
-      debugLog('Profile update failed with non-auth error:', firstError);
-      return { error: getUserFriendlyErrorMessage(firstError) };
+      // Success - update local state
+      setUserProfile(prev => prev ? { ...prev, ...updates } : null);
+      debugLog('Profile updated successfully');
+      return { error: null };
 
     } catch (error) {
       debugLog('Error in updateUserProfile:', error);

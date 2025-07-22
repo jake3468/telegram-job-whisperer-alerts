@@ -6,25 +6,22 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { User, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
-import { useEnhancedTokenManager } from '@/hooks/useEnhancedTokenManager';
-import { useOptimizedFormTokenKeepAlive } from '@/hooks/useOptimizedFormTokenKeepAlive';
+import { useEnterpriseAPIClient } from '@/hooks/useEnterpriseAPIClient';
 
 const ProfessionalBioSection = () => {
   const { toast } = useToast();
   const { userProfile, loading, updateUserProfile } = useCachedUserProfile();
-  const { refreshToken, isTokenValid } = useEnhancedTokenManager();
+  const { makeOptimisticRequest } = useEnterpriseAPIClient();
   
   const [bio, setBio] = useState(userProfile?.bio || '');
   const [saving, setSaving] = useState(false);
   const [optimisticSaved, setOptimisticSaved] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
-
-  // Initialize token keep-alive for long editing sessions
-  useOptimizedFormTokenKeepAlive(bio.length > 0);
+  const [originalBio, setOriginalBio] = useState(userProfile?.bio || '');
 
   React.useEffect(() => {
-    if (userProfile?.bio) {
-      setBio(userProfile.bio);
+    if (userProfile?.bio !== undefined) {
+      setBio(userProfile.bio || '');
+      setOriginalBio(userProfile.bio || '');
     }
   }, [userProfile]);
 
@@ -32,51 +29,58 @@ const ProfessionalBioSection = () => {
     if (saving) return;
     
     setSaving(true);
-    setSaveError(null);
-    setOptimisticSaved(true); // Optimistic update
-
-    try {
-      // Enterprise-grade pre-validation: ensure token is fresh before saving
-      if (!isTokenValid()) {
-        console.log('Token invalid before bio save, refreshing proactively...');
-        await refreshToken(true);
+    
+    // Enterprise-grade optimistic update with silent recovery
+    const { success, error } = await makeOptimisticRequest(
+      // Operation
+      async () => {
+        const result = await updateUserProfile({ bio });
+        if (result.error) {
+          throw new Error(result.error);
+        }
+        return result;
+      },
+      // Optimistic update
+      () => {
+        setOptimisticSaved(true);
+        setOriginalBio(bio); // Update the "saved" state
+      },
+      // Revert update
+      () => {
+        setBio(originalBio);
+        setOptimisticSaved(false);
+      },
+      // Options
+      {
+        maxRetries: 3,
+        silentRetry: true
       }
+    );
 
-      const { error } = await updateUserProfile({ bio });
-      
-      if (error) {
-        throw new Error(error);
-      }
+    setSaving(false);
 
-      // Success - show confirmation toast
+    if (success) {
+      // Silent success - no intrusive notifications for expected operations
       toast({
         title: "Bio updated",
         description: "Your bio has been saved successfully.",
-        duration: 3000
+        duration: 2000
       });
-
-    } catch (error) {
-      // Use user-friendly error message
-      const errorMessage = error instanceof Error ? error.message : 'Unable to save. Please try again.';
-      setSaveError(errorMessage);
-      setOptimisticSaved(false); // Revert optimistic update
-      
+    } else {
+      // Only show error if all retries failed
       toast({
         title: "Save failed",
-        description: errorMessage,
+        description: error || "Please try again",
         variant: "destructive",
-        duration: 4000
+        duration: 3000
       });
-    } finally {
-      setSaving(false);
     }
   };
 
   // Reset optimistic state when user types
   const handleBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setBio(e.target.value);
-    setSaveError(null);
-    if (optimisticSaved) {
+    if (optimisticSaved && e.target.value !== originalBio) {
       setOptimisticSaved(false);
     }
   };
@@ -94,7 +98,7 @@ const ProfessionalBioSection = () => {
     );
   }
 
-  const isActuallySaved = userProfile?.bio === bio && bio && !optimisticSaved;
+  const isActuallySaved = originalBio === bio && bio.length > 0;
   const showSavedIndicator = optimisticSaved || isActuallySaved;
 
   return (
@@ -118,13 +122,6 @@ const ProfessionalBioSection = () => {
           rows={4}
           className="min-h-[100px] border-2 border-emerald-200/40 placeholder-gray-400 font-inter text-gray-100 focus-visible:border-emerald-200 hover:border-emerald-300 text-base resize-none shadow-inner transition-all bg-black"
         />
-        
-        {saveError && (
-          <div className="flex items-center gap-2 p-2 bg-red-900/20 border border-red-400/30 rounded-lg">
-            <AlertCircle className="w-4 h-4 text-red-400" />
-            <span className="text-red-300 text-sm">{saveError}</span>
-          </div>
-        )}
 
         <div className="flex items-center justify-between">
           <Button

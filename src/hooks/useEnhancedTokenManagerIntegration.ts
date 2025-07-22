@@ -1,23 +1,23 @@
 import { useEffect } from 'react';
-import { useEnhancedTokenManager } from './useEnhancedTokenManager';
+import { useEnterpriseSessionManager } from './useEnterpriseSessionManager';
 import { setEnhancedTokenManager } from '@/integrations/supabase/client';
 
 /**
- * Integration hook that connects the enhanced token manager to the Supabase client
- * This ensures all API calls use the same enterprise-grade token management
+ * Integration hook that connects the enterprise session manager to the Supabase client
+ * This ensures all API calls use enterprise-grade session management with silent token refresh
  */
 export const useEnhancedTokenManagerIntegration = () => {
-  const tokenManager = useEnhancedTokenManager();
+  const sessionManager = useEnterpriseSessionManager();
 
   useEffect(() => {
-    // Connect the enhanced token manager to the Supabase client
-    setEnhancedTokenManager(tokenManager);
+    // Connect the enterprise session manager to the Supabase client
+    setEnhancedTokenManager(sessionManager);
     
     return () => {
       // Cleanup on unmount
       setEnhancedTokenManager(null);
     };
-  }, [tokenManager]);
+  }, [sessionManager]);
 
-  return tokenManager;
+  return sessionManager;
 };
