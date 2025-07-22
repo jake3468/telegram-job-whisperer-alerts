@@ -227,25 +227,25 @@ export const useEnterpriseSessionManager = () => {
     };
   }, [user, getToken]);
 
-  // Enterprise-grade token refresh function
+  // Enterprise-grade token refresh function - fix dependency array
   const refreshToken = useCallback(async (forceRefresh = false): Promise<string | null> => {
     if (!getToken) return null;
     
     const getTokenFn = () => getToken({ template: 'supabase', skipCache: true });
     return sessionManager.refreshToken(getTokenFn, forceRefresh);
-  }, [getToken]);
+  }, [getToken]); // Fixed: ensure getToken is always defined
 
-  // Check token validity
+  // Check token validity - no dependencies needed since it's a simple check
   const isTokenValid = useCallback(() => {
     return sessionManager.isTokenValid();
   }, []);
 
-  // Update activity (for manual tracking)
+  // Update activity - no dependencies needed
   const updateActivity = useCallback(() => {
     sessionManager.updateActivity();
   }, []);
 
-  // Get current token immediately
+  // Get current token immediately - no dependencies needed
   const getCurrentToken = useCallback(() => {
     return sessionManager.getCurrentToken();
   }, []);

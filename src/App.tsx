@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -66,9 +67,14 @@ const AppWithSync = () => {
   // Skip for job-alerts page to prevent debug messages
   const shouldUseEnterpriseFeatures = !location.pathname.includes('/job-alerts');
   
-  // Conditionally initialize enterprise-grade token management
-  if (shouldUseEnterpriseFeatures) {
-    useEnhancedTokenManagerIntegration();
+  // Conditionally initialize enterprise-grade token management with error boundary
+  try {
+    if (shouldUseEnterpriseFeatures && isLoaded && isSignedIn) {
+      useEnhancedTokenManagerIntegration();
+    }
+  } catch (error) {
+    console.error('Enterprise token manager error:', error);
+    // Continue without enterprise features if there's an error
   }
   
   // Hide initial loader once React is ready
