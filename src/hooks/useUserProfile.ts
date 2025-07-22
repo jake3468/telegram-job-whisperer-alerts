@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import { useUserInitialization } from './useUserInitialization';
 import { Environment } from '@/utils/environment';
 import { UserProfile, UserProfileUpdateData } from '@/types/userProfile';
@@ -15,7 +15,8 @@ import {
 const { debugLog } = createUserProfileDebugger();
 
 export const useUserProfile = () => {
-  const { user, isLoaded, getToken } = useUser();
+  const { user, isLoaded } = useUser();
+  const { getToken } = useAuth();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
