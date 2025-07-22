@@ -293,7 +293,11 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
 
   // Get display upload date
   const getDisplayUploadDate = () => {
-    return formatUploadDate(userProfile?.resume_uploaded_at || null);
+    if (userProfile?.resume_uploaded_at) {
+      const date = new Date(userProfile.resume_uploaded_at);
+      return date.toLocaleDateString('en-GB'); // dd/mm/yyyy format
+    }
+    return 'Uploaded recently';
   };
 
   return (
