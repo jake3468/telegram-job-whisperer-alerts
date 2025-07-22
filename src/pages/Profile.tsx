@@ -223,7 +223,7 @@ const Profile = () => {
                 Add Your Bio
               </h2>
             </div>
-            <ProfessionalBioSection updateActivity={updateActivity} />
+            <ProfessionalBioSection />
           </div>
 
           {/* Step 3: Job Alerts */}
