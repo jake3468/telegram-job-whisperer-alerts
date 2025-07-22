@@ -1,27 +1,18 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { makeAuthenticatedRequest } from '@/integrations/supabase/client';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
-import { useEnhancedTokenManagerIntegration } from './useEnhancedTokenManagerIntegration';
+import { supabase } from '@/integrations/supabase/client';
+import { useEnterpriseAuth } from './useEnterpriseAuth';
 import { logger } from '@/utils/logger';
 
-interface TrackedJob {
+interface JobEntry {
   id: string;
-  job_title: string;
   company_name: string;
-  location?: string;
-  salary?: string;
-  job_url?: string;
+  job_title: string;
   job_description?: string;
+  job_url?: string;
   status: 'saved' | 'applied' | 'interview' | 'rejected' | 'offer';
-  comments?: string;
-  created_at: string;
-  updated_at: string;
-  user_id: string;
   order_position: number;
-  job_reference_id?: string;
-  file_urls?: any;
   resume_updated: boolean;
   job_role_analyzed: boolean;
   company_researched: boolean;
@@ -30,217 +21,270 @@ interface TrackedJob {
   interview_call_received: boolean;
   interview_prep_guide_received: boolean;
   ai_mock_interview_attempted: boolean;
+  comments?: string;
+  file_urls?: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+interface CachedJobTrackerData {
+  jobs: JobEntry[];
+  userProfileId: string;
+  timestamp: number;
 }
 
 const CACHE_KEY = 'aspirely_job_tracker_cache';
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+
+// Helper function to validate and fix order position conflicts
+const validateAndFixOrderPositions = async (jobs: JobEntry[], userProfileId: string): Promise<JobEntry[]> => {
+  const statusGroups = jobs.reduce((groups, job) => {
+    if (!groups[job.status]) {
+      groups[job.status] = [];
+    }
+    groups[job.status].push(job);
+    return groups;
+  }, {} as Record<string, JobEntry[]>);
+
+  // Check for conflicts and fix them if found
+  let hasConflicts = false;
+  for (const [status, statusJobs] of Object.entries(statusGroups)) {
+    const positionCounts = statusJobs.reduce((counts, job) => {
+      counts[job.order_position] = (counts[job.order_position] || 0) + 1;
+      return counts;
+    }, {} as Record<number, number>);
+
+    if (Object.values(positionCounts).some(count => count > 1)) {
+      hasConflicts = true;
+      break;
+    }
+  }
+
+  if (hasConflicts) {
+    try {
+      await supabase.rpc('rebalance_job_tracker_order_positions');
+      
+      const { data: correctedData, error } = await supabase
+        .from('job_tracker')
+        .select('*')
+        .eq('user_id', userProfileId)
+        .order('order_position', { ascending: true });
+
+      if (error) throw error;
+
+      const correctedJobs: JobEntry[] = (correctedData || []).map(job => ({
+        ...job,
+        file_urls: Array.isArray(job.file_urls) ? job.file_urls.map(url => String(url)) : [],
+        comments: job.comments || undefined
+      }));
+
+      return correctedJobs;
+    } catch (error) {
+      // Silent error handling for order position rebalancing
+      return jobs;
+    }
+  }
+
+  return jobs;
+};
 
 export const useCachedJobTracker = () => {
   const { user } = useUser();
-  const sessionManager = useEnhancedTokenManagerIntegration();
-  
-  const [jobs, setJobs] = useState<TrackedJob[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
+  const [jobs, setJobs] = useState<JobEntry[]>([]);
+  const [userProfileId, setUserProfileId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [connectionIssue, setConnectionIssue] = useState(false);
+  const [hasFetched, setHasFetched] = useState(false);
 
-  // Load cached data immediately
+  // Load cached data immediately on mount
   useEffect(() => {
     try {
       const cached = localStorage.getItem(CACHE_KEY);
       if (cached) {
-        const parsedCache = JSON.parse(cached);
+        const parsedCache: CachedJobTrackerData = JSON.parse(cached);
         const now = Date.now();
         
         if (now - parsedCache.timestamp < CACHE_DURATION) {
           setJobs(parsedCache.jobs);
-          setIsLoading(false);
-          logger.debug('Loaded cached job tracker data:', parsedCache);
+          setUserProfileId(parsedCache.userProfileId);
+          setLoading(false);
         } else {
           localStorage.removeItem(CACHE_KEY);
         }
       }
     } catch (error) {
-      logger.warn('Failed to load cached job tracker data:', error);
       localStorage.removeItem(CACHE_KEY);
     }
   }, []);
 
-  // Fetch jobs with enhanced authentication
-  const fetchJobs = useCallback(async () => {
-    if (!user || !sessionManager) return;
+  // Fetch fresh data only when needed
+  useEffect(() => {
+    if (!user || !isAuthReady) {
+      setLoading(false);
+      return;
+    }
+    
+    const shouldFetch = !hasFetched && jobs.length === 0 && !error;
+    if (shouldFetch) {
+      fetchJobTrackerData();
+    } else if (hasFetched || jobs.length > 0) {
+      setLoading(false);
+    }
+  }, [user?.id, hasFetched, jobs.length, error, isAuthReady]);
 
+  const sanitizeText = (text: string): string => {
+    if (!text) return '';
+    return text
+      .trim()
+      .replace(/\s+/g, ' ')
+      .replace(/[^\w\s-.,()&]/g, '')
+      .substring(0, 200);
+  };
+
+  const fetchJobTrackerData = async (showErrors = false) => {
+    if (!user || !isAuthReady) {
+      return;
+    }
+    
     try {
       setError(null);
+      setConnectionIssue(false);
+      
+      // Get the user UUID from users table
+      const userData = await executeWithRetry(async () => {
+        const { data, error } = await supabase
+          .from('users')
+          .select('id')
+          .eq('clerk_id', user.id)
+          .maybeSingle();
+        
+        if (error) throw error;
+        return data;
+      }, 3, 'fetch user data for job tracker');
+      
+      if (!userData) {
+        throw new Error('Unable to load user data');
+      }
 
-      const { data, error: fetchError } = await makeAuthenticatedRequest(async () => {
-        return await supabase
+      // Get user profile
+      const userProfile = await executeWithRetry(async () => {
+        const { data, error } = await supabase
+          .from('user_profile')
+          .select('id')
+          .eq('user_id', userData.id)
+          .maybeSingle();
+        
+        if (error) throw error;
+        return data;
+      }, 3, 'fetch user profile for job tracker');
+      
+      if (!userProfile) {
+        throw new Error('Unable to load user profile');
+      }
+
+      // Get jobs for this user profile
+      const data = await executeWithRetry(async () => {
+        const { data, error } = await supabase
           .from('job_tracker')
           .select('*')
-          .order('updated_at', { ascending: false });
-      }, { operationType: 'fetch_tracked_jobs' });
+          .eq('user_id', userProfile.id)
+          .order('order_position', { ascending: true });
+        
+        if (error) throw error;
+        return data;
+      }, 3, 'fetch job tracker data');
 
-      if (fetchError) throw fetchError;
+      // Transform and sanitize the data
+      const jobsData: JobEntry[] = (data || []).map(job => ({
+        ...job,
+        company_name: sanitizeText(job.company_name),
+        job_title: sanitizeText(job.job_title),
+        job_description: job.job_description ? sanitizeText(job.job_description) : undefined,
+        file_urls: Array.isArray(job.file_urls) ? job.file_urls.map(url => String(url)) : [],
+        comments: job.comments || undefined
+      }));
 
-      const jobsData = data || [];
-      setJobs(jobsData);
+      // Validate and fix order positions
+      const validatedJobs = await validateAndFixOrderPositions(jobsData, userProfile.id);
+      
+      // Update state
+      setJobs(validatedJobs);
+      setUserProfileId(userProfile.id);
+      setHasFetched(true);
 
-      // Cache the fresh data
+      // Cache the data
       try {
-        const cacheData = {
-          jobs: jobsData,
+        const cacheData: CachedJobTrackerData = {
+          jobs: validatedJobs,
+          userProfileId: userProfile.id,
           timestamp: Date.now()
         };
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-        logger.debug('Cached fresh job tracker data:', cacheData);
       } catch (cacheError) {
-        logger.warn('Failed to cache job tracker data:', cacheError);
+        // Silent cache error handling
       }
 
-      return jobsData;
-    } catch (err) {
-      console.error('Error fetching tracked jobs:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch jobs');
-      throw err;
+    } catch (error: any) {
+      setConnectionIssue(true);
+      setHasFetched(true);
+      
+      if (showErrors) {
+        // Only show user-friendly error messages
+        if (error?.message?.includes('refresh the page')) {
+          setError(error.message);
+        } else {
+          setError('Unable to load job data. Please refresh the page.');
+        }
+      }
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  }, [user, sessionManager]);
+  };
 
-  // Add new job with enhanced authentication
-  const addJob = useCallback(async (jobData: Omit<TrackedJob, 'id' | 'created_at' | 'updated_at'>) => {
-    if (!user || !sessionManager) return;
+  const invalidateCache = () => {
+    localStorage.removeItem(CACHE_KEY);
+    fetchJobTrackerData();
+  };
 
-    try {
-      const { data, error: addError } = await makeAuthenticatedRequest(async () => {
-        return await supabase
-          .from('job_tracker')
-          .insert([jobData])
-          .select()
-          .single();
-      }, { operationType: 'add_tracked_job' });
+  const optimisticUpdate = (updatedJob: JobEntry) => {
+    setJobs(prevJobs => 
+      prevJobs.map(job => job.id === updatedJob.id ? updatedJob : job)
+    );
+  };
 
-      if (addError) throw addError;
+  const optimisticAdd = (newJob: JobEntry) => {
+    setJobs(prevJobs => {
+      const updatedJobs = [...prevJobs, newJob];
+      return updatedJobs;
+    });
+    localStorage.removeItem(CACHE_KEY);
+  };
 
-      // Update local state
-      setJobs(prev => [data, ...prev]);
+  const optimisticDelete = (jobId: string) => {
+    setJobs(prevJobs => prevJobs.filter(job => job.id !== jobId));
+  };
 
-      // Update cache
-      try {
-        const cacheData = {
-          jobs: [data, ...jobs],
-          timestamp: Date.now()
-        };
-        localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-      } catch (cacheError) {
-        logger.warn('Failed to update cache after adding job:', cacheError);
-      }
-
-      return data;
-    } catch (err) {
-      console.error('Error adding job:', err);
-      throw err;
-    }
-  }, [user, sessionManager, jobs]);
-
-  // Update job with enhanced authentication
-  const updateJob = useCallback(async (jobId: string, updates: Partial<TrackedJob>) => {
-    if (!user || !sessionManager) return;
-
-    try {
-      const { data, error: updateError } = await makeAuthenticatedRequest(async () => {
-        return await supabase
-          .from('job_tracker')
-          .update({ ...updates, updated_at: new Date().toISOString() })
-          .eq('id', jobId)
-          .select()
-          .single();
-      }, { operationType: 'update_tracked_job' });
-
-      if (updateError) throw updateError;
-
-      // Update local state
-      setJobs(prev => prev.map(job => job.id === jobId ? data : job));
-
-      // Update cache
-      try {
-        const updatedJobs = jobs.map(job => job.id === jobId ? data : job);
-        const cacheData = {
-          jobs: updatedJobs,
-          timestamp: Date.now()
-        };
-        localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-      } catch (cacheError) {
-        logger.warn('Failed to update cache after updating job:', cacheError);
-      }
-
-      return data;
-    } catch (err) {
-      console.error('Error updating job:', err);
-      throw err;
-    }
-  }, [user, sessionManager, jobs]);
-
-  // Delete job with enhanced authentication
-  const deleteJob = useCallback(async (jobId: string) => {
-    if (!user || !sessionManager) return;
-
-    try {
-      const { error: deleteError } = await makeAuthenticatedRequest(async () => {
-        return await supabase
-          .from('job_tracker')
-          .delete()
-          .eq('id', jobId);
-      }, { operationType: 'delete_tracked_job' });
-
-      if (deleteError) throw deleteError;
-
-      // Update local state
-      setJobs(prev => prev.filter(job => job.id !== jobId));
-
-      // Update cache
-      try {
-        const filteredJobs = jobs.filter(job => job.id !== jobId);
-        const cacheData = {
-          jobs: filteredJobs,
-          timestamp: Date.now()
-        };
-        localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-      } catch (cacheError) {
-        logger.warn('Failed to update cache after deleting job:', cacheError);
-      }
-    } catch (err) {
-      console.error('Error deleting job:', err);
-      throw err;
-    }
-  }, [user, sessionManager, jobs]);
-
-  // Refresh jobs
-  const refreshJobs = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      await fetchJobs();
-    } catch (err) {
-      // Error is already handled in fetchJobs
-    }
-  }, [fetchJobs]);
-
-  // Initial data fetch when user and session manager are ready
-  useEffect(() => {
-    if (user && sessionManager) {
-      // Only fetch if we don't have cached data or if we're already loading
-      if (jobs.length === 0 || isLoading) {
-        fetchJobs();
-      }
-    }
-  }, [user, sessionManager]);
+  const forceRefresh = () => {
+    setError(null);
+    setConnectionIssue(false);
+    localStorage.removeItem(CACHE_KEY);
+    setHasFetched(false);
+    fetchJobTrackerData(true);
+  };
 
   return {
     jobs,
-    isLoading,
+    userProfileId,
+    loading,
     error,
-    addJob,
-    updateJob,
-    deleteJob,
-    refreshJobs
+    connectionIssue,
+    refetch: fetchJobTrackerData,
+    invalidateCache,
+    optimisticUpdate,
+    optimisticAdd,
+    optimisticDelete,
+    forceRefresh
   };
 };
