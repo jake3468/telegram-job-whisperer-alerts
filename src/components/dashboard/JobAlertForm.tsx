@@ -187,7 +187,12 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
 
           if (error) {
             if (error.message && error.message.includes('Maximum of 3 job alerts allowed')) {
-              throw new Error('ALERT_LIMIT_REACHED');
+              toast({
+                title: "Alert limit reached",
+                description: `You can only create up to ${maxAlerts} job alerts. Please delete an existing alert to create a new one.`,
+                variant: "destructive"
+              });
+              return;
             }
             throw error;
           }
@@ -208,45 +213,12 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
 
       onSubmit();
     } catch (error) {
-      console.error('Form submission error:', error);
-      
-      if (error instanceof Error) {
-        switch (error.message) {
-          case 'ALERT_LIMIT_REACHED':
-            toast({
-              title: "Alert limit reached",
-              description: `You can only create up to ${maxAlerts} job alerts. Please delete an existing alert to create a new one.`,
-              variant: "destructive"
-            });
-            break;
-          case 'UPDATE_FAILED':
-            toast({
-              title: "Unable to update",
-              description: "Please check your connection and try again.",
-              variant: "destructive",
-            });
-            break;
-          case 'CREATE_FAILED':
-            toast({
-              title: "Unable to create alert",
-              description: "Please check your connection and try again.",
-              variant: "destructive",
-            });
-            break;
-          default:
-            toast({
-              title: "Temporary issue",
-              description: "Please wait a moment and try again. If the issue persists, please refresh the page.",
-              variant: "destructive",
-            });
-        }
-      } else {
-        toast({
-          title: "Temporary issue",
-          description: "Please wait a moment and try again.",
-          variant: "destructive",
-        });
-      }
+      console.error('[JobAlertForm] Save error:', error);
+      toast({
+        title: editingAlert ? "Update failed" : "Save failed",
+        description: "Please try again",
+        variant: "destructive",
+      });
     } finally {
       setSubmitting(false);
       setLoading(false);
