@@ -24,9 +24,11 @@ interface CachedJobAlertsData {
   isActivated: boolean;
   userProfileId: string;
   timestamp: number;
+  version: string; // Add version field
 }
 
 const CACHE_KEY = 'aspirely_job_alerts_cache';
+const CACHE_VERSION = 'v2'; // Updated version to invalidate old cache
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes for fresh data
 const BACKGROUND_REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes - professional standard
 let isRefreshing = false; // Request deduplication flag
@@ -42,13 +44,19 @@ export const useCachedJobAlertsData = () => {
   const [error, setError] = useState<string | null>(null);
   const [connectionIssue, setConnectionIssue] = useState(false);
 
-  // Load cached data immediately on mount
+  // Load cached data immediately on mount with version check
   useEffect(() => {
     try {
       const cached = localStorage.getItem(CACHE_KEY);
       if (cached) {
         const parsedCache: CachedJobAlertsData = JSON.parse(cached);
         const now = Date.now();
+        
+        // Check cache version - invalidate old versions
+        if (parsedCache.version !== CACHE_VERSION) {
+          localStorage.removeItem(CACHE_KEY);
+          return;
+        }
         
         // Use cached data if it's less than cache duration old
         if (now - parsedCache.timestamp < CACHE_DURATION) {
@@ -99,7 +107,10 @@ export const useCachedJobAlertsData = () => {
       try {
         const parsedCache: CachedJobAlertsData = JSON.parse(cached);
         const now = Date.now();
-        if (now - parsedCache.timestamp < CACHE_DURATION) {
+        // Check cache version before using
+        if (parsedCache.version !== CACHE_VERSION) {
+          localStorage.removeItem(CACHE_KEY);
+        } else if (now - parsedCache.timestamp < CACHE_DURATION) {
           setLoading(false);
           return;
         }
@@ -165,48 +176,29 @@ export const useCachedJobAlertsData = () => {
           return await makeAuthenticatedRequest(async () => {
             const { supabase } = await import('@/integrations/supabase/client');
             
-            // Get user's database ID
-            const { data: userData, error: userError } = await supabase
-              .from('users')
-              .select('id')
-              .eq('clerk_id', user.id)
-              .maybeSingle();
-              
-            if (userError) {
-              logger.error('User fetch error:', userError);
-              throw new Error('Failed to fetch user data');
-            }
+            // Simplified approach - let RLS policies handle user filtering
+            // The RLS policies will automatically filter based on JWT token
             
-            if (!userData) {
-              throw new Error('User not found in database');
-            }
-
-            // Get user profile
+            // First get user profile (needed for profile ID and bot status)
             const { data: profileData, error: profileError } = await supabase
               .from('user_profile')
               .select('id, bot_activated')
-              .eq('user_id', userData.id)
-              .maybeSingle();
+              .single();
               
             if (profileError) {
               logger.error('Profile fetch error:', profileError);
-              throw new Error('Failed to fetch profile data');
-            }
-            
-            if (!profileData) {
-              throw new Error('User profile not found');
+              throw profileError;
             }
 
-            // Fetch job alerts
+            // Fetch job alerts - RLS will automatically filter for current user
             const { data: alertsData, error: alertsError } = await supabase
               .from('job_alerts')
               .select('*')
-              .eq('user_id', profileData.id)
               .order('created_at', { ascending: false });
 
             if (alertsError) {
               logger.error('Alerts fetch error:', alertsError);
-              throw new Error('Failed to fetch job alerts');
+              throw alertsError;
             }
 
             return {
@@ -231,7 +223,8 @@ export const useCachedJobAlertsData = () => {
           alerts: result.alerts,
           isActivated: result.botActivated,
           userProfileId: result.userProfileId,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          version: CACHE_VERSION
         };
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
         logger.debug('Cached fresh job alerts data:', cacheData);
