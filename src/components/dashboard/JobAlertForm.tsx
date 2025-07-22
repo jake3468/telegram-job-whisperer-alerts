@@ -202,12 +202,8 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   };
 
   const handleCountryChange = (countryCode: string, countryName: string) => {
-    // Enhanced session manager activity tracking
-    if (sessionManager?.updateActivity) {
-      sessionManager.updateActivity();
-    } else if (updateActivity) {
-      updateActivity();
-    }
+    // Record form interaction with new enterprise system
+    recordFormInteraction('input');
     
     setFormData(prev => ({
       ...prev,
@@ -223,11 +219,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
 
   // Enhanced form interaction handlers
   const handleFormInteraction = () => {
-    if (sessionManager?.updateActivity) {
-      sessionManager.updateActivity();
-    } else if (updateActivity) {
-      updateActivity();
-    }
+    recordFormInteraction('input');
   };
 
   return (
