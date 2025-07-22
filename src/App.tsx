@@ -63,19 +63,13 @@ const AppWithSync = () => {
   // Initialize sync in background without blocking UI
   useClerkSupabaseSync();
   
-  // Only initialize enterprise token management for pages that need it
-  // Skip for job-alerts page to prevent debug messages
+  // Skip enterprise features for job-alerts page to prevent debug messages
   const shouldUseEnterpriseFeatures = !location.pathname.includes('/job-alerts');
   
-  // Conditionally initialize enterprise-grade token management with error boundary
-  try {
-    if (shouldUseEnterpriseFeatures && isLoaded && isSignedIn) {
-      useEnhancedTokenManagerIntegration();
-    }
-  } catch (error) {
-    console.error('Enterprise token manager error:', error);
-    // Continue without enterprise features if there's an error
-  }
+  // Always call the hook but pass conditions to it - this fixes the hook ordering issue
+  useEnhancedTokenManagerIntegration({
+    enabled: shouldUseEnterpriseFeatures && isLoaded && isSignedIn
+  });
   
   // Hide initial loader once React is ready
   useEffect(() => {

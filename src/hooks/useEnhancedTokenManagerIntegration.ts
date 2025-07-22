@@ -3,26 +3,42 @@ import { useEffect } from 'react';
 import { useEnterpriseSessionManager } from './useEnterpriseSessionManager';
 import { setEnterpriseSessionManager } from '@/integrations/supabase/client';
 
+interface UseEnhancedTokenManagerIntegrationOptions {
+  enabled?: boolean;
+}
+
 /**
  * Integration hook that connects the enterprise session manager to the Supabase client
  * This ensures all API calls use enterprise-grade session management with silent token refresh
  */
-export const useEnhancedTokenManagerIntegration = () => {
+export const useEnhancedTokenManagerIntegration = (options: UseEnhancedTokenManagerIntegrationOptions = {}) => {
+  const { enabled = true } = options;
+  
+  // Always call the hook but conditionally initialize based on enabled flag
   const sessionManager = useEnterpriseSessionManager();
 
   useEffect(() => {
-    // Connect the enterprise session manager to the Supabase client
-    setEnterpriseSessionManager(sessionManager);
-    
-    return () => {
-      // Cleanup on unmount
-      setEnterpriseSessionManager(null);
-    };
-  }, [sessionManager]);
+    // Only connect if enabled
+    if (!enabled) {
+      return;
+    }
 
-  // Return the session manager interface directly (it already has proper method signatures)
-  return sessionManager ? {
-    refreshToken: sessionManager.refreshToken, // This already handles parameters internally
+    try {
+      // Connect the enterprise session manager to the Supabase client
+      setEnterpriseSessionManager(sessionManager);
+      
+      return () => {
+        // Cleanup on unmount or when disabled
+        setEnterpriseSessionManager(null);
+      };
+    } catch (error) {
+      console.error('Failed to connect enterprise session manager:', error);
+    }
+  }, [sessionManager, enabled]);
+
+  // Return the session manager interface only if enabled, otherwise return null
+  return enabled && sessionManager ? {
+    refreshToken: sessionManager.refreshToken,
     updateActivity: sessionManager.updateActivity,
     isTokenValid: sessionManager.isTokenValid,
     getCurrentToken: sessionManager.getCurrentToken,
