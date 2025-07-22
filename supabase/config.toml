@@ -1,3 +1,4 @@
+
 project_id = "fnzloyyhzhrqsvslhhri"
 
 [api]
@@ -30,7 +31,7 @@ enabled = true
 port = 54326
 site_url = "http://localhost:3000"
 additional_redirect_urls = ["https://lovable.app"]
-jwt_expiry = 3600
+jwt_expiry = 14400
 refresh_token_rotation_enabled = true
 security_update_password_require_reauthentication = true
 
