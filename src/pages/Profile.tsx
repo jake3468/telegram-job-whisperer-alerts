@@ -3,8 +3,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 import AuthHeader from '@/components/AuthHeader';
-import EnhancedResumeSection from '@/components/dashboard/EnhancedResumeSection';
-import EnhancedBioSection from '@/components/dashboard/EnhancedBioSection';
+import ProfessionalResumeSection from '@/components/dashboard/ProfessionalResumeSection';
+import ProfessionalBioSection from '@/components/dashboard/ProfessionalBioSection';
 import JWTDebugPanel from '@/components/JWTDebugPanel';
 import ClerkJWTSetupGuide from '@/components/ClerkJWTSetupGuide';
 import { Layout } from '@/components/Layout';
@@ -204,7 +204,7 @@ const Profile = () => {
               </div>
               <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-sky-400 to-fuchsia-400 bg-clip-text text-transparent">Add Current Resume</h2>
             </div>
-            <EnhancedResumeSection />
+            <ProfessionalResumeSection />
             <div className="mt-4 mb-6 text-center">
               <Button 
                 onClick={() => setShowResumeHelp(true)} 
@@ -227,7 +227,7 @@ const Profile = () => {
                 Add Your Bio
               </h2>
             </div>
-            <EnhancedBioSection />
+            <ProfessionalBioSection />
           </div>
 
           {/* Step 3: Job Alerts */}

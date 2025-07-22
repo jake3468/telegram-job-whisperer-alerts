@@ -5,7 +5,7 @@ export const getUserFriendlyErrorMessage = (error: any): string => {
   const errorMessage = typeof error === 'string' ? error : error?.message || '';
   const lowerMessage = errorMessage.toLowerCase();
 
-  // Check for various technical error patterns
+  // Authentication-related errors
   if (
     lowerMessage.includes('jwt') ||
     lowerMessage.includes('token') ||
@@ -15,24 +15,37 @@ export const getUserFriendlyErrorMessage = (error: any): string => {
     lowerMessage.includes('auth') ||
     lowerMessage.includes('session') ||
     lowerMessage.includes('clerk') ||
-    lowerMessage.includes('supabase') ||
     lowerMessage.includes('rls') ||
     lowerMessage.includes('policy') ||
     lowerMessage.includes('permission') ||
-    lowerMessage.includes('database') ||
-    lowerMessage.includes('postgres') ||
-    lowerMessage.includes('connection') ||
+    error?.code === 'PGRST301'
+  ) {
+    return "Connection issue. Please try again.";
+  }
+
+  // Network and server errors
+  if (
     lowerMessage.includes('network') ||
     lowerMessage.includes('timeout') ||
     lowerMessage.includes('fetch') ||
+    lowerMessage.includes('connection') ||
     lowerMessage.includes('500') ||
     lowerMessage.includes('502') ||
     lowerMessage.includes('503') ||
     lowerMessage.includes('504')
   ) {
-    return "Please refresh the page to continue";
+    return "Connection issue. Please check your internet and try again.";
   }
 
-  // For any other technical errors, also return the generic message
-  return "Please refresh the page to continue";
+  // Database errors
+  if (
+    lowerMessage.includes('database') ||
+    lowerMessage.includes('postgres') ||
+    lowerMessage.includes('supabase')
+  ) {
+    return "Unable to save. Please try again.";
+  }
+
+  // Generic fallback
+  return "Something went wrong. Please try again.";
 };

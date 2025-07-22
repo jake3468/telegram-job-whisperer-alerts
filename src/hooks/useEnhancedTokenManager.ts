@@ -27,11 +27,11 @@ export const useEnhancedTokenManager = () => {
   const [isReady, setIsReady] = useState(false);
   const retryTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // Check if token is still valid (with 5-minute buffer)
+  // Check if token is still valid (with aggressive buffer for preemptive refresh)
   const isTokenValid = useCallback(() => {
     if (!cachedToken || !tokenExpiry) return false;
     const now = Date.now();
-    const bufferTime = 5 * 60 * 1000; // 5 minutes
+    const bufferTime = 30 * 60 * 1000; // 30 minutes buffer (aggressive preemptive refresh)
     return (tokenExpiry - now) > bufferTime;
   }, []);
 
@@ -120,17 +120,40 @@ export const useEnhancedTokenManager = () => {
     initializeToken();
   }, [user, getToken, refreshToken]);
 
-  // Proactive token refresh (every 2 hours)
+  // Aggressive proactive token refresh (every 30 seconds for active users)
   useEffect(() => {
     if (!isReady) return;
 
-    const proactiveRefresh = setInterval(async () => {
-      if (!isTokenValid()) {
-        await refreshToken(true);
-      }
-    }, 2 * 60 * 60 * 1000); // 2 hours
+    let userActivity = Date.now();
+    
+    // Track user activity
+    const updateActivity = () => {
+      userActivity = Date.now();
+    };
+    
+    // Add activity listeners
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    events.forEach(event => {
+      document.addEventListener(event, updateActivity, true);
+    });
 
-    return () => clearInterval(proactiveRefresh);
+    const proactiveRefresh = setInterval(async () => {
+      const timeSinceActivity = Date.now() - userActivity;
+      
+      // Only refresh if user was active in the last 10 minutes
+      if (timeSinceActivity < 10 * 60 * 1000) {
+        if (!isTokenValid()) {
+          await refreshToken(true);
+        }
+      }
+    }, 30 * 1000); // 30 seconds
+
+    return () => {
+      clearInterval(proactiveRefresh);
+      events.forEach(event => {
+        document.removeEventListener(event, updateActivity, true);
+      });
+    };
   }, [isReady, refreshToken, isTokenValid]);
 
   return {
