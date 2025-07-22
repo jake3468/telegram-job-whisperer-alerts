@@ -44,7 +44,7 @@ export const useUserCredits = () => {
               .select('current_balance, free_credits, paid_credits, subscription_plan, next_reset_date, created_at, updated_at, id, user_id')
               .eq('user_id', userProfile.user_id)
               .single();
-          }, 'fetch user credits');
+          }, { operationType: 'fetch user credits' });
 
           if (error) {
             // If no record found, try to initialize credits
@@ -53,7 +53,7 @@ export const useUserCredits = () => {
                 return await supabase.rpc('initialize_user_credits', {
                   p_user_id: userProfile.user_id
                 });
-              }, 'initialize user credits');
+              }, { operationType: 'initialize user credits' });
               
               if (!initError) {
                 // Retry the query after initialization
@@ -63,7 +63,7 @@ export const useUserCredits = () => {
                     .select('current_balance, free_credits, paid_credits, subscription_plan, next_reset_date, created_at, updated_at, id, user_id')
                     .eq('user_id', userProfile.user_id)
                     .single();
-                }, 'retry fetch user credits');
+                }, { operationType: 'retry fetch user credits' });
                   
                 if (!retryError && retryCredits) {
                   return {

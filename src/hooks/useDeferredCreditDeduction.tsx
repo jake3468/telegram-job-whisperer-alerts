@@ -28,7 +28,7 @@ export function useDeferredCreditDeduction() {
           p_feature_used: featureName,
           p_description: description
         });
-      }, 'deduct credits');
+      }, { operationType: 'deduct credits' });
 
       if (error) {
         console.error('Credit deduction error:', error);

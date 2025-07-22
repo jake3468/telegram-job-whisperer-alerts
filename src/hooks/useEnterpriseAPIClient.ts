@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useEnterpriseSessionManager } from './useEnterpriseSessionManager';
+import { makeAuthenticatedRequest as makeAuthenticatedRequestClient } from '@/integrations/supabase/client';
 
 interface APIRequestOptions {
   maxRetries?: number;

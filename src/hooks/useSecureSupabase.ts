@@ -59,7 +59,10 @@ export const useSecureSupabase = () => {
 
     try {
       if (requireAuth) {
-        return await makeAuthenticatedRequest(operation, operationType, maxRetries);
+        return await makeAuthenticatedRequest(operation, { 
+          maxRetries, 
+          operationType 
+        });
       } else {
         return await operation();
       }

@@ -86,7 +86,7 @@ export const useCachedCompanyAnalyses = () => {
             .select('*')
             .eq('user_id', userProfile.id)
             .order('created_at', { ascending: false });
-        }, 'fetch company role analyses');
+        }, { operationType: 'fetch company role analyses' });
 
         if (error) {
           console.error('Error fetching company analysis history:', error);
