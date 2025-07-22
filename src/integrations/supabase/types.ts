@@ -1085,6 +1085,8 @@ export type Database = {
           cv_chat_id: string | null
           id: string
           resume: string | null
+          resume_filename: string | null
+          resume_uploaded_at: string | null
           show_job_alerts_onboarding_popup: boolean
           show_job_board_onboarding_popup: boolean
           show_job_tracker_onboarding_popup: boolean
@@ -1100,6 +1102,8 @@ export type Database = {
           cv_chat_id?: string | null
           id?: string
           resume?: string | null
+          resume_filename?: string | null
+          resume_uploaded_at?: string | null
           show_job_alerts_onboarding_popup?: boolean
           show_job_board_onboarding_popup?: boolean
           show_job_tracker_onboarding_popup?: boolean
@@ -1115,6 +1119,8 @@ export type Database = {
           cv_chat_id?: string | null
           id?: string
           resume?: string | null
+          resume_filename?: string | null
+          resume_uploaded_at?: string | null
           show_job_alerts_onboarding_popup?: boolean
           show_job_board_onboarding_popup?: boolean
           show_job_tracker_onboarding_popup?: boolean

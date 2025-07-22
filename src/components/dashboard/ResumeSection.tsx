@@ -14,8 +14,10 @@ const ResumeSection = () => {
     toast
   } = useToast();
   const {
+    userProfile,
     resumeExists,
-    updateResumeStatus
+    updateResumeStatus,
+    updateUserProfile
   } = useCachedUserProfile();
   const [uploading, setUploading] = useState(false);
   const [resumeUrl, setResumeUrl] = useState<string | null>(null);
@@ -62,53 +64,40 @@ const ResumeSection = () => {
   };
   const callResumeWebhook = async (fileUrl: string, fileName: string, fileSize: number) => {
     try {
-      console.log('Calling resume PDF webhook...');
-
-      // Get user data for the webhook payload
-      const {
-        data: userData,
-        error: userError
-      } = await supabase.from('users').select('*').eq('clerk_id', user?.id).single();
+      console.log('Calling resume webhook with:', { fileUrl, fileName, fileSize, userId: user?.id });
       
-      if (userError) {
-        console.error('Error fetching user data for webhook:', userError);
-        // Don't block the upload if webhook data fetch fails
-        return;
-      }
-
-      const payload = {
-        event_type: 'resume_uploaded',
-        user: {
-          id: userData.id,
-          clerk_id: userData.clerk_id,
-          email: userData.email,
-          first_name: userData.first_name,
-          last_name: userData.last_name
-        },
-        resume: {
-          file_url: fileUrl,
-          file_name: fileName,
-          file_size: fileSize,
-          uploaded_at: new Date().toISOString()
-        },
-        timestamp: new Date().toISOString(),
-        retry_count: 0 // Add retry tracking
-      };
-
-      // Call webhook with better error handling
-      const { error: webhookError } = await supabase.functions.invoke('resume-pdf-webhook', {
-        body: payload
+      const { data, error } = await supabase.functions.invoke('resume-pdf-webhook', {
+        body: {
+          fileUrl,
+          fileName,
+          fileSize,
+          userId: user?.id,
+          timestamp: new Date().toISOString()
+        }
       });
 
-      if (webhookError) {
-        console.error('Error calling resume webhook:', webhookError);
-        // Webhook errors shouldn't block the user experience
+      if (error) {
+        console.error('Webhook call failed:', error);
+        toast({
+          title: "Processing Warning",
+          description: "Resume uploaded but processing may be delayed.",
+          variant: "destructive"
+        });
       } else {
-        console.log('Resume webhook called successfully');
+        console.log('Webhook called successfully:', data);
+        toast({
+          title: "Processing Started",
+          description: "Your resume is being processed.",
+          duration: 2000
+        });
       }
     } catch (error) {
-      console.error('Error in resume webhook call:', error);
-      // Don't rethrow - webhook failures shouldn't break the upload flow
+      console.error('Webhook error:', error);
+      toast({
+        title: "Processing Error",
+        description: "Failed to start resume processing.",
+        variant: "destructive"
+      });
     }
   };
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,35 +122,53 @@ const ResumeSection = () => {
     if (uploading) return;
     setUploading(true);
     try {
-      const fileName = `${user.id}/resume.pdf`;
-      const {
-        error: uploadError
-      } = await supabase.storage.from('resumes').upload(fileName, file, {
-        upsert: true
-      });
-      if (uploadError) {
-        toast({
-          title: "Upload failed",
-          description: `Error: ${uploadError.message}`,
-          variant: "destructive"
+      // Check for existing resume and delete if exists
+      const existingResumePath = `${user.id}/resume.pdf`;
+      await supabase.storage.from('resumes').remove([existingResumePath]);
+
+      // Upload new file
+      const filePath = `${user.id}/resume.pdf`;
+      const { error: uploadError } = await supabase.storage
+        .from('resumes')
+        .upload(filePath, file, { 
+          upsert: true,
+          contentType: 'application/pdf'
         });
+
+      if (uploadError) {
         throw uploadError;
       }
-      const {
-        data
-      } = supabase.storage.from('resumes').getPublicUrl(fileName);
-      setResumeUrl(data.publicUrl);
-      updateResumeStatus(true); // Cache that resume now exists
-      await callResumeWebhook(data.publicUrl, file.name, file.size);
+
+      // Get public URL for the uploaded file
+      const { data: { publicUrl } } = supabase.storage
+        .from('resumes')
+        .getPublicUrl(filePath);
+
+      // Update user profile with filename and upload timestamp
+      await updateUserProfile({
+        resume_filename: file.name,
+        resume_uploaded_at: new Date().toISOString()
+      });
+
+      setResumeUrl(publicUrl);
+
+      // Update resume status in cache
+      updateResumeStatus(true);
+
+      // Call the webhook to process the resume
+      await callResumeWebhook(publicUrl, file.name, file.size);
+
       toast({
         title: "Resume uploaded successfully",
-        description: "Your resume has been saved."
+        description: "Your resume has been uploaded and is being processed.",
       });
+
     } catch (error) {
+      console.error('Upload error:', error);
       toast({
         title: "Upload failed",
-        description: "There was an error uploading your resume. Please try again.",
-        variant: "destructive"
+        description: error instanceof Error ? error.message : "Failed to upload resume",
+        variant: "destructive",
       });
     } finally {
       setUploading(false);
@@ -170,24 +177,44 @@ const ResumeSection = () => {
   };
   const handleDeleteResume = async () => {
     if (!user) return;
+    
     try {
-      const fileName = `${user.id}/resume.pdf`;
-      const {
-        error
-      } = await supabase.storage.from('resumes').remove([fileName]);
-      if (error) throw error;
+      setUploading(true);
+      
+      // Delete from Supabase storage
+      const filePath = `${user.id}/resume.pdf`;
+      const { error } = await supabase.storage
+        .from('resumes')
+        .remove([filePath]);
+
+      if (error) {
+        throw error;
+      }
+
+      // Clear filename and upload timestamp from user profile
+      await updateUserProfile({
+        resume_filename: null,
+        resume_uploaded_at: null
+      });
+
       setResumeUrl(null);
-      updateResumeStatus(false); // Cache that resume no longer exists
+      // Update resume status
+      updateResumeStatus(false);
+
       toast({
         title: "Resume deleted",
-        description: "Your resume has been removed."
+        description: "Your resume has been deleted successfully.",
       });
+
     } catch (error) {
+      console.error('Delete error:', error);
       toast({
         title: "Delete failed",
-        description: "There was an error deleting your resume.",
-        variant: "destructive"
+        description: error instanceof Error ? error.message : "Failed to delete resume",
+        variant: "destructive",
       });
+    } finally {
+      setUploading(false);
     }
   };
   const triggerFileInput = () => {
@@ -218,9 +245,24 @@ const ResumeSection = () => {
                 <div className="w-8 h-8 bg-purple-500/60 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple-500/40">
                   <FileText className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-white font-inter font-semibold text-base truncate">resume.pdf</span>
+                <div className="min-w-0">
+                  <span className="text-white font-inter font-semibold text-base truncate block">
+                    {userProfile?.resume_filename || 'resume.pdf'}
+                  </span>
+                  {userProfile?.resume_uploaded_at && (
+                    <span className="text-white/70 text-xs">
+                      Uploaded {new Date(userProfile.resume_uploaded_at).toLocaleDateString()}
+                    </span>
+                  )}
+                </div>
               </div>
-              <Button variant="destructive" size="sm" onClick={handleDeleteResume} className="font-inter bg-red-500 hover:bg-red-600 transition-all text-xs px-4 py-1 h-8 flex-shrink-0 rounded-lg">
+              <Button 
+                variant="destructive" 
+                size="sm" 
+                onClick={handleDeleteResume} 
+                disabled={uploading}
+                className="font-inter bg-red-500 hover:bg-red-600 transition-all text-xs px-4 py-1 h-8 flex-shrink-0 rounded-lg"
+              >
                 <Trash2 className="w-3 h-3 mr-1" />
                 Delete
               </Button>

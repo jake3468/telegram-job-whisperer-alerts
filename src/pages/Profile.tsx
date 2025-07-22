@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 import AuthHeader from '@/components/AuthHeader';
-import ProfessionalResumeSection from '@/components/dashboard/ProfessionalResumeSection';
+import ResumeSection from '@/components/dashboard/ResumeSection';
 import ProfessionalBioSection from '@/components/dashboard/ProfessionalBioSection';
 import JWTDebugPanel from '@/components/JWTDebugPanel';
 import ClerkJWTSetupGuide from '@/components/ClerkJWTSetupGuide';
@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { RefreshCw, Copy } from 'lucide-react';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useToast } from '@/hooks/use-toast';
-import { useEnhancedTokenManager } from '@/hooks/useEnhancedTokenManager';
+
 
 const Profile = () => {
   const { user, isLoaded } = useUser();
@@ -29,8 +29,6 @@ const Profile = () => {
   const { showPopup, hidePopup, dontShowAgain } = useOnboardingPopup();
   const { toast } = useToast();
 
-  // Enhanced token management
-  const { isReady: tokenReady, tokenStats } = useEnhancedTokenManager();
 
   // Connection and error state management
   const [connectionIssue, setConnectionIssue] = useState(false);
@@ -47,7 +45,7 @@ const Profile = () => {
 
   // Enhanced JWT setup check with better error handling
   const checkJWTSetup = useCallback(async () => {
-    if (!isLoaded || !user || !isAuthReady || !tokenReady) return;
+    if (!isLoaded || !user || !isAuthReady) return;
     
     try {
       setError(null);
@@ -75,14 +73,14 @@ const Profile = () => {
         setProfileDataLoaded(true);
       }
     }
-  }, [isLoaded, user, isAuthReady, tokenReady, runComprehensiveJWTTest, lastJWTTestResult, executeWithRetry]);
+  }, [isLoaded, user, isAuthReady, runComprehensiveJWTTest, lastJWTTestResult, executeWithRetry]);
 
   // Initial setup check with enhanced readiness
   useEffect(() => {
-    if (isLoaded && user && isAuthReady && tokenReady) {
+    if (isLoaded && user && isAuthReady) {
       setTimeout(checkJWTSetup, 300);
     }
-  }, [isLoaded, user, isAuthReady, tokenReady, checkJWTSetup]);
+  }, [isLoaded, user, isAuthReady, checkJWTSetup]);
 
   // Manual refresh function - enhanced with token refresh
   const handleManualRefresh = useCallback(() => {
@@ -166,16 +164,6 @@ const Profile = () => {
           </div>
         )}
 
-        {/* Token Status (Development Only) */}
-        {Environment.isDevelopment() && tokenStats.refreshCount > 0 && (
-          <div className="bg-blue-900/20 border border-blue-400/30 rounded-lg p-2 mb-4 text-xs">
-            <p className="text-blue-300">
-              Token refreshes: {tokenStats.refreshCount} | 
-              Failures: {tokenStats.failureCount} | 
-              Ready: {tokenReady ? '✓' : '✗'}
-            </p>
-          </div>
-        )}
       </div>
 
       {/* Show JWT Setup Guide if needed (development only) */}
@@ -185,12 +173,12 @@ const Profile = () => {
         </div>
       )}
 
-      {!isAuthReady || !tokenReady ? (
+      {!isAuthReady ? (
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center space-y-3">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-fuchsia-400 mx-auto"></div>
             <p className="text-gray-300 text-sm">
-              {!isAuthReady ? 'Preparing authentication...' : 'Initializing secure connection...'}
+              Preparing authentication...
             </p>
           </div>
         </div>
@@ -204,7 +192,7 @@ const Profile = () => {
               </div>
               <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-sky-400 to-fuchsia-400 bg-clip-text text-transparent">Add Current Resume</h2>
             </div>
-            <ProfessionalResumeSection />
+            <ResumeSection />
             <div className="mt-4 mb-6 text-center">
               <Button 
                 onClick={() => setShowResumeHelp(true)} 

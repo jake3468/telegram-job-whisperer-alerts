@@ -120,7 +120,7 @@ export const useEnhancedTokenManager = () => {
     initializeToken();
   }, [user, getToken, refreshToken]);
 
-  // Aggressive proactive token refresh (every 30 seconds for active users)
+  // Professional token refresh (every 5 minutes for active users)
   useEffect(() => {
     if (!isReady) return;
 
@@ -146,7 +146,7 @@ export const useEnhancedTokenManager = () => {
           await refreshToken(true);
         }
       }
-    }, 30 * 1000); // 30 seconds
+    }, 5 * 60 * 1000); // 5 minutes
 
     return () => {
       clearInterval(proactiveRefresh);
