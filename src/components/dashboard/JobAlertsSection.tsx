@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,6 +8,7 @@ import JobAlertModal from './JobAlertModal';
 import JobAlertsList from './JobAlertsList';
 import BotStatus from './BotStatus';
 import { useCachedJobAlertsData } from '@/hooks/useCachedJobAlertsData';
+
 interface JobAlert {
   id: string;
   country: string;
@@ -20,17 +22,12 @@ interface JobAlert {
   created_at: string;
   updated_at: string;
 }
+
 interface JobAlertsSectionProps {
   userTimezone: string;
-  updateActivity?: () => void;
 }
-const JobAlertsSection = ({
-  userTimezone,
-  updateActivity
-}: {
-  userTimezone: string;
-  updateActivity?: () => void;
-}) => {
+
+const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
   const { toast } = useToast();
   const { 
     alerts, 
@@ -52,8 +49,8 @@ const JobAlertsSection = ({
   const alertsUsed = alerts.length;
   const alertsRemaining = MAX_ALERTS - alertsUsed;
   const isAtLimit = alertsUsed >= MAX_ALERTS;
+
   const handleCreateAlert = () => {
-    updateActivity?.();
     if (!isActivated) {
       toast({
         title: "Bot not activated",
@@ -73,8 +70,8 @@ const JobAlertsSection = ({
     setEditingAlert(null);
     setShowModal(true);
   };
+
   const handleEditAlert = (alert: JobAlert) => {
-    updateActivity?.();
     if (!isActivated) {
       toast({
         title: "Bot not activated",
@@ -86,8 +83,8 @@ const JobAlertsSection = ({
     setEditingAlert(alert);
     setShowModal(true);
   };
+
   const handleDeleteAlert = async (alertId: string) => {
-    updateActivity?.();
     if (!isActivated) {
       toast({
         title: "Bot not activated",
@@ -125,6 +122,7 @@ const JobAlertsSection = ({
       });
     }
   };
+
   const handleModalSubmit = () => {
     setEditingAlert(null);
     // Invalidate cache to refresh data
@@ -140,6 +138,7 @@ const JobAlertsSection = ({
   const handleManualRefresh = useCallback(() => {
     forceRefresh();
   }, [forceRefresh]);
+
   // Show fast initial loading state, then content even if auth is still loading
   if (loading && !userProfileId) {
     return <div className="max-w-2xl mx-auto w-full">
@@ -151,6 +150,7 @@ const JobAlertsSection = ({
         </div>
       </div>;
   }
+
   return <section className="rounded-3xl border-2 border-orange-400 bg-gradient-to-b from-orange-900/90 via-[#2b1605]/90 to-[#2b1605]/98 shadow-none p-0 max-w-5xl mx-auto">
       <div className="pt-4 px-2 sm:px-6">
         {/* Manual Refresh Button */}
@@ -179,7 +179,6 @@ const JobAlertsSection = ({
                 </span>
                 <span>Job Alerts</span>
               </span>
-              
             </div>
             <p className="text-orange-100 font-inter text-sm font-semibold drop-shadow-none">Set up personalized daily job alerts based on your preferences</p>
             
@@ -223,7 +222,6 @@ const JobAlertsSection = ({
             onSubmit={handleModalSubmit}
             currentAlertCount={alertsUsed}
             maxAlerts={MAX_ALERTS}
-            updateActivity={updateActivity}
           />
 
           {!isActivated && <div className="text-center py-6">
@@ -236,4 +234,5 @@ const JobAlertsSection = ({
       <div className="h-2 sm:h-4" />
     </section>;
 };
+
 export default JobAlertsSection;

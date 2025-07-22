@@ -26,7 +26,6 @@ interface JobAlertModalProps {
   onSubmit: () => void;
   currentAlertCount: number;
   maxAlerts: number;
-  updateActivity?: () => void;
 }
 
 const JobAlertModal = ({
@@ -36,22 +35,18 @@ const JobAlertModal = ({
   editingAlert,
   onSubmit,
   currentAlertCount,
-  maxAlerts,
-  updateActivity
+  maxAlerts
 }: JobAlertModalProps) => {
   const handleFormSubmit = () => {
-    updateActivity?.(); // Track user activity
     onSubmit();
     onClose();
   };
 
   const handleFormCancel = () => {
-    updateActivity?.(); // Track user activity
     onClose();
   };
 
   const handleModalClose = () => {
-    updateActivity?.(); // Track user activity
     onClose();
   };
 
@@ -73,7 +68,7 @@ const JobAlertModal = ({
         </DialogHeader>
         
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto px-3 sm:px-4" onClick={updateActivity}>
+        <div className="flex-1 overflow-y-auto px-3 sm:px-4">
           <JobAlertForm
             userTimezone={userTimezone}
             editingAlert={editingAlert}
@@ -81,7 +76,6 @@ const JobAlertModal = ({
             onCancel={handleFormCancel}
             currentAlertCount={currentAlertCount}
             maxAlerts={maxAlerts}
-            updateActivity={updateActivity}
           />
         </div>
         
