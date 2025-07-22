@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 import { useEnterpriseSessionManager } from './useEnterpriseSessionManager';
 import { setEnterpriseSessionManager } from '@/integrations/supabase/client';
@@ -19,5 +20,20 @@ export const useEnhancedTokenManagerIntegration = () => {
     };
   }, [sessionManager]);
 
-  return sessionManager;
+  // Return a simplified interface that components can use easily
+  return sessionManager ? {
+    refreshToken: async (forceRefresh = false) => {
+      return await sessionManager.refreshToken(forceRefresh);
+    },
+    updateActivity: () => {
+      sessionManager.updateActivity();
+    },
+    isTokenValid: () => {
+      return sessionManager.isTokenValid();
+    },
+    getCurrentToken: () => {
+      return sessionManager.getCurrentToken();
+    },
+    sessionStats: sessionManager.sessionStats
+  } : null;
 };

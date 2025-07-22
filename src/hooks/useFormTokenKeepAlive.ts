@@ -16,7 +16,7 @@ export const useFormTokenKeepAlive = (isFormActive: boolean = true) => {
     try {
       isRefreshingRef.current = true;
       
-      // Use the enterprise session manager to refresh token
+      // Use the simplified interface that handles the getToken internally
       const token = await sessionManager.refreshToken(true);
       
       if (token) {
@@ -29,12 +29,15 @@ export const useFormTokenKeepAlive = (isFormActive: boolean = true) => {
     } finally {
       isRefreshingRef.current = false;
     }
-  }, [getToken, sessionManager]);
+  }, [sessionManager]);
 
   // Update activity timestamp
   const updateActivity = useCallback(() => {
     lastActivityRef.current = Date.now();
-  }, []);
+    if (sessionManager) {
+      sessionManager.updateActivity();
+    }
+  }, [sessionManager]);
 
   // Set up keep-alive mechanism
   useEffect(() => {
