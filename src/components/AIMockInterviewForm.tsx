@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import { useCachedUserCompletionStatus } from '@/hooks/useCachedUserCompletionStatus';
-import { useCachedAIInterviewCredits } from '@/hooks/useCachedAIInterviewCredits';
+import { useAIInterviewCredits } from '@/hooks/useAIInterviewCredits';
 import { useEnterpriseSessionManager } from '@/hooks/useEnterpriseSessionManager';
 import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -32,7 +32,7 @@ const AIMockInterviewForm: React.FC<AIMockInterviewFormProps> = ({ prefillData =
   
   // Use session-aware completion status
   const { hasResume, hasBio, isComplete, loading: completionLoading, refetchStatus } = useCachedUserCompletionStatus();
-  const { credits, loading: creditsLoading, refetch: refetchCredits } = useCachedAIInterviewCredits();
+  const { credits, isLoading: creditsLoading, refetch: refetchCredits } = useAIInterviewCredits();
   
   const [phoneNumber, setPhoneNumber] = useState('');
   const [companyName, setCompanyName] = useState(prefillData.companyName || '');
