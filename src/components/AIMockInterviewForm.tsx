@@ -41,11 +41,12 @@ const AIMockInterviewForm: React.FC<AIMockInterviewFormProps> = ({ prefillData =
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSessionWarning, setShowSessionWarning] = useState(false);
 
-  // Monitor session state for better UX
+  // Monitor session state for better UX - more conservative threshold
   useEffect(() => {
     if (sessionManager?.sessionStats) {
       const stats = sessionManager.sessionStats;
-      const isSessionUnstable = !stats.tokenValid || stats.failureCount > 2;
+      // Only show warning for serious session issues, not temporary token refreshes
+      const isSessionUnstable = !stats.tokenValid && stats.failureCount > 5;
       setShowSessionWarning(isSessionUnstable);
     }
   }, [sessionManager?.sessionStats]);

@@ -62,8 +62,8 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
     const sessionStats = sessionManager.sessionStats;
     const timeSinceLastActivity = Date.now() - sessionStats.lastActivity;
     
-    // If session manager is not ready or token is being refreshed, defer
-    if (!sessionManager.isReady || timeSinceLastActivity > 30000) {
+    // Only defer if session manager is explicitly not ready and has serious issues
+    if (!sessionManager.isReady && sessionStats.failureCount > 5 && timeSinceLastActivity > 60000) {
       return true;
     }
     
