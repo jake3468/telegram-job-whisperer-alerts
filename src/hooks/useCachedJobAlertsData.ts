@@ -2,8 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { logger } from '@/utils/logger';
-import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
-import { makeAuthenticatedRequest } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 
 interface JobAlert {
   id: string;
@@ -36,7 +35,6 @@ let isRefreshing = false; // Request deduplication flag
 export const useCachedJobAlertsData = () => {
   const { user } = useUser();
   const { getToken } = useAuth();
-  const { isAuthReady, executeWithRetry } = useEnterpriseAuth();
   const [alerts, setAlerts] = useState<JobAlert[]>([]);
   const [isActivated, setIsActivated] = useState<boolean>(false);
   const [userProfileId, setUserProfileId] = useState<string | null>(null);
@@ -75,26 +73,8 @@ export const useCachedJobAlertsData = () => {
     }
   }, []);
 
-  // Professional token refresh every 25 minutes (not 5 minutes!)
-  useEffect(() => {
-    if (!user || !isAuthReady) return;
 
-    const tokenRefreshInterval = setInterval(async () => {
-      try {
-        // Only refresh if user is active and no pending operations
-        if (document.visibilityState === 'visible') {
-          await getToken({ skipCache: true });
-          logger.debug('Scheduled token refresh completed');
-        }
-      } catch (error) {
-        logger.warn('Scheduled token refresh failed:', error);
-      }
-    }, 25 * 60 * 1000); // 25 minutes - professional standard
-
-    return () => clearInterval(tokenRefreshInterval);
-  }, [user?.id, isAuthReady, getToken]);
-
-  // Fetch fresh data when user changes or auth becomes ready
+  // Fetch fresh data when user changes
   useEffect(() => {
     if (!user) {
       setLoading(false);
@@ -119,22 +99,19 @@ export const useCachedJobAlertsData = () => {
       }
     }
     
-    if (isAuthReady) {
-      fetchJobAlertsData();
-    }
-  }, [user?.id, isAuthReady]);
+    fetchJobAlertsData();
+  }, [user?.id]);
 
-  // Background auto-refresh like professional sites (Google, Amazon)
+  // Background auto-refresh
   useEffect(() => {
-    if (!user || !isAuthReady) return;
+    if (!user) return;
 
     const backgroundRefreshInterval = setInterval(() => {
-      // Silent background refresh
       fetchJobAlertsData(true);
     }, BACKGROUND_REFRESH_INTERVAL);
 
     return () => clearInterval(backgroundRefreshInterval);
-  }, [user?.id, isAuthReady]);
+  }, [user?.id]);
 
   // Fallback timeout for loading state
   useEffect(() => {
@@ -152,7 +129,7 @@ export const useCachedJobAlertsData = () => {
   }, [loading, user, alerts.length, userProfileId]);
 
   const fetchJobAlertsData = useCallback(async (silent = false) => {
-    if (!user || !isAuthReady) {
+    if (!user) {
       return;
     }
     
@@ -169,45 +146,41 @@ export const useCachedJobAlertsData = () => {
         setConnectionIssue(false);
       }
       
-      const result = await executeWithRetry(
-        async () => {
-          return await makeAuthenticatedRequest(async () => {
-            const { supabase } = await import('@/integrations/supabase/client');
-            
-            // Get user profile - more resilient query
-            const { data: profileData, error: profileError } = await supabase
-              .from('user_profile')
-              .select('id, bot_activated')
-              .maybeSingle();
-              
-            if (profileError) {
-              throw new Error(`Profile fetch failed: ${profileError.message}`);
-            }
-            
-            if (!profileData) {
-              throw new Error('User profile not found. Please try signing out and back in.');
-            }
+      // Simple direct Supabase calls without enterprise wrapper
+      const token = await getToken();
+      if (!token) {
+        throw new Error('Unable to get authentication token');
+      }
+      
+      // Get user profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('user_profile')
+        .select('id, bot_activated')
+        .maybeSingle();
+        
+      if (profileError) {
+        throw new Error(`Profile fetch failed: ${profileError.message}`);
+      }
+      
+      if (!profileData) {
+        throw new Error('User profile not found. Please try signing out and back in.');
+      }
 
-            // Fetch job alerts - RLS policies will filter automatically
-            const { data: alertsData, error: alertsError } = await supabase
-              .from('job_alerts')
-              .select('*')
-              .order('created_at', { ascending: false });
+      // Fetch job alerts
+      const { data: alertsData, error: alertsError } = await supabase
+        .from('job_alerts')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-            if (alertsError) {
-              throw alertsError;
-            }
+      if (alertsError) {
+        throw alertsError;
+      }
 
-            return {
-              alerts: alertsData || [],
-              botActivated: profileData.bot_activated || false,
-              userProfileId: profileData.id
-            };
-          });
-        },
-        5, // 5 retry attempts with exponential backoff
-        'Fetching job alerts data'
-      );
+      const result = {
+        alerts: alertsData || [],
+        botActivated: profileData.bot_activated || false,
+        userProfileId: profileData.id
+      };
 
       // Update state
       setAlerts(result.alerts);
@@ -243,7 +216,7 @@ export const useCachedJobAlertsData = () => {
         setLoading(false);
       }
     }
-  }, [user, isAuthReady, executeWithRetry, alerts.length]);
+  }, [user, getToken, alerts.length]);
 
   const invalidateCache = () => {
     localStorage.removeItem(CACHE_KEY);
@@ -262,32 +235,24 @@ export const useCachedJobAlertsData = () => {
     await fetchJobAlertsData();
   };
 
-  // Enhanced delete function with retry logic using authenticated requests
+  // Simple delete function
   const deleteJobAlert = async (alertId: string) => {
-    if (!isAuthReady) {
-      throw new Error('Authentication not ready, please wait...');
+    const token = await getToken();
+    if (!token) {
+      throw new Error('Unable to get authentication token');
     }
 
-    return await executeWithRetry(
-      async () => {
-        return await makeAuthenticatedRequest(async () => {
-          const { supabase } = await import('@/integrations/supabase/client');
-          const { error } = await supabase
-            .from('job_alerts')
-            .delete()
-            .eq('id', alertId);
-          
-          if (error) throw error;
-          
-          // Optimistically remove from local state
-          setAlerts(prev => prev.filter(alert => alert.id !== alertId));
-          
-          return true;
-        });
-      },
-      3,
-      `Deleting job alert ${alertId}`
-    );
+    const { error } = await supabase
+      .from('job_alerts')
+      .delete()
+      .eq('id', alertId);
+    
+    if (error) throw error;
+    
+    // Optimistically remove from local state
+    setAlerts(prev => prev.filter(alert => alert.id !== alertId));
+    
+    return true;
   };
 
   return {
@@ -297,12 +262,10 @@ export const useCachedJobAlertsData = () => {
     loading,
     error,
     connectionIssue,
-    isAuthReady,
     refetch: fetchJobAlertsData,
     optimisticAdd,
     invalidateCache,
     forceRefresh,
-    deleteJobAlert,
-    executeWithRetry
+    deleteJobAlert
   };
 };

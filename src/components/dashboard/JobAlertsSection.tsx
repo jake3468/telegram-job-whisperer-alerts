@@ -35,11 +35,9 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
     userProfileId, 
     loading, 
     error, 
-    isAuthReady,
     invalidateCache,
     forceRefresh,
-    deleteJobAlert,
-    executeWithRetry
+    deleteJobAlert
   } = useCachedJobAlertsData();
   
   const [showModal, setShowModal] = useState(false);
@@ -94,14 +92,6 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
       return;
     }
 
-    if (!isAuthReady) {
-      toast({
-        title: "Please wait",
-        description: "Authentication is loading, please try again in a moment.",
-        variant: "destructive"
-      });
-      return;
-    }
 
     try {
       await deleteJobAlert(alertId);

@@ -8,6 +8,7 @@ import { useClerkSupabaseSync } from "@/hooks/useClerkSupabaseSync";
 import { useAuth } from "@clerk/clerk-react";
 import { useEffect } from "react";
 import { useEnhancedTokenManagerIntegration } from "@/hooks/useEnhancedTokenManagerIntegration";
+import { useLocation } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import JobGuide from "./pages/JobGuide";
@@ -56,12 +57,19 @@ const LoadingScreen = () => (
 // Component to initialize Clerk-Supabase sync
 const AppWithSync = () => {
   const { isLoaded, isSignedIn } = useAuth();
+  const location = useLocation();
   
   // Initialize sync in background without blocking UI
   useClerkSupabaseSync();
   
-  // Initialize enterprise-grade token management integration
-  useEnhancedTokenManagerIntegration();
+  // Only initialize enterprise token management for pages that need it
+  // Skip for job-alerts page to prevent debug messages
+  const shouldUseEnterpriseFeatures = !location.pathname.includes('/job-alerts');
+  
+  // Conditionally initialize enterprise-grade token management
+  if (shouldUseEnterpriseFeatures) {
+    useEnhancedTokenManagerIntegration();
+  }
   
   // Hide initial loader once React is ready
   useEffect(() => {

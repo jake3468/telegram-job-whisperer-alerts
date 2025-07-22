@@ -8,8 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
-import { useUniversalFormManager } from '@/hooks/useUniversalFormManager';
-import { EnterpriseFormWrapper } from '@/components/common/EnterpriseFormWrapper';
 import { supabase } from '@/integrations/supabase/client';
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -42,15 +40,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   const { user } = useUser();
   const { getToken } = useAuth();
   const { toast } = useToast();
-  const { optimisticAdd, isAuthReady, userProfileId } = useCachedJobAlertsData();
-  
-  // Enterprise-grade universal form manager
-  const { 
-    submitForm, 
-    isSubmitting: formSubmitting, 
-    recordFormInteraction,
-    handleFieldChange 
-  } = useUniversalFormManager();
+  const { optimisticAdd, userProfileId } = useCachedJobAlertsData();
   
   const [loading, setLoading] = useState(false);
   const [countryOpen, setCountryOpen] = useState(false);
@@ -87,22 +77,25 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    recordFormInteraction('submit');
+    setLoading(true);
     
-    // Basic validation - same as BioSection pattern
-    if (!user || !isAuthReady) {
+    // Basic validation
+    if (!user) {
       toast({
-        title: "Initializing...",
-        description: "Please wait a moment while we prepare your session.",
+        title: "Authentication required",
+        description: "Please sign in to continue.",
+        variant: "destructive"
       });
+      setLoading(false);
       return;
     }
 
     if (!userProfileId) {
       toast({
-        title: "Initializing...",
-        description: "Loading your profile data...",
+        title: "Loading profile...",
+        description: "Please wait while we load your profile data.",
       });
+      setLoading(false);
       return;
     }
 
@@ -117,61 +110,60 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
     }
 
     try {
-      if (editingAlert) {
-        // Update existing alert using enterprise form manager
-        await submitForm(async () => {
-          const { error } = await supabase
-            .from('job_alerts')
-            .update({
-              country: formData.country.toLowerCase(),
-              country_name: formData.country_name,
-              location: formData.location,
-              job_title: formData.job_title,
-              job_type: formData.job_type,
-              alert_frequency: formData.alert_frequency,
-              preferred_time: formData.preferred_time,
-              timezone: formData.timezone
-            })
-            .eq('id', editingAlert.id);
+      const token = await getToken();
+      if (!token) {
+        throw new Error('Unable to get authentication token');
+      }
 
-          if (error) {
-            throw error;
-          }
-        });
+      if (editingAlert) {
+        // Update existing alert
+        const { error } = await supabase
+          .from('job_alerts')
+          .update({
+            country: formData.country.toLowerCase(),
+            country_name: formData.country_name,
+            location: formData.location,
+            job_title: formData.job_title,
+            job_type: formData.job_type,
+            alert_frequency: formData.alert_frequency,
+            preferred_time: formData.preferred_time,
+            timezone: formData.timezone
+          })
+          .eq('id', editingAlert.id);
+
+        if (error) {
+          throw error;
+        }
         
         toast({
           title: "Alert Updated",
           description: "Your job alert has been updated successfully.",
         });
       } else {
-        // Create new alert using enterprise form manager
-        const result = await submitForm(async () => {
-          const { data, error } = await supabase
-            .from('job_alerts')
-            .insert({
-              user_id: userProfileId,
-              country: formData.country.toLowerCase(),
-              country_name: formData.country_name,
-              location: formData.location,
-              job_title: formData.job_title,
-              job_type: formData.job_type,
-              alert_frequency: formData.alert_frequency,
-              preferred_time: formData.preferred_time,
-              timezone: formData.timezone
-            })
-            .select()
-            .single();
+        // Create new alert
+        const { data, error } = await supabase
+          .from('job_alerts')
+          .insert({
+            user_id: userProfileId,
+            country: formData.country.toLowerCase(),
+            country_name: formData.country_name,
+            location: formData.location,
+            job_title: formData.job_title,
+            job_type: formData.job_type,
+            alert_frequency: formData.alert_frequency,
+            preferred_time: formData.preferred_time,
+            timezone: formData.timezone
+          })
+          .select()
+          .single();
 
-          if (error) {
-            throw error;
-          }
-
-          return data;
-        });
+        if (error) {
+          throw error;
+        }
 
         // Optimistic UI update for immediate feedback
-        if (result) {
-          optimisticAdd(result as any);
+        if (data) {
+          optimisticAdd(data as any);
         }
         
         toast({
@@ -194,7 +186,6 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   };
 
   const handleInputChange = (field: string, value: string | number) => {
-    handleFieldChange(field, value);
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -202,9 +193,6 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   };
 
   const handleCountryChange = (countryCode: string, countryName: string) => {
-    // Record form interaction with new enterprise system
-    recordFormInteraction('input');
-    
     setFormData(prev => ({
       ...prev,
       country: countryCode,
@@ -217,13 +205,8 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
     return country ? `${country.name} (${country.code})` : countryValue;
   };
 
-  // Enhanced form interaction handlers
-  const handleFormInteraction = () => {
-    recordFormInteraction('input');
-  };
-
   return (
-    <EnterpriseFormWrapper className="space-y-2 sm:space-y-3">
+    <div className="space-y-2 sm:space-y-3">
       <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3">
       {/* Alert limit warning */}
       {!editingAlert && currentAlertCount >= maxAlerts - 1 && (
@@ -367,10 +350,10 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
       <div className="flex flex-col gap-2 pt-3 sticky bottom-0 bg-gradient-to-br from-orange-900/95 via-[#3c1c01]/90 to-[#2b1605]/95 pb-2">
         <Button 
           type="submit" 
-          disabled={loading || formSubmitting || (!editingAlert && currentAlertCount >= maxAlerts)}
+          disabled={loading || (!editingAlert && currentAlertCount >= maxAlerts)}
           className="w-full font-inter bg-pastel-lavender hover:bg-pastel-lavender/80 text-black font-medium text-xs px-3 py-2 h-8 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {formSubmitting ? (
+          {loading ? (
             <>
               <Loader2 className="w-3 h-3 mr-2 animate-spin" />
               Saving...
@@ -383,14 +366,14 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
           type="button" 
           variant="outline" 
           onClick={onCancel} 
-          disabled={formSubmitting}
+          disabled={loading}
           className="w-full font-inter border-gray-500 hover:border-gray-400 text-gray-950 bg-pastel-peach text-xs px-3 py-2 h-8"
         >
           Cancel
         </Button>
       </div>
     </form>
-    </EnterpriseFormWrapper>
+    </div>
   );
 };
 
