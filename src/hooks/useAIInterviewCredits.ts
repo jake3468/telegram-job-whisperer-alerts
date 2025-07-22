@@ -24,9 +24,7 @@ export const useAIInterviewCredits = () => {
   const fetchCredits = async (isRetry = false) => {
     if (!user || !userProfile?.user_id) {
       console.log('AIInterviewCredits: Missing user or userProfile', { user: !!user, userProfile: !!userProfile, user_id: userProfile?.user_id });
-      if (!isRetry) {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
       return;
     }
 
@@ -38,7 +36,7 @@ export const useAIInterviewCredits = () => {
 
       console.log('AIInterviewCredits: Fetching credits for user_id:', userProfile.user_id);
 
-      let { data, error: fetchError } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('ai_interview_credits')
         .select('*')
         .eq('user_id', userProfile.user_id)
@@ -49,16 +47,15 @@ export const useAIInterviewCredits = () => {
         if (fetchError.code === 'PGRST116') {
           // No records found, need to initialize
           logger.info('No AI interview credits found for user, initializing...');
-          data = null; // Ensure data is null for initialization
-        } else if (fetchError.message?.includes('JWT') && retryCount < 3) {
-          // Handle JWT expiration by silently retrying 
-          logger.info('JWT issue detected, retrying...', { retryCount });
+        } else if (fetchError.message?.includes('JWT') && retryCount < 2) {
+          // Handle JWT expiration by silently retrying once
+          logger.info('JWT issue detected, retrying...');
           setRetryCount(prev => prev + 1);
-          setTimeout(() => fetchCredits(true), 1500);
+          setTimeout(() => fetchCredits(true), 1000);
           return;
         } else {
           logger.error('Error fetching AI interview credits:', fetchError);
-          setError(`Failed to load credits: ${fetchError.message}`);
+          setError(`Failed to load call data: ${fetchError.message}`);
           return;
         }
       }

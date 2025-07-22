@@ -1,8 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
-import { useEnterpriseSessionManager } from '@/hooks/useEnterpriseSessionManager';
 import { logger } from '@/utils/logger';
 
 interface CompletionStatus {
@@ -20,13 +18,11 @@ interface CachedCompletionData {
 }
 
 const CACHE_KEY = 'aspirely_user_completion_status_cache';
-const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes - synchronized with profile cache
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 
 export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchStatus: () => Promise<void> } => {
   const { user } = useUser();
-  const { userProfile, loading: profileLoading, refetch: refetchProfile, isShowingCachedData } = useCachedUserProfile();
-  const sessionManager = useEnterpriseSessionManager();
-  
+  const { userProfile, loading: profileLoading, refetch: refetchProfile } = useCachedUserProfile();
   const [status, setStatus] = useState<CompletionStatus>(() => {
     // Initialize with cached data if available
     if (!user) {
@@ -42,7 +38,7 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
         // Use cached data if it's for the same user and within cache duration
         if (parsedCache.userId === user.id && now - parsedCache.timestamp < CACHE_DURATION) {
           logger.debug('Initialized with cached user completion status:', parsedCache.status);
-          return { ...parsedCache.status, loading: false };
+          return { ...parsedCache.status, loading: false }; // Ensure loading is false for cached data
         }
       }
     } catch (error) {
@@ -54,56 +50,31 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
     return { hasResume: false, hasBio: false, isComplete: false, loading: true, lastChecked: null };
   });
 
-  // Check if we should defer completion status checks during token refresh
-  const shouldDeferCheck = () => {
-    if (!sessionManager) return false;
-    
-    // Check if token is currently being refreshed
-    const sessionStats = sessionManager.sessionStats;
-    const timeSinceLastActivity = Date.now() - sessionStats.lastActivity;
-    
-    // Only defer if session manager is explicitly not ready and has serious issues
-    if (!sessionManager.isReady && sessionStats.failureCount > 5 && timeSinceLastActivity > 60000) {
-      return true;
-    }
-    
-    return false;
-  };
-
-  // Update status based on cached profile data with token awareness
+  // Update status based on cached profile data
   useEffect(() => {
     if (!user) {
       setStatus({ hasResume: false, hasBio: false, isComplete: false, loading: false, lastChecked: new Date() });
       return;
     }
 
-    // If we're showing cached profile data or session is not ready, show loading
-    if (profileLoading || shouldDeferCheck()) {
+    if (profileLoading) {
       setStatus(prev => ({ ...prev, loading: true }));
       return;
     }
 
     if (userProfile) {
-      // Use the resume text field as specified by the user
       const hasResume = !!(userProfile.resume && userProfile.resume.trim().length > 0);
       const hasBio = !!(userProfile.bio && userProfile.bio.trim().length > 0);
       const isComplete = hasResume && hasBio;
 
-      // Only log in development environment and not too frequently
+      // Only log in development environment
       if (process.env.NODE_ENV === 'development') {
-        const lastLogTime = localStorage.getItem('completion_status_last_log');
-        const now = Date.now();
-        if (!lastLogTime || now - parseInt(lastLogTime) > 5 * 60 * 1000) {
-          console.log('Profile completion check from cached data:', {
-            userId: user.id,
-            hasResume,
-            hasBio,
-            isComplete,
-            isShowingCachedData,
-            sessionReady: sessionManager?.isReady
-          });
-          localStorage.setItem('completion_status_last_log', now.toString());
-        }
+        console.log('Profile completion check from cached data:', {
+          userId: user.id,
+          hasResume,
+          hasBio,
+          isComplete
+        });
       }
 
       const newStatus = {
@@ -116,7 +87,7 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
 
       setStatus(newStatus);
 
-      // Cache the data with synchronized timestamp
+      // Cache the data
       try {
         const cacheData: CachedCompletionData = {
           status: newStatus,
@@ -128,20 +99,12 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
       } catch (cacheError) {
         logger.warn('Failed to cache user completion status:', cacheError);
       }
-    } else if (!isShowingCachedData) {
-      // Only show loading if we're not showing cached data
-      setStatus(prev => ({ ...prev, loading: true }));
     }
-  }, [user?.id, userProfile, profileLoading, isShowingCachedData, sessionManager?.isReady]);
+  }, [user?.id, userProfile, profileLoading]);
 
   const refetchStatus = async () => {
     // Invalidate cache and force profile refresh
     localStorage.removeItem(CACHE_KEY);
-    
-    // Clear completion status log to allow fresh logging
-    localStorage.removeItem('completion_status_last_log');
-    
-    // Force refresh of profile data
     await refetchProfile();
   };
 

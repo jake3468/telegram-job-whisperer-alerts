@@ -5,27 +5,18 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw, History, DollarSign } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCachedGraceInterviewRequests } from "@/hooks/useCachedGraceInterviewRequests";
-import { useCachedUserCompletionStatus } from "@/hooks/useCachedUserCompletionStatus";
-import { useEnterpriseSessionManager } from "@/hooks/useEnterpriseSessionManager";
 import GraceInterviewReportsModal from "@/components/GraceInterviewReportsModal";
 import { AIInterviewPricingModal } from "@/components/AIInterviewPricingModal";
 import { useLocation } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
 
 const AIMockInterview = () => {
   const location = useLocation();
-  const { toast } = useToast();
   const {
     connectionIssue,
     forceRefresh
   } = useCachedGraceInterviewRequests();
-  
-  const { refetchStatus } = useCachedUserCompletionStatus();
-  const sessionManager = useEnterpriseSessionManager();
-  
   const [isReportsModalOpen, setIsReportsModalOpen] = useState(false);
   const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [prefillData, setPrefillData] = useState<{
     companyName?: string;
     jobTitle?: string;
@@ -45,53 +36,12 @@ const AIMockInterview = () => {
     }
   }, [location.state]);
 
-  const handleManualRefresh = async () => {
-    setIsRefreshing(true);
-    
-    try {
-      // Show immediate feedback
-      toast({
-        title: "Refreshing...",
-        description: "Updating your profile data",
-      });
-      
-      // Force token refresh first
-      if (sessionManager?.refreshToken) {
-        await sessionManager.refreshToken(true);
-      }
-      
-      // Clear all related caches
-      localStorage.removeItem('aspirely_user_profile_cache');
-      localStorage.removeItem('aspirely_user_completion_status_cache');
-      localStorage.removeItem('aspirely_ai_interview_credits_cache');
-      localStorage.removeItem('profile_last_log');
-      localStorage.removeItem('completion_status_last_log');
-      
-      // Wait a moment for token refresh to complete
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Force refresh all data
-      await Promise.all([
-        refetchStatus(),
-        forceRefresh()
-      ]);
-      
-      // Success feedback
-      toast({
-        title: "Refreshed",
-        description: "Your profile data has been updated",
-      });
-      
-    } catch (error) {
-      console.error('Manual refresh failed:', error);
-      toast({
-        title: "Refresh Failed",
-        description: "Please try again or reload the page",
-        variant: "destructive"
-      });
-    } finally {
-      setIsRefreshing(false);
-    }
+  const handleManualRefresh = () => {
+    // Clear all caches and reload the page for a complete refresh
+    localStorage.removeItem('aspirely_user_profile_cache');
+    localStorage.removeItem('aspirely_user_completion_status_cache');
+    localStorage.removeItem('aspirely_ai_interview_credits_cache');
+    window.location.reload();
   };
 
   return <Layout>
@@ -103,19 +53,10 @@ const AIMockInterview = () => {
               <span className="text-5xl">📞</span>
               <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent text-left">AI Mock Interview</h1>
               
-              {/* Enhanced Manual Refresh Button */}
-              {(connectionIssue || isRefreshing) && (
-                <Button 
-                  onClick={handleManualRefresh} 
-                  disabled={isRefreshing}
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0 absolute right-0" 
-                  title={isRefreshing ? "Refreshing..." : "Refresh page"}
-                >
-                  <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                </Button>
-              )}
+              {/* Manual Refresh Button */}
+              {connectionIssue && <Button onClick={handleManualRefresh} variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0 absolute right-0" title="Refresh page">
+                  <RefreshCw className="h-4 w-4" />
+                </Button>}
             </div>
             
             <h2 className="text-xl md:text-2xl text-gray-300 mb-4 leading-relaxed">Get a Mock Interview Phone Call from 👩🏻 Grace</h2>
