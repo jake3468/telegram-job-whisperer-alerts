@@ -1,3 +1,4 @@
+
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { setClerkToken } from '@/integrations/supabase/client';
@@ -170,18 +171,6 @@ class EnterpriseSessionManager {
     return this.state.token;
   }
 
-  // Get valid token (with auto-refresh if needed)
-  async getValidToken(): Promise<string | null> {
-    if (this.isTokenValid()) {
-      return this.state.token;
-    }
-    
-    // Token expired/invalid - need to refresh
-    // This requires the getToken function, so we return null if not available
-    console.warn('[EnterpriseSession] Token invalid, refresh needed');
-    return null;
-  }
-
   // Get session stats
   getSessionStats() {
     return {
@@ -246,8 +235,14 @@ export const useEnterpriseSessionManager = () => {
     sessionManager.updateActivity();
   }, []);
 
+  // Get current token immediately
+  const getCurrentToken = useCallback(() => {
+    return sessionManager.getCurrentToken();
+  }, []);
+
   return {
     refreshToken,
+    getCurrentToken,
     isReady,
     isTokenValid,
     updateActivity,

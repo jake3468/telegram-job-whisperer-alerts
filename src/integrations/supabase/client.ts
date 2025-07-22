@@ -1,3 +1,4 @@
+
 // Enterprise-Grade Supabase Client with Unified Session Management
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
@@ -8,7 +9,7 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Enterprise session management
 let enterpriseSessionManager: any = null;
 
-// Supabase client with basic session persistence for fallback
+// Supabase client with proper session management
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     persistSession: true, // Enable basic persistence for fallback
@@ -50,40 +51,15 @@ export const makeAuthenticatedRequest = async <T>(
         throw new Error('Authentication required');
       }
 
-      // Create authenticated client for this request
-      const authenticatedClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-        },
-        global: {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'apikey': SUPABASE_PUBLISHABLE_KEY
-          }
-        }
+      // Set the authorization header for this request
+      supabase.auth.setSession({
+        access_token: token,
+        refresh_token: '', // Not needed for our use case
       });
 
-      // Replace global supabase methods temporarily
-      const originalFrom = supabase.from.bind(supabase);
-      const originalRpc = supabase.rpc.bind(supabase);
-      const originalStorage = supabase.storage;
-      
-      try {
-        // Override methods with authenticated client
-        (supabase as any).from = authenticatedClient.from.bind(authenticatedClient);
-        (supabase as any).rpc = authenticatedClient.rpc.bind(authenticatedClient);
-        (supabase as any).storage = authenticatedClient.storage;
-        
-        // Execute operation
-        const result = await operation();
-        return result;
-      } finally {
-        // Always restore original methods
-        (supabase as any).from = originalFrom;
-        (supabase as any).rpc = originalRpc;
-        (supabase as any).storage = originalStorage;
-      }
+      // Execute operation
+      const result = await operation();
+      return result;
     } catch (error: any) {
       lastError = error;
       
