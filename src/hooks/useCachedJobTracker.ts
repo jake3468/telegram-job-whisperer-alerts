@@ -8,17 +8,28 @@ import { logger } from '@/utils/logger';
 
 interface TrackedJob {
   id: string;
-  title: string;
-  company: string;
+  job_title: string;
+  company_name: string;
   location?: string;
   salary?: string;
   job_url?: string;
-  description?: string;
-  status: string;
-  application_date?: string;
-  notes?: string;
+  job_description?: string;
+  status: 'saved' | 'applied' | 'interview' | 'rejected' | 'offer';
+  comments?: string;
   created_at: string;
   updated_at: string;
+  user_id: string;
+  order_position: number;
+  job_reference_id?: string;
+  file_urls?: any;
+  resume_updated: boolean;
+  job_role_analyzed: boolean;
+  company_researched: boolean;
+  cover_letter_prepared: boolean;
+  ready_to_apply: boolean;
+  interview_call_received: boolean;
+  interview_prep_guide_received: boolean;
+  ai_mock_interview_attempted: boolean;
 }
 
 const CACHE_KEY = 'aspirely_job_tracker_cache';
@@ -63,7 +74,7 @@ export const useCachedJobTracker = () => {
 
       const { data, error: fetchError } = await makeAuthenticatedRequest(async () => {
         return await supabase
-          .from('job_applications')
+          .from('job_tracker')
           .select('*')
           .order('updated_at', { ascending: false });
       }, { operationType: 'fetch_tracked_jobs' });
@@ -102,7 +113,7 @@ export const useCachedJobTracker = () => {
     try {
       const { data, error: addError } = await makeAuthenticatedRequest(async () => {
         return await supabase
-          .from('job_applications')
+          .from('job_tracker')
           .insert([jobData])
           .select()
           .single();
@@ -138,7 +149,7 @@ export const useCachedJobTracker = () => {
     try {
       const { data, error: updateError } = await makeAuthenticatedRequest(async () => {
         return await supabase
-          .from('job_applications')
+          .from('job_tracker')
           .update({ ...updates, updated_at: new Date().toISOString() })
           .eq('id', jobId)
           .select()
@@ -176,7 +187,7 @@ export const useCachedJobTracker = () => {
     try {
       const { error: deleteError } = await makeAuthenticatedRequest(async () => {
         return await supabase
-          .from('job_applications')
+          .from('job_tracker')
           .delete()
           .eq('id', jobId);
       }, { operationType: 'delete_tracked_job' });

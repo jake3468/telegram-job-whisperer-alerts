@@ -8,13 +8,16 @@ import { useEnhancedTokenManagerIntegration } from './useEnhancedTokenManagerInt
 interface Job {
   id: string;
   title: string;
-  company: string;
+  company_name: string;
   location?: string;
   salary?: string;
-  description?: string;
-  url: string;
+  job_description?: string;
+  link_1_link?: string;
   created_at: string;
-  is_saved?: boolean;
+  is_saved_by_user?: boolean;
+  user_id: string;
+  section?: string;
+  updated_at: string;
 }
 
 interface SavedJob {
@@ -44,12 +47,12 @@ export const useJobBoardData = () => {
 
       const { data, error: fetchError } = await makeAuthenticatedRequest(async () => {
         let query = supabase
-          .from('job_listings')
+          .from('job_board')
           .select('*')
           .order('created_at', { ascending: false });
 
         if (searchQuery) {
-          query = query.or(`title.ilike.%${searchQuery}%,company.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
+          query = query.or(`title.ilike.%${searchQuery}%,company_name.ilike.%${searchQuery}%,job_description.ilike.%${searchQuery}%`);
         }
 
         if (locationFilter) {
@@ -77,33 +80,16 @@ export const useJobBoardData = () => {
     try {
       const { data: savedData, error: savedError } = await makeAuthenticatedRequest(async () => {
         return await supabase
-          .from('saved_jobs')
-          .select(`
-            id,
-            job_id,
-            created_at,
-            job_listings (
-              id,
-              title,
-              company,
-              location,
-              salary,
-              description,
-              url,
-              created_at
-            )
-          `)
+          .from('job_board')
+          .select('*')
+          .eq('is_saved_by_user', true)
           .order('created_at', { ascending: false });
       }, { operationType: 'fetch_saved_jobs' });
 
       if (savedError) throw savedError;
 
-      const savedJobsData = (savedData || []).map((item: any) => ({
-        ...item.job_listings,
-        saved_at: item.created_at
-      }));
-
-      const savedJobIdSet = new Set((savedData || []).map((item: any) => item.job_listings.id));
+      const savedJobsData = savedData || [];
+      const savedJobIdSet = new Set((savedData || []).map((item: any) => item.id));
 
       setSavedJobs(savedJobsData);
       setSavedJobIds(savedJobIdSet);
@@ -119,8 +105,9 @@ export const useJobBoardData = () => {
     try {
       const { error: saveError } = await makeAuthenticatedRequest(async () => {
         return await supabase
-          .from('saved_jobs')
-          .insert([{ job_id: jobId }])
+          .from('job_board')
+          .update({ is_saved_by_user: true })
+          .eq('id', jobId)
           .select();
       }, { operationType: 'save_job' });
 
@@ -144,9 +131,10 @@ export const useJobBoardData = () => {
     try {
       const { error: unsaveError } = await makeAuthenticatedRequest(async () => {
         return await supabase
-          .from('saved_jobs')
-          .delete()
-          .eq('job_id', jobId);
+          .from('job_board')
+          .update({ is_saved_by_user: false })
+          .eq('id', jobId)
+          .select();
       }, { operationType: 'unsave_job' });
 
       if (unsaveError) throw unsaveError;
