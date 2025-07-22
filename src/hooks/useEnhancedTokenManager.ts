@@ -57,9 +57,10 @@ export const useEnhancedTokenManager = () => {
 
     globalTokenManager.isRefreshing = true;
     
+    // Exponential backoff for failures
+    const backoffDelay = Math.min(1000 * Math.pow(2, globalTokenManager.failureCount), 30000);
+    
     try {
-      // Exponential backoff for failures
-      const backoffDelay = Math.min(1000 * Math.pow(2, globalTokenManager.failureCount), 30000);
       if (globalTokenManager.failureCount > 0) {
         await new Promise(resolve => setTimeout(resolve, backoffDelay));
       }
