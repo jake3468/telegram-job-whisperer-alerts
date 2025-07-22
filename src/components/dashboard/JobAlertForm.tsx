@@ -151,22 +151,20 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
         });
       } else {
         // Create new alert using authenticated request - same as BioSection pattern
-        const newAlertData = {
-          user_id: userProfileId,
-          country: formData.country.toLowerCase(),
-          country_name: formData.country_name,
-          location: formData.location,
-          job_title: formData.job_title,
-          job_type: formData.job_type,
-          alert_frequency: formData.alert_frequency,
-          preferred_time: formData.preferred_time,
-          timezone: formData.timezone
-        };
-
         const result = await makeAuthenticatedRequest(async () => {
           const { data, error } = await supabase
             .from('job_alerts')
-            .insert(newAlertData)
+            .insert({
+              user_id: userProfileId,
+              country: formData.country.toLowerCase(),
+              country_name: formData.country_name,
+              location: formData.location,
+              job_title: formData.job_title,
+              job_type: formData.job_type,
+              alert_frequency: formData.alert_frequency,
+              preferred_time: formData.preferred_time,
+              timezone: formData.timezone
+            })
             .select()
             .single();
 
