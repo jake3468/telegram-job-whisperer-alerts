@@ -1,10 +1,12 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { User, CheckCircle, Loader2 } from 'lucide-react';
+import { User, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
+import { useOptimizedFormTokenKeepAlive } from '@/hooks/useOptimizedFormTokenKeepAlive';
 
 const ProfessionalBioSection = () => {
   const { toast } = useToast();
@@ -12,6 +14,11 @@ const ProfessionalBioSection = () => {
   
   const [bio, setBio] = useState(userProfile?.bio || '');
   const [saving, setSaving] = useState(false);
+  const [optimisticSaved, setOptimisticSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  // Proactive token management
+  const { updateActivity, smartTokenRefresh, isReady } = useOptimizedFormTokenKeepAlive(true);
 
   React.useEffect(() => {
     if (userProfile?.bio) {
@@ -20,31 +27,70 @@ const ProfessionalBioSection = () => {
   }, [userProfile]);
 
   const handleSaveBio = async () => {
-    if (saving) return;
+    if (saving || !isReady) return;
     
     setSaving(true);
+    setSaveError(null);
+    setOptimisticSaved(true); // Optimistic update
 
     try {
+      // Proactive token refresh before save
+      const tokenRefreshed = await smartTokenRefresh();
+      if (!tokenRefreshed) {
+        throw new Error('Unable to authenticate. Please refresh the page.');
+      }
+
+      // Small delay to ensure token propagation
+      await new Promise(resolve => setTimeout(resolve, 300));
+
       const { error } = await updateUserProfile({ bio });
       
       if (error) {
-        throw new Error(error);
+        // Try one more time with fresh token for JWT errors
+        if (error.includes('JWT') || error.includes('expired') || error.includes('unauthorized')) {
+          console.log('[BioSection] Retrying with fresh token');
+          await smartTokenRefresh();
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          const retryResult = await updateUserProfile({ bio });
+          if (retryResult.error) {
+            throw new Error('Connection issue. Please try again.');
+          }
+        } else {
+          throw new Error(error);
+        }
       }
 
+      // Success - show confirmation toast
       toast({
         title: "Bio updated",
         description: "Your bio has been saved successfully.",
+        duration: 3000
       });
 
     } catch (error) {
-      console.error('Bio save error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unable to save. Please try again.';
+      setSaveError(errorMessage);
+      setOptimisticSaved(false); // Revert optimistic update
+      
       toast({
-        title: "Unable to save",
-        description: "Please try again.",
+        title: "Save failed",
+        description: errorMessage,
         variant: "destructive",
+        duration: 4000
       });
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Reset optimistic state when user types
+  const handleBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setBio(e.target.value);
+    updateActivity();
+    setSaveError(null);
+    if (optimisticSaved) {
+      setOptimisticSaved(false);
     }
   };
 
@@ -60,6 +106,9 @@ const ProfessionalBioSection = () => {
       </Card>
     );
   }
+
+  const isActuallySaved = userProfile?.bio === bio && bio && !optimisticSaved;
+  const showSavedIndicator = optimisticSaved || isActuallySaved;
 
   return (
     <Card className="rounded-3xl border-2 border-emerald-400/80 bg-gradient-to-br from-emerald-600/90 via-emerald-700/85 to-emerald-900/90 shadow-2xl shadow-emerald-500/20 transition-all hover:shadow-emerald-500/30 backdrop-blur-sm">
@@ -77,16 +126,24 @@ const ProfessionalBioSection = () => {
       <CardContent className="space-y-3 pt-0">
         <Textarea
           value={bio}
-          onChange={(e) => setBio(e.target.value)}
+          onChange={handleBioChange}
+          onFocus={updateActivity}
           placeholder="I enjoy working with startups and exploring AI. My ambition is to build something impactful that people genuinely find value in."
           rows={4}
           className="min-h-[100px] border-2 border-emerald-200/40 placeholder-gray-400 font-inter text-gray-100 focus-visible:border-emerald-200 hover:border-emerald-300 text-base resize-none shadow-inner transition-all bg-black"
         />
+        
+        {saveError && (
+          <div className="flex items-center gap-2 p-2 bg-red-900/20 border border-red-400/30 rounded-lg">
+            <AlertCircle className="w-4 h-4 text-red-400" />
+            <span className="text-red-300 text-sm">{saveError}</span>
+          </div>
+        )}
 
         <div className="flex items-center justify-between">
           <Button
             onClick={handleSaveBio}
-            disabled={saving}
+            disabled={saving || !isReady}
             className="font-inter font-bold text-xs px-4 py-2 h-9 rounded-lg shadow-lg shadow-emerald-500/20 focus-visible:ring-2 focus-visible:ring-emerald-300 transition-colors text-white bg-blue-800 hover:bg-blue-700 disabled:opacity-50"
           >
             {saving ? (
@@ -100,7 +157,7 @@ const ProfessionalBioSection = () => {
           </Button>
           
           {/* Success indicator */}
-          {userProfile?.bio === bio && bio && (
+          {showSavedIndicator && (
             <div className="flex items-center gap-1 text-emerald-300 text-xs">
               <CheckCircle className="w-3 h-3" />
               <span>Saved</span>

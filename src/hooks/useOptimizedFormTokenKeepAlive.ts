@@ -1,78 +1,91 @@
-import { useEffect, useRef, useCallback } from 'react';
+
+import { useCallback, useRef, useState, useEffect } from 'react';
 import { useEnhancedTokenManager } from './useEnhancedTokenManager';
 
-export const useOptimizedFormTokenKeepAlive = (isFormActive: boolean = true) => {
-  const { refreshToken, isReady, isTokenValid } = useEnhancedTokenManager();
-  const keepAliveIntervalRef = useRef<NodeJS.Timeout>();
+interface TokenKeepAliveOptions {
+  preemptiveRefreshMinutes?: number;
+  activityTrackingEnabled?: boolean;
+}
+
+export const useOptimizedFormTokenKeepAlive = (
+  enabled: boolean = true,
+  options: TokenKeepAliveOptions = {}
+) => {
+  const { 
+    refreshToken, 
+    isReady, 
+    isTokenValid 
+  } = useEnhancedTokenManager();
+  
+  const {
+    preemptiveRefreshMinutes = 10,
+    activityTrackingEnabled = true
+  } = options;
+
   const lastActivityRef = useRef<number>(Date.now());
-  const componentMountedRef = useRef<boolean>(true);
+  const refreshTimeoutRef = useRef<NodeJS.Timeout>();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Update activity timestamp
   const updateActivity = useCallback(() => {
-    if (componentMountedRef.current) {
-      lastActivityRef.current = Date.now();
-    }
-  }, []);
+    if (!activityTrackingEnabled) return;
+    lastActivityRef.current = Date.now();
+  }, [activityTrackingEnabled]);
 
-  // Smart token refresh - only when needed
-  const smartTokenRefresh = useCallback(async () => {
-    if (!componentMountedRef.current || !isReady) return;
-    
+  // Smart token refresh with validation
+  const smartTokenRefresh = useCallback(async (): Promise<boolean> => {
+    if (!enabled || !isReady) return false;
+
+    // Skip if token is still valid for the next 10 minutes
+    if (isTokenValid()) return true;
+
+    if (isRefreshing) {
+      // Wait for ongoing refresh
+      let attempts = 0;
+      while (isRefreshing && attempts < 30) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+      return isTokenValid();
+    }
+
+    setIsRefreshing(true);
     try {
-      // Only refresh if token is expiring soon or invalid
-      if (!isTokenValid()) {
-        const token = await refreshToken();
-        if (token) {
-          console.log('[OptimizedFormKeepAlive] Token refreshed successfully');
+      const token = await refreshToken(true);
+      return !!token;
+    } catch (error) {
+      console.warn('[TokenKeepAlive] Refresh failed:', error);
+      return false;
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [enabled, isReady, isTokenValid, refreshToken, isRefreshing]);
+
+  // Proactive refresh based on activity
+  useEffect(() => {
+    if (!enabled || !isReady) return;
+
+    const checkAndRefresh = async () => {
+      const timeSinceActivity = Date.now() - lastActivityRef.current;
+      
+      // Only refresh if user was active in the last 15 minutes
+      if (timeSinceActivity < 15 * 60 * 1000) {
+        if (!isTokenValid()) {
+          await smartTokenRefresh();
         }
       }
-    } catch (error) {
-      console.error('[OptimizedFormKeepAlive] Token refresh failed:', error);
-    }
-  }, [refreshToken, isReady, isTokenValid]);
-
-  // Set up optimized keep-alive mechanism
-  useEffect(() => {
-    if (!isFormActive || !isReady) {
-      if (keepAliveIntervalRef.current) {
-        clearInterval(keepAliveIntervalRef.current);
-      }
-      return;
-    }
-
-    // Initial token check
-    smartTokenRefresh();
-
-    // Check token every 3 minutes (reduced from 30 seconds)
-    keepAliveIntervalRef.current = setInterval(async () => {
-      const timeSinceLastActivity = Date.now() - lastActivityRef.current;
-      
-      // Only refresh if user was active in the last 20 minutes
-      if (timeSinceLastActivity < 20 * 60 * 1000) {
-        await smartTokenRefresh();
-      }
-    }, 3 * 60 * 1000); // 3 minutes
-
-    return () => {
-      if (keepAliveIntervalRef.current) {
-        clearInterval(keepAliveIntervalRef.current);
-      }
     };
-  }, [isFormActive, isReady, smartTokenRefresh]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      componentMountedRef.current = false;
-      if (keepAliveIntervalRef.current) {
-        clearInterval(keepAliveIntervalRef.current);
-      }
-    };
-  }, []);
+    // Check every 5 minutes
+    const interval = setInterval(checkAndRefresh, 5 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, [enabled, isReady, isTokenValid, smartTokenRefresh]);
 
   return {
     updateActivity,
     smartTokenRefresh,
-    isReady
+    isReady: isReady && !isRefreshing,
+    isRefreshing
   };
 };
