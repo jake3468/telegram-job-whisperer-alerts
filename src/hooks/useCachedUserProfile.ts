@@ -71,7 +71,7 @@ export const useCachedUserProfile = () => {
         localStorage.setItem('profile_last_log', now.toString());
       }
       
-      const resumeStatus = !!freshProfile.resume;
+      const resumeStatus = !!freshProfile.resume_filename;
       const profileNow = Date.now();
       
       // Update cached data

@@ -240,7 +240,7 @@ const ResumeSection = () => {
           <CardDescription className="text-white/95 font-inter font-normal drop-shadow-[0_2px_10px_rgba(147,51,234,0.4)] text-sm">Upload your resume (PDF, max 5MB) so our AI can better understand your background and personalize your experience</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 pt-0">
-          {resumeUrl ? <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-xl border border-white/20 bg-black/70 shadow-inner">
+          {(resumeUrl && userProfile?.resume_filename) ? <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-xl border border-white/20 bg-black/70 shadow-inner">
               <div className="flex items-center gap-2 min-w-0">
                 <div className="w-8 h-8 bg-purple-500/60 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple-500/40">
                   <FileText className="w-4 h-4 text-white" />
