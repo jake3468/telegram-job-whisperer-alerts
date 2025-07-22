@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useUserInitialization } from './useUserInitialization';
+import { useOptimizedFormTokenKeepAlive } from './useOptimizedFormTokenKeepAlive';
 import { Environment } from '@/utils/environment';
 import { UserProfile, UserProfileUpdateData } from '@/types/userProfile';
 import { createUserProfileDebugger } from '@/utils/userProfileDebug';
@@ -19,9 +20,10 @@ export const useUserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { initializeUser } = useUserInitialization();
+  const { smartTokenRefresh, isReady } = useOptimizedFormTokenKeepAlive(true);
 
   const fetchUserProfile = async () => {
-    if (!isLoaded) {
+    if (!isLoaded || !isReady) {
       debugLog('Clerk not loaded yet, waiting...');
       return;
     }
@@ -36,6 +38,14 @@ export const useUserProfile = () => {
     try {
       setError(null);
       debugLog('Starting user profile fetch for:', user.id);
+
+      // Ensure fresh token before making requests
+      const tokenRefreshed = await smartTokenRefresh();
+      if (!tokenRefreshed) {
+        setError('Authentication issue. Please refresh the page.');
+        setLoading(false);
+        return;
+      }
 
       // No artificial delays - fetch immediately
       const { data: userData, error: userError } = await fetchUserFromDatabase(user.id);
@@ -127,7 +137,7 @@ export const useUserProfile = () => {
   };
 
   const updateUserProfile = async (updates: UserProfileUpdateData) => {
-    if (!user || !userProfile) {
+    if (!user || !userProfile || !isReady) {
       debugLog('Update attempt without authentication or profile');
       return { error: 'User not authenticated or profile not loaded' };
     }
@@ -135,11 +145,33 @@ export const useUserProfile = () => {
     try {
       debugLog('Attempting profile update for:', userProfile.id);
       
+      // Ensure fresh token before update
+      const tokenRefreshed = await smartTokenRefresh();
+      if (!tokenRefreshed) {
+        return { error: 'Authentication issue. Please refresh the page.' };
+      }
+
+      // Small delay to ensure token propagation
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
       const { error } = await updateUserProfileInDatabase(userProfile.id, updates);
 
       if (error) {
         debugLog('Error updating user profile:', error);
-        return { error: error.message };
+        
+        // Retry once with fresh token for JWT errors
+        if (error.message.includes('JWT') || error.message.includes('expired') || error.message.includes('unauthorized')) {
+          debugLog('Retrying profile update with fresh token');
+          await smartTokenRefresh();
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          const retryResult = await updateUserProfileInDatabase(userProfile.id, updates);
+          if (retryResult.error) {
+            return { error: 'Connection issue. Please try again.' };
+          }
+        } else {
+          return { error: error.message };
+        }
       }
 
       // Update local state
