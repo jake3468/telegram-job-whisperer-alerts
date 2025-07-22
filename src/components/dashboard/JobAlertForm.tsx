@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -91,7 +92,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
       updateActivity();
     }
     
-    // Basic validation
+    // Basic validation - same as BioSection pattern
     if (!user || !isAuthReady) {
       toast({
         title: "Initializing...",
@@ -108,23 +109,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
       return;
     }
 
-    // Session manager validation (same as Bio Section)
-    if (sessionManager && !sessionManager.isTokenValid()) {
-      console.log('[JobAlertForm] Token validation failed, refreshing...');
-      try {
-        await sessionManager.refreshToken();
-      } catch (error) {
-        console.error('[JobAlertForm] Token refresh failed:', error);
-        toast({
-          title: "Session expired",
-          description: "Please refresh the page and try again.",
-          variant: "destructive"
-        });
-        return;
-      }
-    }
-
-    // Check alert limit for new alerts
+    // Check alert limit for new alerts BEFORE making the API call
     if (!editingAlert && currentAlertCount >= maxAlerts) {
       toast({
         title: "Alert limit reached",
@@ -139,7 +124,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
     
     try {
       if (editingAlert) {
-        // Update existing alert using authenticated request
+        // Update existing alert using authenticated request - same as BioSection pattern
         await makeAuthenticatedRequest(async () => {
           const { error } = await supabase
             .from('job_alerts')
@@ -165,7 +150,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
           description: "Your job alert has been updated successfully.",
         });
       } else {
-        // Create new alert using authenticated request
+        // Create new alert using authenticated request - same as BioSection pattern
         const newAlertData = {
           user_id: userProfileId,
           country: formData.country.toLowerCase(),
@@ -186,14 +171,6 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
             .single();
 
           if (error) {
-            if (error.message && error.message.includes('Maximum of 3 job alerts allowed')) {
-              toast({
-                title: "Alert limit reached",
-                description: `You can only create up to ${maxAlerts} job alerts. Please delete an existing alert to create a new one.`,
-                variant: "destructive"
-              });
-              return;
-            }
             throw error;
           }
 
