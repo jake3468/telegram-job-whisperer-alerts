@@ -75,7 +75,7 @@ export const refreshJWTToken = async (): Promise<string | null> => {
   }
 };
 
-// Function to check if token is expired
+// Function to check if token is expired (enterprise-grade timing)
 const isTokenExpired = (token: string): boolean => {
   try {
     const parts = token.split('.');
@@ -83,7 +83,7 @@ const isTokenExpired = (token: string): boolean => {
     
     const payload = JSON.parse(atob(parts[1]));
     const now = Math.floor(Date.now() / 1000);
-    const buffer = 300; // 5 minutes buffer before expiration
+    const buffer = 120; // 2 minutes buffer before expiration (enterprise standard)
     
     return payload.exp && (payload.exp - buffer) < now;
   } catch (e) {
@@ -158,18 +158,11 @@ export const makeAuthenticatedRequest = async <T>(
   
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      // Enhanced token validation using token manager
-      if (enhancedTokenManager?.isTokenValid) {
-        if (!enhancedTokenManager.isTokenValid()) {
-          await refreshJWTToken();
-        }
-      } else {
-        // Fallback to legacy token check
-        if (!currentJWTToken) {
-          await refreshJWTToken();
-        } else if (isTokenExpired(currentJWTToken)) {
-          await refreshJWTToken();
-        }
+      // Enterprise-grade token validation - only refresh if truly expired
+      if (!currentJWTToken) {
+        await refreshJWTToken();
+      } else if (isTokenExpired(currentJWTToken)) {
+        await refreshJWTToken();
       }
 
       if (!currentJWTToken) {

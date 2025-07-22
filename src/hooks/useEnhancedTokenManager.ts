@@ -27,11 +27,11 @@ export const useEnhancedTokenManager = () => {
   const [isReady, setIsReady] = useState(false);
   const retryTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // Check if token is still valid (with aggressive buffer for preemptive refresh)
+  // Check if token is still valid (enterprise-grade buffer)
   const isTokenValid = useCallback(() => {
     if (!cachedToken || !tokenExpiry) return false;
     const now = Date.now();
-    const bufferTime = 30 * 60 * 1000; // 30 minutes buffer (aggressive preemptive refresh)
+    const bufferTime = 2 * 60 * 1000; // 2 minutes buffer (enterprise standard)
     return (tokenExpiry - now) > bufferTime;
   }, []);
 

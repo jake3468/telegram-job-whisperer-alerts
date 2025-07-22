@@ -161,11 +161,8 @@ export const useUserProfile = () => {
     try {
       debugLog('Attempting profile update for:', userProfile.id);
       
-      // Pre-validate token before any API call
-      if (!isTokenValid()) {
-        debugLog('Token invalid before update, refreshing proactively...');
-        await refreshToken(true);
-      }
+      // Enterprise-grade token management - only refresh if actually needed
+      debugLog('Proceeding with API call - token will be validated at request level');
       
       // First attempt
       const { error: firstError } = await updateUserProfileInDatabase(userProfile.id, updates);
