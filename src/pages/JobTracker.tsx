@@ -393,12 +393,7 @@ const JobTracker = () => {
     headerBg: 'bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700'
   }];
 
-  // Initialize user when component mounts
-  useEffect(() => {
-    if (user) {
-      initializeUser();
-    }
-  }, [user, initializeUser]);
+  // Remove redundant user initialization - useUserProfile already handles this
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');

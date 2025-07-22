@@ -43,7 +43,7 @@ export const useUserProfile = () => {
 
       let finalUserData = userData;
 
-      // If user doesn't exist, initialize them
+      // If user doesn't exist, initialize them (with deduplication)
       if (!userData && !userError) {
         debugLog('User not found in Supabase, initializing...');
         

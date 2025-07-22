@@ -69,10 +69,13 @@ const ResumeSection = () => {
         data: userData,
         error: userError
       } = await supabase.from('users').select('*').eq('clerk_id', user?.id).single();
+      
       if (userError) {
         console.error('Error fetching user data for webhook:', userError);
+        // Don't block the upload if webhook data fetch fails
         return;
       }
+
       const payload = {
         event_type: 'resume_uploaded',
         user: {
@@ -88,18 +91,24 @@ const ResumeSection = () => {
           file_size: fileSize,
           uploaded_at: new Date().toISOString()
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        retry_count: 0 // Add retry tracking
       };
-      const {
-        error: webhookError
-      } = await supabase.functions.invoke('resume-pdf-webhook', {
+
+      // Call webhook with better error handling
+      const { error: webhookError } = await supabase.functions.invoke('resume-pdf-webhook', {
         body: payload
       });
+
       if (webhookError) {
         console.error('Error calling resume webhook:', webhookError);
+        // Webhook errors shouldn't block the user experience
+      } else {
+        console.log('Resume webhook called successfully');
       }
     } catch (error) {
       console.error('Error in resume webhook call:', error);
+      // Don't rethrow - webhook failures shouldn't break the upload flow
     }
   };
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
