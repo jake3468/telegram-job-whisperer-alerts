@@ -8,8 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
-import { useEnterpriseAPIClient } from '@/hooks/useEnterpriseAPIClient';
-import { useEnhancedTokenManagerIntegration } from '@/hooks/useEnhancedTokenManagerIntegration';
+import { useUniversalFormManager } from '@/hooks/useUniversalFormManager';
+import { EnterpriseFormWrapper } from '@/components/common/EnterpriseFormWrapper';
 import { supabase } from '@/integrations/supabase/client';
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -43,13 +43,16 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   const { getToken } = useAuth();
   const { toast } = useToast();
   const { optimisticAdd, isAuthReady, userProfileId } = useCachedJobAlertsData();
-  const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
   
-  // Enhanced session manager integration (same as Bio Section)
-  const sessionManager = useEnhancedTokenManagerIntegration();
+  // Enterprise-grade universal form manager
+  const { 
+    submitForm, 
+    isSubmitting: formSubmitting, 
+    recordFormInteraction,
+    handleFieldChange 
+  } = useUniversalFormManager();
   
   const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [countryOpen, setCountryOpen] = useState(false);
   const [formData, setFormData] = useState({
     country: '',
@@ -84,13 +87,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Enhanced session manager activity tracking
-    if (sessionManager?.updateActivity) {
-      sessionManager.updateActivity();
-    } else if (updateActivity) {
-      updateActivity();
-    }
+    recordFormInteraction('submit');
     
     // Basic validation - same as BioSection pattern
     if (!user || !isAuthReady) {
@@ -119,13 +116,10 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
       return;
     }
 
-    setSubmitting(true);
-    setLoading(true);
-    
     try {
       if (editingAlert) {
-        // Update existing alert using authenticated request - same as BioSection pattern
-        await makeAuthenticatedRequest(async () => {
+        // Update existing alert using enterprise form manager
+        await submitForm(async () => {
           const { error } = await supabase
             .from('job_alerts')
             .update({
@@ -150,8 +144,8 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
           description: "Your job alert has been updated successfully.",
         });
       } else {
-        // Create new alert using authenticated request - same as BioSection pattern
-        const result = await makeAuthenticatedRequest(async () => {
+        // Create new alert using enterprise form manager
+        const result = await submitForm(async () => {
           const { data, error } = await supabase
             .from('job_alerts')
             .insert({
@@ -195,19 +189,12 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
         variant: "destructive",
       });
     } finally {
-      setSubmitting(false);
       setLoading(false);
     }
   };
 
   const handleInputChange = (field: string, value: string | number) => {
-    // Enhanced session manager activity tracking
-    if (sessionManager?.updateActivity) {
-      sessionManager.updateActivity();
-    } else if (updateActivity) {
-      updateActivity();
-    }
-    
+    handleFieldChange(field, value);
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -244,7 +231,8 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3" onClick={handleFormInteraction} onKeyDown={handleFormInteraction}>
+    <EnterpriseFormWrapper className="space-y-2 sm:space-y-3">
+      <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3">
       {/* Alert limit warning */}
       {!editingAlert && currentAlertCount >= maxAlerts - 1 && (
         <div className="bg-yellow-900/50 border border-yellow-500/50 rounded-lg p-2 mb-3">
@@ -387,10 +375,10 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
       <div className="flex flex-col gap-2 pt-3 sticky bottom-0 bg-gradient-to-br from-orange-900/95 via-[#3c1c01]/90 to-[#2b1605]/95 pb-2">
         <Button 
           type="submit" 
-          disabled={loading || submitting || (!editingAlert && currentAlertCount >= maxAlerts)} 
+          disabled={loading || formSubmitting || (!editingAlert && currentAlertCount >= maxAlerts)}
           className="w-full font-inter bg-pastel-lavender hover:bg-pastel-lavender/80 text-black font-medium text-xs px-3 py-2 h-8 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {submitting ? (
+          {formSubmitting ? (
             <>
               <Loader2 className="w-3 h-3 mr-2 animate-spin" />
               Saving...
@@ -403,13 +391,14 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
           type="button" 
           variant="outline" 
           onClick={onCancel} 
-          disabled={submitting}
+          disabled={formSubmitting}
           className="w-full font-inter border-gray-500 hover:border-gray-400 text-gray-950 bg-pastel-peach text-xs px-3 py-2 h-8"
         >
           Cancel
         </Button>
       </div>
     </form>
+    </EnterpriseFormWrapper>
   );
 };
 
