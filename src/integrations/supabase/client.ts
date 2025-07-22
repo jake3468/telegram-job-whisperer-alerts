@@ -8,11 +8,11 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Enterprise session management
 let enterpriseSessionManager: any = null;
 
-// Simple, clean Supabase client - no complex token management
+// Supabase client with basic session persistence for fallback
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    persistSession: false,
-    autoRefreshToken: false, // Disable built-in refresh to prevent conflicts
+    persistSession: true, // Enable basic persistence for fallback
+    autoRefreshToken: false, // Keep disabled to let enterprise manager handle
     detectSessionInUrl: false,
   },
   global: {
@@ -42,8 +42,8 @@ export const makeAuthenticatedRequest = async <T>(
       // Get fresh token from enterprise session manager
       let token: string | null = null;
       
-      if (enterpriseSessionManager?.getValidToken) {
-        token = await enterpriseSessionManager.getValidToken();
+      if (enterpriseSessionManager?.refreshToken) {
+        token = await enterpriseSessionManager.refreshToken();
       }
 
       if (!token) {

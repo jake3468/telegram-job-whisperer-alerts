@@ -165,6 +165,23 @@ class EnterpriseSessionManager {
     this.activityListeners = [];
   }
 
+  // Get current token immediately (no refresh)
+  getCurrentToken(): string | null {
+    return this.state.token;
+  }
+
+  // Get valid token (with auto-refresh if needed)
+  async getValidToken(): Promise<string | null> {
+    if (this.isTokenValid()) {
+      return this.state.token;
+    }
+    
+    // Token expired/invalid - need to refresh
+    // This requires the getToken function, so we return null if not available
+    console.warn('[EnterpriseSession] Token invalid, refresh needed');
+    return null;
+  }
+
   // Get session stats
   getSessionStats() {
     return {
