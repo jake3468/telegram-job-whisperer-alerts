@@ -6,7 +6,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { User, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
-import { useOptimizedFormTokenKeepAlive } from '@/hooks/useOptimizedFormTokenKeepAlive';
 
 const ProfessionalBioSection = () => {
   const { toast } = useToast();
@@ -17,9 +16,6 @@ const ProfessionalBioSection = () => {
   const [optimisticSaved, setOptimisticSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  // Proactive token management
-  const { updateActivity, smartTokenRefresh, isReady } = useOptimizedFormTokenKeepAlive(true);
-
   React.useEffect(() => {
     if (userProfile?.bio) {
       setBio(userProfile.bio);
@@ -27,38 +23,17 @@ const ProfessionalBioSection = () => {
   }, [userProfile]);
 
   const handleSaveBio = async () => {
-    if (saving || !isReady) return;
+    if (saving) return;
     
     setSaving(true);
     setSaveError(null);
     setOptimisticSaved(true); // Optimistic update
 
     try {
-      // Proactive token refresh before save
-      const tokenRefreshed = await smartTokenRefresh();
-      if (!tokenRefreshed) {
-        throw new Error('Unable to authenticate. Please refresh the page.');
-      }
-
-      // Small delay to ensure token propagation
-      await new Promise(resolve => setTimeout(resolve, 300));
-
       const { error } = await updateUserProfile({ bio });
       
       if (error) {
-        // Try one more time with fresh token for JWT errors
-        if (error.includes('JWT') || error.includes('expired') || error.includes('unauthorized')) {
-          console.log('[BioSection] Retrying with fresh token');
-          await smartTokenRefresh();
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
-          const retryResult = await updateUserProfile({ bio });
-          if (retryResult.error) {
-            throw new Error('Connection issue. Please try again.');
-          }
-        } else {
-          throw new Error(error);
-        }
+        throw new Error(error);
       }
 
       // Success - show confirmation toast
@@ -87,7 +62,6 @@ const ProfessionalBioSection = () => {
   // Reset optimistic state when user types
   const handleBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setBio(e.target.value);
-    updateActivity();
     setSaveError(null);
     if (optimisticSaved) {
       setOptimisticSaved(false);
@@ -127,7 +101,6 @@ const ProfessionalBioSection = () => {
         <Textarea
           value={bio}
           onChange={handleBioChange}
-          onFocus={updateActivity}
           placeholder="I enjoy working with startups and exploring AI. My ambition is to build something impactful that people genuinely find value in."
           rows={4}
           className="min-h-[100px] border-2 border-emerald-200/40 placeholder-gray-400 font-inter text-gray-100 focus-visible:border-emerald-200 hover:border-emerald-300 text-base resize-none shadow-inner transition-all bg-black"
@@ -143,7 +116,7 @@ const ProfessionalBioSection = () => {
         <div className="flex items-center justify-between">
           <Button
             onClick={handleSaveBio}
-            disabled={saving || !isReady}
+            disabled={saving}
             className="font-inter font-bold text-xs px-4 py-2 h-9 rounded-lg shadow-lg shadow-emerald-500/20 focus-visible:ring-2 focus-visible:ring-emerald-300 transition-colors text-white bg-blue-800 hover:bg-blue-700 disabled:opacity-50"
           >
             {saving ? (
