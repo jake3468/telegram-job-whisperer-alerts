@@ -5,6 +5,7 @@ import { useUserInitialization } from './useUserInitialization';
 import { Environment } from '@/utils/environment';
 import { UserProfile, UserProfileUpdateData } from '@/types/userProfile';
 import { createUserProfileDebugger } from '@/utils/userProfileDebug';
+import { getUserFriendlyErrorMessage } from '@/utils/errorMessages';
 import { 
   fetchUserFromDatabase, 
   fetchUserProfile as fetchUserProfileFromService, 
@@ -14,11 +15,51 @@ import {
 const { debugLog } = createUserProfileDebugger();
 
 export const useUserProfile = () => {
-  const { user, isLoaded } = useUser();
+  const { user, isLoaded, getToken } = useUser();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { initializeUser } = useUserInitialization();
+
+  // Silent token refresh helper
+  const refreshTokenSilently = async (): Promise<boolean> => {
+    try {
+      if (!user) return false;
+      
+      debugLog('Refreshing token silently...');
+      const token = await getToken({ template: 'supabase' });
+      
+      if (token) {
+        // Import and set token in supabase client
+        const { setClerkToken } = await import('@/integrations/supabase/client');
+        await setClerkToken(token);
+        debugLog('Token refreshed successfully');
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      debugLog('Silent token refresh failed:', error);
+      return false;
+    }
+  };
+
+  // Check if error is related to authentication/JWT
+  const isAuthError = (error: any): boolean => {
+    const errorMessage = typeof error === 'string' ? error : error?.message || '';
+    const lowerMessage = errorMessage.toLowerCase();
+    
+    return (
+      lowerMessage.includes('jwt') ||
+      lowerMessage.includes('token') ||
+      lowerMessage.includes('expired') ||
+      lowerMessage.includes('authentication') ||
+      lowerMessage.includes('unauthorized') ||
+      lowerMessage.includes('permission') ||
+      error?.code === 'PGRST301' ||
+      error?.code === '42501'
+    );
+  };
 
   const fetchUserProfile = async () => {
     if (!isLoaded) {
@@ -50,7 +91,7 @@ export const useUserProfile = () => {
         const initResult = await initializeUser();
         if (!initResult.success) {
           debugLog('Failed to initialize user:', initResult.error);
-          setError(`Failed to initialize user: ${initResult.error}`);
+          setError(getUserFriendlyErrorMessage(initResult.error));
           setLoading(false);
           return;
         }
@@ -60,7 +101,7 @@ export const useUserProfile = () => {
 
         if (newUserError || !newUserData) {
           debugLog('Error fetching user after initialization:', newUserError);
-          setError(`Error fetching user after initialization: ${newUserError?.message}`);
+          setError(getUserFriendlyErrorMessage(newUserError));
           setLoading(false);
           return;
         }
@@ -68,15 +109,7 @@ export const useUserProfile = () => {
         finalUserData = newUserData;
       } else if (userError) {
         debugLog('Error fetching user:', userError);
-        
-        // Provide specific error messages
-        if (userError.code === '42501' || userError.message.includes('permission')) {
-          setError('Authentication issue detected. Please refresh the page.');
-        } else if (userError.code === 'PGRST301' || userError.message.includes('JWSError')) {
-          setError('JWT authentication failed. Please refresh the page.');
-        } else {
-          setError(`Error fetching user: ${userError.message}`);
-        }
+        setError(getUserFriendlyErrorMessage(userError));
         setLoading(false);
         return;
       }
@@ -96,14 +129,7 @@ export const useUserProfile = () => {
       
       if (profileError) {
         debugLog('Profile lookup error:', profileError);
-        
-        if (profileError.code === '42501' || profileError.message.includes('permission')) {
-          setError('Profile access denied. Please refresh the page.');
-        } else if (profileError.code === 'PGRST301' || profileError.message.includes('JWSError')) {
-          setError('Authentication failed. Please refresh the page.');
-        } else {
-          setError(`Error fetching profile: ${profileError.message}`);
-        }
+        setError(getUserFriendlyErrorMessage(profileError));
         setLoading(false);
         return;
       }
@@ -120,7 +146,7 @@ export const useUserProfile = () => {
       setError(null);
     } catch (error) {
       debugLog('Error in fetchUserProfile:', error);
-      setError(`Unexpected error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setError(getUserFriendlyErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -129,26 +155,57 @@ export const useUserProfile = () => {
   const updateUserProfile = async (updates: UserProfileUpdateData) => {
     if (!user || !userProfile) {
       debugLog('Update attempt without authentication or profile');
-      return { error: 'User not authenticated or profile not loaded' };
+      return { error: 'Please refresh the page and try again.' };
     }
 
     try {
       debugLog('Attempting profile update for:', userProfile.id);
       
-      const { error } = await updateUserProfileInDatabase(userProfile.id, updates);
+      // First attempt
+      const { error: firstError } = await updateUserProfileInDatabase(userProfile.id, updates);
 
-      if (error) {
-        debugLog('Error updating user profile:', error);
-        return { error: error.message };
+      if (!firstError) {
+        // Success on first attempt
+        setUserProfile(prev => prev ? { ...prev, ...updates } : null);
+        debugLog('Profile updated successfully');
+        return { error: null };
       }
 
-      // Update local state
-      setUserProfile(prev => prev ? { ...prev, ...updates } : null);
-      debugLog('Profile updated successfully');
-      return { error: null };
+      // Check if it's an authentication error that we can retry
+      if (isAuthError(firstError)) {
+        debugLog('Authentication error detected, attempting silent token refresh...');
+        
+        const tokenRefreshed = await refreshTokenSilently();
+        
+        if (tokenRefreshed) {
+          debugLog('Token refreshed, retrying profile update...');
+          
+          // Retry the operation after token refresh
+          const { error: retryError } = await updateUserProfileInDatabase(userProfile.id, updates);
+          
+          if (!retryError) {
+            // Success on retry
+            setUserProfile(prev => prev ? { ...prev, ...updates } : null);
+            debugLog('Profile updated successfully after token refresh');
+            return { error: null };
+          }
+          
+          // Even retry failed
+          debugLog('Profile update failed even after token refresh:', retryError);
+          return { error: getUserFriendlyErrorMessage(retryError) };
+        } else {
+          debugLog('Token refresh failed');
+          return { error: 'Please refresh the page and try again.' };
+        }
+      }
+
+      // Non-auth error, return user-friendly message
+      debugLog('Profile update failed with non-auth error:', firstError);
+      return { error: getUserFriendlyErrorMessage(firstError) };
+
     } catch (error) {
       debugLog('Error in updateUserProfile:', error);
-      return { error: 'Failed to update profile' };
+      return { error: getUserFriendlyErrorMessage(error) };
     }
   };
 

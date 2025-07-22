@@ -44,6 +44,7 @@ const ProfessionalBioSection = () => {
       });
 
     } catch (error) {
+      // Use user-friendly error message
       const errorMessage = error instanceof Error ? error.message : 'Unable to save. Please try again.';
       setSaveError(errorMessage);
       setOptimisticSaved(false); // Revert optimistic update

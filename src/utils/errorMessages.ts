@@ -1,3 +1,4 @@
+
 /**
  * Utility function to convert technical error messages to user-friendly ones
  */
@@ -5,7 +6,7 @@ export const getUserFriendlyErrorMessage = (error: any): string => {
   const errorMessage = typeof error === 'string' ? error : error?.message || '';
   const lowerMessage = errorMessage.toLowerCase();
 
-  // Authentication-related errors
+  // JWT and authentication-related errors
   if (
     lowerMessage.includes('jwt') ||
     lowerMessage.includes('token') ||
@@ -18,9 +19,10 @@ export const getUserFriendlyErrorMessage = (error: any): string => {
     lowerMessage.includes('rls') ||
     lowerMessage.includes('policy') ||
     lowerMessage.includes('permission') ||
-    error?.code === 'PGRST301'
+    error?.code === 'PGRST301' ||
+    error?.code === '42501'
   ) {
-    return "Connection issue. Please try again.";
+    return "Please try again.";
   }
 
   // Network and server errors
