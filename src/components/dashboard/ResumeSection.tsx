@@ -245,8 +245,8 @@ const ResumeSection = () => {
                 <div className="w-8 h-8 bg-purple-500/60 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple-500/40">
                   <FileText className="w-4 h-4 text-white" />
                 </div>
-                <div className="min-w-0">
-                  <span className="text-white font-inter font-semibold text-base truncate block">
+                <div className="min-w-0 flex-1">
+                  <span className="text-white font-inter font-medium text-sm break-words block leading-tight">
                     {userProfile?.resume_filename || 'resume.pdf'}
                   </span>
                   {userProfile?.resume_uploaded_at && (
