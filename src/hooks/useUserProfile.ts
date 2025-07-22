@@ -6,6 +6,7 @@ import { Environment } from '@/utils/environment';
 import { UserProfile, UserProfileUpdateData } from '@/types/userProfile';
 import { createUserProfileDebugger } from '@/utils/userProfileDebug';
 import { getUserFriendlyErrorMessage } from '@/utils/errorMessages';
+import { useEnhancedTokenManager } from './useEnhancedTokenManager';
 import { 
   fetchUserFromDatabase, 
   fetchUserProfile as fetchUserProfileFromService, 
@@ -21,26 +22,24 @@ export const useUserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { initializeUser } = useUserInitialization();
+  const { refreshToken, isTokenValid } = useEnhancedTokenManager();
 
-  // Silent token refresh helper
+  // Enhanced token refresh using enterprise token manager
   const refreshTokenSilently = async (): Promise<boolean> => {
     try {
       if (!user) return false;
       
-      debugLog('Refreshing token silently...');
-      const token = await getToken({ template: 'supabase' });
+      debugLog('Refreshing token using enhanced token manager...');
+      const token = await refreshToken(true); // Force refresh
       
       if (token) {
-        // Import and set token in supabase client
-        const { setClerkToken } = await import('@/integrations/supabase/client');
-        await setClerkToken(token);
-        debugLog('Token refreshed successfully');
+        debugLog('Token refreshed successfully via enhanced manager');
         return true;
       }
       
       return false;
     } catch (error) {
-      debugLog('Silent token refresh failed:', error);
+      debugLog('Enhanced token refresh failed:', error);
       return false;
     }
   };
@@ -161,6 +160,12 @@ export const useUserProfile = () => {
 
     try {
       debugLog('Attempting profile update for:', userProfile.id);
+      
+      // Pre-validate token before any API call
+      if (!isTokenValid()) {
+        debugLog('Token invalid before update, refreshing proactively...');
+        await refreshToken(true);
+      }
       
       // First attempt
       const { error: firstError } = await updateUserProfileInDatabase(userProfile.id, updates);

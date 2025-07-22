@@ -1,20 +1,26 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { User, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
+import { useEnhancedTokenManager } from '@/hooks/useEnhancedTokenManager';
+import { useOptimizedFormTokenKeepAlive } from '@/hooks/useOptimizedFormTokenKeepAlive';
 
 const ProfessionalBioSection = () => {
   const { toast } = useToast();
   const { userProfile, loading, updateUserProfile } = useCachedUserProfile();
+  const { refreshToken, isTokenValid } = useEnhancedTokenManager();
   
   const [bio, setBio] = useState(userProfile?.bio || '');
   const [saving, setSaving] = useState(false);
   const [optimisticSaved, setOptimisticSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+
+  // Initialize token keep-alive for long editing sessions
+  useOptimizedFormTokenKeepAlive(bio.length > 0);
 
   React.useEffect(() => {
     if (userProfile?.bio) {
@@ -30,6 +36,12 @@ const ProfessionalBioSection = () => {
     setOptimisticSaved(true); // Optimistic update
 
     try {
+      // Enterprise-grade pre-validation: ensure token is fresh before saving
+      if (!isTokenValid()) {
+        console.log('Token invalid before bio save, refreshing proactively...');
+        await refreshToken(true);
+      }
+
       const { error } = await updateUserProfile({ bio });
       
       if (error) {

@@ -19,6 +19,7 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
 let currentJWTToken: string | null = null;
 let tokenRefreshFunction: (() => Promise<string | null>) | null = null;
 let clientInstance: any = null;
+let enhancedTokenManager: any = null;
 
 // Create a single Supabase client instance
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
@@ -38,9 +39,24 @@ export const setTokenRefreshFunction = (refreshFn: () => Promise<string | null>)
   tokenRefreshFunction = refreshFn;
 };
 
+// Function to set enhanced token manager
+export const setEnhancedTokenManager = (manager: any) => {
+  enhancedTokenManager = manager;
+};
+
 // Enhanced function to refresh JWT token with silent error handling
 export const refreshJWTToken = async (): Promise<string | null> => {
   try {
+    // Use enhanced token manager if available
+    if (enhancedTokenManager?.refreshToken) {
+      const newToken = await enhancedTokenManager.refreshToken(true);
+      if (newToken) {
+        currentJWTToken = newToken;
+        return newToken;
+      }
+    }
+    
+    // Fallback to legacy token refresh
     if (!tokenRefreshFunction) {
       return currentJWTToken;
     }
@@ -142,11 +158,18 @@ export const makeAuthenticatedRequest = async <T>(
   
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      // Check and refresh token if needed
-      if (!currentJWTToken) {
-        await refreshJWTToken();
-      } else if (isTokenExpired(currentJWTToken)) {
-        await refreshJWTToken();
+      // Enhanced token validation using token manager
+      if (enhancedTokenManager?.isTokenValid) {
+        if (!enhancedTokenManager.isTokenValid()) {
+          await refreshJWTToken();
+        }
+      } else {
+        // Fallback to legacy token check
+        if (!currentJWTToken) {
+          await refreshJWTToken();
+        } else if (isTokenExpired(currentJWTToken)) {
+          await refreshJWTToken();
+        }
       }
 
       if (!currentJWTToken) {

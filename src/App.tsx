@@ -7,6 +7,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { useClerkSupabaseSync } from "@/hooks/useClerkSupabaseSync";
 import { useAuth } from "@clerk/clerk-react";
 import { useEffect } from "react";
+import { useEnhancedTokenManagerIntegration } from "@/hooks/useEnhancedTokenManagerIntegration";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import JobGuide from "./pages/JobGuide";
@@ -58,6 +59,9 @@ const AppWithSync = () => {
   
   // Initialize sync in background without blocking UI
   useClerkSupabaseSync();
+  
+  // Initialize enterprise-grade token management integration
+  useEnhancedTokenManagerIntegration();
   
   // Hide initial loader once React is ready
   useEffect(() => {
