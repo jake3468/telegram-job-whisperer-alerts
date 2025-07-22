@@ -156,7 +156,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
             .eq('id', editingAlert.id);
 
           if (error) {
-            throw new Error('UPDATE_FAILED');
+            throw error;
           }
         });
         
@@ -189,7 +189,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
             if (error.message && error.message.includes('Maximum of 3 job alerts allowed')) {
               throw new Error('ALERT_LIMIT_REACHED');
             }
-            throw new Error('CREATE_FAILED');
+            throw error;
           }
 
           return data;
