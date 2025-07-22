@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -41,7 +42,6 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
   
   const [showModal, setShowModal] = useState(false);
   const [editingAlert, setEditingAlert] = useState<JobAlert | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
   
   const MAX_ALERTS = 3;
   const alertsUsed = alerts.length;
@@ -124,30 +124,10 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
     setEditingAlert(null);
   };
 
-  // Enhanced manual refresh function with better user feedback
-  const handleManualRefresh = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      await forceRefresh();
-      toast({
-        title: "Refreshed",
-        description: "Job alerts data has been updated",
-      });
-    } catch (error) {
-      toast({
-        title: "Refresh failed",
-        description: "Please try again",
-        variant: "destructive"
-      });
-    } finally {
-      setRefreshing(false);
-    }
-  }, [forceRefresh, toast]);
-
-  // Refresh function for bot status changes
-  const handleBotStatusChange = useCallback(() => {
-    invalidateCache();
-  }, [invalidateCache]);
+  // Manual refresh function - uses proper data refetch instead of page reload
+  const handleManualRefresh = useCallback(() => {
+    forceRefresh();
+  }, [forceRefresh]);
 
   // Show fast initial loading state, then content even if auth is still loading
   if (loading && !userProfileId) {
@@ -163,19 +143,20 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
 
   return <section className="rounded-3xl border-2 border-orange-400 bg-gradient-to-b from-orange-900/90 via-[#2b1605]/90 to-[#2b1605]/98 shadow-none p-0 max-w-5xl mx-auto">
       <div className="pt-4 px-2 sm:px-6">
-        {/* Manual Refresh Button - Always show for better UX */}
-        <div className="mb-4 flex justify-end">
-          <Button
-            onClick={handleManualRefresh}
-            variant="outline"
-            size="sm"
-            disabled={refreshing}
-            className="text-xs bg-yellow-900/20 border-yellow-400/30 text-yellow-300 hover:bg-yellow-800/30"
-          >
-            <RefreshCw className={`w-3 h-3 mr-1 ${refreshing ? 'animate-spin' : ''}`} />
-            {refreshing ? 'Refreshing...' : 'Refresh'}
-          </Button>
-        </div>
+        {/* Manual Refresh Button */}
+        {error && (
+          <div className="mb-4 flex justify-end">
+            <Button
+              onClick={handleManualRefresh}
+              variant="outline"
+              size="sm"
+              className="text-xs bg-yellow-900/20 border-yellow-400/30 text-yellow-300 hover:bg-yellow-800/30"
+            >
+              <RefreshCw className="w-3 h-3 mr-1" />
+              Refresh
+            </Button>
+          </div>
+        )}
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <div className="min-w-0">
@@ -215,7 +196,7 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
 
         <div>
           {/* Bot Status Component */}
-          <BotStatus onActivationChange={handleBotStatusChange} />
+          <BotStatus onActivationChange={() => {}} />
 
           {/* Job Alerts List - Only show when activated */}
           {isActivated && <div className="flex flex-col gap-4 pb-6 sm:pb-8">
