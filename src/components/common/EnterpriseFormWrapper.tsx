@@ -110,17 +110,13 @@ export const EnterpriseFormWrapper: React.FC<EnterpriseFormWrapperProps> = ({
     };
 
     const getStatusText = () => {
-      if (tokenStatus === 'refreshing') return 'Refreshing session...';
       if (connectionHealth === 'poor') return 'Connection issues detected';
-      if (tokenStatus === 'expired') return 'Session expired - refreshing...';
-      if (!isActive && timeSinceLastActivity > 60000) return 'Idle - session protected';
+      if (tokenStatus === 'expired') return 'Session expired';
       return 'Session active';
     };
 
-    const shouldShowStatus = statusVisible || 
-                           connectionHealth !== 'healthy' || 
-                           tokenStatus !== 'valid' ||
-                           (!isActive && timeSinceLastActivity > 2 * 60 * 1000);
+    const shouldShowStatus = connectionHealth === 'poor' || 
+                           tokenStatus === 'expired';
 
     if (!shouldShowStatus) return null;
 

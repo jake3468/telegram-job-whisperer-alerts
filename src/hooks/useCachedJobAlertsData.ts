@@ -174,14 +174,18 @@ export const useCachedJobAlertsData = () => {
           return await makeAuthenticatedRequest(async () => {
             const { supabase } = await import('@/integrations/supabase/client');
             
-            // Get user profile - RLS will filter automatically
+            // Get user profile - more resilient query
             const { data: profileData, error: profileError } = await supabase
               .from('user_profile')
               .select('id, bot_activated')
-              .single();
+              .maybeSingle();
               
             if (profileError) {
-              throw profileError;
+              throw new Error(`Profile fetch failed: ${profileError.message}`);
+            }
+            
+            if (!profileData) {
+              throw new Error('User profile not found. Please try signing out and back in.');
             }
 
             // Fetch job alerts - RLS policies will filter automatically
