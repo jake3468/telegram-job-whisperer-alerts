@@ -41,7 +41,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   const { user } = useUser();
   const { getToken } = useAuth();
   const { toast } = useToast();
-  const { executeWithRetry, optimisticAdd, isAuthReady, userProfileId } = useCachedJobAlertsData();
+  const { optimisticAdd, isAuthReady, userProfileId } = useCachedJobAlertsData();
   const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -81,9 +81,8 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
     e.preventDefault();
     updateActivity?.();
     
-    // Professional-grade validation
+    // Basic validation
     if (!user || !isAuthReady) {
-      // Show loading state instead of error for better UX
       toast({
         title: "Initializing...",
         description: "Please wait a moment while we prepare your session.",
@@ -91,7 +90,6 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
       return;
     }
 
-    // Use cached userProfileId for better performance
     if (!userProfileId) {
       toast({
         title: "Initializing...",
@@ -114,40 +112,12 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
     setLoading(true);
     
     try {
-      // Professional-grade operation with retry logic
-      const result = await executeWithRetry(
-        async () => {
-          // Clerk automatically handles token refresh - no need to force it
-
-          if (editingAlert) {
-            // Update existing alert using authenticated request
-            const result = await makeAuthenticatedRequest(async () => {
-              const { error } = await supabase
-                .from('job_alerts')
-                .update({
-                  country: formData.country.toLowerCase(),
-                  country_name: formData.country_name,
-                  location: formData.location,
-                  job_title: formData.job_title,
-                  job_type: formData.job_type,
-                  alert_frequency: formData.alert_frequency,
-                  preferred_time: formData.preferred_time,
-                  timezone: formData.timezone
-                })
-                .eq('id', editingAlert.id);
-
-              if (error) {
-                throw new Error('UPDATE_FAILED');
-              }
-              
-              return { type: 'update' };
-            });
-            
-            return result;
-          } else {
-            // Create new alert using authenticated request
-            const newAlertData = {
-              user_id: userProfileId,
+      if (editingAlert) {
+        // Update existing alert using authenticated request
+        await makeAuthenticatedRequest(async () => {
+          const { error } = await supabase
+            .from('job_alerts')
+            .update({
               country: formData.country.toLowerCase(),
               country_name: formData.country_name,
               location: formData.location,
@@ -156,42 +126,52 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
               alert_frequency: formData.alert_frequency,
               preferred_time: formData.preferred_time,
               timezone: formData.timezone
-            };
+            })
+            .eq('id', editingAlert.id);
 
-            const result = await makeAuthenticatedRequest(async () => {
-              const { data, error } = await supabase
-                .from('job_alerts')
-                .insert(newAlertData)
-                .select()
-                .single();
-
-              if (error) {
-                if (error.message && error.message.includes('Maximum of 3 job alerts allowed')) {
-                  throw new Error('ALERT_LIMIT_REACHED');
-                }
-                throw new Error('CREATE_FAILED');
-              }
-
-              return { type: 'create', data };
-            });
-
-            return result;
+          if (error) {
+            throw new Error('UPDATE_FAILED');
           }
-        },
-        7, // More aggressive retry attempts
-        editingAlert ? 'Updating job alert' : 'Creating job alert'
-      );
-
-      // Handle success with professional messaging
-      if (result.type === 'update') {
+        });
+        
         toast({
           title: "Alert Updated",
           description: "Your job alert has been updated successfully.",
         });
       } else {
+        // Create new alert using authenticated request
+        const newAlertData = {
+          user_id: userProfileId,
+          country: formData.country.toLowerCase(),
+          country_name: formData.country_name,
+          location: formData.location,
+          job_title: formData.job_title,
+          job_type: formData.job_type,
+          alert_frequency: formData.alert_frequency,
+          preferred_time: formData.preferred_time,
+          timezone: formData.timezone
+        };
+
+        const result = await makeAuthenticatedRequest(async () => {
+          const { data, error } = await supabase
+            .from('job_alerts')
+            .insert(newAlertData)
+            .select()
+            .single();
+
+          if (error) {
+            if (error.message && error.message.includes('Maximum of 3 job alerts allowed')) {
+              throw new Error('ALERT_LIMIT_REACHED');
+            }
+            throw new Error('CREATE_FAILED');
+          }
+
+          return data;
+        });
+
         // Optimistic UI update for immediate feedback
-        if (result && 'data' in result && result.data) {
-          optimisticAdd(result.data as any);
+        if (result) {
+          optimisticAdd(result as any);
         }
         
         toast({
@@ -202,7 +182,6 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
 
       onSubmit();
     } catch (error) {
-      // Professional error handling - never show technical errors to users
       console.error('Form submission error:', error);
       
       if (error instanceof Error) {
@@ -229,7 +208,6 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
             });
             break;
           default:
-            // Never show technical authentication errors - provide professional message
             toast({
               title: "Temporary issue",
               description: "Please wait a moment and try again. If the issue persists, please refresh the page.",
