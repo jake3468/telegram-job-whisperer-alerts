@@ -51,15 +51,40 @@ export const makeAuthenticatedRequest = async <T>(
         throw new Error('Authentication required');
       }
 
-      // Set the authorization header for this request
-      supabase.auth.setSession({
-        access_token: token,
-        refresh_token: '', // Not needed for our use case
+      // Create an authenticated client for this operation
+      const authenticatedClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+        },
+        global: {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'apikey': SUPABASE_PUBLISHABLE_KEY
+          }
+        }
       });
 
-      // Execute operation
-      const result = await operation();
-      return result;
+      // Temporarily replace global supabase methods with authenticated versions
+      const originalFrom = supabase.from.bind(supabase);
+      const originalRpc = supabase.rpc.bind(supabase);
+      const originalStorage = supabase.storage;
+      
+      try {
+        // Override with authenticated client methods
+        (supabase as any).from = authenticatedClient.from.bind(authenticatedClient);
+        (supabase as any).rpc = authenticatedClient.rpc.bind(authenticatedClient);
+        (supabase as any).storage = authenticatedClient.storage;
+        
+        // Execute operation with authenticated client
+        const result = await operation();
+        return result;
+      } finally {
+        // Always restore original methods
+        (supabase as any).from = originalFrom;
+        (supabase as any).rpc = originalRpc;
+        (supabase as any).storage = originalStorage;
+      }
     } catch (error: any) {
       lastError = error;
       
