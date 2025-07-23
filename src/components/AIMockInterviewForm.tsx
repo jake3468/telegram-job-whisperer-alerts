@@ -46,29 +46,40 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sessionStatus, setSessionStatus] = useState<'ready' | 'refreshing' | 'expired' | 'error'>('ready');
   const [statusMessage, setStatusMessage] = useState<string>('');
-  const [messageDisplayTime, setMessageDisplayTime] = useState<number>(0);
+  const [lastStatusUpdate, setLastStatusUpdate] = useState<number>(0);
 
-  // Update session status with minimum display time to prevent flickering
+  // Improved session status update with longer minimum display time
   const updateSessionStatus = useCallback((status: typeof sessionStatus, message: string = '') => {
     const now = Date.now();
     
-    // Only update if we're not in a brief display period
-    if (now - messageDisplayTime > 1000) {
+    // Only update if we're not in a brief display period (increased to 3 seconds)
+    if (now - lastStatusUpdate > 3000) {
       setSessionStatus(status);
       setStatusMessage(message);
-      setMessageDisplayTime(now);
+      setLastStatusUpdate(now);
     }
-  }, [messageDisplayTime]);
+  }, [lastStatusUpdate]);
 
-  // Monitor session manager state with reduced frequency
+  // Reduced frequency session monitoring (every 2 minutes instead of 30 seconds)
   useEffect(() => {
     if (!sessionManager) return;
 
     const checkSession = () => {
+      // Only show status if there's actually an issue
       if (!sessionManager.isReady) {
         updateSessionStatus('refreshing', 'Initializing session...');
       } else if (!sessionManager.isTokenValid()) {
-        updateSessionStatus('expired', 'Session expired');
+        // Check if token is about to expire (within 3 minutes)
+        const stats = sessionManager.sessionStats;
+        const timeSinceLastRefresh = Date.now() - (stats?.lastActivity || 0);
+        
+        // Only show expired if it's been more than 3 minutes since last activity
+        if (timeSinceLastRefresh > 3 * 60 * 1000) {
+          updateSessionStatus('expired', 'Session expired');
+        } else {
+          // Silently refresh if within 3 minutes
+          sessionManager.refreshToken(true);
+        }
       } else {
         updateSessionStatus('ready', '');
       }
@@ -77,13 +88,33 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
     // Check immediately
     checkSession();
 
-    // Check every 30 seconds instead of every second
-    const interval = setInterval(checkSession, 30000);
+    // Check every 2 minutes instead of 30 seconds
+    const interval = setInterval(checkSession, 2 * 60 * 1000);
 
     return () => clearInterval(interval);
   }, [sessionManager, updateSessionStatus]);
 
-  // Enhanced token validation with pre-flight refresh
+  // Proactive token refresh with debouncing
+  const refreshTokenDebounced = useCallback(
+    (() => {
+      let timeout: NodeJS.Timeout;
+      return () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(async () => {
+          if (sessionManager?.refreshToken) {
+            try {
+              await sessionManager.refreshToken(false); // Silent refresh
+            } catch (error) {
+              console.error('[AIMockInterviewForm] Proactive token refresh failed:', error);
+            }
+          }
+        }, 1000);
+      };
+    })(),
+    [sessionManager]
+  );
+
+  // Enhanced token validation with proactive refresh
   const ensureTokenValid = useCallback(async (): Promise<boolean> => {
     if (!sessionManager) {
       throw new Error('Session manager not available');
@@ -94,7 +125,12 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
       const token = await sessionManager.ensureTokenForOperation();
       
       if (!token) {
-        updateSessionStatus('expired', 'Session expired - please refresh the page');
+        // If token refresh fails, try automatic page refresh
+        console.log('[AIMockInterviewForm] Token refresh failed, attempting page refresh...');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+        updateSessionStatus('expired', 'Session expired - refreshing page...');
         return false;
       }
 
@@ -107,7 +143,7 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
     }
   }, [sessionManager, updateSessionStatus]);
 
-  // Handle form input changes
+  // Handle form input changes with proactive token refresh
   const handleInputChange = useCallback((field: keyof FormData, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -118,7 +154,10 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
     if (sessionManager?.updateActivity) {
       sessionManager.updateActivity();
     }
-  }, [sessionManager]);
+
+    // Proactive token refresh when user starts typing (debounced)
+    refreshTokenDebounced();
+  }, [sessionManager, refreshTokenDebounced]);
 
   // Enhanced form submission with better error handling
   const handleSubmit = async (e: React.FormEvent) => {
@@ -165,7 +204,7 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
     updateSessionStatus('refreshing', 'Validating session...');
 
     try {
-      // Ensure token is valid before submission
+      // Ensure token is valid before submission with proactive refresh
       const tokenValid = await ensureTokenValid();
       if (!tokenValid) {
         return;
@@ -234,8 +273,12 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
       let errorMessage = 'Please try again';
       
       if (error?.message?.includes('JWT') || error?.message?.includes('expired')) {
-        errorMessage = 'Session expired. Please refresh the page and try again.';
+        errorMessage = 'Session expired. Refreshing page...';
         updateSessionStatus('expired', errorMessage);
+        // Auto-refresh page after 2 seconds
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
       } else if (error?.message?.includes('network') || error?.message?.includes('fetch')) {
         errorMessage = 'Network error. Please check your connection and try again.';
         updateSessionStatus('error', errorMessage);
@@ -251,10 +294,10 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
     } finally {
       setIsSubmitting(false);
       
-      // Clear status message after 3 seconds
+      // Clear status message after 5 seconds (increased from 3)
       setTimeout(() => {
         updateSessionStatus('ready', '');
-      }, 3000);
+      }, 5000);
     }
   };
 
@@ -373,7 +416,7 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
               id="jobDescription"
               value={formData.jobDescription}
               onChange={(e) => handleInputChange('jobDescription', e.target.value)}
-              className="bg-gray-50 border-gray-300 text-black placeholder:text-gray-300 focus:border-purple-500 focus:ring-purple-500 min-h-[100px] resize-none"
+              className="bg-gray-50 border-gray-300 text-black placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500 min-h-[100px] resize-none"
               placeholder="Please paste the job description here (minimum 50 characters required)..."
               required
             />

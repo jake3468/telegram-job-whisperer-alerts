@@ -31,17 +31,18 @@ class EnterpriseSessionManager {
 
   private requestQueue: RequestQueue[] = [];
   private heartbeatInterval: NodeJS.Timeout | null = null;
+  private proactiveRefreshInterval: NodeJS.Timeout | null = null;
   private activityListeners: (() => void)[] = [];
   private debounceTimer: NodeJS.Timeout | null = null;
 
-  // More conservative token buffer calculation (5-8% instead of 10-15%)
+  // Extended token buffer calculation (3 minutes minimum)
   calculateTokenBuffer(tokenExpiry: number): number {
     const totalLifetime = tokenExpiry - Date.now();
-    const bufferPercentage = Math.min(Math.max(totalLifetime * 0.05, 30 * 1000), 8 * 60 * 1000); // 30sec to 8min
+    const bufferPercentage = Math.min(Math.max(totalLifetime * 0.08, 3 * 60 * 1000), 10 * 60 * 1000); // 3min to 10min
     return bufferPercentage;
   }
 
-  // More forgiving token validation with grace period
+  // More forgiving token validation with 3-minute grace period
   isTokenValid(): boolean {
     if (!this.state.token || !this.state.expiry) return false;
     
@@ -49,8 +50,8 @@ class EnterpriseSessionManager {
     const buffer = this.calculateTokenBuffer(this.state.expiry);
     const timeRemaining = this.state.expiry - now;
     
-    // Grace period: consider valid if more than 10 seconds remaining
-    const gracePeriod = 10 * 1000; // 10 seconds
+    // Extended grace period: consider valid if more than 3 minutes remaining
+    const gracePeriod = 3 * 60 * 1000; // 3 minutes
     const hasGracePeriod = timeRemaining > gracePeriod;
     
     // Main validation: token is valid if time remaining > buffer
@@ -59,10 +60,10 @@ class EnterpriseSessionManager {
     return isValid || hasGracePeriod;
   }
 
-  // Check if user is actively using the app (extended to 5 minutes)
+  // Check if user is actively using the app (extended to 10 minutes)
   isUserActive(): boolean {
     const timeSinceActivity = Date.now() - this.state.lastActivity;
-    return timeSinceActivity < 5 * 60 * 1000; // Active if activity within 5 minutes
+    return timeSinceActivity < 10 * 60 * 1000; // Active if activity within 10 minutes
   }
 
   // Update activity timestamp
@@ -70,7 +71,7 @@ class EnterpriseSessionManager {
     this.state.lastActivity = Date.now();
   }
 
-  // Debounced token validation to prevent race conditions
+  // Debounced token validity check to prevent race conditions
   private debouncedValidityCheck(): boolean {
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
@@ -96,9 +97,9 @@ class EnterpriseSessionManager {
     this.state.isRefreshing = true;
 
     try {
-      // Reduced exponential backoff for failures
+      // Minimal backoff for failures
       if (this.state.failureCount > 0) {
-        const backoffDelay = Math.min(500 * Math.pow(2, this.state.failureCount), 5000); // Max 5 seconds
+        const backoffDelay = Math.min(300 * Math.pow(2, this.state.failureCount), 3000); // Max 3 seconds
         await new Promise(resolve => setTimeout(resolve, backoffDelay));
       }
 
@@ -144,16 +145,30 @@ class EnterpriseSessionManager {
     }
   }
 
-  // More conservative background session management (every 30 minutes)
+  // Proactive session management with 5-minute background refresh
   startSessionManagement(getToken: () => Promise<string | null>): void {
-    // Much longer heartbeat interval to prevent excessive refreshes (30 minutes)
+    // Background heartbeat every 5 minutes (reduced from 30 minutes)
     this.heartbeatInterval = setInterval(async () => {
-      // Only refresh if user is actively using the app AND token is actually invalid
+      // Only refresh if user is actively using the app AND token needs refresh
       if (this.isUserActive() && !this.isTokenValid()) {
         console.log('[EnterpriseSession] Background refresh triggered');
         await this.refreshToken(getToken, true);
       }
-    }, 30 * 60 * 1000); // Every 30 minutes
+    }, 5 * 60 * 1000); // Every 5 minutes
+
+    // Proactive refresh 5 minutes before expiry
+    this.proactiveRefreshInterval = setInterval(async () => {
+      if (this.state.token && this.state.expiry) {
+        const timeUntilExpiry = this.state.expiry - Date.now();
+        const fiveMinutes = 5 * 60 * 1000;
+        
+        // If token expires in less than 5 minutes, proactively refresh
+        if (timeUntilExpiry < fiveMinutes && timeUntilExpiry > 0) {
+          console.log('[EnterpriseSession] Proactive refresh triggered (5 minutes before expiry)');
+          await this.refreshToken(getToken, true);
+        }
+      }
+    }, 60 * 1000); // Check every minute
 
     // Activity tracking
     const updateActivity = () => this.updateActivity();
@@ -172,6 +187,11 @@ class EnterpriseSessionManager {
     if (this.heartbeatInterval) {
       clearInterval(this.heartbeatInterval);
       this.heartbeatInterval = null;
+    }
+
+    if (this.proactiveRefreshInterval) {
+      clearInterval(this.proactiveRefreshInterval);
+      this.proactiveRefreshInterval = null;
     }
 
     this.activityListeners.forEach(cleanup => cleanup());
@@ -195,9 +215,9 @@ class EnterpriseSessionManager {
     };
   }
 
-  // New method: Pre-flight token check for form submissions
+  // Enhanced pre-flight token check for form submissions
   async ensureTokenForOperation(getToken: () => Promise<string | null>): Promise<string | null> {
-    // If token is valid, return it immediately
+    // If token is valid with 3-minute buffer, return it immediately
     if (this.isTokenValid()) {
       return this.state.token;
     }
@@ -264,7 +284,7 @@ export const useEnterpriseSessionManager = () => {
     return sessionManager.getCurrentToken();
   }, []);
 
-  // New: Ensure token is valid for operations
+  // Enhanced token validation for operations
   const ensureTokenForOperation = useCallback(async (): Promise<string | null> => {
     if (!getToken) return null;
     
