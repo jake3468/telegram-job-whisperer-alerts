@@ -151,27 +151,6 @@ export const useCachedJobAlertsData = () => {
       
       console.log('[JobAlertsData] Making authenticated request using supabase client...');
       
-      // Test authentication context first to debug JWT token flow
-      console.log('[JobAlertsData] Testing authentication context...');
-      
-      const authTest = await makeAuthenticatedRequest(async () => {
-        return await supabase.rpc('get_current_clerk_user_id_reliable');
-      });
-      
-      console.log('[JobAlertsData] Auth test result (should show clerk_id):', authTest);
-      
-      if (authTest.error) {
-        console.error('[JobAlertsData] Auth test failed:', authTest.error);
-        throw new Error(`Authentication test failed: ${authTest.error.message}`);
-      }
-      
-      if (!authTest.data) {
-        console.error('[JobAlertsData] No clerk_id returned from auth test - JWT token missing user context');
-        throw new Error('Authentication context not established. Please try refreshing the page.');
-      }
-      
-      console.log('[JobAlertsData] Authentication verified, clerk_id:', authTest.data);
-      
       // Use the same authenticated request pattern as userProfileService
       let profileData, alertsData;
       
