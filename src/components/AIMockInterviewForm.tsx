@@ -142,11 +142,20 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
       return;
     }
 
-    // Validate form data
-    if (!formData.phoneNumber || !formData.companyName || !formData.jobTitle) {
+    // Updated validation to include job description as required with minimum 50 characters
+    if (!formData.phoneNumber || !formData.companyName || !formData.jobTitle || !formData.jobDescription) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.jobDescription.length < 50) {
+      toast({
+        title: "Job Description Too Short",
+        description: "Please provide a job description with at least 50 characters.",
         variant: "destructive",
       });
       return;
@@ -283,102 +292,115 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
         </div>
       )}
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="phoneNumber" className="text-gray-300">
-            Phone Number *
-          </Label>
-          <div className="phone-input-container">
-            <PhoneInput
-              country={'us'}
-              value={formData.phoneNumber}
-              onChange={(value) => handleInputChange('phoneNumber', value)}
-              inputStyle={{
-                width: '100%',
-                height: '44px',
-                fontSize: '16px',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: '8px',
-                color: 'white',
-                paddingLeft: '48px'
-              }}
-              buttonStyle={{
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: '8px 0 0 8px'
-              }}
-              dropdownStyle={{
-                backgroundColor: '#1a1a1a',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: 'white'
-              }}
+      {/* Form wrapped in white container */}
+      <div className="bg-white rounded-xl p-6 shadow-lg">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="phoneNumber" className="text-gray-700 font-medium">
+              Phone Number *
+            </Label>
+            <div className="phone-input-container">
+              <PhoneInput
+                country={'us'}
+                value={formData.phoneNumber}
+                onChange={(value) => handleInputChange('phoneNumber', value)}
+                inputStyle={{
+                  width: '100%',
+                  height: '44px',
+                  fontSize: '16px',
+                  backgroundColor: '#f9fafb',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  color: '#374151',
+                  paddingLeft: '48px'
+                }}
+                buttonStyle={{
+                  backgroundColor: '#f9fafb',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px 0 0 8px'
+                }}
+                dropdownStyle={{
+                  backgroundColor: 'white',
+                  border: '1px solid #d1d5db',
+                  color: '#374151'
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Instructional text */}
+          <div className="py-2">
+            <p className="text-gray-600 text-sm">
+              Enter below the company, job title, and description for the role you want a mock interview for.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="companyName" className="text-gray-700 font-medium">
+              Company Name *
+            </Label>
+            <Input
+              id="companyName"
+              type="text"
+              value={formData.companyName}
+              onChange={(e) => handleInputChange('companyName', e.target.value)}
+              className="bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500"
+              placeholder="e.g., Microsoft"
+              required
             />
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="companyName" className="text-gray-300">
-            Company Name *
-          </Label>
-          <Input
-            id="companyName"
-            type="text"
-            value={formData.companyName}
-            onChange={(e) => handleInputChange('companyName', e.target.value)}
-            className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500"
-            placeholder="e.g., Microsoft"
-            required
-          />
-        </div>
+          <div className="space-y-2">
+            <Label htmlFor="jobTitle" className="text-gray-700 font-medium">
+              Job Title *
+            </Label>
+            <Input
+              id="jobTitle"
+              type="text"
+              value={formData.jobTitle}
+              onChange={(e) => handleInputChange('jobTitle', e.target.value)}
+              className="bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500"
+              placeholder="e.g., Senior Software Engineer"
+              required
+            />
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="jobTitle" className="text-gray-300">
-            Job Title *
-          </Label>
-          <Input
-            id="jobTitle"
-            type="text"
-            value={formData.jobTitle}
-            onChange={(e) => handleInputChange('jobTitle', e.target.value)}
-            className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500"
-            placeholder="e.g., Senior Software Engineer"
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="jobDescription" className="text-gray-300">
-            Job Description (Optional)
-          </Label>
-          <Textarea
-            id="jobDescription"
-            value={formData.jobDescription}
-            onChange={(e) => handleInputChange('jobDescription', e.target.value)}
-            className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500 min-h-[100px] resize-none"
-            placeholder="Paste the job description here for more targeted interview questions..."
-          />
-        </div>
-
-        <Button
-          type="submit"
-          disabled={isSubmitting || remainingCredits <= 0 || sessionStatus === 'expired'}
-          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-        >
-          {isSubmitting ? (
-            <div className="flex items-center gap-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-              Submitting...
+          <div className="space-y-2">
+            <Label htmlFor="jobDescription" className="text-gray-700 font-medium">
+              Job Description *
+            </Label>
+            <Textarea
+              id="jobDescription"
+              value={formData.jobDescription}
+              onChange={(e) => handleInputChange('jobDescription', e.target.value)}
+              className="bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500 min-h-[100px] resize-none"
+              placeholder="Please paste the job description here (minimum 50 characters required)..."
+              required
+            />
+            <div className="text-xs text-gray-500 mt-1">
+              {formData.jobDescription.length}/50 characters minimum
             </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Phone className="w-5 h-5" />
-              Call My Phone Now
-            </div>
-          )}
-        </Button>
-      </form>
+          </div>
+
+          <Button
+            type="submit"
+            disabled={isSubmitting || remainingCredits <= 0 || sessionStatus === 'expired'}
+            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          >
+            {isSubmitting ? (
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                Submitting...
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Phone className="w-5 h-5" />
+                Call My Phone Now
+              </div>
+            )}
+          </Button>
+        </form>
+      </div>
     </div>
   );
 };
