@@ -290,6 +290,12 @@ export const useCachedJobAlertsData = () => {
     setAlerts(prev => [newAlert, ...prev]);
   };
 
+  const optimisticUpdate = (updatedAlert: JobAlert) => {
+    setAlerts(prev => prev.map(alert => 
+      alert.id === updatedAlert.id ? updatedAlert : alert
+    ));
+  };
+
   const forceRefresh = async () => {
     setConnectionIssue(false);
     setError(null);
@@ -323,6 +329,7 @@ export const useCachedJobAlertsData = () => {
     connectionIssue,
     refetch: fetchJobAlertsData,
     optimisticAdd,
+    optimisticUpdate,
     invalidateCache,
     forceRefresh,
     deleteJobAlert

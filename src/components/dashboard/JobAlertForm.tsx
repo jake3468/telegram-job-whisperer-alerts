@@ -25,6 +25,8 @@ interface JobAlert {
   alert_frequency: string;
   preferred_time: string;
   timezone: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface JobAlertFormProps {
@@ -48,7 +50,7 @@ const JobAlertForm = ({
 }: JobAlertFormProps) => {
   const { user } = useUser();
   const { toast } = useToast();
-  const { optimisticAdd, userProfileId } = useCachedJobAlertsData();
+  const { optimisticAdd, optimisticUpdate, userProfileId } = useCachedJobAlertsData();
   
   // Enterprise form token keep-alive
   const { updateActivity, silentTokenRefresh } = useFormTokenKeepAlive(true);
@@ -144,16 +146,32 @@ const JobAlertForm = ({
               preferred_time: formData.preferred_time,
               timezone: formData.timezone
             })
-            .eq('id', editingAlert.id);
+             .eq('id', editingAlert.id);
 
-          if (error) {
-            throw error;
-          }
-          
-          toast({
-            title: "Alert Updated",
-            description: "Your job alert has been updated successfully.",
-          });
+           if (error) {
+             throw error;
+           }
+
+           // Optimistic UI update for immediate feedback
+           const updatedAlert = {
+             ...editingAlert,
+             country: formData.country.toLowerCase(),
+             country_name: formData.country_name,
+             location: formData.location,
+             job_title: formData.job_title,
+             job_type: formData.job_type,
+             alert_frequency: formData.alert_frequency,
+             preferred_time: formData.preferred_time,
+             timezone: formData.timezone,
+             updated_at: new Date().toISOString(),
+             created_at: editingAlert.created_at // Keep the original created_at
+           };
+           optimisticUpdate(updatedAlert);
+           
+           toast({
+             title: "Alert Updated",
+             description: "Your job alert has been updated successfully.",
+           });
         } else {
           // Create new alert
           const { data, error } = await supabase
