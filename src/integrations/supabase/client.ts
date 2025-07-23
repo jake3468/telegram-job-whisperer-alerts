@@ -51,13 +51,9 @@ const updateClientAuth = (token: string): void => {
   // Update token in headers without creating new client
   currentAuthToken = token;
   
-  // Set headers directly on the existing client
-  if (globalAuthenticatedClient.supabaseKey) {
-    globalAuthenticatedClient.supabaseKey = SUPABASE_PUBLISHABLE_KEY;
-  }
-  if (globalAuthenticatedClient.supabaseUrl) {
-    globalAuthenticatedClient.supabaseUrl = SUPABASE_URL;
-  }
+  // Set the authorization header properly
+  globalAuthenticatedClient.rest.headers['Authorization'] = `Bearer ${token}`;
+  globalAuthenticatedClient.storage.headers['Authorization'] = `Bearer ${token}`;
 };
 
 // Debounced token refresh to prevent concurrent refreshes
