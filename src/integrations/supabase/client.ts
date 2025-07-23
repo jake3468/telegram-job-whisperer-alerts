@@ -168,13 +168,11 @@ export const makeAuthenticatedRequest = async <T>(
       // Execute operation with method binding instead of creating new clients
       const originalFrom = supabase.from;
       const originalRpc = supabase.rpc;
-      const originalStorage = supabase.storage;
       
       try {
-        // Temporarily bind authenticated methods
+        // Temporarily bind authenticated methods (avoid storage as it's read-only)
         (supabase as any).from = authenticatedClient.from.bind(authenticatedClient);
         (supabase as any).rpc = authenticatedClient.rpc.bind(authenticatedClient);
-        (supabase as any).storage = authenticatedClient.storage;
         
         // Execute operation with bound methods
         const result = await operation();
@@ -189,7 +187,7 @@ export const makeAuthenticatedRequest = async <T>(
         // Always restore original methods
         (supabase as any).from = originalFrom;
         (supabase as any).rpc = originalRpc;
-        (supabase as any).storage = originalStorage;
+        // Don't restore storage as we never modified it
       }
     } catch (error: any) {
       lastError = error;

@@ -40,7 +40,7 @@ export const useAIInterviewCredits = () => {
         .from('ai_interview_credits')
         .select('*')
         .eq('user_id', userProfile.user_id)
-        .single();
+        .maybeSingle();
 
       if (fetchError) {
         // Handle specific error cases
@@ -79,7 +79,7 @@ export const useAIInterviewCredits = () => {
           .from('ai_interview_credits')
           .select('*')
           .eq('user_id', userProfile.user_id)
-          .single();
+          .maybeSingle();
 
         if (refetchError) {
           logger.error('Error fetching newly created AI interview credits:', refetchError);
