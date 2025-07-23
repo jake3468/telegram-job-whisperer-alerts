@@ -2,8 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { logger } from '@/utils/logger';
-import { supabase } from '@/integrations/supabase/client';
-import { useEnterpriseAPIClient } from './useEnterpriseAPIClient';
+import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/client';
 
 interface JobAlert {
   id: string;
@@ -35,7 +34,6 @@ let isRefreshing = false; // Request deduplication flag
 
 export const useCachedJobAlertsData = () => {
   const { user } = useUser();
-  const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
   const [alerts, setAlerts] = useState<JobAlert[]>([]);
   const [isActivated, setIsActivated] = useState<boolean>(false);
   const [userProfileId, setUserProfileId] = useState<string | null>(null);
@@ -151,49 +149,53 @@ export const useCachedJobAlertsData = () => {
         setConnectionIssue(false);
       }
       
-      console.log('[JobAlertsData] Making authenticated request...');
+      console.log('[JobAlertsData] Making authenticated request using supabase client...');
       
-      // Use direct supabase client instead of enterprise session to avoid auth conflicts
+      // Use the same authenticated request pattern as userProfileService
       let profileData, alertsData;
       
-      console.log('[JobAlertsData] Fetching profile directly...');
+      console.log('[JobAlertsData] Fetching profile with authenticated request...');
       
-      // Get user profile
-      const { data: profile, error: profileError } = await supabase
-        .from('user_profile')
-        .select('id, bot_activated')
-        .maybeSingle();
+      // Get user profile using the same pattern as userProfileService
+      const profileResult = await makeAuthenticatedRequest(async () => {
+        return await supabase
+          .from('user_profile')
+          .select('id, bot_activated')
+          .maybeSingle();
+      });
+      
+      console.log('[JobAlertsData] Profile result:', profileResult);
         
-      console.log('[JobAlertsData] Profile query result:', { profile, profileError });
-        
-      if (profileError) {
-        console.error('[JobAlertsData] Profile fetch error:', profileError);
-        throw new Error(`Profile fetch failed: ${profileError.message}`);
+      if (profileResult.error) {
+        console.error('[JobAlertsData] Profile fetch error:', profileResult.error);
+        throw new Error(`Profile fetch failed: ${profileResult.error.message}`);
       }
       
-      if (!profile) {
+      if (!profileResult.data) {
         console.error('[JobAlertsData] No profile found');
         throw new Error('User profile not found. Please try signing out and back in.');
       }
       
-      profileData = profile;
+      profileData = profileResult.data;
       console.log('[JobAlertsData] Profile data:', profileData);
 
-      // Fetch job alerts
-      console.log('[JobAlertsData] Fetching job alerts directly...');
-      const { data: alerts, error: alertsError } = await supabase
-        .from('job_alerts')
-        .select('*')
-        .order('created_at', { ascending: false });
+      // Fetch job alerts using the same pattern
+      console.log('[JobAlertsData] Fetching job alerts with authenticated request...');
+      const alertsResult = await makeAuthenticatedRequest(async () => {
+        return await supabase
+          .from('job_alerts')
+          .select('*')
+          .order('created_at', { ascending: false });
+      });
 
-      console.log('[JobAlertsData] Job alerts query result:', { alerts, alertsError });
+      console.log('[JobAlertsData] Job alerts result:', alertsResult);
 
-      if (alertsError) {
-        console.error('[JobAlertsData] Job alerts fetch error:', alertsError);
-        throw alertsError;
+      if (alertsResult.error) {
+        console.error('[JobAlertsData] Job alerts fetch error:', alertsResult.error);
+        throw alertsResult.error;
       }
       
-      alertsData = alerts;
+      alertsData = alertsResult.data;
 
       const result = {
         alerts: alertsData || [],
@@ -254,16 +256,16 @@ export const useCachedJobAlertsData = () => {
     await fetchJobAlertsData();
   };
 
-  // Simple delete function using enterprise session management
+  // Simple delete function using the same authentication pattern
   const deleteJobAlert = async (alertId: string) => {
-    await makeAuthenticatedRequest(async () => {
-      const { error } = await supabase
+    const result = await makeAuthenticatedRequest(async () => {
+      return await supabase
         .from('job_alerts')
         .delete()
         .eq('id', alertId);
-      
-      if (error) throw error;
     });
+    
+    if (result.error) throw result.error;
     
     // Optimistically remove from local state
     setAlerts(prev => prev.filter(alert => alert.id !== alertId));
