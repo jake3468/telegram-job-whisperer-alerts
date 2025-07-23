@@ -63,12 +63,9 @@ const AppWithSync = () => {
   // Initialize sync in background without blocking UI
   useClerkSupabaseSync();
   
-  // Skip enterprise features for job-alerts page to prevent debug messages
-  const shouldUseEnterpriseFeatures = !location.pathname.includes('/job-alerts');
-  
-  // Always call the hook but pass conditions to it - this fixes the hook ordering issue
+  // Enable enterprise features for all pages to ensure proper token management
   useEnhancedTokenManagerIntegration({
-    enabled: shouldUseEnterpriseFeatures && isLoaded && isSignedIn
+    enabled: isLoaded && isSignedIn
   });
   
   // Hide initial loader once React is ready
