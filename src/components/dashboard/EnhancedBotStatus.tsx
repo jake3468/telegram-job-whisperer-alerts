@@ -73,9 +73,9 @@ const EnhancedBotStatus = ({ onActivationChange }: BotStatusProps) => {
     checkBotStatus();
   }, [user]);
 
-  // Determine the overall activation status
-  const isFullyActivated = botStatus.isActivated && botStatus.hasChatId;
-  const needsActivation = !botStatus.isActivated || !botStatus.hasChatId;
+  // Determine the overall activation status - if bot_activated is true, bot is activated
+  const isFullyActivated = botStatus.isActivated;
+  const needsActivation = !botStatus.isActivated;
 
   if (botStatus.loading) {
     return (
