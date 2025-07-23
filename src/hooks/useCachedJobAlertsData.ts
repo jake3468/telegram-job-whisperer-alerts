@@ -73,10 +73,25 @@ export const useCachedJobAlertsData = () => {
   }, []);
 
 
-  // Fetch fresh data when user changes
+  // Fetch fresh data when user changes or is determined to be null
   useEffect(() => {
+    // Don't immediately set loading to false when user is null on initial load
+    // Wait for Clerk to finish authentication before making decisions
     if (!user) {
-      setLoading(false);
+      // Only set loading to false if we have cached data or if we're certain the user is unauthenticated
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        try {
+          const parsedCache: CachedJobAlertsData = JSON.parse(cached);
+          if (parsedCache.version === CACHE_VERSION && 
+              Date.now() - parsedCache.timestamp < CACHE_DURATION) {
+            // We have valid cache, we can safely set loading to false
+            setLoading(false);
+          }
+        } catch {
+          // Invalid cache, keep loading state until auth resolves
+        }
+      }
       return;
     }
     
