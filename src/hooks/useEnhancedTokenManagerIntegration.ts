@@ -34,14 +34,16 @@ export const useEnhancedTokenManagerIntegration = (options: UseEnhancedTokenMana
     } catch (error) {
       console.error('Failed to connect enterprise session manager:', error);
     }
-  }, [sessionManager?.isReady, enabled]); // Only re-run when session manager is ready
+  }, [sessionManager?.isReady, enabled]);
 
-  // Return the session manager interface only if enabled, otherwise return null
-  return enabled && sessionManager ? {
+  // Return the session manager interface only if enabled and ready
+  return enabled && sessionManager?.isReady ? {
     refreshToken: sessionManager.refreshToken,
     updateActivity: sessionManager.updateActivity,
     isTokenValid: sessionManager.isTokenValid,
     getCurrentToken: sessionManager.getCurrentToken,
-    sessionStats: sessionManager.sessionStats
+    ensureTokenForOperation: sessionManager.ensureTokenForOperation,
+    sessionStats: sessionManager.sessionStats,
+    isReady: sessionManager.isReady
   } : null;
 };

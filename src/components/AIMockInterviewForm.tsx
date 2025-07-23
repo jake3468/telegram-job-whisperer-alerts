@@ -1,18 +1,16 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Phone, CheckCircle, AlertCircle, CreditCard, RefreshCw } from "lucide-react";
-import { useCachedUserProfile } from "@/hooks/useCachedUserProfile";
-import { useCachedUserCompletionStatus } from "@/hooks/useCachedUserCompletionStatus";
-import { useCachedGraceInterviewRequests } from "@/hooks/useCachedGraceInterviewRequests";
-import { useAIInterviewCredits } from "@/hooks/useAIInterviewCredits";
-import { ProfileCompletionWarning } from "@/components/ProfileCompletionWarning";
-import { AIInterviewCreditsDisplay } from "@/components/AIInterviewCreditsDisplay";
-import { AIInterviewPricingModal } from "@/components/AIInterviewPricingModal";
-import { useEnterpriseAPIClient } from "@/hooks/useEnterpriseAPIClient";
+
+import { useState, useEffect, useCallback } from 'react';
+import { useUser } from '@clerk/clerk-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { Phone, AlertCircle, CheckCircle } from 'lucide-react';
+import { makeAuthenticatedRequest } from '@/integrations/supabase/client';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { AIInterviewCreditsDisplay } from './AIInterviewCreditsDisplay';
+import { useAIInterviewCredits } from '@/hooks/useAIInterviewCredits';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 
@@ -33,659 +31,356 @@ interface AIMockInterviewFormProps {
 }
 
 const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFormProps) => {
-  const [formData, setFormData] = useState<FormData>({
-    phoneNumber: "",
-    companyName: "",
-    jobTitle: "",
-    jobDescription: ""
-  });
+  const { user, isLoaded } = useUser();
+  const { toast } = useToast();
+  const { userProfile } = useUserProfile();
+  const { remainingCredits, refetch: refetchCredits } = useAIInterviewCredits();
   
-  // Initialize enterprise API client for secure, token-aware requests
-  const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
-
-  // Auto-populate form data if prefillData is provided
-  useEffect(() => {
-    if (prefillData?.companyName || prefillData?.jobTitle || prefillData?.jobDescription) {
-      setFormData(prev => ({
-        ...prev,
-        companyName: prefillData.companyName || prev.companyName,
-        jobTitle: prefillData.jobTitle || prev.jobTitle,
-        jobDescription: prefillData.jobDescription || prev.jobDescription
-      }));
-    }
-  }, [prefillData]);
+  const [formData, setFormData] = useState<FormData>({
+    phoneNumber: '',
+    companyName: prefillData?.companyName || '',
+    jobTitle: prefillData?.jobTitle || '',
+    jobDescription: prefillData?.jobDescription || ''
+  });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
-  const [isRefreshingToken, setIsRefreshingToken] = useState(false);
-  const [tokenStatus, setTokenStatus] = useState<'valid' | 'refreshing' | 'expired' | 'unknown'>('unknown');
-  
-  const { toast } = useToast();
-  const { userProfile, loading: profileLoading } = useCachedUserProfile();
-  const { hasResume, hasBio, loading: completionLoading } = useCachedUserCompletionStatus();
-  const { optimisticAdd } = useCachedGraceInterviewRequests();
-  const { credits, hasCredits, useCredit, refetch: refetchCredits, isLoading: creditsLoading } = useAIInterviewCredits();
+  const [sessionStatus, setSessionStatus] = useState<'ready' | 'refreshing' | 'expired' | 'error'>('ready');
+  const [statusMessage, setStatusMessage] = useState<string>('');
+  const [messageDisplayTime, setMessageDisplayTime] = useState<number>(0);
 
-  // Simplified token management - prevent infinite loops
-  useEffect(() => {
-    if (!sessionManager?.isTokenValid || !sessionManager?.refreshToken) {
-      return;
+  // Update session status with minimum display time to prevent flickering
+  const updateSessionStatus = useCallback((status: typeof sessionStatus, message: string = '') => {
+    const now = Date.now();
+    
+    // Only update if we're not in a brief display period
+    if (now - messageDisplayTime > 1000) {
+      setSessionStatus(status);
+      setStatusMessage(message);
+      setMessageDisplayTime(now);
     }
+  }, [messageDisplayTime]);
 
-    const checkTokenStatus = async () => {
-      try {
-        const isValid = sessionManager.isTokenValid();
-        
-        // Only refresh if token is truly invalid and we're not already refreshing
-        if (!isValid && !isRefreshingToken) {
-          console.log('[AIMockInterviewForm] Token needs refresh, attempting silent refresh');
-          setIsRefreshingToken(true);
-          
-          try {
-            await sessionManager.refreshToken(true);
-            setTokenStatus('valid');
-          } catch (error) {
-            console.error('[AIMockInterviewForm] Silent token refresh failed:', error);
-            setTokenStatus('expired');
-          } finally {
-            setIsRefreshingToken(false);
-          }
-        } else if (isValid) {
-          setTokenStatus('valid');
-        }
-      } catch (error) {
-        console.error('[AIMockInterviewForm] Error in token check:', error);
+  // Monitor session manager state with reduced frequency
+  useEffect(() => {
+    if (!sessionManager) return;
+
+    const checkSession = () => {
+      if (!sessionManager.isReady) {
+        updateSessionStatus('refreshing', 'Initializing session...');
+      } else if (!sessionManager.isTokenValid()) {
+        updateSessionStatus('expired', 'Session expired');
+      } else {
+        updateSessionStatus('ready', '');
       }
     };
 
-    // Initial check
-    checkTokenStatus();
-    
-    // Set up interval for periodic checks (but less frequent)
-    const interval = setInterval(checkTokenStatus, 10 * 60 * 1000); // Check every 10 minutes
-    
-    return () => clearInterval(interval);
-  }, [sessionManager]); // Only depend on sessionManager, nothing else
+    // Check immediately
+    checkSession();
 
-  const handleInputChange = (field: keyof FormData, value: string) => {
+    // Check every 30 seconds instead of every second
+    const interval = setInterval(checkSession, 30000);
+
+    return () => clearInterval(interval);
+  }, [sessionManager, updateSessionStatus]);
+
+  // Enhanced token validation with pre-flight refresh
+  const ensureTokenValid = useCallback(async (): Promise<boolean> => {
+    if (!sessionManager) {
+      throw new Error('Session manager not available');
+    }
+
+    try {
+      // Pre-flight token check - this will refresh if needed
+      const token = await sessionManager.ensureTokenForOperation();
+      
+      if (!token) {
+        updateSessionStatus('expired', 'Session expired - please refresh the page');
+        return false;
+      }
+
+      updateSessionStatus('ready', '');
+      return true;
+    } catch (error) {
+      console.error('[AIMockInterviewForm] Token validation failed:', error);
+      updateSessionStatus('error', 'Authentication error - please refresh the page');
+      return false;
+    }
+  }, [sessionManager, updateSessionStatus]);
+
+  // Handle form input changes
+  const handleInputChange = useCallback((field: keyof FormData, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
-  };
-
-  const validatePhoneNumber = (phone: string) => {
-    return phone && phone.length >= 8;
-  };
-
-  const validatePhoneNumberUniqueness = async (phoneNumber: string) => {
-    // Enhanced phone number validation with proactive token management
-    return await makeAuthenticatedRequest(async () => {
-      // Log the operation for debugging
-      console.log('[AIMockInterviewForm] Validating phone number uniqueness:', phoneNumber);
-      
-      // Check if phone number already exists in grace_interview_requests
-      // Use .select() without .maybeSingle() to handle multiple results properly
-      const { data: existingRequests, error } = await supabase
-        .from('grace_interview_requests')
-        .select('user_id, phone_number')
-        .eq('phone_number', phoneNumber);
-
-      if (error) {
-        console.error('[AIMockInterviewForm] Error checking phone number:', error);
-        throw new Error("Failed to validate phone number");
-      }
-
-      console.log('[AIMockInterviewForm] Phone validation result:', { existingRequests, phoneNumber });
-
-      if (existingRequests && existingRequests.length > 0) {
-        // Phone number exists, check if any belongs to a different user
-        const otherUserRequests = existingRequests.filter(req => req.user_id !== userProfile?.id);
-        
-        if (otherUserRequests.length > 0) {
-          // Different user - get the email of the first existing account
-          const { data: existingUserProfile, error: profileError } = await supabase
-            .from('user_profile')
-            .select('user_id')
-            .eq('id', otherUserRequests[0].user_id)
-            .single();
-
-          if (profileError) {
-            console.error('[AIMockInterviewForm] Error fetching user profile:', profileError);
-            throw new Error("Failed to validate phone number");
-          }
-
-          const { data: existingUser, error: userError } = await supabase
-            .from('users')
-            .select('email')
-            .eq('id', existingUserProfile.user_id)
-            .single();
-
-          if (userError) {
-            console.error('[AIMockInterviewForm] Error fetching user email:', userError);
-            throw new Error("Failed to validate phone number");
-          }
-
-          return {
-            isValid: false,
-            message: `This phone number is already registered with another account (${existingUser.email}). Please sign in to that account to access the AI Interview feature.`
-          };
-        }
-      }
-
-      return { isValid: true };
-    }, {
-      maxRetries: 3,
-      silentRetry: true
-    });
-  };
-
-  const ensureTokenValid = async () => {
-    if (!sessionManager?.isTokenValid || !sessionManager?.refreshToken) {
-      console.warn('[AIMockInterviewForm] Session manager not available');
-      return false;
-    }
-
-    const isValid = sessionManager.isTokenValid();
-    console.log('[AIMockInterviewForm] Token validity check:', isValid);
     
-    if (!isValid) {
-      setIsRefreshingToken(true);
-      setTokenStatus('refreshing');
-      
-      try {
-        const refreshedToken = await sessionManager.refreshToken(true);
-        console.log('[AIMockInterviewForm] Token refreshed before submission:', !!refreshedToken);
-        
-        if (refreshedToken) {
-          setTokenStatus('valid');
-          return true;
-        } else {
-          setTokenStatus('expired');
-          return false;
-        }
-      } catch (error) {
-        console.error('[AIMockInterviewForm] Token refresh failed:', error);
-        setTokenStatus('expired');
-        return false;
-      } finally {
-        setIsRefreshingToken(false);
-      }
+    // Update activity when user types
+    if (sessionManager?.updateActivity) {
+      sessionManager.updateActivity();
     }
-    
-    return true;
-  };
+  }, [sessionManager]);
 
+  // Enhanced form submission with better error handling
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('[AIMockInterviewForm] Form submission started');
-    console.log('[AIMockInterviewForm] User profile:', userProfile);
-    console.log('[AIMockInterviewForm] Form data:', formData);
-    
-    if (!userProfile?.id) {
-      console.error('[AIMockInterviewForm] User profile not found or missing ID');
+    if (!isLoaded || !user || !userProfile) {
       toast({
-        title: "Authentication Error",
-        description: "Please ensure you're logged in and try again.",
-        variant: "destructive"
+        title: "Error",
+        description: "Please wait for the page to load completely.",
+        variant: "destructive",
       });
       return;
     }
 
-    // Check profile completion first
-    if (!hasResume || !hasBio) {
-      const missing = [];
-      if (!hasResume) missing.push("resume");
-      if (!hasBio) missing.push("bio");
-      
+    if (remainingCredits <= 0) {
       toast({
-        title: "Complete Your Profile First",
-        description: `Please add your ${missing.join(" and ")} in your profile page before requesting an interview.`,
-        variant: "destructive"
+        title: "No Credits Available",
+        description: "You don't have any interview credits remaining. Please purchase more credits to continue.",
+        variant: "destructive",
       });
       return;
     }
 
-    // Check AI interview calls
-    if (!hasCredits) {
-      toast({
-        title: "No Interview Calls",
-        description: "You need AI interview calls to request a call. Purchase calls to continue.",
-        variant: "destructive"
-      });
-      setIsPricingModalOpen(true);
-      return;
-    }
-
-    // Validate form
-    if (!formData.phoneNumber || !formData.companyName || !formData.jobTitle || !formData.jobDescription) {
-      console.error('[AIMockInterviewForm] Missing form fields');
+    // Validate form data
+    if (!formData.phoneNumber || !formData.companyName || !formData.jobTitle) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all fields to continue.",
-        variant: "destructive"
+        description: "Please fill in all required fields.",
+        variant: "destructive",
       });
       return;
     }
-    
-    if (!validatePhoneNumber(formData.phoneNumber)) {
-      console.error('[AIMockInterviewForm] Invalid phone number:', formData.phoneNumber);
-      toast({
-        title: "Invalid Phone Number",
-        description: "Please enter a valid phone number.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    if (formData.jobDescription.length < 50) {
-      console.error('[AIMockInterviewForm] Job description too short:', formData.jobDescription.length);
-      toast({
-        title: "Job Description Too Short",
-        description: "Please provide a more detailed job description (at least 50 characters).",
-        variant: "destructive"
-      });
-      return;
-    }
-    
+
     setIsSubmitting(true);
-    
+    updateSessionStatus('refreshing', 'Validating session...');
+
     try {
-      // Ensure token is valid before proceeding
+      // Ensure token is valid before submission
       const tokenValid = await ensureTokenValid();
       if (!tokenValid) {
-        toast({
-          title: "Session Expired",
-          description: "Please refresh the page and try again.",
-          variant: "destructive"
-        });
-        setIsSubmitting(false);
         return;
       }
 
-      // react-phone-input-2 already includes the + prefix, so we don't need to add it
-      const phoneNumber = formData.phoneNumber.startsWith('+') ? formData.phoneNumber : `+${formData.phoneNumber}`;
-      console.log('[AIMockInterviewForm] Formatted phone number:', phoneNumber);
-      
-      // Validate phone number uniqueness with enhanced error handling
-      console.log('[AIMockInterviewForm] Starting phone number validation...');
-      const phoneValidation = await validatePhoneNumberUniqueness(phoneNumber);
-      console.log('[AIMockInterviewForm] Phone validation result:', phoneValidation);
-      
-      if (!phoneValidation.isValid) {
-        toast({
-          title: "Phone Number Already Registered",
-          description: phoneValidation.message,
-          variant: "destructive"
-        });
-        setIsSubmitting(false);
-        return;
-      }
-      
-      console.log('[AIMockInterviewForm] Inserting data:', {
-        user_id: userProfile.id,
-        phone_number: phoneNumber,
-        company_name: formData.companyName,
-        job_title: formData.jobTitle,
-        job_description: formData.jobDescription
-      });
-      
-      // Use authenticated request for database insertion
-      const data = await makeAuthenticatedRequest(async () => {
+      updateSessionStatus('ready', 'Submitting request...');
+
+      // Submit the form
+      const result = await makeAuthenticatedRequest(async () => {
+        const { supabase } = await import('@/integrations/supabase/client');
+        
+        // Check for existing requests with same phone number
+        const { data: existingRequests } = await supabase
+          .from('grace_interview_requests')
+          .select('id')
+          .eq('user_id', userProfile.id)
+          .eq('phone_number', formData.phoneNumber)
+          .eq('status', 'pending');
+
+        // If there are existing requests, we can still proceed (allow duplicates)
         const { data, error } = await supabase
-          .from("grace_interview_requests")
+          .from('grace_interview_requests')
           .insert({
             user_id: userProfile.id,
-            phone_number: phoneNumber,
+            phone_number: formData.phoneNumber,
             company_name: formData.companyName,
             job_title: formData.jobTitle,
-            job_description: formData.jobDescription
+            job_description: formData.jobDescription || '',
+            status: 'pending'
           })
           .select()
           .single();
-        
-        if (error) {
-          console.error('[AIMockInterviewForm] Supabase error:', error);
-          throw error;
-        }
-        
+
+        if (error) throw error;
         return data;
       }, {
-        maxRetries: 3,
+        operationType: 'interview_request_submission',
+        maxRetries: 2,
         silentRetry: true
       });
-      
-      console.log('[AIMockInterviewForm] Successfully inserted data:', data);
-      
-      // Optimistically add to cache
-      if (data) {
-        optimisticAdd(data);
-      }
 
-      console.log('[AIMockInterviewForm] Interview request submitted successfully. Credit will be deducted when call is made by N8N.');
-      
-      setIsSubmitted(true);
+      // Success
       toast({
         title: "Request Submitted Successfully!",
-        description: "Grace will call you within ~1 minute. Please keep your phone ready."
+        description: "Grace will call you within the next 2 minutes. Please keep your phone nearby.",
+        duration: 8000,
       });
 
-      // Reset form after 5 seconds
-      setTimeout(() => {
-        setIsSubmitted(false);
-        setFormData({
-          phoneNumber: "",
-          companyName: "",
-          jobTitle: "",
-          jobDescription: ""
-        });
-      }, 5000);
+      // Reset form
+      setFormData({
+        phoneNumber: '',
+        companyName: '',
+        jobTitle: '',
+        jobDescription: ''
+      });
+
+      // Refresh credits
+      await refetchCredits();
+      
+      updateSessionStatus('ready', 'Request submitted successfully!');
+      
     } catch (error: any) {
-      console.error('[AIMockInterviewForm] Error submitting interview request:', error);
+      console.error('[AIMockInterviewForm] Submission error:', error);
       
-      // Enhanced error handling with better user feedback
-      let errorMessage = "There was an error submitting your request. Please try again.";
+      // Better error handling
+      let errorMessage = 'Please try again';
       
-      if (error?.message?.includes("Failed to validate phone number")) {
-        errorMessage = "Unable to validate phone number. Please check your connection and try again.";
-      } else if (error?.message?.includes("Please try again")) {
-        errorMessage = "Connection issue. Please try again.";
-      } else if (error?.message?.includes("Session expired")) {
-        errorMessage = "Your session has expired. Please refresh the page and try again.";
-      } else if (error?.message) {
-        errorMessage = error.message;
+      if (error?.message?.includes('JWT') || error?.message?.includes('expired')) {
+        errorMessage = 'Session expired. Please refresh the page and try again.';
+        updateSessionStatus('expired', errorMessage);
+      } else if (error?.message?.includes('network') || error?.message?.includes('fetch')) {
+        errorMessage = 'Network error. Please check your connection and try again.';
+        updateSessionStatus('error', errorMessage);
+      } else {
+        updateSessionStatus('error', errorMessage);
       }
-      
+
       toast({
         title: "Submission Failed",
         description: errorMessage,
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
+      
+      // Clear status message after 3 seconds
+      setTimeout(() => {
+        updateSessionStatus('ready', '');
+      }, 3000);
     }
   };
 
-  if (isSubmitted) {
-    return <div className="bg-gray-900/60 backdrop-blur-lg border border-gray-700/50 rounded-xl p-8 text-center">
-        <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
-        <h3 className="text-2xl font-bold text-green-400 mb-4">Request Submitted!</h3>
-        <p className="text-gray-300 mb-2">
-          Thank you! Grace will call you within ~1 minute.
-        </p>
-        <p className="text-gray-400 text-sm">
-          Please keep your phone ready and answer when Grace calls.
-        </p>
-      </div>;
-  }
-  
+  // Show session status only when there's an issue or actively processing
+  const showSessionStatus = sessionStatus !== 'ready' || statusMessage;
+
   return (
     <div className="space-y-6">
-      {/* Profile Completion Warning */}
-      <ProfileCompletionWarning />
-      
-      {/* AI Interview Credits Display */}
-      <AIInterviewCreditsDisplay 
-        onBuyMore={() => setIsPricingModalOpen(true)} 
-      />
+      {/* Credits Display */}
+      <AIInterviewCreditsDisplay />
 
-      {/* Minimal Token Status Indicator - Only show critical states */}
-      {isRefreshingToken && (
-        <div className="flex items-center justify-center gap-2 text-yellow-400 text-sm bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-2">
-          <RefreshCw className="w-3 h-3 animate-spin" />
-          <span>Refreshing...</span>
+      {/* Session Status - Only show when relevant */}
+      {showSessionStatus && (
+        <div className={`p-3 rounded-lg border ${
+          sessionStatus === 'expired' || sessionStatus === 'error' 
+            ? 'border-red-500/30 bg-red-500/10' 
+            : 'border-blue-500/30 bg-blue-500/10'
+        }`}>
+          <div className="flex items-center gap-2 text-sm">
+            {sessionStatus === 'refreshing' && (
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-400 border-t-transparent"></div>
+            )}
+            {sessionStatus === 'expired' && <AlertCircle className="h-4 w-4 text-red-400" />}
+            {sessionStatus === 'error' && <AlertCircle className="h-4 w-4 text-red-400" />}
+            {statusMessage && (
+              <span className={
+                sessionStatus === 'expired' || sessionStatus === 'error' 
+                  ? 'text-red-400' 
+                  : 'text-blue-400'
+              }>
+                {statusMessage}
+              </span>
+            )}
+          </div>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="border border-purple-500/30 rounded-xl p-8 bg-white shadow-lg shadow-purple-500/20">
-        <div className="space-y-6">
-          {/* Phone Number */}
-          <div>
-            <label htmlFor="phoneNumber" className="block text-sm font-medium text-black mb-2">
-              Phone Number
-            </label>
-            <div className="phone-input-wrapper">
-              <PhoneInput
-                country={'us'}
-                value={formData.phoneNumber}
-                onChange={(phone) => handleInputChange("phoneNumber", phone)}
-                enableSearch={true}
-                searchPlaceholder="Search countries..."
-                inputProps={{
-                  name: 'phoneNumber',
-                  required: true,
-                  className: 'phone-input-field'
-                }}
-                containerClass="phone-input-container"
-                inputClass="phone-input-field"
-                buttonClass="phone-input-button"
-                dropdownClass="phone-input-dropdown"
-                searchClass="phone-input-search"
-              />
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="phoneNumber" className="text-gray-300">
+            Phone Number *
+          </Label>
+          <div className="phone-input-container">
+            <PhoneInput
+              country={'us'}
+              value={formData.phoneNumber}
+              onChange={(value) => handleInputChange('phoneNumber', value)}
+              inputStyle={{
+                width: '100%',
+                height: '44px',
+                fontSize: '16px',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '8px',
+                color: 'white',
+                paddingLeft: '48px'
+              }}
+              buttonStyle={{
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '8px 0 0 8px'
+              }}
+              dropdownStyle={{
+                backgroundColor: '#1a1a1a',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: 'white'
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="companyName" className="text-gray-300">
+            Company Name *
+          </Label>
+          <Input
+            id="companyName"
+            type="text"
+            value={formData.companyName}
+            onChange={(e) => handleInputChange('companyName', e.target.value)}
+            className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500"
+            placeholder="e.g., Microsoft"
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="jobTitle" className="text-gray-300">
+            Job Title *
+          </Label>
+          <Input
+            id="jobTitle"
+            type="text"
+            value={formData.jobTitle}
+            onChange={(e) => handleInputChange('jobTitle', e.target.value)}
+            className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500"
+            placeholder="e.g., Senior Software Engineer"
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="jobDescription" className="text-gray-300">
+            Job Description (Optional)
+          </Label>
+          <Textarea
+            id="jobDescription"
+            value={formData.jobDescription}
+            onChange={(e) => handleInputChange('jobDescription', e.target.value)}
+            className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500 min-h-[100px] resize-none"
+            placeholder="Paste the job description here for more targeted interview questions..."
+          />
+        </div>
+
+        <Button
+          type="submit"
+          disabled={isSubmitting || remainingCredits <= 0 || sessionStatus === 'expired'}
+          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+        >
+          {isSubmitting ? (
+            <div className="flex items-center gap-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+              Submitting...
             </div>
-            <p className="text-xs text-black mt-1">
-              Select your country and enter your mobile number
-            </p>
-          </div>
-
-          {/* Company Name */}
-          <div>
-            <label htmlFor="companyName" className="block text-sm font-medium text-black mb-2">
-              Company Name
-            </label>
-            <Input id="companyName" type="text" placeholder="e.g., Google, Microsoft, Startup Inc." value={formData.companyName} onChange={e => handleInputChange("companyName", e.target.value)} className="bg-gray-800 border-purple-300 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500/20" required />
-          </div>
-
-          {/* Job Title */}
-          <div>
-            <label htmlFor="jobTitle" className="block text-sm font-medium text-black mb-2">
-              Job Title
-            </label>
-            <Input id="jobTitle" type="text" placeholder="e.g., Software Engineer, Product Manager, Data Scientist" value={formData.jobTitle} onChange={e => handleInputChange("jobTitle", e.target.value)} className="bg-gray-800 border-purple-300 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500/20" required />
-          </div>
-
-          {/* Job Description */}
-          <div>
-            <label htmlFor="jobDescription" className="block text-sm font-medium text-black mb-2">
-              Job Description
-            </label>
-            <Textarea id="jobDescription" placeholder="Paste the full job description here. Include responsibilities, requirements, and any specific skills mentioned..." value={formData.jobDescription} onChange={e => handleInputChange("jobDescription", e.target.value)} className="bg-gray-800 border-purple-300 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500/20 min-h-[120px] resize-none" required />
-            <p className="text-xs text-black mt-1">
-              {formData.jobDescription.length}/500+ characters (minimum 50 required)
-            </p>
-          </div>
-        </div>
-
-        {/* Submit Button */}
-        <div className="mt-8">
-          <Button 
-            type="submit" 
-            disabled={isSubmitting || !hasCredits || creditsLoading || isRefreshingToken || tokenStatus === 'expired'} 
-            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                Submitting Request...
-              </>
-            ) : isRefreshingToken ? (
-              <>
-                <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
-                Refreshing Session...
-              </>
-            ) : !hasCredits ? (
-              <>
-                <CreditCard className="w-5 h-5 mr-2" />
-                Purchase Calls to Continue
-              </>
-            ) : tokenStatus === 'expired' ? (
-              <>
-                <AlertCircle className="w-5 h-5 mr-2" />
-                Session Expired - Refresh Page
-              </>
-            ) : (
-              <>
-                <Phone className="w-5 h-5 mr-2" />
-                Call My Phone Now
-              </>
-            )}
-          </Button>
-          
-          {!isSubmitting && hasCredits && tokenStatus === 'valid' && (
-            <p className="text-center text-black text-sm mt-3">
-              Grace will call you within ~1 minute of submitting
-            </p>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Phone className="w-5 h-5" />
+              Call My Phone Now
+            </div>
           )}
-          
-          {!hasCredits && !creditsLoading && (
-            <p className="text-center text-orange-600 text-sm mt-3">
-              Purchase AI interview calls to request a call from Grace
-            </p>
-          )}
-
-          {tokenStatus === 'expired' && (
-            <p className="text-center text-red-600 text-sm mt-3">
-              Your session has expired. Please refresh the page to continue.
-            </p>
-          )}
-        </div>
-      </div>
+        </Button>
       </form>
-
-      {/* Pricing Modal */}
-      <AIInterviewPricingModal
-        isOpen={isPricingModalOpen}
-        onClose={() => setIsPricingModalOpen(false)}
-      />
     </div>
   );
 };
-
-// Custom styles for react-phone-input-2 to match our dark theme
-const phoneInputStyles = `
-  .phone-input-container {
-    width: 100% !important;
-  }
-  
-  .phone-input-field {
-    width: 100% !important;
-    height: 2.5rem !important;
-    background-color: rgb(31 41 55) !important; /* bg-gray-800 */
-    border: 1px solid rgb(55 65 81) !important; /* border-gray-700 */
-    border-radius: 0.5rem !important;
-    color: white !important;
-    font-size: 0.875rem !important;
-    padding-left: 3.5rem !important;
-  }
-  
-  .phone-input-field:focus {
-    border-color: rgb(147 51 234) !important; /* border-purple-500 */
-    box-shadow: 0 0 0 1px rgb(147 51 234 / 0.2) !important;
-    outline: none !important;
-  }
-  
-  .phone-input-field::placeholder {
-    color: rgb(156 163 175) !important; /* text-gray-400 */
-  }
-  
-  .phone-input-button {
-    background-color: rgb(31 41 55) !important; /* bg-gray-800 */
-    border: 1px solid rgb(55 65 81) !important; /* border-gray-700 */
-    border-right: none !important;
-    border-radius: 0.5rem 0 0 0.5rem !important;
-    padding: 0 0.75rem !important;
-  }
-  
-  .phone-input-button:hover {
-    background-color: rgb(17 24 39) !important; /* bg-gray-900 */
-  }
-  
-  .phone-input-button:focus,
-  .phone-input-button:active,
-  .phone-input-button.open {
-    background-color: rgb(31 41 55) !important; /* Keep dark when active */
-    border-color: rgb(147 51 234) !important; /* Purple border when active */
-  }
-  
-  .phone-input-dropdown {
-    background-color: rgb(31 41 55) !important; /* bg-gray-800 */
-    border: 1px solid rgb(55 65 81) !important; /* border-gray-700 */
-    border-radius: 0.5rem !important;
-    max-height: 200px !important;
-    overflow-y: auto !important;
-    z-index: 50 !important;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
-  }
-  
-  .phone-input-dropdown .country {
-    color: white !important;
-    padding: 0.5rem !important;
-    font-size: 0.875rem !important;
-  }
-  
-  .phone-input-dropdown .country .country-name {
-    color: white !important;
-  }
-  
-  .phone-input-dropdown .country .dial-code {
-    color: white !important;
-    font-weight: 500 !important;
-  }
-  
-  .phone-input-dropdown .country:hover {
-    background-color: rgb(55 65 81) !important; /* bg-gray-700 */
-  }
-  
-  .phone-input-dropdown .country.highlight {
-    background-color: rgb(147 51 234) !important; /* bg-purple-500 */
-  }
-  
-  .phone-input-dropdown .country.preferred {
-    background-color: rgb(17 24 39) !important; /* bg-gray-900 */
-  }
-  
-  .phone-input-search {
-    background-color: white !important; /* White background for search */
-    border: 1px solid rgb(209 213 219) !important; /* border-gray-300 */
-    color: black !important; /* Black text */
-    padding: 0.5rem !important;
-    margin: 0.5rem !important;
-    border-radius: 0.375rem !important;
-    width: calc(100% - 1rem) !important;
-  }
-  
-  .phone-input-search:focus {
-    border-color: rgb(147 51 234) !important; /* Purple border on focus */
-    outline: none !important;
-    box-shadow: 0 0 0 1px rgb(147 51 234 / 0.2) !important;
-  }
-  
-  .phone-input-search::placeholder {
-    color: rgb(107 114 128) !important; /* text-gray-500 for placeholder */
-  }
-  
-  /* Fix for flag display */
-  .phone-input-button .flag-dropdown {
-    background-color: transparent !important;
-  }
-  
-  .phone-input-button .selected-flag {
-    background-color: transparent !important;
-  }
-  
-  .phone-input-button .selected-flag:hover {
-    background-color: rgb(17 24 39) !important;
-  }
-`;
-
-// Inject styles
-if (typeof document !== 'undefined') {
-  const styleElement = document.createElement('style');
-  styleElement.textContent = phoneInputStyles;
-  document.head.appendChild(styleElement);
-}
 
 export default AIMockInterviewForm;
