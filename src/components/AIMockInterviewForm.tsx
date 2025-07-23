@@ -86,8 +86,10 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
   };
 
   const validatePhoneNumberUniqueness = async (phoneNumber: string) => {
+    console.log('[AIMockInterviewForm] Starting phone number validation with auth check');
+    
     return await makeAuthenticatedRequest(async () => {
-      console.log('[AIMockInterviewForm] Validating phone number uniqueness:', phoneNumber);
+      console.log('[AIMockInterviewForm] Executing phone number validation query');
       
       const { data: existingRequest, error } = await supabase
         .from('grace_interview_requests')
@@ -96,18 +98,28 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
         .maybeSingle();
 
       if (error) {
-        console.error('[AIMockInterviewForm] Error checking phone number:', error);
-        throw new Error("Failed to validate phone number");
+        console.error('[AIMockInterviewForm] Phone number validation query failed:', error);
+        console.error('[AIMockInterviewForm] Error details:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
+        throw new Error(`Phone validation failed: ${error.message}`);
       }
+
+      console.log('[AIMockInterviewForm] Phone number validation query result:', existingRequest);
 
       if (existingRequest) {
         // If same user is using their own phone number, allow it
         if (existingRequest.user_id === userProfile?.id) {
+          console.log('[AIMockInterviewForm] Phone number belongs to current user, allowing');
           return { isValid: true };
         }
         
         // If different user has this phone number, show error
         if (existingRequest.user_id !== userProfile?.id) {
+          console.log('[AIMockInterviewForm] Phone number belongs to different user, blocking');
           return {
             isValid: false,
             message: "This phone number is already registered with another account."
@@ -115,6 +127,7 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
         }
       }
 
+      console.log('[AIMockInterviewForm] Phone number is available');
       return { isValid: true };
     }, {
       maxRetries: 2,
@@ -293,8 +306,12 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
       
       if (error?.message?.includes("violates row-level security policy")) {
         errorMessage = "Authentication issue. Please refresh the page and try again.";
-      } else if (error?.message?.includes("Failed to validate phone number")) {
-        errorMessage = "Unable to validate phone number. Please check your connection and try again.";
+      } else if (error?.message?.includes("JWT") || error?.message?.includes("auth")) {
+        errorMessage = "Authentication failed. Please refresh the page and try again.";
+      } else if (error?.message?.includes("Failed to validate phone number") || error?.message?.includes("Phone validation failed")) {
+        errorMessage = "Unable to validate phone number. Please check your authentication and try again.";
+      } else if (error?.message?.includes("Authentication failed")) {
+        errorMessage = "Session expired. Please refresh the page and try again.";
       } else if (error?.message?.includes("Please try again")) {
         errorMessage = "Connection issue. Please try again.";
       } else if (error?.message?.includes("Session expired")) {

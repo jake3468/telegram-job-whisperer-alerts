@@ -20,19 +20,41 @@ export const useEnhancedTokenManagerIntegration = (options: UseEnhancedTokenMana
   useEffect(() => {
     // Only connect if enabled
     if (!enabled) {
+      console.log('[TokenManagerIntegration] Token manager integration disabled');
+      return;
+    }
+
+    if (!sessionManager) {
+      console.log('[TokenManagerIntegration] Session manager not ready yet');
       return;
     }
 
     try {
+      console.log('[TokenManagerIntegration] Connecting enterprise session manager to Supabase client');
+      
       // Connect the enterprise session manager to the Supabase client
       setEnterpriseSessionManager(sessionManager);
       
+      // Force an initial token refresh to ensure authentication
+      if (sessionManager.refreshToken) {
+        sessionManager.refreshToken(true).then((token: string | null) => {
+          if (token) {
+            console.log('[TokenManagerIntegration] Initial token refresh completed successfully');
+          } else {
+            console.error('[TokenManagerIntegration] Initial token refresh failed');
+          }
+        }).catch((error: any) => {
+          console.error('[TokenManagerIntegration] Initial token refresh error:', error);
+        });
+      }
+      
       return () => {
+        console.log('[TokenManagerIntegration] Cleaning up enterprise session manager');
         // Cleanup on unmount or when disabled
         setEnterpriseSessionManager(null);
       };
     } catch (error) {
-      console.error('Failed to connect enterprise session manager:', error);
+      console.error('[TokenManagerIntegration] Failed to connect enterprise session manager:', error);
     }
   }, [sessionManager, enabled]);
 
