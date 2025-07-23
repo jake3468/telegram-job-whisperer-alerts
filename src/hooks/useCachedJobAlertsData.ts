@@ -253,11 +253,23 @@ export const useCachedJobAlertsData = () => {
 
     } catch (error) {
       if (!silent) {
-        setError(error instanceof Error ? error.message : 'Unknown error occurred');
+        // Only set error state for persistent connection issues, not auth hiccups
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
         
-        // Only show connection issue if we have no cached data
-        if (alerts.length === 0) {
-          setConnectionIssue(true);
+        // Check if this is a temporary auth issue vs real connection problem
+        if (errorMessage.includes('Access denied') || errorMessage.includes('policy')) {
+          // For auth issues, only show error if we have no cached data at all
+          if (alerts.length === 0 && !userProfileId) {
+            setError(errorMessage);
+          }
+        } else {
+          // For network/connection issues, always show error
+          setError(errorMessage);
+          
+          // Only show connection issue if we have no cached data
+          if (alerts.length === 0) {
+            setConnectionIssue(true);
+          }
         }
       }
     } finally {
@@ -269,9 +281,9 @@ export const useCachedJobAlertsData = () => {
   }, [user, alerts.length]);
 
   const invalidateCache = () => {
-    localStorage.removeItem(CACHE_KEY);
+    // Instead of aggressive cache invalidation, do a background refresh
     setConnectionIssue(false);
-    fetchJobAlertsData();
+    fetchJobAlertsData(true); // Silent background refresh
   };
 
   const optimisticAdd = (newAlert: JobAlert) => {
