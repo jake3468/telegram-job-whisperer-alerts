@@ -4,6 +4,8 @@ export interface UserProfile {
   user_id: string;
   bio: string | null;
   resume: string | null;
+  resume_filename: string | null;
+  resume_uploaded_at: string | null;
   bot_activated: boolean | null;
   chat_id: string | null;
   cv_bot_activated: boolean;
@@ -18,6 +20,8 @@ export interface UserProfile {
 export interface UserProfileUpdateData {
   bio?: string | null;
   resume?: string | null;
+  resume_filename?: string | null;
+  resume_uploaded_at?: string | null;
   bot_activated?: boolean | null;
   chat_id?: string | null;
   cv_bot_activated?: boolean;

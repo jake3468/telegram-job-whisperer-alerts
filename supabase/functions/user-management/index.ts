@@ -26,12 +26,17 @@ Deno.serve(async (req) => {
       throw new Error('Missing required fields: clerk_id and email are required')
     }
 
-    // Check if user already exists
-    const { data: existingUser } = await supabaseClient
+    // Check if user already exists with detailed logging
+    const { data: existingUser, error: checkError } = await supabaseClient
       .from('users')
       .select('id')
       .eq('clerk_id', clerk_id)
       .single()
+
+    if (checkError && checkError.code !== 'PGRST116') {
+      console.error('Error checking existing user:', checkError);
+      throw checkError;
+    }
 
     if (existingUser) {
       console.log('User already exists:', existingUser.id);

@@ -1,4 +1,3 @@
-
 import { Layout } from "@/components/Layout";
 import AIMockInterviewForm from "@/components/AIMockInterviewForm";
 import { Button } from "@/components/ui/button";
@@ -8,9 +7,14 @@ import { useCachedGraceInterviewRequests } from "@/hooks/useCachedGraceInterview
 import GraceInterviewReportsModal from "@/components/GraceInterviewReportsModal";
 import { AIInterviewPricingModal } from "@/components/AIInterviewPricingModal";
 import { useLocation } from "react-router-dom";
+import { useEnhancedTokenManagerIntegration } from "@/hooks/useEnhancedTokenManagerIntegration";
 
 const AIMockInterview = () => {
   const location = useLocation();
+  
+  // Re-enable enterprise session management with optimized settings
+  const sessionManager = useEnhancedTokenManagerIntegration({ enabled: true });
+  
   const {
     connectionIssue,
     forceRefresh
@@ -36,15 +40,36 @@ const AIMockInterview = () => {
     }
   }, [location.state]);
 
-  const handleManualRefresh = () => {
-    // Clear all caches and reload the page for a complete refresh
+  const handleManualRefresh = async () => {
+    console.log('[AIMockInterview] Manual refresh initiated');
+    
+    // Clear all caches
     localStorage.removeItem('aspirely_user_profile_cache');
     localStorage.removeItem('aspirely_user_completion_status_cache');
     localStorage.removeItem('aspirely_ai_interview_credits_cache');
+    
+    // Force token refresh if session manager is available
+    if (sessionManager?.refreshToken) {
+      try {
+        console.log('[AIMockInterview] Forcing token refresh during manual refresh');
+        await sessionManager.refreshToken(true);
+        console.log('[AIMockInterview] Token refreshed successfully');
+      } catch (error) {
+        console.error('[AIMockInterview] Token refresh failed during manual refresh:', error);
+      }
+    }
+    
+    // Force refresh cached data
+    if (forceRefresh) {
+      await forceRefresh();
+    }
+    
+    // Full page reload as fallback
     window.location.reload();
   };
 
-  return <Layout>
+  return (
+    <Layout>
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-950 to-purple-950 text-white overflow-hidden">
         <div className="container mx-auto px-4 py-4 max-w-4xl">
           {/* Hero Section */}
@@ -54,20 +79,36 @@ const AIMockInterview = () => {
               <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent text-left">AI Mock Interview</h1>
               
               {/* Manual Refresh Button */}
-              {connectionIssue && <Button onClick={handleManualRefresh} variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0 absolute right-0" title="Refresh page">
+              {connectionIssue && (
+                <Button
+                  onClick={handleManualRefresh}
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0 absolute right-0"
+                  title="Refresh page"
+                >
                   <RefreshCw className="h-4 w-4" />
-                </Button>}
+                </Button>
+              )}
             </div>
             
             <h2 className="text-xl md:text-2xl text-gray-300 mb-4 leading-relaxed">Get a Mock Interview Phone Call from 👩🏻 Grace</h2>
             
             {/* Action Buttons */}
             <div className="mb-6 flex flex-wrap gap-3 justify-center">
-              <Button onClick={() => setIsReportsModalOpen(true)} variant="outline" className="border-purple-500/30 transition-all duration-300 bg-violet-600 hover:bg-violet-500 text-slate-50">
+              <Button
+                onClick={() => setIsReportsModalOpen(true)}
+                variant="outline"
+                className="border-purple-500/30 transition-all duration-300 bg-violet-600 hover:bg-violet-500 text-slate-50"
+              >
                 <History className="w-4 h-4 mr-2" />
                 Reports
               </Button>
-              <Button onClick={() => setIsPricingModalOpen(true)} variant="outline" className="border-green-500/30 transition-all duration-300 bg-green-600 hover:bg-green-500 text-slate-50">
+              <Button
+                onClick={() => setIsPricingModalOpen(true)}
+                variant="outline"
+                className="border-green-500/30 transition-all duration-300 bg-green-600 hover:bg-green-500 text-slate-50"
+              >
                 <DollarSign className="w-4 h-4 mr-2" />
                 Pricing
               </Button>
@@ -79,7 +120,10 @@ const AIMockInterview = () => {
           {/* Form Section */}
           <div className="flex justify-center">
             <div className="w-full max-w-lg">
-              <AIMockInterviewForm prefillData={prefillData} />
+              <AIMockInterviewForm 
+                prefillData={prefillData} 
+                sessionManager={sessionManager}
+              />
             </div>
           </div>
 
@@ -96,12 +140,19 @@ const AIMockInterview = () => {
         </div>
 
         {/* Reports Modal */}
-        <GraceInterviewReportsModal isOpen={isReportsModalOpen} onClose={() => setIsReportsModalOpen(false)} />
+        <GraceInterviewReportsModal
+          isOpen={isReportsModalOpen}
+          onClose={() => setIsReportsModalOpen(false)}
+        />
         
         {/* Pricing Modal */}
-        <AIInterviewPricingModal isOpen={isPricingModalOpen} onClose={() => setIsPricingModalOpen(false)} />
+        <AIInterviewPricingModal
+          isOpen={isPricingModalOpen}
+          onClose={() => setIsPricingModalOpen(false)}
+        />
       </div>
-    </Layout>;
+    </Layout>
+  );
 };
 
 export default AIMockInterview;

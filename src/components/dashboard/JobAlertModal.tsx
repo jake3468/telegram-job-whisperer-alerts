@@ -26,7 +26,6 @@ interface JobAlertModalProps {
   onSubmit: () => void;
   currentAlertCount: number;
   maxAlerts: number;
-  updateActivity?: () => void;
 }
 
 const JobAlertModal = ({
@@ -36,8 +35,7 @@ const JobAlertModal = ({
   editingAlert,
   onSubmit,
   currentAlertCount,
-  maxAlerts,
-  updateActivity
+  maxAlerts
 }: JobAlertModalProps) => {
   const handleFormSubmit = () => {
     onSubmit();
@@ -48,8 +46,12 @@ const JobAlertModal = ({
     onClose();
   };
 
+  const handleModalClose = () => {
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleModalClose}>
       <DialogContent className="left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[calc(100vw-32px)] max-w-[calc(100vw-32px)] sm:max-w-2xl max-h-[90vh] flex flex-col bg-gradient-to-br from-orange-900/95 via-[#3c1c01]/90 to-[#2b1605]/95 border-2 border-orange-500/70 rounded-2xl p-0">
         {/* Fixed Header */}
         <DialogHeader className="flex-shrink-0 p-3 sm:p-4 pb-2 relative">
@@ -57,7 +59,7 @@ const JobAlertModal = ({
             {editingAlert ? 'Edit Job Alert' : 'Create New Job Alert'}
           </DialogTitle>
           <DialogClose 
-            onClick={onClose}
+            onClick={handleModalClose}
             className="absolute right-3 top-3 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
           >
             <X className="h-4 w-4 text-white" />
@@ -74,7 +76,6 @@ const JobAlertModal = ({
             onCancel={handleFormCancel}
             currentAlertCount={currentAlertCount}
             maxAlerts={maxAlerts}
-            updateActivity={updateActivity}
           />
         </div>
         

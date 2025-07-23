@@ -72,7 +72,7 @@ export const useCachedJobAnalyses = () => {
             .select('*')
             .eq('user_id', userProfile.id)
             .order('created_at', { ascending: false });
-        }, 'fetch job analyses');
+        }, { operationType: 'fetch job analyses' });
 
         if (error) {
           console.error('Error fetching job analyses history:', error);

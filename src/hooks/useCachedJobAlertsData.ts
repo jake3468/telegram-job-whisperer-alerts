@@ -1,9 +1,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
-import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/logger';
-import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 interface JobAlert {
   id: string;
@@ -24,9 +23,11 @@ interface CachedJobAlertsData {
   isActivated: boolean;
   userProfileId: string;
   timestamp: number;
+  version: string; // Add version field
 }
 
 const CACHE_KEY = 'aspirely_job_alerts_cache';
+const CACHE_VERSION = 'v5'; // Fixed RLS policies
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes for fresh data
 const BACKGROUND_REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes - professional standard
 let isRefreshing = false; // Request deduplication flag
@@ -34,7 +35,6 @@ let isRefreshing = false; // Request deduplication flag
 export const useCachedJobAlertsData = () => {
   const { user } = useUser();
   const { getToken } = useAuth();
-  const { isAuthReady, executeWithRetry } = useEnterpriseAuth();
   const [alerts, setAlerts] = useState<JobAlert[]>([]);
   const [isActivated, setIsActivated] = useState<boolean>(false);
   const [userProfileId, setUserProfileId] = useState<string | null>(null);
@@ -42,13 +42,19 @@ export const useCachedJobAlertsData = () => {
   const [error, setError] = useState<string | null>(null);
   const [connectionIssue, setConnectionIssue] = useState(false);
 
-  // Load cached data immediately on mount
+  // Load cached data immediately on mount with version check
   useEffect(() => {
     try {
       const cached = localStorage.getItem(CACHE_KEY);
       if (cached) {
         const parsedCache: CachedJobAlertsData = JSON.parse(cached);
         const now = Date.now();
+        
+        // Check cache version - invalidate old versions
+        if (parsedCache.version !== CACHE_VERSION) {
+          localStorage.removeItem(CACHE_KEY);
+          return;
+        }
         
         // Use cached data if it's less than cache duration old
         if (now - parsedCache.timestamp < CACHE_DURATION) {
@@ -67,26 +73,8 @@ export const useCachedJobAlertsData = () => {
     }
   }, []);
 
-  // Professional token refresh every 25 minutes (not 5 minutes!)
-  useEffect(() => {
-    if (!user || !isAuthReady) return;
 
-    const tokenRefreshInterval = setInterval(async () => {
-      try {
-        // Only refresh if user is active and no pending operations
-        if (document.visibilityState === 'visible') {
-          await getToken({ skipCache: true });
-          logger.debug('Scheduled token refresh completed');
-        }
-      } catch (error) {
-        logger.warn('Scheduled token refresh failed:', error);
-      }
-    }, 25 * 60 * 1000); // 25 minutes - professional standard
-
-    return () => clearInterval(tokenRefreshInterval);
-  }, [user?.id, isAuthReady, getToken]);
-
-  // Fetch fresh data when user changes or auth becomes ready
+  // Fetch fresh data when user changes
   useEffect(() => {
     if (!user) {
       setLoading(false);
@@ -99,7 +87,10 @@ export const useCachedJobAlertsData = () => {
       try {
         const parsedCache: CachedJobAlertsData = JSON.parse(cached);
         const now = Date.now();
-        if (now - parsedCache.timestamp < CACHE_DURATION) {
+        // Check cache version before using
+        if (parsedCache.version !== CACHE_VERSION) {
+          localStorage.removeItem(CACHE_KEY);
+        } else if (now - parsedCache.timestamp < CACHE_DURATION) {
           setLoading(false);
           return;
         }
@@ -108,22 +99,19 @@ export const useCachedJobAlertsData = () => {
       }
     }
     
-    if (isAuthReady) {
-      fetchJobAlertsData();
-    }
-  }, [user?.id, isAuthReady]);
+    fetchJobAlertsData();
+  }, [user?.id]);
 
-  // Background auto-refresh like professional sites (Google, Amazon)
+  // Background auto-refresh
   useEffect(() => {
-    if (!user || !isAuthReady) return;
+    if (!user) return;
 
     const backgroundRefreshInterval = setInterval(() => {
-      // Silent background refresh
       fetchJobAlertsData(true);
     }, BACKGROUND_REFRESH_INTERVAL);
 
     return () => clearInterval(backgroundRefreshInterval);
-  }, [user?.id, isAuthReady]);
+  }, [user?.id]);
 
   // Fallback timeout for loading state
   useEffect(() => {
@@ -141,9 +129,7 @@ export const useCachedJobAlertsData = () => {
   }, [loading, user, alerts.length, userProfileId]);
 
   const fetchJobAlertsData = useCallback(async (silent = false) => {
-    if (!user) return;
-    
-    if (!isAuthReady) {
+    if (!user) {
       return;
     }
     
@@ -160,67 +146,41 @@ export const useCachedJobAlertsData = () => {
         setConnectionIssue(false);
       }
       
-      const result = await executeWithRetry(
-        async () => {
-          // Don't refresh token unnecessarily - Clerk handles this automatically
-          // const token = await getToken({ skipCache: true });
-          // if (!token) {
-          //   throw new Error('Authentication token not available');
-          // }
+      // Simple direct Supabase calls without enterprise wrapper
+      const token = await getToken();
+      if (!token) {
+        throw new Error('Unable to get authentication token');
+      }
+      
+      // Get user profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('user_profile')
+        .select('id, bot_activated')
+        .maybeSingle();
+        
+      if (profileError) {
+        throw new Error(`Profile fetch failed: ${profileError.message}`);
+      }
+      
+      if (!profileData) {
+        throw new Error('User profile not found. Please try signing out and back in.');
+      }
 
-          // Get user's database ID
-          const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('id')
-            .eq('clerk_id', user.id)
-            .maybeSingle();
-            
-          if (userError) {
-            logger.error('User fetch error:', userError);
-            throw new Error('Failed to fetch user data');
-          }
-          
-          if (!userData) {
-            throw new Error('User not found in database');
-          }
+      // Fetch job alerts
+      const { data: alertsData, error: alertsError } = await supabase
+        .from('job_alerts')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-          // Get user profile
-          const { data: profileData, error: profileError } = await supabase
-            .from('user_profile')
-            .select('id, bot_activated')
-            .eq('user_id', userData.id)
-            .maybeSingle();
-            
-          if (profileError) {
-            logger.error('Profile fetch error:', profileError);
-            throw new Error('Failed to fetch profile data');
-          }
-          
-          if (!profileData) {
-            throw new Error('User profile not found');
-          }
+      if (alertsError) {
+        throw alertsError;
+      }
 
-          // Fetch job alerts
-          const { data: alertsData, error: alertsError } = await supabase
-            .from('job_alerts')
-            .select('*')
-            .eq('user_id', profileData.id)
-            .order('created_at', { ascending: false });
-
-          if (alertsError) {
-            logger.error('Alerts fetch error:', alertsError);
-            throw new Error('Failed to fetch job alerts');
-          }
-
-          return {
-            alerts: alertsData || [],
-            botActivated: profileData.bot_activated || false,
-            userProfileId: profileData.id
-          };
-        },
-        5, // 5 retry attempts with exponential backoff
-        'Fetching job alerts data'
-      );
+      const result = {
+        alerts: alertsData || [],
+        botActivated: profileData.bot_activated || false,
+        userProfileId: profileData.id
+      };
 
       // Update state
       setAlerts(result.alerts);
@@ -233,17 +193,15 @@ export const useCachedJobAlertsData = () => {
           alerts: result.alerts,
           isActivated: result.botActivated,
           userProfileId: result.userProfileId,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          version: CACHE_VERSION
         };
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-        logger.debug('Cached fresh job alerts data:', cacheData);
       } catch (cacheError) {
         logger.warn('Failed to cache job alerts data:', cacheError);
       }
 
     } catch (error) {
-      logger.error('Error fetching job alerts data:', error);
-      
       if (!silent) {
         setError(error instanceof Error ? error.message : 'Unknown error occurred');
         
@@ -258,7 +216,7 @@ export const useCachedJobAlertsData = () => {
         setLoading(false);
       }
     }
-  }, [user, isAuthReady, executeWithRetry, alerts.length]);
+  }, [user, getToken, alerts.length]);
 
   const invalidateCache = () => {
     localStorage.removeItem(CACHE_KEY);
@@ -277,29 +235,24 @@ export const useCachedJobAlertsData = () => {
     await fetchJobAlertsData();
   };
 
-  // Enhanced delete function with retry logic
+  // Simple delete function
   const deleteJobAlert = async (alertId: string) => {
-    if (!isAuthReady) {
-      throw new Error('Authentication not ready, please wait...');
+    const token = await getToken();
+    if (!token) {
+      throw new Error('Unable to get authentication token');
     }
 
-    return await executeWithRetry(
-      async () => {
-        const { error } = await supabase
-          .from('job_alerts')
-          .delete()
-          .eq('id', alertId);
-        
-        if (error) throw error;
-        
-        // Optimistically remove from local state
-        setAlerts(prev => prev.filter(alert => alert.id !== alertId));
-        
-        return true;
-      },
-      3,
-      `Deleting job alert ${alertId}`
-    );
+    const { error } = await supabase
+      .from('job_alerts')
+      .delete()
+      .eq('id', alertId);
+    
+    if (error) throw error;
+    
+    // Optimistically remove from local state
+    setAlerts(prev => prev.filter(alert => alert.id !== alertId));
+    
+    return true;
   };
 
   return {
@@ -309,12 +262,10 @@ export const useCachedJobAlertsData = () => {
     loading,
     error,
     connectionIssue,
-    isAuthReady,
     refetch: fetchJobAlertsData,
     optimisticAdd,
     invalidateCache,
     forceRefresh,
-    deleteJobAlert,
-    executeWithRetry
+    deleteJobAlert
   };
 };

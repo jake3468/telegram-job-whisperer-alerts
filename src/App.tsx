@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +8,8 @@ import { HelmetProvider } from "react-helmet-async";
 import { useClerkSupabaseSync } from "@/hooks/useClerkSupabaseSync";
 import { useAuth } from "@clerk/clerk-react";
 import { useEffect } from "react";
+import { useEnhancedTokenManagerIntegration } from "@/hooks/useEnhancedTokenManagerIntegration";
+import { useLocation } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import JobGuide from "./pages/JobGuide";
@@ -55,9 +58,18 @@ const LoadingScreen = () => (
 // Component to initialize Clerk-Supabase sync
 const AppWithSync = () => {
   const { isLoaded, isSignedIn } = useAuth();
+  const location = useLocation();
   
   // Initialize sync in background without blocking UI
   useClerkSupabaseSync();
+  
+  // Skip enterprise features for job-alerts page to prevent debug messages
+  const shouldUseEnterpriseFeatures = !location.pathname.includes('/job-alerts');
+  
+  // Always call the hook but pass conditions to it - this fixes the hook ordering issue
+  useEnhancedTokenManagerIntegration({
+    enabled: shouldUseEnterpriseFeatures && isLoaded && isSignedIn
+  });
   
   // Hide initial loader once React is ready
   useEffect(() => {

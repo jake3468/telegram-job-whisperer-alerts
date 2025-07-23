@@ -163,7 +163,7 @@ export const useTransactionHistory = () => {
               id: payment.id,
               type: payment.event_type,
               amount: creditsDisplay,
-              description: `${product?.product_name || 'Product purchase'} - ${payment.status}`,
+              description: `${(product as any)?.product_name || 'Product purchase'} - ${payment.status}`,
               date: payment.created_at,
               balanceAfter: null,
               featureUsed: null,
@@ -175,8 +175,8 @@ export const useTransactionHistory = () => {
               credits_awarded: payment.credits_awarded,
               created_at: payment.created_at,
               paymentDetails: {
-                product_name: product?.product_name || null,
-                product_type: product?.product_type || null,
+                product_name: (product as any)?.product_name || null,
+                product_type: (product as any)?.product_type || null,
                 price_amount: Number(payment.amount || 0),
                 currency: payment.currency,
                 status: payment.status

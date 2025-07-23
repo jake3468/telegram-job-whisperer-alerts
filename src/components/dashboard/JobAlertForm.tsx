@@ -7,8 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { countries } from '@/data/countries';
@@ -40,9 +40,9 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   const { user } = useUser();
   const { getToken } = useAuth();
   const { toast } = useToast();
-  const { executeWithRetry, optimisticAdd, isAuthReady, userProfileId } = useCachedJobAlertsData();
+  const { optimisticAdd, userProfileId } = useCachedJobAlertsData();
+  
   const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [countryOpen, setCountryOpen] = useState(false);
   const [formData, setFormData] = useState({
     country: '',
@@ -77,28 +77,29 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateActivity?.();
+    setLoading(true);
     
-    // Professional-grade validation
-    if (!user || !isAuthReady) {
-      // Show loading state instead of error for better UX
+    // Basic validation
+    if (!user) {
       toast({
-        title: "Initializing...",
-        description: "Please wait a moment while we prepare your session.",
+        title: "Authentication required",
+        description: "Please sign in to continue.",
+        variant: "destructive"
       });
+      setLoading(false);
       return;
     }
 
-    // Use cached userProfileId for better performance
     if (!userProfileId) {
       toast({
-        title: "Initializing...",
-        description: "Loading your profile data...",
+        title: "Loading profile...",
+        description: "Please wait while we load your profile data.",
       });
+      setLoading(false);
       return;
     }
 
-    // Check alert limit for new alerts
+    // Check alert limit for new alerts BEFORE making the API call
     if (!editingAlert && currentAlertCount >= maxAlerts) {
       toast({
         title: "Alert limit reached",
@@ -108,80 +109,61 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
       return;
     }
 
-    setSubmitting(true);
-    setLoading(true);
-    
     try {
-      // Professional-grade operation with retry logic
-      const result = await executeWithRetry(
-        async () => {
-          // Clerk automatically handles token refresh - no need to force it
+      const token = await getToken();
+      if (!token) {
+        throw new Error('Unable to get authentication token');
+      }
 
-          if (editingAlert) {
-            // Update existing alert - streamlined operation
-            const { error } = await supabase
-              .from('job_alerts')
-              .update({
-                country: formData.country.toLowerCase(),
-                country_name: formData.country_name,
-                location: formData.location,
-                job_title: formData.job_title,
-                job_type: formData.job_type,
-                alert_frequency: formData.alert_frequency,
-                preferred_time: formData.preferred_time,
-                timezone: formData.timezone
-              })
-              .eq('id', editingAlert.id);
+      if (editingAlert) {
+        // Update existing alert
+        const { error } = await supabase
+          .from('job_alerts')
+          .update({
+            country: formData.country.toLowerCase(),
+            country_name: formData.country_name,
+            location: formData.location,
+            job_title: formData.job_title,
+            job_type: formData.job_type,
+            alert_frequency: formData.alert_frequency,
+            preferred_time: formData.preferred_time,
+            timezone: formData.timezone
+          })
+          .eq('id', editingAlert.id);
 
-            if (error) {
-              throw new Error('UPDATE_FAILED');
-            }
-            
-            return { type: 'update' };
-          } else {
-            // Create new alert - streamlined operation using cached userProfileId
-            const newAlertData = {
-              user_id: userProfileId,
-              country: formData.country.toLowerCase(),
-              country_name: formData.country_name,
-              location: formData.location,
-              job_title: formData.job_title,
-              job_type: formData.job_type,
-              alert_frequency: formData.alert_frequency,
-              preferred_time: formData.preferred_time,
-              timezone: formData.timezone
-            };
-
-            const { data, error } = await supabase
-              .from('job_alerts')
-              .insert(newAlertData)
-              .select()
-              .single();
-
-            if (error) {
-              if (error.message && error.message.includes('Maximum of 3 job alerts allowed')) {
-                throw new Error('ALERT_LIMIT_REACHED');
-              }
-              throw new Error('CREATE_FAILED');
-            }
-
-            return { type: 'create', data };
-          }
-        },
-        7, // More aggressive retry attempts
-        editingAlert ? 'Updating job alert' : 'Creating job alert'
-      );
-
-      // Handle success with professional messaging
-      if (result.type === 'update') {
+        if (error) {
+          throw error;
+        }
+        
         toast({
           title: "Alert Updated",
           description: "Your job alert has been updated successfully.",
         });
       } else {
+        // Create new alert
+        const { data, error } = await supabase
+          .from('job_alerts')
+          .insert({
+            user_id: userProfileId,
+            country: formData.country.toLowerCase(),
+            country_name: formData.country_name,
+            location: formData.location,
+            job_title: formData.job_title,
+            job_type: formData.job_type,
+            alert_frequency: formData.alert_frequency,
+            preferred_time: formData.preferred_time,
+            timezone: formData.timezone
+          })
+          .select()
+          .single();
+
+        if (error) {
+          throw error;
+        }
+
         // Optimistic UI update for immediate feedback
-        if (result.data) {
-          optimisticAdd(result.data);
+        if (data) {
+          optimisticAdd(data as any);
         }
         
         toast({
@@ -192,55 +174,18 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
 
       onSubmit();
     } catch (error) {
-      // Professional error handling - never show technical errors to users
-      console.error('Form submission error:', error);
-      
-      if (error instanceof Error) {
-        switch (error.message) {
-          case 'ALERT_LIMIT_REACHED':
-            toast({
-              title: "Alert limit reached",
-              description: `You can only create up to ${maxAlerts} job alerts. Please delete an existing alert to create a new one.`,
-              variant: "destructive"
-            });
-            break;
-          case 'UPDATE_FAILED':
-            toast({
-              title: "Unable to update",
-              description: "Please check your connection and try again.",
-              variant: "destructive",
-            });
-            break;
-          case 'CREATE_FAILED':
-            toast({
-              title: "Unable to create alert",
-              description: "Please check your connection and try again.",
-              variant: "destructive",
-            });
-            break;
-          default:
-            // Never show technical authentication errors - provide professional message
-            toast({
-              title: "Temporary issue",
-              description: "Please wait a moment and try again. If the issue persists, please refresh the page.",
-              variant: "destructive",
-            });
-        }
-      } else {
-        toast({
-          title: "Temporary issue",
-          description: "Please wait a moment and try again.",
-          variant: "destructive",
-        });
-      }
+      console.error('[JobAlertForm] Save error:', error);
+      toast({
+        title: editingAlert ? "Update failed" : "Save failed",
+        description: "Please try again",
+        variant: "destructive",
+      });
     } finally {
-      setSubmitting(false);
       setLoading(false);
     }
   };
 
   const handleInputChange = (field: string, value: string | number) => {
-    updateActivity?.();
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -248,7 +193,6 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   };
 
   const handleCountryChange = (countryCode: string, countryName: string) => {
-    updateActivity?.();
     setFormData(prev => ({
       ...prev,
       country: countryCode,
@@ -262,7 +206,8 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3" onClick={updateActivity} onKeyDown={updateActivity}>
+    <div className="space-y-2 sm:space-y-3">
+      <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3">
       {/* Alert limit warning */}
       {!editingAlert && currentAlertCount >= maxAlerts - 1 && (
         <div className="bg-yellow-900/50 border border-yellow-500/50 rounded-lg p-2 mb-3">
@@ -405,10 +350,10 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
       <div className="flex flex-col gap-2 pt-3 sticky bottom-0 bg-gradient-to-br from-orange-900/95 via-[#3c1c01]/90 to-[#2b1605]/95 pb-2">
         <Button 
           type="submit" 
-          disabled={loading || submitting || (!editingAlert && currentAlertCount >= maxAlerts)} 
+          disabled={loading || (!editingAlert && currentAlertCount >= maxAlerts)}
           className="w-full font-inter bg-pastel-lavender hover:bg-pastel-lavender/80 text-black font-medium text-xs px-3 py-2 h-8 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {submitting ? (
+          {loading ? (
             <>
               <Loader2 className="w-3 h-3 mr-2 animate-spin" />
               Saving...
@@ -421,13 +366,14 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
           type="button" 
           variant="outline" 
           onClick={onCancel} 
-          disabled={submitting}
+          disabled={loading}
           className="w-full font-inter border-gray-500 hover:border-gray-400 text-gray-950 bg-pastel-peach text-xs px-3 py-2 h-8"
         >
           Cancel
         </Button>
       </div>
     </form>
+    </div>
   );
 };
 

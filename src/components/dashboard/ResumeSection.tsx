@@ -1,110 +1,127 @@
+
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Upload, FileText, Trash2 } from 'lucide-react';
-const ResumeSection = () => {
-  const {
-    user
-  } = useUser();
-  const {
-    toast
-  } = useToast();
-  const {
-    resumeExists,
-    updateResumeStatus
-  } = useCachedUserProfile();
+import { useEnhancedTokenManagerIntegration } from '@/hooks/useEnhancedTokenManagerIntegration';
+import { makeAuthenticatedRequest } from '@/integrations/supabase/client';
+
+interface ResumeSectionProps {
+  updateActivity?: () => void;
+}
+
+const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
+  const { user } = useUser();
+  const { toast } = useToast();
+  const { userProfile, resumeExists, updateResumeStatus, updateUserProfile } = useCachedUserProfile();
   const [uploading, setUploading] = useState(false);
   const [resumeUrl, setResumeUrl] = useState<string | null>(null);
+
+  // Enhanced token management
+  const sessionManager = useEnhancedTokenManagerIntegration();
+
   useEffect(() => {
     if (user && !resumeExists) {
-      // Only check for resume if we don't have cached status
       checkExistingResume();
     } else if (resumeExists && user) {
-      // If we know resume exists, set the URL immediately
       const fileName = `${user.id}/resume.pdf`;
-      const {
-        data: urlData
-      } = supabase.storage.from('resumes').getPublicUrl(fileName);
-      setResumeUrl(urlData.publicUrl);
+      // This is a public URL generation, no auth needed
+      const publicUrl = `https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/resumes/${fileName}`;
+      setResumeUrl(publicUrl);
     }
   }, [user, resumeExists]);
+
   const checkExistingResume = async () => {
-    if (!user) return;
+    if (!user || !sessionManager) return;
     try {
-      const fileName = `${user.id}/resume.pdf`;
-      const {
-        data,
-        error
-      } = await supabase.storage.from('resumes').list(user.id, {
-        limit: 1,
-        search: 'resume.pdf'
+      updateActivity?.();
+      
+      await makeAuthenticatedRequest(async () => {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data, error } = await supabase.storage
+          .from('resumes')
+          .list(user.id, {
+            limit: 1,
+            search: 'resume.pdf'
+          });
+
+        if (error) {
+          console.error('Error checking existing resume:', error);
+          return;
+        }
+
+        if (data && data.length > 0) {
+          const fileName = `${user.id}/resume.pdf`;
+          const publicUrl = `https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/resumes/${fileName}`;
+          setResumeUrl(publicUrl);
+          updateResumeStatus(true);
+        } else {
+          updateResumeStatus(false);
+        }
       });
-      if (error) {
-        console.error('Error checking existing resume:', error);
-        return;
-      }
-      if (data && data.length > 0) {
-        const {
-          data: urlData
-        } = supabase.storage.from('resumes').getPublicUrl(fileName);
-        setResumeUrl(urlData.publicUrl);
-        updateResumeStatus(true); // Cache that resume exists
-      } else {
-        updateResumeStatus(false); // Cache that resume doesn't exist
-      }
     } catch (error) {
       console.error('Error checking existing resume:', error);
     }
   };
-  const callResumeWebhook = async (fileUrl: string, fileName: string, fileSize: number) => {
-    try {
-      console.log('Calling resume PDF webhook...');
 
-      // Get user data for the webhook payload
-      const {
-        data: userData,
-        error: userError
-      } = await supabase.from('users').select('*').eq('clerk_id', user?.id).single();
-      if (userError) {
-        console.error('Error fetching user data for webhook:', userError);
-        return;
-      }
-      const payload = {
-        event_type: 'resume_uploaded',
-        user: {
-          id: userData.id,
-          clerk_id: userData.clerk_id,
-          email: userData.email,
-          first_name: userData.first_name,
-          last_name: userData.last_name
-        },
-        resume: {
-          file_url: fileUrl,
-          file_name: fileName,
-          file_size: fileSize,
-          uploaded_at: new Date().toISOString()
-        },
-        timestamp: new Date().toISOString()
-      };
-      const {
-        error: webhookError
-      } = await supabase.functions.invoke('resume-pdf-webhook', {
-        body: payload
+  const callResumeWebhook = async (fileUrl: string, fileName: string, fileSize: number) => {
+    if (!sessionManager) return;
+    
+    try {
+      console.log('Calling resume webhook with:', {
+        fileUrl,
+        fileName,
+        fileSize,
+        userId: user?.id
       });
-      if (webhookError) {
-        console.error('Error calling resume webhook:', webhookError);
-      }
+
+      await makeAuthenticatedRequest(async () => {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data, error } = await supabase.functions.invoke('resume-pdf-webhook', {
+          body: {
+            fileUrl,
+            fileName,
+            fileSize,
+            userId: user?.id,
+            timestamp: new Date().toISOString()
+          }
+        });
+
+        if (error) {
+          console.error('Webhook call failed:', error);
+          toast({
+            title: "Processing Warning",
+            description: "Resume uploaded but processing may be delayed.",
+            variant: "destructive"
+          });
+        } else {
+          console.log('Webhook called successfully:', data);
+          toast({
+            title: "Processing Started",
+            description: "Your resume is being processed.",
+            duration: 2000
+          });
+        }
+      });
     } catch (error) {
-      console.error('Error in resume webhook call:', error);
+      console.error('Webhook error:', error);
+      toast({
+        title: "Processing Error",
+        description: "Failed to start resume processing.",
+        variant: "destructive"
+      });
     }
   };
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file || !user) return;
+    if (!file || !user || !sessionManager) return;
+
+    updateActivity?.();
+
     if (file.type !== 'application/pdf') {
       toast({
         title: "Invalid file type",
@@ -113,6 +130,7 @@ const ResumeSection = () => {
       });
       return;
     }
+
     if (file.size > 5 * 1024 * 1024) {
       toast({
         title: "File too large",
@@ -121,37 +139,60 @@ const ResumeSection = () => {
       });
       return;
     }
+
     if (uploading) return;
+
     setUploading(true);
     try {
-      const fileName = `${user.id}/resume.pdf`;
-      const {
-        error: uploadError
-      } = await supabase.storage.from('resumes').upload(fileName, file, {
-        upsert: true
+      await makeAuthenticatedRequest(async () => {
+        const { supabase } = await import('@/integrations/supabase/client');
+        
+        // Check for existing resume and delete if exists
+        const existingResumePath = `${user.id}/resume.pdf`;
+        await supabase.storage.from('resumes').remove([existingResumePath]);
+
+        // Upload new file
+        const filePath = `${user.id}/resume.pdf`;
+        const { error: uploadError } = await supabase.storage
+          .from('resumes')
+          .upload(filePath, file, {
+            upsert: true,
+            contentType: 'application/pdf'
+          });
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        // Get public URL for the uploaded file
+        const publicUrl = `https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/resumes/${filePath}`;
+        setResumeUrl(publicUrl);
+
+        // Update resume status in cache
+        updateResumeStatus(true);
+
+        return publicUrl;
       });
-      if (uploadError) {
-        toast({
-          title: "Upload failed",
-          description: `Error: ${uploadError.message}`,
-          variant: "destructive"
-        });
-        throw uploadError;
-      }
-      const {
-        data
-      } = supabase.storage.from('resumes').getPublicUrl(fileName);
-      setResumeUrl(data.publicUrl);
-      updateResumeStatus(true); // Cache that resume now exists
-      await callResumeWebhook(data.publicUrl, file.name, file.size);
+
+      // Update user profile with filename and upload timestamp
+      await updateUserProfile({
+        resume_filename: file.name,
+        resume_uploaded_at: new Date().toISOString()
+      });
+
+      // Call the webhook to process the resume
+      const publicUrl = `https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/resumes/${user.id}/resume.pdf`;
+      await callResumeWebhook(publicUrl, file.name, file.size);
+
       toast({
         title: "Resume uploaded successfully",
-        description: "Your resume has been saved."
+        description: "Your resume has been uploaded and is being processed."
       });
     } catch (error) {
+      console.error('Upload error:', error);
       toast({
         title: "Upload failed",
-        description: "There was an error uploading your resume. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to upload resume",
         variant: "destructive"
       });
     } finally {
@@ -159,35 +200,108 @@ const ResumeSection = () => {
       event.target.value = '';
     }
   };
+
   const handleDeleteResume = async () => {
-    if (!user) return;
+    if (!user || !sessionManager) return;
+    
+    updateActivity?.();
+    
     try {
-      const fileName = `${user.id}/resume.pdf`;
-      const {
-        error
-      } = await supabase.storage.from('resumes').remove([fileName]);
-      if (error) throw error;
+      setUploading(true);
+
+      await makeAuthenticatedRequest(async () => {
+        const { supabase } = await import('@/integrations/supabase/client');
+        
+        // Delete from Supabase storage
+        const filePath = `${user.id}/resume.pdf`;
+        const { error } = await supabase.storage
+          .from('resumes')
+          .remove([filePath]);
+
+        if (error) {
+          throw error;
+        }
+      });
+
+      // Clear filename and upload timestamp from user profile
+      await updateUserProfile({
+        resume_filename: null,
+        resume_uploaded_at: null
+      });
+
       setResumeUrl(null);
-      updateResumeStatus(false); // Cache that resume no longer exists
+      // Update resume status
+      updateResumeStatus(false);
+      
       toast({
         title: "Resume deleted",
-        description: "Your resume has been removed."
+        description: "Your resume has been deleted successfully."
       });
     } catch (error) {
+      console.error('Delete error:', error);
       toast({
         title: "Delete failed",
-        description: "There was an error deleting your resume.",
+        description: error instanceof Error ? error.message : "Failed to delete resume",
         variant: "destructive"
       });
+    } finally {
+      setUploading(false);
     }
   };
+
   const triggerFileInput = () => {
-    if (!uploading) {
+    if (!uploading && sessionManager) {
+      updateActivity?.();
       const fileInput = document.getElementById('resume-upload') as HTMLInputElement;
       fileInput?.click();
     }
   };
-  return <section className="p-0 rounded-none bg-transparent shadow-none">
+
+  // Helper function to format upload date
+  const formatUploadDate = (dateString: string | null) => {
+    if (!dateString) return 'Uploaded recently';
+    
+    try {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+      
+      if (diffInHours < 1) {
+        return 'Uploaded recently';
+      } else if (diffInHours < 24) {
+        return `Uploaded ${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+      } else {
+        const diffInDays = Math.floor(diffInHours / 24);
+        if (diffInDays < 7) {
+          return `Uploaded ${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+        } else {
+          return `Uploaded on ${date.toLocaleDateString()}`;
+        }
+      }
+    } catch {
+      return 'Uploaded recently';
+    }
+  };
+
+  // Get display filename - use actual filename if available, otherwise default
+  const getDisplayFilename = () => {
+    if (userProfile?.resume_filename) {
+      return userProfile.resume_filename;
+    }
+    return 'resume.pdf';
+  };
+
+  // Get display upload date
+  const getDisplayUploadDate = () => {
+    if (userProfile?.resume_uploaded_at) {
+      const date = new Date(userProfile.resume_uploaded_at);
+      return date.toLocaleDateString('en-GB'); // dd/mm/yyyy format
+    }
+    return 'Uploaded recently';
+  };
+
+  return (
+    <section className="p-0 rounded-none bg-transparent shadow-none">
       <Card className="
           rounded-3xl border-2 border-purple-400/80 
           bg-gradient-to-br from-purple-600/90 via-purple-700/85 to-purple-900/90
@@ -204,31 +318,44 @@ const ResumeSection = () => {
           <CardDescription className="text-white/95 font-inter font-normal drop-shadow-[0_2px_10px_rgba(147,51,234,0.4)] text-sm">Upload your resume (PDF, max 5MB) so our AI can better understand your background and personalize your experience</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 pt-0">
-          {resumeUrl ? <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-xl border border-white/20 bg-black/70 shadow-inner">
+          {resumeUrl ? (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-xl border border-white/20 bg-black/70 shadow-inner">
               <div className="flex items-center gap-2 min-w-0">
                 <div className="w-8 h-8 bg-purple-500/60 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple-500/40">
                   <FileText className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-white font-inter font-semibold text-base truncate">resume.pdf</span>
+                <div className="min-w-0 flex-1">
+                  <span className="text-white font-inter font-medium text-sm break-words block leading-tight">
+                    {getDisplayFilename()}
+                  </span>
+                  <span className="text-white/70 text-xs">
+                    {getDisplayUploadDate()}
+                  </span>
+                </div>
               </div>
-              <Button variant="destructive" size="sm" onClick={handleDeleteResume} className="font-inter bg-red-500 hover:bg-red-600 transition-all text-xs px-4 py-1 h-8 flex-shrink-0 rounded-lg">
+              <Button variant="destructive" size="sm" onClick={handleDeleteResume} disabled={uploading || !sessionManager} className="font-inter bg-red-500 hover:bg-red-600 transition-all text-xs px-4 py-1 h-8 flex-shrink-0 rounded-lg">
                 <Trash2 className="w-3 h-3 mr-1" />
                 Delete
               </Button>
-            </div> : <div className="border-2 border-dashed border-white/70 rounded-xl p-5 sm:p-8 text-center cursor-pointer hover:border-purple-300 hover:bg-purple-400/15 transition-all duration-300 bg-black/60 shadow-inner" onClick={triggerFileInput}>
+            </div>
+          ) : (
+            <div className="border-2 border-dashed border-white/70 rounded-xl p-5 sm:p-8 text-center cursor-pointer hover:border-purple-300 hover:bg-purple-400/15 transition-all duration-300 bg-black/60 shadow-inner" onClick={triggerFileInput}>
               <div className="w-14 h-14 bg-purple-500/50 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg shadow-purple-500/30">
                 <Upload className="w-7 h-7 text-purple-100" />
               </div>
-              <p className="text-white font-inter mb-4 font-semibold text-base">
+              <p className="text-white font-inter mb-4 font-semibold text-sm">
                 Click to upload or drag and drop your resume
               </p>
-              <Button disabled={uploading} className="font-inter bg-white text-purple-700 hover:bg-purple-50 font-bold text-xs px-4 py-2 h-9 rounded-lg shadow-lg shadow-purple-500/20">
+              <Button disabled={uploading || !sessionManager} className="font-inter bg-white text-purple-700 hover:bg-purple-50 font-bold px-4 py-2 h-9 rounded-lg shadow-lg shadow-purple-500/20 text-xs">
                 {uploading ? 'Uploading...' : 'Upload Resume'}
               </Button>
-              <input id="resume-upload" type="file" accept=".pdf" onChange={handleFileUpload} className="hidden" disabled={uploading} />
-            </div>}
+              <input id="resume-upload" type="file" accept=".pdf" onChange={handleFileUpload} className="hidden" disabled={uploading || !sessionManager} />
+            </div>
+          )}
         </CardContent>
       </Card>
-    </section>;
+    </section>
+  );
 };
+
 export default ResumeSection;

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 import AuthHeader from '@/components/AuthHeader';
 import ResumeSection from '@/components/dashboard/ResumeSection';
-import BioSection from '@/components/dashboard/BioSection';
+import ProfessionalBioSection from '@/components/dashboard/ProfessionalBioSection';
 import JWTDebugPanel from '@/components/JWTDebugPanel';
 import ClerkJWTSetupGuide from '@/components/ClerkJWTSetupGuide';
 import { Layout } from '@/components/Layout';
@@ -12,39 +12,26 @@ import { useJWTDebug } from '@/hooks/useJWTDebug';
 import { Environment } from '@/utils/environment';
 import { OnboardingPopup } from '@/components/OnboardingPopup';
 import { useOnboardingPopup } from '@/hooks/useOnboardingPopup';
-import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
 import { ResumeHelpPopup } from '@/components/ResumeHelpPopup';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Wifi, WifiOff, Copy } from 'lucide-react';
+import { RefreshCw, Copy } from 'lucide-react';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useToast } from '@/hooks/use-toast';
-const Profile = () => {
-  const {
-    user,
-    isLoaded
-  } = useUser();
-  const navigate = useNavigate();
-  const {
-    isAuthReady,
-    executeWithRetry
-  } = useEnterpriseAuth();
-  const {
-    userProfile
-  } = useUserProfile();
-  const {
-    runComprehensiveJWTTest
-  } = useJWTDebug();
-  const [showJWTSetupGuide, setShowJWTSetupGuide] = useState(false);
-  const {
-    showPopup,
-    hidePopup,
-    dontShowAgain
-  } = useOnboardingPopup();
+import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
 
-  // Keep tokens fresh while user is on profile page
-  const {
-    updateActivity
-  } = useFormTokenKeepAlive(true);
+
+const Profile = () => {
+  const { user, isLoaded } = useUser();
+  const navigate = useNavigate();
+  const { isAuthReady, executeWithRetry } = useEnterpriseAuth();
+  const { userProfile } = useUserProfile();
+  const { runComprehensiveJWTTest } = useJWTDebug();
+  const [showJWTSetupGuide, setShowJWTSetupGuide] = useState(false);
+  const { showPopup, hidePopup, dontShowAgain } = useOnboardingPopup();
+  const { toast } = useToast();
+
+  // Enhanced token management for the entire Profile page
+  const { updateActivity } = useFormTokenKeepAlive(true);
 
   // Connection and error state management
   const [connectionIssue, setConnectionIssue] = useState(false);
@@ -52,25 +39,26 @@ const Profile = () => {
   const [lastJWTTestResult, setLastJWTTestResult] = useState<any>(null);
   const [profileDataLoaded, setProfileDataLoaded] = useState(false);
   const [showResumeHelp, setShowResumeHelp] = useState(false);
-  const {
-    toast
-  } = useToast();
+
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
 
-  // Enhanced JWT setup check with enterprise auth retry logic
+  // Enhanced JWT setup check with better error handling
   const checkJWTSetup = useCallback(async () => {
     if (!isLoaded || !user || !isAuthReady) return;
+    
     try {
       setError(null);
       setConnectionIssue(false);
+      
       if (Environment.isDevelopment()) {
         const testResult = await executeWithRetry(async () => {
           return await runComprehensiveJWTTest();
         }, 2, 'JWT comprehensive test');
+        
         setLastJWTTestResult(testResult);
 
         // Show setup guide if JWT is not properly configured
@@ -84,34 +72,30 @@ const Profile = () => {
       setConnectionIssue(true);
       setError('Failed to verify authentication setup');
 
-      // Keep last successful data visible
       if (!lastJWTTestResult) {
-        setProfileDataLoaded(true); // Allow graceful degradation
+        setProfileDataLoaded(true);
       }
     }
   }, [isLoaded, user, isAuthReady, runComprehensiveJWTTest, lastJWTTestResult, executeWithRetry]);
 
-  // Initial setup check with auth readiness
+  // Initial setup check with enhanced readiness
   useEffect(() => {
     if (isLoaded && user && isAuthReady) {
-      // Reduced delay for faster loading
-      setTimeout(checkJWTSetup, 500);
+      setTimeout(checkJWTSetup, 300);
     }
   }, [isLoaded, user, isAuthReady, checkJWTSetup]);
 
-  // Manual refresh function - instant refresh for better UX
+  // Manual refresh function - enhanced with token refresh
   const handleManualRefresh = useCallback(() => {
+    updateActivity(); // Track user activity
     try {
-      // For connection issues, immediately force page refresh
       if (connectionIssue) {
         window.location.reload();
         return;
       }
 
-      // Otherwise try refreshing data first and fall back if needed
       checkJWTSetup();
 
-      // Short timeout for fallback
       setTimeout(() => {
         if (connectionIssue) {
           window.location.reload();
@@ -119,13 +103,13 @@ const Profile = () => {
       }, 1000);
     } catch (err) {
       console.error('Manual refresh failed:', err);
-      // Force page refresh if all else fails
       window.location.reload();
     }
-  }, [connectionIssue, checkJWTSetup]);
+  }, [connectionIssue, checkJWTSetup, updateActivity]);
 
   // Copy user profile ID to clipboard
   const copyUserProfileId = async () => {
+    updateActivity(); // Track user activity
     if (userProfile?.id) {
       try {
         await navigator.clipboard.writeText(userProfile.id);
@@ -142,13 +126,18 @@ const Profile = () => {
       }
     }
   };
+
   if (!isLoaded || !user) {
-    return <div className="min-h-screen bg-gradient-to-br from-pastel-peach via-pastel-blue to-pastel-mint flex items-center justify-center">
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pastel-peach via-pastel-blue to-pastel-mint flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading user...</div>
-      </div>;
+      </div>
+    );
   }
-  return <Layout>
-      <div className="text-center mb-8">
+
+  return (
+    <Layout>
+      <div className="text-center mb-8" onClick={updateActivity}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex-1">
             <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-2">
@@ -160,29 +149,46 @@ const Profile = () => {
           </div>
           
           {/* Manual Refresh Button */}
-          {connectionIssue && <Button onClick={handleManualRefresh} variant="outline" size="sm" className="text-xs bg-red-900/20 border-red-400/30 text-red-300 hover:bg-red-800/30">
+          {connectionIssue && (
+            <Button 
+              onClick={handleManualRefresh} 
+              variant="outline" 
+              size="sm" 
+              className="text-xs bg-red-900/20 border-red-400/30 text-red-300 hover:bg-red-800/30"
+            >
               <RefreshCw className="w-3 h-3 mr-1" />
               Refresh
-            </Button>}
+            </Button>
+          )}
         </div>
         
         {/* Error Message */}
-        {error && <div className="bg-red-900/20 border border-red-400/30 rounded-lg p-3 mb-4">
+        {error && (
+          <div className="bg-red-900/20 border border-red-400/30 rounded-lg p-3 mb-4">
             <p className="text-red-300 text-sm">{error}</p>
-          </div>}
+          </div>
+        )}
+
       </div>
 
       {/* Show JWT Setup Guide if needed (development only) */}
-      {showJWTSetupGuide && Environment.isDevelopment() && !connectionIssue && <div className="mb-8 flex justify-center">
+      {showJWTSetupGuide && Environment.isDevelopment() && !connectionIssue && (
+        <div className="mb-8 flex justify-center">
           <ClerkJWTSetupGuide />
-        </div>}
+        </div>
+      )}
 
-      {!isAuthReady ? <div className="flex items-center justify-center min-h-[400px]">
+      {!isAuthReady ? (
+        <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center space-y-3">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-fuchsia-400 mx-auto"></div>
-            <p className="text-gray-300 text-sm">Preparing authentication...</p>
+            <p className="text-gray-300 text-sm">
+              Preparing authentication...
+            </p>
           </div>
-        </div> : <div className="max-w-4xl mx-auto space-y-8 px-4" onClick={updateActivity} onKeyDown={updateActivity}>
+        </div>
+      ) : (
+        <div className="max-w-4xl mx-auto space-y-8 px-4" onClick={updateActivity} onKeyDown={updateActivity}>
           {/* Step 1: Resume Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-3 mb-4">
@@ -191,9 +197,19 @@ const Profile = () => {
               </div>
               <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-sky-400 to-fuchsia-400 bg-clip-text text-transparent">Add Current Resume</h2>
             </div>
-            <ResumeSection />
+            <ResumeSection updateActivity={updateActivity} />
             <div className="mt-4 mb-6 text-center">
-              <Button onClick={() => setShowResumeHelp(true)} variant="outline" size="sm" className="border-sky-200 hover:border-sky-300 text-white bg-black">Need help fixing your resume ?</Button>
+              <Button 
+                onClick={() => {
+                  updateActivity();
+                  setShowResumeHelp(true);
+                }} 
+                variant="outline" 
+                size="sm" 
+                className="border-sky-200 hover:border-sky-300 text-white bg-black"
+              >
+                Need help fixing your resume ?
+              </Button>
             </div>
           </div>
 
@@ -207,7 +223,7 @@ const Profile = () => {
                 Add Your Bio
               </h2>
             </div>
-            <BioSection />
+            <ProfessionalBioSection />
           </div>
 
           {/* Step 3: Job Alerts */}
@@ -232,39 +248,74 @@ const Profile = () => {
                 <p className="text-amber-100 font-inter mb-2 text-sm">
                   When the bot asks for your Bot ID, copy and paste this:
                 </p>
-                {userProfile?.id ? <div className="flex items-center gap-2 bg-black/30 rounded-lg p-3">
+                {userProfile?.id ? (
+                  <div className="flex items-center gap-2 bg-black/30 rounded-lg p-3">
                     <code className="text-amber-200 font-mono text-sm flex-1 break-all">
                       {userProfile.id}
                     </code>
-                    <Button onClick={copyUserProfileId} variant="ghost" size="sm" className="text-amber-200 hover:text-amber-100 hover:bg-amber-900/30">
+                    <Button 
+                      onClick={copyUserProfileId} 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-amber-200 hover:text-amber-100 hover:bg-amber-900/30"
+                    >
                       <Copy className="w-4 h-4" />
                     </Button>
-                  </div> : <div className="flex items-center gap-2 bg-black/30 rounded-lg p-3">
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 bg-black/30 rounded-lg p-3">
                     <div className="flex items-center gap-2 flex-1">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-amber-200"></div>
                       <span className="text-amber-200 text-sm">Loading your Bot ID...</span>
                     </div>
-                    <Button onClick={() => window.location.reload()} variant="ghost" size="sm" className="text-amber-200 hover:text-amber-100 hover:bg-amber-900/30">
+                    <Button 
+                      onClick={() => {
+                        updateActivity();
+                        window.location.reload();
+                      }} 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-amber-200 hover:text-amber-100 hover:bg-amber-900/30"
+                    >
                       <RefreshCw className="w-4 h-4" />
                     </Button>
-                  </div>}
+                  </div>
+                )}
               </div>
               
-              <Button onClick={() => window.open('https://t.me/Job_AI_update_bot', '_blank')} className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter text-sm">
+              <Button 
+                onClick={() => {
+                  updateActivity();
+                  window.open('https://t.me/Job_AI_update_bot', '_blank');
+                }} 
+                className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter text-sm"
+              >
                 Activate my Job Alerts
               </Button>
             </div>
           </div>
-        </div>}
+        </div>
+      )}
       
       {/* JWT Debug Panel - only in development */}
       {Environment.isDevelopment() && <JWTDebugPanel />}
 
       {/* Onboarding Popup */}
-      <OnboardingPopup isOpen={showPopup} onClose={hidePopup} onDontShowAgain={dontShowAgain} userName={user.firstName || undefined} />
+      <OnboardingPopup 
+        isOpen={showPopup} 
+        onClose={hidePopup} 
+        onDontShowAgain={dontShowAgain} 
+        userName={user.firstName || undefined} 
+      />
       
       {/* Resume Help Popup */}
-      <ResumeHelpPopup isOpen={showResumeHelp} onClose={() => setShowResumeHelp(false)} userProfileId={userProfile?.id} />
-    </Layout>;
+      <ResumeHelpPopup 
+        isOpen={showResumeHelp} 
+        onClose={() => setShowResumeHelp(false)} 
+        userProfileId={userProfile?.id} 
+      />
+    </Layout>
+  );
 };
+
 export default Profile;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
-import { supabase } from '@/integrations/supabase/client';
+import { makeAuthenticatedRequest } from '@/integrations/supabase/client';
 import { logger } from '@/utils/logger';
 
 interface GraceInterviewRequest {
@@ -81,49 +81,58 @@ export const useCachedGraceInterviewRequests = () => {
       setConnectionIssue(false);
       
       // Get the user UUID from users table using clerk_id
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('clerk_id', user.id)
-        .maybeSingle();
+      const userResult = await makeAuthenticatedRequest(async () => {
+        const { supabase } = await import('@/integrations/supabase/client');
+        return await supabase
+          .from('users')
+          .select('id')
+          .eq('clerk_id', user.id)
+          .maybeSingle();
+      });
       
-      if (userError || !userData) {
+      if (userResult.error || !userResult.data) {
         throw new Error('Unable to load user data');
       }
 
       // Get user profile using the user UUID
-      const { data: userProfile, error: profileError } = await supabase
-        .from('user_profile')
-        .select('id')
-        .eq('user_id', userData.id)
-        .maybeSingle();
+      const profileResult = await makeAuthenticatedRequest(async () => {
+        const { supabase } = await import('@/integrations/supabase/client');
+        return await supabase
+          .from('user_profile')
+          .select('id')
+          .eq('user_id', userResult.data.id)
+          .maybeSingle();
+      });
       
-      if (profileError || !userProfile) {
+      if (profileResult.error || !profileResult.data) {
         throw new Error('Unable to load user profile');
       }
 
       // Get grace interview requests for this user profile
-      const { data, error } = await supabase
-        .from('grace_interview_requests')
-        .select('*')
-        .eq('user_id', userProfile.id)
-        .order('created_at', { ascending: false });
+      const result = await makeAuthenticatedRequest(async () => {
+        const { supabase } = await import('@/integrations/supabase/client');
+        return await supabase
+          .from('grace_interview_requests')
+          .select('*')
+          .eq('user_id', profileResult.data.id)
+          .order('created_at', { ascending: false });
+      });
       
-      if (error) {
+      if (result.error) {
         throw new Error('Unable to load interview requests');
       }
 
-      const requestsData = data || [];
+      const requestsData = result.data || [];
       
       // Update state
       setRequests(requestsData);
-      setUserProfileId(userProfile.id);
+      setUserProfileId(profileResult.data.id);
 
       // Cache the data
       try {
         const cacheData: CachedGraceInterviewData = {
           requests: requestsData,
-          userProfileId: userProfile.id,
+          userProfileId: profileResult.data.id,
           timestamp: Date.now()
         };
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
