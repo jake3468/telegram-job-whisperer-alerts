@@ -97,17 +97,6 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
         .eq('phone_number', phoneNumber)
         .maybeSingle();
 
-      if (error) {
-        console.error('[AIMockInterviewForm] Phone number validation query failed:', error);
-        console.error('[AIMockInterviewForm] Error details:', {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          hint: error.hint
-        });
-        throw new Error(`Phone validation failed: ${error.message}`);
-      }
-
       console.log('[AIMockInterviewForm] Phone number validation query result:', existingRequest);
 
       if (existingRequest) {

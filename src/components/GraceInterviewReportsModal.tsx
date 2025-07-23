@@ -55,22 +55,56 @@ const GraceInterviewReportsModal = ({
   }, [isOpen, isLoaded, user, userProfile]);
   const fetchHistory = async () => {
     if (!isLoaded || !user || !userProfile) {
+      console.log('[GraceInterviewReportsModal] Missing dependencies:', { isLoaded, user: !!user, userProfile: !!userProfile });
       return;
     }
+    
+    console.log('[GraceInterviewReportsModal] Fetching history for user profile:', userProfile.id);
     setIsLoading(true);
+    
     try {
-      const {
-        data,
-        error
-      } = await supabase.from('grace_interview_requests').select('*').eq('user_id', userProfile.id).order('created_at', {
-        ascending: false
-      }).limit(20);
+      console.log('[GraceInterviewReportsModal] Making authenticated request to grace_interview_requests');
+      
+      const { data, error } = await supabase
+        .from('grace_interview_requests')
+        .select(`
+          id,
+          phone_number,
+          company_name,
+          job_title,
+          job_description,
+          status,
+          created_at,
+          interview_status,
+          completion_percentage,
+          time_spent,
+          feedback_message,
+          feedback_suggestion,
+          feedback_next_action,
+          report_generated,
+          executive_summary,
+          overall_scores,
+          strengths,
+          areas_for_improvement,
+          detailed_feedback,
+          motivational_message,
+          actionable_plan,
+          next_steps_priority
+        `)
+        .eq('user_id', userProfile.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
       if (error) {
+        console.error('[GraceInterviewReportsModal] Supabase error:', error);
         throw error;
       }
+
+      console.log('[GraceInterviewReportsModal] Successfully fetched data:', data?.length || 0, 'records');
       setHistoryData(data || []);
+      
     } catch (err) {
-      console.error('Failed to fetch interview history:', err);
+      console.error('[GraceInterviewReportsModal] Failed to fetch interview history:', err);
       toast({
         title: "Error",
         description: "Failed to load interview history. Please try again.",
