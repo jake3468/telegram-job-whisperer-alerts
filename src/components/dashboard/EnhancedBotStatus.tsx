@@ -1,83 +1,17 @@
 
-import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
-import { Button } from '@/components/ui/button';
-import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, XCircle, Loader2, Bot, MessageSquare } from 'lucide-react';
+import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
+import { CheckCircle, XCircle, Loader2, Bot } from 'lucide-react';
 
 interface BotStatusProps {
   onActivationChange: () => void;
 }
 
 const EnhancedBotStatus = ({ onActivationChange }: BotStatusProps) => {
-  const { user } = useUser();
-  const { toast } = useToast();
-  const [botStatus, setBotStatus] = useState<{
-    isActivated: boolean;
-    hasChatId: boolean;
-    loading: boolean;
-  }>({
-    isActivated: false,
-    hasChatId: false,
-    loading: true
-  });
+  const { userProfile, loading } = useCachedUserProfile();
 
-  // Check bot activation status
-  const checkBotStatus = async () => {
-    if (!user) return;
+  const isActivated = userProfile?.bot_activated === true;
 
-    setBotStatus(prev => ({ ...prev, loading: true }));
-
-    try {
-      await makeAuthenticatedRequest(async () => {
-        const { data, error } = await supabase
-          .from('user_profile')
-          .select('bot_activated, chat_id')
-          .eq('user_id', (await supabase
-            .from('users')
-            .select('id')
-            .eq('clerk_id', user.id)
-            .single()
-          ).data?.id)
-          .single();
-
-        if (error) {
-          console.error('Error checking bot status:', error);
-          return;
-        }
-
-        const isActivated = data?.bot_activated === true;
-        const hasChatId = Boolean(data?.chat_id);
-
-        setBotStatus({
-          isActivated,
-          hasChatId,
-          loading: false
-        });
-
-        console.log('[EnhancedBotStatus] Status check:', {
-          bot_activated: data?.bot_activated,
-          chat_id: data?.chat_id,
-          isActivated,
-          hasChatId
-        });
-      });
-    } catch (error) {
-      console.error('[EnhancedBotStatus] Error checking status:', error);
-      setBotStatus(prev => ({ ...prev, loading: false }));
-    }
-  };
-
-  useEffect(() => {
-    checkBotStatus();
-  }, [user]);
-
-  // Determine the overall activation status - if bot_activated is true, bot is activated
-  const isFullyActivated = botStatus.isActivated;
-  const needsActivation = !botStatus.isActivated;
-
-  if (botStatus.loading) {
+  if (loading) {
     return (
       <div className="bg-gray-900/50 border border-gray-600 rounded-lg p-4 mb-6">
         <div className="flex items-center gap-3">
@@ -88,7 +22,7 @@ const EnhancedBotStatus = ({ onActivationChange }: BotStatusProps) => {
     );
   }
 
-  if (isFullyActivated) {
+  if (isActivated) {
     return (
       <div className="bg-green-900/50 border border-green-600 rounded-lg p-4 mb-6">
         <div className="flex items-center gap-3 mb-2">
@@ -129,23 +63,6 @@ const EnhancedBotStatus = ({ onActivationChange }: BotStatusProps) => {
             <span className="w-5 h-5 bg-orange-600 text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
             <span className="text-orange-100">Follow the bot's instructions to link your account</span>
           </div>
-        </div>
-
-        <div className="flex gap-2 pt-2">
-          <Button
-            onClick={checkBotStatus}
-            variant="outline"
-            size="sm"
-            className="text-xs bg-orange-800/30 border-orange-500/50 text-orange-200 hover:bg-orange-700/40"
-          >
-            <Bot className="w-3 h-3 mr-1" />
-            Check Status
-          </Button>
-        </div>
-        
-        <div className="text-xs text-orange-300 mt-2">
-          Status: {botStatus.hasChatId ? '✅ Connected' : '❌ Not Connected'} | 
-          {botStatus.isActivated ? '✅ Activated' : '❌ Not Activated'}
         </div>
       </div>
     </div>
