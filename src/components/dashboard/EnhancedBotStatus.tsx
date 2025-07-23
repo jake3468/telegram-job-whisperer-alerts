@@ -28,7 +28,7 @@ const EnhancedBotStatus = ({
         <p className="text-green-200 text-sm">Your Telegram bot is active and ready to send job alerts. Please add your job alerts by clicking the above (+ Add Alert) button.</p>
       </div>;
   }
-  return <div className="bg-orange-900/50 border border-orange-600 rounded-lg p-4 mb-6">
+  return <div className="border border-orange-600 rounded-lg p-4 mb-6 bg-red-950">
       <div className="flex items-center gap-3 mb-3">
         <XCircle className="w-5 h-5 text-orange-400" />
         <span className="text-orange-300 font-medium">Bot Not Yet Activated</span>
