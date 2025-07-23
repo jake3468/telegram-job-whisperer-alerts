@@ -101,32 +101,16 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
       }
 
       if (existingRequest) {
+        // If same user is using their own phone number, allow it
+        if (existingRequest.user_id === userProfile?.id) {
+          return { isValid: true };
+        }
+        
+        // If different user has this phone number, show error
         if (existingRequest.user_id !== userProfile?.id) {
-          const { data: existingUserProfile, error: profileError } = await supabase
-            .from('user_profile')
-            .select('user_id')
-            .eq('id', existingRequest.user_id)
-            .single();
-
-          if (profileError) {
-            console.error('[AIMockInterviewForm] Error fetching user profile:', profileError);
-            throw new Error("Failed to validate phone number");
-          }
-
-          const { data: existingUser, error: userError } = await supabase
-            .from('users')
-            .select('email')
-            .eq('id', existingUserProfile.user_id)
-            .single();
-
-          if (userError) {
-            console.error('[AIMockInterviewForm] Error fetching user email:', userError);
-            throw new Error("Failed to validate phone number");
-          }
-
           return {
             isValid: false,
-            message: `This phone number is already registered with another account (${existingUser.email}). Please sign in to that account to access the AI Interview feature.`
+            message: "This phone number is already registered with another account."
           };
         }
       }
