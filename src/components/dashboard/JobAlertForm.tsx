@@ -50,7 +50,7 @@ const JobAlertForm = ({
 }: JobAlertFormProps) => {
   const { user } = useUser();
   const { toast } = useToast();
-  const { optimisticAdd, optimisticUpdate, userProfileId } = useCachedJobAlertsData();
+  const { optimisticAdd, optimisticUpdate, userProfileId, forceRefresh } = useCachedJobAlertsData();
   
   // Enterprise form token keep-alive
   const { updateActivity, silentTokenRefresh } = useFormTokenKeepAlive(true);
@@ -169,6 +169,12 @@ const JobAlertForm = ({
            console.log('[JobAlertForm] Calling optimistic update with:', updatedAlert);
            optimisticUpdate(updatedAlert);
            
+           // Force refresh to ensure UI synchronization
+           setTimeout(async () => {
+             console.log('[JobAlertForm] Force refreshing data after update');
+             await forceRefresh();
+           }, 100);
+           
            toast({
              title: "Alert Updated",
              description: "Your job alert has been updated successfully.",
@@ -199,6 +205,12 @@ const JobAlertForm = ({
            if (data) {
              console.log('[JobAlertForm] Calling optimistic add with:', data);
              optimisticAdd(data as any);
+             
+             // Force refresh to ensure UI synchronization
+             setTimeout(async () => {
+               console.log('[JobAlertForm] Force refreshing data after create');
+               await forceRefresh();
+             }, 100);
            }
           
           toast({
