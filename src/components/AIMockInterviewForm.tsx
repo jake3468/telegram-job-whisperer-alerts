@@ -67,43 +67,46 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
   const { optimisticAdd } = useCachedGraceInterviewRequests();
   const { credits, hasCredits, useCredit, refetch: refetchCredits, isLoading: creditsLoading } = useAIInterviewCredits();
 
-  // Proactive token management - but less aggressive UI updates
+  // Simplified token management - prevent infinite loops
   useEffect(() => {
+    if (!sessionManager?.isTokenValid || !sessionManager?.refreshToken) {
+      return;
+    }
+
     const checkTokenStatus = async () => {
-      if (sessionManager?.isTokenValid) {
+      try {
         const isValid = sessionManager.isTokenValid();
         
-        // Only update status if there's a significant change
-        if (!isValid && tokenStatus !== 'expired') {
-          setTokenStatus('expired');
-        } else if (isValid && tokenStatus !== 'valid') {
-          setTokenStatus('valid');
-        }
-        
-        // If token is expired or close to expiry, refresh it silently
-        if (!isValid && sessionManager.refreshToken && !isRefreshingToken) {
+        // Only refresh if token is truly invalid and we're not already refreshing
+        if (!isValid && !isRefreshingToken) {
+          console.log('[AIMockInterviewForm] Token needs refresh, attempting silent refresh');
           setIsRefreshingToken(true);
           
           try {
             await sessionManager.refreshToken(true);
             setTokenStatus('valid');
-            console.log('[AIMockInterviewForm] Token refreshed silently');
           } catch (error) {
             console.error('[AIMockInterviewForm] Silent token refresh failed:', error);
             setTokenStatus('expired');
           } finally {
             setIsRefreshingToken(false);
           }
+        } else if (isValid) {
+          setTokenStatus('valid');
         }
+      } catch (error) {
+        console.error('[AIMockInterviewForm] Error in token check:', error);
       }
     };
 
-    // Check token status on mount and less frequently
+    // Initial check
     checkTokenStatus();
-    const interval = setInterval(checkTokenStatus, 5 * 60 * 1000); // Check every 5 minutes instead of 1 minute
+    
+    // Set up interval for periodic checks (but less frequent)
+    const interval = setInterval(checkTokenStatus, 10 * 60 * 1000); // Check every 10 minutes
     
     return () => clearInterval(interval);
-  }, [sessionManager, tokenStatus, isRefreshingToken]); // Include dependencies to prevent unnecessary re-runs
+  }, [sessionManager]); // Only depend on sessionManager, nothing else
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({
@@ -428,18 +431,11 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
         onBuyMore={() => setIsPricingModalOpen(true)} 
       />
 
-      {/* Token Status Indicator - Only show when actually refreshing or permanently expired */}
+      {/* Minimal Token Status Indicator - Only show critical states */}
       {isRefreshingToken && (
-        <div className="flex items-center justify-center gap-2 text-yellow-400 text-sm bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-3">
-          <RefreshCw className="w-4 h-4 animate-spin" />
-          <span>Refreshing session...</span>
-        </div>
-      )}
-
-      {tokenStatus === 'expired' && !isRefreshingToken && (
-        <div className="flex items-center justify-center gap-2 text-red-400 text-sm bg-red-900/20 border border-red-500/30 rounded-lg p-3">
-          <AlertCircle className="w-4 h-4" />
-          <span>Session expired. Please refresh the page.</span>
+        <div className="flex items-center justify-center gap-2 text-yellow-400 text-sm bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-2">
+          <RefreshCw className="w-3 h-3 animate-spin" />
+          <span>Refreshing...</span>
         </div>
       )}
 

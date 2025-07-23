@@ -47,14 +47,14 @@ class EnterpriseSessionManager {
     
     const now = Date.now();
     const buffer = this.calculateTokenBuffer(this.state.expiry);
-    const isValid = (this.state.expiry - now) > buffer;
+    const timeRemaining = this.state.expiry - now;
+    const isValid = timeRemaining > buffer;
     
-    // If token is close to expiry but user is active, extend session
-    if (!isValid && this.isUserActive()) {
-      this.state.sessionExtended = true;
-    }
+    // Add minimum time threshold to prevent rapid refreshes (at least 30 seconds remaining)
+    const minimumTimeThreshold = 30 * 1000; // 30 seconds
+    const hasMinimumTime = timeRemaining > minimumTimeThreshold;
     
-    return isValid;
+    return isValid && hasMinimumTime;
   }
 
   // Check if user is actively using the app
@@ -142,16 +142,16 @@ class EnterpriseSessionManager {
     }
   }
 
-  // Start background session management
+  // Start background session management - but more conservative  
   startSessionManagement(getToken: () => Promise<string | null>): void {
-    // Background heartbeat every 45 minutes (enterprise standard)
+    // Much longer heartbeat interval to prevent excessive refreshes (2 hours)
     this.heartbeatInterval = setInterval(async () => {
-      if (this.isUserActive()) {
-        if (!this.isTokenValid()) {
-          await this.refreshToken(getToken, true);
-        }
+      // Only refresh if user is actively using the app AND token is actually invalid
+      if (this.isUserActive() && !this.isTokenValid()) {
+        console.log('[EnterpriseSession] Background refresh triggered');
+        await this.refreshToken(getToken, true);
       }
-    }, 45 * 60 * 1000);
+    }, 2 * 60 * 60 * 1000); // Every 2 hours instead of 45 minutes
 
     // Activity tracking
     const updateActivity = () => this.updateActivity();

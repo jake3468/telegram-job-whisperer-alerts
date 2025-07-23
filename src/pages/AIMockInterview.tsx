@@ -13,8 +13,8 @@ import { useEnhancedTokenManagerIntegration } from "@/hooks/useEnhancedTokenMana
 const AIMockInterview = () => {
   const location = useLocation();
   
-  // Initialize enterprise session management
-  const sessionManager = useEnhancedTokenManagerIntegration({ enabled: true });
+  // Temporarily disable enterprise session management to prevent refresh loops
+  const sessionManager = null; // useEnhancedTokenManagerIntegration({ enabled: false });
   
   const {
     connectionIssue,
