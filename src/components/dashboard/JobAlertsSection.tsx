@@ -124,10 +124,10 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
     setEditingAlert(null);
   };
 
-  // Manual refresh function - uses proper data refetch instead of page reload
+  // Manual refresh function - reloads entire page to reset all state and tokens
   const handleManualRefresh = useCallback(() => {
-    forceRefresh();
-  }, [forceRefresh]);
+    window.location.reload();
+  }, []);
 
   // Show fast initial loading state, then content even if auth is still loading
   if (loading && !userProfileId) {
