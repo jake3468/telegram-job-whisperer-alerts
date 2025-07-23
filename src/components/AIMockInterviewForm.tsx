@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Phone, CheckCircle, AlertCircle, CreditCard } from "lucide-react";
+import { Loader2, Phone, CheckCircle, AlertCircle, CreditCard, RefreshCw } from "lucide-react";
 import { useCachedUserProfile } from "@/hooks/useCachedUserProfile";
 import { useCachedUserCompletionStatus } from "@/hooks/useCachedUserCompletionStatus";
 import { useCachedGraceInterviewRequests } from "@/hooks/useCachedGraceInterviewRequests";
@@ -29,9 +29,10 @@ interface AIMockInterviewFormProps {
     jobTitle?: string;
     jobDescription?: string;
   };
+  sessionManager?: any;
 }
 
-const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
+const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFormProps) => {
   const [formData, setFormData] = useState<FormData>({
     phoneNumber: "",
     companyName: "",
@@ -53,26 +54,69 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
       }));
     }
   }, [prefillData]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
+  const [isRefreshingToken, setIsRefreshingToken] = useState(false);
+  const [tokenStatus, setTokenStatus] = useState<'valid' | 'refreshing' | 'expired' | 'unknown'>('unknown');
+  
   const { toast } = useToast();
   const { userProfile, loading: profileLoading } = useCachedUserProfile();
   const { hasResume, hasBio, loading: completionLoading } = useCachedUserCompletionStatus();
   const { optimisticAdd } = useCachedGraceInterviewRequests();
   const { credits, hasCredits, useCredit, refetch: refetchCredits, isLoading: creditsLoading } = useAIInterviewCredits();
+
+  // Proactive token management
+  useEffect(() => {
+    const checkTokenStatus = async () => {
+      if (sessionManager?.isTokenValid) {
+        const isValid = sessionManager.isTokenValid();
+        setTokenStatus(isValid ? 'valid' : 'expired');
+        
+        // If token is expired or close to expiry, refresh it proactively
+        if (!isValid && sessionManager.refreshToken) {
+          setIsRefreshingToken(true);
+          setTokenStatus('refreshing');
+          
+          try {
+            await sessionManager.refreshToken(true);
+            setTokenStatus('valid');
+            console.log('[AIMockInterviewForm] Token refreshed proactively');
+          } catch (error) {
+            console.error('[AIMockInterviewForm] Proactive token refresh failed:', error);
+            setTokenStatus('expired');
+          } finally {
+            setIsRefreshingToken(false);
+          }
+        }
+      }
+    };
+
+    // Check token status on mount and periodically
+    checkTokenStatus();
+    const interval = setInterval(checkTokenStatus, 60000); // Check every minute
+    
+    return () => clearInterval(interval);
+  }, [sessionManager]);
+
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
+
   const validatePhoneNumber = (phone: string) => {
-    // Validate that phone number is not empty and has proper format (react-phone-input-2 handles validation)
     return phone && phone.length >= 8;
   };
+
   const validatePhoneNumberUniqueness = async (phoneNumber: string) => {
+    // Enhanced phone number validation with proactive token management
     return await makeAuthenticatedRequest(async () => {
+      // Log the operation for debugging
+      console.log('[AIMockInterviewForm] Validating phone number uniqueness:', phoneNumber);
+      
       // Check if phone number already exists in grace_interview_requests
       const { data: existingRequest, error } = await supabase
         .from('grace_interview_requests')
@@ -81,9 +125,11 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
         .maybeSingle();
 
       if (error) {
-        console.error("Error checking phone number:", error);
+        console.error('[AIMockInterviewForm] Error checking phone number:', error);
         throw new Error("Failed to validate phone number");
       }
+
+      console.log('[AIMockInterviewForm] Phone validation result:', { existingRequest, phoneNumber });
 
       if (existingRequest) {
         // Phone number exists, check if it belongs to the same user
@@ -96,7 +142,7 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
             .single();
 
           if (profileError) {
-            console.error("Error fetching user profile:", profileError);
+            console.error('[AIMockInterviewForm] Error fetching user profile:', profileError);
             throw new Error("Failed to validate phone number");
           }
 
@@ -107,7 +153,7 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
             .single();
 
           if (userError) {
-            console.error("Error fetching user email:", userError);
+            console.error('[AIMockInterviewForm] Error fetching user email:', userError);
             throw new Error("Failed to validate phone number");
           }
 
@@ -119,19 +165,58 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
       }
 
       return { isValid: true };
+    }, {
+      maxRetries: 3,
+      silentRetry: true,
+      operationType: 'phone_validation'
     });
+  };
+
+  const ensureTokenValid = async () => {
+    if (!sessionManager?.isTokenValid || !sessionManager?.refreshToken) {
+      console.warn('[AIMockInterviewForm] Session manager not available');
+      return false;
+    }
+
+    const isValid = sessionManager.isTokenValid();
+    console.log('[AIMockInterviewForm] Token validity check:', isValid);
+    
+    if (!isValid) {
+      setIsRefreshingToken(true);
+      setTokenStatus('refreshing');
+      
+      try {
+        const refreshedToken = await sessionManager.refreshToken(true);
+        console.log('[AIMockInterviewForm] Token refreshed before submission:', !!refreshedToken);
+        
+        if (refreshedToken) {
+          setTokenStatus('valid');
+          return true;
+        } else {
+          setTokenStatus('expired');
+          return false;
+        }
+      } catch (error) {
+        console.error('[AIMockInterviewForm] Token refresh failed:', error);
+        setTokenStatus('expired');
+        return false;
+      } finally {
+        setIsRefreshingToken(false);
+      }
+    }
+    
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log("Form submission started");
-    console.log("User profile:", userProfile);
-    console.log("Profile completion status:", { hasResume, hasBio });
-    console.log("Form data:", formData);
+    console.log('[AIMockInterviewForm] Form submission started');
+    console.log('[AIMockInterviewForm] User profile:', userProfile);
+    console.log('[AIMockInterviewForm] Form data:', formData);
     
     if (!userProfile?.id) {
-      console.error("User profile not found or missing ID");
+      console.error('[AIMockInterviewForm] User profile not found or missing ID');
       toast({
         title: "Authentication Error",
         description: "Please ensure you're logged in and try again.",
@@ -167,7 +252,7 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
 
     // Validate form
     if (!formData.phoneNumber || !formData.companyName || !formData.jobTitle || !formData.jobDescription) {
-      console.error("Missing form fields");
+      console.error('[AIMockInterviewForm] Missing form fields');
       toast({
         title: "Missing Information",
         description: "Please fill in all fields to continue.",
@@ -177,7 +262,7 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
     }
     
     if (!validatePhoneNumber(formData.phoneNumber)) {
-      console.error("Invalid phone number:", formData.phoneNumber);
+      console.error('[AIMockInterviewForm] Invalid phone number:', formData.phoneNumber);
       toast({
         title: "Invalid Phone Number",
         description: "Please enter a valid phone number.",
@@ -187,7 +272,7 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
     }
     
     if (formData.jobDescription.length < 50) {
-      console.error("Job description too short:", formData.jobDescription.length);
+      console.error('[AIMockInterviewForm] Job description too short:', formData.jobDescription.length);
       toast({
         title: "Job Description Too Short",
         description: "Please provide a more detailed job description (at least 50 characters).",
@@ -199,11 +284,27 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
     setIsSubmitting(true);
     
     try {
+      // Ensure token is valid before proceeding
+      const tokenValid = await ensureTokenValid();
+      if (!tokenValid) {
+        toast({
+          title: "Session Expired",
+          description: "Please refresh the page and try again.",
+          variant: "destructive"
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       // react-phone-input-2 already includes the + prefix, so we don't need to add it
       const phoneNumber = formData.phoneNumber.startsWith('+') ? formData.phoneNumber : `+${formData.phoneNumber}`;
+      console.log('[AIMockInterviewForm] Formatted phone number:', phoneNumber);
       
-      // Validate phone number uniqueness with retry logic
+      // Validate phone number uniqueness with enhanced error handling
+      console.log('[AIMockInterviewForm] Starting phone number validation...');
       const phoneValidation = await validatePhoneNumberUniqueness(phoneNumber);
+      console.log('[AIMockInterviewForm] Phone validation result:', phoneValidation);
+      
       if (!phoneValidation.isValid) {
         toast({
           title: "Phone Number Already Registered",
@@ -214,7 +315,7 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
         return;
       }
       
-      console.log("Inserting data:", {
+      console.log('[AIMockInterviewForm] Inserting data:', {
         user_id: userProfile.id,
         phone_number: phoneNumber,
         company_name: formData.companyName,
@@ -237,23 +338,25 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
           .single();
         
         if (error) {
-          console.error("Supabase error:", error);
+          console.error('[AIMockInterviewForm] Supabase error:', error);
           throw error;
         }
         
         return data;
+      }, {
+        maxRetries: 3,
+        silentRetry: true,
+        operationType: 'form_submission'
       });
       
-      console.log("Successfully inserted data:", data);
+      console.log('[AIMockInterviewForm] Successfully inserted data:', data);
       
       // Optimistically add to cache
       if (data) {
         optimisticAdd(data);
       }
 
-      // NOTE: Credit deduction is now handled by N8N calling the ai-interview-credit-deduction edge function
-      // This prevents duplicate credit deductions and ensures credits are only deducted when the actual call is made
-      console.log("Interview request submitted successfully. Credit will be deducted when call is made by N8N.");
+      console.log('[AIMockInterviewForm] Interview request submitted successfully. Credit will be deducted when call is made by N8N.');
       
       setIsSubmitted(true);
       toast({
@@ -272,21 +375,19 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
         });
       }, 5000);
     } catch (error: any) {
-      console.error("Error submitting interview request:", error);
+      console.error('[AIMockInterviewForm] Error submitting interview request:', error);
       
-      // Handle specific error types with improved session management
+      // Enhanced error handling with better user feedback
       let errorMessage = "There was an error submitting your request. Please try again.";
       
-      if (error?.message?.includes("JWT") || error?.message?.includes("expired") || error?.message?.includes("token")) {
+      if (error?.message?.includes("Failed to validate phone number")) {
+        errorMessage = "Unable to validate phone number. Please check your connection and try again.";
+      } else if (error?.message?.includes("Please try again")) {
+        errorMessage = "Connection issue. Please try again.";
+      } else if (error?.message?.includes("Session expired")) {
         errorMessage = "Your session has expired. Please refresh the page and try again.";
-        // Optionally trigger a page refresh after a delay
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
-      } else if (error?.message?.includes("violates row-level security")) {
-        errorMessage = "Authentication error. Please refresh the page and try again.";
       } else if (error?.message) {
-        errorMessage = `Error: ${error.message}`;
+        errorMessage = error.message;
       }
       
       toast({
@@ -298,6 +399,7 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
       setIsSubmitting(false);
     }
   };
+
   if (isSubmitted) {
     return <div className="bg-gray-900/60 backdrop-blur-lg border border-gray-700/50 rounded-xl p-8 text-center">
         <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
@@ -313,13 +415,28 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
   
   return (
     <div className="space-y-6">
-      {/* Profile Completion Warning - Uses the standard component with proper caching */}
+      {/* Profile Completion Warning */}
       <ProfileCompletionWarning />
       
       {/* AI Interview Credits Display */}
       <AIInterviewCreditsDisplay 
         onBuyMore={() => setIsPricingModalOpen(true)} 
       />
+
+      {/* Token Status Indicator */}
+      {(isRefreshingToken || tokenStatus === 'refreshing') && (
+        <div className="flex items-center justify-center gap-2 text-yellow-400 text-sm bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-3">
+          <RefreshCw className="w-4 h-4 animate-spin" />
+          <span>Refreshing session...</span>
+        </div>
+      )}
+
+      {tokenStatus === 'expired' && (
+        <div className="flex items-center justify-center gap-2 text-red-400 text-sm bg-red-900/20 border border-red-500/30 rounded-lg p-3">
+          <AlertCircle className="w-4 h-4" />
+          <span>Session expired. Please refresh the page.</span>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
       <div className="border border-purple-500/30 rounded-xl p-8 bg-white shadow-lg shadow-purple-500/20">
@@ -385,7 +502,7 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
         <div className="mt-8">
           <Button 
             type="submit" 
-            disabled={isSubmitting || !hasCredits || creditsLoading} 
+            disabled={isSubmitting || !hasCredits || creditsLoading || isRefreshingToken || tokenStatus === 'expired'} 
             className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {isSubmitting ? (
@@ -393,10 +510,20 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
                 <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                 Submitting Request...
               </>
+            ) : isRefreshingToken ? (
+              <>
+                <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
+                Refreshing Session...
+              </>
             ) : !hasCredits ? (
               <>
                 <CreditCard className="w-5 h-5 mr-2" />
                 Purchase Calls to Continue
+              </>
+            ) : tokenStatus === 'expired' ? (
+              <>
+                <AlertCircle className="w-5 h-5 mr-2" />
+                Session Expired - Refresh Page
               </>
             ) : (
               <>
@@ -406,7 +533,7 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
             )}
           </Button>
           
-          {!isSubmitting && hasCredits && (
+          {!isSubmitting && hasCredits && tokenStatus === 'valid' && (
             <p className="text-center text-black text-sm mt-3">
               Grace will call you within ~1 minute of submitting
             </p>
@@ -415,6 +542,12 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
           {!hasCredits && !creditsLoading && (
             <p className="text-center text-orange-600 text-sm mt-3">
               Purchase AI interview calls to request a call from Grace
+            </p>
+          )}
+
+          {tokenStatus === 'expired' && (
+            <p className="text-center text-red-600 text-sm mt-3">
+              Your session has expired. Please refresh the page to continue.
             </p>
           )}
         </div>
@@ -553,4 +686,5 @@ if (typeof document !== 'undefined') {
   styleElement.textContent = phoneInputStyles;
   document.head.appendChild(styleElement);
 }
+
 export default AIMockInterviewForm;

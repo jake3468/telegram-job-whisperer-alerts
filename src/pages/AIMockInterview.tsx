@@ -42,7 +42,9 @@ const AIMockInterview = () => {
   }, [location.state]);
 
   const handleManualRefresh = async () => {
-    // Clear all caches and force session refresh
+    console.log('[AIMockInterview] Manual refresh initiated');
+    
+    // Clear all caches
     localStorage.removeItem('aspirely_user_profile_cache');
     localStorage.removeItem('aspirely_user_completion_status_cache');
     localStorage.removeItem('aspirely_ai_interview_credits_cache');
@@ -50,12 +52,20 @@ const AIMockInterview = () => {
     // Force token refresh if session manager is available
     if (sessionManager?.refreshToken) {
       try {
-        await sessionManager.refreshToken();
+        console.log('[AIMockInterview] Forcing token refresh during manual refresh');
+        await sessionManager.refreshToken(true);
+        console.log('[AIMockInterview] Token refreshed successfully');
       } catch (error) {
-        console.log('Token refresh during manual refresh:', error);
+        console.error('[AIMockInterview] Token refresh failed during manual refresh:', error);
       }
     }
     
+    // Force refresh cached data
+    if (forceRefresh) {
+      await forceRefresh();
+    }
+    
+    // Full page reload as fallback
     window.location.reload();
   };
 
@@ -94,7 +104,10 @@ const AIMockInterview = () => {
           {/* Form Section */}
           <div className="flex justify-center">
             <div className="w-full max-w-lg">
-              <AIMockInterviewForm prefillData={prefillData} />
+              <AIMockInterviewForm 
+                prefillData={prefillData} 
+                sessionManager={sessionManager}
+              />
             </div>
           </div>
 
