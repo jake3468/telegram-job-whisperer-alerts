@@ -1,8 +1,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { useUser, useAuth } from '@clerk/clerk-react';
+import { useUser } from '@clerk/clerk-react';
 import { logger } from '@/utils/logger';
 import { supabase } from '@/integrations/supabase/client';
+import { useEnterpriseAPIClient } from './useEnterpriseAPIClient';
 
 interface JobAlert {
   id: string;
@@ -34,7 +35,7 @@ let isRefreshing = false; // Request deduplication flag
 
 export const useCachedJobAlertsData = () => {
   const { user } = useUser();
-  const { getToken } = useAuth();
+  const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
   const [alerts, setAlerts] = useState<JobAlert[]>([]);
   const [isActivated, setIsActivated] = useState<boolean>(false);
   const [userProfileId, setUserProfileId] = useState<string | null>(null);
@@ -146,35 +147,38 @@ export const useCachedJobAlertsData = () => {
         setConnectionIssue(false);
       }
       
-      // Simple direct Supabase calls without enterprise wrapper
-      const token = await getToken();
-      if (!token) {
-        throw new Error('Unable to get authentication token');
-      }
+      // Use enterprise session management for authenticated requests
+      let profileData, alertsData;
       
-      // Get user profile
-      const { data: profileData, error: profileError } = await supabase
-        .from('user_profile')
-        .select('id, bot_activated')
-        .maybeSingle();
+      await makeAuthenticatedRequest(async () => {
+        // Get user profile
+        const { data: profile, error: profileError } = await supabase
+          .from('user_profile')
+          .select('id, bot_activated')
+          .maybeSingle();
+          
+        if (profileError) {
+          throw new Error(`Profile fetch failed: ${profileError.message}`);
+        }
         
-      if (profileError) {
-        throw new Error(`Profile fetch failed: ${profileError.message}`);
-      }
-      
-      if (!profileData) {
-        throw new Error('User profile not found. Please try signing out and back in.');
-      }
+        if (!profile) {
+          throw new Error('User profile not found. Please try signing out and back in.');
+        }
+        
+        profileData = profile;
 
-      // Fetch job alerts
-      const { data: alertsData, error: alertsError } = await supabase
-        .from('job_alerts')
-        .select('*')
-        .order('created_at', { ascending: false });
+        // Fetch job alerts
+        const { data: alerts, error: alertsError } = await supabase
+          .from('job_alerts')
+          .select('*')
+          .order('created_at', { ascending: false });
 
-      if (alertsError) {
-        throw alertsError;
-      }
+        if (alertsError) {
+          throw alertsError;
+        }
+        
+        alertsData = alerts;
+      });
 
       const result = {
         alerts: alertsData || [],
@@ -216,7 +220,7 @@ export const useCachedJobAlertsData = () => {
         setLoading(false);
       }
     }
-  }, [user, getToken, alerts.length]);
+  }, [user, alerts.length]);
 
   const invalidateCache = () => {
     localStorage.removeItem(CACHE_KEY);
@@ -235,19 +239,16 @@ export const useCachedJobAlertsData = () => {
     await fetchJobAlertsData();
   };
 
-  // Simple delete function
+  // Simple delete function using enterprise session management
   const deleteJobAlert = async (alertId: string) => {
-    const token = await getToken();
-    if (!token) {
-      throw new Error('Unable to get authentication token');
-    }
-
-    const { error } = await supabase
-      .from('job_alerts')
-      .delete()
-      .eq('id', alertId);
-    
-    if (error) throw error;
+    await makeAuthenticatedRequest(async () => {
+      const { error } = await supabase
+        .from('job_alerts')
+        .delete()
+        .eq('id', alertId);
+      
+      if (error) throw error;
+    });
     
     // Optimistically remove from local state
     setAlerts(prev => prev.filter(alert => alert.id !== alertId));

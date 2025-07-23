@@ -37,20 +37,37 @@ export const useTransactionHistory = () => {
   const { user } = useUser();
   
   return useQuery({
-    queryKey: ['transaction_history', userProfile?.user_id],
+    queryKey: ['transaction_history', user?.id, userProfile?.user_id],
     queryFn: async () => {
-      if (!userProfile?.user_id) {
+      if (!user?.id || !userProfile?.user_id) {
+        console.warn('[useTransactionHistory] No user ID available');
         return [];
       }
 
       try {
-        console.log('[useTransactionHistory] Fetching transaction history for user:', userProfile.user_id);
+        console.log('[useTransactionHistory] Fetching transaction history for Clerk user:', user.id);
+        console.log('[useTransactionHistory] User profile ID:', userProfile.user_id);
         
-        // Get credit transactions
+        // First, get the actual user UUID from the users table using Clerk ID
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('clerk_id', user.id)
+          .single();
+
+        if (userError || !userData) {
+          console.error('[useTransactionHistory] Error finding user:', userError);
+          throw new Error('User not found');
+        }
+
+        const actualUserId = userData.id;
+        console.log('[useTransactionHistory] Found actual user UUID:', actualUserId);
+        
+        // Get credit transactions - use actual user UUID
         const { data: creditTransactions, error: creditError } = await supabase
           .from('credit_transactions')
           .select('*')
-          .eq('user_id', userProfile.user_id)
+          .eq('user_id', actualUserId)
           .order('created_at', { ascending: false })
           .limit(50);
 
@@ -59,11 +76,11 @@ export const useTransactionHistory = () => {
           throw creditError;
         }
 
-        // Get AI interview transactions
+        // Get AI interview transactions - use actual user UUID
         const { data: aiInterviewTransactions, error: aiError } = await supabase
           .from('ai_interview_transactions')
           .select('*')
-          .eq('user_id', userProfile.user_id)
+          .eq('user_id', actualUserId)
           .order('created_at', { ascending: false })
           .limit(50);
 
@@ -72,7 +89,7 @@ export const useTransactionHistory = () => {
           throw aiError;
         }
 
-        // Get ALL payment records (including failed ones) - removed processed filter
+        // Get ALL payment records (including failed ones) - use actual user UUID
         const { data: paymentRecords, error: paymentError } = await supabase
           .from('payment_records')
           .select(`
@@ -87,7 +104,7 @@ export const useTransactionHistory = () => {
             processed,
             customer_email
           `)
-          .eq('user_id', userProfile.user_id)
+          .eq('user_id', actualUserId)
           .order('created_at', { ascending: false })
           .limit(50);
 

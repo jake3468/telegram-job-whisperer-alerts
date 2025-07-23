@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { useUser, useAuth } from '@clerk/clerk-react';
+import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,11 +7,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { makeAuthenticatedRequest } from '@/integrations/supabase/client';
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { countries } from '@/data/countries';
 import { useCachedJobAlertsData } from '@/hooks/useCachedJobAlertsData';
+import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
+import { supabase } from '@/integrations/supabase/client';
 
 interface JobAlert {
   id: string;
@@ -33,14 +34,24 @@ interface JobAlertFormProps {
   onCancel: () => void;
   currentAlertCount: number;
   maxAlerts: number;
-  updateActivity?: () => void;
+  sessionManager?: any; // Enterprise session manager
 }
 
-const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentAlertCount, maxAlerts, updateActivity }: JobAlertFormProps) => {
+const JobAlertForm = ({ 
+  userTimezone, 
+  editingAlert, 
+  onSubmit, 
+  onCancel, 
+  currentAlertCount, 
+  maxAlerts, 
+  sessionManager 
+}: JobAlertFormProps) => {
   const { user } = useUser();
-  const { getToken } = useAuth();
   const { toast } = useToast();
   const { optimisticAdd, userProfileId } = useCachedJobAlertsData();
+  
+  // Enterprise form token keep-alive
+  const { updateActivity, silentTokenRefresh } = useFormTokenKeepAlive(true);
   
   const [loading, setLoading] = useState(false);
   const [countryOpen, setCountryOpen] = useState(false);
@@ -79,6 +90,9 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
     e.preventDefault();
     setLoading(true);
     
+    // Update activity for session management
+    updateActivity();
+    
     // Basic validation
     if (!user) {
       toast({
@@ -106,71 +120,79 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
         description: `You can only create up to ${maxAlerts} job alerts. Please delete an existing alert to create a new one.`,
         variant: "destructive"
       });
+      setLoading(false);
       return;
     }
 
     try {
-      const token = await getToken();
-      if (!token) {
-        throw new Error('Unable to get authentication token');
-      }
+      // Ensure token is fresh before making the request
+      await silentTokenRefresh();
 
-      if (editingAlert) {
-        // Update existing alert
-        const { error } = await supabase
-          .from('job_alerts')
-          .update({
-            country: formData.country.toLowerCase(),
-            country_name: formData.country_name,
-            location: formData.location,
-            job_title: formData.job_title,
-            job_type: formData.job_type,
-            alert_frequency: formData.alert_frequency,
-            preferred_time: formData.preferred_time,
-            timezone: formData.timezone
-          })
-          .eq('id', editingAlert.id);
+      // Use enterprise authenticated request wrapper
+      await makeAuthenticatedRequest(async () => {
+        if (editingAlert) {
+          // Update existing alert
+          const { error } = await supabase
+            .from('job_alerts')
+            .update({
+              country: formData.country.toLowerCase(),
+              country_name: formData.country_name,
+              location: formData.location,
+              job_title: formData.job_title,
+              job_type: formData.job_type,
+              alert_frequency: formData.alert_frequency,
+              preferred_time: formData.preferred_time,
+              timezone: formData.timezone
+            })
+            .eq('id', editingAlert.id);
 
-        if (error) {
-          throw error;
+          if (error) {
+            throw error;
+          }
+          
+          toast({
+            title: "Alert Updated",
+            description: "Your job alert has been updated successfully.",
+          });
+        } else {
+          // Create new alert
+          const { data, error } = await supabase
+            .from('job_alerts')
+            .insert({
+              user_id: userProfileId,
+              country: formData.country.toLowerCase(),
+              country_name: formData.country_name,
+              location: formData.location,
+              job_title: formData.job_title,
+              job_type: formData.job_type,
+              alert_frequency: formData.alert_frequency,
+              preferred_time: formData.preferred_time,
+              timezone: formData.timezone
+            })
+            .select()
+            .single();
+
+          if (error) {
+            throw error;
+          }
+
+          // Optimistic UI update for immediate feedback
+          if (data) {
+            optimisticAdd(data as any);
+          }
+          
+          toast({
+            title: "Alert Created",
+            description: "Your job alert is now active and monitoring for opportunities.",
+          });
         }
-        
-        toast({
-          title: "Alert Updated",
-          description: "Your job alert has been updated successfully.",
-        });
-      } else {
-        // Create new alert
-        const { data, error } = await supabase
-          .from('job_alerts')
-          .insert({
-            user_id: userProfileId,
-            country: formData.country.toLowerCase(),
-            country_name: formData.country_name,
-            location: formData.location,
-            job_title: formData.job_title,
-            job_type: formData.job_type,
-            alert_frequency: formData.alert_frequency,
-            preferred_time: formData.preferred_time,
-            timezone: formData.timezone
-          })
-          .select()
-          .single();
 
-        if (error) {
-          throw error;
-        }
-
-        // Optimistic UI update for immediate feedback
-        if (data) {
-          optimisticAdd(data as any);
-        }
-        
-        toast({
-          title: "Alert Created",
-          description: "Your job alert is now active and monitoring for opportunities.",
-        });
-      }
+        return { success: true };
+      }, {
+        maxRetries: 3,
+        silentRetry: true,
+        operationType: 'job_alert_save'
+      });
 
       onSubmit();
     } catch (error) {
@@ -186,6 +208,9 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   };
 
   const handleInputChange = (field: string, value: string | number) => {
+    // Update activity on form interaction
+    updateActivity();
+    
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -193,6 +218,9 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
   };
 
   const handleCountryChange = (countryCode: string, countryName: string) => {
+    // Update activity on form interaction
+    updateActivity();
+    
     setFormData(prev => ({
       ...prev,
       country: countryCode,
@@ -229,6 +257,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
                 variant="outline"
                 role="combobox"
                 aria-expanded={countryOpen}
+                onClick={() => updateActivity()}
                 className="w-full justify-between border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs h-8"
               >
                 {formData.country
@@ -351,6 +380,7 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
         <Button 
           type="submit" 
           disabled={loading || (!editingAlert && currentAlertCount >= maxAlerts)}
+          onClick={() => updateActivity()}
           className="w-full font-inter bg-pastel-lavender hover:bg-pastel-lavender/80 text-black font-medium text-xs px-3 py-2 h-8 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
@@ -365,7 +395,10 @@ const JobAlertForm = ({ userTimezone, editingAlert, onSubmit, onCancel, currentA
         <Button 
           type="button" 
           variant="outline" 
-          onClick={onCancel} 
+          onClick={() => {
+            updateActivity();
+            onCancel();
+          }} 
           disabled={loading}
           className="w-full font-inter border-gray-500 hover:border-gray-400 text-gray-950 bg-pastel-peach text-xs px-3 py-2 h-8"
         >
