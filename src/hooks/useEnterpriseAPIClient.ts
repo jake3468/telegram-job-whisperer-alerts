@@ -22,13 +22,19 @@ export const useEnterpriseAPIClient = () => {
       retryDelays = [500, 1000, 2000]
     } = options;
 
+    console.log('[EnterpriseAPI] Starting authenticated request with options:', options);
+
     // Update user activity
     updateActivity();
 
     // Pre-request token validation (only if token is clearly expired)
-    if (!isTokenValid()) {
+    const tokenValid = isTokenValid();
+    console.log('[EnterpriseAPI] Token valid before request:', tokenValid);
+    
+    if (!tokenValid) {
       console.log('[EnterpriseAPI] Pre-validating token...');
-      await refreshToken(true);
+      const newToken = await refreshToken(true);
+      console.log('[EnterpriseAPI] Token refresh result:', !!newToken);
     }
 
     for (let attempt = 0; attempt < maxRetries; attempt++) {
@@ -42,20 +48,28 @@ export const useEnterpriseAPIClient = () => {
         
         return result;
       } catch (error: any) {
+        console.error(`[EnterpriseAPI] Request failed on attempt ${attempt + 1}:`, error);
+        
         const isLastAttempt = attempt === maxRetries - 1;
         const isAuthError = error?.message?.includes('JWT') || 
                            error?.message?.includes('token') ||
                            error?.message?.includes('unauthorized') ||
-                           error?.code === 'PGRST301';
+                           error?.message?.includes('Row Level Security') ||
+                           error?.code === 'PGRST301' ||
+                           error?.code === '42501';
+
+        console.log(`[EnterpriseAPI] Error analysis: isAuthError=${isAuthError}, isLastAttempt=${isLastAttempt}`);
 
         // For auth errors, try token refresh
         if (isAuthError && !isLastAttempt) {
           console.log(`[EnterpriseAPI] Auth error detected, refreshing token (attempt ${attempt + 1})`);
           const newToken = await refreshToken(true);
+          console.log(`[EnterpriseAPI] Token refresh for retry result:`, !!newToken);
           
           if (newToken) {
             // Wait before retry
             if (retryDelays[attempt]) {
+              console.log(`[EnterpriseAPI] Waiting ${retryDelays[attempt]}ms before retry`);
               await new Promise(resolve => setTimeout(resolve, retryDelays[attempt]));
             }
             continue;
