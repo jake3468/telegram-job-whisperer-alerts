@@ -9,12 +9,14 @@ import GraceInterviewReportsModal from "@/components/GraceInterviewReportsModal"
 import { AIInterviewPricingModal } from "@/components/AIInterviewPricingModal";
 import { useLocation } from "react-router-dom";
 import { useEnhancedTokenManagerIntegration } from "@/hooks/useEnhancedTokenManagerIntegration";
+import { useMinimalTokenManager } from "@/hooks/useMinimalTokenManager";
 
 const AIMockInterview = () => {
   const location = useLocation();
   
-  // Initialize enterprise session management
+  // Initialize enterprise session management with minimal token manager
   const sessionManager = useEnhancedTokenManagerIntegration({ enabled: true });
+  const minimalTokenManager = useMinimalTokenManager(true);
   
   const {
     connectionIssue,

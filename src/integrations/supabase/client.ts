@@ -9,12 +9,9 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Enterprise session manager
 let enterpriseSessionManager: any = null;
 
-// Singleton authenticated client cache to prevent multiple instances
-let authenticatedClientCache: { 
-  client: any; 
-  token: string; 
-  expiry: number; 
-} | null = null;
+// Single global client instance - no more multiple clients
+let globalAuthenticatedClient: any = null;
+let currentAuthToken: string | null = null;
 
 // Global refresh lock to prevent concurrent token refreshes
 let isRefreshing = false;
@@ -45,44 +42,22 @@ export const setEnterpriseSessionManager = (manager: any) => {
   enterpriseSessionManager = manager;
 };
 
-// Helper to get or create singleton authenticated client
-const getAuthenticatedClient = async (): Promise<any> => {
-  // Get current token from session manager
-  const currentToken = enterpriseSessionManager?.getCurrentToken?.() || null;
+// Update global client headers instead of creating new clients
+const updateClientAuth = (token: string): void => {
+  if (!globalAuthenticatedClient) {
+    globalAuthenticatedClient = supabase;
+  }
   
-  if (!currentToken) {
-    throw new Error('Authentication required');
+  // Update token in headers without creating new client
+  currentAuthToken = token;
+  
+  // Set headers directly on the existing client
+  if (globalAuthenticatedClient.supabaseKey) {
+    globalAuthenticatedClient.supabaseKey = SUPABASE_PUBLISHABLE_KEY;
   }
-
-  // Check if we can reuse existing client
-  if (authenticatedClientCache && 
-      authenticatedClientCache.token === currentToken && 
-      authenticatedClientCache.expiry > Date.now()) {
-    return authenticatedClientCache.client;
+  if (globalAuthenticatedClient.supabaseUrl) {
+    globalAuthenticatedClient.supabaseUrl = SUPABASE_URL;
   }
-
-  // Create new authenticated client and cache it
-  const authenticatedClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-    global: {
-      headers: {
-        'Authorization': `Bearer ${currentToken}`,
-        'apikey': SUPABASE_PUBLISHABLE_KEY
-      }
-    }
-  });
-
-  // Cache the client with token and expiry (5 minute cache)
-  authenticatedClientCache = {
-    client: authenticatedClient,
-    token: currentToken,
-    expiry: Date.now() + (5 * 60 * 1000)
-  };
-
-  return authenticatedClient;
 };
 
 // Debounced token refresh to prevent concurrent refreshes
@@ -103,9 +78,9 @@ const getValidToken = async (forceRefresh: boolean = false): Promise<string | nu
     refreshPromise = (async () => {
       try {
         const token = await enterpriseSessionManager?.refreshToken?.(forceRefresh);
-        // Clear cached client when token changes
-        if (authenticatedClientCache && authenticatedClientCache.token !== token) {
-          authenticatedClientCache = null;
+        // Update global client with new token
+        if (token && token !== currentAuthToken) {
+          updateClientAuth(token);
         }
         return token;
       } finally {
@@ -162,33 +137,18 @@ export const makeAuthenticatedRequest = async <T>(
         throw new Error('Authentication required');
       }
 
-      // Get singleton authenticated client
-      const authenticatedClient = await getAuthenticatedClient();
+      // Update auth headers on global client instead of creating new ones
+      updateClientAuth(token);
 
-      // Execute operation with method binding instead of creating new clients
-      const originalFrom = supabase.from;
-      const originalRpc = supabase.rpc;
+      // Execute operation directly with the global client
+      const result = await operation();
       
-      try {
-        // Temporarily bind authenticated methods (avoid storage as it's read-only)
-        (supabase as any).from = authenticatedClient.from.bind(authenticatedClient);
-        (supabase as any).rpc = authenticatedClient.rpc.bind(authenticatedClient);
-        
-        // Execute operation with bound methods
-        const result = await operation();
-        
-        // Process any queued requests after successful operation
-        if (requestQueue.length > 0) {
-          setImmediate(() => processRequestQueue());
-        }
-        
-        return result;
-      } finally {
-        // Always restore original methods
-        (supabase as any).from = originalFrom;
-        (supabase as any).rpc = originalRpc;
-        // Don't restore storage as we never modified it
+      // Process any queued requests after successful operation
+      if (requestQueue.length > 0) {
+        setImmediate(() => processRequestQueue());
       }
+      
+      return result;
     } catch (error: any) {
       lastError = error;
       
@@ -200,8 +160,8 @@ export const makeAuthenticatedRequest = async <T>(
                            error?.status === 401;
 
         if (isAuthError) {
-          // Force token refresh and clear cache
-          authenticatedClientCache = null;
+          // Clear current token and wait briefly
+          currentAuthToken = null;
           await new Promise(resolve => setTimeout(resolve, 200));
           continue;
         }

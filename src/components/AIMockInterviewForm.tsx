@@ -66,37 +66,12 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
   const { optimisticAdd } = useCachedGraceInterviewRequests();
   const { credits, hasCredits, useCredit, refetch: refetchCredits, isLoading: creditsLoading } = useAIInterviewCredits();
 
-  // Less aggressive session management - check every 2 minutes instead of every minute
+  // Minimal session checking - only on form submission
   useEffect(() => {
-    const checkSessionStatus = async () => {
-      if (sessionManager?.isTokenValid) {
-        const isValid = sessionManager.isTokenValid();
-        setSessionStatus(isValid ? 'valid' : 'expired');
-        
-        // Only refresh if token is about to expire (within 5 minutes) and user is active
-        if (!isValid && sessionManager.refreshToken) {
-          const timeSinceActivity = Date.now() - (sessionManager.sessionStats?.lastActivity || 0);
-          const isUserActive = timeSinceActivity < 5 * 60 * 1000; // 5 minutes
-          
-          if (isUserActive) {
-            setSessionStatus('refreshing');
-            try {
-              await sessionManager.refreshToken(true);
-              setSessionStatus('valid');
-            } catch (error) {
-              console.error('[AIMockInterviewForm] Session refresh failed:', error);
-              setSessionStatus('expired');
-            }
-          }
-        }
-      }
-    };
-
-    // Check session status less frequently - every 2 minutes
-    checkSessionStatus();
-    const interval = setInterval(checkSessionStatus, 2 * 60 * 1000);
-    
-    return () => clearInterval(interval);
+    if (sessionManager?.isTokenValid) {
+      const isValid = sessionManager.isTokenValid();
+      setSessionStatus(isValid ? 'valid' : 'unknown');
+    }
   }, [sessionManager]);
 
   const handleInputChange = (field: keyof FormData, value: string) => {
@@ -377,14 +352,7 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
         onBuyMore={() => setIsPricingModalOpen(true)} 
       />
 
-      {/* Less aggressive session status - only show when actively refreshing */}
-      {sessionStatus === 'refreshing' && (
-        <div className="flex items-center justify-center gap-2 text-blue-400 text-sm bg-blue-900/20 border border-blue-500/30 rounded-lg p-2">
-          <div className="w-3 h-3 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-          <span>Updating session...</span>
-        </div>
-      )}
-
+      {/* Only show session issues when critical */}
       {sessionStatus === 'expired' && (
         <div className="flex items-center justify-center gap-2 text-red-400 text-sm bg-red-900/20 border border-red-500/30 rounded-lg p-3">
           <AlertCircle className="w-4 h-4" />

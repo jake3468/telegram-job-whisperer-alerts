@@ -124,7 +124,10 @@ class EnterpriseSessionManager {
         this.state.sessionExtended = false;
 
         await setClerkToken(token);
-        console.log(`[EnterpriseSession] Token refreshed (${this.state.refreshCount})`);
+        // Reduce console noise - only log occasional refreshes
+        if (this.state.refreshCount % 5 === 0) {
+          console.log(`[EnterpriseSession] Token refreshed (${this.state.refreshCount})`);
+        }
 
         // Resolve all queued requests
         this.requestQueue.forEach(({ resolve }) => resolve(token));
@@ -150,14 +153,14 @@ class EnterpriseSessionManager {
 
   // Less aggressive session management - check every 10 minutes instead of 45
   startSessionManagement(getToken: () => Promise<string | null>): void {
-    // Background heartbeat every 10 minutes (less aggressive)
+    // Background heartbeat every 15 minutes (very conservative)
     this.heartbeatInterval = setInterval(async () => {
       if (this.isUserActive()) {
         if (!this.isTokenValid()) {
           await this.refreshToken(getToken, true);
         }
       }
-    }, 10 * 60 * 1000); // 10 minutes instead of 45
+    }, 15 * 60 * 1000); // 15 minutes - very conservative
 
     // Activity tracking with less aggressive events
     const updateActivity = () => this.updateActivity();

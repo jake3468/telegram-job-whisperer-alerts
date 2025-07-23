@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { RefreshCw, Copy } from 'lucide-react';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useToast } from '@/hooks/use-toast';
-import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
+import { useMinimalTokenManager } from '@/hooks/useMinimalTokenManager';
 
 
 const Profile = () => {
@@ -30,8 +30,8 @@ const Profile = () => {
   const { showPopup, hidePopup, dontShowAgain } = useOnboardingPopup();
   const { toast } = useToast();
 
-  // Enhanced token management for the entire Profile page
-  const { updateActivity } = useFormTokenKeepAlive(true);
+  // Minimal token management for the Profile page
+  const { updateActivity } = useMinimalTokenManager(true);
 
   // Connection and error state management
   const [connectionIssue, setConnectionIssue] = useState(false);

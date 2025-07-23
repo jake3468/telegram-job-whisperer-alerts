@@ -28,7 +28,10 @@ export const useEnterpriseAPIClient = () => {
 
     // Less aggressive pre-request token validation
     if (!isTokenValid()) {
-      console.log('[EnterpriseAPI] Token expired, refreshing...');
+        // Reduce console noise for token refresh messages
+        if (Math.random() < 0.1) { // Only log 10% of token refresh messages
+          console.log('[EnterpriseAPI] Token expired, refreshing...');
+        }
       await refreshToken(true);
     }
 
