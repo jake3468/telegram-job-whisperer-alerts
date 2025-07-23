@@ -34,14 +34,14 @@ class EnterpriseSessionManager {
   private activityListeners: (() => void)[] = [];
   private debounceTimer: NodeJS.Timeout | null = null;
 
-  // Dynamic token expiry calculation (10-15% buffer)
+  // Less aggressive token expiry calculation (5-10 minute buffer instead of 1-15 minutes)
   calculateTokenBuffer(tokenExpiry: number): number {
     const totalLifetime = tokenExpiry - Date.now();
-    const bufferPercentage = Math.min(Math.max(totalLifetime * 0.1, 60 * 1000), 15 * 60 * 1000); // 1min to 15min
+    const bufferPercentage = Math.min(Math.max(totalLifetime * 0.05, 5 * 60 * 1000), 10 * 60 * 1000); // 5min to 10min buffer
     return bufferPercentage;
   }
 
-  // Check if token is valid with dynamic buffer
+  // Check if token is valid with less aggressive buffer
   isTokenValid(): boolean {
     if (!this.state.token || !this.state.expiry) return false;
     
@@ -49,18 +49,24 @@ class EnterpriseSessionManager {
     const buffer = this.calculateTokenBuffer(this.state.expiry);
     const isValid = (this.state.expiry - now) > buffer;
     
-    // If token is close to expiry but user is active, extend session
-    if (!isValid && this.isUserActive()) {
+    // Less aggressive session extension - only extend if user is very active
+    if (!isValid && this.isUserVeryActive()) {
       this.state.sessionExtended = true;
     }
     
     return isValid;
   }
 
-  // Check if user is actively using the app
+  // Check if user is very actively using the app (stricter than before)
+  isUserVeryActive(): boolean {
+    const timeSinceActivity = Date.now() - this.state.lastActivity;
+    return timeSinceActivity < 30 * 1000; // Active if activity within 30 seconds (much stricter)
+  }
+
+  // Check if user is moderately active (for heartbeat)
   isUserActive(): boolean {
     const timeSinceActivity = Date.now() - this.state.lastActivity;
-    return timeSinceActivity < 2 * 60 * 1000; // Active if activity within 2 minutes
+    return timeSinceActivity < 5 * 60 * 1000; // Active if activity within 5 minutes
   }
 
   // Update activity timestamp
@@ -68,7 +74,7 @@ class EnterpriseSessionManager {
     this.state.lastActivity = Date.now();
   }
 
-  // Debounced token validation to prevent race conditions
+  // Less aggressive debounced token validation
   private debouncedValidityCheck(): boolean {
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
@@ -77,9 +83,9 @@ class EnterpriseSessionManager {
     return this.isTokenValid();
   }
 
-  // Enterprise-grade token refresh with queue management
+  // Less aggressive token refresh with exponential backoff
   async refreshToken(getToken: () => Promise<string | null>, forceRefresh = false): Promise<string | null> {
-    // Return cached token if valid and not forcing refresh (with debounced check)
+    // Return cached token if valid and not forcing refresh
     if (!forceRefresh && this.debouncedValidityCheck()) {
       return this.state.token;
     }
@@ -94,9 +100,9 @@ class EnterpriseSessionManager {
     this.state.isRefreshing = true;
 
     try {
-      // Exponential backoff for failures (enterprise pattern)
+      // More aggressive exponential backoff for failures
       if (this.state.failureCount > 0) {
-        const backoffDelay = Math.min(1000 * Math.pow(2, this.state.failureCount), 10000);
+        const backoffDelay = Math.min(2000 * Math.pow(2, this.state.failureCount), 30000); // 2s to 30s
         await new Promise(resolve => setTimeout(resolve, backoffDelay));
       }
 
@@ -142,20 +148,20 @@ class EnterpriseSessionManager {
     }
   }
 
-  // Start background session management
+  // Less aggressive session management - check every 10 minutes instead of 45
   startSessionManagement(getToken: () => Promise<string | null>): void {
-    // Background heartbeat every 45 minutes (enterprise standard)
+    // Background heartbeat every 10 minutes (less aggressive)
     this.heartbeatInterval = setInterval(async () => {
       if (this.isUserActive()) {
         if (!this.isTokenValid()) {
           await this.refreshToken(getToken, true);
         }
       }
-    }, 45 * 60 * 1000);
+    }, 10 * 60 * 1000); // 10 minutes instead of 45
 
-    // Activity tracking
+    // Activity tracking with less aggressive events
     const updateActivity = () => this.updateActivity();
-    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    const events = ['mousedown', 'keypress', 'touchstart']; // Removed mousemove and scroll
     
     events.forEach(event => {
       document.addEventListener(event, updateActivity, true);
@@ -214,7 +220,7 @@ export const useEnterpriseSessionManager = () => {
       const token = await sessionManager.refreshToken(getTokenFn, true);
       setIsReady(!!token);
       
-      // Start background session management
+      // Start less aggressive session management
       sessionManager.startSessionManagement(getTokenFn);
       initRef.current = true;
     };
@@ -227,25 +233,25 @@ export const useEnterpriseSessionManager = () => {
     };
   }, [user, getToken]);
 
-  // Enterprise-grade token refresh function - fix dependency array
+  // Less aggressive token refresh function
   const refreshToken = useCallback(async (forceRefresh = false): Promise<string | null> => {
     if (!getToken) return null;
     
     const getTokenFn = () => getToken({ template: 'supabase', skipCache: true });
     return sessionManager.refreshToken(getTokenFn, forceRefresh);
-  }, [getToken]); // Fixed: ensure getToken is always defined
+  }, [getToken]);
 
-  // Check token validity - no dependencies needed since it's a simple check
+  // Check token validity
   const isTokenValid = useCallback(() => {
     return sessionManager.isTokenValid();
   }, []);
 
-  // Update activity - no dependencies needed
+  // Update activity
   const updateActivity = useCallback(() => {
     sessionManager.updateActivity();
   }, []);
 
-  // Get current token immediately - no dependencies needed
+  // Get current token immediately
   const getCurrentToken = useCallback(() => {
     return sessionManager.getCurrentToken();
   }, []);
