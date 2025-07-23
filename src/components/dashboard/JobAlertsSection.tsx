@@ -196,11 +196,7 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
 
         <div>
           {/* Enhanced Bot Status Component */}
-          <EnhancedBotStatus 
-            onActivationChange={() => {}} 
-            isActivated={isActivated}
-            loading={loading}
-          />
+          <EnhancedBotStatus onActivationChange={() => {}} />
 
           {/* Job Alerts List - Only show when activated */}
           {isActivated && <div className="flex flex-col gap-4 pb-6 sm:pb-8">
