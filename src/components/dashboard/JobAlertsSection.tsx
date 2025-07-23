@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Bell, Plus, AlertCircle, RefreshCw } from 'lucide-react';
 import JobAlertModal from './JobAlertModal';
 import JobAlertsList from './JobAlertsList';
-import BotStatus from './BotStatus';
+import EnhancedBotStatus from './EnhancedBotStatus';
 import { useCachedJobAlertsData } from '@/hooks/useCachedJobAlertsData';
 
 interface JobAlert {
@@ -25,9 +25,10 @@ interface JobAlert {
 
 interface JobAlertsSectionProps {
   userTimezone: string;
+  sessionManager?: any; // Enterprise session manager
 }
 
-const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
+const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProps) => {
   const { toast } = useToast();
   const { 
     alerts, 
@@ -91,7 +92,6 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
       });
       return;
     }
-
 
     try {
       await deleteJobAlert(alertId);
@@ -195,8 +195,8 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
         </div>
 
         <div>
-          {/* Bot Status Component */}
-          <BotStatus onActivationChange={() => {}} />
+          {/* Enhanced Bot Status Component */}
+          <EnhancedBotStatus onActivationChange={() => {}} />
 
           {/* Job Alerts List - Only show when activated */}
           {isActivated && <div className="flex flex-col gap-4 pb-6 sm:pb-8">
@@ -212,6 +212,7 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
             onSubmit={handleModalSubmit}
             currentAlertCount={alertsUsed}
             maxAlerts={MAX_ALERTS}
+            sessionManager={sessionManager}
           />
 
           {!isActivated && <div className="text-center py-6">

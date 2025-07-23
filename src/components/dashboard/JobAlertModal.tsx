@@ -26,6 +26,7 @@ interface JobAlertModalProps {
   onSubmit: () => void;
   currentAlertCount: number;
   maxAlerts: number;
+  sessionManager?: any; // Enterprise session manager
 }
 
 const JobAlertModal = ({
@@ -35,7 +36,8 @@ const JobAlertModal = ({
   editingAlert,
   onSubmit,
   currentAlertCount,
-  maxAlerts
+  maxAlerts,
+  sessionManager
 }: JobAlertModalProps) => {
   const handleFormSubmit = () => {
     onSubmit();
@@ -76,6 +78,7 @@ const JobAlertModal = ({
             onCancel={handleFormCancel}
             currentAlertCount={currentAlertCount}
             maxAlerts={maxAlerts}
+            sessionManager={sessionManager}
           />
         </div>
         

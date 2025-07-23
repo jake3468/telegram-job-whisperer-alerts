@@ -7,6 +7,7 @@ import JobAlertsSection from '@/components/dashboard/JobAlertsSection';
 import { Layout } from '@/components/Layout';
 import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
+import { useEnhancedTokenManagerIntegration } from '@/hooks/useEnhancedTokenManagerIntegration';
 
 import { JobAlertsOnboardingPopup } from '@/components/JobAlertsOnboardingPopup';
 import { Badge } from '@/components/ui/badge';
@@ -18,9 +19,11 @@ const JobAlerts = () => {
   } = useUser();
   const navigate = useNavigate();
   
-
   // CRITICAL: Ensure Clerk-Supabase sync runs on this page
   useClerkSupabaseSync();
+
+  // Enterprise session management for Job Alerts page
+  const sessionManager = useEnhancedTokenManagerIntegration({ enabled: true });
 
   // Replace useFeatureCreditCheck with the new system
   useCreditWarnings(); // This shows the warning popups
@@ -94,7 +97,10 @@ const JobAlerts = () => {
       <JobAlertsOnboardingPopup />
 
       <div className="space-y-8">
-        <JobAlertsSection userTimezone={userTimezone} />
+        <JobAlertsSection 
+          userTimezone={userTimezone} 
+          sessionManager={sessionManager}
+        />
       </div>
     </Layout>;
 };
