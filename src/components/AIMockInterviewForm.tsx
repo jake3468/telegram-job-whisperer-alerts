@@ -67,24 +67,29 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
   const { optimisticAdd } = useCachedGraceInterviewRequests();
   const { credits, hasCredits, useCredit, refetch: refetchCredits, isLoading: creditsLoading } = useAIInterviewCredits();
 
-  // Proactive token management
+  // Proactive token management - but less aggressive UI updates
   useEffect(() => {
     const checkTokenStatus = async () => {
       if (sessionManager?.isTokenValid) {
         const isValid = sessionManager.isTokenValid();
-        setTokenStatus(isValid ? 'valid' : 'expired');
         
-        // If token is expired or close to expiry, refresh it proactively
-        if (!isValid && sessionManager.refreshToken) {
+        // Only update status if there's a significant change
+        if (!isValid && tokenStatus !== 'expired') {
+          setTokenStatus('expired');
+        } else if (isValid && tokenStatus !== 'valid') {
+          setTokenStatus('valid');
+        }
+        
+        // If token is expired or close to expiry, refresh it silently
+        if (!isValid && sessionManager.refreshToken && !isRefreshingToken) {
           setIsRefreshingToken(true);
-          setTokenStatus('refreshing');
           
           try {
             await sessionManager.refreshToken(true);
             setTokenStatus('valid');
-            console.log('[AIMockInterviewForm] Token refreshed proactively');
+            console.log('[AIMockInterviewForm] Token refreshed silently');
           } catch (error) {
-            console.error('[AIMockInterviewForm] Proactive token refresh failed:', error);
+            console.error('[AIMockInterviewForm] Silent token refresh failed:', error);
             setTokenStatus('expired');
           } finally {
             setIsRefreshingToken(false);
@@ -93,12 +98,12 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
       }
     };
 
-    // Check token status on mount and periodically
+    // Check token status on mount and less frequently
     checkTokenStatus();
-    const interval = setInterval(checkTokenStatus, 60000); // Check every minute
+    const interval = setInterval(checkTokenStatus, 5 * 60 * 1000); // Check every 5 minutes instead of 1 minute
     
     return () => clearInterval(interval);
-  }, [sessionManager]);
+  }, [sessionManager, tokenStatus, isRefreshingToken]); // Include dependencies to prevent unnecessary re-runs
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({
@@ -118,27 +123,29 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
       console.log('[AIMockInterviewForm] Validating phone number uniqueness:', phoneNumber);
       
       // Check if phone number already exists in grace_interview_requests
-      const { data: existingRequest, error } = await supabase
+      // Use .select() without .maybeSingle() to handle multiple results properly
+      const { data: existingRequests, error } = await supabase
         .from('grace_interview_requests')
         .select('user_id, phone_number')
-        .eq('phone_number', phoneNumber)
-        .maybeSingle();
+        .eq('phone_number', phoneNumber);
 
       if (error) {
         console.error('[AIMockInterviewForm] Error checking phone number:', error);
         throw new Error("Failed to validate phone number");
       }
 
-      console.log('[AIMockInterviewForm] Phone validation result:', { existingRequest, phoneNumber });
+      console.log('[AIMockInterviewForm] Phone validation result:', { existingRequests, phoneNumber });
 
-      if (existingRequest) {
-        // Phone number exists, check if it belongs to the same user
-        if (existingRequest.user_id !== userProfile?.id) {
-          // Different user - get the email of the existing account
+      if (existingRequests && existingRequests.length > 0) {
+        // Phone number exists, check if any belongs to a different user
+        const otherUserRequests = existingRequests.filter(req => req.user_id !== userProfile?.id);
+        
+        if (otherUserRequests.length > 0) {
+          // Different user - get the email of the first existing account
           const { data: existingUserProfile, error: profileError } = await supabase
             .from('user_profile')
             .select('user_id')
-            .eq('id', existingRequest.user_id)
+            .eq('id', otherUserRequests[0].user_id)
             .single();
 
           if (profileError) {
@@ -421,15 +428,15 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
         onBuyMore={() => setIsPricingModalOpen(true)} 
       />
 
-      {/* Token Status Indicator */}
-      {(isRefreshingToken || tokenStatus === 'refreshing') && (
+      {/* Token Status Indicator - Only show when actually refreshing or permanently expired */}
+      {isRefreshingToken && (
         <div className="flex items-center justify-center gap-2 text-yellow-400 text-sm bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-3">
           <RefreshCw className="w-4 h-4 animate-spin" />
           <span>Refreshing session...</span>
         </div>
       )}
 
-      {tokenStatus === 'expired' && (
+      {tokenStatus === 'expired' && !isRefreshingToken && (
         <div className="flex items-center justify-center gap-2 text-red-400 text-sm bg-red-900/20 border border-red-500/30 rounded-lg p-3">
           <AlertCircle className="w-4 h-4" />
           <span>Session expired. Please refresh the page.</span>
