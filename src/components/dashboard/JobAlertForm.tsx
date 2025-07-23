@@ -169,6 +169,12 @@ const JobAlertForm = ({
            console.log('[JobAlertForm] Calling optimistic update with:', updatedAlert);
            optimisticUpdate(updatedAlert);
            
+           // Also invalidate cache to ensure fresh data on refresh
+           setTimeout(() => {
+             console.log('[JobAlertForm] Invalidating cache after successful update');
+             localStorage.removeItem('aspirely_job_alerts_cache');
+           }, 1000); // Give the optimistic update time to show
+           
            toast({
              title: "Alert Updated",
              description: "Your job alert has been updated successfully.",
@@ -195,10 +201,17 @@ const JobAlertForm = ({
             throw error;
           }
 
-          // Optimistic UI update for immediate feedback
-          if (data) {
-            optimisticAdd(data as any);
-          }
+           // Optimistic UI update for immediate feedback
+           if (data) {
+             console.log('[JobAlertForm] Calling optimistic add with:', data);
+             optimisticAdd(data as any);
+             
+             // Also invalidate cache to ensure fresh data on refresh
+             setTimeout(() => {
+               console.log('[JobAlertForm] Invalidating cache after successful create');
+               localStorage.removeItem('aspirely_job_alerts_cache');
+             }, 1000); // Give the optimistic update time to show
+           }
           
           toast({
             title: "Alert Created",
