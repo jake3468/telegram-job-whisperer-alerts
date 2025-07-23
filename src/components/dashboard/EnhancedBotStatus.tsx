@@ -31,7 +31,7 @@ const EnhancedBotStatus = ({
   return <div className="border border-orange-600 rounded-lg p-4 mb-6 bg-slate-950">
       <div className="flex items-center gap-3 mb-3">
         <XCircle className="w-5 h-5 text-orange-400" />
-        <span className="text-orange-300 font-medium text-lg">Bot Not Yet Activated</span>
+        <span className="font-medium text-lg text-red-500">Bot Not Yet Activated</span>
       </div>
       
       <div className="space-y-3">
