@@ -8,9 +8,14 @@ import { useCachedGraceInterviewRequests } from "@/hooks/useCachedGraceInterview
 import GraceInterviewReportsModal from "@/components/GraceInterviewReportsModal";
 import { AIInterviewPricingModal } from "@/components/AIInterviewPricingModal";
 import { useLocation } from "react-router-dom";
+import { useEnhancedTokenManagerIntegration } from "@/hooks/useEnhancedTokenManagerIntegration";
 
 const AIMockInterview = () => {
   const location = useLocation();
+  
+  // Initialize enterprise session management
+  const sessionManager = useEnhancedTokenManagerIntegration({ enabled: true });
+  
   const {
     connectionIssue,
     forceRefresh
@@ -36,11 +41,21 @@ const AIMockInterview = () => {
     }
   }, [location.state]);
 
-  const handleManualRefresh = () => {
-    // Clear all caches and reload the page for a complete refresh
+  const handleManualRefresh = async () => {
+    // Clear all caches and force session refresh
     localStorage.removeItem('aspirely_user_profile_cache');
     localStorage.removeItem('aspirely_user_completion_status_cache');
     localStorage.removeItem('aspirely_ai_interview_credits_cache');
+    
+    // Force token refresh if session manager is available
+    if (sessionManager?.refreshToken) {
+      try {
+        await sessionManager.refreshToken();
+      } catch (error) {
+        console.log('Token refresh during manual refresh:', error);
+      }
+    }
+    
     window.location.reload();
   };
 

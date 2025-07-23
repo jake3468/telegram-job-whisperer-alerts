@@ -12,6 +12,7 @@ import { useAIInterviewCredits } from "@/hooks/useAIInterviewCredits";
 import { ProfileCompletionWarning } from "@/components/ProfileCompletionWarning";
 import { AIInterviewCreditsDisplay } from "@/components/AIInterviewCreditsDisplay";
 import { AIInterviewPricingModal } from "@/components/AIInterviewPricingModal";
+import { useEnterpriseAPIClient } from "@/hooks/useEnterpriseAPIClient";
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 
@@ -37,6 +38,9 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
     jobTitle: "",
     jobDescription: ""
   });
+  
+  // Initialize enterprise API client for secure, token-aware requests
+  const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
 
   // Auto-populate form data if prefillData is provided
   useEffect(() => {
@@ -67,8 +71,8 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
     // Validate that phone number is not empty and has proper format (react-phone-input-2 handles validation)
     return phone && phone.length >= 8;
   };
-  const validatePhoneNumberUniqueness = async (phoneNumber: string, retryCount = 0) => {
-    try {
+  const validatePhoneNumberUniqueness = async (phoneNumber: string) => {
+    return await makeAuthenticatedRequest(async () => {
       // Check if phone number already exists in grace_interview_requests
       const { data: existingRequest, error } = await supabase
         .from('grace_interview_requests')
@@ -78,16 +82,6 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
 
       if (error) {
         console.error("Error checking phone number:", error);
-        
-        // Handle JWT/session errors with automatic retry
-        if ((error.message?.includes('JWT') || error.message?.includes('expired') || error.message?.includes('token')) && retryCount < 2) {
-          console.log(`JWT/session error detected, refreshing token and retrying (attempt ${retryCount + 1})`);
-          
-          // Wait a bit and retry with fresh session
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          return validatePhoneNumberUniqueness(phoneNumber, retryCount + 1);
-        }
-        
         throw new Error("Failed to validate phone number");
       }
 
@@ -125,10 +119,7 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
       }
 
       return { isValid: true };
-    } catch (error) {
-      console.error("Phone validation error:", error);
-      throw error;
-    }
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -231,22 +222,27 @@ const AIMockInterviewForm = ({ prefillData }: AIMockInterviewFormProps) => {
         job_description: formData.jobDescription
       });
       
-      const { data, error } = await supabase
-        .from("grace_interview_requests")
-        .insert({
-          user_id: userProfile.id,
-          phone_number: phoneNumber,
-          company_name: formData.companyName,
-          job_title: formData.jobTitle,
-          job_description: formData.jobDescription
-        })
-        .select()
-        .single();
-      
-      if (error) {
-        console.error("Supabase error:", error);
-        throw error;
-      }
+      // Use authenticated request for database insertion
+      const data = await makeAuthenticatedRequest(async () => {
+        const { data, error } = await supabase
+          .from("grace_interview_requests")
+          .insert({
+            user_id: userProfile.id,
+            phone_number: phoneNumber,
+            company_name: formData.companyName,
+            job_title: formData.jobTitle,
+            job_description: formData.jobDescription
+          })
+          .select()
+          .single();
+        
+        if (error) {
+          console.error("Supabase error:", error);
+          throw error;
+        }
+        
+        return data;
+      });
       
       console.log("Successfully inserted data:", data);
       
