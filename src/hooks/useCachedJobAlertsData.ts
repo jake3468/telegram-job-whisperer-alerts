@@ -2,7 +2,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { logger } from '@/utils/logger';
-import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
+import { useEnterpriseAPIClient } from './useEnterpriseAPIClient';
 
 interface JobAlert {
   id: string;
@@ -34,6 +35,7 @@ let isRefreshing = false; // Request deduplication flag
 
 export const useCachedJobAlertsData = () => {
   const { user } = useUser();
+  const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
   const [alerts, setAlerts] = useState<JobAlert[]>([]);
   const [isActivated, setIsActivated] = useState<boolean>(false);
   const [userProfileId, setUserProfileId] = useState<string | null>(null);
