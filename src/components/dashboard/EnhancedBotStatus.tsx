@@ -36,25 +36,19 @@ const EnhancedBotStatus = ({
       
       <div className="space-y-3">
         <p className="text-orange-200 text-sm">
-          Follow these steps to activate your Telegram bot for job alerts:
+          🤖 How to Activate the Job Alert Bot on Telegram:
         </p>
         
-        <div className="space-y-2 text-sm">
-          <div className="flex items-center gap-2">
-            <span className="w-5 h-5 bg-orange-600 text-white rounded-full flex items-center justify-center text-xs font-bold">1</span>
-            <span className="text-orange-100">Search for our bot on Telegram: <code className="bg-orange-800/50 px-1 rounded">@YourJobBot</code></span>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <span className="w-5 h-5 bg-orange-600 text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
-            <span className="text-orange-100">Start a conversation by sending <code className="bg-orange-800/50 px-1 rounded">/start</code></span>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <span className="w-5 h-5 bg-orange-600 text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
-            <span className="text-orange-100">Follow the bot's instructions to link your account</span>
-          </div>
-        </div>
+        <ol className="text-sm space-y-2 text-orange-200 list-decimal list-inside">
+          <li>Open your 'Telegram' app</li>
+          <li>Copy the bot name: <code className="bg-orange-800/50 px-1 rounded text-orange-100">Job_AI_update_bot</code></li>
+          <li>Paste it into Telegram's search bar 🔍 and open the bot.</li>
+          <li>Click the 'Start' button in the chat. If you don't see it, type '<code className="bg-orange-800/50 px-1 rounded text-orange-100">/start</code>' and send it.</li>
+          <li>The bot will ask for your "Bot ID" 🔑. Copy your Bot ID from your dashboard and send it to the bot.</li>
+          <li>Once successful, you'll receive a message: "Bot successfully activated! ✅"</li>
+          <li>🎯 You're all set! You can now set your Job Alerts below.</li>
+          <li>🔔 Make sure the Telegram bot is not muted, so you don't miss your daily job alerts.</li>
+        </ol>
       </div>
     </div>;
 };
