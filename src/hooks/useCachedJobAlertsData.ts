@@ -153,93 +153,47 @@ export const useCachedJobAlertsData = () => {
       
       console.log('[JobAlertsData] Making authenticated request...');
       
-      // Use enterprise session management for authenticated requests
+      // Use direct supabase client instead of enterprise session to avoid auth conflicts
       let profileData, alertsData;
       
-      try {
-        await makeAuthenticatedRequest(async () => {
-          console.log('[JobAlertsData] Inside authenticated request, fetching profile...');
-          
-          // Get user profile
-          const { data: profile, error: profileError } = await supabase
-            .from('user_profile')
-            .select('id, bot_activated')
-            .maybeSingle();
-            
-          console.log('[JobAlertsData] Profile query result:', { profile, profileError });
-            
-          if (profileError) {
-            console.error('[JobAlertsData] Profile fetch error:', profileError);
-            throw new Error(`Profile fetch failed: ${profileError.message}`);
-          }
-          
-          if (!profile) {
-            console.error('[JobAlertsData] No profile found');
-            throw new Error('User profile not found. Please try signing out and back in.');
-          }
-          
-          profileData = profile;
-          console.log('[JobAlertsData] Profile data:', profileData);
-
-          // Fetch job alerts
-          console.log('[JobAlertsData] Fetching job alerts...');
-          const { data: alerts, error: alertsError } = await supabase
-            .from('job_alerts')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-          console.log('[JobAlertsData] Job alerts query result:', { alerts, alertsError });
-
-          if (alertsError) {
-            console.error('[JobAlertsData] Job alerts fetch error:', alertsError);
-            throw alertsError;
-          }
-          
-          alertsData = alerts;
-        });
-      } catch (enterpriseError) {
-        console.error('[JobAlertsData] Enterprise session failed, attempting fallback:', enterpriseError);
+      console.log('[JobAlertsData] Fetching profile directly...');
+      
+      // Get user profile
+      const { data: profile, error: profileError } = await supabase
+        .from('user_profile')
+        .select('id, bot_activated')
+        .maybeSingle();
         
-        // Fallback to regular supabase client
-        console.log('[JobAlertsData] Using fallback direct supabase client...');
+      console.log('[JobAlertsData] Profile query result:', { profile, profileError });
         
-        // Get user profile with regular client
-        const { data: profile, error: profileError } = await supabase
-          .from('user_profile')
-          .select('id, bot_activated')
-          .maybeSingle();
-          
-        console.log('[JobAlertsData] Fallback profile query result:', { profile, profileError });
-          
-        if (profileError) {
-          console.error('[JobAlertsData] Fallback profile fetch error:', profileError);
-          throw new Error(`Profile fetch failed: ${profileError.message}`);
-        }
-        
-        if (!profile) {
-          console.error('[JobAlertsData] No profile found in fallback');
-          throw new Error('User profile not found. Please try signing out and back in.');
-        }
-        
-        profileData = profile;
-        console.log('[JobAlertsData] Fallback profile data:', profileData);
-
-        // Fetch job alerts with regular client
-        console.log('[JobAlertsData] Fallback fetching job alerts...');
-        const { data: alerts, error: alertsError } = await supabase
-          .from('job_alerts')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        console.log('[JobAlertsData] Fallback job alerts query result:', { alerts, alertsError });
-
-        if (alertsError) {
-          console.error('[JobAlertsData] Fallback job alerts fetch error:', alertsError);
-          throw alertsError;
-        }
-        
-        alertsData = alerts;
+      if (profileError) {
+        console.error('[JobAlertsData] Profile fetch error:', profileError);
+        throw new Error(`Profile fetch failed: ${profileError.message}`);
       }
+      
+      if (!profile) {
+        console.error('[JobAlertsData] No profile found');
+        throw new Error('User profile not found. Please try signing out and back in.');
+      }
+      
+      profileData = profile;
+      console.log('[JobAlertsData] Profile data:', profileData);
+
+      // Fetch job alerts
+      console.log('[JobAlertsData] Fetching job alerts directly...');
+      const { data: alerts, error: alertsError } = await supabase
+        .from('job_alerts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      console.log('[JobAlertsData] Job alerts query result:', { alerts, alertsError });
+
+      if (alertsError) {
+        console.error('[JobAlertsData] Job alerts fetch error:', alertsError);
+        throw alertsError;
+      }
+      
+      alertsData = alerts;
 
       const result = {
         alerts: alertsData || [],
