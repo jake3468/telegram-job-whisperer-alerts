@@ -1,16 +1,14 @@
-import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 import { CheckCircle, XCircle, Loader2, Bot } from 'lucide-react';
 interface BotStatusProps {
   onActivationChange: () => void;
+  isActivated: boolean;
+  loading: boolean;
 }
 const EnhancedBotStatus = ({
-  onActivationChange
+  onActivationChange,
+  isActivated,
+  loading
 }: BotStatusProps) => {
-  const {
-    userProfile,
-    loading
-  } = useCachedUserProfile();
-  const isActivated = userProfile?.bot_activated === true;
   if (loading) {
     return <div className="bg-gray-900/50 border border-gray-600 rounded-lg p-4 mb-6">
         <div className="flex items-center gap-3">
