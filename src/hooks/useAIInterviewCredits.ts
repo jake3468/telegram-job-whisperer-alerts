@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@clerk/clerk-react';
 import { logger } from '@/utils/logger';
 import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
@@ -40,94 +39,62 @@ export const useAIInterviewCredits = () => {
 
       logger.debug('AIInterviewCredits: Fetching credits for user_id:', userProfile.user_id);
 
-      // CRITICAL FIX: Use makeAuthenticatedRequest for proper JWT token handling
-      const { data, error: fetchError } = await makeAuthenticatedRequest(async () => {
-        return await supabase
-          .from('ai_interview_credits')
-          .select('*')
-          .eq('user_id', userProfile.user_id)
-          .maybeSingle();
-      }, { operationType: 'fetch_ai_interview_credits' });
+      const { data, error: fetchError } = await supabase
+        .from('ai_interview_credits')
+        .select('*')
+        .eq('user_id', userProfile.user_id)
+        .maybeSingle();
 
       if (fetchError) {
         // Handle specific error cases
         if (fetchError.code === 'PGRST116') {
           // No records found, need to initialize
           logger.info('No AI interview credits found for user, initializing...');
-          
-          // Initialize credits using authenticated request
-          const { data: initResult, error: initError } = await makeAuthenticatedRequest(async () => {
-            return await supabase.rpc('initialize_ai_interview_credits', {
-              p_user_id: userProfile.user_id
-            });
-          }, { operationType: 'initialize_ai_interview_credits' });
-
-          if (initError) {
-            logger.error('Error initializing AI interview credits:', initError);
-            setError(`Failed to initialize calls: ${initError.message}`);
-            return;
-          }
-
-          // Fetch the newly created record
-          const { data: newData, error: refetchError } = await makeAuthenticatedRequest(async () => {
-            return await supabase
-              .from('ai_interview_credits')
-              .select('*')
-              .eq('user_id', userProfile.user_id)
-              .maybeSingle();
-          }, { operationType: 'refetch_ai_interview_credits' });
-
-          if (refetchError) {
-            logger.error('Error fetching newly created AI interview credits:', refetchError);
-            setError(`Failed to load new call data: ${refetchError.message}`);
-            return;
-          }
-
-          setCredits(newData);
-          logger.info('Successfully initialized and loaded AI interview credits:', newData);
+        } else if (fetchError.message?.includes('JWT') && retryCount < 2) {
+          // Handle JWT expiration by silently retrying once
+          logger.info('JWT issue detected, retrying...');
+          setRetryCount(prev => prev + 1);
+          setTimeout(() => fetchCredits(true), 1000);
+          return;
         } else {
           logger.error('Error fetching AI interview credits:', fetchError);
           setError(`Failed to load call data: ${fetchError.message}`);
           return;
         }
-      } else {
-        if (!data) {
-          // Initialize credits for this user
-          logger.info('Initializing AI interview credits for user:', userProfile.user_id);
-          
-          const { data: initResult, error: initError } = await makeAuthenticatedRequest(async () => {
-            return await supabase.rpc('initialize_ai_interview_credits', {
-              p_user_id: userProfile.user_id
-            });
-          }, { operationType: 'initialize_ai_interview_credits' });
+      }
 
-          if (initError) {
-            logger.error('Error initializing AI interview credits:', initError);
-            setError(`Failed to initialize calls: ${initError.message}`);
-            return;
-          }
+      if (!data) {
+        // Initialize credits for this user
+        logger.info('Initializing AI interview credits for user:', userProfile.user_id);
+        
+        const { data: initResult, error: initError } = await supabase.rpc('initialize_ai_interview_credits', {
+          p_user_id: userProfile.user_id
+        });
 
-          // Fetch the newly created record
-          const { data: newData, error: refetchError } = await makeAuthenticatedRequest(async () => {
-            return await supabase
-              .from('ai_interview_credits')
-              .select('*')
-              .eq('user_id', userProfile.user_id)
-              .maybeSingle();
-          }, { operationType: 'refetch_ai_interview_credits' });
-
-          if (refetchError) {
-            logger.error('Error fetching newly created AI interview credits:', refetchError);
-            setError(`Failed to load new call data: ${refetchError.message}`);
-            return;
-          }
-
-          setCredits(newData);
-          logger.info('Successfully initialized and loaded AI interview credits:', newData);
-        } else {
-          setCredits(data);
-          logger.debug('Successfully loaded existing AI interview credits:', data);
+        if (initError) {
+          logger.error('Error initializing AI interview credits:', initError);
+          setError(`Failed to initialize calls: ${initError.message}`);
+          return;
         }
+
+        // Fetch the newly created record
+        const { data: newData, error: refetchError } = await supabase
+          .from('ai_interview_credits')
+          .select('*')
+          .eq('user_id', userProfile.user_id)
+          .maybeSingle();
+
+        if (refetchError) {
+          logger.error('Error fetching newly created AI interview credits:', refetchError);
+          setError(`Failed to load new call data: ${refetchError.message}`);
+          return;
+        }
+
+        setCredits(newData);
+        logger.info('Successfully initialized and loaded AI interview credits:', newData);
+      } else {
+        setCredits(data);
+        logger.debug('Successfully loaded existing AI interview credits:', data);
       }
       
       // Reset retry count on success
@@ -152,13 +119,10 @@ export const useAIInterviewCredits = () => {
     }
 
     try {
-      // CRITICAL FIX: Use makeAuthenticatedRequest for proper JWT token handling
-      const { data: success, error: useError } = await makeAuthenticatedRequest(async () => {
-        return await supabase.rpc('use_ai_interview_credit', {
-          p_user_id: userProfile.user_id,
-          p_description: description || 'AI mock interview call used'
-        });
-      }, { operationType: 'use_ai_interview_credit' });
+      const { data: success, error: useError } = await supabase.rpc('use_ai_interview_credit', {
+        p_user_id: userProfile.user_id,
+        p_description: description || 'AI mock interview call used'
+      });
 
       if (useError) {
         logger.error('Error using AI interview credit:', useError);

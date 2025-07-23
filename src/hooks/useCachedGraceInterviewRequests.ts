@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
-import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/logger';
 
 interface GraceInterviewRequest {
@@ -15,21 +14,6 @@ interface GraceInterviewRequest {
   created_at: string;
   updated_at: string;
   processed_at?: string;
-  interview_status?: string;
-  completion_percentage?: number;
-  time_spent?: number;
-  feedback_message?: string;
-  feedback_suggestion?: string;
-  feedback_next_action?: string;
-  report_generated?: boolean;
-  executive_summary?: string;
-  overall_scores?: any;
-  strengths?: string;
-  areas_for_improvement?: string;
-  detailed_feedback?: string;
-  motivational_message?: string;
-  actionable_plan?: string;
-  next_steps_priority?: string;
 }
 
 interface CachedGraceInterviewData {
@@ -96,80 +80,40 @@ export const useCachedGraceInterviewRequests = () => {
       setError(null);
       setConnectionIssue(false);
       
-      logger.debug('Fetching grace interview data for user:', user.id);
-      
-      // CRITICAL FIX: Use makeAuthenticatedRequest for proper JWT token handling
       // Get the user UUID from users table using clerk_id
-      const { data: userData, error: userError } = await makeAuthenticatedRequest(async () => {
-        return await supabase
-          .from('users')
-          .select('id')
-          .eq('clerk_id', user.id)
-          .maybeSingle();
-      }, { operationType: 'fetch_user_by_clerk_id' });
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('clerk_id', user.id)
+        .maybeSingle();
       
       if (userError || !userData) {
-        logger.error('Error fetching user data:', userError);
         throw new Error('Unable to load user data');
       }
 
       // Get user profile using the user UUID
-      const { data: userProfile, error: profileError } = await makeAuthenticatedRequest(async () => {
-        return await supabase
-          .from('user_profile')
-          .select('id')
-          .eq('user_id', userData.id)
-          .maybeSingle();
-      }, { operationType: 'fetch_user_profile' });
+      const { data: userProfile, error: profileError } = await supabase
+        .from('user_profile')
+        .select('id')
+        .eq('user_id', userData.id)
+        .maybeSingle();
       
       if (profileError || !userProfile) {
-        logger.error('Error fetching user profile:', profileError);
         throw new Error('Unable to load user profile');
       }
 
       // Get grace interview requests for this user profile
-      const { data, error } = await makeAuthenticatedRequest(async () => {
-        return await supabase
-          .from('grace_interview_requests')
-          .select(`
-            id,
-            user_id,
-            phone_number,
-            company_name,
-            job_title,
-            job_description,
-            status,
-            created_at,
-            updated_at,
-            processed_at,
-            interview_status,
-            completion_percentage,
-            time_spent,
-            feedback_message,
-            feedback_suggestion,
-            feedback_next_action,
-            report_generated,
-            executive_summary,
-            overall_scores,
-            strengths,
-            areas_for_improvement,
-            detailed_feedback,
-            motivational_message,
-            actionable_plan,
-            next_steps_priority
-          `)
-          .eq('user_id', userProfile.id)
-          .order('created_at', { ascending: false });
-      }, { operationType: 'fetch_grace_interview_requests' });
+      const { data, error } = await supabase
+        .from('grace_interview_requests')
+        .select('*')
+        .eq('user_id', userProfile.id)
+        .order('created_at', { ascending: false });
       
       if (error) {
-        logger.error('Error fetching grace interview requests:', error);
         throw new Error('Unable to load interview requests');
       }
 
       const requestsData = data || [];
-      
-      logger.debug('Successfully fetched grace interview requests:', requestsData.length);
       
       // Update state
       setRequests(requestsData);

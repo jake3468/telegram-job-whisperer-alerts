@@ -9,7 +9,7 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Enterprise session manager
 let enterpriseSessionManager: any = null;
 
-// Single global client instance
+// Single global client instance - no more multiple clients
 let globalAuthenticatedClient: any = null;
 let currentAuthToken: string | null = null;
 
@@ -40,61 +40,54 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
 // Set enterprise session manager (single source of truth)
 export const setEnterpriseSessionManager = (manager: any) => {
   enterpriseSessionManager = manager;
-  console.log('[SupabaseClient] Enterprise session manager connected:', !!manager);
 };
 
-// CRITICAL FIX: Properly update client auth with JWT token
-const updateClientAuth = async (token: string): Promise<void> => {
+// Update global client headers instead of creating new clients
+const updateClientAuth = (token: string): void => {
   if (!globalAuthenticatedClient) {
     globalAuthenticatedClient = supabase;
   }
   
+  // Update token in headers without creating new client
   currentAuthToken = token;
   
-  console.log('[SupabaseClient] Setting JWT token in Authorization header');
+  // Set the authorization header properly for all Supabase operations
+  // Use session management to set the JWT token
+  globalAuthenticatedClient.auth.setSession({
+    access_token: token,
+    refresh_token: '',
+    expires_in: 3600,
+    expires_at: Date.now() / 1000 + 3600,
+    token_type: 'bearer',
+    user: null
+  });
   
-  // FIXED: Set the JWT token in the Authorization header for all requests
-  globalAuthenticatedClient.rest.headers['Authorization'] = `Bearer ${token}`;
-  
-  // Also set in the global headers for consistency
-  globalAuthenticatedClient.supabaseKey = token;
-  
-  console.log('[SupabaseClient] JWT token set in client headers');
+  console.log('[SupabaseClient] Updated auth session with token:', token ? 'Present' : 'Missing');
 };
 
 // Debounced token refresh to prevent concurrent refreshes
 const getValidToken = async (forceRefresh: boolean = false): Promise<string | null> => {
   // If already refreshing, wait for the existing promise
   if (isRefreshing && refreshPromise) {
-    console.log('[SupabaseClient] Waiting for existing token refresh');
     return await refreshPromise;
   }
 
   // Check if current token is valid without forcing refresh
   if (!forceRefresh && enterpriseSessionManager?.isTokenValid?.()) {
-    const token = enterpriseSessionManager.getCurrentToken?.();
-    if (token) {
-      console.log('[SupabaseClient] Using cached valid token');
-      return token;
-    }
+    return enterpriseSessionManager.getCurrentToken?.() || null;
   }
 
   // Start refresh process
   if (!isRefreshing) {
     isRefreshing = true;
-    console.log('[SupabaseClient] Starting token refresh process');
-    
     refreshPromise = (async () => {
       try {
         const token = await enterpriseSessionManager?.refreshToken?.(forceRefresh);
+        // Update global client with new token
         if (token && token !== currentAuthToken) {
-          console.log('[SupabaseClient] Got new token, updating client auth');
-          await updateClientAuth(token);
+          updateClientAuth(token);
         }
         return token;
-      } catch (error) {
-        console.error('[SupabaseClient] Token refresh failed:', error);
-        return null;
       } finally {
         isRefreshing = false;
         refreshPromise = null;
@@ -110,8 +103,6 @@ const processRequestQueue = async () => {
   const queue = [...requestQueue];
   requestQueue = [];
   
-  console.log('[SupabaseClient] Processing', queue.length, 'queued requests');
-  
   for (const { resolve, reject, operation, options } of queue) {
     try {
       const result = await makeAuthenticatedRequest(operation, options);
@@ -122,7 +113,7 @@ const processRequestQueue = async () => {
   }
 };
 
-// CRITICAL FIX: Enterprise-grade authenticated request with proper JWT token handling
+// Enterprise-grade authenticated request with singleton client pattern
 export const makeAuthenticatedRequest = async <T>(
   operation: () => Promise<T>,
   options: {
@@ -149,7 +140,7 @@ export const makeAuthenticatedRequest = async <T>(
     try {
       console.log(`[SupabaseClient] Attempt ${attempt + 1}/${maxRetries} for ${operationType}`);
       
-      // CRITICAL FIX: Always ensure we have a valid token before operation
+      // Get valid token (smart validation)
       const token = await getValidToken(attempt > 0);
       
       if (!token) {
@@ -157,12 +148,12 @@ export const makeAuthenticatedRequest = async <T>(
         throw new Error('Authentication required - no token available');
       }
 
-      // CRITICAL FIX: Ensure the token is set in the client before each request
-      if (token !== currentAuthToken) {
-        console.log('[SupabaseClient] Token changed, updating client auth');
-        await updateClientAuth(token);
-      }
+      console.log('[SupabaseClient] Token obtained, updating auth headers');
+      
+      // Update auth headers on global client instead of creating new ones
+      updateClientAuth(token);
 
+      // Execute operation directly with the global client
       console.log('[SupabaseClient] Executing operation with authenticated client');
       const result = await operation();
       
@@ -188,6 +179,7 @@ export const makeAuthenticatedRequest = async <T>(
 
         if (isAuthError) {
           console.log('[SupabaseClient] Auth error detected, forcing token refresh');
+          // Clear current token and wait briefly
           currentAuthToken = null;
           await new Promise(resolve => setTimeout(resolve, 500));
           continue;
@@ -218,10 +210,9 @@ export const makeAuthenticatedRequest = async <T>(
   throw lastError || new Error(`Request failed after ${maxRetries} attempts`);
 };
 
-// Legacy functions for backward compatibility
+// Legacy functions for backward compatibility (minimal implementations)
 export const setTokenRefreshFunction = (refreshFn: () => Promise<string | null>) => {
   // Legacy - now handled by enterprise session manager
-  console.log('[SupabaseClient] Legacy setTokenRefreshFunction called');
 };
 
 export const setEnhancedTokenManager = (manager: any) => {
@@ -238,12 +229,7 @@ export const refreshJWTToken = async (): Promise<string | null> => {
 };
 
 export const setClerkToken = async (token: string | null) => {
-  // CRITICAL FIX: Properly handle token setting
-  if (token) {
-    console.log('[SupabaseClient] Setting Clerk token via legacy function');
-    await updateClientAuth(token);
-    return true;
-  }
+  // Legacy - now handled by enterprise session manager
   return true;
 };
 
@@ -252,7 +238,7 @@ export const getCurrentJWTToken = () => {
   if (enterpriseSessionManager?.getCurrentToken) {
     return enterpriseSessionManager.getCurrentToken();
   }
-  return currentAuthToken;
+  return null;
 };
 
 export const testJWTTransmission = async () => {
