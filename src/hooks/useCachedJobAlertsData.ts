@@ -233,6 +233,7 @@ export const useCachedJobAlertsData = () => {
       };
 
       // Update state
+      console.log('[JobAlertsData] Updating state with fresh data:', result);
       setAlerts(result.alerts);
       setIsActivated(result.botActivated);
       setUserProfileId(result.userProfileId);
@@ -288,8 +289,10 @@ export const useCachedJobAlertsData = () => {
   };
 
   const optimisticAdd = (newAlert: JobAlert) => {
+    console.log('[JobAlertsData] Optimistic add called with:', newAlert);
     setAlerts(prev => {
       const updated = [newAlert, ...prev];
+      console.log('[JobAlertsData] Optimistic add - updating alerts from', prev.length, 'to', updated.length);
       // Update cache immediately to maintain consistency
       updateCacheWithAlerts(updated);
       return updated;
@@ -297,10 +300,12 @@ export const useCachedJobAlertsData = () => {
   };
 
   const optimisticUpdate = (updatedAlert: JobAlert) => {
+    console.log('[JobAlertsData] Optimistic update called with:', updatedAlert);
     setAlerts(prev => {
       const updated = prev.map(alert => 
         alert.id === updatedAlert.id ? updatedAlert : alert
       );
+      console.log('[JobAlertsData] Optimistic update - alerts updated:', updated);
       // Update cache immediately to maintain consistency
       updateCacheWithAlerts(updated);
       return updated;
@@ -309,6 +314,7 @@ export const useCachedJobAlertsData = () => {
 
   const updateCacheWithAlerts = (newAlerts: JobAlert[]) => {
     try {
+      console.log('[JobAlertsData] Updating cache with', newAlerts.length, 'alerts');
       const cached = localStorage.getItem(CACHE_KEY);
       if (cached) {
         const parsedCache: CachedJobAlertsData = JSON.parse(cached);
@@ -318,6 +324,7 @@ export const useCachedJobAlertsData = () => {
           timestamp: Date.now()
         };
         localStorage.setItem(CACHE_KEY, JSON.stringify(updatedCache));
+        console.log('[JobAlertsData] Cache updated successfully');
       }
     } catch (error) {
       console.warn('Failed to update cache with optimistic data:', error);

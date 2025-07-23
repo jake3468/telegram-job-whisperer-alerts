@@ -166,6 +166,7 @@ const JobAlertForm = ({
              updated_at: new Date().toISOString(),
              created_at: editingAlert.created_at // Keep the original created_at
            };
+           console.log('[JobAlertForm] Calling optimistic update with:', updatedAlert);
            optimisticUpdate(updatedAlert);
            
            toast({
