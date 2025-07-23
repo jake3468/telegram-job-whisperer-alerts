@@ -373,7 +373,7 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
               id="jobDescription"
               value={formData.jobDescription}
               onChange={(e) => handleInputChange('jobDescription', e.target.value)}
-              className="bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500 min-h-[100px] resize-none"
+              className="bg-gray-50 border-gray-300 text-black placeholder:text-gray-300 focus:border-purple-500 focus:ring-purple-500 min-h-[100px] resize-none"
               placeholder="Please paste the job description here (minimum 50 characters required)..."
               required
             />
