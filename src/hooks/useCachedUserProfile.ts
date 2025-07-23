@@ -35,7 +35,7 @@ export const useCachedUserProfile = () => {
         if (now - parsedCache.timestamp < CACHE_DURATION) {
           setCachedData(parsedCache);
           setDisplayProfile(parsedCache.profile);
-          logger.debug('Loaded cached profile data:', parsedCache.profile);
+          logger.debug('Loaded cached profile data for user:', parsedCache.profile.id);
         } else {
           // Remove expired cache
           localStorage.removeItem(CACHE_KEY);
@@ -121,7 +121,7 @@ export const useCachedUserProfile = () => {
       try {
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
         setCachedData(cacheData);
-        logger.debug('Updated cached profile after edit:', cacheData);
+        logger.debug('Updated cached profile after edit for user:', cacheData.profile.id);
       } catch (error) {
         logger.warn('Failed to update cached profile:', error);
       }
