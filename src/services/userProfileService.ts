@@ -13,7 +13,7 @@ export const fetchUserFromDatabase = async (clerkUserId: string) => {
       .select('id, clerk_id, email, first_name, last_name')
       .eq('clerk_id', clerkUserId)
       .maybeSingle();
-  }, { operationType: 'user lookup' });
+  });
 };
 
 export const fetchUserProfile = async (userId: string, maxAttempts: number = 3) => {
@@ -29,7 +29,7 @@ export const fetchUserProfile = async (userId: string, maxAttempts: number = 3) 
         .select('*')
         .eq('user_id', userId)
         .maybeSingle();
-    }, { operationType: `profile fetch attempt ${attempt}` });
+    });
 
     profileData = profileResult.data;
     profileError = profileResult.error;
@@ -57,5 +57,5 @@ export const updateUserProfileInDatabase = async (profileId: string, updates: Us
       .from('user_profile')
       .update(updates)
       .eq('id', profileId);
-  }, { operationType: 'profile update' });
+  });
 };

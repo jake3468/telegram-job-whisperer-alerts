@@ -9,6 +9,25 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Enterprise session manager
 let enterpriseSessionManager: any = null;
 
+// Singleton authenticated client cache to prevent multiple instances
+let authenticatedClientCache: { 
+  client: any; 
+  token: string; 
+  expiry: number; 
+} | null = null;
+
+// Global refresh lock to prevent concurrent token refreshes
+let isRefreshing = false;
+let refreshPromise: Promise<string | null> | null = null;
+
+// Request queue during token refresh
+let requestQueue: Array<{
+  resolve: (value: any) => void;
+  reject: (error: any) => void;
+  operation: () => Promise<any>;
+  options: any;
+}> = [];
+
 // Supabase client with proper session management
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
@@ -26,7 +45,95 @@ export const setEnterpriseSessionManager = (manager: any) => {
   enterpriseSessionManager = manager;
 };
 
-// Enterprise-grade authenticated request with proper token handling
+// Helper to get or create singleton authenticated client
+const getAuthenticatedClient = async (): Promise<any> => {
+  // Get current token from session manager
+  const currentToken = enterpriseSessionManager?.getCurrentToken?.() || null;
+  
+  if (!currentToken) {
+    throw new Error('Authentication required');
+  }
+
+  // Check if we can reuse existing client
+  if (authenticatedClientCache && 
+      authenticatedClientCache.token === currentToken && 
+      authenticatedClientCache.expiry > Date.now()) {
+    return authenticatedClientCache.client;
+  }
+
+  // Create new authenticated client and cache it
+  const authenticatedClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+    global: {
+      headers: {
+        'Authorization': `Bearer ${currentToken}`,
+        'apikey': SUPABASE_PUBLISHABLE_KEY
+      }
+    }
+  });
+
+  // Cache the client with token and expiry (5 minute cache)
+  authenticatedClientCache = {
+    client: authenticatedClient,
+    token: currentToken,
+    expiry: Date.now() + (5 * 60 * 1000)
+  };
+
+  return authenticatedClient;
+};
+
+// Debounced token refresh to prevent concurrent refreshes
+const getValidToken = async (forceRefresh: boolean = false): Promise<string | null> => {
+  // If already refreshing, wait for the existing promise
+  if (isRefreshing && refreshPromise) {
+    return await refreshPromise;
+  }
+
+  // Check if current token is valid without forcing refresh
+  if (!forceRefresh && enterpriseSessionManager?.isTokenValid?.()) {
+    return enterpriseSessionManager.getCurrentToken?.() || null;
+  }
+
+  // Start refresh process
+  if (!isRefreshing) {
+    isRefreshing = true;
+    refreshPromise = (async () => {
+      try {
+        const token = await enterpriseSessionManager?.refreshToken?.(forceRefresh);
+        // Clear cached client when token changes
+        if (authenticatedClientCache && authenticatedClientCache.token !== token) {
+          authenticatedClientCache = null;
+        }
+        return token;
+      } finally {
+        isRefreshing = false;
+        refreshPromise = null;
+      }
+    })();
+  }
+
+  return await refreshPromise;
+};
+
+// Process queued requests after token refresh
+const processRequestQueue = async () => {
+  const queue = [...requestQueue];
+  requestQueue = [];
+  
+  for (const { resolve, reject, operation, options } of queue) {
+    try {
+      const result = await makeAuthenticatedRequest(operation, options);
+      resolve(result);
+    } catch (error) {
+      reject(error);
+    }
+  }
+};
+
+// Enterprise-grade authenticated request with singleton client pattern
 export const makeAuthenticatedRequest = async <T>(
   operation: () => Promise<T>,
   options: {
@@ -35,74 +142,75 @@ export const makeAuthenticatedRequest = async <T>(
     operationType?: string;
   } = {}
 ): Promise<T> => {
-  const { maxRetries = 3, silentRetry = true, operationType = 'api_request' } = options;
+  const { maxRetries = 2, silentRetry = true, operationType = 'api_request' } = options;
+  
+  // If currently refreshing, queue the request
+  if (isRefreshing) {
+    return new Promise((resolve, reject) => {
+      requestQueue.push({ resolve, reject, operation, options });
+    });
+  }
+
   let lastError: any = null;
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      // Get fresh token from enterprise session manager
-      let token: string | null = null;
+      // Get valid token (smart validation)
+      const token = await getValidToken(attempt > 0);
       
-      if (enterpriseSessionManager?.refreshToken) {
-        // Call refreshToken with proper parameters - it handles getToken internally
-        token = await enterpriseSessionManager.refreshToken();
-      }
-
       if (!token) {
         throw new Error('Authentication required');
       }
 
-      // Create a fresh authenticated client for this specific operation
-      const authenticatedClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-        },
-        global: {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'apikey': SUPABASE_PUBLISHABLE_KEY
-          }
-        }
-      });
+      // Get singleton authenticated client
+      const authenticatedClient = await getAuthenticatedClient();
 
-      // Execute operation with the authenticated client by temporarily replacing methods
+      // Execute operation with method binding instead of creating new clients
       const originalFrom = supabase.from;
       const originalRpc = supabase.rpc;
+      const originalStorage = supabase.storage;
       
       try {
-        // Temporarily replace methods with authenticated versions
+        // Temporarily bind authenticated methods
         (supabase as any).from = authenticatedClient.from.bind(authenticatedClient);
         (supabase as any).rpc = authenticatedClient.rpc.bind(authenticatedClient);
+        (supabase as any).storage = authenticatedClient.storage;
         
-        // Execute operation with authenticated client
+        // Execute operation with bound methods
         const result = await operation();
+        
+        // Process any queued requests after successful operation
+        if (requestQueue.length > 0) {
+          setImmediate(() => processRequestQueue());
+        }
+        
         return result;
       } finally {
         // Always restore original methods
         (supabase as any).from = originalFrom;
         (supabase as any).rpc = originalRpc;
+        (supabase as any).storage = originalStorage;
       }
     } catch (error: any) {
       lastError = error;
       
-      // Silent retry for auth errors
+      // Only retry auth errors on first attempt
       if (attempt < maxRetries - 1) {
         const isAuthError = error?.code === 'PGRST301' || 
                            error?.message?.includes('JWT') ||
                            error?.message?.includes('expired') ||
                            error?.status === 401;
 
-        if (isAuthError && enterpriseSessionManager?.refreshToken) {
-          // Try to refresh token silently
-          await enterpriseSessionManager.refreshToken(true);
-          await new Promise(resolve => setTimeout(resolve, 100 * (attempt + 1)));
+        if (isAuthError) {
+          // Force token refresh and clear cache
+          authenticatedClientCache = null;
+          await new Promise(resolve => setTimeout(resolve, 200));
           continue;
         }
 
-        // Retry network errors
-        if (error?.message?.includes('fetch') || error?.message?.includes('network')) {
-          await new Promise(resolve => setTimeout(resolve, 500 * (attempt + 1)));
+        // Retry network errors with exponential backoff
+        if (silentRetry && (error?.message?.includes('fetch') || error?.message?.includes('network'))) {
+          await new Promise(resolve => setTimeout(resolve, 300 * Math.pow(2, attempt)));
           continue;
         }
       }
@@ -115,7 +223,7 @@ export const makeAuthenticatedRequest = async <T>(
   if (lastError?.code === 'PGRST301' || 
       lastError?.message?.includes('JWT') || 
       lastError?.status === 401) {
-    throw new Error('Session expired. Please refresh the page.');
+    throw new Error('Please try again');
   }
 
   throw lastError || new Error(`Request failed after ${maxRetries} attempts`);
@@ -156,7 +264,7 @@ export const testJWTTransmission = async () => {
   try {
     const { data, error } = await makeAuthenticatedRequest(async () => {
       return await supabase.rpc('debug_user_auth');
-    }, { operationType: 'jwt_test' });
+    });
     
     return { data, error };
   } catch (error) {
