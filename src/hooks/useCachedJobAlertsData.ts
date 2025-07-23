@@ -281,19 +281,47 @@ export const useCachedJobAlertsData = () => {
   }, [user, alerts.length]);
 
   const invalidateCache = () => {
-    // Instead of aggressive cache invalidation, do a background refresh
+    // Only clear cache and force fresh fetch - no silent background refresh
+    localStorage.removeItem(CACHE_KEY);
     setConnectionIssue(false);
-    fetchJobAlertsData(true); // Silent background refresh
+    fetchJobAlertsData();
   };
 
   const optimisticAdd = (newAlert: JobAlert) => {
-    setAlerts(prev => [newAlert, ...prev]);
+    setAlerts(prev => {
+      const updated = [newAlert, ...prev];
+      // Update cache immediately to maintain consistency
+      updateCacheWithAlerts(updated);
+      return updated;
+    });
   };
 
   const optimisticUpdate = (updatedAlert: JobAlert) => {
-    setAlerts(prev => prev.map(alert => 
-      alert.id === updatedAlert.id ? updatedAlert : alert
-    ));
+    setAlerts(prev => {
+      const updated = prev.map(alert => 
+        alert.id === updatedAlert.id ? updatedAlert : alert
+      );
+      // Update cache immediately to maintain consistency
+      updateCacheWithAlerts(updated);
+      return updated;
+    });
+  };
+
+  const updateCacheWithAlerts = (newAlerts: JobAlert[]) => {
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const parsedCache: CachedJobAlertsData = JSON.parse(cached);
+        const updatedCache = {
+          ...parsedCache,
+          alerts: newAlerts,
+          timestamp: Date.now()
+        };
+        localStorage.setItem(CACHE_KEY, JSON.stringify(updatedCache));
+      }
+    } catch (error) {
+      console.warn('Failed to update cache with optimistic data:', error);
+    }
   };
 
   const forceRefresh = async () => {
@@ -315,7 +343,12 @@ export const useCachedJobAlertsData = () => {
     if (result.error) throw result.error;
     
     // Optimistically remove from local state
-    setAlerts(prev => prev.filter(alert => alert.id !== alertId));
+    setAlerts(prev => {
+      const updated = prev.filter(alert => alert.id !== alertId);
+      // Update cache immediately to maintain consistency
+      updateCacheWithAlerts(updated);
+      return updated;
+    });
     
     return true;
   };

@@ -96,8 +96,8 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
     try {
       await deleteJobAlert(alertId);
       
-      // Background refresh without disrupting UI
-      invalidateCache();
+      // Don't invalidate cache for deletes - optimistic update handles UI
+      // invalidateCache();
       
       toast({
         title: "Alert deleted",
@@ -115,8 +115,8 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
 
   const handleModalSubmit = () => {
     setEditingAlert(null);
-    // Background refresh without disrupting UI
-    invalidateCache();
+    // Don't invalidate cache for edits - optimistic update handles UI
+    // invalidateCache();
   };
   
   const handleModalClose = () => {
