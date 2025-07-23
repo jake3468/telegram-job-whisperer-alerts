@@ -151,6 +151,27 @@ export const useCachedJobAlertsData = () => {
       
       console.log('[JobAlertsData] Making authenticated request using supabase client...');
       
+      // Test authentication context first to debug JWT token flow
+      console.log('[JobAlertsData] Testing authentication context...');
+      
+      const authTest = await makeAuthenticatedRequest(async () => {
+        return await supabase.rpc('get_current_clerk_user_id_reliable');
+      });
+      
+      console.log('[JobAlertsData] Auth test result (should show clerk_id):', authTest);
+      
+      if (authTest.error) {
+        console.error('[JobAlertsData] Auth test failed:', authTest.error);
+        throw new Error(`Authentication test failed: ${authTest.error.message}`);
+      }
+      
+      if (!authTest.data) {
+        console.error('[JobAlertsData] No clerk_id returned from auth test - JWT token missing user context');
+        throw new Error('Authentication context not established. Please try refreshing the page.');
+      }
+      
+      console.log('[JobAlertsData] Authentication verified, clerk_id:', authTest.data);
+      
       // Use the same authenticated request pattern as userProfileService
       let profileData, alertsData;
       
@@ -168,6 +189,13 @@ export const useCachedJobAlertsData = () => {
         
       if (profileResult.error) {
         console.error('[JobAlertsData] Profile fetch error:', profileResult.error);
+        
+        // Check if this is an RLS policy violation
+        if (profileResult.error.message?.includes('policy')) {
+          console.error('[JobAlertsData] RLS policy violation detected - authentication context lost');
+          throw new Error('Access denied. Please refresh the page and try again.');
+        }
+        
         throw new Error(`Profile fetch failed: ${profileResult.error.message}`);
       }
       
@@ -192,6 +220,13 @@ export const useCachedJobAlertsData = () => {
 
       if (alertsResult.error) {
         console.error('[JobAlertsData] Job alerts fetch error:', alertsResult.error);
+        
+        // Check if this is an RLS policy violation
+        if (alertsResult.error.message?.includes('policy')) {
+          console.error('[JobAlertsData] RLS policy violation on job_alerts - authentication context lost');
+          throw new Error('Access denied to job alerts. Please refresh the page and try again.');
+        }
+        
         throw alertsResult.error;
       }
       
