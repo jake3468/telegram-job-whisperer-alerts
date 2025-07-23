@@ -9,9 +9,12 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Enterprise session manager
 let enterpriseSessionManager: any = null;
 
-// Single global client instance - no more multiple clients
-let globalAuthenticatedClient: any = null;
-let currentAuthToken: string | null = null;
+// Singleton authenticated client cache to prevent multiple instances
+let authenticatedClientCache: { 
+  client: any; 
+  token: string; 
+  expiry: number; 
+} | null = null;
 
 // Global refresh lock to prevent concurrent token refreshes
 let isRefreshing = false;
@@ -42,27 +45,44 @@ export const setEnterpriseSessionManager = (manager: any) => {
   enterpriseSessionManager = manager;
 };
 
-// Update global client headers instead of creating new clients
-const updateClientAuth = (token: string): void => {
-  if (!globalAuthenticatedClient) {
-    globalAuthenticatedClient = supabase;
+// Helper to get or create singleton authenticated client
+const getAuthenticatedClient = async (): Promise<any> => {
+  // Get current token from session manager
+  const currentToken = enterpriseSessionManager?.getCurrentToken?.() || null;
+  
+  if (!currentToken) {
+    throw new Error('Authentication required');
   }
-  
-  // Update token in headers without creating new client
-  currentAuthToken = token;
-  
-  // Set the authorization header properly for all Supabase operations
-  // Use session management to set the JWT token
-  globalAuthenticatedClient.auth.setSession({
-    access_token: token,
-    refresh_token: '',
-    expires_in: 3600,
-    expires_at: Date.now() / 1000 + 3600,
-    token_type: 'bearer',
-    user: null
+
+  // Check if we can reuse existing client
+  if (authenticatedClientCache && 
+      authenticatedClientCache.token === currentToken && 
+      authenticatedClientCache.expiry > Date.now()) {
+    return authenticatedClientCache.client;
+  }
+
+  // Create new authenticated client and cache it
+  const authenticatedClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+    global: {
+      headers: {
+        'Authorization': `Bearer ${currentToken}`,
+        'apikey': SUPABASE_PUBLISHABLE_KEY
+      }
+    }
   });
-  
-  console.log('[SupabaseClient] Updated auth session with token:', token ? 'Present' : 'Missing');
+
+  // Cache the client with token and expiry (5 minute cache)
+  authenticatedClientCache = {
+    client: authenticatedClient,
+    token: currentToken,
+    expiry: Date.now() + (5 * 60 * 1000)
+  };
+
+  return authenticatedClient;
 };
 
 // Debounced token refresh to prevent concurrent refreshes
@@ -83,9 +103,9 @@ const getValidToken = async (forceRefresh: boolean = false): Promise<string | nu
     refreshPromise = (async () => {
       try {
         const token = await enterpriseSessionManager?.refreshToken?.(forceRefresh);
-        // Update global client with new token
-        if (token && token !== currentAuthToken) {
-          updateClientAuth(token);
+        // Clear cached client when token changes
+        if (authenticatedClientCache && authenticatedClientCache.token !== token) {
+          authenticatedClientCache = null;
         }
         return token;
       } finally {
@@ -124,11 +144,8 @@ export const makeAuthenticatedRequest = async <T>(
 ): Promise<T> => {
   const { maxRetries = 2, silentRetry = true, operationType = 'api_request' } = options;
   
-  console.log(`[SupabaseClient] Starting authenticated request for ${operationType}`);
-  
   // If currently refreshing, queue the request
   if (isRefreshing) {
-    console.log('[SupabaseClient] Token refresh in progress, queueing request');
     return new Promise((resolve, reject) => {
       requestQueue.push({ resolve, reject, operation, options });
     });
@@ -138,58 +155,60 @@ export const makeAuthenticatedRequest = async <T>(
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      console.log(`[SupabaseClient] Attempt ${attempt + 1}/${maxRetries} for ${operationType}`);
-      
       // Get valid token (smart validation)
       const token = await getValidToken(attempt > 0);
       
       if (!token) {
-        console.error('[SupabaseClient] No token available for authenticated request');
-        throw new Error('Authentication required - no token available');
+        throw new Error('Authentication required');
       }
 
-      console.log('[SupabaseClient] Token obtained, updating auth headers');
-      
-      // Update auth headers on global client instead of creating new ones
-      updateClientAuth(token);
+      // Get singleton authenticated client
+      const authenticatedClient = await getAuthenticatedClient();
 
-      // Execute operation directly with the global client
-      console.log('[SupabaseClient] Executing operation with authenticated client');
-      const result = await operation();
+      // Execute operation with method binding instead of creating new clients
+      const originalFrom = supabase.from;
+      const originalRpc = supabase.rpc;
       
-      console.log(`[SupabaseClient] ${operationType} completed successfully`);
-      
-      // Process any queued requests after successful operation
-      if (requestQueue.length > 0) {
-        setImmediate(() => processRequestQueue());
+      try {
+        // Temporarily bind authenticated methods (avoid storage as it's read-only)
+        (supabase as any).from = authenticatedClient.from.bind(authenticatedClient);
+        (supabase as any).rpc = authenticatedClient.rpc.bind(authenticatedClient);
+        
+        // Execute operation with bound methods
+        const result = await operation();
+        
+        // Process any queued requests after successful operation
+        if (requestQueue.length > 0) {
+          setImmediate(() => processRequestQueue());
+        }
+        
+        return result;
+      } finally {
+        // Always restore original methods
+        (supabase as any).from = originalFrom;
+        (supabase as any).rpc = originalRpc;
+        // Don't restore storage as we never modified it
       }
-      
-      return result;
     } catch (error: any) {
       lastError = error;
-      console.error(`[SupabaseClient] ${operationType} failed on attempt ${attempt + 1}:`, error);
       
       // Only retry auth errors on first attempt
       if (attempt < maxRetries - 1) {
         const isAuthError = error?.code === 'PGRST301' || 
                            error?.message?.includes('JWT') ||
                            error?.message?.includes('expired') ||
-                           error?.message?.includes('auth') ||
                            error?.status === 401;
 
         if (isAuthError) {
-          console.log('[SupabaseClient] Auth error detected, forcing token refresh');
-          // Clear current token and wait briefly
-          currentAuthToken = null;
-          await new Promise(resolve => setTimeout(resolve, 500));
+          // Force token refresh and clear cache
+          authenticatedClientCache = null;
+          await new Promise(resolve => setTimeout(resolve, 200));
           continue;
         }
 
         // Retry network errors with exponential backoff
         if (silentRetry && (error?.message?.includes('fetch') || error?.message?.includes('network'))) {
-          const delay = 300 * Math.pow(2, attempt);
-          console.log(`[SupabaseClient] Network error, retrying in ${delay}ms`);
-          await new Promise(resolve => setTimeout(resolve, delay));
+          await new Promise(resolve => setTimeout(resolve, 300 * Math.pow(2, attempt)));
           continue;
         }
       }
@@ -198,13 +217,11 @@ export const makeAuthenticatedRequest = async <T>(
     }
   }
 
-  console.error(`[SupabaseClient] ${operationType} failed after ${maxRetries} attempts:`, lastError);
-
   // Convert auth errors to user-friendly messages
   if (lastError?.code === 'PGRST301' || 
       lastError?.message?.includes('JWT') || 
       lastError?.status === 401) {
-    throw new Error('Authentication failed - please refresh the page and try again');
+    throw new Error('Please try again');
   }
 
   throw lastError || new Error(`Request failed after ${maxRetries} attempts`);

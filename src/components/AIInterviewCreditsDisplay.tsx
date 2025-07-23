@@ -26,7 +26,7 @@ export const AIInterviewCreditsDisplay = ({
 
   // Show error state with better messaging and retry option
   if (error) {
-    // Log only error type, not full error details
+    console.error('AIInterviewCreditsDisplay error:', error);
     return <Card className="p-4 border-destructive/20 bg-destructive/5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">

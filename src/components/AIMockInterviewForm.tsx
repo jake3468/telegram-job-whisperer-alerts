@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Phone, CheckCircle, AlertCircle, CreditCard } from "lucide-react";
+import { Loader2, Phone, CheckCircle, AlertCircle, CreditCard, RefreshCw } from "lucide-react";
 import { useCachedUserProfile } from "@/hooks/useCachedUserProfile";
 import { useCachedUserCompletionStatus } from "@/hooks/useCachedUserCompletionStatus";
 import { useCachedGraceInterviewRequests } from "@/hooks/useCachedGraceInterviewRequests";
@@ -58,7 +58,8 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
-  const [sessionStatus, setSessionStatus] = useState<'valid' | 'refreshing' | 'expired' | 'unknown'>('unknown');
+  const [isRefreshingToken, setIsRefreshingToken] = useState(false);
+  const [tokenStatus, setTokenStatus] = useState<'valid' | 'refreshing' | 'expired' | 'unknown'>('unknown');
   
   const { toast } = useToast();
   const { userProfile, loading: profileLoading } = useCachedUserProfile();
@@ -66,12 +67,37 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
   const { optimisticAdd } = useCachedGraceInterviewRequests();
   const { credits, hasCredits, useCredit, refetch: refetchCredits, isLoading: creditsLoading } = useAIInterviewCredits();
 
-  // Minimal session checking - only on form submission
+  // Proactive token management
   useEffect(() => {
-    if (sessionManager?.isTokenValid) {
-      const isValid = sessionManager.isTokenValid();
-      setSessionStatus(isValid ? 'valid' : 'unknown');
-    }
+    const checkTokenStatus = async () => {
+      if (sessionManager?.isTokenValid) {
+        const isValid = sessionManager.isTokenValid();
+        setTokenStatus(isValid ? 'valid' : 'expired');
+        
+        // If token is expired or close to expiry, refresh it proactively
+        if (!isValid && sessionManager.refreshToken) {
+          setIsRefreshingToken(true);
+          setTokenStatus('refreshing');
+          
+          try {
+            await sessionManager.refreshToken(true);
+            setTokenStatus('valid');
+            console.log('[AIMockInterviewForm] Token refreshed proactively');
+          } catch (error) {
+            console.error('[AIMockInterviewForm] Proactive token refresh failed:', error);
+            setTokenStatus('expired');
+          } finally {
+            setIsRefreshingToken(false);
+          }
+        }
+      }
+    };
+
+    // Check token status on mount and periodically
+    checkTokenStatus();
+    const interval = setInterval(checkTokenStatus, 60000); // Check every minute
+    
+    return () => clearInterval(interval);
   }, [sessionManager]);
 
   const handleInputChange = (field: keyof FormData, value: string) => {
@@ -86,11 +112,12 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
   };
 
   const validatePhoneNumberUniqueness = async (phoneNumber: string) => {
-    console.log('[AIMockInterviewForm] Starting phone number validation with auth check');
-    
+    // Enhanced phone number validation with proactive token management
     return await makeAuthenticatedRequest(async () => {
-      console.log('[AIMockInterviewForm] Executing phone number validation query');
+      // Log the operation for debugging
+      console.log('[AIMockInterviewForm] Validating phone number uniqueness:', phoneNumber);
       
+      // Check if phone number already exists in grace_interview_requests
       const { data: existingRequest, error } = await supabase
         .from('grace_interview_requests')
         .select('user_id, phone_number')
@@ -98,41 +125,86 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
         .maybeSingle();
 
       if (error) {
-        console.error('[AIMockInterviewForm] Phone number validation query failed:', error);
-        console.error('[AIMockInterviewForm] Error details:', {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          hint: error.hint
-        });
-        throw new Error(`Phone validation failed: ${error.message}`);
+        console.error('[AIMockInterviewForm] Error checking phone number:', error);
+        throw new Error("Failed to validate phone number");
       }
 
-      console.log('[AIMockInterviewForm] Phone number validation query result:', existingRequest);
+      console.log('[AIMockInterviewForm] Phone validation result:', { existingRequest, phoneNumber });
 
       if (existingRequest) {
-        // If same user is using their own phone number, allow it
-        if (existingRequest.user_id === userProfile?.id) {
-          console.log('[AIMockInterviewForm] Phone number belongs to current user, allowing');
-          return { isValid: true };
-        }
-        
-        // If different user has this phone number, show error
+        // Phone number exists, check if it belongs to the same user
         if (existingRequest.user_id !== userProfile?.id) {
-          console.log('[AIMockInterviewForm] Phone number belongs to different user, blocking');
+          // Different user - get the email of the existing account
+          const { data: existingUserProfile, error: profileError } = await supabase
+            .from('user_profile')
+            .select('user_id')
+            .eq('id', existingRequest.user_id)
+            .single();
+
+          if (profileError) {
+            console.error('[AIMockInterviewForm] Error fetching user profile:', profileError);
+            throw new Error("Failed to validate phone number");
+          }
+
+          const { data: existingUser, error: userError } = await supabase
+            .from('users')
+            .select('email')
+            .eq('id', existingUserProfile.user_id)
+            .single();
+
+          if (userError) {
+            console.error('[AIMockInterviewForm] Error fetching user email:', userError);
+            throw new Error("Failed to validate phone number");
+          }
+
           return {
             isValid: false,
-            message: "This phone number is already registered with another account."
+            message: `This phone number is already registered with another account (${existingUser.email}). Please sign in to that account to access the AI Interview feature.`
           };
         }
       }
 
-      console.log('[AIMockInterviewForm] Phone number is available');
       return { isValid: true };
     }, {
-      maxRetries: 2,
+      maxRetries: 3,
       silentRetry: true
     });
+  };
+
+  const ensureTokenValid = async () => {
+    if (!sessionManager?.isTokenValid || !sessionManager?.refreshToken) {
+      console.warn('[AIMockInterviewForm] Session manager not available');
+      return false;
+    }
+
+    const isValid = sessionManager.isTokenValid();
+    console.log('[AIMockInterviewForm] Token validity check:', isValid);
+    
+    if (!isValid) {
+      setIsRefreshingToken(true);
+      setTokenStatus('refreshing');
+      
+      try {
+        const refreshedToken = await sessionManager.refreshToken(true);
+        console.log('[AIMockInterviewForm] Token refreshed before submission:', !!refreshedToken);
+        
+        if (refreshedToken) {
+          setTokenStatus('valid');
+          return true;
+        } else {
+          setTokenStatus('expired');
+          return false;
+        }
+      } catch (error) {
+        console.error('[AIMockInterviewForm] Token refresh failed:', error);
+        setTokenStatus('expired');
+        return false;
+      } finally {
+        setIsRefreshingToken(false);
+      }
+    }
+    
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -146,7 +218,7 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
       console.error('[AIMockInterviewForm] User profile not found or missing ID');
       toast({
         title: "Authentication Error",
-        description: "Please refresh the page and try again.",
+        description: "Please ensure you're logged in and try again.",
         variant: "destructive"
       });
       return;
@@ -211,8 +283,9 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
     setIsSubmitting(true);
     
     try {
-      // Ensure session is valid before proceeding
-      if (sessionStatus === 'expired') {
+      // Ensure token is valid before proceeding
+      const tokenValid = await ensureTokenValid();
+      if (!tokenValid) {
         toast({
           title: "Session Expired",
           description: "Please refresh the page and try again.",
@@ -222,10 +295,11 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
         return;
       }
 
+      // react-phone-input-2 already includes the + prefix, so we don't need to add it
       const phoneNumber = formData.phoneNumber.startsWith('+') ? formData.phoneNumber : `+${formData.phoneNumber}`;
       console.log('[AIMockInterviewForm] Formatted phone number:', phoneNumber);
       
-      // Validate phone number uniqueness
+      // Validate phone number uniqueness with enhanced error handling
       console.log('[AIMockInterviewForm] Starting phone number validation...');
       const phoneValidation = await validatePhoneNumberUniqueness(phoneNumber);
       console.log('[AIMockInterviewForm] Phone validation result:', phoneValidation);
@@ -269,8 +343,8 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
         
         return data;
       }, {
-        maxRetries: 2,
-        silentRetry: false
+        maxRetries: 3,
+        silentRetry: true
       });
       
       console.log('[AIMockInterviewForm] Successfully inserted data:', data);
@@ -280,7 +354,7 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
         optimisticAdd(data);
       }
 
-      console.log('[AIMockInterviewForm] Interview request submitted successfully.');
+      console.log('[AIMockInterviewForm] Interview request submitted successfully. Credit will be deducted when call is made by N8N.');
       
       setIsSubmitted(true);
       toast({
@@ -304,14 +378,8 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
       // Enhanced error handling with better user feedback
       let errorMessage = "There was an error submitting your request. Please try again.";
       
-      if (error?.message?.includes("violates row-level security policy")) {
-        errorMessage = "Authentication issue. Please refresh the page and try again.";
-      } else if (error?.message?.includes("JWT") || error?.message?.includes("auth")) {
-        errorMessage = "Authentication failed. Please refresh the page and try again.";
-      } else if (error?.message?.includes("Failed to validate phone number") || error?.message?.includes("Phone validation failed")) {
-        errorMessage = "Unable to validate phone number. Please check your authentication and try again.";
-      } else if (error?.message?.includes("Authentication failed")) {
-        errorMessage = "Session expired. Please refresh the page and try again.";
+      if (error?.message?.includes("Failed to validate phone number")) {
+        errorMessage = "Unable to validate phone number. Please check your connection and try again.";
       } else if (error?.message?.includes("Please try again")) {
         errorMessage = "Connection issue. Please try again.";
       } else if (error?.message?.includes("Session expired")) {
@@ -353,8 +421,15 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
         onBuyMore={() => setIsPricingModalOpen(true)} 
       />
 
-      {/* Only show session issues when critical */}
-      {sessionStatus === 'expired' && (
+      {/* Token Status Indicator */}
+      {(isRefreshingToken || tokenStatus === 'refreshing') && (
+        <div className="flex items-center justify-center gap-2 text-yellow-400 text-sm bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-3">
+          <RefreshCw className="w-4 h-4 animate-spin" />
+          <span>Refreshing session...</span>
+        </div>
+      )}
+
+      {tokenStatus === 'expired' && (
         <div className="flex items-center justify-center gap-2 text-red-400 text-sm bg-red-900/20 border border-red-500/30 rounded-lg p-3">
           <AlertCircle className="w-4 h-4" />
           <span>Session expired. Please refresh the page.</span>
@@ -425,7 +500,7 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
         <div className="mt-8">
           <Button 
             type="submit" 
-            disabled={isSubmitting || !hasCredits || creditsLoading || sessionStatus === 'expired'} 
+            disabled={isSubmitting || !hasCredits || creditsLoading || isRefreshingToken || tokenStatus === 'expired'} 
             className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {isSubmitting ? (
@@ -433,12 +508,17 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
                 <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                 Submitting Request...
               </>
+            ) : isRefreshingToken ? (
+              <>
+                <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
+                Refreshing Session...
+              </>
             ) : !hasCredits ? (
               <>
                 <CreditCard className="w-5 h-5 mr-2" />
                 Purchase Calls to Continue
               </>
-            ) : sessionStatus === 'expired' ? (
+            ) : tokenStatus === 'expired' ? (
               <>
                 <AlertCircle className="w-5 h-5 mr-2" />
                 Session Expired - Refresh Page
@@ -451,7 +531,7 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
             )}
           </Button>
           
-          {!isSubmitting && hasCredits && sessionStatus === 'valid' && (
+          {!isSubmitting && hasCredits && tokenStatus === 'valid' && (
             <p className="text-center text-black text-sm mt-3">
               Grace will call you within ~1 minute of submitting
             </p>
@@ -463,7 +543,7 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
             </p>
           )}
 
-          {sessionStatus === 'expired' && (
+          {tokenStatus === 'expired' && (
             <p className="text-center text-red-600 text-sm mt-3">
               Your session has expired. Please refresh the page to continue.
             </p>

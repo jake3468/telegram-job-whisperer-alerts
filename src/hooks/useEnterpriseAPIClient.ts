@@ -1,4 +1,3 @@
-
 import { useCallback } from 'react';
 import { useEnterpriseSessionManager } from './useEnterpriseSessionManager';
 import { makeAuthenticatedRequest as makeAuthenticatedRequestClient } from '@/integrations/supabase/client';
@@ -12,26 +11,23 @@ interface APIRequestOptions {
 export const useEnterpriseAPIClient = () => {
   const { refreshToken, isTokenValid, updateActivity } = useEnterpriseSessionManager();
 
-  // Less aggressive API request wrapper with better error handling
+  // Enterprise-grade API request wrapper with silent authentication recovery
   const makeAuthenticatedRequest = useCallback(async <T>(
     operation: () => Promise<T>,
     options: APIRequestOptions = {}
   ): Promise<T> => {
     const {
-      maxRetries = 2, // Reduced from 3 to 2
+      maxRetries = 3,
       silentRetry = true,
-      retryDelays = [1000, 2000] // Reduced retry delays
+      retryDelays = [500, 1000, 2000]
     } = options;
 
     // Update user activity
     updateActivity();
 
-    // Less aggressive pre-request token validation
+    // Pre-request token validation (only if token is clearly expired)
     if (!isTokenValid()) {
-        // Reduce console noise for token refresh messages
-        if (Math.random() < 0.1) { // Only log 10% of token refresh messages
-          console.log('[EnterpriseAPI] Token expired, refreshing...');
-        }
+      console.log('[EnterpriseAPI] Pre-validating token...');
       await refreshToken(true);
     }
 
@@ -50,10 +46,9 @@ export const useEnterpriseAPIClient = () => {
         const isAuthError = error?.message?.includes('JWT') || 
                            error?.message?.includes('token') ||
                            error?.message?.includes('unauthorized') ||
-                           error?.message?.includes('violates row-level security') ||
                            error?.code === 'PGRST301';
 
-        // For auth errors, try token refresh only once
+        // For auth errors, try token refresh
         if (isAuthError && !isLastAttempt) {
           console.log(`[EnterpriseAPI] Auth error detected, refreshing token (attempt ${attempt + 1})`);
           const newToken = await refreshToken(true);
@@ -82,7 +77,7 @@ export const useEnterpriseAPIClient = () => {
           
           // Convert technical errors to user-friendly messages
           if (isAuthError) {
-            throw new Error('Authentication issue. Please refresh the page and try again.');
+            throw new Error('Please try again');
           } else if (error?.message?.includes('network') || error?.message?.includes('fetch')) {
             throw new Error('Network connection issue. Please check your internet and try again.');
           } else {

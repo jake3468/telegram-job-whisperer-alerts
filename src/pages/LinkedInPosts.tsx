@@ -19,7 +19,7 @@ import LoadingMessages from '@/components/LoadingMessages';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { useLinkedInPostTimeoutFallback } from '@/hooks/useLinkedInPostTimeoutFallback';
-import { useMinimalTokenManager } from '@/hooks/useMinimalTokenManager';
+import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
 import { useCachedLinkedInPosts } from '@/hooks/useCachedLinkedInPosts';
 interface LinkedInPostData {
   post_heading_1: string | null;
@@ -82,11 +82,12 @@ const LinkedInPosts = () => {
     refetch: refetchHistory
   } = useCachedLinkedInPosts();
 
-  // Initialize minimal token manager
+  // Initialize form token keep-alive - determine if form is active
   const isFormActive = !isGenerating && !isSubmitting && Boolean(formData.topic.trim() || formData.opinion.trim() || formData.personal_story.trim() || formData.audience.trim() || formData.tone);
   const {
-    updateActivity
-  } = useMinimalTokenManager(isFormActive);
+    updateActivity,
+    silentTokenRefresh
+  } = useFormTokenKeepAlive(isFormActive);
   const toneOptions = [{
     value: 'professional',
     label: 'Professional & Insightful'
@@ -381,8 +382,9 @@ const LinkedInPosts = () => {
     setPostsData(null);
     setCurrentPostId(null);
 
-    // Update activity before submission
-    updateActivity();
+    // Proactively refresh token before submission to prevent JWT errors
+    console.log('🔐 Refreshing token before form submission...');
+    await silentTokenRefresh();
     try {
       console.log('🚀 Creating LinkedIn post with user_profile.id:', userProfile.id);
       await executeWithRetry(async () => {

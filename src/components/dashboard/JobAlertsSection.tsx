@@ -124,10 +124,10 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
     setEditingAlert(null);
   };
 
-  // Manual refresh function - performs full page reload to reset all state
+  // Manual refresh function - uses proper data refetch instead of page reload
   const handleManualRefresh = useCallback(() => {
-    window.location.reload();
-  }, []);
+    forceRefresh();
+  }, [forceRefresh]);
 
   // Show fast initial loading state, then content even if auth is still loading
   if (loading && !userProfileId) {
@@ -143,17 +143,17 @@ const JobAlertsSection = ({ userTimezone }: JobAlertsSectionProps) => {
 
   return <section className="rounded-3xl border-2 border-orange-400 bg-gradient-to-b from-orange-900/90 via-[#2b1605]/90 to-[#2b1605]/98 shadow-none p-0 max-w-5xl mx-auto">
       <div className="pt-4 px-2 sm:px-6">
-        {/* Manual Refresh Button - Only show when there are errors */}
+        {/* Manual Refresh Button */}
         {error && (
           <div className="mb-4 flex justify-end">
             <Button
               onClick={handleManualRefresh}
               variant="outline"
               size="sm"
-              className="text-xs bg-blue-900/20 border-blue-400/30 text-blue-300 hover:bg-blue-800/30"
+              className="text-xs bg-yellow-900/20 border-yellow-400/30 text-yellow-300 hover:bg-yellow-800/30"
             >
               <RefreshCw className="w-3 h-3 mr-1" />
-              Refresh Page
+              Refresh
             </Button>
           </div>
         )}

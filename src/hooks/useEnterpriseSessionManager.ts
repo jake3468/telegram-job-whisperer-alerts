@@ -34,14 +34,14 @@ class EnterpriseSessionManager {
   private activityListeners: (() => void)[] = [];
   private debounceTimer: NodeJS.Timeout | null = null;
 
-  // Less aggressive token expiry calculation (5-10 minute buffer instead of 1-15 minutes)
+  // Dynamic token expiry calculation (10-15% buffer)
   calculateTokenBuffer(tokenExpiry: number): number {
     const totalLifetime = tokenExpiry - Date.now();
-    const bufferPercentage = Math.min(Math.max(totalLifetime * 0.05, 5 * 60 * 1000), 10 * 60 * 1000); // 5min to 10min buffer
+    const bufferPercentage = Math.min(Math.max(totalLifetime * 0.1, 60 * 1000), 15 * 60 * 1000); // 1min to 15min
     return bufferPercentage;
   }
 
-  // Check if token is valid with less aggressive buffer
+  // Check if token is valid with dynamic buffer
   isTokenValid(): boolean {
     if (!this.state.token || !this.state.expiry) return false;
     
@@ -49,24 +49,18 @@ class EnterpriseSessionManager {
     const buffer = this.calculateTokenBuffer(this.state.expiry);
     const isValid = (this.state.expiry - now) > buffer;
     
-    // Less aggressive session extension - only extend if user is very active
-    if (!isValid && this.isUserVeryActive()) {
+    // If token is close to expiry but user is active, extend session
+    if (!isValid && this.isUserActive()) {
       this.state.sessionExtended = true;
     }
     
     return isValid;
   }
 
-  // Check if user is very actively using the app (stricter than before)
-  isUserVeryActive(): boolean {
-    const timeSinceActivity = Date.now() - this.state.lastActivity;
-    return timeSinceActivity < 30 * 1000; // Active if activity within 30 seconds (much stricter)
-  }
-
-  // Check if user is moderately active (for heartbeat)
+  // Check if user is actively using the app
   isUserActive(): boolean {
     const timeSinceActivity = Date.now() - this.state.lastActivity;
-    return timeSinceActivity < 5 * 60 * 1000; // Active if activity within 5 minutes
+    return timeSinceActivity < 2 * 60 * 1000; // Active if activity within 2 minutes
   }
 
   // Update activity timestamp
@@ -74,7 +68,7 @@ class EnterpriseSessionManager {
     this.state.lastActivity = Date.now();
   }
 
-  // Less aggressive debounced token validation
+  // Debounced token validation to prevent race conditions
   private debouncedValidityCheck(): boolean {
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
@@ -83,9 +77,9 @@ class EnterpriseSessionManager {
     return this.isTokenValid();
   }
 
-  // Less aggressive token refresh with exponential backoff
+  // Enterprise-grade token refresh with queue management
   async refreshToken(getToken: () => Promise<string | null>, forceRefresh = false): Promise<string | null> {
-    // Return cached token if valid and not forcing refresh
+    // Return cached token if valid and not forcing refresh (with debounced check)
     if (!forceRefresh && this.debouncedValidityCheck()) {
       return this.state.token;
     }
@@ -100,9 +94,9 @@ class EnterpriseSessionManager {
     this.state.isRefreshing = true;
 
     try {
-      // More aggressive exponential backoff for failures
+      // Exponential backoff for failures (enterprise pattern)
       if (this.state.failureCount > 0) {
-        const backoffDelay = Math.min(2000 * Math.pow(2, this.state.failureCount), 30000); // 2s to 30s
+        const backoffDelay = Math.min(1000 * Math.pow(2, this.state.failureCount), 10000);
         await new Promise(resolve => setTimeout(resolve, backoffDelay));
       }
 
@@ -124,10 +118,7 @@ class EnterpriseSessionManager {
         this.state.sessionExtended = false;
 
         await setClerkToken(token);
-        // Reduce console noise - only log occasional refreshes
-        if (this.state.refreshCount % 5 === 0) {
-          console.log(`[EnterpriseSession] Token refreshed (${this.state.refreshCount})`);
-        }
+        console.log(`[EnterpriseSession] Token refreshed (${this.state.refreshCount})`);
 
         // Resolve all queued requests
         this.requestQueue.forEach(({ resolve }) => resolve(token));
@@ -151,20 +142,20 @@ class EnterpriseSessionManager {
     }
   }
 
-  // Less aggressive session management - check every 10 minutes instead of 45
+  // Start background session management
   startSessionManagement(getToken: () => Promise<string | null>): void {
-    // Background heartbeat every 15 minutes (very conservative)
+    // Background heartbeat every 45 minutes (enterprise standard)
     this.heartbeatInterval = setInterval(async () => {
       if (this.isUserActive()) {
         if (!this.isTokenValid()) {
           await this.refreshToken(getToken, true);
         }
       }
-    }, 15 * 60 * 1000); // 15 minutes - very conservative
+    }, 45 * 60 * 1000);
 
-    // Activity tracking with less aggressive events
+    // Activity tracking
     const updateActivity = () => this.updateActivity();
-    const events = ['mousedown', 'keypress', 'touchstart']; // Removed mousemove and scroll
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
     
     events.forEach(event => {
       document.addEventListener(event, updateActivity, true);
@@ -223,7 +214,7 @@ export const useEnterpriseSessionManager = () => {
       const token = await sessionManager.refreshToken(getTokenFn, true);
       setIsReady(!!token);
       
-      // Start less aggressive session management
+      // Start background session management
       sessionManager.startSessionManagement(getTokenFn);
       initRef.current = true;
     };
@@ -236,25 +227,25 @@ export const useEnterpriseSessionManager = () => {
     };
   }, [user, getToken]);
 
-  // Less aggressive token refresh function
+  // Enterprise-grade token refresh function - fix dependency array
   const refreshToken = useCallback(async (forceRefresh = false): Promise<string | null> => {
     if (!getToken) return null;
     
     const getTokenFn = () => getToken({ template: 'supabase', skipCache: true });
     return sessionManager.refreshToken(getTokenFn, forceRefresh);
-  }, [getToken]);
+  }, [getToken]); // Fixed: ensure getToken is always defined
 
-  // Check token validity
+  // Check token validity - no dependencies needed since it's a simple check
   const isTokenValid = useCallback(() => {
     return sessionManager.isTokenValid();
   }, []);
 
-  // Update activity
+  // Update activity - no dependencies needed
   const updateActivity = useCallback(() => {
     sessionManager.updateActivity();
   }, []);
 
-  // Get current token immediately
+  // Get current token immediately - no dependencies needed
   const getCurrentToken = useCallback(() => {
     return sessionManager.getCurrentToken();
   }, []);
