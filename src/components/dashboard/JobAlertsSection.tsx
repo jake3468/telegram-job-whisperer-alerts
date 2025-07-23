@@ -3,7 +3,7 @@ import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Bell, Plus, AlertCircle, RefreshCw, Copy } from 'lucide-react';
+import { Bell, Plus, AlertCircle, RefreshCw } from 'lucide-react';
 import JobAlertModal from './JobAlertModal';
 import JobAlertsList from './JobAlertsList';
 import EnhancedBotStatus from './EnhancedBotStatus';
@@ -129,25 +129,6 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
     window.location.reload();
   }, []);
 
-  // Copy user profile ID to clipboard
-  const copyProfileId = useCallback(async () => {
-    if (userProfileId) {
-      try {
-        await navigator.clipboard.writeText(userProfileId);
-        toast({
-          title: "Profile ID Copied",
-          description: "Your profile ID has been copied to clipboard.",
-        });
-      } catch (error) {
-        toast({
-          title: "Copy Failed",
-          description: "Failed to copy profile ID to clipboard.",
-          variant: "destructive"
-        });
-      }
-    }
-  }, [userProfileId, toast]);
-
   // Show fast initial loading state, then content even if auth is still loading
   if (loading && !userProfileId) {
     return <div className="max-w-2xl mx-auto w-full">
@@ -191,26 +172,6 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
             </div>
             <p className="text-orange-100 font-inter text-sm font-semibold drop-shadow-none">Set up personalized daily job alerts based on your preferences</p>
             
-            {/* User Profile ID */}
-            {userProfileId && (
-              <div className="flex items-center gap-2 mt-2">
-                <span className="text-xs text-orange-200 font-medium">Profile ID:</span>
-                <div className="flex items-center gap-1 bg-orange-800/30 rounded px-2 py-1">
-                  <span className="text-xs text-orange-100 font-mono">
-                    {userProfileId.slice(0, 8)}...{userProfileId.slice(-8)}
-                  </span>
-                  <Button
-                    onClick={copyProfileId}
-                    variant="ghost"
-                    size="sm"
-                    className="h-4 w-4 p-0 hover:bg-orange-700/30"
-                  >
-                    <Copy className="w-3 h-3 text-orange-300" />
-                  </Button>
-                </div>
-              </div>
-            )}
-
             {/* Alert Usage Counter */}
             {isActivated && <div className="flex items-center gap-2 mt-2">
                 <div className="flex items-center gap-1 text-xs">
