@@ -35,14 +35,14 @@ class EnterpriseSessionManager {
   private activityListeners: (() => void)[] = [];
   private debounceTimer: NodeJS.Timeout | null = null;
 
-  // Extended token buffer calculation (3 minutes minimum)
+  // Realistic token buffer calculation (30 seconds)
   calculateTokenBuffer(tokenExpiry: number): number {
     const totalLifetime = tokenExpiry - Date.now();
-    const bufferPercentage = Math.min(Math.max(totalLifetime * 0.08, 3 * 60 * 1000), 10 * 60 * 1000); // 3min to 10min
-    return bufferPercentage;
+    const bufferTime = 30 * 1000; // 30 seconds buffer
+    return Math.min(bufferTime, totalLifetime * 0.1); // Max 10% of lifetime or 30 seconds
   }
 
-  // More forgiving token validation with 3-minute grace period
+  // Straightforward token validation with 30-second buffer
   isTokenValid(): boolean {
     if (!this.state.token || !this.state.expiry) return false;
     
@@ -50,14 +50,8 @@ class EnterpriseSessionManager {
     const buffer = this.calculateTokenBuffer(this.state.expiry);
     const timeRemaining = this.state.expiry - now;
     
-    // Extended grace period: consider valid if more than 3 minutes remaining
-    const gracePeriod = 3 * 60 * 1000; // 3 minutes
-    const hasGracePeriod = timeRemaining > gracePeriod;
-    
-    // Main validation: token is valid if time remaining > buffer
-    const isValid = timeRemaining > buffer;
-    
-    return isValid || hasGracePeriod;
+    // Token is valid if time remaining > buffer
+    return timeRemaining > buffer;
   }
 
   // Check if user is actively using the app (extended to 10 minutes)
@@ -99,7 +93,7 @@ class EnterpriseSessionManager {
     try {
       // Minimal backoff for failures
       if (this.state.failureCount > 0) {
-        const backoffDelay = Math.min(300 * Math.pow(2, this.state.failureCount), 3000); // Max 3 seconds
+        const backoffDelay = Math.min(200 * Math.pow(2, this.state.failureCount), 2000); // Max 2 seconds
         await new Promise(resolve => setTimeout(resolve, backoffDelay));
       }
 
@@ -145,30 +139,30 @@ class EnterpriseSessionManager {
     }
   }
 
-  // Proactive session management with 5-minute background refresh
+  // Proactive session management with 1-minute background refresh
   startSessionManagement(getToken: () => Promise<string | null>): void {
-    // Background heartbeat every 5 minutes (reduced from 30 minutes)
+    // Background heartbeat every 1 minute for truly proactive refresh
     this.heartbeatInterval = setInterval(async () => {
       // Only refresh if user is actively using the app AND token needs refresh
       if (this.isUserActive() && !this.isTokenValid()) {
         console.log('[EnterpriseSession] Background refresh triggered');
         await this.refreshToken(getToken, true);
       }
-    }, 5 * 60 * 1000); // Every 5 minutes
+    }, 60 * 1000); // Every 1 minute
 
-    // Proactive refresh 5 minutes before expiry
+    // Proactive refresh when token has 30-60 seconds left
     this.proactiveRefreshInterval = setInterval(async () => {
       if (this.state.token && this.state.expiry) {
         const timeUntilExpiry = this.state.expiry - Date.now();
-        const fiveMinutes = 5 * 60 * 1000;
+        const sixtySeconds = 60 * 1000;
         
-        // If token expires in less than 5 minutes, proactively refresh
-        if (timeUntilExpiry < fiveMinutes && timeUntilExpiry > 0) {
-          console.log('[EnterpriseSession] Proactive refresh triggered (5 minutes before expiry)');
+        // If token expires in less than 60 seconds, proactively refresh
+        if (timeUntilExpiry < sixtySeconds && timeUntilExpiry > 0) {
+          console.log('[EnterpriseSession] Proactive refresh triggered (60 seconds before expiry)');
           await this.refreshToken(getToken, true);
         }
       }
-    }, 60 * 1000); // Check every minute
+    }, 30 * 1000); // Check every 30 seconds
 
     // Activity tracking
     const updateActivity = () => this.updateActivity();
@@ -217,7 +211,7 @@ class EnterpriseSessionManager {
 
   // Enhanced pre-flight token check for form submissions
   async ensureTokenForOperation(getToken: () => Promise<string | null>): Promise<string | null> {
-    // If token is valid with 3-minute buffer, return it immediately
+    // If token is valid with 30-second buffer, return it immediately
     if (this.isTokenValid()) {
       return this.state.token;
     }

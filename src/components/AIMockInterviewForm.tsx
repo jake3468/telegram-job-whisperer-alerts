@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
@@ -69,15 +68,15 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
       if (!sessionManager.isReady) {
         updateSessionStatus('refreshing', 'Initializing session...');
       } else if (!sessionManager.isTokenValid()) {
-        // Check if token is about to expire (within 3 minutes)
+        // Check if token is about to expire (within 1 minute)
         const stats = sessionManager.sessionStats;
         const timeSinceLastRefresh = Date.now() - (stats?.lastActivity || 0);
         
-        // Only show expired if it's been more than 3 minutes since last activity
-        if (timeSinceLastRefresh > 3 * 60 * 1000) {
+        // Only show expired if it's been more than 1 minute since last activity
+        if (timeSinceLastRefresh > 60 * 1000) {
           updateSessionStatus('expired', 'Session expired');
         } else {
-          // Silently refresh if within 3 minutes
+          // Silently refresh if within 1 minute
           sessionManager.refreshToken(true);
         }
       } else {
@@ -351,21 +350,21 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
                   width: '100%',
                   height: '44px',
                   fontSize: '16px',
-                  backgroundColor: '#f9fafb',
-                  border: '1px solid #d1d5db',
+                  backgroundColor: '#1f2937',
+                  border: '1px solid #4b5563',
                   borderRadius: '8px',
-                  color: '#374151',
+                  color: '#ffffff',
                   paddingLeft: '48px'
                 }}
                 buttonStyle={{
-                  backgroundColor: '#f9fafb',
-                  border: '1px solid #d1d5db',
+                  backgroundColor: '#1f2937',
+                  border: '1px solid #4b5563',
                   borderRadius: '8px 0 0 8px'
                 }}
                 dropdownStyle={{
-                  backgroundColor: 'white',
-                  border: '1px solid #d1d5db',
-                  color: '#374151'
+                  backgroundColor: '#1f2937',
+                  border: '1px solid #4b5563',
+                  color: '#ffffff'
                 }}
               />
             </div>
@@ -387,7 +386,7 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
               type="text"
               value={formData.companyName}
               onChange={(e) => handleInputChange('companyName', e.target.value)}
-              className="bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500"
+              className="bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500"
               placeholder="e.g., Microsoft"
               required
             />
@@ -402,7 +401,7 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
               type="text"
               value={formData.jobTitle}
               onChange={(e) => handleInputChange('jobTitle', e.target.value)}
-              className="bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-purple-500 focus:ring-purple-500"
+              className="bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500"
               placeholder="e.g., Senior Software Engineer"
               required
             />
@@ -416,7 +415,7 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
               id="jobDescription"
               value={formData.jobDescription}
               onChange={(e) => handleInputChange('jobDescription', e.target.value)}
-              className="bg-gray-50 border-gray-300 text-black placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500 min-h-[100px] resize-none"
+              className="bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500 min-h-[100px] resize-none"
               placeholder="Please paste the job description here (minimum 50 characters required)..."
               required
             />
