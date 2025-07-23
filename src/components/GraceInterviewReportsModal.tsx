@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { History, Phone, Calendar, Trash2, Eye, X, AlertCircle, Clock, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { makeAuthenticatedRequest } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { PremiumInterviewReportDisplay } from './PremiumInterviewReportDisplay';
 interface GraceInterviewRequest {
@@ -59,16 +59,17 @@ const GraceInterviewReportsModal = ({
     }
     setIsLoading(true);
     try {
-      const {
-        data,
-        error
-      } = await supabase.from('grace_interview_requests').select('*').eq('user_id', userProfile.id).order('created_at', {
-        ascending: false
-      }).limit(20);
-      if (error) {
-        throw error;
+      const result = await makeAuthenticatedRequest(async () => {
+        const { supabase } = await import('@/integrations/supabase/client');
+        return await supabase.from('grace_interview_requests').select('*').eq('user_id', userProfile.id).order('created_at', {
+          ascending: false
+        }).limit(20);
+      });
+      
+      if (result.error) {
+        throw result.error;
       }
-      setHistoryData(data || []);
+      setHistoryData(result.data || []);
     } catch (err) {
       console.error('Failed to fetch interview history:', err);
       toast({
@@ -90,11 +91,13 @@ const GraceInterviewReportsModal = ({
       return;
     }
     try {
-      const {
-        error
-      } = await supabase.from('grace_interview_requests').delete().eq('id', itemId).eq('user_id', userProfile.id);
-      if (error) {
-        throw error;
+      const result = await makeAuthenticatedRequest(async () => {
+        const { supabase } = await import('@/integrations/supabase/client');
+        return await supabase.from('grace_interview_requests').delete().eq('id', itemId).eq('user_id', userProfile.id);
+      });
+      
+      if (result.error) {
+        throw result.error;
       }
       setHistoryData(prev => prev.filter(item => item.id !== itemId));
       toast({

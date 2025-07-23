@@ -28,17 +28,25 @@ let requestQueue: Array<{
   options: any;
 }> = [];
 
-// Supabase client with proper session management
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: false, // Let enterprise manager handle
-    detectSessionInUrl: false,
-  },
-  global: {
-    headers: {}
+// Supabase client with proper session management (singleton pattern)
+let singletonClient: any = null;
+
+export const supabase = (() => {
+  if (!singletonClient) {
+    singletonClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+      auth: {
+        persistSession: false, // Prevent session conflicts
+        autoRefreshToken: false, // Let enterprise manager handle
+        detectSessionInUrl: false,
+        flowType: 'implicit'
+      },
+      global: {
+        headers: {}
+      }
+    });
   }
-});
+  return singletonClient;
+})();
 
 // Set enterprise session manager (single source of truth)
 export const setEnterpriseSessionManager = (manager: any) => {
@@ -61,11 +69,18 @@ const getAuthenticatedClient = async (): Promise<any> => {
     return authenticatedClientCache.client;
   }
 
+  // Clear any previous cached client to prevent multiple instances
+  if (authenticatedClientCache) {
+    authenticatedClientCache = null;
+  }
+
   // Create new authenticated client and cache it
   const authenticatedClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
+      detectSessionInUrl: false,
+      flowType: 'implicit'
     },
     global: {
       headers: {
@@ -75,11 +90,11 @@ const getAuthenticatedClient = async (): Promise<any> => {
     }
   });
 
-  // Cache the client with token and expiry (5 minute cache)
+  // Cache the client with token and expiry (2 minute cache to reduce conflicts)
   authenticatedClientCache = {
     client: authenticatedClient,
     token: currentToken,
-    expiry: Date.now() + (5 * 60 * 1000)
+    expiry: Date.now() + (2 * 60 * 1000)
   };
 
   return authenticatedClient;

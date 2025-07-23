@@ -18,8 +18,8 @@ export const useEnhancedTokenManagerIntegration = (options: UseEnhancedTokenMana
   const sessionManager = useEnterpriseSessionManager();
 
   useEffect(() => {
-    // Only connect if enabled
-    if (!enabled) {
+    // Only connect if enabled and session manager is ready
+    if (!enabled || !sessionManager?.isReady) {
       return;
     }
 
@@ -34,7 +34,7 @@ export const useEnhancedTokenManagerIntegration = (options: UseEnhancedTokenMana
     } catch (error) {
       console.error('Failed to connect enterprise session manager:', error);
     }
-  }, [sessionManager, enabled]);
+  }, [sessionManager?.isReady, enabled]); // Only re-run when session manager is ready
 
   // Return the session manager interface only if enabled, otherwise return null
   return enabled && sessionManager ? {
