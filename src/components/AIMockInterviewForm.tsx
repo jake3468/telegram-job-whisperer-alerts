@@ -167,8 +167,7 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
       return { isValid: true };
     }, {
       maxRetries: 3,
-      silentRetry: true,
-      operationType: 'phone_validation'
+      silentRetry: true
     });
   };
 
@@ -345,8 +344,7 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
         return data;
       }, {
         maxRetries: 3,
-        silentRetry: true,
-        operationType: 'form_submission'
+        silentRetry: true
       });
       
       console.log('[AIMockInterviewForm] Successfully inserted data:', data);
