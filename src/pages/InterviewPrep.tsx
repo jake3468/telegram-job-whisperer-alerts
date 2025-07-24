@@ -148,18 +148,16 @@ const InterviewPrep = () => {
   // Enhanced real-time subscription with proper channel configuration
   useEffect(() => {
     if (!currentAnalysis?.id || !isAuthReady) return;
-    console.log('🔄 Setting up real-time subscription for:', currentAnalysis.id);
+    
     const channel = supabase.channel(`interview-prep-${currentAnalysis.id}`).on('postgres_changes', {
       event: 'UPDATE',
       schema: 'public',
       table: 'interview_prep',
       filter: `id=eq.${currentAnalysis.id}`
     }, async payload => {
-      console.log('📡 Interview prep updated via real-time:', payload);
       if (payload.new && payload.new.interview_questions) {
         const parsedData = parseInterviewQuestions(payload.new.interview_questions);
         if (parsedData) {
-          console.log('✅ Setting interview data from real-time update');
           setInterviewData(parsedData);
           setIsGenerating(false);
           toast({
@@ -168,9 +166,7 @@ const InterviewPrep = () => {
           });
         }
       }
-    }).subscribe(status => {
-      console.log('📡 Real-time subscription status:', status);
-    });
+    }).subscribe();
 
     // Improved fallback polling mechanism
     const pollInterval = setInterval(async () => {
@@ -178,10 +174,9 @@ const InterviewPrep = () => {
         return;
       }
       try {
-        console.log('🔄 Fallback polling for results...');
         await checkForExistingResults();
       } catch (error) {
-        console.error('❌ Fallback polling error:', error);
+        console.error('Fallback polling error:', error);
       }
     }, 3000); // Poll every 3 seconds
 

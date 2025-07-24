@@ -14,14 +14,13 @@ export const useClerkSupabaseSync = () => {
     const setupTokenRefresh = async () => {
       if (!user || !isLoaded || syncedRef.current) return;
 
-      console.log('Setting up Clerk-Supabase sync for user:', user.id);
+      
 
       try {
         // Set up the token refresh function
         const refreshFunction = async () => {
           try {
             const token = await getToken({ template: 'supabase' });
-            console.log('Token refreshed:', token ? 'Success' : 'Failed');
             return token;
           } catch (error) {
             console.error('Failed to get token from Clerk:', error);
@@ -37,7 +36,6 @@ export const useClerkSupabaseSync = () => {
         
         if (token) {
           const success = await setClerkToken(token);
-          console.log('Initial token set:', success);
           if (success) {
             syncedRef.current = true;
             tokenSetRef.current = true;

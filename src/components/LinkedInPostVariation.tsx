@@ -60,7 +60,6 @@ const LinkedInPostVariation = ({
   // Reset loading state when N8N images arrive or regular images are loaded
   useEffect(() => {
     if ((n8nImages.length > 0 || generatedImages.length > 0) && isUserLoadingImage) {
-      console.log(`🎯 Images detected, resetting loading state for variation ${variationNumber}`);
       setIsUserLoadingImage(false);
       setImageGenerationFailed(false);
     }

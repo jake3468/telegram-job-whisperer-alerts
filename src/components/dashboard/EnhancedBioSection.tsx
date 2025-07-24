@@ -58,7 +58,6 @@ const EnhancedBioSection = () => {
       
       // Retry logic for JWT-related errors
       if ((errorMessage.includes('JWT') || errorMessage.includes('unauthorized') || errorMessage.includes('expired')) && currentAttempt < 3) {
-        console.log(`[BioSection] Retrying save attempt ${currentAttempt}/3 due to JWT error`);
         
         // Wait and retry with fresh token
         setTimeout(async () => {

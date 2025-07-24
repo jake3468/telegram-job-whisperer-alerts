@@ -41,7 +41,6 @@ const JobAnalysisHistoryModal = ({
   const [retryCount, setRetryCount] = useState(0);
 
   const handleRefresh = () => {
-    console.log('🔄 MANUAL REFRESH TRIGGERED - Job Analysis');
     refetch();
   };
   const handleCopyResult = async (item: JobAnalysisItem) => {
@@ -238,10 +237,7 @@ const JobAnalysisHistoryModal = ({
               <div className="text-white/70 text-center">
                 <History className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No job analyses found.</p>
-                <Button onClick={() => {
-                  console.log('🔄 RETRY BUTTON CLICKED - Job Analysis');
-                  handleRefresh();
-                }} size="sm" className="mt-2 bg-blue-600 hover:bg-blue-700">
+                <Button onClick={handleRefresh} size="sm" className="mt-2 bg-blue-600 hover:bg-blue-700">
                   Retry Loading
                 </Button>
               </div>
