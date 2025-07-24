@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Trash2, Eye, Clock, Building2, Briefcase, AlertTriangle, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useUser } from '@clerk/clerk-react';
+import { useEnterpriseAPIClient } from '@/hooks/useEnterpriseAPIClient';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { supabase } from '@/integrations/supabase/client';
 import InterviewPrepDownloadActions from '@/components/InterviewPrepDownloadActions';
 interface InterviewPrepHistoryModalProps {
   onSelectEntry?: (entry: any) => void;
@@ -18,44 +19,115 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
   const [isOpen, setIsOpen] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<any>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [interviewHistory, setInterviewHistory] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const {
     toast
   } = useToast();
+  const { user, isLoaded } = useUser();
   const {
     userProfile
   } = useUserProfile();
-  const queryClient = useQueryClient();
-  const {
-    data: interviewHistory,
-    isLoading
-  } = useQuery({
-    queryKey: ['interview-prep-history', userProfile?.id],
-    queryFn: async () => {
-      if (!userProfile?.id) return [];
-      const {
-        data,
-        error
-      } = await supabase.from('interview_prep').select('*').eq('user_id', userProfile.id).order('created_at', {
-        ascending: false
+  const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
+  useEffect(() => {
+    if (isOpen && isLoaded && user && userProfile) {
+      console.log('🔄 InterviewPrepHistoryModal: Starting to fetch history');
+      fetchHistory();
+    }
+  }, [isOpen, isLoaded, user, userProfile]);
+
+  const fetchHistory = async () => {
+    if (!isLoaded || !user || !userProfile) {
+      console.log('❌ Cannot fetch history: missing requirements', {
+        isLoaded,
+        user: !!user,
+        userProfile: !!userProfile
       });
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!userProfile?.id && isOpen
-  });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      console.log('📡 Fetching interview prep history for user:', user.id);
+      
+      const { data, error } = await makeAuthenticatedRequest(async () => {
+        return await supabase
+          .from('interview_prep')
+          .select(`
+            *,
+            user_profile!inner(user_id, users!inner(clerk_id))
+          `)
+          .eq('user_profile.users.clerk_id', user.id)
+          .order('created_at', { ascending: false });
+      }, { maxRetries: 3 });
+
+      if (error) {
+        console.error('❌ Error fetching history:', error);
+        throw error;
+      }
+      
+      console.log('✅ Successfully fetched history:', data?.length || 0, 'items');
+      setInterviewHistory(data || []);
+    } catch (err) {
+      console.error('❌ Failed to fetch history:', err);
+      toast({
+        title: "Error",
+        description: "Failed to load history. Please try again or refresh the page.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const handleDelete = async (id: string, event: React.MouseEvent) => {
     event.stopPropagation();
+    
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "User not found. Please try again.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     try {
-      const {
-        error
-      } = await supabase.from('interview_prep').delete().eq('id', id);
-      if (error) throw error;
+      console.log(`Attempting to delete interview prep item with ID: ${id} for user: ${user.id}`);
+      
+      const { error } = await makeAuthenticatedRequest(async () => {
+        // First get the user_profile.id for this user
+        const { data: profileData, error: profileError } = await supabase
+          .from('user_profile')
+          .select('id')
+          .in('user_id',
+            supabase
+              .from('users')
+              .select('id')
+              .eq('clerk_id', user.id)
+          );
+
+        if (profileError || !profileData?.[0]) {
+          throw new Error('User profile not found');
+        }
+
+        return await supabase
+          .from('interview_prep')
+          .delete()
+          .eq('id', id)
+          .eq('user_id', profileData[0].id);
+      }, { maxRetries: 2 });
+
+      if (error) {
+        console.error('Supabase delete error:', error);
+        throw error;
+      }
+      
+      console.log('Delete operation completed successfully');
+      
+      // Remove from local state
+      setInterviewHistory(prev => prev.filter(item => item.id !== id));
       toast({
         title: "Interview prep deleted",
         description: "The interview prep entry has been successfully deleted."
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['interview-prep-history']
       });
     } catch (error) {
       console.error('Error deleting interview prep:', error);
