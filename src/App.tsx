@@ -73,8 +73,6 @@ const AppWithSync = () => {
   
   // Hide initial loader once React is ready
   useEffect(() => {
-    console.log('App state:', { isLoaded, isSignedIn });
-    
     if (isLoaded) {
       // Small delay to ensure smooth transition
       setTimeout(() => {
@@ -85,11 +83,8 @@ const AppWithSync = () => {
   
   // Show loading screen only while Clerk auth is loading
   if (!isLoaded) {
-    console.log('Showing loading screen - auth not loaded');
     return <LoadingScreen />;
   }
-  
-  console.log('Rendering routes - auth loaded:', { isLoaded, isSignedIn });
   
   return (
     <>
@@ -125,8 +120,6 @@ const AppWithSync = () => {
 };
 
 const App = () => {
-  console.log('App component rendering');
-  
   return (
     <QueryClientProvider client={queryClient}>
       <HelmetProvider>

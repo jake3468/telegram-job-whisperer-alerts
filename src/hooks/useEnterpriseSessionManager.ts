@@ -115,7 +115,6 @@ class EnterpriseSessionManager {
         this.state.sessionExtended = false;
 
         await setClerkToken(token);
-        console.log(`[EnterpriseSession] Token refreshed silently (${this.state.refreshCount})`);
 
         // Resolve all queued requests
         this.requestQueue.forEach(({ resolve }) => resolve(token));
@@ -127,7 +126,6 @@ class EnterpriseSessionManager {
       throw new Error('No token received');
     } catch (error) {
       this.state.failureCount++;
-      console.error(`[EnterpriseSession] Refresh failed (${this.state.failureCount}):`, error);
 
       // Reject all queued requests
       this.requestQueue.forEach(({ reject }) => reject(error as Error));
@@ -145,7 +143,6 @@ class EnterpriseSessionManager {
     this.heartbeatInterval = setInterval(async () => {
       // Only refresh if user is actively using the app AND token needs refresh
       if (this.isUserActive() && !this.isTokenValid()) {
-        console.log('[EnterpriseSession] Background refresh triggered');
         await this.refreshToken(getToken, true);
       }
     }, 60 * 1000); // Every 1 minute
@@ -158,7 +155,6 @@ class EnterpriseSessionManager {
         
         // If token expires in less than 60 seconds, proactively refresh
         if (timeUntilExpiry < sixtySeconds && timeUntilExpiry > 0) {
-          console.log('[EnterpriseSession] Proactive refresh triggered (60 seconds before expiry)');
           await this.refreshToken(getToken, true);
         }
       }
@@ -217,7 +213,6 @@ class EnterpriseSessionManager {
     }
 
     // If token is close to expiry or invalid, proactively refresh
-    console.log('[EnterpriseSession] Pre-flight token refresh for operation');
     return await this.refreshToken(getToken, true);
   }
 }

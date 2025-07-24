@@ -11,6 +11,7 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { useCachedInterviewPrep } from '@/hooks/useCachedInterviewPrep';
 import { supabase } from '@/integrations/supabase/client';
 import InterviewPrepDownloadActions from '@/components/InterviewPrepDownloadActions';
+import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
 interface InterviewPrepHistoryModalProps {
   onSelectEntry?: (entry: any) => void;
 }
@@ -27,7 +28,6 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
   const { data: interviewHistory, isLoading, refetch } = useCachedInterviewPrep();
   const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
   const handleRefresh = () => {
-    console.log('🔄 MANUAL REFRESH TRIGGERED - Interview Prep');
     refetch();
   };
   const handleDelete = async (id: string, event: React.MouseEvent) => {
@@ -43,7 +43,7 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
     }
     
     try {
-      console.log(`Attempting to delete interview prep item with ID: ${id} for user: ${user.id}`);
+      
       
       const { error } = await makeAuthenticatedRequest(async () => {
         return await supabase
@@ -57,7 +57,7 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
         throw error;
       }
       
-      console.log('Delete operation completed successfully');
+      
       
       // Refresh the data after deletion
       refetch();
@@ -97,16 +97,11 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
   const renderInterviewQuestions = (content: string) => {
     if (!content) return null;
 
-    // Simple markdown parsing - only handle basic formatting
-    const processedContent = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
-    .replace(/^# (.*$)/gm, '<h1>$1</h1>') // H1 headers
-    .replace(/^## (.*$)/gm, '<h2>$1</h2>') // H2 headers
-    .replace(/^### (.*$)/gm, '<h3>$1</h3>') // H3 headers
-    .replace(/\n/g, '<br>'); // Line breaks
-
-    return <div className="text-black bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words" dangerouslySetInnerHTML={{
-      __html: processedContent
-    }} />;
+    // Use SafeHTMLRenderer for secure HTML rendering
+    return <SafeHTMLRenderer 
+      content={content} 
+      className="text-black bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words"
+    />;
   };
   if (showDetails && selectedEntry) {
     return <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -221,10 +216,7 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
                 <Clock className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm mb-3">No interview prep found.</p>
                 <Button 
-                  onClick={() => {
-                    console.log('🔄 RETRY BUTTON CLICKED - Interview Prep');
-                    handleRefresh();
-                  }} 
+                  onClick={handleRefresh}
                   size="sm"
                   className="bg-blue-600 hover:bg-blue-700"
                   disabled={isLoading}

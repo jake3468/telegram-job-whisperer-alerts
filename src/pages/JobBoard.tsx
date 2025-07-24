@@ -9,6 +9,9 @@ import { Search, MapPin, Building2, ExternalLink, X, RefreshCw, Check, Trash2 } 
 import { useJobBoardData } from '@/hooks/useJobBoardData';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { JobBoardOnboardingPopup } from '@/components/JobBoardOnboardingPopup';
+import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
+import { useEnhancedTokenManagerIntegration } from '@/hooks/useEnhancedTokenManagerIntegration';
+import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
 import { Tables } from '@/integrations/supabase/types';
 type JobBoardItem = Tables<'job_board'>;
 interface JobCardProps {
@@ -178,6 +181,12 @@ const JobBoard = () => {
     user,
     isLoaded
   } = useUser(); // Add Clerk authentication
+  
+  // Token management and session handling
+  const { isSynced } = useClerkSupabaseSync();
+  const sessionManager = useEnhancedTokenManagerIntegration({ enabled: true });
+  const { updateActivity } = useFormTokenKeepAlive(true);
+  
   const {
     userProfile,
     updateUserProfile
@@ -198,6 +207,7 @@ const JobBoard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJob, setSelectedJob] = useState<JobBoardItem | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [activeTab, setActiveTab] = useState('posted-today');
 
   // Handle onboarding popup
   useEffect(() => {
@@ -205,10 +215,23 @@ const JobBoard = () => {
       setShowOnboarding(true);
     }
   }, [userProfile]);
+
+  // Set up navigation callback for tab switching
+  useEffect(() => {
+    (window as any).jobBoardNavigationCallback = (tabName: string) => {
+      setActiveTab(tabName);
+    };
+
+    return () => {
+      delete (window as any).jobBoardNavigationCallback;
+    };
+  }, []);
   const handleCloseOnboarding = () => {
+    updateActivity();
     setShowOnboarding(false);
   };
   const handleDontShowOnboardingAgain = async () => {
+    updateActivity();
     setShowOnboarding(false);
     if (userProfile) {
       await updateUserProfile({
@@ -219,6 +242,7 @@ const JobBoard = () => {
 
   // Manual refresh function - robust error handling like Job Tracker
   const handleManualRefresh = useCallback(() => {
+    updateActivity();
     try {
       // For connection issues or persistent errors, immediately force page refresh
       if (connectionIssue || error) {
@@ -240,7 +264,7 @@ const JobBoard = () => {
       // Force page refresh if all else fails
       window.location.reload();
     }
-  }, [forceRefresh, connectionIssue, error]);
+  }, [forceRefresh, connectionIssue, error, updateActivity]);
 
   // Show loading while Clerk is loading
   if (!isLoaded) {
@@ -312,32 +336,32 @@ const JobBoard = () => {
 
           {/* Job Sections */}
           <div className="w-full overflow-hidden">
-            <Tabs defaultValue="posted-today" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <div className="px-2 sm:px-4 mb-6">
-                <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm gap-0.5 sm:gap-1 h-auto p-0.5 sm:p-1 border-0 rounded-xl">
-                  <TabsTrigger value="posted-today" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
-                    <span className="hidden lg:inline truncate">Posted Today</span>
-                    <span className="lg:hidden truncate">Today</span>
-                    <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({filteredPostedTodayJobs.length})</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="last-7-days" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
-                    <span className="hidden sm:inline truncate">Last 7 Days</span>
-                    <span className="sm:hidden truncate">Week</span>
-                    <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({filteredLast7DaysJobs.length})</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="saved-to-tracker" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
-                    <span className="hidden sm:inline truncate">Saved</span>
-                    <span className="sm:hidden truncate">Saved</span>
-                    <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({filteredSavedToTrackerJobs.length})</span>
-                  </TabsTrigger>
-                </TabsList>
+                 <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm gap-0.5 sm:gap-1 h-auto p-0.5 sm:p-1 border-0 rounded-xl">
+                   <TabsTrigger value="posted-today" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden" onClick={updateActivity}>
+                     <span className="hidden lg:inline truncate">Posted Today</span>
+                     <span className="lg:hidden truncate">Today</span>
+                     <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({filteredPostedTodayJobs.length})</span>
+                   </TabsTrigger>
+                   <TabsTrigger value="last-7-days" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden" onClick={updateActivity}>
+                     <span className="hidden sm:inline truncate">Last 7 Days</span>
+                     <span className="sm:hidden truncate">Week</span>
+                     <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({filteredLast7DaysJobs.length})</span>
+                   </TabsTrigger>
+                   <TabsTrigger value="saved-to-tracker" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden" onClick={updateActivity}>
+                     <span className="hidden sm:inline truncate">Saved</span>
+                     <span className="sm:hidden truncate">Saved</span>
+                     <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({filteredSavedToTrackerJobs.length})</span>
+                   </TabsTrigger>
+                 </TabsList>
               </div>
 
               {/* Search */}
               <div className="mb-6 px-2 sm:px-4">
                 <div className="relative w-full max-w-md mx-auto">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                  <Input placeholder="Search by job title or company name..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-12 pr-4 bg-gray-800 border border-gray-600 text-white placeholder:text-gray-400 h-12 text-sm w-full rounded-2xl shadow-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-600 transition-all" />
+                  <Input placeholder="Search by job title or company name..." value={searchTerm} onChange={e => { updateActivity(); setSearchTerm(e.target.value); }} onFocus={updateActivity} className="pl-12 pr-4 bg-gray-800 border border-gray-600 text-white placeholder:text-gray-400 h-12 text-sm w-full rounded-2xl shadow-sm focus:border-gray-500 focus:ring-2 focus:ring-gray-600 transition-all" />
                 </div>
               </div>
 
@@ -348,7 +372,7 @@ const JobBoard = () => {
                         {searchTerm ? `No jobs matching "${searchTerm}" found in posted today.` : "No jobs posted today."}
                       </p>
                     </div> : <div className="space-y-3 w-full max-w-2xl mx-auto">
-                      {filteredPostedTodayJobs.map(job => <JobCard key={job.id} job={job} onView={() => setSelectedJob(job)} onSaveToTracker={() => markJobAsSaved(job)} section="posted-today" />)}
+                      {filteredPostedTodayJobs.map(job => <JobCard key={job.id} job={job} onView={() => { updateActivity(); setSelectedJob(job); }} onSaveToTracker={() => { updateActivity(); markJobAsSaved(job); }} section="posted-today" />)}
                     </div>}
                 </TabsContent>
 
@@ -358,7 +382,7 @@ const JobBoard = () => {
                         {searchTerm ? `No jobs matching "${searchTerm}" found in last 7 days.` : "No jobs from the last 7 days."}
                       </p>
                     </div> : <div className="space-y-3 w-full max-w-2xl mx-auto">
-                      {filteredLast7DaysJobs.map(job => <JobCard key={job.id} job={job} onView={() => setSelectedJob(job)} onSaveToTracker={() => markJobAsSaved(job)} section="last-7-days" />)}
+                      {filteredLast7DaysJobs.map(job => <JobCard key={job.id} job={job} onView={() => { updateActivity(); setSelectedJob(job); }} onSaveToTracker={() => { updateActivity(); markJobAsSaved(job); }} section="last-7-days" />)}
                     </div>}
                 </TabsContent>
 
@@ -377,7 +401,7 @@ const JobBoard = () => {
                       </p>
                       {!searchTerm && <p className="text-gray-500 mt-2">Save jobs from other sections to see them here.</p>}
                     </div> : <div className="space-y-3 w-full max-w-2xl mx-auto">
-                      {filteredSavedToTrackerJobs.map(job => <JobCard key={job.id} job={job} onView={() => setSelectedJob(job)} onSaveToTracker={() => saveToTracker(job)} onDelete={() => deleteJobFromBoard(job)} section="saved" isAddedToTracker={job.job_reference_id ? jobTrackerStatus[job.job_reference_id] : false} />)}
+                      {filteredSavedToTrackerJobs.map(job => <JobCard key={job.id} job={job} onView={() => { updateActivity(); setSelectedJob(job); }} onSaveToTracker={() => { updateActivity(); saveToTracker(job); }} onDelete={() => { updateActivity(); deleteJobFromBoard(job); }} section="saved" isAddedToTracker={job.job_reference_id ? jobTrackerStatus[job.job_reference_id] : false} />)}
                     </div>}
                 </TabsContent>
               </div>
@@ -389,7 +413,7 @@ const JobBoard = () => {
         <JobBoardOnboardingPopup isOpen={showOnboarding} onClose={handleCloseOnboarding} onDontShowAgain={handleDontShowOnboardingAgain} />
 
         {/* Job Details Modal */}
-        <Dialog open={!!selectedJob} onOpenChange={() => setSelectedJob(null)}>
+        <Dialog open={!!selectedJob} onOpenChange={() => { updateActivity(); setSelectedJob(null); }}>
           <DialogContent className="max-w-3xl max-h-[85vh] bg-white border-gray-200 flex flex-col p-0">
             {selectedJob && <>
                 {/* Fixed Header */}
@@ -404,9 +428,9 @@ const JobBoard = () => {
                         <span className="font-medium">{selectedJob.company_name}</span>
                       </div>
                     </div>
-                    <Button variant="ghost" size="icon" className="text-gray-500 hover:text-gray-700 flex-shrink-0" onClick={() => setSelectedJob(null)}>
-                      <X className="h-5 w-5" />
-                    </Button>
+                     <Button variant="ghost" size="icon" className="text-gray-500 hover:text-gray-700 flex-shrink-0" onClick={() => { updateActivity(); setSelectedJob(null); }}>
+                       <X className="h-5 w-5" />
+                     </Button>
                   </div>
                 </DialogHeader>
                 
@@ -467,9 +491,9 @@ const JobBoard = () => {
 
                   {/* Save Button */}
                   <div className="pt-2">
-                    <Button onClick={() => selectedJob && saveToTracker(selectedJob)} className="w-full bg-blue-600 text-white hover:bg-blue-700 text-sm h-10">
-                      Save to Job Tracker
-                    </Button>
+                     <Button onClick={() => { updateActivity(); selectedJob && saveToTracker(selectedJob); }} className="w-full bg-blue-600 text-white hover:bg-blue-700 text-sm h-10">
+                       Save to Job Tracker
+                     </Button>
                   </div>
                 </div>
               </>}

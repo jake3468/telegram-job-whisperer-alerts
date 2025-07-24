@@ -89,7 +89,7 @@ export const useEnterpriseUserPresence = (config: Partial<PresenceConfig> = {}) 
       }));
     }, fullConfig.activeThreshold);
 
-    console.log(`[EnterprisePresence] Activity detected: ${interactionType} (weight: ${activityWeight})`);
+    
   }, [sessionManager, fullConfig.activeThreshold, fullConfig.formFocusWeight]);
 
   // Proactive token refresh - more aggressive than standard
@@ -104,8 +104,6 @@ export const useEnterpriseUserPresence = (config: Partial<PresenceConfig> = {}) 
       const needsRefresh = !sessionManager.isTokenValid();
       
       if (needsRefresh || presenceState.isActive) {
-        console.log('[EnterprisePresence] Proactive token refresh initiated...');
-        
         const token = await sessionManager.refreshToken(true);
         
         if (token) {
@@ -114,7 +112,6 @@ export const useEnterpriseUserPresence = (config: Partial<PresenceConfig> = {}) 
             tokenStatus: 'valid',
             connectionHealth: 'healthy'
           }));
-          console.log('[EnterprisePresence] Token refreshed successfully');
         } else {
           throw new Error('Token refresh failed');
         }
@@ -151,7 +148,7 @@ export const useEnterpriseUserPresence = (config: Partial<PresenceConfig> = {}) 
       
       setPresenceState(prev => ({ ...prev, connectionHealth: health }));
       
-      console.log(`[EnterprisePresence] Connection health: ${health} (${responseTime}ms)`);
+      
     } catch (error) {
       console.error('[EnterprisePresence] Connection test failed:', error);
       setPresenceState(prev => ({ ...prev, connectionHealth: 'poor' }));
@@ -162,7 +159,7 @@ export const useEnterpriseUserPresence = (config: Partial<PresenceConfig> = {}) 
   useEffect(() => {
     if (!sessionManager) return;
 
-    console.log('[EnterprisePresence] Initializing enterprise presence detection...');
+    
     
     // Enhanced activity event listeners
     const activityEvents = [
@@ -216,7 +213,6 @@ export const useEnterpriseUserPresence = (config: Partial<PresenceConfig> = {}) 
   // Manual activity update for form interactions
   const recordFormInteraction = useCallback((interactionType: 'focus' | 'input' | 'submit' | 'click' = 'input') => {
     updateActivity('form');
-    console.log(`[EnterprisePresence] Form interaction: ${interactionType}`);
   }, [updateActivity]);
 
   // Force immediate token refresh

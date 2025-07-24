@@ -175,7 +175,7 @@ const LinkedInPosts = () => {
   });
   useEffect(() => {
     if (!currentPostId || !isAuthReady || !userProfile?.id) return;
-    console.log('🔄 Setting up real-time subscription for post ID:', currentPostId);
+    
     let channel: any;
     const setupRealTime = async () => {
       try {
@@ -186,17 +186,8 @@ const LinkedInPosts = () => {
             table: 'job_linkedin',
             filter: `id=eq.${currentPostId}`
           }, async payload => {
-            console.log('📡 LinkedIn post updated via real-time:', payload);
             if (payload.new) {
               const newData = payload.new as any;
-              console.log('📊 New posts data received:', {
-                hasHeading1: Boolean(newData.post_heading_1 && newData.post_heading_1.trim()),
-                hasContent1: Boolean(newData.post_content_1 && newData.post_content_1.trim()),
-                hasHeading2: Boolean(newData.post_heading_2 && newData.post_heading_2.trim()),
-                hasContent2: Boolean(newData.post_content_2 && newData.post_content_2.trim()),
-                hasHeading3: Boolean(newData.post_heading_3 && newData.post_heading_3.trim()),
-                hasContent3: Boolean(newData.post_content_3 && newData.post_content_3.trim())
-              });
               const linkedInPostData: LinkedInPostData = {
                 post_heading_1: newData.post_heading_1,
                 post_content_1: newData.post_content_1,
@@ -205,10 +196,8 @@ const LinkedInPosts = () => {
                 post_heading_3: newData.post_heading_3,
                 post_content_3: newData.post_content_3
               };
-              console.log('🔄 Setting posts data:', linkedInPostData);
               setPostsData(linkedInPostData);
               if (areAllPostsReady(linkedInPostData)) {
-                console.log('🎉 All posts are ready! Stopping loading');
                 setIsGenerating(false);
                 toast({
                   title: "LinkedIn Posts Generated!",
@@ -267,13 +256,9 @@ const LinkedInPosts = () => {
               post_heading_3: data.post_heading_3,
               post_content_3: data.post_content_3
             };
-            console.log('🔄 Setting existing posts data:', linkedInPostData);
             setPostsData(linkedInPostData);
             if (areAllPostsReady(linkedInPostData)) {
-              console.log('📋 Existing data is complete, stopping loading state');
               setIsGenerating(false);
-            } else {
-              console.log('📋 Existing data is incomplete, keeping loading state');
             }
           }
         }, 3, 'check existing post data');
@@ -437,13 +422,6 @@ const LinkedInPosts = () => {
   };
   const shouldShowResults = postsData && areAllPostsReady(postsData);
   const shouldShowLoading = isGenerating && !shouldShowResults;
-  console.log('🎯 Display logic:', {
-    postsData: !!postsData,
-    areAllPostsReady: postsData ? areAllPostsReady(postsData) : false,
-    shouldShowResults,
-    shouldShowLoading,
-    isGenerating
-  });
 
   // Show professional authentication loading state within the page layout
   if (!isAuthReady && !isRefreshing) {

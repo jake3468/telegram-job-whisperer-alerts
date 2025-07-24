@@ -37,10 +37,22 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
   
   const [formData, setFormData] = useState<FormData>({
     phoneNumber: '',
-    companyName: prefillData?.companyName || '',
-    jobTitle: prefillData?.jobTitle || '',
-    jobDescription: prefillData?.jobDescription || ''
+    companyName: '',
+    jobTitle: '',
+    jobDescription: ''
   });
+
+  // Update form data when prefillData changes
+  useEffect(() => {
+    if (prefillData) {
+      setFormData(prev => ({
+        ...prev,
+        companyName: prefillData.companyName || prev.companyName,
+        jobTitle: prefillData.jobTitle || prev.jobTitle,
+        jobDescription: prefillData.jobDescription || prev.jobDescription
+      }));
+    }
+  }, [prefillData]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sessionStatus, setSessionStatus] = useState<'ready' | 'refreshing' | 'expired' | 'error'>('ready');

@@ -117,12 +117,12 @@ const JobGuide = () => {
   }, [isGenerating]);
   useEffect(() => {
     if (!jobAnalysisId || !isGenerating) return;
-    console.log('🔄 Starting enhanced polling for job analysis results, ID:', jobAnalysisId);
+    
     let retryCount = 0;
     const maxRetries = 3;
     const pollForResults = async () => {
       try {
-        console.log('📡 Polling attempt', retryCount + 1, 'for analysis ID:', jobAnalysisId);
+        
 
         // Use enterprise auth for bulletproof polling
         const data = await executeWithRetry(async () => {

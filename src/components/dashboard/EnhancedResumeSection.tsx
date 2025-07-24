@@ -59,7 +59,6 @@ const EnhancedResumeSection = () => {
   const callResumeWebhook = async (fileUrl: string, fileName: string, fileSize: number, retryCount = 0): Promise<boolean> => {
     try {
       setWebhookStatus('pending');
-      console.log(`[ResumeWebhook] Calling webhook (attempt ${retryCount + 1})`);
 
       // Get user data for the webhook payload
       const { data: userData, error: userError } = await supabase
@@ -197,7 +196,6 @@ const EnhancedResumeSection = () => {
       
       // Retry logic for JWT-related errors
       if ((errorMessage.includes('JWT') || errorMessage.includes('unauthorized') || errorMessage.includes('expired')) && currentAttempt < 3) {
-        console.log(`[ResumeUpload] Retrying upload attempt ${currentAttempt}/3 due to JWT error`);
         
         setTimeout(async () => {
           await smartTokenRefresh();

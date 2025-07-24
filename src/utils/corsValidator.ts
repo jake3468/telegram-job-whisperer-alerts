@@ -16,11 +16,11 @@ class CorsValidator {
     this.config = {
       allowedOrigins: Environment.isProduction() 
         ? ['https://aspirely.ai', 'https://www.aspirely.ai']
-        : ['http://localhost:5173', 'https://*.lovable.app'],
+        : ['http://localhost:5173', 'https://lovable.app', 'https://aspirely.lovable.app'],
       allowedMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: [
         'Content-Type',
-        'Authorization',
+        'Authorization', 
         'X-Requested-With',
         'Accept',
         'Origin'

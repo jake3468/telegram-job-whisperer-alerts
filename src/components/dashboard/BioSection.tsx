@@ -33,16 +33,12 @@ export const BioSection = () => {
   useEffect(() => {
     const loadBioData = async () => {
       if (!sessionManager) {
-        console.log('[BioSection] Waiting for session manager...');
         return;
       }
-
-      console.log('[BioSection] Loading bio data...');
       setIsLoading(true);
 
       try {
         const result = await makeAuthenticatedRequest(async () => {
-          console.log('[BioSection] Making authenticated request for user profile...');
           const { data, error } = await supabase
             .from('user_profile')
             .select('*')
@@ -53,7 +49,7 @@ export const BioSection = () => {
             throw error;
           }
 
-          console.log('[BioSection] User profile data:', data);
+          
           return data;
         });
 
@@ -61,7 +57,6 @@ export const BioSection = () => {
           const userBio = result.bio || '';
           setBio(userBio);
           setInitialBio(userBio);
-          console.log('[BioSection] Bio loaded successfully:', userBio);
         }
       } catch (error) {
         console.error('[BioSection] Error loading bio:', error);
@@ -105,8 +100,6 @@ export const BioSection = () => {
     sessionManager.updateActivity();
 
     try {
-      console.log('[BioSection] Saving bio...');
-      
       await makeAuthenticatedRequest(async () => {
         const { error } = await supabase
           .from('user_profile')
@@ -118,7 +111,7 @@ export const BioSection = () => {
           throw error;
         }
 
-        console.log('[BioSection] Bio saved successfully');
+        
       });
 
       setInitialBio(bio);

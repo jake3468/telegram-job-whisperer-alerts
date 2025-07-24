@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
@@ -11,6 +12,7 @@ type JobTrackerItem = Tables<'job_tracker'>;
 export const useJobBoardData = () => {
   const { user: clerkUser } = useUser();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
+  const navigate = useNavigate();
   const [postedTodayJobs, setPostedTodayJobs] = useState<JobBoardItem[]>([]);
   const [last7DaysJobs, setLast7DaysJobs] = useState<JobBoardItem[]>([]);
   const [savedToTrackerJobs, setSavedToTrackerJobs] = useState<JobBoardItem[]>([]);
@@ -207,11 +209,15 @@ export const useJobBoardData = () => {
       }, 5, 'mark job as saved');
 
       // Success - show message immediately
-      toast.success('Job saved! Check the Saved section.');
+      toast.success('Job saved! Redirecting to Saved section...');
       
       // Refresh data with separate error handling
       try {
         await fetchJobs();
+        // Add navigation callback to trigger tab switch in JobBoard component
+        if ((window as any).jobBoardNavigationCallback) {
+          (window as any).jobBoardNavigationCallback('saved-to-tracker');
+        }
       } catch (refreshError) {
         console.error('Error refreshing job data after save:', refreshError);
         // Don't show error to user, the main operation succeeded
@@ -319,13 +325,17 @@ export const useJobBoardData = () => {
 
       // Success actions with separate error handling
       if (shouldShowSuccess) {
-        toast.success('Job added to tracker successfully!');
+        toast.success('Job added to tracker! Redirecting to Job Tracker...');
         
         try {
           await fetchJobs();
+          // Navigate to Job Tracker page with refresh state
+          navigate('/job-tracker', { state: { refresh: true } });
         } catch (refreshError) {
           console.error('Error refreshing job data after tracker save:', refreshError);
           // Don't show error to user, the main operation succeeded
+          // Still navigate even if refresh fails
+          navigate('/job-tracker', { state: { refresh: true } });
         }
       }
     } catch (err) {

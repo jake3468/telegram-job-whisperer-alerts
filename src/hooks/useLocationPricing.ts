@@ -47,13 +47,13 @@ export const useLocationPricing = () => {
   useEffect(() => {
     const detectLocation = async () => {
       try {
-        logger.debug('Starting location detection...');
+        
         
         // Primary IP detection service with better error handling
         let locationData = null;
         
         try {
-          logger.debug('Trying primary location service...');
+          
           
           // Create AbortController for timeout
           const controller = new AbortController();
@@ -70,7 +70,6 @@ export const useLocationPricing = () => {
           }
           
           locationData = await response.json();
-          logger.debug('Primary location service response:', locationData);
           
           // Check if the response contains error
           if (locationData.error) {
@@ -82,7 +81,7 @@ export const useLocationPricing = () => {
           
           // Fallback to alternative service with better error handling
           try {
-            logger.debug('Trying fallback location service...');
+            
             
             const controller2 = new AbortController();
             const timeoutId2 = setTimeout(() => controller2.abort(), 5000);
@@ -98,7 +97,6 @@ export const useLocationPricing = () => {
             }
             
             const ipData = await fallbackResponse.json();
-            logger.debug('Fallback IP detected:', ipData);
             
             // Use ipwhois for geolocation
             const controller3 = new AbortController();
@@ -116,14 +114,13 @@ export const useLocationPricing = () => {
             
             const geoData = await geoResponse.json();
             locationData = { country_code: geoData.country_code };
-            logger.debug('Fallback location data obtained:', locationData);
             
           } catch (fallbackError) {
             logger.warn('Fallback location service also failed:', fallbackError);
             
             // Try one more service as last resort
             try {
-              logger.debug('Trying final fallback service...');
+              
               
               const controller4 = new AbortController();
               const timeoutId4 = setTimeout(() => controller4.abort(), 3000);
@@ -134,10 +131,7 @@ export const useLocationPricing = () => {
               
               clearTimeout(timeoutId4);
               
-              if (finalResponse.ok) {
-                // This won't give us country, but at least we tried
-                logger.debug('Final service responded, but no country detection available');
-              }
+              // Final service attempted
             } catch (finalError) {
               logger.warn('All location services failed');
             }
@@ -148,14 +142,10 @@ export const useLocationPricing = () => {
         if (locationData?.country_code) {
           const countryCode = locationData.country_code.toLowerCase();
           setUserCountry(countryCode);
-          logger.info('Location detected successfully:', countryCode);
-          
           // Set pricing based on detected location (case-insensitive comparison)
           if (countryCode === 'in' || countryCode === 'india') {
-            logger.info('Setting Indian pricing for country:', countryCode);
             setPricingData(getIndianPricing());
           } else {
-            logger.debug('Setting international pricing for country:', countryCode);
             setPricingData(getGlobalPricing());
           }
         } else {

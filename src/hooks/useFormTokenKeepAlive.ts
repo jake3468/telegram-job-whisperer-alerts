@@ -19,11 +19,6 @@ export const useFormTokenKeepAlive = (isFormActive: boolean = true) => {
       // Use the simplified interface that handles the getToken internally
       const token = await sessionManager.refreshToken(true);
       
-      if (token) {
-        console.log('[FormTokenKeepAlive] Token silently refreshed via enterprise session manager');
-      } else {
-        console.warn('[FormTokenKeepAlive] Failed to refresh token');
-      }
     } catch (error) {
       console.error('[FormTokenKeepAlive] Silent token refresh failed:', error);
     } finally {
