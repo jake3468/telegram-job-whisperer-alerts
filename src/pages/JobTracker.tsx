@@ -313,6 +313,16 @@ const JobTracker = () => {
     optimisticDelete,
     forceRefresh
   } = useCachedJobTracker();
+
+  // Handle refresh trigger from navigation state
+  useEffect(() => {
+    const state = window.history.state;
+    if (state?.refresh) {
+      // Clear the navigation state and trigger refresh
+      window.history.replaceState({}, document.title, window.location.pathname);
+      forceRefresh();
+    }
+  }, [forceRefresh]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<JobEntry | null>(null);

@@ -198,6 +198,7 @@ const JobBoard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJob, setSelectedJob] = useState<JobBoardItem | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [activeTab, setActiveTab] = useState('posted-today');
 
   // Handle onboarding popup
   useEffect(() => {
@@ -205,6 +206,17 @@ const JobBoard = () => {
       setShowOnboarding(true);
     }
   }, [userProfile]);
+
+  // Set up navigation callback for tab switching
+  useEffect(() => {
+    (window as any).jobBoardNavigationCallback = (tabName: string) => {
+      setActiveTab(tabName);
+    };
+
+    return () => {
+      delete (window as any).jobBoardNavigationCallback;
+    };
+  }, []);
   const handleCloseOnboarding = () => {
     setShowOnboarding(false);
   };
@@ -312,7 +324,7 @@ const JobBoard = () => {
 
           {/* Job Sections */}
           <div className="w-full overflow-hidden">
-            <Tabs defaultValue="posted-today" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <div className="px-2 sm:px-4 mb-6">
                 <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm gap-0.5 sm:gap-1 h-auto p-0.5 sm:p-1 border-0 rounded-xl">
                   <TabsTrigger value="posted-today" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
