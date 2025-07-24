@@ -35,7 +35,6 @@ export const useCachedUserProfile = () => {
         if (now - parsedCache.timestamp < CACHE_DURATION) {
           setCachedData(parsedCache);
           setDisplayProfile(parsedCache.profile);
-          logger.debug('Loaded cached profile data:', parsedCache.profile);
         } else {
           // Remove expired cache
           localStorage.removeItem(CACHE_KEY);
@@ -48,7 +47,6 @@ export const useCachedUserProfile = () => {
         
         if (now - parsedResumeCache.timestamp < CACHE_DURATION) {
           setResumeExists(parsedResumeCache.exists);
-          logger.debug('Loaded cached resume status:', parsedResumeCache.exists);
         } else {
           localStorage.removeItem(RESUME_CACHE_KEY);
         }
@@ -64,13 +62,6 @@ export const useCachedUserProfile = () => {
   useEffect(() => {
     if (freshProfile) {
       setConnectionIssue(false);
-      // Only log once every 5 minutes to prevent spam
-      const lastLogTime = localStorage.getItem('profile_last_log');
-      const now = Date.now();
-      if (!lastLogTime || now - parseInt(lastLogTime) > 5 * 60 * 1000) {
-        logger.debug('Fresh profile data received:', freshProfile.id);
-        localStorage.setItem('profile_last_log', now.toString());
-      }
       
       const resumeStatus = !!freshProfile.resume_filename;
       const profileNow = Date.now();
@@ -121,7 +112,6 @@ export const useCachedUserProfile = () => {
       try {
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
         setCachedData(cacheData);
-        logger.debug('Updated cached profile after edit:', cacheData);
       } catch (error) {
         logger.warn('Failed to update cached profile:', error);
       }
@@ -140,7 +130,6 @@ export const useCachedUserProfile = () => {
         timestamp: Date.now()
       };
       localStorage.setItem(RESUME_CACHE_KEY, JSON.stringify(resumeCache));
-      logger.debug('Updated resume status cache:', exists);
     } catch (error) {
       logger.warn('Failed to cache resume status:', error);
     }

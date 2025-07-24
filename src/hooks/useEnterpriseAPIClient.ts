@@ -27,7 +27,6 @@ export const useEnterpriseAPIClient = () => {
 
     // Pre-request token validation (only if token is clearly expired)
     if (!isTokenValid()) {
-      console.log('[EnterpriseAPI] Pre-validating token...');
       await refreshToken(true);
     }
 
@@ -36,9 +35,6 @@ export const useEnterpriseAPIClient = () => {
         const result = await operation();
         
         // Success - return result
-        if (attempt > 0) {
-          console.log(`[EnterpriseAPI] Request succeeded on retry ${attempt}`);
-        }
         
         return result;
       } catch (error: any) {
@@ -50,7 +46,6 @@ export const useEnterpriseAPIClient = () => {
 
         // For auth errors, try token refresh
         if (isAuthError && !isLastAttempt) {
-          console.log(`[EnterpriseAPI] Auth error detected, refreshing token (attempt ${attempt + 1})`);
           const newToken = await refreshToken(true);
           
           if (newToken) {
@@ -64,7 +59,6 @@ export const useEnterpriseAPIClient = () => {
 
         // For network errors, retry with delay
         if (!isAuthError && !isLastAttempt && silentRetry) {
-          console.log(`[EnterpriseAPI] Network error, retrying (attempt ${attempt + 1}):`, error.message);
           if (retryDelays[attempt]) {
             await new Promise(resolve => setTimeout(resolve, retryDelays[attempt]));
           }
@@ -73,7 +67,6 @@ export const useEnterpriseAPIClient = () => {
 
         // Last attempt or non-retryable error
         if (isLastAttempt) {
-          console.error(`[EnterpriseAPI] Request failed after ${maxRetries} attempts:`, error);
           
           // Convert technical errors to user-friendly messages
           if (isAuthError) {

@@ -44,7 +44,6 @@ export const useCachedUserCredits = () => {
             next_reset_date: parsedCache.next_reset_date
           };
           setDisplayData(cachedDisplayData);
-          logger.debug('Loaded cached credits data:', cachedDisplayData);
         } else {
           // Remove expired cache
           localStorage.removeItem(CACHE_KEY);
@@ -72,7 +71,6 @@ export const useCachedUserCredits = () => {
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
         setCachedData(cacheData);
         setDisplayData(freshData);
-        logger.debug('Cached fresh credits data:', cacheData);
       } catch (error) {
         logger.warn('Failed to cache credits data:', error);
         setDisplayData(freshData);

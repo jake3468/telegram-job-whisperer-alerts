@@ -29,10 +29,7 @@ if (!PUBLISHABLE_KEY) {
   throw new Error("Missing Clerk Publishable Key");
 }
 
-// Log environment info for debugging
-console.log(`[Clerk Environment] Domain: ${window.location.hostname}`);
-console.log(`[Clerk Environment] Using ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'} Clerk key`);
-console.log(`[Clerk Environment] Key prefix: ${PUBLISHABLE_KEY.substring(0, 10)}...`);
+// Environment setup complete
 
 createRoot(document.getElementById("root")!).render(
   <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
