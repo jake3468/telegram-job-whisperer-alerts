@@ -4,6 +4,7 @@ import { useUser } from '@clerk/clerk-react';
 import { logger } from '@/utils/logger';
 import { supabase } from '@/integrations/supabase/client';
 import { useEnterpriseAPIClient } from './useEnterpriseAPIClient';
+import { useEnhancedTokenManager } from './useEnhancedTokenManager';
 
 interface JobAlert {
   id: string;
@@ -36,6 +37,7 @@ let isRefreshing = false; // Request deduplication flag
 export const useCachedJobAlertsData = () => {
   const { user } = useUser();
   const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
+  const { refreshToken, isTokenValid, isReady } = useEnhancedTokenManager();
   const [alerts, setAlerts] = useState<JobAlert[]>([]);
   const [isActivated, setIsActivated] = useState<boolean>(false);
   const [userProfileId, setUserProfileId] = useState<string | null>(null);
@@ -75,16 +77,16 @@ export const useCachedJobAlertsData = () => {
   }, []);
 
 
-  // Fetch fresh data when user changes
+  // Fetch fresh data when user changes and token is ready
   useEffect(() => {
-    if (!user) {
+    if (!user || !isReady) {
       setLoading(false);
       return;
     }
     
-    // Don't fetch if we already have fresh cached data
+    // Don't fetch if we already have fresh cached data AND token is valid
     const cached = localStorage.getItem(CACHE_KEY);
-    if (cached) {
+    if (cached && isTokenValid()) {
       try {
         const parsedCache: CachedJobAlertsData = JSON.parse(cached);
         const now = Date.now();
@@ -101,7 +103,7 @@ export const useCachedJobAlertsData = () => {
     }
     
     fetchJobAlertsData();
-  }, [user?.id]);
+  }, [user?.id, isReady, isTokenValid]);
 
   // Background auto-refresh
   useEffect(() => {
@@ -145,6 +147,15 @@ export const useCachedJobAlertsData = () => {
       if (!silent) {
         setError(null);
         setConnectionIssue(false);
+      }
+      
+      // Pre-flight token validation - ensure token is valid before making requests
+      if (!isTokenValid()) {
+        logger.debug('Token invalid, refreshing before data fetch');
+        const newToken = await refreshToken(true);
+        if (!newToken) {
+          throw new Error('Authentication failed. Please try signing out and back in.');
+        }
       }
       
       // Use enterprise session management for authenticated requests
@@ -220,7 +231,7 @@ export const useCachedJobAlertsData = () => {
         setLoading(false);
       }
     }
-  }, [user, alerts.length]);
+  }, [user, alerts.length, isTokenValid, refreshToken, makeAuthenticatedRequest]);
 
   const invalidateCache = () => {
     localStorage.removeItem(CACHE_KEY);
