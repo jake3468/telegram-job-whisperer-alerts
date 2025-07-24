@@ -23,7 +23,7 @@ interface JobAlertModalProps {
   onClose: () => void;
   userTimezone: string;
   editingAlert: JobAlert | null;
-  onSubmit: () => void;
+  onSubmit: (newAlert?: JobAlert) => void;
   currentAlertCount: number;
   maxAlerts: number;
   sessionManager?: any; // Enterprise session manager
@@ -39,8 +39,8 @@ const JobAlertModal = ({
   maxAlerts,
   sessionManager
 }: JobAlertModalProps) => {
-  const handleFormSubmit = () => {
-    onSubmit();
+  const handleFormSubmit = (newAlert?: JobAlert) => {
+    onSubmit(newAlert);
     onClose();
   };
 

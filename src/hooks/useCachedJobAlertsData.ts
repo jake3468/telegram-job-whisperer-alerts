@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { logger } from '@/utils/logger';
 import { supabase } from '@/integrations/supabase/client';
@@ -44,65 +44,113 @@ export const useCachedJobAlertsData = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [connectionIssue, setConnectionIssue] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<any>({});
+  
+  // Refs for tracking state
+  const isRequestInProgressRef = useRef(false);
+  const lastValidTokenRef = useRef<string | null>(null);
+  const lastSuccessfulFetchRef = useRef<number>(0);
 
-  // Load cached data immediately on mount with version check
+  // Enhanced cache loading with token awareness
   useEffect(() => {
-    try {
-      const cached = localStorage.getItem(CACHE_KEY);
-      if (cached) {
+    const loadCachedData = () => {
+      try {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (!cached) return false;
+
         const parsedCache: CachedJobAlertsData = JSON.parse(cached);
         const now = Date.now();
         
-        // Check cache version - invalidate old versions
-        if (parsedCache.version !== CACHE_VERSION) {
+        // Enhanced cache validation
+        const isCacheValid = parsedCache.version === CACHE_VERSION && 
+                           (now - parsedCache.timestamp < CACHE_DURATION);
+        
+        if (!isCacheValid) {
           localStorage.removeItem(CACHE_KEY);
-          return;
+          setDebugInfo(prev => ({ ...prev, cacheInvalidated: 'version_or_expired', timestamp: now }));
+          return false;
         }
         
-        // Use cached data if it's less than cache duration old
-        if (now - parsedCache.timestamp < CACHE_DURATION) {
-          setAlerts(parsedCache.alerts);
-          setIsActivated(parsedCache.isActivated);
-          setUserProfileId(parsedCache.userProfileId);
-          setLoading(false);
-          logger.debug('Loaded cached job alerts data:', parsedCache);
-        } else {
-          localStorage.removeItem(CACHE_KEY);
+        // Additional validation: ensure we have valid token when using cache
+        if (isReady && !isTokenValid()) {
+          setDebugInfo(prev => ({ ...prev, cacheSkipped: 'invalid_token', timestamp: now }));
+          return false;
         }
+        
+        // Load valid cached data
+        setAlerts(parsedCache.alerts);
+        setIsActivated(parsedCache.isActivated);
+        setUserProfileId(parsedCache.userProfileId);
+        setLoading(false);
+        lastSuccessfulFetchRef.current = parsedCache.timestamp;
+        
+        setDebugInfo(prev => ({ 
+          ...prev, 
+          cacheLoaded: true, 
+          cacheAge: now - parsedCache.timestamp,
+          alertCount: parsedCache.alerts.length,
+          timestamp: now 
+        }));
+        
+        logger.debug('[JobAlerts] Loaded cached data:', { 
+          alerts: parsedCache.alerts.length, 
+          age: now - parsedCache.timestamp 
+        });
+        return true;
+      } catch (error) {
+        logger.warn('[JobAlerts] Cache loading failed:', error);
+        localStorage.removeItem(CACHE_KEY);
+        setDebugInfo(prev => ({ ...prev, cacheError: error.message, timestamp: Date.now() }));
+        return false;
       }
-    } catch (error) {
-      logger.warn('Failed to load cached job alerts data:', error);
-      localStorage.removeItem(CACHE_KEY);
-    }
-  }, []);
+    };
+
+    loadCachedData();
+  }, [isReady, isTokenValid]);
 
 
-  // Fetch fresh data when user changes and token is ready
+  // Enhanced fetch trigger with token state tracking
   useEffect(() => {
     if (!user || !isReady) {
       setLoading(false);
+      setDebugInfo(prev => ({ ...prev, skipReason: 'no_user_or_not_ready', timestamp: Date.now() }));
       return;
     }
+
+    const currentToken = 'current_session'; // Use session indicator instead
+    const tokenChanged = isReady && !isTokenValid();
     
-    // Don't fetch if we already have fresh cached data AND token is valid
-    const cached = localStorage.getItem(CACHE_KEY);
-    if (cached && isTokenValid()) {
+    // Smart fetch decision based on cache freshness and token state
+    const shouldFetchFresh = () => {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (!cached) return true;
+      
       try {
         const parsedCache: CachedJobAlertsData = JSON.parse(cached);
         const now = Date.now();
-        // Check cache version before using
-        if (parsedCache.version !== CACHE_VERSION) {
-          localStorage.removeItem(CACHE_KEY);
-        } else if (now - parsedCache.timestamp < CACHE_DURATION) {
-          setLoading(false);
-          return;
-        }
+        const isCacheExpired = (now - parsedCache.timestamp) >= CACHE_DURATION;
+        const hasValidToken = isTokenValid();
+        
+        setDebugInfo(prev => ({ 
+          ...prev, 
+          shouldFetch: { isCacheExpired, hasValidToken, tokenChanged, cacheAge: now - parsedCache.timestamp },
+          timestamp: now 
+        }));
+        
+        // Fetch if cache expired, token changed, or token invalid
+        return isCacheExpired || tokenChanged || !hasValidToken;
       } catch {
-        // Invalid cache, continue to fetch
+        return true; // Fetch if cache parsing fails
       }
+    };
+
+    if (shouldFetchFresh()) {
+      lastValidTokenRef.current = currentToken;
+      fetchJobAlertsData();
+    } else {
+      setLoading(false);
+      setDebugInfo(prev => ({ ...prev, fetchSkipped: 'cache_fresh_and_token_valid', timestamp: Date.now() }));
     }
-    
-    fetchJobAlertsData();
   }, [user?.id, isReady, isTokenValid]);
 
   // Background auto-refresh
@@ -133,139 +181,293 @@ export const useCachedJobAlertsData = () => {
 
   const fetchJobAlertsData = useCallback(async (silent = false) => {
     if (!user) {
+      setDebugInfo(prev => ({ ...prev, fetchAborted: 'no_user', timestamp: Date.now() }));
       return;
     }
     
-    // Request deduplication - prevent multiple simultaneous requests
-    if (isRefreshing) {
+    // Enhanced request deduplication with debugging
+    if (isRequestInProgressRef.current) {
+      setDebugInfo(prev => ({ ...prev, fetchDeduplicated: true, timestamp: Date.now() }));
       return;
     }
     
-    isRefreshing = true;
+    isRequestInProgressRef.current = true;
+    const startTime = Date.now();
     
     try {
       if (!silent) {
         setError(null);
         setConnectionIssue(false);
+        setLoading(true);
       }
       
-      // Pre-flight token validation - ensure token is valid before making requests
-      if (!isTokenValid()) {
-        logger.debug('Token invalid, refreshing before data fetch');
-        const newToken = await refreshToken(true);
-        if (!newToken) {
-          throw new Error('Authentication failed. Please try signing out and back in.');
+      // Enhanced pre-flight checks with retry logic
+      let tokenRefreshAttempts = 0;
+      const maxTokenRefreshAttempts = 3;
+      
+      while (tokenRefreshAttempts < maxTokenRefreshAttempts) {
+        if (!isTokenValid()) {
+          logger.debug(`[JobAlerts] Token invalid, refreshing (attempt ${tokenRefreshAttempts + 1})`);
+          
+          const newToken = await refreshToken(true);
+          if (!newToken) {
+            if (tokenRefreshAttempts === maxTokenRefreshAttempts - 1) {
+              throw new Error('Authentication failed after multiple attempts. Please sign out and back in.');
+            }
+            tokenRefreshAttempts++;
+            await new Promise(resolve => setTimeout(resolve, 1000 * tokenRefreshAttempts)); // Exponential backoff
+            continue;
+          }
+          
+          lastValidTokenRef.current = newToken;
+          // Small delay to ensure token propagation
+          await new Promise(resolve => setTimeout(resolve, 200));
         }
+        break;
       }
       
-      // Use enterprise session management for authenticated requests
+      // Enhanced authenticated request with detailed error handling
       let profileData, alertsData;
       
       await makeAuthenticatedRequest(async () => {
-        // Get user profile
+        // Get user profile with enhanced error context
         const { data: profile, error: profileError } = await supabase
           .from('user_profile')
           .select('id, bot_activated')
           .maybeSingle();
           
         if (profileError) {
-          throw new Error(`Profile fetch failed: ${profileError.message}`);
+          logger.error('[JobAlerts] Profile fetch error:', profileError);
+          
+          // Provide specific error context
+          if (profileError.code === 'PGRST301') {
+            throw new Error('Authentication expired. Please refresh the page.');
+          }
+          throw new Error(`Unable to load your profile: ${profileError.message}`);
         }
         
         if (!profile) {
-          throw new Error('User profile not found. Please try signing out and back in.');
+          throw new Error('Your profile was not found. Please ensure you are properly signed in.');
         }
         
         profileData = profile;
 
-        // Fetch job alerts
+        // Fetch job alerts with retry on auth failure
         const { data: alerts, error: alertsError } = await supabase
           .from('job_alerts')
           .select('*')
           .order('created_at', { ascending: false });
 
         if (alertsError) {
-          throw alertsError;
+          logger.error('[JobAlerts] Alerts fetch error:', alertsError);
+          
+          if (alertsError.code === 'PGRST301') {
+            throw new Error('Authentication expired while loading alerts. Please refresh the page.');
+          }
+          throw new Error(`Unable to load job alerts: ${alertsError.message}`);
         }
         
-        alertsData = alerts;
+        alertsData = alerts || [];
+      }, { 
+        maxRetries: 3, 
+        silentRetry: false
       });
 
+      const endTime = Date.now();
+      const fetchDuration = endTime - startTime;
+      
       const result = {
         alerts: alertsData || [],
         botActivated: profileData.bot_activated || false,
         userProfileId: profileData.id
       };
 
-      // Update state
-      setAlerts(result.alerts);
-      setIsActivated(result.botActivated);
-      setUserProfileId(result.userProfileId);
+      // Update state with optimized re-rendering
+      const stateUpdates = [];
+      if (JSON.stringify(alerts) !== JSON.stringify(result.alerts)) {
+        setAlerts(result.alerts);
+        stateUpdates.push('alerts');
+      }
+      if (isActivated !== result.botActivated) {
+        setIsActivated(result.botActivated);
+        stateUpdates.push('activation');
+      }
+      if (userProfileId !== result.userProfileId) {
+        setUserProfileId(result.userProfileId);
+        stateUpdates.push('profileId');
+      }
 
-      // Cache the data
+      // Enhanced caching with token association
       try {
         const cacheData: CachedJobAlertsData = {
           alerts: result.alerts,
           isActivated: result.botActivated,
           userProfileId: result.userProfileId,
-          timestamp: Date.now(),
+          timestamp: endTime,
           version: CACHE_VERSION
         };
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+        lastSuccessfulFetchRef.current = endTime;
+        
+        setDebugInfo(prev => ({ 
+          ...prev, 
+          lastSuccessfulFetch: endTime,
+          fetchDuration,
+          stateUpdates,
+          resultSummary: {
+            alertCount: result.alerts.length,
+            isActivated: result.botActivated,
+            profileId: result.userProfileId
+          }
+        }));
+        
+        logger.debug('[JobAlerts] Fetch completed successfully:', {
+          duration: fetchDuration,
+          alerts: result.alerts.length,
+          stateUpdates
+        });
       } catch (cacheError) {
-        logger.warn('Failed to cache job alerts data:', cacheError);
+        logger.warn('[JobAlerts] Cache write failed:', cacheError);
       }
 
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+      
+      setDebugInfo(prev => ({ 
+        ...prev, 
+        lastError: { message: errorMessage, timestamp: Date.now(), code: error?.code },
+        errorContext: {
+          silent,
+          hasExistingData: alerts.length > 0,
+          tokenValid: isTokenValid(),
+          userPresent: !!user
+        }
+      }));
+      
+      logger.error('[JobAlerts] Fetch failed:', { error: errorMessage, context: { silent, alertCount: alerts.length } });
+      
       if (!silent) {
-        setError(error instanceof Error ? error.message : 'Unknown error occurred');
+        // Enhanced error differentiation
+        if (errorMessage.includes('Authentication') || errorMessage.includes('expired')) {
+          setError('Please refresh the page to continue');
+        } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+          setError('Connection issue. Please check your internet and try again.');
+        } else {
+          setError(errorMessage);
+        }
         
-        // Only show connection issue if we have no cached data
-        if (alerts.length === 0) {
+        // Only show connection issue for network errors and when no data exists
+        if (alerts.length === 0 && (errorMessage.includes('network') || errorMessage.includes('fetch'))) {
           setConnectionIssue(true);
         }
       }
     } finally {
-      isRefreshing = false; // Reset deduplication flag
+      isRequestInProgressRef.current = false;
       if (!silent) {
         setLoading(false);
       }
     }
-  }, [user, alerts.length, isTokenValid, refreshToken, makeAuthenticatedRequest]);
+  }, [user, alerts, isActivated, userProfileId, isTokenValid, refreshToken, makeAuthenticatedRequest]);
 
-  const invalidateCache = () => {
+  // Enhanced cache management with token awareness
+  const invalidateCache = useCallback(() => {
     localStorage.removeItem(CACHE_KEY);
+    lastSuccessfulFetchRef.current = 0;
+    lastValidTokenRef.current = null;
     setConnectionIssue(false);
+    setError(null);
+    setDebugInfo(prev => ({ ...prev, cacheInvalidated: 'manual', timestamp: Date.now() }));
+    
+    // Force fresh fetch
     fetchJobAlertsData();
-  };
+  }, [fetchJobAlertsData]);
 
-  const optimisticAdd = (newAlert: JobAlert) => {
-    setAlerts(prev => [newAlert, ...prev]);
-  };
+  // Enhanced optimistic updates with proper re-render triggering
+  const optimisticAdd = useCallback((newAlert: JobAlert) => {
+    setAlerts(prev => {
+      const updated = [newAlert, ...prev];
+      setDebugInfo(prevDebug => ({ 
+        ...prevDebug, 
+        optimisticAdd: { alertId: newAlert.id, timestamp: Date.now(), newCount: updated.length }
+      }));
+      
+      // Invalidate cache since we have new data
+      try {
+        localStorage.removeItem(CACHE_KEY);
+      } catch (e) {
+        logger.warn('[JobAlerts] Failed to clear cache after optimistic add:', e);
+      }
+      
+      return updated;
+    });
+  }, []);
 
-  const forceRefresh = async () => {
+  // Enhanced force refresh with debug tracking
+  const forceRefresh = useCallback(async () => {
     setConnectionIssue(false);
     setError(null);
     setLoading(true);
+    lastValidTokenRef.current = null; // Force token validation
+    
+    setDebugInfo(prev => ({ ...prev, forceRefreshTriggered: Date.now() }));
+    
+    // Clear cache to ensure fresh data
+    localStorage.removeItem(CACHE_KEY);
+    
     await fetchJobAlertsData();
-  };
+  }, [fetchJobAlertsData]);
 
-  // Simple delete function using enterprise session management
-  const deleteJobAlert = async (alertId: string) => {
-    await makeAuthenticatedRequest(async () => {
-      const { error } = await supabase
-        .from('job_alerts')
-        .delete()
-        .eq('id', alertId);
+  // Enhanced delete function with optimistic updates and error recovery
+  const deleteJobAlert = useCallback(async (alertId: string) => {
+    const originalAlerts = [...alerts];
+    
+    try {
+      // Optimistically remove from local state first for immediate UI feedback
+      setAlerts(prev => prev.filter(alert => alert.id !== alertId));
       
-      if (error) throw error;
-    });
-    
-    // Optimistically remove from local state
-    setAlerts(prev => prev.filter(alert => alert.id !== alertId));
-    
-    return true;
-  };
+      // Perform the actual deletion
+      await makeAuthenticatedRequest(async () => {
+        const { error } = await supabase
+          .from('job_alerts')
+          .delete()
+          .eq('id', alertId);
+        
+        if (error) throw error;
+      }, { 
+        maxRetries: 3 
+      });
+      
+      // Update cache after successful deletion
+      try {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+          const parsedCache: CachedJobAlertsData = JSON.parse(cached);
+          parsedCache.alerts = parsedCache.alerts.filter(alert => alert.id !== alertId);
+          parsedCache.timestamp = Date.now();
+          localStorage.setItem(CACHE_KEY, JSON.stringify(parsedCache));
+        }
+      } catch (cacheError) {
+        logger.warn('[JobAlerts] Failed to update cache after deletion:', cacheError);
+      }
+      
+      setDebugInfo(prev => ({ 
+        ...prev, 
+        lastDeletion: { alertId, timestamp: Date.now(), success: true }
+      }));
+      
+      return true;
+    } catch (error) {
+      // Revert optimistic update on failure
+      setAlerts(originalAlerts);
+      
+      setDebugInfo(prev => ({ 
+        ...prev, 
+        lastDeletion: { alertId, timestamp: Date.now(), success: false, error: error.message }
+      }));
+      
+      throw error;
+    }
+  }, [alerts, makeAuthenticatedRequest]);
 
   return {
     alerts,
@@ -274,6 +476,7 @@ export const useCachedJobAlertsData = () => {
     loading,
     error,
     connectionIssue,
+    debugInfo, // Add debug info for troubleshooting
     refetch: fetchJobAlertsData,
     optimisticAdd,
     invalidateCache,

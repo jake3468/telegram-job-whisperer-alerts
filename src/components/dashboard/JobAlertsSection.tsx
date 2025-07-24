@@ -36,6 +36,8 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
     userProfileId, 
     loading, 
     error, 
+    debugInfo,
+    optimisticAdd,
     invalidateCache,
     forceRefresh,
     deleteJobAlert
@@ -94,10 +96,8 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
     }
 
     try {
+      // deleteJobAlert now handles optimistic updates internally
       await deleteJobAlert(alertId);
-      
-      // Invalidate cache to refresh data
-      invalidateCache();
       
       toast({
         title: "Alert deleted",
@@ -105,18 +105,40 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
       });
     } catch (error) {
       console.error('Error deleting job alert:', error);
-      toast({
-        title: "Delete failed",
-        description: "There was an error deleting the job alert.",
-        variant: "destructive"
-      });
+      
+      // Enhanced error handling with context
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
+      if (errorMessage.includes('Authentication') || errorMessage.includes('expired')) {
+        toast({
+          title: "Session expired",
+          description: "Please refresh the page to continue.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Delete failed",
+          description: "There was an error deleting the job alert. Please try again.",
+          variant: "destructive"
+        });
+      }
     }
   };
 
-  const handleModalSubmit = () => {
+  const handleModalSubmit = (newAlert?: JobAlert) => {
     setEditingAlert(null);
-    // Invalidate cache to refresh data
-    invalidateCache();
+    
+    // If a new alert was created, add it optimistically for immediate UI feedback
+    if (newAlert && !editingAlert) {
+      optimisticAdd(newAlert);
+      toast({
+        title: "Alert created",
+        description: "Your job alert has been created successfully and will be processed shortly.",
+      });
+    } else {
+      // For edits, just invalidate cache to refresh data
+      invalidateCache();
+    }
   };
   
   const handleModalClose = () => {
