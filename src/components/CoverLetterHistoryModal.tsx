@@ -73,9 +73,9 @@ const CoverLetterHistoryModal = ({
             job_description, 
             created_at, 
             cover_letter,
-            user_profile!inner(user_id)
+            user_profile!inner(user_id, users!inner(clerk_id))
           `)
-          .eq('user_profile.user_id', user.id)
+          .eq('user_profile.users.clerk_id', user.id)
           .order('created_at', { ascending: false })
           .limit(20);
 
@@ -155,7 +155,12 @@ const CoverLetterHistoryModal = ({
             supabase
               .from('user_profile')
               .select('id')
-              .eq('user_id', user.id)
+              .in('user_id',
+                supabase
+                  .from('users')
+                  .select('id')
+                  .eq('clerk_id', user.id)
+              )
           );
 
         if (error) {
