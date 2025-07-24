@@ -38,9 +38,41 @@ const CoverLetterHistoryModal = ({
   const [isLoading, setIsLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<CoverLetterItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  
   useEffect(() => {
-    if (isOpen && user && userProfile) {
-      fetchHistory();
+    if (isOpen) {
+      console.log('[CoverLetterHistory] Modal opened, userProfile:', !!userProfile, 'user:', !!user);
+      
+      // Start loading immediately when modal opens
+      setIsLoading(true);
+      
+      if (user && userProfile) {
+        fetchHistory();
+      } else {
+        // Retry after a delay if user/profile not ready
+        const retryTimer = setTimeout(() => {
+          console.log('[CoverLetterHistory] Retrying fetch after delay');
+          if (user && userProfile) {
+            fetchHistory();
+          } else {
+            console.log('[CoverLetterHistory] User or profile still not available');
+            setIsLoading(false);
+            toast({
+              title: "Profile Loading",
+              description: "Please wait for your profile to load and try again.",
+              variant: "destructive"
+            });
+          }
+        }, 1000);
+        
+        return () => clearTimeout(retryTimer);
+      }
+    } else {
+      // Reset state when modal closes
+      setIsLoading(false);
+      setHistoryData([]);
+      setShowDetails(false);
+      setSelectedItem(null);
     }
   }, [isOpen, user, userProfile]);
   const fetchHistory = async () => {
