@@ -31,70 +31,56 @@ const CoverLetterHistoryModal = ({
   const {
     toast
   } = useToast();
-  const {
-    userProfile,
-    loading: profileLoading,
-    error: profileError,
-    refetch: refetchProfile
-  } = useCachedUserProfile();
   const [historyData, setHistoryData] = useState<CoverLetterItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<CoverLetterItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
   
   
   useEffect(() => {
-    if (isOpen) {
-      console.log('[CoverLetterHistory] Modal opened, userProfile:', !!userProfile, 'user:', !!user, 'profileLoading:', profileLoading, 'profileError:', profileError);
-      
-      if (user && userProfile && !profileLoading) {
-        // Profile is ready, fetch immediately
-        console.log('[CoverLetterHistory] Profile ready, fetching data');
-        fetchHistory();
-      } else if (profileError && retryCount < 3) {
-        // Profile failed to load, try to refetch
-        console.log('[CoverLetterHistory] Profile error detected, retrying...', retryCount);
-        setIsLoading(true);
-        setTimeout(() => {
-          refetchProfile();
-          setRetryCount(prev => prev + 1);
-        }, 1000);
-      } else if (profileLoading || !userProfile) {
-        // Still loading or no profile yet
-        setIsLoading(true);
-        console.log('[CoverLetterHistory] Profile still loading...');
-      }
-    } else {
+    if (isOpen && user) {
+      console.log('[CoverLetterHistory] Modal opened, fetching data directly');
+      fetchHistory();
+    } else if (!isOpen) {
       // Reset state when modal closes
       setIsLoading(false);
       setHistoryData([]);
       setShowDetails(false);
       setSelectedItem(null);
-      setRetryCount(0);
     }
-  }, [isOpen, user, userProfile, profileLoading, profileError, retryCount]);
-
-  const handleRetry = () => {
-    console.log('[CoverLetterHistory] Manual retry triggered');
-    setRetryCount(0);
-    setIsLoading(true);
-    refetchProfile();
-  };
+  }, [isOpen, user]);
   const fetchHistory = async () => {
-    if (!user || !userProfile) return;
+    if (!user) {
+      console.log('[CoverLetterHistory] No user available');
+      return;
+    }
+    
     setIsLoading(true);
     try {
-      const {
-        data,
-        error
-      } = await supabase.from('job_cover_letters').select('id, company_name, job_title, job_description, created_at, cover_letter').eq('user_id', userProfile.id).order('created_at', {
-        ascending: false
-      }).limit(20);
+      console.log('[CoverLetterHistory] Fetching data for user:', user.id);
+      
+      // Fetch data directly using a join to get the user's profile ID
+      const { data, error } = await supabase
+        .from('job_cover_letters')
+        .select(`
+          id, 
+          company_name, 
+          job_title, 
+          job_description, 
+          created_at, 
+          cover_letter,
+          user_profile!inner(user_id)
+        `)
+        .eq('user_profile.user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
       if (error) {
         console.error('Error fetching history:', error);
         throw error;
       }
+
+      console.log('[CoverLetterHistory] Successfully fetched', data?.length || 0, 'items');
 
       // Transform the data to match our interface
       const transformedData = (data || []).map((item: any) => ({
@@ -105,6 +91,7 @@ const CoverLetterHistoryModal = ({
         created_at: item.created_at,
         cover_letter: item.cover_letter
       }));
+      
       setHistoryData(transformedData);
     } catch (err) {
       console.error('Failed to fetch history:', err);
@@ -136,19 +123,29 @@ const CoverLetterHistoryModal = ({
     }
   };
   const handleDelete = async (itemId: string) => {
-    if (!userProfile) {
+    if (!user) {
       toast({
         title: "Error",
-        description: "User profile not found. Please try again.",
+        description: "User not found. Please try again.",
         variant: "destructive"
       });
       return;
     }
+    
     try {
-      console.log(`Attempting to delete cover letter item with ID: ${itemId} for user profile: ${userProfile.id}`);
-      const {
-        error
-      } = await supabase.from('job_cover_letters').delete().eq('id', itemId).eq('user_id', userProfile.id);
+      console.log(`Attempting to delete cover letter item with ID: ${itemId} for user: ${user.id}`);
+      
+      // Delete using a join to ensure we only delete the user's own data
+      const { error } = await supabase
+        .from('job_cover_letters')
+        .delete()
+        .eq('id', itemId)
+        .in('user_id', 
+          supabase
+            .from('user_profile')
+            .select('id')
+            .eq('user_id', user.id)
+        );
       if (error) {
         console.error('Supabase delete error:', error);
         throw error;
@@ -296,27 +293,10 @@ const CoverLetterHistoryModal = ({
         </div>
 
         <div className="flex-1 overflow-y-auto min-h-0">
-          {isLoading || profileLoading ? <div className="flex items-center justify-center py-8">
+          {isLoading ? <div className="flex items-center justify-center py-8">
               <div className="text-white/70 text-sm flex items-center gap-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white/70"></div>
                 Loading history...
-              </div>
-            </div> : profileError || (!user || !userProfile) ? <div className="flex items-center justify-center py-8">
-              <div className="text-white/70 text-center space-y-3">
-                <AlertCircle className="w-6 h-6 sm:w-8 sm:h-8 mx-auto opacity-50" />
-                <div>
-                  <p className="text-sm mb-2">
-                    {profileError ? "Failed to load your profile." : "Profile not available."}
-                  </p>
-                  <Button
-                    onClick={handleRetry}
-                    size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    <RefreshCw className="w-3 h-3 mr-1" />
-                    Retry
-                  </Button>
-                </div>
               </div>
             </div> : historyData.length === 0 ? <div className="flex items-center justify-center py-8">
               <div className="text-white/70 text-center">
