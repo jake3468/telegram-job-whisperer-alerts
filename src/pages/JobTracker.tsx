@@ -60,8 +60,7 @@ const DroppableColumn = ({
   onDeleteJob,
   onViewJob,
   onUpdateChecklist,
-  activeJobId,
-  isDragActive
+  activeJobId
 }: {
   column: any;
   jobs: JobEntry[];
@@ -70,7 +69,6 @@ const DroppableColumn = ({
   onViewJob: (job: JobEntry) => void;
   onUpdateChecklist: (jobId: string, field: string) => void;
   activeJobId?: string;
-  isDragActive: boolean;
 }) => {
   const {
     isOver,
@@ -95,12 +93,18 @@ const DroppableColumn = ({
           </div>}
       </div>
 
-      <div className={`p-2 h-[450px] transition-colors ${isDragActive ? 'overflow-hidden' : 'overflow-y-auto'} ${isDropTarget ? 'bg-black/5' : ''}`} style={{
-      scrollBehavior: isDragActive ? 'auto' : 'smooth'
-    }}>
+      <div className={`p-2 h-[450px] overflow-y-auto ${isDropTarget ? 'bg-black/5' : ''} transition-colors`}>
         <SortableContext items={jobs.map(job => job.id)} strategy={verticalListSortingStrategy}>
           <div className="space-y-1">
-            {jobs.map((job, index) => <SortableJobCard key={`${job.id}-${job.status}-${job.order_position}`} job={job} onDelete={onDeleteJob} onView={onViewJob} onUpdateChecklist={onUpdateChecklist} />)}
+            {jobs.map((job, index) => (
+              <SortableJobCard 
+                key={`${job.id}-${job.status}-${job.order_position}`} 
+                job={job} 
+                onDelete={onDeleteJob} 
+                onView={onViewJob} 
+                onUpdateChecklist={onUpdateChecklist} 
+              />
+            ))}
           </div>
         </SortableContext>
       </div>
@@ -120,9 +124,7 @@ const SortableJobCard = ({
   onUpdateChecklist: (jobId: string, field: string) => void;
 }) => {
   const [isChecklistExpanded, setIsChecklistExpanded] = useState(false);
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
 
   // Calculate progress based on status and boolean fields
   const getProgress = () => {
@@ -226,12 +228,7 @@ const SortableJobCard = ({
       });
     }
   };
-  return <div ref={setNodeRef} style={{
-    ...style,
-    touchAction: isDragging ? 'none' : 'auto',
-    userSelect: isDragging ? 'none' : 'auto',
-    WebkitUserSelect: isDragging ? 'none' : 'auto'
-  }} className={`bg-white rounded-lg border-2 border-gray-400 shadow-md hover:shadow-lg transition-all duration-200 py-1.5 px-2 mb-1 hover:scale-[1.02] min-w-0 w-full overflow-hidden ${isDragging ? 'shadow-2xl border-blue-400 bg-blue-50 scale-105 z-50' : ''}`}>
+  return <div ref={setNodeRef} style={style} className={`bg-white rounded-lg border-2 border-gray-400 shadow-md hover:shadow-lg transition-all duration-200 py-1.5 px-2 mb-1 hover:scale-[1.02] min-w-0 w-full overflow-hidden ${isDragging ? 'shadow-2xl border-blue-400 bg-blue-50' : ''}`}>
       {/* Top section: Progress + Company + Actions */}
       <div className="flex items-center gap-2 min-w-0">
         {/* Left: Progress badge in circle */}
@@ -241,16 +238,12 @@ const SortableJobCard = ({
         
         {/* Center: Company & Job Title */}
         <div className="flex-1 min-w-0 overflow-hidden">
-          <div className="font-bold text-sm text-black leading-tight break-words hyphens-auto" style={{
-          wordBreak: 'break-word',
-          overflowWrap: 'anywhere'
-        }}>
+          <div className="font-bold text-sm text-black leading-tight break-words hyphens-auto" 
+               style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
             {job.company_name}
           </div>
-          <div className="text-xs text-gray-600 leading-tight break-words hyphens-auto" style={{
-          wordBreak: 'break-word',
-          overflowWrap: 'anywhere'
-        }}>
+          <div className="text-xs text-gray-600 leading-tight break-words hyphens-auto"
+               style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
             {job.job_title}
           </div>
         </div>
@@ -271,15 +264,28 @@ const SortableJobCard = ({
             </a>}
 
           {/* Enhanced Drag Handle with Mobile Touch Support */}
-          <div {...attributes} {...listeners} onClick={handleDragAttempt} className={`relative cursor-grab p-3 sm:p-2 transition-all duration-200 flex-shrink-0 rounded-md touch-manipulation ${canDrag ? `text-gray-600 hover:text-gray-800 ${isDragging ? 'bg-blue-100 scale-110 shadow-lg' : 'hover:bg-gray-100'}` : "text-gray-400 cursor-not-allowed"}`} title={canDrag ? "Hold for 0.5s then drag to move" : "Complete checklist to move"} style={{
-          minWidth: '32px',
-          minHeight: '32px',
-          WebkitTouchCallout: 'none',
-          WebkitUserSelect: 'none',
-          userSelect: 'none'
-        }}>
+          <div 
+            {...attributes} 
+            {...listeners} 
+            onClick={handleDragAttempt}
+            className={`relative cursor-grab p-3 sm:p-2 transition-all duration-200 flex-shrink-0 rounded-md touch-manipulation ${
+              canDrag 
+                ? `text-gray-600 hover:text-gray-800 ${isDragging ? 'bg-blue-100 scale-110 shadow-lg' : 'hover:bg-gray-100'}` 
+                : "text-gray-400 cursor-not-allowed"
+            }`} 
+            title={canDrag ? "Hold for 0.5s then drag to move" : "Complete checklist to move"}
+            style={{ 
+              minWidth: '32px', 
+              minHeight: '32px',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none',
+              userSelect: 'none'
+            }}
+          >
             {/* Dragging Indicator */}
-            {isDragging && <div className="absolute inset-0 bg-blue-500/30 rounded-md animate-pulse" />}
+            {isDragging && (
+              <div className="absolute inset-0 bg-blue-500/30 rounded-md animate-pulse" />
+            )}
             
             <GripVertical className={`w-4 h-4 relative z-10 transition-transform ${isDragging ? 'scale-110' : ''}`} />
           </div>
@@ -304,10 +310,7 @@ const JobTracker = () => {
     user,
     isLoaded
   } = useUser();
-  const {
-    executeWithRetry,
-    isAuthReady
-  } = useEnterpriseAuth();
+  const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
   const navigate = useNavigate();
   const {
     toast
@@ -322,12 +325,8 @@ const JobTracker = () => {
 
   // Enterprise session management for Job Tracker page
   useClerkSupabaseSync();
-  const sessionManager = useEnhancedTokenManagerIntegration({
-    enabled: true
-  });
-  const {
-    updateActivity
-  } = useFormTokenKeepAlive(true);
+  const sessionManager = useEnhancedTokenManagerIntegration({ enabled: true });
+  const { updateActivity } = useFormTokenKeepAlive(true);
 
   // Use cached hook for instant data display
   const {
@@ -371,15 +370,19 @@ const JobTracker = () => {
     job_description: '',
     job_url: ''
   });
-  // Auto-scroll animation frame ref
-  const autoScrollAnimationRef = React.useRef<number | null>(null);
-  const [isDragActive, setIsDragActive] = useState(false);
-  const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor, {
-    activationConstraint: {
-      delay: 500,
-      tolerance: 5
-    }
-  }), useSensor(MouseSensor));
+  // Auto-scroll interval ref
+  const autoScrollIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 500,
+        tolerance: 5,
+      },
+    }),
+    useSensor(MouseSensor)
+  );
   const columns = [{
     key: 'saved',
     title: 'Saved',
@@ -505,18 +508,17 @@ const JobTracker = () => {
     }
     try {
       // Get the next order position using database function for consistency
-      const {
-        data: nextPosition,
-        error: positionError
-      } = await executeWithRetry(async () => {
+      const { data: nextPosition, error: positionError } = await executeWithRetry(async () => {
         return await supabase.rpc('get_next_order_position', {
           p_user_id: userProfileId,
           p_status: selectedStatus
         });
       }, 3, 'get next order position');
+
       if (positionError) {
         throw new Error(`Failed to get order position: ${positionError.message}`);
       }
+
       const orderPosition = nextPosition || 0;
 
       // Create optimistic update first
@@ -541,10 +543,7 @@ const JobTracker = () => {
       };
       optimisticAdd(tempJob);
       const data = await executeWithRetry(async () => {
-        const {
-          data,
-          error
-        } = await supabase.from('job_tracker').insert({
+        const { data, error } = await supabase.from('job_tracker').insert({
           user_id: userProfileId,
           company_name: formData.company_name,
           job_title: formData.job_title,
@@ -614,23 +613,24 @@ const JobTracker = () => {
       description: "Please wait while we save your changes.",
       duration: 0
     });
+
     try {
       await executeWithRetry(async () => {
-        const {
-          error
-        } = await supabase.from('job_tracker').update({
+        const { error } = await supabase.from('job_tracker').update({
           company_name: editFormData.company_name,
           job_title: editFormData.job_title,
           job_description: editFormData.job_description || null,
           job_url: editFormData.job_url || null
         }).eq('id', selectedJob.id).eq('user_id', userProfileId);
+        
         if (error) {
           throw error;
         }
       }, 3, 'update job details');
-
+      
       // Dismiss loading toast
       loadingToast.dismiss();
+      
       toast({
         title: "Success",
         description: "Job updated successfully!"
@@ -641,14 +641,16 @@ const JobTracker = () => {
     } catch (error: any) {
       // Dismiss loading toast
       loadingToast.dismiss();
-
+      
       // Enterprise-grade error handling - user-friendly messages only
       let errorMessage = "Unable to update job. Please try again.";
+      
       if (error?.code === 'PGRST116') {
         errorMessage = "Job not found. Please refresh the page.";
       } else if (error?.message?.includes('refresh the page')) {
         errorMessage = error.message;
       }
+      
       toast({
         title: "Update Failed",
         description: errorMessage,
@@ -659,6 +661,7 @@ const JobTracker = () => {
   const handleDeleteJob = async () => {
     updateActivity(); // Track user activity
     if (!selectedJob) return;
+    
     if (!isAuthReady || !userProfileId) {
       toast({
         title: "Please wait",
@@ -674,22 +677,28 @@ const JobTracker = () => {
       description: "Please wait while we remove this job.",
       duration: 0
     });
+
     try {
       await executeWithRetry(async () => {
-        const {
-          error
-        } = await supabase.from('job_tracker').delete().eq('id', selectedJob.id).eq('user_id', userProfileId);
+        const { error } = await supabase
+          .from('job_tracker')
+          .delete()
+          .eq('id', selectedJob.id)
+          .eq('user_id', userProfileId);
+        
         if (error) {
           throw error;
         }
       }, 3, 'delete job');
-
+      
       // Dismiss loading toast
       loadingToast.dismiss();
+      
       toast({
         title: "Success",
         description: "Job deleted successfully!"
       });
+      
       optimisticDelete(selectedJob.id);
       setIsViewModalOpen(false);
       setSelectedJob(null);
@@ -697,12 +706,14 @@ const JobTracker = () => {
     } catch (error: any) {
       // Dismiss loading toast
       loadingToast.dismiss();
-
+      
       // Enterprise-grade error handling
       let errorMessage = "Unable to delete job. Please try again.";
+      
       if (error?.message?.includes('refresh the page')) {
         errorMessage = error.message;
       }
+      
       toast({
         title: "Delete Failed",
         description: errorMessage,
@@ -715,6 +726,7 @@ const JobTracker = () => {
     const scrollThreshold = 100;
     const scrollSpeed = 10;
     const viewportHeight = window.innerHeight;
+    
     if (clientY < scrollThreshold) {
       // Scroll up
       window.scrollBy(0, -scrollSpeed);
@@ -729,26 +741,25 @@ const JobTracker = () => {
     const draggedJob = jobs.find(job => job.id === event.active.id);
     if (draggedJob) {
       setActiveJob(draggedJob);
-
+      
       // Haptic feedback for mobile (if supported)
       if (navigator.vibrate) {
         navigator.vibrate(50);
       }
+      
       updateActivity();
     }
   };
   const handleDragEnd = async (event: DragEndEvent) => {
-    const {
-      active,
-      over
-    } = event;
+    const { active, over } = event;
     setActiveJob(null);
-
-    // Clear auto-scroll animation
-    if (autoScrollAnimationRef.current) {
-      cancelAnimationFrame(autoScrollAnimationRef.current);
-      autoScrollAnimationRef.current = null;
+    
+    // Clear auto-scroll interval
+    if (autoScrollIntervalRef.current) {
+      clearInterval(autoScrollIntervalRef.current);
+      autoScrollIntervalRef.current = null;
     }
+    
     updateActivity(); // Track user activity
     if (!over) return;
     const activeJobToMove = jobs.find(j => j.id === active.id);
@@ -779,9 +790,7 @@ const JobTracker = () => {
         try {
           await executeWithRetry(async () => {
             await Promise.all(reorderedJobs.map(async (job, index) => {
-              const {
-                error
-              } = await supabase.from('job_tracker').update({
+              const { error } = await supabase.from('job_tracker').update({
                 order_position: index
               }).eq('id', job.id);
               if (error) throw error;
@@ -846,20 +855,19 @@ const JobTracker = () => {
     if (targetColumn && activeJobToMove.status !== targetColumn.key) {
       try {
         // Get the next order position using database function for consistency
-        const {
-          data: nextPosition,
-          error: positionError
-        } = await executeWithRetry(async () => {
+        const { data: nextPosition, error: positionError } = await executeWithRetry(async () => {
           return await supabase.rpc('get_next_order_position', {
             p_user_id: userProfileId,
             p_status: targetColumn.key as 'saved' | 'applied' | 'interview' | 'rejected' | 'offer'
           });
         }, 3, 'get next order position for drag drop');
+
         if (positionError) {
           throw new Error(`Failed to get order position: ${positionError.message}`);
         }
-        const orderPosition = nextPosition || 0;
 
+        const orderPosition = nextPosition || 0;
+        
         // Optimistic update - update UI immediately  
         const updatedJob = {
           ...activeJobToMove,
@@ -890,10 +898,9 @@ const JobTracker = () => {
           file_urls: Array.isArray(updatedJob.file_urls) ? updatedJob.file_urls.map(url => String(url)) : [],
           comments: updatedJob.comments || undefined
         } as JobEntry);
+
         await executeWithRetry(async () => {
-          const {
-            error
-          } = await supabase.from('job_tracker').update({
+          const { error } = await supabase.from('job_tracker').update({
             status: targetColumn.key as 'saved' | 'applied' | 'interview' | 'rejected' | 'offer',
             order_position: orderPosition,
             interview_call_received: updatedJob.interview_call_received,
@@ -941,8 +948,8 @@ const JobTracker = () => {
   const handleUpdateChecklistItem = async (jobId: string, field: string) => {
     updateActivity(); // Track user activity
     const targetJob = jobs.find(job => job.id === jobId);
-    if (!targetJob || targetJob.status !== 'saved' && targetJob.status !== 'applied' && targetJob.status !== 'interview') return;
-
+    if (!targetJob || (targetJob.status !== 'saved' && targetJob.status !== 'applied' && targetJob.status !== 'interview')) return;
+    
     // Check if authentication is ready
     if (!isAuthReady) {
       toast({
@@ -952,28 +959,27 @@ const JobTracker = () => {
       });
       return;
     }
+    
     try {
       // Update in database using enhanced authentication
       const currentValue = targetJob[field as keyof JobEntry] as boolean;
-
+      
       // First perform optimistic update for immediate UI feedback
       const updatedJob = {
         ...targetJob,
         [field]: !currentValue
       };
       optimisticUpdate(updatedJob);
-
+      
       // Also update selectedJob if it's the same job
       if (selectedJob && selectedJob.id === jobId) {
         setSelectedJob(updatedJob);
       }
-
+      
       // Perform database update with improved error handling
       try {
         await executeWithRetry(async () => {
-          const {
-            error
-          } = await supabase.from('job_tracker').update({
+          const { error } = await supabase.from('job_tracker').update({
             [field]: !currentValue
           }).eq('id', jobId);
           if (error) throw error;
@@ -986,13 +992,13 @@ const JobTracker = () => {
         });
       } catch (dbError) {
         console.error('Database error updating checklist:', dbError);
-
+        
         // Revert optimistic update on database error
         optimisticUpdate(targetJob);
         if (selectedJob && selectedJob.id === jobId) {
           setSelectedJob(targetJob);
         }
-
+        
         // Only show error toast for actual database failures
         toast({
           title: "Error",
@@ -1003,12 +1009,13 @@ const JobTracker = () => {
     } catch (error) {
       // This catches any unexpected errors in the optimistic update logic
       console.error('Unexpected error in checklist update:', error);
-
+      
       // Ensure we revert the optimistic update
       optimisticUpdate(targetJob);
       if (selectedJob && selectedJob.id === jobId) {
         setSelectedJob(targetJob);
       }
+      
       toast({
         title: "Error",
         description: "An unexpected error occurred. Please try again.",
@@ -1021,7 +1028,7 @@ const JobTracker = () => {
         <div className="text-white text-xs">Loading...</div>
       </div>;
   }
-
+  
   // Show loading state if authentication is not ready
   if (!isAuthReady) {
     return <Layout>
@@ -1030,6 +1037,7 @@ const JobTracker = () => {
         </div>
       </Layout>;
   }
+  
   if (loading) {
     return <Layout>
         <div className="flex items-center justify-center min-h-[400px]">
@@ -1082,34 +1090,38 @@ const JobTracker = () => {
 
         {/* Main content area - responsive flexbox layout */}
         <main className="flex-1 p-4 overflow-x-hidden md:overflow-x-auto">
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragMove={event => {
-          // Implement auto-scroll during drag
-          if (event.active && event.delta) {
-            const rect = event.active.rect.current.translated;
-            if (rect) {
-              const clientY = rect.top + rect.height / 2;
-
-              // Clear existing animation
-              if (autoScrollAnimationRef.current) {
-                cancelAnimationFrame(autoScrollAnimationRef.current);
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDragMove={(event) => {
+              // Implement auto-scroll during drag
+              if (event.active && event.delta) {
+                const rect = event.active.rect.current.translated;
+                if (rect) {
+                  const clientY = rect.top + rect.height / 2;
+                  
+                  // Clear existing interval
+                  if (autoScrollIntervalRef.current) {
+                    clearInterval(autoScrollIntervalRef.current);
+                  }
+                  
+                  // Set up new auto-scroll interval
+                  autoScrollIntervalRef.current = setInterval(() => {
+                    autoScroll(clientY);
+                  }, 16); // ~60fps
+                }
               }
-
-              // Set up new auto-scroll animation
-              const scroll = () => {
-                autoScroll(clientY);
-                autoScrollAnimationRef.current = requestAnimationFrame(scroll);
-              };
-              autoScrollAnimationRef.current = requestAnimationFrame(scroll);
-            }
-          }
-        }}>
+            }}
+          >
             {/* Responsive flexbox: stacked on mobile, wrapped on larger screens */}
             <div className="flex flex-col md:flex-row md:flex-wrap gap-2 sm:gap-4 w-full min-w-0">
               {columns.map(column => <DroppableColumn key={column.key} column={column} jobs={getJobsByStatus(column.key)} onAddJob={() => {
               updateActivity(); // Track user activity
               setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
               setIsModalOpen(true);
-            }} onDeleteJob={handleDeleteJob} onViewJob={handleViewJob} onUpdateChecklist={handleUpdateChecklistItem} activeJobId={activeJob?.id} isDragActive={isDragActive} />)}
+            }} onDeleteJob={handleDeleteJob} onViewJob={handleViewJob} onUpdateChecklist={handleUpdateChecklistItem} activeJobId={activeJob?.id} />)}
             </div>
             <DragOverlay>
               {activeJob ? <div className="bg-gray-800 rounded-lg p-4 border border-gray-600 shadow-2xl transform rotate-3 w-full max-w-[280px]">
@@ -1307,7 +1319,9 @@ const JobTracker = () => {
                    {/* Tips for Applied status */}
                    {selectedJob.status === 'applied' && <div className="mt-3 space-y-2">
                        <div className="p-2 bg-green-50 border border-green-200 rounded-lg">
-                         <p className="text-green-700 text-xs font-medium">💡 Once you receive the interview call from the HR, you can tick mark above and then move this card to the 'Interview' section to unlock the checklist for interview preparation.</p>
+                         <p className="text-green-700 text-xs font-medium">
+                           💡 Once you receive the interview call, you can tick mark above and then move this card to the 'Interview' section to unlock the checklist for interview preparation.
+                         </p>
                        </div>
                        <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
                          <p className="text-blue-700 text-xs font-medium mb-2">
