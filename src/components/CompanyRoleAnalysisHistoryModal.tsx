@@ -296,7 +296,7 @@ const CompanyRoleAnalysisHistoryModal = ({
                       <Button onClick={() => {
                   setSelectedItem(item);
                   setShowDetails(true);
-                }} size="sm" className="flex-1 bg-green-600/80 hover:bg-green-600 text-white text-xs px-2 py-1">
+                }} size="sm" className="flex-1 text-white text-xs px-2 py-1 bg-blue-800 hover:bg-blue-700">
                         <Eye className="w-3 h-3 mr-1" />
                         View
                       </Button>
