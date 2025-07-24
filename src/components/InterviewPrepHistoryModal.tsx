@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useUser } from '@clerk/clerk-react';
 import { useEnterpriseAPIClient } from '@/hooks/useEnterpriseAPIClient';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useCachedInterviewPrep } from '@/hooks/useCachedInterviewPrep';
 import { supabase } from '@/integrations/supabase/client';
 import InterviewPrepDownloadActions from '@/components/InterviewPrepDownloadActions';
 interface InterviewPrepHistoryModalProps {
@@ -19,69 +20,15 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
   const [isOpen, setIsOpen] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState<any>(null);
   const [showDetails, setShowDetails] = useState(false);
-  const [interviewHistory, setInterviewHistory] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const {
     toast
   } = useToast();
   const { user, isLoaded } = useUser();
-  const {
-    userProfile
-  } = useUserProfile();
+  const { data: interviewHistory, isLoading, refetch } = useCachedInterviewPrep();
   const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
-  useEffect(() => {
-    if (isOpen && isLoaded && user && userProfile) {
-      console.log('🔄 InterviewPrepHistoryModal: Starting to fetch history');
-      fetchHistory();
-    }
-  }, [isOpen, isLoaded, user, userProfile]);
-
-  const fetchHistory = async () => {
-    console.log('🚀 FETCHHISTORY CALLED - Interview Prep Modal');
-    if (!isLoaded || !user || !userProfile) {
-      console.log('❌ Cannot fetch history: missing requirements', {
-        isLoaded,
-        user: !!user,
-        userProfile: !!userProfile
-      });
-      return;
-    }
-    setIsLoading(true);
-    try {
-      console.log('📡 Fetching interview prep history for user:', user.id);
-      console.log('📡 User profile ID:', userProfile.id);
-      
-      const { data, error } = await makeAuthenticatedRequest(async () => {
-        console.log('📡 Making authenticated request to fetch interview prep');
-        const result = await supabase
-          .from('interview_prep')
-          .select('*')
-          .eq('user_id', userProfile.id)
-          .order('created_at', { ascending: false });
-        console.log('📡 Supabase query result:', result);
-        return result;
-      }, { maxRetries: 3 });
-
-      if (error) {
-        console.error('❌ Error fetching history:', error);
-        console.error('❌ Error details:', JSON.stringify(error, null, 2));
-        throw error;
-      }
-      
-      console.log('✅ Successfully fetched history:', data?.length || 0, 'items');
-      console.log('✅ History data:', data);
-      setInterviewHistory(data || []);
-    } catch (err) {
-      console.error('❌ Failed to fetch history:', err);
-      console.error('❌ Error stack:', err instanceof Error ? err.stack : 'No stack trace');
-      toast({
-        title: "Error",
-        description: "Failed to load history. Please try again or refresh the page.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleRefresh = () => {
+    console.log('🔄 MANUAL REFRESH TRIGGERED - Interview Prep');
+    refetch();
   };
   const handleDelete = async (id: string, event: React.MouseEvent) => {
     event.stopPropagation();
@@ -99,26 +46,10 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
       console.log(`Attempting to delete interview prep item with ID: ${id} for user: ${user.id}`);
       
       const { error } = await makeAuthenticatedRequest(async () => {
-        // First get the user_profile.id for this user
-        const { data: profileData, error: profileError } = await supabase
-          .from('user_profile')
-          .select('id')
-          .in('user_id',
-            supabase
-              .from('users')
-              .select('id')
-              .eq('clerk_id', user.id)
-          );
-
-        if (profileError || !profileData?.[0]) {
-          throw new Error('User profile not found');
-        }
-
         return await supabase
           .from('interview_prep')
           .delete()
-          .eq('id', id)
-          .eq('user_id', profileData[0].id);
+          .eq('id', id);
       }, { maxRetries: 2 });
 
       if (error) {
@@ -128,8 +59,8 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
       
       console.log('Delete operation completed successfully');
       
-      // Remove from local state
-      setInterviewHistory(prev => prev.filter(item => item.id !== id));
+      // Refresh the data after deletion
+      refetch();
       toast({
         title: "Interview prep deleted",
         description: "The interview prep entry has been successfully deleted."
@@ -292,7 +223,7 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
                 <Button 
                   onClick={() => {
                     console.log('🔄 RETRY BUTTON CLICKED - Interview Prep');
-                    fetchHistory();
+                    handleRefresh();
                   }} 
                   size="sm"
                   className="bg-blue-600 hover:bg-blue-700"
