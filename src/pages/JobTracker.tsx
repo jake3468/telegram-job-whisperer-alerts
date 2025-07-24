@@ -228,7 +228,15 @@ const SortableJobCard = ({
       });
     }
   };
-  return <div ref={setNodeRef} style={style} className={`bg-white rounded-lg border-2 border-gray-400 shadow-md hover:shadow-lg transition-all duration-200 py-1.5 px-2 mb-1 hover:scale-[1.02] min-w-0 w-full overflow-hidden ${isDragging ? 'shadow-2xl border-blue-400 bg-blue-50' : ''}`}>
+  return <div 
+    ref={setNodeRef} 
+    style={{
+      ...style,
+      touchAction: isDragging ? 'none' : 'auto',
+      userSelect: isDragging ? 'none' : 'auto',
+      WebkitUserSelect: isDragging ? 'none' : 'auto'
+    }} 
+    className={`bg-white rounded-lg border-2 border-gray-400 shadow-md hover:shadow-lg transition-all duration-200 py-1.5 px-2 mb-1 hover:scale-[1.02] min-w-0 w-full overflow-hidden ${isDragging ? 'shadow-2xl border-blue-400 bg-blue-50 scale-105 z-50' : ''}`}>
       {/* Top section: Progress + Company + Actions */}
       <div className="flex items-center gap-2 min-w-0">
         {/* Left: Progress badge in circle */}
@@ -370,8 +378,9 @@ const JobTracker = () => {
     job_description: '',
     job_url: ''
   });
-  // Auto-scroll interval ref
-  const autoScrollIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
+  // Auto-scroll animation frame ref
+  const autoScrollAnimationRef = React.useRef<number | null>(null);
+  const [isDragScrolling, setIsDragScrolling] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -754,10 +763,10 @@ const JobTracker = () => {
     const { active, over } = event;
     setActiveJob(null);
     
-    // Clear auto-scroll interval
-    if (autoScrollIntervalRef.current) {
-      clearInterval(autoScrollIntervalRef.current);
-      autoScrollIntervalRef.current = null;
+    // Clear auto-scroll animation
+    if (autoScrollAnimationRef.current) {
+      cancelAnimationFrame(autoScrollAnimationRef.current);
+      autoScrollAnimationRef.current = null;
     }
     
     updateActivity(); // Track user activity
@@ -1102,15 +1111,17 @@ const JobTracker = () => {
                 if (rect) {
                   const clientY = rect.top + rect.height / 2;
                   
-                  // Clear existing interval
-                  if (autoScrollIntervalRef.current) {
-                    clearInterval(autoScrollIntervalRef.current);
+                  // Clear existing animation
+                  if (autoScrollAnimationRef.current) {
+                    cancelAnimationFrame(autoScrollAnimationRef.current);
                   }
                   
-                  // Set up new auto-scroll interval
-                  autoScrollIntervalRef.current = setInterval(() => {
+                  // Set up new auto-scroll animation
+                  const scroll = () => {
                     autoScroll(clientY);
-                  }, 16); // ~60fps
+                    autoScrollAnimationRef.current = requestAnimationFrame(scroll);
+                  };
+                  autoScrollAnimationRef.current = requestAnimationFrame(scroll);
                 }
               }
             }}
