@@ -721,6 +721,88 @@ const JobTracker = () => {
       });
     }
   };
+
+  // Status transition function for quick actions
+  const moveJobToStatus = useCallback(async (jobId: string, newStatus: 'saved' | 'applied' | 'interview' | 'rejected' | 'offer') => {
+    try {
+      updateActivity();
+      
+      const movingJob = jobs.find(job => job.id === jobId);
+      if (!movingJob) return;
+
+      // Calculate new position (add to end of target column)
+      const targetJobs = jobs.filter(job => job.status === newStatus);
+      const newPosition = targetJobs.length;
+
+      // Reset relevant checklist items when moving between statuses
+      const resetFields: any = {};
+      
+      // When moving from saved to applied, reset applied-specific items
+      if (movingJob.status === 'saved' && newStatus === 'applied') {
+        resetFields.interview_call_received = false;
+      }
+      
+      // When moving from applied to interview, reset interview-specific items  
+      if (movingJob.status === 'applied' && newStatus === 'interview') {
+        resetFields.interview_prep_guide_received = false;
+        resetFields.ai_mock_interview_attempted = false;
+      }
+      
+      // When moving back to previous stages, reset future stage items
+      if (newStatus === 'saved') {
+        resetFields.interview_call_received = false;
+        resetFields.interview_prep_guide_received = false;
+        resetFields.ai_mock_interview_attempted = false;
+      } else if (newStatus === 'applied') {
+        resetFields.interview_prep_guide_received = false;
+        resetFields.ai_mock_interview_attempted = false;
+      }
+
+      // Update the job with new status, position, and reset fields
+      const { error: updateError } = await supabase
+        .from('job_tracker')
+        .update({ 
+          status: newStatus,
+          order_position: newPosition,
+          ...resetFields,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', jobId);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Update optimistic state
+      const updatedJob = { 
+        ...movingJob, 
+        status: newStatus,
+        order_position: newPosition,
+        ...resetFields,
+        updated_at: new Date().toISOString()
+      };
+      optimisticUpdate(updatedJob);
+      
+      // Update selected job if it's the same one
+      if (selectedJob && selectedJob.id === jobId) {
+        setSelectedJob(updatedJob);
+      }
+
+      toast({
+        title: "Success",
+        description: `Job moved to ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)} column`,
+      });
+
+    } catch (error) {
+      console.error('Error moving job:', error);
+      toast({
+        title: "Error", 
+        description: "Failed to move job. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }, [jobs, optimisticUpdate, updateActivity, toast, selectedJob]);
+
   // Auto-scroll implementation
   const autoScroll = useCallback((clientY: number) => {
     const scrollThreshold = 100;
@@ -1333,13 +1415,86 @@ const JobTracker = () => {
                        </div>
                      </div>}
                     
-                     {/* Tips for Interview status */}
-                     {selectedJob.status === 'interview' && <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-                         <p className="text-blue-700 text-xs font-medium">
-                           💖 Got an update from the recruiter? You can now move this job to either the 'Offer' or 'Rejected' column. Whatever the outcome, we're cheering you on — and there's always a next step 😊
-                         </p>
-                       </div>}
-                 </div>}
+                      {/* Tips for Interview status */}
+                      {selectedJob.status === 'interview' && <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                          <p className="text-blue-700 text-xs font-medium">
+                            💖 Got an update from the recruiter? You can now move this job to either the 'Offer' or 'Rejected' column. Whatever the outcome, we're cheering you on — and there's always a next step 😊
+                          </p>
+                        </div>}
+                  </div>}
+
+                  {/* Status Transition Buttons Section */}
+                  {(selectedJob.status === 'saved' || selectedJob.status === 'applied' || selectedJob.status === 'interview') && (
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <h3 className="font-semibold text-gray-800 mb-3">Quick Actions</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {/* Saved job buttons */}
+                        {selectedJob.status === 'saved' && (
+                          <Button
+                            onClick={() => moveJobToStatus(selectedJob.id, 'applied')}
+                            disabled={!(selectedJob.resume_updated && selectedJob.job_role_analyzed && selectedJob.company_researched && selectedJob.cover_letter_prepared && selectedJob.ready_to_apply)}
+                            className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Move to Applied
+                          </Button>
+                        )}
+
+                        {/* Applied job buttons */}
+                        {selectedJob.status === 'applied' && (
+                          <>
+                            <Button
+                              onClick={() => moveJobToStatus(selectedJob.id, 'saved')}
+                              variant="outline"
+                              className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                            >
+                              Move back to Saved
+                            </Button>
+                            <Button
+                              onClick={() => moveJobToStatus(selectedJob.id, 'interview')}
+                              disabled={!selectedJob.interview_call_received}
+                              className="bg-yellow-600 hover:bg-yellow-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              Move to Interview
+                            </Button>
+                            <Button
+                              onClick={() => moveJobToStatus(selectedJob.id, 'rejected')}
+                              disabled={!selectedJob.interview_call_received}
+                              className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              Move to Rejected
+                            </Button>
+                          </>
+                        )}
+
+                        {/* Interview job buttons */}
+                        {selectedJob.status === 'interview' && (
+                          <>
+                            <Button
+                              onClick={() => moveJobToStatus(selectedJob.id, 'applied')}
+                              variant="outline"
+                              className="border-green-300 text-green-700 hover:bg-green-50"
+                            >
+                              Move back to Applied
+                            </Button>
+                            <Button
+                              onClick={() => moveJobToStatus(selectedJob.id, 'rejected')}
+                              disabled={!(selectedJob.interview_prep_guide_received && selectedJob.ai_mock_interview_attempted)}
+                              className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              Move to Rejected
+                            </Button>
+                            <Button
+                              onClick={() => moveJobToStatus(selectedJob.id, 'offer')}
+                              disabled={!(selectedJob.interview_prep_guide_received && selectedJob.ai_mock_interview_attempted)}
+                              className="bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              Move to Offer
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
               {/* Comments Section */}
               <div className="bg-gradient-to-r from-yellow-50 to-amber-100 rounded-lg p-3 border border-yellow-200">
