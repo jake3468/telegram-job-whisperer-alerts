@@ -8,6 +8,9 @@ import { useUserInitialization } from '@/hooks/useUserInitialization';
 import { useCachedJobTracker } from '@/hooks/useCachedJobTracker';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
+import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
+import { useEnhancedTokenManagerIntegration } from '@/hooks/useEnhancedTokenManagerIntegration';
+import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
 import { JobTrackerOnboardingPopup } from '@/components/JobTrackerOnboardingPopup';
 import { Plus, ExternalLink, Trash2, X, Bookmark, Send, Users, XCircle, Trophy, GripVertical, RefreshCw, AlertCircle } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -300,6 +303,11 @@ const JobTracker = () => {
     updateUserProfile
   } = useUserProfile();
 
+  // Enterprise session management for Job Tracker page
+  useClerkSupabaseSync();
+  const sessionManager = useEnhancedTokenManagerIntegration({ enabled: true });
+  const { updateActivity } = useFormTokenKeepAlive(true);
+
   // Use cached hook for instant data display
   const {
     jobs,
@@ -430,6 +438,7 @@ const JobTracker = () => {
 
   // Manual refresh function - instant refresh for better UX
   const handleManualRefresh = useCallback(() => {
+    updateActivity(); // Track user activity
     try {
       // For inactive state or offline scenarios, immediately force page refresh
       if (connectionIssue || error) {
@@ -451,8 +460,9 @@ const JobTracker = () => {
       // Force page refresh if all else fails
       window.location.reload();
     }
-  }, [forceRefresh, connectionIssue, error]);
+  }, [forceRefresh, connectionIssue, error, updateActivity]);
   const handleAddJob = async () => {
+    updateActivity(); // Track user activity
     if (!formData.company_name || !formData.job_title) {
       toast({
         title: "Error",
@@ -630,6 +640,7 @@ const JobTracker = () => {
     }
   };
   const handleDeleteJob = async () => {
+    updateActivity(); // Track user activity
     if (!selectedJob) return;
     
     if (!isAuthReady || !userProfileId) {
@@ -692,6 +703,7 @@ const JobTracker = () => {
     }
   };
   const handleDragStart = (event: DragStartEvent) => {
+    updateActivity(); // Track user activity
     const {
       active
     } = event;
@@ -699,6 +711,7 @@ const JobTracker = () => {
     setActiveJob(job || null);
   };
   const handleDragEnd = async (event: DragEndEvent) => {
+    updateActivity(); // Track user activity
     const {
       active,
       over
@@ -876,6 +889,7 @@ const JobTracker = () => {
     return filteredJobs;
   };
   const handleViewJob = (job: JobEntry) => {
+    updateActivity(); // Track user activity
     setSelectedJob(job);
     setEditFormData({
       company_name: job.company_name,
@@ -888,6 +902,7 @@ const JobTracker = () => {
 
   // Function to handle checklist updates for cards
   const handleUpdateChecklistItem = async (jobId: string, field: string) => {
+    updateActivity(); // Track user activity
     const targetJob = jobs.find(job => job.id === jobId);
     if (!targetJob || (targetJob.status !== 'saved' && targetJob.status !== 'applied' && targetJob.status !== 'interview')) return;
     
@@ -1035,6 +1050,7 @@ const JobTracker = () => {
             {/* Responsive flexbox: stacked on mobile, wrapped on larger screens */}
             <div className="flex flex-col md:flex-row md:flex-wrap gap-2 sm:gap-4 w-full min-w-0">
               {columns.map(column => <DroppableColumn key={column.key} column={column} jobs={getJobsByStatus(column.key)} onAddJob={() => {
+              updateActivity(); // Track user activity
               setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
               setIsModalOpen(true);
             }} onDeleteJob={handleDeleteJob} onViewJob={handleViewJob} onUpdateChecklist={handleUpdateChecklistItem} activeJobId={activeJob?.id} />)}
