@@ -124,13 +124,7 @@ const SortableJobCard = ({
   onUpdateChecklist: (jobId: string, field: string) => void;
 }) => {
   const [isChecklistExpanded, setIsChecklistExpanded] = useState(false);
-  const [isHolding, setIsHolding] = useState(false);
-  const [holdProgress, setHoldProgress] = useState(0);
-  const [holdTimer, setHoldTimer] = useState<NodeJS.Timeout | null>(null);
-  const [progressTimer, setProgressTimer] = useState<NodeJS.Timeout | null>(null);
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
 
   // Calculate progress based on status and boolean fields
   const getProgress = () => {
@@ -234,85 +228,7 @@ const SortableJobCard = ({
       });
     }
   };
-
-  // Enhanced mobile touch handlers for hold-to-select
-  const handleTouchStart = () => {
-    if (!canDrag) return;
-    
-    setIsHolding(true);
-    setHoldProgress(0);
-    
-    // Haptic feedback on touch start (if supported)
-    if (navigator.vibrate) {
-      navigator.vibrate(20);
-    }
-    
-    // Progress animation during hold
-    const startTime = Date.now();
-    const updateProgress = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min((elapsed / 500) * 100, 100);
-      setHoldProgress(progress);
-      
-      if (progress < 100) {
-        setProgressTimer(setTimeout(updateProgress, 16)); // ~60fps
-      }
-    };
-    updateProgress();
-    
-    // Selection state after 500ms
-    const timer = setTimeout(() => {
-      setIsHolding(false);
-      setHoldProgress(100);
-      
-      // Stronger haptic feedback when ready to drag (if supported)
-      if (navigator.vibrate) {
-        navigator.vibrate([50, 50, 50]);
-      }
-    }, 500);
-    
-    setHoldTimer(timer);
-  };
-
-  const handleTouchEnd = () => {
-    // Only reset if we haven't completed the hold (less than 500ms)
-    if (holdTimer && holdProgress < 100) {
-      clearTimeout(holdTimer);
-      setHoldTimer(null);
-      setIsHolding(false);
-      setHoldProgress(0);
-    }
-    if (progressTimer && holdProgress < 100) {
-      clearTimeout(progressTimer);
-      setProgressTimer(null);
-    }
-    
-    // If we've completed the hold (100% progress), keep the selected state
-    // The drag operation itself will handle the reset through the DnD library
-  };
-
-  const handleTouchCancel = () => {
-    // Reset everything on touch cancel
-    if (holdTimer) {
-      clearTimeout(holdTimer);
-      setHoldTimer(null);
-    }
-    if (progressTimer) {
-      clearTimeout(progressTimer);
-      setProgressTimer(null);
-    }
-    setIsHolding(false);
-    setHoldProgress(0);
-  };
-
-  // Cleanup timers on unmount
-  React.useEffect(() => {
-    return () => {
-      if (holdTimer) clearTimeout(holdTimer);
-      if (progressTimer) clearTimeout(progressTimer);
-    };
-  }, [holdTimer, progressTimer]);
-  return <div ref={setNodeRef} style={style} className="bg-white rounded-lg border-2 border-gray-400 shadow-md hover:shadow-lg transition-all duration-200 py-1.5 px-2 mb-1 hover:scale-[1.02] min-w-0 w-full overflow-hidden">
+  return <div ref={setNodeRef} style={style} className={`bg-white rounded-lg border-2 border-gray-400 shadow-md hover:shadow-lg transition-all duration-200 py-1.5 px-2 mb-1 hover:scale-[1.02] min-w-0 w-full overflow-hidden ${isDragging ? 'shadow-2xl border-blue-400 bg-blue-50' : ''}`}>
       {/* Top section: Progress + Company + Actions */}
       <div className="flex items-center gap-2 min-w-0">
         {/* Left: Progress badge in circle */}
@@ -352,39 +268,26 @@ const SortableJobCard = ({
             {...attributes} 
             {...listeners} 
             onClick={handleDragAttempt}
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
-            onTouchCancel={handleTouchCancel}
-            className={`relative cursor-grab p-2 transition-all duration-200 flex-shrink-0 rounded touch-manipulation ${
+            className={`relative cursor-grab p-3 sm:p-2 transition-all duration-200 flex-shrink-0 rounded-md touch-manipulation ${
               canDrag 
-                ? `text-gray-600 hover:text-gray-800 ${isHolding ? 'bg-blue-100 scale-110' : ''} ${holdProgress === 100 ? 'bg-green-100 text-green-600' : ''}` 
+                ? `text-gray-600 hover:text-gray-800 ${isDragging ? 'bg-blue-100 scale-110 shadow-lg' : 'hover:bg-gray-100'}` 
                 : "text-gray-400 cursor-not-allowed"
             }`} 
             title={canDrag ? "Hold for 0.5s then drag to move" : "Complete checklist to move"}
             style={{ 
-              minWidth: '24px', 
-              minHeight: '24px',
+              minWidth: '32px', 
+              minHeight: '32px',
               WebkitTouchCallout: 'none',
               WebkitUserSelect: 'none',
               userSelect: 'none'
             }}
           >
-            {/* Hold Progress Indicator */}
-            {isHolding && holdProgress < 100 && (
-              <div 
-                className="absolute inset-0 bg-blue-500/20 rounded transition-all duration-75"
-                style={{
-                  background: `conic-gradient(from 0deg, rgb(59 130 246 / 0.4) ${holdProgress * 3.6}deg, transparent ${holdProgress * 3.6}deg)`
-                }}
-              />
+            {/* Dragging Indicator */}
+            {isDragging && (
+              <div className="absolute inset-0 bg-blue-500/30 rounded-md animate-pulse" />
             )}
             
-            {/* Success Indicator */}
-            {holdProgress === 100 && (
-              <div className="absolute inset-0 bg-green-500/20 rounded animate-pulse" />
-            )}
-            
-            <GripVertical className={`w-4 h-4 relative z-10 transition-transform ${isHolding ? 'scale-90' : ''}`} />
+            <GripVertical className={`w-4 h-4 relative z-10 transition-transform ${isDragging ? 'scale-110' : ''}`} />
           </div>
         </div>
       </div>
@@ -467,20 +370,19 @@ const JobTracker = () => {
     job_description: '',
     job_url: ''
   });
-  const sensors = useSensors(useSensor(PointerSensor, {
-    activationConstraint: {
-      distance: 8
-    }
-  }), useSensor(TouchSensor, {
-    activationConstraint: {
-      delay: 500, // Increased from 150ms to 500ms for better mobile experience
-      tolerance: 8
-    }
-  }), useSensor(MouseSensor, {
-    activationConstraint: {
-      distance: 8
-    }
-  }));
+  // Auto-scroll interval ref
+  const autoScrollIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 500,
+        tolerance: 5,
+      },
+    }),
+    useSensor(MouseSensor)
+  );
   const columns = [{
     key: 'saved',
     title: 'Saved',
@@ -819,21 +721,46 @@ const JobTracker = () => {
       });
     }
   };
+  // Auto-scroll implementation
+  const autoScroll = useCallback((clientY: number) => {
+    const scrollThreshold = 100;
+    const scrollSpeed = 10;
+    const viewportHeight = window.innerHeight;
+    
+    if (clientY < scrollThreshold) {
+      // Scroll up
+      window.scrollBy(0, -scrollSpeed);
+    } else if (clientY > viewportHeight - scrollThreshold) {
+      // Scroll down
+      window.scrollBy(0, scrollSpeed);
+    }
+  }, []);
+
+  // Drag and Drop handlers with auto-scroll support and optimistic updates
   const handleDragStart = (event: DragStartEvent) => {
-    updateActivity(); // Track user activity
-    const {
-      active
-    } = event;
-    const job = jobs.find(j => j.id === active.id);
-    setActiveJob(job || null);
+    const draggedJob = jobs.find(job => job.id === event.active.id);
+    if (draggedJob) {
+      setActiveJob(draggedJob);
+      
+      // Haptic feedback for mobile (if supported)
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+      
+      updateActivity();
+    }
   };
   const handleDragEnd = async (event: DragEndEvent) => {
-    updateActivity(); // Track user activity
-    const {
-      active,
-      over
-    } = event;
+    const { active, over } = event;
     setActiveJob(null);
+    
+    // Clear auto-scroll interval
+    if (autoScrollIntervalRef.current) {
+      clearInterval(autoScrollIntervalRef.current);
+      autoScrollIntervalRef.current = null;
+    }
+    
+    updateActivity(); // Track user activity
     if (!over) return;
     const activeJobToMove = jobs.find(j => j.id === active.id);
     if (!activeJobToMove) return;
@@ -1163,7 +1090,31 @@ const JobTracker = () => {
 
         {/* Main content area - responsive flexbox layout */}
         <main className="flex-1 p-4 overflow-x-hidden md:overflow-x-auto">
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDragMove={(event) => {
+              // Implement auto-scroll during drag
+              if (event.active && event.delta) {
+                const rect = event.active.rect.current.translated;
+                if (rect) {
+                  const clientY = rect.top + rect.height / 2;
+                  
+                  // Clear existing interval
+                  if (autoScrollIntervalRef.current) {
+                    clearInterval(autoScrollIntervalRef.current);
+                  }
+                  
+                  // Set up new auto-scroll interval
+                  autoScrollIntervalRef.current = setInterval(() => {
+                    autoScroll(clientY);
+                  }, 16); // ~60fps
+                }
+              }
+            }}
+          >
             {/* Responsive flexbox: stacked on mobile, wrapped on larger screens */}
             <div className="flex flex-col md:flex-row md:flex-wrap gap-2 sm:gap-4 w-full min-w-0">
               {columns.map(column => <DroppableColumn key={column.key} column={column} jobs={getJobsByStatus(column.key)} onAddJob={() => {
