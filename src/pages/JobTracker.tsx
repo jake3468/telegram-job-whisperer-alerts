@@ -95,7 +95,7 @@ const DroppableColumn = ({
           </div>}
       </div>
 
-      <div className={`p-2 h-[450px] transition-colors ${isDragActive ? 'overflow-hidden' : 'overflow-y-auto'} ${isDropTarget ? 'bg-black/5' : ''}`}>
+      <div className={`p-2 h-[450px] transition-colors ${isDragActive ? 'overflow-hidden' : 'overflow-y-auto'} ${isDropTarget ? 'bg-black/5' : ''}`} style={{ scrollBehavior: isDragActive ? 'auto' : 'smooth' }}>
         <SortableContext items={jobs.map(job => job.id)} strategy={verticalListSortingStrategy}>
           <div className="space-y-1">
             {jobs.map((job, index) => (
