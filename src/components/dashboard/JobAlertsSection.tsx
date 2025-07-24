@@ -96,8 +96,8 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
     try {
       await deleteJobAlert(alertId);
       
-      // Don't invalidate cache for deletes - optimistic update handles UI
-      // invalidateCache();
+      // Invalidate cache to refresh data
+      invalidateCache();
       
       toast({
         title: "Alert deleted",
@@ -115,8 +115,8 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
 
   const handleModalSubmit = () => {
     setEditingAlert(null);
-    // Don't invalidate cache for edits - optimistic update handles UI
-    // invalidateCache();
+    // Invalidate cache to refresh data
+    invalidateCache();
   };
   
   const handleModalClose = () => {
@@ -143,8 +143,8 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
 
   return <section className="rounded-3xl border-2 border-orange-400 bg-gradient-to-b from-orange-900/90 via-[#2b1605]/90 to-[#2b1605]/98 shadow-none p-0 max-w-5xl mx-auto">
       <div className="pt-4 px-2 sm:px-6">
-        {/* Manual Refresh Button - Only show for persistent connection issues */}
-        {error && !userProfileId && alerts.length === 0 && (
+        {/* Manual Refresh Button */}
+        {error && (
           <div className="mb-4 flex justify-end">
             <Button
               onClick={handleManualRefresh}
@@ -196,11 +196,7 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
 
         <div>
           {/* Enhanced Bot Status Component */}
-          <EnhancedBotStatus 
-            onActivationChange={invalidateCache} 
-            isActivated={isActivated}
-            loading={loading}
-          />
+          <EnhancedBotStatus onActivationChange={() => {}} />
 
           {/* Job Alerts List - Only show when activated */}
           {isActivated && <div className="flex flex-col gap-4 pb-6 sm:pb-8">

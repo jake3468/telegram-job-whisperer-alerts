@@ -2,7 +2,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { logger } from '@/utils/logger';
-import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
+import { useEnterpriseAPIClient } from './useEnterpriseAPIClient';
 
 interface JobAlert {
   id: string;
@@ -34,6 +35,7 @@ let isRefreshing = false; // Request deduplication flag
 
 export const useCachedJobAlertsData = () => {
   const { user } = useUser();
+  const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
   const [alerts, setAlerts] = useState<JobAlert[]>([]);
   const [isActivated, setIsActivated] = useState<boolean>(false);
   const [userProfileId, setUserProfileId] = useState<string | null>(null);
@@ -73,25 +75,10 @@ export const useCachedJobAlertsData = () => {
   }, []);
 
 
-  // Fetch fresh data when user changes or is determined to be null
+  // Fetch fresh data when user changes
   useEffect(() => {
-    // Don't immediately set loading to false when user is null on initial load
-    // Wait for Clerk to finish authentication before making decisions
     if (!user) {
-      // Only set loading to false if we have cached data or if we're certain the user is unauthenticated
-      const cached = localStorage.getItem(CACHE_KEY);
-      if (cached) {
-        try {
-          const parsedCache: CachedJobAlertsData = JSON.parse(cached);
-          if (parsedCache.version === CACHE_VERSION && 
-              Date.now() - parsedCache.timestamp < CACHE_DURATION) {
-            // We have valid cache, we can safely set loading to false
-            setLoading(false);
-          }
-        } catch {
-          // Invalid cache, keep loading state until auth resolves
-        }
-      }
+      setLoading(false);
       return;
     }
     
@@ -144,15 +131,11 @@ export const useCachedJobAlertsData = () => {
 
   const fetchJobAlertsData = useCallback(async (silent = false) => {
     if (!user) {
-      console.log('[JobAlertsData] No user found, returning early');
       return;
     }
     
-    console.log('[JobAlertsData] Starting fetch for user:', user.id);
-    
     // Request deduplication - prevent multiple simultaneous requests
     if (isRefreshing) {
-      console.log('[JobAlertsData] Already refreshing, skipping request');
       return;
     }
     
@@ -164,67 +147,38 @@ export const useCachedJobAlertsData = () => {
         setConnectionIssue(false);
       }
       
-      console.log('[JobAlertsData] Making authenticated request using supabase client...');
-      
-      // Use the same authenticated request pattern as userProfileService
+      // Use enterprise session management for authenticated requests
       let profileData, alertsData;
       
-      console.log('[JobAlertsData] Fetching profile with authenticated request...');
-      
-      // Get user profile using the same pattern as userProfileService
-      const profileResult = await makeAuthenticatedRequest(async () => {
-        return await supabase
+      await makeAuthenticatedRequest(async () => {
+        // Get user profile
+        const { data: profile, error: profileError } = await supabase
           .from('user_profile')
           .select('id, bot_activated')
           .maybeSingle();
-      });
-      
-      console.log('[JobAlertsData] Profile result:', profileResult);
-        
-      if (profileResult.error) {
-        console.error('[JobAlertsData] Profile fetch error:', profileResult.error);
-        
-        // Check if this is an RLS policy violation
-        if (profileResult.error.message?.includes('policy')) {
-          console.error('[JobAlertsData] RLS policy violation detected - authentication context lost');
-          throw new Error('Access denied. Please refresh the page and try again.');
+          
+        if (profileError) {
+          throw new Error(`Profile fetch failed: ${profileError.message}`);
         }
         
-        throw new Error(`Profile fetch failed: ${profileResult.error.message}`);
-      }
-      
-      if (!profileResult.data) {
-        console.error('[JobAlertsData] No profile found');
-        throw new Error('User profile not found. Please try signing out and back in.');
-      }
-      
-      profileData = profileResult.data;
-      console.log('[JobAlertsData] Profile data:', profileData);
+        if (!profile) {
+          throw new Error('User profile not found. Please try signing out and back in.');
+        }
+        
+        profileData = profile;
 
-      // Fetch job alerts using the same pattern
-      console.log('[JobAlertsData] Fetching job alerts with authenticated request...');
-      const alertsResult = await makeAuthenticatedRequest(async () => {
-        return await supabase
+        // Fetch job alerts
+        const { data: alerts, error: alertsError } = await supabase
           .from('job_alerts')
           .select('*')
           .order('created_at', { ascending: false });
-      });
 
-      console.log('[JobAlertsData] Job alerts result:', alertsResult);
-
-      if (alertsResult.error) {
-        console.error('[JobAlertsData] Job alerts fetch error:', alertsResult.error);
-        
-        // Check if this is an RLS policy violation
-        if (alertsResult.error.message?.includes('policy')) {
-          console.error('[JobAlertsData] RLS policy violation on job_alerts - authentication context lost');
-          throw new Error('Access denied to job alerts. Please refresh the page and try again.');
+        if (alertsError) {
+          throw alertsError;
         }
         
-        throw alertsResult.error;
-      }
-      
-      alertsData = alertsResult.data;
+        alertsData = alerts;
+      });
 
       const result = {
         alerts: alertsData || [],
@@ -233,7 +187,6 @@ export const useCachedJobAlertsData = () => {
       };
 
       // Update state
-      console.log('[JobAlertsData] Updating state with fresh data:', result);
       setAlerts(result.alerts);
       setIsActivated(result.botActivated);
       setUserProfileId(result.userProfileId);
@@ -254,23 +207,11 @@ export const useCachedJobAlertsData = () => {
 
     } catch (error) {
       if (!silent) {
-        // Only set error state for persistent connection issues, not auth hiccups
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        setError(error instanceof Error ? error.message : 'Unknown error occurred');
         
-        // Check if this is a temporary auth issue vs real connection problem
-        if (errorMessage.includes('Access denied') || errorMessage.includes('policy')) {
-          // For auth issues, only show error if we have no cached data at all
-          if (alerts.length === 0 && !userProfileId) {
-            setError(errorMessage);
-          }
-        } else {
-          // For network/connection issues, always show error
-          setError(errorMessage);
-          
-          // Only show connection issue if we have no cached data
-          if (alerts.length === 0) {
-            setConnectionIssue(true);
-          }
+        // Only show connection issue if we have no cached data
+        if (alerts.length === 0) {
+          setConnectionIssue(true);
         }
       }
     } finally {
@@ -282,53 +223,13 @@ export const useCachedJobAlertsData = () => {
   }, [user, alerts.length]);
 
   const invalidateCache = () => {
-    // Only clear cache and force fresh fetch - no silent background refresh
     localStorage.removeItem(CACHE_KEY);
     setConnectionIssue(false);
     fetchJobAlertsData();
   };
 
   const optimisticAdd = (newAlert: JobAlert) => {
-    console.log('[JobAlertsData] Optimistic add called with:', newAlert);
-    setAlerts(prev => {
-      const updated = [newAlert, ...prev];
-      console.log('[JobAlertsData] Optimistic add - updating alerts from', prev.length, 'to', updated.length);
-      // Update cache immediately to maintain consistency
-      updateCacheWithAlerts(updated);
-      return updated;
-    });
-  };
-
-  const optimisticUpdate = (updatedAlert: JobAlert) => {
-    console.log('[JobAlertsData] Optimistic update called with:', updatedAlert);
-    setAlerts(prev => {
-      const updated = prev.map(alert => 
-        alert.id === updatedAlert.id ? updatedAlert : alert
-      );
-      console.log('[JobAlertsData] Optimistic update - alerts updated:', updated);
-      // Update cache immediately to maintain consistency
-      updateCacheWithAlerts(updated);
-      return updated;
-    });
-  };
-
-  const updateCacheWithAlerts = (newAlerts: JobAlert[]) => {
-    try {
-      console.log('[JobAlertsData] Updating cache with', newAlerts.length, 'alerts');
-      const cached = localStorage.getItem(CACHE_KEY);
-      if (cached) {
-        const parsedCache: CachedJobAlertsData = JSON.parse(cached);
-        const updatedCache = {
-          ...parsedCache,
-          alerts: newAlerts,
-          timestamp: Date.now()
-        };
-        localStorage.setItem(CACHE_KEY, JSON.stringify(updatedCache));
-        console.log('[JobAlertsData] Cache updated successfully');
-      }
-    } catch (error) {
-      console.warn('Failed to update cache with optimistic data:', error);
-    }
+    setAlerts(prev => [newAlert, ...prev]);
   };
 
   const forceRefresh = async () => {
@@ -338,24 +239,19 @@ export const useCachedJobAlertsData = () => {
     await fetchJobAlertsData();
   };
 
-  // Simple delete function using the same authentication pattern
+  // Simple delete function using enterprise session management
   const deleteJobAlert = async (alertId: string) => {
-    const result = await makeAuthenticatedRequest(async () => {
-      return await supabase
+    await makeAuthenticatedRequest(async () => {
+      const { error } = await supabase
         .from('job_alerts')
         .delete()
         .eq('id', alertId);
+      
+      if (error) throw error;
     });
-    
-    if (result.error) throw result.error;
     
     // Optimistically remove from local state
-    setAlerts(prev => {
-      const updated = prev.filter(alert => alert.id !== alertId);
-      // Update cache immediately to maintain consistency
-      updateCacheWithAlerts(updated);
-      return updated;
-    });
+    setAlerts(prev => prev.filter(alert => alert.id !== alertId));
     
     return true;
   };
@@ -369,7 +265,6 @@ export const useCachedJobAlertsData = () => {
     connectionIssue,
     refetch: fetchJobAlertsData,
     optimisticAdd,
-    optimisticUpdate,
     invalidateCache,
     forceRefresh,
     deleteJobAlert

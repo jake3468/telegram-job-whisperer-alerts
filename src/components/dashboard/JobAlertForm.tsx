@@ -25,8 +25,6 @@ interface JobAlert {
   alert_frequency: string;
   preferred_time: string;
   timezone: string;
-  created_at: string;
-  updated_at: string;
 }
 
 interface JobAlertFormProps {
@@ -50,7 +48,7 @@ const JobAlertForm = ({
 }: JobAlertFormProps) => {
   const { user } = useUser();
   const { toast } = useToast();
-  const { optimisticAdd, optimisticUpdate, userProfileId, forceRefresh } = useCachedJobAlertsData();
+  const { optimisticAdd, userProfileId } = useCachedJobAlertsData();
   
   // Enterprise form token keep-alive
   const { updateActivity, silentTokenRefresh } = useFormTokenKeepAlive(true);
@@ -146,39 +144,16 @@ const JobAlertForm = ({
               preferred_time: formData.preferred_time,
               timezone: formData.timezone
             })
-             .eq('id', editingAlert.id);
+            .eq('id', editingAlert.id);
 
-           if (error) {
-             throw error;
-           }
-
-           // Optimistic UI update for immediate feedback
-           const updatedAlert = {
-             ...editingAlert,
-             country: formData.country.toLowerCase(),
-             country_name: formData.country_name,
-             location: formData.location,
-             job_title: formData.job_title,
-             job_type: formData.job_type,
-             alert_frequency: formData.alert_frequency,
-             preferred_time: formData.preferred_time,
-             timezone: formData.timezone,
-             updated_at: new Date().toISOString(),
-             created_at: editingAlert.created_at // Keep the original created_at
-           };
-           console.log('[JobAlertForm] Calling optimistic update with:', updatedAlert);
-           optimisticUpdate(updatedAlert);
-           
-           // Force refresh to ensure UI synchronization
-           setTimeout(async () => {
-             console.log('[JobAlertForm] Force refreshing data after update');
-             await forceRefresh();
-           }, 100);
-           
-           toast({
-             title: "Alert Updated",
-             description: "Your job alert has been updated successfully.",
-           });
+          if (error) {
+            throw error;
+          }
+          
+          toast({
+            title: "Alert Updated",
+            description: "Your job alert has been updated successfully.",
+          });
         } else {
           // Create new alert
           const { data, error } = await supabase
@@ -201,17 +176,10 @@ const JobAlertForm = ({
             throw error;
           }
 
-           // Optimistic UI update for immediate feedback
-           if (data) {
-             console.log('[JobAlertForm] Calling optimistic add with:', data);
-             optimisticAdd(data as any);
-             
-             // Force refresh to ensure UI synchronization
-             setTimeout(async () => {
-               console.log('[JobAlertForm] Force refreshing data after create');
-               await forceRefresh();
-             }, 100);
-           }
+          // Optimistic UI update for immediate feedback
+          if (data) {
+            optimisticAdd(data as any);
+          }
           
           toast({
             title: "Alert Created",
