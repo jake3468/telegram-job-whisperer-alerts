@@ -60,7 +60,8 @@ const DroppableColumn = ({
   onDeleteJob,
   onViewJob,
   onUpdateChecklist,
-  activeJobId
+  activeJobId,
+  isDragActive
 }: {
   column: any;
   jobs: JobEntry[];
@@ -69,6 +70,7 @@ const DroppableColumn = ({
   onViewJob: (job: JobEntry) => void;
   onUpdateChecklist: (jobId: string, field: string) => void;
   activeJobId?: string;
+  isDragActive: boolean;
 }) => {
   const {
     isOver,
@@ -93,7 +95,7 @@ const DroppableColumn = ({
           </div>}
       </div>
 
-      <div className={`p-2 h-[450px] overflow-y-auto ${isDropTarget ? 'bg-black/5' : ''} transition-colors`}>
+      <div className={`p-2 h-[450px] transition-colors ${isDragActive ? 'overflow-hidden' : 'overflow-y-auto'} ${isDropTarget ? 'bg-black/5' : ''}`}>
         <SortableContext items={jobs.map(job => job.id)} strategy={verticalListSortingStrategy}>
           <div className="space-y-1">
             {jobs.map((job, index) => (
@@ -380,7 +382,7 @@ const JobTracker = () => {
   });
   // Auto-scroll animation frame ref
   const autoScrollAnimationRef = React.useRef<number | null>(null);
-  const [isDragScrolling, setIsDragScrolling] = useState(false);
+  const [isDragActive, setIsDragActive] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -1132,7 +1134,7 @@ const JobTracker = () => {
               updateActivity(); // Track user activity
               setSelectedStatus(column.key as 'saved' | 'applied' | 'interview');
               setIsModalOpen(true);
-            }} onDeleteJob={handleDeleteJob} onViewJob={handleViewJob} onUpdateChecklist={handleUpdateChecklistItem} activeJobId={activeJob?.id} />)}
+            }} onDeleteJob={handleDeleteJob} onViewJob={handleViewJob} onUpdateChecklist={handleUpdateChecklistItem} activeJobId={activeJob?.id} isDragActive={isDragActive} />)}
             </div>
             <DragOverlay>
               {activeJob ? <div className="bg-gray-800 rounded-lg p-4 border border-gray-600 shadow-2xl transform rotate-3 w-full max-w-[280px]">
