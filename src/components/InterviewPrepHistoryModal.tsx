@@ -11,6 +11,7 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { useCachedInterviewPrep } from '@/hooks/useCachedInterviewPrep';
 import { supabase } from '@/integrations/supabase/client';
 import InterviewPrepDownloadActions from '@/components/InterviewPrepDownloadActions';
+import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
 interface InterviewPrepHistoryModalProps {
   onSelectEntry?: (entry: any) => void;
 }
@@ -97,16 +98,11 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
   const renderInterviewQuestions = (content: string) => {
     if (!content) return null;
 
-    // Simple markdown parsing - only handle basic formatting
-    const processedContent = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
-    .replace(/^# (.*$)/gm, '<h1>$1</h1>') // H1 headers
-    .replace(/^## (.*$)/gm, '<h2>$1</h2>') // H2 headers
-    .replace(/^### (.*$)/gm, '<h3>$1</h3>') // H3 headers
-    .replace(/\n/g, '<br>'); // Line breaks
-
-    return <div className="text-black bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words" dangerouslySetInnerHTML={{
-      __html: processedContent
-    }} />;
+    // Use SafeHTMLRenderer for secure HTML rendering
+    return <SafeHTMLRenderer 
+      content={content} 
+      className="text-black bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words"
+    />;
   };
   if (showDetails && selectedEntry) {
     return <Dialog open={isOpen} onOpenChange={setIsOpen}>

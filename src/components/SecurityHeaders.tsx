@@ -30,7 +30,7 @@ const SecurityHeaders = () => {
     };
 
     // X-Frame-Options
-    setHttpEquivTag('X-Frame-Options', 'DENY');
+    setHttpEquivTag('X-Frame-Options', 'SAMEORIGIN');
 
     // X-Content-Type-Options
     setHttpEquivTag('X-Content-Type-Options', 'nosniff');

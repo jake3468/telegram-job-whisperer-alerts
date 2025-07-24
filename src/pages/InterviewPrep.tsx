@@ -20,6 +20,7 @@ import { useCachedInterviewPrep } from '@/hooks/useCachedInterviewPrep';
 import InterviewPrepDownloadActions from '@/components/InterviewPrepDownloadActions';
 import { ProfileCompletionWarning } from '@/components/ProfileCompletionWarning';
 import { useLocation } from 'react-router-dom';
+import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
 const InterviewPrep = () => {
   // Use enterprise-level authentication
   const {
@@ -344,16 +345,11 @@ const InterviewPrep = () => {
       displayContent = content;
     }
 
-    // Simple markdown parsing with smaller text sizes
-    const processedContent = displayContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
-    .replace(/^# (.*$)/gim, '<h1 style="font-size: 1.125rem; font-weight: bold; margin: 0.75rem 0; color: #1e40af;">$1</h1>') // H1 headers - smaller
-    .replace(/^## (.*$)/gim, '<h2 style="font-size: 1rem; font-weight: bold; margin: 0.5rem 0; color: #2563eb;">$1</h2>') // H2 headers - smaller
-    .replace(/^### (.*$)/gim, '<h3 style="font-size: 0.95rem; font-weight: bold; margin: 0.375rem 0; color: #3b82f6;">$1</h3>') // H3 headers - smaller
-    .replace(/\n/g, '<br>'); // Line breaks
-
-    return <div className="text-gray-800 bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words border border-gray-700" dangerouslySetInnerHTML={{
-      __html: processedContent
-    }} />;
+    // Use SafeHTMLRenderer for secure HTML rendering
+    return <SafeHTMLRenderer 
+      content={displayContent} 
+      className="text-gray-800 bg-white rounded p-4 font-inter text-sm leading-relaxed whitespace-pre-wrap break-words border border-gray-700"
+    />;
   };
 
   // Check if form is valid and user has credits
