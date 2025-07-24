@@ -39,33 +39,39 @@ const CoverLetterHistoryModal = ({
   const [selectedItem, setSelectedItem] = useState<CoverLetterItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   
+  
   useEffect(() => {
     if (isOpen) {
       console.log('[CoverLetterHistory] Modal opened, userProfile:', !!userProfile, 'user:', !!user);
       
-      // Start loading immediately when modal opens
-      setIsLoading(true);
-      
       if (user && userProfile) {
+        // Profile is ready, fetch immediately
         fetchHistory();
       } else {
-        // Retry after a delay if user/profile not ready
-        const retryTimer = setTimeout(() => {
-          console.log('[CoverLetterHistory] Retrying fetch after delay');
+        // Start loading state while waiting for profile
+        setIsLoading(true);
+        
+        // Set up a polling mechanism to check for profile availability
+        const pollForProfile = () => {
           if (user && userProfile) {
+            console.log('[CoverLetterHistory] Profile now available, fetching data');
             fetchHistory();
           } else {
-            console.log('[CoverLetterHistory] User or profile still not available');
-            setIsLoading(false);
-            toast({
-              title: "Profile Loading",
-              description: "Please wait for your profile to load and try again.",
-              variant: "destructive"
-            });
+            // Continue polling every 500ms for up to 10 seconds
+            setTimeout(pollForProfile, 500);
           }
-        }, 1000);
+        };
         
-        return () => clearTimeout(retryTimer);
+        // Start polling after a short delay
+        setTimeout(pollForProfile, 500);
+        
+        // Set a maximum timeout to stop loading if profile never becomes available
+        const maxTimeout = setTimeout(() => {
+          console.log('[CoverLetterHistory] Max timeout reached, stopping loading');
+          setIsLoading(false);
+        }, 10000); // 10 seconds max wait
+        
+        return () => clearTimeout(maxTimeout);
       }
     } else {
       // Reset state when modal closes
@@ -294,6 +300,11 @@ const CoverLetterHistoryModal = ({
               <div className="text-white/70 text-sm flex items-center gap-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white/70"></div>
                 Loading history...
+              </div>
+            </div> : !user || !userProfile ? <div className="flex items-center justify-center py-8">
+              <div className="text-white/70 text-center">
+                <AlertCircle className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">Please wait for your profile to load...</p>
               </div>
             </div> : historyData.length === 0 ? <div className="flex items-center justify-center py-8">
               <div className="text-white/70 text-center">
