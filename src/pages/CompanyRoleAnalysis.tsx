@@ -141,6 +141,9 @@ const CompanyRoleAnalysis = () => {
   useEffect(() => {
     if (!userProfile?.id || !pendingAnalysisId || !isAuthReady) return;
     console.log('Setting up real-time subscription for analysis:', pendingAnalysisId);
+    
+    let cleanupFn: (() => void) | null = null;
+    
     const setupSubscription = async () => {
       await executeWithRetry(async () => {
         const channel = supabase.channel('company-analysis-updates').on('postgres_changes', {
@@ -154,22 +157,40 @@ const CompanyRoleAnalysis = () => {
           // Enhanced detection - check if the updated record has meaningful data
           const updatedData = payload.new as CompanyRoleAnalysisData;
           if (updatedData && hasAnalysisResult(updatedData)) {
-            console.log('Meaningful analysis data detected via real-time, refreshing data');
+            console.log('Meaningful analysis data detected via real-time, refreshing data and showing results');
 
-            // Analysis has meaningful data, refresh and show results
-            refetchHistory();
+            // Analysis has meaningful data, refresh and show results immediately
+            refetchHistory().then(() => {
+              // Set showRecentResults to true after data is refreshed
+              setShowRecentResults(true);
+              setPendingAnalysisId(null);
+              setIsSubmitting(false);
+              setLoadingMessages([]);
+              toast({
+                title: "Analysis Complete!",
+                description: "Your company analysis is ready to view. Credits will be deducted automatically."
+              });
+            });
           } else {
             console.log('Real-time update received but no meaningful data yet, continuing to wait...');
           }
         }).subscribe();
-        return () => {
+        
+        cleanupFn = () => {
           console.log('Cleaning up real-time subscription');
           supabase.removeChannel(channel);
         };
       }, 3, 'setup real-time subscription');
     };
+    
     setupSubscription();
-  }, [userProfile?.id, pendingAnalysisId, refetchHistory, isAuthReady, executeWithRetry]);
+    
+    return () => {
+      if (cleanupFn) {
+        cleanupFn();
+      }
+    };
+  }, [userProfile?.id, pendingAnalysisId, refetchHistory, isAuthReady, executeWithRetry, toast]);
 
   // Loading messages effect
   useEffect(() => {
