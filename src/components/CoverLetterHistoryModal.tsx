@@ -3,9 +3,9 @@ import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy } from 'lucide-react';
+import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useUserProfile } from '@/hooks/useUserProfile';
+import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 import CoverLetterDownloadActions from '@/components/CoverLetterDownloadActions';
 interface CoverLetterItem {
   id: string;
@@ -32,46 +32,38 @@ const CoverLetterHistoryModal = ({
     toast
   } = useToast();
   const {
-    userProfile
-  } = useUserProfile();
+    userProfile,
+    loading: profileLoading,
+    error: profileError,
+    refetch: refetchProfile
+  } = useCachedUserProfile();
   const [historyData, setHistoryData] = useState<CoverLetterItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<CoverLetterItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   
   
   useEffect(() => {
     if (isOpen) {
-      console.log('[CoverLetterHistory] Modal opened, userProfile:', !!userProfile, 'user:', !!user);
+      console.log('[CoverLetterHistory] Modal opened, userProfile:', !!userProfile, 'user:', !!user, 'profileLoading:', profileLoading, 'profileError:', profileError);
       
-      if (user && userProfile) {
+      if (user && userProfile && !profileLoading) {
         // Profile is ready, fetch immediately
+        console.log('[CoverLetterHistory] Profile ready, fetching data');
         fetchHistory();
-      } else {
-        // Start loading state while waiting for profile
+      } else if (profileError && retryCount < 3) {
+        // Profile failed to load, try to refetch
+        console.log('[CoverLetterHistory] Profile error detected, retrying...', retryCount);
         setIsLoading(true);
-        
-        // Set up a polling mechanism to check for profile availability
-        const pollForProfile = () => {
-          if (user && userProfile) {
-            console.log('[CoverLetterHistory] Profile now available, fetching data');
-            fetchHistory();
-          } else {
-            // Continue polling every 500ms for up to 10 seconds
-            setTimeout(pollForProfile, 500);
-          }
-        };
-        
-        // Start polling after a short delay
-        setTimeout(pollForProfile, 500);
-        
-        // Set a maximum timeout to stop loading if profile never becomes available
-        const maxTimeout = setTimeout(() => {
-          console.log('[CoverLetterHistory] Max timeout reached, stopping loading');
-          setIsLoading(false);
-        }, 10000); // 10 seconds max wait
-        
-        return () => clearTimeout(maxTimeout);
+        setTimeout(() => {
+          refetchProfile();
+          setRetryCount(prev => prev + 1);
+        }, 1000);
+      } else if (profileLoading || !userProfile) {
+        // Still loading or no profile yet
+        setIsLoading(true);
+        console.log('[CoverLetterHistory] Profile still loading...');
       }
     } else {
       // Reset state when modal closes
@@ -79,8 +71,16 @@ const CoverLetterHistoryModal = ({
       setHistoryData([]);
       setShowDetails(false);
       setSelectedItem(null);
+      setRetryCount(0);
     }
-  }, [isOpen, user, userProfile]);
+  }, [isOpen, user, userProfile, profileLoading, profileError, retryCount]);
+
+  const handleRetry = () => {
+    console.log('[CoverLetterHistory] Manual retry triggered');
+    setRetryCount(0);
+    setIsLoading(true);
+    refetchProfile();
+  };
   const fetchHistory = async () => {
     if (!user || !userProfile) return;
     setIsLoading(true);
@@ -296,15 +296,27 @@ const CoverLetterHistoryModal = ({
         </div>
 
         <div className="flex-1 overflow-y-auto min-h-0">
-          {isLoading ? <div className="flex items-center justify-center py-8">
+          {isLoading || profileLoading ? <div className="flex items-center justify-center py-8">
               <div className="text-white/70 text-sm flex items-center gap-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white/70"></div>
                 Loading history...
               </div>
-            </div> : !user || !userProfile ? <div className="flex items-center justify-center py-8">
-              <div className="text-white/70 text-center">
-                <AlertCircle className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">Please wait for your profile to load...</p>
+            </div> : profileError || (!user || !userProfile) ? <div className="flex items-center justify-center py-8">
+              <div className="text-white/70 text-center space-y-3">
+                <AlertCircle className="w-6 h-6 sm:w-8 sm:h-8 mx-auto opacity-50" />
+                <div>
+                  <p className="text-sm mb-2">
+                    {profileError ? "Failed to load your profile." : "Profile not available."}
+                  </p>
+                  <Button
+                    onClick={handleRetry}
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <RefreshCw className="w-3 h-3 mr-1" />
+                    Retry
+                  </Button>
+                </div>
               </div>
             </div> : historyData.length === 0 ? <div className="flex items-center justify-center py-8">
               <div className="text-white/70 text-center">
