@@ -3,9 +3,10 @@ import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy } from 'lucide-react';
+import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useUserProfile } from '@/hooks/useUserProfile';
+import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
+import { useEnterpriseAPIClient } from '@/hooks/useEnterpriseAPIClient';
 import CoverLetterDownloadActions from '@/components/CoverLetterDownloadActions';
 interface CoverLetterItem {
   id: string;
@@ -31,32 +32,65 @@ const CoverLetterHistoryModal = ({
   const {
     toast
   } = useToast();
-  const {
-    userProfile
-  } = useUserProfile();
+  const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
   const [historyData, setHistoryData] = useState<CoverLetterItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<CoverLetterItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  
+  
   useEffect(() => {
-    if (isOpen && user && userProfile) {
+    if (isOpen && user) {
+      console.log('[CoverLetterHistory] Modal opened, fetching data directly');
       fetchHistory();
+    } else if (!isOpen) {
+      // Reset state when modal closes
+      setIsLoading(false);
+      setHistoryData([]);
+      setShowDetails(false);
+      setSelectedItem(null);
     }
-  }, [isOpen, user, userProfile]);
+  }, [isOpen, user]);
   const fetchHistory = async () => {
-    if (!user || !userProfile) return;
+    if (!user) {
+      console.log('[CoverLetterHistory] No user available');
+      return;
+    }
+    
     setIsLoading(true);
+    
     try {
-      const {
-        data,
-        error
-      } = await supabase.from('job_cover_letters').select('id, company_name, job_title, job_description, created_at, cover_letter').eq('user_id', userProfile.id).order('created_at', {
-        ascending: false
-      }).limit(20);
-      if (error) {
-        console.error('Error fetching history:', error);
-        throw error;
-      }
+      console.log('[CoverLetterHistory] Fetching data for user:', user.id);
+      
+      // Use enterprise API client with automatic token refresh and retry logic
+      const data = await makeAuthenticatedRequest(async () => {
+        const { data: fetchedData, error } = await supabase
+          .from('job_cover_letters')
+          .select(`
+            id, 
+            company_name, 
+            job_title, 
+            job_description, 
+            created_at, 
+            cover_letter,
+            user_profile!inner(user_id, users!inner(clerk_id))
+          `)
+          .eq('user_profile.users.clerk_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(20);
+
+        if (error) {
+          console.error('[CoverLetterHistory] Supabase error:', error);
+          throw error;
+        }
+
+        return fetchedData;
+      }, {
+        maxRetries: 3,
+        silentRetry: true
+      });
+
+      console.log('[CoverLetterHistory] Successfully fetched', data?.length || 0, 'items');
 
       // Transform the data to match our interface
       const transformedData = (data || []).map((item: any) => ({
@@ -67,9 +101,10 @@ const CoverLetterHistoryModal = ({
         created_at: item.created_at,
         cover_letter: item.cover_letter
       }));
+      
       setHistoryData(transformedData);
     } catch (err) {
-      console.error('Failed to fetch history:', err);
+      console.error('[CoverLetterHistory] Failed to fetch history:', err);
       toast({
         title: "Error",
         description: "Failed to load history. Please try again.",
@@ -98,24 +133,46 @@ const CoverLetterHistoryModal = ({
     }
   };
   const handleDelete = async (itemId: string) => {
-    if (!userProfile) {
+    if (!user) {
       toast({
         title: "Error",
-        description: "User profile not found. Please try again.",
+        description: "User not found. Please try again.",
         variant: "destructive"
       });
       return;
     }
+    
     try {
-      console.log(`Attempting to delete cover letter item with ID: ${itemId} for user profile: ${userProfile.id}`);
-      const {
-        error
-      } = await supabase.from('job_cover_letters').delete().eq('id', itemId).eq('user_id', userProfile.id);
-      if (error) {
-        console.error('Supabase delete error:', error);
-        throw error;
-      }
-      console.log('Delete operation completed successfully');
+      console.log(`[CoverLetterHistory] Attempting to delete item: ${itemId} for user: ${user.id}`);
+      
+      // Use enterprise API client for deletion as well
+      await makeAuthenticatedRequest(async () => {
+        const { error } = await supabase
+          .from('job_cover_letters')
+          .delete()
+          .eq('id', itemId)
+          .in('user_id', 
+            supabase
+              .from('user_profile')
+              .select('id')
+              .in('user_id',
+                supabase
+                  .from('users')
+                  .select('id')
+                  .eq('clerk_id', user.id)
+              )
+          );
+
+        if (error) {
+          console.error('[CoverLetterHistory] Delete error:', error);
+          throw error;
+        }
+      }, {
+        maxRetries: 2,
+        silentRetry: true
+      });
+
+      console.log('[CoverLetterHistory] Delete operation completed successfully');
 
       // Remove from local state
       setHistoryData(prev => prev.filter(item => item.id !== itemId));
@@ -130,7 +187,7 @@ const CoverLetterHistoryModal = ({
         setSelectedItem(null);
       }
     } catch (err) {
-      console.error('Failed to delete item:', err);
+      console.error('[CoverLetterHistory] Failed to delete item:', err);
       toast({
         title: "Error",
         description: "Failed to delete item. Please try again.",

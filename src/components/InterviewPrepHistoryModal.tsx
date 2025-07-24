@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Trash2, Eye, Clock, Building2, Briefcase, AlertTriangle, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useUser } from '@clerk/clerk-react';
+import { useEnterpriseAPIClient } from '@/hooks/useEnterpriseAPIClient';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useCachedInterviewPrep } from '@/hooks/useCachedInterviewPrep';
+import { supabase } from '@/integrations/supabase/client';
 import InterviewPrepDownloadActions from '@/components/InterviewPrepDownloadActions';
 interface InterviewPrepHistoryModalProps {
   onSelectEntry?: (entry: any) => void;
@@ -21,41 +23,47 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
   const {
     toast
   } = useToast();
-  const {
-    userProfile
-  } = useUserProfile();
-  const queryClient = useQueryClient();
-  const {
-    data: interviewHistory,
-    isLoading
-  } = useQuery({
-    queryKey: ['interview-prep-history', userProfile?.id],
-    queryFn: async () => {
-      if (!userProfile?.id) return [];
-      const {
-        data,
-        error
-      } = await supabase.from('interview_prep').select('*').eq('user_id', userProfile.id).order('created_at', {
-        ascending: false
-      });
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!userProfile?.id && isOpen
-  });
+  const { user, isLoaded } = useUser();
+  const { data: interviewHistory, isLoading, refetch } = useCachedInterviewPrep();
+  const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
+  const handleRefresh = () => {
+    console.log('🔄 MANUAL REFRESH TRIGGERED - Interview Prep');
+    refetch();
+  };
   const handleDelete = async (id: string, event: React.MouseEvent) => {
     event.stopPropagation();
+    
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "User not found. Please try again.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     try {
-      const {
-        error
-      } = await supabase.from('interview_prep').delete().eq('id', id);
-      if (error) throw error;
+      console.log(`Attempting to delete interview prep item with ID: ${id} for user: ${user.id}`);
+      
+      const { error } = await makeAuthenticatedRequest(async () => {
+        return await supabase
+          .from('interview_prep')
+          .delete()
+          .eq('id', id);
+      }, { maxRetries: 2 });
+
+      if (error) {
+        console.error('Supabase delete error:', error);
+        throw error;
+      }
+      
+      console.log('Delete operation completed successfully');
+      
+      // Refresh the data after deletion
+      refetch();
       toast({
         title: "Interview prep deleted",
         description: "The interview prep entry has been successfully deleted."
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['interview-prep-history']
       });
     } catch (error) {
       console.error('Error deleting interview prep:', error);
@@ -208,10 +216,28 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white/70"></div>
                 Loading history...
               </div>
-            </div> : !interviewHistory?.length ? <div className="flex items-center justify-center py-8">
+            </div> : !interviewHistory?.length ? <div className="flex flex-col items-center justify-center py-8">
               <div className="text-white/70 text-center">
                 <Clock className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No interview prep found.</p>
+                <p className="text-sm mb-3">No interview prep found.</p>
+                <Button 
+                  onClick={() => {
+                    console.log('🔄 RETRY BUTTON CLICKED - Interview Prep');
+                    handleRefresh();
+                  }} 
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white/70 mr-2"></div>
+                      Retrying...
+                    </>
+                  ) : (
+                    'Retry Loading'
+                  )}
+                </Button>
               </div>
             </div> : <div className="space-y-2 sm:space-y-3 pb-4">
               {interviewHistory.map(entry => <div key={entry.id} className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-green-600">

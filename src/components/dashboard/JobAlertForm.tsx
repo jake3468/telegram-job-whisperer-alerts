@@ -30,7 +30,7 @@ interface JobAlert {
 interface JobAlertFormProps {
   userTimezone: string;
   editingAlert: JobAlert | null;
-  onSubmit: () => void;
+  onSubmit: (newAlert?: JobAlert) => void;
   onCancel: () => void;
   currentAlertCount: number;
   maxAlerts: number;
@@ -48,7 +48,7 @@ const JobAlertForm = ({
 }: JobAlertFormProps) => {
   const { user } = useUser();
   const { toast } = useToast();
-  const { optimisticAdd, userProfileId } = useCachedJobAlertsData();
+  const { userProfileId } = useCachedJobAlertsData();
   
   // Enterprise form token keep-alive
   const { updateActivity, silentTokenRefresh } = useFormTokenKeepAlive(true);
@@ -129,6 +129,8 @@ const JobAlertForm = ({
       await silentTokenRefresh();
 
       // Use enterprise authenticated request wrapper
+      let createdAlert: JobAlert | null = null;
+      
       await makeAuthenticatedRequest(async () => {
         if (editingAlert) {
           // Update existing alert
@@ -175,26 +177,17 @@ const JobAlertForm = ({
           if (error) {
             throw error;
           }
-
-          // Optimistic UI update for immediate feedback
-          if (data) {
-            optimisticAdd(data as any);
-          }
           
-          toast({
-            title: "Alert Created",
-            description: "Your job alert is now active and monitoring for opportunities.",
-          });
+          // Store the created alert for optimistic update
+          createdAlert = data as JobAlert;
         }
-
-        return { success: true };
       }, {
         maxRetries: 3,
-        silentRetry: true,
-        operationType: 'job_alert_save'
+        silentRetry: true
       });
 
-      onSubmit();
+      // Pass the new alert data to parent for optimistic updates
+      onSubmit(createdAlert || undefined);
     } catch (error) {
       console.error('[JobAlertForm] Save error:', error);
       toast({

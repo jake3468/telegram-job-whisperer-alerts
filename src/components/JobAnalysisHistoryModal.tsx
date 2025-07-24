@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy } from 'lucide-react';
+import { useEnterpriseAPIClient } from '@/hooks/useEnterpriseAPIClient';
+import { useCachedJobAnalyses } from '@/hooks/useCachedJobAnalyses';
 import { supabase } from '@/integrations/supabase/client';
-import { useUserProfile } from '@/hooks/useUserProfile';
 import { PercentageMeter } from '@/components/PercentageMeter';
 interface JobAnalysisItem {
   id: string;
@@ -33,68 +34,15 @@ const JobAnalysisHistoryModal = ({
   const {
     toast
   } = useToast();
-  const {
-    userProfile
-  } = useUserProfile();
-  const [historyData, setHistoryData] = useState<JobAnalysisItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { data: historyData, isLoading, refetch } = useCachedJobAnalyses();
+  const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
   const [selectedItem, setSelectedItem] = useState<JobAnalysisItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
-  useEffect(() => {
-    if (isOpen && isLoaded && user && userProfile) {
-      console.log('🔄 JobAnalysisHistoryModal: Starting to fetch history');
-      fetchHistory();
-    }
-  }, [isOpen, isLoaded, user, userProfile]);
-  const fetchHistory = async (isRetry = false) => {
-    if (!isLoaded || !user || !userProfile) {
-      console.log('❌ Cannot fetch history: missing requirements', {
-        isLoaded,
-        user: !!user,
-        userProfile: !!userProfile
-      });
-      return;
-    }
-    setIsLoading(true);
-    try {
-      console.log('📡 Fetching job analysis history for user:', userProfile.id);
-      const {
-        data,
-        error
-      } = await supabase.from('job_analyses').select('id, company_name, job_title, job_description, created_at, job_match, match_score').eq('user_id', userProfile.id).order('created_at', {
-        ascending: false
-      }).limit(20);
-      if (error) {
-        console.error('❌ Error fetching history:', error);
 
-        // If JWT expired, try to refresh the session
-        if (error.message?.includes('JWT expired') || error.code === 'PGRST301') {
-          console.log('🔄 JWT expired, attempting to refresh session...');
-          if (!isRetry && retryCount < 2) {
-            // Wait a moment for potential token refresh, then retry
-            setTimeout(() => {
-              setRetryCount(prev => prev + 1);
-              fetchHistory(true);
-            }, 2000);
-            return;
-          }
-        }
-        throw error;
-      }
-      console.log('✅ Successfully fetched history:', data?.length || 0, 'items');
-      setHistoryData(data || []);
-      setRetryCount(0); // Reset retry count on success
-    } catch (err) {
-      console.error('❌ Failed to fetch history:', err);
-      toast({
-        title: "Error",
-        description: "Failed to load history. Please try again or refresh the page.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleRefresh = () => {
+    console.log('🔄 MANUAL REFRESH TRIGGERED - Job Analysis');
+    refetch();
   };
   const handleCopyResult = async (item: JobAnalysisItem) => {
     const result = item.job_match;
@@ -115,27 +63,34 @@ const JobAnalysisHistoryModal = ({
     }
   };
   const handleDelete = async (itemId: string) => {
-    if (!userProfile) {
+    if (!user) {
       toast({
         title: "Error",
-        description: "User profile not found. Please try again.",
+        description: "User not found. Please try again.",
         variant: "destructive"
       });
       return;
     }
+    
     try {
-      console.log(`Attempting to delete job analysis item with ID: ${itemId} for user profile: ${userProfile.id}`);
-      const {
-        error
-      } = await supabase.from('job_analyses').delete().eq('id', itemId).eq('user_id', userProfile.id);
+      console.log(`Attempting to delete job analysis item with ID: ${itemId} for user: ${user.id}`);
+      
+      const { error } = await makeAuthenticatedRequest(async () => {
+        return await supabase
+          .from('job_analyses')
+          .delete()
+          .eq('id', itemId);
+      }, { maxRetries: 2 });
+
       if (error) {
         console.error('Supabase delete error:', error);
         throw error;
       }
+      
       console.log('Delete operation completed successfully');
-
-      // Remove from local state
-      setHistoryData(prev => prev.filter(item => item.id !== itemId));
+      
+      // Refresh the data after deletion
+      refetch();
       toast({
         title: "Deleted",
         description: "Job analysis deleted successfully."
@@ -283,7 +238,10 @@ const JobAnalysisHistoryModal = ({
               <div className="text-white/70 text-center">
                 <History className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No job analyses found.</p>
-                <Button onClick={() => fetchHistory()} size="sm" className="mt-2 bg-blue-600 hover:bg-blue-700">
+                <Button onClick={() => {
+                  console.log('🔄 RETRY BUTTON CLICKED - Job Analysis');
+                  handleRefresh();
+                }} size="sm" className="mt-2 bg-blue-600 hover:bg-blue-700">
                   Retry Loading
                 </Button>
               </div>

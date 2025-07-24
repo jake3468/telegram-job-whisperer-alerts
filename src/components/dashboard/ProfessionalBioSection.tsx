@@ -13,17 +13,19 @@ const ProfessionalBioSection = () => {
   const { userProfile, loading, updateUserProfile } = useCachedUserProfile();
   const { makeOptimisticRequest } = useEnterpriseAPIClient();
   
-  const [bio, setBio] = useState(userProfile?.bio || '');
+  const defaultBio = 'Trying to learn fast, contribute meaningfully, and level up as I go.';
+  const [bio, setBio] = useState(userProfile?.bio || defaultBio);
   const [saving, setSaving] = useState(false);
   const [optimisticSaved, setOptimisticSaved] = useState(false);
-  const [originalBio, setOriginalBio] = useState(userProfile?.bio || '');
+  const [originalBio, setOriginalBio] = useState(userProfile?.bio || defaultBio);
 
   React.useEffect(() => {
     if (userProfile?.bio !== undefined) {
-      setBio(userProfile.bio || '');
-      setOriginalBio(userProfile.bio || '');
+      const bioValue = userProfile.bio || defaultBio;
+      setBio(bioValue);
+      setOriginalBio(bioValue);
     }
-  }, [userProfile]);
+  }, [userProfile, defaultBio]);
 
   const handleSaveBio = async () => {
     if (saving) return;
