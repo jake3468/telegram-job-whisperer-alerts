@@ -275,6 +275,24 @@ const SortableJobCard = ({
   };
 
   const handleTouchEnd = () => {
+    // Only reset if we haven't completed the hold (less than 500ms)
+    if (holdTimer && holdProgress < 100) {
+      clearTimeout(holdTimer);
+      setHoldTimer(null);
+      setIsHolding(false);
+      setHoldProgress(0);
+    }
+    if (progressTimer && holdProgress < 100) {
+      clearTimeout(progressTimer);
+      setProgressTimer(null);
+    }
+    
+    // If we've completed the hold (100% progress), keep the selected state
+    // The drag operation itself will handle the reset through the DnD library
+  };
+
+  const handleTouchCancel = () => {
+    // Reset everything on touch cancel
     if (holdTimer) {
       clearTimeout(holdTimer);
       setHoldTimer(null);
@@ -283,12 +301,8 @@ const SortableJobCard = ({
       clearTimeout(progressTimer);
       setProgressTimer(null);
     }
-    
-    // Reset states after a delay to show completion
-    setTimeout(() => {
-      setIsHolding(false);
-      setHoldProgress(0);
-    }, 1000);
+    setIsHolding(false);
+    setHoldProgress(0);
   };
 
   // Cleanup timers on unmount
@@ -340,6 +354,7 @@ const SortableJobCard = ({
             onClick={handleDragAttempt}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
+            onTouchCancel={handleTouchCancel}
             className={`relative cursor-grab p-2 transition-all duration-200 flex-shrink-0 rounded touch-manipulation ${
               canDrag 
                 ? `text-gray-600 hover:text-gray-800 ${isHolding ? 'bg-blue-100 scale-110' : ''} ${holdProgress === 100 ? 'bg-green-100 text-green-600' : ''}` 
