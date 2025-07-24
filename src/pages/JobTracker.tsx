@@ -124,6 +124,10 @@ const SortableJobCard = ({
   onUpdateChecklist: (jobId: string, field: string) => void;
 }) => {
   const [isChecklistExpanded, setIsChecklistExpanded] = useState(false);
+  const [isHolding, setIsHolding] = useState(false);
+  const [holdProgress, setHoldProgress] = useState(0);
+  const [holdTimer, setHoldTimer] = useState<NodeJS.Timeout | null>(null);
+  const [progressTimer, setProgressTimer] = useState<NodeJS.Timeout | null>(null);
   const {
     toast
   } = useToast();
@@ -230,6 +234,70 @@ const SortableJobCard = ({
       });
     }
   };
+
+  // Enhanced mobile touch handlers for hold-to-select
+  const handleTouchStart = () => {
+    if (!canDrag) return;
+    
+    setIsHolding(true);
+    setHoldProgress(0);
+    
+    // Haptic feedback on touch start (if supported)
+    if (navigator.vibrate) {
+      navigator.vibrate(20);
+    }
+    
+    // Progress animation during hold
+    const startTime = Date.now();
+    const updateProgress = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min((elapsed / 500) * 100, 100);
+      setHoldProgress(progress);
+      
+      if (progress < 100) {
+        setProgressTimer(setTimeout(updateProgress, 16)); // ~60fps
+      }
+    };
+    updateProgress();
+    
+    // Selection state after 500ms
+    const timer = setTimeout(() => {
+      setIsHolding(false);
+      setHoldProgress(100);
+      
+      // Stronger haptic feedback when ready to drag (if supported)
+      if (navigator.vibrate) {
+        navigator.vibrate([50, 50, 50]);
+      }
+    }, 500);
+    
+    setHoldTimer(timer);
+  };
+
+  const handleTouchEnd = () => {
+    if (holdTimer) {
+      clearTimeout(holdTimer);
+      setHoldTimer(null);
+    }
+    if (progressTimer) {
+      clearTimeout(progressTimer);
+      setProgressTimer(null);
+    }
+    
+    // Reset states after a delay to show completion
+    setTimeout(() => {
+      setIsHolding(false);
+      setHoldProgress(0);
+    }, 1000);
+  };
+
+  // Cleanup timers on unmount
+  React.useEffect(() => {
+    return () => {
+      if (holdTimer) clearTimeout(holdTimer);
+      if (progressTimer) clearTimeout(progressTimer);
+    };
+  }, [holdTimer, progressTimer]);
   return <div ref={setNodeRef} style={style} className="bg-white rounded-lg border-2 border-gray-400 shadow-md hover:shadow-lg transition-all duration-200 py-1.5 px-2 mb-1 hover:scale-[1.02] min-w-0 w-full overflow-hidden">
       {/* Top section: Progress + Company + Actions */}
       <div className="flex items-center gap-2 min-w-0">
@@ -265,9 +333,43 @@ const SortableJobCard = ({
               <ExternalLink className="w-3 h-3" />
             </a>}
 
-          {/* Drag Handle */}
-          <div {...attributes} {...listeners} onClick={handleDragAttempt} className={`cursor-grab p-1 transition-colors flex-shrink-0 ${canDrag ? "text-gray-600 hover:text-gray-800" : "text-gray-400 cursor-not-allowed"}`} title={canDrag ? "Drag to move" : "Complete checklist to move"}>
-            <GripVertical className="w-3 h-3" />
+          {/* Enhanced Drag Handle with Mobile Touch Support */}
+          <div 
+            {...attributes} 
+            {...listeners} 
+            onClick={handleDragAttempt}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            className={`relative cursor-grab p-2 transition-all duration-200 flex-shrink-0 rounded touch-manipulation ${
+              canDrag 
+                ? `text-gray-600 hover:text-gray-800 ${isHolding ? 'bg-blue-100 scale-110' : ''} ${holdProgress === 100 ? 'bg-green-100 text-green-600' : ''}` 
+                : "text-gray-400 cursor-not-allowed"
+            }`} 
+            title={canDrag ? "Hold for 0.5s then drag to move" : "Complete checklist to move"}
+            style={{ 
+              minWidth: '24px', 
+              minHeight: '24px',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none',
+              userSelect: 'none'
+            }}
+          >
+            {/* Hold Progress Indicator */}
+            {isHolding && holdProgress < 100 && (
+              <div 
+                className="absolute inset-0 bg-blue-500/20 rounded transition-all duration-75"
+                style={{
+                  background: `conic-gradient(from 0deg, rgb(59 130 246 / 0.4) ${holdProgress * 3.6}deg, transparent ${holdProgress * 3.6}deg)`
+                }}
+              />
+            )}
+            
+            {/* Success Indicator */}
+            {holdProgress === 100 && (
+              <div className="absolute inset-0 bg-green-500/20 rounded animate-pulse" />
+            )}
+            
+            <GripVertical className={`w-4 h-4 relative z-10 transition-transform ${isHolding ? 'scale-90' : ''}`} />
           </div>
         </div>
       </div>
@@ -356,7 +458,7 @@ const JobTracker = () => {
     }
   }), useSensor(TouchSensor, {
     activationConstraint: {
-      delay: 150,
+      delay: 500, // Increased from 150ms to 500ms for better mobile experience
       tolerance: 8
     }
   }), useSensor(MouseSensor, {
