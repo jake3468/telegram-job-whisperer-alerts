@@ -50,6 +50,7 @@ const JobAnalysisHistoryModal = ({
     }
   }, [isOpen, isLoaded, user, userProfile]);
   const fetchHistory = async () => {
+    console.log('🚀 FETCHHISTORY CALLED - Job Analysis Modal');
     if (!isLoaded || !user || !userProfile) {
       console.log('❌ Cannot fetch history: missing requirements', {
         isLoaded,
@@ -63,7 +64,8 @@ const JobAnalysisHistoryModal = ({
       console.log('📡 Fetching job analysis history for user:', user.id);
       
       const { data, error } = await makeAuthenticatedRequest(async () => {
-        return await supabase
+        console.log('📡 Making authenticated request to fetch job analysis');
+        const result = await supabase
           .from('job_analyses')
           .select(`
             id, 
@@ -78,6 +80,8 @@ const JobAnalysisHistoryModal = ({
           .eq('user_profile.users.clerk_id', user.id)
           .order('created_at', { ascending: false })
           .limit(20);
+        console.log('📡 Supabase query result:', result);
+        return result;
       }, { maxRetries: 3 });
 
       if (error) {
@@ -309,7 +313,10 @@ const JobAnalysisHistoryModal = ({
               <div className="text-white/70 text-center">
                 <History className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No job analyses found.</p>
-                <Button onClick={() => fetchHistory()} size="sm" className="mt-2 bg-blue-600 hover:bg-blue-700">
+                <Button onClick={() => {
+                  console.log('🔄 RETRY BUTTON CLICKED - Job Analysis');
+                  fetchHistory();
+                }} size="sm" className="mt-2 bg-blue-600 hover:bg-blue-700">
                   Retry Loading
                 </Button>
               </div>

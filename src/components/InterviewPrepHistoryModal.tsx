@@ -37,6 +37,7 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
   }, [isOpen, isLoaded, user, userProfile]);
 
   const fetchHistory = async () => {
+    console.log('🚀 FETCHHISTORY CALLED - Interview Prep Modal');
     if (!isLoaded || !user || !userProfile) {
       console.log('❌ Cannot fetch history: missing requirements', {
         isLoaded,
@@ -52,11 +53,13 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
       
       const { data, error } = await makeAuthenticatedRequest(async () => {
         console.log('📡 Making authenticated request to fetch interview prep');
-        return await supabase
+        const result = await supabase
           .from('interview_prep')
           .select('*')
           .eq('user_id', userProfile.id)
           .order('created_at', { ascending: false });
+        console.log('📡 Supabase query result:', result);
+        return result;
       }, { maxRetries: 3 });
 
       if (error) {
@@ -287,8 +290,11 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
                 <Clock className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm mb-3">No interview prep found.</p>
                 <Button 
-                  onClick={fetchHistory} 
-                  size="sm" 
+                  onClick={() => {
+                    console.log('🔄 RETRY BUTTON CLICKED - Interview Prep');
+                    fetchHistory();
+                  }} 
+                  size="sm"
                   className="bg-blue-600 hover:bg-blue-700"
                   disabled={isLoading}
                 >
