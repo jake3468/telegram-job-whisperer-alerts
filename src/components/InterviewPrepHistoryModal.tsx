@@ -48,27 +48,29 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
     setIsLoading(true);
     try {
       console.log('📡 Fetching interview prep history for user:', user.id);
+      console.log('📡 User profile ID:', userProfile.id);
       
       const { data, error } = await makeAuthenticatedRequest(async () => {
+        console.log('📡 Making authenticated request to fetch interview prep');
         return await supabase
           .from('interview_prep')
-          .select(`
-            *,
-            user_profile!inner(user_id, users!inner(clerk_id))
-          `)
-          .eq('user_profile.users.clerk_id', user.id)
+          .select('*')
+          .eq('user_id', userProfile.id)
           .order('created_at', { ascending: false });
       }, { maxRetries: 3 });
 
       if (error) {
         console.error('❌ Error fetching history:', error);
+        console.error('❌ Error details:', JSON.stringify(error, null, 2));
         throw error;
       }
       
       console.log('✅ Successfully fetched history:', data?.length || 0, 'items');
+      console.log('✅ History data:', data);
       setInterviewHistory(data || []);
     } catch (err) {
       console.error('❌ Failed to fetch history:', err);
+      console.error('❌ Error stack:', err instanceof Error ? err.stack : 'No stack trace');
       toast({
         title: "Error",
         description: "Failed to load history. Please try again or refresh the page.",
@@ -280,10 +282,25 @@ export const InterviewPrepHistoryModal: React.FC<InterviewPrepHistoryModalProps>
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white/70"></div>
                 Loading history...
               </div>
-            </div> : !interviewHistory?.length ? <div className="flex items-center justify-center py-8">
+            </div> : !interviewHistory?.length ? <div className="flex flex-col items-center justify-center py-8">
               <div className="text-white/70 text-center">
                 <Clock className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No interview prep found.</p>
+                <p className="text-sm mb-3">No interview prep found.</p>
+                <Button 
+                  onClick={fetchHistory} 
+                  size="sm" 
+                  className="bg-blue-600 hover:bg-blue-700"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white/70 mr-2"></div>
+                      Retrying...
+                    </>
+                  ) : (
+                    'Retry Loading'
+                  )}
+                </Button>
               </div>
             </div> : <div className="space-y-2 sm:space-y-3 pb-4">
               {interviewHistory.map(entry => <div key={entry.id} className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-green-600">
