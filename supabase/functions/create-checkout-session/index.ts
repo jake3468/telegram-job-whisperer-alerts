@@ -165,21 +165,30 @@ serve(async (req) => {
     logStep("Payment URL retrieved successfully", { paymentUrl: paymentUrl.substring(0, 50) + "..." });
 
     // Add user data to payment URL if available
-    if (userDetails && (userDetails.first_name || userDetails.last_name)) {
-      const fullName = `${userDetails.first_name || ''} ${userDetails.last_name || ''}`.trim();
-      
-      // Add query parameters for pre-filling
-      const urlObj = new URL(paymentUrl);
-      if (fullName) {
-        urlObj.searchParams.set('prefill_name', fullName);
-      }
-      if (userDetails.email) {
-        urlObj.searchParams.set('prefill_email', userDetails.email);
-      }
-      
-      paymentUrl = urlObj.toString();
-      logStep("Payment URL with user data", { fullName, email: userDetails.email });
+    const urlObj = new URL(paymentUrl);
+    
+    // Construct full name from first_name and last_name, handling null values
+    let fullName = '';
+    if (userDetails.first_name && userDetails.last_name) {
+      fullName = `${userDetails.first_name} ${userDetails.last_name}`;
+    } else if (userDetails.first_name) {
+      fullName = userDetails.first_name;
+    } else if (userDetails.last_name) {
+      fullName = userDetails.last_name;
     }
+    
+    // Add fullName parameter only if we have a name
+    if (fullName) {
+      urlObj.searchParams.set('fullName', fullName);
+    }
+    
+    // Add email parameter
+    if (userDetails.email) {
+      urlObj.searchParams.set('email', userDetails.email);
+    }
+    
+    paymentUrl = urlObj.toString();
+    logStep("Payment URL with user data", { fullName: fullName || 'none', email: userDetails.email });
 
     return new Response(JSON.stringify({ 
       url: paymentUrl,
