@@ -225,18 +225,12 @@ const Profile = () => {
               <div className="text-amber-100 font-inter mb-4 text-base space-y-2">
                 <p className="text-sm">Set up personalized job alerts and get updates from the last 24 hours 🔥 delivered straight to your Telegram everyday just for you, based on your preferences.</p>
                 
-                <p className="text-sm">Each alert looks like this 👇 and includes all tools in one click: resume, cover letter, visa info, job fit, and more.</p>
+                <p className="text-sm">Each job alert will look like below example👇 and will include all tools in one click: resume, cover letter, visa info, job fit, and more.</p>
                 
                 <div className="mb-3 flex justify-center">
-                  <img 
-                    src="/lovable-uploads/011bb020-d0c1-4c09-b4ea-82b329e1afaa.png" 
-                    alt="Telegram job alert example" 
-                    className="max-w-full h-auto rounded-lg shadow-sm max-h-64 sm:max-h-80"
-                    loading="lazy"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
+                  <img src="/lovable-uploads/011bb020-d0c1-4c09-b4ea-82b329e1afaa.png" alt="Telegram job alert example" className="max-w-full h-auto rounded-lg shadow-sm max-h-64 sm:max-h-80" loading="lazy" onError={e => {
+                e.currentTarget.style.display = 'none';
+              }} />
                 </div>
                 <p className="text-sm">Click the button below to activate the Telegram Job Alert Bot and create your personalized job alerts.</p>
               </div>
