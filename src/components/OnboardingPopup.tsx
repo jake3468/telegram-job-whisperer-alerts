@@ -118,6 +118,17 @@ export function OnboardingPopup({
               <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                 <h3 className="text-sm font-bold text-orange-600 mb-1">📲 Step 3: Activate Telegram Alerts</h3>
                 <p className="text-gray-700 text-xs mb-2">Get daily job alerts like the one below 👇</p>
+                <div className="mb-3 flex justify-center">
+                  <img 
+                    src="/lovable-uploads/f2862620-a249-47c6-982e-20ecd839539d.png" 
+                    alt="Telegram job alert example" 
+                    className="max-w-full h-auto rounded-lg shadow-sm max-h-64"
+                    loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
                 <p className="text-gray-700 text-xs mb-1 font-medium">Each alert gives you:</p>
                 <ul className="space-y-0.5 text-xs text-gray-600 ml-2">
                   <li>• One-tap resume, cover letter, and visa info</li>
