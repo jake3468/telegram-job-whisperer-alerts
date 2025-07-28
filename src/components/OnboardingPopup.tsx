@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { X, ChevronRight, ChevronLeft, FileText, User, Bell, Target } from 'lucide-react';
+import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 interface OnboardingPopupProps {
   isOpen: boolean;
   onClose: () => void;
@@ -16,8 +17,35 @@ export function OnboardingPopup({
 }: OnboardingPopupProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
-  const nextStep = () => {
+  const { userProfile, updateUserProfile } = useCachedUserProfile();
+  const detectAndStoreLocation = async () => {
+    // Only detect location if it hasn't been set yet
+    if (userProfile?.user_location) {
+      return;
+    }
+
+    try {
+      // Use a free IP geolocation service to detect location
+      const response = await fetch('https://ipapi.co/json/');
+      const data = await response.json();
+      
+      // Check if the user is in India based on country code
+      const isInIndia = data.country_code === 'IN';
+      const location = isInIndia ? 'india' : 'global';
+      
+      // Update user profile with location
+      await updateUserProfile({ user_location: location });
+    } catch (error) {
+      // Fallback to 'global' if detection fails
+      await updateUserProfile({ user_location: 'global' });
+    }
+  };
+
+  const nextStep = async () => {
     if (currentStep < 1) {
+      // Detect and store location on first next click
+      await detectAndStoreLocation();
+      
       setCurrentStep(currentStep + 1);
       // Scroll to top of content
       setTimeout(() => {

@@ -1092,6 +1092,7 @@ export type Database = {
           show_job_tracker_onboarding_popup: boolean
           show_onboarding_popup: boolean
           user_id: string | null
+          user_location: string | null
         }
         Insert: {
           bio?: string | null
@@ -1109,6 +1110,7 @@ export type Database = {
           show_job_tracker_onboarding_popup?: boolean
           show_onboarding_popup?: boolean
           user_id?: string | null
+          user_location?: string | null
         }
         Update: {
           bio?: string | null
@@ -1126,6 +1128,7 @@ export type Database = {
           show_job_tracker_onboarding_popup?: boolean
           show_onboarding_popup?: boolean
           user_id?: string | null
+          user_location?: string | null
         }
         Relationships: [
           {
