@@ -35,6 +35,7 @@ const Profile = () => {
     runComprehensiveJWTTest
   } = useJWTDebug();
   const [showJWTSetupGuide, setShowJWTSetupGuide] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const {
     showPopup,
     hidePopup,
@@ -228,9 +229,24 @@ const Profile = () => {
                 <p className="text-sm">Each job alert will look like below example👇 and will include all tools in one click: resume, cover letter, visa info, job fit, and more.</p>
                 
                 <div className="mb-3 flex justify-center">
-                  <img src="/lovable-uploads/011bb020-d0c1-4c09-b4ea-82b329e1afaa.png" alt="Telegram job alert example" className="max-w-full h-auto rounded-lg shadow-sm max-h-64 sm:max-h-80" loading="lazy" onError={e => {
-                e.currentTarget.style.display = 'none';
-              }} />
+                  <div className="relative max-w-full max-h-64 sm:max-h-80">
+                    <img 
+                      src="/lovable-uploads/011bb020-d0c1-4c09-b4ea-82b329e1afaa.png" 
+                      alt="Telegram job alert example" 
+                      className="max-w-full h-auto rounded-lg shadow-sm max-h-64 sm:max-h-80" 
+                      loading="lazy" 
+                      onLoad={() => setImageLoaded(true)}
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        setImageLoaded(true);
+                      }} 
+                    />
+                    {!imageLoaded && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-amber-900/20 rounded-lg">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-200"></div>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <p className="text-sm">Click the button below to activate the Telegram Job Alert Bot and create your personalized job alerts.</p>
               </div>
