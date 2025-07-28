@@ -98,7 +98,7 @@ const HeroSection = () => {
           </div>
         </div>
 
-        <p className="text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-left md:text-base text-sm">Everything you need for your job hunt, all in one place. Fast, focused, and clutter free. Apply within the first 24 hours before thousands do. Build smart resumes, generate tailored cover letters, decode job fit, and prep with real phone call mock interviews, all powered by advanced AI.</p>
+        <p className="text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-left md:text-base text-sm">Everything you need for your job hunt, all in one place. Fast, focused, and clutter free. Get Telegram job alerts within the first 24 hours before thousands apply. Build smart resumes, generate tailored cover letters, decode job fit, and prep with real phone call mock interviews - all powered by advanced AI</p>
         
         <SignedOut>
           <div className="flex justify-center">
