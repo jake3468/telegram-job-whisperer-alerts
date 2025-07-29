@@ -17,35 +17,39 @@ export function OnboardingPopup({
 }: OnboardingPopupProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
-  const { userProfile, updateUserProfile } = useCachedUserProfile();
+  const {
+    userProfile,
+    updateUserProfile
+  } = useCachedUserProfile();
   const detectAndStoreLocation = async () => {
     // Only detect location if it hasn't been set yet
     if (userProfile?.user_location) {
       return;
     }
-
     try {
       // Use a free IP geolocation service to detect location
       const response = await fetch('https://ipapi.co/json/');
       const data = await response.json();
-      
+
       // Check if the user is in India based on country code
       const isInIndia = data.country_code === 'IN';
       const location = isInIndia ? 'india' : 'global';
-      
+
       // Update user profile with location
-      await updateUserProfile({ user_location: location });
+      await updateUserProfile({
+        user_location: location
+      });
     } catch (error) {
       // Fallback to 'global' if detection fails
-      await updateUserProfile({ user_location: 'global' });
+      await updateUserProfile({
+        user_location: 'global'
+      });
     }
   };
-
   const nextStep = async () => {
     if (currentStep < 1) {
       // Detect and store location on first next click
       await detectAndStoreLocation();
-      
       setCurrentStep(currentStep + 1);
       // Scroll to top of content
       setTimeout(() => {
@@ -117,17 +121,11 @@ export function OnboardingPopup({
               
               <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                 <h3 className="text-sm font-bold text-orange-600 mb-1">📲 Step 3: Activate Telegram Alerts</h3>
-                <p className="text-gray-700 text-xs mb-2">Get daily job alerts like the one below 👇</p>
+                <p className="text-gray-700 text-xs mb-2">Get daily job alerts like the example below 👇</p>
                 <div className="mb-3 flex justify-center">
-                  <img 
-                    src="/lovable-uploads/f2862620-a249-47c6-982e-20ecd839539d.png" 
-                    alt="Telegram job alert example" 
-                    className="max-w-full h-auto rounded-lg shadow-sm max-h-64"
-                    loading="lazy"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
+                  <img src="/lovable-uploads/f2862620-a249-47c6-982e-20ecd839539d.png" alt="Telegram job alert example" className="max-w-full h-auto rounded-lg shadow-sm max-h-64" loading="lazy" onError={e => {
+                  e.currentTarget.style.display = 'none';
+                }} />
                 </div>
                 <p className="text-gray-700 text-xs mb-1 font-medium">Each alert gives you:</p>
                 <ul className="space-y-0.5 text-xs text-gray-600 ml-2">
