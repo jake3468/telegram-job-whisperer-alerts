@@ -714,6 +714,27 @@ export type Database = {
           },
         ]
       }
+      job_telegram_uk: {
+        Row: {
+          company_name: string
+          created_at: string
+          id: string
+          job_title: string
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          id?: string
+          job_title: string
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          id?: string
+          job_title?: string
+        }
+        Relationships: []
+      }
       job_tracker: {
         Row: {
           ai_mock_interview_attempted: boolean
@@ -1289,6 +1310,12 @@ export type Database = {
         }[]
       }
       cleanup_old_job_board_data: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          deleted_jobs: number
+        }[]
+      }
+      cleanup_old_job_telegram_uk_data: {
         Args: Record<PropertyKey, never>
         Returns: {
           deleted_jobs: number
