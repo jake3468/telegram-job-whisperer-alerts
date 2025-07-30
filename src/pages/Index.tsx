@@ -13,10 +13,7 @@ import Footer from "@/components/Footer";
 import { useEffect } from "react";
 
 const Index = () => {
-  console.log('Index page rendering');
-  
   useEffect(() => {
-    console.log('Index page mounted');
     // Add JSON-LD structured data for better Google crawlability
     const script = document.createElement('script');
     script.type = 'application/ld+json';

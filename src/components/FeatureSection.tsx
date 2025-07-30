@@ -44,8 +44,6 @@ const FeatureSection = ({
         setIsLoading(true);
         setHasError(false);
         
-        logger.debug(`Fetching animation from: ${lottieUrl}`);
-        
         const response = await fetch(lottieUrl);
         
         if (!response.ok) {
@@ -54,7 +52,6 @@ const FeatureSection = ({
         
         const data = await response.json();
         setAnimationData(data);
-        logger.debug(`Successfully loaded animation for: ${title}`);
       } catch (error) {
         logger.error(`Failed to load Lottie animation for ${title}:`, error);
         setHasError(true);
