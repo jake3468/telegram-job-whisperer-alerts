@@ -71,7 +71,7 @@ const FeatureSection = ({
       <h3 className="text-2xl md:text-3xl mb-2 font-opensans text-indigo-700 font-bold">
         {title}
       </h3>
-      <p className="mb-3 font-opensans font-light text-neutral-950 text-sm">
+      <p className="mb-3 font-opensans font-medium text-neutral-950 text-sm">
         {subheading}
       </p>
     </div>
@@ -80,7 +80,7 @@ const FeatureSection = ({
   // Mobile: content section (description + button only)
   const mobileContentSection = (
     <div className="lg:hidden flex flex-col space-y-6">
-      <p className="leading-relaxed font-opensans text-neutral-950 text-xs">
+      <p className="leading-relaxed font-opensans font-light text-neutral-950 text-xs">
         {description}
       </p>
       {isComingSoon ? (
@@ -112,10 +112,10 @@ const FeatureSection = ({
         <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-opensans text-blue-700">
           {title}
         </h3>
-        <p className="md:text-xl mb-4 font-opensans font-light text-base text-neutral-950">
+        <p className="md:text-xl mb-4 font-opensans font-medium text-base text-neutral-950">
           {subheading}
         </p>
-        <p className="md:text-lg leading-relaxed font-opensans text-sm text-neutral-950">
+        <p className="md:text-lg leading-relaxed font-opensans font-light text-sm text-neutral-950">
           {description}
         </p>
       </div>
