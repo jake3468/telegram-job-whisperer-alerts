@@ -77,13 +77,13 @@ const HeroSection = () => {
         
         {/* AI Services Badges - Combined Image */}
         <div className="flex justify-center items-center gap-3 mb-4 md:mb-6 opacity-90">
-          <span className="text-sm font-inter font-medium text-zinc-50">Powered by</span>
+          <span className="text-sm font-playfair font-medium text-zinc-50">Powered by</span>
           <div className="flex items-center">
             <img alt="AI Services - OpenAI, Claude, and Perplexity" className="h-8 object-contain hover:scale-110 transition-transform duration-200" loading="lazy" src="/lovable-uploads/061e42ad-45f4-4e4c-b642-9efff932bddd.png" />
           </div>
         </div>
 
-        <p className="text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-left md:text-base text-sm">
+        <p className="text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-playfair font-light leading-relaxed drop-shadow shadow-black text-left md:text-base text-sm">
           Perfect job matches delivered to your{' '}
           <span className="font-bold bg-gradient-to-r from-[#0088cc] to-[#0088cc] bg-clip-text text-transparent">Telegram</span>
           {' '}like personal messages.{' '}
