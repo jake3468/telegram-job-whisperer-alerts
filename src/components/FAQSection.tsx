@@ -10,7 +10,7 @@ const FAQSection = () => {
   const faqs = [
     {
       question: "What is Aspirely.ai and how does it work?",
-      answer: "Aspirely.ai is an AI-powered job hunting toolkit that automates the boring parts of job searching. We help you create personalized cover letters, prepare for interviews, analyze job postings and companies, generate LinkedIn content, and even send you daily job alerts via Telegram. Our AI tools use advanced models like OpenAI, Claude, and Perplexity to provide highly personalized results based on your resume and preferences."
+      answer: "Aspirely.ai is an AI-powered job hunting toolkit that automates the boring parts of job searching. We help you create personalized cover letters, prepare for interviews through our AI mock phone call system with Grace, analyze job postings and companies, generate LinkedIn content, organize your applications with our Job Tracker, browse opportunities on our Job Board, and send you daily job alerts via Telegram. Our AI tools use advanced models like OpenAI, Claude, and Perplexity to provide highly personalized results based on your resume and preferences."
     },
     {
       question: "How much does Aspirely.ai cost?",
@@ -18,7 +18,7 @@ const FAQSection = () => {
     },
     {
       question: "What AI tools and features are available?",
-      answer: "Aspirely.ai offers 7 main features: (1) Telegram Job Alerts with personalized job matching, (2) Job Analysis for detailed job posting insights, (3) Company Decoder for comprehensive company research, (4) Interview Prep with tailored questions and tips, (5) Cover Letter generation, (6) LinkedIn Post creation with image suggestions, and (7) Telegram Resume Bot for instant resume updates. All tools are powered by leading AI models and provide downloadable results."
+      answer: "Aspirely.ai offers 10 main features: (1) Telegram Job Alerts with personalized job matching and one-click access to resumes and cover letters, (2) Job Board for centralized job browsing and management, (3) Job Tracker for application organization with AI-powered checklists, (4) AI Mock Phone Call Interview with Grace for realistic practice and feedback reports, (5) Job Analysis for detailed job posting insights, (6) Company Decoder for comprehensive company research, (7) Interview Prep with tailored questions and tips, (8) Cover Letter generation, (9) LinkedIn Post creation with image suggestions, and (10) Telegram Resume Bot for instant resume updates. All tools are powered by leading AI models and provide downloadable results."
     },
     {
       question: "Is my data safe and private with Aspirely.ai?",
