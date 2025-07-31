@@ -10,9 +10,8 @@ const JobTrackerPreview = () => {
             style={{ objectPosition: '50% 0%' }}
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-black/50 pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
-          <div className="absolute bottom-4 left-6 right-6">
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/80 via-black/50 to-transparent pointer-events-none" />
+          <div className="absolute bottom-4 left-6 right-6 bg-black/40 rounded-lg p-4 backdrop-blur-sm">
             <h3 className="text-white text-lg sm:text-xl font-semibold mb-2 font-inter">
               Your Job Search, Organized
             </h3>
