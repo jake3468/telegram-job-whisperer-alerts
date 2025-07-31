@@ -108,9 +108,7 @@ const HeroSection = () => {
             Go to Dashboard
           </button>
         </SignedIn>
-        <p className="text-gray-400 text-sm mt-2 font-inter drop-shadow shadow-black">
-          No credit card required. Start with 30 free credits today.
-        </p>
+        <p className="mt-2 font-inter drop-shadow shadow-black text-emerald-300 text-xs">No credit card required. Start with 30 free credits.</p>
         
         {/* More prominent Privacy Policy Link for Google OAuth Verification */}
         <div className="mt-4 mb-2">
