@@ -15,7 +15,7 @@ const HeroSection = () => {
   } = useUser();
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
   const [showParticles, setShowParticles] = useState(false);
-  const fullText = 'Yeah, finally — a premium job hunt tool for top 0.1% candidates';
+  const fullText = 'AI finds your next job while you sleep';
   useEffect(() => {
     if (isLoaded && user) {
       navigate('/dashboard');
@@ -30,8 +30,8 @@ const HeroSection = () => {
         const animationData = await response.json();
         setLottieAnimationData(animationData);
 
-        // Load particles after main content is ready
-        setTimeout(() => setShowParticles(true), 100);
+        // Load particles immediately
+        setShowParticles(true);
       } catch (error) {
         console.error('Failed to load Lottie animation:', error);
         // Still show particles even if Lottie fails
@@ -53,30 +53,8 @@ const HeroSection = () => {
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
-        <h1 className="text-2xl md:text-4xl font-extrabold text-white mb-1 leading-tight font-inter drop-shadow-xl animate-fade-in">
-          {fullText.split(' ').map((word, wordIndex) => {
-          const cleanWord = word.replace(/[.,—]/g, ''); // Remove punctuation for matching
-          const punctuation = word.match(/[.,—]/g)?.[0] || '';
-          if (cleanWord === 'Yeah') {
-            return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">
-                        {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
-                      </span>;
-          } else if (cleanWord === 'finally') {
-            return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">
-                        {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
-                      </span>;
-          } else if (cleanWord === 'premium') {
-            return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500 bg-clip-text text-transparent">
-                        {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
-                      </span>;
-          } else if (cleanWord === 'top' || cleanWord === '0.1%') {
-            return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-purple-400 via-pink-500 to-rose-500 bg-clip-text text-transparent">
-                        {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
-                      </span>;
-          } else {
-            return <span key={wordIndex}>{wordIndex === 0 ? word : ` ${word}`}</span>;
-          }
-        })}
+        <h1 className="text-2xl md:text-4xl font-extrabold mb-1 leading-tight font-inter drop-shadow-xl animate-fade-in bg-gradient-to-r from-blue-500 to-blue-400 bg-clip-text text-transparent">
+          {fullText}
         </h1>
         
         {/* Lottie Animation */}
@@ -98,7 +76,16 @@ const HeroSection = () => {
           </div>
         </div>
 
-        <p className="text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-left md:text-base text-sm">Perfect job matches delivered to your Telegram like personal messages. One click gets you custom resumes, cover letters, interview prep, company insights, and visa sponsorship info. Premium dashboard included. Apply anywhere, fully prepared</p>
+        <p className="text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-left md:text-base text-sm">
+          Perfect job matches delivered to your{' '}
+          <span className="font-bold bg-gradient-to-r from-[#0088cc] to-[#0088cc] bg-clip-text text-transparent">Telegram</span>
+          {' '}like personal messages.{' '}
+          <span className="font-bold bg-gradient-to-r from-[#4CAF50] to-[#4CAF50] bg-clip-text text-transparent">One click</span>
+          {' '}gets you custom resumes, cover letters, interview prep, company insights, and visa sponsorship info.{' '}
+          <span className="font-bold bg-gradient-to-r from-[#9C27B0] to-[#9C27B0] bg-clip-text text-transparent">Premium dashboard</span>
+          {' '}included. Apply anywhere,{' '}
+          <span className="font-bold bg-gradient-to-r from-[#FF9800] to-[#FF9800] bg-clip-text text-transparent">fully prepared</span>
+        </p>
         
         <SignedOut>
           <div className="flex justify-center">
