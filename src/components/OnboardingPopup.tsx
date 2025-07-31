@@ -96,15 +96,13 @@ export function OnboardingPopup({
               </h1>
             </div>
             
-            <h2 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
-              This Isn't Another Boring Job Site.
-            </h2>
+            
             <p className="text-base sm:text-xl font-semibold text-gray-900">
               Welcome to Aspirely.ai — where we break the rules, rewrite the hiring game, and hand the power back to you.
             </p>
             <p className="text-sm sm:text-lg text-gray-600">
-              You're not here to scroll through clutter. You're here to flip the system. And this is where it begins.
-            </p>
+
+You're not here to scroll through clutter. You're here to flip the system. And this is where it begins.</p>
           </div>;
       case 1:
         return <div className="space-y-4">
