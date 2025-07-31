@@ -8,7 +8,6 @@ import HowItWorksSection from "@/components/HowItWorksSection";
 import PricingSection from "@/components/PricingSection";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
-import LazySection from "@/components/LazySection";
 // Temporarily disable SecurityHeaders for debugging
 // import SecurityHeaders from "@/components/SecurityHeaders";
 import { useEffect } from "react";
@@ -46,34 +45,16 @@ const Index = () => {
       <AuthHeader />
       <HeroSection />
       <JobTrackerPreview />
-      
-      <LazySection>
-        <AboutUsSection />
-      </LazySection>
-      
-      <LazySection>
-        <ToolsSection />
-      </LazySection>
-      
-      <LazySection>
-        <HowItWorksSection />
-      </LazySection>
-      
-      <LazySection>
-        <div id="pricing">
-          <PricingSection />
-        </div>
-      </LazySection>
-      
-      <LazySection>
-        <div id="faq">
-          <FAQSection />
-        </div>
-      </LazySection>
-      
-      <LazySection>
-        <Footer />
-      </LazySection>
+      <AboutUsSection />
+      <ToolsSection />
+      <HowItWorksSection />
+      <div id="pricing">
+        <PricingSection />
+      </div>
+      <div id="faq">
+        <FAQSection />
+      </div>
+      <Footer />
     </div>
   );
 };

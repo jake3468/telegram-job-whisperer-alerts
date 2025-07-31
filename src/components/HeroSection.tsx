@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import Lottie from 'lottie-react';
-import Particles from './Particles';
+import { lazy, Suspense } from 'react';
+
+// Lazy load particles for performance
+const Particles = lazy(() => import('./Particles'));
 const HeroSection = () => {
   const navigate = useNavigate();
   const {
@@ -11,10 +14,7 @@ const HeroSection = () => {
     isLoaded
   } = useUser();
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
-  const [showParticles, setShowParticles] = useState(true);
-  
-  // Performance: Check if user prefers reduced motion
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const [showParticles, setShowParticles] = useState(false);
   const fullText = 'AI finds your next job while you sleep';
   useEffect(() => {
     if (isLoaded && user) {
@@ -22,51 +22,35 @@ const HeroSection = () => {
     }
   }, [user, isLoaded, navigate]);
 
-  // Load Lottie animation with caching
+  // Load Lottie animation
   useEffect(() => {
     const loadLottieAnimation = async () => {
       try {
-        // Check cache first
-        const cacheKey = 'hero_lottie_animation';
-        const cached = localStorage.getItem(cacheKey);
-        const cacheTime = localStorage.getItem(`${cacheKey}_time`);
-        
-        if (cached && cacheTime && Date.now() - parseInt(cacheTime) < 24 * 60 * 60 * 1000) {
-          setLottieAnimationData(JSON.parse(cached));
-          return;
-        }
-
         const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json');
         const animationData = await response.json();
-        
-        // Cache the animation
-        localStorage.setItem(cacheKey, JSON.stringify(animationData));
-        localStorage.setItem(`${cacheKey}_time`, Date.now().toString());
-        
         setLottieAnimationData(animationData);
+
+        // Load particles immediately
+        setShowParticles(true);
       } catch (error) {
         console.error('Failed to load Lottie animation:', error);
+        // Still show particles even if Lottie fails
+        setTimeout(() => setShowParticles(true), 100);
       }
     };
     loadLottieAnimation();
-  }, [prefersReducedMotion]);
+  }, []);
   const goToDashboard = () => {
     navigate('/dashboard');
   };
-  return (
-    <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-2 overflow-hidden bg-black">
-      {/* ALWAYS show black background - no conditions, no gaps */}
-      <div className="absolute inset-0 bg-black" />
-      
-      {/* Particles can load whenever - black background is always there */}
-      {!prefersReducedMotion && (
-        <div className="absolute inset-0">
-          <Particles 
-            particleColors={['#ffffff', '#ffffff']} 
-            particleCount={window.innerWidth < 768 ? 150 : 300} 
-          />
-        </div>
-      )}
+  return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-2 overflow-hidden bg-black">
+      {/* Animated Cosmic Stars Background - Lazy Loaded */}
+      {showParticles && <div className="absolute inset-0 z-0">
+          <Suspense fallback={null}>
+            <Particles particleColors={['#ffffff', '#ffffff']} particleCount={500} particleSpread={8} speed={0.08} particleBaseSize={80} moveParticlesOnHover={false} alphaParticles={false} disableRotation={false} />
+          </Suspense>
+        </div>}
+      <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
         {/* Premium Badge */}
@@ -126,8 +110,21 @@ const HeroSection = () => {
         </SignedIn>
         <p className="mt-2 font-inter drop-shadow shadow-black text-emerald-300 text-xs">No credit card required. Start with 30 free credits.</p>
         
+        {/* More prominent Privacy Policy Link for Google OAuth Verification */}
+        <div className="mt-4 mb-2">
+          <p className="text-gray-300 font-inter font-medium text-xs">
+            By using Aspirely.ai, you agree to our{' '}
+            <a href="/privacy-policy" className="text-white hover:text-gray-200 underline transition-colors font-semibold">
+              Privacy Policy
+            </a>
+            {' '}and{' '}
+            <a href="/terms-of-service" className="text-white hover:text-gray-200 underline transition-colors font-semibold">
+              Terms of Service
+            </a>
+            .
+          </p>
+        </div>
       </div>
-    </section>
-  );
+    </section>;
 };
 export default HeroSection;

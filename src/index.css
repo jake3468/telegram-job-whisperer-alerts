@@ -6,10 +6,6 @@
 @tailwind utilities;
 
 @layer base {
-  /* Immediate black background to prevent white flash */
-  html, body {
-    background-color: #000000 !important;
-  }
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
@@ -87,9 +83,8 @@
     @apply border-border;
   }
   body {
-    @apply text-foreground;
-    background-color: #000000 !important; /* Force black background to prevent white flash */
-  }
+    @apply bg-background text-foreground;
+}
 
 /* Hide scrollbar but keep functionality */
 .scrollbar-hide {

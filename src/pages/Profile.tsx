@@ -230,13 +230,22 @@ const Profile = () => {
                 
                 <div className="mb-3 flex justify-center">
                   <div className="relative max-w-full max-h-64 sm:max-h-80">
-                    <img src="/lovable-uploads/011bb020-d0c1-4c09-b4ea-82b329e1afaa.png" alt="Telegram job alert example" className="max-w-full h-auto rounded-lg shadow-sm max-h-64 sm:max-h-80" loading="lazy" onLoad={() => setImageLoaded(true)} onError={e => {
-                  e.currentTarget.style.display = 'none';
-                  setImageLoaded(true);
-                }} />
-                    {!imageLoaded && <div className="absolute inset-0 flex items-center justify-center bg-amber-900/20 rounded-lg">
+                    <img 
+                      src="/lovable-uploads/011bb020-d0c1-4c09-b4ea-82b329e1afaa.png" 
+                      alt="Telegram job alert example" 
+                      className="max-w-full h-auto rounded-lg shadow-sm max-h-64 sm:max-h-80" 
+                      loading="lazy" 
+                      onLoad={() => setImageLoaded(true)}
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        setImageLoaded(true);
+                      }} 
+                    />
+                    {!imageLoaded && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-amber-900/20 rounded-lg">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-200"></div>
-                      </div>}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <p className="text-sm">Click the button below to activate the Telegram Job Alert Bot and create your personalized job alerts.</p>
@@ -270,18 +279,6 @@ const Profile = () => {
             window.open('https://t.me/Job_AI_update_bot', '_blank');
           }} className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter text-sm">
                 Activate my Job Alerts
-              </Button>
-            </div>
-            
-            <div className="mt-6 p-4">
-              <p className="text-sm mb-3 text-white">
-                If you've completed the above 3 steps and activated your Telegram Job Alerts Bot, click below to go to the Create Job Alerts page:
-              </p>
-              <Button onClick={() => {
-            updateActivity();
-            navigate('/job-alerts');
-          }} variant="outline" className="border-amber-400/50 bg-amber-900/20 text-amber-200 hover:bg-amber-800/30 hover:border-amber-300 font-inter text-sm">
-                🔗 Create Job Alerts
               </Button>
             </div>
           </div>

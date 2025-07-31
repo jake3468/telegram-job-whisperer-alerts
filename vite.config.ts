@@ -33,13 +33,13 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // Optimized dependencies for faster loading
+  // Simplified optimizeDeps to reduce startup overhead
   optimizeDeps: {
     include: [
       "react",
       "react-dom",
       "@clerk/clerk-react",
-      "lottie-react" // Include back to prevent loading issues
+      "lottie-react"
     ]
   },
   build: {
@@ -48,8 +48,6 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
-          clerk: ['@clerk/clerk-react'],
-          animations: ['lottie-react', 'ogl'],
           ui: ['@radix-ui/react-dialog', '@radix-ui/react-toast']
         }
       }

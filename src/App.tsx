@@ -39,11 +39,9 @@ const hideInitialLoader = () => {
   const loader = document.getElementById('initial-loader');
   if (loader) {
     loader.classList.add('fade-out');
-    // Remove loading class from body to restore scrolling
-    document.body.classList.remove('loading');
     setTimeout(() => {
       loader.remove();
-    }, 500);
+    }, 300);
   }
 };
 
@@ -73,18 +71,19 @@ const AppWithSync = () => {
     enabled: shouldUseEnterpriseFeatures && isLoaded && isSignedIn
   });
   
-  // Hide initial loader once React is ready - immediate, no artificial delay
+  // Hide initial loader once React is ready
   useEffect(() => {
     if (isLoaded) {
-      // Remove loader immediately when React components are ready
-      hideInitialLoader();
+      // Small delay to ensure smooth transition
+      setTimeout(() => {
+        hideInitialLoader();
+      }, 100);
     }
-  }, [isLoaded]);
+  }, [isLoaded, isSignedIn]);
   
-  // Show loading screen while Clerk auth is loading OR during initial transition
+  // Show loading screen only while Clerk auth is loading
   if (!isLoaded) {
-    // Don't show React loading screen, let HTML loader handle it
-    return null;
+    return <LoadingScreen />;
   }
   
   return (

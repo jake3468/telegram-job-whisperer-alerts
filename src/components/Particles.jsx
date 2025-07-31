@@ -90,12 +90,6 @@ const Particles = ({
   disableRotation = false,
   className,
 }) => {
-  // Performance optimization: reduce particles on mobile
-  const isMobile = window.innerWidth < 768;
-  const optimizedParticleCount = isMobile ? Math.min(particleCount, 150) : particleCount;
-  
-  // Respect user's motion preferences
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const containerRef = useRef(null);
   const mouseRef = useRef({ x: 0, y: 0 });
 
@@ -105,19 +99,8 @@ const Particles = ({
 
     const renderer = new Renderer({ depth: false, alpha: true });
     const gl = renderer.gl;
-    const canvas = gl.canvas;
-    
-    // Set canvas background to black immediately
-    canvas.style.backgroundColor = '#000000';
-    canvas.style.position = 'absolute';
-    canvas.style.top = '0';
-    canvas.style.left = '0';
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-    canvas.style.pointerEvents = 'none';
-    
-    container.appendChild(canvas);
-    gl.clearColor(0, 0, 0, 1.0); // Set clear color to solid black
+    container.appendChild(gl.canvas);
+    gl.clearColor(0, 0, 0, 0);
 
     const camera = new Camera(gl, { fov: 15 });
     camera.position.set(0, 0, cameraDistance);
@@ -142,7 +125,7 @@ const Particles = ({
       container.addEventListener("mousemove", handleMouseMove);
     }
 
-    const count = optimizedParticleCount;
+    const count = particleCount;
     const positions = new Float32Array(count * 3);
     const randoms = new Float32Array(count * 4);
     const colors = new Float32Array(count * 3);
@@ -205,7 +188,7 @@ const Particles = ({
         particles.position.y = 0;
       }
 
-      if (!disableRotation && !prefersReducedMotion) {
+      if (!disableRotation) {
         particles.rotation.x = Math.sin(elapsed * 0.0002) * 0.1;
         particles.rotation.y = Math.cos(elapsed * 0.0005) * 0.15;
         particles.rotation.z += 0.01 * speed;
@@ -244,12 +227,6 @@ const Particles = ({
     <div
       ref={containerRef}
       className={`particles-container ${className}`}
-      style={{
-        backgroundColor: '#000000',
-        position: 'relative',
-        width: '100%',
-        height: '100%'
-      }}
     />
   );
 };
