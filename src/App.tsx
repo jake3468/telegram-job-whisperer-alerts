@@ -73,15 +73,13 @@ const AppWithSync = () => {
     enabled: shouldUseEnterpriseFeatures && isLoaded && isSignedIn
   });
   
-  // Hide initial loader once React is ready with proper delay
+  // Hide initial loader once React is ready - immediate, no artificial delay
   useEffect(() => {
     if (isLoaded) {
-      // Ensure minimum loader time and smooth transition
-      setTimeout(() => {
-        hideInitialLoader();
-      }, 800); // Increased to 800ms for smoother transition
+      // Remove loader immediately when React components are ready
+      hideInitialLoader();
     }
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded]);
   
   // Show loading screen while Clerk auth is loading OR during initial transition
   if (!isLoaded) {
