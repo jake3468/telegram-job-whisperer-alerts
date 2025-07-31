@@ -68,10 +68,10 @@ const FeatureSection = ({
   // Mobile: header section (title + subheading only)
   const mobileHeaderSection = (
     <div className="lg:hidden">
-      <h3 className="text-2xl md:text-3xl mb-2 font-inter text-indigo-700 font-bold">
+      <h3 className="text-2xl md:text-3xl mb-2 font-opensans text-indigo-700 font-bold">
         {title}
       </h3>
-      <p className="mb-3 font-inter font-light text-neutral-950 text-sm">
+      <p className="mb-3 font-opensans font-light text-neutral-950 text-sm">
         {subheading}
       </p>
     </div>
@@ -79,8 +79,8 @@ const FeatureSection = ({
 
   // Mobile: content section (description + button only)
   const mobileContentSection = (
-    <div className="lg:hidden flex flex-col space-y-3">
-      <p className="leading-relaxed font-inter text-neutral-950 text-xs">
+    <div className="lg:hidden flex flex-col space-y-6">
+      <p className="leading-relaxed font-opensans text-neutral-950 text-xs">
         {description}
       </p>
       {isComingSoon ? (
@@ -107,15 +107,15 @@ const FeatureSection = ({
 
   // Desktop: full content section
   const desktopContentSection = (
-    <div className="hidden lg:flex flex-col justify-center space-y-4">
+    <div className="hidden lg:flex flex-col justify-center space-y-8">
       <div>
-        <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-blue-700">
+        <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-opensans text-blue-700">
           {title}
         </h3>
-        <p className="md:text-xl mb-4 font-inter font-light text-base text-neutral-950">
+        <p className="md:text-xl mb-4 font-opensans font-light text-base text-neutral-950">
           {subheading}
         </p>
-        <p className="md:text-lg leading-relaxed font-inter text-sm text-neutral-950">
+        <p className="md:text-lg leading-relaxed font-opensans text-sm text-neutral-950">
           {description}
         </p>
       </div>
@@ -178,16 +178,16 @@ const FeatureSection = ({
   return (
     <section className="py-1 md:py-2 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-3xl p-2 md:p-4">
+        <div className="bg-gray-50 dark:bg-gray-900 rounded-3xl p-6 md:p-8 lg:p-10">
           {/* Mobile Layout */}
-          <div className="lg:hidden space-y-2">
+          <div className="lg:hidden space-y-6">
             {mobileHeaderSection}
             {animationSection}
             {mobileContentSection}
           </div>
           
           {/* Desktop Layout */}
-          <div className={`hidden lg:grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center ${isReversed ? 'lg:grid-flow-col-dense' : ''}`}>
+          <div className={`hidden lg:grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center ${isReversed ? 'lg:grid-flow-col-dense' : ''}`}>
             {isReversed ? (
               <>
                 <div className={isReversed ? 'lg:col-start-2' : ''}>{animationSection}</div>
