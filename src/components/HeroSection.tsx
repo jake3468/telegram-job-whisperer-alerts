@@ -53,7 +53,14 @@ const HeroSection = () => {
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
-        <h1 className="text-2xl md:text-4xl font-extrabold mb-1 leading-tight font-inter drop-shadow-xl animate-fade-in bg-gradient-to-r from-blue-500 to-blue-400 bg-clip-text text-transparent">
+        {/* Premium Badge */}
+        <div className="mb-3">
+          <span className="inline-flex items-center px-3 py-1 text-xs font-medium bg-white/10 text-white rounded-full backdrop-blur-sm border border-white/20">
+            🌟 Premium AI Career Platform
+          </span>
+        </div>
+        
+        <h1 className="text-2xl md:text-4xl font-extrabold mb-1 leading-tight font-orbitron drop-shadow-xl animate-fade-in bg-gradient-to-r from-[#1e40af] to-[#3b82f6] bg-clip-text text-transparent">
           {fullText}
         </h1>
         
