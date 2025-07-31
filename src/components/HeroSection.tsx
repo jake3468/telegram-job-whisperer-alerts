@@ -60,7 +60,7 @@ const HeroSection = () => {
           </span>
         </div>
         
-        <h1 className="text-2xl md:text-4xl font-extrabold mb-1 leading-tight font-orbitron drop-shadow-xl animate-fade-in bg-gradient-to-r from-[#1e40af] to-[#3b82f6] bg-clip-text text-transparent">
+        <h1 className="text-2xl md:text-4xl font-extrabold mb-1 leading-tight font-orbitron tracking-wide drop-shadow-2xl animate-fade-in bg-gradient-to-r from-[#0066ff] to-[#00ccff] bg-clip-text text-transparent [text-shadow:_0_0_30px_rgb(0_102_255_/_50%)]">
           {fullText}
         </h1>
         
