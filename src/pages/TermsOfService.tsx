@@ -1,22 +1,14 @@
-
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
-
 const TermsOfService = () => {
   const navigate = useNavigate();
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  return (
-    <div className="min-h-screen bg-black text-slate-50 font-inter">
+  return <div className="min-h-screen bg-black text-slate-50 font-inter">
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <button 
-          onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-sky-400 hover:text-sky-300 transition-colors mb-8"
-        >
+        <button onClick={() => navigate('/')} className="flex items-center gap-2 text-sky-400 hover:text-sky-300 transition-colors mb-8">
           <ArrowLeft size={20} />
           Back to Home
         </button>
@@ -52,9 +44,7 @@ const TermsOfService = () => {
               <div className="space-y-4 mb-6">
                 <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
                   <h4 className="text-white font-semibold mb-2">Telegram Job Alerts</h4>
-                  <p className="text-gray-300 text-sm">
-                    Personalized daily job alerts delivered via Telegram bot, utilizing RapidAPI for job aggregation and OpenAI for personalization and suitability scoring.
-                  </p>
+                  <p className="text-gray-300 text-sm">Personalized daily job alerts delivered via Telegram bot, utilizing SerpApi & RapidAPI for job aggregation and OpenAI & Perplexity for job alert message creation.</p>
                 </div>
 
                 <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
@@ -387,8 +377,6 @@ const TermsOfService = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default TermsOfService;
