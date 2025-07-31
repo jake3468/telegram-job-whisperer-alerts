@@ -77,7 +77,7 @@ const HeroSection = () => {
         
         {/* AI Services Badges - Combined Image */}
         <div className="flex justify-center items-center gap-3 mb-4 md:mb-6 opacity-90">
-          <span className="text-gray-300 text-sm font-inter font-medium">Powered by</span>
+          <span className="text-sm font-inter font-medium text-zinc-50">Powered by</span>
           <div className="flex items-center">
             <img alt="AI Services - OpenAI, Claude, and Perplexity" className="h-8 object-contain hover:scale-110 transition-transform duration-200" loading="lazy" src="/lovable-uploads/061e42ad-45f4-4e4c-b642-9efff932bddd.png" />
           </div>
