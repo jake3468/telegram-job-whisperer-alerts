@@ -54,8 +54,10 @@ const HeroSection = () => {
     navigate('/dashboard');
   };
   return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-2 overflow-hidden bg-black">
-      {/* Immediate black background to prevent white flash */}
+      {/* Multiple layers of immediate black background to prevent white flash */}
       <div className="absolute inset-0 z-0 bg-black" aria-hidden="true" />
+      <div className="absolute inset-0 z-1 bg-black" aria-hidden="true" />
+      <div className="absolute inset-0 z-2 bg-black" aria-hidden="true" />
       
       {/* Animated Cosmic Stars Background - Immediate Load for No White Flash */}
       {showParticles && !prefersReducedMotion && <div className="absolute inset-0 z-5 bg-black">
@@ -72,7 +74,7 @@ const HeroSection = () => {
         </div>}
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
-      <div className="text-center max-w-4xl mx-auto z-20 relative">
+      <div className="text-center max-w-4xl mx-auto z-20 relative bg-black">
         {/* Premium Badge */}
         <div className="mb-3">
           <span className="inline-flex items-center px-3 py-1 text-xs font-medium bg-white/10 text-white rounded-full backdrop-blur-sm border border-white/20">
@@ -84,12 +86,13 @@ const HeroSection = () => {
           {fullText}
         </h1>
         
-        {/* Lottie Animation */}
-        {lottieAnimationData && <div className="flex justify-center mt-2 mb-4">
-            <div className="w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64">
+        {/* Lottie Animation with black background protection */}
+        {lottieAnimationData && <div className="flex justify-center mt-2 mb-4 bg-black">
+            <div className="w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64 bg-black">
               <Lottie animationData={lottieAnimationData} loop={true} autoplay={true} style={{
             width: '100%',
             height: '100%',
+            backgroundColor: '#000000',
             filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
           }} />
             </div>
