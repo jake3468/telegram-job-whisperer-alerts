@@ -6,11 +6,12 @@ const JobTrackerPreview = () => {
           <img 
             src="/lovable-uploads/ae14cafd-7775-4b28-9bbf-76fde85f2cf5.png"
             alt="Job Tracker Interface Preview - Manage your job applications with ease"
-            className="w-full h-full object-contain sm:object-cover hover:scale-105 transition-transform duration-700 ease-out"
+            className="w-full h-full object-contain sm:object-cover"
             style={{ objectPosition: '50% 0%' }}
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-black/50 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
           <div className="absolute bottom-4 left-6 right-6">
             <h3 className="text-white text-lg sm:text-xl font-semibold mb-2 font-inter">
               Your Job Search, Organized
