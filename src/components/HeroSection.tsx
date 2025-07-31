@@ -3,10 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import Lottie from 'lottie-react';
-import { lazy, Suspense } from 'react';
-
-// Lazy load particles for performance
-const Particles = lazy(() => import('./Particles'));
+import Particles from './Particles';
 const HeroSection = () => {
   const navigate = useNavigate();
   const {
@@ -14,7 +11,7 @@ const HeroSection = () => {
     isLoaded
   } = useUser();
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
-  const [showParticles, setShowParticles] = useState(false);
+  const [showParticles, setShowParticles] = useState(true);
   
   // Performance: Check if user prefers reduced motion
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -36,7 +33,6 @@ const HeroSection = () => {
         
         if (cached && cacheTime && Date.now() - parseInt(cacheTime) < 24 * 60 * 60 * 1000) {
           setLottieAnimationData(JSON.parse(cached));
-          setShowParticles(true);
           return;
         }
 
@@ -48,13 +44,8 @@ const HeroSection = () => {
         localStorage.setItem(`${cacheKey}_time`, Date.now().toString());
         
         setLottieAnimationData(animationData);
-        setShowParticles(true);
       } catch (error) {
         console.error('Failed to load Lottie animation:', error);
-        // Still show particles even if Lottie fails, but only if motion is allowed
-        if (!prefersReducedMotion) {
-          setTimeout(() => setShowParticles(true), 100);
-        }
       }
     };
     loadLottieAnimation();
@@ -66,20 +57,18 @@ const HeroSection = () => {
       {/* Immediate black background to prevent white flash */}
       <div className="absolute inset-0 z-0 bg-black" aria-hidden="true" />
       
-      {/* Animated Cosmic Stars Background - Lazy Loaded & Performance Optimized */}
-      {showParticles && !prefersReducedMotion && <div className="absolute inset-0 z-5">
-          <Suspense fallback={<div className="absolute inset-0 bg-black" />}>
-            <Particles 
-              particleColors={['#ffffff', '#ffffff']} 
-              particleCount={window.innerWidth < 768 ? 150 : 300} 
-              particleSpread={8} 
-              speed={0.08} 
-              particleBaseSize={80} 
-              moveParticlesOnHover={false} 
-              alphaParticles={false} 
-              disableRotation={false} 
-            />
-          </Suspense>
+      {/* Animated Cosmic Stars Background - Immediate Load for No White Flash */}
+      {showParticles && !prefersReducedMotion && <div className="absolute inset-0 z-5 bg-black">
+          <Particles 
+            particleColors={['#ffffff', '#ffffff']} 
+            particleCount={window.innerWidth < 768 ? 150 : 300} 
+            particleSpread={8} 
+            speed={0.08} 
+            particleBaseSize={80} 
+            moveParticlesOnHover={false} 
+            alphaParticles={false} 
+            disableRotation={false} 
+          />
         </div>}
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
