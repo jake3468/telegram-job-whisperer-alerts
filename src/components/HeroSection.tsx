@@ -47,13 +47,20 @@ const HeroSection = () => {
       {/* Animated Cosmic Stars Background - Lazy Loaded */}
       {showParticles && <div className="absolute inset-0 z-0">
           <Suspense fallback={null}>
-            <Particles particleColors={['#ffffff', '#60a5fa']} particleCount={150} particleSpread={10} speed={0.1} particleBaseSize={1} moveParticlesOnHover={true} alphaParticles={true} disableRotation={false} />
+            <Particles particleColors={['#ffffff', '#ffffff']} particleCount={500} particleSpread={8} speed={0.08} particleBaseSize={80} moveParticlesOnHover={false} alphaParticles={false} disableRotation={false} />
           </Suspense>
         </div>}
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
-        <h1 className="text-2xl md:text-4xl font-extrabold mb-1 leading-tight font-inter drop-shadow-xl animate-fade-in bg-gradient-to-r from-blue-500 to-blue-400 bg-clip-text text-transparent">
+        {/* Premium Badge */}
+        <div className="mb-3">
+          <span className="inline-flex items-center px-3 py-1 text-xs font-medium bg-white/10 text-white rounded-full backdrop-blur-sm border border-white/20">
+            🌟 Premium AI Career Platform
+          </span>
+        </div>
+        
+        <h1 className="text-2xl md:text-4xl font-extrabold mb-1 leading-tight font-orbitron tracking-wide drop-shadow-2xl animate-fade-in bg-gradient-to-r from-[#0066ff] to-[#00ccff] bg-clip-text text-transparent [text-shadow:_0_0_30px_rgb(0_102_255_/_50%)]">
           {fullText}
         </h1>
         
