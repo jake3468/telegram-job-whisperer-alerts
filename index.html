@@ -168,7 +168,7 @@
     </script>
   </head>
 
-  <body style="background-color: #000000 !important; margin: 0; padding: 0; overflow: hidden;">
+  <body style="background-color: #000000 !important; margin: 0; padding: 0;" class="loading">
     <noscript>
       <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000000; color: white; display: flex; align-items: center; justify-content: center; font-family: Inter, sans-serif; z-index: 999999;">
         <div style="text-align: center;">
@@ -255,9 +255,13 @@
         /* Critical CSS to prevent white flash - loaded immediately */
         html, body {
           background-color: #000000 !important;
-          overflow: hidden !important;
           margin: 0 !important;
           padding: 0 !important;
+        }
+        
+        /* Temporarily prevent scrolling only during initial load */
+        body.loading {
+          overflow: hidden !important;
         }
         
         /* Ensure all elements have black background during load */
@@ -271,11 +275,6 @@
           min-height: 100vh !important;
           width: 100vw !important;
           position: relative !important;
-        }
-        
-        /* Prevent scrolling during initial load */
-        body {
-          overflow: hidden !important;
         }
         
         /* Ensure loader is always on top */

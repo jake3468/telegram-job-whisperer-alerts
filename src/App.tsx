@@ -39,9 +39,11 @@ const hideInitialLoader = () => {
   const loader = document.getElementById('initial-loader');
   if (loader) {
     loader.classList.add('fade-out');
+    // Remove loading class from body to restore scrolling
+    document.body.classList.remove('loading');
     setTimeout(() => {
       loader.remove();
-    }, 300);
+    }, 500);
   }
 };
 
