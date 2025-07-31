@@ -38,11 +38,8 @@ export default defineConfig(({ mode }) => ({
     include: [
       "react",
       "react-dom",
-      "@clerk/clerk-react"
-    ],
-    exclude: [
-      "lottie-react", // Lazy load this
-      "ogl" // Lazy load particles
+      "@clerk/clerk-react",
+      "lottie-react" // Include back to prevent loading issues
     ]
   },
   build: {

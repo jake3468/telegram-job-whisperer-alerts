@@ -91,7 +91,16 @@ export const useLottieCache = (url: string) => {
       }
 
       try {
-        const response = await fetch(url);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+        
+        const response = await fetch(url, { 
+          signal: controller.signal,
+          cache: 'force-cache' // Use browser cache
+        });
+        
+        clearTimeout(timeoutId);
+        
         if (!response.ok) {
           throw new Error(`Failed to fetch animation: ${response.status}`);
         }
@@ -104,6 +113,7 @@ export const useLottieCache = (url: string) => {
         }
       } catch (err) {
         if (!isCancelled) {
+          console.warn('Lottie animation failed to load, using fallback:', err);
           setError(err instanceof Error ? err : new Error('Unknown error'));
         }
       } finally {

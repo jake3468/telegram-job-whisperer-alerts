@@ -23,21 +23,24 @@ const FeatureSection = ({
   isComingSoon = false
 }: FeatureSectionProps) => {
   const [LottieComponent, setLottieComponent] = useState<React.ComponentType<any> | null>(null);
-  const { ref, isIntersecting } = useIntersectionObserver({ threshold: 0.1, rootMargin: '100px' });
+  const { ref, isIntersecting } = useIntersectionObserver({ 
+    threshold: 0.05, 
+    rootMargin: '300px' // Load earlier to prevent delays
+  });
   
-  // Only load animation when component is visible
-  const { data: animationData, isLoading, error } = useLottieCache(isIntersecting ? lottieUrl : '');
+  // Load animation when visible or preemptively
+  const { data: animationData, isLoading, error } = useLottieCache(
+    isIntersecting || !lottieUrl ? lottieUrl : ''
+  );
   const hasError = !!error;
   useEffect(() => {
-    // Only load Lottie React when needed
-    if (isIntersecting && !LottieComponent) {
-      import('lottie-react').then(module => {
-        setLottieComponent(() => module.default);
-      }).catch(error => {
-        logger.error('Failed to load Lottie React module:', error);
-      });
-    }
-  }, [isIntersecting, LottieComponent]);
+    // Load Lottie React immediately when component mounts to prevent loading delays
+    import('lottie-react').then(module => {
+      setLottieComponent(() => module.default);
+    }).catch(error => {
+      logger.error('Failed to load Lottie React module:', error);
+    });
+  }, []);
 
   // Mobile: header section (title + subheading only)
   const mobileHeaderSection = <div className="lg:hidden">
