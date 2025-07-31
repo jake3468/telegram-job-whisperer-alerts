@@ -54,13 +54,15 @@ const HeroSection = () => {
     navigate('/dashboard');
   };
   return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-2 overflow-hidden bg-black">
-      {/* Multiple layers of immediate black background to prevent white flash */}
+      {/* Immediate CSS-only black backgrounds to prevent any white flash */}
       <div className="absolute inset-0 z-0 bg-black" aria-hidden="true" />
       <div className="absolute inset-0 z-1 bg-black" aria-hidden="true" />
       <div className="absolute inset-0 z-2 bg-black" aria-hidden="true" />
+      <div className="absolute inset-0 z-3 bg-black" aria-hidden="true" />
+      <div className="absolute inset-0 z-4 bg-black" aria-hidden="true" />
       
-      {/* Animated Cosmic Stars Background - Immediate Load for No White Flash */}
-      {showParticles && !prefersReducedMotion && <div className="absolute inset-0 z-5 bg-black">
+      {/* Animated Cosmic Stars Background */}
+      {showParticles && !prefersReducedMotion && <div className="absolute inset-0 z-5">
           <Particles 
             particleColors={['#ffffff', '#ffffff']} 
             particleCount={window.innerWidth < 768 ? 150 : 300} 

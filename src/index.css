@@ -6,6 +6,10 @@
 @tailwind utilities;
 
 @layer base {
+  /* Immediate black background to prevent white flash */
+  html, body {
+    background-color: #000000 !important;
+  }
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
