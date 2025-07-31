@@ -90,6 +90,12 @@ const Particles = ({
   disableRotation = false,
   className,
 }) => {
+  // Performance optimization: reduce particles on mobile
+  const isMobile = window.innerWidth < 768;
+  const optimizedParticleCount = isMobile ? Math.min(particleCount, 150) : particleCount;
+  
+  // Respect user's motion preferences
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const containerRef = useRef(null);
   const mouseRef = useRef({ x: 0, y: 0 });
 
@@ -125,7 +131,7 @@ const Particles = ({
       container.addEventListener("mousemove", handleMouseMove);
     }
 
-    const count = particleCount;
+    const count = optimizedParticleCount;
     const positions = new Float32Array(count * 3);
     const randoms = new Float32Array(count * 4);
     const colors = new Float32Array(count * 3);
@@ -188,7 +194,7 @@ const Particles = ({
         particles.position.y = 0;
       }
 
-      if (!disableRotation) {
+      if (!disableRotation && !prefersReducedMotion) {
         particles.rotation.x = Math.sin(elapsed * 0.0002) * 0.1;
         particles.rotation.y = Math.cos(elapsed * 0.0005) * 0.15;
         particles.rotation.z += 0.01 * speed;

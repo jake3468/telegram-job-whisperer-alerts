@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { SignUpButton } from "@clerk/clerk-react";
 import { ArrowRight } from "lucide-react";
 import { logger } from "@/utils/logger";
+import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
+import { useLottieCache } from "@/hooks/useLottieCache";
 interface FeatureSectionProps {
   title: string;
   subheading: string;
@@ -21,40 +23,21 @@ const FeatureSection = ({
   isComingSoon = false
 }: FeatureSectionProps) => {
   const [LottieComponent, setLottieComponent] = useState<React.ComponentType<any> | null>(null);
-  const [animationData, setAnimationData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
+  const { ref, isIntersecting } = useIntersectionObserver({ threshold: 0.1, rootMargin: '100px' });
+  
+  // Only load animation when component is visible
+  const { data: animationData, isLoading, error } = useLottieCache(isIntersecting ? lottieUrl : '');
+  const hasError = !!error;
   useEffect(() => {
-    import('lottie-react').then(module => {
-      setLottieComponent(() => module.default);
-    }).catch(error => {
-      logger.error('Failed to load Lottie React module:', error);
-      setHasError(true);
-      setIsLoading(false);
-    });
-  }, []);
-  useEffect(() => {
-    const fetchAnimation = async () => {
-      try {
-        setIsLoading(true);
-        setHasError(false);
-        const response = await fetch(lottieUrl);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch animation: ${response.status} ${response.statusText}`);
-        }
-        const data = await response.json();
-        setAnimationData(data);
-      } catch (error) {
-        logger.error(`Failed to load Lottie animation for ${title}:`, error);
-        setHasError(true);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    if (lottieUrl) {
-      fetchAnimation();
+    // Only load Lottie React when needed
+    if (isIntersecting && !LottieComponent) {
+      import('lottie-react').then(module => {
+        setLottieComponent(() => module.default);
+      }).catch(error => {
+        logger.error('Failed to load Lottie React module:', error);
+      });
     }
-  }, [lottieUrl, title]);
+  }, [isIntersecting, LottieComponent]);
 
   // Mobile: header section (title + subheading only)
   const mobileHeaderSection = <div className="lg:hidden">
@@ -121,7 +104,7 @@ const FeatureSection = ({
           </div>}
       </div>
     </div>;
-  return <section className="py-1 md:py-2 px-4 bg-black">
+  return <section ref={ref} className="py-1 md:py-2 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
         <div className="bg-gray-50 dark:bg-gray-900 rounded-3xl p-6 md:p-8 lg:p-10">
           {/* Mobile Layout */}

@@ -2,15 +2,18 @@
 import AuthHeader from "@/components/AuthHeader";
 import HeroSection from "@/components/HeroSection";
 import JobTrackerPreview from "@/components/JobTrackerPreview";
-import AboutUsSection from "@/components/AboutUsSection";
-import ToolsSection from "@/components/ToolsSection";
-import HowItWorksSection from "@/components/HowItWorksSection";
-import PricingSection from "@/components/PricingSection";
-import FAQSection from "@/components/FAQSection";
-import Footer from "@/components/Footer";
+import LazySection from "@/components/LazySection";
 // Temporarily disable SecurityHeaders for debugging
 // import SecurityHeaders from "@/components/SecurityHeaders";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
+
+// Lazy load non-critical sections
+const AboutUsSection = lazy(() => import("@/components/AboutUsSection"));
+const ToolsSection = lazy(() => import("@/components/ToolsSection"));
+const HowItWorksSection = lazy(() => import("@/components/HowItWorksSection"));
+const PricingSection = lazy(() => import("@/components/PricingSection"));
+const FAQSection = lazy(() => import("@/components/FAQSection"));
+const Footer = lazy(() => import("@/components/Footer"));
 
 const Index = () => {
   useEffect(() => {
@@ -45,16 +48,34 @@ const Index = () => {
       <AuthHeader />
       <HeroSection />
       <JobTrackerPreview />
-      <AboutUsSection />
-      <ToolsSection />
-      <HowItWorksSection />
-      <div id="pricing">
-        <PricingSection />
-      </div>
-      <div id="faq">
-        <FAQSection />
-      </div>
-      <Footer />
+      
+      <LazySection>
+        <AboutUsSection />
+      </LazySection>
+      
+      <LazySection>
+        <ToolsSection />
+      </LazySection>
+      
+      <LazySection>
+        <HowItWorksSection />
+      </LazySection>
+      
+      <LazySection>
+        <div id="pricing">
+          <PricingSection />
+        </div>
+      </LazySection>
+      
+      <LazySection>
+        <div id="faq">
+          <FAQSection />
+        </div>
+      </LazySection>
+      
+      <LazySection>
+        <Footer />
+      </LazySection>
     </div>
   );
 };

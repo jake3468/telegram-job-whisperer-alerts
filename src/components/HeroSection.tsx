@@ -15,6 +15,9 @@ const HeroSection = () => {
   } = useUser();
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
   const [showParticles, setShowParticles] = useState(false);
+  
+  // Performance: Check if user prefers reduced motion
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const fullText = 'AI finds your next job while you sleep';
   useEffect(() => {
     if (isLoaded && user) {
@@ -22,32 +25,57 @@ const HeroSection = () => {
     }
   }, [user, isLoaded, navigate]);
 
-  // Load Lottie animation
+  // Load Lottie animation with caching
   useEffect(() => {
     const loadLottieAnimation = async () => {
       try {
+        // Check cache first
+        const cacheKey = 'hero_lottie_animation';
+        const cached = localStorage.getItem(cacheKey);
+        const cacheTime = localStorage.getItem(`${cacheKey}_time`);
+        
+        if (cached && cacheTime && Date.now() - parseInt(cacheTime) < 24 * 60 * 60 * 1000) {
+          setLottieAnimationData(JSON.parse(cached));
+          setShowParticles(true);
+          return;
+        }
+
         const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json');
         const animationData = await response.json();
+        
+        // Cache the animation
+        localStorage.setItem(cacheKey, JSON.stringify(animationData));
+        localStorage.setItem(`${cacheKey}_time`, Date.now().toString());
+        
         setLottieAnimationData(animationData);
-
-        // Load particles immediately
         setShowParticles(true);
       } catch (error) {
         console.error('Failed to load Lottie animation:', error);
-        // Still show particles even if Lottie fails
-        setTimeout(() => setShowParticles(true), 100);
+        // Still show particles even if Lottie fails, but only if motion is allowed
+        if (!prefersReducedMotion) {
+          setTimeout(() => setShowParticles(true), 100);
+        }
       }
     };
     loadLottieAnimation();
-  }, []);
+  }, [prefersReducedMotion]);
   const goToDashboard = () => {
     navigate('/dashboard');
   };
   return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-2 overflow-hidden bg-black">
-      {/* Animated Cosmic Stars Background - Lazy Loaded */}
-      {showParticles && <div className="absolute inset-0 z-0">
+      {/* Animated Cosmic Stars Background - Lazy Loaded & Performance Optimized */}
+      {showParticles && !prefersReducedMotion && <div className="absolute inset-0 z-0">
           <Suspense fallback={null}>
-            <Particles particleColors={['#ffffff', '#ffffff']} particleCount={500} particleSpread={8} speed={0.08} particleBaseSize={80} moveParticlesOnHover={false} alphaParticles={false} disableRotation={false} />
+            <Particles 
+              particleColors={['#ffffff', '#ffffff']} 
+              particleCount={window.innerWidth < 768 ? 150 : 300} 
+              particleSpread={8} 
+              speed={0.08} 
+              particleBaseSize={80} 
+              moveParticlesOnHover={false} 
+              alphaParticles={false} 
+              disableRotation={false} 
+            />
           </Suspense>
         </div>}
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
