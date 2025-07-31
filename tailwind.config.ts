@@ -115,6 +115,7 @@ export default {
 			fontFamily: {
 				'inter': ['Inter', 'system-ui', 'sans-serif'],
         'orbitron': ['Orbitron', 'sans-serif'], // Added Orbitron font
+        'playfair': ['Playfair Display', 'serif'], // Added Playfair Display font
 			}
 		}
 	},
