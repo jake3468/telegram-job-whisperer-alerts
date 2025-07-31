@@ -54,14 +54,12 @@ const HeroSection = () => {
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
         {/* Premium Badge */}
-        <div className="mb-3">
-          <span className="inline-flex items-center px-3 py-1 text-xs font-medium bg-white/10 text-white rounded-full backdrop-blur-sm border border-white/20">
-            🌟 Premium AI Career Platform
-          </span>
+        <div className="premium-badge">
+          ⭐ Premium AI Career Platform
         </div>
         
-        <h1 className="text-2xl md:text-4xl font-extrabold mb-1 leading-tight font-orbitron tracking-wide drop-shadow-2xl animate-fade-in bg-gradient-to-r from-[#0066ff] to-[#00ccff] bg-clip-text text-transparent [text-shadow:_0_0_30px_rgb(0_102_255_/_50%)]">
-          {fullText}
+        <h1 className="headline">
+          AI finds your next job while you sleep
         </h1>
         
         {/* Lottie Animation */}
@@ -83,15 +81,16 @@ const HeroSection = () => {
           </div>
         </div>
 
-        <p className="text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-left md:text-base text-sm">
-          Perfect job matches delivered to your{' '}
-          <span className="font-bold bg-gradient-to-r from-[#0088cc] to-[#0088cc] bg-clip-text text-transparent">Telegram</span>
-          {' '}like personal messages.{' '}
-          <span className="font-bold bg-gradient-to-r from-[#4CAF50] to-[#4CAF50] bg-clip-text text-transparent">One click</span>
-          {' '}gets you custom resumes, cover letters, interview prep, company insights, and visa sponsorship info.{' '}
-          <span className="font-bold bg-gradient-to-r from-[#9C27B0] to-[#9C27B0] bg-clip-text text-transparent">Premium dashboard</span>
-          {' '}included. Apply anywhere,{' '}
-          <span className="font-bold bg-gradient-to-r from-[#FF9800] to-[#FF9800] bg-clip-text text-transparent">fully prepared</span>
+        <p className="subheading">
+          Perfect job matches delivered to your{" "}
+          <span className="telegram-emphasis">Telegram</span>{" "}
+          like personal messages.{" "}
+          <span className="one-click-emphasis">One click</span>{" "}
+          gets you custom resumes, cover letters, interview prep, 
+          company insights, and visa sponsorship info.{" "}
+          <span className="premium-emphasis">Premium dashboard</span>{" "}
+          included. Apply anywhere,{" "}
+          <span className="prepared-emphasis">fully prepared</span>.
         </p>
         
         <SignedOut>
