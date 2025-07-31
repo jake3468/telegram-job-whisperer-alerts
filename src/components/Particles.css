@@ -2,4 +2,9 @@
   position: relative;
   width: 100%;
   height: 100%;
+  background-color: #000000 !important;
+}
+
+.particles-container canvas {
+  background-color: #000000 !important;
 }

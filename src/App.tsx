@@ -74,10 +74,10 @@ const AppWithSync = () => {
   // Hide initial loader once React is ready with proper delay
   useEffect(() => {
     if (isLoaded) {
-      // Longer delay to ensure smooth transition and prevent white flash
+      // Ensure minimum loader time and smooth transition
       setTimeout(() => {
         hideInitialLoader();
-      }, 500); // Increased from 100ms to 500ms
+      }, 800); // Increased to 800ms for smoother transition
     }
   }, [isLoaded, isSignedIn]);
   

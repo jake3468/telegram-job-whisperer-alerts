@@ -105,8 +105,19 @@ const Particles = ({
 
     const renderer = new Renderer({ depth: false, alpha: true });
     const gl = renderer.gl;
-    container.appendChild(gl.canvas);
-    gl.clearColor(0, 0, 0, 0);
+    const canvas = gl.canvas;
+    
+    // Set canvas background to black immediately
+    canvas.style.backgroundColor = '#000000';
+    canvas.style.position = 'absolute';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.pointerEvents = 'none';
+    
+    container.appendChild(canvas);
+    gl.clearColor(0, 0, 0, 1.0); // Set clear color to solid black
 
     const camera = new Camera(gl, { fov: 15 });
     camera.position.set(0, 0, cameraDistance);
@@ -233,6 +244,12 @@ const Particles = ({
     <div
       ref={containerRef}
       className={`particles-container ${className}`}
+      style={{
+        backgroundColor: '#000000',
+        position: 'relative',
+        width: '100%',
+        height: '100%'
+      }}
     />
   );
 };

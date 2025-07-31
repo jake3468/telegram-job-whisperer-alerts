@@ -168,22 +168,32 @@
     </script>
   </head>
 
-  <body style="background-color: #000000; margin: 0; padding: 0;">
+  <body style="background-color: #000000 !important; margin: 0; padding: 0; overflow: hidden;">
+    <noscript>
+      <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000000; color: white; display: flex; align-items: center; justify-content: center; font-family: Inter, sans-serif; z-index: 999999;">
+        <div style="text-align: center;">
+          <h1>Aspirely.ai</h1>
+          <p>Please enable JavaScript to use this application.</p>
+        </div>
+      </div>
+    </noscript>
     <div id="root">
       <!-- Immediate loading screen - appears instantly before React loads -->
       <div id="initial-loader" style="
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #000000 0%, #1a1a2e 50%, #16213e 100%);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: #000000 !important;
+        background: linear-gradient(135deg, #000000 0%, #1a1a2e 50%, #16213e 100%) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        z-index: 999999 !important;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        opacity: 1 !important;
       ">
         <!-- Logo and branding -->
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
@@ -242,9 +252,37 @@
           pointer-events: none;
         }
         
-        /* Ensure no white flash during loading */
+        /* Critical CSS to prevent white flash - loaded immediately */
         html, body {
           background-color: #000000 !important;
+          overflow: hidden !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+        
+        /* Ensure all elements have black background during load */
+        *, *::before, *::after {
+          background-color: transparent !important;
+        }
+        
+        /* Root element styling */
+        #root {
+          background-color: #000000 !important;
+          min-height: 100vh !important;
+          width: 100vw !important;
+          position: relative !important;
+        }
+        
+        /* Prevent scrolling during initial load */
+        body {
+          overflow: hidden !important;
+        }
+        
+        /* Ensure loader is always on top */
+        #initial-loader {
+          position: fixed !important;
+          z-index: 999999 !important;
+          background: #000000 !important;
         }
       </style>
     </div>
