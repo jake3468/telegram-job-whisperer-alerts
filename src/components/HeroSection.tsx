@@ -74,7 +74,7 @@ const HeroSection = () => {
         </div>}
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
-      <div className="text-center max-w-4xl mx-auto z-20 relative bg-black">
+      <div className="text-center max-w-4xl mx-auto z-20 relative">
         {/* Premium Badge */}
         <div className="mb-3">
           <span className="inline-flex items-center px-3 py-1 text-xs font-medium bg-white/10 text-white rounded-full backdrop-blur-sm border border-white/20">
@@ -86,13 +86,12 @@ const HeroSection = () => {
           {fullText}
         </h1>
         
-        {/* Lottie Animation with black background protection */}
-        {lottieAnimationData && <div className="flex justify-center mt-2 mb-4 bg-black">
-            <div className="w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64 bg-black">
+        {/* Lottie Animation */}
+        {lottieAnimationData && <div className="flex justify-center mt-2 mb-4">
+            <div className="w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64">
               <Lottie animationData={lottieAnimationData} loop={true} autoplay={true} style={{
             width: '100%',
             height: '100%',
-            backgroundColor: '#000000',
             filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
           }} />
             </div>
