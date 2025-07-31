@@ -112,7 +112,7 @@ const HeroSection = () => {
         
         {/* More prominent Privacy Policy Link for Google OAuth Verification */}
         <div className="mt-4 mb-2">
-          <p className="text-gray-300 text-sm font-inter font-medium">
+          <p className="text-gray-300 font-inter font-medium text-xs">
             By using Aspirely.ai, you agree to our{' '}
             <a href="/privacy-policy" className="text-white hover:text-gray-200 underline transition-colors font-semibold">
               Privacy Policy
