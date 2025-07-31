@@ -273,7 +273,7 @@ const Profile = () => {
               </Button>
             </div>
             
-            <div className="mt-6 p-4 rounded-lg border border-amber-400/30 bg-gradient-to-br from-amber-900/10 to-orange-900/10 bg-gray-950">
+            <div className="mt-6 p-4">
               <p className="text-sm mb-3 text-white">
                 If you've completed the above 3 steps and activated your Telegram Job Alerts Bot, click below to go to the Create Job Alerts page:
               </p>
