@@ -218,9 +218,7 @@ const Profile = () => {
               <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-400 rounded-full flex items-center justify-center font-bold text-black text-sm shadow-lg border-2 border-amber-300">
                 3
               </div>
-              <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
-                Create Job Alerts
-              </h2>
+              <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Create Telegram Job Alerts</h2>
             </div>
             <div className="rounded-3xl border-2 border-amber-400/50 bg-gradient-to-br from-amber-900/20 via-orange-900/10 to-yellow-900/20 p-6">
               <div className="text-amber-100 font-inter mb-4 text-base space-y-2">
