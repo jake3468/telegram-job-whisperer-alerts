@@ -7,6 +7,35 @@ import { lazy, Suspense } from 'react';
 
 // Lazy load particles for performance
 const Particles = lazy(() => import('./Particles'));
+
+// Preload rocket animation immediately when module loads
+const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json';
+const CACHE_KEY = 'rocket-animation-data-v1';
+
+// Start loading animation data immediately
+const rocketAnimationPromise = (async () => {
+  try {
+    // Check cache first
+    const cachedData = localStorage.getItem(CACHE_KEY);
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
+    
+    // Fetch with high priority
+    const response = await fetch(ROCKET_ANIMATION_URL, {
+      cache: 'force-cache',
+      priority: 'high'
+    } as RequestInit);
+    const animationData = await response.json();
+    
+    // Cache for next time
+    localStorage.setItem(CACHE_KEY, JSON.stringify(animationData));
+    return animationData;
+  } catch (error) {
+    console.error('Failed to preload rocket animation:', error);
+    return null;
+  }
+})();
 const HeroSection = () => {
   const navigate = useNavigate();
   const {
@@ -22,41 +51,23 @@ const HeroSection = () => {
     }
   }, [user, isLoaded, navigate]);
 
-  // Load Lottie animation with caching
+  // Load Lottie animation using preloaded promise
   useEffect(() => {
-    const loadLottieAnimation = async () => {
+    const loadAnimation = async () => {
       try {
-        const cacheKey = 'rocket-animation-data';
-        const cacheVersion = 'v1';
-        const fullCacheKey = `${cacheKey}-${cacheVersion}`;
-        
-        // Try to get from localStorage first
-        const cachedData = localStorage.getItem(fullCacheKey);
-        if (cachedData) {
-          const parsedData = JSON.parse(cachedData);
-          setLottieAnimationData(parsedData);
-          setShowParticles(true);
-          return;
+        const animationData = await rocketAnimationPromise;
+        if (animationData) {
+          setLottieAnimationData(animationData);
         }
-
-        // Fetch with cache headers for browser cache
-        const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json', {
-          cache: 'force-cache'
-        });
-        const animationData = await response.json();
-        
-        // Cache in localStorage for faster subsequent loads
-        localStorage.setItem(fullCacheKey, JSON.stringify(animationData));
-        
-        setLottieAnimationData(animationData);
-        setShowParticles(true);
       } catch (error) {
-        console.error('Failed to load Lottie animation:', error);
-        // Still show particles even if Lottie fails
-        setTimeout(() => setShowParticles(true), 100);
+        console.error('Failed to load rocket animation:', error);
+      } finally {
+        // Always show particles
+        setShowParticles(true);
       }
     };
-    loadLottieAnimation();
+    
+    loadAnimation();
   }, []);
   const goToDashboard = () => {
     navigate('/dashboard');
