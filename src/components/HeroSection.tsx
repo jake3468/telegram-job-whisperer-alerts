@@ -22,15 +22,33 @@ const HeroSection = () => {
     }
   }, [user, isLoaded, navigate]);
 
-  // Load Lottie animation
+  // Load Lottie animation with caching
   useEffect(() => {
     const loadLottieAnimation = async () => {
       try {
-        const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json');
-        const animationData = await response.json();
-        setLottieAnimationData(animationData);
+        const cacheKey = 'rocket-animation-data';
+        const cacheVersion = 'v1';
+        const fullCacheKey = `${cacheKey}-${cacheVersion}`;
+        
+        // Try to get from localStorage first
+        const cachedData = localStorage.getItem(fullCacheKey);
+        if (cachedData) {
+          const parsedData = JSON.parse(cachedData);
+          setLottieAnimationData(parsedData);
+          setShowParticles(true);
+          return;
+        }
 
-        // Load particles immediately
+        // Fetch with cache headers for browser cache
+        const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json', {
+          cache: 'force-cache'
+        });
+        const animationData = await response.json();
+        
+        // Cache in localStorage for faster subsequent loads
+        localStorage.setItem(fullCacheKey, JSON.stringify(animationData));
+        
+        setLottieAnimationData(animationData);
         setShowParticles(true);
       } catch (error) {
         console.error('Failed to load Lottie animation:', error);
