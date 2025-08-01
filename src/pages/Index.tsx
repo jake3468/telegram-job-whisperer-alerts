@@ -8,16 +8,11 @@ import HowItWorksSection from "@/components/HowItWorksSection";
 import PricingSection from "@/components/PricingSection";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
-import { usePagePerformance } from "@/hooks/usePagePerformance";
-import { useAnimationPreloader } from "@/services/animationPreloader";
 // Temporarily disable SecurityHeaders for debugging
 // import SecurityHeaders from "@/components/SecurityHeaders";
 import { useEffect } from "react";
 
 const Index = () => {
-  const { preloadLowPriority } = useAnimationPreloader();
-  usePagePerformance('Landing Page');
-
   useEffect(() => {
     // Add JSON-LD structured data for better Google crawlability
     const script = document.createElement('script');
@@ -39,16 +34,10 @@ const Index = () => {
     
     document.head.appendChild(script);
     
-    // Preload low priority animations after page is fully loaded
-    const timer = setTimeout(() => {
-      preloadLowPriority();
-    }, 3000);
-    
     return () => {
       document.head.removeChild(script);
-      clearTimeout(timer);
     };
-  }, [preloadLowPriority]);
+  }, []);
 
   return (
     <div className="min-h-screen bg-black font-inter text-slate-50">

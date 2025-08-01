@@ -1,37 +1,45 @@
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState, lazy, Suspense } from 'react';
+import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
-import LottieWrapper from '@/components/LottieWrapper';
-import { useAnimationPreloader } from '@/services/animationPreloader';
+import Lottie from 'lottie-react';
+import { lazy, Suspense } from 'react';
 
 // Lazy load particles for performance
 const Particles = lazy(() => import('./Particles'));
 const HeroSection = () => {
   const navigate = useNavigate();
-  const { user, isLoaded } = useUser();
+  const {
+    user,
+    isLoaded
+  } = useUser();
+  const [lottieAnimationData, setLottieAnimationData] = useState(null);
   const [showParticles, setShowParticles] = useState(false);
-  const { preloadMediumPriority } = useAnimationPreloader();
   const fullText = 'AI finds your next job while you sleep';
-  
   useEffect(() => {
     if (isLoaded && user) {
       navigate('/dashboard');
     }
   }, [user, isLoaded, navigate]);
 
-  // Initialize particles and preload animations
+  // Load Lottie animation
   useEffect(() => {
-    // Show particles immediately for better perceived performance
-    setShowParticles(true);
-    
-    // Preload medium priority animations after hero loads
-    const timer = setTimeout(() => {
-      preloadMediumPriority();
-    }, 1000);
-    
-    return () => clearTimeout(timer);
-  }, [preloadMediumPriority]);
+    const loadLottieAnimation = async () => {
+      try {
+        const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json');
+        const animationData = await response.json();
+        setLottieAnimationData(animationData);
+
+        // Load particles immediately
+        setShowParticles(true);
+      } catch (error) {
+        console.error('Failed to load Lottie animation:', error);
+        // Still show particles even if Lottie fails
+        setTimeout(() => setShowParticles(true), 100);
+      }
+    };
+    loadLottieAnimation();
+  }, []);
   const goToDashboard = () => {
     navigate('/dashboard');
   };
@@ -56,18 +64,16 @@ const HeroSection = () => {
           {fullText}
         </h1>
         
-        {/* Optimized Lottie Animation */}
-        <div className="flex justify-center mt-2 mb-4">
-          <LottieWrapper
-            url="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json"
-            className="w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64"
-            style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}
-            priority="high"
-            fallbackIcon="🚀"
-            title="Hero Animation - Businessman with Rocket"
-            onLoad={() => console.log('Hero animation loaded successfully')}
-          />
-        </div>
+        {/* Lottie Animation */}
+        {lottieAnimationData && <div className="flex justify-center mt-2 mb-4">
+            <div className="w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64">
+              <Lottie animationData={lottieAnimationData} loop={true} autoplay={true} style={{
+            width: '100%',
+            height: '100%',
+            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
+          }} />
+            </div>
+          </div>}
         
         {/* AI Services Badges - Combined Image */}
         <div className="flex justify-center items-center gap-3 mb-4 md:mb-6 opacity-90">
