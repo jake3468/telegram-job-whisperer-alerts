@@ -268,9 +268,7 @@ const Profile = () => {
               <Button onClick={() => {
             updateActivity();
             window.open('https://t.me/Job_AI_update_bot', '_blank');
-          }} className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter text-sm">
-                Activate my Job Alerts
-              </Button>
+          }} className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter text-sm">Activate the Bot</Button>
             </div>
           </div>
 
@@ -282,7 +280,7 @@ const Profile = () => {
             <Button onClick={() => {
           updateActivity();
           navigate('/job-alerts');
-        }} variant="outline" className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-blue-400/30 font-semibold text-zinc-950 bg-emerald-600 hover:bg-emerald-500">
+        }} variant="outline" className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-blue-400/30 font-semibold text-zinc-950 bg-sky-400 hover:bg-sky-300">
               🔗 Create Job Alerts
             </Button>
           </div>
