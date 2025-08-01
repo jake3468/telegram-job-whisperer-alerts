@@ -279,7 +279,7 @@ const Profile = () => {
           updateActivity();
           navigate('/job-alerts');
         }} variant="outline" className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-blue-400/30 font-semibold text-zinc-950 bg-cyan-400 hover:bg-cyan-300">
-              🔗 Create Job Alerts
+              🚀 Create Job Alerts
             </Button>
           </div>
         </div>}
