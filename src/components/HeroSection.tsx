@@ -109,21 +109,6 @@ const HeroSection = () => {
           </button>
         </SignedIn>
         <p className="mt-2 font-inter drop-shadow shadow-black text-emerald-300 text-xs">No credit card required. Start with 30 free credits.</p>
-        
-        {/* More prominent Privacy Policy Link for Google OAuth Verification */}
-        <div className="mt-4 mb-2">
-          <p className="text-gray-300 font-inter font-medium text-xs">
-            By using Aspirely.ai, you agree to our{' '}
-            <a href="/privacy-policy" className="text-white hover:text-gray-200 underline transition-colors font-semibold">
-              Privacy Policy
-            </a>
-            {' '}and{' '}
-            <a href="/terms-of-service" className="text-white hover:text-gray-200 underline transition-colors font-semibold">
-              Terms of Service
-            </a>
-            .
-          </p>
-        </div>
       </div>
     </section>;
 };
