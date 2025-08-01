@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { X, ChevronRight, ChevronLeft, FileText, User, Bell, Target } from 'lucide-react';
+import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 interface OnboardingPopupProps {
   isOpen: boolean;
   onClose: () => void;
@@ -16,8 +17,39 @@ export function OnboardingPopup({
 }: OnboardingPopupProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
-  const nextStep = () => {
+  const {
+    userProfile,
+    updateUserProfile
+  } = useCachedUserProfile();
+  const detectAndStoreLocation = async () => {
+    // Only detect location if it hasn't been set yet
+    if (userProfile?.user_location) {
+      return;
+    }
+    try {
+      // Use a free IP geolocation service to detect location
+      const response = await fetch('https://ipapi.co/json/');
+      const data = await response.json();
+
+      // Check if the user is in India based on country code
+      const isInIndia = data.country_code === 'IN';
+      const location = isInIndia ? 'india' : 'global';
+
+      // Update user profile with location
+      await updateUserProfile({
+        user_location: location
+      });
+    } catch (error) {
+      // Fallback to 'global' if detection fails
+      await updateUserProfile({
+        user_location: 'global'
+      });
+    }
+  };
+  const nextStep = async () => {
     if (currentStep < 1) {
+      // Detect and store location on first next click
+      await detectAndStoreLocation();
       setCurrentStep(currentStep + 1);
       // Scroll to top of content
       setTimeout(() => {
@@ -64,34 +96,45 @@ export function OnboardingPopup({
               </h1>
             </div>
             
-            <h2 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
-              This Isn't Another Boring Job Site.
-            </h2>
+            
             <p className="text-base sm:text-xl font-semibold text-gray-900">
               Welcome to Aspirely.ai — where we break the rules, rewrite the hiring game, and hand the power back to you.
             </p>
             <p className="text-sm sm:text-lg text-gray-600">
-              You're not here to scroll through clutter. You're here to flip the system. And this is where it begins.
-            </p>
+
+You're not here to scroll through clutter. You're here to flip the system. And this is where it begins.</p>
           </div>;
       case 1:
         return <div className="space-y-4">
-            <div className="text-center">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 text-left">What you should do immediately ?</h2>
-            </div>
-            
-            <div className="space-y-2">
+            <div className="space-y-3">
               <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                <h3 className="text-sm font-semibold text-purple-600 mb-1">📄 First let's feed the AI.</h3>
-                <p className="text-gray-700 text-xs">Upload your resume after you close this popup message , so that our tools can understand your experience, skills, and background.</p>
+                <h3 className="text-sm font-bold text-purple-600 mb-1">📄 Step 1: Upload Your Resume</h3>
+                <p className="text-gray-700 text-xs">Feed the AI your resume so it can understand your skills and experience.</p>
               </div>
               
               <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                <h3 className="text-sm font-semibold text-blue-600 mb-1">💬 Who are you beyond the PDF?</h3>
-                <p className="text-gray-700 text-xs">Then, write a short intro — your story, your strengths, your vibe. Not just "hard-working team player" — tell us the stuff that makes you... you. not just the boring stuff. Brag. Be weird. Be real.</p>
-                <p className="text-purple-600 text-xs mt-1 font-medium">
-                  The better we know you, the better the results. It's quick, and it sets the stage for everything that follows.
-                </p>
+                <h3 className="text-sm font-bold text-blue-600 mb-1">💬 Step 2: Write a Short Intro</h3>
+                <p className="text-gray-700 text-xs">Tell us who you are beyond the PDF. Be real, be bold — it helps us personalize everything for you.</p>
+              </div>
+              
+              <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                <h3 className="text-sm font-bold text-orange-600 mb-1">📲 Step 3: Activate Telegram Alerts</h3>
+                <p className="text-gray-700 text-xs mb-2">Get your own personalized daily job alerts like the example below 👇</p>
+                <div className="mb-3 flex justify-center">
+                  <img src="/lovable-uploads/f2862620-a249-47c6-982e-20ecd839539d.png" alt="Telegram job alert example" className="max-w-full h-auto rounded-lg shadow-sm max-h-64" loading="lazy" onError={e => {
+                  e.currentTarget.style.display = 'none';
+                }} />
+                </div>
+                <p className="text-gray-700 text-xs mb-1 font-medium">Each alert gives you:</p>
+                <ul className="space-y-0.5 text-xs text-gray-600 ml-2">
+                  <li>• One-tap resume, cover letter, and visa info</li>
+                  <li>• Instant company insights & job fit checks</li>
+                  <li>• Effortless job tracking — way easier than anything you've used before</li>
+                </ul>
+              </div>
+              
+              <div className="bg-green-50 rounded-lg p-3 border border-green-200 text-center">
+                <p className="text-green-700 text-sm font-bold">✅ Now, close this popup and get started — it takes just 2 minutes!</p>
               </div>
             </div>
           </div>;

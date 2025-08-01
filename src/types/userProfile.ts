@@ -15,6 +15,7 @@ export interface UserProfile {
   show_job_alerts_onboarding_popup: boolean;
   show_job_board_onboarding_popup: boolean;
   show_job_tracker_onboarding_popup: boolean;
+  user_location: string | null;
 }
 
 export interface UserProfileUpdateData {
@@ -30,4 +31,5 @@ export interface UserProfileUpdateData {
   show_job_alerts_onboarding_popup?: boolean;
   show_job_board_onboarding_popup?: boolean;
   show_job_tracker_onboarding_popup?: boolean;
+  user_location?: string | null;
 }

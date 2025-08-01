@@ -1,4 +1,3 @@
-
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -8,6 +7,35 @@ import { lazy, Suspense } from 'react';
 
 // Lazy load particles for performance
 const Particles = lazy(() => import('./Particles'));
+
+// Preload rocket animation immediately when module loads
+const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json';
+const CACHE_KEY = 'rocket-animation-data-v1';
+
+// Start loading animation data immediately
+const rocketAnimationPromise = (async () => {
+  try {
+    // Check cache first
+    const cachedData = localStorage.getItem(CACHE_KEY);
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
+    
+    // Fetch with high priority
+    const response = await fetch(ROCKET_ANIMATION_URL, {
+      cache: 'force-cache',
+      priority: 'high'
+    } as RequestInit);
+    const animationData = await response.json();
+    
+    // Cache for next time
+    localStorage.setItem(CACHE_KEY, JSON.stringify(animationData));
+    return animationData;
+  } catch (error) {
+    console.error('Failed to preload rocket animation:', error);
+    return null;
+  }
+})();
 const HeroSection = () => {
   const navigate = useNavigate();
   const {
@@ -16,30 +44,30 @@ const HeroSection = () => {
   } = useUser();
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
   const [showParticles, setShowParticles] = useState(false);
-  const fullText = 'Yeah, finally — a premium job hunt tool for top 0.1% candidates';
+  const fullText = 'AI finds your next job while you sleep';
   useEffect(() => {
     if (isLoaded && user) {
       navigate('/dashboard');
     }
   }, [user, isLoaded, navigate]);
 
-  // Load Lottie animation
+  // Load Lottie animation using preloaded promise
   useEffect(() => {
-    const loadLottieAnimation = async () => {
+    const loadAnimation = async () => {
       try {
-        const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json');
-        const animationData = await response.json();
-        setLottieAnimationData(animationData);
-
-        // Load particles after main content is ready
-        setTimeout(() => setShowParticles(true), 100);
+        const animationData = await rocketAnimationPromise;
+        if (animationData) {
+          setLottieAnimationData(animationData);
+        }
       } catch (error) {
-        console.error('Failed to load Lottie animation:', error);
-        // Still show particles even if Lottie fails
-        setTimeout(() => setShowParticles(true), 100);
+        console.error('Failed to load rocket animation:', error);
+      } finally {
+        // Always show particles
+        setShowParticles(true);
       }
     };
-    loadLottieAnimation();
+    
+    loadAnimation();
   }, []);
   const goToDashboard = () => {
     navigate('/dashboard');
@@ -54,30 +82,15 @@ const HeroSection = () => {
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
-        <h1 className="text-2xl md:text-4xl font-extrabold text-white mb-1 leading-tight font-inter drop-shadow-xl animate-fade-in">
-          {fullText.split(' ').map((word, wordIndex) => {
-          const cleanWord = word.replace(/[.,—]/g, ''); // Remove punctuation for matching
-          const punctuation = word.match(/[.,—]/g)?.[0] || '';
-          if (cleanWord === 'Yeah') {
-            return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">
-                        {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
-                      </span>;
-          } else if (cleanWord === 'finally') {
-            return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">
-                        {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
-                      </span>;
-          } else if (cleanWord === 'premium') {
-            return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500 bg-clip-text text-transparent">
-                        {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
-                      </span>;
-          } else if (cleanWord === 'top' || cleanWord === '0.1%') {
-            return <span key={wordIndex} className="italic font-black bg-gradient-to-r from-purple-400 via-pink-500 to-rose-500 bg-clip-text text-transparent">
-                        {wordIndex === 0 ? cleanWord : ` ${cleanWord}`}{punctuation}
-                      </span>;
-          } else {
-            return <span key={wordIndex}>{wordIndex === 0 ? word : ` ${word}`}</span>;
-          }
-        })}
+        {/* Premium Badge */}
+        <div className="mb-3">
+          <span className="inline-flex items-center px-3 py-1 text-xs font-medium bg-white/10 text-white rounded-full backdrop-blur-sm border border-white/20">
+            🌟 Premium AI Career Platform
+          </span>
+        </div>
+        
+        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-playfair tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)]">
+          {fullText}
         </h1>
         
         {/* Lottie Animation */}
@@ -93,13 +106,22 @@ const HeroSection = () => {
         
         {/* AI Services Badges - Combined Image */}
         <div className="flex justify-center items-center gap-3 mb-4 md:mb-6 opacity-90">
-          <span className="text-gray-300 text-sm font-inter font-medium">Powered by</span>
+          <span className="text-sm font-playfair font-medium text-white drop-shadow-lg">Powered by</span>
           <div className="flex items-center">
             <img alt="AI Services - OpenAI, Claude, and Perplexity" className="h-8 object-contain hover:scale-110 transition-transform duration-200" loading="lazy" src="/lovable-uploads/061e42ad-45f4-4e4c-b642-9efff932bddd.png" />
           </div>
         </div>
 
-        <p className="text-gray-200 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-inter font-light leading-relaxed drop-shadow shadow-black text-left md:text-base text-sm">Everything you need for your job hunt - all in one place, no clutter. Apply in the first 24 hours, before 3000 others do. Build resumes, cover letters, decode job fit, and prep with real phone call mock interviews -  all powered by the most advanced AI.</p>
+        <p className="text-white mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-poppins font-light leading-relaxed drop-shadow-lg md:text-base text-sm [text-shadow:_0_1px_2px_rgba(0,0,0,0.8)] text-center">
+          Perfect job matches delivered to your{' '}
+          <span className="font-bold italic bg-gradient-to-r from-[#00D4FF] to-[#0099FF] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,212,255,0.8)]">Telegram</span>
+          {' '}like personal messages.{' '}
+          <span className="font-bold italic bg-gradient-to-r from-[#00FF88] to-[#00CC66] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,255,136,0.8)]">One click</span>
+          {' '}gets you custom resumes, cover letters, interview prep, company insights, and visa sponsorship info.{' '}
+          <span className="font-bold italic bg-gradient-to-r from-[#FF44FF] to-[#DD22DD] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(255,68,255,0.8)]">Premium dashboard</span>
+          {' '}included. Apply anywhere,{' '}
+          <span className="font-bold italic bg-gradient-to-r from-[#FFDD00] to-[#FFAA00] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(255,221,0,0.8)]">fully prepared</span>
+        </p>
         
         <SignedOut>
           <div className="flex justify-center">
@@ -115,24 +137,7 @@ const HeroSection = () => {
             Go to Dashboard
           </button>
         </SignedIn>
-        <p className="text-gray-400 text-sm mt-2 font-inter drop-shadow shadow-black">
-          No credit card required. Start with 30 free credits today.
-        </p>
-        
-        {/* More prominent Privacy Policy Link for Google OAuth Verification */}
-        <div className="mt-4 mb-2">
-          <p className="text-gray-300 text-sm font-inter font-medium">
-            By using Aspirely.ai, you agree to our{' '}
-            <a href="/privacy-policy" className="text-white hover:text-gray-200 underline transition-colors font-semibold">
-              Privacy Policy
-            </a>
-            {' '}and{' '}
-            <a href="/terms-of-service" className="text-white hover:text-gray-200 underline transition-colors font-semibold">
-              Terms of Service
-            </a>
-            .
-          </p>
-        </div>
+        <p className="mt-2 font-inter drop-shadow shadow-black text-emerald-300 text-xs">No credit card required. Start with 30 free credits.</p>
       </div>
     </section>;
 };

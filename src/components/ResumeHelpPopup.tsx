@@ -48,7 +48,7 @@ export const ResumeHelpPopup: React.FC<ResumeHelpPopupProps> = ({
             </p>
             
             {userProfileId && <div className="rounded-lg p-4 border bg-sky-100">
-                <p className="text-gray-600 text-xs mb-2 font-medium">When the bot asks for your Bot ID, copy and paste this:</p>
+                <p className="text-gray-600 text-xs mb-2 font-medium">When the bot asks for your 'Activation Key', copy and paste this:</p>
                 <div className="flex items-center gap-2 bg-white rounded border p-2">
                   <code className="text-xs font-mono text-gray-800 flex-1 break-all">
                     {userProfileId}
