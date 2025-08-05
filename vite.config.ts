@@ -33,14 +33,17 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // Simplified optimizeDeps to reduce startup overhead
+  // Optimized for Clerk and authentication performance
   optimizeDeps: {
     include: [
       "react",
       "react-dom",
       "@clerk/clerk-react",
+      "@clerk/types",
       "lottie-react"
-    ]
+    ],
+    // Force pre-bundling of Clerk modules
+    force: mode === 'development'
   },
   build: {
     sourcemap: mode === 'development',
@@ -48,6 +51,7 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
+          clerk: ['@clerk/clerk-react', '@clerk/types'],
           ui: ['@radix-ui/react-dialog', '@radix-ui/react-toast']
         }
       }

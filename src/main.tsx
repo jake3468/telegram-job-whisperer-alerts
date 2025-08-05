@@ -32,7 +32,16 @@ if (!PUBLISHABLE_KEY) {
 // Environment setup complete
 
 createRoot(document.getElementById("root")!).render(
-  <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+  <ClerkProvider 
+    publishableKey={PUBLISHABLE_KEY}
+    appearance={{
+      // Optimize for faster loading
+      layout: {
+        logoImageUrl: undefined, // Skip logo loading for faster init
+        showOptionalFields: false
+      }
+    }}
+  >
     <App />
   </ClerkProvider>
 );
