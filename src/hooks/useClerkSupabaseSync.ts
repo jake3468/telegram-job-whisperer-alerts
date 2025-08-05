@@ -9,6 +9,7 @@ export const useClerkSupabaseSync = () => {
   const { getToken } = useAuth();
   const syncedRef = useRef(false);
   const tokenSetRef = useRef(false);
+  const syncTimeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     const setupTokenRefresh = async () => {
@@ -49,10 +50,18 @@ export const useClerkSupabaseSync = () => {
     };
 
     if (isLoaded && user && !syncedRef.current) {
-      // Setup sync but don't block the UI
-      setupTokenRefresh();
+      // Debounce the sync setup to prevent race conditions during OAuth
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current);
+      }
+      syncTimeoutRef.current = setTimeout(() => {
+        setupTokenRefresh();
+      }, 100); // Small delay to debounce rapid calls during OAuth
     } else if (isLoaded && !user && tokenSetRef.current) {
       // User logged out, clear the token
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current);
+      }
       setClerkToken(null);
       tokenSetRef.current = false;
       syncedRef.current = false;
