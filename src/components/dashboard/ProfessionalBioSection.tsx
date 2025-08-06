@@ -13,7 +13,7 @@ const ProfessionalBioSection = () => {
   const { userProfile, loading, updateUserProfile } = useCachedUserProfile();
   const { makeOptimisticRequest } = useEnterpriseAPIClient();
   
-  const defaultBio = 'Trying to learn fast, contribute meaningfully, and level up as I go.';
+  const defaultBio = '.';
   const [bio, setBio] = useState(userProfile?.bio || defaultBio);
   const [saving, setSaving] = useState(false);
   const [optimisticSaved, setOptimisticSaved] = useState(false);
