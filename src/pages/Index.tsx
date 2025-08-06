@@ -2,6 +2,7 @@
 import AuthHeader from "@/components/AuthHeader";
 import HeroSection from "@/components/HeroSection";
 import JobTrackerPreview from "@/components/JobTrackerPreview";
+import YouTubeShortPreview from "@/components/YouTubeShortPreview";
 import AboutUsSection from "@/components/AboutUsSection";
 import ToolsSection from "@/components/ToolsSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
@@ -45,6 +46,7 @@ const Index = () => {
       <AuthHeader />
       <HeroSection />
       <JobTrackerPreview />
+      <YouTubeShortPreview />
       <AboutUsSection />
       <ToolsSection />
       <HowItWorksSection />
