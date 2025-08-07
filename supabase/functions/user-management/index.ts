@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
       .from('user_profile')
       .insert({
         user_id: newUser.id,
-        bio: 'Trying to learn fast, contribute meaningfully, and level up as I go.',
+        bio: '.',
         resume: null,
         bot_activated: false,
         cv_bot_activated: false
