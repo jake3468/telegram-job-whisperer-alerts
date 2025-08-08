@@ -72,9 +72,7 @@ export function OnboardingPopup({
       }, 0);
     }
   };
-  const handleClose = async () => {
-    // Detect and store location when closing popup
-    await detectAndStoreLocation();
+  const handleClose = () => {
     setCurrentStep(0);
     onClose();
   };
@@ -108,13 +106,10 @@ You're not here to scroll through clutter. You're here to flip the system. And t
           </div>;
       case 1:
         return <div className="space-y-4">
-            <div className="bg-blue-50 rounded-lg p-3 border border-blue-200 text-center mb-4">
-              <p className="text-blue-700 text-sm font-bold">Below are the three steps you need to do first to be ahead of 99% of all job seekers. If you do these 3 simple steps, we can assure you that you will see and feel the changes and be more efficient.</p>
-            </div>
             <div className="space-y-3">
               <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                 <h3 className="text-sm font-bold text-purple-600 mb-1">📄 Step 1: Upload Your Resume</h3>
-                <p className="text-gray-700 text-xs">Feed the AI your resume so it can understand your skills and experience.</p>
+                <p className="text-xs text-left text-emerald-950">Below are the 3 steps you need to do first to be ahead of 99% of all job seekers. If you do these 3 simple steps, we can assure you that you will see and feel the changes and be more efficient.</p>
               </div>
               
               <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
