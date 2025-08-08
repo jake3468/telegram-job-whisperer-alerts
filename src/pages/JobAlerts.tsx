@@ -1,4 +1,3 @@
-
 import { useUser } from '@clerk/clerk-react';
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -9,25 +8,27 @@ import { useCreditWarnings } from '@/hooks/useCreditWarnings';
 import { useClerkSupabaseSync } from '@/hooks/useClerkSupabaseSync';
 import { useEnhancedTokenManagerIntegration } from '@/hooks/useEnhancedTokenManagerIntegration';
 import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
-
 import { JobAlertsOnboardingPopup } from '@/components/JobAlertsOnboardingPopup';
 import { Badge } from '@/components/ui/badge';
-
 const JobAlerts = () => {
   const {
     user,
     isLoaded
   } = useUser();
   const navigate = useNavigate();
-  
+
   // CRITICAL: Ensure Clerk-Supabase sync runs on this page
   useClerkSupabaseSync();
 
   // Enterprise session management for Job Alerts page
-  const sessionManager = useEnhancedTokenManagerIntegration({ enabled: true });
-  
+  const sessionManager = useEnhancedTokenManagerIntegration({
+    enabled: true
+  });
+
   // Proactive token refresh to prevent expiration
-  const { updateActivity } = useFormTokenKeepAlive(true);
+  const {
+    updateActivity
+  } = useFormTokenKeepAlive(true);
 
   // Replace useFeatureCreditCheck with the new system
   useCreditWarnings(); // This shows the warning popups
@@ -61,19 +62,16 @@ const JobAlerts = () => {
       return 'UTC';
     }
   }, []);
-  
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
     }
   }, [user, isLoaded, navigate]);
-  
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-gradient-to-br from-pastel-mint via-pastel-lavender to-pastel-peach flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading user...</div>
       </div>;
   }
-  
   return <Layout>
       <div className="text-center mb-8">
         <h1 className="text-4xl font-orbitron font-extrabold mb-2 drop-shadow tracking-tight flex items-center justify-center gap-2">
@@ -88,7 +86,7 @@ const JobAlerts = () => {
         </h1>
         
         <p className="text-md text-orange-100 font-inter font-light mb-4">
-          Get job alerts from the latest <span className="italic text-indigo-200">24-hour</span> postings — sent to your <span className="italic text-pastel-peach">Telegram</span> and listed under 'Posted Today' in your <span className="italic text-pastel-peach">Job Board</span> page
+          Get job alerts from the latest <span className="italic text-teal-200">24-hour</span> postings — sent to your <span className="italic text-cyan-400">Telegram</span> and listed under 'Posted Today' in your <span className="italic text-pink-300">Job Board</span> page
         </p>
 
         {/* Usage Cost Badge */}
@@ -101,12 +99,8 @@ const JobAlerts = () => {
       <JobAlertsOnboardingPopup />
 
       <div className="space-y-8">
-        <JobAlertsSection 
-          userTimezone={userTimezone} 
-          sessionManager={sessionManager}
-        />
+        <JobAlertsSection userTimezone={userTimezone} sessionManager={sessionManager} />
       </div>
     </Layout>;
 };
-
 export default JobAlerts;

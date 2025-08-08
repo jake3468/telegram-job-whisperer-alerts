@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,7 +7,6 @@ import JobAlertModal from './JobAlertModal';
 import JobAlertsList from './JobAlertsList';
 import EnhancedBotStatus from './EnhancedBotStatus';
 import { useCachedJobAlertsData } from '@/hooks/useCachedJobAlertsData';
-
 interface JobAlert {
   id: string;
   country: string;
@@ -22,35 +20,35 @@ interface JobAlert {
   created_at: string;
   updated_at: string;
 }
-
 interface JobAlertsSectionProps {
   userTimezone: string;
   sessionManager?: any; // Enterprise session manager
 }
-
-const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProps) => {
-  const { toast } = useToast();
-  const { 
-    alerts, 
-    isActivated, 
-    userProfileId, 
-    loading, 
-    error, 
+const JobAlertsSection = ({
+  userTimezone,
+  sessionManager
+}: JobAlertsSectionProps) => {
+  const {
+    toast
+  } = useToast();
+  const {
+    alerts,
+    isActivated,
+    userProfileId,
+    loading,
+    error,
     debugInfo,
     optimisticAdd,
     invalidateCache,
     forceRefresh,
     deleteJobAlert
   } = useCachedJobAlertsData();
-  
   const [showModal, setShowModal] = useState(false);
   const [editingAlert, setEditingAlert] = useState<JobAlert | null>(null);
-  
   const MAX_ALERTS = 3;
   const alertsUsed = alerts.length;
   const alertsRemaining = MAX_ALERTS - alertsUsed;
   const isAtLimit = alertsUsed >= MAX_ALERTS;
-
   const handleCreateAlert = () => {
     if (!isActivated) {
       toast({
@@ -71,7 +69,6 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
     setEditingAlert(null);
     setShowModal(true);
   };
-
   const handleEditAlert = (alert: JobAlert) => {
     if (!isActivated) {
       toast({
@@ -84,7 +81,6 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
     setEditingAlert(alert);
     setShowModal(true);
   };
-
   const handleDeleteAlert = async (alertId: string) => {
     if (!isActivated) {
       toast({
@@ -94,21 +90,18 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
       });
       return;
     }
-
     try {
       // deleteJobAlert now handles optimistic updates internally
       await deleteJobAlert(alertId);
-      
       toast({
         title: "Alert deleted",
         description: "Job alert has been removed successfully."
       });
     } catch (error) {
       console.error('Error deleting job alert:', error);
-      
+
       // Enhanced error handling with context
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      
       if (errorMessage.includes('Authentication') || errorMessage.includes('expired')) {
         toast({
           title: "Session expired",
@@ -124,23 +117,21 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
       }
     }
   };
-
   const handleModalSubmit = (newAlert?: JobAlert) => {
     setEditingAlert(null);
-    
+
     // If a new alert was created, add it optimistically for immediate UI feedback
     if (newAlert && !editingAlert) {
       optimisticAdd(newAlert);
       toast({
         title: "Alert created",
-        description: "Your job alert has been created successfully and will be processed shortly.",
+        description: "Your job alert has been created successfully and will be processed shortly."
       });
     } else {
       // For edits, just invalidate cache to refresh data
       invalidateCache();
     }
   };
-  
   const handleModalClose = () => {
     setShowModal(false);
     setEditingAlert(null);
@@ -162,23 +153,15 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
         </div>
       </div>;
   }
-
   return <section className="rounded-3xl border-2 border-orange-400 bg-gradient-to-b from-orange-900/90 via-[#2b1605]/90 to-[#2b1605]/98 shadow-none p-0 max-w-5xl mx-auto">
       <div className="pt-4 px-2 sm:px-6">
         {/* Manual Refresh Button */}
-        {error && (
-          <div className="mb-4 flex justify-end">
-            <Button
-              onClick={handleManualRefresh}
-              variant="outline"
-              size="sm"
-              className="text-xs bg-yellow-900/20 border-yellow-400/30 text-yellow-300 hover:bg-yellow-800/30"
-            >
+        {error && <div className="mb-4 flex justify-end">
+            <Button onClick={handleManualRefresh} variant="outline" size="sm" className="text-xs bg-yellow-900/20 border-yellow-400/30 text-yellow-300 hover:bg-yellow-800/30">
               <RefreshCw className="w-3 h-3 mr-1" />
               Refresh
             </Button>
-          </div>
-        )}
+          </div>}
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <div className="min-w-0">
@@ -192,7 +175,7 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
                 <span>Job Alerts</span>
               </span>
             </div>
-            <p className="text-orange-100 font-inter text-sm font-semibold drop-shadow-none">Set up personalized daily job alerts based on your preferences</p>
+            <p className="text-orange-100 font-inter text-sm drop-shadow-none font-extralight">Set up personalized daily job alerts based on your preferences - just one job title and location per alert to ensure we send you the most accurate matches.</p>
             
             {/* Alert Usage Counter */}
             {isActivated && <div className="flex items-center gap-2 mt-2">
@@ -226,16 +209,7 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
             </div>}
 
           {/* Job Alert Modal */}
-          <JobAlertModal
-            isOpen={showModal}
-            onClose={handleModalClose}
-            userTimezone={userTimezone}
-            editingAlert={editingAlert}
-            onSubmit={handleModalSubmit}
-            currentAlertCount={alertsUsed}
-            maxAlerts={MAX_ALERTS}
-            sessionManager={sessionManager}
-          />
+          <JobAlertModal isOpen={showModal} onClose={handleModalClose} userTimezone={userTimezone} editingAlert={editingAlert} onSubmit={handleModalSubmit} currentAlertCount={alertsUsed} maxAlerts={MAX_ALERTS} sessionManager={sessionManager} />
 
           {!isActivated && <div className="text-center py-6">
               <Bell className="w-10 h-10 text-orange-400 mx-auto mb-3" />
@@ -247,5 +221,4 @@ const JobAlertsSection = ({ userTimezone, sessionManager }: JobAlertsSectionProp
       <div className="h-2 sm:h-4" />
     </section>;
 };
-
 export default JobAlertsSection;
