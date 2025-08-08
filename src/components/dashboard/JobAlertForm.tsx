@@ -309,7 +309,7 @@ const JobAlertForm = ({
             id="job_title" 
             value={formData.job_title} 
             onChange={(e) => handleInputChange('job_title', e.target.value)} 
-            placeholder="Enter only one job title (e.g., Software Engineer, Project Manager)" 
+            placeholder="Enter only one job title (e.g., Software Engineer, Project Manager etc.)" 
             required 
             className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs h-8"
           />
