@@ -297,7 +297,7 @@ const JobAlertForm = ({
             id="location" 
             value={formData.location} 
             onChange={(e) => handleInputChange('location', e.target.value)} 
-            placeholder="e.g., New York, NY" 
+            placeholder="Enter only one location (e.g., New York, Bengaluru etc.)" 
             required 
             className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs h-8"
           />
@@ -309,7 +309,7 @@ const JobAlertForm = ({
             id="job_title" 
             value={formData.job_title} 
             onChange={(e) => handleInputChange('job_title', e.target.value)} 
-            placeholder="e.g., Software Engineer" 
+            placeholder="Enter only one job title (e.g., Software Engineer, Project Manager)" 
             required 
             className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs h-8"
           />
