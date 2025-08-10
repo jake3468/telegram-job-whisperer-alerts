@@ -74,7 +74,8 @@ const HeroSection = () => {
   };
   return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-2 overflow-hidden bg-black">
       {/* Animated Cosmic Stars Background - Lazy Loaded */}
-      {showParticles && <div className="absolute inset-0 z-0">
+      {showParticles && <div className="absolute top-0 left-0 right-0 h-[60%] sm:h-[65%] md:h-[70%] z-0 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 pointer-events-none z-10" />
           <Suspense fallback={null}>
             <Particles particleColors={['#ffffff', '#ffffff']} particleCount={500} particleSpread={8} speed={0.08} particleBaseSize={80} moveParticlesOnHover={false} alphaParticles={false} disableRotation={false} />
           </Suspense>
