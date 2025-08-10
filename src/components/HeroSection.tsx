@@ -90,15 +90,9 @@ const HeroSection = () => {
           </span>
         </div>
         
-        {/* Paint Brush Background Container */}
-        <div className="relative inline-block">
-          {/* Blue Paint Brush Effect */}
-          <div className="absolute inset-0 z-15 before:content-[''] before:absolute before:inset-[-20px] before:bg-gradient-to-r before:from-cyan-400/40 before:via-blue-500/50 before:to-blue-600/40 before:rounded-[50px_40px_60px_30px] before:transform before:rotate-[-2deg] before:blur-[1px] before:z-[-1]"></div>
-          
-          <h1 className="relative z-25 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-playfair tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)]">
-            {fullText}
-          </h1>
-        </div>
+        <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-playfair tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)]">
+          {fullText}
+        </h1>
         
         {/* Lottie Animation */}
         {lottieAnimationData && <div className="flex justify-center mt-2 mb-4">
