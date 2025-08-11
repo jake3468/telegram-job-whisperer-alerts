@@ -44,7 +44,7 @@ const HeroSection = () => {
   } = useUser();
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
   const [showParticles, setShowParticles] = useState(false);
-  const fullText = 'We search for your next job while you focus on living your life';
+  const fullText = 'AI finds your next job while you sleep';
   useEffect(() => {
     if (isLoaded && user) {
       navigate('/dashboard');
@@ -86,7 +86,7 @@ const HeroSection = () => {
         {/* Black background to block particles behind headline */}
         <div className="relative">
           <div className="absolute inset-0 bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
-          <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-quattrocento tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)]">
+          <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-playfair tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)]">
             {fullText}
           </h1>
         </div>
@@ -125,7 +125,7 @@ const HeroSection = () => {
           <div className="flex justify-center">
             <SignUpButton mode="modal">
               <button className="bg-gradient-to-r from-purple-600 via-blue-600 to-purple-700 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-3 text-base sm:text-lg rounded-lg transition-all duration-300 font-inter font-semibold shadow-lg hover:shadow-purple-500/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-purple-400/50 mb-2 flex items-center gap-2 justify-center">
-                ✨ Start Now for Free
+                ✨ Try for Free
               </button>
             </SignUpButton>
           </div>
