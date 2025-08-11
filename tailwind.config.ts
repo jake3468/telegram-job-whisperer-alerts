@@ -118,6 +118,7 @@ export default {
         'playfair': ['Playfair Display', 'serif'], // Added Playfair Display font
         'poppins': ['Poppins', 'system-ui', 'sans-serif'], // Added Poppins font
         'opensans': ['Open Sans', 'system-ui', 'sans-serif'], // Added Open Sans font
+        'quattrocento': ['Quattrocento', 'serif'], // Added Quattrocento font
 			}
 		}
 	},
