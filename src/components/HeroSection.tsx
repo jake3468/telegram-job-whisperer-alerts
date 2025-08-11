@@ -20,14 +20,14 @@ const rocketAnimationPromise = (async () => {
     if (cachedData) {
       return JSON.parse(cachedData);
     }
-    
+
     // Fetch with high priority
     const response = await fetch(ROCKET_ANIMATION_URL, {
       cache: 'force-cache',
       priority: 'high'
     } as RequestInit);
     const animationData = await response.json();
-    
+
     // Cache for next time
     localStorage.setItem(CACHE_KEY, JSON.stringify(animationData));
     return animationData;
@@ -66,7 +66,6 @@ const HeroSection = () => {
         setShowParticles(true);
       }
     };
-    
     loadAnimation();
   }, []);
   const goToDashboard = () => {
@@ -136,7 +135,7 @@ const HeroSection = () => {
             Go to Dashboard
           </button>
         </SignedIn>
-        <p className="mt-2 font-inter drop-shadow shadow-black text-emerald-300 text-xs">No credit card required. Start with 30 free credits.</p>
+        
       </div>
     </section>;
 };
