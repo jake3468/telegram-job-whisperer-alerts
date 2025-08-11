@@ -73,12 +73,7 @@ const HeroSection = () => {
     navigate('/dashboard');
   };
   return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-2 overflow-hidden bg-black">
-      {/* Animated Cosmic Stars Background - Positioned between headline and paragraph */}
-      {showParticles && <div className="absolute left-0 right-0 z-0 overflow-hidden" style={{top: '45%', height: '25%'}}>
-          <Suspense fallback={null}>
-            <Particles particleColors={['#ffffff', '#ffffff']} particleCount={300} particleSpread={6} speed={0.08} particleBaseSize={60} moveParticlesOnHover={false} alphaParticles={false} disableRotation={false} />
-          </Suspense>
-        </div>}
+      {/* Particle animation hidden for now */}
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
