@@ -44,7 +44,7 @@ const HeroSection = () => {
   } = useUser();
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
   const [showParticles, setShowParticles] = useState(false);
-  const fullText = 'AI finds your next job while you sleep';
+  const fullText = 'We search for your next job while you focus on living your life';
   useEffect(() => {
     if (isLoaded && user) {
       navigate('/dashboard');
