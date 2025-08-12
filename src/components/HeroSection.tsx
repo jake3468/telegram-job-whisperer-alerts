@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import Lottie from 'lottie-react';
 import LightRays from './LightRays';
+import { useIsMobile } from '../hooks/use-mobile';
 
 // Preload rocket animation immediately when module loads
 const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json';
@@ -40,6 +41,7 @@ const HeroSection = () => {
     isLoaded
   } = useUser();
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
+  const isMobile = useIsMobile();
   const fullText = 'AI finds your next job while you sleep';
   useEffect(() => {
     if (isLoaded && user) {
@@ -65,19 +67,20 @@ const HeroSection = () => {
     navigate('/dashboard');
   };
   return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-2 overflow-hidden bg-black">
-      {/* Light rays background animation with responsive length for mobile */}
+      {/* Light rays background animation with enhanced mobile configuration */}
       <div className="absolute inset-0 z-0">
         <LightRays
           raysOrigin="top-center"
           raysColor="#00ffff"
-          raysSpeed={1.5}
-          lightSpread={0.8}
-          rayLength={window.innerWidth < 768 ? 6.0 : 4.0}
-          fadeDistance={window.innerWidth < 768 ? 5.0 : 3.0}
+          raysSpeed={isMobile ? 2.8 : 1.5}
+          lightSpread={isMobile ? 1.4 : 0.8}
+          rayLength={isMobile ? 8.5 : 4.0}
+          fadeDistance={isMobile ? 7.0 : 3.0}
           followMouse={true}
-          mouseInfluence={0.1}
-          noiseAmount={0.1}
-          distortion={0.05}
+          mouseInfluence={isMobile ? 0.15 : 0.1}
+          noiseAmount={isMobile ? 0.15 : 0.1}
+          distortion={isMobile ? 0.08 : 0.05}
+          pulsating={isMobile ? true : false}
           className="w-full h-full"
         />
       </div>
