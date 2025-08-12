@@ -177,7 +177,7 @@ const Profile = () => {
             <div className="text-gray-100 font-inter font-light text-left text-sm space-y-3">
               <p>☺️ Thank you for choosing us. We are here to do everything we can to help you land your next job faster and with less stress. You focus on your goals, and we will make sure the right opportunities reach you before anyone else.</p>
               
-              <p>🚀 Your journey starts with personalized <span className="italic text-yellow-300">job alerts</span>. Turn them on right now so you are the first to know when roles matching your chosen title and location appear. Our alerts are faster and more relevant than LinkedIn or Indeed because they are tailored to what you set.</p>
+              <p>🚀 Your journey starts with personalized <span className="italic text-yellow-300">job alerts</span>. Turn them on right now by following the below steps, so you are the first to know when roles matching your chosen title and location appear. Our alerts are faster and more relevant than LinkedIn or Indeed because they are tailored to what you set.</p>
               
               <p>⏳ Without alerts, the best jobs could pass you by before you even see them. Every day without alerts is a missed opportunity.</p>
               
