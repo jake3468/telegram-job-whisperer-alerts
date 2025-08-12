@@ -86,8 +86,9 @@ const HeroSection = () => {
       <div className="text-center max-w-4xl mx-auto z-20 relative">
         {/* Trust Badge */}
         <div className="mb-3">
-          <div className="inline-flex items-center px-2 py-0.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-medium">
-            🛡️ Trusted by 1000+ Professionals
+          <div className="inline-flex items-center px-2 py-0.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-xs font-medium">
+            <span className="text-transparent" style={{ color: 'initial' }}>🛡️</span>
+            <span className="text-white ml-1">Trusted by 1000+ Professionals</span>
           </div>
         </div>
         
