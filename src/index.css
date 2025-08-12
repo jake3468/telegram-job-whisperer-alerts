@@ -95,5 +95,31 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;  /* Safari and Chrome */
 }
-}
 
+/* Brush stroke color token */
+:root { --brush-blue: 200 95% 75%; }
+.dark { --brush-blue: 200 90% 70%; }
+
+/* Brush stroke effect for hero headline */
+.brush-stroke-text {
+  position: relative;
+  display: inline;
+  padding: 0 0.15em;
+}
+.brush-stroke-text::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%) rotate(-1deg);
+  bottom: 0.12em;
+  width: 108%;
+  height: 0.6em;
+  background:
+    radial-gradient(60% 60% at 12% 50%, hsl(var(--brush-blue) / 0.85) 0 60%, transparent 61%),
+    radial-gradient(60% 60% at 88% 50%, hsl(var(--brush-blue) / 0.85) 0 60%, transparent 61%),
+    linear-gradient(hsl(var(--brush-blue) / 0.9), hsl(var(--brush-blue) / 0.9));
+  border-radius: 9999px;
+  filter: blur(0.4px);
+  box-shadow: 0 2px 10px hsl(var(--brush-blue) / 0.35);
+}
+}
