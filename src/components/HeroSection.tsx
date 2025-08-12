@@ -84,7 +84,7 @@ const HeroSection = () => {
         {/* Black background to block particles behind headline */}
         <div className="relative">
           <div className="absolute inset-0 bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
-          <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-quattrocento tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)]">We hunt your <span className="italic font-bold bg-gradient-to-r from-[#00BFFF] via-[#1E90FF] to-[#0080FF] bg-clip-text text-transparent drop-shadow-lg [text-shadow:_0_0_25px_rgba(0,191,255,0.9)] tracking-normal">jobs</span> so you can live life.</h1>
+          <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-quattrocento tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)]">Apply to <span className="italic font-bold bg-gradient-to-r from-[#00BFFF] via-[#1E90FF] to-[#0080FF] bg-clip-text text-transparent drop-shadow-lg [text-shadow:_0_0_25px_rgba(0,191,255,0.9)] tracking-normal">jobs</span> 10x quicker.</h1>
         </div>
         
         {/* Lottie Animation */}
