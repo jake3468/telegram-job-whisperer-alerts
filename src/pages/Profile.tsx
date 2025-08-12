@@ -18,7 +18,6 @@ import { RefreshCw, Copy } from 'lucide-react';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useToast } from '@/hooks/use-toast';
 import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
-
 const Profile = () => {
   const {
     user,
@@ -58,7 +57,6 @@ const Profile = () => {
   const [lastJWTTestResult, setLastJWTTestResult] = useState<any>(null);
   const [profileDataLoaded, setProfileDataLoaded] = useState(false);
   const [showResumeHelp, setShowResumeHelp] = useState(false);
-
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
@@ -119,7 +117,6 @@ const Profile = () => {
       window.location.reload();
     }
   }, [connectionIssue, checkJWTSetup, updateActivity]);
-
   const detectAndStoreLocation = async () => {
     // Only detect location if it hasn't been set yet
     if (userProfile?.user_location) {
@@ -165,13 +162,11 @@ const Profile = () => {
       }
     }
   };
-
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-gradient-to-br from-pastel-peach via-pastel-blue to-pastel-mint flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading user...</div>
       </div>;
   }
-
   return <Layout>
       <div className="text-center mb-8" onClick={updateActivity}>
         <div className="flex items-center justify-between mb-4">
@@ -270,9 +265,7 @@ const Profile = () => {
 
           {/* Create Job Alerts Link Section */}
           <div className="text-center space-y-3 mt-6">
-            <p className="text-gray-300 font-inter text-sm">
-              If you've completed the above steps and activated your Telegram Job Alerts Bot, click below to go to the Create Job Alerts page:
-            </p>
+            <p className="text-gray-300 font-inter text-sm">If you've completed the above step and activated your Telegram Job Alerts Bot, click below to go to the Create Job Alerts page:</p>
             <Button onClick={() => {
           updateActivity();
           navigate('/job-alerts');
@@ -328,5 +321,4 @@ const Profile = () => {
       <ResumeHelpPopup isOpen={showResumeHelp} onClose={() => setShowResumeHelp(false)} userProfileId={userProfile?.id} />
     </Layout>;
 };
-
 export default Profile;
