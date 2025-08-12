@@ -119,6 +119,7 @@ export default {
         'poppins': ['Poppins', 'system-ui', 'sans-serif'], // Added Poppins font
         'opensans': ['Open Sans', 'system-ui', 'sans-serif'], // Added Open Sans font
         'quattrocento': ['Quattrocento', 'serif'], // Added Quattrocento font
+        'gilroy': ['Manrope', 'system-ui', 'sans-serif'], // Added Gilroy-like font (Manrope)
 			}
 		}
 	},

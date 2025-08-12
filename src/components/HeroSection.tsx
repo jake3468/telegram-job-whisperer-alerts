@@ -94,7 +94,7 @@ const HeroSection = () => {
         {/* Black background to block particles behind headline */}
         <div className="relative">
           <div className="absolute inset-0 bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
-          <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-quattrocento tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">Your AI shortcut to more <span className="italic">job</span> offers.</h1>
+          <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-sans tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">Your AI shortcut to more <span className="italic">job</span> offers. 🎯</h1>
         </div>
         
         {/* Lottie Animation */}
@@ -120,7 +120,7 @@ const HeroSection = () => {
           </div>
         </div>
 
-        <p className="text-white mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-poppins font-light leading-relaxed drop-shadow-lg md:text-base text-sm [text-shadow:_0_1px_2px_rgba(0,0,0,0.8)] text-center">
+        <p className="text-white mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-lg md:text-base text-sm [text-shadow:_0_1px_2px_rgba(0,0,0,0.8)] text-center">
           Perfect job matches delivered to your{' '}
           <span className="font-bold italic bg-gradient-to-r from-[#00D4FF] to-[#0099FF] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,212,255,0.8)]">Telegram</span>
           {' '}like personal messages.{' '}
