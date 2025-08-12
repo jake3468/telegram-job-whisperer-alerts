@@ -174,7 +174,7 @@ const Profile = () => {
             <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-2">
               Welcome, <span className="italic bg-gradient-to-r from-pastel-peach to-pastel-mint bg-clip-text text-transparent">{user.firstName || 'User'}</span>
             </h1>
-            <p className="text-zinc-50 font-inter font-light text-left text-base drop-shadow-lg [text-shadow:_0_1px_2px_rgba(0,0,0,0.8)] [filter:brightness(1.1)_contrast(1.05)]">
+            <p className="text-gray-100 font-inter font-light text-left text-sm">
               Start by setting up your personalized <span className="italic text-yellow-300">job alerts</span>. Once they're active, upload your latest <span className="italic text-purple-300">resume</span> and <span className="italic text-green-300">bio</span> to apply faster, transform your job search, and stand out as a top applicant.
             </p>
           </div>
