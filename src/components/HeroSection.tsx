@@ -120,7 +120,7 @@ const HeroSection = () => {
           </div>
         </div>
 
-        <p className="text-white mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-lg md:text-base text-sm [text-shadow:_0_1px_2px_rgba(0,0,0,0.8)] text-center">
+        <p className="text-zinc-50 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
           Perfect job matches delivered to your{' '}
           <span className="font-bold italic bg-gradient-to-r from-[#00D4FF] to-[#0099FF] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,212,255,0.8)]">Telegram</span>
           {' '}like personal messages.{' '}
