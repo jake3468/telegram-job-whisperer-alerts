@@ -281,7 +281,7 @@ const Profile = () => {
 
           {/* Your Profile heading */}
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-orbitron font-bold italic"><span className="mr-2">🪪</span><span className="bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-blue-200">Your Profile</span></h2>
+            <h2 className="text-2xl font-orbitron font-bold italic"><span className="mr-2 not-italic">🪪</span><span className="bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-blue-200">Your Profile</span></h2>
           </div>
 
           {/* Resume Section */}
