@@ -93,7 +93,7 @@ const HeroSection = () => {
               {showParticles && (
                 <Suspense fallback={null}>
                   <Particles 
-                    className="absolute inset-0 w-full h-full"
+                    className="absolute inset-0 w-full h-full z-0"
                     particleSpread={3}
                     speed={0.2}
                     particleBaseSize={50}
@@ -106,7 +106,7 @@ const HeroSection = () => {
             height: '100%',
             filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))',
             position: 'relative',
-            zIndex: 10
+            zIndex: 20
           }} />
             </div>
           </div>}
