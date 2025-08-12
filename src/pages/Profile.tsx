@@ -181,7 +181,7 @@ const Profile = () => {
               
               <p>⏳ Without alerts, the best jobs could pass you by before you even see them. Every day without alerts is a missed opportunity.</p>
               
-              <p>📄 Once your alerts are live, you can upload your <span className="italic text-purple-300">resume</span> and <span className="italic text-green-300">bio</span> so every application hits with speed and precision.</p>
+              <p>📄 Once your alerts are live, you can then upload your <span className="italic text-purple-300">resume</span> and <span className="italic text-green-300">bio</span> so every application hits with speed and precision.</p>
             </div>
           </div>
           
