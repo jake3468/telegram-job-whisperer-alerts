@@ -72,8 +72,8 @@ const HeroSection = () => {
           raysColor="#00ffff"
           raysSpeed={1.5}
           lightSpread={0.8}
-          rayLength={2.5}
-          fadeDistance={2.0}
+          rayLength={4.0}
+          fadeDistance={3.0}
           followMouse={true}
           mouseInfluence={0.1}
           noiseAmount={0.1}
