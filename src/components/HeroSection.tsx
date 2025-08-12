@@ -101,13 +101,15 @@ const HeroSection = () => {
                   />
                 </Suspense>
               )}
-              <Lottie animationData={lottieAnimationData} loop={true} autoplay={true} style={{
-            width: '100%',
-            height: '100%',
-            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))',
-            position: 'relative',
-            zIndex: 20
-          }} />
+              <Lottie 
+                animationData={lottieAnimationData} 
+                loop={true} 
+                autoplay={true} 
+                className="absolute inset-0 w-full h-full z-10"
+                style={{
+                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
+                }} 
+              />
             </div>
           </div>}
         
