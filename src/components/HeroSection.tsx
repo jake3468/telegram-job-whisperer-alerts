@@ -78,9 +78,7 @@ const HeroSection = () => {
       <div className="text-center max-w-4xl mx-auto z-20 relative">
         {/* Premium Badge */}
         <div className="mb-3">
-          <span className="inline-flex items-center px-3 py-1 text-xs font-medium bg-white/10 text-white rounded-full backdrop-blur-sm border border-white/20">
-            🌟 Premium AI Career Platform
-          </span>
+          
         </div>
         
         {/* Black background to block particles behind headline */}
