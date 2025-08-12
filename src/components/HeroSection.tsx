@@ -89,11 +89,24 @@ const HeroSection = () => {
         
         {/* Lottie Animation */}
         {lottieAnimationData && <div className="flex justify-center mt-2 mb-4">
-            <div className="w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64">
+            <div className="relative w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64">
+              {showParticles && (
+                <Suspense fallback={null}>
+                  <Particles 
+                    className="absolute inset-0 w-full h-full"
+                    particleSpread={3}
+                    speed={0.2}
+                    particleBaseSize={50}
+                    alphaParticles={true}
+                  />
+                </Suspense>
+              )}
               <Lottie animationData={lottieAnimationData} loop={true} autoplay={true} style={{
             width: '100%',
             height: '100%',
-            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
+            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))',
+            position: 'relative',
+            zIndex: 10
           }} />
             </div>
           </div>}
