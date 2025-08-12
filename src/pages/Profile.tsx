@@ -18,6 +18,7 @@ import { RefreshCw, Copy } from 'lucide-react';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useToast } from '@/hooks/use-toast';
 import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
+
 const Profile = () => {
   const {
     user,
@@ -56,6 +57,7 @@ const Profile = () => {
   const [lastJWTTestResult, setLastJWTTestResult] = useState<any>(null);
   const [profileDataLoaded, setProfileDataLoaded] = useState(false);
   const [showResumeHelp, setShowResumeHelp] = useState(false);
+
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
@@ -136,11 +138,13 @@ const Profile = () => {
       }
     }
   };
+
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-gradient-to-br from-pastel-peach via-pastel-blue to-pastel-mint flex items-center justify-center">
         <div className="text-fuchsia-900 text-xs">Loading user...</div>
       </div>;
   }
+
   return <Layout>
       <div className="text-center mb-8" onClick={updateActivity}>
         <div className="flex items-center justify-between mb-4">
@@ -149,7 +153,7 @@ const Profile = () => {
               Welcome, <span className="italic bg-gradient-to-r from-pastel-peach to-pastel-mint bg-clip-text text-transparent">{user.firstName || 'User'}</span>
             </h1>
             <p className="text-gray-100 font-inter font-light text-left text-base">
-              Complete 3 quick steps to apply faster, transform your job search, and stand out as a top applicant. Add your <span className="italic text-green-300">resume</span> and <span className="italic text-pastel-blue">bio</span>, then set up personalized <span className="italic text-amber-200">job alerts</span>.
+              Complete your profile to apply faster, transform your job search, and stand out as a top applicant. Add your <span className="italic text-green-300">resume</span> and <span className="italic text-pastel-blue">bio</span>, then set up personalized <span className="italic text-amber-200">job alerts</span>.
             </p>
           </div>
           
@@ -180,44 +184,9 @@ const Profile = () => {
             </p>
           </div>
         </div> : <div className="max-w-4xl mx-auto space-y-8 px-4" onClick={updateActivity} onKeyDown={updateActivity}>
-          {/* Step 1: Resume Section */}
+          {/* Create Telegram Job Alerts */}
           <div className="space-y-4">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-sky-700 to-fuchsia-700 rounded-full flex items-center justify-center font-bold text-white text-sm shadow-lg">
-                1
-              </div>
-              <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-sky-400 to-fuchsia-400 bg-clip-text text-transparent">Add Current Resume</h2>
-            </div>
-            <ResumeSection updateActivity={updateActivity} />
-            <div className="mt-4 mb-6 text-center">
-              <Button onClick={() => {
-            updateActivity();
-            setShowResumeHelp(true);
-          }} variant="outline" size="sm" className="border-sky-200 hover:border-sky-300 text-white bg-black">
-                Need help fixing your resume ?
-              </Button>
-            </div>
-          </div>
-
-          {/* Step 2: Bio Section */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-teal-700 to-emerald-700 rounded-full flex items-center justify-center font-bold text-white text-sm shadow-lg">
-                2
-              </div>
-              <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-pastel-lavender to-pastel-mint bg-clip-text text-transparent">
-                Add Your Bio
-              </h2>
-            </div>
-            <ProfessionalBioSection />
-          </div>
-
-          {/* Step 3: Job Alerts */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-400 rounded-full flex items-center justify-center font-bold text-black text-sm shadow-lg border-2 border-amber-300">
-                3
-              </div>
               <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Create Telegram Job Alerts</h2>
             </div>
             <div className="rounded-3xl border-2 border-amber-400/50 bg-gradient-to-br from-amber-900/20 via-orange-900/10 to-yellow-900/20 p-6">
@@ -273,7 +242,7 @@ const Profile = () => {
           {/* Create Job Alerts Link Section */}
           <div className="text-center space-y-3 mt-6">
             <p className="text-gray-300 font-inter text-sm">
-              If you've completed the above 3 steps and activated your Telegram Job Alerts Bot, click below to go to the Create Job Alerts page:
+              If you've completed the above steps and activated your Telegram Job Alerts Bot, click below to go to the Create Job Alerts page:
             </p>
             <Button onClick={() => {
           updateActivity();
@@ -281,6 +250,42 @@ const Profile = () => {
         }} variant="outline" className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-blue-400/30 font-semibold text-zinc-950 bg-cyan-400 hover:bg-cyan-300">
               🚀 Create Job Alerts
             </Button>
+          </div>
+
+          {/* Horizontal separator */}
+          <div className="flex items-center my-8">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent"></div>
+          </div>
+
+          {/* Your Profile heading */}
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-orbitron font-bold bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent">Your Profile</h2>
+          </div>
+
+          {/* Resume Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-sky-400 to-fuchsia-400 bg-clip-text text-transparent">Add Current Resume</h2>
+            </div>
+            <ResumeSection updateActivity={updateActivity} />
+            <div className="mt-4 mb-6 text-center">
+              <Button onClick={() => {
+            updateActivity();
+            setShowResumeHelp(true);
+          }} variant="outline" size="sm" className="border-sky-200 hover:border-sky-300 text-white bg-black">
+                Need help fixing your resume ?
+              </Button>
+            </div>
+          </div>
+
+          {/* Bio Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-pastel-lavender to-pastel-mint bg-clip-text text-transparent">
+                Add Your Bio
+              </h2>
+            </div>
+            <ProfessionalBioSection />
           </div>
         </div>}
       
@@ -294,4 +299,5 @@ const Profile = () => {
       <ResumeHelpPopup isOpen={showResumeHelp} onClose={() => setShowResumeHelp(false)} userProfileId={userProfile?.id} />
     </Layout>;
 };
+
 export default Profile;
