@@ -3,10 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import Lottie from 'lottie-react';
-import { lazy, Suspense } from 'react';
-
-// Lazy load particles for performance
-const Particles = lazy(() => import('./Particles'));
+import LightRays from './LightRays';
 
 // Preload rocket animation immediately when module loads
 const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json';
@@ -43,7 +40,6 @@ const HeroSection = () => {
     isLoaded
   } = useUser();
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
-  const [showParticles, setShowParticles] = useState(false);
   const fullText = 'AI finds your next job while you sleep';
   useEffect(() => {
     if (isLoaded && user) {
@@ -61,9 +57,6 @@ const HeroSection = () => {
         }
       } catch (error) {
         console.error('Failed to load rocket animation:', error);
-      } finally {
-        // Always show particles
-        setShowParticles(true);
       }
     };
     loadAnimation();
@@ -72,40 +65,46 @@ const HeroSection = () => {
     navigate('/dashboard');
   };
   return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-2 overflow-hidden bg-black">
-      {/* Particle animation hidden for now */}
+      {/* Light rays background animation with responsive length for mobile */}
+      <div className="absolute inset-0 z-0">
+        <LightRays
+          raysOrigin="top-center"
+          raysColor="#00ffff"
+          raysSpeed={1.5}
+          lightSpread={0.8}
+          rayLength={window.innerWidth < 768 ? 6.0 : 4.0}
+          fadeDistance={window.innerWidth < 768 ? 5.0 : 3.0}
+          followMouse={true}
+          mouseInfluence={0.1}
+          noiseAmount={0.1}
+          distortion={0.05}
+          className="w-full h-full"
+        />
+      </div>
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
-        {/* Premium Badge */}
+        {/* Trust Badge */}
         <div className="mb-3">
-          
+          <div className="inline-flex items-center px-2 py-0.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white text-xs font-medium">
+            🛡️ Trusted by 1000+ Professionals
+          </div>
         </div>
         
         {/* Black background to block particles behind headline */}
         <div className="relative">
           <div className="absolute inset-0 bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
-          <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-quattrocento tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)]">Apply to <span className="italic font-bold bg-gradient-to-r from-[#00BFFF] via-[#1E90FF] to-[#0080FF] bg-clip-text text-transparent drop-shadow-lg [text-shadow:_0_0_25px_rgba(0,191,255,0.9)] tracking-normal">jobs</span> 10x faster.</h1>
+          <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-quattrocento tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">Your AI shortcut to more <span className="italic">job</span> offers.</h1>
         </div>
         
         {/* Lottie Animation */}
         {lottieAnimationData && <div className="flex justify-center mt-2 mb-4">
             <div className="relative w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64">
-              {showParticles && (
-                <Suspense fallback={null}>
-                  <Particles 
-                    className="absolute inset-0 w-full h-full z-0"
-                    particleSpread={3}
-                    speed={0.2}
-                    particleBaseSize={50}
-                    alphaParticles={true}
-                  />
-                </Suspense>
-              )}
               <Lottie 
                 animationData={lottieAnimationData} 
                 loop={true} 
                 autoplay={true} 
-                className="absolute inset-0 w-full h-full z-10"
+                className="w-full h-full z-10 relative"
                 style={{
                   filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
                 }} 
