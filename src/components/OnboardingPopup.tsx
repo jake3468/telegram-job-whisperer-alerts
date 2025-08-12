@@ -18,38 +18,10 @@ export function OnboardingPopup({
   const [currentStep, setCurrentStep] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
   const {
-    userProfile,
-    updateUserProfile
+    userProfile
   } = useCachedUserProfile();
-  const detectAndStoreLocation = async () => {
-    // Only detect location if it hasn't been set yet
-    if (userProfile?.user_location) {
-      return;
-    }
-    try {
-      // Use a free IP geolocation service to detect location
-      const response = await fetch('https://ipapi.co/json/');
-      const data = await response.json();
-
-      // Check if the user is in India based on country code
-      const isInIndia = data.country_code === 'IN';
-      const location = isInIndia ? 'india' : 'global';
-
-      // Update user profile with location
-      await updateUserProfile({
-        user_location: location
-      });
-    } catch (error) {
-      // Fallback to 'global' if detection fails
-      await updateUserProfile({
-        user_location: 'global'
-      });
-    }
-  };
-  const nextStep = async () => {
+  const nextStep = () => {
     if (currentStep < 1) {
-      // Detect and store location on first next click
-      await detectAndStoreLocation();
       setCurrentStep(currentStep + 1);
       // Scroll to top of content
       setTimeout(() => {
@@ -72,9 +44,7 @@ export function OnboardingPopup({
       }, 0);
     }
   };
-  const handleClose = async () => {
-    // Detect and store location when closing popup
-    await detectAndStoreLocation();
+  const handleClose = () => {
     setCurrentStep(0);
     onClose();
   };

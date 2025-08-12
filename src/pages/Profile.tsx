@@ -30,7 +30,8 @@ const Profile = () => {
     executeWithRetry
   } = useEnterpriseAuth();
   const {
-    userProfile
+    userProfile,
+    updateUserProfile
   } = useUserProfile();
   const {
     runComprehensiveJWTTest
@@ -118,6 +119,32 @@ const Profile = () => {
       window.location.reload();
     }
   }, [connectionIssue, checkJWTSetup, updateActivity]);
+
+  const detectAndStoreLocation = async () => {
+    // Only detect location if it hasn't been set yet
+    if (userProfile?.user_location) {
+      return;
+    }
+    try {
+      // Use a free IP geolocation service to detect location
+      const response = await fetch('https://ipapi.co/json/');
+      const data = await response.json();
+
+      // Check if the user is in India based on country code
+      const isInIndia = data.country_code === 'IN';
+      const location = isInIndia ? 'india' : 'global';
+
+      // Update user profile with location
+      await updateUserProfile({
+        user_location: location
+      });
+    } catch (error) {
+      // Fallback to 'global' if detection fails
+      await updateUserProfile({
+        user_location: 'global'
+      });
+    }
+  };
 
   // Copy user profile ID to clipboard
   const copyUserProfileId = async () => {
@@ -232,8 +259,10 @@ const Profile = () => {
                   </div>}
               </div>
               
-              <Button onClick={() => {
+              <Button onClick={async () => {
             updateActivity();
+            // Detect and store location when activating the bot
+            await detectAndStoreLocation();
             window.open('https://t.me/Job_AI_update_bot', '_blank');
           }} className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter text-sm">Activate the Bot</Button>
             </div>
