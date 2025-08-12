@@ -65,15 +65,15 @@ const HeroSection = () => {
     navigate('/dashboard');
   };
   return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-2 overflow-hidden bg-black">
-      {/* Light rays background animation */}
+      {/* Light rays background animation with responsive length for mobile */}
       <div className="absolute inset-0 z-0">
         <LightRays
           raysOrigin="top-center"
           raysColor="#00ffff"
           raysSpeed={1.5}
           lightSpread={0.8}
-          rayLength={4.0}
-          fadeDistance={3.0}
+          rayLength={window.innerWidth < 768 ? 6.0 : 4.0}
+          fadeDistance={window.innerWidth < 768 ? 5.0 : 3.0}
           followMouse={true}
           mouseInfluence={0.1}
           noiseAmount={0.1}
