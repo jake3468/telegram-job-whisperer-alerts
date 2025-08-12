@@ -172,7 +172,7 @@ const Profile = () => {
         <div className="flex items-center justify-between mb-4">
           <div className="flex-1">
             <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow mb-2">
-              Welcome, <span className="italic bg-gradient-to-r from-pastel-peach to-pastel-mint bg-clip-text text-transparent">{user.firstName || 'User'}</span>
+              🎉 Welcome, <span className="italic bg-gradient-to-r from-pastel-peach to-pastel-mint bg-clip-text text-transparent">{user.firstName || 'User'}</span>
             </h1>
             <p className="text-gray-100 font-inter font-light text-left text-sm">
               Start by setting up your personalized <span className="italic text-yellow-300">job alerts</span>. Once they're active, upload your latest <span className="italic text-purple-300">resume</span> and <span className="italic text-green-300">bio</span> to apply faster, transform your job search, and stand out as a top applicant.
@@ -209,7 +209,7 @@ const Profile = () => {
           {/* Create Telegram Job Alerts */}
           <div className="space-y-4">
             <div className="flex items-center gap-3 mb-4">
-              <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Create Your Job Alerts Now</h2>
+              <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">📢 Create Your Job Alerts Now</h2>
             </div>
             <div className="rounded-3xl border-2 border-amber-400/50 bg-gradient-to-br from-amber-900/20 via-orange-900/10 to-yellow-900/20 p-6">
               <div className="text-amber-100 font-inter mb-4 text-base space-y-2">
@@ -259,7 +259,7 @@ const Profile = () => {
             // Detect and store location when activating the bot
             await detectAndStoreLocation();
             window.open('https://t.me/Job_AI_update_bot', '_blank');
-          }} className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter text-sm">Activate the Bot</Button>
+          }} className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter text-sm">🚀 Activate the Bot</Button>
             </div>
           </div>
 
@@ -281,13 +281,13 @@ const Profile = () => {
 
           {/* Your Profile heading */}
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-orbitron font-bold italic bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-blue-200">Your Profile</h2>
+            <h2 className="text-2xl font-orbitron font-bold italic bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-blue-200">🪪 Your Profile</h2>
           </div>
 
           {/* Resume Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-3 mb-4">
-              <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-sky-400 to-fuchsia-400 bg-clip-text text-transparent">Add Current Resume</h2>
+              <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-sky-400 to-fuchsia-400 bg-clip-text text-transparent">📑 Add Current Resume</h2>
             </div>
             <ResumeSection updateActivity={updateActivity} />
             <div className="mt-4 mb-6 text-center">
@@ -304,7 +304,7 @@ const Profile = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-3 mb-4">
               <h2 className="text-xl font-orbitron font-bold bg-gradient-to-r from-pastel-lavender to-pastel-mint bg-clip-text text-transparent">
-                Add Your Bio
+                ✏️ Add Your Bio
               </h2>
             </div>
             <ProfessionalBioSection />
