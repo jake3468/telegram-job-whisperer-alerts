@@ -175,7 +175,7 @@ const Profile = () => {
               <span className="mr-2">🎉</span><span className="bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent">Welcome, </span><span className="italic bg-gradient-to-r from-pastel-peach to-pastel-mint bg-clip-text text-transparent">{user.firstName || 'User'}</span>
             </h1>
             <p className="text-gray-100 font-inter font-light text-left text-sm">
-              Start by setting up your personalized <span className="italic text-yellow-300">job alerts</span>. Once they're active, upload your latest <span className="italic text-purple-300">resume</span> and <span className="italic text-green-300">bio</span> to apply faster, transform your job search, and stand out as a top applicant.
+              ☺️ Thank you for choosing us. We are here to do everything we can to help you land your next job faster and with less stress. You focus on your goals, and we will make sure the right opportunities reach you before anyone else. 🚀 Your journey starts with personalized <span className="italic text-yellow-300">job alerts</span>. Turn them on right now so you are the first to know when roles matching your chosen title and location appear. Our alerts are faster and more relevant than LinkedIn or Indeed because they are tailored to what you set. ⏳ Without alerts, the best jobs could pass you by before you even see them. Every day without alerts is a missed opportunity. 📄 Once your alerts are live, you can upload your <span className="italic text-purple-300">resume</span> and <span className="italic text-green-300">bio</span> so every application hits with speed and precision.
             </p>
           </div>
           
