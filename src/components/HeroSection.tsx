@@ -78,27 +78,38 @@ const HeroSection = () => {
       <div className="text-center max-w-4xl mx-auto z-20 relative">
         {/* Premium Badge */}
         <div className="mb-3">
-          <span className="inline-flex items-center px-3 py-1 text-xs font-medium bg-white/10 text-white rounded-full backdrop-blur-sm border border-white/20">
-            🌟 Premium AI Career Platform
-          </span>
+          
         </div>
         
         {/* Black background to block particles behind headline */}
         <div className="relative">
           <div className="absolute inset-0 bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
-          <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-quattrocento tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)]">
-            We search for your next job while you focus on living your life.
-          </h1>
+          <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-quattrocento tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)]">Apply to <span className="italic font-bold bg-gradient-to-r from-[#00BFFF] via-[#1E90FF] to-[#0080FF] bg-clip-text text-transparent drop-shadow-lg [text-shadow:_0_0_25px_rgba(0,191,255,0.9)] tracking-normal">jobs</span> 10x quicker.</h1>
         </div>
         
         {/* Lottie Animation */}
         {lottieAnimationData && <div className="flex justify-center mt-2 mb-4">
-            <div className="w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64">
-              <Lottie animationData={lottieAnimationData} loop={true} autoplay={true} style={{
-            width: '100%',
-            height: '100%',
-            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
-          }} />
+            <div className="relative w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64">
+              {showParticles && (
+                <Suspense fallback={null}>
+                  <Particles 
+                    className="absolute inset-0 w-full h-full z-0"
+                    particleSpread={3}
+                    speed={0.2}
+                    particleBaseSize={50}
+                    alphaParticles={true}
+                  />
+                </Suspense>
+              )}
+              <Lottie 
+                animationData={lottieAnimationData} 
+                loop={true} 
+                autoplay={true} 
+                className="absolute inset-0 w-full h-full z-10"
+                style={{
+                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
+                }} 
+              />
             </div>
           </div>}
         
