@@ -80,7 +80,7 @@ const ComparisonSlider = () => {
   ];
 
   return (
-    <section className="py-16 px-4 bg-black relative overflow-hidden">
+    <section className="pt-8 pb-16 px-4 bg-black relative overflow-hidden">
       <div className="max-w-6xl mx-auto">
         <div 
           ref={containerRef}
