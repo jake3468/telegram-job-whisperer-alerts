@@ -3,9 +3,16 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 const ComparisonSlider = () => {
   const isMobile = useIsMobile();
-  const [sliderPosition, setSliderPosition] = useState(isMobile ? 75 : 50);
+  const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Update slider position based on mobile state
+  React.useEffect(() => {
+    if (!isDragging) {
+      setSliderPosition(isMobile ? 75 : 50);
+    }
+  }, [isMobile, isDragging]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     setIsDragging(true);
