@@ -84,14 +84,20 @@ const ComparisonSlider = () => {
       <div className="max-w-6xl mx-auto">
         <div 
           ref={containerRef}
-          className="relative h-auto min-h-[500px] rounded-2xl overflow-hidden shadow-2xl cursor-grab active:cursor-grabbing"
+          className="relative rounded-2xl overflow-hidden shadow-2xl cursor-grab active:cursor-grabbing"
           style={{ userSelect: 'none' }}
         >
           {/* Left Side - Without Aspirely.ai */}
           <div 
-            className="absolute inset-0 bg-gradient-to-br from-red-950 to-red-900 p-4 md:p-6 flex flex-col font-sans"
+            className="bg-gradient-to-br from-red-950 to-red-900 p-4 md:p-6 font-sans"
             style={{ 
-              clipPath: `polygon(0 0, ${sliderPosition}% 0, ${sliderPosition}% 100%, 0 100%)` 
+              clipPath: `polygon(0 0, ${sliderPosition}% 0, ${sliderPosition}% 100%, 0 100%)`,
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 'fit-content',
+              minHeight: '100%'
             }}
           >
             <div className="flex items-center gap-3 mb-4">
@@ -103,7 +109,7 @@ const ComparisonSlider = () => {
             <p className="text-red-200 mb-4 text-sm md:text-base">
               Leaving now means repeating the same mistakes and missing better opportunities.
             </p>
-            <div className="space-y-2 flex-1">
+            <div className="space-y-2 pb-4">
               {withoutItems.map((item, index) => (
                 <div key={index} className="flex items-start gap-2">
                   <span className="text-red-400 text-base mt-0.5">❌</span>
@@ -117,9 +123,15 @@ const ComparisonSlider = () => {
 
           {/* Right Side - With Aspirely.ai */}
           <div 
-            className="absolute inset-0 bg-gradient-to-br from-green-950 to-green-900 p-4 md:p-6 flex flex-col font-sans"
+            className="bg-gradient-to-br from-green-950 to-green-900 p-4 md:p-6 font-sans"
             style={{ 
-              clipPath: `polygon(${sliderPosition}% 0, 100% 0, 100% 100%, ${sliderPosition}% 100%)` 
+              clipPath: `polygon(${sliderPosition}% 0, 100% 0, 100% 100%, ${sliderPosition}% 100%)`,
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 'fit-content',
+              minHeight: '100%'
             }}
           >
             <div className="flex items-center gap-3 mb-4">
@@ -131,11 +143,34 @@ const ComparisonSlider = () => {
             <p className="text-green-200 mb-4 text-sm md:text-base">
               This changes everything. Set up in less than 2 minutes and start getting results.
             </p>
-            <div className="space-y-2 flex-1">
+            <div className="space-y-2 pb-4">
               {withItems.map((item, index) => (
                 <div key={index} className="flex items-start gap-2">
                   <span className="text-green-400 text-base mt-0.5">✅</span>
                   <span className="text-green-100 text-xs md:text-sm leading-snug">
+                    {item}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Hidden content for height reference */}
+          <div className="invisible p-4 md:p-6 font-sans">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-2xl md:text-3xl">🚀</span>
+              <h3 className="text-xl md:text-2xl font-bold">
+                With Aspirely.ai
+              </h3>
+            </div>
+            <p className="mb-4 text-sm md:text-base">
+              This changes everything. Set up in less than 2 minutes and start getting results.
+            </p>
+            <div className="space-y-2 pb-4">
+              {withItems.map((item, index) => (
+                <div key={index} className="flex items-start gap-2">
+                  <span className="text-base mt-0.5">✅</span>
+                  <span className="text-xs md:text-sm leading-snug">
                     {item}
                   </span>
                 </div>
