@@ -64,7 +64,7 @@ const HeroSection = () => {
   const goToDashboard = () => {
     navigate('/dashboard');
   };
-  return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-2 overflow-hidden bg-black">
+  return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-0 overflow-hidden bg-black">
       {/* Light rays background animation with responsive length for mobile */}
       <div className="absolute inset-0 z-0">
         <LightRays
@@ -86,7 +86,7 @@ const HeroSection = () => {
       <div className="text-center max-w-4xl mx-auto z-20 relative">
         {/* Trust Badge */}
         <div className="mb-3">
-          <div className="inline-flex items-center px-2 py-0.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-xs font-medium">
+          <div className="inline-flex items-center px-1.5 py-0.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-xs font-medium">
             <span className="text-transparent" style={{ color: 'initial' }}>🛡️</span>
             <span className="text-white ml-1">Trusted by 1000+ Professionals</span>
           </div>
@@ -140,6 +140,9 @@ const HeroSection = () => {
               </button>
             </SignUpButton>
           </div>
+          <p className="text-white/80 text-sm font-medium mt-2 mb-0 font-sans">
+            It's 100% free to start. No credit card required!
+          </p>
         </SignedOut>
         <SignedIn>
           <button onClick={goToDashboard} className="bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-600 hover:from-sky-600 hover:to-blue-700 text-white px-12 py-4 text-lg sm:text-xl rounded-xl transition-all duration-300 font-inter font-bold shadow-2xl drop-shadow-xl hover:shadow-sky-500/60 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-sky-400/50 mb-2">

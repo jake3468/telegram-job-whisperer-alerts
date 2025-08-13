@@ -1,6 +1,7 @@
 
 import AuthHeader from "@/components/AuthHeader";
 import HeroSection from "@/components/HeroSection";
+import ComparisonSlider from "@/components/ComparisonSlider";
 import JobTrackerPreview from "@/components/JobTrackerPreview";
 import YouTubeShortPreview from "@/components/YouTubeShortPreview";
 import AboutUsSection from "@/components/AboutUsSection";
@@ -45,6 +46,7 @@ const Index = () => {
       {/* <SecurityHeaders /> - Temporarily disabled for debugging */}
       <AuthHeader />
       <HeroSection />
+      <ComparisonSlider />
       <JobTrackerPreview />
       <YouTubeShortPreview />
       <AboutUsSection />

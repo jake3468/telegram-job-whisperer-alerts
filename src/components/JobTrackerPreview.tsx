@@ -1,6 +1,6 @@
 const JobTrackerPreview = () => {
   return (
-    <section className="bg-black pt-2 pb-8 px-4 overflow-hidden">
+    <section className="bg-black pt-0 pb-8 px-4 overflow-hidden">
       <div className="max-w-6xl mx-auto">
         <div className="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] rounded-3xl overflow-hidden shadow-2xl border border-gray-800/50">
           <img 
