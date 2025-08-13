@@ -140,7 +140,7 @@ const HeroSection = () => {
               </button>
             </SignUpButton>
           </div>
-          <p className="text-white/80 text-sm font-medium mt-2 mb-0">
+          <p className="text-white/80 text-sm font-medium mt-2 mb-0 font-sans">
             It's 100% free to start. No credit card required!
           </p>
         </SignedOut>
