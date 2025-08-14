@@ -48,13 +48,8 @@ export const Step1ResumeUpload = ({
         </div>}
 
       {/* Resume Upload Section */}
-      <div className="relative flex-1">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-xl sm:rounded-2xl blur-xl"></div>
-        <Card className="relative bg-gray-900/40 backdrop-blur-sm border border-gray-700/50 rounded-xl sm:rounded-2xl shadow-2xl h-full">
-          <CardContent className="p-4 sm:p-6 h-full">
-            <ResumeSection updateActivity={updateActivity} />
-          </CardContent>
-        </Card>
+      <div className="flex-1">
+        <ResumeSection updateActivity={updateActivity} />
       </div>
     </div>;
 };
