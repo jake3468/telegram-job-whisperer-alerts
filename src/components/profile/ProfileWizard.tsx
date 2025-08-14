@@ -79,10 +79,10 @@ export const ProfileWizard = () => {
   }
 
   return (
-    <div className="w-full max-w-full px-3 py-4 sm:px-4 sm:py-8 sm:max-w-2xl md:max-w-4xl mx-auto overflow-x-hidden">
+    <div className="w-full max-w-full px-3 py-2 sm:px-4 sm:py-8 sm:max-w-2xl md:max-w-4xl mx-auto overflow-x-hidden min-h-screen flex flex-col">
       {/* Welcome Header */}
-      <div className="text-center mb-6 sm:mb-8">
-        <h1 className="font-extrabold text-xl sm:text-2xl md:text-4xl font-orbitron drop-shadow mb-2 break-words">
+      <div className="text-center mb-3 sm:mb-8">
+        <h1 className="font-extrabold text-lg sm:text-2xl md:text-4xl font-orbitron drop-shadow mb-1 break-words">
           <span className="mr-1 sm:mr-2">🎉</span>
           <span className="bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent">
             Welcome, 
@@ -91,25 +91,25 @@ export const ProfileWizard = () => {
             {user?.firstName || 'User'}
           </span>
         </h1>
-        <p className="text-gray-300 text-base sm:text-lg mt-2 px-2">Let's set up your profile in just 3 steps</p>
+        <p className="text-gray-300 text-sm sm:text-lg mt-1 px-2">Let's set up your profile in just 3 steps</p>
       </div>
 
       {/* Progress Bar */}
-      <div className="mb-6 sm:mb-8">
-        <div className="flex justify-between items-center mb-3 sm:mb-4">
+      <div className="mb-3 sm:mb-8">
+        <div className="flex justify-between items-center mb-2 sm:mb-4">
           <span className="text-xs sm:text-sm text-gray-400">Progress</span>
           <span className="text-xs sm:text-sm text-gray-400">{getProgressPercentage()}% complete</span>
         </div>
-        <div className="w-full bg-gray-700 rounded-full h-2">
+        <div className="w-full bg-gray-700 rounded-full h-1.5 sm:h-2">
           <div 
-            className="h-2 rounded-full bg-gradient-to-r from-red-500 via-orange-400 to-green-500 transition-all duration-500"
+            className="h-1.5 sm:h-2 rounded-full bg-gradient-to-r from-red-500 via-orange-400 to-green-500 transition-all duration-500"
             style={{ width: `${getProgressPercentage()}%` }}
           />
         </div>
       </div>
 
       {/* Step Navigation */}
-      <div className="flex flex-row justify-center items-center space-x-1 sm:space-x-2 mb-6 sm:mb-8">
+      <div className="flex flex-row justify-center items-center space-x-1 sm:space-x-2 mb-4 sm:mb-8">
         {[1, 2, 3].map((stepNum) => {
           const status = getStepStatus(stepNum);
           const isActive = stepNum === currentStep;
@@ -119,12 +119,12 @@ export const ProfileWizard = () => {
               <div className="flex flex-col items-center">
                 <button
                   onClick={() => setCurrentStep(stepNum)}
-                  className={`flex flex-col items-center transition-all duration-200 min-h-[44px] px-2 py-2 ${
+                  className={`flex flex-col items-center transition-all duration-200 min-h-[36px] sm:min-h-[44px] px-1 py-1 sm:px-2 sm:py-2 ${
                     status === 'pending' && stepNum !== currentStep ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:scale-105'
                   }`}
                   disabled={status === 'pending' && stepNum !== currentStep}
                 >
-                  <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-sm sm:text-lg mb-1 sm:mb-2 transition-all duration-200 ${
+                  <div className={`w-7 h-7 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-xs sm:text-lg mb-1 sm:mb-2 transition-all duration-200 ${
                     status === 'complete' 
                       ? 'bg-emerald-500 text-black' 
                       : isActive 
@@ -142,7 +142,7 @@ export const ProfileWizard = () => {
               </div>
               
               {stepNum < 3 && (
-                <ArrowRight className={`w-4 h-4 mx-1 sm:mx-2 transition-all duration-200 ${
+                <ArrowRight className={`w-3 h-3 sm:w-4 sm:h-4 mx-1 sm:mx-2 transition-all duration-200 ${
                   getStepStatus(stepNum) === 'complete' 
                     ? 'text-emerald-400' 
                     : isActive 
@@ -156,7 +156,7 @@ export const ProfileWizard = () => {
       </div>
 
       {/* Step Content */}
-      <div className="mb-6 sm:mb-8">
+      <div className="flex-1 mb-3 sm:mb-8">
         {currentStep === 1 && <Step1ResumeUpload onComplete={nextStep} />}
         {currentStep === 2 && <Step2BioCreation onComplete={nextStep} />}
         {currentStep === 3 && <Step3JobAlertsSetup onComplete={nextStep} />}
