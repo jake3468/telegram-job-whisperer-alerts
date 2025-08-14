@@ -235,7 +235,7 @@ const Profile = () => {
             <Button 
               onClick={() => setShowResumeHelp(true)}
               variant="secondary"
-              className="w-full bg-gray-800/50 hover:bg-gray-700/50 text-gray-200 border border-gray-600/30 rounded-lg py-3 text-sm font-medium transition-colors"
+              className="w-full bg-gray-800/50 hover:bg-gray-700/50 text-gray-200 border border-white rounded-lg py-3 text-sm font-medium transition-colors"
             >
               Need help fixing your resume ?
             </Button>
