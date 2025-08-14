@@ -65,30 +65,6 @@ export const Step1ResumeUpload = ({
         </Button>
       </div>
 
-      {/* Benefits Section */}
-      <div className="bg-gradient-to-r from-blue-900/10 to-purple-900/10 rounded-xl p-4 sm:p-6 border border-blue-400/20">
-        <h3 className="text-base sm:text-lg font-semibold text-blue-300 mb-3 sm:mb-4 break-words">Why upload your resume?</h3>
-        <div className="space-y-3">
-          <div className="flex items-start gap-3">
-            <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0" />
-            <p className="text-gray-300 text-xs sm:text-sm break-words">
-              <strong>Personalized job matching:</strong> We analyze your skills and experience to find the most relevant opportunities
-            </p>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0" />
-            <p className="text-gray-300 text-xs sm:text-sm break-words">
-              <strong>Instant cover letters:</strong> Generate tailored cover letters for each job application
-            </p>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0" />
-            <p className="text-gray-300 text-xs sm:text-sm break-words">
-              <strong>Smart job alerts:</strong> Receive notifications only for jobs that match your qualifications
-            </p>
-          </div>
-        </div>
-      </div>
 
 
       {/* Resume Help Popup */}
