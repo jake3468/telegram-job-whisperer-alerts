@@ -79,7 +79,7 @@ export const ProfileWizard = () => {
   }
 
   return (
-    <div className="w-full max-w-full px-3 py-2 sm:px-4 sm:py-8 sm:max-w-2xl md:max-w-4xl mx-auto overflow-x-hidden min-h-screen flex flex-col">
+    <div className="w-full max-w-full px-3 py-2 sm:px-4 sm:py-8 sm:max-w-2xl md:max-w-4xl mx-auto overflow-x-hidden flex flex-col">
       {/* Welcome Header */}
       <div className="text-center mb-3 sm:mb-8">
         <h1 className="font-extrabold text-lg sm:text-2xl md:text-4xl font-orbitron drop-shadow mb-1 break-words">
@@ -163,7 +163,7 @@ export const ProfileWizard = () => {
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between items-center gap-3 flex-shrink-0 pt-2 mt-2">
+      <div className="flex justify-between items-center gap-3 flex-shrink-0 pt-2">
         <Button
           onClick={prevStep}
           variant="outline"
