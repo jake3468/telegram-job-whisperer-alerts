@@ -535,7 +535,7 @@ const JobGuide = () => {
                  </div>
                 {/* Action Buttons */}
                 <div className="flex flex-col md:flex-row gap-3 pt-4">
-                  <Button onClick={handleSubmit} disabled={isButtonDisabled} className="flex-1 bg-gradient-to-r from-white via-white to-white hover:from-white/90 hover:via-white/90 hover:to-white/90 text-black font-orbitron font-bold text-base h-12 shadow-2xl shadow-gray-300/50 border-0 disabled:opacity-50 disabled:cursor-not-allowed">
+                  <Button onClick={handleSubmit} disabled={isButtonDisabled} className="flex-1 bg-gradient-to-r from-white via-white to-white hover:from-white/90 hover:via-white/90 hover:to-white/90 text-black font-orbitron font-bold text-base h-12 border-0 disabled:opacity-50 disabled:cursor-not-allowed">
                     {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
                     {isGenerating ? loadingMessage || 'Analyzing...' : 'Generate Job Analysis'}
                   </Button>
