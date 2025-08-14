@@ -147,21 +147,28 @@ const CoverLetterHistoryModal = ({
       
       // Use enterprise API client for deletion as well
       await makeAuthenticatedRequest(async () => {
+        // First get the user profile ID
+        const { data: userProfile } = await supabase
+          .from('user_profile')
+          .select('id')
+          .eq('user_id', (
+            await supabase
+              .from('users')
+              .select('id')
+              .eq('clerk_id', user.id)
+              .single()
+          ).data?.id)
+          .single();
+
+        if (!userProfile?.id) {
+          throw new Error('User profile not found');
+        }
+
         const { error } = await supabase
           .from('job_cover_letters')
           .delete()
           .eq('id', itemId)
-          .in('user_id', 
-            supabase
-              .from('user_profile')
-              .select('id')
-              .in('user_id',
-                supabase
-                  .from('users')
-                  .select('id')
-                  .eq('clerk_id', user.id)
-              )
-          );
+          .eq('user_id', userProfile.id);
 
         if (error) {
           console.error('[CoverLetterHistory] Delete error:', error);

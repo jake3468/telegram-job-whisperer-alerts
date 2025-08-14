@@ -115,6 +115,7 @@ class EnterpriseSessionManager {
         this.state.sessionExtended = false;
 
         await setClerkToken(token);
+        console.log('✅ Token refreshed and set:', !!token);
 
         // Resolve all queued requests
         this.requestQueue.forEach(({ resolve }) => resolve(token));

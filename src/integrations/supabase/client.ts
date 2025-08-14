@@ -9,17 +9,6 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Enterprise session manager
 let enterpriseSessionManager: any = null;
 
-// Singleton authenticated client cache to prevent multiple instances
-let authenticatedClientCache: { 
-  client: any; 
-  token: string; 
-  expiry: number; 
-} | null = null;
-
-// Global refresh lock to prevent concurrent token refreshes
-let isRefreshing = false;
-let refreshPromise: Promise<string | null> | null = null;
-
 // Request queue during token refresh
 let requestQueue: Array<{
   resolve: (value: any) => void;
@@ -28,109 +17,61 @@ let requestQueue: Array<{
   options: any;
 }> = [];
 
-// Supabase client with proper session management (singleton pattern)
-let singletonClient: any = null;
+// Global refresh state
+let isRefreshing = false;
 
-export const supabase = (() => {
-  if (!singletonClient) {
-    singletonClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-      auth: {
-        persistSession: false, // Prevent session conflicts
-        autoRefreshToken: false, // Let enterprise manager handle
-        detectSessionInUrl: false,
-        flowType: 'implicit'
-      },
-      global: {
-        headers: {}
-      }
-    });
+// Main Supabase client (singleton)
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+    detectSessionInUrl: false,
+    flowType: 'implicit'
+  },
+  global: {
+    headers: {}
   }
-  return singletonClient;
-})();
+});
 
 // Set enterprise session manager (single source of truth)
 export const setEnterpriseSessionManager = (manager: any) => {
   enterpriseSessionManager = manager;
 };
 
-// Helper to get or create singleton authenticated client
-const getAuthenticatedClient = async (): Promise<any> => {
-  // Get current token from session manager
-  const currentToken = enterpriseSessionManager?.getCurrentToken?.() || null;
-  
-  if (!currentToken) {
-    throw new Error('Authentication required');
+// Simple token injection into main client
+const injectTokenIntoClient = (token: string | null) => {
+  if (token) {
+    // Set the authorization header directly on the main client
+    (supabase as any).rest.headers = {
+      ...(supabase as any).rest.headers,
+      'Authorization': `Bearer ${token}`
+    };
+  } else {
+    // Remove authorization header
+    const headers = { ...(supabase as any).rest.headers };
+    delete headers['Authorization'];
+    (supabase as any).rest.headers = headers;
   }
-
-  // Check if we can reuse existing client
-  if (authenticatedClientCache && 
-      authenticatedClientCache.token === currentToken && 
-      authenticatedClientCache.expiry > Date.now()) {
-    return authenticatedClientCache.client;
-  }
-
-  // Clear any previous cached client to prevent multiple instances
-  if (authenticatedClientCache) {
-    authenticatedClientCache = null;
-  }
-
-  // Create new authenticated client and cache it
-  const authenticatedClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-      detectSessionInUrl: false,
-      flowType: 'implicit'
-    },
-    global: {
-      headers: {
-        'Authorization': `Bearer ${currentToken}`,
-        'apikey': SUPABASE_PUBLISHABLE_KEY
-      }
-    }
-  });
-
-  // Cache the client with token and expiry (2 minute cache to reduce conflicts)
-  authenticatedClientCache = {
-    client: authenticatedClient,
-    token: currentToken,
-    expiry: Date.now() + (2 * 60 * 1000)
-  };
-
-  return authenticatedClient;
 };
 
-// Debounced token refresh to prevent concurrent refreshes
-const getValidToken = async (forceRefresh: boolean = false): Promise<string | null> => {
-  // If already refreshing, wait for the existing promise
-  if (isRefreshing && refreshPromise) {
-    return await refreshPromise;
+// Get and inject valid token
+const ensureValidToken = async (forceRefresh: boolean = false): Promise<string | null> => {
+  if (!enterpriseSessionManager) {
+    return null;
   }
 
-  // Check if current token is valid without forcing refresh
-  if (!forceRefresh && enterpriseSessionManager?.isTokenValid?.()) {
-    return enterpriseSessionManager.getCurrentToken?.() || null;
+  let token = null;
+  
+  if (!forceRefresh && enterpriseSessionManager.isTokenValid?.()) {
+    token = enterpriseSessionManager.getCurrentToken?.();
+  } else {
+    token = await enterpriseSessionManager.refreshToken?.(forceRefresh);
   }
-
-  // Start refresh process
-  if (!isRefreshing) {
-    isRefreshing = true;
-    refreshPromise = (async () => {
-      try {
-        const token = await enterpriseSessionManager?.refreshToken?.(forceRefresh);
-        // Clear cached client when token changes
-        if (authenticatedClientCache && authenticatedClientCache.token !== token) {
-          authenticatedClientCache = null;
-        }
-        return token;
-      } finally {
-        isRefreshing = false;
-        refreshPromise = null;
-      }
-    })();
-  }
-
-  return await refreshPromise;
+  
+  // Inject token into the main client
+  injectTokenIntoClient(token);
+  
+  return token;
 };
 
 // Process queued requests after token refresh
@@ -148,7 +89,7 @@ const processRequestQueue = async () => {
   }
 };
 
-// Enterprise-grade authenticated request with singleton client pattern
+// Simplified authenticated request with direct token injection
 export const makeAuthenticatedRequest = async <T>(
   operation: () => Promise<T>,
   options: {
@@ -157,7 +98,7 @@ export const makeAuthenticatedRequest = async <T>(
     operationType?: string;
   } = {}
 ): Promise<T> => {
-  const { maxRetries = 2, silentRetry = true, operationType = 'api_request' } = options;
+  const { maxRetries = 2, silentRetry = true } = options;
   
   // If currently refreshing, queue the request
   if (isRefreshing) {
@@ -170,40 +111,22 @@ export const makeAuthenticatedRequest = async <T>(
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      // Get valid token (smart validation)
-      const token = await getValidToken(attempt > 0);
+      // Ensure we have a valid token and inject it
+      const token = await ensureValidToken(attempt > 0);
       
       if (!token) {
-        throw new Error('Authentication required');
+        throw new Error('Authentication required - please sign in');
       }
 
-      // Get singleton authenticated client
-      const authenticatedClient = await getAuthenticatedClient();
-
-      // Execute operation with method binding instead of creating new clients
-      const originalFrom = supabase.from;
-      const originalRpc = supabase.rpc;
+      // Execute operation with injected token
+      const result = await operation();
       
-      try {
-        // Temporarily bind authenticated methods (avoid storage as it's read-only)
-        (supabase as any).from = authenticatedClient.from.bind(authenticatedClient);
-        (supabase as any).rpc = authenticatedClient.rpc.bind(authenticatedClient);
-        
-        // Execute operation with bound methods
-        const result = await operation();
-        
-        // Process any queued requests after successful operation
-        if (requestQueue.length > 0) {
-          setImmediate(() => processRequestQueue());
-        }
-        
-        return result;
-      } finally {
-        // Always restore original methods
-        (supabase as any).from = originalFrom;
-        (supabase as any).rpc = originalRpc;
-        // Don't restore storage as we never modified it
+      // Process any queued requests after successful operation
+      if (requestQueue.length > 0) {
+        setTimeout(() => processRequestQueue(), 0);
       }
+      
+      return result;
     } catch (error: any) {
       lastError = error;
       
@@ -215,15 +138,8 @@ export const makeAuthenticatedRequest = async <T>(
                            error?.status === 401;
 
         if (isAuthError) {
-          // Force token refresh and clear cache
-          authenticatedClientCache = null;
-          await new Promise(resolve => setTimeout(resolve, 200));
-          continue;
-        }
-
-        // Retry network errors with exponential backoff
-        if (silentRetry && (error?.message?.includes('fetch') || error?.message?.includes('network'))) {
-          await new Promise(resolve => setTimeout(resolve, 300 * Math.pow(2, attempt)));
+          // Force token refresh on auth error
+          await new Promise(resolve => setTimeout(resolve, 100));
           continue;
         }
       }
@@ -236,7 +152,7 @@ export const makeAuthenticatedRequest = async <T>(
   if (lastError?.code === 'PGRST301' || 
       lastError?.message?.includes('JWT') || 
       lastError?.status === 401) {
-    throw new Error('Please try again');
+    throw new Error('Please sign in again');
   }
 
   throw lastError || new Error(`Request failed after ${maxRetries} attempts`);
@@ -261,7 +177,8 @@ export const refreshJWTToken = async (): Promise<string | null> => {
 };
 
 export const setClerkToken = async (token: string | null) => {
-  // Legacy - now handled by enterprise session manager
+  // Inject token directly into the main client
+  injectTokenIntoClient(token);
   return true;
 };
 
@@ -275,31 +192,20 @@ export const getCurrentJWTToken = () => {
 
 export const testJWTTransmission = async () => {
   try {
-    console.log('🧪 Testing JWT transmission to Supabase...');
+    // Ensure we have a valid token
+    const token = await ensureValidToken(true);
     
-    // First check if we have session manager
-    if (!enterpriseSessionManager) {
-      return { data: null, error: 'Session manager not connected' };
-    }
-    
-    // Check current token
-    const currentToken = enterpriseSessionManager.getCurrentToken?.();
-    console.log('🔑 Current token available:', !!currentToken);
-    
-    if (!currentToken) {
-      return { data: null, error: 'No current token available' };
+    if (!token) {
+      return { data: null, error: 'No token available' };
     }
     
     // Test the authenticated request pipeline
     const { data, error } = await makeAuthenticatedRequest(async () => {
-      console.log('📡 Making RPC call to debug_user_auth...');
       return await supabase.rpc('debug_user_auth');
-    }, { operationType: 'jwt_test' });
+    });
     
-    console.log('📊 JWT Test Result:', { data, error });
     return { data, error };
   } catch (error) {
-    console.error('❌ JWT Test Error:', error);
     return { data: null, error: error.message };
   }
 };

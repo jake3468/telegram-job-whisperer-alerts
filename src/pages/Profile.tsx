@@ -5,7 +5,7 @@ import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 import AuthHeader from '@/components/AuthHeader';
 import ResumeSection from '@/components/dashboard/ResumeSection';
 import ProfessionalBioSection from '@/components/dashboard/ProfessionalBioSection';
-import { JWTDebugPanel } from '@/components/JWTDebugPanel';
+
 import ClerkJWTSetupGuide from '@/components/ClerkJWTSetupGuide';
 import { Layout } from '@/components/Layout';
 import { useJWTDebug } from '@/hooks/useJWTDebug';
@@ -317,8 +317,6 @@ const Profile = () => {
           </div>
         </div>}
       
-      {/* JWT Debug Panel - only in development */}
-      {Environment.isDevelopment() && <JWTDebugPanel />}
 
       {/* Onboarding Popup */}
       <OnboardingPopup isOpen={showPopup} onClose={hidePopup} onDontShowAgain={dontShowAgain} userName={user.firstName || undefined} />
