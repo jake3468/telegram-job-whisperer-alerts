@@ -30,23 +30,23 @@ export const Step2BioCreation = ({
   }, []);
   return <div className="w-full max-w-full px-3 py-1 sm:px-4 sm:py-2 sm:max-w-2xl md:max-w-4xl mx-auto flex flex-col">
       {/* Step Header */}
-      <div className="text-center mb-1 sm:mb-2">
-        <div className="flex items-center justify-center mb-2 sm:mb-6">
-          <div className="relative">
-            <div className="p-3 sm:p-4 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl sm:rounded-2xl border border-blue-400/30 backdrop-blur-sm">
-              <PenTool className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
-            </div>
-            <div className="absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-xs font-bold">2</span>
-            </div>
+      <div className="flex items-center gap-3 px-2 mb-2">
+        <div className="relative flex-shrink-0">
+          <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl border border-blue-400/30 backdrop-blur-sm">
+            <PenTool className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
+          </div>
+          <div className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-blue-500 rounded-full flex items-center justify-center">
+            <span className="text-white text-xs font-bold">2</span>
           </div>
         </div>
-        <h2 className="text-lg sm:text-2xl font-bold text-white mb-2 sm:mb-4">
-          Write Your Professional Bio
-        </h2>
-        <p className="text-gray-400 text-xs sm:text-base leading-relaxed">
-          Tell us a bit about yourself - it helps our AI tailor tools to your unique profile
-        </p>
+        <div className="flex-1">
+          <h2 className="text-base sm:text-xl font-bold text-white mb-1">
+            Write Your Professional Bio
+          </h2>
+          <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
+            Tell us a bit about yourself - it helps our AI tailor tools to your unique profile
+          </p>
+        </div>
       </div>
 
       {/* Success Message */}
