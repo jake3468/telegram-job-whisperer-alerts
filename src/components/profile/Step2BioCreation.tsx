@@ -27,7 +27,7 @@ export const Step2BioCreation = ({
       behavior: 'smooth'
     });
   }, []);
-  return <div className="w-full max-w-full px-3 py-1 sm:px-4 sm:py-2 sm:max-w-2xl md:max-w-4xl mx-auto flex flex-col">
+  return <div className="space-y-2 sm:space-y-4 max-w-2xl mx-auto">
       {/* Step Header */}
       <div className="flex items-center gap-3 px-2 mb-2">
         <div className="relative flex-shrink-0">
@@ -49,16 +49,18 @@ export const Step2BioCreation = ({
       </div>
 
       {/* Success Message */}
-      {hasBio && <div className="bg-emerald-900/20 border border-emerald-400/30 rounded-lg p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 mb-1 sm:mb-3">
-          <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 flex-shrink-0" />
+      {hasBio && <div className="bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-400/20 rounded-lg p-2 sm:p-3 flex items-center gap-2 backdrop-blur-sm">
+          <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-emerald-500/20 rounded-full flex items-center justify-center">
+            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-400" />
+          </div>
           <div>
-            <p className="text-emerald-300 font-medium text-xs sm:text-base break-words">Bio completed successfully!</p>
-            <p className="text-emerald-200 text-xs sm:text-sm break-words">You can continue to job alerts or refine your bio below.</p>
+            <p className="text-emerald-300 font-semibold text-xs">Bio completed successfully!</p>
+            <p className="text-emerald-200/80 text-xs">You can continue to the next step.</p>
           </div>
         </div>}
 
       {/* Bio Section */}
-      <div className="mb-4">
+      <div>
         <ProfessionalBioSection />
       </div>
 
