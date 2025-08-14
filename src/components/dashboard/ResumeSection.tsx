@@ -34,7 +34,7 @@ const ResumeSection = ({
     if (user && !resumeExists) {
       checkExistingResume();
     } else if (resumeExists && user) {
-      const fileName = `${user.id}/resume.pdf`;
+      const fileName = `user_${user.id}/resume.pdf`;
       // This is a public URL generation, no auth needed
       const publicUrl = `https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/resumes/${fileName}`;
       setResumeUrl(publicUrl);
@@ -51,7 +51,7 @@ const ResumeSection = ({
         const {
           data,
           error
-        } = await supabase.storage.from('resumes').list(user.id, {
+        } = await supabase.storage.from('resumes').list(`user_${user.id}`, {
           limit: 1,
           search: 'resume.pdf'
         });
@@ -60,7 +60,7 @@ const ResumeSection = ({
           return;
         }
         if (data && data.length > 0) {
-          const fileName = `${user.id}/resume.pdf`;
+          const fileName = `user_${user.id}/resume.pdf`;
           const publicUrl = `https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/resumes/${fileName}`;
           setResumeUrl(publicUrl);
           updateResumeStatus(true);
@@ -160,7 +160,7 @@ const ResumeSection = ({
         console.log('User check result:', { existingUser, userCheckError });
 
         // Check for existing resume and delete if exists
-        const existingResumePath = `${user.id}/resume.pdf`;
+        const existingResumePath = `user_${user.id}/resume.pdf`;
         console.log('Removing existing resume at path:', existingResumePath);
         await supabase.storage.from('resumes').remove([existingResumePath]);
 
@@ -169,9 +169,10 @@ const ResumeSection = ({
         if (!currentToken) {
           throw new Error('Authentication token not available');
         }
+        console.log('JWT token available for upload:', { hasToken: !!currentToken, userId: user.id });
 
         // Upload new file
-        const filePath = `${user.id}/resume.pdf`;
+        const filePath = `user_${user.id}/resume.pdf`;
         console.log('Uploading to path:', filePath, 'with user:', user.id);
         const {
           error: uploadError
@@ -200,7 +201,7 @@ const ResumeSection = ({
       });
 
       // Call the webhook to process the resume
-      const publicUrl = `https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/resumes/${user.id}/resume.pdf`;
+      const publicUrl = `https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/resumes/user_${user.id}/resume.pdf`;
       await callResumeWebhook(publicUrl, file.name, file.size);
       toast({
         title: "Resume uploaded successfully",
@@ -235,7 +236,8 @@ const ResumeSection = ({
         }
 
         // Delete from Supabase storage
-        const filePath = `${user.id}/resume.pdf`;
+        const filePath = `user_${user.id}/resume.pdf`;
+        console.log('Deleting resume at path:', filePath);
         const {
           error
         } = await supabase.storage.from('resumes').remove([filePath]);
