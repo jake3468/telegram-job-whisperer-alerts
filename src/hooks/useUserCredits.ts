@@ -24,9 +24,17 @@ export const useUserCredits = () => {
   const query = useQuery({
     queryKey: ['user_credits', userProfile?.user_id], 
     queryFn: async () => {
-      // Ensure we have both Clerk user and user profile before proceeding
-      if (!isClerkLoaded || !user?.id || !userProfile?.user_id) {
-        throw new Error('Authentication not ready');
+      // Validate authentication state
+      if (!isClerkLoaded) {
+        throw new Error('Authentication not loaded');
+      }
+      
+      if (!user?.id || typeof user.id !== 'string' || user.id.length === 0) {
+        throw new Error('Invalid user session. Please log out and log in again.');
+      }
+      
+      if (!userProfile?.user_id || typeof userProfile.user_id !== 'string') {
+        throw new Error('User profile not available');
       }
       
       // Proactively refresh JWT token before making request

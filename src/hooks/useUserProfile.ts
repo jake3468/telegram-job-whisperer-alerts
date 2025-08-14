@@ -54,6 +54,14 @@ export const useUserProfile = () => {
       return;
     }
 
+    // Validate Clerk user ID format
+    if (!user.id || user.id.length === 0) {
+      debugLog('Invalid Clerk user ID');
+      setError('Invalid user session. Please log in again.');
+      setLoading(false);
+      return;
+    }
+
     // Add timeout to prevent infinite loading
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
@@ -65,18 +73,34 @@ export const useUserProfile = () => {
 
     try {
       setError(null);
-      debugLog('Starting user profile fetch for:', user.id);
+      debugLog('Starting user profile fetch for Clerk ID:', user.id);
 
-      // Enterprise-grade authenticated request
-      const { data: userData, error: userError } = await makeAuthenticatedRequest(
+      // Enterprise-grade authenticated request with proper error handling
+      const userResult = await makeAuthenticatedRequest(
         () => fetchUserFromDatabase(user.id)
       );
-      debugLog('User lookup result:', userData ? 'Found' : 'Not found');
+      
+      if (userResult.error) {
+        debugLog('User fetch error:', userResult.error);
+        
+        // Handle specific database errors
+        if (userResult.error.message?.includes('invalid input syntax for type uuid')) {
+          setError('Session error. Please log out and log in again.');
+          setLoading(false);
+          return;
+        }
+        
+        setError(getUserFriendlyErrorMessage(userResult.error));
+        setLoading(false);
+        return;
+      }
 
-      let finalUserData = userData;
+      debugLog('User lookup result:', userResult.data ? 'Found' : 'Not found');
+
+      let finalUserData = userResult.data;
 
       // If user doesn't exist, initialize them (with deduplication)
-      if (!userData && !userError) {
+      if (!finalUserData) {
         debugLog('User not found in Supabase, initializing...');
         
         const initResult = await initializeUser();
@@ -88,23 +112,18 @@ export const useUserProfile = () => {
         }
 
         // Fetch user data after initialization with enterprise authentication
-        const { data: newUserData, error: newUserError } = await makeAuthenticatedRequest(
+        const newUserResult = await makeAuthenticatedRequest(
           () => fetchUserFromDatabase(user.id)
         );
 
-        if (newUserError || !newUserData) {
-          debugLog('Error fetching user after initialization:', newUserError);
-          setError(getUserFriendlyErrorMessage(newUserError));
+        if (newUserResult.error || !newUserResult.data) {
+          debugLog('Error fetching user after initialization:', newUserResult.error);
+          setError(getUserFriendlyErrorMessage(newUserResult.error));
           setLoading(false);
           return;
         }
 
-        finalUserData = newUserData;
-      } else if (userError) {
-        debugLog('Error fetching user:', userError);
-        setError(getUserFriendlyErrorMessage(userError));
-        setLoading(false);
-        return;
+        finalUserData = newUserResult.data;
       }
 
       if (!finalUserData) {
@@ -114,29 +133,45 @@ export const useUserProfile = () => {
         return;
       }
 
-      // Get user profile with enterprise authentication
-      const { data: profileData, error: profileError } = await makeAuthenticatedRequest(
-        () => fetchUserProfileFromService(finalUserData.id, 1)
-      );
-
-      debugLog('Profile lookup result:', profileData ? 'Accessible' : 'Not accessible');
-      
-      if (profileError) {
-        debugLog('Profile lookup error:', profileError);
-        setError(getUserFriendlyErrorMessage(profileError));
+      // Validate that we have a proper UUID for the user
+      if (!finalUserData.id || typeof finalUserData.id !== 'string') {
+        debugLog('Invalid user ID format:', finalUserData.id);
+        setError('User data corruption detected. Please contact support.');
         setLoading(false);
         return;
       }
 
-      if (!profileData) {
+      // Get user profile with enterprise authentication
+      const profileResult = await makeAuthenticatedRequest(
+        () => fetchUserProfileFromService(finalUserData.id, 1)
+      );
+
+      debugLog('Profile lookup result:', profileResult.data ? 'Accessible' : 'Not accessible');
+      
+      if (profileResult.error) {
+        debugLog('Profile lookup error:', profileResult.error);
+        
+        // Handle specific database errors
+        if (profileResult.error.message?.includes('invalid input syntax for type uuid')) {
+          setError('Profile data corruption. Please contact support.');
+          setLoading(false);
+          return;
+        }
+        
+        setError(getUserFriendlyErrorMessage(profileResult.error));
+        setLoading(false);
+        return;
+      }
+
+      if (!profileResult.data) {
         debugLog('No profile found');
         setError('Profile not found. Please contact support.');
         setLoading(false);
         return;
       }
 
-      debugLog('Successfully fetched user profile:', profileData.id);
-      setUserProfile(profileData);
+      debugLog('Successfully fetched user profile:', profileResult.data.id);
+      setUserProfile(profileResult.data);
       setError(null);
     } catch (error) {
       // Check if this was a timeout abort
@@ -146,7 +181,13 @@ export const useUserProfile = () => {
       }
       
       debugLog('Error in fetchUserProfile:', error);
-      setError(getUserFriendlyErrorMessage(error));
+      
+      // Handle UUID format errors specifically
+      if (error instanceof Error && error.message?.includes('invalid input syntax for type uuid')) {
+        setError('Session error. Please log out and log in again.');
+      } else {
+        setError(getUserFriendlyErrorMessage(error));
+      }
     } finally {
       clearTimeout(timeoutId);
       setLoading(false);
