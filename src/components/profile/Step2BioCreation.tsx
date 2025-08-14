@@ -30,21 +30,21 @@ export const Step2BioCreation = ({
   }, []);
   return <div className="space-y-4 sm:space-y-6 max-w-2xl mx-auto">
       {/* Step Header */}
-      <div className="text-center px-2 py-4">
-        <div className="flex items-center justify-center mb-6">
+      <div className="text-center px-2 py-8">
+        <div className="flex items-center justify-center mb-8">
           <div className="relative">
-            <div className="p-4 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-2xl border border-blue-400/30 backdrop-blur-sm">
-              <PenTool className="w-8 h-8 text-blue-400" />
+            <div className="p-6 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-2xl border border-blue-400/30 backdrop-blur-sm">
+              <PenTool className="w-10 h-10 text-blue-400" />
             </div>
             <div className="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
               <span className="text-white text-xs font-bold">2</span>
             </div>
           </div>
         </div>
-        <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">
+        <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6">
           Write Your Professional Bio
         </h2>
-        <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
+        <p className="text-gray-400 text-base sm:text-lg leading-relaxed max-w-lg mx-auto">
           Tell us a bit about yourself - it helps our AI tailor tools to your unique profile
         </p>
       </div>
