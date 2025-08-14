@@ -9,7 +9,7 @@ import { OnboardingPopup } from '@/components/OnboardingPopup';
 import { useOnboardingPopup } from '@/hooks/useOnboardingPopup';
 import { ResumeHelpPopup } from '@/components/ResumeHelpPopup';
 import { ProfileWizard } from '@/components/profile/ProfileWizard';
-import { ProfileWizardComplete } from '@/components/profile/ProfileWizardComplete';
+
 import { ProfileResumeSection } from '@/components/profile/ProfileResumeSection';
 import ClerkJWTSetupGuide from '@/components/ClerkJWTSetupGuide';
 import { Button } from '@/components/ui/button';

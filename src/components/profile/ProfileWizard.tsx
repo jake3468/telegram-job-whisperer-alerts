@@ -6,7 +6,7 @@ import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 import { Step1ResumeUpload } from './Step1ResumeUpload';
 import { Step2BioCreation } from './Step2BioCreation';
 import { Step3JobAlertsSetup } from './Step3JobAlertsSetup';
-import { ProfileWizardComplete } from './ProfileWizardComplete';
+
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -78,10 +78,6 @@ export const ProfileWizard = () => {
     return Math.round((currentStep / TOTAL_STEPS) * 100);
   };
 
-  // Show completion screen if profile setup is completed
-  if (userProfile?.profile_setup_completed) {
-    return <ProfileWizardComplete />;
-  }
 
   return (
     <div className="w-full max-w-full px-3 py-1 sm:px-4 sm:py-2 sm:max-w-2xl md:max-w-4xl mx-auto flex flex-col">
