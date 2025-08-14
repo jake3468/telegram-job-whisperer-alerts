@@ -90,12 +90,6 @@ export const Step1ResumeUpload = ({
         </div>
       </div>
 
-      {/* Quick Action Buttons */}
-      {hasResume && <div className="text-center pt-4">
-          <Button onClick={onComplete} className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white font-semibold px-6 sm:px-8 min-h-[44px] break-words">
-            Continue to Bio →
-          </Button>
-        </div>}
 
       {/* Resume Help Popup */}
       {showResumeHelp && <ResumeHelpPopup isOpen={showResumeHelp} onClose={() => setShowResumeHelp(false)} />}
