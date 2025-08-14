@@ -109,27 +109,9 @@ export const Step3JobAlertsSetup = ({
       <div className="space-y-3">
         {/* Value Proposition */}
         <div className="space-y-2">
-          <p className="text-gray-700 text-xs font-medium">
-            Get personalized job alerts with:
+          <p className="text-white text-xs font-medium">
+            Each job alert will look like below example👇 and will include all tools in one click: resume, cover letter, visa info, job fit, and more.
           </p>
-          <div className="grid grid-cols-1 gap-1 text-xs">
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0" />
-              <span className="truncate">Instant resume generation</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0" />
-              <span className="truncate">Custom cover letters</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0" />
-              <span className="truncate">Visa sponsorship info</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0" />
-              <span className="truncate">Job fit analysis</span>
-            </div>
-          </div>
         </div>
 
         {/* Preview Image */}
