@@ -56,7 +56,6 @@ export const useSecureAPI = (options: SecureAPIOptions = {}) => {
 
       // Execute the request
       const result = await requestFn();
-      logger.debug('Secure API request completed successfully');
       
       return result;
     } catch (error) {

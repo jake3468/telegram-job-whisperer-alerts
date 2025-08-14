@@ -50,7 +50,6 @@ export const useCachedLinkedInPosts = () => {
         if (now - parsedCache.timestamp < CACHE_DURATION) {
           setCachedData(parsedCache.data);
           setIsShowingCachedData(true);
-          logger.debug('Loaded cached LinkedIn posts data:', parsedCache.data.length, 'items');
         } else {
           // Remove expired cache
           localStorage.removeItem(CACHE_KEY);
@@ -107,7 +106,6 @@ export const useCachedLinkedInPosts = () => {
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
         setCachedData(freshData);
         setIsShowingCachedData(false);
-        logger.debug('Updated LinkedIn posts cache with fresh data:', freshData.length, 'items');
       } catch (error) {
         logger.warn('Failed to cache LinkedIn posts data:', error);
         // Still update state even if caching fails

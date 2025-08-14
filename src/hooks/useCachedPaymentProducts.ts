@@ -41,7 +41,6 @@ export const useCachedPaymentProducts = (currentRegion?: string, currentCurrency
           setDisplayProducts(parsedCache.products);
           setDisplaySubscriptionProducts(parsedCache.subscriptionProducts);
           setDisplayCreditPackProducts(parsedCache.creditPackProducts);
-          logger.debug('Loaded cached products data:', parsedCache);
         } else {
           // Remove expired or mismatched cache
           localStorage.removeItem(CACHE_KEY);
@@ -86,7 +85,6 @@ export const useCachedPaymentProducts = (currentRegion?: string, currentCurrency
         const cacheKey = `${currentRegion}_${currentCurrency}_${products.length}`;
         const lastLoggedKey = sessionStorage.getItem('last_products_log');
         if (lastLoggedKey !== cacheKey) {
-          logger.debug('Cached fresh products data:', cacheData);
           sessionStorage.setItem('last_products_log', cacheKey);
         }
       } catch (error) {

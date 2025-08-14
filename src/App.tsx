@@ -66,11 +66,10 @@ const AppWithSync = () => {
   // Skip enterprise features for job-alerts page to prevent debug messages
   const shouldUseEnterpriseFeatures = !location.pathname.includes('/job-alerts');
   
-  // DISABLED: Enterprise session manager until we fix the dual token system issue
-  // The ClerkSupabaseSync is handling tokens directly now
-  // useEnhancedTokenManagerIntegration({
-  //   enabled: shouldUseEnterpriseFeatures && isLoaded && isSignedIn
-  // });
+  // Enable enterprise session manager for better token management
+  useEnhancedTokenManagerIntegration({
+    enabled: shouldUseEnterpriseFeatures && isLoaded && isSignedIn
+  });
   
   // Hide initial loader once React is ready
   useEffect(() => {

@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/client';
 import { useUserProfile } from './useUserProfile';
-import { useEnterpriseAuth } from './useEnterpriseAuth';
 import { logger } from '@/utils/logger';
 
 interface InterviewPrepData {
@@ -26,7 +25,6 @@ const CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours
 
 export const useCachedInterviewPrep = () => {
   const { userProfile } = useUserProfile();
-  const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
   const [cachedData, setCachedData] = useState<InterviewPrepData[]>([]);
   const [isShowingCachedData, setIsShowingCachedData] = useState(false);
   const [connectionIssue, setConnectionIssue] = useState(false);
@@ -43,7 +41,6 @@ export const useCachedInterviewPrep = () => {
         if (now - parsedCache.timestamp < CACHE_DURATION) {
           setCachedData(parsedCache.data);
           setIsShowingCachedData(true);
-          logger.debug('Loaded cached interview prep data:', parsedCache.data.length, 'items');
         } else {
           // Remove expired cache
           localStorage.removeItem(CACHE_KEY);
@@ -64,9 +61,9 @@ export const useCachedInterviewPrep = () => {
   } = useQuery({
     queryKey: ['interview-prep-history', userProfile?.id],
     queryFn: async () => {
-      if (!userProfile?.id || !isAuthReady) return [];
+      if (!userProfile?.id) return [];
       
-      return executeWithRetry(async () => {
+      return makeAuthenticatedRequest(async () => {
         const { data, error } = await supabase
           .from('interview_prep')
           .select('*')
@@ -75,9 +72,9 @@ export const useCachedInterviewPrep = () => {
         
         if (error) throw error;
         return data || [];
-      }, 3, 'fetch interview history');
+      }, { maxRetries: 3, operationType: 'fetch interview history' });
     },
-    enabled: !!userProfile?.id && isAuthReady,
+    enabled: !!userProfile?.id,
     staleTime: 30000, // Consider data fresh for 30 seconds
     gcTime: CACHE_DURATION, // Keep in cache for 2 hours
     retry: 2
@@ -104,7 +101,6 @@ export const useCachedInterviewPrep = () => {
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
         setCachedData(freshData);
         setIsShowingCachedData(false);
-        logger.debug('Updated interview prep cache with fresh data:', freshData.length, 'items');
       } catch (error) {
         logger.warn('Failed to cache interview prep data:', error);
         // Still update state even if caching fails

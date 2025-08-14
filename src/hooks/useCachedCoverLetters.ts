@@ -41,7 +41,6 @@ export const useCachedCoverLetters = () => {
         if (now - parsedCache.timestamp < CACHE_DURATION) {
           setCachedData(parsedCache.data);
           setIsShowingCachedData(true);
-          logger.debug('Loaded cached cover letters data:', parsedCache.data.length, 'items');
         } else {
           // Remove expired cache
           localStorage.removeItem(CACHE_KEY);
@@ -104,7 +103,6 @@ export const useCachedCoverLetters = () => {
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
         setCachedData(freshData);
         setIsShowingCachedData(false);
-        logger.debug('Updated cover letters cache with fresh data:', freshData.length, 'items');
       } catch (error) {
         logger.warn('Failed to cache cover letters data:', error);
         // Still update state even if caching fails

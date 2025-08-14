@@ -91,7 +91,6 @@ export const useAIInterviewCredits = () => {
         logger.info('Successfully initialized and loaded AI interview credits:', newData);
       } else {
         setCredits(data);
-        logger.debug('Successfully loaded existing AI interview credits:', data);
       }
       
       // Reset retry count on success

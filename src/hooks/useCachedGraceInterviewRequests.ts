@@ -46,7 +46,6 @@ export const useCachedGraceInterviewRequests = () => {
           setRequests(parsedCache.requests);
           setUserProfileId(parsedCache.userProfileId);
           setLoading(false); // Mark as loaded since we have cached data
-          logger.debug('Loaded cached grace interview data:', parsedCache);
         } else {
           localStorage.removeItem(CACHE_KEY);
         }
@@ -136,7 +135,6 @@ export const useCachedGraceInterviewRequests = () => {
           timestamp: Date.now()
         };
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-        logger.debug('Cached fresh grace interview data:', cacheData);
       } catch (cacheError) {
         logger.warn('Failed to cache grace interview data:', cacheError);
       }
@@ -169,7 +167,6 @@ export const useCachedGraceInterviewRequests = () => {
         timestamp: Date.now()
       };
       localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-      logger.debug('Optimistically updated cache with new request:', newRequest);
     } catch (error) {
       logger.warn('Failed to update cache optimistically:', error);
     }
