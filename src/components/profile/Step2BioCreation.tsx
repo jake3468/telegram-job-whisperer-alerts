@@ -31,15 +31,22 @@ export const Step2BioCreation = ({
   return <div className="space-y-4 sm:space-y-6">
       {/* Step Header */}
       <div className="text-center px-2">
-        <div className="flex items-center justify-center mb-3 sm:mb-4">
-          <div className="p-2 sm:p-3 bg-purple-500/20 rounded-full">
-            <PenTool className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400" />
+        <div className="flex items-center justify-center mb-4">
+          <div className="relative">
+            <div className="p-4 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-2xl border border-blue-400/30 backdrop-blur-sm">
+              <PenTool className="w-8 h-8 text-blue-400" />
+            </div>
+            <div className="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs font-bold">2</span>
+            </div>
           </div>
         </div>
-        <h2 className="text-lg sm:text-xl md:text-2xl font-orbitron font-bold text-purple-400 mb-2 break-words">
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">
           Write Your Professional Bio
         </h2>
-        <p className="text-gray-300 text-sm sm:text-base md:text-lg break-words">Tell us a bit about yourself - it helps our AI tailor tools to your unique profile.</p>
+        <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
+          Tell us a bit about yourself - it helps our AI tailor tools to your unique profile
+        </p>
       </div>
 
       {/* Success Message */}
@@ -52,7 +59,23 @@ export const Step2BioCreation = ({
         </div>}
 
       {/* Bio Section */}
-      <ProfessionalBioSection />
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-2xl blur-xl"></div>
+        <Card className="relative bg-gray-900/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl shadow-2xl">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-blue-500/20 rounded-lg">
+                <PenTool className="w-5 h-5 text-blue-400" />
+              </div>
+              <div>
+                <h3 className="text-white font-semibold">Professional Bio</h3>
+                <p className="text-gray-400 text-xs">Write your professional summary</p>
+              </div>
+            </div>
+            <ProfessionalBioSection />
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Character Goal */}
       <div className="text-center p-3 sm:p-4 bg-purple-900/20 rounded-lg border border-purple-400/30">
