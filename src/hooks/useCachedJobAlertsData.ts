@@ -92,10 +92,6 @@ export const useCachedJobAlertsData = () => {
           timestamp: now 
         }));
         
-        logger.debug('[JobAlerts] Loaded cached data:', { 
-          alerts: parsedCache.alerts.length, 
-          age: now - parsedCache.timestamp 
-        });
         return true;
       } catch (error) {
         logger.warn('[JobAlerts] Cache loading failed:', error);
@@ -207,7 +203,7 @@ export const useCachedJobAlertsData = () => {
       
       while (tokenRefreshAttempts < maxTokenRefreshAttempts) {
         if (!isTokenValid()) {
-          logger.debug(`[JobAlerts] Token invalid, refreshing (attempt ${tokenRefreshAttempts + 1})`);
+          
           
           const newToken = await refreshToken(true);
           if (!newToken) {
@@ -321,11 +317,6 @@ export const useCachedJobAlertsData = () => {
           }
         }));
         
-        logger.debug('[JobAlerts] Fetch completed successfully:', {
-          duration: fetchDuration,
-          alerts: result.alerts.length,
-          stateUpdates
-        });
       } catch (cacheError) {
         logger.warn('[JobAlerts] Cache write failed:', cacheError);
       }

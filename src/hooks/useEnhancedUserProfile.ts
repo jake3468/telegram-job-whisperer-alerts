@@ -28,19 +28,6 @@ export const useEnhancedUserProfile = () => {
   // Enhanced validation
   const isReady = auth.isValid && !isLoading && !enhancedError;
 
-  // Log authentication and profile state for debugging
-  useEffect(() => {
-    if (auth.clerkUserId) {
-      logger.debug('Enhanced user profile state:', {
-        clerkUserId: auth.clerkUserId,
-        isAuthValid: auth.isValid,
-        hasProfile: !!userProfile,
-        profileId: userProfile?.id,
-        isLoading,
-        error: enhancedError
-      });
-    }
-  }, [auth.clerkUserId, auth.isValid, userProfile, isLoading, enhancedError]);
 
   return {
     userProfile,
