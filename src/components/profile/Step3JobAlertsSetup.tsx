@@ -73,72 +73,72 @@ export const Step3JobAlertsSetup = ({
   const handleCompleteProfile = () => {
     onComplete();
   };
-  return <div className="space-y-6 max-w-full overflow-hidden">
+  return <div className="space-y-4 max-w-full overflow-hidden px-1">
       {/* Step Header */}
-      <div className="flex items-center gap-3 px-2 mb-2">
+      <div className="flex items-center gap-2 mb-2">
         <div className="relative flex-shrink-0">
-          <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl border border-blue-400/30 backdrop-blur-sm">
-            <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
+          <div className="p-2 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl border border-blue-400/30 backdrop-blur-sm">
+            <Bell className="w-4 h-4 sm:w-6 sm:h-6 text-blue-400" />
           </div>
-          <div className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-blue-500 rounded-full flex items-center justify-center">
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
             <span className="text-white text-xs font-bold">3</span>
           </div>
         </div>
         <div className="flex-1 min-w-0">
-          <h2 className="text-sm sm:text-xl font-bold text-white mb-1 truncate">
+          <h2 className="text-sm sm:text-lg font-bold text-white mb-1 truncate">
             Set Up Job Alerts
           </h2>
-          <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
-            Get personalized job opportunities delivered straight to Telegram
+          <p className="text-gray-400 text-xs leading-relaxed">
+            Get personalized job opportunities delivered to Telegram
           </p>
         </div>
       </div>
 
       {/* Profile Completion Status */}
       {!isComplete && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-3">
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2">
           <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
           <div className="min-w-0 flex-1">
-            <p className="text-amber-800 font-medium text-xs sm:text-sm">Complete your profile first</p>
-            <p className="text-amber-700 text-xs sm:text-sm break-words">Upload your resume and write your bio to get the most relevant job alerts.</p>
+            <p className="text-amber-800 font-medium text-xs">Complete your profile first</p>
+            <p className="text-amber-700 text-xs break-words">Upload your resume and bio for relevant alerts.</p>
           </div>
         </div>
       )}
 
       {/* Job Alerts Content */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {/* Value Proposition */}
-        <div className="space-y-3">
-          <p className="text-gray-700 text-xs sm:text-sm font-medium">
-            Get personalized job alerts with everything you need:
+        <div className="space-y-2">
+          <p className="text-gray-700 text-xs font-medium">
+            Get personalized job alerts with:
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+          <div className="grid grid-cols-1 gap-1 text-xs">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0" />
               <span className="truncate">Instant resume generation</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0" />
               <span className="truncate">Custom cover letters</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0" />
               <span className="truncate">Visa sponsorship info</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0" />
               <span className="truncate">Job fit analysis</span>
             </div>
           </div>
         </div>
 
         {/* Preview Image */}
-        <div className="flex justify-center px-2">
-          <div className="relative w-full max-w-[280px] sm:max-w-xs">
+        <div className="w-full overflow-hidden">
+          <div className="relative w-full max-w-[240px] mx-auto">
             <img 
               src="/lovable-uploads/011bb020-d0c1-4c09-b4ea-82b329e1afaa.png" 
               alt="Telegram job alert example" 
-              className="w-full h-auto rounded-lg shadow-md border border-gray-200" 
+              className="w-full h-auto rounded-lg shadow-sm border border-gray-200 max-w-full" 
               loading="lazy" 
               onLoad={() => setImageLoaded(true)} 
               onError={e => {
@@ -148,7 +148,7 @@ export const Step3JobAlertsSetup = ({
             />
             {!imageLoaded && (
               <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
               </div>
             )}
           </div>
