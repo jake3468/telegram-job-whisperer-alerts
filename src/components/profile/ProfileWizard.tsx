@@ -81,8 +81,8 @@ export const ProfileWizard = () => {
   return (
     <div className="w-full max-w-full px-3 py-2 sm:px-4 sm:py-8 sm:max-w-2xl md:max-w-4xl mx-auto overflow-x-hidden min-h-screen flex flex-col justify-between">
       {/* Welcome Header */}
-      <div className="text-center mb-2 sm:mb-6">
-        <h1 className="font-extrabold text-base sm:text-2xl md:text-4xl font-orbitron drop-shadow mb-1 break-words">
+      <div className="text-center mb-3 sm:mb-8">
+        <h1 className="font-extrabold text-lg sm:text-2xl md:text-4xl font-orbitron drop-shadow mb-1 break-words">
           <span className="mr-1 sm:mr-2">🎉</span>
           <span className="bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent">
             Welcome, 
@@ -91,25 +91,25 @@ export const ProfileWizard = () => {
             {user?.firstName || 'User'}
           </span>
         </h1>
-        <p className="text-gray-300 text-xs sm:text-lg mt-1 px-2">Let's set up your profile in just 3 steps</p>
+        <p className="text-gray-300 text-sm sm:text-lg mt-1 px-2">Let's set up your profile in just 3 steps</p>
       </div>
 
       {/* Progress Bar */}
-      <div className="mb-2 sm:mb-6">
-        <div className="flex justify-between items-center mb-1 sm:mb-3">
+      <div className="mb-3 sm:mb-8">
+        <div className="flex justify-between items-center mb-2 sm:mb-4">
           <span className="text-xs sm:text-sm text-gray-400">Progress</span>
           <span className="text-xs sm:text-sm text-gray-400">{getProgressPercentage()}% complete</span>
         </div>
-        <div className="w-full bg-gray-700 rounded-full h-1 sm:h-2">
+        <div className="w-full bg-gray-700 rounded-full h-1.5 sm:h-2">
           <div 
-            className="h-1 sm:h-2 rounded-full bg-gradient-to-r from-red-500 via-orange-400 to-green-500 transition-all duration-500"
+            className="h-1.5 sm:h-2 rounded-full bg-gradient-to-r from-red-500 via-orange-400 to-green-500 transition-all duration-500"
             style={{ width: `${getProgressPercentage()}%` }}
           />
         </div>
       </div>
 
       {/* Step Navigation */}
-      <div className="flex flex-row justify-center items-center space-x-1 sm:space-x-2 mb-2 sm:mb-6">
+      <div className="flex flex-row justify-center items-center space-x-1 sm:space-x-2 mb-4 sm:mb-8">
         {[1, 2, 3].map((stepNum) => {
           const status = getStepStatus(stepNum);
           const isActive = stepNum === currentStep;
