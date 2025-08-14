@@ -156,14 +156,14 @@ export const ProfileWizard = () => {
       </div>
 
       {/* Step Content */}
-      <div className="flex-1 overflow-auto">
+      <div className="overflow-auto mb-4">
         {currentStep === 1 && <Step1ResumeUpload onComplete={nextStep} />}
         {currentStep === 2 && <Step2BioCreation onComplete={nextStep} />}
         {currentStep === 3 && <Step3JobAlertsSetup onComplete={nextStep} />}
       </div>
 
-      {/* Navigation Buttons */}
-      <div className="flex justify-between items-center gap-3 flex-shrink-0 pt-3 pb-2">
+      {/* Navigation Buttons - Moved closer to content */}
+      <div className="flex justify-between items-center gap-3 flex-shrink-0 pt-2 pb-2">
         <Button
           onClick={prevStep}
           variant="outline"
