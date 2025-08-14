@@ -10,6 +10,7 @@ import { useOnboardingPopup } from '@/hooks/useOnboardingPopup';
 import { ResumeHelpPopup } from '@/components/ResumeHelpPopup';
 import { ProfileWizard } from '@/components/profile/ProfileWizard';
 import { ProfileWizardComplete } from '@/components/profile/ProfileWizardComplete';
+import { ProfileResumeSection } from '@/components/profile/ProfileResumeSection';
 import ClerkJWTSetupGuide from '@/components/ClerkJWTSetupGuide';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
@@ -224,9 +225,7 @@ const Profile = () => {
           </div>
         </div>
       ) : (
-        <div className="text-center">
-          <p className="text-gray-300 mb-6">Redirecting to profile setup...</p>
-        </div>
+        <ProfileResumeSection />
       )}
 
       {/* Onboarding Popup */}
