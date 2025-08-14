@@ -102,10 +102,10 @@ const ProfessionalBioSection = () => {
   }
   const isActuallySaved = originalBio === bio && bio.length > 0;
   const showSavedIndicator = optimisticSaved || isActuallySaved;
-  return <Card className="rounded-3xl border-2 border-emerald-400/80 bg-gradient-to-br from-emerald-600/90 via-emerald-700/85 to-emerald-900/90 shadow-2xl shadow-emerald-500/20 transition-all hover:shadow-emerald-500/30 backdrop-blur-sm">
+  return <Card className="rounded-2xl border-2 border-emerald-400/80 bg-gradient-to-br from-emerald-600/90 via-emerald-700/85 to-emerald-900/90 shadow-lg shadow-emerald-500/20 transition-all hover:shadow-emerald-500/30 backdrop-blur-sm">
       
-      <CardContent className="space-y-3 pt-0">
-        <Textarea value={bio} onChange={handleBioChange} placeholder="I enjoy working with startups and exploring AI. My ambition is to build something impactful that people genuinely find value in." rows={4} className="min-h-[100px] border-2 border-emerald-200/40 placeholder-gray-400 font-inter text-gray-100 focus-visible:border-emerald-200 hover:border-emerald-300 text-base resize-none shadow-inner transition-all bg-black" />
+      <CardContent className="space-y-2 pt-0 p-4">
+        <Textarea value={bio} onChange={handleBioChange} placeholder="I enjoy working with startups and exploring AI. My ambition is to build something impactful that people genuinely find value in." rows={3} className="min-h-[80px] border-2 border-emerald-200/40 placeholder-gray-400 font-inter text-gray-100 focus-visible:border-emerald-200 hover:border-emerald-300 text-sm resize-none shadow-inner transition-all bg-black" />
 
         <div className="flex items-center justify-between">
           <Button onClick={handleSaveBio} disabled={saving} className="font-inter font-bold text-xs px-4 py-2 h-9 rounded-lg shadow-lg shadow-emerald-500/20 focus-visible:ring-2 focus-visible:ring-emerald-300 transition-colors text-white bg-blue-800 hover:bg-blue-700 disabled:opacity-50">

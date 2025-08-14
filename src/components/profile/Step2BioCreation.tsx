@@ -58,11 +58,8 @@ export const Step2BioCreation = ({
         </div>}
 
       {/* Bio Section */}
-      <div className="relative flex-1 min-h-0 mb-4">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-xl sm:rounded-2xl blur-xl"></div>
-        <div className="relative bg-gray-900/40 backdrop-blur-sm border border-gray-700/50 rounded-xl sm:rounded-2xl shadow-2xl h-full flex flex-col p-4 sm:p-6">
-          <ProfessionalBioSection />
-        </div>
+      <div className="mb-4">
+        <ProfessionalBioSection />
       </div>
 
       {/* Character Goal */}
