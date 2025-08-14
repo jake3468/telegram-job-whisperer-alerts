@@ -318,23 +318,23 @@ const ResumeSection = ({
   };
   return <section className="p-0 rounded-none bg-transparent shadow-none">
       <Card className="
-          rounded-3xl border-2 border-purple-400/80 
+          rounded-xl border border-purple-400/80 
           bg-gradient-to-br from-purple-600/90 via-purple-700/85 to-purple-900/90
-          shadow-2xl shadow-purple-500/20 transition-all hover:shadow-purple-500/30
+          shadow-lg shadow-purple-500/20 transition-all hover:shadow-purple-500/30
           backdrop-blur-sm
         ">
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-2 pt-3">
           
           
         </CardHeader>
-        <CardContent className="space-y-3 pt-0">
-          {resumeUrl ? <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-xl border border-white/20 bg-black/70 shadow-inner">
+        <CardContent className="space-y-2 pt-0 px-3 pb-3">
+          {resumeUrl ? <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 rounded-lg border border-white/20 bg-black/70 shadow-inner">
               <div className="flex items-center gap-2 min-w-0">
-                <div className="w-8 h-8 bg-purple-500/60 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple-500/40">
-                  <FileText className="w-4 h-4 text-white" />
+                <div className="w-6 h-6 bg-purple-500/60 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple-500/40">
+                  <FileText className="w-3 h-3 text-white" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <span className="text-white font-inter font-medium text-sm break-words block leading-tight">
+                  <span className="text-white font-inter font-medium text-xs break-words block leading-tight">
                     {getDisplayFilename()}
                   </span>
                   <span className="text-white/70 text-xs">
@@ -342,18 +342,18 @@ const ResumeSection = ({
                   </span>
                 </div>
               </div>
-              <Button variant="destructive" size="sm" onClick={handleDeleteResume} disabled={uploading || !sessionManager} className="font-inter bg-red-500 hover:bg-red-600 transition-all text-xs px-4 py-1 h-8 flex-shrink-0 rounded-lg">
+              <Button variant="destructive" size="sm" onClick={handleDeleteResume} disabled={uploading || !sessionManager} className="font-inter bg-red-500 hover:bg-red-600 transition-all text-xs px-3 py-1 h-7 flex-shrink-0 rounded-lg mt-2 sm:mt-0">
                 <Trash2 className="w-3 h-3 mr-1" />
                 Delete
               </Button>
-            </div> : <div className="border-2 border-dashed border-white/70 rounded-xl p-5 sm:p-8 text-center cursor-pointer hover:border-purple-300 hover:bg-purple-400/15 transition-all duration-300 bg-black/60 shadow-inner" onClick={triggerFileInput}>
-              <div className="w-14 h-14 bg-purple-500/50 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg shadow-purple-500/30">
-                <Upload className="w-7 h-7 text-purple-100" />
+            </div> : <div className="border-2 border-dashed border-white/70 rounded-lg p-3 sm:p-4 text-center cursor-pointer hover:border-purple-300 hover:bg-purple-400/15 transition-all duration-300 bg-black/60 shadow-inner" onClick={triggerFileInput}>
+              <div className="w-10 h-10 bg-purple-500/50 rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg shadow-purple-500/30">
+                <Upload className="w-5 h-5 text-purple-100" />
               </div>
-              <p className="text-white font-inter mb-4 font-semibold text-sm">
+              <p className="text-white font-inter mb-3 font-semibold text-xs">
                 Click to upload or drag and drop your resume
               </p>
-              <Button disabled={uploading || !sessionManager} className="font-inter bg-white text-purple-700 hover:bg-purple-50 font-bold px-4 py-2 h-9 rounded-lg shadow-lg shadow-purple-500/20 text-xs">
+              <Button disabled={uploading || !sessionManager} className="font-inter bg-white text-purple-700 hover:bg-purple-50 font-bold px-3 py-1.5 h-7 rounded-lg shadow-lg shadow-purple-500/20 text-xs">
                 {uploading ? 'Uploading...' : 'Upload Resume'}
               </Button>
               <input id="resume-upload" type="file" accept=".pdf" onChange={handleFileUpload} className="hidden" disabled={uploading || !sessionManager} />
