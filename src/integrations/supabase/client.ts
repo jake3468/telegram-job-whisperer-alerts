@@ -55,9 +55,6 @@ const injectTokenIntoClient = (token: string | null) => {
         'Content-Type': 'application/json',
         'Prefer': 'return=minimal'
       };
-      
-      console.debug('✅ Token injected successfully');
-      console.debug('📋 Headers set:', Object.keys((supabase as any).rest.headers));
     } else {
       // Reset to default headers
       (supabase as any).rest.headers = {
@@ -65,11 +62,9 @@ const injectTokenIntoClient = (token: string | null) => {
         'Content-Type': 'application/json',
         'Prefer': 'return=minimal'
       };
-      
-      console.debug('🔓 Token removed from Supabase client');
     }
   } catch (error) {
-    console.error('❌ Error injecting token:', error);
+    // Silent error handling for production
   }
 };
 
@@ -137,8 +132,7 @@ export const makeAuthenticatedRequest = async <T>(
         throw new Error('Authentication required - please sign in');
       }
 
-      // Force inject token right before operation with explicit logging
-      console.debug(`🔧 Injecting token for attempt ${attempt + 1}:`, token.substring(0, 30) + '...');
+      // Force inject token right before operation
       injectTokenIntoClient(token);
 
       // Execute operation with fresh token injection
@@ -205,22 +199,8 @@ export const refreshJWTToken = async (): Promise<string | null> => {
 };
 
 export const setClerkToken = async (token: string | null) => {
-  // Inject token directly into the main client and log for debugging
-  console.debug('🔑 Setting Clerk token in Supabase client:', !!token);
-  if (token) {
-    console.debug('Token length:', token.length);
-    console.debug('Token preview:', token.substring(0, 50) + '...');
-  }
+  // Inject token directly into the main client
   injectTokenIntoClient(token);
-  
-  // Test the connection immediately
-  try {
-    const { data, error } = await supabase.rpc('debug_user_auth');
-    console.debug('🧪 Auth test result:', { data, error });
-  } catch (testError) {
-    console.warn('⚠️ Auth test failed:', testError);
-  }
-  
   return true;
 };
 

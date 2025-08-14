@@ -36,15 +36,11 @@ export const useClerkSupabaseSync = () => {
         const token = await getToken({ template: 'supabase' });
         
         if (token) {
-          console.debug('🔄 Initial Clerk token sync, length:', token.length);
           const success = await setClerkToken(token);
           if (success) {
             syncedRef.current = true;
             tokenSetRef.current = true;
-            console.debug('✅ Clerk token successfully synced to Supabase');
           }
-        } else {
-          console.warn('⚠️ No Clerk token available for initial sync');
         }
       } catch (error) {
         console.error('Error in token setup:', error);
