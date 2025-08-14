@@ -15,8 +15,7 @@ export const Step1ResumeUpload = ({
   const {
     hasResume
   } = useCachedUserCompletionStatus();
-  return (
-    <div className="space-y-4 sm:space-y-6 max-w-2xl mx-auto">
+  return <div className="space-y-4 sm:space-y-6 max-w-2xl mx-auto">
       {/* Step Header */}
       <div className="text-center px-2">
         <div className="flex items-center justify-center mb-4">
@@ -38,17 +37,15 @@ export const Step1ResumeUpload = ({
       </div>
 
       {/* Success Message */}
-      {hasResume && (
-        <div className="bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-400/20 rounded-xl p-4 flex items-center gap-3 backdrop-blur-sm">
+      {hasResume && <div className="bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-400/20 rounded-xl p-4 flex items-center gap-3 backdrop-blur-sm">
           <div className="flex-shrink-0 w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center">
             <CheckCircle className="w-5 h-5 text-emerald-400" />
           </div>
           <div>
             <p className="text-emerald-300 font-semibold text-sm">Resume uploaded successfully!</p>
-            <p className="text-emerald-200/80 text-xs">You can continue to the next step or update your resume below.</p>
+            <p className="text-emerald-200/80 text-xs">You can now continue to the next step.</p>
           </div>
-        </div>
-      )}
+        </div>}
 
       {/* Resume Upload Section */}
       <div className="relative">
@@ -68,6 +65,5 @@ export const Step1ResumeUpload = ({
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
+    </div>;
 };
