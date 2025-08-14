@@ -79,9 +79,9 @@ export const ProfileWizard = () => {
   }
 
   return (
-    <div className="h-screen w-full max-w-full px-3 py-2 sm:px-4 sm:py-4 sm:max-w-2xl md:max-w-4xl mx-auto overflow-hidden flex flex-col">
+    <div className="h-screen w-full max-w-full px-3 py-1 sm:px-4 sm:py-4 sm:max-w-2xl md:max-w-4xl mx-auto overflow-hidden flex flex-col">
       {/* Welcome Header */}
-      <div className="text-center mb-2 sm:mb-4">
+      <div className="text-center mb-1 sm:mb-4">
         <h1 className="font-extrabold text-lg sm:text-2xl md:text-4xl font-orbitron drop-shadow mb-1 break-words">
           <span className="mr-1 sm:mr-2">🎉</span>
           <span className="bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent">
@@ -95,8 +95,8 @@ export const ProfileWizard = () => {
       </div>
 
       {/* Progress Bar */}
-      <div className="mb-2 sm:mb-4">
-        <div className="flex justify-between items-center mb-2">
+      <div className="mb-1 sm:mb-3">
+        <div className="flex justify-between items-center mb-1">
           <span className="text-xs sm:text-sm text-gray-400">Progress</span>
           <span className="text-xs sm:text-sm text-gray-400">{getProgressPercentage()}% complete</span>
         </div>
@@ -109,7 +109,7 @@ export const ProfileWizard = () => {
       </div>
 
       {/* Step Navigation */}
-      <div className="flex flex-row justify-center items-center space-x-1 sm:space-x-2 mb-3 sm:mb-4">
+      <div className="flex flex-row justify-center items-center space-x-1 sm:space-x-2 mb-2 sm:mb-3">
         {[1, 2, 3].map((stepNum) => {
           const status = getStepStatus(stepNum);
           const isActive = stepNum === currentStep;
