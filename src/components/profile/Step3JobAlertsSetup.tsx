@@ -190,26 +190,7 @@ export const Step3JobAlertsSetup = ({
             <ExternalLink className="w-3 h-3 mr-2 flex-shrink-0" />
             <span className="text-xs leading-tight break-words">Activate Telegram Bot</span>
           </Button>
-          
-          <Button 
-            onClick={handleCreateJobAlerts} 
-            variant="outline" 
-            className="w-full border-blue-300 text-blue-600 hover:bg-blue-50 py-2 px-3 h-auto min-h-[40px]"
-          >
-            <Bell className="w-3 h-3 mr-2 flex-shrink-0" />
-            <span className="text-xs leading-tight break-words">Create Job Alerts</span>
-          </Button>
         </div>
-      </div>
-
-      {/* Complete Setup Button */}
-      <div className="text-center pt-3">
-        <Button 
-          onClick={handleCompleteProfile} 
-          className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white font-semibold px-4 py-2 h-auto min-h-[40px] w-full max-w-[280px]"
-        >
-          <span className="text-xs leading-tight break-words">Complete Profile Setup 🎉</span>
-        </Button>
       </div>
     </div>;
 };
