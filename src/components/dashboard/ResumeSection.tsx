@@ -164,9 +164,15 @@ const ResumeSection = ({
         console.log('Removing existing resume at path:', existingResumePath);
         await supabase.storage.from('resumes').remove([existingResumePath]);
 
+        // Ensure we have a valid token before storage operations
+        const currentToken = await sessionManager.ensureTokenForOperation();
+        if (!currentToken) {
+          throw new Error('Authentication token not available');
+        }
+
         // Upload new file
         const filePath = `${user.id}/resume.pdf`;
-        console.log('Uploading to path:', filePath);
+        console.log('Uploading to path:', filePath, 'with user:', user.id);
         const {
           error: uploadError
         } = await supabase.storage.from('resumes').upload(filePath, file, {
@@ -221,6 +227,12 @@ const ResumeSection = ({
         const {
           supabase
         } = await import('@/integrations/supabase/client');
+
+        // Ensure we have a valid token before storage operations
+        const currentToken = await sessionManager.ensureTokenForOperation();
+        if (!currentToken) {
+          throw new Error('Authentication token not available');
+        }
 
         // Delete from Supabase storage
         const filePath = `${user.id}/resume.pdf`;
