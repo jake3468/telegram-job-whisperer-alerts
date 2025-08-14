@@ -109,21 +109,21 @@ export const ProfileWizard = () => {
       </div>
 
       {/* Step Navigation */}
-      <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8 sm:mb-12">
+      <div className="flex flex-row justify-center items-center space-x-2 sm:space-x-4 mb-6 sm:mb-8">
         {[1, 2, 3].map((stepNum) => {
           const status = getStepStatus(stepNum);
           const isActive = stepNum === currentStep;
           
           return (
-            <div key={stepNum} className="flex flex-row sm:flex-col items-center w-full sm:w-auto">
+            <div key={stepNum} className="flex flex-col items-center">
               <button
                 onClick={() => setCurrentStep(stepNum)}
-                className={`flex flex-row sm:flex-col items-center transition-all duration-200 min-h-[44px] px-3 py-2 sm:p-0 ${
+                className={`flex flex-col items-center transition-all duration-200 min-h-[44px] px-2 py-2 ${
                   status === 'pending' && stepNum !== currentStep ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:scale-105'
                 }`}
                 disabled={status === 'pending' && stepNum !== currentStep}
               >
-                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-sm sm:text-lg mb-0 sm:mb-2 mr-3 sm:mr-0 transition-all duration-200 ${
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-sm sm:text-lg mb-1 sm:mb-2 transition-all duration-200 ${
                   status === 'complete' 
                     ? 'bg-emerald-500 text-black' 
                     : isActive 
@@ -132,18 +132,21 @@ export const ProfileWizard = () => {
                 }`}>
                   {status === 'complete' ? '✓' : stepNum}
                 </div>
-                <span className={`text-sm font-medium break-words ${
+                <span className={`text-xs sm:text-sm font-medium text-center break-words ${
                   isActive ? 'text-blue-400' : status === 'complete' ? 'text-emerald-400' : 'text-gray-400'
                 }`}>
                   {stepNum === 1 ? 'Resume' : stepNum === 2 ? 'Bio' : 'Job Alerts'}
                 </span>
               </button>
               {stepNum < 3 && (
-                <div className={`hidden sm:block w-16 h-1 mx-4 transition-all duration-200 ${
+                <div className={`absolute top-4 sm:top-5 left-1/2 w-8 sm:w-16 h-0.5 sm:h-1 transition-all duration-200 ${
                   getStepStatus(stepNum) === 'complete' 
                     ? 'bg-gradient-to-r from-emerald-400 to-blue-400' 
                     : 'bg-gray-600'
-                }`} />
+                }`} style={{ 
+                  transform: `translateX(${stepNum === 1 ? '100%' : '200%'})`,
+                  zIndex: -1 
+                }} />
               )}
             </div>
           );
