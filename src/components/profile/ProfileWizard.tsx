@@ -157,7 +157,7 @@ export const ProfileWizard = () => {
         </div>
 
         {/* Step Content */}
-        <div className="flex-1 overflow-hidden">
+        <div className="overflow-hidden">
           {currentStep === 1 && <Step1ResumeUpload onComplete={nextStep} />}
           {currentStep === 2 && <Step2BioCreation onComplete={nextStep} />}
           {currentStep === 3 && <Step3JobAlertsSetup onComplete={nextStep} />}
