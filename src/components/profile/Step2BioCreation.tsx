@@ -61,22 +61,20 @@ export const Step2BioCreation = ({
       {/* Bio Section */}
       <div className="relative flex-1 min-h-0 mb-4">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-xl sm:rounded-2xl blur-xl"></div>
-        <Card className="relative bg-gray-900/40 backdrop-blur-sm border border-gray-700/50 rounded-xl sm:rounded-2xl shadow-2xl h-full flex flex-col">
-          <CardContent className="p-4 sm:p-6 flex-1 flex flex-col min-h-0">
-            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <div className="p-1.5 sm:p-2 bg-blue-500/20 rounded-lg">
-                <PenTool className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
-              </div>
-              <div>
-                <h3 className="text-white font-semibold text-sm sm:text-base">Professional Bio</h3>
-                <p className="text-gray-400 text-xs">Write your professional summary</p>
-              </div>
+        <div className="relative bg-gray-900/40 backdrop-blur-sm border border-gray-700/50 rounded-xl sm:rounded-2xl shadow-2xl h-full flex flex-col p-4 sm:p-6">
+          <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <div className="p-1.5 sm:p-2 bg-blue-500/20 rounded-lg">
+              <PenTool className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
             </div>
-            <div className="flex-1 min-h-0">
-              <ProfessionalBioSection />
+            <div>
+              <h3 className="text-white font-semibold text-sm sm:text-base">Professional Bio</h3>
+              <p className="text-gray-400 text-xs">Write your professional summary</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="flex-1 min-h-0">
+            <ProfessionalBioSection />
+          </div>
+        </div>
       </div>
 
       {/* Character Goal */}
