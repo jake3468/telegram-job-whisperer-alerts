@@ -109,11 +109,7 @@ export const Step2BioCreation = ({
             {showExamples ? 'Hide Examples' : 'View Example Bios'}
           </Button>
           
-          {showExamples && <div className="space-y-3">
-              {BIO_EXAMPLES.map((example, index) => <div key={index} className="p-2 sm:p-3 bg-blue-900/20 rounded-lg border border-blue-400/20">
-                  <p className="text-gray-300 text-xs sm:text-sm italic break-words">{example}</p>
-                </div>)}
-            </div>}
+          {showExamples}
         </div>
       </div>
 
