@@ -323,11 +323,11 @@ const ResumeSection = ({
           shadow-lg shadow-purple-500/20 transition-all hover:shadow-purple-500/30
           backdrop-blur-sm
         ">
-        <CardHeader className="pb-2 pt-3">
+        <CardHeader className="pb-1 pt-2">
           
           
         </CardHeader>
-        <CardContent className="space-y-2 pt-0 px-3 pb-3">
+        <CardContent className="space-y-2 pt-0 px-3 pb-2">
           {resumeUrl ? <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 rounded-lg border border-white/20 bg-black/70 shadow-inner">
               <div className="flex items-center gap-2 min-w-0">
                 <div className="w-6 h-6 bg-purple-500/60 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple-500/40">
