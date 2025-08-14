@@ -102,7 +102,7 @@ export const ProfileWizard = () => {
         </div>
         <div className="w-full bg-gray-700 rounded-full h-2">
           <div 
-            className="h-2 rounded-full bg-gradient-to-r from-emerald-400 to-blue-400 transition-all duration-500"
+            className="h-2 rounded-full bg-gradient-to-r from-red-500 via-orange-400 to-green-500 transition-all duration-500"
             style={{ width: `${getProgressPercentage()}%` }}
           />
         </div>
