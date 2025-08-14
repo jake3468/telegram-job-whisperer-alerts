@@ -79,11 +79,11 @@ export const ProfileWizard = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="w-full max-w-full px-3 py-4 sm:px-4 sm:py-8 sm:max-w-2xl md:max-w-4xl mx-auto overflow-x-hidden">
       {/* Welcome Header */}
-      <div className="text-center mb-8">
-        <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron drop-shadow mb-2">
-          <span className="mr-2">🎉</span>
+      <div className="text-center mb-6 sm:mb-8">
+        <h1 className="font-extrabold text-xl sm:text-2xl md:text-4xl font-orbitron drop-shadow mb-2 break-words">
+          <span className="mr-1 sm:mr-2">🎉</span>
           <span className="bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent">
             Welcome, 
           </span>
@@ -91,14 +91,14 @@ export const ProfileWizard = () => {
             {user?.firstName || 'User'}
           </span>
         </h1>
-        <p className="text-gray-300 text-lg mt-2">Let's set up your profile in just 3 steps</p>
+        <p className="text-gray-300 text-base sm:text-lg mt-2 px-2">Let's set up your profile in just 3 steps</p>
       </div>
 
       {/* Progress Bar */}
-      <div className="mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-sm text-gray-400">Progress</span>
-          <span className="text-sm text-gray-400">{getProgressPercentage()}% complete</span>
+      <div className="mb-6 sm:mb-8">
+        <div className="flex justify-between items-center mb-3 sm:mb-4">
+          <span className="text-xs sm:text-sm text-gray-400">Progress</span>
+          <span className="text-xs sm:text-sm text-gray-400">{getProgressPercentage()}% complete</span>
         </div>
         <div className="w-full bg-gray-700 rounded-full h-2">
           <div 
@@ -109,21 +109,21 @@ export const ProfileWizard = () => {
       </div>
 
       {/* Step Navigation */}
-      <div className="flex justify-center items-center space-x-4 mb-12">
+      <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8 sm:mb-12">
         {[1, 2, 3].map((stepNum) => {
           const status = getStepStatus(stepNum);
           const isActive = stepNum === currentStep;
           
           return (
-            <div key={stepNum} className="flex items-center">
+            <div key={stepNum} className="flex flex-row sm:flex-col items-center w-full sm:w-auto">
               <button
                 onClick={() => setCurrentStep(stepNum)}
-                className={`flex flex-col items-center transition-all duration-200 ${
+                className={`flex flex-row sm:flex-col items-center transition-all duration-200 min-h-[44px] px-3 py-2 sm:p-0 ${
                   status === 'pending' && stepNum !== currentStep ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:scale-105'
                 }`}
                 disabled={status === 'pending' && stepNum !== currentStep}
               >
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg mb-2 transition-all duration-200 ${
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-sm sm:text-lg mb-0 sm:mb-2 mr-3 sm:mr-0 transition-all duration-200 ${
                   status === 'complete' 
                     ? 'bg-emerald-500 text-black' 
                     : isActive 
@@ -132,14 +132,14 @@ export const ProfileWizard = () => {
                 }`}>
                   {status === 'complete' ? '✓' : stepNum}
                 </div>
-                <span className={`text-sm font-medium ${
+                <span className={`text-sm font-medium break-words ${
                   isActive ? 'text-blue-400' : status === 'complete' ? 'text-emerald-400' : 'text-gray-400'
                 }`}>
                   {stepNum === 1 ? 'Resume' : stepNum === 2 ? 'Bio' : 'Job Alerts'}
                 </span>
               </button>
               {stepNum < 3 && (
-                <div className={`w-16 h-1 mx-4 transition-all duration-200 ${
+                <div className={`hidden sm:block w-16 h-1 mx-4 transition-all duration-200 ${
                   getStepStatus(stepNum) === 'complete' 
                     ? 'bg-gradient-to-r from-emerald-400 to-blue-400' 
                     : 'bg-gray-600'
@@ -151,30 +151,30 @@ export const ProfileWizard = () => {
       </div>
 
       {/* Step Content */}
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         {currentStep === 1 && <Step1ResumeUpload onComplete={nextStep} />}
         {currentStep === 2 && <Step2BioCreation onComplete={nextStep} />}
         {currentStep === 3 && <Step3JobAlertsSetup onComplete={nextStep} />}
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-0">
         <Button
           onClick={prevStep}
           variant="outline"
           disabled={currentStep === 1}
-          className="flex items-center gap-2"
+          className="flex items-center justify-center gap-2 min-h-[44px] order-2 sm:order-1"
         >
           <ChevronLeft className="w-4 h-4" />
           Previous
         </Button>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 order-1 sm:order-2">
           {currentStep < TOTAL_STEPS && (
             <Button
               onClick={() => nextStep()}
               variant="ghost"
-              className="text-gray-400 hover:text-gray-300"
+              className="text-gray-400 hover:text-gray-300 min-h-[44px] order-2 sm:order-1"
             >
               Skip for now
             </Button>
@@ -183,9 +183,11 @@ export const ProfileWizard = () => {
           <Button
             onClick={nextStep}
             disabled={currentStep < TOTAL_STEPS && !canProceedToNext() || isCompleting}
-            className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+            className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 min-h-[44px] order-1 sm:order-2"
           >
-            {isCompleting ? 'Completing...' : currentStep === TOTAL_STEPS ? 'Complete Setup' : 'Continue'}
+            <span className="break-words text-center">
+              {isCompleting ? 'Completing...' : currentStep === TOTAL_STEPS ? 'Complete Setup' : 'Continue'}
+            </span>
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
