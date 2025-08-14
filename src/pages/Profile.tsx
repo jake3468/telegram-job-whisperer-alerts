@@ -229,6 +229,18 @@ const Profile = () => {
       ) : (
         <div className="space-y-6">
           <ProfileResumeSection />
+          
+          {/* Need help fixing resume button */}
+          <div className="max-w-2xl mx-auto px-2">
+            <Button 
+              onClick={() => setShowResumeHelp(true)}
+              variant="secondary"
+              className="w-full bg-gray-800/50 hover:bg-gray-700/50 text-gray-200 border border-gray-600/30 rounded-lg py-3 text-sm font-medium transition-colors"
+            >
+              Need help fixing your resume ?
+            </Button>
+          </div>
+          
           <ProfileBioSection />
           <ProfileJobAlertsSection />
         </div>
@@ -241,7 +253,11 @@ const Profile = () => {
       
       {/* Resume Help Popup */}
       {showResumeHelp && (
-        <ResumeHelpPopup isOpen={showResumeHelp} onClose={() => setShowResumeHelp(false)} />
+        <ResumeHelpPopup 
+          isOpen={showResumeHelp} 
+          onClose={() => setShowResumeHelp(false)} 
+          userProfileId={userProfile?.id}
+        />
       )}
     </Layout>
   );
