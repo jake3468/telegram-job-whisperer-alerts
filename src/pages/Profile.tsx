@@ -28,6 +28,9 @@ const Profile = () => {
   const { userProfile, updateUserProfile } = useUserProfile();
   const { toast } = useToast();
 
+  // Check if we should show wizard or full profile
+  const shouldShowWizard = userProfile && !userProfile.profile_setup_completed;
+
   // Connection and error state management
   const [connectionIssue, setConnectionIssue] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,12 +41,7 @@ const Profile = () => {
   // Check if we're in wizard mode
   const isWizardMode = step || window.location.pathname.includes('/step/') || window.location.pathname.includes('/complete');
 
-  // Redirect to wizard by default for new flow
-  useEffect(() => {
-    if (isLoaded && user && !isWizardMode && !window.location.pathname.includes('/profile/step') && !window.location.pathname.includes('/profile/complete')) {
-      navigate('/profile/step/1');
-    }
-  }, [isLoaded, user, isWizardMode, navigate]);
+  // No longer redirecting to step URLs
   useEffect(() => {
     if (isLoaded && !user) {
       navigate('/');
@@ -155,30 +153,8 @@ const Profile = () => {
       </div>;
   }
 
-  // Render wizard or complete page if in wizard mode
-  if (step === 'complete' || window.location.pathname.includes('/complete')) {
-    return (
-      <Layout>
-        <ProfileWizardComplete />
-        {/* Onboarding Popup */}
-        {showPopup && (
-          <OnboardingPopup isOpen={showPopup} onClose={hidePopup} onDontShowAgain={dontShowAgain} />
-        )}
-        {/* Resume Help Popup */}
-        {showResumeHelp && (
-          <ResumeHelpPopup isOpen={showResumeHelp} onClose={() => setShowResumeHelp(false)} />
-        )}
-        {/* JWT Setup Guide */}
-        {showJWTSetupGuide && Environment.isDevelopment() && !connectionIssue && (
-          <div className="mb-8 flex justify-center">
-            <ClerkJWTSetupGuide />
-          </div>
-        )}
-      </Layout>
-    );
-  }
-
-  if (isWizardMode) {
+  // Show wizard if profile setup not completed
+  if (shouldShowWizard) {
     return (
       <Layout>
         <ProfileWizard />

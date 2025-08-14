@@ -69,6 +69,10 @@ export const Step3JobAlertsSetup = ({ onComplete }: Step3JobAlertsSetupProps) =>
     navigate('/job-alerts');
   }, [navigate, updateActivity]);
 
+  const handleCompleteProfile = () => {
+    onComplete();
+  };
+
   return (
     <div className="space-y-6">
       {/* Step Header */}
@@ -248,10 +252,10 @@ export const Step3JobAlertsSetup = ({ onComplete }: Step3JobAlertsSetupProps) =>
       {/* Complete Setup Button */}
       <div className="text-center pt-4">
         <Button 
-          onClick={onComplete}
+          onClick={handleCompleteProfile}
           className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white font-semibold px-8"
         >
-          Complete Profile Setup
+          Complete Profile Setup 🎉
         </Button>
       </div>
     </div>

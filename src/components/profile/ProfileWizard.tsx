@@ -1,53 +1,64 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useCachedUserCompletionStatus } from '@/hooks/useCachedUserCompletionStatus';
+import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 import { Step1ResumeUpload } from './Step1ResumeUpload';
 import { Step2BioCreation } from './Step2BioCreation';
 import { Step3JobAlertsSetup } from './Step3JobAlertsSetup';
 import { ProfileWizardComplete } from './ProfileWizardComplete';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const TOTAL_STEPS = 3;
 
 export const ProfileWizard = () => {
-  const { step } = useParams();
-  const navigate = useNavigate();
   const { user } = useUser();
-  const { hasResume, hasBio, isComplete } = useCachedUserCompletionStatus();
-  
-  const currentStep = parseInt(step || '1');
-  
-  // Redirect if invalid step
-  useEffect(() => {
-    if (currentStep < 1 || currentStep > TOTAL_STEPS) {
-      navigate('/profile/step/1');
-    }
-  }, [currentStep, navigate]);
-
-  const goToStep = (stepNumber: number) => {
-    navigate(`/profile/step/${stepNumber}`);
-  };
+  const { hasResume, hasBio } = useCachedUserCompletionStatus();
+  const { userProfile, refetch } = useCachedUserProfile();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isCompleting, setIsCompleting] = useState(false);
 
   const nextStep = () => {
     if (currentStep < TOTAL_STEPS) {
-      goToStep(currentStep + 1);
+      setCurrentStep(currentStep + 1);
     } else {
-      navigate('/profile/complete');
+      completeSetup();
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1) {
-      goToStep(currentStep - 1);
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const completeSetup = async () => {
+    if (!userProfile?.id) return;
+    
+    setIsCompleting(true);
+    try {
+      const { error } = await supabase
+        .from('user_profile')
+        .update({ profile_setup_completed: true })
+        .eq('id', userProfile.id);
+
+      if (error) throw error;
+
+      toast.success('Profile setup completed! 🎉');
+      await refetch();
+    } catch (error) {
+      console.error('Error completing setup:', error);
+      toast.error('Failed to complete setup');
+    } finally {
+      setIsCompleting(false);
     }
   };
 
   const getStepStatus = (stepNum: number) => {
-    if (stepNum === 1) return hasResume ? 'complete' : 'current';
-    if (stepNum === 2) return hasBio ? 'complete' : hasResume ? 'current' : 'pending';
-    if (stepNum === 3) return isComplete ? 'current' : 'pending';
+    if (stepNum < currentStep) return 'complete';
+    if (stepNum === currentStep) return 'current';
     return 'pending';
   };
 
@@ -59,14 +70,11 @@ export const ProfileWizard = () => {
   };
 
   const getProgressPercentage = () => {
-    let progress = 0;
-    if (hasResume) progress += 33;
-    if (hasBio) progress += 33;
-    if (isComplete) progress += 34;
-    return progress;
+    return Math.round((currentStep / TOTAL_STEPS) * 100);
   };
 
-  if (currentStep === 4 || (currentStep > TOTAL_STEPS)) {
+  // Show completion screen if profile setup is completed
+  if (userProfile?.profile_setup_completed) {
     return <ProfileWizardComplete />;
   }
 
@@ -109,7 +117,7 @@ export const ProfileWizard = () => {
           return (
             <div key={stepNum} className="flex items-center">
               <button
-                onClick={() => goToStep(stepNum)}
+                onClick={() => setCurrentStep(stepNum)}
                 className={`flex flex-col items-center transition-all duration-200 ${
                   status === 'pending' && stepNum !== currentStep ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:scale-105'
                 }`}
@@ -174,10 +182,10 @@ export const ProfileWizard = () => {
           
           <Button
             onClick={nextStep}
-            disabled={currentStep < TOTAL_STEPS && !canProceedToNext()}
+            disabled={currentStep < TOTAL_STEPS && !canProceedToNext() || isCompleting}
             className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
           >
-            {currentStep === TOTAL_STEPS ? 'Complete Setup' : 'Continue'}
+            {isCompleting ? 'Completing...' : currentStep === TOTAL_STEPS ? 'Complete Setup' : 'Continue'}
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
