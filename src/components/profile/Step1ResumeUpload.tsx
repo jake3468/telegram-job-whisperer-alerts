@@ -6,18 +6,20 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Upload, FileText } from 'lucide-react';
 import { ResumeHelpPopup } from '@/components/ResumeHelpPopup';
-
 interface Step1ResumeUploadProps {
   onComplete: () => void;
 }
-
-export const Step1ResumeUpload = ({ onComplete }: Step1ResumeUploadProps) => {
-  const { updateActivity } = useFormTokenKeepAlive(true);
-  const { hasResume } = useCachedUserCompletionStatus();
+export const Step1ResumeUpload = ({
+  onComplete
+}: Step1ResumeUploadProps) => {
+  const {
+    updateActivity
+  } = useFormTokenKeepAlive(true);
+  const {
+    hasResume
+  } = useCachedUserCompletionStatus();
   const [showResumeHelp, setShowResumeHelp] = useState(false);
-
-  return (
-    <div className="space-y-4 sm:space-y-6">
+  return <div className="space-y-4 sm:space-y-6">
       {/* Step Header */}
       <div className="text-center px-2">
         <div className="flex items-center justify-center mb-3 sm:mb-4">
@@ -28,21 +30,17 @@ export const Step1ResumeUpload = ({ onComplete }: Step1ResumeUploadProps) => {
         <h2 className="text-lg sm:text-xl md:text-2xl font-orbitron font-bold text-blue-400 mb-2 break-words">
           Upload Your Resume
         </h2>
-        <p className="text-gray-300 text-sm sm:text-base md:text-lg break-words">
-          Help us understand your background to provide better job matches
-        </p>
+        <p className="text-gray-300 text-sm sm:text-base md:text-lg break-words">Upload your resume (PDF, max 5MB) so our AI can better understand your background and personalize your experience</p>
       </div>
 
       {/* Success Message */}
-      {hasResume && (
-        <div className="bg-emerald-900/20 border border-emerald-400/30 rounded-lg p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+      {hasResume && <div className="bg-emerald-900/20 border border-emerald-400/30 rounded-lg p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
           <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" />
           <div>
             <p className="text-emerald-300 font-medium text-sm sm:text-base break-words">Resume uploaded successfully!</p>
             <p className="text-emerald-200 text-xs sm:text-sm break-words">You can continue to the next step or update your resume below.</p>
           </div>
-        </div>
-      )}
+        </div>}
 
       {/* Resume Upload Section */}
       <Card className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border-blue-400/30">
@@ -59,15 +57,10 @@ export const Step1ResumeUpload = ({ onComplete }: Step1ResumeUploadProps) => {
 
       {/* Help Section */}
       <div className="text-center">
-        <Button 
-          onClick={() => {
-            updateActivity();
-            setShowResumeHelp(true);
-          }} 
-          variant="outline" 
-          size="sm" 
-          className="border-blue-200 hover:border-blue-300 text-white bg-black/20 min-h-[44px] px-4 break-words"
-        >
+        <Button onClick={() => {
+        updateActivity();
+        setShowResumeHelp(true);
+      }} variant="outline" size="sm" className="border-blue-200 hover:border-blue-300 text-white bg-black/20 min-h-[44px] px-4 break-words">
           Need help fixing your resume?
         </Button>
       </div>
@@ -98,21 +91,13 @@ export const Step1ResumeUpload = ({ onComplete }: Step1ResumeUploadProps) => {
       </div>
 
       {/* Quick Action Buttons */}
-      {hasResume && (
-        <div className="text-center pt-4">
-          <Button 
-            onClick={onComplete}
-            className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white font-semibold px-6 sm:px-8 min-h-[44px] break-words"
-          >
+      {hasResume && <div className="text-center pt-4">
+          <Button onClick={onComplete} className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white font-semibold px-6 sm:px-8 min-h-[44px] break-words">
             Continue to Bio →
           </Button>
-        </div>
-      )}
+        </div>}
 
       {/* Resume Help Popup */}
-      {showResumeHelp && (
-        <ResumeHelpPopup isOpen={showResumeHelp} onClose={() => setShowResumeHelp(false)} />
-      )}
-    </div>
-  );
+      {showResumeHelp && <ResumeHelpPopup isOpen={showResumeHelp} onClose={() => setShowResumeHelp(false)} />}
+    </div>;
 };
