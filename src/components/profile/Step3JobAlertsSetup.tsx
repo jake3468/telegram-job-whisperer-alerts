@@ -34,12 +34,12 @@ export const Step3JobAlertsSetup = ({
         await navigator.clipboard.writeText(userProfile.id);
         toast({
           title: "Copied!",
-          description: "Your Bot ID has been copied to clipboard"
+          description: "Your Activation Key has been copied to clipboard"
         });
       } catch (err) {
         toast({
           title: "Copy failed",
-          description: "Please manually copy the Bot ID",
+          description: "Please manually copy the Activation Key",
           variant: "destructive"
         });
       }
