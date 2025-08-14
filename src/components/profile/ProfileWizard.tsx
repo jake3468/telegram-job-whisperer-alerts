@@ -79,7 +79,7 @@ export const ProfileWizard = () => {
   }
 
   return (
-    <div className="h-screen w-full max-w-full px-3 py-1 sm:px-4 sm:py-2 sm:max-w-2xl md:max-w-4xl mx-auto flex flex-col overflow-hidden">
+    <div className="w-full max-w-full px-3 py-1 sm:px-4 sm:py-2 sm:max-w-2xl md:max-w-4xl mx-auto flex flex-col">
       {/* Welcome Header */}
       <div className="text-center mb-1 sm:mb-2">
         <h1 className="font-extrabold text-lg sm:text-2xl md:text-4xl font-orbitron drop-shadow mb-1 break-words">
@@ -95,7 +95,7 @@ export const ProfileWizard = () => {
       </div>
 
       {/* Progress Bar */}
-      <div className="mb-1 sm:mb-2">
+      <div className="mb-1 sm:mb-3">
         <div className="flex justify-between items-center mb-1">
           <span className="text-xs sm:text-sm text-gray-400">Progress</span>
           <span className="text-xs sm:text-sm text-gray-400">{getProgressPercentage()}% complete</span>
@@ -155,8 +155,8 @@ export const ProfileWizard = () => {
         })}
       </div>
 
-      {/* Step Content - Takes remaining space but doesn't overflow */}
-      <div className="flex-1 min-h-0 overflow-auto">
+      {/* Step Content */}
+      <div className="overflow-auto mb-4">
         {currentStep === 1 && <Step1ResumeUpload onComplete={nextStep} />}
         {currentStep === 2 && <Step2BioCreation onComplete={nextStep} />}
         {currentStep === 3 && <Step3JobAlertsSetup onComplete={nextStep} />}
