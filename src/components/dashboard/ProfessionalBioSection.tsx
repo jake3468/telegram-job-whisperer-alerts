@@ -103,15 +103,7 @@ const ProfessionalBioSection = () => {
   const isActuallySaved = originalBio === bio && bio.length > 0;
   const showSavedIndicator = optimisticSaved || isActuallySaved;
   return <Card className="rounded-3xl border-2 border-emerald-400/80 bg-gradient-to-br from-emerald-600/90 via-emerald-700/85 to-emerald-900/90 shadow-2xl shadow-emerald-500/20 transition-all hover:shadow-emerald-500/30 backdrop-blur-sm">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-white font-orbitron flex items-center gap-2 text-lg drop-shadow-[0_2px_8px_rgba(16,185,129,0.6)]">
-          <div className="w-7 h-7 bg-emerald-400/60 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30">
-            <User className="w-4 h-4 text-white drop-shadow-[0_2px_8px_rgba(255,255,255,0.8)]" />
-          </div>
-          
-        </CardTitle>
-        
-      </CardHeader>
+      
       <CardContent className="space-y-3 pt-0">
         <Textarea value={bio} onChange={handleBioChange} placeholder="I enjoy working with startups and exploring AI. My ambition is to build something impactful that people genuinely find value in." rows={4} className="min-h-[100px] border-2 border-emerald-200/40 placeholder-gray-400 font-inter text-gray-100 focus-visible:border-emerald-200 hover:border-emerald-300 text-base resize-none shadow-inner transition-all bg-black" />
 
