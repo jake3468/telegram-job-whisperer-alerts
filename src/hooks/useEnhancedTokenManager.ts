@@ -87,7 +87,7 @@ export const useEnhancedTokenManager = () => {
 
         const success = await setClerkToken(token);
         if (success) {
-          console.log(`[TokenManager] Token refreshed successfully (${globalTokenManager.refreshCount})`);
+          
           return token;
         }
       }

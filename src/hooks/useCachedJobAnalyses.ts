@@ -42,7 +42,6 @@ export const useCachedJobAnalyses = () => {
         if (now - parsedCache.timestamp < CACHE_DURATION) {
           setCachedData(parsedCache.data);
           setIsShowingCachedData(true);
-          logger.debug('Loaded cached job analyses data:', parsedCache.data.length, 'items');
         } else {
           // Remove expired cache
           localStorage.removeItem(CACHE_KEY);
@@ -107,7 +106,6 @@ export const useCachedJobAnalyses = () => {
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
         setCachedData(freshData);
         setIsShowingCachedData(false);
-        logger.debug('Updated job analyses cache with fresh data:', freshData.length, 'items');
       } catch (error) {
         logger.warn('Failed to cache job analyses data:', error);
         // Still update state even if caching fails

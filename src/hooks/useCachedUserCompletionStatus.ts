@@ -37,7 +37,6 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
         
         // Use cached data if it's for the same user and within cache duration
         if (parsedCache.userId === user.id && now - parsedCache.timestamp < CACHE_DURATION) {
-          logger.debug('Initialized with cached user completion status:', parsedCache.status);
           return { ...parsedCache.status, loading: false }; // Ensure loading is false for cached data
         }
       }
@@ -69,12 +68,7 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
 
       // Only log in development environment
       if (process.env.NODE_ENV === 'development') {
-        console.log('Profile completion check from cached data:', {
-          userId: user.id,
-          hasResume,
-          hasBio,
-          isComplete
-        });
+        // Status check completed
       }
 
       const newStatus = {
@@ -95,7 +89,6 @@ export const useCachedUserCompletionStatus = (): CompletionStatus & { refetchSta
           userId: user.id
         };
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-        logger.debug('Cached user completion status from profile data:', newStatus);
       } catch (cacheError) {
         logger.warn('Failed to cache user completion status:', cacheError);
       }

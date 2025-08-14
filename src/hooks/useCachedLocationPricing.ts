@@ -33,7 +33,6 @@ export const useCachedLocationPricing = () => {
           if (now - parsedLocationCache.timestamp < LOCATION_CACHE_DURATION) {
             setCachedLocation(parsedLocationCache.country);
             defaultRegion = parsedLocationCache.country === 'IN' ? 'IN' : 'global';
-            logger.debug('Using cached location for default pricing:', parsedLocationCache.country);
           } else {
             localStorage.removeItem(LOCATION_CACHE_KEY);
           }
@@ -52,7 +51,6 @@ export const useCachedLocationPricing = () => {
           setCachedData(parsedCache);
           const { timestamp, ...pricingData } = parsedCache;
           setDisplayData(pricingData);
-          logger.debug('Loaded cached pricing data:', pricingData);
           return; // Exit early to prevent setting default pricing
         } else {
           // Remove expired cache and set default pricing based on cached location
@@ -64,7 +62,6 @@ export const useCachedLocationPricing = () => {
       if (!locationCache) {
         const defaultPricing = getDefaultPricing(defaultRegion);
         setDisplayData(defaultPricing);
-        logger.debug('Set default pricing based on region (no cache):', defaultRegion);
       }
       
     } catch (error) {
@@ -91,9 +88,8 @@ export const useCachedLocationPricing = () => {
         // Only update display data if region changed or we don't have display data
         if (!displayData || displayData.region !== freshData.region) {
           setDisplayData(freshData);
-          logger.debug('Updated display data with fresh pricing (region changed):', freshData);
         } else {
-          logger.debug('Skipping display update - same region. Cached fresh data:', cacheData);
+          // Same region, just cache the fresh data
         }
       } catch (error) {
         logger.warn('Failed to cache pricing data:', error);
@@ -115,7 +111,6 @@ export const useCachedLocationPricing = () => {
         };
         localStorage.setItem(LOCATION_CACHE_KEY, JSON.stringify(locationCache));
         setCachedLocation(userCountry);
-        logger.debug('Cached user location:', userCountry);
       } catch (error) {
         logger.warn('Failed to cache user location:', error);
       }

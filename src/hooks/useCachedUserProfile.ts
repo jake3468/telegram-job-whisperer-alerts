@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useUserProfile } from './useUserProfile';
+import { useEnhancedUserProfile } from './useEnhancedUserProfile';
 import { logger } from '@/utils/logger';
 import { UserProfile, UserProfileUpdateData } from '@/types/userProfile';
 
@@ -15,7 +15,7 @@ const RESUME_CACHE_KEY = 'aspirely_resume_status_cache';
 const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
 export const useCachedUserProfile = () => {
-  const { userProfile: freshProfile, loading, error, updateUserProfile: originalUpdate, refetch } = useUserProfile();
+  const { userProfile: freshProfile, loading, error, updateUserProfile: originalUpdate, refetch, isReady } = useEnhancedUserProfile();
   const [cachedData, setCachedData] = useState<CachedProfileData | null>(null);
   const [displayProfile, setDisplayProfile] = useState<UserProfile | null>(null);
   const [resumeExists, setResumeExists] = useState<boolean>(false);
@@ -147,6 +147,7 @@ export const useCachedUserProfile = () => {
     resumeExists,
     updateResumeStatus,
     connectionIssue,
-    isShowingCachedData
+    isShowingCachedData,
+    isReady
   };
 };

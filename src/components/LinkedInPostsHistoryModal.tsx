@@ -3,9 +3,10 @@ import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { History, Share2, X, AlertCircle, Copy } from 'lucide-react';
+import { History, Share2, X, AlertCircle, Copy, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useCachedLinkedInPosts } from '@/hooks/useCachedLinkedInPosts';
 import LinkedInHistoryItem from './linkedin-history/LinkedInHistoryItem';
 import LinkedInInputDetails from './linkedin-history/LinkedInInputDetails';
 import LinkedInPostResult from './linkedin-history/LinkedInPostResult';
@@ -41,10 +42,16 @@ const LinkedInPostsHistoryModal = ({
   const { user } = useUser();
   const { toast } = useToast();
   const { userProfile } = useUserProfile();
-  const [historyData, setHistoryData] = useState<LinkedInPostItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState<LinkedInPostItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+
+  // Use cached LinkedIn posts hook for instant data display
+  const {
+    data: historyData,
+    isLoading,
+    connectionIssue,
+    refetch: refetchHistory
+  } = useCachedLinkedInPosts();
 
   const {
     generatedImages,
@@ -54,40 +61,6 @@ const LinkedInPostsHistoryModal = ({
     handleGetImageForPost
   } = useLinkedInImageManager(selectedItem?.id || null);
 
-  useEffect(() => {
-    if (isOpen && user && userProfile) {
-      fetchHistory();
-    }
-  }, [isOpen, user, userProfile]);
-
-  const fetchHistory = async () => {
-    if (!user || !userProfile) return;
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('job_linkedin')
-        .select('id, topic, opinion, personal_story, audience, tone, created_at, post_heading_1, post_content_1, post_heading_2, post_content_2, post_heading_3, post_content_3')
-        .eq('user_id', userProfile.id)
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      if (error) {
-        console.error('Error fetching history:', error);
-        throw error;
-      }
-
-      setHistoryData(data || []);
-    } catch (err) {
-      console.error('Failed to fetch history:', err);
-      toast({
-        title: "Error",
-        description: "Failed to load history. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleCopyResult = async (item: LinkedInPostItem, postNumber?: number) => {
     let result;
@@ -150,7 +123,7 @@ const LinkedInPostsHistoryModal = ({
       return;
     }
     try {
-      console.log(`Attempting to delete LinkedIn post item with ID: ${itemId} for user profile: ${userProfile.id}`);
+      
       
       const { error } = await supabase
         .from('job_linkedin')
@@ -162,9 +135,10 @@ const LinkedInPostsHistoryModal = ({
         console.error('Supabase delete error:', error);
         throw error;
       }
-      console.log('Delete operation completed successfully');
+      
 
-      setHistoryData(prev => prev.filter(item => item.id !== itemId));
+      // Refresh the cached data after successful deletion
+      refetchHistory();
       toast({
         title: "Deleted",
         description: "LinkedIn post deleted successfully."
@@ -257,14 +231,27 @@ const LinkedInPostsHistoryModal = ({
               <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
               LinkedIn Posts History
             </DialogTitle>
-            <Button 
-              onClick={onClose} 
-              size="sm" 
-              variant="ghost"
-              className="text-white/70 hover:text-white h-8 w-8 p-0 hover:bg-white/10"
-            >
-              <X className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              {connectionIssue && (
+                <Button 
+                  onClick={() => window.location.reload()} 
+                  variant="outline" 
+                  size="sm" 
+                  className="border-orange-400/30 bg-orange-100/10 text-orange-600 hover:bg-orange-200/20" 
+                  title="Connection issue detected. Click to refresh the page."
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </Button>
+              )}
+              <Button 
+                onClick={onClose} 
+                size="sm" 
+                variant="ghost"
+                className="text-white/70 hover:text-white h-8 w-8 p-0 hover:bg-white/10"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
           <DialogDescription className="text-white/70 font-inter text-xs sm:text-sm">
             Your history is automatically deleted after 60 days. Found {historyData.length} items.

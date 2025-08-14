@@ -72,23 +72,61 @@ export const useJobBoardData = () => {
       setError(null);
       setConnectionIssue(false);
 
-      // Get user data with fallback error handling
+      // Validate Clerk user ID before database queries
+      if (!clerkUser.id || typeof clerkUser.id !== 'string' || clerkUser.id.length === 0) {
+        console.error('Invalid Clerk user ID:', clerkUser.id);
+        throw new Error('Invalid user session. Please log out and log in again.');
+      }
+
+      // Get user data with proper error handling
       const { data: users, error: userError } = await supabase
         .from('users')
         .select('id')
         .eq('clerk_id', clerkUser.id)
         .maybeSingle();
 
+      if (userError) {
+        console.error('User fetch error:', userError);
+        
+        // Handle UUID format errors specifically
+        if (userError.message?.includes('invalid input syntax for type uuid')) {
+          throw new Error('Session error. Please log out and log in again.');
+        }
+        
+        throw new Error('Failed to fetch user data');
+      }
+
+      if (!users) {
+        console.error('User not found for Clerk ID:', clerkUser.id);
+        throw new Error('User not found. Please refresh the page.');
+      }
+
+      // Validate user ID format
+      if (!users.id || typeof users.id !== 'string') {
+        console.error('Invalid user ID format:', users.id);
+        throw new Error('User data corruption. Please contact support.');
+      }
+
       const { data: userProfile, error: profileError } = await supabase
         .from('user_profile')
         .select('id')
-        .eq('user_id', users?.id)
+        .eq('user_id', users.id)
         .maybeSingle();
 
-      // If user data issues, trigger connection issue instead of failing silently
-      if (userError || profileError || !users || !userProfile) {
-        console.error('User data fetch issue:', { userError, profileError });
-        throw new Error('User data not found');
+      if (profileError) {
+        console.error('Profile fetch error:', profileError);
+        
+        // Handle UUID format errors specifically
+        if (profileError.message?.includes('invalid input syntax for type uuid')) {
+          throw new Error('Profile data corruption. Please contact support.');
+        }
+        
+        throw new Error('Failed to fetch user profile');
+      }
+
+      if (!userProfile) {
+        console.error('User profile not found for user ID:', users.id);
+        throw new Error('User profile not found. Please contact support.');
       }
 
       // Note: Cleanup function now runs automatically every hour via cron job

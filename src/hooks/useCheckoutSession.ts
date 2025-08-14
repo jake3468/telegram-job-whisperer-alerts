@@ -25,7 +25,7 @@ export const useCheckoutSession = () => {
     }
 
     if (!isAuthReady) {
-      console.log('[CheckoutSession] Authentication not ready, waiting...');
+      
       toast.error('Please wait, authentication is loading...', {
         action: {
           label: 'Close',
@@ -35,7 +35,7 @@ export const useCheckoutSession = () => {
       return null;
     }
 
-    console.log('Creating checkout session for product:', productId);
+    
 
     // Set loading state for this specific product
     setLoadingStates(prev => ({ ...prev, [productId]: true }));
@@ -50,7 +50,7 @@ export const useCheckoutSession = () => {
             throw new Error('Failed to get Clerk authentication token');
           }
 
-          console.log('🔐 CLIENT: Got Clerk token, creating checkout session');
+          
 
           // Make direct fetch request with Clerk token
           const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/functions/v1/create-checkout-session', {
@@ -74,7 +74,7 @@ export const useCheckoutSession = () => {
             throw new Error('No checkout URL returned from server');
           }
 
-          console.log('Checkout session created successfully');
+          
           return data;
         },
         5,

@@ -23,7 +23,7 @@ export const useAIInterviewCredits = () => {
 
   const fetchCredits = async (isRetry = false) => {
     if (!user || !userProfile?.user_id) {
-      console.log('AIInterviewCredits: Missing user or userProfile', { user: !!user, userProfile: !!userProfile, user_id: userProfile?.user_id });
+      
       setIsLoading(false);
       return;
     }
@@ -34,7 +34,7 @@ export const useAIInterviewCredits = () => {
       }
       setError(null);
 
-      console.log('AIInterviewCredits: Fetching credits for user_id:', userProfile.user_id);
+      
 
       const { data, error: fetchError } = await supabase
         .from('ai_interview_credits')
@@ -91,12 +91,11 @@ export const useAIInterviewCredits = () => {
         logger.info('Successfully initialized and loaded AI interview credits:', newData);
       } else {
         setCredits(data);
-        logger.debug('Successfully loaded existing AI interview credits:', data);
       }
       
       // Reset retry count on success
       setRetryCount(0);
-      console.log('AIInterviewCredits: Successfully loaded credits:', data || 'newly created');
+      
     } catch (err) {
       logger.error('Unexpected error fetching AI interview credits:', err);
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';

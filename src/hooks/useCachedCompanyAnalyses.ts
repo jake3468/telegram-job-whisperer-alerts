@@ -56,7 +56,6 @@ export const useCachedCompanyAnalyses = () => {
         if (now - parsedCache.timestamp < CACHE_DURATION) {
           setCachedData(parsedCache.data);
           setIsShowingCachedData(true);
-          logger.debug('Loaded cached company analysis data:', parsedCache.data.length, 'items');
         } else {
           // Remove expired cache
           localStorage.removeItem(CACHE_KEY);
@@ -126,7 +125,6 @@ export const useCachedCompanyAnalyses = () => {
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
         setCachedData(freshData);
         setIsShowingCachedData(false);
-        logger.debug('Updated company analysis cache with fresh data:', freshData.length, 'items');
       } catch (error) {
         logger.warn('Failed to cache company analysis data:', error);
         // Still update state even if caching fails

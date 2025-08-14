@@ -6,25 +6,19 @@ import { useToast } from '@/hooks/use-toast';
 import { History, Phone, Calendar, Trash2, Eye, X, AlertCircle, Clock, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import { makeAuthenticatedRequest } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useCachedGraceInterviewRequests } from '@/hooks/useCachedGraceInterviewRequests';
 import { PremiumInterviewReportDisplay } from './PremiumInterviewReportDisplay';
 interface GraceInterviewRequest {
   id: string;
+  user_id: string;
   phone_number: string;
   company_name: string;
   job_title: string;
   job_description: string;
   status: string;
   created_at: string;
-  interview_status?: string;
-  completion_percentage?: number;
-  time_spent?: string;
-  feedback_message?: string;
-  feedback_suggestion?: string;
-  feedback_next_action?: string;
-  report_generated?: boolean;
-  report_data?: any;
-  actionable_plan?: any;
-  next_steps_priority?: any;
+  updated_at: string;
+  processed_at?: string;
 }
 interface GraceInterviewReportsModalProps {
   isOpen: boolean;
@@ -44,41 +38,19 @@ const GraceInterviewReportsModal = ({
   const {
     userProfile
   } = useUserProfile();
-  const [historyData, setHistoryData] = useState<GraceInterviewRequest[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  
+  const { 
+    requests: historyData = [], 
+    loading: isLoading, 
+    connectionIssue, 
+    forceRefresh 
+  } = useCachedGraceInterviewRequests();
+  
   const [selectedItem, setSelectedItem] = useState<GraceInterviewRequest | null>(null);
   const [showDetails, setShowDetails] = useState(false);
-  useEffect(() => {
-    if (isOpen && isLoaded && user && userProfile) {
-      fetchHistory();
-    }
-  }, [isOpen, isLoaded, user, userProfile]);
-  const fetchHistory = async () => {
-    if (!isLoaded || !user || !userProfile) {
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const result = await makeAuthenticatedRequest(async () => {
-        const { supabase } = await import('@/integrations/supabase/client');
-        return await supabase.from('grace_interview_requests').select('*').eq('user_id', userProfile.id).order('created_at', {
-          ascending: false
-        }).limit(20);
-      });
-      
-      if (result.error) {
-        throw result.error;
-      }
-      setHistoryData(result.data || []);
-    } catch (err) {
-      console.error('Failed to fetch interview history:', err);
-      toast({
-        title: "Error",
-        description: "Failed to load interview history. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
+  const handleRetryLoading = async () => {
+    if (forceRefresh) {
+      await forceRefresh();
     }
   };
   const handleDelete = async (itemId: string) => {
@@ -99,14 +71,20 @@ const GraceInterviewReportsModal = ({
       if (result.error) {
         throw result.error;
       }
-      setHistoryData(prev => prev.filter(item => item.id !== itemId));
+      
       toast({
         title: "Deleted",
         description: "Interview request deleted successfully."
       });
+      
       if (selectedItem && selectedItem.id === itemId) {
         setShowDetails(false);
         setSelectedItem(null);
+      }
+      
+      // Force refresh to update the list
+      if (forceRefresh) {
+        await forceRefresh();
       }
     } catch (err) {
       console.error('Failed to delete item:', err);
@@ -203,6 +181,17 @@ const GraceInterviewReportsModal = ({
                 <div className="animate-spin rounded-full h-5 w-5 border-2 border-gray-200 border-t-blue-600"></div>
                 Loading interview history...
               </div>
+            </div> : connectionIssue ? <div className="flex flex-col items-center justify-center py-12">
+              <div className="text-gray-500 text-center max-w-md">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <AlertCircle className="w-8 h-8 text-red-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to load data</h3>
+                <p className="text-sm text-gray-600 mb-4">There was an issue loading your interview history. Please try again.</p>
+                <Button onClick={handleRetryLoading} size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                  Retry Loading
+                </Button>
+              </div>
             </div> : historyData.length === 0 ? <div className="flex flex-col items-center justify-center py-12">
               <div className="text-gray-500 text-center max-w-md">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -210,7 +199,7 @@ const GraceInterviewReportsModal = ({
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">No interview reports yet</h3>
                 <p className="text-sm text-gray-600 mb-4">Complete your first AI mock interview to see reports here.</p>
-                <Button onClick={() => fetchHistory()} size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Button onClick={handleRetryLoading} size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
                   Refresh
                 </Button>
               </div>
@@ -236,15 +225,12 @@ const GraceInterviewReportsModal = ({
                             <span>{formatDate(item.created_at)}</span>
                           </div>
                           
-                          {item.interview_status && <div className="flex items-center gap-2">
-                              {getStatusIcon(item.interview_status)}
-                              <span className={`text-xs font-medium ${getStatusColor(item.interview_status)}`}>
-                                {formatStatusText(item.interview_status)}
-                              </span>
-                              {item.completion_percentage !== null && <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                                  {item.completion_percentage}%
-                                </span>}
-                            </div>}
+                          <div className="flex items-center gap-2">
+                            {getStatusIcon(item.status)}
+                            <span className={`text-xs font-medium ${getStatusColor(item.status)}`}>
+                              {formatStatusText(item.status)}
+                            </span>
+                          </div>
                         </div>
                       </div>
                       
@@ -283,15 +269,12 @@ const GraceInterviewReportsModal = ({
                             <span className="whitespace-nowrap">{formatDate(item.created_at)}</span>
                           </div>
                           
-                          {item.interview_status && <div className="flex items-center gap-2">
-                              {getStatusIcon(item.interview_status)}
-                              <span className={`text-sm font-medium ${getStatusColor(item.interview_status)}`}>
-                                {formatStatusText(item.interview_status)}
-                              </span>
-                              {item.completion_percentage !== null && <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                                  {item.completion_percentage}%
-                                </span>}
-                            </div>}
+                          <div className="flex items-center gap-2">
+                            {getStatusIcon(item.status)}
+                            <span className={`text-sm font-medium ${getStatusColor(item.status)}`}>
+                              {formatStatusText(item.status)}
+                            </span>
+                          </div>
                         </div>
 
                         <div className="flex items-center gap-2 flex-shrink-0">

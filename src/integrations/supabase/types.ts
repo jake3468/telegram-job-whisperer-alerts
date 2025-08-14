@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -1116,6 +1116,7 @@ export type Database = {
           cv_bot_activated: boolean
           cv_chat_id: string | null
           id: string
+          profile_setup_completed: boolean
           resume: string | null
           resume_filename: string | null
           resume_uploaded_at: string | null
@@ -1134,6 +1135,7 @@ export type Database = {
           cv_bot_activated?: boolean
           cv_chat_id?: string | null
           id?: string
+          profile_setup_completed?: boolean
           resume?: string | null
           resume_filename?: string | null
           resume_uploaded_at?: string | null
@@ -1152,6 +1154,7 @@ export type Database = {
           cv_bot_activated?: boolean
           cv_chat_id?: string | null
           id?: string
+          profile_setup_completed?: boolean
           resume?: string | null
           resume_filename?: string | null
           resume_uploaded_at?: string | null
@@ -1259,20 +1262,20 @@ export type Database = {
     Functions: {
       add_ai_interview_credits: {
         Args: {
-          p_user_id: string
           p_amount: number
           p_description?: string
           p_payment_record_id?: string
+          p_user_id: string
         }
         Returns: boolean
       }
       add_credits: {
         Args: {
-          p_user_id: string
           p_amount: number
-          p_transaction_type: string
           p_description?: string
           p_is_paid?: boolean
+          p_transaction_type: string
+          p_user_id: string
         }
         Returns: boolean
       }
@@ -1286,26 +1289,26 @@ export type Database = {
       }
       check_and_insert_cover_letter_execution: {
         Args: {
+          p_check_minutes?: number
           p_fingerprint: string
           p_record_id: string
-          p_submission_id?: string
           p_request_type?: string
-          p_check_minutes?: number
+          p_submission_id?: string
         }
         Returns: string
       }
       check_and_insert_execution: {
         Args: {
+          p_check_minutes?: number
           p_fingerprint: string
           p_record_id: string
-          p_submission_id?: string
           p_request_type?: string
-          p_check_minutes?: number
+          p_submission_id?: string
         }
         Returns: string
       }
       check_sufficient_credits: {
-        Args: { p_user_id: string; p_required_credits: number }
+        Args: { p_required_credits: number; p_user_id: string }
         Returns: boolean
       }
       cleanup_old_company_analysis_data: {
@@ -1335,8 +1338,8 @@ export type Database = {
       cleanup_old_linkedin_data: {
         Args: Record<PropertyKey, never>
         Returns: {
-          deleted_posts: number
           deleted_images: number
+          deleted_posts: number
         }[]
       }
       cleanup_old_webhook_executions: {
@@ -1350,22 +1353,22 @@ export type Database = {
       debug_user_auth: {
         Args: Record<PropertyKey, never>
         Returns: {
-          clerk_id: string
-          jwt_sub: string
-          jwt_issuer: string
-          jwt_aud: string
-          current_setting_claims: string
           auth_role: string
+          clerk_id: string
+          current_setting_claims: string
+          jwt_aud: string
+          jwt_issuer: string
+          jwt_sub: string
           user_exists: boolean
           user_id_found: string
         }[]
       }
       deduct_credits: {
         Args: {
-          p_user_id: string
           p_amount: number
-          p_feature_used: string
           p_description?: string
+          p_feature_used: string
+          p_user_id: string
         }
         Returns: boolean
       }
@@ -1399,8 +1402,8 @@ export type Database = {
       }
       get_next_order_position: {
         Args: {
-          p_user_id: string
           p_status: Database["public"]["Enums"]["job_status"]
+          p_user_id: string
         }
         Returns: number
       }
@@ -1414,12 +1417,12 @@ export type Database = {
       }
       http_delete: {
         Args:
+          | { content: string; content_type: string; uri: string }
           | { uri: string }
-          | { uri: string; content: string; content_type: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
       }
       http_get: {
-        Args: { uri: string } | { uri: string; data: Json }
+        Args: { data: Json; uri: string } | { uri: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
       }
       http_head: {
@@ -1438,17 +1441,17 @@ export type Database = {
         }[]
       }
       http_patch: {
-        Args: { uri: string; content: string; content_type: string }
+        Args: { content: string; content_type: string; uri: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
       }
       http_post: {
         Args:
-          | { uri: string; content: string; content_type: string }
-          | { uri: string; data: Json }
+          | { content: string; content_type: string; uri: string }
+          | { data: Json; uri: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
       }
       http_put: {
-        Args: { uri: string; content: string; content_type: string }
+        Args: { content: string; content_type: string; uri: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
       }
       http_reset_curlopt: {
@@ -1469,31 +1472,31 @@ export type Database = {
       }
       insert_job_analysis: {
         Args: {
-          p_user_id: string
           p_company_name: string
-          p_job_title: string
           p_job_description: string
+          p_job_title: string
+          p_user_id: string
         }
         Returns: string
       }
       process_payment_credits: {
         Args: {
-          p_webhook_id: string
-          p_event_type: string
-          p_customer_email: string
-          p_customer_name?: string
-          p_product_id?: string
-          p_quantity?: number
           p_amount?: number
           p_currency?: string
-          p_status?: string
-          p_payment_id?: string
-          p_subscription_id?: string
-          p_payment_method?: string
+          p_customer_email: string
+          p_customer_name?: string
           p_error_code?: string
           p_error_message?: string
-          p_webhook_timestamp?: string
+          p_event_type: string
+          p_payment_id?: string
+          p_payment_method?: string
+          p_product_id?: string
+          p_quantity?: number
           p_raw_payload?: Json
+          p_status?: string
+          p_subscription_id?: string
+          p_webhook_id: string
+          p_webhook_timestamp?: string
         }
         Returns: Json
       }
@@ -1508,10 +1511,10 @@ export type Database = {
       test_jwt_access: {
         Args: Record<PropertyKey, never>
         Returns: {
-          test_result: string
+          can_access_users: boolean
           clerk_id: string
           issuer: string
-          can_access_users: boolean
+          test_result: string
         }[]
       }
       text_to_bytea: {
@@ -1523,7 +1526,7 @@ export type Database = {
         Returns: string
       }
       use_ai_interview_credit: {
-        Args: { p_user_id: string; p_description?: string }
+        Args: { p_description?: string; p_user_id: string }
         Returns: boolean
       }
     }
