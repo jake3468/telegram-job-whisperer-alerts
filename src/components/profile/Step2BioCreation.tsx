@@ -167,17 +167,6 @@ export const Step2BioCreation = ({ onComplete }: Step2BioCreationProps) => {
         </p>
       </div>
 
-      {/* Quick Action Buttons */}
-      {hasBio && (
-        <div className="text-center pt-4">
-          <Button 
-            onClick={onComplete}
-            className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold px-6 sm:px-8 min-h-[44px] break-words"
-          >
-            Continue to Job Alerts →
-          </Button>
-        </div>
-      )}
     </div>
   );
 };
