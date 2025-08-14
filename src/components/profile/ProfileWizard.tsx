@@ -79,10 +79,10 @@ export const ProfileWizard = () => {
   }
 
   return (
-    <div className="w-full max-w-full px-3 py-1 sm:px-4 sm:py-8 sm:max-w-2xl md:max-w-4xl mx-auto overflow-x-hidden h-screen flex flex-col justify-between">
+    <div className="w-full max-w-full px-3 py-2 sm:px-4 sm:py-8 sm:max-w-2xl md:max-w-4xl mx-auto overflow-x-hidden min-h-screen flex flex-col justify-between">
       {/* Welcome Header */}
-      <div className="text-center mb-1 sm:mb-6">
-        <h1 className="font-extrabold text-sm sm:text-2xl md:text-4xl font-orbitron drop-shadow mb-0.5 break-words">
+      <div className="text-center mb-2 sm:mb-6">
+        <h1 className="font-extrabold text-base sm:text-2xl md:text-4xl font-orbitron drop-shadow mb-1 break-words">
           <span className="mr-1 sm:mr-2">🎉</span>
           <span className="bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent">
             Welcome, 
@@ -91,12 +91,12 @@ export const ProfileWizard = () => {
             {user?.firstName || 'User'}
           </span>
         </h1>
-        <p className="text-gray-300 text-xs sm:text-lg mt-0.5 px-2">Let's set up your profile in just 3 steps</p>
+        <p className="text-gray-300 text-xs sm:text-lg mt-1 px-2">Let's set up your profile in just 3 steps</p>
       </div>
 
       {/* Progress Bar */}
-      <div className="mb-1 sm:mb-6">
-        <div className="flex justify-between items-center mb-0.5 sm:mb-3">
+      <div className="mb-2 sm:mb-6">
+        <div className="flex justify-between items-center mb-1 sm:mb-3">
           <span className="text-xs sm:text-sm text-gray-400">Progress</span>
           <span className="text-xs sm:text-sm text-gray-400">{getProgressPercentage()}% complete</span>
         </div>
@@ -109,7 +109,7 @@ export const ProfileWizard = () => {
       </div>
 
       {/* Step Navigation */}
-      <div className="flex flex-row justify-center items-center space-x-1 sm:space-x-2 mb-1 sm:mb-6">
+      <div className="flex flex-row justify-center items-center space-x-1 sm:space-x-2 mb-2 sm:mb-6">
         {[1, 2, 3].map((stepNum) => {
           const status = getStepStatus(stepNum);
           const isActive = stepNum === currentStep;
@@ -156,14 +156,14 @@ export const ProfileWizard = () => {
       </div>
 
       {/* Step Content */}
-      <div className="flex-1 min-h-0">
+      <div className="flex-1">
         {currentStep === 1 && <Step1ResumeUpload onComplete={nextStep} />}
         {currentStep === 2 && <Step2BioCreation onComplete={nextStep} />}
         {currentStep === 3 && <Step3JobAlertsSetup onComplete={nextStep} />}
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between items-center gap-3 pt-2 flex-shrink-0">
+      <div className="flex justify-between items-center gap-3 mt-auto pt-3">
         <Button
           onClick={prevStep}
           variant="outline"
