@@ -179,16 +179,8 @@ export const Step3JobAlertsSetup = ({
           </Button>
           
           <p className="text-gray-400 text-xs text-center leading-relaxed">
-            Make sure that you complete the bot activation by following the above steps. Once you activate the bot, then click the below "Create Alerts" button.
+            Make sure that you complete the bot activation by following the above steps.
           </p>
-          
-          <Button 
-            onClick={handleCreateJobAlerts} 
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-3 h-auto min-h-[40px]"
-          >
-            <Zap className="w-3 h-3 mr-2 flex-shrink-0" />
-            <span className="text-xs leading-tight break-words">Create Alerts</span>
-          </Button>
         </div>
       </div>
     </div>;
