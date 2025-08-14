@@ -144,17 +144,29 @@ const ResumeSection = ({
     if (uploading) return;
     setUploading(true);
     try {
+      console.log('Upload starting for user:', { userId: user.id, email: user.emailAddresses?.[0]?.emailAddress });
       await makeAuthenticatedRequest(async () => {
         const {
           supabase
         } = await import('@/integrations/supabase/client');
 
+        // Check if user exists in database
+        const { data: existingUser, error: userCheckError } = await supabase
+          .from('users')
+          .select('id, clerk_id')
+          .eq('clerk_id', user.id)
+          .single();
+        
+        console.log('User check result:', { existingUser, userCheckError });
+
         // Check for existing resume and delete if exists
         const existingResumePath = `${user.id}/resume.pdf`;
+        console.log('Removing existing resume at path:', existingResumePath);
         await supabase.storage.from('resumes').remove([existingResumePath]);
 
         // Upload new file
         const filePath = `${user.id}/resume.pdf`;
+        console.log('Uploading to path:', filePath);
         const {
           error: uploadError
         } = await supabase.storage.from('resumes').upload(filePath, file, {
@@ -162,6 +174,7 @@ const ResumeSection = ({
           contentType: 'application/pdf'
         });
         if (uploadError) {
+          console.error('Storage upload error:', uploadError);
           throw uploadError;
         }
 
