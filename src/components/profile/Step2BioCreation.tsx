@@ -5,29 +5,30 @@ import ProfessionalBioSection from '@/components/dashboard/ProfessionalBioSectio
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, PenTool, Lightbulb, Target } from 'lucide-react';
-
 interface Step2BioCreationProps {
   onComplete: () => void;
 }
-
-const BIO_EXAMPLES = [
-  "Experienced software engineer with 5+ years in full-stack development, specializing in React and Node.js...",
-  "Marketing professional with expertise in digital campaigns and brand strategy, proven track record of increasing ROI...",
-  "Data scientist passionate about machine learning and analytics, experienced in Python, SQL, and cloud platforms..."
-];
-
-export const Step2BioCreation = ({ onComplete }: Step2BioCreationProps) => {
-  const { updateActivity } = useFormTokenKeepAlive(true);
-  const { hasBio, hasResume } = useCachedUserCompletionStatus();
+const BIO_EXAMPLES = ["Experienced software engineer with 5+ years in full-stack development, specializing in React and Node.js...", "Marketing professional with expertise in digital campaigns and brand strategy, proven track record of increasing ROI...", "Data scientist passionate about machine learning and analytics, experienced in Python, SQL, and cloud platforms..."];
+export const Step2BioCreation = ({
+  onComplete
+}: Step2BioCreationProps) => {
+  const {
+    updateActivity
+  } = useFormTokenKeepAlive(true);
+  const {
+    hasBio,
+    hasResume
+  } = useCachedUserCompletionStatus();
   const [showExamples, setShowExamples] = useState(false);
 
   // Auto-scroll to top when component mounts
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   }, []);
-
-  return (
-    <div className="space-y-4 sm:space-y-6">
+  return <div className="space-y-4 sm:space-y-6">
       {/* Step Header */}
       <div className="text-center px-2">
         <div className="flex items-center justify-center mb-3 sm:mb-4">
@@ -38,21 +39,17 @@ export const Step2BioCreation = ({ onComplete }: Step2BioCreationProps) => {
         <h2 className="text-lg sm:text-xl md:text-2xl font-orbitron font-bold text-purple-400 mb-2 break-words">
           Write Your Professional Bio
         </h2>
-        <p className="text-gray-300 text-sm sm:text-base md:text-lg break-words">
-          Tell employers about your experience, skills, and career goals
-        </p>
+        <p className="text-gray-300 text-sm sm:text-base md:text-lg break-words">Tell us a bit about yourself - it helps our AI tailor tools to your unique profile.</p>
       </div>
 
       {/* Success Message */}
-      {hasBio && (
-        <div className="bg-emerald-900/20 border border-emerald-400/30 rounded-lg p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+      {hasBio && <div className="bg-emerald-900/20 border border-emerald-400/30 rounded-lg p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
           <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" />
           <div>
             <p className="text-emerald-300 font-medium text-sm sm:text-base break-words">Bio completed successfully!</p>
             <p className="text-emerald-200 text-xs sm:text-sm break-words">You can continue to job alerts or refine your bio below.</p>
           </div>
-        </div>
-      )}
+        </div>}
 
       {/* Bio Section */}
       <Card className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 border-purple-400/30">
@@ -108,24 +105,15 @@ export const Step2BioCreation = ({ onComplete }: Step2BioCreationProps) => {
           <h3 className="text-base sm:text-lg font-semibold text-blue-300 mb-3 sm:mb-4 break-words">
             Need inspiration?
           </h3>
-          <Button 
-            onClick={() => setShowExamples(!showExamples)}
-            variant="outline"
-            size="sm"
-            className="mb-4 border-blue-400/30 text-blue-300 hover:bg-blue-900/20 min-h-[44px] break-words"
-          >
+          <Button onClick={() => setShowExamples(!showExamples)} variant="outline" size="sm" className="mb-4 border-blue-400/30 text-blue-300 hover:bg-blue-900/20 min-h-[44px] break-words">
             {showExamples ? 'Hide Examples' : 'View Example Bios'}
           </Button>
           
-          {showExamples && (
-            <div className="space-y-3">
-              {BIO_EXAMPLES.map((example, index) => (
-                <div key={index} className="p-2 sm:p-3 bg-blue-900/20 rounded-lg border border-blue-400/20">
+          {showExamples && <div className="space-y-3">
+              {BIO_EXAMPLES.map((example, index) => <div key={index} className="p-2 sm:p-3 bg-blue-900/20 rounded-lg border border-blue-400/20">
                   <p className="text-gray-300 text-xs sm:text-sm italic break-words">{example}</p>
-                </div>
-              ))}
-            </div>
-          )}
+                </div>)}
+            </div>}
         </div>
       </div>
 
@@ -167,6 +155,5 @@ export const Step2BioCreation = ({ onComplete }: Step2BioCreationProps) => {
         </p>
       </div>
 
-    </div>
-  );
+    </div>;
 };
