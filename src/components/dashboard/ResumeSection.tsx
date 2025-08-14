@@ -171,9 +171,9 @@ const ResumeSection = ({
         }
         console.log('JWT token available for upload:', { hasToken: !!currentToken, userId: user.id });
 
-        // Upload new file
+        // Upload new file - check that user.id is clerk ID, not prefixed
         const filePath = `user_${user.id}/resume.pdf`;
-        console.log('Uploading to path:', filePath, 'with user:', user.id);
+        console.log('Uploading to path:', filePath, 'clerk_id:', user.id);
         const {
           error: uploadError
         } = await supabase.storage.from('resumes').upload(filePath, file, {

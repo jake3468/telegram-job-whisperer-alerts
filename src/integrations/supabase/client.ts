@@ -56,10 +56,12 @@ const injectTokenIntoClient = (token: string | null) => {
         'Prefer': 'return=minimal'
       };
       
-      // CRITICAL: Set headers for storage operations
-      if ((supabase as any).storage?.headers) {
-        (supabase as any).storage.headers['Authorization'] = `Bearer ${token}`;
-      }
+      // CRITICAL: Set headers for storage operations - use correct method
+      (supabase as any).storage.headers = {
+        ...(supabase as any).storage.headers,
+        'Authorization': `Bearer ${token}`,
+        'apikey': SUPABASE_PUBLISHABLE_KEY
+      };
       
       console.log('Token injected successfully:', { hasToken: !!token, timestamp: Date.now() });
     } else {
@@ -71,9 +73,9 @@ const injectTokenIntoClient = (token: string | null) => {
       };
       
       // Reset storage headers
-      if ((supabase as any).storage?.headers) {
-        delete (supabase as any).storage.headers['Authorization'];
-      }
+      (supabase as any).storage.headers = {
+        'apikey': SUPABASE_PUBLISHABLE_KEY
+      };
     }
   } catch (error) {
     console.error('Token injection error:', error);
