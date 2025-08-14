@@ -73,7 +73,7 @@ export const Step3JobAlertsSetup = ({
   const handleCompleteProfile = () => {
     onComplete();
   };
-  return <div className="space-y-6">
+  return <div className="space-y-6 max-w-full overflow-hidden">
       {/* Step Header */}
       <div className="flex items-center gap-3 px-2 mb-2">
         <div className="relative flex-shrink-0">
@@ -84,8 +84,8 @@ export const Step3JobAlertsSetup = ({
             <span className="text-white text-xs font-bold">3</span>
           </div>
         </div>
-        <div className="flex-1">
-          <h2 className="text-base sm:text-xl font-bold text-white mb-1">
+        <div className="flex-1 min-w-0">
+          <h2 className="text-sm sm:text-xl font-bold text-white mb-1 truncate">
             Set Up Job Alerts
           </h2>
           <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
@@ -96,46 +96,45 @@ export const Step3JobAlertsSetup = ({
 
       {/* Profile Completion Status */}
       {!isComplete && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-amber-800 font-medium text-sm">Complete your profile first</p>
-            <p className="text-amber-700 text-sm">Upload your resume and write your bio to get the most relevant job alerts.</p>
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-3">
+          <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div className="min-w-0 flex-1">
+            <p className="text-amber-800 font-medium text-xs sm:text-sm">Complete your profile first</p>
+            <p className="text-amber-700 text-xs sm:text-sm break-words">Upload your resume and write your bio to get the most relevant job alerts.</p>
           </div>
         </div>
       )}
-
 
       {/* Job Alerts Content */}
       <div className="space-y-4">
         {/* Value Proposition */}
         <div className="space-y-3">
-          <p className="text-gray-700 text-sm font-medium">
+          <p className="text-gray-700 text-xs sm:text-sm font-medium">
             Get personalized job alerts with everything you need:
           </p>
-          <div className="grid grid-cols-2 gap-2 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full" />
-              <span>Instant resume generation</span>
+              <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+              <span className="truncate">Instant resume generation</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full" />
-              <span>Custom cover letters</span>
+              <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+              <span className="truncate">Custom cover letters</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full" />
-              <span>Visa sponsorship info</span>
+              <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+              <span className="truncate">Visa sponsorship info</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full" />
-              <span>Job fit analysis</span>
+              <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+              <span className="truncate">Job fit analysis</span>
             </div>
           </div>
         </div>
 
         {/* Preview Image */}
-        <div className="flex justify-center">
-          <div className="relative w-full max-w-xs">
+        <div className="flex justify-center px-2">
+          <div className="relative w-full max-w-[280px] sm:max-w-xs">
             <img 
               src="/lovable-uploads/011bb020-d0c1-4c09-b4ea-82b329e1afaa.png" 
               alt="Telegram job alert example" 
@@ -156,28 +155,28 @@ export const Step3JobAlertsSetup = ({
         </div>
 
         {/* Bot ID Section */}
-        <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-gray-700 mb-3 text-sm font-medium">
+        <div className="p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <p className="text-gray-700 mb-3 text-xs sm:text-sm font-medium">
             When the bot asks for your 'Activation Key', use this ID:
           </p>
           {userProfile?.id ? (
-            <div className="flex items-center gap-2 bg-white rounded-lg p-3 border border-gray-200">
-              <code className="text-gray-800 font-mono text-sm flex-1 break-all">
+            <div className="flex items-center gap-2 bg-white rounded-lg p-2 sm:p-3 border border-gray-200">
+              <code className="text-gray-800 font-mono text-xs sm:text-sm flex-1 break-all min-w-0">
                 {userProfile.id}
               </code>
               <Button 
                 onClick={copyUserProfileId} 
                 variant="outline" 
                 size="sm" 
-                className="hover:bg-blue-50"
+                className="hover:bg-blue-50 flex-shrink-0"
               >
-                <Copy className="w-4 h-4" />
+                <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
               </Button>
             </div>
           ) : (
-            <div className="flex items-center gap-2 bg-white rounded-lg p-3 border border-gray-200">
+            <div className="flex items-center gap-2 bg-white rounded-lg p-2 sm:p-3 border border-gray-200">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-              <span className="text-gray-600 text-sm">Loading your Bot ID...</span>
+              <span className="text-gray-600 text-xs sm:text-sm">Loading your Bot ID...</span>
             </div>
           )}
         </div>
@@ -186,19 +185,19 @@ export const Step3JobAlertsSetup = ({
         <div className="space-y-3">
           <Button 
             onClick={handleActivateBot} 
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm"
           >
-            <ExternalLink className="w-4 h-4 mr-2" />
-            Activate Telegram Bot
+            <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
+            <span className="truncate">Activate Telegram Bot</span>
           </Button>
           
           <Button 
             onClick={handleCreateJobAlerts} 
             variant="outline" 
-            className="w-full border-blue-300 text-blue-600 hover:bg-blue-50"
+            className="w-full border-blue-300 text-blue-600 hover:bg-blue-50 text-xs sm:text-sm"
           >
-            <Bell className="w-4 h-4 mr-2" />
-            Create Job Alerts
+            <Bell className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
+            <span className="truncate">Create Job Alerts</span>
           </Button>
         </div>
       </div>
@@ -207,9 +206,9 @@ export const Step3JobAlertsSetup = ({
       <div className="text-center pt-4">
         <Button 
           onClick={handleCompleteProfile} 
-          className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white font-semibold px-8"
+          className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 text-white font-semibold px-6 sm:px-8 text-xs sm:text-sm"
         >
-          Complete Profile Setup 🎉
+          <span className="truncate">Complete Profile Setup 🎉</span>
         </Button>
       </div>
     </div>;
