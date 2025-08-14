@@ -1,5 +1,5 @@
 import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
-import { useCachedUserCompletionStatus } from '@/hooks/useCachedUserCompletionStatus';
+import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 import ResumeSection from '@/components/dashboard/ResumeSection';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Upload, FileText } from 'lucide-react';
@@ -13,8 +13,8 @@ export const Step1ResumeUpload = ({
     updateActivity
   } = useFormTokenKeepAlive(true);
   const {
-    hasResume
-  } = useCachedUserCompletionStatus();
+    resumeExists
+  } = useCachedUserProfile();
   return <div className="space-y-4 sm:space-y-6 max-w-2xl mx-auto">
       {/* Step Header */}
       <div className="text-center px-2">
@@ -37,7 +37,7 @@ export const Step1ResumeUpload = ({
       </div>
 
       {/* Success Message */}
-      {hasResume && <div className="bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-400/20 rounded-xl p-4 flex items-center gap-3 backdrop-blur-sm">
+      {resumeExists && <div className="bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-400/20 rounded-xl p-4 flex items-center gap-3 backdrop-blur-sm">
           <div className="flex-shrink-0 w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center">
             <CheckCircle className="w-5 h-5 text-emerald-400" />
           </div>

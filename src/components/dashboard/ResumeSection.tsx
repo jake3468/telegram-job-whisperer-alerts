@@ -219,11 +219,10 @@ const ResumeSection = ({
         }
       });
 
-      // Clear filename, upload timestamp, and resume content from user profile
+      // Clear filename and upload timestamp from user profile
       await updateUserProfile({
         resume_filename: null,
-        resume_uploaded_at: null,
-        resume: null
+        resume_uploaded_at: null
       });
       setResumeUrl(null);
       // Update resume status
