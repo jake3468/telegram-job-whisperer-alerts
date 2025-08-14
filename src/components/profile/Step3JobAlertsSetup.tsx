@@ -140,34 +140,36 @@ export const Step3JobAlertsSetup = ({
         </div>
 
         {/* Bot ID Section */}
-        <div className="p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-gray-700 mb-3 text-xs sm:text-sm font-medium">
-            When the bot asks for your 'Activation Key', use this ID:
-          </p>
-          {userProfile?.id ? (
-            <div className="flex items-center gap-2 bg-white rounded-lg p-2 sm:p-3 border border-gray-200">
-              <code className="text-gray-800 font-mono text-xs sm:text-sm flex-1 break-all min-w-0">
-                {userProfile.id}
-              </code>
-              <Button 
-                onClick={copyUserProfileId} 
-                variant="outline" 
-                size="sm" 
-                className="hover:bg-blue-50 flex-shrink-0"
-              >
-                <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
-              </Button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 bg-white rounded-lg p-2 sm:p-3 border border-gray-200">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-              <span className="text-gray-600 text-xs sm:text-sm">Loading your Bot ID...</span>
-            </div>
-          )}
+        <div className="max-w-md mx-auto">
+          <div className="p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <p className="text-gray-700 mb-3 text-xs sm:text-sm font-medium">
+              When the bot asks for your 'Activation Key', use this ID:
+            </p>
+            {userProfile?.id ? (
+              <div className="flex items-center gap-2 bg-white rounded-lg p-2 sm:p-3 border border-gray-200">
+                <code className="text-gray-800 font-mono text-xs sm:text-sm flex-1 break-all min-w-0">
+                  {userProfile.id}
+                </code>
+                <Button 
+                  onClick={copyUserProfileId} 
+                  variant="outline" 
+                  size="sm" 
+                  className="hover:bg-blue-50 flex-shrink-0"
+                >
+                  <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 bg-white rounded-lg p-2 sm:p-3 border border-gray-200">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                <span className="text-gray-600 text-xs sm:text-sm">Loading your Bot ID...</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="space-y-2">
+        <div className="max-w-md mx-auto">
           <Button 
             onClick={handleActivateBot} 
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 h-auto min-h-[40px]"
