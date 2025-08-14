@@ -15,44 +15,59 @@ export const Step1ResumeUpload = ({
   const {
     hasResume
   } = useCachedUserCompletionStatus();
-  return <div className="space-y-4 sm:space-y-6">
+  return (
+    <div className="space-y-4 sm:space-y-6 max-w-2xl mx-auto">
       {/* Step Header */}
       <div className="text-center px-2">
-        <div className="flex items-center justify-center mb-3 sm:mb-4">
-          <div className="p-2 sm:p-3 bg-blue-500/20 rounded-full">
-            <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
+        <div className="flex items-center justify-center mb-4">
+          <div className="relative">
+            <div className="p-4 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-2xl border border-blue-400/30 backdrop-blur-sm">
+              <FileText className="w-8 h-8 text-blue-400" />
+            </div>
+            <div className="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs font-bold">1</span>
+            </div>
           </div>
         </div>
-        <h2 className="text-lg sm:text-xl md:text-2xl font-orbitron font-bold text-blue-400 mb-2 break-words">
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">
           Upload Your Resume
         </h2>
-        <p className="text-gray-300 text-sm sm:text-base md:text-lg break-words">Upload your resume (PDF, max 5MB) so our AI can better understand your background and personalize your experience</p>
+        <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
+          Upload your resume so our AI can personalize your experience
+        </p>
       </div>
 
       {/* Success Message */}
-      {hasResume && <div className="bg-emerald-900/20 border border-emerald-400/30 rounded-lg p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
-          <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-          <div>
-            <p className="text-emerald-300 font-medium text-sm sm:text-base break-words">Resume uploaded successfully!</p>
-            <p className="text-emerald-200 text-xs sm:text-sm break-words">You can continue to the next step or update your resume below.</p>
+      {hasResume && (
+        <div className="bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-400/20 rounded-xl p-4 flex items-center gap-3 backdrop-blur-sm">
+          <div className="flex-shrink-0 w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center">
+            <CheckCircle className="w-5 h-5 text-emerald-400" />
           </div>
-        </div>}
+          <div>
+            <p className="text-emerald-300 font-semibold text-sm">Resume uploaded successfully!</p>
+            <p className="text-emerald-200/80 text-xs">You can continue to the next step or update your resume below.</p>
+          </div>
+        </div>
+      )}
 
       {/* Resume Upload Section */}
-      <Card className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border-blue-400/30">
-        <CardHeader className="p-3 sm:p-6">
-          <CardTitle className="flex items-center gap-2 text-blue-300 text-sm sm:text-base break-words">
-            <Upload className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-            Resume Upload
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-3 sm:p-6">
-          <ResumeSection updateActivity={updateActivity} />
-        </CardContent>
-      </Card>
-
-
-
-
-    </div>;
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-2xl blur-xl"></div>
+        <Card className="relative bg-gray-900/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl shadow-2xl">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-blue-500/20 rounded-lg">
+                <Upload className="w-5 h-5 text-blue-400" />
+              </div>
+              <div>
+                <h3 className="text-white font-semibold">Resume Upload</h3>
+                <p className="text-gray-400 text-xs">PDF format, max 5MB</p>
+              </div>
+            </div>
+            <ResumeSection updateActivity={updateActivity} />
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
 };
