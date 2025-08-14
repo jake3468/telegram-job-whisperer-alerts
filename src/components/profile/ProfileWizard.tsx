@@ -178,7 +178,7 @@ export const ProfileWizard = () => {
         <Button
           onClick={() => nextStep()}
           variant="ghost"
-          className="text-gray-400 hover:text-gray-300"
+          className="text-gray-400 hover:text-gray-800"
           size="sm"
         >
           Skip for now
