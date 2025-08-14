@@ -212,10 +212,27 @@ const Profile = () => {
             </p>
           </div>
         </div> : <div className="max-w-4xl mx-auto space-y-8 px-4" onClick={updateActivity} onKeyDown={updateActivity}>
-          {/* Create Telegram Job Alerts */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 mb-4">
-              <h2 className="text-xl font-orbitron font-bold"><span className="mr-2">📢</span><span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Create Your Job Alerts Now</span></h2>
+          {/* Step Progress Indicator */}
+          <div className="flex justify-center items-center space-x-8 mb-12">
+            <div className="flex flex-col items-center">
+              <div className="w-10 h-10 bg-amber-500 text-black rounded-full flex items-center justify-center font-bold text-lg mb-2">1</div>
+              <span className="text-amber-400 font-semibold text-sm text-center">Job Alerts</span>
+            </div>
+            <div className="w-16 h-1 bg-gradient-to-r from-amber-400 to-blue-400"></div>
+            <div className="flex flex-col items-center">
+              <div className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-lg mb-2">2</div>
+              <span className="text-blue-400 font-semibold text-sm text-center">Profile</span>
+            </div>
+          </div>
+
+          {/* Step 1: Create Your Job Alerts Now */}
+          <div className="space-y-4 text-center">
+            <div className="mb-6 text-center">
+              <h2 className="text-2xl font-orbitron font-bold">
+                <span className="mr-2">📢</span>
+                <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Create Your Job Alerts Now</span>
+              </h2>
+              <p className="text-amber-200 text-lg font-medium mt-2">Step 1</p>
             </div>
             <div className="rounded-3xl border-2 border-amber-400/50 bg-gradient-to-br from-amber-900/20 via-orange-900/10 to-yellow-900/20 p-6">
               <div className="text-amber-100 font-inter mb-4 text-base space-y-2">
@@ -260,12 +277,16 @@ const Profile = () => {
                   </div>}
               </div>
               
-              <Button onClick={async () => {
-            updateActivity();
-            // Detect and store location when activating the bot
-            await detectAndStoreLocation();
-            window.open('https://t.me/Job_AI_update_bot', '_blank');
-          }} className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter text-sm"><span className="mr-1">🚀</span>Activate the Bot</Button>
+              <div className="text-center">
+                <Button onClick={async () => {
+              updateActivity();
+              // Detect and store location when activating the bot
+              await detectAndStoreLocation();
+              window.open('https://t.me/Job_AI_update_bot', '_blank');
+            }} className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-black font-semibold font-inter text-sm">
+                  <span className="mr-1">🚀</span>Activate the Bot
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -281,13 +302,17 @@ const Profile = () => {
           </div>
 
           {/* Horizontal separator */}
-          <div className="flex items-center my-8">
+          <div className="flex items-center my-12">
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent"></div>
           </div>
 
-          {/* Your Profile heading */}
+          {/* Step 2: Your Profile */}
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-orbitron font-bold italic"><span className="mr-2 not-italic">🪪</span><span className="bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-blue-200">Your Profile</span></h2>
+            <h2 className="text-2xl font-orbitron font-bold">
+              <span className="mr-2">🪪</span>
+              <span className="bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-blue-200">Your Profile</span>
+            </h2>
+            <p className="text-blue-200 text-lg font-medium mt-2">Step 2</p>
           </div>
 
           {/* Resume Section */}
