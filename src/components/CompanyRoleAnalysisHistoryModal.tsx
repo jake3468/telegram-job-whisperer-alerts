@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy, TrendingUp, Shield, Lightbulb, DollarSign, Users, GraduationCap, AlertTriangle, MapPin } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/client';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useCachedCompanyAnalyses } from '@/hooks/useCachedCompanyAnalyses';
 import { PremiumAnalysisResults } from '@/components/PremiumAnalysisResults';
 interface CompanyRoleAnalysisItem {
   id: string;
@@ -47,69 +48,13 @@ const CompanyRoleAnalysisHistoryModal = ({
   const {
     toast
   } = useToast();
-  const {
-    userProfile
-  } = useUserProfile();
-  const [historyData, setHistoryData] = useState<CompanyRoleAnalysisItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { userProfile } = useUserProfile();
+  const { data: historyData, isLoading, refetch } = useCachedCompanyAnalyses();
   const [selectedItem, setSelectedItem] = useState<CompanyRoleAnalysisItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
-  useEffect(() => {
-    if (isOpen && user && userProfile) {
-      fetchHistory();
-    }
-  }, [isOpen, user, userProfile]);
-  const fetchHistory = async () => {
-    if (!user || !userProfile) return;
-    setIsLoading(true);
-    try {
-      const {
-        data,
-        error
-      } = await supabase.from('company_role_analyses').select('*').eq('user_id', userProfile.id).order('created_at', {
-        ascending: false
-      }).limit(20);
-      if (error) {
-        console.error('Error fetching history:', error);
-        throw error;
-      }
-
-      // Transform the data to match our interface
-      const transformedData = (data || []).map((item: any) => ({
-        id: item.id,
-        company_name: item.company_name,
-        location: item.location,
-        job_title: item.job_title,
-        created_at: item.created_at,
-        research_date: item.research_date,
-        local_role_market_context: item.local_role_market_context,
-        company_news_updates: item.company_news_updates,
-        role_security_score: item.role_security_score,
-        role_security_score_breakdown: item.role_security_score_breakdown,
-        role_security_outlook: item.role_security_outlook,
-        role_security_automation_risks: item.role_security_automation_risks,
-        role_security_departmental_trends: item.role_security_departmental_trends,
-        role_experience_score: item.role_experience_score,
-        role_experience_score_breakdown: item.role_experience_score_breakdown,
-        role_experience_specific_insights: item.role_experience_specific_insights,
-        role_compensation_analysis: item.role_compensation_analysis,
-        role_workplace_environment: item.role_workplace_environment,
-        career_development: item.career_development,
-        role_specific_considerations: item.role_specific_considerations,
-        interview_and_hiring_insights: item.interview_and_hiring_insights,
-        sources: item.sources
-      }));
-      setHistoryData(transformedData);
-    } catch (err) {
-      console.error('Failed to fetch history:', err);
-      toast({
-        title: "Error",
-        description: "Failed to load history. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  
+  const handleRefresh = () => {
+    refetch();
   };
   const handleDelete = async (itemId: string) => {
     if (!userProfile) {
@@ -121,18 +66,17 @@ const CompanyRoleAnalysisHistoryModal = ({
       return;
     }
     try {
+      const { error } = await makeAuthenticatedRequest(async () => {
+        return await supabase.from('company_role_analyses').delete().eq('id', itemId).eq('user_id', userProfile.id);
+      }, { maxRetries: 2 });
       
-      const {
-        error
-      } = await supabase.from('company_role_analyses').delete().eq('id', itemId).eq('user_id', userProfile.id);
       if (error) {
         console.error('Supabase delete error:', error);
         throw error;
       }
       
-
-      // Remove from local state
-      setHistoryData(prev => prev.filter(item => item.id !== itemId));
+      // Refresh the data after deletion
+      refetch();
       toast({
         title: "Deleted",
         description: "Analysis deleted successfully."
@@ -262,10 +206,25 @@ const CompanyRoleAnalysisHistoryModal = ({
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white/70"></div>
                 Loading history...
               </div>
-            </div> : historyData.length === 0 ? <div className="flex items-center justify-center py-8">
+            </div> : !historyData?.length ? <div className="flex flex-col items-center justify-center py-8">
               <div className="text-white/70 text-center">
                 <History className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No company analyses found.</p>
+                <p className="text-sm mb-3">No company analyses found.</p>
+                <Button 
+                  onClick={handleRefresh}
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white/70 mr-2"></div>
+                      Retrying...
+                    </>
+                  ) : (
+                    'Retry Loading'
+                  )}
+                </Button>
               </div>
             </div> : <div className="space-y-2 sm:space-y-3 pb-4">
               {historyData.map(item => <div key={item.id} className="rounded-lg p-3 sm:p-4 border border-white/10 transition-colors bg-green-600">
