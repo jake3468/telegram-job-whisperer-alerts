@@ -31,7 +31,7 @@ export const Step1ResumeUpload = ({
             Upload Your Resume
           </h2>
           <p className="text-gray-400 text-xs sm:text-base leading-relaxed">
-            Upload your resume so our AI can personalize your experience
+            Upload your resume so our AI can personalize your experience (PDF format, max 5MB)
           </p>
         </div>
       </div>
@@ -52,15 +52,6 @@ export const Step1ResumeUpload = ({
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-xl sm:rounded-2xl blur-xl"></div>
         <Card className="relative bg-gray-900/40 backdrop-blur-sm border border-gray-700/50 rounded-xl sm:rounded-2xl shadow-2xl h-full">
           <CardContent className="p-4 sm:p-6 h-full">
-            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <div className="p-1.5 sm:p-2 bg-blue-500/20 rounded-lg">
-                <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
-              </div>
-              <div>
-                <h3 className="text-white font-semibold text-sm sm:text-base">Resume Upload</h3>
-                <p className="text-gray-400 text-xs">PDF format, max 5MB</p>
-              </div>
-            </div>
             <ResumeSection updateActivity={updateActivity} />
           </CardContent>
         </Card>
