@@ -20,7 +20,7 @@ let requestQueue: Array<{
 // Global refresh state
 let isRefreshing = false;
 
-// Main Supabase client (singleton)
+// Main Supabase client (singleton) 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     persistSession: false,
@@ -29,7 +29,9 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     flowType: 'implicit'
   },
   global: {
-    headers: {}
+    headers: {
+      'apikey': SUPABASE_PUBLISHABLE_KEY
+    }
   }
 });
 
@@ -40,17 +42,34 @@ export const setEnterpriseSessionManager = (manager: any) => {
 
 // Simple token injection into main client
 const injectTokenIntoClient = (token: string | null) => {
-  if (token) {
-    // Set the authorization header directly on the main client
-    (supabase as any).rest.headers = {
-      ...(supabase as any).rest.headers,
-      'Authorization': `Bearer ${token}`
-    };
-  } else {
-    // Remove authorization header
-    const headers = { ...(supabase as any).rest.headers };
-    delete headers['Authorization'];
-    (supabase as any).rest.headers = headers;
+  try {
+    if (token) {
+      // Set authorization header on global client
+      (supabase as any).supabaseKey = SUPABASE_PUBLISHABLE_KEY;
+      (supabase as any).supabaseUrl = SUPABASE_URL;
+      
+      // Set headers on the REST client
+      (supabase as any).rest.headers = {
+        'apikey': SUPABASE_PUBLISHABLE_KEY,
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      };
+      
+      console.debug('✅ Token injected successfully');
+      console.debug('📋 Headers set:', Object.keys((supabase as any).rest.headers));
+    } else {
+      // Reset to default headers
+      (supabase as any).rest.headers = {
+        'apikey': SUPABASE_PUBLISHABLE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      };
+      
+      console.debug('🔓 Token removed from Supabase client');
+    }
+  } catch (error) {
+    console.error('❌ Error injecting token:', error);
   }
 };
 
@@ -111,14 +130,18 @@ export const makeAuthenticatedRequest = async <T>(
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      // Ensure we have a valid token and inject it
+      // Ensure we have a valid token and inject it before EVERY operation
       const token = await ensureValidToken(attempt > 0);
       
       if (!token) {
         throw new Error('Authentication required - please sign in');
       }
 
-      // Execute operation with injected token
+      // Force inject token right before operation with explicit logging
+      console.debug(`🔧 Injecting token for attempt ${attempt + 1}:`, token.substring(0, 30) + '...');
+      injectTokenIntoClient(token);
+
+      // Execute operation with fresh token injection
       const result = await operation();
       
       // Process any queued requests after successful operation
@@ -138,8 +161,13 @@ export const makeAuthenticatedRequest = async <T>(
                            error?.status === 401;
 
         if (isAuthError) {
-          // Force token refresh on auth error
-          await new Promise(resolve => setTimeout(resolve, 100));
+          // Force token refresh on auth error and clear cache
+          isRefreshing = true;
+          try {
+            await ensureValidToken(true);
+          } finally {
+            isRefreshing = false;
+          }
           continue;
         }
       }
@@ -177,8 +205,22 @@ export const refreshJWTToken = async (): Promise<string | null> => {
 };
 
 export const setClerkToken = async (token: string | null) => {
-  // Inject token directly into the main client
+  // Inject token directly into the main client and log for debugging
+  console.debug('🔑 Setting Clerk token in Supabase client:', !!token);
+  if (token) {
+    console.debug('Token length:', token.length);
+    console.debug('Token preview:', token.substring(0, 50) + '...');
+  }
   injectTokenIntoClient(token);
+  
+  // Test the connection immediately
+  try {
+    const { data, error } = await supabase.rpc('debug_user_auth');
+    console.debug('🧪 Auth test result:', { data, error });
+  } catch (testError) {
+    console.warn('⚠️ Auth test failed:', testError);
+  }
+  
   return true;
 };
 

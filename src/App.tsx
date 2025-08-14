@@ -66,10 +66,11 @@ const AppWithSync = () => {
   // Skip enterprise features for job-alerts page to prevent debug messages
   const shouldUseEnterpriseFeatures = !location.pathname.includes('/job-alerts');
   
-  // Always call the hook but pass conditions to it - this fixes the hook ordering issue
-  useEnhancedTokenManagerIntegration({
-    enabled: shouldUseEnterpriseFeatures && isLoaded && isSignedIn
-  });
+  // DISABLED: Enterprise session manager until we fix the dual token system issue
+  // The ClerkSupabaseSync is handling tokens directly now
+  // useEnhancedTokenManagerIntegration({
+  //   enabled: shouldUseEnterpriseFeatures && isLoaded && isSignedIn
+  // });
   
   // Hide initial loader once React is ready
   useEffect(() => {
