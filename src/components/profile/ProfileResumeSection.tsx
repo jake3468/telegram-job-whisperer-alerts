@@ -34,16 +34,12 @@ export const ProfileResumeSection = () => {
         </div>
       </div>
 
-      {/* Success Message */}
+      {/* Info Message */}
       {resumeExists && (
-        <div className="bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-400/20 rounded-lg p-2 sm:p-3 flex items-center gap-2 backdrop-blur-sm">
-          <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-emerald-500/20 rounded-full flex items-center justify-center">
-            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-400" />
-          </div>
-          <div>
-            <p className="text-emerald-300 font-semibold text-xs">Resume uploaded successfully!</p>
-            <p className="text-emerald-200/80 text-xs">You can delete and replace it with another resume if needed.</p>
-          </div>
+        <div className="px-2 mb-2">
+          <p className="text-gray-400 text-xs sm:text-sm">
+            You can delete and replace it with another resume if needed.
+          </p>
         </div>
       )}
 
