@@ -190,8 +190,8 @@ const Profile = () => {
               <span className="italic bg-gradient-to-r from-pastel-peach to-pastel-mint bg-clip-text text-transparent">{user.firstName || 'User'}</span>
             </h1>
             <div className="text-gray-100 font-inter font-light text-left text-sm space-y-3">
-              <p>🎯 <strong>Complete your profile first</strong> to unlock personalized job alerts and get faster, more relevant job matches tailored to your background.</p>
-              <p>⚡ <strong>Then activate job alerts</strong> to receive the hottest opportunities delivered straight to your Telegram before they hit LinkedIn or Indeed.</p>
+              <p>🎯 Add or update your resume and bio here so you can instantly get job-tailored cover letters, resumes, interview prep, and more when your job alerts arrive in Telegram.</p>
+              <p>⚡ If you have already completed these steps and set your job alerts, just wait for your first Telegram job updates to start arriving from tomorrow.</p>
             </div>
           </div>
           
