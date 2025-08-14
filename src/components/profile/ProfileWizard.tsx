@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 import { useCachedUserCompletionStatus } from '@/hooks/useCachedUserCompletionStatus';
 import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
@@ -14,6 +15,7 @@ import { toast } from 'sonner';
 const TOTAL_STEPS = 3;
 
 export const ProfileWizard = () => {
+  const navigate = useNavigate();
   const { user } = useUser();
   const { hasResume, hasBio } = useCachedUserCompletionStatus();
   const { userProfile, refetch } = useCachedUserProfile();
@@ -24,7 +26,7 @@ export const ProfileWizard = () => {
     if (currentStep < TOTAL_STEPS) {
       setCurrentStep(currentStep + 1);
     } else {
-      completeSetup();
+      completeSetupAndRedirect();
     }
   };
 
@@ -34,7 +36,7 @@ export const ProfileWizard = () => {
     }
   };
 
-  const completeSetup = async () => {
+  const completeSetupAndRedirect = async () => {
     if (!userProfile?.id) return;
     
     setIsCompleting(true);
@@ -46,8 +48,11 @@ export const ProfileWizard = () => {
 
       if (error) throw error;
 
-      toast.success('Profile setup completed! 🎉');
+      toast.success('Profile setup completed! 🎉 Now create your job alerts.');
       await refetch();
+      
+      // Redirect to job alerts page
+      navigate('/job-alerts');
     } catch (error) {
       console.error('Error completing setup:', error);
       toast.error('Failed to complete setup');
@@ -190,7 +195,7 @@ export const ProfileWizard = () => {
           className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
           size="sm"
         >
-          {isCompleting ? 'Completing...' : currentStep === TOTAL_STEPS ? 'Complete Setup' : 'Next'}
+          {isCompleting ? 'Completing...' : currentStep === TOTAL_STEPS ? 'Create Job Alerts' : 'Next'}
           <ChevronRight className="w-4 h-4" />
         </Button>
       </div>
