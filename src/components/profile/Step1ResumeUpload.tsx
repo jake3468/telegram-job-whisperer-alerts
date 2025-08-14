@@ -31,7 +31,7 @@ export const Step1ResumeUpload = ({
             Upload Your Resume
           </h2>
           <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
-            Upload your resume so our AI can personalize your experience (PDF format, max 5MB)
+            Upload your resume so our AI can personalize your experience (PDF format, max 5MB). Don't worry if your current resume isn't perfect - you can update it by chatting with our latest Resume Builder Bot.
           </p>
         </div>
       </div>

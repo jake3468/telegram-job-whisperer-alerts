@@ -169,13 +169,25 @@ export const Step3JobAlertsSetup = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="max-w-md mx-auto">
+        <div className="max-w-md mx-auto space-y-3">
           <Button 
             onClick={handleActivateBot} 
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 h-auto min-h-[40px]"
           >
             <ExternalLink className="w-3 h-3 mr-2 flex-shrink-0" />
             <span className="text-xs leading-tight break-words">Activate Telegram Bot</span>
+          </Button>
+          
+          <p className="text-gray-400 text-xs text-center leading-relaxed">
+            Make sure that you complete the bot activation by following the above steps. Once you activate the bot, then click the below "Create Alerts" button.
+          </p>
+          
+          <Button 
+            onClick={handleCreateJobAlerts} 
+            className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-3 h-auto min-h-[40px]"
+          >
+            <Zap className="w-3 h-3 mr-2 flex-shrink-0" />
+            <span className="text-xs leading-tight break-words">Create Alerts</span>
           </Button>
         </div>
       </div>

@@ -43,21 +43,11 @@ export const Step2BioCreation = ({
             Write Your Professional Bio
           </h2>
           <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
-            Tell us a bit about yourself - it helps our AI tailor tools to your unique profile
+            Tell us a bit about yourself - it helps our AI tailor tools to your unique profile. If you don't want to update it now, you can always do it later.
           </p>
         </div>
       </div>
 
-      {/* Success Message */}
-      {hasBio && <div className="bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-400/20 rounded-lg p-2 sm:p-3 flex items-center gap-2 backdrop-blur-sm">
-          <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-emerald-500/20 rounded-full flex items-center justify-center">
-            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-400" />
-          </div>
-          <div>
-            <p className="text-emerald-300 font-semibold text-xs">Bio completed successfully!</p>
-            <p className="text-emerald-200/80 text-xs">You can continue to the next step.</p>
-          </div>
-        </div>}
 
       {/* Bio Section */}
       <div>
