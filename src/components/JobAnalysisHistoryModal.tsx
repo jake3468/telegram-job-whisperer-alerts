@@ -3,7 +3,7 @@ import { useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy } from 'lucide-react';
+import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy, RefreshCw } from 'lucide-react';
 import { useEnterpriseAPIClient } from '@/hooks/useEnterpriseAPIClient';
 import { useCachedJobAnalyses } from '@/hooks/useCachedJobAnalyses';
 import { supabase } from '@/integrations/supabase/client';
@@ -34,7 +34,7 @@ const JobAnalysisHistoryModal = ({
   const {
     toast
   } = useToast();
-  const { data: historyData, isLoading, refetch } = useCachedJobAnalyses();
+  const { data: historyData, isLoading, connectionIssue, refetch } = useCachedJobAnalyses();
   const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
   const [selectedItem, setSelectedItem] = useState<JobAnalysisItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
@@ -209,9 +209,22 @@ const JobAnalysisHistoryModal = ({
               <History className="w-4 h-4 sm:w-5 sm:h-5" />
               Job Analysis History
             </DialogTitle>
-            <Button onClick={onClose} size="sm" variant="ghost" className="text-white/70 hover:text-white h-8 w-8 p-0 hover:bg-white/10">
-              <X className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              {connectionIssue && (
+                <Button 
+                  onClick={() => window.location.reload()} 
+                  variant="outline" 
+                  size="sm" 
+                  className="border-orange-400/30 bg-orange-100/10 text-orange-600 hover:bg-orange-200/20" 
+                  title="Connection issue detected. Click to refresh the page."
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </Button>
+              )}
+              <Button onClick={onClose} size="sm" variant="ghost" className="text-white/70 hover:text-white h-8 w-8 p-0 hover:bg-white/10">
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
           <DialogDescription className="text-white/70 font-inter text-xs sm:text-sm">
             Your history is automatically deleted after 60 days. Found {historyData.length} items.
