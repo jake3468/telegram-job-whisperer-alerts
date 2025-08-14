@@ -110,6 +110,9 @@ export const Step3JobAlertsSetup = ({
         {/* Value Proposition */}
         <div className="space-y-2">
           <p className="text-white text-xs font-medium">
+            Click the below "Activate Telegram Bot" button and paste the activation key provided below.
+          </p>
+          <p className="text-white text-xs font-medium">
             Each job alert will look like below example👇 and will include all tools in one click: resume, cover letter, visa info, job fit, and more.
           </p>
         </div>
