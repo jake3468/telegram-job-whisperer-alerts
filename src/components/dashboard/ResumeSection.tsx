@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
@@ -8,21 +7,29 @@ import { useToast } from '@/hooks/use-toast';
 import { Upload, FileText, Trash2 } from 'lucide-react';
 import { useEnhancedTokenManagerIntegration } from '@/hooks/useEnhancedTokenManagerIntegration';
 import { makeAuthenticatedRequest } from '@/integrations/supabase/client';
-
 interface ResumeSectionProps {
   updateActivity?: () => void;
 }
-
-const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
-  const { user } = useUser();
-  const { toast } = useToast();
-  const { userProfile, resumeExists, updateResumeStatus, updateUserProfile } = useCachedUserProfile();
+const ResumeSection = ({
+  updateActivity
+}: ResumeSectionProps) => {
+  const {
+    user
+  } = useUser();
+  const {
+    toast
+  } = useToast();
+  const {
+    userProfile,
+    resumeExists,
+    updateResumeStatus,
+    updateUserProfile
+  } = useCachedUserProfile();
   const [uploading, setUploading] = useState(false);
   const [resumeUrl, setResumeUrl] = useState<string | null>(null);
 
   // Enhanced token management
   const sessionManager = useEnhancedTokenManagerIntegration();
-
   useEffect(() => {
     if (user && !resumeExists) {
       checkExistingResume();
@@ -33,26 +40,25 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
       setResumeUrl(publicUrl);
     }
   }, [user, resumeExists]);
-
   const checkExistingResume = async () => {
     if (!user || !sessionManager) return;
     try {
       updateActivity?.();
-      
       await makeAuthenticatedRequest(async () => {
-        const { supabase } = await import('@/integrations/supabase/client');
-        const { data, error } = await supabase.storage
-          .from('resumes')
-          .list(user.id, {
-            limit: 1,
-            search: 'resume.pdf'
-          });
-
+        const {
+          supabase
+        } = await import('@/integrations/supabase/client');
+        const {
+          data,
+          error
+        } = await supabase.storage.from('resumes').list(user.id, {
+          limit: 1,
+          search: 'resume.pdf'
+        });
         if (error) {
           console.error('Error checking existing resume:', error);
           return;
         }
-
         if (data && data.length > 0) {
           const fileName = `${user.id}/resume.pdf`;
           const publicUrl = `https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/resumes/${fileName}`;
@@ -66,10 +72,8 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
       console.error('Error checking existing resume:', error);
     }
   };
-
   const callResumeWebhook = async (fileUrl: string, fileName: string, fileSize: number) => {
     if (!sessionManager) return;
-    
     try {
       console.log('Calling resume webhook with:', {
         fileUrl,
@@ -77,10 +81,14 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
         fileSize,
         userId: user?.id
       });
-
       await makeAuthenticatedRequest(async () => {
-        const { supabase } = await import('@/integrations/supabase/client');
-        const { data, error } = await supabase.functions.invoke('resume-pdf-webhook', {
+        const {
+          supabase
+        } = await import('@/integrations/supabase/client');
+        const {
+          data,
+          error
+        } = await supabase.functions.invoke('resume-pdf-webhook', {
           body: {
             fileUrl,
             fileName,
@@ -89,7 +97,6 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
             timestamp: new Date().toISOString()
           }
         });
-
         if (error) {
           console.error('Webhook call failed:', error);
           toast({
@@ -98,7 +105,6 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
             variant: "destructive"
           });
         } else {
-          
           toast({
             title: "Processing Started",
             description: "Your resume is being processed.",
@@ -115,13 +121,10 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
       });
     }
   };
-
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !user || !sessionManager) return;
-
     updateActivity?.();
-
     if (file.type !== 'application/pdf') {
       toast({
         title: "Invalid file type",
@@ -130,7 +133,6 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
       });
       return;
     }
-
     if (file.size > 5 * 1024 * 1024) {
       toast({
         title: "File too large",
@@ -139,27 +141,26 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
       });
       return;
     }
-
     if (uploading) return;
-
     setUploading(true);
     try {
       await makeAuthenticatedRequest(async () => {
-        const { supabase } = await import('@/integrations/supabase/client');
-        
+        const {
+          supabase
+        } = await import('@/integrations/supabase/client');
+
         // Check for existing resume and delete if exists
         const existingResumePath = `${user.id}/resume.pdf`;
         await supabase.storage.from('resumes').remove([existingResumePath]);
 
         // Upload new file
         const filePath = `${user.id}/resume.pdf`;
-        const { error: uploadError } = await supabase.storage
-          .from('resumes')
-          .upload(filePath, file, {
-            upsert: true,
-            contentType: 'application/pdf'
-          });
-
+        const {
+          error: uploadError
+        } = await supabase.storage.from('resumes').upload(filePath, file, {
+          upsert: true,
+          contentType: 'application/pdf'
+        });
         if (uploadError) {
           throw uploadError;
         }
@@ -170,7 +171,6 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
 
         // Update resume status in cache
         updateResumeStatus(true);
-
         return publicUrl;
       });
 
@@ -183,7 +183,6 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
       // Call the webhook to process the resume
       const publicUrl = `https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/resumes/${user.id}/resume.pdf`;
       await callResumeWebhook(publicUrl, file.name, file.size);
-
       toast({
         title: "Resume uploaded successfully",
         description: "Your resume has been uploaded and is being processed."
@@ -200,24 +199,21 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
       event.target.value = '';
     }
   };
-
   const handleDeleteResume = async () => {
     if (!user || !sessionManager) return;
-    
     updateActivity?.();
-    
     try {
       setUploading(true);
-
       await makeAuthenticatedRequest(async () => {
-        const { supabase } = await import('@/integrations/supabase/client');
-        
+        const {
+          supabase
+        } = await import('@/integrations/supabase/client');
+
         // Delete from Supabase storage
         const filePath = `${user.id}/resume.pdf`;
-        const { error } = await supabase.storage
-          .from('resumes')
-          .remove([filePath]);
-
+        const {
+          error
+        } = await supabase.storage.from('resumes').remove([filePath]);
         if (error) {
           throw error;
         }
@@ -228,11 +224,9 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
         resume_filename: null,
         resume_uploaded_at: null
       });
-
       setResumeUrl(null);
       // Update resume status
       updateResumeStatus(false);
-      
       toast({
         title: "Resume deleted",
         description: "Your resume has been deleted successfully."
@@ -248,7 +242,6 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
       setUploading(false);
     }
   };
-
   const triggerFileInput = () => {
     if (!uploading && sessionManager) {
       updateActivity?.();
@@ -260,12 +253,10 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
   // Helper function to format upload date
   const formatUploadDate = (dateString: string | null) => {
     if (!dateString) return 'Uploaded recently';
-    
     try {
       const date = new Date(dateString);
       const now = new Date();
       const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-      
       if (diffInHours < 1) {
         return 'Uploaded recently';
       } else if (diffInHours < 24) {
@@ -299,9 +290,7 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
     }
     return 'Uploaded recently';
   };
-
-  return (
-    <section className="p-0 rounded-none bg-transparent shadow-none">
+  return <section className="p-0 rounded-none bg-transparent shadow-none">
       <Card className="
           rounded-3xl border-2 border-purple-400/80 
           bg-gradient-to-br from-purple-600/90 via-purple-700/85 to-purple-900/90
@@ -309,17 +298,11 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
           backdrop-blur-sm
         ">
         <CardHeader className="pb-3">
-          <CardTitle className="text-white font-orbitron flex items-center gap-2 text-lg drop-shadow-[0_2px_8px_rgba(147,51,234,0.6)]">
-            <div className="w-7 h-7 bg-purple-400/60 rounded-full flex items-center justify-center shadow-lg shadow-purple-500/30">
-              <FileText className="w-4 h-4 text-white drop-shadow-[0_2px_8px_rgba(255,255,255,0.8)]" />
-            </div>
-            <span className="text-white font-bold">Resume</span>
-          </CardTitle>
-          <CardDescription className="text-white/95 font-inter font-normal drop-shadow-[0_2px_10px_rgba(147,51,234,0.4)] text-sm">Upload your resume (PDF, max 5MB) so our AI can better understand your background and personalize your experience</CardDescription>
+          
+          
         </CardHeader>
         <CardContent className="space-y-3 pt-0">
-          {resumeUrl ? (
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-xl border border-white/20 bg-black/70 shadow-inner">
+          {resumeUrl ? <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-xl border border-white/20 bg-black/70 shadow-inner">
               <div className="flex items-center gap-2 min-w-0">
                 <div className="w-8 h-8 bg-purple-500/60 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple-500/40">
                   <FileText className="w-4 h-4 text-white" />
@@ -337,9 +320,7 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
                 <Trash2 className="w-3 h-3 mr-1" />
                 Delete
               </Button>
-            </div>
-          ) : (
-            <div className="border-2 border-dashed border-white/70 rounded-xl p-5 sm:p-8 text-center cursor-pointer hover:border-purple-300 hover:bg-purple-400/15 transition-all duration-300 bg-black/60 shadow-inner" onClick={triggerFileInput}>
+            </div> : <div className="border-2 border-dashed border-white/70 rounded-xl p-5 sm:p-8 text-center cursor-pointer hover:border-purple-300 hover:bg-purple-400/15 transition-all duration-300 bg-black/60 shadow-inner" onClick={triggerFileInput}>
               <div className="w-14 h-14 bg-purple-500/50 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg shadow-purple-500/30">
                 <Upload className="w-7 h-7 text-purple-100" />
               </div>
@@ -350,12 +331,9 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
                 {uploading ? 'Uploading...' : 'Upload Resume'}
               </Button>
               <input id="resume-upload" type="file" accept=".pdf" onChange={handleFileUpload} className="hidden" disabled={uploading || !sessionManager} />
-            </div>
-          )}
+            </div>}
         </CardContent>
       </Card>
-    </section>
-  );
+    </section>;
 };
-
 export default ResumeSection;
