@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { History, FileText, Briefcase, Building, Calendar, Trash2, Eye, X, AlertCircle, Copy, RefreshCw } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { makeAuthenticatedRequest } from '@/integrations/supabase/client';
 import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
-import { useEnterpriseAPIClient } from '@/hooks/useEnterpriseAPIClient';
+import { useCachedCoverLetters } from '@/hooks/useCachedCoverLetters';
 import CoverLetterDownloadActions from '@/components/CoverLetterDownloadActions';
+
 interface CoverLetterItem {
   id: string;
   company_name?: string;
@@ -16,11 +17,13 @@ interface CoverLetterItem {
   created_at: string;
   cover_letter?: string;
 }
+
 interface CoverLetterHistoryModalProps {
   isOpen: boolean;
   onClose: () => void;
   gradientColors: string;
 }
+
 const CoverLetterHistoryModal = ({
   isOpen,
   onClose,
@@ -32,88 +35,31 @@ const CoverLetterHistoryModal = ({
   const {
     toast
   } = useToast();
-  const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
-  const [historyData, setHistoryData] = useState<CoverLetterItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  
+  const { 
+    data: historyData = [], 
+    isLoading, 
+    connectionIssue, 
+    refetch 
+  } = useCachedCoverLetters();
+  
   const [selectedItem, setSelectedItem] = useState<CoverLetterItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   
+  const handleRetryLoading = async () => {
+    if (refetch) {
+      await refetch();
+    }
+  };
   
   useEffect(() => {
-    if (isOpen && user) {
-      
-      fetchHistory();
-    } else if (!isOpen) {
+    if (!isOpen) {
       // Reset state when modal closes
-      setIsLoading(false);
-      setHistoryData([]);
       setShowDetails(false);
       setSelectedItem(null);
     }
-  }, [isOpen, user]);
-  const fetchHistory = async () => {
-    if (!user) {
-      
-      return;
-    }
-    
-    setIsLoading(true);
-    
-    try {
-      
-      
-      // Use enterprise API client with automatic token refresh and retry logic
-      const data = await makeAuthenticatedRequest(async () => {
-        const { data: fetchedData, error } = await supabase
-          .from('job_cover_letters')
-          .select(`
-            id, 
-            company_name, 
-            job_title, 
-            job_description, 
-            created_at, 
-            cover_letter,
-            user_profile!inner(user_id, users!inner(clerk_id))
-          `)
-          .eq('user_profile.users.clerk_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(20);
+  }, [isOpen]);
 
-        if (error) {
-          console.error('[CoverLetterHistory] Supabase error:', error);
-          throw error;
-        }
-
-        return fetchedData;
-      }, {
-        maxRetries: 3,
-        silentRetry: true
-      });
-
-      
-
-      // Transform the data to match our interface
-      const transformedData = (data || []).map((item: any) => ({
-        id: item.id,
-        company_name: item.company_name,
-        job_title: item.job_title,
-        job_description: item.job_description,
-        created_at: item.created_at,
-        cover_letter: item.cover_letter
-      }));
-      
-      setHistoryData(transformedData);
-    } catch (err) {
-      console.error('[CoverLetterHistory] Failed to fetch history:', err);
-      toast({
-        title: "Error",
-        description: "Failed to load history. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
   const handleCopyResult = async (item: CoverLetterItem) => {
     const result = item.cover_letter;
     if (!result) return;
@@ -132,6 +78,7 @@ const CoverLetterHistoryModal = ({
       });
     }
   };
+
   const handleDelete = async (itemId: string) => {
     if (!user) {
       toast({
@@ -143,10 +90,9 @@ const CoverLetterHistoryModal = ({
     }
     
     try {
-      
-      
-      // Use enterprise API client for deletion as well
       await makeAuthenticatedRequest(async () => {
+        const { supabase } = await import('@/integrations/supabase/client');
+        
         // First get the user profile ID
         const { data: userProfile } = await supabase
           .from('user_profile')
@@ -174,15 +120,8 @@ const CoverLetterHistoryModal = ({
           console.error('[CoverLetterHistory] Delete error:', error);
           throw error;
         }
-      }, {
-        maxRetries: 2,
-        silentRetry: true
       });
 
-      
-
-      // Remove from local state
-      setHistoryData(prev => prev.filter(item => item.id !== itemId));
       toast({
         title: "Deleted",
         description: "Cover letter deleted successfully."
@@ -193,6 +132,11 @@ const CoverLetterHistoryModal = ({
         setShowDetails(false);
         setSelectedItem(null);
       }
+      
+      // Force refresh to update the list
+      if (refetch) {
+        await refetch();
+      }
     } catch (err) {
       console.error('[CoverLetterHistory] Failed to delete item:', err);
       toast({
@@ -202,6 +146,7 @@ const CoverLetterHistoryModal = ({
       });
     }
   };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -211,9 +156,11 @@ const CoverLetterHistoryModal = ({
       minute: '2-digit'
     });
   };
+
   const hasResult = (item: CoverLetterItem) => {
     return item.cover_letter && item.cover_letter.trim().length > 0;
   };
+
   if (showDetails && selectedItem) {
     return <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-6xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
@@ -295,6 +242,7 @@ const CoverLetterHistoryModal = ({
         </DialogContent>
       </Dialog>;
   }
+
   return <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] max-w-5xl h-[90vh] overflow-hidden bg-black border-white/20 flex flex-col">
         <DialogHeader className="flex-shrink-0">
@@ -326,6 +274,17 @@ const CoverLetterHistoryModal = ({
               <div className="text-white/70 text-sm flex items-center gap-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white/70"></div>
                 Loading history...
+              </div>
+            </div> : connectionIssue ? <div className="flex flex-col items-center justify-center py-8">
+              <div className="text-white/70 text-center max-w-md">
+                <div className="w-16 h-16 bg-red-100/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <AlertCircle className="w-8 h-8 text-red-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-white mb-2">Failed to load data</h3>
+                <p className="text-sm text-white/70 mb-4">There was an issue loading your cover letter history. Please try again.</p>
+                <Button onClick={handleRetryLoading} size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                  Retry Loading
+                </Button>
               </div>
             </div> : historyData.length === 0 ? <div className="flex items-center justify-center py-8">
               <div className="text-white/70 text-center">
@@ -409,4 +368,5 @@ const CoverLetterHistoryModal = ({
       </DialogContent>
     </Dialog>;
 };
+
 export default CoverLetterHistoryModal;
