@@ -28,10 +28,10 @@ export const Step2BioCreation = ({
       behavior: 'smooth'
     });
   }, []);
-  return <div className="space-y-4 sm:space-y-6">
+  return <div className="space-y-4 sm:space-y-6 max-w-2xl mx-auto">
       {/* Step Header */}
-      <div className="text-center px-2">
-        <div className="flex items-center justify-center mb-4">
+      <div className="text-center px-2 py-4">
+        <div className="flex items-center justify-center mb-6">
           <div className="relative">
             <div className="p-4 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-2xl border border-blue-400/30 backdrop-blur-sm">
               <PenTool className="w-8 h-8 text-blue-400" />
@@ -41,7 +41,7 @@ export const Step2BioCreation = ({
             </div>
           </div>
         </div>
-        <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">
           Write Your Professional Bio
         </h2>
         <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
