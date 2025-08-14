@@ -275,13 +275,32 @@ export const getCurrentJWTToken = () => {
 
 export const testJWTTransmission = async () => {
   try {
-    const { data, error } = await makeAuthenticatedRequest(async () => {
-      return await supabase.rpc('debug_user_auth');
-    });
+    console.log('🧪 Testing JWT transmission to Supabase...');
     
+    // First check if we have session manager
+    if (!enterpriseSessionManager) {
+      return { data: null, error: 'Session manager not connected' };
+    }
+    
+    // Check current token
+    const currentToken = enterpriseSessionManager.getCurrentToken?.();
+    console.log('🔑 Current token available:', !!currentToken);
+    
+    if (!currentToken) {
+      return { data: null, error: 'No current token available' };
+    }
+    
+    // Test the authenticated request pipeline
+    const { data, error } = await makeAuthenticatedRequest(async () => {
+      console.log('📡 Making RPC call to debug_user_auth...');
+      return await supabase.rpc('debug_user_auth');
+    }, { operationType: 'jwt_test' });
+    
+    console.log('📊 JWT Test Result:', { data, error });
     return { data, error };
   } catch (error) {
-    return { data: null, error };
+    console.error('❌ JWT Test Error:', error);
+    return { data: null, error: error.message };
   }
 };
 
