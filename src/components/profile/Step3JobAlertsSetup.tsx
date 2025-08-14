@@ -89,7 +89,7 @@ export const Step3JobAlertsSetup = ({
             Set Up Job Alerts
           </h2>
           <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
-            Get personalized job opportunities delivered straight to Telegram
+            Set up your personalized job alerts now 🔥 and get the latest opportunities from the last 24 hours delivered straight to Telegram - faster and more relevant than LinkedIn or Indeed.
           </p>
         </div>
       </div>
