@@ -62,12 +62,5 @@ export const Step2BioCreation = ({
         <ProfessionalBioSection />
       </div>
 
-      {/* Character Goal */}
-      <div className="text-center p-2 sm:p-4 bg-purple-900/20 rounded-lg border border-purple-400/30 flex-shrink-0">
-        <p className="text-purple-300 text-xs sm:text-sm break-words">
-          <strong>Tip:</strong> Aim for 150-300 characters for the best results. Quality over quantity!
-        </p>
-      </div>
-
     </div>;
 };
