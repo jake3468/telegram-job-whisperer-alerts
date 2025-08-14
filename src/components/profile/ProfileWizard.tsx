@@ -79,9 +79,9 @@ export const ProfileWizard = () => {
   }
 
   return (
-    <div className="h-screen w-full max-w-full px-3 py-1 sm:px-4 sm:py-4 sm:max-w-2xl md:max-w-4xl mx-auto overflow-hidden flex flex-col">
+    <div className="w-full max-w-full px-3 py-1 sm:px-4 sm:py-2 sm:max-w-2xl md:max-w-4xl mx-auto flex flex-col">
       {/* Welcome Header */}
-      <div className="text-center mb-1 sm:mb-4">
+      <div className="text-center mb-1 sm:mb-2">
         <h1 className="font-extrabold text-lg sm:text-2xl md:text-4xl font-orbitron drop-shadow mb-1 break-words">
           <span className="mr-1 sm:mr-2">🎉</span>
           <span className="bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent">
