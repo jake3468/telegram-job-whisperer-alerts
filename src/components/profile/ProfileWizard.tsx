@@ -163,39 +163,36 @@ export const ProfileWizard = () => {
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-0">
+      <div className="flex justify-between items-center gap-3">
         <Button
           onClick={prevStep}
           variant="outline"
           disabled={currentStep === 1}
-          className="flex items-center justify-center gap-2 min-h-[44px] order-2 sm:order-1"
+          className="flex items-center gap-2"
+          size="sm"
         >
           <ChevronLeft className="w-4 h-4" />
-          Previous
+          Go back
         </Button>
 
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 order-1 sm:order-2">
-          {currentStep < TOTAL_STEPS && (
-            <Button
-              onClick={() => nextStep()}
-              variant="ghost"
-              className="text-gray-400 hover:text-gray-300 min-h-[44px] order-2 sm:order-1"
-            >
-              Skip for now
-            </Button>
-          )}
-          
-          <Button
-            onClick={nextStep}
-            disabled={currentStep < TOTAL_STEPS && !canProceedToNext() || isCompleting}
-            className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 min-h-[44px] order-1 sm:order-2"
-          >
-            <span className="break-words text-center">
-              {isCompleting ? 'Completing...' : currentStep === TOTAL_STEPS ? 'Complete Setup' : 'Continue'}
-            </span>
-            <ChevronRight className="w-4 h-4" />
-          </Button>
-        </div>
+        <Button
+          onClick={() => nextStep()}
+          variant="ghost"
+          className="text-gray-400 hover:text-gray-300"
+          size="sm"
+        >
+          Skip for now
+        </Button>
+        
+        <Button
+          onClick={nextStep}
+          disabled={currentStep < TOTAL_STEPS && !canProceedToNext() || isCompleting}
+          className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+          size="sm"
+        >
+          {isCompleting ? 'Completing...' : currentStep === TOTAL_STEPS ? 'Complete Setup' : 'Next'}
+          <ChevronRight className="w-4 h-4" />
+        </Button>
       </div>
     </div>
   );
