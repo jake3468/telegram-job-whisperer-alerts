@@ -41,7 +41,7 @@ const CoverLetterHistoryModal = ({
   
   useEffect(() => {
     if (isOpen && user) {
-      console.log('[CoverLetterHistory] Modal opened, fetching data directly');
+      
       fetchHistory();
     } else if (!isOpen) {
       // Reset state when modal closes
@@ -53,14 +53,14 @@ const CoverLetterHistoryModal = ({
   }, [isOpen, user]);
   const fetchHistory = async () => {
     if (!user) {
-      console.log('[CoverLetterHistory] No user available');
+      
       return;
     }
     
     setIsLoading(true);
     
     try {
-      console.log('[CoverLetterHistory] Fetching data for user:', user.id);
+      
       
       // Use enterprise API client with automatic token refresh and retry logic
       const data = await makeAuthenticatedRequest(async () => {
@@ -90,7 +90,7 @@ const CoverLetterHistoryModal = ({
         silentRetry: true
       });
 
-      console.log('[CoverLetterHistory] Successfully fetched', data?.length || 0, 'items');
+      
 
       // Transform the data to match our interface
       const transformedData = (data || []).map((item: any) => ({
@@ -143,7 +143,7 @@ const CoverLetterHistoryModal = ({
     }
     
     try {
-      console.log(`[CoverLetterHistory] Attempting to delete item: ${itemId} for user: ${user.id}`);
+      
       
       // Use enterprise API client for deletion as well
       await makeAuthenticatedRequest(async () => {
@@ -179,7 +179,7 @@ const CoverLetterHistoryModal = ({
         silentRetry: true
       });
 
-      console.log('[CoverLetterHistory] Delete operation completed successfully');
+      
 
       // Remove from local state
       setHistoryData(prev => prev.filter(item => item.id !== itemId));

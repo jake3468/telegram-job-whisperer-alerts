@@ -98,7 +98,7 @@ const ResumeSection = ({ updateActivity }: ResumeSectionProps) => {
             variant: "destructive"
           });
         } else {
-          console.log('Webhook called successfully:', data);
+          
           toast({
             title: "Processing Started",
             description: "Your resume is being processed.",

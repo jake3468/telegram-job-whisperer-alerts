@@ -106,7 +106,6 @@ const EnhancedResumeSection = () => {
         
         // Retry logic for webhook failures
         if (retryCount < 2) {
-          console.log(`Retrying webhook in ${(retryCount + 1) * 2} seconds...`);
           await new Promise(resolve => setTimeout(resolve, (retryCount + 1) * 2000));
           return callResumeWebhook(fileUrl, fileName, fileSize, retryCount + 1);
         }
@@ -115,7 +114,7 @@ const EnhancedResumeSection = () => {
         return false;
       }
 
-      console.log('Resume webhook called successfully:', data);
+      
       setWebhookStatus('success');
       return true;
     } catch (error) {
@@ -123,7 +122,7 @@ const EnhancedResumeSection = () => {
       
       // Retry on timeout or network errors
       if (retryCount < 2 && (error instanceof Error && (error.message.includes('timeout') || error.message.includes('network')))) {
-        console.log(`Retrying webhook in ${(retryCount + 1) * 2} seconds...`);
+        
         await new Promise(resolve => setTimeout(resolve, (retryCount + 1) * 2000));
         return callResumeWebhook(fileUrl, fileName, fileSize, retryCount + 1);
       }

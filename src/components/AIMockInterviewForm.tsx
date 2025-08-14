@@ -137,7 +137,7 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
       
       if (!token) {
         // If token refresh fails, try automatic page refresh
-        console.log('[AIMockInterviewForm] Token refresh failed, attempting page refresh...');
+        
         setTimeout(() => {
           window.location.reload();
         }, 1000);

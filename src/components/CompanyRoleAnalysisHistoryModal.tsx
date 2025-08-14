@@ -121,7 +121,7 @@ const CompanyRoleAnalysisHistoryModal = ({
       return;
     }
     try {
-      console.log(`Attempting to delete company analysis item with ID: ${itemId} for user profile: ${userProfile.id}`);
+      
       const {
         error
       } = await supabase.from('company_role_analyses').delete().eq('id', itemId).eq('user_id', userProfile.id);
@@ -129,7 +129,7 @@ const CompanyRoleAnalysisHistoryModal = ({
         console.error('Supabase delete error:', error);
         throw error;
       }
-      console.log('Delete operation completed successfully');
+      
 
       // Remove from local state
       setHistoryData(prev => prev.filter(item => item.id !== itemId));

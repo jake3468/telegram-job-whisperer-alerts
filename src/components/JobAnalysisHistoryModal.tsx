@@ -72,7 +72,7 @@ const JobAnalysisHistoryModal = ({
     }
     
     try {
-      console.log(`Attempting to delete job analysis item with ID: ${itemId} for user: ${user.id}`);
+      
       
       const { error } = await makeAuthenticatedRequest(async () => {
         return await supabase
@@ -86,7 +86,7 @@ const JobAnalysisHistoryModal = ({
         throw error;
       }
       
-      console.log('Delete operation completed successfully');
+      
       
       // Refresh the data after deletion
       refetch();

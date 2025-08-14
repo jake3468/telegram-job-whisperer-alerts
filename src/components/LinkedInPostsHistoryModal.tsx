@@ -150,7 +150,7 @@ const LinkedInPostsHistoryModal = ({
       return;
     }
     try {
-      console.log(`Attempting to delete LinkedIn post item with ID: ${itemId} for user profile: ${userProfile.id}`);
+      
       
       const { error } = await supabase
         .from('job_linkedin')
@@ -162,7 +162,7 @@ const LinkedInPostsHistoryModal = ({
         console.error('Supabase delete error:', error);
         throw error;
       }
-      console.log('Delete operation completed successfully');
+      
 
       setHistoryData(prev => prev.filter(item => item.id !== itemId));
       toast({
