@@ -1,11 +1,8 @@
-import { useState } from 'react';
 import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
 import { useCachedUserCompletionStatus } from '@/hooks/useCachedUserCompletionStatus';
 import ResumeSection from '@/components/dashboard/ResumeSection';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Upload, FileText } from 'lucide-react';
-import { ResumeHelpPopup } from '@/components/ResumeHelpPopup';
 interface Step1ResumeUploadProps {
   onComplete: () => void;
 }
@@ -18,7 +15,6 @@ export const Step1ResumeUpload = ({
   const {
     hasResume
   } = useCachedUserCompletionStatus();
-  const [showResumeHelp, setShowResumeHelp] = useState(false);
   return <div className="space-y-4 sm:space-y-6">
       {/* Step Header */}
       <div className="text-center px-2">
@@ -55,19 +51,8 @@ export const Step1ResumeUpload = ({
         </CardContent>
       </Card>
 
-      {/* Help Section */}
-      <div className="text-center">
-        <Button onClick={() => {
-        updateActivity();
-        setShowResumeHelp(true);
-      }} variant="outline" size="sm" className="border-blue-200 hover:border-blue-300 text-white bg-black/20 min-h-[44px] px-4 break-words">
-          Need help fixing your resume?
-        </Button>
-      </div>
 
 
 
-      {/* Resume Help Popup */}
-      {showResumeHelp && <ResumeHelpPopup isOpen={showResumeHelp} onClose={() => setShowResumeHelp(false)} />}
     </div>;
 };
