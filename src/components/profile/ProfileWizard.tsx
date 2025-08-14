@@ -168,35 +168,37 @@ export const ProfileWizard = () => {
       </div>
 
       {/* Navigation Buttons - Moved closer to content */}
-      <div className="flex justify-between items-center gap-3 flex-shrink-0 pt-2 pb-2">
+      <div className="flex justify-between items-center gap-2 flex-shrink-0 pt-2 pb-2 px-1">
         <Button
           onClick={prevStep}
           variant="outline"
           disabled={currentStep === 1}
-          className="flex items-center gap-2"
+          className="flex items-center gap-1 px-3 py-2 h-auto min-h-[36px]"
           size="sm"
         >
-          <ChevronLeft className="w-4 h-4" />
-          Go back
+          <ChevronLeft className="w-3 h-3 flex-shrink-0" />
+          <span className="text-xs">Go back</span>
         </Button>
 
         <Button
           onClick={() => nextStep()}
           variant="ghost"
-          className="text-gray-400 hover:text-gray-800"
+          className="text-gray-400 hover:text-gray-800 px-2 py-2 h-auto min-h-[36px]"
           size="sm"
         >
-          Skip for now
+          <span className="text-xs">Skip</span>
         </Button>
         
         <Button
           onClick={nextStep}
           disabled={currentStep < TOTAL_STEPS && !canProceedToNext() || isCompleting}
-          className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+          className="flex items-center gap-1 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-3 py-2 h-auto min-h-[36px]"
           size="sm"
         >
-          {isCompleting ? 'Completing...' : currentStep === TOTAL_STEPS ? 'Create Job Alerts' : 'Next'}
-          <ChevronRight className="w-4 h-4" />
+          <span className="text-xs leading-tight">
+            {isCompleting ? 'Completing...' : currentStep === TOTAL_STEPS ? 'Create Alerts' : 'Next'}
+          </span>
+          <ChevronRight className="w-3 h-3 flex-shrink-0" />
         </Button>
       </div>
     </div>
