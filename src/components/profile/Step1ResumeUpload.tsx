@@ -15,7 +15,7 @@ export const Step1ResumeUpload = ({
   const {
     resumeExists
   } = useCachedUserProfile();
-  return <div className="space-y-3 sm:space-y-6 max-w-2xl mx-auto h-full flex flex-col">
+  return <div className="space-y-3 sm:space-y-6 max-w-2xl mx-auto h-full flex flex-col overflow-hidden">
       {/* Step Header */}
       <div className="flex items-center gap-3 px-2 mb-3">
         <div className="relative flex-shrink-0">
@@ -48,7 +48,7 @@ export const Step1ResumeUpload = ({
         </div>}
 
       {/* Resume Upload Section */}
-      <div className="flex-1">
+      <div className="min-h-0 overflow-auto">
         <ResumeSection updateActivity={updateActivity} />
       </div>
     </div>;
