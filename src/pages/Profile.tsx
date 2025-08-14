@@ -11,6 +11,7 @@ import { ResumeHelpPopup } from '@/components/ResumeHelpPopup';
 import { ProfileWizard } from '@/components/profile/ProfileWizard';
 
 import { ProfileResumeSection } from '@/components/profile/ProfileResumeSection';
+import { ProfileBioSection } from '@/components/profile/ProfileBioSection';
 import ClerkJWTSetupGuide from '@/components/ClerkJWTSetupGuide';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
@@ -225,7 +226,10 @@ const Profile = () => {
           </div>
         </div>
       ) : (
-        <ProfileResumeSection />
+        <div className="space-y-6">
+          <ProfileResumeSection />
+          <ProfileBioSection />
+        </div>
       )}
 
       {/* Onboarding Popup */}
