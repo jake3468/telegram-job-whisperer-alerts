@@ -28,9 +28,9 @@ export const Step2BioCreation = ({
       behavior: 'smooth'
     });
   }, []);
-  return <div className="space-y-3 sm:space-y-6 max-w-2xl mx-auto h-full flex flex-col">
+  return <div className="w-full max-w-full px-3 py-1 sm:px-4 sm:py-2 sm:max-w-2xl md:max-w-4xl mx-auto flex flex-col">
       {/* Step Header */}
-      <div className="text-center px-2">
+      <div className="text-center mb-1 sm:mb-2">
         <div className="flex items-center justify-center mb-2 sm:mb-6">
           <div className="relative">
             <div className="p-3 sm:p-4 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl sm:rounded-2xl border border-blue-400/30 backdrop-blur-sm">
@@ -50,7 +50,7 @@ export const Step2BioCreation = ({
       </div>
 
       {/* Success Message */}
-      {hasBio && <div className="bg-emerald-900/20 border border-emerald-400/30 rounded-lg p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
+      {hasBio && <div className="bg-emerald-900/20 border border-emerald-400/30 rounded-lg p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 mb-1 sm:mb-3">
           <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 flex-shrink-0" />
           <div>
             <p className="text-emerald-300 font-medium text-xs sm:text-base break-words">Bio completed successfully!</p>
@@ -59,10 +59,10 @@ export const Step2BioCreation = ({
         </div>}
 
       {/* Bio Section */}
-      <div className="relative flex-1">
+      <div className="relative flex-1 min-h-0 mb-4">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-xl sm:rounded-2xl blur-xl"></div>
         <Card className="relative bg-gray-900/40 backdrop-blur-sm border border-gray-700/50 rounded-xl sm:rounded-2xl shadow-2xl h-full flex flex-col">
-          <CardContent className="p-4 sm:p-6 flex-1 flex flex-col">
+          <CardContent className="p-4 sm:p-6 flex-1 flex flex-col min-h-0">
             <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
               <div className="p-1.5 sm:p-2 bg-blue-500/20 rounded-lg">
                 <PenTool className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
@@ -72,7 +72,7 @@ export const Step2BioCreation = ({
                 <p className="text-gray-400 text-xs">Write your professional summary</p>
               </div>
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-h-0">
               <ProfessionalBioSection />
             </div>
           </CardContent>
@@ -80,7 +80,7 @@ export const Step2BioCreation = ({
       </div>
 
       {/* Character Goal */}
-      <div className="text-center p-2 sm:p-4 bg-purple-900/20 rounded-lg border border-purple-400/30">
+      <div className="text-center p-2 sm:p-4 bg-purple-900/20 rounded-lg border border-purple-400/30 flex-shrink-0">
         <p className="text-purple-300 text-xs sm:text-sm break-words">
           <strong>Tip:</strong> Aim for 150-300 characters for the best results. Quality over quantity!
         </p>
