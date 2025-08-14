@@ -54,17 +54,7 @@ export const Step2BioCreation = ({
         </div>}
 
       {/* Bio Section */}
-      <Card className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 border-purple-400/30">
-        <CardHeader className="p-3 sm:p-6">
-          <CardTitle className="flex items-center gap-2 text-purple-300 text-sm sm:text-base break-words">
-            <Target className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-            Professional Bio
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-3 sm:p-6">
-          <ProfessionalBioSection />
-        </CardContent>
-      </Card>
+      
 
       {/* Tips and Examples Section */}
       
