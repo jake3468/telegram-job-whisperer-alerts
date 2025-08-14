@@ -418,24 +418,6 @@ const JobGuide = () => {
   // Button should be disabled if: form invalid, submitting, generating, no credits, credits loading, or auth not ready
   const isButtonDisabled = !isFormValid || isSubmitting || isGenerating || !hasCredits || creditsLoading || !isAuthReady;
 
-  // Enhanced debug logging
-  console.log('🔍 Form validation debug:', {
-    companyName: `"${formData.companyName}" (length: ${formData.companyName?.length || 0})`,
-    jobTitle: `"${formData.jobTitle}" (length: ${formData.jobTitle?.length || 0})`,
-    jobDescription: `"${formData.jobDescription?.substring(0, 50)}..." (length: ${formData.jobDescription?.length || 0})`,
-    isFormValid,
-    isComplete,
-    completionLoading,
-    profileLoading,
-    hasResume,
-    hasBio,
-    hasCredits,
-    creditsLoading,
-    isSubmitting,
-    isGenerating,
-    isButtonDisabled,
-    userProfile: !!userProfile
-  });
   if (!isLoaded || !user) {
     return <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-slate-400 text-xs">Loading...</div>

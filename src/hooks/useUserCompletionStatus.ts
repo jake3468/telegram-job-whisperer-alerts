@@ -54,7 +54,7 @@ export const useUserCompletionStatus = (): CompletionStatus & { refetchStatus: (
           });
 
         hasResume = !resumeError && resumeData && resumeData.length > 0;
-        console.log('Resume check result:', { hasResume, resumeData: resumeData?.length, resumeError });
+        
       } catch (error) {
         console.warn('Resume check failed:', error);
         hasResume = false;
@@ -70,14 +70,12 @@ export const useUserCompletionStatus = (): CompletionStatus & { refetchStatus: (
           .maybeSingle();
 
         hasBio = !profileError && profileData?.bio && profileData.bio.trim().length > 0;
-        console.log('Bio check result:', { hasBio, bioLength: profileData?.bio?.length, profileError });
       } catch (error) {
         console.warn('Bio check failed:', error);
         hasBio = false;
       }
 
       const isComplete = hasResume && hasBio;
-      console.log('Profile completion status:', { hasResume, hasBio, isComplete });
 
       setStatus({
         hasResume,

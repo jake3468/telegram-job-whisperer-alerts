@@ -65,8 +65,6 @@ export const useCachedJobAnalyses = () => {
       if (!userProfile?.id) return [];
       
       try {
-        console.log('🔍 Fetching job analyses for userProfile.id:', userProfile.id);
-        
         const { data, error } = await makeAuthenticatedRequest(async () => {
           return await supabase
             .from('job_analyses')
@@ -75,14 +73,8 @@ export const useCachedJobAnalyses = () => {
             .order('created_at', { ascending: false });
         }, { operationType: 'fetch job analyses' });
 
-        console.log('📊 Job analyses query result:', { 
-          dataCount: data?.length || 0, 
-          error: error?.message,
-          userProfileId: userProfile.id
-        });
-
         if (error) {
-          console.error('❌ Error fetching job analyses history:', error);
+          console.error('Error fetching job analyses history:', error);
           return [];
         }
 
