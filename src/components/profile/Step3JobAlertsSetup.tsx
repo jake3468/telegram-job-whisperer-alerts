@@ -73,7 +73,7 @@ export const Step3JobAlertsSetup = ({
   const handleCompleteProfile = () => {
     onComplete();
   };
-  return <div className="space-y-4 max-w-full overflow-hidden px-1">
+  return <div className="space-y-4 max-w-2xl mx-auto">
       {/* Step Header */}
       <div className="flex items-center gap-3 px-2 mb-2">
         <div className="relative flex-shrink-0">
@@ -124,7 +124,7 @@ export const Step3JobAlertsSetup = ({
 
 
         {/* Bot ID Section */}
-        <div className="max-w-md mx-auto">
+        <div>
           <div className="p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
             <p className="text-gray-700 mb-3 text-xs sm:text-sm font-medium">
               After you click the below 'Activate Telegram Bot' button, the bot will ask for your activation key. At that time, you need to copy and paste the below:
@@ -153,7 +153,7 @@ export const Step3JobAlertsSetup = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="max-w-md mx-auto space-y-3">
+        <div className="space-y-3">
           <Button 
             onClick={handleActivateBot} 
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 h-auto min-h-[40px]"
