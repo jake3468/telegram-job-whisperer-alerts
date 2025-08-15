@@ -89,7 +89,7 @@ export const Step3JobAlertsSetup = ({
             Set Up Job Alerts
           </h2>
           <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
-            Set up your personalized job alerts now 🔥 and get the latest opportunities from the last 24 hours delivered straight to Telegram - faster and more relevant than LinkedIn or Indeed.
+            Set up job alerts 🔥 and get the latest 24-hour opportunities on Telegram faster and more relevant than LinkedIn or Indeed.
           </p>
         </div>
       </div>
@@ -107,29 +107,11 @@ export const Step3JobAlertsSetup = ({
 
       {/* Job Alerts Content */}
       <div className="space-y-3">
-        {/* Value Proposition */}
-        <div className="space-y-2">
-          <div className="text-white text-xs font-medium space-y-1">
-            <p className="mb-2 text-center">With each job alert, you'll get one-click access to everything you need:</p>
-            <div className="text-left space-y-1">
-              <p>✅ Job-tailored Resume</p>
-              <p>✅ Cover Letter</p>
-              <p>✅ Interview Preparation Kit</p>
-              <p>✅ Company Insights</p>
-              <p>✅ Job Match % (how well you fit this role)</p>
-              <p>✅ Visa Sponsorship Details (for foreign job seekers)</p>
-              <p>✅ LinkedIn HR Contact List</p>
-              <p>✅ Personalized Message to HR</p>
-            </div>
-          </div>
-        </div>
-
-
         {/* Bot ID Section */}
         <div>
           <div className="p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
             <p className="text-gray-700 mb-3 text-xs sm:text-sm font-medium">
-              After you click the below 'Activate Telegram Bot' button, the bot will ask for your activation key. At that time, you need to copy and paste the below:
+              First click the below 'Activate Telegram Bot' button. When it asks for your 'Activation Key' you need to copy and paste the below:
             </p>
             {userProfile?.id ? (
               <div className="flex items-center gap-2 bg-black rounded-lg p-2 sm:p-3 border border-gray-600">
@@ -163,6 +145,23 @@ export const Step3JobAlertsSetup = ({
             <ExternalLink className="w-3 h-3 mr-2 flex-shrink-0" />
             <span className="text-xs leading-tight break-words">Activate Telegram Bot</span>
           </Button>
+          
+          {/* Value Proposition */}
+          <div className="space-y-2">
+            <div className="text-white text-xs font-medium space-y-1">
+              <p className="mb-2 text-center">With each job alert, you'll get one-click access to everything you need:</p>
+              <div className="text-left space-y-1">
+                <p>✅ Job-tailored Resume</p>
+                <p>✅ Cover Letter</p>
+                <p>✅ Interview Preparation Kit</p>
+                <p>✅ Company Insights</p>
+                <p>✅ Job Match % (how well you fit this role)</p>
+                <p>✅ Visa Sponsorship Details (for foreign job seekers)</p>
+                <p>✅ LinkedIn HR Contact List</p>
+                <p>✅ Personalized Message to HR</p>
+              </div>
+            </div>
+          </div>
           
           <p className="text-gray-400 text-xs text-center leading-relaxed">
             Make sure you complete the bot activation by following the above steps. Once the bot is activated successfully, click the "Create Alerts" button below to start setting your alerts.
