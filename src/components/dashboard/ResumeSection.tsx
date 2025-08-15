@@ -324,8 +324,9 @@ const ResumeSection = ({
           backdrop-blur-sm
         ">
         <CardHeader className="pb-1 pt-2">
-          
-          
+          <p className="text-white text-xs leading-relaxed opacity-90">
+            Data privacy is our top priority at Aspirely.ai. Your resume will be used exclusively to create job-tailored resumes, cover letters, interview prep, and other personalized career tools. We will never share your information with third parties. For more details, please see our Privacy Policy.
+          </p>
         </CardHeader>
         <CardContent className="space-y-2 pt-0 px-3 pb-2">
           {resumeUrl ? <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 rounded-lg border border-white/20 bg-black/70 shadow-inner">
