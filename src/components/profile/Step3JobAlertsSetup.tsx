@@ -117,27 +117,6 @@ export const Step3JobAlertsSetup = ({
           </p>
         </div>
 
-        {/* Preview Image */}
-        <div className="w-full overflow-hidden">
-          <div className="relative w-full max-w-[240px] mx-auto">
-            <img 
-              src="/lovable-uploads/011bb020-d0c1-4c09-b4ea-82b329e1afaa.png" 
-              alt="Telegram job alert example" 
-              className="w-full h-auto rounded-lg shadow-sm border border-gray-200 max-w-full" 
-              loading="lazy" 
-              onLoad={() => setImageLoaded(true)} 
-              onError={e => {
-                e.currentTarget.style.display = 'none';
-                setImageLoaded(true);
-              }} 
-            />
-            {!imageLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-              </div>
-            )}
-          </div>
-        </div>
 
         {/* Bot ID Section */}
         <div className="max-w-md mx-auto">
