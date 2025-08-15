@@ -113,7 +113,7 @@ export const Step3JobAlertsSetup = ({
             Click the below "Activate Telegram Bot" button and paste the activation key provided below.
           </p>
           <p className="text-white text-xs font-medium">
-            Each job alert will look like below example👇 and will include all tools in one click: resume, cover letter, visa info, job fit, and more.
+            With each job alert, you'll get one-click access to everything you need:  ✅ Job-tailored Resume ✅ Cover Letter ✅ Interview Preparation Kit ✅ Company Insights ✅ Job Match % (how well you fit this role) ✅ Visa Sponsorship Details (for international students/job seekers) ✅ LinkedIn HR Contact List ✅ Personalized Message to HR
           </p>
         </div>
 
