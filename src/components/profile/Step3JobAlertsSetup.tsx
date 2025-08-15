@@ -133,8 +133,8 @@ export const Step3JobAlertsSetup = ({
               When the bot asks for your 'Activation Key', use this ID:
             </p>
             {userProfile?.id ? (
-              <div className="flex items-center gap-2 bg-white rounded-lg p-2 sm:p-3 border border-gray-200">
-                <code className="text-gray-800 font-mono text-xs sm:text-sm flex-1 break-all min-w-0">
+              <div className="flex items-center gap-2 bg-black rounded-lg p-2 sm:p-3 border border-gray-600">
+                <code className="text-white font-mono text-xs sm:text-sm flex-1 break-all min-w-0">
                   {userProfile.id}
                 </code>
                 <Button 
