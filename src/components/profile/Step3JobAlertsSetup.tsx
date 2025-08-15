@@ -130,7 +130,7 @@ export const Step3JobAlertsSetup = ({
         <div className="max-w-md mx-auto">
           <div className="p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
             <p className="text-gray-700 mb-3 text-xs sm:text-sm font-medium">
-              When the bot asks for your 'Activation Key', copy and paste the below:
+              After you click the below 'Activate Telegram Bot' button, the bot will ask for your activation key. At that time, you need to copy and paste the below:
             </p>
             {userProfile?.id ? (
               <div className="flex items-center gap-2 bg-black rounded-lg p-2 sm:p-3 border border-gray-600">
