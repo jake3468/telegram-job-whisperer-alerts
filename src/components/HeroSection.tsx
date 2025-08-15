@@ -122,7 +122,14 @@ const HeroSection = () => {
         </div>
 
         <p className="text-zinc-50 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
-          Perfect job matches delivered to your Telegram like personal messages. One click gets you custom resumes, cover letters, interview prep, company insights, and visa sponsorship info. Premium dashboard included. Apply anywhere, fully prepared.
+          Perfect job matches delivered to your{' '}
+          <span className="font-bold italic bg-gradient-to-r from-[#00D4FF] to-[#0099FF] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,212,255,0.8)]">Telegram</span>
+          {' '}like personal messages.{' '}
+          <span className="font-bold italic bg-gradient-to-r from-[#00FF88] to-[#00CC66] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,255,136,0.8)]">One click</span>
+          {' '}gets you custom resumes, cover letters, interview prep, company insights, and visa sponsorship info.{' '}
+          <span className="font-bold italic bg-gradient-to-r from-[#FF44FF] to-[#DD22DD] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(255,68,255,0.8)]">Premium dashboard</span>
+          {' '}included. Apply anywhere,{' '}
+          <span className="font-bold italic bg-gradient-to-r from-[#FFDD00] to-[#FFAA00] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(255,221,0,0.8)]">fully prepared</span>
         </p>
         
         <SignedOut>
