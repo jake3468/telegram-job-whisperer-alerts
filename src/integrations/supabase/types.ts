@@ -539,6 +539,7 @@ export type Database = {
       job_board: {
         Row: {
           company_name: string
+          country_code: string | null
           created_at: string
           id: string
           is_saved_by_user: boolean | null
@@ -563,6 +564,7 @@ export type Database = {
         }
         Insert: {
           company_name: string
+          country_code?: string | null
           created_at?: string
           id?: string
           is_saved_by_user?: boolean | null
@@ -587,6 +589,7 @@ export type Database = {
         }
         Update: {
           company_name?: string
+          country_code?: string | null
           created_at?: string
           id?: string
           is_saved_by_user?: boolean | null

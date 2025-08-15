@@ -73,7 +73,7 @@ export const Step3JobAlertsSetup = ({
   const handleCompleteProfile = () => {
     onComplete();
   };
-  return <div className="space-y-4 max-w-full overflow-hidden px-1">
+  return <div className="space-y-4 max-w-2xl mx-auto">
       {/* Step Header */}
       <div className="flex items-center gap-3 px-2 mb-2">
         <div className="relative flex-shrink-0">
@@ -109,45 +109,31 @@ export const Step3JobAlertsSetup = ({
       <div className="space-y-3">
         {/* Value Proposition */}
         <div className="space-y-2">
-          <p className="text-white text-xs font-medium">
-            Click the below "Activate Telegram Bot" button and paste the activation key provided below.
-          </p>
-          <p className="text-white text-xs font-medium">
-            Each job alert will look like below example👇 and will include all tools in one click: resume, cover letter, visa info, job fit, and more.
-          </p>
-        </div>
-
-        {/* Preview Image */}
-        <div className="w-full overflow-hidden">
-          <div className="relative w-full max-w-[240px] mx-auto">
-            <img 
-              src="/lovable-uploads/011bb020-d0c1-4c09-b4ea-82b329e1afaa.png" 
-              alt="Telegram job alert example" 
-              className="w-full h-auto rounded-lg shadow-sm border border-gray-200 max-w-full" 
-              loading="lazy" 
-              onLoad={() => setImageLoaded(true)} 
-              onError={e => {
-                e.currentTarget.style.display = 'none';
-                setImageLoaded(true);
-              }} 
-            />
-            {!imageLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-              </div>
-            )}
+          <div className="text-white text-xs font-medium space-y-1">
+            <p className="mb-2 text-center">With each job alert, you'll get one-click access to everything you need:</p>
+            <div className="text-left space-y-1">
+              <p>✅ Job-tailored Resume</p>
+              <p>✅ Cover Letter</p>
+              <p>✅ Interview Preparation Kit</p>
+              <p>✅ Company Insights</p>
+              <p>✅ Job Match % (how well you fit this role)</p>
+              <p>✅ Visa Sponsorship Details (for foreign job seekers)</p>
+              <p>✅ LinkedIn HR Contact List</p>
+              <p>✅ Personalized Message to HR</p>
+            </div>
           </div>
         </div>
 
+
         {/* Bot ID Section */}
-        <div className="max-w-md mx-auto">
+        <div>
           <div className="p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
             <p className="text-gray-700 mb-3 text-xs sm:text-sm font-medium">
-              When the bot asks for your 'Activation Key', use this ID:
+              After you click the below 'Activate Telegram Bot' button, the bot will ask for your activation key. At that time, you need to copy and paste the below:
             </p>
             {userProfile?.id ? (
-              <div className="flex items-center gap-2 bg-white rounded-lg p-2 sm:p-3 border border-gray-200">
-                <code className="text-gray-800 font-mono text-xs sm:text-sm flex-1 break-all min-w-0">
+              <div className="flex items-center gap-2 bg-black rounded-lg p-2 sm:p-3 border border-gray-600">
+                <code className="text-white font-mono text-xs sm:text-sm flex-1 break-all min-w-0">
                   {userProfile.id}
                 </code>
                 <Button 
@@ -169,7 +155,7 @@ export const Step3JobAlertsSetup = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="max-w-md mx-auto space-y-3">
+        <div className="space-y-3">
           <Button 
             onClick={handleActivateBot} 
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 h-auto min-h-[40px]"
