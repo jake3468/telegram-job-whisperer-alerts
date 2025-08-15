@@ -119,7 +119,7 @@ export const Step3JobAlertsSetup = ({
             <p>✅ Interview Preparation Kit</p>
             <p>✅ Company Insights</p>
             <p>✅ Job Match % (how well you fit this role)</p>
-            <p>✅ Visa Sponsorship Details (for international students/job seekers)</p>
+            <p>✅ Visa Sponsorship Details (for foreign job seekers)</p>
             <p>✅ LinkedIn HR Contact List</p>
             <p>✅ Personalized Message to HR</p>
           </div>
