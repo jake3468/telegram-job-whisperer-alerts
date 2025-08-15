@@ -107,24 +107,6 @@ export const Step3JobAlertsSetup = ({
 
       {/* Job Alerts Content */}
       <div className="space-y-3">
-        {/* Value Proposition */}
-        <div className="space-y-2">
-          <div className="text-white text-xs font-medium space-y-1">
-            <p className="mb-2 text-center">With each job alert, you'll get one-click access to everything you need:</p>
-            <div className="text-left space-y-1">
-              <p>✅ Job-tailored Resume</p>
-              <p>✅ Cover Letter</p>
-              <p>✅ Interview Preparation Kit</p>
-              <p>✅ Company Insights</p>
-              <p>✅ Job Match % (how well you fit this role)</p>
-              <p>✅ Visa Sponsorship Details (for foreign job seekers)</p>
-              <p>✅ LinkedIn HR Contact List</p>
-              <p>✅ Personalized Message to HR</p>
-            </div>
-          </div>
-        </div>
-
-
         {/* Bot ID Section */}
         <div>
           <div className="p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
@@ -163,6 +145,23 @@ export const Step3JobAlertsSetup = ({
             <ExternalLink className="w-3 h-3 mr-2 flex-shrink-0" />
             <span className="text-xs leading-tight break-words">Activate Telegram Bot</span>
           </Button>
+          
+          {/* Value Proposition */}
+          <div className="space-y-2">
+            <div className="text-white text-xs font-medium space-y-1">
+              <p className="mb-2 text-center">With each job alert, you'll get one-click access to everything you need:</p>
+              <div className="text-left space-y-1">
+                <p>✅ Job-tailored Resume</p>
+                <p>✅ Cover Letter</p>
+                <p>✅ Interview Preparation Kit</p>
+                <p>✅ Company Insights</p>
+                <p>✅ Job Match % (how well you fit this role)</p>
+                <p>✅ Visa Sponsorship Details (for foreign job seekers)</p>
+                <p>✅ LinkedIn HR Contact List</p>
+                <p>✅ Personalized Message to HR</p>
+              </div>
+            </div>
+          </div>
           
           <p className="text-gray-400 text-xs text-center leading-relaxed">
             Make sure you complete the bot activation by following the above steps. Once the bot is activated successfully, click the "Create Alerts" button below to start setting your alerts.
