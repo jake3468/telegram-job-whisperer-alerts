@@ -14,6 +14,35 @@ export type Database = {
   }
   public: {
     Tables: {
+      add_job_chat_history_new: {
+        Row: {
+          id: number
+          message: Json
+          session_id: string
+          user_id: string | null
+        }
+        Insert: {
+          id?: number
+          message: Json
+          session_id: string
+          user_id?: string | null
+        }
+        Update: {
+          id?: number
+          message?: Json
+          session_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "add_job_chat_history_new_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       add_job_telegram: {
         Row: {
           company_name: string
