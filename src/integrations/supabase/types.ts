@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      add_job_telegram: {
+        Row: {
+          company_name: string
+          country_code: string
+          created_at: string
+          id: string
+          job_description: string
+          job_location: string
+          job_title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_name: string
+          country_code: string
+          created_at?: string
+          id?: string
+          job_description: string
+          job_location: string
+          job_title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string
+          country_code?: string
+          created_at?: string
+          id?: string
+          job_description?: string
+          job_location?: string
+          job_title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "add_job_telegram_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_interview_credits: {
         Row: {
           created_at: string
