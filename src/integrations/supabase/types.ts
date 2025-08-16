@@ -1112,6 +1112,7 @@ export type Database = {
       }
       user_profile: {
         Row: {
+          add_job_chat_id: string | null
           bio: string | null
           bot_activated: boolean | null
           chat_id: string | null
@@ -1131,6 +1132,7 @@ export type Database = {
           user_location: string | null
         }
         Insert: {
+          add_job_chat_id?: string | null
           bio?: string | null
           bot_activated?: boolean | null
           chat_id?: string | null
@@ -1150,6 +1152,7 @@ export type Database = {
           user_location?: string | null
         }
         Update: {
+          add_job_chat_id?: string | null
           bio?: string | null
           bot_activated?: boolean | null
           chat_id?: string | null
