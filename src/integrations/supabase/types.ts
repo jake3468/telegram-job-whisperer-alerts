@@ -77,15 +77,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "add_job_telegram_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profile"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       ai_interview_credits: {
         Row: {
