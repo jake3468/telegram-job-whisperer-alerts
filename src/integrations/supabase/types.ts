@@ -47,6 +47,7 @@ export type Database = {
         Row: {
           company_name: string
           country_code: string
+          country_name: string | null
           created_at: string
           id: string
           job_description: string
@@ -58,6 +59,7 @@ export type Database = {
         Insert: {
           company_name: string
           country_code: string
+          country_name?: string | null
           created_at?: string
           id?: string
           job_description: string
@@ -69,6 +71,7 @@ export type Database = {
         Update: {
           company_name?: string
           country_code?: string
+          country_name?: string | null
           created_at?: string
           id?: string
           job_description?: string
