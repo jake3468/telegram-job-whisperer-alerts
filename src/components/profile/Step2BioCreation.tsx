@@ -49,14 +49,6 @@ export const Step2BioCreation = ({
             <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
               Tell us a bit about yourself - it helps our AI tailor tools to your unique profile. If you don't want to update it now, you can always do it later.
             </p>
-            
-            {/* Success Message */}
-            {hasBio && (
-              <div className="flex items-center gap-2 mt-3 p-2 bg-green-50 border border-green-200 rounded-lg">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span className="text-green-700 text-sm font-medium">Bio completed!</span>
-              </div>
-            )}
           </div>
 
           {/* Bio Section */}
