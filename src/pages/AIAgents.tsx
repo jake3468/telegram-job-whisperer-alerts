@@ -26,41 +26,34 @@ const AIAgents = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-black via-gray-950 to-purple-950 p-6">
+      <div className="min-h-screen bg-background p-6 md:p-8 lg:p-10">
         <div className="text-center mb-12">
-          <h1 className="font-orbitron mb-2 drop-shadow tracking-tight font-bold text-4xl flex items-center justify-center gap-2">
-            <span>🤖</span>
-            <span style={{
-              WebkitBackgroundClip: 'text',
-              backgroundClip: 'text',
-              color: 'transparent'
-            }} className="bg-gradient-to-r from-fuchsia-400 via-purple-400 to-pink-500 bg-clip-text text-purple-500 text-left">
-              Meet Your <span className="italic">AI Agents</span>
-            </span>
-          </h1>
-          <p className="text-sm text-purple-100 font-inter font-light mb-3">
-            It's time to meet and activate your personal <span className="italic text-pastel-peach">AI agents</span>, ready to guide you through every step of your job hunt.
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-foreground mb-2 font-inter">
+            Meet Your AI Agents
+          </h2>
+          <p className="text-base sm:text-xl text-muted-foreground font-inter font-light">
+            Activate your personal AI agents, ready to guide you through every step of your job hunt.
           </p>
         </div>
 
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {agents.map((agent) => (
-              <Card key={agent.id} className="bg-white/5 border-white/20 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 hover:scale-105">
-                <CardHeader className="text-center pb-4">
-                  <div className="text-4xl mb-4">{agent.icon}</div>
-                  <CardTitle className="text-xl font-bold text-white mb-2">
+              <Card key={agent.id} className="rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 md:p-8 lg:p-10">
+                <CardHeader className="text-center pb-6">
+                  <div className="text-5xl mb-6">{agent.icon}</div>
+                  <CardTitle className="text-2xl font-bold text-card-foreground mb-2 font-inter">
                     {agent.title}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="px-6 pb-6">
-                  <CardDescription className="text-purple-100 text-sm leading-relaxed text-center">
+                <CardContent className="text-center pb-6">
+                  <CardDescription className="text-muted-foreground text-base leading-relaxed font-opensans font-light">
                     {agent.description}
                   </CardDescription>
                 </CardContent>
-                <CardFooter className="pt-0 pb-6 px-6">
+                <CardFooter className="pt-0 justify-center">
                   <Button 
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium py-3 px-6 rounded-lg transition-all duration-300"
                     onClick={() => {
                       // Future routing will be added here
                       console.log(`Activating ${agent.title}`);
