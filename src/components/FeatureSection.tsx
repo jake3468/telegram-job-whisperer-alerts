@@ -12,6 +12,7 @@ interface FeatureSectionProps {
   isComingSoon?: boolean;
   label?: string;
   buttonUrl?: string;
+  additionalContent?: React.ReactNode;
 }
 const FeatureSection = ({
   title,
@@ -22,7 +23,8 @@ const FeatureSection = ({
   isReversed = false,
   isComingSoon = false,
   label,
-  buttonUrl
+  buttonUrl,
+  additionalContent
 }: FeatureSectionProps) => {
   const [LottieComponent, setLottieComponent] = useState<React.ComponentType<any> | null>(null);
   const [animationData, setAnimationData] = useState(null);
@@ -192,6 +194,11 @@ const FeatureSection = ({
                     </button>
                   </SignUpButton>
                 }
+                {additionalContent && (
+                  <div className="mt-3">
+                    {additionalContent}
+                  </div>
+                )}
               </div>
             </div>
           </div>
