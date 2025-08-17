@@ -316,7 +316,8 @@ const ResumeSection = ({
     }
     return 'Uploaded recently';
   };
-  return <section className="p-0 rounded-none bg-transparent shadow-none">
+  return (
+    <section className="p-0 rounded-none bg-transparent shadow-none">
       <Card className="
           rounded-xl border border-purple-400/80 
           bg-gradient-to-br from-purple-600/90 via-purple-700/85 to-purple-900/90
@@ -328,7 +329,8 @@ const ResumeSection = ({
           
         </CardHeader>
         <CardContent className="space-y-2 pt-0 px-3 pb-2">
-          {resumeUrl ? <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 rounded-lg border border-white/20 bg-black/70 shadow-inner">
+          {resumeUrl ? (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 rounded-lg border border-white/20 bg-black/70 shadow-inner">
               <div className="flex items-center gap-2 min-w-0">
                 <div className="w-6 h-6 bg-purple-500/60 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple-500/40">
                   <FileText className="w-3 h-3 text-white" />
@@ -342,27 +344,47 @@ const ResumeSection = ({
                   </span>
                 </div>
               </div>
-              <Button variant="destructive" size="sm" onClick={handleDeleteResume} disabled={uploading || !sessionManager} className="font-inter bg-red-500 hover:bg-red-600 transition-all text-xs px-3 py-1 h-7 flex-shrink-0 rounded-lg mt-2 sm:mt-0">
+              <Button 
+                variant="destructive" 
+                size="sm" 
+                onClick={handleDeleteResume} 
+                disabled={uploading || !sessionManager} 
+                className="font-inter bg-red-500 hover:bg-red-600 transition-all text-xs px-3 py-1 h-7 flex-shrink-0 rounded-lg mt-2 sm:mt-0"
+              >
                 <Trash2 className="w-3 h-3 mr-1" />
                 Delete
               </Button>
-            </div> : <div className="border-2 border-dashed border-white/70 rounded-lg p-3 sm:p-4 text-center cursor-pointer hover:border-purple-300 hover:bg-purple-400/15 transition-all duration-300 bg-black/60 shadow-inner" onClick={triggerFileInput}>
+            </div>
+          ) : (
+            <div 
+              className="border-2 border-dashed border-white/70 rounded-lg p-3 sm:p-4 text-center cursor-pointer hover:border-purple-300 hover:bg-purple-400/15 transition-all duration-300 bg-black/60 shadow-inner" 
+              onClick={triggerFileInput}
+            >
               <div className="w-10 h-10 bg-purple-500/50 rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg shadow-purple-500/30">
                 <Upload className="w-5 h-5 text-purple-100" />
               </div>
               <p className="text-white font-inter mb-3 font-semibold text-xs">
                 Click to upload or drag and drop your resume
               </p>
-              <Button disabled={uploading || !sessionManager} className="font-inter bg-white text-purple-700 hover:bg-purple-50 font-bold px-3 py-1.5 h-7 rounded-lg shadow-lg shadow-purple-500/20 text-xs">
+              <Button 
+                disabled={uploading || !sessionManager} 
+                className="font-inter bg-white text-purple-700 hover:bg-purple-50 font-bold px-3 py-1.5 h-7 rounded-lg shadow-lg shadow-purple-500/20 text-xs"
+              >
                 {uploading ? 'Uploading...' : 'Upload Resume'}
               </Button>
-              <input id="resume-upload" type="file" accept=".pdf" onChange={handleFileUpload} className="hidden" disabled={uploading || !sessionManager} />
-            </div>}
+              <input 
+                id="resume-upload" 
+                type="file" 
+                accept=".pdf" 
+                onChange={handleFileUpload} 
+                className="hidden" 
+                disabled={uploading || !sessionManager} 
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
-      <p className="text-white text-xs leading-relaxed opacity-80 mt-3 px-2">
-        Data privacy is our top priority at Aspirely.ai. Your resume will be used exclusively to create job-tailored resumes, cover letters, interview prep, and other personalized career tools.
-      </p>
-    </section>;
+    </section>
+  );
 };
 export default ResumeSection;

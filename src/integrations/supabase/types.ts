@@ -14,6 +14,74 @@ export type Database = {
   }
   public: {
     Tables: {
+      add_job_chat_history_new: {
+        Row: {
+          id: number
+          message: Json
+          session_id: string
+          user_id: string | null
+        }
+        Insert: {
+          id?: number
+          message: Json
+          session_id: string
+          user_id?: string | null
+        }
+        Update: {
+          id?: number
+          message?: Json
+          session_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "add_job_chat_history_new_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      add_job_telegram: {
+        Row: {
+          company_name: string
+          country_code: string
+          country_name: string | null
+          created_at: string
+          id: string
+          job_description: string
+          job_location: string
+          job_title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_name: string
+          country_code: string
+          country_name?: string | null
+          created_at?: string
+          id?: string
+          job_description: string
+          job_location: string
+          job_title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string
+          country_code?: string
+          country_name?: string | null
+          created_at?: string
+          id?: string
+          job_description?: string
+          job_location?: string
+          job_title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_interview_credits: {
         Row: {
           created_at: string
@@ -1112,6 +1180,8 @@ export type Database = {
       }
       user_profile: {
         Row: {
+          add_job_bot_activated: boolean | null
+          add_job_chat_id: string | null
           bio: string | null
           bot_activated: boolean | null
           chat_id: string | null
@@ -1131,6 +1201,8 @@ export type Database = {
           user_location: string | null
         }
         Insert: {
+          add_job_bot_activated?: boolean | null
+          add_job_chat_id?: string | null
           bio?: string | null
           bot_activated?: boolean | null
           chat_id?: string | null
@@ -1150,6 +1222,8 @@ export type Database = {
           user_location?: string | null
         }
         Update: {
+          add_job_bot_activated?: boolean | null
+          add_job_chat_id?: string | null
           bio?: string | null
           bot_activated?: boolean | null
           chat_id?: string | null

@@ -18,7 +18,7 @@ import LinkedInPosts from "./pages/LinkedInPosts";
 import InterviewPrep from "./pages/InterviewPrep";
 import CompanyRoleAnalysis from "./pages/CompanyRoleAnalysis";
 import Profile from "./pages/Profile";
-import ResumeBuilder from "./pages/ResumeBuilder";
+
 import JobAlerts from "./pages/JobAlerts";
 import GetMoreCredits from "./pages/GetMoreCredits";
 import JobTracker from "./pages/JobTracker";
@@ -30,6 +30,7 @@ import TermsOfService from "./pages/TermsOfService";
 import ContactSupport from "./pages/ContactSupport";
 import Blogs from "./pages/Blogs";
 import BlogPost from "./pages/BlogPost";
+import AIAgents from "./pages/AIAgents";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -105,7 +106,8 @@ const AppWithSync = () => {
         <Route path="/interview-prep" element={<ProtectedRoute><InterviewPrep /></ProtectedRoute>} />
         <Route path="/company-role-analysis" element={<ProtectedRoute><CompanyRoleAnalysis /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-        <Route path="/resume-builder" element={<ProtectedRoute><ResumeBuilder /></ProtectedRoute>} />
+        <Route path="/ai-agents" element={<ProtectedRoute><AIAgents /></ProtectedRoute>} />
+        
         <Route path="/job-alerts" element={<ProtectedRoute><JobAlerts /></ProtectedRoute>} />
         <Route path="/get-more-credits" element={<ProtectedRoute><GetMoreCredits /></ProtectedRoute>} />
         <Route path="/job-board" element={<ProtectedRoute><JobBoard /></ProtectedRoute>} />

@@ -2,6 +2,7 @@
 // Enterprise-Grade Supabase Client with Unified Session Management
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
+import { logger } from '@/utils/logger';
 
 const SUPABASE_URL = "https://fnzloyyhzhrqsvslhhri.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuemxveXloemhycXN2c2xoaHJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MzAyMjIsImV4cCI6MjA2NDUwNjIyMn0.xdlgb_amJ1fV31uinCFotGW00isgT5-N8zJ_gLHEKuk";
@@ -62,8 +63,6 @@ const injectTokenIntoClient = (token: string | null) => {
         'Authorization': `Bearer ${token}`,
         'apikey': SUPABASE_PUBLISHABLE_KEY
       };
-      
-      console.log('Token injected successfully:', { hasToken: !!token, timestamp: Date.now() });
     } else {
       // Reset to default headers
       (supabase as any).rest.headers = {
