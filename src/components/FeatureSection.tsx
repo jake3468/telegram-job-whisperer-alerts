@@ -144,12 +144,12 @@ const FeatureSection = ({
             </div>
           </div>
         ) : (
-          <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-4 md:p-6 max-w-md mx-auto h-80 flex flex-col">
-            <div className="text-center space-y-3 flex-1 flex flex-col">
-              <h3 className="text-lg md:text-xl font-bold font-opensans text-blue-700">
+          <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-3 md:p-4 lg:p-6 max-w-md mx-auto h-72 md:h-80 flex flex-col">
+            <div className="text-center space-y-2 md:space-y-3 flex-1 flex flex-col">
+              <h3 className="text-base md:text-lg lg:text-xl font-bold font-opensans text-blue-700 leading-tight">
                 {title}
               </h3>
-              <p className="text-sm font-opensans font-medium text-neutral-950">
+              <p className="text-xs md:text-sm font-opensans font-medium text-neutral-950 leading-tight">
                 {subheading}
               </p>
               <div className="flex-1 flex items-center">
@@ -157,13 +157,13 @@ const FeatureSection = ({
                   {description}
                 </p>
               </div>
-              <div className="pt-2">
+              <div className="pt-1 md:pt-2">
                 {isComingSoon ? 
-                  <button type="button" disabled className="w-full bg-gray-700 text-white font-medium py-2 px-4 rounded-lg text-sm cursor-not-allowed opacity-75">
+                  <button type="button" disabled className="w-full bg-gray-700 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm cursor-not-allowed opacity-75">
                     Coming Soon
                   </button> : 
                   <SignUpButton mode="modal">
-                    <button type="button" className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg text-sm transition-all duration-200">
+                    <button type="button" className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200">
                       {buttonText}
                     </button>
                   </SignUpButton>
