@@ -51,7 +51,7 @@ const AIAgents = () => {
             <p className="text-gray-700 mb-3 text-xs sm:text-sm font-medium">
               Steps to activate all 3 <span className="text-blue-600">Telegram</span> AI agents<br /><br />
               1. Copy your Activation Key given below.<br /><br />
-              2. Click the "Activate on <span className="text-slate-950">Telegram</span>" button.<br /><br />
+              2. Click the "Activate on " button.<br /><br />
               3. When the bot asks for your key, paste it to start using your AI agents.
             </p>
             {userProfile?.id ? <div className="flex items-center gap-2 bg-black rounded-lg p-2 sm:p-3 border border-gray-600">
