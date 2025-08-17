@@ -10,6 +10,7 @@ interface FeatureSectionProps {
   buttonText: string;
   isReversed?: boolean;
   isComingSoon?: boolean;
+  label?: string;
 }
 const FeatureSection = ({
   title,
@@ -18,7 +19,8 @@ const FeatureSection = ({
   lottieUrl,
   buttonText,
   isReversed = false,
-  isComingSoon = false
+  isComingSoon = false,
+  label
 }: FeatureSectionProps) => {
   const [LottieComponent, setLottieComponent] = useState<React.ComponentType<any> | null>(null);
   const [animationData, setAnimationData] = useState(null);
@@ -144,7 +146,12 @@ const FeatureSection = ({
             </div>
           </div>
         ) : (
-          <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-3 md:p-4 lg:p-6 max-w-md mx-auto h-auto md:h-80 flex flex-col">
+          <div className="relative bg-gray-50 dark:bg-gray-900 rounded-2xl p-3 md:p-4 lg:p-6 max-w-md mx-auto h-auto md:h-80 flex flex-col">
+            {label && (
+              <div className="absolute -left-2 top-4 bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">
+                {label}
+              </div>
+            )}
             <div className="text-center space-y-2 md:space-y-3 md:flex-1 md:flex md:flex-col">
               <h3 className="text-base md:text-lg lg:text-xl font-bold font-opensans text-blue-700 leading-tight">
                 {title}

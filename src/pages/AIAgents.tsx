@@ -25,6 +25,7 @@ const AIAgents = () => {
             lottieUrl=""
             buttonText="Activate Now"
             isReversed={false}
+            label="1"
           />
 
           {/* Job Alerts Agent */}
@@ -35,6 +36,7 @@ const AIAgents = () => {
             lottieUrl=""
             buttonText="Activate Now"
             isReversed={true}
+            label="2"
           />
 
           {/* Resume Builder Agent */}
@@ -45,6 +47,7 @@ const AIAgents = () => {
             lottieUrl=""
             buttonText="Activate Now"
             isReversed={false}
+            label="3"
           />
         </div>
       </div>
