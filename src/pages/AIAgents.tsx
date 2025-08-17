@@ -1,33 +1,12 @@
 import { Layout } from '@/components/Layout';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import FeatureSection from '@/components/FeatureSection';
 
 const AIAgents = () => {
-  const agents = [
-    {
-      id: 'job-application',
-      icon: '👔',
-      title: 'Job Application Agent',
-      description: "I'll be your quick helper when you find a job. Share the basics, and I'll give you everything from a tailored resume to HR contacts in one click."
-    },
-    {
-      id: 'job-alerts',
-      icon: '🔔',
-      title: 'Job Alerts Agent',
-      description: "I'll scan the web daily and send you the latest jobs at your chosen time. Fresh, relevant roles delivered right when you need them."
-    },
-    {
-      id: 'resume-builder',
-      icon: '📝',
-      title: 'Resume Builder Agent',
-      description: "I'll turn your resume into a sharp, job-ready version. Clean format, keyword-optimized, and packed with achievements that stand out."
-    }
-  ];
-
   return (
     <Layout>
-      <div className="min-h-screen bg-black p-6 md:p-8 lg:p-10">
-        <div className="text-center mb-12">
+      <div className="min-h-screen bg-black">
+        {/* Header Section */}
+        <div className="max-w-7xl mx-auto px-4 py-4 text-center">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-white mb-2 font-inter">
             Meet Your AI Agents
           </h2>
@@ -36,39 +15,40 @@ const AIAgents = () => {
           </p>
         </div>
 
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {agents.map((agent) => (
-              <Card key={agent.id} className="rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 md:p-8 lg:p-10">
-                <CardHeader className="text-center pb-6">
-                  <div className="text-5xl mb-6">{agent.icon}</div>
-                  <CardTitle className="text-2xl font-bold text-card-foreground mb-2 font-inter">
-                    {agent.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center pb-6">
-                  <CardDescription className="text-muted-foreground text-base leading-relaxed font-opensans font-light">
-                    {agent.description}
-                  </CardDescription>
-                </CardContent>
-                <CardFooter className="pt-0 justify-center">
-                  <Button 
-                    className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium py-3 px-6 rounded-lg transition-all duration-300"
-                    onClick={() => {
-                      // Future routing will be added here
-                      console.log(`Activating ${agent.title}`);
-                    }}
-                  >
-                    Activate Now
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
+        {/* Agent Sections */}
+        <div className="space-y-0">
+          {/* Job Application Agent */}
+          <FeatureSection
+            title="👔 Job Application Agent"
+            subheading="Your quick helper when you find a job. Share the basics, get everything in one click."
+            description="I'll be your quick helper when you find a job. Share the basics, and I'll give you everything from a tailored resume to HR contacts in one click. No more spending hours customizing applications - just provide the job details and let me handle the rest with precision and speed."
+            lottieUrl="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations/business%20workshop.json"
+            buttonText="Activate Now"
+            isReversed={false}
+          />
+
+          {/* Job Alerts Agent */}
+          <FeatureSection
+            title="🔔 Job Alerts Agent"
+            subheading="Daily web scanning for the latest jobs at your chosen time. Fresh, relevant roles delivered."
+            description="I'll scan the web daily and send you the latest jobs at your chosen time. Fresh, relevant roles delivered right when you need them. Set your preferences once, and I'll monitor thousands of job boards to bring you opportunities that match your skills and location."
+            lottieUrl="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//alerts%20job.json"
+            buttonText="Activate Now"
+            isReversed={true}
+          />
+
+          {/* Resume Builder Agent */}
+          <FeatureSection
+            title="📝 Resume Builder Agent"
+            subheading="Transform your resume into a sharp, job-ready version. Clean, optimized, outstanding."
+            description="I'll turn your resume into a sharp, job-ready version. Clean format, keyword-optimized, and packed with achievements that stand out. Whether you're switching industries or climbing the ladder, I'll help you present your experience in the best possible light."
+            lottieUrl="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations/resume%20cv.json"
+            buttonText="Activate Now"
+            isReversed={false}
+          />
         </div>
       </div>
     </Layout>
   );
 };
-
 export default AIAgents;
