@@ -181,17 +181,17 @@ export const ProfileWizard = () => {
           <span className="text-xs">Skip</span>
         </Button>
         
-        <Button
-          onClick={nextStep}
-          disabled={currentStep < TOTAL_STEPS && !canProceedToNext() || isCompleting}
-          className="flex items-center gap-1 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-3 py-2 h-auto min-h-[36px]"
-          size="sm"
-        >
-          <span className="text-xs leading-tight">
-            {isCompleting ? 'Completing...' : currentStep === TOTAL_STEPS ? 'Create Alerts' : 'Next'}
-          </span>
-          <ChevronRight className="w-3 h-3 flex-shrink-0" />
-        </Button>
+        {currentStep < TOTAL_STEPS && (
+          <Button
+            onClick={nextStep}
+            disabled={!canProceedToNext()}
+            className="flex items-center gap-1 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-3 py-2 h-auto min-h-[36px]"
+            size="sm"
+          >
+            <span className="text-xs leading-tight">Next</span>
+            <ChevronRight className="w-3 h-3 flex-shrink-0" />
+          </Button>
+        )}
       </div>
     </div>
   );

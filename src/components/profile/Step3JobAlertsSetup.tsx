@@ -1,9 +1,12 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
+import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Users } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 interface Step3JobAlertsSetupProps {
   onComplete: () => void;
 }
@@ -11,14 +14,39 @@ export const Step3JobAlertsSetup = ({
   onComplete
 }: Step3JobAlertsSetupProps) => {
   const navigate = useNavigate();
+  const { userProfile, refetch } = useCachedUserProfile();
+  const [isCompleting, setIsCompleting] = useState(false);
   const {
     updateActivity
   } = useFormTokenKeepAlive(true);
 
-  const handleHireAgents = useCallback(() => {
+  const handleHireAgents = useCallback(async () => {
+    if (!userProfile?.id) return;
+    
     updateActivity();
-    navigate('/ai-agents');
-  }, [navigate, updateActivity]);
+    setIsCompleting(true);
+    
+    try {
+      // Update profile setup completion status
+      const { error } = await supabase
+        .from('user_profile')
+        .update({ profile_setup_completed: true })
+        .eq('id', userProfile.id);
+
+      if (error) throw error;
+
+      toast.success('Profile setup completed! 🎉 Your AI agents are ready to work for you.');
+      await refetch();
+      
+      // Redirect to AI agents page
+      navigate('/ai-agents');
+    } catch (error) {
+      console.error('Error completing setup:', error);
+      toast.error('Failed to complete setup');
+    } finally {
+      setIsCompleting(false);
+    }
+  }, [navigate, updateActivity, userProfile?.id, refetch]);
   return (
     <Card className="bg-gray-800 border border-gray-600 shadow-lg max-w-2xl mx-auto">
       <CardContent className="p-4 sm:p-6 space-y-4">
@@ -55,9 +83,10 @@ export const Step3JobAlertsSetup = ({
 
           <Button 
             onClick={handleHireAgents}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 text-sm font-medium rounded-lg transition-colors"
+            disabled={isCompleting}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
           >
-            Yes, I Want Them!
+            {isCompleting ? 'Setting up your agents...' : 'Yes, I Want Them!'}
           </Button>
         </div>
       </CardContent>
