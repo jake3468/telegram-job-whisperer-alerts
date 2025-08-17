@@ -11,6 +11,7 @@ interface FeatureSectionProps {
   isReversed?: boolean;
   isComingSoon?: boolean;
   label?: string;
+  buttonUrl?: string;
 }
 const FeatureSection = ({
   title,
@@ -20,7 +21,8 @@ const FeatureSection = ({
   buttonText,
   isReversed = false,
   isComingSoon = false,
-  label
+  label,
+  buttonUrl
 }: FeatureSectionProps) => {
   const [LottieComponent, setLottieComponent] = useState<React.ComponentType<any> | null>(null);
   const [animationData, setAnimationData] = useState(null);
@@ -75,7 +77,12 @@ const FeatureSection = ({
       </p>
       {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75">
           Coming Soon
-        </button> : <SignUpButton mode="modal">
+        </button> : buttonUrl ? <a href={buttonUrl} target="_blank" rel="noopener noreferrer">
+          <button type="button" className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
+            {buttonText}
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </a> : <SignUpButton mode="modal">
           <button type="button" className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
             {buttonText}
             <ArrowRight className="w-4 h-4" />
@@ -99,7 +106,12 @@ const FeatureSection = ({
       
       {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75">
           Coming Soon
-        </button> : <SignUpButton mode="modal">
+        </button> : buttonUrl ? <a href={buttonUrl} target="_blank" rel="noopener noreferrer">
+          <button type="button" className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
+            {buttonText}
+            <ArrowRight className="w-5 h-5" />
+          </button>
+        </a> : <SignUpButton mode="modal">
           <button type="button" className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
             {buttonText}
             <ArrowRight className="w-5 h-5" />
@@ -168,7 +180,12 @@ const FeatureSection = ({
                 {isComingSoon ? 
                   <button type="button" disabled className="w-full bg-gray-700 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm cursor-not-allowed opacity-75">
                     Coming Soon
-                  </button> : 
+                  </button> : buttonUrl ?
+                  <a href={buttonUrl} target="_blank" rel="noopener noreferrer" className="block w-full">
+                    <button type="button" className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200">
+                      {buttonText}
+                    </button>
+                  </a> :
                   <SignUpButton mode="modal">
                     <button type="button" className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200">
                       {buttonText}
