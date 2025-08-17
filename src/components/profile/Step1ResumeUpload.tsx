@@ -16,7 +16,7 @@ export const Step1ResumeUpload = ({
     resumeExists
   } = useCachedUserProfile();
   return (
-    <Card className="bg-gray-100 border border-gray-200 shadow-lg max-w-2xl mx-auto">
+    <Card className="bg-gray-800 border border-gray-600 shadow-lg max-w-2xl mx-auto">
       <CardContent className="p-4 sm:p-6 space-y-4">
         {/* Step Header */}
         <div className="mb-4">
@@ -29,11 +29,11 @@ export const Step1ResumeUpload = ({
                 <span className="text-white text-xs font-bold">1</span>
               </div>
             </div>
-            <h2 className="text-base sm:text-xl font-bold text-black">
+            <h2 className="text-base sm:text-xl font-bold text-gray-100">
               Upload Your Resume
             </h2>
           </div>
-          <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
+          <p className="text-gray-300 text-xs sm:text-sm leading-relaxed">
             Upload your resume so our AI can personalize your experience (PDF format, max 5MB). It does not need to be perfect now, this can be made better later.
           </p>
         </div>
