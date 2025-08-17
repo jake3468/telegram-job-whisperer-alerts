@@ -22,14 +22,14 @@ export const Step1ResumeUpload = ({
         <div className="mb-4">
           <div className="flex items-center gap-3 mb-2">
             <div className="relative flex-shrink-0">
-              <div className="p-2 sm:p-3 bg-blue-50 rounded-xl border border-blue-200">
-                <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+              <div className="p-2 sm:p-3 bg-blue-600 rounded-xl border border-blue-700 shadow-lg">
+                <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-blue-600 rounded-full flex items-center justify-center">
+              <div className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-blue-800 rounded-full flex items-center justify-center shadow-md">
                 <span className="text-white text-xs font-bold">1</span>
               </div>
             </div>
-            <h2 className="text-base sm:text-xl font-bold text-gray-900">
+            <h2 className="text-base sm:text-xl font-bold text-black">
               Upload Your Resume
             </h2>
           </div>
