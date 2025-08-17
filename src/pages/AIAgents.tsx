@@ -1,12 +1,12 @@
 import { Layout } from '@/components/Layout';
 import FeatureSection from '@/components/FeatureSection';
-import { useUserProfile } from '@/hooks/useUserProfile';
+import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Copy } from 'lucide-react';
 
 const AIAgents = () => {
-  const { userProfile } = useUserProfile();
+  const { userProfile } = useCachedUserProfile();
   const { toast } = useToast();
 
   const copyUserProfileId = async () => {
