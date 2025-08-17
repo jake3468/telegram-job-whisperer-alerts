@@ -75,7 +75,17 @@ const AIAgents = () => {
         {/* Agent Sections */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {/* Job Application Agent */}
-          <FeatureSection title="👔 Job Application Agent" subheading="Your quick helper when you find a job." description="I'll be your quick helper when you find a job. Share the basics, and I'll give you everything from a tailored resume to HR contacts in one click." lottieUrl="" buttonText="Activate Now" isReversed={false} label="1" buttonUrl="https://t.me/add_job_aspirelyai_bot" />
+          <FeatureSection 
+            title="👔 Job Application Agent" 
+            subheading="Your quick helper when you find a job." 
+            description="I'll be your quick helper when you find a job. Share the basics, and I'll give you everything from a tailored resume to HR contacts in one click." 
+            lottieUrl="" 
+            buttonText="Activate Now" 
+            isReversed={false} 
+            label="1" 
+            buttonUrl="https://t.me/add_job_aspirelyai_bot"
+            activationStatus={userProfile?.add_job_bot_activated}
+          />
 
           {/* Job Alerts Agent */}
           <FeatureSection 
@@ -88,6 +98,7 @@ const AIAgents = () => {
             label="2" 
             buttonUrl="https://t.me/Job_AI_update_bot"
             shouldDetectLocation={true}
+            activationStatus={userProfile?.bot_activated}
             additionalContent={
               <>
                 <p className="text-xs text-gray-600 mb-2 text-center">
@@ -105,7 +116,17 @@ const AIAgents = () => {
           />
 
           {/* Resume Builder Agent */}
-          <FeatureSection title="📝 Resume Builder Agent" subheading="Transform your resume into a sharp, job-ready version." description="I'll turn your resume into a sharp, job-ready version. Clean format, keyword-optimized, and packed with achievements that stand out." lottieUrl="" buttonText="Activate Now" isReversed={false} label="3" buttonUrl="https://t.me/Resume_builder_AI_bot" />
+          <FeatureSection 
+            title="📝 Resume Builder Agent" 
+            subheading="Transform your resume into a sharp, job-ready version." 
+            description="I'll turn your resume into a sharp, job-ready version. Clean format, keyword-optimized, and packed with achievements that stand out." 
+            lottieUrl="" 
+            buttonText="Activate Now" 
+            isReversed={false} 
+            label="3" 
+            buttonUrl="https://t.me/Resume_builder_AI_bot"
+            activationStatus={userProfile?.cv_bot_activated}
+          />
         </div>
       </div>
     </Layout>;

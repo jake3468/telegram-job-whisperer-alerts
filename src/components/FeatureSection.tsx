@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { logger } from "@/utils/logger";
 import { useCachedUserProfile } from "@/hooks/useCachedUserProfile";
 import { detectAndStoreLocation } from "@/utils/locationDetection";
+import ActivationStatusTag from "./ActivationStatusTag";
 interface FeatureSectionProps {
   title: string;
   subheading: string;
@@ -16,6 +17,7 @@ interface FeatureSectionProps {
   buttonUrl?: string;
   additionalContent?: React.ReactNode;
   shouldDetectLocation?: boolean;
+  activationStatus?: boolean | null;
 }
 const FeatureSection = ({
   title,
@@ -28,7 +30,8 @@ const FeatureSection = ({
   label,
   buttonUrl,
   additionalContent,
-  shouldDetectLocation = false
+  shouldDetectLocation = false,
+  activationStatus
 }: FeatureSectionProps) => {
   const [LottieComponent, setLottieComponent] = useState<React.ComponentType<any> | null>(null);
   const [animationData, setAnimationData] = useState(null);
@@ -193,6 +196,9 @@ const FeatureSection = ({
               <div className="absolute -left-3 -top-3 bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
                 {label}
               </div>
+            )}
+            {activationStatus !== undefined && (
+              <ActivationStatusTag isActivated={activationStatus} />
             )}
             <div className="text-center space-y-2 md:space-y-3 flex-1 flex flex-col">
               <h3 className="text-base md:text-lg lg:text-xl font-bold font-opensans text-blue-700 leading-tight">

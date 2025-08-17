@@ -10,6 +10,7 @@ export interface UserProfile {
   chat_id: string | null;
   cv_bot_activated: boolean;
   cv_chat_id: string | null;
+  add_job_bot_activated: boolean | null;
   created_at: string | null;
   show_onboarding_popup: boolean;
   show_job_alerts_onboarding_popup: boolean;
@@ -28,6 +29,7 @@ export interface UserProfileUpdateData {
   chat_id?: string | null;
   cv_bot_activated?: boolean;
   cv_chat_id?: string | null;
+  add_job_bot_activated?: boolean | null;
   show_onboarding_popup?: boolean;
   show_job_alerts_onboarding_popup?: boolean;
   show_job_board_onboarding_popup?: boolean;
