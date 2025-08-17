@@ -97,10 +97,6 @@ export const ProfileWizard = () => {
 
       {/* Progress Bar */}
       <div className="mb-1 sm:mb-3">
-        <div className="flex justify-between items-center mb-1">
-          <span className="text-xs sm:text-sm text-gray-400">Progress</span>
-          <span className="text-xs sm:text-sm text-gray-400">{getProgressPercentage()}% complete</span>
-        </div>
         <div className="w-full bg-gray-700 rounded-full h-1.5 sm:h-2">
           <div 
             className="h-1.5 sm:h-2 rounded-full bg-green-400 transition-all duration-500"
