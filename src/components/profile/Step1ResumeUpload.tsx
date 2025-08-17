@@ -17,7 +17,7 @@ export const Step1ResumeUpload = ({
   } = useCachedUserProfile();
   return <div className="space-y-2 sm:space-y-4 max-w-2xl mx-auto">
       {/* Step Header */}
-      <div className="flex items-center gap-3 px-2 mb-2">
+      <div className="flex items-center gap-3 px-2 mb-2 pt-2">
         <div className="relative flex-shrink-0">
           <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl border border-blue-400/30 backdrop-blur-sm">
             <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
