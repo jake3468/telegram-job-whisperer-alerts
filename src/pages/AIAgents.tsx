@@ -88,7 +88,7 @@ const AIAgents = () => {
             label="2" 
             buttonUrl="https://t.me/Job_AI_update_bot"
             additionalContent={
-              <div className="pt-2 border-t border-gray-200">
+              <>
                 <p className="text-xs text-gray-600 mb-2 text-center">
                   After activating the Job Alerts AI Agent, click "Create Job Alerts" below to set your daily preferences.
                 </p>
@@ -99,7 +99,7 @@ const AIAgents = () => {
                   <CalendarPlus className="w-3 h-3" />
                   Create Job Alerts
                 </Button>
-              </div>
+              </>
             }
           />
 

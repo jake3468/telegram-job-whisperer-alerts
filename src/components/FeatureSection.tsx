@@ -194,12 +194,12 @@ const FeatureSection = ({
                     </button>
                   </SignUpButton>
                 }
-                {additionalContent && (
-                  <div className="mt-3">
-                    {additionalContent}
-                  </div>
-                )}
               </div>
+              {additionalContent && (
+                <div className="pt-2 border-t border-gray-200 mt-3">
+                  {additionalContent}
+                </div>
+              )}
             </div>
           </div>
         )}
