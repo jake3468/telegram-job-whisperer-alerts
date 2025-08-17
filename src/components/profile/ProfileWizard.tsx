@@ -85,10 +85,10 @@ export const ProfileWizard = () => {
       <div className="text-center mb-1 sm:mb-2">
         <h1 className="font-extrabold text-2xl sm:text-3xl md:text-4xl font-orbitron drop-shadow mb-1 break-words">
           <span className="mr-1 sm:mr-2">🎉</span>
-          <span className="bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent">
+          <span className="text-gray-100">
             Welcome, 
           </span>
-          <span className="italic bg-gradient-to-r from-pastel-peach to-pastel-mint bg-clip-text text-transparent">
+          <span className="italic text-gray-100">
             {user?.firstName || 'User'}
           </span>
         </h1>
