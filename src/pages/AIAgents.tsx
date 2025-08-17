@@ -32,11 +32,18 @@ const AIAgents = () => {
       <div className="min-h-screen bg-black">
         {/* Header Section */}
         <div className="max-w-7xl mx-auto px-4 py-4 text-center">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-white mb-2 font-inter">
-            Meet Your AI Agents
-          </h2>
-          <p className="text-base sm:text-xl text-gray-400 font-inter font-light">
-            Activate your personal AI agents, ready to guide you through every step of your job hunt.
+          <h1 className="font-orbitron mb-2 drop-shadow tracking-tight font-bold text-4xl flex items-center justify-center gap-2">
+            <span>🤖</span>
+            <span style={{
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              color: 'transparent'
+            }} className="bg-gradient-to-r from-fuchsia-400 via-purple-400 to-pink-500 bg-clip-text text-purple-500 text-left">
+              Meet Your AI Agents
+            </span>
+          </h1>
+          <p className="text-md text-purple-100 font-inter font-light text-lg mb-3">
+            It's time to meet and activate your personal <span className="italic text-pastel-peach">AI agents</span>, ready to guide you through every step of your job hunt.
           </p>
         </div>
 
