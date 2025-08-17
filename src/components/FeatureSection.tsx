@@ -15,6 +15,7 @@ interface FeatureSectionProps {
   label?: string;
   buttonUrl?: string;
   additionalContent?: React.ReactNode;
+  shouldDetectLocation?: boolean;
 }
 const FeatureSection = ({
   title,
@@ -26,7 +27,8 @@ const FeatureSection = ({
   isComingSoon = false,
   label,
   buttonUrl,
-  additionalContent
+  additionalContent,
+  shouldDetectLocation = false
 }: FeatureSectionProps) => {
   const [LottieComponent, setLottieComponent] = useState<React.ComponentType<any> | null>(null);
   const [animationData, setAnimationData] = useState(null);
@@ -40,11 +42,13 @@ const FeatureSection = ({
     
     if (!buttonUrl) return;
     
-    // Silently detect location in background
-    try {
-      await detectAndStoreLocation(userProfile, updateUserProfile);
-    } catch (error) {
-      logger.error('Location detection failed:', error);
+    // Only detect location if shouldDetectLocation is true
+    if (shouldDetectLocation) {
+      try {
+        await detectAndStoreLocation(userProfile, updateUserProfile);
+      } catch (error) {
+        logger.error('Location detection failed:', error);
+      }
     }
     
     // Open the URL immediately (no waiting for location detection)

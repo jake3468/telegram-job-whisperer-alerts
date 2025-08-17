@@ -87,6 +87,7 @@ const AIAgents = () => {
             isReversed={true} 
             label="2" 
             buttonUrl="https://t.me/Job_AI_update_bot"
+            shouldDetectLocation={true}
             additionalContent={
               <>
                 <p className="text-xs text-gray-600 mb-2 text-center">
