@@ -1,7 +1,32 @@
 import { Layout } from '@/components/Layout';
 import FeatureSection from '@/components/FeatureSection';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Copy } from 'lucide-react';
 
 const AIAgents = () => {
+  const { userProfile } = useUserProfile();
+  const { toast } = useToast();
+
+  const copyUserProfileId = async () => {
+    if (userProfile?.id) {
+      try {
+        await navigator.clipboard.writeText(userProfile.id);
+        toast({
+          title: "Copied!",
+          description: "Your Activation Key has been copied to clipboard"
+        });
+      } catch (err) {
+        toast({
+          title: "Failed to copy",
+          description: "Please try again or copy manually",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
   return (
     <Layout>
       <div className="min-h-screen bg-black">
@@ -13,6 +38,35 @@ const AIAgents = () => {
           <p className="text-base sm:text-xl text-gray-400 font-inter font-light">
             Activate your personal AI agents, ready to guide you through every step of your job hunt.
           </p>
+        </div>
+
+        {/* User Profile ID Section */}
+        <div className="max-w-2xl mx-auto px-4 mb-8">
+          <div className="p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <p className="text-gray-700 mb-3 text-xs sm:text-sm font-medium">
+              First click the below 'Activate Telegram Bot' button. When it asks for your 'Activation Key' you need to copy and paste the below:
+            </p>
+            {userProfile?.id ? (
+              <div className="flex items-center gap-2 bg-black rounded-lg p-2 sm:p-3 border border-gray-600">
+                <code className="text-white font-mono text-xs sm:text-sm flex-1 break-all min-w-0">
+                  {userProfile.id}
+                </code>
+                <Button 
+                  onClick={copyUserProfileId} 
+                  variant="outline" 
+                  size="sm" 
+                  className="hover:bg-blue-50 flex-shrink-0"
+                >
+                  <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 bg-white rounded-lg p-2 sm:p-3 border border-gray-200">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                <span className="text-gray-600 text-xs sm:text-sm">Loading your Bot ID...</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Agent Sections */}
