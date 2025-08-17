@@ -26,12 +26,12 @@ const AIAgents = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-background p-6 md:p-8 lg:p-10">
+      <div className="min-h-screen bg-black p-6 md:p-8 lg:p-10">
         <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-foreground mb-2 font-inter">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-white mb-2 font-inter">
             Meet Your AI Agents
           </h2>
-          <p className="text-base sm:text-xl text-muted-foreground font-inter font-light">
+          <p className="text-base sm:text-xl text-gray-400 font-inter font-light">
             Activate your personal AI agents, ready to guide you through every step of your job hunt.
           </p>
         </div>
