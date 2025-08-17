@@ -50,21 +50,23 @@ const AIAgents = () => {
           <div className="p-3 sm:p-4 rounded-lg border border-border bg-gray-950">
             <p className="mb-3 text-xs sm:text-sm font-medium text-slate-50">
               Steps to activate all 3 <span className="text-sky-300">Telegram</span> AI agents<br /><br />
-              1. Copy your Activation Key given below.<br /><br />
-              2. Click the "Activate Now" button.<br /><br />
-              3. When it asks for your activation key, paste it to start using your AI agents.
+              1. Copy your Activation Key given below.
             </p>
-            {userProfile?.id ? <div className="flex items-center gap-2 rounded-lg p-2 sm:p-3 border border-gray-600 bg-blue-800">
+            {userProfile?.id ? <div className="flex items-center gap-2 rounded-lg p-2 sm:p-3 border border-gray-600 bg-blue-800 mb-4">
                 <code className="text-white font-mono text-xs sm:text-sm flex-1 break-all min-w-0">
                   {userProfile.id}
                 </code>
                 <Button onClick={copyUserProfileId} variant="outline" size="sm" className="hover:bg-blue-50 flex-shrink-0">
                   <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>
-              </div> : <div className="flex items-center gap-2 bg-white rounded-lg p-2 sm:p-3 border border-gray-200">
+              </div> : <div className="flex items-center gap-2 bg-white rounded-lg p-2 sm:p-3 border border-gray-200 mb-4">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
                 <span className="text-gray-600 text-xs sm:text-sm">Loading your Bot ID...</span>
               </div>}
+            <p className="text-xs sm:text-sm font-medium text-slate-50">
+              2. Click the "Activate Now" button.<br /><br />
+              3. When it asks for your activation key, paste it to start using your AI agents.
+            </p>
           </div>
         </div>
 
