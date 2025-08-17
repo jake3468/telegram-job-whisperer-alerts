@@ -47,7 +47,7 @@ const AIAgents = () => {
 
         {/* User Profile ID Section */}
         <div className="max-w-2xl mx-auto px-4 mb-8">
-          <div className="p-3 sm:p-4 bg-muted rounded-lg border border-border">
+          <div className="p-3 sm:p-4 bg-pastel-lavender rounded-lg border border-border">
             <p className="text-muted-foreground mb-3 text-xs sm:text-sm font-medium">
               Steps to activate all 3 <span className="text-primary">Telegram</span> AI agents<br /><br />
               1. Copy your Activation Key given below.<br /><br />
