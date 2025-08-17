@@ -32,7 +32,6 @@ const FeatureSection = ({
   const [animationData, setAnimationData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   
   const { userProfile, updateUserProfile } = useCachedUserProfile();
 
@@ -41,16 +40,15 @@ const FeatureSection = ({
     
     if (!buttonUrl) return;
     
-    setIsDetectingLocation(true);
+    // Silently detect location in background
     try {
       await detectAndStoreLocation(userProfile, updateUserProfile);
     } catch (error) {
       logger.error('Location detection failed:', error);
-    } finally {
-      setIsDetectingLocation(false);
-      // Open the URL after location detection
-      window.open(buttonUrl, '_blank', 'noopener,noreferrer');
     }
+    
+    // Open the URL immediately (no waiting for location detection)
+    window.open(buttonUrl, '_blank', 'noopener,noreferrer');
   };
   useEffect(() => {
     import('lottie-react').then(module => {
@@ -104,10 +102,9 @@ const FeatureSection = ({
         </button> : buttonUrl ? <button 
           type="button" 
           onClick={handleButtonWithUrlClick}
-          disabled={isDetectingLocation}
-          className="w-fit bg-primary hover:bg-primary/90 disabled:opacity-75 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
+          className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
         >
-          {isDetectingLocation ? 'Detecting Location...' : buttonText}
+          {buttonText}
           <ArrowRight className="w-4 h-4" />
         </button> : <SignUpButton mode="modal">
           <button type="button" className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
@@ -136,10 +133,9 @@ const FeatureSection = ({
         </button> : buttonUrl ? <button 
           type="button" 
           onClick={handleButtonWithUrlClick}
-          disabled={isDetectingLocation}
-          className="w-fit bg-primary hover:bg-primary/90 disabled:opacity-75 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
+          className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
         >
-          {isDetectingLocation ? 'Detecting Location...' : buttonText}
+          {buttonText}
           <ArrowRight className="w-5 h-5" />
         </button> : <SignUpButton mode="modal">
           <button type="button" className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
@@ -214,10 +210,9 @@ const FeatureSection = ({
                   <button 
                     type="button" 
                     onClick={handleButtonWithUrlClick}
-                    disabled={isDetectingLocation}
-                    className="w-full bg-primary hover:bg-primary/90 disabled:opacity-75 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200"
+                    className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200"
                   >
-                    {isDetectingLocation ? 'Detecting Location...' : buttonText}
+                    {buttonText}
                   </button> :
                   <SignUpButton mode="modal">
                     <button type="button" className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200">
