@@ -20,7 +20,7 @@ const AIAgents = () => {
           {/* Job Application Agent */}
           <FeatureSection
             title="👔 Job Application Agent"
-            subheading="Your quick helper when you find a job. Share the basics, get everything in one click."
+            subheading="Your quick helper when you find a job."
             description="I'll be your quick helper when you find a job. Share the basics, and I'll give you everything from a tailored resume to HR contacts in one click."
             lottieUrl=""
             buttonText="Activate Now"
