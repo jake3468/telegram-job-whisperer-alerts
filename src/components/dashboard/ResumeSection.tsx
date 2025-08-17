@@ -360,9 +360,6 @@ const ResumeSection = ({
             </div>}
         </CardContent>
       </Card>
-      <p className="text-white text-xs leading-relaxed opacity-80 mt-3 px-2">
-        Data privacy is our top priority at Aspirely.ai. Your resume will be used exclusively to create job-tailored resumes, cover letters, interview prep, and other personalized career tools.
-      </p>
     </section>;
 };
 export default ResumeSection;
