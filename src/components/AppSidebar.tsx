@@ -1,6 +1,6 @@
 
 
-import { User, Bell, Target, FileText, X, Share2, CreditCard, FileUser, Building2, MessageSquare, Kanban, Phone, Briefcase } from 'lucide-react';
+import { User, Bell, Target, FileText, X, Share2, CreditCard, FileUser, Building2, MessageSquare, Kanban, Phone, Briefcase, Bot } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarHeader, SidebarFooter, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { SignedIn, UserButton, useUser } from '@clerk/clerk-react';
@@ -12,6 +12,10 @@ const profileItems = [{
   title: 'Profile',
   url: '/profile',
   icon: User
+}, {
+  title: 'AI Agents',
+  url: '/ai-agents',
+  icon: Bot
 }, {
   title: 'Create Job Alerts',
   url: '/job-alerts',
