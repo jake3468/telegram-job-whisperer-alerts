@@ -17,7 +17,7 @@ export const Step1ResumeUpload = ({
   } = useCachedUserProfile();
   return <div className="space-y-2 sm:space-y-4 max-w-2xl mx-auto">
       {/* Step Header */}
-      <div className="flex items-center gap-3 px-2 mb-2 pt-2">
+      <div className="flex items-center gap-3 px-2 mb-2">
         <div className="relative flex-shrink-0">
           <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl border border-blue-400/30 backdrop-blur-sm">
             <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
@@ -30,6 +30,7 @@ export const Step1ResumeUpload = ({
           <h2 className="text-base sm:text-xl font-bold text-white mb-1">
             Upload Your Resume
           </h2>
+          <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">Upload your resume so our AI can personalize your experience (PDF format, max 5MB). It does not need to be perfect now, this can be made better later.</p>
         </div>
       </div>
 
