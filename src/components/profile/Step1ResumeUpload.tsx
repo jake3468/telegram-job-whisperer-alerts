@@ -16,7 +16,7 @@ export const Step1ResumeUpload = ({
     resumeExists
   } = useCachedUserProfile();
   return (
-    <Card className="bg-gray-50 border border-gray-200 shadow-lg max-w-2xl mx-auto">
+    <Card className="bg-gray-100 border border-gray-200 shadow-lg max-w-2xl mx-auto">
       <CardContent className="p-4 sm:p-6 space-y-4">
         {/* Step Header */}
         <div className="mb-4">
