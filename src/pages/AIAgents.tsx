@@ -16,12 +16,12 @@ const AIAgents = () => {
         </div>
 
         {/* Agent Sections */}
-        <div className="space-y-0">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {/* Job Application Agent */}
           <FeatureSection
             title="👔 Job Application Agent"
             subheading="Your quick helper when you find a job. Share the basics, get everything in one click."
-            description="I'll be your quick helper when you find a job. Share the basics, and I'll give you everything from a tailored resume to HR contacts in one click. No more spending hours customizing applications - just provide the job details and let me handle the rest with precision and speed."
+            description="I'll be your quick helper when you find a job. Share the basics, and I'll give you everything from a tailored resume to HR contacts in one click."
             lottieUrl=""
             buttonText="Activate Now"
             isReversed={false}
@@ -30,8 +30,8 @@ const AIAgents = () => {
           {/* Job Alerts Agent */}
           <FeatureSection
             title="🔔 Job Alerts Agent"
-            subheading="Daily web scanning for the latest jobs at your chosen time. Fresh, relevant roles delivered."
-            description="I'll scan the web daily and send you the latest jobs at your chosen time. Fresh, relevant roles delivered right when you need them. Set your preferences once, and I'll monitor thousands of job boards to bring you opportunities that match your skills and location."
+            subheading="Daily web scanning for the latest jobs at your chosen time."
+            description="I'll scan the web daily and send you the latest jobs at your chosen time. Fresh, relevant roles delivered right when you need them."
             lottieUrl=""
             buttonText="Activate Now"
             isReversed={true}
@@ -40,8 +40,8 @@ const AIAgents = () => {
           {/* Resume Builder Agent */}
           <FeatureSection
             title="📝 Resume Builder Agent"
-            subheading="Transform your resume into a sharp, job-ready version. Clean, optimized, outstanding."
-            description="I'll turn your resume into a sharp, job-ready version. Clean format, keyword-optimized, and packed with achievements that stand out. Whether you're switching industries or climbing the ladder, I'll help you present your experience in the best possible light."
+            subheading="Transform your resume into a sharp, job-ready version."
+            description="I'll turn your resume into a sharp, job-ready version. Clean format, keyword-optimized, and packed with achievements that stand out."
             lottieUrl=""
             buttonText="Activate Now"
             isReversed={false}
