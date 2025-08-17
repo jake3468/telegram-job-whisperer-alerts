@@ -30,7 +30,7 @@ export const Step2BioCreation = ({
   }, []);
   return (
     <div className="space-y-2 sm:space-y-4 max-w-2xl mx-auto">
-      <Card className="bg-white shadow-lg border border-gray-200">
+      <Card className="bg-gray-50 shadow-lg border border-gray-200">
         <CardContent className="p-4 sm:p-6">
           <div className="mb-4">
             <div className="flex items-center gap-3 mb-2">
