@@ -63,8 +63,6 @@ const injectTokenIntoClient = (token: string | null) => {
         'Authorization': `Bearer ${token}`,
         'apikey': SUPABASE_PUBLISHABLE_KEY
       };
-      
-      logger.debug('Token injected successfully:', { hasToken: !!token, timestamp: Date.now() });
     } else {
       // Reset to default headers
       (supabase as any).rest.headers = {
