@@ -3,7 +3,8 @@ import FeatureSection from '@/components/FeatureSection';
 import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Copy } from 'lucide-react';
+import { Copy, CalendarPlus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 const AIAgents = () => {
   const {
     userProfile
@@ -11,6 +12,7 @@ const AIAgents = () => {
   const {
     toast
   } = useToast();
+  const navigate = useNavigate();
   const copyUserProfileId = async () => {
     if (userProfile?.id) {
       try {
@@ -76,7 +78,23 @@ const AIAgents = () => {
           <FeatureSection title="👔 Job Application Agent" subheading="Your quick helper when you find a job." description="I'll be your quick helper when you find a job. Share the basics, and I'll give you everything from a tailored resume to HR contacts in one click." lottieUrl="" buttonText="Activate Now" isReversed={false} label="1" buttonUrl="https://t.me/add_job_aspirelyai_bot" />
 
           {/* Job Alerts Agent */}
-          <FeatureSection title="🔔 Job Alerts Agent" subheading="Daily web scanning for the latest jobs at your chosen time." description="I'll scan the web daily and send you the latest jobs at your chosen time. Fresh, relevant roles delivered right when you need them." lottieUrl="" buttonText="Activate Now" isReversed={true} label="2" buttonUrl="https://t.me/Job_AI_update_bot" />
+          <div className="space-y-4">
+            <FeatureSection title="🔔 Job Alerts Agent" subheading="Daily web scanning for the latest jobs at your chosen time." description="I'll scan the web daily and send you the latest jobs at your chosen time. Fresh, relevant roles delivered right when you need them." lottieUrl="" buttonText="Activate Now" isReversed={true} label="2" buttonUrl="https://t.me/Job_AI_update_bot" />
+            
+            {/* Additional Job Alerts Setup */}
+            <div className="max-w-md mx-auto p-4 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200">
+              <p className="text-sm text-blue-800 mb-3 text-center">
+                After activating the Job Alerts AI Agent, click "Create Job Alerts" below to set your daily preferences.
+              </p>
+              <Button 
+                onClick={() => navigate('/job-alerts')}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-200"
+              >
+                <CalendarPlus className="w-4 h-4" />
+                Create Job Alerts
+              </Button>
+            </div>
+          </div>
 
           {/* Resume Builder Agent */}
           <FeatureSection title="📝 Resume Builder Agent" subheading="Transform your resume into a sharp, job-ready version." description="I'll turn your resume into a sharp, job-ready version. Clean format, keyword-optimized, and packed with achievements that stand out." lottieUrl="" buttonText="Activate Now" isReversed={false} label="3" buttonUrl="https://t.me/Resume_builder_AI_bot" />
