@@ -49,7 +49,10 @@ const AIAgents = () => {
         <div className="max-w-2xl mx-auto px-4 mb-8">
           <div className="p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
             <p className="text-gray-700 mb-3 text-xs sm:text-sm font-medium">
-              First click the below 'Activate Telegram Bot' button. When it asks for your 'Activation Key' you need to copy and paste the below:
+              Steps to activate all 3 AI agents<br />
+              Copy your activation key given below.<br />
+              Click the "Activate Now" button.<br />
+              When asked, paste your activation key to complete activation.
             </p>
             {userProfile?.id ? <div className="flex items-center gap-2 bg-black rounded-lg p-2 sm:p-3 border border-gray-600">
                 <code className="text-white font-mono text-xs sm:text-sm flex-1 break-all min-w-0">
