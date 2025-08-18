@@ -85,13 +85,6 @@ export const Step3JobAlertsSetup = ({
         </CardContent>
       </Card>
 
-      <Button 
-        onClick={handleHireAgents}
-        disabled={isCompleting}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
-      >
-        {isCompleting ? 'Setting up your agents...' : 'Yes, I Want Them!'}
-      </Button>
     </div>
   );
 };
