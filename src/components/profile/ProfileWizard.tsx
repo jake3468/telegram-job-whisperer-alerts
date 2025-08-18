@@ -142,7 +142,7 @@ export const ProfileWizard = () => {
                   <span className={`text-xs sm:text-sm font-medium text-center break-words ${
                     isActive ? 'text-blue-400' : status === 'complete' ? 'text-emerald-400' : 'text-gray-400'
                   }`}>
-                    {stepNum === 1 ? 'Resume' : stepNum === 2 ? 'Bio' : 'Job Alerts'}
+                    {stepNum === 1 ? 'Resume' : stepNum === 2 ? 'Bio' : 'AI Agents'}
                   </span>
                 </button>
               </div>
