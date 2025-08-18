@@ -128,11 +128,7 @@ const HeroSection = () => {
           <span className="italic bg-gradient-to-r from-[#00FF88] to-[#00CC66] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,255,136,0.8)]">Job Alerts Agent</span>
           {' '}delivers daily matches to your Telegram,{' '}
           <span className="italic bg-gradient-to-r from-[#FF44FF] to-[#DD22DD] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(255,68,255,0.8)]">Resume Builder Agent</span>
-          {' '}creates optimized resumes.{' '}
-          <span className="font-bold italic bg-gradient-to-r from-[#FFDD00] to-[#FFAA00] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(255,221,0,0.8)]">One-click insights</span>
-          {' '}and prep.{' '}
-          <span className="font-bold italic bg-gradient-to-r from-[#9D4EDD] to-[#7209B7] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(157,78,221,0.8)]">Premium dashboard</span>
-          {' '}included.
+          {' '}creates ATS optimized resumes. One-click insights and prep. Premium dashboard included.
         </p>
         
         <SignedOut>
