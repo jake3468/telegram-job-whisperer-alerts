@@ -95,7 +95,7 @@ const HeroSection = () => {
         {/* Black background to block particles behind headline */}
         <div className="relative">
           <div className="absolute inset-0 bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
-          <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-sans tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)]">Your AI shortcut to more <span className="italic">job offers</span>. 🎯</h1>
+          <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-sans tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)]">Get 3 <span className="italic">AI Agents</span> - they work, you get the job 🎯</h1>
         </div>
         
         {/* Lottie Animation */}
@@ -122,14 +122,13 @@ const HeroSection = () => {
         </div>
 
         <p className="text-zinc-50 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
-          Perfect job matches delivered to your{' '}
-          <span className="font-bold italic bg-gradient-to-r from-[#00D4FF] to-[#0099FF] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,212,255,0.8)]">Telegram</span>
-          {' '}like personal messages.{' '}
-          <span className="font-bold italic bg-gradient-to-r from-[#00FF88] to-[#00CC66] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,255,136,0.8)]">One click</span>
-          {' '}gets you custom resumes, cover letters, interview prep, company insights, and visa sponsorship info.{' '}
-          <span className="font-bold italic bg-gradient-to-r from-[#FF44FF] to-[#DD22DD] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(255,68,255,0.8)]">Premium dashboard</span>
-          {' '}included. Apply anywhere,{' '}
-          <span className="font-bold italic bg-gradient-to-r from-[#FFDD00] to-[#FFAA00] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(255,221,0,0.8)]">fully prepared</span>
+          We have 3 AI agents:{' '}
+          <span className="italic bg-gradient-to-r from-[#00D4FF] to-[#0099FF] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,212,255,0.8)]">Job Application Agent</span>
+          {' '}handles all materials when you find roles,{' '}
+          <span className="italic bg-gradient-to-r from-[#00FF88] to-[#00CC66] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,255,136,0.8)]">Job Alerts Agent</span>
+          {' '}delivers daily matches to your Telegram,{' '}
+          <span className="italic bg-gradient-to-r from-[#FF44FF] to-[#DD22DD] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(255,68,255,0.8)]">Resume Builder Agent</span>
+          {' '}creates ATS optimized resumes. One-click insights and prep. Premium dashboard included.
         </p>
         
         <SignedOut>
