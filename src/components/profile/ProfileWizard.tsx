@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 import { useCachedUserCompletionStatus } from '@/hooks/useCachedUserCompletionStatus';
 import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
+import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
 import { Step1ResumeUpload } from './Step1ResumeUpload';
 import { Step2BioCreation } from './Step2BioCreation';
 import { Step3JobAlertsSetup } from './Step3JobAlertsSetup';
@@ -21,6 +22,7 @@ export const ProfileWizard = () => {
   const { userProfile, refetch } = useCachedUserProfile();
   const [currentStep, setCurrentStep] = useState(1);
   const [isCompleting, setIsCompleting] = useState(false);
+  const { updateActivity } = useFormTokenKeepAlive(true);
 
   const nextStep = () => {
     if (currentStep < TOTAL_STEPS) {
@@ -36,11 +38,14 @@ export const ProfileWizard = () => {
     }
   };
 
-  const completeSetupAndRedirect = async () => {
+  const handleHireAgents = useCallback(async () => {
     if (!userProfile?.id) return;
     
+    updateActivity();
     setIsCompleting(true);
+    
     try {
+      // Update profile setup completion status
       const { error } = await supabase
         .from('user_profile')
         .update({ profile_setup_completed: true })
@@ -48,17 +53,21 @@ export const ProfileWizard = () => {
 
       if (error) throw error;
 
-      toast.success('Profile setup completed! 🎉 Now create your job alerts.');
+      toast.success('Profile setup completed! 🎉 Your AI agents are ready to work for you.');
       await refetch();
       
-      // Redirect to job alerts page
-      navigate('/job-alerts');
+      // Redirect to AI agents page
+      navigate('/ai-agents');
     } catch (error) {
       console.error('Error completing setup:', error);
       toast.error('Failed to complete setup');
     } finally {
       setIsCompleting(false);
     }
+  }, [navigate, updateActivity, userProfile?.id, refetch]);
+
+  const completeSetupAndRedirect = async () => {
+    await handleHireAgents();
   };
 
   const getStepStatus = (stepNum: number) => {
@@ -172,14 +181,16 @@ export const ProfileWizard = () => {
           <span className="text-xs">Go back</span>
         </Button>
 
-        <Button
-          onClick={() => nextStep()}
-          variant="ghost"
-          className="text-gray-400 hover:text-gray-800 px-2 py-2 h-auto min-h-[36px]"
-          size="sm"
-        >
-          <span className="text-xs">Skip</span>
-        </Button>
+        {currentStep === 3 && (
+          <Button
+            onClick={handleHireAgents}
+            disabled={isCompleting}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 h-auto min-h-[36px]"
+            size="sm"
+          >
+            <span className="text-xs">{isCompleting ? 'Setting up...' : 'Yes, I Want Them!'}</span>
+          </Button>
+        )}
         
         {currentStep < TOTAL_STEPS && (
           <Button
