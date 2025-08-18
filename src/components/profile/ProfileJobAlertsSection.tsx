@@ -43,6 +43,9 @@ export const ProfileJobAlertsSection = () => {
       
       // Redirect to AI agents page
       navigate('/ai-agents');
+      
+      // Scroll to top of the page
+      window.scrollTo(0, 0);
     } catch (error) {
       console.error('Error completing setup:', error);
       toast.error('Failed to complete setup');
