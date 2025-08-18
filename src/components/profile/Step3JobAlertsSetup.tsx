@@ -106,9 +106,7 @@ export const Step3JobAlertsSetup = ({
                   <span className="text-white text-xs font-bold">3</span>
                 </div>
               </div>
-              <h2 className="text-base sm:text-xl font-bold text-gray-100">
-                Hire Your Job Hunt Agents
-              </h2>
+              <h2 className="text-base sm:text-xl font-bold text-gray-100">Hire your Job Hunt Agents</h2>
             </div>
             <p className="text-gray-300 text-xs sm:text-sm leading-relaxed">
               Now comes the crucial part. You're about to hire 3 personal AI agents who will work for you, day and night, to make your job hunt effortless.
