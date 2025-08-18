@@ -56,8 +56,9 @@ export const ProfileWizard = () => {
       toast.success('Profile setup completed! 🎉 Your AI agents are ready to work for you.');
       await refetch();
       
-      // Redirect to AI agents page
+      // Redirect to AI agents page and scroll to top
       navigate('/ai-agents');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       console.error('Error completing setup:', error);
       toast.error('Failed to complete setup');
