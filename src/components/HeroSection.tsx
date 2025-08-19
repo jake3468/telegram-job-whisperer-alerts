@@ -121,15 +121,45 @@ const HeroSection = () => {
           </div>
         </div>
 
-        <p className="text-zinc-50 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
-          We have 3 AI agents:{' '}
-          <span className="italic bg-gradient-to-r from-[#00D4FF] to-[#0099FF] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,212,255,0.8)]">Job Application Agent</span>
-          {' '}handles all materials when you find roles,{' '}
-          <span className="italic bg-gradient-to-r from-[#00FF88] to-[#00CC66] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,255,136,0.8)]">Job Alerts Agent</span>
-          {' '}delivers daily matches to your Telegram,{' '}
-          <span className="italic bg-gradient-to-r from-[#FF44FF] to-[#DD22DD] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(255,68,255,0.8)]">Resume Builder Agent</span>
-          {' '}creates ATS optimized resumes. One-click insights and prep. Premium dashboard included.
-        </p>
+        <div className="text-zinc-50 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
+          <p className="mb-4">We have 3 AI agents:</p>
+          <ul className="space-y-3 mb-4">
+            <li>
+              <a 
+                href="https://t.me/add_job_aspirelyai_bot" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 hover:scale-105 transition-transform duration-200 cursor-pointer"
+              >
+                <span className="text-xl">👔</span>
+                <span className="italic bg-gradient-to-r from-[#00D4FF] to-[#0099FF] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,212,255,0.8)] hover:from-[#00E4FF] hover:to-[#00A9FF] transition-all duration-200">Job Application Agent</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="https://t.me/Job_AI_update_bot" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 hover:scale-105 transition-transform duration-200 cursor-pointer"
+              >
+                <span className="text-xl">🔔</span>
+                <span className="italic bg-gradient-to-r from-[#00FF88] to-[#00CC66] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,255,136,0.8)] hover:from-[#00FF98] hover:to-[#00DC76] transition-all duration-200">Job Alerts Agent</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="https://t.me/Resume_builder_AI_bot" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 hover:scale-105 transition-transform duration-200 cursor-pointer"
+              >
+                <span className="text-xl">📝</span>
+                <span className="italic bg-gradient-to-r from-[#FF44FF] to-[#DD22DD] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(255,68,255,0.8)] hover:from-[#FF54FF] hover:to-[#ED32ED] transition-all duration-200">Resume Builder Agent</span>
+              </a>
+            </li>
+          </ul>
+          <p>One-click insights and prep. Premium dashboard included.</p>
+        </div>
         
         <SignedOut>
           <div className="flex justify-center">
