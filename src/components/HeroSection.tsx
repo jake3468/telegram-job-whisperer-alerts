@@ -9,7 +9,11 @@ import LightRays from './LightRays';
 const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json';
 const CACHE_KEY = 'rocket-animation-data-v1';
 
-// Start loading animation data immediately
+// Preload telegram animation immediately when module loads
+const TELEGRAM_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations/telegram%20logo.json';
+const TELEGRAM_CACHE_KEY = 'telegram-animation-data-v1';
+
+// Start loading rocket animation data immediately
 const rocketAnimationPromise = (async () => {
   try {
     // Check cache first
@@ -33,6 +37,31 @@ const rocketAnimationPromise = (async () => {
     return null;
   }
 })();
+
+// Start loading telegram animation data immediately
+const telegramAnimationPromise = (async () => {
+  try {
+    // Check cache first
+    const cachedData = localStorage.getItem(TELEGRAM_CACHE_KEY);
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
+
+    // Fetch with high priority
+    const response = await fetch(TELEGRAM_ANIMATION_URL, {
+      cache: 'force-cache',
+      priority: 'high'
+    } as RequestInit);
+    const animationData = await response.json();
+
+    // Cache for next time
+    localStorage.setItem(TELEGRAM_CACHE_KEY, JSON.stringify(animationData));
+    return animationData;
+  } catch (error) {
+    console.error('Failed to preload telegram animation:', error);
+    return null;
+  }
+})();
 const HeroSection = () => {
   const navigate = useNavigate();
   const {
@@ -40,6 +69,7 @@ const HeroSection = () => {
     isLoaded
   } = useUser();
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
+  const [telegramAnimationData, setTelegramAnimationData] = useState(null);
   const fullText = 'AI finds your next job while you sleep';
   useEffect(() => {
     if (isLoaded && user) {
@@ -47,19 +77,27 @@ const HeroSection = () => {
     }
   }, [user, isLoaded, navigate]);
 
-  // Load Lottie animation using preloaded promise
+  // Load Lottie animations using preloaded promises
   useEffect(() => {
-    const loadAnimation = async () => {
+    const loadAnimations = async () => {
       try {
-        const animationData = await rocketAnimationPromise;
-        if (animationData) {
-          setLottieAnimationData(animationData);
+        const [rocketData, telegramData] = await Promise.all([
+          rocketAnimationPromise,
+          telegramAnimationPromise
+        ]);
+        
+        if (rocketData) {
+          setLottieAnimationData(rocketData);
+        }
+        
+        if (telegramData) {
+          setTelegramAnimationData(telegramData);
         }
       } catch (error) {
-        console.error('Failed to load rocket animation:', error);
+        console.error('Failed to load animations:', error);
       }
     };
-    loadAnimation();
+    loadAnimations();
   }, []);
   const goToDashboard = () => {
     navigate('/dashboard');
@@ -123,44 +161,68 @@ const HeroSection = () => {
 
         <div className="text-zinc-50 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-3">We have 3 AI agents (click to access via Telegram):</p>
-          <ul className="space-y-1 mb-4">
-            <li className="flex items-center gap-2">
-              <span className="text-xl">👔</span>
-              <span className="italic bg-gradient-to-r from-[#00D4FF] to-[#0099FF] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,212,255,0.8)]">Job Application Agent</span>
+          <ul className="space-y-2 mb-4 flex flex-col items-center">
+            <li>
               <a 
                 href="https://t.me/add_job_aspirelyai_bot" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 ml-2 hover:scale-105 transition-all duration-200 cursor-pointer hover:bg-white/10 px-2 py-1 rounded-lg"
+                className="flex items-center justify-center gap-2 hover:scale-105 transition-all duration-200 cursor-pointer hover:bg-white/10 px-3 py-2 rounded-lg"
               >
-                <span className="text-xs text-white/80">Launch in</span>
-                <img src="/lovable-uploads/305ebad6-e839-4a93-a08e-151b48e15858.png" alt="Telegram" className="w-4 h-4" />
+                <span className="text-xl">👔</span>
+                <span className="italic bg-gradient-to-r from-[#00D4FF] to-[#0099FF] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,212,255,0.8)]">Job Application Agent</span>
+                {telegramAnimationData && (
+                  <div className="w-5 h-5 ml-1">
+                    <Lottie 
+                      animationData={telegramAnimationData} 
+                      loop={true} 
+                      autoplay={true} 
+                      className="w-full h-full"
+                    />
+                  </div>
+                )}
               </a>
             </li>
-            <li className="flex items-center gap-2">
-              <span className="text-xl">🔔</span>
-              <span className="italic bg-gradient-to-r from-[#00FF88] to-[#00CC66] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,255,136,0.8)]">Job Alerts Agent</span>
+            <li>
               <a 
                 href="https://t.me/Job_AI_update_bot" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 ml-2 hover:scale-105 transition-all duration-200 cursor-pointer hover:bg-white/10 px-2 py-1 rounded-lg"
+                className="flex items-center justify-center gap-2 hover:scale-105 transition-all duration-200 cursor-pointer hover:bg-white/10 px-3 py-2 rounded-lg"
               >
-                <span className="text-xs text-white/80">Launch in</span>
-                <img src="/lovable-uploads/305ebad6-e839-4a93-a08e-151b48e15858.png" alt="Telegram" className="w-4 h-4" />
+                <span className="text-xl">🔔</span>
+                <span className="italic bg-gradient-to-r from-[#00FF88] to-[#00CC66] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,255,136,0.8)]">Job Alerts Agent</span>
+                {telegramAnimationData && (
+                  <div className="w-5 h-5 ml-1">
+                    <Lottie 
+                      animationData={telegramAnimationData} 
+                      loop={true} 
+                      autoplay={true} 
+                      className="w-full h-full"
+                    />
+                  </div>
+                )}
               </a>
             </li>
-            <li className="flex items-center gap-2">
-              <span className="text-xl">📝</span>
-              <span className="italic bg-gradient-to-r from-[#FF44FF] to-[#DD22DD] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(255,68,255,0.8)]">Resume Builder Agent</span>
+            <li>
               <a 
                 href="https://t.me/Resume_builder_AI_bot" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 ml-2 hover:scale-105 transition-all duration-200 cursor-pointer hover:bg-white/10 px-2 py-1 rounded-lg"
+                className="flex items-center justify-center gap-2 hover:scale-105 transition-all duration-200 cursor-pointer hover:bg-white/10 px-3 py-2 rounded-lg"
               >
-                <span className="text-xs text-white/80">Launch in</span>
-                <img src="/lovable-uploads/305ebad6-e839-4a93-a08e-151b48e15858.png" alt="Telegram" className="w-4 h-4" />
+                <span className="text-xl">📝</span>
+                <span className="italic bg-gradient-to-r from-[#FF44FF] to-[#DD22DD] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(255,68,255,0.8)]">Resume Builder Agent</span>
+                {telegramAnimationData && (
+                  <div className="w-5 h-5 ml-1">
+                    <Lottie 
+                      animationData={telegramAnimationData} 
+                      loop={true} 
+                      autoplay={true} 
+                      className="w-full h-full"
+                    />
+                  </div>
+                )}
               </a>
             </li>
           </ul>
