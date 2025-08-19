@@ -170,9 +170,9 @@ const HeroSection = () => {
                   href="https://t.me/add_job_aspirelyai_bot" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="hover:scale-110 transition-all duration-200 cursor-pointer p-1 rounded-lg hover:bg-white/10 ml-1"
-                >
-                  <div className="w-5 h-5">
+                   className="hover:scale-110 transition-all duration-200 cursor-pointer p-0.5 rounded-lg hover:bg-white/10 ml-1"
+                 >
+                   <div className="w-12 h-12">
                     <Lottie 
                       animationData={telegramAnimationData} 
                       loop={true} 
@@ -191,9 +191,9 @@ const HeroSection = () => {
                   href="https://t.me/Job_AI_update_bot" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="hover:scale-110 transition-all duration-200 cursor-pointer p-1 rounded-lg hover:bg-white/10 ml-1"
-                >
-                  <div className="w-5 h-5">
+                   className="hover:scale-110 transition-all duration-200 cursor-pointer p-0.5 rounded-lg hover:bg-white/10 ml-1"
+                 >
+                   <div className="w-12 h-12">
                     <Lottie 
                       animationData={telegramAnimationData} 
                       loop={true} 
@@ -212,9 +212,9 @@ const HeroSection = () => {
                   href="https://t.me/Resume_builder_AI_bot" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="hover:scale-110 transition-all duration-200 cursor-pointer p-1 rounded-lg hover:bg-white/10 ml-1"
-                >
-                  <div className="w-5 h-5">
+                   className="hover:scale-110 transition-all duration-200 cursor-pointer p-0.5 rounded-lg hover:bg-white/10 ml-1"
+                 >
+                   <div className="w-12 h-12">
                     <Lottie 
                       animationData={telegramAnimationData} 
                       loop={true} 
