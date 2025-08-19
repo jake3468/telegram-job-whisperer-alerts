@@ -161,7 +161,7 @@ const HeroSection = () => {
 
         <div className="text-zinc-50 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-3">We have 3 AI agents (click to access via Telegram):</p>
-          <ul className="space-y-1 mb-4 flex flex-col items-center">
+          <ul className="space-y-0 mb-4 flex flex-col items-center">
             <li className="flex items-center justify-center gap-2">
               <span className="text-xl">👔</span>
               <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)]">Job Application Agent</span>
