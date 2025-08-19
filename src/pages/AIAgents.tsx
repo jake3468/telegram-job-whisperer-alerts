@@ -105,7 +105,10 @@ const AIAgents = () => {
                   After activating the Job Alerts AI Agent, click "Create Job Alerts" below to set your daily preferences.
                 </p>
                 <Button 
-                  onClick={() => navigate('/job-alerts')}
+                  onClick={() => {
+                    navigate('/job-alerts');
+                    window.scrollTo(0, 0);
+                  }}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 text-xs"
                 >
                   <CalendarPlus className="w-3 h-3" />
