@@ -172,7 +172,7 @@ const HeroSection = () => {
                   rel="noopener noreferrer"
                   className="hover:scale-110 transition-all duration-200 cursor-pointer p-1 rounded-lg hover:bg-white/10 ml-1"
                 >
-                  <div className="w-12 h-12">
+                  <div className="w-5 h-5">
                     <Lottie 
                       animationData={telegramAnimationData} 
                       loop={true} 
@@ -193,7 +193,7 @@ const HeroSection = () => {
                   rel="noopener noreferrer"
                   className="hover:scale-110 transition-all duration-200 cursor-pointer p-1 rounded-lg hover:bg-white/10 ml-1"
                 >
-                  <div className="w-12 h-12">
+                  <div className="w-5 h-5">
                     <Lottie 
                       animationData={telegramAnimationData} 
                       loop={true} 
@@ -214,7 +214,7 @@ const HeroSection = () => {
                   rel="noopener noreferrer"
                   className="hover:scale-110 transition-all duration-200 cursor-pointer p-1 rounded-lg hover:bg-white/10 ml-1"
                 >
-                  <div className="w-12 h-12">
+                  <div className="w-5 h-5">
                     <Lottie 
                       animationData={telegramAnimationData} 
                       loop={true} 
