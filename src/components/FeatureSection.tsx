@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { SignUpButton } from "@clerk/clerk-react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ExternalLink } from "lucide-react";
 import { logger } from "@/utils/logger";
 import { useCachedUserProfile } from "@/hooks/useCachedUserProfile";
 import { detectAndStoreLocation } from "@/utils/locationDetection";
@@ -109,8 +109,9 @@ const FeatureSection = ({
         </button> : buttonUrl ? <button 
           type="button" 
           onClick={handleButtonWithUrlClick}
-          className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
+          className="w-fit bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 flex-row transition-all duration-200 shadow-lg hover:shadow-xl"
         >
+          <ExternalLink className="w-4 h-4" />
           {buttonText}
           <ArrowRight className="w-4 h-4" />
         </button> : <SignUpButton mode="modal">
@@ -140,8 +141,9 @@ const FeatureSection = ({
         </button> : buttonUrl ? <button 
           type="button" 
           onClick={handleButtonWithUrlClick}
-          className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
+          className="w-fit bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 flex-row transition-all duration-200 shadow-lg hover:shadow-xl"
         >
+          <ExternalLink className="w-5 h-5" />
           {buttonText}
           <ArrowRight className="w-5 h-5" />
         </button> : <SignUpButton mode="modal">
@@ -220,8 +222,9 @@ const FeatureSection = ({
                   <button 
                     type="button" 
                     onClick={handleButtonWithUrlClick}
-                    className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200 flex items-center gap-2 justify-center"
                   >
+                    <ExternalLink className="w-3 h-3" />
                     {buttonText}
                   </button> :
                   <SignUpButton mode="modal">
