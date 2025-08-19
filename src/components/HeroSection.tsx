@@ -166,13 +166,13 @@ const HeroSection = () => {
               <span className="text-xl">👔</span>
               <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)]">Job Application Agent</span>
               {telegramAnimationData && (
-                <a 
+                  <a 
                   href="https://t.me/add_job_aspirelyai_bot" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                   className="hover:scale-110 transition-all duration-200 cursor-pointer rounded-lg hover:bg-white/10 ml-1"
+                   className="hover:scale-110 transition-all duration-200 cursor-pointer ml-1"
                  >
-                   <div className="w-16 h-16">
+                   <div className="w-8 h-8">
                     <Lottie 
                       animationData={telegramAnimationData} 
                       loop={true} 
@@ -187,13 +187,13 @@ const HeroSection = () => {
               <span className="text-xl">🔔</span>
               <span className="italic text-[#00FF85] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,255,133,0.8)]">Job Alerts Agent</span>
               {telegramAnimationData && (
-                <a 
+                  <a 
                   href="https://t.me/Job_AI_update_bot" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                   className="hover:scale-110 transition-all duration-200 cursor-pointer rounded-lg hover:bg-white/10 ml-1"
+                   className="hover:scale-110 transition-all duration-200 cursor-pointer ml-1"
                  >
-                   <div className="w-16 h-16">
+                   <div className="w-8 h-8">
                     <Lottie 
                       animationData={telegramAnimationData} 
                       loop={true} 
@@ -208,13 +208,13 @@ const HeroSection = () => {
               <span className="text-xl">📝</span>
               <span className="italic text-[#FF4FFF] drop-shadow-md [text-shadow:_0_0_10px_rgba(255,79,255,0.8)]">Resume Builder Agent</span>
               {telegramAnimationData && (
-                <a 
+                  <a 
                   href="https://t.me/Resume_builder_AI_bot" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                   className="hover:scale-110 transition-all duration-200 cursor-pointer rounded-lg hover:bg-white/10 ml-1"
+                   className="hover:scale-110 transition-all duration-200 cursor-pointer ml-1"
                  >
-                   <div className="w-16 h-16">
+                   <div className="w-8 h-8">
                     <Lottie 
                       animationData={telegramAnimationData} 
                       loop={true} 
