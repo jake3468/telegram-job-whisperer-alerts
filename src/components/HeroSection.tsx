@@ -81,15 +81,10 @@ const HeroSection = () => {
   useEffect(() => {
     const loadAnimations = async () => {
       try {
-        const [rocketData, telegramData] = await Promise.all([
-          rocketAnimationPromise,
-          telegramAnimationPromise
-        ]);
-        
+        const [rocketData, telegramData] = await Promise.all([rocketAnimationPromise, telegramAnimationPromise]);
         if (rocketData) {
           setLottieAnimationData(rocketData);
         }
-        
         if (telegramData) {
           setTelegramAnimationData(telegramData);
         }
@@ -105,19 +100,7 @@ const HeroSection = () => {
   return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-0 overflow-hidden bg-black">
       {/* Light rays background animation with responsive length for mobile */}
       <div className="absolute inset-0 z-0">
-        <LightRays
-          raysOrigin="top-center"
-          raysColor="#00ffff"
-          raysSpeed={1.5}
-          lightSpread={0.8}
-          rayLength={window.innerWidth < 768 ? 6.0 : 4.0}
-          fadeDistance={window.innerWidth < 768 ? 5.0 : 3.0}
-          followMouse={true}
-          mouseInfluence={0.1}
-          noiseAmount={0.1}
-          distortion={0.05}
-          className="w-full h-full"
-        />
+        <LightRays raysOrigin="top-center" raysColor="#00ffff" raysSpeed={1.5} lightSpread={0.8} rayLength={window.innerWidth < 768 ? 6.0 : 4.0} fadeDistance={window.innerWidth < 768 ? 5.0 : 3.0} followMouse={true} mouseInfluence={0.1} noiseAmount={0.1} distortion={0.05} className="w-full h-full" />
       </div>
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
@@ -125,7 +108,9 @@ const HeroSection = () => {
         {/* Trust Badge */}
         <div className="mb-3">
           <div className="inline-flex items-center px-1 py-0.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-[10px] font-medium">
-            <span className="text-transparent" style={{ color: 'initial' }}>🛡️</span>
+            <span className="text-transparent" style={{
+            color: 'initial'
+          }}>🛡️</span>
             <span className="text-white ml-1">Trusted by 1000+ Professionals</span>
           </div>
         </div>
@@ -139,15 +124,9 @@ const HeroSection = () => {
         {/* Lottie Animation */}
         {lottieAnimationData && <div className="flex justify-center mt-2 mb-4">
             <div className="relative w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64">
-              <Lottie 
-                animationData={lottieAnimationData} 
-                loop={true} 
-                autoplay={true} 
-                className="w-full h-full z-10 relative"
-                style={{
-                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
-                }} 
-              />
+              <Lottie animationData={lottieAnimationData} loop={true} autoplay={true} className="w-full h-full z-10 relative" style={{
+            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
+          }} />
             </div>
           </div>}
         
@@ -160,69 +139,42 @@ const HeroSection = () => {
         </div>
 
         <div className="text-zinc-50 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-3">Meet 3 AI Agents built to simplify your job hunting. Just click to start using them on Telegram :</p>
+          <p className="mb-3">Meet 3 AI Agents built to simplify your job hunting. Just click to start using them on Telegram 👇:</p>
           <ul className="space-y-0 mb-4 flex flex-col items-center -space-y-1">
             <li className="flex items-center justify-center gap-2">
-              <a 
-                href="https://t.me/add_job_aspirelyai_bot" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2"
-              >
+              <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2">
                 <span className="text-xl">👔</span>
                 <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)]">Job Application Agent</span>
-                {telegramAnimationData && (
-                  <div className="w-12 h-12 ml-1">
-                    <Lottie 
-                      animationData={telegramAnimationData} 
-                      loop={true} 
-                      autoplay={true}
-                      style={{ width: '100%', height: '100%' }}
-                    />
-                  </div>
-                )}
+                {telegramAnimationData && <div className="w-12 h-12 ml-1">
+                    <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} style={{
+                  width: '100%',
+                  height: '100%'
+                }} />
+                  </div>}
               </a>
             </li>
             <li className="flex items-center justify-center gap-2">
-              <a 
-                href="https://t.me/Job_AI_update_bot" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2"
-              >
+              <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2">
                 <span className="text-xl">🔔</span>
                 <span className="italic text-[#00FF85] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,255,133,0.8)]">Job Alerts Agent</span>
-                {telegramAnimationData && (
-                  <div className="w-12 h-12 ml-1">
-                    <Lottie 
-                      animationData={telegramAnimationData} 
-                      loop={true} 
-                      autoplay={true}
-                      style={{ width: '100%', height: '100%' }}
-                    />
-                  </div>
-                )}
+                {telegramAnimationData && <div className="w-12 h-12 ml-1">
+                    <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} style={{
+                  width: '100%',
+                  height: '100%'
+                }} />
+                  </div>}
               </a>
             </li>
             <li className="flex items-center justify-center gap-2">
-              <a 
-                href="https://t.me/Resume_builder_AI_bot" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2"
-              >
+              <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2">
                 <span className="text-xl">📝</span>
                 <span className="italic text-[#FF4FFF] drop-shadow-md [text-shadow:_0_0_10px_rgba(255,79,255,0.8)]">Resume Builder Agent</span>
-                {telegramAnimationData && (
-                  <div className="w-12 h-12 ml-1">
-                    <Lottie 
-                      animationData={telegramAnimationData} 
-                      loop={true} 
-                      autoplay={true}
-                      style={{ width: '100%', height: '100%' }}
-                    />
-                  </div>
-                )}
+                {telegramAnimationData && <div className="w-12 h-12 ml-1">
+                    <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} style={{
+                  width: '100%',
+                  height: '100%'
+                }} />
+                  </div>}
               </a>
             </li>
           </ul>
