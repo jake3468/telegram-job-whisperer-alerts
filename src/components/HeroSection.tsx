@@ -161,7 +161,7 @@ const HeroSection = () => {
 
         <div className="text-zinc-50 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-3">We have 3 AI agents (click to access via Telegram):</p>
-          <ul className="space-y-2 mb-4 flex flex-col items-center">
+          <ul className="space-y-0.5 mb-4 flex flex-col items-center">
             <li>
               <a 
                 href="https://t.me/add_job_aspirelyai_bot" 
@@ -170,9 +170,9 @@ const HeroSection = () => {
                 className="flex items-center justify-center gap-2 hover:scale-105 transition-all duration-200 cursor-pointer hover:bg-white/10 px-3 py-2 rounded-lg"
               >
                 <span className="text-xl">👔</span>
-                <span className="italic bg-gradient-to-r from-[#00D4FF] to-[#0099FF] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,212,255,0.8)]">Job Application Agent</span>
+                <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)]">Job Application Agent</span>
                 {telegramAnimationData && (
-                  <div className="w-5 h-5 ml-1">
+                  <div className="w-6 h-6 ml-1">
                     <Lottie 
                       animationData={telegramAnimationData} 
                       loop={true} 
@@ -191,9 +191,9 @@ const HeroSection = () => {
                 className="flex items-center justify-center gap-2 hover:scale-105 transition-all duration-200 cursor-pointer hover:bg-white/10 px-3 py-2 rounded-lg"
               >
                 <span className="text-xl">🔔</span>
-                <span className="italic bg-gradient-to-r from-[#00FF88] to-[#00CC66] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(0,255,136,0.8)]">Job Alerts Agent</span>
+                <span className="italic text-[#00FF85] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,255,133,0.8)]">Job Alerts Agent</span>
                 {telegramAnimationData && (
-                  <div className="w-5 h-5 ml-1">
+                  <div className="w-6 h-6 ml-1">
                     <Lottie 
                       animationData={telegramAnimationData} 
                       loop={true} 
@@ -212,9 +212,9 @@ const HeroSection = () => {
                 className="flex items-center justify-center gap-2 hover:scale-105 transition-all duration-200 cursor-pointer hover:bg-white/10 px-3 py-2 rounded-lg"
               >
                 <span className="text-xl">📝</span>
-                <span className="italic bg-gradient-to-r from-[#FF44FF] to-[#DD22DD] bg-clip-text text-transparent drop-shadow-md [text-shadow:_0_0_10px_rgba(255,68,255,0.8)]">Resume Builder Agent</span>
+                <span className="italic text-[#FF4FFF] drop-shadow-md [text-shadow:_0_0_10px_rgba(255,79,255,0.8)]">Resume Builder Agent</span>
                 {telegramAnimationData && (
-                  <div className="w-5 h-5 ml-1">
+                  <div className="w-6 h-6 ml-1">
                     <Lottie 
                       animationData={telegramAnimationData} 
                       loop={true} 
