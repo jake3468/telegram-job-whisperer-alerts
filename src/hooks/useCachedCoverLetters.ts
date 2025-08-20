@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserProfile } from './useUserProfile';
 import { logger } from '@/utils/logger';
+import { safeLocalStorage } from '@/utils/safeStorage';
 
 interface CoverLetterData {
   id: string;
@@ -32,7 +33,7 @@ export const useCachedCoverLetters = () => {
   // Load cached data immediately on mount
   useEffect(() => {
     try {
-      const cached = localStorage.getItem(CACHE_KEY);
+      const cached = safeLocalStorage.getItem(CACHE_KEY);
       if (cached) {
         const parsedCache: CachedCoverLetterData = JSON.parse(cached);
         const now = Date.now();
@@ -43,12 +44,12 @@ export const useCachedCoverLetters = () => {
           setIsShowingCachedData(true);
         } else {
           // Remove expired cache
-          localStorage.removeItem(CACHE_KEY);
+          safeLocalStorage.removeItem(CACHE_KEY);
         }
       }
     } catch (error) {
       logger.warn('Failed to load cached cover letters data:', error);
-      localStorage.removeItem(CACHE_KEY);
+      safeLocalStorage.removeItem(CACHE_KEY);
     }
   }, []);
 
@@ -100,7 +101,7 @@ export const useCachedCoverLetters = () => {
       };
 
       try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+        safeLocalStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
         setCachedData(freshData);
         setIsShowingCachedData(false);
       } catch (error) {
