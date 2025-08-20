@@ -3,23 +3,34 @@ import { createRoot } from 'react-dom/client'
 import { ClerkProvider } from '@clerk/clerk-react'
 import App from './App.tsx'
 import './index.css'
+import { ClerkErrorBoundary } from './components/ClerkErrorBoundary'
 
 // Temporarily disable security headers for debugging
 // import { securityHeaders } from '@/utils/securityHeaders'
 // securityHeaders.setSecurityHeaders();
 
 // Environment detection
-const isProduction = window.location.hostname === 'aspirely.ai';
+const isProduction = window.location.hostname === 'aspirely.ai' || window.location.hostname === 'www.aspirely.ai';
 const isLovablePreview = window.location.hostname.includes('lovable.app');
 
 // Select the appropriate Clerk key based on environment
 const getClerkPublishableKey = () => {
+  console.log('[CLERK DEBUG] Environment detection:', {
+    hostname: window.location.hostname,
+    isProduction,
+    isLovablePreview
+  });
+  
   if (isProduction) {
-    // Production key for aspirely.ai domain
-    return import.meta.env.VITE_CLERK_PUBLISHABLE_KEY_PROD || "pk_live_Y2xlcmsuYXNwaXJlbHkuYWkk";
+    // Production key for aspirely.ai and www.aspirely.ai domains
+    const key = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY_PROD || "pk_live_Y2xlcmsuYXNwaXJlbHkuYWkk";
+    console.log('[CLERK DEBUG] Using production key:', key.substring(0, 20) + '...');
+    return key;
   } else {
     // Development key for Lovable preview and localhost
-    return import.meta.env.VITE_CLERK_PUBLISHABLE_KEY_DEV || "pk_test_bmF0dXJhbC1lZWwtNDcuY2xlcmsuYWNjb3VudHMuZGV2JA";
+    const key = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY_DEV || "pk_test_bmF0dXJhbC1lZWwtNDcuY2xlcmsuYWNjb3VudHMuZGV2JA";
+    console.log('[CLERK DEBUG] Using development key:', key.substring(0, 20) + '...');
+    return key;
   }
 };
 
@@ -32,16 +43,18 @@ if (!PUBLISHABLE_KEY) {
 // Environment setup complete
 
 createRoot(document.getElementById("root")!).render(
-  <ClerkProvider 
-    publishableKey={PUBLISHABLE_KEY}
-    appearance={{
-      // Optimize for faster loading
-      layout: {
-        logoImageUrl: undefined, // Skip logo loading for faster init
-        showOptionalFields: false
-      }
-    }}
-  >
-    <App />
-  </ClerkProvider>
+  <ClerkErrorBoundary>
+    <ClerkProvider 
+      publishableKey={PUBLISHABLE_KEY}
+      appearance={{
+        // Optimize for faster loading
+        layout: {
+          logoImageUrl: undefined, // Skip logo loading for faster init
+          showOptionalFields: false
+        }
+      }}
+    >
+      <App />
+    </ClerkProvider>
+  </ClerkErrorBoundary>
 );

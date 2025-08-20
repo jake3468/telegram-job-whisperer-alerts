@@ -1,7 +1,7 @@
 
 // Environment detection utilities
 export const Environment = {
-  isProduction: () => window.location.hostname === 'aspirely.ai',
+  isProduction: () => window.location.hostname === 'aspirely.ai' || window.location.hostname === 'www.aspirely.ai',
   isLovablePreview: () => window.location.hostname.includes('lovable.app'),
   isDevelopment: () => window.location.hostname === 'localhost' || window.location.hostname.includes('127.0.0.1'),
   
