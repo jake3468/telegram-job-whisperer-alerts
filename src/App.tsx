@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import { useEnhancedTokenManagerIntegration } from "@/hooks/useEnhancedTokenManagerIntegration";
 import { useLocation } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { StorageErrorBoundary } from "@/components/StorageErrorBoundary";
 import Index from "./pages/Index";
 import JobGuide from "./pages/JobGuide";
 import CoverLetter from "./pages/CoverLetter";
@@ -123,17 +124,19 @@ const AppWithSync = () => {
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <HelmetProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AppWithSync />
-          </BrowserRouter>
-        </TooltipProvider>
-      </HelmetProvider>
-    </QueryClientProvider>
+    <StorageErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <HelmetProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AppWithSync />
+            </BrowserRouter>
+          </TooltipProvider>
+        </HelmetProvider>
+      </QueryClientProvider>
+    </StorageErrorBoundary>
   );
 };
 
