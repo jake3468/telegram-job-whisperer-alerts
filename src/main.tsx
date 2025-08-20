@@ -5,6 +5,7 @@ import App from './App.tsx'
 import './index.css'
 import { ClerkErrorBoundary } from './components/ClerkErrorBoundary'
 import { detectStorageCapabilities, getStorageErrorMessage } from './utils/storageDetection'
+import { CookieConsentBanner } from './components/CookieConsentBanner'
 
 // Temporarily disable security headers for debugging
 // import { securityHeaders } from '@/utils/securityHeaders'
@@ -64,6 +65,7 @@ createRoot(document.getElementById("root")!).render(
       }}
     >
       <App />
+      <CookieConsentBanner />
     </ClerkProvider>
   </ClerkErrorBoundary>
 );
