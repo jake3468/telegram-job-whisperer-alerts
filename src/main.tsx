@@ -65,7 +65,11 @@ createRoot(document.getElementById("root")!).render(
       }}
     >
       <App />
-      <CookieConsentBanner />
+        <CookieConsentBanner 
+          onAcceptAll={() => console.log('Accepted all cookies')}
+          onAcceptNecessary={() => console.log('Accepted necessary cookies only')}
+          onSavePreferences={(prefs) => console.log('Saved preferences:', prefs)}
+        />
     </ClerkProvider>
   </ClerkErrorBoundary>
 );

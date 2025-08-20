@@ -1,17 +1,21 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Cookie, Shield, AlertCircle } from 'lucide-react';
+import { Cookie, Shield, AlertCircle, Settings } from 'lucide-react';
 import { detectStorageCapabilities, getStorageErrorMessage, type StorageCapabilities } from '@/utils/storageDetection';
+import { CookiePreferencesModal } from './CookiePreferencesModal';
+import { CookiePreferences } from '@/types/cookieConsent';
 
 interface CookieConsentBannerProps {
-  onAccept?: () => void;
-  onDecline?: () => void;
+  onAcceptAll?: () => void;
+  onAcceptNecessary?: () => void;
+  onSavePreferences?: (preferences: CookiePreferences) => void;
 }
 
-export function CookieConsentBanner({ onAccept, onDecline }: CookieConsentBannerProps) {
+export function CookieConsentBanner({ onAcceptAll, onAcceptNecessary, onSavePreferences }: CookieConsentBannerProps) {
   const [storageCapabilities, setStorageCapabilities] = useState<StorageCapabilities | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [showPreferences, setShowPreferences] = useState(false);
 
   useEffect(() => {
     // Check if user has already given consent
@@ -30,20 +34,23 @@ export function CookieConsentBanner({ onAccept, onDecline }: CookieConsentBanner
     return () => clearTimeout(timer);
   }, []);
 
-  const handleAccept = () => {
-    try {
-      localStorage.setItem('cookie-consent', 'accepted');
-    } catch (e) {
-      // If localStorage fails, at least hide the banner
-      console.warn('Could not save consent preference');
-    }
+  const handleAcceptAll = () => {
     setIsVisible(false);
-    onAccept?.();
+    onAcceptAll?.();
   };
 
-  const handleDecline = () => {
+  const handleAcceptNecessary = () => {
     setIsVisible(false);
-    onDecline?.();
+    onAcceptNecessary?.();
+  };
+
+  const handleManagePreferences = () => {
+    setShowPreferences(true);
+  };
+
+  const handleSavePreferences = (preferences: CookiePreferences) => {
+    setIsVisible(false);
+    onSavePreferences?.(preferences);
   };
 
   const hasStorageIssues = storageCapabilities && 
@@ -100,20 +107,35 @@ export function CookieConsentBanner({ onAccept, onDecline }: CookieConsentBanner
               <span>Required for authentication</span>
             </div>
 
-            <div className="flex gap-3 flex-wrap">
-              <Button onClick={handleAccept} size="sm" className="flex-1 sm:flex-none">
-                {hasStorageIssues ? 'I understand' : 'Accept & Continue'}
-              </Button>
-              
-              {!hasStorageIssues && (
-                <Button onClick={handleDecline} variant="outline" size="sm">
-                  Decline
+            <div className="flex gap-2 flex-wrap">
+              {hasStorageIssues ? (
+                <Button onClick={handleAcceptNecessary} size="sm" className="flex-1">
+                  I understand
                 </Button>
+              ) : (
+                <>
+                  <Button onClick={handleAcceptAll} size="sm" className="flex-1 sm:flex-none">
+                    Accept All
+                  </Button>
+                  <Button onClick={handleAcceptNecessary} variant="outline" size="sm" className="flex-1 sm:flex-none">
+                    Only Necessary
+                  </Button>
+                  <Button onClick={handleManagePreferences} variant="ghost" size="sm" className="flex items-center gap-1">
+                    <Settings className="w-3 h-3" />
+                    Manage
+                  </Button>
+                </>
               )}
             </div>
           </div>
         </div>
       </Card>
+      
+      <CookiePreferencesModal
+        isOpen={showPreferences}
+        onClose={() => setShowPreferences(false)}
+        onSave={handleSavePreferences}
+      />
     </div>
   );
 }
