@@ -4,6 +4,7 @@ import { ClerkProvider } from '@clerk/clerk-react'
 import App from './App.tsx'
 import './index.css'
 import { ClerkErrorBoundary } from './components/ClerkErrorBoundary'
+import { detectStorageCapabilities, getStorageErrorMessage } from './utils/storageDetection'
 
 // Temporarily disable security headers for debugging
 // import { securityHeaders } from '@/utils/securityHeaders'
@@ -38,6 +39,14 @@ const PUBLISHABLE_KEY = getClerkPublishableKey();
 
 if (!PUBLISHABLE_KEY) {
   throw new Error("Missing Clerk Publishable Key");
+}
+
+// Check storage capabilities
+const storageCapabilities = detectStorageCapabilities();
+console.log('[STORAGE] Capabilities detected:', storageCapabilities);
+
+if (!storageCapabilities.localStorage && !storageCapabilities.sessionStorage) {
+  console.error('[STORAGE] Critical storage unavailable:', getStorageErrorMessage(storageCapabilities));
 }
 
 // Environment setup complete

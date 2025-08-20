@@ -9,9 +9,12 @@ class ContentSecurityPolicyManager {
       'default-src': ["'self'"],
       'script-src': [
         "'self'",
+        "'unsafe-inline'", // Required for Clerk's inline scripts
         ...(isProduction ? [] : ["'unsafe-eval'"]), // Remove unsafe-eval in production
         'https://clerk.aspirely.ai',
         'https://*.clerk.accounts.dev',
+        'https://clerk.com',
+        'https://*.clerk.com',
         'https://*.googletagmanager.com',
         'https://js.stripe.com',
         'https://challenges.cloudflare.com', // Cloudflare Turnstile
@@ -40,9 +43,13 @@ class ContentSecurityPolicyManager {
         'https://ipwhois.app',
         'https://clerk.aspirely.ai',
         'https://*.clerk.accounts.dev',
+        'https://clerk.com',
+        'https://*.clerk.com',
         'https://api.stripe.com',
         'https://challenges.cloudflare.com', // Cloudflare Turnstile API
-        'https://*.hcaptcha.com' // Fallback CAPTCHA provider
+        'https://*.hcaptcha.com', // Fallback CAPTCHA provider
+        'wss://clerk.aspirely.ai',
+        'wss://*.clerk.accounts.dev'
       ],
       'frame-src': [
         "'self'",
