@@ -26,6 +26,20 @@ export class ClerkErrorBoundary extends Component<Props, State> {
     console.error('[CLERK ERROR BOUNDARY] Error details:', { error, errorInfo });
   }
 
+  private getErrorMessage(): string {
+    const errorMessage = this.state.error?.message || '';
+    
+    if (errorMessage.includes('sessionStorage') || errorMessage.includes('localStorage')) {
+      return 'Your browser is blocking storage access. This might happen in private/incognito mode or with strict privacy settings. Please try refreshing or using a regular browser window.';
+    }
+    
+    if (errorMessage.includes('Access is denied')) {
+      return 'Browser security settings are preventing authentication. Please check your privacy settings or try a different browser.';
+    }
+    
+    return 'We\'re having trouble loading the authentication system. This might be a temporary issue.';
+  }
+
   render() {
     if (this.state.hasError) {
       return (
@@ -34,7 +48,7 @@ export class ClerkErrorBoundary extends Component<Props, State> {
             <AlertTriangle className="w-12 h-12 text-destructive mx-auto mb-4" />
             <h1 className="text-2xl font-bold mb-2">Authentication Error</h1>
             <p className="text-muted-foreground mb-6">
-              We're having trouble loading the authentication system. This might be a temporary issue.
+              {this.getErrorMessage()}
             </p>
             <div className="space-y-4">
               <Button 
