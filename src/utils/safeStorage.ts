@@ -41,8 +41,10 @@ const memorySessionStorage = new MemoryStorage();
 let localStorageAvailable = false;
 let sessionStorageAvailable = false;
 
-// Test storage availability without throwing errors
+// Test storage availability lazily when first accessed
 const testStorageAvailability = () => {
+  if (localStorageAvailable || sessionStorageAvailable) return; // Already tested
+  
   try {
     const testKey = '__storage_test__';
     localStorage.setItem(testKey, 'test');
@@ -62,14 +64,12 @@ const testStorageAvailability = () => {
   }
 };
 
-// Test availability once
-testStorageAvailability();
-
 /**
  * Safe localStorage wrapper with memory fallback
  */
 export const safeLocalStorage = {
   getItem: (key: string): string | null => {
+    testStorageAvailability(); // Test only when needed
     try {
       if (localStorageAvailable) {
         return localStorage.getItem(key);
@@ -81,6 +81,7 @@ export const safeLocalStorage = {
   },
 
   setItem: (key: string, value: string): void => {
+    testStorageAvailability(); // Test only when needed
     try {
       if (localStorageAvailable) {
         localStorage.setItem(key, value);
@@ -122,6 +123,7 @@ export const safeLocalStorage = {
  */
 export const safeSessionStorage = {
   getItem: (key: string): string | null => {
+    testStorageAvailability(); // Test only when needed
     try {
       if (sessionStorageAvailable) {
         return sessionStorage.getItem(key);
@@ -133,6 +135,7 @@ export const safeSessionStorage = {
   },
 
   setItem: (key: string, value: string): void => {
+    testStorageAvailability(); // Test only when needed
     try {
       if (sessionStorageAvailable) {
         sessionStorage.setItem(key, value);

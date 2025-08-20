@@ -24,7 +24,7 @@ export class StorageErrorBoundary extends React.Component<
   }
 
   static getDerivedStateFromError(error: Error): StorageErrorBoundaryState {
-    // Check if this is a storage-related error
+    // For storage errors, we silently continue with memory-only mode
     const isStorageError = 
       error.message.includes('Access denied') ||
       error.message.includes('localStorage') ||
@@ -34,7 +34,9 @@ export class StorageErrorBoundary extends React.Component<
       error.name === 'DOMException';
 
     if (isStorageError) {
-      return { hasError: true, error };
+      // Log the error but don't show error UI - just continue silently
+      console.warn('Storage not available, continuing with memory-only mode:', error.message);
+      return { hasError: false }; // Don't show error UI
     }
 
     // Re-throw non-storage errors
