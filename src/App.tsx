@@ -57,8 +57,8 @@ const LoadingScreen = () => (
   </div>
 );
 
-// Component to initialize Clerk-Supabase sync
-const AppWithSync = () => {
+// Component for authenticated routes that need Clerk sync
+const AuthenticatedApp = () => {
   const { isLoaded, isSignedIn } = useAuth();
   const location = useLocation();
   
@@ -73,23 +73,38 @@ const AppWithSync = () => {
     enabled: shouldUseEnterpriseFeatures && isLoaded && isSignedIn
   });
   
-  // Hide initial loader once React is ready
-  useEffect(() => {
-    if (isLoaded) {
-      // Small delay to ensure smooth transition
-      setTimeout(() => {
-        hideInitialLoader();
-      }, 100);
-    }
-  }, [isLoaded, isSignedIn]);
-  
-  // Show loading screen only while Clerk auth is loading
+  // Show loading screen only while Clerk auth is loading for protected routes
   if (!isLoaded) {
     return <LoadingScreen />;
   }
   
+  return null; // This component just handles auth sync
+};
+
+// Main app component that renders immediately
+const AppWithRoutes = () => {
+  const location = useLocation();
+  
+  // Check if current route is public (doesn't need authentication)
+  const publicRoutes = ['/', '/blogs', '/blog/', '/privacy-policy', '/terms-of-service', '/contact-support'];
+  const isPublicRoute = publicRoutes.some(route => 
+    location.pathname === route || location.pathname.startsWith(route)
+  );
+  
+  // Hide initial loader immediately for public routes
+  useEffect(() => {
+    if (isPublicRoute) {
+      setTimeout(() => {
+        hideInitialLoader();
+      }, 50);
+    }
+  }, [isPublicRoute]);
+  
   return (
     <>
+      {/* Only initialize auth sync for protected routes */}
+      {!isPublicRoute && <AuthenticatedApp />}
+      
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Index />} />
@@ -131,7 +146,7 @@ const App = () => {
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <AppWithSync />
+              <AppWithRoutes />
             </BrowserRouter>
           </TooltipProvider>
         </HelmetProvider>
