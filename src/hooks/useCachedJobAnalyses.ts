@@ -28,7 +28,7 @@ export const useCachedJobAnalyses = () => {
   const { user } = useUser();
   const [data, setData] = useState<JobAnalysisData[]>([]);
   const [userProfileId, setUserProfileId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [connectionIssue, setConnectionIssue] = useState(false);
 
@@ -44,7 +44,7 @@ export const useCachedJobAnalyses = () => {
         if (now - parsedCache.timestamp < CACHE_DURATION) {
           setData(parsedCache.data);
           setUserProfileId(parsedCache.userProfileId);
-          setIsLoading(false);
+          setLoading(false);
         } else {
           localStorage.removeItem(CACHE_KEY);
         }
@@ -58,7 +58,7 @@ export const useCachedJobAnalyses = () => {
   // Fetch fresh data only when user changes or when explicitly requested
   useEffect(() => {
     if (!user) {
-      setIsLoading(false);
+      setLoading(false);
       return;
     }
     
@@ -67,7 +67,7 @@ export const useCachedJobAnalyses = () => {
     if (shouldFetch) {
       fetchJobAnalysesData();
     } else {
-      setIsLoading(false);
+      setLoading(false);
     }
   }, [user?.id]);
 
@@ -146,7 +146,7 @@ export const useCachedJobAnalyses = () => {
         setError(error.message);
       }
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -164,13 +164,11 @@ export const useCachedJobAnalyses = () => {
   return {
     data,
     userProfileId,
-    isLoading,
+    loading,
     error,
     connectionIssue,
     refetch: fetchJobAnalysesData,
     invalidateCache,
-    forceRefresh,
-    hasCache: data.length > 0,
-    isShowingCachedData: false
+    forceRefresh
   };
 };

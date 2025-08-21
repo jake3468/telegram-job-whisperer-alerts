@@ -68,8 +68,7 @@ const JobGuide = () => {
   // Use cached job analyses hook for instant data display
   const {
     data: jobAnalysisHistory,
-    isLoading: historyLoading,
-    isShowingCachedData,
+    loading: historyLoading,
     connectionIssue,
     refetch: refetchHistory
   } = useCachedJobAnalyses();

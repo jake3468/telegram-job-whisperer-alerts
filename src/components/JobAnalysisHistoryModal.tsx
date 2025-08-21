@@ -34,16 +34,14 @@ const JobAnalysisHistoryModal = ({
   const {
     toast
   } = useToast();
-  const { data: historyData, isLoading, connectionIssue, forceRefresh } = useCachedJobAnalyses();
+  const { data: historyData, loading, connectionIssue, forceRefresh } = useCachedJobAnalyses();
   const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
   const [selectedItem, setSelectedItem] = useState<JobAnalysisItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
 
-  const handleRetryLoading = async () => {
-    if (forceRefresh) {
-      await forceRefresh();
-    }
+  const handleRetryLoading = () => {
+    forceRefresh();
   };
   const handleCopyResult = async (item: JobAnalysisItem) => {
     const result = item.job_match;
@@ -211,22 +209,9 @@ const JobAnalysisHistoryModal = ({
               <History className="w-4 h-4 sm:w-5 sm:h-5" />
               Job Analysis History
             </DialogTitle>
-            <div className="flex items-center gap-2">
-              {connectionIssue && (
-                <Button 
-                  onClick={() => window.location.reload()} 
-                  variant="outline" 
-                  size="sm" 
-                  className="border-orange-400/30 bg-orange-100/10 text-orange-600 hover:bg-orange-200/20" 
-                  title="Connection issue detected. Click to refresh the page."
-                >
-                  <RefreshCw className="w-4 h-4" />
-                </Button>
-              )}
-              <Button onClick={onClose} size="sm" variant="ghost" className="text-white/70 hover:text-white h-8 w-8 p-0 hover:bg-white/10">
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
+            <Button onClick={onClose} size="sm" variant="ghost" className="text-white/70 hover:text-white h-8 w-8 p-0 hover:bg-white/10">
+              <X className="w-4 h-4" />
+            </Button>
           </div>
           <DialogDescription className="text-white/70 font-inter text-xs sm:text-sm">
             Your history is automatically deleted after 60 days. Found {historyData.length} items.
@@ -243,7 +228,7 @@ const JobAnalysisHistoryModal = ({
         </div>
 
         <div className="flex-1 overflow-y-auto min-h-0">
-          {isLoading ? <div className="flex items-center justify-center py-8">
+          {loading ? <div className="flex items-center justify-center py-8">
               <div className="text-white/70 text-sm flex items-center gap-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white/70"></div>
                 Loading history...
