@@ -72,6 +72,7 @@ export const useCachedJobAnalyses = () => {
   }, [user?.id]);
 
   const fetchJobAnalysesData = async (showErrors = false) => {
+    console.log('📡 [Job Analysis] fetchJobAnalysesData called with showErrors:', showErrors);
     if (!user) return;
     
     try {
@@ -156,8 +157,10 @@ export const useCachedJobAnalyses = () => {
   };
 
   const forceRefresh = () => {
+    console.log('🔄 [Job Analysis] Force refresh called');
     setError(null);
     setConnectionIssue(false);
+    setLoading(true);
     fetchJobAnalysesData(true);
   };
 
