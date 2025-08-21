@@ -41,7 +41,6 @@ const JobAnalysisHistoryModal = ({
   const [retryCount, setRetryCount] = useState(0);
 
   const handleRetryLoading = () => {
-    console.log('🔄 [Job Analysis Modal] Retry loading clicked, calling forceRefresh');
     forceRefresh();
   };
   const handleCopyResult = async (item: JobAnalysisItem) => {
