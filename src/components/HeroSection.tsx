@@ -139,7 +139,7 @@ const HeroSection = () => {
         </div>
 
         <div className="text-zinc-50 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-3">Meet 3 AI Agents built to simplify your job hunting. Just click to start using them on Telegram 👇:</p>
+          <p className="mb-3">3 AI Agents built to simplify your job hunting. Just click to start using them on Telegram 👇:</p>
           <ul className="space-y-0 mb-4 flex flex-col items-center -space-y-1">
             <li className="flex items-center justify-center gap-2">
               <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2">
