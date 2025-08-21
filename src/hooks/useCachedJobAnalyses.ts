@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/client';
 import { useUserProfile } from './useUserProfile';
 import { logger } from '@/utils/logger';
@@ -26,6 +26,7 @@ const CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours
 
 export const useCachedJobAnalyses = () => {
   const { userProfile } = useUserProfile();
+  const queryClient = useQueryClient();
   const [cachedData, setCachedData] = useState<JobAnalysisData[]>([]);
   const [isShowingCachedData, setIsShowingCachedData] = useState(false);
   const [connectionIssue, setConnectionIssue] = useState(false);
@@ -115,6 +116,27 @@ export const useCachedJobAnalyses = () => {
     }
   }, [freshData, isFreshLoading]);
 
+  // Force refresh function that invalidates cache and forces fresh fetch
+  const forceRefresh = async () => {
+    try {
+      // Clear localStorage cache
+      localStorage.removeItem(CACHE_KEY);
+      setCachedData([]);
+      setIsShowingCachedData(false);
+      
+      // Invalidate React Query cache
+      await queryClient.invalidateQueries({
+        queryKey: ['job-analyses-history', userProfile?.id]
+      });
+      
+      // Force refetch
+      return await refetch();
+    } catch (error) {
+      logger.warn('Failed to force refresh job analyses:', error);
+      throw error;
+    }
+  };
+
   // Return cached data immediately, fresh data loads in background
   const data = freshData || cachedData;
   const isLoading = isFreshLoading && !cachedData.length;
@@ -126,6 +148,7 @@ export const useCachedJobAnalyses = () => {
     connectionIssue,
     error,
     refetch,
+    forceRefresh,
     hasCache: cachedData.length > 0
   };
 };

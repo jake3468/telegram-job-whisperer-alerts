@@ -34,14 +34,24 @@ const JobAnalysisHistoryModal = ({
   const {
     toast
   } = useToast();
-  const { data: historyData, isLoading, connectionIssue, refetch } = useCachedJobAnalyses();
+  const { data: historyData, isLoading, connectionIssue, refetch, forceRefresh } = useCachedJobAnalyses();
   const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
   const [selectedItem, setSelectedItem] = useState<JobAnalysisItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
 
-  const handleRefresh = () => {
-    refetch();
+  const handleRetryLoading = async () => {
+    try {
+      await forceRefresh();
+      setRetryCount(prev => prev + 1);
+    } catch (error) {
+      console.error('Failed to retry loading:', error);
+      toast({
+        title: "Error",
+        description: "Failed to reload data. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
   const handleCopyResult = async (item: JobAnalysisItem) => {
     const result = item.job_match;
@@ -89,7 +99,7 @@ const JobAnalysisHistoryModal = ({
       
       
       // Refresh the data after deletion
-      refetch();
+      await forceRefresh();
       toast({
         title: "Deleted",
         description: "Job analysis deleted successfully."
@@ -250,7 +260,7 @@ const JobAnalysisHistoryModal = ({
               <div className="text-white/70 text-center">
                 <History className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No job analyses found.</p>
-                <Button onClick={handleRefresh} size="sm" className="mt-2 bg-blue-600 hover:bg-blue-700">
+                <Button onClick={handleRetryLoading} size="sm" className="mt-2 bg-blue-600 hover:bg-blue-700">
                   Retry Loading
                 </Button>
               </div>
