@@ -41,11 +41,14 @@ const JobAnalysisHistoryModal = ({
   const [retryCount, setRetryCount] = useState(0);
 
   const handleRetryLoading = async () => {
+    console.log('🔄 [Job Analyses Modal] Retry loading button clicked');
     try {
+      console.log('📡 [Job Analyses Modal] Calling forceRefresh...');
       await forceRefresh();
       setRetryCount(prev => prev + 1);
+      console.log('✅ [Job Analyses Modal] Retry loading completed successfully');
     } catch (error) {
-      console.error('Failed to retry loading:', error);
+      console.error('❌ [Job Analyses Modal] Failed to retry loading:', error);
       toast({
         title: "Error",
         description: "Failed to reload data. Please try again.",

@@ -63,9 +63,14 @@ export const useCachedJobAnalyses = () => {
   } = useQuery({
     queryKey: ['job-analyses-history', userProfile?.id],
     queryFn: async () => {
-      if (!userProfile?.id) return [];
+      console.log('🔍 [Job Analyses] Starting fetch with userProfile:', userProfile);
+      if (!userProfile?.id) {
+        console.log('❌ [Job Analyses] No user profile ID found');
+        return [];
+      }
       
       try {
+        console.log('📡 [Job Analyses] Making authenticated request for user:', userProfile.id);
         const { data, error } = await makeAuthenticatedRequest(async () => {
           return await supabase
             .from('job_analyses')
@@ -74,14 +79,17 @@ export const useCachedJobAnalyses = () => {
             .order('created_at', { ascending: false });
         }, { operationType: 'fetch job analyses' });
 
+        console.log('📊 [Job Analyses] Query result - data:', data, 'error:', error);
+
         if (error) {
-          console.error('Error fetching job analyses history:', error);
+          console.error('❌ [Job Analyses] Error fetching job analyses history:', error);
           return [];
         }
 
+        console.log('✅ [Job Analyses] Successfully fetched', data?.length || 0, 'job analyses');
         return data as JobAnalysisData[];
       } catch (err) {
-        console.error('Exception fetching job analyses history:', err);
+        console.error('💥 [Job Analyses] Exception fetching job analyses history:', err);
         return [];
       }
     },
@@ -118,20 +126,27 @@ export const useCachedJobAnalyses = () => {
 
   // Force refresh function that invalidates cache and forces fresh fetch
   const forceRefresh = async () => {
+    console.log('🔄 [Job Analyses] Force refresh initiated');
     try {
       // Clear localStorage cache
       localStorage.removeItem(CACHE_KEY);
       setCachedData([]);
       setIsShowingCachedData(false);
+      console.log('🗑️ [Job Analyses] Cache cleared');
       
       // Invalidate React Query cache
       await queryClient.invalidateQueries({
         queryKey: ['job-analyses-history', userProfile?.id]
       });
+      console.log('🔄 [Job Analyses] React Query cache invalidated');
       
       // Force refetch
-      return await refetch();
+      console.log('📡 [Job Analyses] Forcing refetch...');
+      const result = await refetch();
+      console.log('✅ [Job Analyses] Force refresh completed:', result);
+      return result;
     } catch (error) {
+      console.error('❌ [Job Analyses] Failed to force refresh job analyses:', error);
       logger.warn('Failed to force refresh job analyses:', error);
       throw error;
     }
