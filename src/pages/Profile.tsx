@@ -150,17 +150,26 @@ const Profile = () => {
       }
     }
   };
+  // Always render Layout, handle loading states within it
   if (!isLoaded || !user) {
-    return <div className="min-h-screen bg-gradient-to-br from-pastel-peach via-pastel-blue to-pastel-mint flex items-center justify-center">
-        <div className="text-fuchsia-900 text-xs">Loading user...</div>
-      </div>;
+    return (
+      <Layout>
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <div className="text-gray-300 text-sm">Loading user...</div>
+        </div>
+      </Layout>
+    );
   }
 
-  // Show loading while profile data is being fetched
+  // Show loading while profile data is being fetched - within Layout
   if (profileLoading && !userProfile) {
-    return <div className="min-h-screen bg-gradient-to-br from-pastel-peach via-pastel-blue to-pastel-mint flex items-center justify-center">
-        <div className="text-fuchsia-900 text-xs">Loading profile...</div>
-      </div>;
+    return (
+      <Layout>
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <div className="text-gray-300 text-sm">Loading profile...</div>
+        </div>
+      </Layout>
+    );
   }
 
   // Show wizard if profile setup not completed
