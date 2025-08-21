@@ -34,26 +34,15 @@ const JobAnalysisHistoryModal = ({
   const {
     toast
   } = useToast();
-  const { data: historyData, isLoading, connectionIssue, refetch, forceRefresh } = useCachedJobAnalyses();
+  const { data: historyData, isLoading, connectionIssue, forceRefresh } = useCachedJobAnalyses();
   const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
   const [selectedItem, setSelectedItem] = useState<JobAnalysisItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
 
   const handleRetryLoading = async () => {
-    console.log('🔄 [Job Analyses Modal] Retry loading button clicked');
-    try {
-      console.log('📡 [Job Analyses Modal] Calling forceRefresh...');
+    if (forceRefresh) {
       await forceRefresh();
-      setRetryCount(prev => prev + 1);
-      console.log('✅ [Job Analyses Modal] Retry loading completed successfully');
-    } catch (error) {
-      console.error('❌ [Job Analyses Modal] Failed to retry loading:', error);
-      toast({
-        title: "Error",
-        description: "Failed to reload data. Please try again.",
-        variant: "destructive"
-      });
     }
   };
   const handleCopyResult = async (item: JobAnalysisItem) => {
@@ -102,7 +91,7 @@ const JobAnalysisHistoryModal = ({
       
       
       // Refresh the data after deletion
-      await forceRefresh();
+      forceRefresh();
       toast({
         title: "Deleted",
         description: "Job analysis deleted successfully."

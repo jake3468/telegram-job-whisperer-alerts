@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/client';
-import { useUserProfile } from './useUserProfile';
+import { useUser } from '@clerk/clerk-react';
+import { makeAuthenticatedRequest } from '@/integrations/supabase/client';
 import { logger } from '@/utils/logger';
 
 interface JobAnalysisData {
@@ -18,17 +17,19 @@ interface JobAnalysisData {
 
 interface CachedJobAnalysisData {
   data: JobAnalysisData[];
+  userProfileId: string;
   timestamp: number;
 }
 
 const CACHE_KEY = 'aspirely_job_analyses_cache';
-const CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
 export const useCachedJobAnalyses = () => {
-  const { userProfile } = useUserProfile();
-  const queryClient = useQueryClient();
-  const [cachedData, setCachedData] = useState<JobAnalysisData[]>([]);
-  const [isShowingCachedData, setIsShowingCachedData] = useState(false);
+  const { user } = useUser();
+  const [data, setData] = useState<JobAnalysisData[]>([]);
+  const [userProfileId, setUserProfileId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [connectionIssue, setConnectionIssue] = useState(false);
 
   // Load cached data immediately on mount
@@ -41,10 +42,10 @@ export const useCachedJobAnalyses = () => {
         
         // Use cached data if it's less than cache duration old
         if (now - parsedCache.timestamp < CACHE_DURATION) {
-          setCachedData(parsedCache.data);
-          setIsShowingCachedData(true);
+          setData(parsedCache.data);
+          setUserProfileId(parsedCache.userProfileId);
+          setIsLoading(false); // Mark as loaded since we have cached data
         } else {
-          // Remove expired cache
           localStorage.removeItem(CACHE_KEY);
         }
       }
@@ -54,116 +55,123 @@ export const useCachedJobAnalyses = () => {
     }
   }, []);
 
-  // Fetch fresh data with React Query
-  const {
-    data: freshData,
-    isLoading: isFreshLoading,
-    error,
-    refetch
-  } = useQuery({
-    queryKey: ['job-analyses-history', userProfile?.id],
-    queryFn: async () => {
-      console.log('🔍 [Job Analyses] Starting fetch with userProfile:', userProfile);
-      if (!userProfile?.id) {
-        console.log('❌ [Job Analyses] No user profile ID found');
-        return [];
-      }
-      
-      try {
-        console.log('📡 [Job Analyses] Making authenticated request for user:', userProfile.id);
-        const { data, error } = await makeAuthenticatedRequest(async () => {
-          return await supabase
-            .from('job_analyses')
-            .select('*')
-            .eq('user_id', userProfile.id)
-            .order('created_at', { ascending: false });
-        }, { operationType: 'fetch job analyses' });
-
-        console.log('📊 [Job Analyses] Query result - data:', data, 'error:', error);
-
-        if (error) {
-          console.error('❌ [Job Analyses] Error fetching job analyses history:', error);
-          return [];
-        }
-
-        console.log('✅ [Job Analyses] Successfully fetched', data?.length || 0, 'job analyses');
-        return data as JobAnalysisData[];
-      } catch (err) {
-        console.error('💥 [Job Analyses] Exception fetching job analyses history:', err);
-        return [];
-      }
-    },
-    enabled: !!userProfile?.id,
-    staleTime: 30000, // Consider data fresh for 30 seconds
-    gcTime: CACHE_DURATION, // Keep in cache for 2 hours
-  });
-
-  // Connection issue handling
+  // Fetch fresh data only when user changes or when explicitly requested
   useEffect(() => {
-    setConnectionIssue(!!error && cachedData.length > 0);
-  }, [error, cachedData.length]);
-
-  // Update cache when fresh data arrives
-  useEffect(() => {
-    if (freshData && !isFreshLoading) {
-      const cacheData: CachedJobAnalysisData = {
-        data: freshData,
-        timestamp: Date.now()
-      };
-
-      try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-        setCachedData(freshData);
-        setIsShowingCachedData(false);
-      } catch (error) {
-        logger.warn('Failed to cache job analyses data:', error);
-        // Still update state even if caching fails
-        setCachedData(freshData);
-        setIsShowingCachedData(false);
-      }
+    if (!user) {
+      setIsLoading(false);
+      return;
     }
-  }, [freshData, isFreshLoading]);
+    
+    // Only fetch if we don't have cached data or user has changed
+    const shouldFetch = data.length === 0 && !error;
+    if (shouldFetch) {
+      fetchJobAnalysesData();
+    } else {
+      setIsLoading(false);
+    }
+  }, [user?.id]); // Only depend on user ID, not the entire user object
 
-  // Force refresh function that invalidates cache and forces fresh fetch
-  const forceRefresh = async () => {
-    console.log('🔄 [Job Analyses] Force refresh initiated');
+  const fetchJobAnalysesData = async (showErrors = false) => {
+    if (!user) return;
+    
     try {
-      // Clear localStorage cache
-      localStorage.removeItem(CACHE_KEY);
-      setCachedData([]);
-      setIsShowingCachedData(false);
-      console.log('🗑️ [Job Analyses] Cache cleared');
+      setError(null);
+      setConnectionIssue(false);
       
-      // Invalidate React Query cache
-      await queryClient.invalidateQueries({
-        queryKey: ['job-analyses-history', userProfile?.id]
+      // Get the user UUID from users table using clerk_id
+      const userResult = await makeAuthenticatedRequest(async () => {
+        const { supabase } = await import('@/integrations/supabase/client');
+        return await supabase
+          .from('users')
+          .select('id')
+          .eq('clerk_id', user.id)
+          .maybeSingle();
       });
-      console.log('🔄 [Job Analyses] React Query cache invalidated');
       
-      // Force refetch
-      console.log('📡 [Job Analyses] Forcing refetch...');
-      const result = await refetch();
-      console.log('✅ [Job Analyses] Force refresh completed:', result);
-      return result;
-    } catch (error) {
-      console.error('❌ [Job Analyses] Failed to force refresh job analyses:', error);
-      logger.warn('Failed to force refresh job analyses:', error);
-      throw error;
+      if (userResult.error || !userResult.data) {
+        throw new Error('Unable to load user data');
+      }
+
+      // Get user profile using the user UUID
+      const profileResult = await makeAuthenticatedRequest(async () => {
+        const { supabase } = await import('@/integrations/supabase/client');
+        return await supabase
+          .from('user_profile')
+          .select('id')
+          .eq('user_id', userResult.data.id)
+          .maybeSingle();
+      });
+      
+      if (profileResult.error || !profileResult.data) {
+        throw new Error('Unable to load user profile');
+      }
+
+      // Get job analyses for this user profile
+      const result = await makeAuthenticatedRequest(async () => {
+        const { supabase } = await import('@/integrations/supabase/client');
+        return await supabase
+          .from('job_analyses')
+          .select('*')
+          .eq('user_id', profileResult.data.id)
+          .order('created_at', { ascending: false });
+      });
+      
+      if (result.error) {
+        throw new Error('Unable to load job analyses');
+      }
+
+      const jobAnalysesData = result.data || [];
+      
+      // Update state
+      setData(jobAnalysesData);
+      setUserProfileId(profileResult.data.id);
+
+      // Cache the data
+      try {
+        const cacheData: CachedJobAnalysisData = {
+          data: jobAnalysesData,
+          userProfileId: profileResult.data.id,
+          timestamp: Date.now()
+        };
+        localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+      } catch (cacheError) {
+        logger.warn('Failed to cache job analyses data:', cacheError);
+      }
+
+    } catch (error: any) {
+      logger.error('Error fetching job analyses data:', error);
+      setConnectionIssue(true);
+      
+      if (showErrors) {
+        setError(error.message);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Return cached data immediately, fresh data loads in background
-  const data = freshData || cachedData;
-  const isLoading = isFreshLoading && !cachedData.length;
+  const invalidateCache = () => {
+    localStorage.removeItem(CACHE_KEY);
+    fetchJobAnalysesData();
+  };
+
+  const forceRefresh = () => {
+    // Force a full refresh with error showing
+    setError(null);
+    setConnectionIssue(false);
+    fetchJobAnalysesData(true);
+  };
 
   return {
     data,
+    userProfileId,
     isLoading,
-    isShowingCachedData: isShowingCachedData && !freshData,
-    connectionIssue,
     error,
-    refetch,
+    connectionIssue,
+    refetch: fetchJobAnalysesData,
+    invalidateCache,
     forceRefresh,
-    hasCache: cachedData.length > 0
+    hasCache: data.length > 0,
+    isShowingCachedData: false // Not needed in this pattern
   };
 };
