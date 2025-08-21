@@ -17,7 +17,7 @@ import ClerkJWTSetupGuide from '@/components/ClerkJWTSetupGuide';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
 import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
-import { useUserProfile } from '@/hooks/useUserProfile';
+import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 import { useToast } from '@/hooks/use-toast';
 const Profile = () => {
   const { user, isLoaded } = useUser();
@@ -28,11 +28,11 @@ const Profile = () => {
   const [showJWTSetupGuide, setShowJWTSetupGuide] = useState(false);
   const { showPopup, hidePopup, dontShowAgain } = useOnboardingPopup();
   const { updateActivity } = useFormTokenKeepAlive(true);
-  const { userProfile, updateUserProfile } = useUserProfile();
+  const { userProfile, updateUserProfile, loading: profileLoading, isReady } = useCachedUserProfile();
   const { toast } = useToast();
 
   // Check if we should show wizard or full profile
-  const shouldShowWizard = userProfile && !userProfile.profile_setup_completed;
+  const shouldShowWizard = !userProfile || userProfile.profile_setup_completed === false;
 
   // Connection and error state management
   const [connectionIssue, setConnectionIssue] = useState(false);
@@ -150,10 +150,26 @@ const Profile = () => {
       }
     }
   };
+  // Always render Layout, handle loading states within it
   if (!isLoaded || !user) {
-    return <div className="min-h-screen bg-gradient-to-br from-pastel-peach via-pastel-blue to-pastel-mint flex items-center justify-center">
-        <div className="text-fuchsia-900 text-xs">Loading user...</div>
-      </div>;
+    return (
+      <Layout>
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <div className="text-gray-300 text-sm">Loading user...</div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Show loading while profile data is being fetched - within Layout
+  if (profileLoading && !userProfile) {
+    return (
+      <Layout>
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <div className="text-gray-300 text-sm">Loading profile...</div>
+        </div>
+      </Layout>
+    );
   }
 
   // Show wizard if profile setup not completed

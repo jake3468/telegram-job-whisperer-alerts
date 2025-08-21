@@ -1,13 +1,12 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { safeSessionStorage } from '@/utils/safeStorage';
 
 const ComparisonSlider = () => {
   const isMobile = useIsMobile();
   
-  // Initialize slider position from safe sessionStorage or default
+  // Initialize slider position from sessionStorage or default
   const getInitialPosition = () => {
-    const saved = safeSessionStorage.getItem('sliderPosition');
+    const saved = sessionStorage.getItem('sliderPosition');
     if (saved) return parseFloat(saved);
     return isMobile ? 75 : 50;
   };
@@ -16,14 +15,14 @@ const ComparisonSlider = () => {
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Save slider position to safe sessionStorage whenever it changes
+  // Save slider position to sessionStorage whenever it changes
   React.useEffect(() => {
-    safeSessionStorage.setItem('sliderPosition', sliderPosition.toString());
+    sessionStorage.setItem('sliderPosition', sliderPosition.toString());
   }, [sliderPosition]);
 
   // Only update position for mobile/desktop change if user hasn't interacted yet
   React.useEffect(() => {
-    const hasUserInteracted = safeSessionStorage.getItem('sliderPosition');
+    const hasUserInteracted = sessionStorage.getItem('sliderPosition');
     if (!hasUserInteracted && !isDragging) {
       setSliderPosition(isMobile ? 75 : 50);
     }

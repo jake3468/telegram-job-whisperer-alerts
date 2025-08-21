@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useUserCredits } from './useUserCredits';
 import { logger } from '@/utils/logger';
-import { safeLocalStorage } from '@/utils/safeStorage';
 
 interface CachedCreditsData {
   current_balance: number;
@@ -26,10 +25,10 @@ export const useCachedUserCredits = () => {
     next_reset_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
   });
 
-  // Load cached data immediately on mount using safe storage
+  // Load cached data immediately on mount
   useEffect(() => {
     try {
-      const cached = safeLocalStorage.getItem(CACHE_KEY);
+      const cached = localStorage.getItem(CACHE_KEY);
       if (cached) {
         const parsedCache = JSON.parse(cached);
         const now = Date.now();
@@ -47,16 +46,16 @@ export const useCachedUserCredits = () => {
           setDisplayData(cachedDisplayData);
         } else {
           // Remove expired cache
-          safeLocalStorage.removeItem(CACHE_KEY);
+          localStorage.removeItem(CACHE_KEY);
         }
       }
     } catch (error) {
       logger.warn('Failed to load cached credits data:', error);
-      safeLocalStorage.removeItem(CACHE_KEY);
+      localStorage.removeItem(CACHE_KEY);
     }
   }, []);
 
-  // Update cache and display data when fresh data arrives using safe storage
+  // Update cache and display data when fresh data arrives
   useEffect(() => {
     if (freshData) {
       const cacheData: CachedCreditsData = {
@@ -69,7 +68,7 @@ export const useCachedUserCredits = () => {
       };
 
       try {
-        safeLocalStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+        localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
         setCachedData(cacheData);
         setDisplayData(freshData);
       } catch (error) {

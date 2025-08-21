@@ -11,7 +11,6 @@ import { useEffect } from "react";
 import { useEnhancedTokenManagerIntegration } from "@/hooks/useEnhancedTokenManagerIntegration";
 import { useLocation } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { StorageErrorBoundary } from "@/components/StorageErrorBoundary";
 import Index from "./pages/Index";
 import JobGuide from "./pages/JobGuide";
 import CoverLetter from "./pages/CoverLetter";
@@ -57,8 +56,8 @@ const LoadingScreen = () => (
   </div>
 );
 
-// Component for authenticated routes that need Clerk sync
-const AuthenticatedApp = () => {
+// Component to initialize Clerk-Supabase sync
+const AppWithSync = () => {
   const { isLoaded, isSignedIn } = useAuth();
   const location = useLocation();
   
@@ -73,38 +72,23 @@ const AuthenticatedApp = () => {
     enabled: shouldUseEnterpriseFeatures && isLoaded && isSignedIn
   });
   
-  // Show loading screen only while Clerk auth is loading for protected routes
+  // Hide initial loader once React is ready
+  useEffect(() => {
+    if (isLoaded) {
+      // Small delay to ensure smooth transition
+      setTimeout(() => {
+        hideInitialLoader();
+      }, 100);
+    }
+  }, [isLoaded, isSignedIn]);
+  
+  // Show loading screen only while Clerk auth is loading
   if (!isLoaded) {
     return <LoadingScreen />;
   }
   
-  return null; // This component just handles auth sync
-};
-
-// Main app component that renders immediately
-const AppWithRoutes = () => {
-  const location = useLocation();
-  
-  // Check if current route is public (doesn't need authentication)
-  const publicRoutes = ['/', '/blogs', '/blog/', '/privacy-policy', '/terms-of-service', '/contact-support'];
-  const isPublicRoute = publicRoutes.some(route => 
-    location.pathname === route || location.pathname.startsWith(route)
-  );
-  
-  // Hide initial loader immediately for public routes
-  useEffect(() => {
-    if (isPublicRoute) {
-      setTimeout(() => {
-        hideInitialLoader();
-      }, 50);
-    }
-  }, [isPublicRoute]);
-  
   return (
     <>
-      {/* Only initialize auth sync for protected routes */}
-      {!isPublicRoute && <AuthenticatedApp />}
-      
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Index />} />
@@ -139,19 +123,17 @@ const AppWithRoutes = () => {
 
 const App = () => {
   return (
-    <StorageErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <HelmetProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <AppWithRoutes />
-            </BrowserRouter>
-          </TooltipProvider>
-        </HelmetProvider>
-      </QueryClientProvider>
-    </StorageErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <HelmetProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AppWithSync />
+          </BrowserRouter>
+        </TooltipProvider>
+      </HelmetProvider>
+    </QueryClientProvider>
   );
 };
 

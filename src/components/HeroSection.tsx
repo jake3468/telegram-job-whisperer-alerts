@@ -4,38 +4,64 @@ import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import Lottie from 'lottie-react';
 import LightRays from './LightRays';
-import { safeLocalStorage } from '@/utils/safeStorage';
 
-// Animation URLs and cache keys
+// Preload rocket animation immediately when module loads
 const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json';
 const CACHE_KEY = 'rocket-animation-data-v1';
+
+// Preload telegram animation immediately when module loads
 const TELEGRAM_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations/telegram%20logo.json';
 const TELEGRAM_CACHE_KEY = 'telegram-animation-data-v1';
 
-// Safe animation loading function (no module-level storage access)
-const loadAnimationWithCache = async (url: string, cacheKey: string) => {
+// Start loading rocket animation data immediately
+const rocketAnimationPromise = (async () => {
   try {
-    // Check cache first using safe storage
-    const cachedData = safeLocalStorage.getItem(cacheKey);
+    // Check cache first
+    const cachedData = localStorage.getItem(CACHE_KEY);
     if (cachedData) {
       return JSON.parse(cachedData);
     }
 
     // Fetch with high priority
-    const response = await fetch(url, {
+    const response = await fetch(ROCKET_ANIMATION_URL, {
       cache: 'force-cache',
       priority: 'high'
     } as RequestInit);
     const animationData = await response.json();
 
-    // Cache for next time using safe storage
-    safeLocalStorage.setItem(cacheKey, JSON.stringify(animationData));
+    // Cache for next time
+    localStorage.setItem(CACHE_KEY, JSON.stringify(animationData));
     return animationData;
   } catch (error) {
-    console.error(`Failed to load animation from ${url}:`, error);
+    console.error('Failed to preload rocket animation:', error);
     return null;
   }
-};
+})();
+
+// Start loading telegram animation data immediately
+const telegramAnimationPromise = (async () => {
+  try {
+    // Check cache first
+    const cachedData = localStorage.getItem(TELEGRAM_CACHE_KEY);
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
+
+    // Fetch with high priority
+    const response = await fetch(TELEGRAM_ANIMATION_URL, {
+      cache: 'force-cache',
+      priority: 'high'
+    } as RequestInit);
+    const animationData = await response.json();
+
+    // Cache for next time
+    localStorage.setItem(TELEGRAM_CACHE_KEY, JSON.stringify(animationData));
+    return animationData;
+  } catch (error) {
+    console.error('Failed to preload telegram animation:', error);
+    return null;
+  }
+})();
 const HeroSection = () => {
   const navigate = useNavigate();
   const {
@@ -51,14 +77,11 @@ const HeroSection = () => {
     }
   }, [user, isLoaded, navigate]);
 
-  // Load Lottie animations safely without module-level storage access
+  // Load Lottie animations using preloaded promises
   useEffect(() => {
     const loadAnimations = async () => {
       try {
-        const [rocketData, telegramData] = await Promise.all([
-          loadAnimationWithCache(ROCKET_ANIMATION_URL, CACHE_KEY),
-          loadAnimationWithCache(TELEGRAM_ANIMATION_URL, TELEGRAM_CACHE_KEY)
-        ]);
+        const [rocketData, telegramData] = await Promise.all([rocketAnimationPromise, telegramAnimationPromise]);
         if (rocketData) {
           setLottieAnimationData(rocketData);
         }

@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/client';
 import { useUserProfile } from './useUserProfile';
 import { logger } from '@/utils/logger';
-import { safeLocalStorage } from '@/utils/safeStorage';
 
 interface CompanyRoleAnalysisData {
   id: string;
@@ -48,7 +47,7 @@ export const useCachedCompanyAnalyses = () => {
   // Load cached data immediately on mount
   useEffect(() => {
     try {
-      const cached = safeLocalStorage.getItem(CACHE_KEY);
+      const cached = localStorage.getItem(CACHE_KEY);
       if (cached) {
         const parsedCache: CachedCompanyAnalysisData = JSON.parse(cached);
         const now = Date.now();
@@ -59,12 +58,12 @@ export const useCachedCompanyAnalyses = () => {
           setIsShowingCachedData(true);
         } else {
           // Remove expired cache
-          safeLocalStorage.removeItem(CACHE_KEY);
+          localStorage.removeItem(CACHE_KEY);
         }
       }
     } catch (error) {
       logger.warn('Failed to load cached company analysis data:', error);
-      safeLocalStorage.removeItem(CACHE_KEY);
+      localStorage.removeItem(CACHE_KEY);
     }
   }, []);
 
@@ -123,7 +122,7 @@ export const useCachedCompanyAnalyses = () => {
       };
 
       try {
-        safeLocalStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+        localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
         setCachedData(freshData);
         setIsShowingCachedData(false);
       } catch (error) {
