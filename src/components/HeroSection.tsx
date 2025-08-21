@@ -139,7 +139,19 @@ const HeroSection = () => {
         </div>
 
         <div className="text-zinc-50 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-3">Meet 3 AI Agents built to simplify your job hunting. Just click to start using them on Telegram 👇:</p>
+          <p className="mb-4">AI that updates your resume, creates tailored cover letters for any job, prepares interview kits, and connects you with the right HR contacts. Everything you need, all in one place.</p>
+          
+          <SignedOut>
+            <div className="flex justify-center mb-6">
+              <SignUpButton mode="modal">
+                <button className="bg-white hover:bg-gray-100 text-black px-8 py-3 text-base sm:text-lg rounded-lg transition-all duration-300 font-inter font-semibold shadow-lg hover:shadow-gray-300/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-gray-400/50 mb-2 flex items-center gap-2 justify-center">
+                  🚀 Try for Free
+                </button>
+              </SignUpButton>
+            </div>
+          </SignedOut>
+
+          <p className="mb-3">After creating your account you'll unlock the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
           <ul className="space-y-0 mb-4 flex flex-col items-center -space-y-1">
             <li className="flex items-center justify-center gap-2">
               <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2">
@@ -180,18 +192,6 @@ const HeroSection = () => {
           </ul>
         </div>
         
-        <SignedOut>
-          <div className="flex justify-center">
-            <SignUpButton mode="modal">
-              <button className="bg-gradient-to-r from-purple-600 via-blue-600 to-purple-700 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-3 text-base sm:text-lg rounded-lg transition-all duration-300 font-inter font-semibold shadow-lg hover:shadow-purple-500/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-purple-400/50 mb-2 flex items-center gap-2 justify-center">
-                ✨ Try for Free
-              </button>
-            </SignUpButton>
-          </div>
-          <p className="text-white/80 text-sm font-medium mt-2 mb-0 font-sans">
-            It's 100% free to start. No credit card required!
-          </p>
-        </SignedOut>
         <SignedIn>
           <button onClick={goToDashboard} className="bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-600 hover:from-sky-600 hover:to-blue-700 text-white px-12 py-4 text-lg sm:text-xl rounded-xl transition-all duration-300 font-inter font-bold shadow-2xl drop-shadow-xl hover:shadow-sky-500/60 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-sky-400/50 mb-2">
             Go to Dashboard
