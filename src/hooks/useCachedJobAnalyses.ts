@@ -44,7 +44,7 @@ export const useCachedJobAnalyses = () => {
         if (now - parsedCache.timestamp < CACHE_DURATION) {
           setData(parsedCache.data);
           setUserProfileId(parsedCache.userProfileId);
-          setIsLoading(false); // Mark as loaded since we have cached data
+          setIsLoading(false);
         } else {
           localStorage.removeItem(CACHE_KEY);
         }
@@ -69,7 +69,7 @@ export const useCachedJobAnalyses = () => {
     } else {
       setIsLoading(false);
     }
-  }, [user?.id]); // Only depend on user ID, not the entire user object
+  }, [user?.id]);
 
   const fetchJobAnalysesData = async (showErrors = false) => {
     if (!user) return;
@@ -156,7 +156,6 @@ export const useCachedJobAnalyses = () => {
   };
 
   const forceRefresh = () => {
-    // Force a full refresh with error showing
     setError(null);
     setConnectionIssue(false);
     fetchJobAnalysesData(true);
@@ -172,6 +171,6 @@ export const useCachedJobAnalyses = () => {
     invalidateCache,
     forceRefresh,
     hasCache: data.length > 0,
-    isShowingCachedData: false // Not needed in this pattern
+    isShowingCachedData: false
   };
 };
