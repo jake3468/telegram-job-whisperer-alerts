@@ -15,6 +15,7 @@ import { useCachedPaymentProducts } from '@/hooks/useCachedPaymentProducts';
 import { useCheckoutSession } from '@/hooks/useCheckoutSession';
 import { toast } from 'sonner';
 import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
+import { Analytics } from '@/utils/analytics';
 const planGradientBg = {
   free: "bg-white border border-gray-200",
   subscription: "bg-gradient-to-br from-[#2563eb] via-[#3893ec] to-[#1872ba] dark:from-[#274299] dark:via-[#3177c7] dark:to-[#1b466c]",
@@ -84,10 +85,16 @@ export default function GetMoreCredits() {
       return;
     }
     console.log('Subscribing with product:', subscriptionProduct.product_id);
-    const session = await createCheckoutSession(subscriptionProduct.product_id);
-    if (session?.url) {
-      window.open(session.url, '_blank');
-    } else {
+    
+    const productDetails = {
+      type: 'subscription' as const,
+      price: subscriptionProduct.price_amount,
+      currency: pricingData?.currency || 'USD',
+      credits: subscriptionProduct.credits_amount
+    };
+    
+    const session = await createCheckoutSession(subscriptionProduct.product_id, productDetails);
+    if (!session?.url) {
       toast.error('Failed to create checkout session');
     }
   };
@@ -96,12 +103,30 @@ export default function GetMoreCredits() {
       toast.error('Please wait, authentication is loading...');
       return;
     }
+    
+    // Find the product details for tracking
+    const product = creditPackProducts.find(p => p.product_id === productId) || 
+                   pricingData?.creditPacks.find(p => p.productId === productId);
+    
     console.log('Buying credit pack with product:', productId);
-    const session = await createCheckoutSession(productId);
-    if (session?.url) {
-      window.open(session.url, '_blank');
+    
+    if (product) {
+      const productDetails = {
+        type: 'credit_pack' as const,
+        price: 'price_amount' in product ? product.price_amount : product.price,
+        currency: pricingData?.currency || 'USD',
+        credits: 'credits_amount' in product ? product.credits_amount : product.credits
+      };
+      
+      const session = await createCheckoutSession(productId, productDetails);
+      if (!session?.url) {
+        toast.error('Failed to create checkout session');
+      }
     } else {
-      toast.error('Failed to create checkout session');
+      const session = await createCheckoutSession(productId);
+      if (!session?.url) {
+        toast.error('Failed to create checkout session');
+      }
     }
   };
   useEffect(() => {
@@ -134,6 +159,11 @@ export default function GetMoreCredits() {
 
   // Get display data (cached data is already handled in the hooks)
   const currentBalance = credits ? Number(credits.current_balance) : 0;
+  
+  // Track pricing page view on mount
+  useEffect(() => {
+    Analytics.trackViewPricing();
+  }, []);
   return <Layout>
       <div className="w-full flex flex-col pb-5 sm:pb-8">
         <div className="text-center mb-5 sm:mb-12 px-2 sm:px-4">

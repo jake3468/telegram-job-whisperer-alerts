@@ -4,12 +4,13 @@ import { supabase, makeAuthenticatedRequest } from '@/integrations/supabase/clie
 import { useToast } from '@/hooks/use-toast';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUserCredits } from '@/hooks/useUserCredits';
+import { Analytics } from '@/utils/analytics';
 
 export function useDeferredCreditDeduction() {
   const [isDeducting, setIsDeducting] = useState(false);
   const { toast } = useToast();
   const { userProfile } = useUserProfile();
-  const { refreshCredits } = useUserCredits();
+  const { refreshCredits, data: userCredits } = useUserCredits();
 
   const deductCredits = async (amount: number, featureName: string, description: string) => {
     if (!userProfile?.user_id) {
@@ -51,6 +52,14 @@ export function useDeferredCreditDeduction() {
       }
 
       console.log(`[useDeferredCreditDeduction] Successfully deducted ${amount} credits for ${featureName}`);
+      
+      // Track credit consumption for analytics
+      const currentBalance = userCredits?.current_balance || 0;
+      Analytics.trackCreditConsumption(
+        featureName, 
+        amount, 
+        currentBalance - amount
+      );
       
       // Refresh credits data after successful deduction
       refreshCredits();
