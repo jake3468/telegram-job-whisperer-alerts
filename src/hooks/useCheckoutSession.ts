@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import { toast } from 'sonner';
 import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
+import { Analytics } from '@/utils/analytics';
 
 export const useCheckoutSession = () => {
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
@@ -11,7 +12,7 @@ export const useCheckoutSession = () => {
   const { getToken } = useAuth();
   const { isAuthReady, executeWithRetry } = useEnterpriseAuth();
 
-  const createCheckoutSession = async (productId: string) => {
+  const createCheckoutSession = async (productId: string, productDetails?: { type: 'subscription' | 'credit_pack', price: number, currency?: string, credits: number }) => {
     if (!user) {
       const errorMsg = 'User not authenticated';
       setError(errorMsg);
@@ -74,6 +75,19 @@ export const useCheckoutSession = () => {
             throw new Error('No checkout URL returned from server');
           }
 
+          // Track begin_checkout event
+          if (productDetails) {
+            Analytics.trackBeginCheckout(
+              productId,
+              productDetails.type,
+              productDetails.price,
+              productDetails.currency || 'USD',
+              productDetails.credits
+            );
+          }
+
+          // Open checkout URL in new tab
+          window.open(data.url, '_blank');
           
           return data;
         },

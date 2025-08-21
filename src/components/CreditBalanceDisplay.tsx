@@ -2,6 +2,8 @@
 import { useCachedUserCredits } from '@/hooks/useCachedUserCredits';
 import { useSidebar } from '@/components/ui/sidebar';
 import { Loader2 } from 'lucide-react';
+import { useEffect } from 'react';
+import { Analytics } from '@/utils/analytics';
 
 const CreditBalanceDisplay = () => {
   const { data: credits, isLoading, isPending } = useCachedUserCredits();
@@ -20,6 +22,13 @@ const CreditBalanceDisplay = () => {
   // Always show credits - use cached data if available, fallback to 0 only if no data at all
   const balance = credits ? Math.max(Number(credits.current_balance) || 0, 0) : 0;
   const isLowCredits = balance < 5;
+
+  // Track low credits warning when balance is low
+  useEffect(() => {
+    if (balance > 0 && isLowCredits) {
+      Analytics.trackCreditsDepletedOrLow(balance);
+    }
+  }, [balance, isLowCredits]);
 
   return (
     <div className={`text-sm font-orbitron transition-colors ${

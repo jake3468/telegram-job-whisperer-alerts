@@ -49,8 +49,12 @@
     <!-- DNS Prefetch and Preconnect -->
     <link rel="dns-prefetch" href="//fonts.googleapis.com" />
     <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+    <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+    <link rel="dns-prefetch" href="//www.google-analytics.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="preconnect" href="https://www.google-analytics.com" crossorigin>
     
     <!-- Clerk authentication performance optimization -->
     <link rel="dns-prefetch" href="//natural-eel-47.clerk.accounts.dev">
@@ -78,6 +82,15 @@
 
     <!-- Umami Analytics -->
     <script defer src="https://cloud.umami.is/script.js" data-website-id="829cc74c-dbb2-46a2-8267-94146b86c3f3"></script>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DQC8P8B93Q"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-DQC8P8B93Q');
+    </script>
 
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
