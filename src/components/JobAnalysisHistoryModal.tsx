@@ -34,14 +34,14 @@ const JobAnalysisHistoryModal = ({
   const {
     toast
   } = useToast();
-  const { data: historyData, loading, connectionIssue, forceRefresh } = useCachedJobAnalyses();
+  const { data: historyData, isLoading, connectionIssue, refetch } = useCachedJobAnalyses();
   const { makeAuthenticatedRequest } = useEnterpriseAPIClient();
   const [selectedItem, setSelectedItem] = useState<JobAnalysisItem | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
 
-  const handleRetryLoading = () => {
-    forceRefresh();
+  const handleRefresh = () => {
+    refetch();
   };
   const handleCopyResult = async (item: JobAnalysisItem) => {
     const result = item.job_match;
@@ -89,7 +89,7 @@ const JobAnalysisHistoryModal = ({
       
       
       // Refresh the data after deletion
-      forceRefresh();
+      refetch();
       toast({
         title: "Deleted",
         description: "Job analysis deleted successfully."
@@ -209,9 +209,22 @@ const JobAnalysisHistoryModal = ({
               <History className="w-4 h-4 sm:w-5 sm:h-5" />
               Job Analysis History
             </DialogTitle>
-            <Button onClick={onClose} size="sm" variant="ghost" className="text-white/70 hover:text-white h-8 w-8 p-0 hover:bg-white/10">
-              <X className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              {connectionIssue && (
+                <Button 
+                  onClick={() => window.location.reload()} 
+                  variant="outline" 
+                  size="sm" 
+                  className="border-orange-400/30 bg-orange-100/10 text-orange-600 hover:bg-orange-200/20" 
+                  title="Connection issue detected. Click to refresh the page."
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </Button>
+              )}
+              <Button onClick={onClose} size="sm" variant="ghost" className="text-white/70 hover:text-white h-8 w-8 p-0 hover:bg-white/10">
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
           <DialogDescription className="text-white/70 font-inter text-xs sm:text-sm">
             Your history is automatically deleted after 60 days. Found {historyData.length} items.
@@ -228,7 +241,7 @@ const JobAnalysisHistoryModal = ({
         </div>
 
         <div className="flex-1 overflow-y-auto min-h-0">
-          {loading ? <div className="flex items-center justify-center py-8">
+          {isLoading ? <div className="flex items-center justify-center py-8">
               <div className="text-white/70 text-sm flex items-center gap-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white/70"></div>
                 Loading history...
@@ -237,7 +250,7 @@ const JobAnalysisHistoryModal = ({
               <div className="text-white/70 text-center">
                 <History className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No job analyses found.</p>
-                <Button onClick={handleRetryLoading} size="sm" className="mt-2 bg-blue-600 hover:bg-blue-700">
+                <Button onClick={handleRefresh} size="sm" className="mt-2 bg-blue-600 hover:bg-blue-700">
                   Retry Loading
                 </Button>
               </div>

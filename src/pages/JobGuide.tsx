@@ -68,7 +68,8 @@ const JobGuide = () => {
   // Use cached job analyses hook for instant data display
   const {
     data: jobAnalysisHistory,
-    loading: historyLoading,
+    isLoading: historyLoading,
+    isShowingCachedData,
     connectionIssue,
     refetch: refetchHistory
   } = useCachedJobAnalyses();
@@ -468,6 +469,9 @@ const JobGuide = () => {
                     </CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
+                    {connectionIssue && <Button onClick={() => window.location.reload()} variant="outline" size="sm" className="border-orange-400/30 bg-orange-100/10 text-orange-300 hover:bg-orange-200/20" title="Connection issue detected. Click to refresh the page.">
+                        <RefreshCw className="w-4 h-4" />
+                      </Button>}
                     <JobAnalysisHistory type="job_analysis" gradientColors="from-slate-200 via-slate-300 to-slate-200" borderColors="border-slate-600/30" />
                   </div>
                 </div>
