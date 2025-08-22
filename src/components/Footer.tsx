@@ -80,44 +80,66 @@ const Footer = () => {
           
           <div className="flex flex-col items-center space-y-4">
             <h3 className="text-white font-semibold text-sm font-inter">Featured on</h3>
-            <div className="flex flex-col items-center space-y-3">
-              <div itemProp="award" itemScope itemType="https://schema.org/Award">
-                <meta itemProp="name" content="Featured on Startup Fame" />
-                <a 
-                  href="https://startupfa.me/s/aspirely.ai?utm_source=aspirely.ai" 
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  itemProp="url"
-                  data-verification-target="startup-fame"
-                >
-                  <img 
-                    src="https://startupfa.me/badges/featured/default-rounded.webp" 
-                    alt="Featured on Startup Fame" 
-                    width="171" 
-                    height="54"
-                    itemProp="image"
-                  />
-                </a>
+            <div className="flex flex-col items-center space-y-4">
+              {/* Badge row - horizontal on desktop/tablet */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+                <div itemProp="award" itemScope itemType="https://schema.org/Award">
+                  <meta itemProp="name" content="Featured on Startup Fame" />
+                  <a 
+                    href="https://startupfa.me/s/aspirely.ai?utm_source=aspirely.ai" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    itemProp="url"
+                    data-verification-target="startup-fame"
+                  >
+                    <img 
+                      src="https://startupfa.me/badges/featured/default-rounded.webp" 
+                      alt="Featured on Startup Fame" 
+                      width="171" 
+                      height="54"
+                      itemProp="image"
+                    />
+                  </a>
+                </div>
+                
+                <div itemProp="award" itemScope itemType="https://schema.org/Award">
+                  <meta itemProp="name" content="Featured on Findly Tools" />
+                  <a 
+                    href="https://findly.tools/aspirely-ai?utm_source=aspirely-ai" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    itemProp="url"
+                    data-verification-target="findly-tools"
+                  >
+                    <img 
+                      src="https://findly.tools/badges/findly-tools-badge-light.svg" 
+                      alt="Featured on findly.tools" 
+                      width="150"
+                      itemProp="image"
+                    />
+                  </a>
+                </div>
+                
+                <div itemProp="award" itemScope itemType="https://schema.org/Award">
+                  <meta itemProp="name" content="Listed on Turbo0" />
+                  <a 
+                    href="https://turbo0.com/item/aspirelyai" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    itemProp="url"
+                    data-verification-target="turbo0"
+                  >
+                    <img 
+                      src="https://img.turbo0.com/badge-listed-light.svg" 
+                      alt="Listed on Turbo0" 
+                      style={{height: '54px', width: 'auto'}}
+                      itemProp="image"
+                    />
+                  </a>
+                </div>
               </div>
               
-              <div itemProp="award" itemScope itemType="https://schema.org/Award">
-                <meta itemProp="name" content="Featured on Findly Tools" />
-                <a 
-                  href="https://findly.tools/aspirely-ai?utm_source=aspirely-ai" 
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  itemProp="url"
-                  data-verification-target="findly-tools"
-                >
-                  <img 
-                    src="https://findly.tools/badges/findly-tools-badge-light.svg" 
-                    alt="Featured on findly.tools" 
-                    width="150"
-                    itemProp="image"
-                  />
-                </a>
-              </div>
-              
+              {/* Text link on new line */}
               <div itemProp="award" itemScope itemType="https://schema.org/Award">
                 <meta itemProp="name" content="Featured on Micro SaaS Examples" />
                 <a 
@@ -129,24 +151,6 @@ const Footer = () => {
                   data-verification-target="microsaas-examples"
                 >
                   Featured On Micro SaaS Examples
-                </a>
-              </div>
-              
-              <div itemProp="award" itemScope itemType="https://schema.org/Award">
-                <meta itemProp="name" content="Listed on Turbo0" />
-                <a 
-                  href="https://turbo0.com/item/aspirelyai" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  itemProp="url"
-                  data-verification-target="turbo0"
-                >
-                  <img 
-                    src="https://img.turbo0.com/badge-listed-light.svg" 
-                    alt="Listed on Turbo0" 
-                    style={{height: '54px', width: 'auto'}}
-                    itemProp="image"
-                  />
                 </a>
               </div>
             </div>
