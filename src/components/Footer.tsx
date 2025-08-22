@@ -72,6 +72,16 @@ const Footer = () => {
           </div>
         </div>
 
+        {/* Featured on Section */}
+        <div className="py-8">
+          <div className="flex flex-col items-center space-y-4">
+            <h3 className="text-white font-semibold text-sm font-inter">Featured on</h3>
+            <a href="https://startupfa.me/s/aspirely.ai?utm_source=aspirely.ai" target="_blank" rel="noopener noreferrer">
+              <img src="https://startupfa.me/badges/featured/default-rounded.webp" alt="Featured on Startup Fame" width="171" height="54" />
+            </a>
+          </div>
+        </div>
+
         {/* Bottom Section */}
         <div className="pt-8 border-t border-gray-800">
           <div className="flex flex-col sm:flex-row justify-between items-center">
