@@ -151,7 +151,7 @@ const HeroSection = () => {
             </div>
           </SignedOut>
 
-          <p className="mb-3">After creating your account you'll unlock the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
+          <p className="mb-3 text-sm">After creating your account you'll unlock the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
           <ul className="space-y-0 mb-4 flex flex-col items-center -space-y-1">
             <li className="flex items-center justify-center gap-2">
               <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2">
