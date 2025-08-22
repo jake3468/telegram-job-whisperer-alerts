@@ -118,7 +118,7 @@ const HeroSection = () => {
         {/* Black background to block particles behind headline */}
         <div className="relative">
           <div className="absolute inset-0 bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
-          <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-sans tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">We help you land jobs faster using AI 🤖</h1>
+          <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-sans tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">We help you land jobs faster using AI 🚀</h1>
         </div>
         
         {/* Lottie Animation */}
@@ -145,7 +145,7 @@ const HeroSection = () => {
             <div className="flex justify-center mb-6">
               <SignUpButton mode="modal">
                 <button className="bg-white hover:bg-gray-100 text-black px-8 py-3 text-base sm:text-lg rounded-lg transition-all duration-300 font-inter font-semibold shadow-lg hover:shadow-gray-300/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-gray-400/50 mb-2 flex items-center gap-2 justify-center">
-                  🚀 Start Free Now
+                  🎯 Start Free Now
                 </button>
               </SignUpButton>
             </div>
