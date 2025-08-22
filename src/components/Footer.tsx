@@ -80,6 +80,13 @@ const Footer = () => {
               <a href="https://startupfa.me/s/aspirely.ai?utm_source=aspirely.ai" target="_blank">
                 <img src="https://startupfa.me/badges/featured/default-rounded.webp" alt="Featured on Startup Fame" width="171" height="54" />
               </a>
+              <a href="https://findly.tools/aspirely-ai?utm_source=aspirely-ai" target="_blank">
+                <img 
+                  src="https://findly.tools/badges/findly-tools-badge-light.svg" 
+                  alt="Featured on findly.tools" 
+                  width="150" 
+                />
+              </a>
               <a href="https://www.microsaasexamples.com/" target="_blank" className="text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
                 Featured On Micro SaaS Examples
               </a>
