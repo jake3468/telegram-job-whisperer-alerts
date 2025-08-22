@@ -137,6 +137,25 @@ const Footer = () => {
                     />
                   </a>
                 </div>
+                
+                <div itemProp="award" itemScope itemType="https://schema.org/Award">
+                  <meta itemProp="name" content="Featured on Twelve Tools" />
+                  <a 
+                    href="https://twelve.tools" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    itemProp="url"
+                    data-verification-target="twelve-tools"
+                  >
+                    <img 
+                      src="https://twelve.tools/badge0-light.svg" 
+                      alt="Featured on Twelve Tools" 
+                      width="200" 
+                      height="54"
+                      itemProp="image"
+                    />
+                  </a>
+                </div>
               </div>
               
               {/* Text link on new line */}
