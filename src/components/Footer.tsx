@@ -73,23 +73,64 @@ const Footer = () => {
         </div>
 
         {/* Featured on Section */}
-        <div className="py-8">
+        <div className="py-8" itemScope itemType="https://schema.org/Organization">
+          <meta itemProp="name" content="Aspirely.ai" />
+          <meta itemProp="url" content="https://aspirely.ai" />
+          <meta itemProp="description" content="AI-powered career advancement platform for job seekers" />
+          
           <div className="flex flex-col items-center space-y-4">
             <h3 className="text-white font-semibold text-sm font-inter">Featured on</h3>
             <div className="flex flex-col items-center space-y-3">
-              <a href="https://startupfa.me/s/aspirely.ai?utm_source=aspirely.ai" target="_blank">
-                <img src="https://startupfa.me/badges/featured/default-rounded.webp" alt="Featured on Startup Fame" width="171" height="54" />
-              </a>
-              <a href="https://findly.tools/aspirely-ai?utm_source=aspirely-ai" target="_blank">
-                <img 
-                  src="https://findly.tools/badges/findly-tools-badge-light.svg" 
-                  alt="Featured on findly.tools" 
-                  width="150" 
-                />
-              </a>
-              <a href="https://www.microsaasexamples.com/" target="_blank" className="text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
-                Featured On Micro SaaS Examples
-              </a>
+              <div itemProp="award" itemScope itemType="https://schema.org/Award">
+                <meta itemProp="name" content="Featured on Startup Fame" />
+                <a 
+                  href="https://startupfa.me/s/aspirely.ai?utm_source=aspirely.ai" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  itemProp="url"
+                  data-verification-target="startup-fame"
+                >
+                  <img 
+                    src="https://startupfa.me/badges/featured/default-rounded.webp" 
+                    alt="Featured on Startup Fame" 
+                    width="171" 
+                    height="54"
+                    itemProp="image"
+                  />
+                </a>
+              </div>
+              
+              <div itemProp="award" itemScope itemType="https://schema.org/Award">
+                <meta itemProp="name" content="Featured on Findly Tools" />
+                <a 
+                  href="https://findly.tools/aspirely-ai?utm_source=aspirely-ai" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  itemProp="url"
+                  data-verification-target="findly-tools"
+                >
+                  <img 
+                    src="https://findly.tools/badges/findly-tools-badge-light.svg" 
+                    alt="Featured on findly.tools" 
+                    width="150"
+                    itemProp="image"
+                  />
+                </a>
+              </div>
+              
+              <div itemProp="award" itemScope itemType="https://schema.org/Award">
+                <meta itemProp="name" content="Featured on Micro SaaS Examples" />
+                <a 
+                  href="https://www.microsaasexamples.com/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter"
+                  itemProp="url"
+                  data-verification-target="microsaas-examples"
+                >
+                  Featured On Micro SaaS Examples
+                </a>
+              </div>
             </div>
           </div>
         </div>
