@@ -76,9 +76,14 @@ const Footer = () => {
         <div className="py-8">
           <div className="flex flex-col items-center space-y-4">
             <h3 className="text-white font-semibold text-sm font-inter">Featured on</h3>
-            <a href="https://startupfa.me/s/aspirely.ai?utm_source=aspirely.ai" target="_blank">
-              <img src="https://startupfa.me/badges/featured/default-rounded.webp" alt="Featured on Startup Fame" width="171" height="54" />
-            </a>
+            <div className="flex flex-col items-center space-y-3">
+              <a href="https://startupfa.me/s/aspirely.ai?utm_source=aspirely.ai" target="_blank">
+                <img src="https://startupfa.me/badges/featured/default-rounded.webp" alt="Featured on Startup Fame" width="171" height="54" />
+              </a>
+              <a href="https://www.microsaasexamples.com/" target="_blank" className="text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
+                Featured On Micro SaaS Examples
+              </a>
+            </div>
           </div>
         </div>
 

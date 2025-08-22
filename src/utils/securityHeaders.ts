@@ -23,7 +23,7 @@ class SecurityHeadersManager {
       form-action 'self';
       upgrade-insecure-requests;
     `.replace(/\s+/g, ' ').trim(),
-    'X-Frame-Options': 'DENY',
+    'X-Frame-Options': 'SAMEORIGIN',
     'X-Content-Type-Options': 'nosniff',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Permissions-Policy': 'geolocation=(), microphone=(), camera=()'
@@ -94,6 +94,11 @@ class SecurityHeadersManager {
   }
 
   private isSuspiciousUserAgent(userAgent: string): boolean {
+    // Allow Startup Fame Bot specifically
+    if (userAgent.toLowerCase().includes('startup fame')) {
+      return false;
+    }
+
     const suspiciousPatterns = [
       /bot/i,
       /crawler/i,
@@ -112,6 +117,8 @@ class SecurityHeadersManager {
     const allowedOrigins = [
       'https://aspirely.ai',
       'https://www.aspirely.ai',
+      'https://startupfa.me',
+      'https://www.startupfa.me',
       'http://localhost:3000',
       'http://localhost:5173',
       'http://127.0.0.1:3000',
