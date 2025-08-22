@@ -15,15 +15,33 @@ class CorsValidator {
   constructor() {
     this.config = {
       allowedOrigins: Environment.isProduction() 
-        ? ['https://aspirely.ai', 'https://www.aspirely.ai']
-        : ['http://localhost:5173', 'https://lovable.app', 'https://aspirely.lovable.app'],
+        ? [
+            'https://aspirely.ai', 
+            'https://www.aspirely.ai',
+            'https://findly.tools',
+            'https://www.findly.tools',
+            'https://startupfa.me',
+            'https://www.startupfa.me',
+            'https://microsaasexamples.com',
+            'https://www.microsaasexamples.com'
+          ]
+        : [
+            'http://localhost:5173', 
+            'https://lovable.app', 
+            'https://aspirely.lovable.app',
+            'https://findly.tools',
+            'https://startupfa.me',
+            'https://microsaasexamples.com'
+          ],
       allowedMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: [
         'Content-Type',
         'Authorization', 
         'X-Requested-With',
         'Accept',
-        'Origin'
+        'Origin',
+        'User-Agent',
+        'X-Verification-Bot'
       ],
       credentials: true
     };

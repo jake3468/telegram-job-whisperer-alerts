@@ -94,20 +94,48 @@ class SecurityHeadersManager {
   }
 
   private isSuspiciousUserAgent(userAgent: string): boolean {
-    // Allow Startup Fame Bot specifically
-    if (userAgent.toLowerCase().includes('startup fame')) {
+    const lowerUserAgent = userAgent.toLowerCase();
+    
+    // Allow legitimate verification and service bots
+    const allowedBots = [
+      'startup fame',
+      'findly.tools',
+      'findlybot',
+      'microsaas',
+      'googlebot',
+      'bingbot',
+      'slurp',
+      'duckduckbot',
+      'baiduspider',
+      'yandexbot',
+      'facebookexternalhit',
+      'twitterbot',
+      'linkedinbot',
+      'whatsapp',
+      'telegrambot',
+      'discordbot',
+      'slackbot',
+      'verification',
+      'validator',
+      'checker',
+      'monitor',
+      'uptimerobot',
+      'pingdom',
+      'statuspage'
+    ];
+
+    // If it matches any allowed bot pattern, it's not suspicious
+    if (allowedBots.some(bot => lowerUserAgent.includes(bot))) {
       return false;
     }
 
     const suspiciousPatterns = [
-      /bot/i,
-      /crawler/i,
-      /spider/i,
-      /scraper/i,
       /curl/i,
       /wget/i,
-      /python/i,
-      /postman/i
+      /python-requests/i,
+      /postman/i,
+      /scrapy/i,
+      /selenium/i
     ];
 
     return suspiciousPatterns.some(pattern => pattern.test(userAgent));
