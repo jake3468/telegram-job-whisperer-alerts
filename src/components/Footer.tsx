@@ -76,7 +76,7 @@ const Footer = () => {
         <div className="py-8">
           <div className="flex flex-col items-center space-y-4">
             <h3 className="text-white font-semibold text-sm font-inter">Featured on</h3>
-            <a href="https://startupfa.me/s/aspirely.ai?utm_source=aspirely.ai" target="_blank" rel="noopener noreferrer">
+            <a href="https://startupfa.me/s/aspirely.ai?utm_source=aspirely.ai" target="_blank">
               <img src="https://startupfa.me/badges/featured/default-rounded.webp" alt="Featured on Startup Fame" width="171" height="54" />
             </a>
           </div>
