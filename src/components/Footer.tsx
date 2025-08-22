@@ -131,6 +131,24 @@ const Footer = () => {
                   Featured On Micro SaaS Examples
                 </a>
               </div>
+              
+              <div itemProp="award" itemScope itemType="https://schema.org/Award">
+                <meta itemProp="name" content="Listed on Turbo0" />
+                <a 
+                  href="https://turbo0.com/item/aspirelyai" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  itemProp="url"
+                  data-verification-target="turbo0"
+                >
+                  <img 
+                    src="https://img.turbo0.com/badge-listed-light.svg" 
+                    alt="Listed on Turbo0" 
+                    style={{height: '54px', width: 'auto'}}
+                    itemProp="image"
+                  />
+                </a>
+              </div>
             </div>
           </div>
         </div>
