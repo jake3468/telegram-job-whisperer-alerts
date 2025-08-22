@@ -10,6 +10,10 @@ Allow: /contact-support
 Allow: /privacy-policy
 Allow: /terms-of-service
 
+# Badge verification content
+Allow: /*badge*
+Allow: /*verification*
+
 # Disallow protected pages that require authentication
 Disallow: /job-guide
 Disallow: /cover-letter
