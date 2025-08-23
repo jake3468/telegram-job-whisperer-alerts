@@ -83,24 +83,7 @@ const Footer = () => {
             <div className="flex flex-col items-center space-y-4">
               {/* Badge row - horizontal on desktop/tablet */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
-                <div itemProp="award" itemScope itemType="https://schema.org/Award">
-                  <meta itemProp="name" content="Featured on Startup Fame" />
-                  <a 
-                    href="https://startupfa.me/s/aspirely.ai?utm_source=aspirely.ai" 
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    itemProp="url"
-                    data-verification-target="startup-fame"
-                  >
-                    <img 
-                      src="https://startupfa.me/badges/featured/default-rounded.webp" 
-                      alt="Featured on Startup Fame" 
-                      width="171" 
-                      height="54"
-                      itemProp="image"
-                    />
-                  </a>
-                </div>
+                <a href="https://startupfa.me/s/aspirely.ai?utm_source=aspirely.ai" target="_blank"><img src="https://startupfa.me/badges/featured-badge.webp" alt="Featured on Startup Fame" width="171" height="54" /></a>
                 
                 <div itemProp="award" itemScope itemType="https://schema.org/Award">
                   <meta itemProp="name" content="Featured on Findly Tools" />
@@ -120,23 +103,9 @@ const Footer = () => {
                   </a>
                 </div>
                 
-                <div itemProp="award" itemScope itemType="https://schema.org/Award">
-                  <meta itemProp="name" content="Listed on Turbo0" />
-                  <a 
-                    href="https://turbo0.com/item/aspirelyai" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    itemProp="url"
-                    data-verification-target="turbo0"
-                  >
-                    <img 
-                      src="https://img.turbo0.com/badge-listed-light.svg" 
-                      alt="Listed on Turbo0" 
-                      style={{height: '54px', width: 'auto'}}
-                      itemProp="image"
-                    />
-                  </a>
-                </div>
+                <a href="https://turbo0.com/item/aspirelyai" target="_blank" rel="noopener noreferrer">
+                  <img src="https://img.turbo0.com/badge-listed-light.svg" alt="Listed on Turbo0" style={{height: '54px', width: 'auto'}} />
+                </a>
                 
                 <div itemProp="award" itemScope itemType="https://schema.org/Award">
                   <meta itemProp="name" content="Featured on Twelve Tools" />
@@ -156,6 +125,8 @@ const Footer = () => {
                     />
                   </a>
                 </div>
+                
+                <a href="https://fazier.com/launches/aspirely.ai" target="_blank"><img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&theme=light" width="120" alt="Fazier badge" /></a>
               </div>
               
               {/* Text link on new line */}
