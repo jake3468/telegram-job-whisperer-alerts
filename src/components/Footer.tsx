@@ -156,6 +156,24 @@ const Footer = () => {
                     />
                   </a>
                 </div>
+                
+                <div itemProp="award" itemScope itemType="https://schema.org/Award">
+                  <meta itemProp="name" content="Featured on Fazier" />
+                  <a 
+                    href="https://fazier.com/launches/aspirely.ai" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    itemProp="url"
+                    data-verification-target="fazier"
+                  >
+                    <img 
+                      src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&theme=light" 
+                      width="120" 
+                      alt="Fazier badge"
+                      itemProp="image"
+                    />
+                  </a>
+                </div>
               </div>
               
               {/* Text link on new line */}
