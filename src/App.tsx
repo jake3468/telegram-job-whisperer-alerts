@@ -99,7 +99,7 @@ const AppWithSync = () => {
         <Route path="/contact-support" element={<ContactSupport />} />
         
         {/* Protected Routes */}
-        <Route path="/dashboard" element={<Navigate to="/profile" replace />} />
+        <Route path="/dashboard" element={<Navigate to="/ai-agents" replace />} />
         <Route path="/job-guide" element={<ProtectedRoute><JobGuide /></ProtectedRoute>} />
         <Route path="/cover-letter" element={<ProtectedRoute><CoverLetter /></ProtectedRoute>} />
         <Route path="/linkedin-posts" element={<ProtectedRoute><LinkedInPosts /></ProtectedRoute>} />
