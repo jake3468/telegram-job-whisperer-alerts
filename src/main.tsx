@@ -41,6 +41,8 @@ createRoot(document.getElementById("root")!).render(
         showOptionalFields: false
       }
     }}
+    signInFallbackRedirectUrl="/ai-agents"
+    signUpFallbackRedirectUrl="/ai-agents"
   >
     <App />
   </ClerkProvider>

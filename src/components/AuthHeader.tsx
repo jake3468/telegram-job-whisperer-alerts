@@ -57,7 +57,7 @@ const AuthHeader = () => {
         <div className="hidden lg:block">
           <SignedOut>
             <div className="flex items-center space-x-4">
-              <SignInButton mode="modal">
+              <SignInButton mode="modal" fallbackRedirectUrl="/ai-agents">
                 <button className="rounded-xl border border-sky-400/80 bg-black/80 text-white hover:border-fuchsia-500 hover:text-fuchsia-300 transition-colors duration-200 font-inter text-base font-semibold px-6 py-2 shadow-md focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2" style={{
                   minWidth: '100px',
                   boxShadow: "0 4px 32px 0 rgba(56,189,248,0.09)"
@@ -65,7 +65,7 @@ const AuthHeader = () => {
                   <span className="text-sm sm:text-base tracking-wide">Sign In</span>
                 </button>
               </SignInButton>
-              <SignUpButton mode="modal">
+              <SignUpButton mode="modal" fallbackRedirectUrl="/ai-agents">
                 <button className="rounded-xl bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white px-6 py-2 shadow-lg hover:from-blue-600 hover:to-blue-800 transition-all duration-200 font-inter font-semibold text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
                   Create Account
                 </button>
@@ -109,7 +109,7 @@ const AuthHeader = () => {
             
             {/* Auth Buttons */}
             <SignedOut>
-              <SignInButton mode="modal">
+              <SignInButton mode="modal" fallbackRedirectUrl="/ai-agents">
                 <button 
                   className="w-full rounded-xl border border-sky-400/80 bg-black/80 text-white hover:border-fuchsia-500 hover:text-fuchsia-300 transition-colors duration-200 font-inter text-base font-semibold px-6 py-3 shadow-md focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2"
                   onClick={() => setIsMenuOpen(false)}
@@ -117,7 +117,7 @@ const AuthHeader = () => {
                   Sign In
                 </button>
               </SignInButton>
-              <SignUpButton mode="modal">
+              <SignUpButton mode="modal" fallbackRedirectUrl="/ai-agents">
                 <button 
                   className="w-full rounded-xl bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white px-6 py-3 shadow-lg hover:from-blue-600 hover:to-blue-800 transition-all duration-200 font-inter font-semibold text-base focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
                   onClick={() => setIsMenuOpen(false)}
