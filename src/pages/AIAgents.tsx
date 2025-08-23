@@ -63,7 +63,7 @@ const AIAgents = () => {
                 </Button>
               </div> : <div className="flex items-center gap-2 bg-white rounded-lg p-2 sm:p-3 border border-gray-200 mb-4">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-                <span className="text-gray-600 text-xs sm:text-sm">Loading your Bot ID...</span>
+                <span className="text-gray-600 text-xs sm:text-sm">Loading Activation Key...</span>
               </div>}
             <p className="text-xs sm:text-sm font-medium text-slate-50">
               2. Click the "Activate Now" button.<br /><br />
