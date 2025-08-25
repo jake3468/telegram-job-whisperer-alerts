@@ -126,7 +126,7 @@ const Footer = () => {
                   </a>
                 </div>
                 
-                <a href="https://fazier.com/launches/aspirely.ai" target="_blank"><img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&theme=light" width="120" alt="Fazier badge" /></a>
+                <a href="https://fazier.com/launches/aspirely-ai" target="_blank"><img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&theme=light" width="120" alt="Fazier badge" /></a>
               </div>
               
               {/* Text link on new line */}
