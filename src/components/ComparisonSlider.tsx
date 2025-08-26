@@ -143,7 +143,7 @@ const ComparisonSlider = () => {
           </div> */}
 
           {/* Right Side - Without Aspirely.ai */}
-          {/* <div 
+          <div 
             className="bg-gradient-to-br from-red-950 to-red-900 p-4 md:p-6 font-sans"
             style={{ 
               clipPath: `polygon(${sliderPosition}% 0, 100% 0, 100% 100%, ${sliderPosition}% 100%)`,
@@ -174,7 +174,7 @@ const ComparisonSlider = () => {
                 </div>
               ))}
             </div>
-          </div> */}
+          </div>
 
           {/* Hidden content for height reference */}
           <div className="invisible p-4 md:p-6 font-sans">
@@ -200,7 +200,7 @@ const ComparisonSlider = () => {
           </div>
 
           {/* Slider Handle */}
-          {/* <div 
+          <div 
             className="absolute top-0 bottom-0 flex items-center z-10 touch-none"
             style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
             onMouseDown={handleMouseDown}
@@ -211,7 +211,7 @@ const ComparisonSlider = () => {
                 <div className="w-3 h-3 md:w-4 md:h-4 bg-white rounded-full"></div>
               </div>
             </div>
-          </div> */}
+          </div>
 
           {/* Center Line */}
           <div 
