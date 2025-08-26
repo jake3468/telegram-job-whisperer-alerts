@@ -109,7 +109,7 @@ const ComparisonSlider = () => {
           style={{ userSelect: 'none' }}
         >
           {/* Left Side - With Aspirely.ai */}
-          <div 
+          {/* <div 
             className="bg-gradient-to-br from-green-950 to-green-900 p-4 md:p-6 font-sans"
             style={{ 
               clipPath: `polygon(0 0, ${sliderPosition}% 0, ${sliderPosition}% 100%, 0 100%)`,
@@ -140,7 +140,7 @@ const ComparisonSlider = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Right Side - Without Aspirely.ai */}
           <div 
@@ -221,11 +221,11 @@ const ComparisonSlider = () => {
         </div>
 
         {/* Instructions */}
-        <div className="text-center mt-6">
+        {/* <div className="text-center mt-6">
           <p className="text-gray-400 text-sm">
             {isMobile ? '👈 Drag the slider to the left to compare' : 'Click and drag the slider to compare'}
           </p>
-        </div>
+        </div> */}
       </div>
     </section>
   );
