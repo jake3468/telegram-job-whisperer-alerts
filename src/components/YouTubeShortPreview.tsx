@@ -21,8 +21,8 @@ const YouTubeShortPreview = () => {
   const handlePlay = () => {
     setIsPlaying(true);
   };
-  const embedUrl = "https://www.youtube.com/embed/Ksoi_V9MjF8?autoplay=1&mute=0&controls=1&rel=0&modestbranding=1";
-  const thumbnailUrl = "https://img.youtube.com/vi/Ksoi_V9MjF8/maxresdefault.jpg";
+  const embedUrl = "https://www.youtube.com/embed/ky654x0RFR8?autoplay=1&mute=0&controls=1&rel=0&modestbranding=1";
+  const thumbnailUrl = "https://img.youtube.com/vi/ky654x0RFR8/maxresdefault.jpg";
   return <section className="bg-black py-8 px-4" ref={containerRef}>
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-center">
