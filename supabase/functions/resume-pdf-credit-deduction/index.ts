@@ -21,7 +21,7 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Resume PDF credit deduction triggered');
+    console.log('Resume PDF credit deduction triggered - v3 credits');
     
     const payload = await req.json();
     const { cv_chat_id } = payload;
