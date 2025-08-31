@@ -126,21 +126,8 @@ const Footer = () => {
                   </a>
                 </div>
                 
-                <a href="https://fazier.com/launches/aspirely-ai" target="_blank"><img src="https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&theme=light" width="120" alt="Fazier badge" /></a>
-              </div>
-              
-              {/* Text link on new line */}
-              <div itemProp="award" itemScope itemType="https://schema.org/Award">
-                <meta itemProp="name" content="Featured on Micro SaaS Examples" />
-                <a 
-                  href="https://www.microsaasexamples.com/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter"
-                  itemProp="url"
-                  data-verification-target="microsaas-examples"
-                >
-                  Featured On Micro SaaS Examples
+                <a href="https://fazier.com/launches/aspirely-ai" target="_blank" rel="noopener noreferrer">
+                  <img src="https://fazier.com/api/v1/public/badges/embed_image.svg?launch_id=5237&badge_type=daily&theme=neutral" className="w-32 md:w-44 mx-auto mt-2" alt="Fazier badge" loading="eager" fetchPriority="high" decoding="async" />
                 </a>
               </div>
             </div>

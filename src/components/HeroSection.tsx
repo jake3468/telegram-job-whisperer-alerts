@@ -105,14 +105,6 @@ const HeroSection = () => {
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
-        {/* Trust Badge */}
-        <div className="mb-3">
-          <div className="flex justify-center">
-            <a href="https://fazier.com/launches/aspirely-ai" target="_blank" rel="noopener noreferrer">
-              <img src="https://fazier.com/api/v1/public/badges/embed_image.svg?launch_id=5237&badge_type=daily&theme=neutral" className="w-32 md:w-44 mx-auto mt-2" alt="Fazier badge" loading="eager" fetchPriority="high" decoding="async" />
-            </a>
-          </div>
-        </div>
         
         {/* Black background to block particles behind headline */}
         <div className="relative">
