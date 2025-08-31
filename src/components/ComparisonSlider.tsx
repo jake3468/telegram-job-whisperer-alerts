@@ -8,7 +8,7 @@ const ComparisonSlider = () => {
   const getInitialPosition = () => {
     const saved = sessionStorage.getItem('sliderPosition');
     if (saved) return parseFloat(saved);
-    return isMobile ? 75 : 50;
+    return 90; // Default to right side edge for all screen views
   };
   
   const [sliderPosition, setSliderPosition] = useState(getInitialPosition);
@@ -24,7 +24,7 @@ const ComparisonSlider = () => {
   React.useEffect(() => {
     const hasUserInteracted = sessionStorage.getItem('sliderPosition');
     if (!hasUserInteracted && !isDragging) {
-      setSliderPosition(isMobile ? 75 : 50);
+      setSliderPosition(90); // Default to right side edge for all screen views
     }
   }, [isMobile, isDragging]);
 
