@@ -21,7 +21,7 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Resume PDF credit deduction triggered');
+    console.log('Resume PDF credit deduction triggered - v3 credits');
     
     const payload = await req.json();
     const { cv_chat_id } = payload;
@@ -89,7 +89,7 @@ serve(async (req) => {
     }
 
     const currentBalance = Number(userCredits.current_balance);
-    const requiredCredits = 2;
+    const requiredCredits = 3;
 
     console.log('Current balance:', currentBalance, 'Required:', requiredCredits);
 
