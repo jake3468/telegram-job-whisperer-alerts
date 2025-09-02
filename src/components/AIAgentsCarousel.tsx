@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { Card, CardContent } from './ui/card';
-import { useIsMobile } from '@/hooks/use-mobile';
 import Lottie from 'lottie-react';
 const jobApplicationPreview = '/lovable-uploads/2b660a4e-994b-4576-b0b9-92c1edfd908e.png';
 import jobAlertsPreview from '@/assets/job-alerts-agent-preview.png';
@@ -11,8 +10,6 @@ interface AIAgent {
   title: string;
   description: string;
   icon: string;
-  color: string;
-  textGlow: string;
   telegramUrl: string;
   previewImage: string;
 }
@@ -23,8 +20,6 @@ const aiAgents: AIAgent[] = [
     title: 'Job Application Agent',
     description: 'Automatically applies to jobs that match your profile with tailored cover letters',
     icon: '👔',
-    color: '#00E5FF',
-    textGlow: 'rgba(0,229,255,0.8)',
     telegramUrl: 'https://t.me/add_job_aspirelyai_bot',
     previewImage: jobApplicationPreview
   },
@@ -33,8 +28,6 @@ const aiAgents: AIAgent[] = [
     title: 'Job Alerts Agent',
     description: 'Sends you daily job alerts tailored to your preferences and location',
     icon: '🔔',
-    color: '#00FF85',
-    textGlow: 'rgba(0,255,133,0.8)',
     telegramUrl: 'https://t.me/Job_AI_update_bot',
     previewImage: jobAlertsPreview
   },
@@ -43,8 +36,6 @@ const aiAgents: AIAgent[] = [
     title: 'Resume Builder Agent',
     description: 'Creates and updates your resume with AI optimization for better job matches',
     icon: '📝',
-    color: '#FF4FFF',
-    textGlow: 'rgba(255,79,255,0.8)',
     telegramUrl: 'https://t.me/Resume_builder_AI_bot',
     previewImage: resumeBuilderPreview
   }
@@ -55,65 +46,122 @@ interface AIAgentsCarouselProps {
 }
 
 const AIAgentsCarousel = ({ telegramAnimationData }: AIAgentsCarouselProps) => {
-  const [scrollY, setScrollY] = useState(0);
-  const [activeCard, setActiveCard] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const cardsRef = useRef<HTMLDivElement[]>([]);
+  const scrollingRef = useRef(false);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
+  const animateStackCards = useCallback(() => {
+    if (!containerRef.current) return;
+    
+    const containerTop = containerRef.current.getBoundingClientRect().top;
+    const cardHeight = window.innerHeight * 0.8; // 80vh card height
+    const cardMargin = 20; // Gap between cards
+
+    cardsRef.current.forEach((card, index) => {
+      if (!card) return;
       
-      // Calculate which card should be active based on scroll position
-      const scrollProgress = window.scrollY / (window.innerHeight * 0.5);
-      const newActiveCard = Math.min(Math.floor(scrollProgress), aiAgents.length - 1);
-      setActiveCard(Math.max(0, newActiveCard));
-    };
+      const scrolling = -containerTop - index * (cardHeight + cardMargin);
+      
+      if (scrolling > 0) {
+        // Card is in sticky position - apply stacking effect
+        const scale = Math.max(0.8, 1 - (scrolling * 0.0008)); // Slower scale down
+        const translateY = Math.min(scrolling * 0.1, cardMargin * index);
+        
+        card.style.transform = `translateY(${translateY}px) scale(${scale})`;
+        card.style.zIndex = (aiAgents.length - index).toString();
+      } else {
+        // Card hasn't reached sticky position yet
+        card.style.transform = `translateY(0px) scale(1)`;
+        card.style.zIndex = (aiAgents.length - index).toString();
+      }
+    });
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    scrollingRef.current = false;
   }, []);
 
-  return (
-    <div className="relative h-[200vh] w-full">
-      <div className="sticky top-1/2 transform -translate-y-1/2 flex justify-center items-center px-4">
-        <div className="relative w-full max-w-md">
-          {aiAgents.map((agent, index) => {
-            const offset = (index - activeCard) * 20;
-            const scale = index === activeCard ? 1 : 0.9 - Math.abs(index - activeCard) * 0.1;
-            const opacity = index === activeCard ? 1 : Math.max(0.3, 1 - Math.abs(index - activeCard) * 0.3);
-            const zIndex = aiAgents.length - Math.abs(index - activeCard);
+  const handleScroll = useCallback(() => {
+    if (scrollingRef.current) return;
+    scrollingRef.current = true;
+    requestAnimationFrame(animateStackCards);
+  }, [animateStackCards]);
 
-            return (
-              <Card 
-                key={agent.id}
-                className="absolute inset-0 bg-gray-50 border-gray-200 rounded-3xl shadow-xl transition-all duration-500 ease-out"
-                style={{
-                  transform: `translateY(${offset}px) scale(${scale})`,
-                  opacity,
-                  zIndex
-                }}
-              >
-                <CardContent className="p-8 text-center h-full flex flex-col justify-between">
-                  <div className="flex-1">
-                    <div className="mb-6">
-                      <img 
-                        src={agent.previewImage} 
-                        alt={`${agent.title} preview`}
-                        className="w-full h-48 object-cover rounded-2xl mb-6"
-                      />
-                      <div className="flex items-center justify-center gap-3 mb-4">
-                        <span className="text-4xl">{agent.icon}</span>
-                        <h3 className="font-bold text-neutral-950 text-2xl font-opensans leading-tight">{agent.title}</h3>
-                      </div>
+  const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
+    if (entries[0].isIntersecting) {
+      // Cards are in viewport - add scroll listener
+      window.addEventListener('scroll', handleScroll, { passive: true });
+    } else {
+      // Cards are out of viewport - remove scroll listener
+      window.removeEventListener('scroll', handleScroll);
+    }
+  }, [handleScroll]);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    // Initialize Intersection Observer
+    observerRef.current = new IntersectionObserver(handleIntersection, {
+      threshold: 0.1,
+    });
+    
+    observerRef.current.observe(containerRef.current);
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [handleIntersection, handleScroll]);
+
+  return (
+    <div 
+      ref={containerRef}
+      className="relative w-full"
+      style={{ height: `${100 + aiAgents.length * 100}vh` }} // Dynamic height based on number of cards
+    >
+      <div className="sticky top-0 h-screen flex items-center justify-center px-4">
+        <div className="relative w-full max-w-2xl">
+          {aiAgents.map((agent, index) => (
+            <Card
+              key={agent.id}
+              ref={(el) => {
+                if (el) cardsRef.current[index] = el;
+              }}
+              className="absolute inset-0 bg-white border border-gray-200 rounded-3xl shadow-2xl"
+              style={{
+                height: '80vh',
+                top: `${index * 20}px`,
+                transformOrigin: 'center top',
+                zIndex: aiAgents.length - index,
+              }}
+            >
+              <CardContent className="p-8 h-full flex flex-col">
+                <div className="flex-1 flex flex-col justify-center items-center text-center">
+                  <div className="mb-8">
+                    <img 
+                      src={agent.previewImage} 
+                      alt={`${agent.title} preview`}
+                      className="w-full max-w-md h-64 object-cover rounded-2xl mb-6 mx-auto"
+                    />
+                    <div className="flex items-center justify-center gap-4 mb-6">
+                      <span className="text-5xl">{agent.icon}</span>
+                      <h3 className="font-bold text-black text-3xl font-opensans leading-tight">
+                        {agent.title}
+                      </h3>
                     </div>
-                    <p className="text-base text-neutral-950 mb-6 leading-relaxed font-opensans font-light">
-                      {agent.description}
-                    </p>
                   </div>
+                  <p className="text-lg text-black mb-8 leading-relaxed font-opensans font-light max-w-lg">
+                    {agent.description}
+                  </p>
+                </div>
+                
+                <div className="flex justify-center">
                   <a 
                     href={agent.telegramUrl} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="w-full inline-flex items-center justify-center gap-3 px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all duration-200 text-lg font-medium shadow-lg hover:shadow-xl"
+                    className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all duration-200 text-xl font-medium shadow-lg hover:shadow-xl min-w-[200px]"
                   >
                     <span>Start Now</span>
                     {telegramAnimationData && (
@@ -122,23 +170,11 @@ const AIAgentsCarousel = ({ telegramAnimationData }: AIAgentsCarouselProps) => {
                       </div>
                     )}
                   </a>
-                </CardContent>
-              </Card>
-            );
-          })}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-      </div>
-      
-      {/* Progress indicator */}
-      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2 z-50">
-        {aiAgents.map((_, index) => (
-          <div
-            key={index}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
-              index === activeCard ? 'bg-blue-600 scale-125' : 'bg-gray-300'
-            }`}
-          />
-        ))}
       </div>
     </div>
   );
