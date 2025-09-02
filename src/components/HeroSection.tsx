@@ -185,7 +185,7 @@ const HeroSection = () => {
           <p className="mb-3 text-sm">After creating your account you'll unlock the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
           <ul className="space-y-2 mb-4 flex flex-col items-center">
             <li className="flex items-center justify-center gap-2">
-              <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-white rounded-2xl px-4 py-2">
+              <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-white rounded-2xl px-2 py-1">
                 <span className="text-xl">👔</span>
                 <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)]">Job Application Agent</span>
                 {telegramAnimationData && <div className="w-12 h-12 ml-1">
@@ -197,7 +197,7 @@ const HeroSection = () => {
               </a>
             </li>
             <li className="flex items-center justify-center gap-2">
-              <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-white rounded-2xl px-4 py-2">
+              <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-white rounded-2xl px-2 py-1">
                 <span className="text-xl">🔔</span>
                 <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)]">Job Alerts Agent</span>
                 {telegramAnimationData && <div className="w-12 h-12 ml-1">
@@ -209,7 +209,7 @@ const HeroSection = () => {
               </a>
             </li>
             <li className="flex items-center justify-center gap-2">
-              <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-white rounded-2xl px-4 py-2">
+              <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-white rounded-2xl px-2 py-1">
                 <span className="text-xl">📝</span>
                 <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)]">Resume Builder Agent</span>
                 {telegramAnimationData && <div className="w-12 h-12 ml-1">
