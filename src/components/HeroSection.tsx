@@ -169,7 +169,7 @@ const HeroSection = () => {
                 <div className="flex text-yellow-400 mb-1">
                   <span>⭐⭐⭐⭐⭐</span>
                 </div>
-                <div className="text-white text-xs">
+                <div className="text-white text-xs text-left">
                   <span className="font-bold">255+</span> <span className="italic">professionals winning while others struggle</span>
                 </div>
               </div>
