@@ -170,7 +170,7 @@ const FeatureSection = ({
           </div>}
       </div>
     </div> : null;
-  return <section className="py-1 md:py-2 px-4 bg-dark-custom">
+  return <section className="py-1 md:py-2 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
         {lottieUrl ? (
           <div className="bg-gray-50 dark:bg-gray-900 rounded-3xl p-6 md:p-8 lg:p-10">

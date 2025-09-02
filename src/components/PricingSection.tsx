@@ -29,7 +29,7 @@ const PricingSection = () => {
 
   // Prevent rendering if pricing data is not available
   if (!pricingData) {
-    return <section className="py-16 sm:py-24 px-4 bg-dark-custom">
+    return <section className="py-16 sm:py-24 px-4 bg-black">
         <div className="max-w-7xl mx-auto text-center">
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
@@ -38,7 +38,7 @@ const PricingSection = () => {
         </div>
       </section>;
   }
-  return <section className="py-8 md:py-12 px-4 bg-dark-custom">
+  return <section className="py-8 md:py-12 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-6">
           <h2 className="text-3xl sm:text-5xl font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-2 font-inter">Pricing Plans</h2>

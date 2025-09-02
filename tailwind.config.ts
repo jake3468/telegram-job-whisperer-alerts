@@ -63,7 +63,6 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				'dark-custom': '#30313d',
 				pastel: {
 					blue: '#B8C5FF',
 					mint: '#A5FBCB', 

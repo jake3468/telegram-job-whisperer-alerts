@@ -30,7 +30,7 @@ const AuthHeader = () => {
 
   return (
     // Blended navbar with transparent background
-    <header className="w-full backdrop-blur-md bg-dark-custom/30 fixed top-0 left-0 right-0 z-50 border-b border-sky-600/20 shadow-[0_6px_24px_0px_rgba(16,118,238,0.05)]">
+    <header className="w-full backdrop-blur-md bg-black/30 fixed top-0 left-0 right-0 z-50 border-b border-sky-600/20 shadow-[0_6px_24px_0px_rgba(16,118,238,0.05)]">
       <div className="flex justify-between items-center px-3 sm:px-6 py-4 max-w-7xl mx-auto">
         {/* Logo and Site Name: Left side */}
         <div className="flex items-center space-x-2 sm:space-x-3 z-40 cursor-pointer" onClick={() => navigate('/')}>
@@ -58,7 +58,7 @@ const AuthHeader = () => {
           <SignedOut>
             <div className="flex items-center space-x-4">
               <SignInButton mode="modal" fallbackRedirectUrl="/ai-agents">
-                <button className="rounded-xl border border-sky-400/80 bg-dark-custom/80 text-white hover:border-fuchsia-500 hover:text-fuchsia-300 transition-colors duration-200 font-inter text-base font-semibold px-6 py-2 shadow-md focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2" style={{
+                <button className="rounded-xl border border-sky-400/80 bg-black/80 text-white hover:border-fuchsia-500 hover:text-fuchsia-300 transition-colors duration-200 font-inter text-base font-semibold px-6 py-2 shadow-md focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2" style={{
                   minWidth: '100px',
                   boxShadow: "0 4px 32px 0 rgba(56,189,248,0.09)"
                 }}>
@@ -91,7 +91,7 @@ const AuthHeader = () => {
 
       {/* Mobile/Tablet Dropdown Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-dark-custom/95 backdrop-blur-md border-b border-sky-600/20 shadow-lg">
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-black/95 backdrop-blur-md border-b border-sky-600/20 shadow-lg">
           <div className="px-4 py-4 space-y-3">
             {/* Navigation Items */}
             {navItems.map((item) => (
@@ -110,8 +110,8 @@ const AuthHeader = () => {
             {/* Auth Buttons */}
             <SignedOut>
               <SignInButton mode="modal" fallbackRedirectUrl="/ai-agents">
-                 <button 
-                  className="w-full rounded-xl border border-sky-400/80 bg-dark-custom/80 text-white hover:border-fuchsia-500 hover:text-fuchsia-300 transition-colors duration-200 font-inter text-base font-semibold px-6 py-3 shadow-md focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2"
+                <button 
+                  className="w-full rounded-xl border border-sky-400/80 bg-black/80 text-white hover:border-fuchsia-500 hover:text-fuchsia-300 transition-colors duration-200 font-inter text-base font-semibold px-6 py-3 shadow-md focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Sign In

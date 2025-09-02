@@ -12,7 +12,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-dark-custom py-12 px-4 border-t border-gray-800">
+    <footer className="bg-black py-12 px-4 border-t border-gray-800">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
           {/* Company Info */}

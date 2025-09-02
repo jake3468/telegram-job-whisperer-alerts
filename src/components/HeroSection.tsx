@@ -98,24 +98,24 @@ const HeroSection = () => {
   const goToDashboard = () => {
     navigate('/dashboard');
   };
-  return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-0 overflow-hidden bg-dark-custom">
+  return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-0 overflow-hidden bg-black">
       {/* Light rays background animation with responsive length for mobile */}
       <div className="absolute inset-0 z-0">
         <LightRays raysOrigin="top-center" raysColor="#00ffff" raysSpeed={1.5} lightSpread={0.8} rayLength={window.innerWidth < 768 ? 6.0 : 4.0} fadeDistance={window.innerWidth < 768 ? 5.0 : 3.0} followMouse={true} mouseInfluence={0.1} noiseAmount={0.1} distortion={0.05} className="w-full h-full" />
       </div>
-      <div className="absolute inset-0 z-10 bg-dark-custom/20" aria-hidden="true" />
+      <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
         
         {/* Black background to block particles behind headline */}
         <div className="relative">
-          <div className="absolute inset-0 bg-dark-custom/80 rounded-lg blur-sm z-10 transform scale-110"></div>
+          <div className="absolute inset-0 bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
           <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-sans tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">
-            <span className="block md:inline"><span className="inline-block bg-white text-black px-2 py-1 rounded">Get job offers</span> </span>
+            <span className="block md:inline">Get job offers </span>
             <span className="block md:inline">
               <span className="inline-block bg-cyan-400 text-black px-2 py-1 rounded">faster</span>
-              <span className="ml-2"><span className="inline-block bg-white text-black px-2 py-1 rounded">using AI 🚀</span></span>
+              <span className="ml-2">using AI 🚀</span>
             </span>
           </h1>
         </div>
