@@ -213,7 +213,7 @@ const FeatureSection = ({
                 <p className="text-xs leading-relaxed font-opensans font-normal text-neutral-950">
                   {description}
                 </p>
-                {title === "Job Application Agent" && (
+                {title === "👔 Job Application Agent" && (
                   <img 
                     src="/lovable-uploads/438fbede-9968-4fe7-9622-807454b576af.png" 
                     alt="Job Application Agent conversation interface" 
