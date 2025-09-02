@@ -26,7 +26,7 @@ const HowItWorksSection = () => {
   ];
 
   return (
-    <section id="how-it-works" className="bg-black py-12 md:py-16 px-4">
+    <section id="how-it-works" className="bg-dark-custom py-12 md:py-16 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
           <h2 className="text-4xl md:text-5xl font-semibold text-white mb-2 font-inter">

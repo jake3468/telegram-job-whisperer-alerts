@@ -42,7 +42,7 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black font-inter text-slate-50">
+    <div className="min-h-screen bg-dark-custom font-inter text-slate-50">
       {/* <SecurityHeaders /> - Temporarily disabled for debugging */}
       <AuthHeader />
       <HeroSection />

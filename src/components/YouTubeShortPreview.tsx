@@ -23,7 +23,7 @@ const YouTubeShortPreview = () => {
   };
   const embedUrl = "https://www.youtube.com/embed/ky654x0RFR8?autoplay=1&mute=0&controls=1&rel=0&modestbranding=1";
   const thumbnailUrl = "https://img.youtube.com/vi/ky654x0RFR8/maxresdefault.jpg";
-  return <section className="bg-black py-8 px-4" ref={containerRef}>
+  return <section className="bg-dark-custom py-8 px-4" ref={containerRef}>
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-center">
           <div className="relative w-[280px] h-[498px] sm:w-[320px] sm:h-[568px] lg:w-[360px] lg:h-[640px] rounded-2xl overflow-hidden shadow-2xl border border-gray-800/50 bg-gray-900">
@@ -34,7 +34,7 @@ const YouTubeShortPreview = () => {
             }
           }} aria-label="Play YouTube short video">
                 {isVisible && <img src={thumbnailUrl} alt="YouTube Short Preview" className="w-full h-full object-cover" loading="lazy" />}
-                <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors duration-300" />
+                <div className="absolute inset-0 bg-dark-custom/30 group-hover:bg-dark-custom/20 transition-colors duration-300" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
                     <Play className="w-6 h-6 text-white ml-1" fill="currentColor" />

@@ -1,5 +1,5 @@
 const AboutUsSection = () => {
-  return <section id="about-us" className="bg-black py-4 md:py-6 px-4">
+  return <section id="about-us" className="bg-dark-custom py-4 md:py-6 px-4">
       <div className="max-w-4xl mx-auto text-center">
         <div className="mb-3">
           <h2 className="text-3xl md:text-4xl font-semibold text-white mb-2 font-inter">
