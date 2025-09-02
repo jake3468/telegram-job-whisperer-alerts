@@ -237,6 +237,18 @@ const FeatureSection = ({
                     />
                   </>
                 )}
+                {title === "🔔 Job Alerts Agent" && (
+                  <>
+                    <p className="mt-3 text-xs font-medium text-neutral-700">
+                      Example chat below 👇
+                    </p>
+                    <img 
+                      src="/lovable-uploads/e5a7f299-f690-47de-a1b5-f44cfc229925.png" 
+                      alt="Job Alerts Agent conversation interface" 
+                      className="mt-2 w-full max-w-xs rounded-lg shadow-md"
+                    />
+                  </>
+                )}
               </div>
               <div className="pt-3 md:pt-2 space-y-3">
                 {isComingSoon ? 
