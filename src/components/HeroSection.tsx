@@ -136,30 +136,28 @@ const HeroSection = () => {
             </div>
             <p className="text-yellow-300 text-sm mb-4 font-medium">Get 50% off with code "ASP123"</p>
             
-            {/* Avatar Group with Stars */}
+            {/* Avatar Group with Rating */}
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="flex -space-x-2">
                 <Avatar className="h-8 w-8 border-2 border-white">
-                  <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="User" />
-                  <AvatarFallback>U1</AvatarFallback>
+                  <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Remy Sharp" />
+                  <AvatarFallback>RS</AvatarFallback>
                 </Avatar>
                 <Avatar className="h-8 w-8 border-2 border-white">
-                  <AvatarImage src="/static/images/avatar/3.jpg" alt="Cindy Baker" />
-                  <AvatarFallback>U2</AvatarFallback>
+                  <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Travis Howard" />
+                  <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
                 <Avatar className="h-8 w-8 border-2 border-white">
-                  <AvatarImage src="https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?w=100&h=100&fit=crop&crop=face" alt="User" />
-                  <AvatarFallback>U3</AvatarFallback>
+                  <AvatarImage src="https://images.unsplash.com/photo-1494790108755-2616b612b647?w=100&h=100&fit=crop&crop=face" alt="Agnes Walker" />
+                  <AvatarFallback>AW</AvatarFallback>
                 </Avatar>
                 <Avatar className="h-8 w-8 border-2 border-white">
-                  <AvatarImage src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="User" />
-                  <AvatarFallback>U4</AvatarFallback>
+                  <AvatarImage src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="Trevor Henderson" />
+                  <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
-                <div className="h-8 w-8 bg-gray-600 border-2 border-white rounded-full flex items-center justify-center text-xs text-white font-medium">
-                  +255
-                </div>
               </div>
-              <div className="flex text-yellow-300">
+              <span className="text-white text-sm font-medium">255 professionals winning while others struggle</span>
+              <div className="flex text-yellow-400">
                 <span>⭐⭐⭐⭐⭐</span>
               </div>
             </div>
