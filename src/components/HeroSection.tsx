@@ -105,6 +105,15 @@ const HeroSection = () => {
       </div>
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
+      {/* Discount Badge at Top */}
+      <div className="absolute top-6 left-1/2 transform -translate-x-1/2 z-30">
+        <div className="bg-cyan-400/20 border border-cyan-400/40 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg shadow-cyan-400/20">
+          <span className="text-cyan-300 text-sm font-medium [text-shadow:_0_0_10px_rgba(34,211,238,0.8)]">
+            Get 50% off with code "ASP123"
+          </span>
+        </div>
+      </div>
+      
       <div className="text-center max-w-4xl mx-auto z-20 relative">
         
         {/* Black background to block particles behind headline */}
@@ -134,7 +143,7 @@ const HeroSection = () => {
                 </button>
               </SignUpButton>
             </div>
-            <p className="text-yellow-300 text-sm mb-4 font-medium">Get 50% off with code "ASP123"</p>
+            
             
             {/* Avatar Group with Rating */}
             <div className="flex items-center justify-center gap-3 mb-4">
