@@ -75,10 +75,10 @@ const AIAgentsCarousel = ({ telegramAnimationData }: AIAgentsCarouselProps) => {
       <div className="w-full max-w-sm mx-auto">
         <Carousel className="w-full">
           <CarouselContent>
-            {aiAgents.map((agent, index) => (
+            {aiAgents.map((agent) => (
               <CarouselItem key={agent.id}>
-                <Card className="bg-white border-gray-200 shadow-lg animate-[slide-left_20s_linear_infinite] hover:animate-none">
-                  <CardContent className="p-4 text-center" style={{ animationDelay: `${index * 2}s` }}>
+                <Card className="bg-white border-gray-200 shadow-lg">
+                  <CardContent className="p-4 text-center">
                     <div className="mb-3">
                       <img 
                         src={agent.previewImage} 
@@ -126,10 +126,9 @@ const AIAgentsCarousel = ({ telegramAnimationData }: AIAgentsCarouselProps) => {
         {aiAgents.map((agent, index) => (
           <Card 
             key={agent.id} 
-            className={`bg-white border-gray-200 shadow-lg animate-[slide-left_25s_linear_infinite] hover:animate-none hover:scale-105 transition-all duration-200 ${
+            className={`bg-white border-gray-200 shadow-lg hover:scale-105 transition-all duration-200 ${
               index === 2 ? 'col-span-2 max-w-sm mx-auto' : ''
             }`}
-            style={{ animationDelay: `${index * 3}s` }}
           >
             <CardContent className="p-4 text-center">
               <div className="mb-3">
@@ -170,11 +169,10 @@ const AIAgentsCarousel = ({ telegramAnimationData }: AIAgentsCarouselProps) => {
   // Desktop: Horizontal row
   return (
     <div className="flex flex-wrap justify-center gap-6 max-w-6xl mx-auto">
-      {aiAgents.map((agent, index) => (
+      {aiAgents.map((agent) => (
         <Card 
           key={agent.id} 
-          className="bg-white border-gray-200 shadow-lg animate-[slide-left_30s_linear_infinite] hover:animate-none hover:scale-105 transition-all duration-200 max-w-xs"
-          style={{ animationDelay: `${index * 4}s` }}
+          className="bg-white border-gray-200 shadow-lg hover:scale-105 transition-all duration-200 max-w-xs"
         >
           <CardContent className="p-6 text-center">
             <div className="mb-4">
