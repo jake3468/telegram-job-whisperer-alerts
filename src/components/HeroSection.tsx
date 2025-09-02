@@ -133,7 +133,7 @@ const HeroSection = () => {
                 </button>
               </SignUpButton>
             </div>
-            <p className="text-yellow-300 text-sm mb-4 font-medium">Use code "ASP123" to get 50% off on all purchases</p>
+            <p className="text-yellow-300 text-sm mb-4 font-medium">Get 50% off with code "ASP123"</p>
           </SignedOut>
 
           <p className="mb-3 text-sm">After creating your account you'll unlock the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
