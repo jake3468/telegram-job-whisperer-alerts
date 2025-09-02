@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import Lottie from 'lottie-react';
 import LightRays from './LightRays';
+import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 
 // Preload rocket animation immediately when module loads
 const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json';
@@ -134,6 +135,34 @@ const HeroSection = () => {
               </SignUpButton>
             </div>
             <p className="text-yellow-300 text-sm mb-4 font-medium">Get 50% off with code "ASP123"</p>
+            
+            {/* Avatar Group with Stars */}
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="flex -space-x-2">
+                <Avatar className="h-8 w-8 border-2 border-white">
+                  <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="User" />
+                  <AvatarFallback>U1</AvatarFallback>
+                </Avatar>
+                <Avatar className="h-8 w-8 border-2 border-white">
+                  <AvatarImage src="https://images.unsplash.com/photo-1494790108755-2616b612c88b?w=100&h=100&fit=crop&crop=face" alt="User" />
+                  <AvatarFallback>U2</AvatarFallback>
+                </Avatar>
+                <Avatar className="h-8 w-8 border-2 border-white">
+                  <AvatarImage src="https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?w=100&h=100&fit=crop&crop=face" alt="User" />
+                  <AvatarFallback>U3</AvatarFallback>
+                </Avatar>
+                <Avatar className="h-8 w-8 border-2 border-white">
+                  <AvatarImage src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="User" />
+                  <AvatarFallback>U4</AvatarFallback>
+                </Avatar>
+                <div className="h-8 w-8 bg-gray-600 border-2 border-white rounded-full flex items-center justify-center text-xs text-white font-medium">
+                  +255
+                </div>
+              </div>
+              <div className="flex text-yellow-300">
+                <span>⭐⭐⭐⭐⭐</span>
+              </div>
+            </div>
           </SignedOut>
 
           <p className="mb-3 text-sm">After creating your account you'll unlock the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
