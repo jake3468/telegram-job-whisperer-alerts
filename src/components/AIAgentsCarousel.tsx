@@ -75,10 +75,10 @@ const AIAgentsCarousel = ({ telegramAnimationData }: AIAgentsCarouselProps) => {
       <div className="w-full max-w-sm mx-auto">
         <Carousel className="w-full">
           <CarouselContent>
-            {aiAgents.map((agent) => (
+            {aiAgents.map((agent, index) => (
               <CarouselItem key={agent.id}>
-                <Card className="bg-black/40 border-white/20 backdrop-blur-sm">
-                  <CardContent className="p-4 text-center">
+                <Card className="bg-white border-gray-200 shadow-lg animate-[slide-left_20s_linear_infinite] hover:animate-none">
+                  <CardContent className="p-4 text-center" style={{ animationDelay: `${index * 2}s` }}>
                     <div className="mb-3">
                       <img 
                         src={agent.previewImage} 
@@ -87,17 +87,17 @@ const AIAgentsCarousel = ({ telegramAnimationData }: AIAgentsCarouselProps) => {
                       />
                       <div className="flex items-center justify-center gap-2 mb-2">
                         <span className="text-2xl">{agent.icon}</span>
-                        <h3 className="font-semibold text-white text-sm">{agent.title}</h3>
+                        <h3 className="font-semibold text-black text-sm">{agent.title}</h3>
                       </div>
                     </div>
-                    <p className="text-xs text-zinc-300 mb-3 leading-relaxed">
+                    <p className="text-xs text-gray-700 mb-3 leading-relaxed">
                       {agent.description}
                     </p>
                     <a 
                       href={agent.telegramUrl} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200 text-xs"
+                      className="inline-flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all duration-200 text-xs"
                       style={{ color: agent.color }}
                     >
                       <span>Start Now</span>
@@ -126,9 +126,10 @@ const AIAgentsCarousel = ({ telegramAnimationData }: AIAgentsCarouselProps) => {
         {aiAgents.map((agent, index) => (
           <Card 
             key={agent.id} 
-            className={`bg-black/40 border-white/20 backdrop-blur-sm hover:scale-105 transition-all duration-200 ${
+            className={`bg-white border-gray-200 shadow-lg animate-[slide-left_25s_linear_infinite] hover:animate-none hover:scale-105 transition-all duration-200 ${
               index === 2 ? 'col-span-2 max-w-sm mx-auto' : ''
             }`}
+            style={{ animationDelay: `${index * 3}s` }}
           >
             <CardContent className="p-4 text-center">
               <div className="mb-3">
@@ -139,18 +140,18 @@ const AIAgentsCarousel = ({ telegramAnimationData }: AIAgentsCarouselProps) => {
                 />
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <span className="text-xl">{agent.icon}</span>
-                  <h3 className="font-semibold text-white text-sm">{agent.title}</h3>
+                  <h3 className="font-semibold text-black text-sm">{agent.title}</h3>
                 </div>
               </div>
-              <p className="text-xs text-zinc-300 mb-3 leading-relaxed">
+              <p className="text-xs text-gray-700 mb-3 leading-relaxed">
                 {agent.description}
               </p>
               <a 
                 href={agent.telegramUrl} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200 text-xs"
-                style={{ color: agent.color, textShadow: `0 0 10px ${agent.textGlow}` }}
+                className="inline-flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all duration-200 text-xs"
+                style={{ color: agent.color }}
               >
                 <span>Start Now</span>
                 {telegramAnimationData && (
@@ -169,8 +170,12 @@ const AIAgentsCarousel = ({ telegramAnimationData }: AIAgentsCarouselProps) => {
   // Desktop: Horizontal row
   return (
     <div className="flex flex-wrap justify-center gap-6 max-w-6xl mx-auto">
-      {aiAgents.map((agent) => (
-        <Card key={agent.id} className="bg-black/40 border-white/20 backdrop-blur-sm hover:scale-105 transition-all duration-200 max-w-xs">
+      {aiAgents.map((agent, index) => (
+        <Card 
+          key={agent.id} 
+          className="bg-white border-gray-200 shadow-lg animate-[slide-left_30s_linear_infinite] hover:animate-none hover:scale-105 transition-all duration-200 max-w-xs"
+          style={{ animationDelay: `${index * 4}s` }}
+        >
           <CardContent className="p-6 text-center">
             <div className="mb-4">
               <img 
@@ -180,18 +185,18 @@ const AIAgentsCarousel = ({ telegramAnimationData }: AIAgentsCarouselProps) => {
               />
               <div className="flex items-center justify-center gap-2 mb-3">
                 <span className="text-2xl">{agent.icon}</span>
-                <h3 className="font-semibold text-white">{agent.title}</h3>
+                <h3 className="font-semibold text-black">{agent.title}</h3>
               </div>
             </div>
-            <p className="text-sm text-zinc-300 mb-4 leading-relaxed">
+            <p className="text-sm text-gray-700 mb-4 leading-relaxed">
               {agent.description}
             </p>
             <a 
               href={agent.telegramUrl} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200 text-sm"
-              style={{ color: agent.color, textShadow: `0 0 10px ${agent.textGlow}` }}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all duration-200 text-sm"
+              style={{ color: agent.color }}
             >
               <span>Start Now</span>
               {telegramAnimationData && (
