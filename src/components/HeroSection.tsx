@@ -145,7 +145,7 @@ const HeroSection = () => {
               </div>
             </div>
             {/* Avatar Group with Rating */}
-            <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="flex items-center justify-center gap-4 mb-4">
               <div className="flex -space-x-2">
                 <Avatar className="h-8 w-8 border-2 border-white">
                   <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Remy Sharp" />
@@ -164,9 +164,14 @@ const HeroSection = () => {
                   <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
               </div>
-              <span className="text-white text-sm font-medium">255 professionals winning while others struggle</span>
-              <div className="flex text-yellow-400">
-                <span>⭐⭐⭐⭐⭐</span>
+              
+              <div className="flex flex-col items-start">
+                <div className="flex text-yellow-400 mb-1">
+                  <span>⭐⭐⭐⭐⭐</span>
+                </div>
+                <div className="text-white text-xs">
+                  <span className="font-bold">255+</span> <span className="italic">professionals winning while others struggle</span>
+                </div>
               </div>
             </div>
           </SignedOut>
