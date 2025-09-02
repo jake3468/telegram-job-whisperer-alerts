@@ -214,11 +214,28 @@ const FeatureSection = ({
                   {description}
                 </p>
                 {title === "👔 Job Application Agent" && (
-                  <img 
-                    src="/lovable-uploads/438fbede-9968-4fe7-9622-807454b576af.png" 
-                    alt="Job Application Agent conversation interface" 
-                    className="mt-3 w-full max-w-xs rounded-lg shadow-md"
-                  />
+                  <>
+                    <p className="mt-3 text-xs font-medium text-neutral-700">
+                      Example chat below 👇
+                    </p>
+                    <img 
+                      src="/lovable-uploads/438fbede-9968-4fe7-9622-807454b576af.png" 
+                      alt="Job Application Agent conversation interface" 
+                      className="mt-2 w-full max-w-xs rounded-lg shadow-md"
+                    />
+                  </>
+                )}
+                {title === "📝 Resume Builder Agent" && (
+                  <>
+                    <p className="mt-3 text-xs font-medium text-neutral-700">
+                      Example chat below 👇
+                    </p>
+                    <img 
+                      src="/lovable-uploads/80af4c55-96c8-4c4e-9cb9-f4f6c8530524.png" 
+                      alt="Resume Builder Agent conversation interface" 
+                      className="mt-2 w-full max-w-xs rounded-lg shadow-md"
+                    />
+                  </>
                 )}
               </div>
               <div className="pt-3 md:pt-2 space-y-3">
