@@ -206,13 +206,49 @@ const FeatureSection = ({
               <h3 className="text-base md:text-lg lg:text-xl font-bold font-opensans text-blue-700 leading-tight">
                 {title}
               </h3>
-              <p className="text-xs md:text-sm font-opensans font-medium text-neutral-950 leading-tight">
+              <p className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs md:text-sm font-opensans font-medium leading-tight">
                 {subheading}
               </p>
-              <div className="flex-1 flex items-center">
+              <div className="flex-1 flex flex-col items-center">
                 <p className="text-xs leading-relaxed font-opensans font-normal text-neutral-950">
                   {description}
                 </p>
+                {title === "👔 Job Application Agent" && (
+                  <>
+                    <p className="mt-3 text-xs font-medium text-neutral-700">
+                      Example chat below 👇
+                    </p>
+                    <img 
+                      src="/lovable-uploads/438fbede-9968-4fe7-9622-807454b576af.png" 
+                      alt="Job Application Agent conversation interface" 
+                      className="mt-2 w-full max-w-xs rounded-lg shadow-md"
+                    />
+                  </>
+                )}
+                {title === "📝 Resume Builder Agent" && (
+                  <>
+                    <p className="mt-3 text-xs font-medium text-neutral-700">
+                      Example chat below 👇
+                    </p>
+                    <img 
+                      src="/lovable-uploads/80af4c55-96c8-4c4e-9cb9-f4f6c8530524.png" 
+                      alt="Resume Builder Agent conversation interface" 
+                      className="mt-2 w-full max-w-xs rounded-lg shadow-md"
+                    />
+                  </>
+                )}
+                {title === "🔔 Job Alerts Agent" && (
+                  <>
+                    <p className="mt-3 text-xs font-medium text-neutral-700">
+                      Example chat below 👇
+                    </p>
+                    <img 
+                      src="/lovable-uploads/e5a7f299-f690-47de-a1b5-f44cfc229925.png" 
+                      alt="Job Alerts Agent conversation interface" 
+                      className="mt-2 w-full max-w-xs rounded-lg shadow-md"
+                    />
+                  </>
+                )}
               </div>
               <div className="pt-3 md:pt-2 space-y-3">
                 {isComingSoon ? 

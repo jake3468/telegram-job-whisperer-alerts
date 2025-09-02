@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import Lottie from 'lottie-react';
 import LightRays from './LightRays';
+import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 
 // Preload rocket animation immediately when module loads
 const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json';
@@ -104,12 +105,19 @@ const HeroSection = () => {
       </div>
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
+      
       <div className="text-center max-w-4xl mx-auto z-20 relative">
         
         {/* Black background to block particles behind headline */}
         <div className="relative">
           <div className="absolute inset-0 bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
-          <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-sans tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">Get job offers faster using AI 🚀</h1>
+          <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-sans tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">
+            <span className="block md:inline">Get job offers </span>
+            <span className="block md:inline">
+              <span className="inline-block bg-cyan-400 text-black px-2 py-1 rounded">faster</span>
+              <span className="ml-2">using AI 🚀</span>
+            </span>
+          </h1>
         </div>
         
         {/* Lottie Animation */}
@@ -121,13 +129,6 @@ const HeroSection = () => {
             </div>
           </div>}
         
-        {/* AI Services Badges - Combined Image */}
-        <div className="flex justify-center items-center gap-3 mb-4 md:mb-6 opacity-90">
-          <span className="text-sm font-playfair font-medium text-white drop-shadow-lg">Powered by</span>
-          <div className="flex items-center">
-            <img alt="AI Services - OpenAI, Claude, and Perplexity" className="h-8 object-contain hover:scale-110 transition-transform duration-200" loading="lazy" src="/lovable-uploads/061e42ad-45f4-4e4c-b642-9efff932bddd.png" />
-          </div>
-        </div>
 
         <div className="text-zinc-50 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-4">AI that updates your <span className="font-bold italic text-cyan-400">Resume</span>, sends daily <span className="font-bold italic text-cyan-400">Job Alerts</span>, crafts tailored <span className="font-bold italic text-cyan-400">Cover Letters</span>, prepares <span className="font-bold italic text-cyan-400">Interview Kits</span>, checks <span className="font-bold italic text-cyan-400">Job fit</span>, gives insider <span className="font-bold italic text-cyan-400">Company</span> knowledge, and shows the right <span className="font-bold italic text-cyan-400">HR contacts</span>. Everything you will ever need, all in one place.</p>
@@ -140,12 +141,51 @@ const HeroSection = () => {
                 </button>
               </SignUpButton>
             </div>
+            
+            {/* Discount Badge */}
+            <div className="flex justify-center mb-4">
+              <div className="bg-green-400/20 border border-green-400/40 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg shadow-green-400/20">
+                <span className="text-green-300 text-xs font-medium [text-shadow:_0_0_10px_rgba(34,197,94,0.8)]">
+                  Get 50% off with code "ASP123"
+                </span>
+              </div>
+            </div>
+            {/* Avatar Group with Rating */}
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="flex -space-x-2">
+                <Avatar className="h-8 w-8 border-2 border-white">
+                  <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Remy Sharp" />
+                  <AvatarFallback>RS</AvatarFallback>
+                </Avatar>
+                <Avatar className="h-8 w-8 border-2 border-white">
+                  <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Travis Howard" />
+                  <AvatarFallback>TH</AvatarFallback>
+                </Avatar>
+                <Avatar className="h-8 w-8 border-2 border-white">
+                  <AvatarImage src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="Agnes Walker" />
+                  <AvatarFallback>AW</AvatarFallback>
+                </Avatar>
+                <Avatar className="h-8 w-8 border-2 border-white">
+                  <AvatarImage src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="Trevor Henderson" />
+                  <AvatarFallback>TH</AvatarFallback>
+                </Avatar>
+              </div>
+              
+              <div className="flex flex-col items-start">
+                <div className="flex text-yellow-400 mb-1">
+                  <span>⭐⭐⭐⭐⭐</span>
+                </div>
+                <div className="text-white text-xs text-left">
+                  <span className="font-bold">255+</span> <span className="italic">professionals winning while others struggle</span>
+                </div>
+              </div>
+            </div>
           </SignedOut>
 
           <p className="mb-3 text-sm">After creating your account you'll unlock the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
-          <ul className="space-y-0 mb-4 flex flex-col items-center -space-y-1">
+          <ul className="space-y-2 mb-4 flex flex-col items-center">
             <li className="flex items-center justify-center gap-2">
-              <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2">
+              <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-white rounded-2xl px-2 py-1">
                 <span className="text-xl">👔</span>
                 <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)]">Job Application Agent</span>
                 {telegramAnimationData && <div className="w-12 h-12 ml-1">
@@ -157,9 +197,9 @@ const HeroSection = () => {
               </a>
             </li>
             <li className="flex items-center justify-center gap-2">
-              <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2">
+              <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-white rounded-2xl px-2 py-1">
                 <span className="text-xl">🔔</span>
-                <span className="italic text-[#00FF85] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,255,133,0.8)]">Job Alerts Agent</span>
+                <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)]">Job Alerts Agent</span>
                 {telegramAnimationData && <div className="w-12 h-12 ml-1">
                     <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} style={{
                   width: '100%',
@@ -169,9 +209,9 @@ const HeroSection = () => {
               </a>
             </li>
             <li className="flex items-center justify-center gap-2">
-              <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2">
+              <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-white rounded-2xl px-2 py-1">
                 <span className="text-xl">📝</span>
-                <span className="italic text-[#FF4FFF] drop-shadow-md [text-shadow:_0_0_10px_rgba(255,79,255,0.8)]">Resume Builder Agent</span>
+                <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)]">Resume Builder Agent</span>
                 {telegramAnimationData && <div className="w-12 h-12 ml-1">
                     <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} style={{
                   width: '100%',
