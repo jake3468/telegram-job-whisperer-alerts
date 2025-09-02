@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from './ui/card';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from './ui/carousel';
 import { useIsMobile } from '@/hooks/use-mobile';
 import Lottie from 'lottie-react';
 const jobApplicationPreview = '/lovable-uploads/2b660a4e-994b-4576-b0b9-92c1edfd908e.png';
@@ -56,153 +55,91 @@ interface AIAgentsCarouselProps {
 }
 
 const AIAgentsCarousel = ({ telegramAnimationData }: AIAgentsCarouselProps) => {
-  const isMobile = useIsMobile();
-  const [isTablet, setIsTablet] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const [activeCard, setActiveCard] = useState(0);
 
   useEffect(() => {
-    const checkTablet = () => {
-      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024);
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+      
+      // Calculate which card should be active based on scroll position
+      const scrollProgress = window.scrollY / (window.innerHeight * 0.5);
+      const newActiveCard = Math.min(Math.floor(scrollProgress), aiAgents.length - 1);
+      setActiveCard(Math.max(0, newActiveCard));
     };
-    
-    checkTablet();
-    window.addEventListener('resize', checkTablet);
-    return () => window.removeEventListener('resize', checkTablet);
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Mobile: Carousel view
-  if (isMobile) {
-    return (
-      <div className="w-full max-w-xs mx-auto px-2">
-        <Carousel className="w-full">
-          <CarouselContent className="-ml-2 md:-ml-4">
-            {aiAgents.map((agent) => (
-              <CarouselItem key={agent.id} className="pl-2 md:pl-4">
-                <Card className="bg-gray-50 border-gray-200 rounded-2xl shadow-sm">
-                  <CardContent className="p-3 text-center">
-                    <div className="mb-3">
+  return (
+    <div className="relative h-[200vh] w-full">
+      <div className="sticky top-1/2 transform -translate-y-1/2 flex justify-center items-center px-4">
+        <div className="relative w-full max-w-md">
+          {aiAgents.map((agent, index) => {
+            const offset = (index - activeCard) * 20;
+            const scale = index === activeCard ? 1 : 0.9 - Math.abs(index - activeCard) * 0.1;
+            const opacity = index === activeCard ? 1 : Math.max(0.3, 1 - Math.abs(index - activeCard) * 0.3);
+            const zIndex = aiAgents.length - Math.abs(index - activeCard);
+
+            return (
+              <Card 
+                key={agent.id}
+                className="absolute inset-0 bg-gray-50 border-gray-200 rounded-3xl shadow-xl transition-all duration-500 ease-out"
+                style={{
+                  transform: `translateY(${offset}px) scale(${scale})`,
+                  opacity,
+                  zIndex
+                }}
+              >
+                <CardContent className="p-8 text-center h-full flex flex-col justify-between">
+                  <div className="flex-1">
+                    <div className="mb-6">
                       <img 
                         src={agent.previewImage} 
                         alt={`${agent.title} preview`}
-                        className="w-full h-24 object-cover rounded-lg mb-3"
+                        className="w-full h-48 object-cover rounded-2xl mb-6"
                       />
-                      <div className="flex items-center justify-center gap-2 mb-2">
-                        <span className="text-xl">{agent.icon}</span>
-                        <h3 className="font-semibold text-neutral-950 text-sm font-opensans leading-tight">{agent.title}</h3>
+                      <div className="flex items-center justify-center gap-3 mb-4">
+                        <span className="text-4xl">{agent.icon}</span>
+                        <h3 className="font-bold text-neutral-950 text-2xl font-opensans leading-tight">{agent.title}</h3>
                       </div>
                     </div>
-                    <p className="text-xs text-neutral-950 mb-3 leading-relaxed font-opensans font-light">
+                    <p className="text-base text-neutral-950 mb-6 leading-relaxed font-opensans font-light">
                       {agent.description}
                     </p>
-                    <a 
-                      href={agent.telegramUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 text-xs font-medium"
-                    >
-                      <span>Start Now</span>
-                      {telegramAnimationData && (
-                        <div className="w-3 h-3">
-                          <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} />
-                        </div>
-                      )}
-                    </a>
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="left-1" />
-          <CarouselNext className="right-1" />
-        </Carousel>
-      </div>
-    );
-  }
-
-  // Tablet: Grid view (2x2 with center alignment)
-  if (isTablet) {
-    return (
-      <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto px-4">
-        {aiAgents.map((agent, index) => (
-          <Card 
-            key={agent.id} 
-            className={`bg-gray-50 border-gray-200 rounded-2xl shadow-sm hover:scale-105 transition-all duration-200 ${
-              index === 2 ? 'col-span-2 max-w-sm mx-auto' : ''
-            }`}
-          >
-            <CardContent className="p-4 text-center">
-              <div className="mb-3">
-                <img 
-                  src={agent.previewImage} 
-                  alt={`${agent.title} preview`}
-                  className="w-full h-24 object-cover rounded-lg mb-3"
-                />
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <span className="text-xl">{agent.icon}</span>
-                  <h3 className="font-semibold text-neutral-950 text-sm font-opensans leading-tight">{agent.title}</h3>
-                </div>
-              </div>
-              <p className="text-xs text-neutral-950 mb-3 leading-relaxed font-opensans font-light">
-                {agent.description}
-              </p>
-              <a 
-                href={agent.telegramUrl} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 text-xs font-medium"
-              >
-                <span>Start Now</span>
-                {telegramAnimationData && (
-                  <div className="w-3 h-3">
-                    <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} />
                   </div>
-                )}
-              </a>
-            </CardContent>
-          </Card>
+                  <a 
+                    href={agent.telegramUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-full inline-flex items-center justify-center gap-3 px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all duration-200 text-lg font-medium shadow-lg hover:shadow-xl"
+                  >
+                    <span>Start Now</span>
+                    {telegramAnimationData && (
+                      <div className="w-6 h-6">
+                        <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} />
+                      </div>
+                    )}
+                  </a>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+      
+      {/* Progress indicator */}
+      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2 z-50">
+        {aiAgents.map((_, index) => (
+          <div
+            key={index}
+            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              index === activeCard ? 'bg-blue-600 scale-125' : 'bg-gray-300'
+            }`}
+          />
         ))}
       </div>
-    );
-  }
-
-  // Desktop: Horizontal row
-  return (
-    <div className="flex flex-wrap justify-center gap-6 max-w-6xl mx-auto px-4">
-      {aiAgents.map((agent) => (
-        <Card 
-          key={agent.id} 
-          className="bg-gray-50 border-gray-200 rounded-2xl shadow-sm hover:scale-105 transition-all duration-200 max-w-xs"
-        >
-          <CardContent className="p-6 text-center">
-            <div className="mb-4">
-              <img 
-                src={agent.previewImage} 
-                alt={`${agent.title} preview`}
-                className="w-full h-32 object-cover rounded-lg mb-4"
-              />
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <span className="text-2xl">{agent.icon}</span>
-                <h3 className="font-semibold text-neutral-950 font-opensans leading-tight">{agent.title}</h3>
-              </div>
-            </div>
-            <p className="text-sm text-neutral-950 mb-4 leading-relaxed font-opensans font-light">
-              {agent.description}
-            </p>
-            <a 
-              href={agent.telegramUrl} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 text-sm font-medium"
-            >
-              <span>Start Now</span>
-              {telegramAnimationData && (
-                <div className="w-4 h-4">
-                  <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} />
-                </div>
-              )}
-            </a>
-          </CardContent>
-        </Card>
-      ))}
     </div>
   );
 };
