@@ -105,14 +105,6 @@ const HeroSection = () => {
       </div>
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
-      {/* Discount Badge at Top */}
-      <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-50">
-        <div className="bg-green-400/20 border border-green-400/40 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg shadow-green-400/20">
-          <span className="text-green-300 text-xs font-medium [text-shadow:_0_0_10px_rgba(34,197,94,0.8)]">
-            Get 50% off with code "ASP123"
-          </span>
-        </div>
-      </div>
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
         
@@ -144,7 +136,14 @@ const HeroSection = () => {
               </SignUpButton>
             </div>
             
-            
+            {/* Discount Badge */}
+            <div className="flex justify-center mb-4">
+              <div className="bg-green-400/20 border border-green-400/40 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg shadow-green-400/20">
+                <span className="text-green-300 text-xs font-medium [text-shadow:_0_0_10px_rgba(34,197,94,0.8)]">
+                  Get 50% off with code "ASP123"
+                </span>
+              </div>
+            </div>
             {/* Avatar Group with Rating */}
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="flex -space-x-2">
