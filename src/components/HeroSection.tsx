@@ -144,7 +144,7 @@ const HeroSection = () => {
                   <AvatarFallback>U1</AvatarFallback>
                 </Avatar>
                 <Avatar className="h-8 w-8 border-2 border-white">
-                  <AvatarImage src="https://images.unsplash.com/photo-1494790108755-2616b612c88b?w=100&h=100&fit=crop&crop=face" alt="User" />
+                  <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Emma" alt="User" />
                   <AvatarFallback>U2</AvatarFallback>
                 </Avatar>
                 <Avatar className="h-8 w-8 border-2 border-white">
