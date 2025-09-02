@@ -209,10 +209,17 @@ const FeatureSection = ({
               <p className="text-xs md:text-sm font-opensans font-medium text-neutral-950 leading-tight">
                 {subheading}
               </p>
-              <div className="flex-1 flex items-center">
+              <div className="flex-1 flex flex-col items-center">
                 <p className="text-xs leading-relaxed font-opensans font-normal text-neutral-950">
                   {description}
                 </p>
+                {title === "Job Application Agent" && (
+                  <img 
+                    src="/lovable-uploads/438fbede-9968-4fe7-9622-807454b576af.png" 
+                    alt="Job Application Agent conversation interface" 
+                    className="mt-3 w-full max-w-xs rounded-lg shadow-md"
+                  />
+                )}
               </div>
               <div className="pt-3 md:pt-2 space-y-3">
                 {isComingSoon ? 
