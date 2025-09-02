@@ -156,7 +156,7 @@ const HeroSection = () => {
                   <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
                 <Avatar className="h-8 w-8 border-2 border-white">
-                  <AvatarImage src="https://images.unsplash.com/photo-1494790108755-2616b612b647?w=100&h=100&fit=crop&crop=face" alt="Agnes Walker" />
+                  <AvatarImage src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="Agnes Walker" />
                   <AvatarFallback>AW</AvatarFallback>
                 </Avatar>
                 <Avatar className="h-8 w-8 border-2 border-white">
