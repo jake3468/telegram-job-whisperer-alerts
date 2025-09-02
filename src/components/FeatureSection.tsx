@@ -206,7 +206,7 @@ const FeatureSection = ({
               <h3 className="text-base md:text-lg lg:text-xl font-bold font-opensans text-blue-700 leading-tight">
                 {title}
               </h3>
-              <p className="text-xs md:text-sm font-opensans font-medium text-neutral-950 leading-tight">
+              <p className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs md:text-sm font-opensans font-medium leading-tight">
                 {subheading}
               </p>
               <div className="flex-1 flex flex-col items-center">
