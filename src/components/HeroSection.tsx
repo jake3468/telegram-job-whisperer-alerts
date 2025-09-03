@@ -108,18 +108,18 @@ const HeroSection = () => {
       
       {/* Main Container with Grid Layout */}
       <div className="max-w-7xl mx-auto z-20 relative w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
           
           {/* Mobile Preview - Shows on all screen sizes */}
           <div className="flex justify-center items-center mb-8 md:mb-0">
             <MobilePreview />
           </div>
           
-          {/* Hero Content - Always center aligned */}
-          <div className="text-center max-w-2xl mx-auto md:mx-0">
+          {/* Hero Content - Always left aligned */}
+          <div className="text-left max-w-2xl mx-auto md:mx-0 md:pl-8">
         
         {/* Black background to block particles behind headline */}
-        <div className="relative">
+        <div className="relative mb-8">
           <div className="absolute inset-0 bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
           <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-sans tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">
             <span className="block md:inline">Get job offers </span>
