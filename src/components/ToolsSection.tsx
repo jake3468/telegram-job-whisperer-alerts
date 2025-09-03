@@ -3,13 +3,13 @@ import FeatureSection from "./FeatureSection";
 
 const ToolsSection = () => {
   return (
-    <section id="features" className="relative bg-white dark:bg-black transition-colors duration-300">
+    <section id="features" className="relative bg-black">
       {/* Header Section */}
       <div className="max-w-7xl mx-auto px-4 py-4 text-center">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-black dark:text-white mb-2 font-inter transition-colors duration-300">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-white mb-2 font-inter">
           Unlock Your Career Potential
         </h2>
-        <p className="text-base sm:text-xl text-gray-600 dark:text-gray-400 font-inter font-light transition-colors duration-300">
+        <p className="text-base sm:text-xl text-gray-400 font-inter font-light">
           Explore our AI-powered tools designed to streamline your job search.
         </p>
       </div>
@@ -78,7 +78,7 @@ const ToolsSection = () => {
 
         {/* Placeholder for other features - to be added later */}
         <div className="py-16 px-4 text-center">
-          <p className="text-gray-600 dark:text-gray-400 font-inter transition-colors duration-300">
+          <p className="text-gray-400 font-inter">
             More features coming soon...
           </p>
         </div>

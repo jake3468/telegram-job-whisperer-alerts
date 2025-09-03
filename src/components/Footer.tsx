@@ -12,31 +12,31 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-white dark:bg-black py-12 px-4 border-t border-gray-300 dark:border-gray-800 transition-colors duration-300">
+    <footer className="bg-black py-12 px-4 border-t border-gray-800">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
           {/* Company Info */}
           <div className="md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
               <img alt="JobBots Logo" className="h-8 w-8" src="/lovable-uploads/d1063169-3726-4087-9672-b20c6091d9a4.jpg" />
-              <span className="text-xl font-semibold text-black dark:text-white font-orbitron transition-colors duration-300">Aspirely.ai</span>
+              <span className="text-xl font-semibold text-white font-orbitron">Aspirely.ai</span>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 text-sm font-inter max-w-md transition-colors duration-300">
+            <p className="text-gray-400 text-sm font-inter max-w-md">
               The AI-powered platform for finding and creating your perfect career path with advanced job matching and personalized guidance.
             </p>
           </div>
 
           {/* Product Section */}
           <div>
-            <h3 className="text-black dark:text-white font-semibold text-sm font-inter mb-4 transition-colors duration-300">Product</h3>
+            <h3 className="text-white font-semibold text-sm font-inter mb-4">Product</h3>
             <div className="space-y-3">
-              <button onClick={() => scrollToSection('features')} className="block text-gray-600 dark:text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
+              <button onClick={() => scrollToSection('features')} className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
                 Features
               </button>
-              <button onClick={() => scrollToSection('how-it-works')} className="block text-gray-600 dark:text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
+              <button onClick={() => scrollToSection('how-it-works')} className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
                 How It Works
               </button>
-              <button onClick={() => scrollToSection('pricing')} className="block text-gray-600 dark:text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
+              <button onClick={() => scrollToSection('pricing')} className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
                 Pricing
               </button>
             </div>
@@ -44,15 +44,15 @@ const Footer = () => {
 
           {/* Company Section */}
           <div>
-            <h3 className="text-black dark:text-white font-semibold text-sm font-inter mb-4 transition-colors duration-300">Company</h3>
+            <h3 className="text-white font-semibold text-sm font-inter mb-4">Company</h3>
             <div className="space-y-3">
-              <button onClick={() => scrollToSection('about-us')} className="block text-gray-600 dark:text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
+              <button onClick={() => scrollToSection('about-us')} className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
                 About Us
               </button>
-              <Link to="/contact-support" className="block text-gray-600 dark:text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
+              <Link to="/contact-support" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
                 Contact Support
               </Link>
-              <Link to="/blogs" className="block text-gray-600 dark:text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter" onClick={() => window.scrollTo(0, 0)}>
+              <Link to="/blogs" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter" onClick={() => window.scrollTo(0, 0)}>
                 Blogs
               </Link>
             </div>
@@ -60,12 +60,12 @@ const Footer = () => {
 
           {/* Legal Section - Using standard HTML anchor tags for better crawlability */}
           <div>
-            <h3 className="text-black dark:text-white font-semibold text-sm font-inter mb-4 transition-colors duration-300">Legal</h3>
+            <h3 className="text-white font-semibold text-sm font-inter mb-4">Legal</h3>
             <div className="space-y-3">
-              <a href="/privacy-policy" className="block text-gray-600 dark:text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
+              <a href="/privacy-policy" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
                 Privacy Policy
               </a>
-              <a href="/terms-of-service" className="block text-gray-600 dark:text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
+              <a href="/terms-of-service" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
                 Terms of Service
               </a>
             </div>
@@ -79,7 +79,7 @@ const Footer = () => {
           <meta itemProp="description" content="AI-powered career advancement platform for job seekers" />
           
           <div className="flex flex-col items-center space-y-4">
-            <h3 className="text-black dark:text-white font-semibold text-sm font-inter transition-colors duration-300">Featured on</h3>
+            <h3 className="text-white font-semibold text-sm font-inter">Featured on</h3>
             <div className="flex flex-col items-center space-y-4">
               {/* Badge row - horizontal on desktop/tablet */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
@@ -135,9 +135,9 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="pt-8 border-t border-gray-300 dark:border-gray-800 transition-colors duration-300">
+        <div className="pt-8 border-t border-gray-800">
           <div className="flex flex-col sm:flex-row justify-between items-center">
-            <p className="text-gray-600 dark:text-gray-500 text-sm font-inter mb-4 sm:mb-0 transition-colors duration-300">
+            <p className="text-gray-500 text-sm font-inter mb-4 sm:mb-0">
               © {new Date().getFullYear()} Aspirely.ai. All rights reserved.
             </p>
             <div className="flex items-center space-x-6">

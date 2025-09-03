@@ -23,7 +23,7 @@ const YouTubeShortPreview = () => {
   };
   const embedUrl = "https://www.youtube.com/embed/ky654x0RFR8?autoplay=1&mute=0&controls=1&rel=0&modestbranding=1";
   const thumbnailUrl = "https://img.youtube.com/vi/ky654x0RFR8/maxresdefault.jpg";
-  return <section className="bg-white dark:bg-black py-8 px-4 transition-colors duration-300" ref={containerRef}>
+  return <section className="bg-black py-8 px-4" ref={containerRef}>
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-center">
           <div className="relative w-[280px] h-[498px] sm:w-[320px] sm:h-[568px] lg:w-[360px] lg:h-[640px] rounded-2xl overflow-hidden shadow-2xl border border-gray-800/50 bg-gray-900">
@@ -41,7 +41,7 @@ const YouTubeShortPreview = () => {
                   </div>
                 </div>
                 <div className="absolute bottom-4 left-4 right-4">
-                  <p className="text-black dark:text-white font-medium drop-shadow-lg text-xl transition-colors duration-300">Watch How It Works in 30 Seconds</p>
+                  <p className="text-white font-medium drop-shadow-lg text-xl">Watch How It Works in 30 Seconds</p>
                 </div>
               </div> : <iframe src={embedUrl} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title="Aspirely.ai Demo Short" />}
           </div>

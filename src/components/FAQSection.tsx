@@ -31,13 +31,13 @@ const FAQSection = () => {
   ];
 
   return (
-    <section className="py-12 md:py-16 px-4 bg-white dark:bg-black transition-colors duration-300">
+    <section className="py-12 md:py-16 px-4 bg-black">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-6">
-          <h2 className="text-4xl font-bold text-black dark:bg-gradient-to-r dark:from-sky-400 dark:to-blue-500 dark:bg-clip-text dark:text-transparent dark:mb-2 mb-2 font-inter transition-colors duration-300">
+          <h2 className="text-4xl font-bold bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent mb-2 font-inter">
             Frequently Asked Questions
           </h2>
-          <p className="text-base-content dark:text-gray-300 text-lg font-inter transition-colors duration-300">
+          <p className="text-gray-300 text-lg font-inter">
             Everything you need to know about Aspirely.ai
           </p>
         </div>
@@ -47,12 +47,12 @@ const FAQSection = () => {
             <AccordionItem 
               key={index} 
               value={`item-${index}`}
-              className="border border-gray-300 dark:border-gray-800 rounded-lg bg-gray-100 dark:bg-gray-900/50 backdrop-blur-sm transition-colors duration-300"
+              className="border border-gray-800 rounded-lg bg-gray-900/50 backdrop-blur-sm"
             >
-              <AccordionTrigger className="px-6 py-4 text-left text-black dark:text-white hover:text-sky-400 transition-colors font-inter font-medium">
+              <AccordionTrigger className="px-6 py-4 text-left text-white hover:text-sky-400 transition-colors font-inter font-medium">
                 {faq.question}
               </AccordionTrigger>
-              <AccordionContent className="px-6 pb-4 text-base-content-secondary dark:text-gray-300 leading-relaxed font-inter transition-colors duration-300">
+              <AccordionContent className="px-6 pb-4 text-gray-300 leading-relaxed font-inter">
                 {faq.answer}
               </AccordionContent>
             </AccordionItem>

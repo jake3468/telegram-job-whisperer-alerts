@@ -3,7 +3,6 @@ import { SignedIn, SignedOut, SignInButton, SignUpButton } from '@clerk/clerk-re
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
-import ThemeToggle from './ThemeToggle';
 
 const AuthHeader = () => {
   const navigate = useNavigate();
@@ -31,12 +30,12 @@ const AuthHeader = () => {
 
   return (
     // Blended navbar with transparent background
-    <header className="w-full backdrop-blur-md bg-black/30 dark:bg-black/30 bg-white/80 fixed top-0 left-0 right-0 z-50 border-b border-sky-600/20 shadow-[0_6px_24px_0px_rgba(16,118,238,0.05)] transition-colors duration-300">
+    <header className="w-full backdrop-blur-md bg-black/30 fixed top-0 left-0 right-0 z-50 border-b border-sky-600/20 shadow-[0_6px_24px_0px_rgba(16,118,238,0.05)]">
       <div className="flex justify-between items-center px-3 sm:px-6 py-4 max-w-7xl mx-auto">
         {/* Logo and Site Name: Left side */}
         <div className="flex items-center space-x-2 sm:space-x-3 z-40 cursor-pointer" onClick={() => navigate('/')}>
           <img alt="JobBots Logo" className="h-9 w-9 sm:h-10 sm:w-10 drop-shadow-lg" src="/lovable-uploads/924d7c77-405f-4345-8967-693eebdb7865.jpg" />
-          <span className="font-orbitron text-white dark:text-white text-black font-extrabold sm:text-3xl text-2xl tracking-wider drop-shadow transition-colors duration-300">
+          <span className="font-orbitron text-white font-extrabold sm:text-3xl text-2xl tracking-wider drop-shadow">
             Aspirely.ai
           </span>
         </div>
@@ -47,7 +46,7 @@ const AuthHeader = () => {
             <button
               key={item.id}
               onClick={() => scrollToSection(item.id)}
-              className="text-white dark:text-white text-black hover:text-sky-300 transition-colors duration-200 font-inter font-medium text-base"
+              className="text-white hover:text-sky-300 transition-colors duration-200 font-inter font-medium text-base"
             >
               {item.label}
             </button>
@@ -55,8 +54,7 @@ const AuthHeader = () => {
         </nav>
 
         {/* Desktop Auth Buttons: Right side - only show on large screens */}
-        <div className="hidden lg:flex items-center gap-4">
-          <ThemeToggle />
+        <div className="hidden lg:block">
           <SignedOut>
             <div className="flex items-center space-x-4">
               <SignInButton mode="modal" fallbackRedirectUrl="/ai-agents">
@@ -80,11 +78,10 @@ const AuthHeader = () => {
         </div>
 
         {/* Mobile/Tablet Hamburger Menu - show on tablet and mobile */}
-        <div className="lg:hidden flex items-center gap-3">
-          <ThemeToggle />
+        <div className="lg:hidden">
           <button
             onClick={toggleMenu}
-            className="text-white dark:text-white text-black p-2 rounded-lg hover:bg-white/10 transition-colors duration-200"
+            className="text-white p-2 rounded-lg hover:bg-white/10 transition-colors duration-200"
             aria-label="Toggle menu"
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -94,14 +91,14 @@ const AuthHeader = () => {
 
       {/* Mobile/Tablet Dropdown Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-black/95 dark:bg-black/95 bg-white/95 backdrop-blur-md border-b border-sky-600/20 shadow-lg transition-colors duration-300">
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-black/95 backdrop-blur-md border-b border-sky-600/20 shadow-lg">
           <div className="px-4 py-4 space-y-3">
             {/* Navigation Items */}
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
-                className="w-full text-left text-white dark:text-white text-black hover:text-sky-300 transition-colors duration-200 font-inter font-medium text-base py-2 px-2 rounded hover:bg-white/5"
+                className="w-full text-left text-white hover:text-sky-300 transition-colors duration-200 font-inter font-medium text-base py-2 px-2 rounded hover:bg-white/5"
               >
                 {item.label}
               </button>
