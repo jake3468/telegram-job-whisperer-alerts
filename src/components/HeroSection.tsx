@@ -111,8 +111,8 @@ const HeroSection = () => {
       <div className="max-w-7xl mx-auto z-20 relative w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
           
-          {/* Mobile Preview - Shows on all screen sizes */}
-          <div className="flex justify-center items-center mb-8 md:mb-0">
+          {/* Mobile Preview - Hidden on mobile, shown on desktop */}
+          <div className="hidden md:flex justify-center items-center mb-8 md:mb-0">
             <MobilePreview />
           </div>
           
@@ -191,6 +191,11 @@ const HeroSection = () => {
               </div>
             </div>
           </SignedOut>
+
+          {/* Mobile Preview - Shows only on mobile, below hero content */}
+          <div className="flex md:hidden justify-center items-center mt-8 mb-8">
+            <MobilePreview />
+          </div>
 
         <SignedIn>
           <button onClick={goToDashboard} className="bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-600 hover:from-sky-600 hover:to-blue-700 text-white px-12 py-4 text-lg sm:text-xl rounded-xl transition-all duration-300 font-inter font-bold shadow-2xl drop-shadow-xl hover:shadow-sky-500/60 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-sky-400/50 mb-2">
