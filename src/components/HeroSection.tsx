@@ -134,7 +134,9 @@ const HeroSection = () => {
             <div className="hidden md:block lg:hidden">
               <span className="bg-cyan-400 text-black px-0.5 py-0">We do the</span>
               <br />
-              <span className="bg-cyan-400 text-black px-0.5 py-0 mt-2 md:mt-3 inline-block">boring stuff.</span> <span className="bg-cyan-400 text-black px-0.5 py-0">You get the job</span> 🏆
+              <span className="bg-cyan-400 text-black px-0.5 py-0 mt-2 md:mt-3 inline-block">boring stuff.</span>
+              <br />
+              <span className="bg-cyan-400 text-black px-0.5 py-0 mt-2 md:mt-3 inline-block">You get the job</span> 🏆
             </div>
           </h1>
         </div>
