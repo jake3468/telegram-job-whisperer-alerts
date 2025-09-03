@@ -109,7 +109,7 @@ const HeroSection = () => {
       
       {/* Main Container with Grid Layout */}
       <div className="max-w-7xl mx-auto z-20 relative w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-center">
           
           {/* Mobile Preview - Hidden on mobile, shown on desktop */}
           <div className="hidden md:flex justify-center items-center mb-8 md:mb-0">
@@ -117,10 +117,10 @@ const HeroSection = () => {
           </div>
           
           {/* Hero Content - Center aligned with mobile preview */}
-          <div className="text-left max-w-2xl mx-auto md:mx-0 md:pl-8 flex flex-col justify-center">
+          <div className="text-left max-w-2xl mx-auto md:mx-0 md:pl-4 flex flex-col justify-center mt-8 md:mt-0">
         
         {/* Black background to block particles behind headline */}
-        <div className="relative mb-12">
+        <div className="relative mb-8">
           <div className="absolute inset-0 bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
           <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-sans tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">
             <span className="block md:inline">Get job offers </span>
