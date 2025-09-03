@@ -157,7 +157,7 @@ const HeroSection = () => {
           <SignedOut>
             {/* Button and Badge Container */}
             <div className="flex flex-col items-start md:flex-col md:items-start lg:flex-row lg:items-center lg:justify-start gap-4 md:gap-6 mb-8">
-              <SignUpButton mode="modal" className="bg-slate-200 hover:bg-slate-100">
+              <SignUpButton mode="modal">
                 <button className="bg-[#F8F9FD] hover:bg-gray-100 text-black px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-2xl transition-all duration-300 font-inter font-semibold shadow-lg hover:shadow-gray-300/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-gray-400/50 flex items-center gap-2 justify-start md:justify-center w-auto">
                   🎯 Start Free Now
                 </button>
