@@ -123,9 +123,7 @@ const HeroSection = () => {
         <div className="relative mb-8">
           <div className="absolute inset-0 bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
           <h1 className="relative z-30 text-3xl md:text-4xl lg:text-5xl font-bold mb-1 leading-tight font-sans tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">
-            <span className="block md:inline">
-              <span className="inline-block bg-cyan-400 text-black px-2 py-1">We do the boring stuff. You get the job</span> <span className="ml-1">🏆</span>
-            </span>
+            <span className="inline bg-cyan-400 text-black px-2 py-1">We do the boring stuff. You get the job</span> 🏆
           </h1>
         </div>
         
