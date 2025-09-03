@@ -5,7 +5,6 @@ import { useUser } from '@clerk/clerk-react';
 import Lottie from 'lottie-react';
 import LightRays from './LightRays';
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
-import MobilePreview from './MobilePreview';
 import { HeroVideo } from '@/components/HeroVideo';
 
 // Preload rocket animation immediately when module loads
@@ -112,9 +111,9 @@ const HeroSection = () => {
       <div className="max-w-7xl mx-auto z-20 relative w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-center">
           
-          {/* Mobile Preview - Hidden on mobile, shown on desktop */}
+          {/* Hero Video - Hidden on mobile, shown on desktop */}
           <div className="hidden md:flex justify-center items-center mb-8 md:mb-0">
-            <MobilePreview />
+            <HeroVideo className="w-full max-w-md h-64 md:h-80" />
           </div>
           
           {/* Hero Content - Center aligned with mobile preview */}
@@ -191,9 +190,9 @@ const HeroSection = () => {
             </div>
           </SignedOut>
 
-          {/* Mobile Preview - Shows only on mobile, below hero content */}
+          {/* Hero Video - Shows only on mobile, below hero content */}
           <div className="flex md:hidden justify-center items-center mt-8 mb-8">
-            <MobilePreview />
+            <HeroVideo className="w-full max-w-sm h-48" />
           </div>
 
         <SignedIn>
