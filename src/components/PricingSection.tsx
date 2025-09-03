@@ -162,7 +162,7 @@ const PricingSection = () => {
             <CardContent className="grow flex flex-col px-4 pb-4 bg-slate-200">
               <div className="flex flex-col gap-2 my-3 flex-grow">
                 {/* Show database products if available, otherwise show static fallback */}
-                {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="rounded-lg p-2.5 border border-gray-200 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-blue-100">
+                {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="rounded-lg p-2.5 border border-gray-200 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-sky-300">
                       <span className="text-gray-800 font-medium text-sm">{pack.credits_amount} credits</span>
                       <div className="flex items-center gap-2">
                         <span className="text-gray-900 font-bold text-sm">{pricingData.currencySymbol}{pack.price_amount}</span>
