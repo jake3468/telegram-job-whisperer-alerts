@@ -213,7 +213,7 @@ const HeroSection = () => {
         <div className="text-left">
           <p className="text-white mb-6 text-sm md:text-base">After creating your account you'll unlock the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
           
-          <div className="flex flex-col md:flex-row items-center justify-center space-y-3 md:space-y-0 md:space-x-3">
+          <div className="flex flex-col md:flex-row items-start justify-start md:items-center md:justify-center space-y-3 md:space-y-0 md:space-x-3">
             <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-white rounded-xl px-3 py-2 bg-black/20 backdrop-blur-sm">
               <span className="text-lg">👔</span>
               <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)] text-sm">Job Application Agent</span>
