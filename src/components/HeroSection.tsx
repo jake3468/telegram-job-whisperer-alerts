@@ -116,11 +116,11 @@ const HeroSection = () => {
             <MobilePreview />
           </div>
           
-          {/* Hero Content - Always left aligned */}
-          <div className="text-left max-w-2xl mx-auto md:mx-0 md:pl-8">
+          {/* Hero Content - Center aligned with mobile preview */}
+          <div className="text-left max-w-2xl mx-auto md:mx-0 md:pl-8 flex flex-col justify-center">
         
         {/* Black background to block particles behind headline */}
-        <div className="relative mb-8">
+        <div className="relative mb-12">
           <div className="absolute inset-0 bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
           <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-sans tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">
             <span className="block md:inline">Get job offers </span>
@@ -141,12 +141,12 @@ const HeroSection = () => {
           </div>} */}
         
 
-        <div className="text-zinc-50 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-4 text-sm md:text-base">Our AI Agents will update your <span className="font-bold italic text-cyan-400">Resume</span>, send daily <span className="font-bold italic text-cyan-400">Job Alerts</span>, craft tailored <span className="font-bold italic text-cyan-400">Cover Letters</span>, prepare <span className="font-bold italic text-cyan-400">Interview Kits</span>, check <span className="font-bold italic text-cyan-400">Job fit</span>, give insider <span className="font-bold italic text-cyan-400">Company</span> knowledge, and show the right <span className="font-bold italic text-cyan-400">HR contacts</span>. Everything you will ever need, all in one place.</p>
+        <div className="text-zinc-50 mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
+          <p className="mb-8 text-sm md:text-base">Our AI Agents will update your <span className="font-bold italic text-cyan-400">Resume</span>, send daily <span className="font-bold italic text-cyan-400">Job Alerts</span>, craft tailored <span className="font-bold italic text-cyan-400">Cover Letters</span>, prepare <span className="font-bold italic text-cyan-400">Interview Kits</span>, check <span className="font-bold italic text-cyan-400">Job fit</span>, give insider <span className="font-bold italic text-cyan-400">Company</span> knowledge, and show the right <span className="font-bold italic text-cyan-400">HR contacts</span>. Everything you will ever need, all in one place.</p>
           
           <SignedOut>
             {/* Button and Badge Container */}
-            <div className="flex flex-col items-center md:flex-row md:items-center md:justify-start gap-4 mb-6">
+            <div className="flex flex-col items-center md:flex-row md:items-center md:justify-start gap-6 mb-8">
               <SignUpButton mode="modal">
                 <button className="bg-[#F8F9FD] hover:bg-gray-100 text-black px-6 py-2 text-base sm:text-lg rounded-2xl transition-all duration-300 font-inter font-semibold shadow-lg hover:shadow-gray-300/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-gray-400/50 flex items-center gap-2 justify-center">
                   🎯 Start Free Now
@@ -161,7 +161,7 @@ const HeroSection = () => {
               </div>
             </div>
             {/* Avatar Group with Rating */}
-            <div className="flex items-center justify-start gap-4 mb-4">
+            <div className="flex items-center justify-start gap-4 mb-6">
               <div className="flex -space-x-2">
                 <Avatar className="h-8 w-8 border-2 border-white">
                   <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Remy Sharp" />
