@@ -98,24 +98,28 @@ const HeroSection = () => {
   const goToDashboard = () => {
     navigate('/dashboard');
   };
-  return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-0 overflow-hidden bg-black">
+  return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-0 overflow-hidden bg-white dark:bg-black transition-colors duration-300">
       {/* Light rays background animation with responsive length for mobile */}
       <div className="absolute inset-0 z-0">
         <LightRays raysOrigin="top-center" raysColor="#00ffff" raysSpeed={1.5} lightSpread={0.8} rayLength={window.innerWidth < 768 ? 6.0 : 4.0} fadeDistance={window.innerWidth < 768 ? 5.0 : 3.0} followMouse={true} mouseInfluence={0.1} noiseAmount={0.1} distortion={0.05} className="w-full h-full" />
       </div>
-      <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
+      <div className="absolute inset-0 z-10 bg-black/20 dark:bg-black/20" aria-hidden="true" />
       
       
       <div className="text-center max-w-4xl mx-auto z-20 relative">
         
         {/* Black background to block particles behind headline */}
         <div className="relative">
-          <div className="absolute inset-0 bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
-          <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-sans tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">
-            <span className="block md:inline">Get job offers </span>
+          <div className="absolute inset-0 bg-black/80 dark:bg-black/80 bg-white/80 rounded-lg blur-sm z-10 transform scale-110 transition-colors duration-300"></div>
+          <h1 className="relative z-30 text-3xl md:text-5xl lg:text-6xl font-bold mb-1 leading-tight font-sans tracking-tight text-black dark:text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic transition-colors duration-300">
             <span className="block md:inline">
-              <span className="inline-block bg-cyan-400 text-black px-2 py-1 rounded">faster</span>
-              <span className="ml-2">using AI 🚀</span>
+              <span className="inline-block bg-black dark:bg-cyan-400 text-white dark:text-black px-2 py-1 rounded transition-colors duration-300">Get job offers</span>
+            </span>
+            <span className="block md:inline">
+              <span className="inline-block bg-black dark:bg-cyan-400 text-white dark:text-black px-2 py-1 rounded transition-colors duration-300">faster</span>
+              <span className="ml-2">
+                <span className="inline-block bg-black dark:bg-cyan-400 text-white dark:text-black px-2 py-1 rounded transition-colors duration-300">using AI 🚀</span>
+              </span>
             </span>
           </h1>
         </div>
@@ -130,7 +134,7 @@ const HeroSection = () => {
           </div>}
         
 
-        <div className="text-zinc-50 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
+        <div className="text-zinc-700 dark:text-zinc-50 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)] transition-colors duration-300">
           <p className="mb-4">AI that updates your <span className="font-bold italic text-cyan-400">Resume</span>, sends daily <span className="font-bold italic text-cyan-400">Job Alerts</span>, crafts tailored <span className="font-bold italic text-cyan-400">Cover Letters</span>, prepares <span className="font-bold italic text-cyan-400">Interview Kits</span>, checks <span className="font-bold italic text-cyan-400">Job fit</span>, gives insider <span className="font-bold italic text-cyan-400">Company</span> knowledge, and shows the right <span className="font-bold italic text-cyan-400">HR contacts</span>. Everything you will ever need, all in one place.</p>
           
           <SignedOut>
@@ -175,7 +179,7 @@ const HeroSection = () => {
                 <div className="flex text-yellow-400 mb-1">
                   <span>⭐⭐⭐⭐⭐</span>
                 </div>
-                <div className="text-white text-xs text-left">
+                <div className="text-black dark:text-white text-xs text-left transition-colors duration-300">
                   <span className="font-bold">255+</span> <span className="italic">professionals winning while others struggle</span>
                 </div>
               </div>

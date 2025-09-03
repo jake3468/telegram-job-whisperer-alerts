@@ -26,13 +26,13 @@ const HowItWorksSection = () => {
   ];
 
   return (
-    <section id="how-it-works" className="bg-black py-12 md:py-16 px-4">
+    <section id="how-it-works" className="bg-white dark:bg-black py-12 md:py-16 px-4 transition-colors duration-300">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <h2 className="text-4xl md:text-5xl font-semibold text-white mb-2 font-inter">
+          <h2 className="text-4xl md:text-5xl font-semibold text-black dark:text-white mb-2 font-inter transition-colors duration-300">
             How It Works
           </h2>
-          <p className="text-xl text-gray-400 font-inter font-light">
+          <p className="text-xl text-gray-600 dark:text-gray-400 font-inter font-light transition-colors duration-300">
             Get started in minutes. It's that simple.
           </p>
         </div>
@@ -58,11 +58,11 @@ const HowItWorksSection = () => {
                   </div>
                 </div>
                 
-                <h3 className="text-2xl font-semibold mb-4 text-white font-inter">
+                <h3 className="text-2xl font-semibold mb-4 text-black dark:text-white font-inter transition-colors duration-300">
                   {step.title}
                 </h3>
                 
-                <p className="text-gray-300 font-inter font-light leading-relaxed text-lg max-w-xs">
+                <p className="text-gray-700 dark:text-gray-300 font-inter font-light leading-relaxed text-lg max-w-xs transition-colors duration-300">
                   {step.description}
                 </p>
 
@@ -79,7 +79,7 @@ const HowItWorksSection = () => {
 
           {/* Call to action */}
           <div className="text-center mt-8">
-            <p className="text-gray-400 text-lg mb-6 font-inter">
+            <p className="text-gray-600 dark:text-gray-400 text-lg mb-6 font-inter transition-colors duration-300">
               Ready to transform your job search?
             </p>
             <div className="inline-flex items-center gap-2 text-sky-400 font-inter font-medium">

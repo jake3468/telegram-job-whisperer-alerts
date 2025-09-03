@@ -1,6 +1,7 @@
 
 import { createRoot } from 'react-dom/client'
 import { ClerkProvider } from '@clerk/clerk-react'
+import { ThemeProvider } from 'next-themes'
 import App from './App.tsx'
 import './index.css'
 
@@ -32,18 +33,25 @@ if (!PUBLISHABLE_KEY) {
 // Environment setup complete
 
 createRoot(document.getElementById("root")!).render(
-  <ClerkProvider 
-    publishableKey={PUBLISHABLE_KEY}
-    appearance={{
-      // Optimize for faster loading
-      layout: {
-        logoImageUrl: undefined, // Skip logo loading for faster init
-        showOptionalFields: false
-      }
-    }}
-    signInFallbackRedirectUrl="/ai-agents"
-    signUpFallbackRedirectUrl="/ai-agents"
+  <ThemeProvider
+    attribute="class"
+    defaultTheme="dark"
+    enableSystem={false}
+    disableTransitionOnChange={false}
   >
-    <App />
-  </ClerkProvider>
+    <ClerkProvider 
+      publishableKey={PUBLISHABLE_KEY}
+      appearance={{
+        // Optimize for faster loading
+        layout: {
+          logoImageUrl: undefined, // Skip logo loading for faster init
+          showOptionalFields: false
+        }
+      }}
+      signInFallbackRedirectUrl="/ai-agents"
+      signUpFallbackRedirectUrl="/ai-agents"
+    >
+      <App />
+    </ClerkProvider>
+  </ThemeProvider>
 );
