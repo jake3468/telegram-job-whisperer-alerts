@@ -97,24 +97,24 @@ export const HeroVideo: React.FC<HeroVideoProps> = ({
   if (isLoading) {
     return (
       <div className={`relative ${className}`}>
-        {/* Mobile Phone Frame */}
-        <div className="relative w-72 h-[600px] mx-auto">
-          {/* Phone Outer Frame */}
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2.5rem] shadow-2xl border-2 border-slate-700">
-            {/* Phone Inner Screen */}
-            <div className="absolute top-6 left-6 right-6 bottom-6 bg-slate-800 rounded-[2rem] overflow-hidden">
+        {/* Mobile Phone Frame - Thin edges */}
+        <div className="relative w-64 h-[550px] mx-auto">
+          {/* Phone Outer Frame with thin bezels */}
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2rem] shadow-2xl border border-slate-600">
+            {/* Phone Inner Screen - Very thin bezels */}
+            <div className="absolute top-2 left-2 right-2 bottom-2 bg-slate-800 rounded-[1.5rem] overflow-hidden">
               {/* Loading State */}
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-slate-700 to-slate-800">
                 <div className="text-slate-400 text-sm animate-pulse">Loading demo...</div>
               </div>
             </div>
             
-            {/* Phone Details */}
-            <div className="absolute top-3 left-1/2 transform -translate-x-1/2 flex items-center gap-2">
-              <div className="w-2 h-2 bg-slate-600 rounded-full"></div>
-              <div className="w-12 h-1 bg-slate-600 rounded-full"></div>
+            {/* Phone Details - Thin */}
+            <div className="absolute top-0.5 left-1/2 transform -translate-x-1/2 flex items-center gap-1">
+              <div className="w-1.5 h-1.5 bg-slate-500 rounded-full"></div>
+              <div className="w-8 h-0.5 bg-slate-500 rounded-full"></div>
             </div>
-            <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-slate-600 rounded-full"></div>
+            <div className="absolute bottom-0.5 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-slate-500 rounded-full"></div>
           </div>
         </div>
       </div>
@@ -124,12 +124,12 @@ export const HeroVideo: React.FC<HeroVideoProps> = ({
   if (error || (!videoUrls.webm && !videoUrls.mp4)) {
     return (
       <div className={`relative ${className}`}>
-        {/* Mobile Phone Frame */}
-        <div className="relative w-72 h-[600px] mx-auto">
-          {/* Phone Outer Frame */}
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2.5rem] shadow-2xl border-2 border-slate-700">
-            {/* Phone Inner Screen */}
-            <div className="absolute top-6 left-6 right-6 bottom-6 bg-slate-800 rounded-[2rem] overflow-hidden">
+        {/* Mobile Phone Frame - Thin edges */}
+        <div className="relative w-64 h-[550px] mx-auto">
+          {/* Phone Outer Frame with thin bezels */}
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2rem] shadow-2xl border border-slate-600">
+            {/* Phone Inner Screen - Very thin bezels */}
+            <div className="absolute top-2 left-2 right-2 bottom-2 bg-slate-800 rounded-[1.5rem] overflow-hidden">
               {/* Error State */}
               <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-slate-700 to-slate-800 p-6 text-center">
                 <div className="text-4xl mb-3">📱</div>
@@ -138,12 +138,12 @@ export const HeroVideo: React.FC<HeroVideoProps> = ({
               </div>
             </div>
             
-            {/* Phone Details */}
-            <div className="absolute top-3 left-1/2 transform -translate-x-1/2 flex items-center gap-2">
-              <div className="w-2 h-2 bg-slate-600 rounded-full"></div>
-              <div className="w-12 h-1 bg-slate-600 rounded-full"></div>
+            {/* Phone Details - Thin */}
+            <div className="absolute top-0.5 left-1/2 transform -translate-x-1/2 flex items-center gap-1">
+              <div className="w-1.5 h-1.5 bg-slate-500 rounded-full"></div>
+              <div className="w-8 h-0.5 bg-slate-500 rounded-full"></div>
             </div>
-            <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-slate-600 rounded-full"></div>
+            <div className="absolute bottom-0.5 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-slate-500 rounded-full"></div>
           </div>
         </div>
       </div>
@@ -152,13 +152,13 @@ export const HeroVideo: React.FC<HeroVideoProps> = ({
 
   return (
     <div className={`relative group ${className}`}>
-      {/* Mobile Phone Frame */}
-      <div className="relative w-72 h-[600px] mx-auto">
-        {/* Phone Outer Frame with proper proportions */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2.5rem] shadow-2xl border-2 border-slate-700">
-          {/* Phone Inner Screen - matches 574x1216 aspect ratio */}
-          <div className="absolute top-6 left-6 right-6 bottom-6 bg-black rounded-[2rem] overflow-hidden">
-            {/* Video - show entire video without cropping */}
+      {/* Mobile Phone Frame - Full outline with thin edges */}
+      <div className="relative w-64 h-[550px] mx-auto">
+        {/* Phone Outer Frame with thinner bezels */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2rem] shadow-2xl border border-slate-600">
+          {/* Phone Inner Screen - Very thin bezels to show full video */}
+          <div className="absolute top-2 left-2 right-2 bottom-2 bg-black rounded-[1.5rem] overflow-hidden">
+            {/* Video - show entire video without any cropping */}
             <video
               ref={videoRef}
               className="w-full h-full object-contain bg-black"
@@ -191,16 +191,16 @@ export const HeroVideo: React.FC<HeroVideoProps> = ({
             {/* Video Controls Overlay */}
             {showControls && (
               <div className="absolute inset-0 bg-transparent group-hover:bg-black/10 transition-colors duration-200 pointer-events-none">
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-auto">
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-auto">
                   <button
                     onClick={togglePlayPause}
-                    className="flex items-center justify-center w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-colors"
+                    className="flex items-center justify-center w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-colors"
                   >
                     {isPlaying ? <Pause className="w-3 h-3 text-white" /> : <Play className="w-3 h-3 text-white ml-0.5" />}
                   </button>
                   <button
                     onClick={toggleMute}
-                    className="flex items-center justify-center w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-colors"
+                    className="flex items-center justify-center w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-colors"
                   >
                     {isMuted ? <VolumeX className="w-3 h-3 text-white" /> : <Volume2 className="w-3 h-3 text-white" />}
                   </button>
@@ -209,14 +209,14 @@ export const HeroVideo: React.FC<HeroVideoProps> = ({
             )}
           </div>
           
-          {/* Phone Details - More realistic */}
-          {/* Camera and speaker */}
-          <div className="absolute top-3 left-1/2 transform -translate-x-1/2 flex items-center gap-2">
-            <div className="w-2 h-2 bg-slate-600 rounded-full"></div>
-            <div className="w-12 h-1 bg-slate-600 rounded-full"></div>
+          {/* Phone Details - Thin and minimal */}
+          {/* Top notch area */}
+          <div className="absolute top-0.5 left-1/2 transform -translate-x-1/2 flex items-center gap-1">
+            <div className="w-1.5 h-1.5 bg-slate-500 rounded-full"></div>
+            <div className="w-8 h-0.5 bg-slate-500 rounded-full"></div>
           </div>
-          {/* Home indicator */}
-          <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-slate-600 rounded-full"></div>
+          {/* Bottom home indicator */}
+          <div className="absolute bottom-0.5 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-slate-500 rounded-full"></div>
         </div>
       </div>
     </div>
