@@ -191,53 +191,13 @@ const HeroSection = () => {
             </div>
           </SignedOut>
 
-          <p className="mb-3 text-sm">After creating your account you'll unlock the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
-          <ul className="space-y-2 mb-4 flex flex-col items-start">
-            <li className="flex items-center justify-start gap-2">
-              <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-white rounded-2xl px-2 py-1">
-                <span className="text-xl">👔</span>
-                <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)]">Job Application Agent</span>
-                {telegramAnimationData && <div className="w-12 h-12 ml-1">
-                    <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} style={{
-                  width: '100%',
-                  height: '100%'
-                }} />
-                  </div>}
-              </a>
-            </li>
-            <li className="flex items-center justify-start gap-2">
-              <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-white rounded-2xl px-2 py-1">
-                <span className="text-xl">🔔</span>
-                <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)]">Job Alerts Agent</span>
-                {telegramAnimationData && <div className="w-12 h-12 ml-1">
-                    <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} style={{
-                  width: '100%',
-                  height: '100%'
-                }} />
-                  </div>}
-              </a>
-            </li>
-            <li className="flex items-center justify-start gap-2">
-              <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-white rounded-2xl px-2 py-1">
-                <span className="text-xl">📝</span>
-                <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)]">Resume Builder Agent</span>
-                {telegramAnimationData && <div className="w-12 h-12 ml-1">
-                    <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} style={{
-                  width: '100%',
-                  height: '100%'
-                }} />
-                  </div>}
-              </a>
-            </li>
-          </ul>
-        </div>
-        
         <SignedIn>
           <button onClick={goToDashboard} className="bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-600 hover:from-sky-600 hover:to-blue-700 text-white px-12 py-4 text-lg sm:text-xl rounded-xl transition-all duration-300 font-inter font-bold shadow-2xl drop-shadow-xl hover:shadow-sky-500/60 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-sky-400/50 mb-2">
             Go to Dashboard
           </button>
         </SignedIn>
         
+        </div>
           </div>
         </div>
       </div>
