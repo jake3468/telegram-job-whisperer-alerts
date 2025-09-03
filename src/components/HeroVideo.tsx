@@ -98,11 +98,11 @@ export const HeroVideo: React.FC<HeroVideoProps> = ({
     return (
       <div className={`relative ${className}`}>
         {/* Mobile Phone Frame */}
-        <div className="relative w-64 h-[520px] mx-auto">
+        <div className="relative w-72 h-[600px] mx-auto">
           {/* Phone Outer Frame */}
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2.5rem] shadow-2xl">
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2.5rem] shadow-2xl border-2 border-slate-700">
             {/* Phone Inner Screen */}
-            <div className="absolute top-4 left-4 right-4 bottom-4 bg-slate-800 rounded-[2rem] overflow-hidden">
+            <div className="absolute top-6 left-6 right-6 bottom-6 bg-slate-800 rounded-[2rem] overflow-hidden">
               {/* Loading State */}
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-slate-700 to-slate-800">
                 <div className="text-slate-400 text-sm animate-pulse">Loading demo...</div>
@@ -110,8 +110,11 @@ export const HeroVideo: React.FC<HeroVideoProps> = ({
             </div>
             
             {/* Phone Details */}
-            <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-slate-600 rounded-full"></div>
-            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-slate-600 rounded-full"></div>
+            <div className="absolute top-3 left-1/2 transform -translate-x-1/2 flex items-center gap-2">
+              <div className="w-2 h-2 bg-slate-600 rounded-full"></div>
+              <div className="w-12 h-1 bg-slate-600 rounded-full"></div>
+            </div>
+            <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-slate-600 rounded-full"></div>
           </div>
         </div>
       </div>
@@ -122,11 +125,11 @@ export const HeroVideo: React.FC<HeroVideoProps> = ({
     return (
       <div className={`relative ${className}`}>
         {/* Mobile Phone Frame */}
-        <div className="relative w-64 h-[520px] mx-auto">
+        <div className="relative w-72 h-[600px] mx-auto">
           {/* Phone Outer Frame */}
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2.5rem] shadow-2xl">
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2.5rem] shadow-2xl border-2 border-slate-700">
             {/* Phone Inner Screen */}
-            <div className="absolute top-4 left-4 right-4 bottom-4 bg-slate-800 rounded-[2rem] overflow-hidden">
+            <div className="absolute top-6 left-6 right-6 bottom-6 bg-slate-800 rounded-[2rem] overflow-hidden">
               {/* Error State */}
               <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-slate-700 to-slate-800 p-6 text-center">
                 <div className="text-4xl mb-3">📱</div>
@@ -136,8 +139,11 @@ export const HeroVideo: React.FC<HeroVideoProps> = ({
             </div>
             
             {/* Phone Details */}
-            <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-slate-600 rounded-full"></div>
-            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-slate-600 rounded-full"></div>
+            <div className="absolute top-3 left-1/2 transform -translate-x-1/2 flex items-center gap-2">
+              <div className="w-2 h-2 bg-slate-600 rounded-full"></div>
+              <div className="w-12 h-1 bg-slate-600 rounded-full"></div>
+            </div>
+            <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-slate-600 rounded-full"></div>
           </div>
         </div>
       </div>
@@ -147,21 +153,33 @@ export const HeroVideo: React.FC<HeroVideoProps> = ({
   return (
     <div className={`relative group ${className}`}>
       {/* Mobile Phone Frame */}
-      <div className="relative w-64 h-[520px] mx-auto">
-        {/* Phone Outer Frame */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2.5rem] shadow-2xl">
-          {/* Phone Inner Screen */}
-          <div className="absolute top-4 left-4 right-4 bottom-4 bg-black rounded-[2rem] overflow-hidden">
-            {/* Video */}
+      <div className="relative w-72 h-[600px] mx-auto">
+        {/* Phone Outer Frame with proper proportions */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2.5rem] shadow-2xl border-2 border-slate-700">
+          {/* Phone Inner Screen - matches 574x1216 aspect ratio */}
+          <div className="absolute top-6 left-6 right-6 bottom-6 bg-black rounded-[2rem] overflow-hidden">
+            {/* Video - show entire video without cropping */}
             <video
               ref={videoRef}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain bg-black"
               loop
               playsInline
               muted={isMuted}
-              preload="metadata"
+              preload="auto"
               autoPlay
-              onLoadedData={() => setIsLoading(false)}
+              onLoadedData={() => {
+                setIsLoading(false);
+                // Force immediate play after loading
+                if (videoRef.current) {
+                  videoRef.current.play().catch(console.warn);
+                }
+              }}
+              onCanPlay={() => {
+                // Ensure autoplay starts as soon as possible
+                if (videoRef.current && !isPlaying) {
+                  videoRef.current.play().catch(console.warn);
+                }
+              }}
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
             >
@@ -172,8 +190,8 @@ export const HeroVideo: React.FC<HeroVideoProps> = ({
 
             {/* Video Controls Overlay */}
             {showControls && (
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200">
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <div className="absolute inset-0 bg-transparent group-hover:bg-black/10 transition-colors duration-200 pointer-events-none">
+                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-auto">
                   <button
                     onClick={togglePlayPause}
                     className="flex items-center justify-center w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-colors"
@@ -191,9 +209,14 @@ export const HeroVideo: React.FC<HeroVideoProps> = ({
             )}
           </div>
           
-          {/* Phone Details */}
-          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-slate-600 rounded-full"></div>
-          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-slate-600 rounded-full"></div>
+          {/* Phone Details - More realistic */}
+          {/* Camera and speaker */}
+          <div className="absolute top-3 left-1/2 transform -translate-x-1/2 flex items-center gap-2">
+            <div className="w-2 h-2 bg-slate-600 rounded-full"></div>
+            <div className="w-12 h-1 bg-slate-600 rounded-full"></div>
+          </div>
+          {/* Home indicator */}
+          <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-slate-600 rounded-full"></div>
         </div>
       </div>
     </div>
