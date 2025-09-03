@@ -56,12 +56,12 @@ const PricingSection = () => {
         <div className="grid gap-8 lg:gap-8 grid-cols-1 lg:grid-cols-3 items-stretch max-w-6xl mx-auto">
           {/* Free Plan */}
           <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-blue-400/30 min-h-[420px]`}>
-            <CardHeader className="text-center pb-4 pt-6 px-4">
+            <CardHeader className="text-center pb-4 pt-6 px-4 bg-slate-200">
               <CardTitle className={`text-xl font-bold mb-2 ${planTextColor.free} font-inter`}>Free Plan</CardTitle>
               <div className="text-3xl font-extrabold text-gray-900 mb-1">Free</div>
               <div className="text-sm font-semibold text-gray-600">30 credits/month</div>
             </CardHeader>
-            <CardContent className="grow flex flex-col px-4 pb-4">
+            <CardContent className="grow flex flex-col px-4 pb-4 bg-slate-200">
               <ul className="space-y-2 my-4 flex-grow">
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
@@ -152,14 +152,14 @@ const PricingSection = () => {
 
           {/* Credit Packs */}
           <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-indigo-400/30 min-h-[420px]`}>
-            <CardHeader className="text-center pb-4 pt-6 px-4">
+            <CardHeader className="text-center pb-4 pt-6 px-4 bg-slate-200">
               <CardTitle className={`text-xl font-bold mb-2 ${planTextColor.pack} font-inter`}>Credit Packs</CardTitle>
               <div className="text-3xl font-extrabold text-gray-900 mb-1">
                 Starting {pricingData.currencySymbol}{creditPackProducts.length > 0 ? Math.min(...creditPackProducts.map(p => p.price_amount)) : pricingData.creditPacks[0]?.price}
               </div>
               <div className="text-sm font-semibold text-gray-600">Select your desired amount:</div>
             </CardHeader>
-            <CardContent className="grow flex flex-col px-4 pb-4">
+            <CardContent className="grow flex flex-col px-4 pb-4 bg-slate-200">
               <div className="flex flex-col gap-2 my-3 flex-grow">
                 {/* Show database products if available, otherwise show static fallback */}
                 {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="rounded-lg p-2.5 border border-gray-200 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-blue-100">
