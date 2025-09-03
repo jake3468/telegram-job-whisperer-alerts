@@ -241,6 +241,30 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
+      
+      {/* Telegram Agents Section - Below Hero */}
+      <div className="max-w-4xl mx-auto z-20 relative w-full mt-12 px-4">
+        <div className="text-center">
+          <p className="text-white mb-6 text-sm md:text-base">After creating your account you'll unlock the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
+          
+          <div className="flex flex-col items-center space-y-4">
+            <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-3 border border-white rounded-2xl px-4 py-3 bg-black/20 backdrop-blur-sm">
+              <span className="text-2xl">👔</span>
+              <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)] text-lg">Job Application Agent</span>
+            </a>
+            
+            <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-3 border border-white rounded-2xl px-4 py-3 bg-black/20 backdrop-blur-sm">
+              <span className="text-2xl">🔔</span>
+              <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)] text-lg">Job Alerts Agent</span>
+            </a>
+            
+            <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-3 border border-white rounded-2xl px-4 py-3 bg-black/20 backdrop-blur-sm">
+              <span className="text-2xl">📝</span>
+              <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)] text-lg">Resume Builder Agent</span>
+            </a>
+          </div>
+        </div>
+      </div>
     </section>;
 };
 export default HeroSection;
