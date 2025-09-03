@@ -110,13 +110,13 @@ const HeroSection = () => {
       <div className="max-w-7xl mx-auto z-20 relative w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
           
-          {/* Left Column - Mobile Preview (Desktop Only) */}
-          <div className="hidden md:flex justify-center items-center">
+          {/* Mobile Preview - Shows on all screen sizes */}
+          <div className="flex justify-center items-center mb-8 md:mb-0">
             <MobilePreview />
           </div>
           
-          {/* Right Column - Hero Content */}
-          <div className="text-center md:text-left max-w-2xl mx-auto md:mx-0">
+          {/* Hero Content - Always center aligned */}
+          <div className="text-center max-w-2xl mx-auto md:mx-0">
         
         {/* Black background to block particles behind headline */}
         <div className="relative">
@@ -130,14 +130,14 @@ const HeroSection = () => {
           </h1>
         </div>
         
-        {/* Lottie Animation */}
-        {lottieAnimationData && <div className="flex justify-center mt-2 mb-4">
+        {/* Lottie Animation - Rocket - Commented out for now */}
+        {/* {lottieAnimationData && <div className="flex justify-center mt-2 mb-4">
             <div className="relative w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64">
               <Lottie animationData={lottieAnimationData} loop={true} autoplay={true} className="w-full h-full z-10 relative" style={{
             filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
           }} />
             </div>
-          </div>}
+          </div>} */}
         
 
         <div className="text-zinc-50 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
