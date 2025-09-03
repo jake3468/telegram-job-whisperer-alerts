@@ -212,7 +212,7 @@ const HeroSection = () => {
     {/* Telegram Agents Section - Separate section below hero */}
     <section className="relative py-12 bg-black">
       <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
-        <div className="text-center">
+        <div className="text-left">
           <p className="text-white mb-6 text-sm md:text-base">After creating your account you'll unlock the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
           
           <div className="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
