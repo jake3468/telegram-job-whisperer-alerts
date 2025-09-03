@@ -131,12 +131,12 @@ const HeroSection = () => {
         
 
         <div className="text-zinc-50 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-4 text-sm md:text-base">Our AI Agents will update your <span className="font-bold italic text-cyan-400">Resume</span>, send daily <span className="font-bold italic text-cyan-400">Job Alerts</span>, craft tailored <span className="font-bold italic text-cyan-400">Cover Letters</span>, prepare <span className="font-bold italic text-cyan-400">Interview Kits</span>, check <span className="font-bold italic text-cyan-400">Job fit</span>, give insider <span className="font-bold italic text-cyan-400">Company</span> knowledge, and show the right <span className="font-bold italic text-cyan-400">HR contacts</span>. Everything you will ever need, all in one place.</p>
+          <p className="mb-4 text-sm">AI that updates your <span className="font-bold italic text-cyan-400">Resume</span>, sends daily <span className="font-bold italic text-cyan-400">Job Alerts</span>, crafts tailored <span className="font-bold italic text-cyan-400">Cover Letters</span>, prepares <span className="font-bold italic text-cyan-400">Interview Kits</span>, checks <span className="font-bold italic text-cyan-400">Job fit</span>, gives insider <span className="font-bold italic text-cyan-400">Company</span> knowledge, and shows the right <span className="font-bold italic text-cyan-400">HR contacts</span>. Everything you will ever need, all in one place.</p>
           
           <SignedOut>
             <div className="flex justify-center mb-6">
-              <SignUpButton mode="modal">
-                <button className="bg-[#F8F9FD] hover:bg-gray-100 text-black px-6 py-2 text-base sm:text-lg rounded-2xl transition-all duration-300 font-inter font-semibold shadow-lg hover:shadow-gray-300/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-gray-400/50 mb-2 flex items-center gap-2 justify-center">
+              <SignUpButton mode="modal" className="bg-slate-200 hover:bg-slate-100">
+                <button className="bg-white hover:bg-gray-100 text-black px-8 py-3 text-base sm:text-lg rounded-lg transition-all duration-300 font-inter font-semibold shadow-lg hover:shadow-gray-300/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-gray-400/50 mb-2 flex items-center gap-2 justify-center">
                   🎯 Start Free Now
                 </button>
               </SignUpButton>
