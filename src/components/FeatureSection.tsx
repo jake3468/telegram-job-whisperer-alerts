@@ -173,7 +173,7 @@ const FeatureSection = ({
   return <section className="py-1 md:py-2 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
         {lottieUrl ? (
-          <div className="bg-gray-50 dark:bg-gray-900 rounded-3xl p-6 md:p-8 lg:p-10">
+          <div className="bg-[#F8F9FD] dark:bg-gray-900 rounded-3xl p-6 md:p-8 lg:p-10">
             {/* Mobile Layout */}
             <div className="lg:hidden space-y-6">
               {mobileHeaderSection}
@@ -193,7 +193,7 @@ const FeatureSection = ({
             </div>
           </div>
         ) : (
-          <div className="relative bg-gray-50 dark:bg-gray-900 rounded-2xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col">
+          <div className="relative bg-[#F8F9FD] dark:bg-gray-900 rounded-2xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col">
             {label && (
               <div className="absolute -left-3 -top-3 bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
                 {label}
