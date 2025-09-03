@@ -5,6 +5,7 @@ import { useUser } from '@clerk/clerk-react';
 import Lottie from 'lottie-react';
 import LightRays from './LightRays';
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
+import MobilePreview from './MobilePreview';
 
 // Preload rocket animation immediately when module loads
 const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json';
@@ -98,15 +99,24 @@ const HeroSection = () => {
   const goToDashboard = () => {
     navigate('/dashboard');
   };
-  return <section className="relative min-h-[60vh] sm:min-h-[70vh] flex flex-col items-center justify-center px-4 pt-20 sm:pt-24 pb-0 overflow-hidden bg-black">
+  return <section className="relative min-h-[80vh] flex items-center justify-center px-4 pt-20 sm:pt-24 pb-8 overflow-hidden bg-black">
       {/* Light rays background animation with responsive length for mobile */}
       <div className="absolute inset-0 z-0">
         <LightRays raysOrigin="top-center" raysColor="#00ffff" raysSpeed={1.5} lightSpread={0.8} rayLength={window.innerWidth < 768 ? 6.0 : 4.0} fadeDistance={window.innerWidth < 768 ? 5.0 : 3.0} followMouse={true} mouseInfluence={0.1} noiseAmount={0.1} distortion={0.05} className="w-full h-full" />
       </div>
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
       
-      
-      <div className="text-center max-w-4xl mx-auto z-20 relative">
+      {/* Main Container with Grid Layout */}
+      <div className="max-w-7xl mx-auto z-20 relative w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+          
+          {/* Left Column - Mobile Preview (Desktop Only) */}
+          <div className="hidden md:flex justify-center items-center">
+            <MobilePreview />
+          </div>
+          
+          {/* Right Column - Hero Content */}
+          <div className="text-center md:text-left max-w-2xl mx-auto md:mx-0">
         
         {/* Black background to block particles behind headline */}
         <div className="relative">
@@ -229,6 +239,8 @@ const HeroSection = () => {
           </button>
         </SignedIn>
         
+          </div>
+        </div>
       </div>
     </section>;
 };
