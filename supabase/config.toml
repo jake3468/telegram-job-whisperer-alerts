@@ -41,3 +41,6 @@ verify_jwt = true
 
 [functions.create-checkout-session]
 verify_jwt = false
+
+[functions.video-rate-limiter]
+verify_jwt = false

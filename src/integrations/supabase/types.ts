@@ -1282,6 +1282,36 @@ export type Database = {
         }
         Relationships: []
       }
+      video_analytics: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          played_at: string
+          session_id: string | null
+          user_agent: string | null
+          video_path: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          played_at?: string
+          session_id?: string | null
+          user_agent?: string | null
+          video_path: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          played_at?: string
+          session_id?: string | null
+          user_agent?: string | null
+          video_path?: string
+        }
+        Relationships: []
+      }
       webhook_executions: {
         Row: {
           completed_at: string | null
