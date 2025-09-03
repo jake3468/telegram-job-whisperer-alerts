@@ -158,13 +158,13 @@ const HeroSection = () => {
             {/* Button and Badge Container */}
             <div className="flex flex-col items-start md:flex-col md:items-start lg:flex-row lg:items-center lg:justify-start gap-4 md:gap-6 mb-8">
               <SignUpButton mode="modal">
-                <button className="bg-[#F8F9FD] hover:bg-gray-100 text-black px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-2xl transition-all duration-300 font-inter font-semibold shadow-lg hover:shadow-gray-300/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-gray-400/50 flex items-center gap-2 justify-center w-full md:w-auto">
+                <button className="bg-[#F8F9FD] hover:bg-gray-100 text-black px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-2xl transition-all duration-300 font-inter font-semibold shadow-lg hover:shadow-gray-300/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-gray-400/50 flex items-center gap-2 justify-start md:justify-center w-full md:w-auto">
                   🎯 Start Free Now
                 </button>
               </SignUpButton>
               
               {/* Discount Badge */}
-              <div className="bg-green-400/20 border border-green-400/40 backdrop-blur-sm rounded-full px-4 py-2 md:px-4 md:py-2 shadow-lg shadow-green-400/20 w-full md:w-auto text-center">
+              <div className="bg-green-400/20 border border-green-400/40 backdrop-blur-sm rounded-full px-4 py-2 md:px-4 md:py-2 shadow-lg shadow-green-400/20 w-full md:w-auto text-left md:text-center">
                 <span className="text-green-300 text-xs md:text-sm font-medium [text-shadow:_0_0_10px_rgba(34,197,94,0.8)]">
                   Get 50% off with code "ASP123"
                 </span>
