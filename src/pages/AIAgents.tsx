@@ -89,8 +89,8 @@ const AIAgents = () => {
 
           {/* Job Alerts Agent */}
           <FeatureSection 
-            title="🔔 Job Alerts Agent" 
-            subheading="Daily web scanning for the latest jobs at your chosen time." 
+            title="Job Alerts" 
+            subheading="Daily web scanning for the latest jobs at your chosen time."
             description="I'll scan the web daily and send you the latest jobs at your chosen time. Fresh, relevant roles delivered right when you need them." 
             lottieUrl="" 
             buttonText="Activate Now" 
