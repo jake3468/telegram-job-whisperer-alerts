@@ -190,9 +190,9 @@ const HeroSection = () => {
             </div>
           </SignedOut>
 
-          {/* Hero Video - Shows fully on mobile, centered and sized appropriately */}
-          <div className="flex md:hidden justify-center items-center mt-6 mb-6 px-4">
-            <HeroVideo className="w-full max-w-[280px] scale-75" />
+          {/* Hero Video - Shows fully on mobile, larger size and reduced spacing */}
+          <div className="flex md:hidden justify-center items-center mt-6 mb-2 px-2">
+            <HeroVideo className="w-full max-w-[320px]" />
           </div>
 
         <SignedIn>
