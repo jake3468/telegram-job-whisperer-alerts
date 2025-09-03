@@ -96,9 +96,23 @@ export const HeroVideo: React.FC<HeroVideoProps> = ({
 
   if (isLoading) {
     return (
-      <div className={`relative bg-muted/20 rounded-xl overflow-hidden flex items-center justify-center ${className}`}>
-        <div className="animate-pulse bg-muted/40 w-full h-full min-h-[200px] flex items-center justify-center">
-          <div className="text-muted-foreground text-sm">Loading video...</div>
+      <div className={`relative ${className}`}>
+        {/* Mobile Phone Frame */}
+        <div className="relative w-64 h-[520px] mx-auto">
+          {/* Phone Outer Frame */}
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2.5rem] shadow-2xl">
+            {/* Phone Inner Screen */}
+            <div className="absolute top-4 left-4 right-4 bottom-4 bg-slate-800 rounded-[2rem] overflow-hidden">
+              {/* Loading State */}
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-slate-700 to-slate-800">
+                <div className="text-slate-400 text-sm animate-pulse">Loading demo...</div>
+              </div>
+            </div>
+            
+            {/* Phone Details */}
+            <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-slate-600 rounded-full"></div>
+            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-slate-600 rounded-full"></div>
+          </div>
         </div>
       </div>
     );
@@ -106,53 +120,82 @@ export const HeroVideo: React.FC<HeroVideoProps> = ({
 
   if (error || (!videoUrls.webm && !videoUrls.mp4)) {
     return (
-      <div className={`relative bg-muted/20 rounded-xl overflow-hidden flex items-center justify-center ${className}`}>
-        <div className="text-muted-foreground text-sm p-8 text-center">
-          <div className="mb-2">📹</div>
-          <div>Video coming soon!</div>
-          <div className="text-xs mt-1 opacity-70">Demo video will be available here</div>
+      <div className={`relative ${className}`}>
+        {/* Mobile Phone Frame */}
+        <div className="relative w-64 h-[520px] mx-auto">
+          {/* Phone Outer Frame */}
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2.5rem] shadow-2xl">
+            {/* Phone Inner Screen */}
+            <div className="absolute top-4 left-4 right-4 bottom-4 bg-slate-800 rounded-[2rem] overflow-hidden">
+              {/* Error State */}
+              <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-slate-700 to-slate-800 p-6 text-center">
+                <div className="text-4xl mb-3">📱</div>
+                <div className="text-slate-300 text-sm mb-1">Demo Coming Soon!</div>
+                <div className="text-slate-500 text-xs">Video will appear here</div>
+              </div>
+            </div>
+            
+            {/* Phone Details */}
+            <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-slate-600 rounded-full"></div>
+            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-slate-600 rounded-full"></div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`relative bg-black/20 rounded-xl overflow-hidden group ${className}`}>
-      <video
-        ref={videoRef}
-        className="w-full h-full object-cover"
-        loop
-        playsInline
-        muted={isMuted}
-        preload="metadata"
-        autoPlay
-        onLoadedData={() => setIsLoading(false)}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-      >
-        {videoUrls.webm && <source src={videoUrls.webm} type="video/webm" />}
-        {videoUrls.mp4 && <source src={videoUrls.mp4} type="video/mp4" />}
-        Your browser does not support the video tag.
-      </video>
+    <div className={`relative group ${className}`}>
+      {/* Mobile Phone Frame */}
+      <div className="relative w-64 h-[520px] mx-auto">
+        {/* Phone Outer Frame */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2.5rem] shadow-2xl">
+          {/* Phone Inner Screen */}
+          <div className="absolute top-4 left-4 right-4 bottom-4 bg-black rounded-[2rem] overflow-hidden">
+            {/* Video */}
+            <video
+              ref={videoRef}
+              className="w-full h-full object-cover"
+              loop
+              playsInline
+              muted={isMuted}
+              preload="metadata"
+              autoPlay
+              onLoadedData={() => setIsLoading(false)}
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+            >
+              {videoUrls.webm && <source src={videoUrls.webm} type="video/webm" />}
+              {videoUrls.mp4 && <source src={videoUrls.mp4} type="video/mp4" />}
+              Your browser does not support the video tag.
+            </video>
 
-      {showControls && (
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200">
-          <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <button
-              onClick={togglePlayPause}
-              className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-colors"
-            >
-              {isPlaying ? <Pause className="w-4 h-4 text-white" /> : <Play className="w-4 h-4 text-white ml-0.5" />}
-            </button>
-            <button
-              onClick={toggleMute}
-              className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-colors"
-            >
-              {isMuted ? <VolumeX className="w-4 h-4 text-white" /> : <Volume2 className="w-4 h-4 text-white" />}
-            </button>
+            {/* Video Controls Overlay */}
+            {showControls && (
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200">
+                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <button
+                    onClick={togglePlayPause}
+                    className="flex items-center justify-center w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-colors"
+                  >
+                    {isPlaying ? <Pause className="w-3 h-3 text-white" /> : <Play className="w-3 h-3 text-white ml-0.5" />}
+                  </button>
+                  <button
+                    onClick={toggleMute}
+                    className="flex items-center justify-center w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-colors"
+                  >
+                    {isMuted ? <VolumeX className="w-3 h-3 text-white" /> : <Volume2 className="w-3 h-3 text-white" />}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
+          
+          {/* Phone Details */}
+          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-slate-600 rounded-full"></div>
+          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-slate-600 rounded-full"></div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
