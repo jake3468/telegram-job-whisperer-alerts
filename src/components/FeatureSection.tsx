@@ -37,14 +37,14 @@ const FeatureSection = ({
   const [animationData, setAnimationData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  
-  const { userProfile, updateUserProfile } = useCachedUserProfile();
-
+  const {
+    userProfile,
+    updateUserProfile
+  } = useCachedUserProfile();
   const handleButtonWithUrlClick = async (e: React.MouseEvent) => {
     e.preventDefault();
-    
     if (!buttonUrl) return;
-    
+
     // Only detect location if shouldDetectLocation is true
     if (shouldDetectLocation) {
       try {
@@ -53,7 +53,7 @@ const FeatureSection = ({
         logger.error('Location detection failed:', error);
       }
     }
-    
+
     // Open the URL immediately (no waiting for location detection)
     window.open(buttonUrl, '_blank', 'noopener,noreferrer');
   };
@@ -106,11 +106,7 @@ const FeatureSection = ({
       </p>
       {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75">
           Coming Soon
-        </button> : buttonUrl ? <button 
-          type="button" 
-          onClick={handleButtonWithUrlClick}
-          className="w-fit bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 flex-row transition-all duration-200 shadow-lg hover:shadow-xl"
-        >
+        </button> : buttonUrl ? <button type="button" onClick={handleButtonWithUrlClick} className="w-fit bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 flex-row transition-all duration-200 shadow-lg hover:shadow-xl">
           <ExternalLink className="w-4 h-4" />
           {buttonText}
           <ArrowRight className="w-4 h-4" />
@@ -138,11 +134,7 @@ const FeatureSection = ({
       
       {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75">
           Coming Soon
-        </button> : buttonUrl ? <button 
-          type="button" 
-          onClick={handleButtonWithUrlClick}
-          className="w-fit bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 flex-row transition-all duration-200 shadow-lg hover:shadow-xl"
-        >
+        </button> : buttonUrl ? <button type="button" onClick={handleButtonWithUrlClick} className="w-fit bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 flex-row transition-all duration-200 shadow-lg hover:shadow-xl">
           <ExternalLink className="w-5 h-5" />
           {buttonText}
           <ArrowRight className="w-5 h-5" />
@@ -172,8 +164,7 @@ const FeatureSection = ({
     </div> : null;
   return <section className="py-1 md:py-2 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
-        {lottieUrl ? (
-          <div className="bg-[#F8F9FD] dark:bg-gray-900 rounded-3xl p-6 md:p-8 lg:p-10">
+        {lottieUrl ? <div className="rounded-3xl p-6 md:p-8 lg:p-10 bg-slate-200">
             {/* Mobile Layout */}
             <div className="lg:hidden space-y-6">
               {mobileHeaderSection}
@@ -191,17 +182,11 @@ const FeatureSection = ({
                   {animationSection}
                 </>}
             </div>
-          </div>
-        ) : (
-          <div className="relative bg-[#F8F9FD] dark:bg-gray-900 rounded-2xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col">
-            {label && (
-              <div className="absolute -left-3 -top-3 bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
+          </div> : <div className="relative bg-gray-50 dark:bg-gray-900 rounded-2xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col">
+            {label && <div className="absolute -left-3 -top-3 bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
                 {label}
-              </div>
-            )}
-            {activationStatus !== undefined && (
-              <ActivationStatusTag isActivated={activationStatus} />
-            )}
+              </div>}
+            {activationStatus !== undefined && <ActivationStatusTag isActivated={activationStatus} />}
             <div className="text-center space-y-2 md:space-y-3 flex-1 flex flex-col">
               <h3 className="text-base md:text-lg lg:text-xl font-bold font-opensans text-blue-700 leading-tight">
                 {title}
@@ -213,71 +198,42 @@ const FeatureSection = ({
                 <p className="text-xs leading-relaxed font-opensans font-normal text-neutral-950">
                   {description}
                 </p>
-                {title === "👔 Job Application Agent" && (
-                  <>
+                {title === "👔 Job Application Agent" && <>
                     <p className="mt-3 text-xs font-medium text-neutral-700">
                       Example chat below 👇
                     </p>
-                    <img 
-                      src="/lovable-uploads/438fbede-9968-4fe7-9622-807454b576af.png" 
-                      alt="Job Application Agent conversation interface" 
-                      className="mt-2 w-full max-w-xs rounded-lg shadow-md"
-                    />
-                  </>
-                )}
-                {title === "📝 Resume Builder Agent" && (
-                  <>
+                    <img src="/lovable-uploads/438fbede-9968-4fe7-9622-807454b576af.png" alt="Job Application Agent conversation interface" className="mt-2 w-full max-w-xs rounded-lg shadow-md" />
+                  </>}
+                {title === "📝 Resume Builder Agent" && <>
                     <p className="mt-3 text-xs font-medium text-neutral-700">
                       Example chat below 👇
                     </p>
-                    <img 
-                      src="/lovable-uploads/80af4c55-96c8-4c4e-9cb9-f4f6c8530524.png" 
-                      alt="Resume Builder Agent conversation interface" 
-                      className="mt-2 w-full max-w-xs rounded-lg shadow-md"
-                    />
-                  </>
-                )}
-                {title === "🔔 Job Alerts Agent" && (
-                  <>
+                    <img src="/lovable-uploads/80af4c55-96c8-4c4e-9cb9-f4f6c8530524.png" alt="Resume Builder Agent conversation interface" className="mt-2 w-full max-w-xs rounded-lg shadow-md" />
+                  </>}
+                {title === "🔔 Job Alerts Agent" && <>
                     <p className="mt-3 text-xs font-medium text-neutral-700">
                       Example chat below 👇
                     </p>
-                    <img 
-                      src="/lovable-uploads/e5a7f299-f690-47de-a1b5-f44cfc229925.png" 
-                      alt="Job Alerts Agent conversation interface" 
-                      className="mt-2 w-full max-w-xs rounded-lg shadow-md"
-                    />
-                  </>
-                )}
+                    <img src="/lovable-uploads/e5a7f299-f690-47de-a1b5-f44cfc229925.png" alt="Job Alerts Agent conversation interface" className="mt-2 w-full max-w-xs rounded-lg shadow-md" />
+                  </>}
               </div>
               <div className="pt-3 md:pt-2 space-y-3">
-                {isComingSoon ? 
-                  <button type="button" disabled className="w-full bg-gray-700 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm cursor-not-allowed opacity-75">
+                {isComingSoon ? <button type="button" disabled className="w-full bg-gray-700 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm cursor-not-allowed opacity-75">
                     Coming Soon
-                  </button> : buttonUrl ?
-                  <button 
-                    type="button" 
-                    onClick={handleButtonWithUrlClick}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200 flex items-center gap-2 justify-center"
-                  >
+                  </button> : buttonUrl ? <button type="button" onClick={handleButtonWithUrlClick} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200 flex items-center gap-2 justify-center">
                     <ExternalLink className="w-3 h-3" />
                     {buttonText}
-                  </button> :
-                  <SignUpButton mode="modal">
+                  </button> : <SignUpButton mode="modal">
                     <button type="button" className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200">
                       {buttonText}
                     </button>
-                  </SignUpButton>
-                }
-                {additionalContent && (
-                  <div className="border-t border-gray-200 pt-3">
+                  </SignUpButton>}
+                {additionalContent && <div className="border-t border-gray-200 pt-3">
                     {additionalContent}
-                  </div>
-                )}
+                  </div>}
               </div>
             </div>
-          </div>
-        )}
+          </div>}
       </div>
     </section>;
 };
