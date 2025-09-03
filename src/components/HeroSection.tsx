@@ -134,7 +134,7 @@ const HeroSection = () => {
           </div>}
         
 
-        <div className="text-zinc-700 dark:text-zinc-50 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)] transition-colors duration-300">
+        <div className="text-base-content dark:text-zinc-50 mb-4 md:mb-6 lg:mb-8 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)] transition-colors duration-300">
           <p className="mb-4">AI that updates your <span className="font-bold italic text-cyan-400">Resume</span>, sends daily <span className="font-bold italic text-cyan-400">Job Alerts</span>, crafts tailored <span className="font-bold italic text-cyan-400">Cover Letters</span>, prepares <span className="font-bold italic text-cyan-400">Interview Kits</span>, checks <span className="font-bold italic text-cyan-400">Job fit</span>, gives insider <span className="font-bold italic text-cyan-400">Company</span> knowledge, and shows the right <span className="font-bold italic text-cyan-400">HR contacts</span>. Everything you will ever need, all in one place.</p>
           
           <SignedOut>
@@ -186,7 +186,7 @@ const HeroSection = () => {
             </div>
           </SignedOut>
 
-          <p className="mb-3 text-sm">After creating your account you'll unlock the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
+          <p className="mb-3 text-sm text-base-content-secondary dark:text-zinc-50">After creating your account you'll unlock the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
           <ul className="space-y-2 mb-4 flex flex-col items-center">
             <li className="flex items-center justify-center gap-2">
               <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-white rounded-2xl px-2 py-1">

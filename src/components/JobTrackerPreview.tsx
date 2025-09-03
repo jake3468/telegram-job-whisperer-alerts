@@ -15,7 +15,7 @@ const JobTrackerPreview = () => {
             <h3 className="text-black dark:text-white text-lg sm:text-xl font-semibold mb-2 font-inter transition-colors duration-300">
               Your Job Search, Organized
             </h3>
-            <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base font-inter transition-colors duration-300">
+            <p className="text-base-content-secondary dark:text-gray-300 text-sm sm:text-base font-inter transition-colors duration-300">
               Track applications, prep for interviews, and never miss an opportunity
             </p>
           </div>

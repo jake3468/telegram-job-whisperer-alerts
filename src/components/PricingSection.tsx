@@ -42,14 +42,14 @@ const PricingSection = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-6">
           <h2 className="text-3xl sm:text-5xl font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-2 font-inter">Pricing Plans</h2>
-          <p className="text-lg text-blue-600 dark:text-blue-100 font-inter font-light mb-6 transition-colors duration-300">
+          <p className="text-lg text-base-content dark:text-blue-100 font-inter font-light mb-6 transition-colors duration-300">
             Pay only for what you use. Get started with free monthly credits, and upgrade anytime.
           </p>
           
           {/* Payment Partner Information */}
-          <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-200 mb-8 justify-center transition-colors duration-300">
+          <div className="flex items-center gap-2 text-sm text-base-content-secondary dark:text-blue-200 mb-8 justify-center transition-colors duration-300">
             <span>Powered by</span>
-            <span className="ml-1 font-semibold text-blue-700 dark:text-blue-100 transition-colors duration-300">Dodo Payments</span>
+            <span className="ml-1 font-semibold text-base-content dark:text-blue-100 transition-colors duration-300">Dodo Payments</span>
           </div>
         </div>
 

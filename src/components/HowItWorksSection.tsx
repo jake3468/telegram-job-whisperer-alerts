@@ -32,7 +32,7 @@ const HowItWorksSection = () => {
           <h2 className="text-4xl md:text-5xl font-semibold text-black dark:text-white mb-2 font-inter transition-colors duration-300">
             How It Works
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 font-inter font-light transition-colors duration-300">
+          <p className="text-xl text-base-content dark:text-gray-400 font-inter font-light transition-colors duration-300">
             Get started in minutes. It's that simple.
           </p>
         </div>
@@ -62,7 +62,7 @@ const HowItWorksSection = () => {
                   {step.title}
                 </h3>
                 
-                <p className="text-gray-700 dark:text-gray-300 font-inter font-light leading-relaxed text-lg max-w-xs transition-colors duration-300">
+                <p className="text-base-content-secondary dark:text-gray-300 font-inter font-light leading-relaxed text-lg max-w-xs transition-colors duration-300">
                   {step.description}
                 </p>
 
@@ -79,7 +79,7 @@ const HowItWorksSection = () => {
 
           {/* Call to action */}
           <div className="text-center mt-8">
-            <p className="text-gray-600 dark:text-gray-400 text-lg mb-6 font-inter transition-colors duration-300">
+            <p className="text-base-content-secondary dark:text-gray-400 text-lg mb-6 font-inter transition-colors duration-300">
               Ready to transform your job search?
             </p>
             <div className="inline-flex items-center gap-2 text-sky-400 font-inter font-medium">

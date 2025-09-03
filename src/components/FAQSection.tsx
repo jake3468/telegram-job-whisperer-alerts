@@ -37,7 +37,7 @@ const FAQSection = () => {
           <h2 className="text-4xl font-bold text-black dark:bg-gradient-to-r dark:from-sky-400 dark:to-blue-500 dark:bg-clip-text dark:text-transparent dark:mb-2 mb-2 font-inter transition-colors duration-300">
             Frequently Asked Questions
           </h2>
-          <p className="text-gray-700 dark:text-gray-300 text-lg font-inter transition-colors duration-300">
+          <p className="text-base-content dark:text-gray-300 text-lg font-inter transition-colors duration-300">
             Everything you need to know about Aspirely.ai
           </p>
         </div>
@@ -52,7 +52,7 @@ const FAQSection = () => {
               <AccordionTrigger className="px-6 py-4 text-left text-black dark:text-white hover:text-sky-400 transition-colors font-inter font-medium">
                 {faq.question}
               </AccordionTrigger>
-              <AccordionContent className="px-6 pb-4 text-gray-700 dark:text-gray-300 leading-relaxed font-inter transition-colors duration-300">
+              <AccordionContent className="px-6 pb-4 text-base-content-secondary dark:text-gray-300 leading-relaxed font-inter transition-colors duration-300">
                 {faq.answer}
               </AccordionContent>
             </AccordionItem>
