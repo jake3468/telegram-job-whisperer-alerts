@@ -9,14 +9,14 @@ interface HeroVideoProps {
 }
 
 export const HeroVideo: React.FC<HeroVideoProps> = ({ 
-  videoPath = 'hero-demo.mp4', 
+  videoPath = 'hero-demo', 
   className = '',
   showControls = true 
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [videoUrls, setVideoUrls] = useState<{ webm: string | null; mp4: string | null }>({ webm: null, mp4: null });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -44,24 +44,31 @@ export const HeroVideo: React.FC<HeroVideoProps> = ({
     }
   }, [videoPath, sessionId]);
 
-  // Load video URL from Supabase Storage
+  // Load video URLs from Supabase Storage
   useEffect(() => {
-    const loadVideo = async () => {
+    const loadVideos = async () => {
       try {
-        const { data } = supabase.storage
+        const webmData = supabase.storage
           .from('hero-videos')
-          .getPublicUrl(videoPath);
+          .getPublicUrl(`${videoPath}.webm`);
 
-        setVideoUrl(data.publicUrl);
+        const mp4Data = supabase.storage
+          .from('hero-videos')
+          .getPublicUrl(`${videoPath}.mp4`);
+
+        setVideoUrls({
+          webm: webmData.data.publicUrl,
+          mp4: mp4Data.data.publicUrl
+        });
       } catch (err) {
-        console.error('Error loading video:', err);
-        setError('Failed to load video');
+        console.error('Error loading videos:', err);
+        setError('Failed to load videos');
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadVideo();
+    loadVideos();
   }, [videoPath]);
 
   const togglePlayPause = async () => {
@@ -97,7 +104,7 @@ export const HeroVideo: React.FC<HeroVideoProps> = ({
     );
   }
 
-  if (error || !videoUrl) {
+  if (error || (!videoUrls.webm && !videoUrls.mp4)) {
     return (
       <div className={`relative bg-muted/20 rounded-xl overflow-hidden flex items-center justify-center ${className}`}>
         <div className="text-muted-foreground text-sm p-8 text-center">
@@ -123,7 +130,8 @@ export const HeroVideo: React.FC<HeroVideoProps> = ({
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
       >
-        <source src={videoUrl} type="video/mp4" />
+        {videoUrls.webm && <source src={videoUrls.webm} type="video/webm" />}
+        {videoUrls.mp4 && <source src={videoUrls.mp4} type="video/mp4" />}
         Your browser does not support the video tag.
       </video>
 
