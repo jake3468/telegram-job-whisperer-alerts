@@ -111,8 +111,8 @@ const HeroSection = () => {
       <div className="max-w-7xl mx-auto z-20 relative w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-center">
           
-          {/* Hero Video - Positioned at top to align with hero text */}
-          <div className="hidden md:flex justify-start items-start mb-8 md:mb-0">
+          {/* Hero Video - Centered in left side, aligned with hero text */}
+          <div className="hidden md:flex justify-center items-start mb-8 md:mb-0 md:pr-8">
             <HeroVideo className="w-full max-w-xs" />
           </div>
           
@@ -190,9 +190,9 @@ const HeroSection = () => {
             </div>
           </SignedOut>
 
-          {/* Hero Video - Shows only on mobile, below hero content */}
-          <div className="flex md:hidden justify-center items-center mt-8 mb-8">
-            <HeroVideo className="w-full max-w-sm h-48" />
+          {/* Hero Video - Shows fully on mobile, centered and sized appropriately */}
+          <div className="flex md:hidden justify-center items-center mt-6 mb-6 px-4">
+            <HeroVideo className="w-full max-w-[280px] scale-75" />
           </div>
 
         <SignedIn>
