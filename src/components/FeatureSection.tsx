@@ -121,13 +121,13 @@ const FeatureSection = ({
   // Desktop: full content section
   const desktopContentSection = <div className="hidden lg:flex flex-col justify-center space-y-8">
       <div>
-        <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-opensans text-cyan-300">
+        <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-opensans text-blue-700">
           {title}
         </h3>
-        <p className="md:text-xl mb-4 font-opensans font-medium text-base text-slate-100">
+        <p className="md:text-xl mb-4 font-opensans font-medium text-base text-neutral-950">
           {subheading}
         </p>
-        <p className="md:text-lg leading-relaxed font-opensans font-light text-sm text-slate-100">
+        <p className="md:text-lg leading-relaxed font-opensans font-light text-sm text-neutral-950">
           {description}
         </p>
       </div>
@@ -138,7 +138,7 @@ const FeatureSection = ({
           <ExternalLink className="w-5 h-5" />
           {buttonText}
           <ArrowRight className="w-5 h-5" />
-        </button> : <SignUpButton mode="modal" className="bg-blue-700 hover:bg-blue-600">
+        </button> : <SignUpButton mode="modal">
           <button type="button" className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
             {buttonText}
             <ArrowRight className="w-5 h-5" />
@@ -164,7 +164,7 @@ const FeatureSection = ({
     </div> : null;
   return <section className="py-1 md:py-2 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
-        {lottieUrl ? <div className="rounded-3xl p-6 md:p-8 lg:p-10 bg-black">
+        {lottieUrl ? <div className="rounded-3xl p-6 md:p-8 lg:p-10 bg-slate-200">
             {/* Mobile Layout */}
             <div className="lg:hidden space-y-6">
               {mobileHeaderSection}
