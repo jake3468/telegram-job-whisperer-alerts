@@ -104,16 +104,16 @@ const FeatureSection = ({
       <p className="leading-relaxed font-opensans text-neutral-950 text-xs font-normal">
         {description}
       </p>
-      {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75">
+      {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75 text-sm">
           Coming Soon
-        </button> : buttonUrl ? <button type="button" onClick={handleButtonWithUrlClick} className="w-fit bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 flex-row transition-all duration-200 shadow-lg hover:shadow-xl">
-          <ExternalLink className="w-4 h-4" />
+        </button> : buttonUrl ? <button type="button" onClick={handleButtonWithUrlClick} className="w-fit bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-4 rounded-full flex items-center gap-2 flex-row transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
+          <ExternalLink className="w-3 h-3" />
           {buttonText}
-          <ArrowRight className="w-4 h-4" />
+          <ArrowRight className="w-3 h-3" />
         </button> : <SignUpButton mode="modal">
-          <button type="button" className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
+          <button type="button" className="w-fit bg-primary hover:bg-primary/90 text-white font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
             {buttonText}
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-3 h-3" />
           </button>
         </SignUpButton>}
     </div>;
