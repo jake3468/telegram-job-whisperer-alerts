@@ -148,7 +148,7 @@ export const JobTrackerVideo: React.FC<JobTrackerVideoProps> = ({
   if (!hasLoaded || isLoading) {
     return (
       <div ref={containerRef} className={`relative ${className}`}>
-        <div className="relative h-[180px] sm:h-[200px] lg:h-[240px] rounded-3xl overflow-hidden shadow-2xl border border-gray-800/50">
+        <div className="relative h-[240px] rounded-3xl overflow-hidden shadow-2xl border border-gray-800/50">
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-gray-900 to-black">
             <div className="text-center">
               <div className="text-4xl mb-3">📋</div>
@@ -165,7 +165,7 @@ export const JobTrackerVideo: React.FC<JobTrackerVideoProps> = ({
   if (error || rateLimitBlocked || (!videoUrls.webm && !videoUrls.mp4)) {
     return (
       <div ref={containerRef} className={`relative ${className}`}>
-        <div className="relative h-[180px] sm:h-[200px] lg:h-[240px] rounded-3xl overflow-hidden shadow-2xl border border-gray-800/50">
+        <div className="relative h-[240px] rounded-3xl overflow-hidden shadow-2xl border border-gray-800/50">
           <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-gray-900 to-black p-6 text-center">
             <div className="text-4xl mb-3">📋</div>
             <div className="text-gray-300 text-sm mb-1">
@@ -182,7 +182,7 @@ export const JobTrackerVideo: React.FC<JobTrackerVideoProps> = ({
 
   return (
     <div ref={containerRef} className={`relative group ${className}`}>
-        <div className="relative h-[180px] sm:h-[200px] lg:h-[240px] rounded-3xl overflow-hidden shadow-2xl border border-gray-800/50">
+        <div className="relative h-[240px] rounded-3xl overflow-hidden shadow-2xl border border-gray-800/50">
         {/* Video */}
         <video
           ref={videoRef}
