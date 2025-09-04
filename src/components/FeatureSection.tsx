@@ -111,7 +111,7 @@ const FeatureSection = ({
           {buttonText}
           <ArrowRight className="w-3 h-3" />
         </button> : <SignUpButton mode="modal">
-          <button type="button" className="w-fit bg-primary hover:bg-primary/90 text-white font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
+          <button type="button" className="w-fit bg-cyan-500 hover:bg-cyan-600 text-gray-800 font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
             {buttonText}
             <ArrowRight className="w-3 h-3" />
           </button>
@@ -224,7 +224,7 @@ const FeatureSection = ({
                     <ExternalLink className="w-3 h-3" />
                     {buttonText}
                   </button> : <SignUpButton mode="modal">
-                    <button type="button" className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200">
+                    <button type="button" className="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-800 font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200">
                       {buttonText}
                     </button>
                   </SignUpButton>}
