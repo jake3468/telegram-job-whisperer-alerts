@@ -164,7 +164,7 @@ const FeatureSection = ({
     </div> : null;
   return <section className="py-1 md:py-2 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
-        {lottieUrl ? <div className="rounded-3xl p-6 md:p-8 lg:p-10 bg-[#30313d]">
+        {lottieUrl ? <div className="rounded-3xl p-6 md:p-8 lg:p-10 bg-black">
             {/* Mobile Layout */}
             <div className="lg:hidden space-y-6">
               {mobileHeaderSection}
