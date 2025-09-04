@@ -44,8 +44,9 @@ export const JobTrackerVideo: React.FC<JobTrackerVideoProps> = ({
 
       return true;
     } catch (err) {
-      console.warn('Rate limiting check failed:', err);
-      return true; // Allow if rate limiter fails
+      console.warn('Rate limiting check failed, allowing video to play:', err);
+      // If rate limiter fails, allow the video to play rather than blocking it
+      return true;
     }
   }, [videoPath, sessionId, checkRateLimit]);
 
@@ -90,14 +91,7 @@ export const JobTrackerVideo: React.FC<JobTrackerVideoProps> = ({
     setHasLoaded(true);
     
     try {
-      // Check rate limits before loading videos
-      const canAccess = await trackVideoPlay();
-      if (!canAccess) {
-        setError('Access temporarily limited');
-        setIsLoading(false);
-        return;
-      }
-
+      // Skip rate limiting for demo video and load directly
       const webmData = supabase.storage
         .from('hero-videos')
         .getPublicUrl(`${videoPath}.webm`);
@@ -116,7 +110,7 @@ export const JobTrackerVideo: React.FC<JobTrackerVideoProps> = ({
     } finally {
       setIsLoading(false);
     }
-  }, [videoPath, trackVideoPlay, hasLoaded]);
+  }, [videoPath, hasLoaded]);
 
   // Auto-play when video comes into view and is loaded
   useEffect(() => {
@@ -136,13 +130,6 @@ export const JobTrackerVideo: React.FC<JobTrackerVideoProps> = ({
         videoRef.current.pause();
         setIsPlaying(false);
       } else {
-        // Check rate limits before playing
-        const canPlay = await trackVideoPlay();
-        if (!canPlay) {
-          setRateLimitBlocked(true);
-          return;
-        }
-
         await videoRef.current.play();
         setIsPlaying(true);
       }
