@@ -46,9 +46,6 @@ const Footer = () => {
           <div>
             <h3 className="text-white font-semibold text-sm font-inter mb-4">Company</h3>
             <div className="space-y-3">
-              <button onClick={() => scrollToSection('about-us')} className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
-                About Us
-              </button>
               <Link to="/contact-support" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
                 Contact Support
               </Link>

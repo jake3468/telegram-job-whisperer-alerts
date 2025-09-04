@@ -21,7 +21,6 @@ const AuthHeader = () => {
   };
 
   const navItems = [
-    { label: 'About Us', id: 'about-us' },
     { label: 'Features', id: 'features' },
     { label: 'How It Works', id: 'how-it-works' },
     { label: 'Pricing', id: 'pricing' },
