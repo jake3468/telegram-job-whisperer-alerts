@@ -141,7 +141,7 @@ const TermsOfService = () => {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">4. Subscription Plans and Pricing</h2>
+              <h2 className="text-2xl font-semibold text-white mb-4">4. Pricing Plans</h2>
               
               <h3 className="text-xl font-medium text-sky-400 mb-3">4.1 Service Tiers</h3>
               <div className="space-y-4 mb-6">
