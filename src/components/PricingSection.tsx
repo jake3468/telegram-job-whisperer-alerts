@@ -131,26 +131,26 @@ const PricingSection = () => {
               <div className="text-sm font-semibold text-gray-300">Select your desired amount:</div>
             </CardHeader>
             <CardContent className="grow flex flex-col px-4 pb-4">
-              <div className="flex flex-col gap-2 my-3 flex-grow">
+              <div className="flex flex-col gap-2 my-3 flex-grow max-w-sm mx-auto">
                 {/* Show database products if available, otherwise show static fallback */}
-                {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="rounded-lg p-2.5 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-gray-700">
+                {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="rounded-md p-2 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-gray-700">
                       <span className="text-white font-medium text-sm">{pack.credits_amount} credits</span>
                       <div className="flex items-center gap-2">
                         <span className="text-white font-bold text-sm">{pricingData.currencySymbol}{pack.price_amount}</span>
                         <SignUpButton mode="modal">
-                          <Button size="sm" className="bg-gray-50 hover:bg-gray-100 text-gray-800 text-xs px-3 py-1 h-auto rounded-md">
+                          <Button size="sm" className="bg-gray-50 hover:bg-gray-100 text-gray-800 text-xs px-2 py-1 h-auto rounded-md">
                             Buy
                           </Button>
                         </SignUpButton>
                       </div>
                     </div>) :
               // Only show fallback if no database products and not loading
-              !isProductsLoading && pricingData.creditPacks.map(pack => <div key={pack.credits} className="bg-gray-700 rounded-lg p-2.5 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300">
+              !isProductsLoading && pricingData.creditPacks.map(pack => <div key={pack.credits} className="bg-gray-700 rounded-md p-2 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300">
                       <span className="text-white font-medium text-sm">{pack.credits} credits</span>
                       <div className="flex items-center gap-2">
                         <span className="text-white font-bold text-sm">{pricingData.currencySymbol}{pack.price}</span>
                         <SignUpButton mode="modal">
-                          <Button size="sm" className="bg-gray-50 hover:bg-gray-100 text-gray-800 text-xs px-3 py-1 h-auto rounded-md">
+                          <Button size="sm" className="bg-gray-50 hover:bg-gray-100 text-gray-800 text-xs px-2 py-1 h-auto rounded-md">
                             Buy
                           </Button>
                         </SignUpButton>
