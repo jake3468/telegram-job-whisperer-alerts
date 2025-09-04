@@ -187,80 +187,28 @@ export default function GetMoreCredits() {
               duration-500
             `}>
             {/* Free Plan */}
-            <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-blue-400/30 min-h-[320px] sm:min-h-[380px]`}>
-              <CardHeader className="text-center pb-2 pt-3 sm:pb-4 sm:pt-6 px-3 sm:px-4">
+            <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-blue-400/30 min-h-[280px] sm:min-h-[300px]`}>
+              <CardHeader className="text-center pb-1 pt-2 sm:pb-2 sm:pt-3 px-2 sm:px-3">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 ${planTextColor.free}`}>Free Plan</CardTitle>
-                <div className="text-2xl sm:text-3xl font-extrabold text-white mt-0.5 mb-0.5">Free</div>
-                <div className="mt-0 text-xs sm:text-sm font-semibold text-gray-300">10 credits/month</div>
+                <div className="text-xl sm:text-2xl font-extrabold text-white mb-0.5">Free</div>
+                <div className="text-xs sm:text-sm font-semibold text-gray-300">10 credits/month</div>
               </CardHeader>
-              <CardContent className="grow flex flex-col px-3 sm:px-4 pb-3">
-                <ul className="space-y-1 sm:space-y-2 my-2 sm:my-4 flex-grow">
-                  <li className="flex items-center gap-1 sm:gap-2">
-                    <div className="w-5 h-5 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                      <Check className="w-3 h-3 text-black" />
-                    </div>
-                    <span className="text-xs sm:text-sm text-white">Access to all features</span>
-                  </li>
-                  <li className="flex items-center gap-1 sm:gap-2">
-                    <div className="w-5 h-5 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                      <Check className="w-3 h-3 text-black" />
-                    </div>
-                    <span className="text-xs sm:text-sm text-white">10 credits every month (auto-renewal)</span>
-                  </li>
-                  <li className="flex items-center gap-1 sm:gap-2">
-                    <div className="w-5 h-5 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                      <Check className="w-3 h-3 text-black" />
-                    </div>
-                    <span className="text-xs sm:text-sm text-white">Perfect for occasional use</span>
-                  </li>
-                  <li className="mt-2 sm:mt-3">
-                    <div className="text-xs sm:text-sm font-semibold text-cyan-300 mb-1 sm:mb-2">What You Can Do Each Month:</div>
-                    <ul className="space-y-1 ml-3 sm:ml-4">
-                      <li className="flex items-center gap-1 sm:gap-2">
-                        <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                          <Check className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-black" />
-                        </div>
-                        <span className="text-[10px] sm:text-xs text-white">Create 2 Resumes</span>
-                      </li>
-                      <li className="flex items-center gap-1 sm:gap-2">
-                        <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                          <Check className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-black" />
-                        </div>
-                        <span className="text-[10px] sm:text-xs text-white">Create 9 Cover Letters</span>
-                      </li>
-                      <li className="flex items-center gap-1 sm:gap-2">
-                        <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                          <Check className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-black" />
-                        </div>
-                        <span className="text-[10px] sm:text-xs text-white">Run 10 Job Fit Checks</span>
-                      </li>
-                      <li className="flex items-center gap-1 sm:gap-2">
-                        <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                          <Check className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-black" />
-                        </div>
-                        <span className="text-[10px] sm:text-xs text-white">Access 3 Company Insights</span>
-                      </li>
-                      <li className="flex items-center gap-1 sm:gap-2">
-                        <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                          <Check className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-black" />
-                        </div>
-                        <span className="text-[10px] sm:text-xs text-white">View 5 HR Profiles</span>
-                      </li>
-                      <li className="flex items-center gap-1 sm:gap-2">
-                        <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                          <Check className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-black" />
-                        </div>
-                        <span className="text-[10px] sm:text-xs text-white">Check 5 Visa Info</span>
-                      </li>
-                      <li className="flex items-center gap-1 sm:gap-2">
-                        <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                          <Check className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-black" />
-                        </div>
-                        <span className="text-[10px] sm:text-xs text-white">Practice 1 Interview Prep</span>
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
+              <CardContent className="grow flex flex-col px-2 sm:px-3 pb-2">
+                <div className="text-center my-2 flex-grow">
+                  <div className="text-xs sm:text-sm text-white mb-1">Access to all features</div>
+                  <div className="text-xs sm:text-sm text-white mb-1">10 credits every month (auto-renewal)</div>
+                  <div className="text-xs sm:text-sm font-semibold text-cyan-300 mb-1">What you can do each month:</div>
+                  <div className="text-[10px] sm:text-xs text-white space-y-0.5">
+                    <div>2 Resumes</div>
+                    <div>9 Cover Letters</div>
+                    <div>10 Job Fit Checks</div>
+                    <div>3 Company Insights</div>
+                    <div>5 LinkedIn HR Profiles</div>
+                    <div>5 Visa Info lookups</div>
+                    <div>1 Interview Prep</div>
+                    <div>Up to 100 Job Alert messages</div>
+                  </div>
+                </div>
                 <div className="mt-auto">
                   <Button className="w-full py-2 sm:py-2.5 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-orbitron text-xs sm:text-sm shadow border-0" disabled>
                     Current Plan
