@@ -190,7 +190,7 @@ const PricingSection = () => {
                       <img 
                         src="/lovable-uploads/e5bac2d4-e5d9-4f9d-accf-c8ac205f690b.png" 
                         alt="Jobs that will vanish by 2030 e-book cover" 
-                        className="w-16 h-20 object-cover rounded shadow-md flex-shrink-0"
+                        className="w-20 h-28 object-contain rounded shadow-md flex-shrink-0"
                       />
                       <div className="flex-grow">
                         <div className="text-cyan-400 font-semibold text-xs mb-1">FREE E-book:</div>
