@@ -1,5 +1,6 @@
 
 import { Link } from 'react-router-dom';
+import { Twitter, Linkedin, Youtube, Instagram } from 'lucide-react';
 
 const Footer = () => {
   const scrollToSection = (sectionId: string) => {
@@ -24,6 +25,52 @@ const Footer = () => {
             <p className="text-gray-400 text-sm font-inter max-w-md">
               The AI-powered platform for finding and creating your perfect career path with advanced job matching and personalized guidance.
             </p>
+            <div className="flex items-center space-x-4 mt-4">
+              <a 
+                href="https://x.com/Aspirely_ai" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white hover:text-gray-200 transition-colors duration-200"
+                aria-label="Follow us on X"
+              >
+                <svg 
+                  width="20" 
+                  height="20" 
+                  viewBox="0 0 24 24" 
+                  fill="currentColor"
+                  className="w-5 h-5"
+                >
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+              </a>
+              <a 
+                href="https://www.linkedin.com/company/107778088/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white hover:text-gray-200 transition-colors duration-200"
+                aria-label="Follow us on LinkedIn"
+              >
+                <Linkedin size={20} />
+              </a>
+              <a 
+                href="https://www.youtube.com/@AspirelyAI" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white hover:text-gray-200 transition-colors duration-200"
+                aria-label="Subscribe to our YouTube channel"
+              >
+                <Youtube size={20} />
+              </a>
+              <a 
+                href="https://www.instagram.com/aspirely.ai/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white hover:text-gray-200 transition-colors duration-200"
+                aria-label="Follow us on Instagram"
+              >
+                <Instagram size={20} />
+              </a>
+            </div>
           </div>
 
           {/* Product Section */}
