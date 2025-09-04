@@ -78,7 +78,7 @@ const PricingSection = () => {
               </div>
               <div className="mt-auto">
                 <SignUpButton mode="modal">
-                  <Button className="w-full py-2.5 bg-cyan-200 hover:bg-cyan-300 text-gray-50 rounded-xl font-inter text-sm shadow border-0 font-semibold">
+                  <Button className="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-800 font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
                     Get Started
                   </Button>
                 </SignUpButton>
