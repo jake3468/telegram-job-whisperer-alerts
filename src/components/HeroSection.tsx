@@ -223,7 +223,8 @@ const HeroSection = () => {
     <section className="relative py-12 bg-black">
       <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
         <div className="text-left">
-          <p className="text-white mb-6 text-sm md:text-base">After creating your account you'll unlock the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
+          <p className="text-white mb-4 text-sm md:text-base font-inter">By using our AI Job Agents, you'll <span className="font-semibold font-inter">unlock your true potential</span> and discover opportunities you never knew existed.</p>
+          <p className="text-white mb-6 text-sm md:text-base font-inter">Explore the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
           
           <div className="flex flex-col md:flex-row items-start justify-start md:items-center md:justify-center space-y-3 md:space-y-0 md:space-x-3">
             <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-white rounded-xl px-3 py-2 bg-black/20 backdrop-blur-sm">
