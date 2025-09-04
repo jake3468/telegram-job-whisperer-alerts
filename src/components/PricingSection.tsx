@@ -52,7 +52,7 @@ const PricingSection = () => {
           </div>
         </div>
 
-        <div className="grid gap-6 lg:gap-8 grid-cols-1 lg:grid-cols-2 items-stretch max-w-4xl mx-auto">
+        <div className="grid gap-6 lg:gap-8 grid-cols-1 md:grid-cols-2 items-stretch max-w-4xl md:max-w-3xl lg:max-w-4xl mx-auto">
           {/* Free Plan */}
           <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-blue-400/30 min-h-[320px]`}>
             <CardHeader className="text-center pb-2 pt-4 px-3">
@@ -134,8 +134,8 @@ const PricingSection = () => {
               <div className="flex flex-col gap-2 my-3 flex-grow max-w-md mx-auto">
                 {/* Show database products if available, otherwise show static fallback */}
                 {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="rounded-md p-3 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-gray-700">
-                      <span className="text-white font-medium text-sm">{pack.credits_amount} credits</span>
-                      <div className="flex items-center gap-2">
+                      <span className="text-white font-medium text-sm mr-4">{pack.credits_amount} credits</span>
+                      <div className="flex items-center gap-3">
                         <span className="text-white font-bold text-sm">{pricingData.currencySymbol}{pack.price_amount}</span>
                         <SignUpButton mode="modal">
                           <Button size="sm" className="bg-gray-50 hover:bg-gray-100 text-gray-800 text-xs px-2 py-1 h-auto rounded-md">
@@ -146,8 +146,8 @@ const PricingSection = () => {
                     </div>) :
               // Only show fallback if no database products and not loading
               !isProductsLoading && pricingData.creditPacks.map(pack => <div key={pack.credits} className="bg-gray-700 rounded-md p-3 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300">
-                      <span className="text-white font-medium text-sm">{pack.credits} credits</span>
-                      <div className="flex items-center gap-2">
+                      <span className="text-white font-medium text-sm mr-4">{pack.credits} credits</span>
+                      <div className="flex items-center gap-3">
                         <span className="text-white font-bold text-sm">{pricingData.currencySymbol}{pack.price}</span>
                         <SignUpButton mode="modal">
                           <Button size="sm" className="bg-gray-50 hover:bg-gray-100 text-gray-800 text-xs px-2 py-1 h-auto rounded-md">
@@ -165,26 +165,28 @@ const PricingSection = () => {
               </div>
               
               {/* Features list */}
-              <ul className="space-y-1 mb-3">
-                <li className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                    <Check className="w-2.5 h-2.5 text-black" />
-                  </div>
-                  <span className="text-white text-xs">No expiration</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                    <Check className="w-2.5 h-2.5 text-black" />
-                  </div>
-                  <span className="text-white text-xs">Instant activation</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                    <Check className="w-2.5 h-2.5 text-black" />
-                  </div>
-                  <span className="text-white text-xs">Secure payment</span>
-                </li>
-              </ul>
+              <div className="flex flex-col items-center mb-3">
+                <ul className="space-y-1 text-center">
+                  <li className="flex items-center gap-2 justify-center">
+                    <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-2.5 h-2.5 text-black" />
+                    </div>
+                    <span className="text-white text-xs">No expiration</span>
+                  </li>
+                  <li className="flex items-center gap-2 justify-center">
+                    <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-2.5 h-2.5 text-black" />
+                    </div>
+                    <span className="text-white text-xs">Instant activation</span>
+                  </li>
+                  <li className="flex items-center gap-2 justify-center">
+                    <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-2.5 h-2.5 text-black" />
+                    </div>
+                    <span className="text-white text-xs">Secure payment</span>
+                  </li>
+                </ul>
+              </div>
             </CardContent>
           </Card>
         </div>
