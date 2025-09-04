@@ -170,7 +170,7 @@ const PricingSection = () => {
                   <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                     <Check className="w-2.5 h-2.5 text-black" />
                   </div>
-                  <span className="text-white text-xs">No expiration</span>
+                  <span className="text-white text-xs">No expiration – use your credits anytime</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
@@ -182,7 +182,7 @@ const PricingSection = () => {
                   <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                     <Check className="w-2.5 h-2.5 text-black" />
                   </div>
-                  <span className="text-white text-xs">Secure payment</span>
+                  <span className="text-white text-xs">Secure payment, No subscription, pay only for what you need</span>
                 </li>
               </ul>
             </CardContent>
