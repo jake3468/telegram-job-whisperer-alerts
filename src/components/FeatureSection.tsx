@@ -138,7 +138,7 @@ const FeatureSection = ({
           <ExternalLink className="w-5 h-5" />
           {buttonText}
           <ArrowRight className="w-5 h-5" />
-        </button> : <SignUpButton mode="modal">
+        </button> : <SignUpButton mode="modal" className="bg-blue-700 hover:bg-blue-600">
           <button type="button" className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
             {buttonText}
             <ArrowRight className="w-5 h-5" />
