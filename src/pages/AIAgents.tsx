@@ -5,9 +5,11 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Copy, CalendarPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { detectAndStoreLocation } from '@/utils/locationDetection';
 const AIAgents = () => {
   const {
-    userProfile
+    userProfile,
+    updateUserProfile
   } = useCachedUserProfile();
   const {
     toast
@@ -84,6 +86,7 @@ const AIAgents = () => {
             isReversed={false} 
             label="1" 
             buttonUrl="https://t.me/Resume_builder_AI_bot"
+            shouldDetectLocation={true}
             activationStatus={userProfile?.cv_bot_activated}
           />
 
@@ -105,7 +108,9 @@ const AIAgents = () => {
                   After activating the Job Alerts AI Agent, click "Create Job Alerts" below to set your daily preferences.
                 </p>
                 <Button 
-                  onClick={() => {
+                  onClick={async () => {
+                    // Detect and store location before navigation
+                    await detectAndStoreLocation(userProfile, updateUserProfile);
                     navigate('/job-alerts');
                     window.scrollTo(0, 0);
                   }}
@@ -128,6 +133,7 @@ const AIAgents = () => {
             isReversed={false} 
             label="3" 
             buttonUrl="https://t.me/add_job_aspirelyai_bot"
+            shouldDetectLocation={true}
             activationStatus={userProfile?.add_job_bot_activated}
           />
         </div>
