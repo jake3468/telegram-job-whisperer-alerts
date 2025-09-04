@@ -19,9 +19,7 @@ const FAQSection = () => {
   return <section className="py-12 md:py-16 px-4 bg-black">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-6">
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text mb-2 font-inter text-gray-50">
-            Frequently Asked Questions
-          </h2>
+          <h2 className="text-4xl font-bold bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text mb-2 font-inter text-gray-50">Frequently Asked Questions (FAQ)</h2>
           <p className="text-gray-300 text-lg font-inter">
             Everything you need to know about Aspirely.ai
           </p>
