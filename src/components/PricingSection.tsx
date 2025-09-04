@@ -2,7 +2,7 @@ import { SignUpButton } from '@clerk/clerk-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Globe, Loader2 } from 'lucide-react';
+import { Check, Globe, Loader2, ArrowRight } from 'lucide-react';
 import { useLocationPricing } from '@/hooks/useLocationPricing';
 import { usePaymentProducts } from '@/hooks/usePaymentProducts';
 const planGradientBg = {
@@ -108,10 +108,11 @@ const PricingSection = () => {
                   </div>
                 </div>
               </div>
-              <div className="mt-auto">
+              <div className="mt-auto flex justify-center">
                 <SignUpButton mode="modal">
-                  <Button className="w-full bg-gray-50 hover:bg-gray-100 text-gray-800 font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
+                  <Button className="bg-gray-50 hover:bg-gray-100 text-gray-800 font-semibold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
                     Get Started
+                    <ArrowRight className="w-4 h-4" />
                   </Button>
                 </SignUpButton>
               </div>
