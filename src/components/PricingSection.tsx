@@ -40,7 +40,7 @@ const PricingSection = () => {
   return <section className="py-8 md:py-12 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-6">
-          <h2 className="text-3xl sm:text-5xl font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-2 font-inter">Pricing Plans</h2>
+          <h2 className="text-3xl sm:text-5xl font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text mb-2 font-inter text-gray-50">Pricing Plans</h2>
           <p className="text-lg text-blue-100 font-inter font-light mb-6">
             Start with 10 free monthly credits and upgrade anytime with flexible credit packs.
           </p>
@@ -170,7 +170,7 @@ const PricingSection = () => {
                   <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                     <Check className="w-2.5 h-2.5 text-black" />
                   </div>
-                  <span className="text-white text-xs">No expiration – use your credits anytime</span>
+                  <span className="text-white text-xs">No expiration</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
@@ -182,7 +182,7 @@ const PricingSection = () => {
                   <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                     <Check className="w-2.5 h-2.5 text-black" />
                   </div>
-                  <span className="text-white text-xs">Secure payment, No subscription, pay only for what you need</span>
+                  <span className="text-white text-xs">Secure payment</span>
                 </li>
               </ul>
             </CardContent>
