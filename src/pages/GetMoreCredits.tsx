@@ -50,7 +50,6 @@ export default function GetMoreCredits() {
     isShowingCachedData: isShowingCachedPricing
   } = useCachedLocationPricing();
   const {
-    subscriptionProducts,
     creditPackProducts,
     isLoading: isProductsLoading,
     isShowingCachedData: isShowingCachedProducts
@@ -74,30 +73,6 @@ export default function GetMoreCredits() {
       setConnectionIssue(false);
     }
   }, [credits, creditsError]);
-  const handleSubscribeClick = async () => {
-    if (!isAuthReady) {
-      toast.error('Please wait, authentication is loading...');
-      return;
-    }
-    const subscriptionProduct = subscriptionProducts[0];
-    if (!subscriptionProduct) {
-      toast.error('Subscription product not available');
-      return;
-    }
-    console.log('Subscribing with product:', subscriptionProduct.product_id);
-    
-    const productDetails = {
-      type: 'subscription' as const,
-      price: subscriptionProduct.price_amount,
-      currency: pricingData?.currency || 'USD',
-      credits: subscriptionProduct.credits_amount
-    };
-    
-    const session = await createCheckoutSession(subscriptionProduct.product_id, productDetails);
-    if (!session?.url) {
-      toast.error('Failed to create checkout session');
-    }
-  };
   const handleCreditPackClick = async (productId: string) => {
     if (!isAuthReady) {
       toast.error('Please wait, authentication is loading...');
@@ -207,7 +182,7 @@ export default function GetMoreCredits() {
               grid gap-3 sm:gap-4 
               w-full
               grid-cols-1
-              lg:grid-cols-3
+              lg:grid-cols-2
               items-stretch
               duration-500
             `}>
@@ -216,7 +191,7 @@ export default function GetMoreCredits() {
               <CardHeader className="text-center pb-2 pt-3 sm:pb-4 sm:pt-6 px-3 sm:px-4">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 ${planTextColor.free}`}>Free Plan</CardTitle>
                 <div className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-0.5 mb-0.5">Free</div>
-                <div className="mt-0 text-xs sm:text-sm font-semibold text-gray-600">30 credits/month</div>
+                <div className="mt-0 text-xs sm:text-sm font-semibold text-gray-600">10 credits/month</div>
               </CardHeader>
               <CardContent className="grow flex flex-col px-3 sm:px-4 pb-3">
                 <ul className="space-y-1 sm:space-y-2 my-2 sm:my-4 flex-grow">
@@ -226,7 +201,7 @@ export default function GetMoreCredits() {
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-gray-700">30 credits every month</span>
+                    <span className="text-xs sm:text-sm text-gray-700">10 credits every month</span>
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
@@ -242,64 +217,6 @@ export default function GetMoreCredits() {
                     Current Plan
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Monthly Subscription */}
-            <Card className={`flex flex-col rounded-2xl shadow-2xl border-0 ${planGradientBg.subscription} relative transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-cyan-400/30 min-h-[350px] sm:min-h-[420px]`}>
-              <div className="absolute -top-3 sm:-top-6 left-1/2 -translate-x-1/2 z-10">
-                <Badge className="bg-gradient-to-r from-blue-400 to-cyan-400 text-white font-orbitron text-xs px-3 sm:px-4 py-0.5 sm:py-1 shadow-xl border-0 tracking-wide">
-                  MOST POPULAR
-                </Badge>
-              </div>
-              <CardHeader className="text-center pb-2 pt-4 sm:pb-4 sm:pt-8 px-3 sm:px-4">
-                <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 ${planTextColor.subscription}`}>Monthly Subscription</CardTitle>
-                 <div className="text-2xl sm:text-3xl font-extrabold text-cyan-100 mb-0.5 sm:mb-1 mt-0.5">
-                   {pricingData && subscriptionProducts[0] ? <>
-                       {pricingData.currencySymbol}{subscriptionProducts[0].price_amount}
-                       <span className="text-xs sm:text-base font-bold align-super">/month</span>
-                     </> : pricingData ? <>
-                       {pricingData.currencySymbol}{pricingData.monthlyPrice}
-                       <span className="text-xs sm:text-base font-bold align-super">/month</span>
-                     </> : <span className="text-cyan-200">Loading...</span>}
-                 </div>
-                 <div className="mt-0 text-xs sm:text-sm font-semibold text-cyan-200">
-                   {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits/month` : pricingData ? '300 credits/month' : 'Loading...'}
-                 </div>
-              </CardHeader>
-              <CardContent className="grow flex flex-col px-3 sm:px-4 pb-3">
-                <ul className="space-y-1 sm:space-y-2 my-2 sm:my-4 flex-grow">
-                   <li className="flex items-center gap-1 sm:gap-2">
-                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                     <span className="text-xs sm:text-sm text-cyan-100">
-                       {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits every month` : '300 credits every month'}
-                     </span>
-                   </li>
-                  <li className="flex items-center gap-1 sm:gap-2">
-                    <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-cyan-100">Auto-renewal</span>
-                  </li>
-                  <li className="flex items-center gap-1 sm:gap-2">
-                    <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-cyan-100">Cancel anytime</span>
-                  </li>
-                  <li className="flex items-center gap-1 sm:gap-2">
-                    <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-cyan-100">Best value for regular users</span>
-                  </li>
-                  <li className="flex items-center gap-1 sm:gap-2">
-                    <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-cyan-100">Priority support</span>
-                  </li>
-                </ul>
-                 <div className="mt-auto">
-                   <Button onClick={handleSubscribeClick} className="w-full py-2 sm:py-2.5 bg-white hover:bg-yellow-100 text-black font-orbitron text-xs rounded-xl shadow border-0 font-bold transition-colors duration-200" disabled={!isAuthReady || connectionIssue || isPricingLoading || isProductsLoading || subscriptionProducts[0] && isCheckoutLoading(subscriptionProducts[0].product_id)}>
-                     {!isAuthReady ? 'Please wait...' : subscriptionProducts[0] && isCheckoutLoading(subscriptionProducts[0].product_id) ? <>
-                         <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                         Processing...
-                       </> : 'Subscribe Now'}
-                   </Button>
-                 </div>
               </CardContent>
             </Card>
 

@@ -90,12 +90,7 @@ export const usePaymentProducts = () => {
     }
   }, [pricingData?.region, pricingData?.currency]);
 
-  // Memoize the filtered arrays to prevent recreation on every render
-  const subscriptionProducts = useMemo(() => 
-    products.filter(p => p.product_type === 'subscription'), 
-    [products]
-  );
-
+  // Only return credit packs now (no subscriptions)
   const creditPackProducts = useMemo(() => 
     products.filter(p => 
       p.product_type === 'credit_pack' && 
@@ -116,7 +111,6 @@ export const usePaymentProducts = () => {
 
   return {
     products,
-    subscriptionProducts,
     creditPackProducts,
     aiInterviewProducts,
     isLoading,

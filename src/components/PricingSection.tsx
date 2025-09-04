@@ -22,7 +22,6 @@ const PricingSection = () => {
     userCountry
   } = useLocationPricing();
   const {
-    subscriptionProducts,
     creditPackProducts,
     isLoading: isProductsLoading
   } = usePaymentProducts();
@@ -43,7 +42,7 @@ const PricingSection = () => {
         <div className="text-center mb-6">
           <h2 className="text-3xl sm:text-5xl font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text text-transparent mb-2 font-inter">Pricing Plans</h2>
           <p className="text-lg text-blue-100 font-inter font-light mb-6">
-            Pay only for what you use. Get started with free monthly credits, and upgrade anytime.
+            Start with 10 free monthly credits and upgrade anytime with flexible credit packs.
           </p>
           
           {/* Payment Partner Information */}
@@ -53,13 +52,13 @@ const PricingSection = () => {
           </div>
         </div>
 
-        <div className="grid gap-8 lg:gap-8 grid-cols-1 lg:grid-cols-3 items-stretch max-w-6xl mx-auto">
+        <div className="grid gap-8 lg:gap-8 grid-cols-1 lg:grid-cols-2 items-stretch max-w-6xl mx-auto">
           {/* Free Plan */}
           <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-blue-400/30 min-h-[420px]`}>
             <CardHeader className="text-center pb-4 pt-6 px-4">
               <CardTitle className={`text-xl font-bold mb-2 ${planTextColor.free} font-inter`}>Free Plan</CardTitle>
               <div className="text-3xl font-extrabold text-gray-900 mb-1">Free</div>
-              <div className="text-sm font-semibold text-gray-600">30 credits/month</div>
+              <div className="text-sm font-semibold text-gray-600">10 credits/month</div>
             </CardHeader>
             <CardContent className="grow flex flex-col px-4 pb-4">
               <ul className="space-y-2 my-4 flex-grow">
@@ -69,7 +68,7 @@ const PricingSection = () => {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                  <span className="text-sm text-gray-700">30 credits every month</span>
+                  <span className="text-sm text-gray-700">10 credits every month</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
@@ -84,66 +83,6 @@ const PricingSection = () => {
                 <SignUpButton mode="modal">
                   <Button className="w-full py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-inter text-sm shadow border-0 font-semibold">
                     Get Started
-                  </Button>
-                </SignUpButton>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Monthly Subscription */}
-          <Card className={`flex flex-col rounded-2xl shadow-2xl border-0 ${planGradientBg.subscription} relative transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-cyan-400/30 min-h-[460px] mt-8 lg:mt-0`}>
-            <div className="absolute -top-6 left-1/2 -translate-x-1/2 z-10">
-              <Badge className="bg-gradient-to-r from-blue-400 to-cyan-400 text-white font-inter text-xs px-4 py-1 shadow-xl border-0 tracking-wide font-semibold">
-                MOST POPULAR
-              </Badge>
-            </div>
-            <CardHeader className="text-center pb-4 pt-8 px-4">
-              <CardTitle className={`text-xl font-bold mb-2 ${planTextColor.subscription} font-inter`}>Monthly Subscription</CardTitle>
-              <div className="text-3xl font-extrabold text-cyan-100 mb-1">
-                {subscriptionProducts[0] ? <>
-                    {pricingData.currencySymbol}{subscriptionProducts[0].price_amount}
-                    <span className="text-base font-bold align-super">/month</span>
-                  </> : <>
-                    {pricingData.currencySymbol}{pricingData.monthlyPrice}
-                    <span className="text-base font-bold align-super">/month</span>
-                  </>}
-              </div>
-              <div className="text-sm font-semibold text-cyan-200">
-                {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits/month` : '300 credits/month'}
-              </div>
-            </CardHeader>
-            <CardContent className="grow flex flex-col px-4 pb-4">
-              <ul className="space-y-2 my-4 flex-grow">
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                  <span className="text-sm text-cyan-100">
-                    {subscriptionProducts[0] ? `${subscriptionProducts[0].credits_amount} credits every month` : '300 credits every month'}
-                  </span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                  <span className="text-sm text-cyan-100">Auto-renewal</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                  <span className="text-sm text-cyan-100">Cancel anytime</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                  <span className="text-sm text-cyan-100">Best value for regular users</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                  <span className="text-sm text-cyan-100">Priority support</span>
-                </li>
-              </ul>
-              <div className="mt-auto">
-                <SignUpButton mode="modal">
-                  <Button className="w-full py-2.5 bg-white hover:bg-yellow-100 text-black font-inter text-sm rounded-xl shadow border-0 font-bold transition-colors duration-200" disabled={isPricingLoading || isProductsLoading}>
-                    {isPricingLoading || isProductsLoading ? <>
-                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                        Loading...
-                      </> : 'Subscribe Now'}
                   </Button>
                 </SignUpButton>
               </div>
