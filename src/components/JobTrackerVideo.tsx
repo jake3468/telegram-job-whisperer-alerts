@@ -186,7 +186,7 @@ export const JobTrackerVideo: React.FC<JobTrackerVideoProps> = ({
         {/* Video */}
         <video
           ref={videoRef}
-          className="w-full h-full object-contain bg-black"
+          className="w-full h-full object-cover bg-black"
           loop
           playsInline
           muted={isMuted}
