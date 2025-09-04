@@ -196,19 +196,27 @@ export default function GetMoreCredits() {
               <CardContent className="grow flex flex-col px-3 sm:px-4 pb-3">
                 <ul className="space-y-1 sm:space-y-2 my-2 sm:my-4 flex-grow">
                   <li className="flex items-center gap-1 sm:gap-2">
-                    <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                    <div className="w-5 h-5 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-black" />
+                    </div>
                     <span className="text-xs sm:text-sm text-white">Access to all features</span>
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
-                    <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                    <div className="w-5 h-5 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-black" />
+                    </div>
                     <span className="text-xs sm:text-sm text-white">10 credits every month</span>
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
-                    <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                    <div className="w-5 h-5 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-black" />
+                    </div>
                     <span className="text-xs sm:text-sm text-white">Auto-renewal</span>
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
-                    <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                    <div className="w-5 h-5 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-black" />
+                    </div>
                     <span className="text-xs sm:text-sm text-white">Perfect for occasional use</span>
                   </li>
                 </ul>  
@@ -262,15 +270,21 @@ export default function GetMoreCredits() {
                 {/* Features list */}
                 <ul className="space-y-1 mb-2">
                   <li className="flex items-center gap-1 sm:gap-2">
-                    <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                    <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-2.5 h-2.5 text-black" />
+                    </div>
                     <span className="text-white text-[10px] sm:text-xs">No expiration</span>
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
-                    <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                    <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-2.5 h-2.5 text-black" />
+                    </div>
                     <span className="text-white text-[10px] sm:text-xs">Instant activation</span>
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
-                    <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                    <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-2.5 h-2.5 text-black" />
+                    </div>
                     <span className="text-white text-[10px] sm:text-xs">Secure payment</span>
                   </li>
                 </ul>

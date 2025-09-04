@@ -63,25 +63,33 @@ const PricingSection = () => {
             <CardContent className="grow flex flex-col px-4 pb-4">
               <ul className="space-y-2 my-4 flex-grow">
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                  <div className="w-5 h-5 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-black" />
+                  </div>
                   <span className="text-sm text-white">Access to all features</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                  <div className="w-5 h-5 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-black" />
+                  </div>
                   <span className="text-sm text-white">10 credits every month</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                  <div className="w-5 h-5 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-black" />
+                  </div>
                   <span className="text-sm text-white">Auto-renewal</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                  <div className="w-5 h-5 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-black" />
+                  </div>
                   <span className="text-sm text-white">Perfect for occasional use</span>
                 </li>
               </ul>
               <div className="mt-auto">
                 <SignUpButton mode="modal">
-                  <Button className="w-full py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-inter text-sm shadow border-0 font-semibold">
+                  <Button className="w-full py-2.5 bg-cyan-200 hover:bg-cyan-300 text-gray-50 rounded-xl font-inter text-sm shadow border-0 font-semibold">
                     Get Started
                   </Button>
                 </SignUpButton>
@@ -135,15 +143,21 @@ const PricingSection = () => {
               {/* Features list */}
               <ul className="space-y-1 mb-3">
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                  <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-2.5 h-2.5 text-black" />
+                  </div>
                   <span className="text-white text-xs">No expiration</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                  <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-2.5 h-2.5 text-black" />
+                  </div>
                   <span className="text-white text-xs">Instant activation</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                  <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-2.5 h-2.5 text-black" />
+                  </div>
                   <span className="text-white text-xs">Secure payment</span>
                 </li>
               </ul>
