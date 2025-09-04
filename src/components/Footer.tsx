@@ -1,5 +1,6 @@
 
 import { Link } from 'react-router-dom';
+import { Twitter, Linkedin, Youtube, Instagram } from 'lucide-react';
 
 const Footer = () => {
   const scrollToSection = (sectionId: string) => {
@@ -24,6 +25,44 @@ const Footer = () => {
             <p className="text-gray-400 text-sm font-inter max-w-md">
               The AI-powered platform for finding and creating your perfect career path with advanced job matching and personalized guidance.
             </p>
+            <div className="flex items-center space-x-4 mt-4">
+              <a 
+                href="https://x.com/Aspirely_ai" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-sky-400 transition-colors duration-200"
+                aria-label="Follow us on X (Twitter)"
+              >
+                <Twitter size={20} />
+              </a>
+              <a 
+                href="https://www.linkedin.com/company/107778088/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-sky-400 transition-colors duration-200"
+                aria-label="Follow us on LinkedIn"
+              >
+                <Linkedin size={20} />
+              </a>
+              <a 
+                href="https://www.youtube.com/@AspirelyAI" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-sky-400 transition-colors duration-200"
+                aria-label="Subscribe to our YouTube channel"
+              >
+                <Youtube size={20} />
+              </a>
+              <a 
+                href="https://www.instagram.com/aspirely.ai/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-sky-400 transition-colors duration-200"
+                aria-label="Follow us on Instagram"
+              >
+                <Instagram size={20} />
+              </a>
+            </div>
           </div>
 
           {/* Product Section */}
