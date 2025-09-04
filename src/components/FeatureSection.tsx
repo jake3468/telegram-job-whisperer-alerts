@@ -5,6 +5,7 @@ import { logger } from "@/utils/logger";
 import { useCachedUserProfile } from "@/hooks/useCachedUserProfile";
 import { detectAndStoreLocation } from "@/utils/locationDetection";
 import ActivationStatusTag from "./ActivationStatusTag";
+import { JobTrackerVideo } from "./JobTrackerVideo";
 interface FeatureSectionProps {
   title: string;
   subheading: string;
@@ -91,29 +92,29 @@ const FeatureSection = ({
 
   // Mobile: header section (title + subheading only)
   const mobileHeaderSection = <div className="lg:hidden">
-      <h3 className="text-2xl md:text-3xl mb-2 font-opensans text-indigo-700 font-bold">
+      <h3 className="text-2xl md:text-3xl mb-2 font-inter text-cyan-300 font-bold">
         {title}
       </h3>
-      <p className="mb-3 font-opensans font-medium text-neutral-950 text-sm">
+      <p className="mb-3 font-inter font-medium text-slate-100 text-sm">
         {subheading}
       </p>
     </div>;
 
   // Mobile: content section (description + button only)
   const mobileContentSection = <div className="lg:hidden flex flex-col space-y-6">
-      <p className="leading-relaxed font-opensans text-neutral-950 text-xs font-normal">
+      <p className="leading-relaxed font-inter text-slate-100 text-xs font-normal">
         {description}
       </p>
-      {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75">
+      {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75 text-sm">
           Coming Soon
-        </button> : buttonUrl ? <button type="button" onClick={handleButtonWithUrlClick} className="w-fit bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 flex-row transition-all duration-200 shadow-lg hover:shadow-xl">
-          <ExternalLink className="w-4 h-4" />
+        </button> : buttonUrl ? <button type="button" onClick={handleButtonWithUrlClick} className="w-fit bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-4 rounded-full flex items-center gap-2 flex-row transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
+          <ExternalLink className="w-3 h-3" />
           {buttonText}
-          <ArrowRight className="w-4 h-4" />
+          <ArrowRight className="w-3 h-3" />
         </button> : <SignUpButton mode="modal">
-          <button type="button" className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
+          <button type="button" className="w-fit bg-cyan-500 hover:bg-cyan-600 text-gray-800 font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
             {buttonText}
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-3 h-3" />
           </button>
         </SignUpButton>}
     </div>;
@@ -121,13 +122,13 @@ const FeatureSection = ({
   // Desktop: full content section
   const desktopContentSection = <div className="hidden lg:flex flex-col justify-center space-y-8">
       <div>
-        <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-opensans text-blue-700">
+        <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-cyan-300">
           {title}
         </h3>
-        <p className="md:text-xl mb-4 font-opensans font-medium text-base text-neutral-950">
+        <p className="md:text-xl mb-4 font-inter font-medium text-base text-slate-100">
           {subheading}
         </p>
-        <p className="md:text-lg leading-relaxed font-opensans font-light text-sm text-neutral-950">
+        <p className="md:text-lg leading-relaxed font-inter font-light text-sm text-slate-100">
           {description}
         </p>
       </div>
@@ -138,16 +139,21 @@ const FeatureSection = ({
           <ExternalLink className="w-5 h-5" />
           {buttonText}
           <ArrowRight className="w-5 h-5" />
-        </button> : <SignUpButton mode="modal">
-          <button type="button" className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
-            {buttonText}
-            <ArrowRight className="w-5 h-5" />
-          </button>
-        </SignUpButton>}
+         </button> : <SignUpButton mode="modal">
+           <button type="button" className="w-fit bg-gray-50 hover:bg-gray-100 text-gray-800 font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
+             {buttonText}
+             <ArrowRight className="w-5 h-5" />
+           </button>
+         </SignUpButton>}
     </div>;
   const animationSection = lottieUrl ? <div className="flex items-center justify-center">
       <div className="w-full max-w-48 lg:max-w-md">
-        {isLoading ? <div className="w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center animate-pulse">
+        {title === "Job Tracker" ? (
+          <JobTrackerVideo 
+            className="w-full"
+            showControls={true}
+          />
+        ) : isLoading ? <div className="w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center animate-pulse">
             <div className="text-gray-500 text-sm">Loading animation...</div>
           </div> : hasError ? <div className="w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
             <div className="text-center text-gray-500">
@@ -164,7 +170,7 @@ const FeatureSection = ({
     </div> : null;
   return <section className="py-1 md:py-2 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
-        {lottieUrl ? <div className="rounded-3xl p-6 md:p-8 lg:p-10 bg-slate-200">
+        {lottieUrl ? <div className="rounded-3xl p-6 md:p-8 lg:p-10 bg-black border border-gray-600">
             {/* Mobile Layout */}
             <div className="lg:hidden space-y-6">
               {mobileHeaderSection}
@@ -224,7 +230,7 @@ const FeatureSection = ({
                     <ExternalLink className="w-3 h-3" />
                     {buttonText}
                   </button> : <SignUpButton mode="modal">
-                    <button type="button" className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200">
+                    <button type="button" className="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-800 font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200">
                       {buttonText}
                     </button>
                   </SignUpButton>}

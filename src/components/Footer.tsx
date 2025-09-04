@@ -19,7 +19,7 @@ const Footer = () => {
           <div className="md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
               <img alt="JobBots Logo" className="h-8 w-8" src="/lovable-uploads/d1063169-3726-4087-9672-b20c6091d9a4.jpg" />
-              <span className="text-xl font-semibold text-white font-orbitron">Aspirely.ai</span>
+              <span className="text-xl font-semibold text-white font-inter">Aspirely.ai</span>
             </div>
             <p className="text-gray-400 text-sm font-inter max-w-md">
               The AI-powered platform for finding and creating your perfect career path with advanced job matching and personalized guidance.
@@ -46,9 +46,6 @@ const Footer = () => {
           <div>
             <h3 className="text-white font-semibold text-sm font-inter mb-4">Company</h3>
             <div className="space-y-3">
-              <button onClick={() => scrollToSection('about-us')} className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
-                About Us
-              </button>
               <Link to="/contact-support" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
                 Contact Support
               </Link>
@@ -83,7 +80,9 @@ const Footer = () => {
             <div className="flex flex-col items-center space-y-4">
               {/* Badge row - horizontal on desktop/tablet */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
-                <a href="https://startupfa.me/s/aspirely.ai?utm_source=aspirely.ai" target="_blank"><img src="https://startupfa.me/badges/featured-badge.webp" alt="Featured on Startup Fame" width="171" height="54" /></a>
+                <a href="https://startupfa.me/s/aspirely.ai?utm_source=aspirely.ai" target="_blank" rel="noopener noreferrer">
+                  <img src="https://startupfa.me/badges/featured-badge.webp" alt="Featured on Startup Fame" width="171" height="54" loading="lazy" />
+                </a>
                 
                 <div itemProp="award" itemScope itemType="https://schema.org/Award">
                   <meta itemProp="name" content="Featured on Findly Tools" />
@@ -99,12 +98,13 @@ const Footer = () => {
                       alt="Featured on findly.tools" 
                       width="150"
                       itemProp="image"
+                      loading="lazy"
                     />
                   </a>
                 </div>
                 
                 <a href="https://turbo0.com/item/aspirelyai" target="_blank" rel="noopener noreferrer">
-                  <img src="https://img.turbo0.com/badge-listed-light.svg" alt="Listed on Turbo0" style={{height: '54px', width: 'auto'}} />
+                  <img src="https://img.turbo0.com/badge-listed-light.svg" alt="Listed on Turbo0" style={{height: '54px', width: 'auto'}} loading="lazy" />
                 </a>
                 
                 <div itemProp="award" itemScope itemType="https://schema.org/Award">
@@ -122,12 +122,13 @@ const Footer = () => {
                       width="200" 
                       height="54"
                       itemProp="image"
+                      loading="lazy"
                     />
                   </a>
                 </div>
                 
                 <a href="https://fazier.com/launches/aspirely-ai" target="_blank" rel="noopener noreferrer">
-                  <img src="https://fazier.com/api/v1/public/badges/embed_image.svg?launch_id=5237&badge_type=daily&theme=neutral" className="w-32 md:w-44 mx-auto mt-2" alt="Fazier badge" loading="eager" fetchPriority="high" decoding="async" />
+                  <img src="https://fazier.com/api/v1/public/badges/embed_image.svg?launch_id=5237&badge_type=daily&theme=neutral" className="w-32 md:w-44 mx-auto mt-2" alt="Fazier badge" loading="lazy" decoding="async" />
                 </a>
               </div>
             </div>

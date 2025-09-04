@@ -2,8 +2,7 @@
 import AuthHeader from "@/components/AuthHeader";
 import HeroSection from "@/components/HeroSection";
 // import ComparisonSlider from "@/components/ComparisonSlider";
-import JobTrackerPreview from "@/components/JobTrackerPreview";
-import YouTubeShortPreview from "@/components/YouTubeShortPreview";
+
 import AboutUsSection from "@/components/AboutUsSection";
 import ToolsSection from "@/components/ToolsSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
@@ -14,8 +13,30 @@ import Footer from "@/components/Footer";
 // import SecurityHeaders from "@/components/SecurityHeaders";
 import { useEffect } from "react";
 
+// Global postMessage error handler to suppress external service errors
+const suppressExternalPostMessageErrors = () => {
+  window.addEventListener('message', (event) => {
+    // List of known external origins that might cause postMessage errors
+    const allowedOrigins = [
+      'https://startupfa.me',
+      'https://findly.tools', 
+      'https://turbo0.com',
+      'https://twelve.tools',
+      'https://fazier.com'
+    ];
+    
+    // Only suppress errors from known external services
+    if (!allowedOrigins.some(origin => event.origin.includes(origin))) {
+      console.warn('Unrecognized postMessage origin:', event.origin);
+    }
+  }, false);
+};
+
 const Index = () => {
   useEffect(() => {
+    // Suppress external postMessage errors
+    suppressExternalPostMessageErrors();
+    
     // Add JSON-LD structured data for better Google crawlability
     const script = document.createElement('script');
     script.type = 'application/ld+json';
@@ -47,8 +68,7 @@ const Index = () => {
       <AuthHeader />
       <HeroSection />
       {/* <ComparisonSlider /> */}
-      <JobTrackerPreview />
-      <YouTubeShortPreview />
+      
       <AboutUsSection />
       <ToolsSection />
       <HowItWorksSection />
