@@ -152,7 +152,7 @@ const HeroSection = () => {
         
 
         <div className="text-zinc-50 mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-8 text-sm md:text-base">Our AI Agents will update your <span className="font-bold italic text-cyan-400">Resume</span>, send daily <span className="font-bold italic text-cyan-400">Job Alerts</span>, craft tailored <span className="font-bold italic text-cyan-400">Cover Letters</span>, prepare <span className="font-bold italic text-cyan-400">Interview Kits</span>, check <span className="font-bold italic text-cyan-400">Job fit</span>, give insider <span className="font-bold italic text-cyan-400">Company</span> knowledge, and shares the <span className="font-bold italic text-cyan-400">HRs</span> you should contact. Everything you will ever need, all in one place.</p>
+          <p className="mb-8 text-sm md:text-base font-inter">Our AI Agents will update your <span className="font-bold italic text-cyan-400">Resume</span>, send daily <span className="font-bold italic text-cyan-400">Job Alerts</span>, craft tailored <span className="font-bold italic text-cyan-400">Cover Letters</span>, prepare <span className="font-bold italic text-cyan-400">Interview Kits</span>, check <span className="font-bold italic text-cyan-400">Job fit</span>, give insider <span className="font-bold italic text-cyan-400">Company</span> knowledge, and shares the <span className="font-bold italic text-cyan-400">HRs</span> you should contact. Everything you will ever need, all in one place.</p>
           
           <SignedOut>
             {/* Button and Badge Container */}
