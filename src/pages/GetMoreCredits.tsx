@@ -157,7 +157,7 @@ export default function GetMoreCredits() {
           </div>
           <p className="text-blue-100 font-inter font-light mb-1 sm:mb-2 animate-fade-in sm:text-base text-left text-sm">💬 Start with free monthly credits and upgrade anytime - either by purchasing flexible credit packs or a monthly subscription. For any payment-related queries, feel free to reach out to us at &quot;support@aspirely.ai&quot; we're here to help! </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
-            <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in">
+            <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in mt-2 md:mt-0">
               Current Balance:{" "}
               {credits ? <span className="font-bold text-cyan-100">
                   {currentBalance.toLocaleString()} credits
