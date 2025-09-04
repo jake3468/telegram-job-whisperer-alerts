@@ -13,12 +13,15 @@ export const JobTrackerVideo: React.FC<JobTrackerVideoProps> = ({
   showControls = true 
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [videoUrls, setVideoUrls] = useState<{ webm: string | null; mp4: string | null }>({ webm: null, mp4: null });
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [rateLimitBlocked, setRateLimitBlocked] = useState(false);
+  const [isInView, setIsInView] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
   
   const { checkRateLimit } = useVideoRateLimiter();
   const videoPath = 'job-tracker-demo';
@@ -46,40 +49,84 @@ export const JobTrackerVideo: React.FC<JobTrackerVideoProps> = ({
     }
   }, [videoPath, sessionId, checkRateLimit]);
 
-  // Load video URLs from Supabase Storage
+  // Intersection Observer for lazy loading
   useEffect(() => {
-    const loadVideos = async () => {
-      try {
-        // Check rate limits before loading videos
-        const canAccess = await trackVideoPlay();
-        if (!canAccess) {
-          setError('Access temporarily limited');
-          setIsLoading(false);
-          return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        setIsInView(entry.isIntersecting);
+        
+        if (entry.isIntersecting && !hasLoaded) {
+          // Start loading video when it comes into view
+          loadVideos();
+        } else if (!entry.isIntersecting && videoRef.current) {
+          // Pause video when it goes out of view
+          videoRef.current.pause();
+          setIsPlaying(false);
         }
+      },
+      {
+        threshold: 0.3, // Trigger when 30% of the video is visible
+        rootMargin: '50px' // Start loading 50px before it's visible
+      }
+    );
 
-        const webmData = supabase.storage
-          .from('hero-videos')
-          .getPublicUrl(`${videoPath}.webm`);
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
 
-        const mp4Data = supabase.storage
-          .from('hero-videos')
-          .getPublicUrl(`${videoPath}.mp4`);
-
-        setVideoUrls({
-          webm: webmData.data.publicUrl,
-          mp4: mp4Data.data.publicUrl
-        });
-      } catch (err) {
-        console.error('Error loading videos:', err);
-        setError('Failed to load videos');
-      } finally {
-        setIsLoading(false);
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
       }
     };
+  }, [hasLoaded]);
 
-    loadVideos();
-  }, [videoPath, trackVideoPlay]);
+  // Load video URLs from Supabase Storage
+  const loadVideos = useCallback(async () => {
+    if (hasLoaded) return; // Prevent multiple loads
+    
+    setIsLoading(true);
+    setHasLoaded(true);
+    
+    try {
+      // Check rate limits before loading videos
+      const canAccess = await trackVideoPlay();
+      if (!canAccess) {
+        setError('Access temporarily limited');
+        setIsLoading(false);
+        return;
+      }
+
+      const webmData = supabase.storage
+        .from('hero-videos')
+        .getPublicUrl(`${videoPath}.webm`);
+
+      const mp4Data = supabase.storage
+        .from('hero-videos')
+        .getPublicUrl(`${videoPath}.mp4`);
+
+      setVideoUrls({
+        webm: webmData.data.publicUrl,
+        mp4: mp4Data.data.publicUrl
+      });
+    } catch (err) {
+      console.error('Error loading videos:', err);
+      setError('Failed to load videos');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [videoPath, trackVideoPlay, hasLoaded]);
+
+  // Auto-play when video comes into view and is loaded
+  useEffect(() => {
+    if (isInView && videoRef.current && videoUrls.webm && !isPlaying) {
+      videoRef.current.play().catch(() => {
+        // Autoplay might be blocked, that's fine
+        console.log('Autoplay blocked, user interaction required');
+      });
+    }
+  }, [isInView, videoUrls.webm, isPlaying]);
 
   const togglePlayPause = async () => {
     if (!videoRef.current) return;
@@ -110,12 +157,18 @@ export const JobTrackerVideo: React.FC<JobTrackerVideoProps> = ({
     setIsMuted(videoRef.current.muted);
   };
 
-  if (isLoading) {
+  // Show placeholder when not loaded yet
+  if (!hasLoaded || isLoading) {
     return (
-      <div className={`relative ${className}`}>
+      <div ref={containerRef} className={`relative ${className}`}>
         <div className="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] rounded-3xl overflow-hidden shadow-2xl border border-gray-800/50">
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-gray-900 to-black">
-            <div className="text-gray-400 text-sm animate-pulse">Loading job tracker demo...</div>
+            <div className="text-center">
+              <div className="text-4xl mb-3">📋</div>
+              <div className="text-gray-400 text-sm">
+                {isLoading ? 'Loading job tracker demo...' : 'Scroll to view demo'}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -124,7 +177,7 @@ export const JobTrackerVideo: React.FC<JobTrackerVideoProps> = ({
 
   if (error || rateLimitBlocked || (!videoUrls.webm && !videoUrls.mp4)) {
     return (
-      <div className={`relative ${className}`}>
+      <div ref={containerRef} className={`relative ${className}`}>
         <div className="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] rounded-3xl overflow-hidden shadow-2xl border border-gray-800/50">
           <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-gray-900 to-black p-6 text-center">
             <div className="text-4xl mb-3">📋</div>
@@ -141,7 +194,7 @@ export const JobTrackerVideo: React.FC<JobTrackerVideoProps> = ({
   }
 
   return (
-    <div className={`relative group ${className}`}>
+    <div ref={containerRef} className={`relative group ${className}`}>
       <div className="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] rounded-3xl overflow-hidden shadow-2xl border border-gray-800/50">
         {/* Video */}
         <video
@@ -150,18 +203,17 @@ export const JobTrackerVideo: React.FC<JobTrackerVideoProps> = ({
           loop
           playsInline
           muted={isMuted}
-          preload="auto"
-          autoPlay
+          preload="metadata"
           onLoadedData={() => {
             setIsLoading(false);
-            // Force immediate play after loading
-            if (videoRef.current) {
+            // Auto-play if in view
+            if (isInView && videoRef.current) {
               videoRef.current.play().catch(console.warn);
             }
           }}
           onCanPlay={() => {
-            // Ensure autoplay starts as soon as possible
-            if (videoRef.current && !isPlaying) {
+            // Auto-play if in view
+            if (isInView && videoRef.current && !isPlaying) {
               videoRef.current.play().catch(console.warn);
             }
           }}
