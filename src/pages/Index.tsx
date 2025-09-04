@@ -3,7 +3,6 @@ import AuthHeader from "@/components/AuthHeader";
 import HeroSection from "@/components/HeroSection";
 // import ComparisonSlider from "@/components/ComparisonSlider";
 
-import YouTubeShortPreview from "@/components/YouTubeShortPreview";
 import AboutUsSection from "@/components/AboutUsSection";
 import ToolsSection from "@/components/ToolsSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
@@ -70,7 +69,6 @@ const Index = () => {
       <HeroSection />
       {/* <ComparisonSlider /> */}
       
-      <YouTubeShortPreview />
       <AboutUsSection />
       <ToolsSection />
       <HowItWorksSection />
