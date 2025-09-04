@@ -147,7 +147,7 @@ const TermsOfService = () => {
               <div className="space-y-4 mb-6">
                 <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
                   <h4 className="text-white font-semibold mb-2">Free Plan</h4>
-                  <p className="text-gray-300 text-sm">30 free credits per month with access to all features</p>
+                  <p className="text-gray-300 text-sm">10 free credits per month with access to all features</p>
                 </div>
 
                 <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
