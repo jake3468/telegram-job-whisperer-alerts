@@ -72,19 +72,60 @@ const PricingSection = () => {
                   <div className="w-5 h-5 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                     <Check className="w-3 h-3 text-black" />
                   </div>
-                  <span className="text-sm text-white">10 credits every month</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                    <Check className="w-3 h-3 text-black" />
-                  </div>
-                  <span className="text-sm text-white">Auto-renewal</span>
+                  <span className="text-sm text-white">10 credits every month (auto-renewal)</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-5 h-5 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                     <Check className="w-3 h-3 text-black" />
                   </div>
                   <span className="text-sm text-white">Perfect for occasional use</span>
+                </li>
+                <li className="mt-3">
+                  <div className="text-sm font-semibold text-cyan-300 mb-2">What You Can Do Each Month:</div>
+                  <ul className="space-y-1 ml-4">
+                    <li className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-2.5 h-2.5 text-black" />
+                      </div>
+                      <span className="text-xs text-white">Create 2 Resumes</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-2.5 h-2.5 text-black" />
+                      </div>
+                      <span className="text-xs text-white">Create 9 Cover Letters</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-2.5 h-2.5 text-black" />
+                      </div>
+                      <span className="text-xs text-white">Run 10 Job Fit Checks</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-2.5 h-2.5 text-black" />
+                      </div>
+                      <span className="text-xs text-white">Access 3 Company Insights</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-2.5 h-2.5 text-black" />
+                      </div>
+                      <span className="text-xs text-white">View 5 HR Profiles</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-2.5 h-2.5 text-black" />
+                      </div>
+                      <span className="text-xs text-white">Check 5 Visa Info</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-2.5 h-2.5 text-black" />
+                      </div>
+                      <span className="text-xs text-white">Practice 1 Interview Prep</span>
+                    </li>
+                  </ul>
                 </li>
               </ul>
               <div className="mt-auto">
