@@ -64,16 +64,16 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				pastel: {
-					blue: '#B8C5FF',
-					mint: '#A5FBCB', 
-					peach: '#FFD2B5',
-					lavender: '#E5D4FF'
+					blue: 'hsl(230, 100%, 85%)',
+					mint: 'hsl(148, 88%, 82%)', 
+					peach: 'hsl(23, 100%, 85%)',
+					lavender: 'hsl(269, 100%, 91%)'
 				},
-        sky: { // Ensure sky colors are defined if used for highlighting or buttons
-          '400': '#38bdf8', // Example, adjust if you have specific sky shades
-          '500': '#0ea5e9',
-          '600': '#0284c7',
-          '700': '#0369a1',
+        sky: {
+          '400': 'hsl(199, 89%, 48%)',
+          '500': 'hsl(199, 89%, 48%)',
+          '600': 'hsl(200, 98%, 39%)',
+          '700': 'hsl(201, 96%, 32%)',
         },
         highlight: 'hsl(196, 88%, 55%)', // Sky-blue like color for highlighting
 			},

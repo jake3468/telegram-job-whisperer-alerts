@@ -140,7 +140,7 @@ const FeatureSection = ({
           {buttonText}
           <ArrowRight className="w-5 h-5" />
          </button> : <SignUpButton mode="modal">
-           <button type="button" className="w-fit bg-gray-50 hover:bg-gray-100 text-gray-800 font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
+           <button type="button" className="w-fit bg-secondary hover:bg-secondary/80 text-secondary-foreground font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
              {buttonText}
              <ArrowRight className="w-5 h-5" />
            </button>
