@@ -125,7 +125,10 @@ const FeatureSection = ({
           {title}
         </h3>
         <p className="md:text-xl mb-4 font-opensans font-medium text-base text-slate-100">
-          Fresh job alerts daily, filtered for your career goals
+          {subheading}
+        </p>
+        <p className="md:text-lg leading-relaxed font-opensans font-light text-sm text-slate-100">
+          {description}
         </p>
       </div>
       
