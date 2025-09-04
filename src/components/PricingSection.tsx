@@ -185,6 +185,25 @@ const PricingSection = () => {
                     </div>
                     <span className="text-white text-xs">Secure payment</span>
                   </li>
+                  <li className="mt-4 p-3 bg-gray-800/50 rounded-lg border border-gray-600">
+                    <div className="flex items-start gap-3">
+                      <img 
+                        src="/lovable-uploads/e5bac2d4-e5d9-4f9d-accf-c8ac205f690b.png" 
+                        alt="Jobs that will vanish by 2030 e-book cover" 
+                        className="w-16 h-20 object-cover rounded shadow-md flex-shrink-0"
+                      />
+                      <div className="flex-grow">
+                        <div className="text-cyan-400 font-semibold text-xs mb-1">FREE E-book:</div>
+                        <div className="text-white font-medium text-xs mb-2">"Jobs that will vanish by 2030: 8 Strategies to Save Your Career Before AI Takes Over"</div>
+                        <div className="text-gray-300 text-xs leading-relaxed">
+                          Purchase any of the credit packs above and get a downloadable link sent via email from noreply@dodopayments.com
+                        </div>
+                        <div className="text-gray-400 text-xs mt-1">
+                          Instant access, read on any device, keep forever
+                        </div>
+                      </div>
+                    </div>
+                  </li>
                 </ul>
               </div>
             </CardContent>
