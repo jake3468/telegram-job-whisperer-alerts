@@ -181,6 +181,7 @@ export default function GetMoreCredits() {
           <div className={`
               grid gap-3 sm:gap-4 
               w-full
+              max-w-4xl mx-auto
               grid-cols-1
               lg:grid-cols-2
               items-stretch
@@ -194,7 +195,7 @@ export default function GetMoreCredits() {
                 <div className="text-xs sm:text-sm font-semibold text-gray-300">10 credits/month</div>
               </CardHeader>
               <CardContent className="grow flex flex-col px-2 sm:px-3 pb-2">
-                <div className="text-center my-2 flex-grow">
+                <div className="text-left my-2 flex-grow">
                   <div className="text-xs sm:text-sm text-white mb-1">Access to all features</div>
                   <div className="text-xs sm:text-sm text-white mb-1">10 credits every month (auto-renewal)</div>
                   <div className="text-xs sm:text-sm font-semibold text-cyan-300 mb-1">What you can do each month:</div>

@@ -52,7 +52,7 @@ const PricingSection = () => {
           </div>
         </div>
 
-        <div className="grid gap-8 lg:gap-8 grid-cols-1 lg:grid-cols-2 items-stretch max-w-6xl mx-auto">
+        <div className="grid gap-6 lg:gap-8 grid-cols-1 lg:grid-cols-2 items-stretch max-w-4xl mx-auto">
           {/* Free Plan */}
           <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-blue-400/30 min-h-[320px]`}>
             <CardHeader className="text-center pb-2 pt-4 px-3">
@@ -61,7 +61,7 @@ const PricingSection = () => {
               <div className="text-sm font-semibold text-gray-300">10 credits/month</div>
             </CardHeader>
             <CardContent className="grow flex flex-col px-3 pb-3">
-              <div className="text-center my-3 flex-grow">
+              <div className="text-left my-3 flex-grow">
                 <div className="text-sm text-white mb-2">Access to all features</div>
                 <div className="text-sm text-white mb-2">10 credits every month (auto-renewal)</div>
                 <div className="text-sm font-semibold text-cyan-300 mb-2">What you can do each month:</div>
