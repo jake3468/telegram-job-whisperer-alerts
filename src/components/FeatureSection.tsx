@@ -132,16 +132,16 @@ const FeatureSection = ({
         </p>
       </div>
       
-      {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-xl flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75">
+      {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75">
           Coming Soon
-        </button> : buttonUrl ? <button type="button" onClick={handleButtonWithUrlClick} className="w-fit bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-xl flex items-center gap-2 flex-row transition-all duration-200 shadow-lg hover:shadow-xl">
-          <ExternalLink className="w-4 h-4" />
+        </button> : buttonUrl ? <button type="button" onClick={handleButtonWithUrlClick} className="w-fit bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 flex-row transition-all duration-200 shadow-lg hover:shadow-xl">
+          <ExternalLink className="w-5 h-5" />
           {buttonText}
-          <ArrowRight className="w-4 h-4" />
-        </button> : <SignUpButton mode="modal">
-          <button type="button" className="w-fit bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-xl flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
+          <ArrowRight className="w-5 h-5" />
+        </button> : <SignUpButton mode="modal" className="bg-blue-700 hover:bg-blue-600">
+          <button type="button" className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
             {buttonText}
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-5 h-5" />
           </button>
         </SignUpButton>}
     </div>;
