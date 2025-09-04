@@ -1,5 +1,5 @@
 
-import { UserPlus, Upload, Sparkles, Rocket } from "lucide-react";
+import { UserPlus, Sparkles, Rocket } from "lucide-react";
 
 const HowItWorksSection = () => {
   const steps = [
@@ -9,19 +9,14 @@ const HowItWorksSection = () => {
       description: "Create your free account in seconds. No credit card required to get started.",
     },
     {
-      icon: Upload,
-      title: "Upload Resume", 
-      description: "Share your current resume and tell us about your career goals and preferences.",
-    },
-    {
       icon: Sparkles,
-      title: "AI Analysis",
-      description: "We use your profile to give you personalized results through our AI-powered tools",
+      title: "Activate Your AI Agents",
+      description: "Meet your personal AI agents and activate them using the activation key shown. Chat with them to discover your next steps.",
     },
     {
       icon: Rocket,
       title: "Get Results",
-      description: "Access all features instantly - from job alerts to cover letters to interview prep.",
+      description: "Use all 3 Telegram AI Job Agents and access all our AI tools on the site, including phone-call AI mock interviews, job alerts, cover letters, resumes, and more.",
     }
   ];
 
@@ -41,7 +36,7 @@ const HowItWorksSection = () => {
           {/* Connection line for desktop */}
           <div className="hidden lg:block absolute top-16 left-0 right-0 h-0.5 bg-gradient-to-r from-sky-500/20 via-blue-500/40 to-indigo-500/20"></div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
             {steps.map((step, index) => (
               <div 
                 key={index}
