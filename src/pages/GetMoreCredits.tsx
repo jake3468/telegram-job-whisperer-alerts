@@ -144,7 +144,7 @@ export default function GetMoreCredits() {
         <div className="text-center mb-5 sm:mb-12 px-2 sm:px-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex-1">
-              <h1 className="text-2xl xs:text-3xl font-orbitron font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text mb-1 sm:mb-2 drop-shadow tracking-tight animate-fade-in text-sky-400 sm:text-4xl">
+              <h1 className="text-2xl xs:text-3xl font-inter font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text mb-1 sm:mb-2 drop-shadow tracking-tight animate-fade-in text-sky-400 sm:text-4xl">
                 Flexible Pricing Plans
               </h1>
             </div>
