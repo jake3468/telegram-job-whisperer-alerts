@@ -178,7 +178,7 @@ export default function GetMoreCredits() {
         
         {/* Responsive grid area with tight spacing for mobile; px for interior gap only */}
         <div className="flex-1 flex flex-col items-center justify-center w-full px-2 sm:px-4">
-          <div className="grid gap-6 lg:gap-8 grid-cols-1 md:grid-cols-2 items-stretch max-w-4xl md:max-w-3xl lg:max-w-4xl mx-auto">
+          <div className="grid gap-6 lg:gap-8 grid-cols-1 lg:grid-cols-2 items-stretch max-w-4xl mx-auto">
             {/* Free Plan */}
             <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-blue-400/30 min-h-[320px]`}>
               <CardHeader className="text-center pb-2 pt-4 px-3">
