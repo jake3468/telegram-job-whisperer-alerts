@@ -183,6 +183,7 @@ export default function GetMoreCredits() {
               w-full
               max-w-4xl mx-auto
               grid-cols-1
+              md:grid-cols-2
               lg:grid-cols-2
               items-stretch
               duration-500
@@ -230,25 +231,25 @@ export default function GetMoreCredits() {
               <CardContent className="grow flex flex-col px-3 sm:px-4 pb-3">
                  <div className="flex flex-col gap-1 sm:gap-2 my-2 sm:my-3 flex-grow">
                    {/* Show database products if available, otherwise show static fallback */}
-                    {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="border border-gray-500 rounded-lg p-2 sm:p-2.5 flex justify-between items-center shadow hover:shadow-gray-300/50 transition duration-300 bg-gray-700">
-                        <span className="text-white font-medium text-xs sm:text-sm">{pack.credits_amount} credits</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-white font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price_amount}</span>
-                          <Button size="sm" onClick={() => handleCreditPackClick(pack.product_id)} className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={!isAuthReady || connectionIssue || isCheckoutLoading(pack.product_id)}>
-                            {!isAuthReady ? '...' : isCheckoutLoading(pack.product_id) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
-                          </Button>
-                       </div>
-                     </div>) :
-                // Only show fallback if no database products and not loading
-                !isProductsLoading && pricingData?.creditPacks.map(pack => <div key={pack.credits} className="bg-gray-700 border border-gray-500 rounded-lg p-2 sm:p-2.5 flex justify-between items-center shadow hover:shadow-gray-300/50 transition duration-300">
-                     <span className="text-white font-medium text-xs sm:text-sm">{pack.credits} credits</span>
-                     <div className="flex items-center gap-2">
-                       <span className="text-white font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price}</span>
-                        <Button size="sm" onClick={() => handleCreditPackClick(pack.productId)} className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={!isAuthReady || connectionIssue || isCheckoutLoading(pack.productId)}>
-                          {!isAuthReady ? '...' : isCheckoutLoading(pack.productId) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
-                        </Button>
-                     </div>
-                   </div>)}
+                     {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="border border-gray-500 rounded-lg p-2 sm:p-2.5 flex justify-between items-center shadow hover:shadow-gray-300/50 transition duration-300 bg-gray-700">
+                         <span className="text-white font-medium text-xs sm:text-sm mr-4">{pack.credits_amount} credits</span>
+                         <div className="flex items-center gap-3">
+                           <span className="text-white font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price_amount}</span>
+                           <Button size="sm" onClick={() => handleCreditPackClick(pack.product_id)} className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={!isAuthReady || connectionIssue || isCheckoutLoading(pack.product_id)}>
+                             {!isAuthReady ? '...' : isCheckoutLoading(pack.product_id) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
+                           </Button>
+                        </div>
+                      </div>) :
+                 // Only show fallback if no database products and not loading
+                 !isProductsLoading && pricingData?.creditPacks.map(pack => <div key={pack.credits} className="bg-gray-700 border border-gray-500 rounded-lg p-2 sm:p-2.5 flex justify-between items-center shadow hover:shadow-gray-300/50 transition duration-300">
+                      <span className="text-white font-medium text-xs sm:text-sm mr-4">{pack.credits} credits</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-white font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price}</span>
+                         <Button size="sm" onClick={() => handleCreditPackClick(pack.productId)} className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={!isAuthReady || connectionIssue || isCheckoutLoading(pack.productId)}>
+                           {!isAuthReady ? '...' : isCheckoutLoading(pack.productId) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
+                         </Button>
+                      </div>
+                    </div>)}
                   
                   {/* Loading state */}
                   {isProductsLoading && <div className="flex items-center justify-center py-4">
@@ -258,26 +259,28 @@ export default function GetMoreCredits() {
                 </div>
                 
                 {/* Features list */}
-                <ul className="space-y-1 mb-2">
-                  <li className="flex items-center gap-1 sm:gap-2">
-                    <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                      <Check className="w-2.5 h-2.5 text-black" />
-                    </div>
-                    <span className="text-white text-[10px] sm:text-xs">No expiration</span>
-                  </li>
-                  <li className="flex items-center gap-1 sm:gap-2">
-                    <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                      <Check className="w-2.5 h-2.5 text-black" />
-                    </div>
-                    <span className="text-white text-[10px] sm:text-xs">Instant activation</span>
-                  </li>
-                  <li className="flex items-center gap-1 sm:gap-2">
-                    <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                      <Check className="w-2.5 h-2.5 text-black" />
-                    </div>
-                    <span className="text-white text-[10px] sm:text-xs">Secure payment</span>
-                  </li>
-                </ul>
+                <div className="flex flex-col items-center mb-2 mt-1">
+                  <ul className="space-y-1">
+                    <li className="flex items-center gap-1 sm:gap-2">
+                      <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-2.5 h-2.5 text-black" />
+                      </div>
+                      <span className="text-white text-[10px] sm:text-xs">No expiration</span>
+                    </li>
+                    <li className="flex items-center gap-1 sm:gap-2">
+                      <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-2.5 h-2.5 text-black" />
+                      </div>
+                      <span className="text-white text-[10px] sm:text-xs">Instant activation</span>
+                    </li>
+                    <li className="flex items-center gap-1 sm:gap-2">
+                      <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-2.5 h-2.5 text-black" />
+                      </div>
+                      <span className="text-white text-[10px] sm:text-xs">Secure payment</span>
+                    </li>
+                  </ul>
+                </div>
               </CardContent>
             </Card>
           </div>
