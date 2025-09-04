@@ -17,14 +17,14 @@ import { toast } from 'sonner';
 import { useEnterpriseAuth } from '@/hooks/useEnterpriseAuth';
 import { Analytics } from '@/utils/analytics';
 const planGradientBg = {
-  free: "bg-white border border-gray-200",
+  free: "bg-[#30313d] border border-gray-600",
   subscription: "bg-gradient-to-br from-[#2563eb] via-[#3893ec] to-[#1872ba] dark:from-[#274299] dark:via-[#3177c7] dark:to-[#1b466c]",
-  pack: "bg-white border border-gray-200"
+  pack: "bg-[#30313d] border border-gray-600"
 };
 const planTextColor = {
-  free: "text-gray-800",
+  free: "text-white",
   subscription: "text-cyan-100",
-  pack: "text-gray-800"
+  pack: "text-white"
 };
 export default function GetMoreCredits() {
   const {
@@ -190,26 +190,26 @@ export default function GetMoreCredits() {
             <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-blue-400/30 min-h-[320px] sm:min-h-[380px]`}>
               <CardHeader className="text-center pb-2 pt-3 sm:pb-4 sm:pt-6 px-3 sm:px-4">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 ${planTextColor.free}`}>Free Plan</CardTitle>
-                <div className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-0.5 mb-0.5">Free</div>
-                <div className="mt-0 text-xs sm:text-sm font-semibold text-gray-600">10 credits/month</div>
+                <div className="text-2xl sm:text-3xl font-extrabold text-white mt-0.5 mb-0.5">Free</div>
+                <div className="mt-0 text-xs sm:text-sm font-semibold text-gray-300">10 credits/month</div>
               </CardHeader>
               <CardContent className="grow flex flex-col px-3 sm:px-4 pb-3">
                 <ul className="space-y-1 sm:space-y-2 my-2 sm:my-4 flex-grow">
                   <li className="flex items-center gap-1 sm:gap-2">
-                    <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-gray-700">Access to all features</span>
+                    <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm text-white">Access to all features</span>
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
-                    <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-gray-700">10 credits every month</span>
+                    <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm text-white">10 credits every month</span>
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
-                    <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-gray-700">Auto-renewal</span>
+                    <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm text-white">Auto-renewal</span>
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
-                    <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-gray-700">Perfect for occasional use</span>
+                    <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm text-white">Perfect for occasional use</span>
                   </li>
                 </ul>  
                 <div className="mt-auto">
@@ -224,28 +224,28 @@ export default function GetMoreCredits() {
             <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-indigo-400/30 min-h-[320px] sm:min-h-[380px]`}>
               <CardHeader className="text-center pb-2 pt-3 sm:pb-4 sm:pt-6 px-3 sm:px-4">
                 <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 ${planTextColor.pack}`}>Credit Packs</CardTitle>
-                 <div className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-0.5 sm:mb-1">
+                 <div className="text-2xl sm:text-3xl font-extrabold text-white mb-0.5 sm:mb-1">
                    {pricingData ? `Starting ${pricingData.currencySymbol}${creditPackProducts.length > 0 ? Math.min(...creditPackProducts.map(p => p.price_amount)) : pricingData.creditPacks[0]?.price}` : 'Loading...'}
                  </div>
-                <div className="mt-0 text-xs sm:text-sm font-semibold text-gray-600">Select your desired amount:</div>
+                <div className="mt-0 text-xs sm:text-sm font-semibold text-gray-300">Select your desired amount:</div>
               </CardHeader>
               <CardContent className="grow flex flex-col px-3 sm:px-4 pb-3">
                  <div className="flex flex-col gap-1 sm:gap-2 my-2 sm:my-3 flex-grow">
                    {/* Show database products if available, otherwise show static fallback */}
-                   {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="border border-gray-200 rounded-lg p-2 sm:p-2.5 flex justify-between items-center shadow hover:shadow-gray-300/50 transition duration-300 bg-blue-100">
-                       <span className="text-gray-700 font-medium text-xs sm:text-sm">{pack.credits_amount} credits</span>
-                       <div className="flex items-center gap-2">
-                         <span className="text-gray-900 font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price_amount}</span>
+                    {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="border border-gray-500 rounded-lg p-2 sm:p-2.5 flex justify-between items-center shadow hover:shadow-gray-300/50 transition duration-300 bg-gray-700">
+                        <span className="text-white font-medium text-xs sm:text-sm">{pack.credits_amount} credits</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-white font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price_amount}</span>
                           <Button size="sm" onClick={() => handleCreditPackClick(pack.product_id)} className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={!isAuthReady || connectionIssue || isCheckoutLoading(pack.product_id)}>
                             {!isAuthReady ? '...' : isCheckoutLoading(pack.product_id) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
                           </Button>
                        </div>
                      </div>) :
                 // Only show fallback if no database products and not loading
-                !isProductsLoading && pricingData?.creditPacks.map(pack => <div key={pack.credits} className="bg-gray-50 border border-gray-200 rounded-lg p-2 sm:p-2.5 flex justify-between items-center shadow hover:shadow-gray-300/50 transition duration-300">
-                     <span className="text-gray-700 font-medium text-xs sm:text-sm">{pack.credits} credits</span>
+                !isProductsLoading && pricingData?.creditPacks.map(pack => <div key={pack.credits} className="bg-gray-700 border border-gray-500 rounded-lg p-2 sm:p-2.5 flex justify-between items-center shadow hover:shadow-gray-300/50 transition duration-300">
+                     <span className="text-white font-medium text-xs sm:text-sm">{pack.credits} credits</span>
                      <div className="flex items-center gap-2">
-                       <span className="text-gray-900 font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price}</span>
+                       <span className="text-white font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price}</span>
                         <Button size="sm" onClick={() => handleCreditPackClick(pack.productId)} className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={!isAuthReady || connectionIssue || isCheckoutLoading(pack.productId)}>
                           {!isAuthReady ? '...' : isCheckoutLoading(pack.productId) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
                         </Button>
@@ -255,23 +255,23 @@ export default function GetMoreCredits() {
                   {/* Loading state */}
                   {isProductsLoading && <div className="flex items-center justify-center py-4">
                       <Loader2 className="w-4 h-4 animate-spin text-indigo-300" />
-                      <span className="ml-2 text-gray-600 text-xs">Loading credit packs...</span>
+                      <span className="ml-2 text-white text-xs">Loading credit packs...</span>
                     </div>}
                 </div>
                 
                 {/* Features list */}
                 <ul className="space-y-1 mb-2">
                   <li className="flex items-center gap-1 sm:gap-2">
-                    <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-gray-700 text-[10px] sm:text-xs">No expiration</span>
+                    <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                    <span className="text-white text-[10px] sm:text-xs">No expiration</span>
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
-                    <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-gray-700 text-[10px] sm:text-xs">Instant activation</span>
+                    <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                    <span className="text-white text-[10px] sm:text-xs">Instant activation</span>
                   </li>
                   <li className="flex items-center gap-1 sm:gap-2">
-                    <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    <span className="text-gray-700 text-[10px] sm:text-xs">Secure payment</span>
+                    <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                    <span className="text-white text-[10px] sm:text-xs">Secure payment</span>
                   </li>
                 </ul>
               </CardContent>

@@ -6,14 +6,14 @@ import { Check, Globe, Loader2 } from 'lucide-react';
 import { useLocationPricing } from '@/hooks/useLocationPricing';
 import { usePaymentProducts } from '@/hooks/usePaymentProducts';
 const planGradientBg = {
-  free: "bg-white border border-gray-200",
+  free: "bg-[#30313d] border border-gray-600",
   subscription: "bg-gradient-to-br from-[#2563eb] via-[#3893ec] to-[#1872ba] dark:from-[#274299] dark:via-[#3177c7] dark:to-[#1b466c]",
-  pack: "bg-white border border-gray-200"
+  pack: "bg-[#30313d] border border-gray-600"
 };
 const planTextColor = {
-  free: "text-gray-800",
+  free: "text-white",
   subscription: "text-cyan-100",
-  pack: "text-gray-800"
+  pack: "text-white"
 };
 const PricingSection = () => {
   const {
@@ -57,26 +57,26 @@ const PricingSection = () => {
           <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-blue-400/30 min-h-[420px]`}>
             <CardHeader className="text-center pb-4 pt-6 px-4">
               <CardTitle className={`text-xl font-bold mb-2 ${planTextColor.free} font-inter`}>Free Plan</CardTitle>
-              <div className="text-3xl font-extrabold text-gray-900 mb-1">Free</div>
-              <div className="text-sm font-semibold text-gray-600">10 credits/month</div>
+              <div className="text-3xl font-extrabold text-white mb-1">Free</div>
+              <div className="text-sm font-semibold text-gray-300">10 credits/month</div>
             </CardHeader>
             <CardContent className="grow flex flex-col px-4 pb-4">
               <ul className="space-y-2 my-4 flex-grow">
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                  <span className="text-sm text-gray-700">Access to all features</span>
+                  <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                  <span className="text-sm text-white">Access to all features</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                  <span className="text-sm text-gray-700">10 credits every month</span>
+                  <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                  <span className="text-sm text-white">10 credits every month</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                  <span className="text-sm text-gray-700">Auto-renewal</span>
+                  <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                  <span className="text-sm text-white">Auto-renewal</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                  <span className="text-sm text-gray-700">Perfect for occasional use</span>
+                  <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                  <span className="text-sm text-white">Perfect for occasional use</span>
                 </li>
               </ul>
               <div className="mt-auto">
@@ -93,18 +93,18 @@ const PricingSection = () => {
           <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-indigo-400/30 min-h-[420px]`}>
             <CardHeader className="text-center pb-4 pt-6 px-4">
               <CardTitle className={`text-xl font-bold mb-2 ${planTextColor.pack} font-inter`}>Credit Packs</CardTitle>
-              <div className="text-3xl font-extrabold text-gray-900 mb-1">
+              <div className="text-3xl font-extrabold text-white mb-1">
                 Starting {pricingData.currencySymbol}{creditPackProducts.length > 0 ? Math.min(...creditPackProducts.map(p => p.price_amount)) : pricingData.creditPacks[0]?.price}
               </div>
-              <div className="text-sm font-semibold text-gray-600">Select your desired amount:</div>
+              <div className="text-sm font-semibold text-gray-300">Select your desired amount:</div>
             </CardHeader>
             <CardContent className="grow flex flex-col px-4 pb-4">
               <div className="flex flex-col gap-2 my-3 flex-grow">
                 {/* Show database products if available, otherwise show static fallback */}
-                {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="rounded-lg p-2.5 border border-gray-200 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-blue-100">
-                      <span className="text-gray-800 font-medium text-sm">{pack.credits_amount} credits</span>
+                {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="rounded-lg p-2.5 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-gray-700">
+                      <span className="text-white font-medium text-sm">{pack.credits_amount} credits</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-gray-900 font-bold text-sm">{pricingData.currencySymbol}{pack.price_amount}</span>
+                        <span className="text-white font-bold text-sm">{pricingData.currencySymbol}{pack.price_amount}</span>
                         <SignUpButton mode="modal">
                           <Button size="sm" className="bg-gray-800 hover:bg-gray-900 text-white text-xs px-3 py-1 h-auto rounded-md">
                             Buy
@@ -113,10 +113,10 @@ const PricingSection = () => {
                       </div>
                     </div>) :
               // Only show fallback if no database products and not loading
-              !isProductsLoading && pricingData.creditPacks.map(pack => <div key={pack.credits} className="bg-gray-100 rounded-lg p-2.5 border border-gray-200 flex justify-between items-center shadow hover:shadow-md transition duration-300">
-                      <span className="text-gray-800 font-medium text-sm">{pack.credits} credits</span>
+              !isProductsLoading && pricingData.creditPacks.map(pack => <div key={pack.credits} className="bg-gray-700 rounded-lg p-2.5 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300">
+                      <span className="text-white font-medium text-sm">{pack.credits} credits</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-gray-900 font-bold text-sm">{pricingData.currencySymbol}{pack.price}</span>
+                        <span className="text-white font-bold text-sm">{pricingData.currencySymbol}{pack.price}</span>
                         <SignUpButton mode="modal">
                           <Button size="sm" className="bg-gray-800 hover:bg-gray-900 text-white text-xs px-3 py-1 h-auto rounded-md">
                             Buy
@@ -135,16 +135,16 @@ const PricingSection = () => {
               {/* Features list */}
               <ul className="space-y-1 mb-3">
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                  <span className="text-gray-700 text-xs">No expiration</span>
+                  <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                  <span className="text-white text-xs">No expiration</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                  <span className="text-gray-700 text-xs">Instant activation</span>
+                  <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                  <span className="text-white text-xs">Instant activation</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                  <span className="text-gray-700 text-xs">Secure payment</span>
+                  <Check className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                  <span className="text-white text-xs">Secure payment</span>
                 </li>
               </ul>
             </CardContent>
