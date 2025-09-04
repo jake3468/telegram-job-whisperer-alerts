@@ -178,106 +178,131 @@ export default function GetMoreCredits() {
         
         {/* Responsive grid area with tight spacing for mobile; px for interior gap only */}
         <div className="flex-1 flex flex-col items-center justify-center w-full px-2 sm:px-4">
-          <div className={`
-              grid gap-3 sm:gap-4 
-              w-full
-              max-w-4xl mx-auto
-              grid-cols-1
-              md:grid-cols-2
-              lg:grid-cols-2
-              items-stretch
-              duration-500
-            `}>
+          <div className="grid gap-6 lg:gap-8 grid-cols-1 md:grid-cols-2 items-stretch max-w-4xl md:max-w-3xl lg:max-w-4xl mx-auto">
             {/* Free Plan */}
-            <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-blue-400/30 min-h-[280px] sm:min-h-[300px]`}>
-              <CardHeader className="text-center pb-1 pt-2 sm:pb-2 sm:pt-3 px-2 sm:px-3">
-                <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 ${planTextColor.free}`}>Free Plan</CardTitle>
-                <div className="text-xl sm:text-2xl font-extrabold text-white mb-0.5">Free</div>
-                <div className="text-xs sm:text-sm font-semibold text-gray-300">10 credits/month</div>
+            <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-blue-400/30 min-h-[320px]`}>
+              <CardHeader className="text-center pb-2 pt-4 px-3">
+                <div className="inline-block px-3 py-1 bg-cyan-400 text-gray-800 text-sm font-bold rounded-full mb-2">
+                  Free Plan
+                </div>
+                <div className="text-2xl font-extrabold text-white mb-1">Free</div>
+                <div className="text-sm font-semibold text-gray-300">10 credits/month</div>
               </CardHeader>
-              <CardContent className="grow flex flex-col px-2 sm:px-3 pb-2">
-                <div className="text-left my-2 flex-grow">
-                  <div className="text-xs sm:text-sm text-white mb-1">Access to all features</div>
-                  <div className="text-xs sm:text-sm text-white mb-1">10 credits every month (auto-renewal)</div>
-                  <div className="text-xs sm:text-sm font-semibold text-cyan-300 mb-1">What you can do each month:</div>
-                  <div className="text-[10px] sm:text-xs text-white space-y-0.5">
-                    <div>2 Resumes</div>
-                    <div>9 Cover Letters</div>
-                    <div>10 Job Fit Checks</div>
-                    <div>3 Company Insights</div>
-                    <div>5 LinkedIn HR Profiles</div>
-                    <div>5 Visa Info lookups</div>
-                    <div>1 Interview Prep</div>
-                    <div>Up to 100 Job Alert messages</div>
+              <CardContent className="grow flex flex-col px-3 pb-3">
+                <div className="text-left my-3 flex-grow px-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-2.5 h-2.5 text-black" />
+                    </div>
+                    <span className="text-sm text-white">Access to all features</span>
+                  </div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-2.5 h-2.5 text-black" />
+                    </div>
+                    <span className="text-sm text-white">10 credits every month (auto-renewal)</span>
+                  </div>
+                  
+                  <div className="text-sm font-semibold text-cyan-300 mb-2">Use credits on any feature you want:</div>
+                  <div className="text-xs text-white space-y-1 ml-4 mb-3">
+                    <div>Resume = 3 credits</div>
+                    <div>Cover Letter = 1.5 credits</div>
+                    <div>Interview Prep = 6 credits</div>
+                    <div>Job Fit Check = 1 credit</div>
+                    <div>Company Insights = 3 credits</div>
+                    <div>Visa Info = 2 credits</div>
+                    <div>HR Profile = 2 credits</div>
+                  </div>
+
+                  <div className="text-xs text-gray-300 bg-gray-800/30 p-2 rounded border-l-2 border-cyan-400/40 mb-3">
+                    <strong>Example:</strong> With 10 credits, you could create 3 Cover Letters + 1 Resume + 2 Job Fit Checks, or run 10 Job Fit Checks - your choice.
+                  </div>
+
+                  <div className="text-sm font-semibold text-cyan-300 mb-2">Plus:</div>
+                  <div className="text-xs text-white space-y-1 ml-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-2 h-2 text-black" />
+                      </div>
+                      <span>Up to 100 Job Alert messages included every month</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-2 h-2 text-black" />
+                      </div>
+                      <span>2 free phone-call AI mock interviews</span>
+                    </div>
                   </div>
                 </div>
-                <div className="mt-auto">
-                  <Button className="w-full py-2 sm:py-2.5 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-orbitron text-xs sm:text-sm shadow border-0" disabled>
+                <div className="mt-auto flex justify-center">
+                  <Button className="bg-gray-50 hover:bg-gray-100 text-gray-800 font-semibold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl" disabled>
                     Current Plan
                   </Button>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Credit Packs - Region-specific products only */}
-            <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.01] hover:shadow-indigo-400/30 min-h-[320px] sm:min-h-[380px]`}>
-              <CardHeader className="text-center pb-2 pt-3 sm:pb-4 sm:pt-6 px-3 sm:px-4">
-                <CardTitle className={`text-lg sm:text-xl font-orbitron font-bold mb-1 ${planTextColor.pack}`}>Credit Packs</CardTitle>
-                 <div className="text-2xl sm:text-3xl font-extrabold text-white mb-0.5 sm:mb-1">
-                   {pricingData ? `Starting ${pricingData.currencySymbol}${creditPackProducts.length > 0 ? Math.min(...creditPackProducts.map(p => p.price_amount)) : pricingData.creditPacks[0]?.price}` : 'Loading...'}
-                 </div>
-                <div className="mt-0 text-xs sm:text-sm font-semibold text-gray-300">Select your desired amount:</div>
+            {/* Credit Packs */}
+            <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-indigo-400/30 min-h-[420px]`}>
+              <CardHeader className="text-center pb-4 pt-6 px-4">
+                <div className="inline-block px-3 py-1 bg-cyan-400 text-gray-800 text-sm font-bold rounded-full mb-2">
+                  Pay-as-you-go
+                </div>
+                <div className="text-3xl font-extrabold text-white mb-1">
+                  {pricingData ? `Starting ${pricingData.currencySymbol}${creditPackProducts.length > 0 ? Math.min(...creditPackProducts.map(p => p.price_amount)) : pricingData.creditPacks[0]?.price}` : 'Loading...'}
+                </div>
+                <div className="text-sm font-semibold text-gray-300">Select your desired amount:</div>
               </CardHeader>
-              <CardContent className="grow flex flex-col px-3 sm:px-4 pb-3">
-                 <div className="flex flex-col gap-1 sm:gap-2 my-2 sm:my-3 flex-grow">
-                   {/* Show database products if available, otherwise show static fallback */}
-                     {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="border border-gray-500 rounded-lg p-2 sm:p-2.5 flex justify-between items-center shadow hover:shadow-gray-300/50 transition duration-300 bg-gray-700">
-                         <span className="text-white font-medium text-xs sm:text-sm mr-4">{pack.credits_amount} credits</span>
-                         <div className="flex items-center gap-3">
-                           <span className="text-white font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price_amount}</span>
-                           <Button size="sm" onClick={() => handleCreditPackClick(pack.product_id)} className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={!isAuthReady || connectionIssue || isCheckoutLoading(pack.product_id)}>
-                             {!isAuthReady ? '...' : isCheckoutLoading(pack.product_id) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
-                           </Button>
-                        </div>
-                      </div>) :
-                 // Only show fallback if no database products and not loading
-                 !isProductsLoading && pricingData?.creditPacks.map(pack => <div key={pack.credits} className="bg-gray-700 border border-gray-500 rounded-lg p-2 sm:p-2.5 flex justify-between items-center shadow hover:shadow-gray-300/50 transition duration-300">
-                      <span className="text-white font-medium text-xs sm:text-sm mr-4">{pack.credits} credits</span>
+              <CardContent className="grow flex flex-col px-4 pb-4">
+                <div className="flex flex-col gap-2 my-3 flex-grow max-w-md mx-auto">
+                  {/* Show database products if available, otherwise show static fallback */}
+                  {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="rounded-md p-3 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-gray-700">
+                      <span className="text-white font-medium text-sm mr-4">{pack.credits_amount} credits</span>
                       <div className="flex items-center gap-3">
-                        <span className="text-white font-bold text-xs sm:text-sm">{pricingData?.currencySymbol}{pack.price}</span>
-                         <Button size="sm" onClick={() => handleCreditPackClick(pack.productId)} className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1 h-auto rounded-md" disabled={!isAuthReady || connectionIssue || isCheckoutLoading(pack.productId)}>
-                           {!isAuthReady ? '...' : isCheckoutLoading(pack.productId) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
-                         </Button>
+                        <span className="text-white font-bold text-sm">{pricingData?.currencySymbol}{pack.price_amount}</span>
+                        <Button size="sm" onClick={() => handleCreditPackClick(pack.product_id)} className="bg-gray-50 hover:bg-gray-100 text-gray-800 text-xs px-2 py-1 h-auto rounded-md" disabled={!isAuthReady || connectionIssue || isCheckoutLoading(pack.product_id)}>
+                          {!isAuthReady ? '...' : isCheckoutLoading(pack.product_id) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
+                        </Button>
+                      </div>
+                    </div>) :
+                  // Only show fallback if no database products and not loading
+                  !isProductsLoading && pricingData?.creditPacks.map(pack => <div key={pack.credits} className="bg-gray-700 rounded-md p-3 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300">
+                      <span className="text-white font-medium text-sm mr-4">{pack.credits} credits</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-white font-bold text-sm">{pricingData?.currencySymbol}{pack.price}</span>
+                        <Button size="sm" onClick={() => handleCreditPackClick(pack.productId)} className="bg-gray-50 hover:bg-gray-100 text-gray-800 text-xs px-2 py-1 h-auto rounded-md" disabled={!isAuthReady || connectionIssue || isCheckoutLoading(pack.productId)}>
+                          {!isAuthReady ? '...' : isCheckoutLoading(pack.productId) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Buy'}
+                        </Button>
                       </div>
                     </div>)}
                   
                   {/* Loading state */}
                   {isProductsLoading && <div className="flex items-center justify-center py-4">
                       <Loader2 className="w-4 h-4 animate-spin text-indigo-300" />
-                      <span className="ml-2 text-white text-xs">Loading credit packs...</span>
+                      <span className="ml-2 text-indigo-200 text-xs">Loading credit packs...</span>
                     </div>}
                 </div>
                 
                 {/* Features list */}
-                <div className="flex flex-col items-center mb-2 mt-1">
+                <div className="flex flex-col items-center mb-3 mt-1">
                   <ul className="space-y-1">
-                    <li className="flex items-center gap-1 sm:gap-2">
+                    <li className="flex items-center gap-2">
                       <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                         <Check className="w-2.5 h-2.5 text-black" />
                       </div>
-                      <span className="text-white text-[10px] sm:text-xs">No expiration</span>
+                      <span className="text-white text-xs">No expiration</span>
                     </li>
-                    <li className="flex items-center gap-1 sm:gap-2">
+                    <li className="flex items-center gap-2">
                       <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                         <Check className="w-2.5 h-2.5 text-black" />
                       </div>
-                      <span className="text-white text-[10px] sm:text-xs">Instant activation</span>
+                      <span className="text-white text-xs">Instant activation</span>
                     </li>
-                    <li className="flex items-center gap-1 sm:gap-2">
+                    <li className="flex items-center gap-2">
                       <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                         <Check className="w-2.5 h-2.5 text-black" />
                       </div>
-                      <span className="text-white text-[10px] sm:text-xs">Secure payment</span>
+                      <span className="text-white text-xs">Secure payment</span>
                     </li>
                   </ul>
                 </div>
