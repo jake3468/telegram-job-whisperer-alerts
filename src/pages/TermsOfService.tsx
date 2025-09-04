@@ -150,7 +150,10 @@ const TermsOfService = () => {
                   <p className="text-gray-300 text-sm">10 free credits per month with access to all features</p>
                 </div>
 
-                
+                <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
+                  <h4 className="text-white font-semibold mb-2">Monthly Subscription</h4>
+                  <p className="text-gray-300 text-sm">Monthly recurring subscription with enhanced credit allocation</p>
+                </div>
 
                 <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
                   <h4 className="text-white font-semibold mb-2">Credit Packs</h4>
