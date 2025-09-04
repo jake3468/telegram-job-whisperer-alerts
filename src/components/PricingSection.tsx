@@ -61,19 +61,69 @@ const PricingSection = () => {
               <div className="text-sm font-semibold text-gray-300">10 credits/month</div>
             </CardHeader>
             <CardContent className="grow flex flex-col px-3 pb-3">
-              <div className="text-left my-3 flex-grow">
-                <div className="text-sm text-white mb-2">Access to all features</div>
-                <div className="text-sm text-white mb-2">10 credits every month (auto-renewal)</div>
-                <div className="text-sm font-semibold text-cyan-300 mb-2">What you can do each month:</div>
-                <div className="text-xs text-white space-y-1">
-                  <div>2 Resumes</div>
-                  <div>9 Cover Letters</div>
-                  <div>10 Job Fit Checks</div>
-                  <div>3 Company Insights</div>
-                  <div>5 LinkedIn HR Profiles</div>
-                  <div>5 Visa Info lookups</div>
-                  <div>1 Interview Prep</div>
-                  <div>Up to 100 Job Alert messages</div>
+              <div className="text-left my-3 flex-grow px-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-2.5 h-2.5 text-black" />
+                  </div>
+                  <span className="text-sm text-white">Access to all features</span>
+                </div>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-2.5 h-2.5 text-black" />
+                  </div>
+                  <span className="text-sm text-white">10 credits every month (auto-renewal)</span>
+                </div>
+                <div className="text-sm font-semibold text-cyan-300 mb-2 mt-3">What you can do each month:</div>
+                <div className="text-xs text-white space-y-1 ml-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-2 h-2 text-black" />
+                    </div>
+                    <span>2 Resumes</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-2 h-2 text-black" />
+                    </div>
+                    <span>9 Cover Letters</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-2 h-2 text-black" />
+                    </div>
+                    <span>10 Job Fit Checks</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-2 h-2 text-black" />
+                    </div>
+                    <span>3 Company Insights</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-2 h-2 text-black" />
+                    </div>
+                    <span>5 LinkedIn HR Profiles</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-2 h-2 text-black" />
+                    </div>
+                    <span>5 Visa Info lookups</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-2 h-2 text-black" />
+                    </div>
+                    <span>1 Interview Prep</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-2 h-2 text-black" />
+                    </div>
+                    <span>Up to 100 Job Alert messages</span>
+                  </div>
                 </div>
               </div>
               <div className="mt-auto">
