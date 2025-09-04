@@ -138,12 +138,12 @@ const FeatureSection = ({
           <ExternalLink className="w-5 h-5" />
           {buttonText}
           <ArrowRight className="w-5 h-5" />
-        </button> : <SignUpButton mode="modal">
-          <button type="button" className="w-fit bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
-            {buttonText}
-            <ArrowRight className="w-5 h-5" />
-          </button>
-        </SignUpButton>}
+         </button> : <SignUpButton mode="modal">
+           <button type="button" className="w-fit bg-cyan-500 hover:bg-cyan-600 text-gray-800 font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
+             {buttonText}
+             <ArrowRight className="w-5 h-5" />
+           </button>
+         </SignUpButton>}
     </div>;
   const animationSection = lottieUrl ? <div className="flex items-center justify-center">
       <div className="w-full max-w-48 lg:max-w-md">
