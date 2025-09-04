@@ -56,7 +56,9 @@ const PricingSection = () => {
           {/* Free Plan */}
           <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-blue-400/30 min-h-[320px]`}>
             <CardHeader className="text-center pb-2 pt-4 px-3">
-              <CardTitle className={`text-lg font-bold mb-1 ${planTextColor.free} font-inter`}>Free Plan</CardTitle>
+              <div className="inline-block px-3 py-1 bg-cyan-400 text-gray-800 text-sm font-bold rounded-full mb-2">
+                Free Plan
+              </div>
               <div className="text-2xl font-extrabold text-white mb-1">Free</div>
               <div className="text-sm font-semibold text-gray-300">10 credits/month</div>
             </CardHeader>
@@ -139,7 +141,9 @@ const PricingSection = () => {
           {/* Credit Packs */}
           <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-indigo-400/30 min-h-[420px]`}>
             <CardHeader className="text-center pb-4 pt-6 px-4">
-              <CardTitle className={`text-xl font-bold mb-2 ${planTextColor.pack} font-inter`}>Credit Packs</CardTitle>
+              <div className="inline-block px-3 py-1 bg-cyan-400 text-gray-800 text-sm font-bold rounded-full mb-2">
+                Pay-as-you-go
+              </div>
               <div className="text-3xl font-extrabold text-white mb-1">
                 Starting {pricingData.currencySymbol}{creditPackProducts.length > 0 ? Math.min(...creditPackProducts.map(p => p.price_amount)) : pricingData.creditPacks[0]?.price}
               </div>
