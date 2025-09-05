@@ -68,7 +68,7 @@ const AuthHeader = () => {
           <SignedOut>
             <div className="flex items-center space-x-4">
               <SignInButton mode="modal" fallbackRedirectUrl="/ai-agents">
-                <button className="rounded-xl border border-primary/80 bg-background/80 text-foreground hover:border-accent hover:text-accent transition-colors duration-200 font-inter text-base font-semibold px-6 py-2 shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" style={{
+                <button className="rounded-xl border border-primary/80 bg-background/80 text-foreground hover:border-accent hover:text-black transition-colors duration-200 font-inter text-base font-semibold px-6 py-2 shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" style={{
                   minWidth: '100px',
                   boxShadow: "0 4px 32px 0 rgba(56,189,248,0.09)"
                 }}>
@@ -130,7 +130,7 @@ const AuthHeader = () => {
             <SignedOut>
               <SignInButton mode="modal" fallbackRedirectUrl="/ai-agents">
                 <button 
-                  className="w-full rounded-xl border border-primary/80 bg-background/80 text-foreground hover:border-accent hover:text-accent transition-colors duration-200 font-inter text-base font-semibold px-6 py-3 shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  className="w-full rounded-xl border border-primary/80 bg-background/80 text-foreground hover:border-accent hover:text-black transition-colors duration-200 font-inter text-base font-semibold px-6 py-3 shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Sign In
