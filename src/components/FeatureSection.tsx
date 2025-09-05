@@ -168,7 +168,7 @@ const FeatureSection = ({
           </div>}
       </div>
     </div> : null;
-  return <section className="py-1 md:py-2 px-4 bg-background">
+  return <section className="py-1 md:py-2 px-4 bg-background rounded-3xl">
       <div className="max-w-7xl mx-auto">
         {lottieUrl ? <div className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white">
             {/* Mobile Layout */}
