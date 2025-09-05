@@ -80,7 +80,7 @@ const AIAgents = () => {
           <FeatureSection 
             title="📝 Resume Builder Agent" 
             subheading="Transform your resume into a sharp, job-ready version." 
-            description="I'll turn your resume into a sharp, job-ready version. Clean format, keyword-optimized, and packed with achievements that stand out." 
+            description="Get a clean, ATS-friendly format that's keyword-optimized and highlights your achievements. You can easily add new projects, update experiences, and tailor your resume for every job - just by chatting with it." 
             lottieUrl="" 
             buttonText="Activate Now" 
             isReversed={false} 
@@ -94,7 +94,7 @@ const AIAgents = () => {
           <FeatureSection 
             title="🔔 Job Alerts Agent" 
             subheading="Daily web scanning for the latest jobs at your chosen time." 
-            description="I'll scan the web daily and send you the latest jobs at your chosen time. Fresh, relevant roles delivered right when you need them." 
+            description="Get fresh, relevant roles delivered right when you need them, with one-click access to tailored resumes, applications, interview prep & more.. for every opportunity." 
             lottieUrl="" 
             buttonText="Activate Now" 
             isReversed={true} 
@@ -127,7 +127,7 @@ const AIAgents = () => {
           <FeatureSection 
             title="👔 Job Application Agent" 
             subheading="Your quick helper when you find a job." 
-            description="I'll be your quick helper when you find a job. Share the basics, and I'll give you everything from a tailored resume to HR contacts in one click." 
+            description="Share a few details and instantly receive a tailored resume, cover letter, HR contacts, interview prep & more.. - everything you need to apply with confidence" 
             lottieUrl="" 
             buttonText="Activate Now" 
             isReversed={false} 

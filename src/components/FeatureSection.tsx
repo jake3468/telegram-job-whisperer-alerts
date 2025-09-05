@@ -92,17 +92,17 @@ const FeatureSection = ({
 
   // Mobile: header section (title + subheading only)
   const mobileHeaderSection = <div className="lg:hidden">
-      <h3 className="text-2xl md:text-3xl mb-2 font-inter text-cyan-300 font-bold">
+      <h3 className="text-2xl md:text-3xl mb-2 font-inter text-primary font-bold">
         {title}
       </h3>
-      <p className="mb-3 font-inter font-medium text-slate-100 text-sm">
+      <p className="mb-3 font-inter font-medium text-foreground text-sm">
         {subheading}
       </p>
     </div>;
 
   // Mobile: content section (description + button only)
   const mobileContentSection = <div className="lg:hidden flex flex-col space-y-6">
-      <p className="leading-relaxed font-inter text-slate-100 text-xs font-normal">
+      <p className="leading-relaxed font-inter text-foreground text-xs font-normal">
         {description}
       </p>
       {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75 text-sm">
@@ -112,7 +112,7 @@ const FeatureSection = ({
           {buttonText}
           <ArrowRight className="w-3 h-3" />
         </button> : <SignUpButton mode="modal">
-          <button type="button" className="w-fit bg-cyan-500 hover:bg-cyan-600 text-gray-800 font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
+          <button type="button" className="w-fit bg-black text-white dark:bg-white dark:text-black font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
             {buttonText}
             <ArrowRight className="w-3 h-3" />
           </button>
@@ -122,13 +122,13 @@ const FeatureSection = ({
   // Desktop: full content section
   const desktopContentSection = <div className="hidden lg:flex flex-col justify-center space-y-8">
       <div>
-        <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-cyan-300">
+        <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-primary">
           {title}
         </h3>
-        <p className="md:text-xl mb-4 font-inter font-medium text-base text-slate-100">
+        <p className="md:text-xl mb-4 font-inter font-medium text-base text-foreground">
           {subheading}
         </p>
-        <p className="md:text-lg leading-relaxed font-inter font-light text-sm text-slate-100">
+        <p className="md:text-lg leading-relaxed font-inter font-light text-sm text-foreground">
           {description}
         </p>
       </div>
@@ -140,7 +140,7 @@ const FeatureSection = ({
           {buttonText}
           <ArrowRight className="w-5 h-5" />
          </button> : <SignUpButton mode="modal">
-           <button type="button" className="w-fit bg-secondary hover:bg-secondary/80 text-secondary-foreground font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
+           <button type="button" className="w-fit bg-black text-white dark:bg-white dark:text-black font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
              {buttonText}
              <ArrowRight className="w-5 h-5" />
            </button>
@@ -168,9 +168,9 @@ const FeatureSection = ({
           </div>}
       </div>
     </div> : null;
-  return <section className="py-1 md:py-2 px-4 bg-black">
+  return <section className="py-1 md:py-2 px-4 bg-background rounded-3xl">
       <div className="max-w-7xl mx-auto">
-        {lottieUrl ? <div className="rounded-3xl p-6 md:p-8 lg:p-10 bg-black border border-gray-600">
+        {lottieUrl ? <div className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white">
             {/* Mobile Layout */}
             <div className="lg:hidden space-y-6">
               {mobileHeaderSection}
@@ -188,38 +188,44 @@ const FeatureSection = ({
                   {animationSection}
                 </>}
             </div>
-          </div> : <div className="relative bg-gray-50 dark:bg-gray-900 rounded-2xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col">
+          </div> : <div className="relative bg-gray-50 dark:bg-gray-900 rounded-3xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col">
             {label && <div className="absolute -left-3 -top-3 bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
                 {label}
               </div>}
             {activationStatus !== undefined && <ActivationStatusTag isActivated={activationStatus} />}
-            <div className="text-center space-y-2 md:space-y-3 flex-1 flex flex-col">
+            <div className="text-left space-y-2 md:space-y-3 flex-1 flex flex-col">
               <h3 className="text-base md:text-lg lg:text-xl font-bold font-opensans text-blue-700 leading-tight">
                 {title}
               </h3>
-              <p className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs md:text-sm font-opensans font-medium leading-tight">
+              <p className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs md:text-sm font-opensans font-medium leading-tight w-fit">
                 {subheading}
               </p>
               <div className="flex-1 flex flex-col items-center">
-                <p className="text-xs leading-relaxed font-opensans font-normal text-neutral-950">
+                <p className="text-xs leading-relaxed font-opensans font-normal text-neutral-950 text-left">
                   {description}
                 </p>
                 {title === "👔 Job Application Agent" && <>
-                    <p className="mt-3 text-xs font-medium text-neutral-700">
-                      Example chat below 👇
-                    </p>
+                    <div className="mt-3 inline-block border border-gray-800 bg-gray-100 px-2 py-1 rounded-lg">
+                      <p className="text-xs font-medium text-neutral-700">
+                        Example chat below 👇
+                      </p>
+                    </div>
                     <img src="/lovable-uploads/438fbede-9968-4fe7-9622-807454b576af.png" alt="Job Application Agent conversation interface" className="mt-2 w-full max-w-xs rounded-lg shadow-md" />
                   </>}
                 {title === "📝 Resume Builder Agent" && <>
-                    <p className="mt-3 text-xs font-medium text-neutral-700">
-                      Example chat below 👇
-                    </p>
+                    <div className="mt-3 inline-block border border-gray-800 bg-gray-100 px-2 py-1 rounded-lg">
+                      <p className="text-xs font-medium text-neutral-700">
+                        Example chat below 👇
+                      </p>
+                    </div>
                     <img src="/lovable-uploads/80af4c55-96c8-4c4e-9cb9-f4f6c8530524.png" alt="Resume Builder Agent conversation interface" className="mt-2 w-full max-w-xs rounded-lg shadow-md" />
                   </>}
                 {title === "🔔 Job Alerts Agent" && <>
-                    <p className="mt-3 text-xs font-medium text-neutral-700">
-                      Example chat below 👇
-                    </p>
+                    <div className="mt-3 inline-block border border-gray-800 bg-gray-100 px-2 py-1 rounded-lg">
+                      <p className="text-xs font-medium text-neutral-700">
+                        Example chat below 👇
+                      </p>
+                    </div>
                     <img src="/lovable-uploads/e5a7f299-f690-47de-a1b5-f44cfc229925.png" alt="Job Alerts Agent conversation interface" className="mt-2 w-full max-w-xs rounded-lg shadow-md" />
                   </>}
               </div>
@@ -230,7 +236,7 @@ const FeatureSection = ({
                     <ExternalLink className="w-3 h-3" />
                     {buttonText}
                   </button> : <SignUpButton mode="modal">
-                    <button type="button" className="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-800 font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200">
+                    <button type="button" className="w-full bg-black text-white dark:bg-white dark:text-black font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200">
                       {buttonText}
                     </button>
                   </SignUpButton>}

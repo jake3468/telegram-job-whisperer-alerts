@@ -21,13 +21,13 @@ const HowItWorksSection = () => {
   ];
 
   return (
-    <section id="how-it-works" className="bg-black py-12 md:py-16 px-4">
+    <section id="how-it-works" className="bg-background py-12 md:py-16 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <h2 className="text-4xl md:text-5xl font-semibold text-white mb-2 font-inter">
+          <h2 className="text-4xl md:text-5xl font-semibold text-foreground mb-2 font-inter">
             How It Works
           </h2>
-          <p className="text-xl text-gray-400 font-inter font-light">
+          <p className="text-xl text-muted-foreground font-inter font-light">
             Get started in minutes. It's that simple.
           </p>
         </div>
@@ -53,11 +53,11 @@ const HowItWorksSection = () => {
                   </div>
                 </div>
                 
-                <h3 className="text-2xl font-semibold mb-4 text-white font-inter">
+                <h3 className="text-2xl font-semibold mb-4 text-foreground font-inter">
                   {step.title}
                 </h3>
                 
-                <p className="text-gray-300 font-inter font-light leading-relaxed text-lg max-w-xs">
+                <p className="text-muted-foreground font-inter font-light leading-relaxed text-lg max-w-xs">
                   {step.description}
                 </p>
 
@@ -74,10 +74,10 @@ const HowItWorksSection = () => {
 
           {/* Call to action */}
           <div className="text-center mt-8">
-            <p className="text-gray-400 text-lg mb-6 font-inter">
+            <p className="text-muted-foreground text-lg mb-6 font-inter">
               Ready to transform your job search?
             </p>
-            <div className="inline-flex items-center gap-2 text-sky-400 font-inter font-medium">
+            <div className="inline-flex items-center gap-2 text-primary font-inter font-medium">
               <span>Start your journey</span>
               <Rocket className="w-5 h-5" />
             </div>

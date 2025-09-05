@@ -16,21 +16,21 @@ const FAQSection = () => {
     question: "How do I get started and what support is available?",
     answer: "Getting started is easy! Simply create your free account with 10 credits, upload your resume and preferences in your profile, and start using any of our AI tools. If you need help, our support team responds within 48 hours at support@aspirely.ai. We handle all types of inquiries and provide priority support for premium users. You can also access our tools via Telegram bots for job alerts and resume updates."
   }];
-  return <section className="py-12 md:py-16 px-4 bg-black">
+  return <section className="py-12 md:py-16 px-4 bg-background">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-6">
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text mb-2 font-inter text-gray-50">Frequently Asked Questions (FAQ)</h2>
-          <p className="text-gray-300 text-lg font-inter">
+          <h2 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary bg-clip-text mb-2 font-inter text-foreground">Frequently Asked Questions (FAQ)</h2>
+          <p className="text-muted-foreground text-lg font-inter">
             Everything you need to know about Aspirely.ai
           </p>
         </div>
         
         <Accordion type="single" collapsible className="w-full max-w-2xl mx-auto space-y-4">
-          {faqs.map((faq, index) => <AccordionItem key={index} value={`item-${index}`} className="border border-gray-800 rounded-lg bg-gray-900/50 backdrop-blur-sm">
-              <AccordionTrigger className="px-4 py-3 text-left text-white hover:text-sky-400 transition-colors font-inter font-medium">
+          {faqs.map((faq, index) => <AccordionItem key={index} value={`item-${index}`} className="border border-black dark:border-white rounded-lg bg-card/50 backdrop-blur-sm">
+              <AccordionTrigger className="px-4 py-3 text-left text-foreground hover:text-primary transition-colors font-inter font-medium">
                 {faq.question}
               </AccordionTrigger>
-              <AccordionContent className="px-6 pb-4 text-gray-300 leading-relaxed font-inter">
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed font-inter">
                 {faq.answer}
               </AccordionContent>
             </AccordionItem>)}
