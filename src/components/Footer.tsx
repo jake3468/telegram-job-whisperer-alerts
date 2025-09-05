@@ -126,9 +126,9 @@ const Footer = () => {
             <h3 className="text-foreground font-semibold text-sm font-inter">Featured on</h3>
             <div className="flex flex-col items-center space-y-4">
               {/* Badge row - horizontal on desktop/tablet */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 justify-items-center max-w-4xl mx-auto">
                 <a href="https://startupfa.me/s/aspirely.ai?utm_source=aspirely.ai" target="_blank" rel="noopener noreferrer">
-                  <img src="https://startupfa.me/badges/featured-badge.webp" alt="Featured on Startup Fame" width="171" height="54" loading="lazy" />
+                  <img src="https://startupfa.me/badges/featured-badge.webp" alt="Featured on Startup Fame" className="h-12 w-auto object-contain" loading="lazy" />
                 </a>
                 
                 <div itemProp="award" itemScope itemType="https://schema.org/Award">
@@ -143,7 +143,7 @@ const Footer = () => {
                     <img 
                       src="https://findly.tools/badges/findly-tools-badge-light.svg" 
                       alt="Featured on findly.tools" 
-                      width="150"
+                      className="h-12 w-auto object-contain"
                       itemProp="image"
                       loading="lazy"
                     />
@@ -151,7 +151,7 @@ const Footer = () => {
                 </div>
                 
                 <a href="https://turbo0.com/item/aspirelyai" target="_blank" rel="noopener noreferrer">
-                  <img src="https://img.turbo0.com/badge-listed-light.svg" alt="Listed on Turbo0" style={{height: '54px', width: 'auto'}} loading="lazy" />
+                  <img src="https://img.turbo0.com/badge-listed-light.svg" alt="Listed on Turbo0" className="h-12 w-auto object-contain" loading="lazy" />
                 </a>
                 
                 <div itemProp="award" itemScope itemType="https://schema.org/Award">
@@ -166,16 +166,15 @@ const Footer = () => {
                     <img 
                       src="https://twelve.tools/badge0-light.svg" 
                       alt="Featured on Twelve Tools" 
-                      width="200" 
-                      height="54"
+                      className="h-12 w-auto object-contain"
                       itemProp="image"
                       loading="lazy"
                     />
                   </a>
                 </div>
                 
-                <a href="https://fazier.com/launches/aspirely-ai" target="_blank" rel="noopener noreferrer">
-                  <img src="https://fazier.com/api/v1/public/badges/embed_image.svg?launch_id=5237&badge_type=daily&theme=neutral" className="w-32 md:w-44 mx-auto mt-2" alt="Fazier badge" loading="lazy" decoding="async" />
+                <a href="https://fazier.com/launches/aspirely-ai" target="_blank" rel="noopener noreferrer" className="col-span-2 md:col-span-1">
+                  <img src="https://fazier.com/api/v1/public/badges/embed_image.svg?launch_id=5237&badge_type=daily&theme=neutral" className="h-12 w-auto object-contain mx-auto" alt="Fazier badge" loading="lazy" decoding="async" />
                 </a>
               </div>
             </div>
