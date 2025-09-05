@@ -92,17 +92,17 @@ const FeatureSection = ({
 
   // Mobile: header section (title + subheading only)
   const mobileHeaderSection = <div className="lg:hidden">
-      <h3 className="text-2xl md:text-3xl mb-2 font-inter text-cyan-300 font-bold">
+      <h3 className="text-2xl md:text-3xl mb-2 font-inter text-primary font-bold">
         {title}
       </h3>
-      <p className="mb-3 font-inter font-medium text-slate-100 text-sm">
+      <p className="mb-3 font-inter font-medium text-foreground text-sm">
         {subheading}
       </p>
     </div>;
 
   // Mobile: content section (description + button only)
   const mobileContentSection = <div className="lg:hidden flex flex-col space-y-6">
-      <p className="leading-relaxed font-inter text-slate-100 text-xs font-normal">
+      <p className="leading-relaxed font-inter text-foreground text-xs font-normal">
         {description}
       </p>
       {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75 text-sm">
@@ -122,13 +122,13 @@ const FeatureSection = ({
   // Desktop: full content section
   const desktopContentSection = <div className="hidden lg:flex flex-col justify-center space-y-8">
       <div>
-        <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-cyan-300">
+        <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-primary">
           {title}
         </h3>
-        <p className="md:text-xl mb-4 font-inter font-medium text-base text-slate-100">
+        <p className="md:text-xl mb-4 font-inter font-medium text-base text-foreground">
           {subheading}
         </p>
-        <p className="md:text-lg leading-relaxed font-inter font-light text-sm text-slate-100">
+        <p className="md:text-lg leading-relaxed font-inter font-light text-sm text-foreground">
           {description}
         </p>
       </div>
@@ -168,9 +168,9 @@ const FeatureSection = ({
           </div>}
       </div>
     </div> : null;
-  return <section className="py-1 md:py-2 px-4 bg-black">
+  return <section className="py-1 md:py-2 px-4 bg-background">
       <div className="max-w-7xl mx-auto">
-        {lottieUrl ? <div className="rounded-3xl p-6 md:p-8 lg:p-10 bg-black border border-gray-600">
+        {lottieUrl ? <div className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-border">
             {/* Mobile Layout */}
             <div className="lg:hidden space-y-6">
               {mobileHeaderSection}

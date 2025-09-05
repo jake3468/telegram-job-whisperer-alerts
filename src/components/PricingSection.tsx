@@ -37,18 +37,18 @@ const PricingSection = () => {
         </div>
       </section>;
   }
-  return <section className="py-8 md:py-12 px-4 bg-black">
+  return <section className="py-8 md:py-12 px-4 bg-background">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-6">
-          <h2 className="text-3xl sm:text-5xl font-extrabold bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-300 bg-clip-text mb-2 font-inter text-gray-50">Pricing Plans</h2>
-          <p className="text-lg text-blue-100 font-inter font-light mb-6">
+          <h2 className="text-3xl sm:text-5xl font-extrabold bg-gradient-to-r from-primary via-primary to-primary bg-clip-text mb-2 font-inter text-foreground">Pricing Plans</h2>
+          <p className="text-lg text-muted-foreground font-inter font-light mb-6">
             Start with 10 free monthly credits and upgrade anytime with flexible credit packs.
           </p>
           
           {/* Payment Partner Information */}
-          <div className="flex items-center gap-2 text-sm text-blue-200 mb-8 justify-center">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-8 justify-center">
             <span>Powered by</span>
-            <span className="ml-1 font-semibold text-blue-100">Dodo Payments</span>
+            <span className="ml-1 font-semibold text-foreground">Dodo Payments</span>
           </div>
         </div>
 

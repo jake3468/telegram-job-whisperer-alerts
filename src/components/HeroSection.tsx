@@ -100,7 +100,7 @@ const HeroSection = () => {
     navigate('/dashboard');
   };
   return <>
-    <section className="relative min-h-[80vh] flex items-center justify-center px-4 pt-20 sm:pt-24 pb-8 overflow-hidden bg-black">
+    <section className="relative min-h-[80vh] flex items-center justify-center px-4 pt-20 sm:pt-24 pb-8 overflow-hidden bg-background">
       {/* Light rays background animation with responsive length for mobile */}
       <div className="absolute inset-0 z-0">
         <LightRays raysOrigin="top-center" raysColor="#00ffff" raysSpeed={1.5} lightSpread={0.8} rayLength={window.innerWidth < 768 ? 6.0 : 4.0} fadeDistance={window.innerWidth < 768 ? 5.0 : 3.0} followMouse={true} mouseInfluence={0.1} noiseAmount={0.1} distortion={0.05} className="w-full h-full" />
@@ -121,22 +121,22 @@ const HeroSection = () => {
         
         {/* Black background to block particles behind headline */}
         <div className="relative mb-8">
-          <div className="absolute inset-0 bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
-          <h1 className="relative z-30 text-3xl md:text-4xl lg:text-5xl mb-1 leading-tight font-sans tracking-tight text-white drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">
+          <div className="absolute inset-0 bg-background/80 dark:bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
+          <h1 className="relative z-30 text-3xl md:text-4xl lg:text-5xl mb-1 leading-tight font-sans tracking-tight text-foreground drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)] dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">
             {/* Mobile and Desktop view */}
             <div className="block md:hidden lg:block">
-              <span className="bg-cyan-400 text-black px-0.5 py-0 font-inter">We do the boring stuff.</span>
+              <span className="bg-primary text-primary-foreground px-0.5 py-0 font-inter">We do the boring stuff.</span>
               <br />
-              <span className="bg-cyan-400 text-black px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter">You get the job</span> 🏆
+              <span className="bg-primary text-primary-foreground px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter">You get the job</span> 🏆
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden">
-              <span className="bg-cyan-400 text-black px-0.5 py-0">We do the</span>
+              <span className="bg-primary text-primary-foreground px-0.5 py-0">We do the</span>
               <br />
-              <span className="bg-cyan-400 text-black px-0.5 py-0 mt-2 md:mt-3 inline-block">boring stuff.</span>
+              <span className="bg-primary text-primary-foreground px-0.5 py-0 mt-2 md:mt-3 inline-block">boring stuff.</span>
               <br />
-              <span className="bg-cyan-400 text-black px-0.5 py-0 mt-2 md:mt-3 inline-block">You get the job</span> 🏆
+              <span className="bg-primary text-primary-foreground px-0.5 py-0 mt-2 md:mt-3 inline-block">You get the job</span> 🏆
             </div>
           </h1>
         </div>
@@ -151,21 +151,21 @@ const HeroSection = () => {
           </div>} */}
         
 
-        <div className="text-zinc-50 mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-8 text-sm md:text-base font-inter">Our AI Agents will update your <span className="font-bold italic text-cyan-400">Resume</span>, send daily <span className="font-bold italic text-cyan-400">Job Alerts</span>, craft tailored <span className="font-bold italic text-cyan-400">Cover Letters</span>, prepare <span className="font-bold italic text-cyan-400">Interview Kits</span>, check <span className="font-bold italic text-cyan-400">Job fit</span>, give insider <span className="font-bold italic text-cyan-400">Company</span> knowledge, and shares the <span className="font-bold italic text-cyan-400">HRs</span> you should contact. Everything you will ever need, all in one place.</p>
+        <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
+          <p className="mb-8 text-sm md:text-base font-inter">Our AI Agents will update your <span className="font-bold italic text-primary">Resume</span>, send daily <span className="font-bold italic text-primary">Job Alerts</span>, craft tailored <span className="font-bold italic text-primary">Cover Letters</span>, prepare <span className="font-bold italic text-primary">Interview Kits</span>, check <span className="font-bold italic text-primary">Job fit</span>, give insider <span className="font-bold italic text-primary">Company</span> knowledge, and shares the <span className="font-bold italic text-primary">HRs</span> you should contact. Everything you will ever need, all in one place.</p>
           
           <SignedOut>
             {/* Button and Badge Container */}
             <div className="flex flex-col items-start md:flex-col md:items-start lg:flex-row lg:items-center lg:justify-start gap-4 md:gap-6 mb-8">
               <SignUpButton mode="modal">
-                <button className="bg-gray-100 hover:bg-gray-200 text-black px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-2xl transition-all duration-300 font-inter font-semibold shadow-lg hover:shadow-gray-300/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-gray-400/50 flex items-center gap-2 justify-start md:justify-center w-auto">
+                <button className="bg-secondary hover:bg-secondary/80 text-secondary-foreground px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-2xl transition-all duration-300 font-inter font-semibold shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-primary/50 flex items-center gap-2 justify-start md:justify-center w-auto">
                   🎯 Start Free Now
                 </button>
               </SignUpButton>
               
               {/* Discount Badge */}
-              <div className="bg-green-400/20 border border-green-400/40 backdrop-blur-sm rounded-full px-4 py-2 md:px-4 md:py-2 shadow-lg shadow-green-400/20 w-auto text-left md:text-center">
-                <span className="text-green-300 text-xs md:text-sm font-medium font-inter [text-shadow:_0_0_10px_rgba(34,197,94,0.8)]">
+              <div className="bg-accent/20 border border-accent/40 backdrop-blur-sm rounded-full px-4 py-2 md:px-4 md:py-2 shadow-lg shadow-accent/20 w-auto text-left md:text-center">
+                <span className="text-accent-foreground text-xs md:text-sm font-medium font-inter [text-shadow:_0_0_10px_rgba(34,197,94,0.8)]">
                   Get 50% off with code "ASP123"
                 </span>
               </div>
@@ -195,7 +195,7 @@ const HeroSection = () => {
                 <div className="flex text-yellow-400 mb-1">
                   <span>⭐⭐⭐⭐⭐</span>
                 </div>
-                <div className="text-white text-xs text-left">
+                <div className="text-foreground text-xs text-left">
                   <span className="font-bold">255+</span> <span className="italic">professionals winning while others struggle</span>
                 </div>
               </div>
@@ -220,26 +220,26 @@ const HeroSection = () => {
     </section>
     
     {/* Telegram Agents Section - Separate section below hero */}
-    <section className="relative py-12 bg-black">
+    <section className="relative py-12 bg-background">
       <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
         <div className="text-left">
-          <p className="text-white mb-4 text-sm md:text-base font-inter">By using our AI Job Agents, you'll <span className="font-semibold font-inter">unlock your true potential</span> and discover opportunities you never knew existed.</p>
-          <p className="text-white mb-6 text-sm md:text-base font-inter">Explore the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
+          <p className="text-foreground mb-4 text-sm md:text-base font-inter">By using our AI Job Agents, you'll <span className="font-semibold font-inter">unlock your true potential</span> and discover opportunities you never knew existed.</p>
+          <p className="text-foreground mb-6 text-sm md:text-base font-inter">Explore the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
           
           <div className="flex flex-col md:flex-row items-start justify-start md:items-center md:justify-center space-y-3 md:space-y-0 md:space-x-3">
-            <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-white rounded-xl px-3 py-2 bg-black/20 backdrop-blur-sm">
+            <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-border rounded-xl px-3 py-2 bg-background/20 dark:bg-black/20 backdrop-blur-sm">
               <span className="text-lg">👔</span>
-              <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)] text-sm">Job Application Agent</span>
+              <span className="italic text-primary drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)] text-sm">Job Application Agent</span>
             </a>
             
-            <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-white rounded-xl px-3 py-2 bg-black/20 backdrop-blur-sm">
+            <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-border rounded-xl px-3 py-2 bg-background/20 dark:bg-black/20 backdrop-blur-sm">
               <span className="text-lg">🔔</span>
-              <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)] text-sm">Job Alerts Agent</span>
+              <span className="italic text-primary drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)] text-sm">Job Alerts Agent</span>
             </a>
             
-            <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-white rounded-xl px-3 py-2 bg-black/20 backdrop-blur-sm">
+            <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-border rounded-xl px-3 py-2 bg-background/20 dark:bg-black/20 backdrop-blur-sm">
               <span className="text-lg">📝</span>
-              <span className="italic text-[#00E5FF] drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)] text-sm">Resume Builder Agent</span>
+              <span className="italic text-primary drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)] text-sm">Resume Builder Agent</span>
             </a>
           </div>
         </div>

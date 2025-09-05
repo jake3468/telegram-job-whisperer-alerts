@@ -13,16 +13,16 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-black py-12 px-4 border-t border-gray-800">
+    <footer className="bg-background py-12 px-4 border-t border-border">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
           {/* Company Info */}
           <div className="md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
               <img alt="JobBots Logo" className="h-8 w-8" src="/lovable-uploads/d1063169-3726-4087-9672-b20c6091d9a4.jpg" />
-              <span className="text-xl font-semibold text-white font-inter">Aspirely.ai</span>
+              <span className="text-xl font-semibold text-foreground font-inter">Aspirely.ai</span>
             </div>
-            <p className="text-gray-400 text-sm font-inter max-w-md">
+            <p className="text-muted-foreground text-sm font-inter max-w-md">
               The AI-powered platform for finding and creating your perfect career path with advanced job matching and personalized guidance.
             </p>
             <div className="flex items-center space-x-4 mt-4">
@@ -30,7 +30,7 @@ const Footer = () => {
                 href="https://x.com/Aspirely_ai" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-white hover:text-gray-200 transition-colors duration-200"
+                className="text-foreground hover:text-muted-foreground transition-colors duration-200"
                 aria-label="Follow us on X"
               >
                 <svg 
@@ -47,7 +47,7 @@ const Footer = () => {
                 href="https://www.linkedin.com/company/107778088/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-white hover:text-gray-200 transition-colors duration-200"
+                className="text-foreground hover:text-muted-foreground transition-colors duration-200"
                 aria-label="Follow us on LinkedIn"
               >
                 <Linkedin size={20} />
@@ -56,7 +56,7 @@ const Footer = () => {
                 href="https://www.youtube.com/@AspirelyAI" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-white hover:text-gray-200 transition-colors duration-200"
+                className="text-foreground hover:text-muted-foreground transition-colors duration-200"
                 aria-label="Subscribe to our YouTube channel"
               >
                 <Youtube size={20} />
@@ -65,7 +65,7 @@ const Footer = () => {
                 href="https://www.instagram.com/aspirely.ai/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-white hover:text-gray-200 transition-colors duration-200"
+                className="text-foreground hover:text-muted-foreground transition-colors duration-200"
                 aria-label="Follow us on Instagram"
               >
                 <Instagram size={20} />
@@ -75,15 +75,15 @@ const Footer = () => {
 
           {/* Product Section */}
           <div>
-            <h3 className="text-white font-semibold text-sm font-inter mb-4">Product</h3>
+            <h3 className="text-foreground font-semibold text-sm font-inter mb-4">Product</h3>
             <div className="space-y-3">
-              <button onClick={() => scrollToSection('features')} className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
+              <button onClick={() => scrollToSection('features')} className="block text-muted-foreground hover:text-primary transition-colors duration-200 text-sm font-inter">
                 Features
               </button>
-              <button onClick={() => scrollToSection('how-it-works')} className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
+              <button onClick={() => scrollToSection('how-it-works')} className="block text-muted-foreground hover:text-primary transition-colors duration-200 text-sm font-inter">
                 How It Works
               </button>
-              <button onClick={() => scrollToSection('pricing')} className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
+              <button onClick={() => scrollToSection('pricing')} className="block text-muted-foreground hover:text-primary transition-colors duration-200 text-sm font-inter">
                 Pricing
               </button>
             </div>
@@ -91,12 +91,12 @@ const Footer = () => {
 
           {/* Company Section */}
           <div>
-            <h3 className="text-white font-semibold text-sm font-inter mb-4">Company</h3>
+            <h3 className="text-foreground font-semibold text-sm font-inter mb-4">Company</h3>
             <div className="space-y-3">
-              <Link to="/contact-support" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
+              <Link to="/contact-support" className="block text-muted-foreground hover:text-primary transition-colors duration-200 text-sm font-inter">
                 Contact Support
               </Link>
-              <Link to="/blogs" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter" onClick={() => window.scrollTo(0, 0)}>
+              <Link to="/blogs" className="block text-muted-foreground hover:text-primary transition-colors duration-200 text-sm font-inter" onClick={() => window.scrollTo(0, 0)}>
                 Blogs
               </Link>
             </div>
@@ -104,12 +104,12 @@ const Footer = () => {
 
           {/* Legal Section - Using standard HTML anchor tags for better crawlability */}
           <div>
-            <h3 className="text-white font-semibold text-sm font-inter mb-4">Legal</h3>
+            <h3 className="text-foreground font-semibold text-sm font-inter mb-4">Legal</h3>
             <div className="space-y-3">
-              <a href="/privacy-policy" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
+              <a href="/privacy-policy" className="block text-muted-foreground hover:text-primary transition-colors duration-200 text-sm font-inter">
                 Privacy Policy
               </a>
-              <a href="/terms-of-service" className="block text-gray-400 hover:text-sky-400 transition-colors duration-200 text-sm font-inter">
+              <a href="/terms-of-service" className="block text-muted-foreground hover:text-primary transition-colors duration-200 text-sm font-inter">
                 Terms of Service
               </a>
             </div>
@@ -123,7 +123,7 @@ const Footer = () => {
           <meta itemProp="description" content="AI-powered career advancement platform for job seekers" />
           
           <div className="flex flex-col items-center space-y-4">
-            <h3 className="text-white font-semibold text-sm font-inter">Featured on</h3>
+            <h3 className="text-foreground font-semibold text-sm font-inter">Featured on</h3>
             <div className="flex flex-col items-center space-y-4">
               {/* Badge row - horizontal on desktop/tablet */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
@@ -183,9 +183,9 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="pt-8 border-t border-gray-800">
+        <div className="pt-8 border-t border-border">
           <div className="flex flex-col sm:flex-row justify-between items-center">
-            <p className="text-gray-500 text-sm font-inter mb-4 sm:mb-0">
+            <p className="text-muted-foreground text-sm font-inter mb-4 sm:mb-0">
               © {new Date().getFullYear()} Aspirely.ai. All rights reserved.
             </p>
             <div className="flex items-center space-x-6">

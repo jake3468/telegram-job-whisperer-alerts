@@ -1,12 +1,12 @@
 import FeatureSection from "./FeatureSection";
 const ToolsSection = () => {
-  return <section id="features" className="relative bg-black">
+  return <section id="features" className="relative bg-background">
       {/* Header Section */}
       <div className="max-w-7xl mx-auto px-4 py-4 text-center">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-white mb-2 font-inter">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-foreground mb-2 font-inter">
           Unlock Your Career Potential
         </h2>
-        <p className="text-base sm:text-xl text-gray-400 font-inter font-light">Explore all our AI-powered tools designed to streamline your job search.</p>
+        <p className="text-base sm:text-xl text-muted-foreground font-inter font-light">Explore all our AI-powered tools designed to streamline your job search.</p>
       </div>
 
       {/* Feature Sections */}
@@ -31,7 +31,7 @@ const ToolsSection = () => {
 
         {/* Placeholder for other features - to be added later */}
         <div className="py-16 px-4 text-center">
-          <p className="text-gray-400 font-inter">
+          <p className="text-muted-foreground font-inter">
             More features coming soon...
           </p>
         </div>
