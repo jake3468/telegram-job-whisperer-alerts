@@ -49,10 +49,10 @@ const PrivacyPolicy = () => {
             <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-300 dark:from-cyan-300 dark:to-cyan-200 bg-clip-text text-transparent mb-4">
               Privacy Policy
             </h1>
-            <p className="text-muted-foreground">Last updated: {new Date().toLocaleDateString()}</p>
+            <p className="text-gray-700 dark:text-gray-400">Last updated: {new Date().toLocaleDateString()}</p>
           </div>
 
-          <div className="prose prose-invert dark:prose-invert prose-cyan max-w-none">
+          <div className="prose prose-gray dark:prose-invert prose-cyan max-w-none">
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-white mb-4">1. Introduction</h2>
               <p className="text-gray-300 leading-relaxed mb-4">

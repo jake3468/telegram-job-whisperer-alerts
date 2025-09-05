@@ -83,7 +83,7 @@ const Blogs = () => {
       <div className="pb-12 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-orbitron font-bold mb-6 bg-gradient-to-r from-cyan-400 via-cyan-300 to-cyan-200 dark:from-cyan-300 dark:via-cyan-200 dark:to-cyan-100 bg-clip-text text-transparent">Our Blogs</h1>
-          <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-700 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
             Insights, tips, and industry updates to help you excel in your career journey
           </p>
           
@@ -110,7 +110,7 @@ const Blogs = () => {
       {/* Featured Blogs */}
       {featuredBlogs.length > 0 && <div className="px-4 mb-16">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-orbitron font-bold mb-8 text-center">Featured Posts</h2>
+            <h2 className="text-3xl font-orbitron font-bold mb-8 text-center text-gray-900 dark:text-white">Featured Posts</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredBlogs.map(blog => <Card key={blog.id} className="bg-card border-border hover:border-cyan-500/50 dark:hover:border-cyan-400/50 transition-colors">
                   <Link to={`/blog/${blog.slug}`} onClick={() => window.scrollTo(0, 0)}>
@@ -124,12 +124,12 @@ const Blogs = () => {
                         <User className="w-4 h-4 ml-2" />
                         {blog.author_name}
                       </div>
-                      <h3 className="text-xl font-semibold text-foreground hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">
                         {blog.title}
                       </h3>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-gray-300 mb-4">{blog.excerpt}</p>
+                      <p className="text-gray-700 dark:text-gray-300 mb-4">{blog.excerpt}</p>
                       {blog.tags && blog.tags.length > 0 && <div className="flex flex-wrap gap-2">
                           {blog.tags.map(tag => <Badge key={tag} variant="secondary" className="bg-gray-800 text-gray-300">
                               {tag}
@@ -145,7 +145,7 @@ const Blogs = () => {
       {/* All Blogs */}
       <div className="px-4 pb-16">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-orbitron font-bold mb-8 text-center">All Posts</h2>
+          <h2 className="text-3xl font-orbitron font-bold mb-8 text-center text-gray-900 dark:text-white">All Posts</h2>
           
           {filteredBlogs.length === 0 ? <div className="text-center py-12">
               <p className="text-xl text-gray-400">No blogs found matching your criteria.</p>
