@@ -100,7 +100,7 @@ const HeroSection = () => {
     navigate('/dashboard');
   };
   return <>
-    <section className="relative min-h-[80vh] flex items-center justify-center px-4 pt-20 sm:pt-24 pb-8 overflow-hidden bg-background">
+    <section className="relative min-h-[80vh] flex items-center justify-center px-4 pt-20 sm:pt-24 pb-8 overflow-hidden bg-white dark:bg-black">
       {/* Light rays background animation - only in dark mode */}
       <div className="absolute inset-0 z-0 dark:block hidden">
         <LightRays raysOrigin="top-center" raysColor="#00ffff" raysSpeed={1.5} lightSpread={0.8} rayLength={window.innerWidth < 768 ? 6.0 : 4.0} fadeDistance={window.innerWidth < 768 ? 5.0 : 3.0} followMouse={true} mouseInfluence={0.1} noiseAmount={0.1} distortion={0.05} className="w-full h-full" />
@@ -158,14 +158,14 @@ const HeroSection = () => {
             {/* Button and Badge Container */}
             <div className="flex flex-col items-start md:flex-col md:items-start lg:flex-row lg:items-center lg:justify-start gap-4 md:gap-6 mb-8">
               <SignUpButton mode="modal">
-                <button className="bg-secondary hover:bg-secondary/80 text-secondary-foreground px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-2xl transition-all duration-300 font-inter font-semibold shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-primary/50 flex items-center gap-2 justify-start md:justify-center w-auto">
+                <button className="bg-gray-800 hover:bg-gray-900 text-white dark:bg-gray-50 dark:hover:bg-gray-200 dark:text-gray-900 px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-2xl transition-all duration-300 font-inter font-semibold shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-primary/50 flex items-center gap-2 justify-start md:justify-center w-auto">
                   🎯 Start Free Now
                 </button>
               </SignUpButton>
               
               {/* Discount Badge */}
-              <div className="bg-accent/20 border border-accent/40 backdrop-blur-sm rounded-full px-4 py-2 md:px-4 md:py-2 shadow-lg shadow-accent/20 w-auto text-left md:text-center">
-                <span className="text-accent-foreground text-xs md:text-sm font-medium font-inter dark:[text-shadow:_0_0_10px_rgba(34,197,94,0.8)]">
+              <div className="bg-green-100 border border-green-300 dark:bg-green-900/30 dark:border-green-700 backdrop-blur-sm rounded-full px-4 py-2 md:px-4 md:py-2 shadow-lg shadow-green-500/20 w-auto text-left md:text-center">
+                <span className="text-green-800 dark:text-green-300 text-xs md:text-sm font-medium font-inter">
                   Get 50% off with code "ASP123"
                 </span>
               </div>
