@@ -193,11 +193,11 @@ const FeatureSection = ({
                 {label}
               </div>}
             {activationStatus !== undefined && <ActivationStatusTag isActivated={activationStatus} />}
-            <div className="text-center space-y-2 md:space-y-3 flex-1 flex flex-col">
+            <div className="text-left space-y-2 md:space-y-3 flex-1 flex flex-col">
               <h3 className="text-base md:text-lg lg:text-xl font-bold font-opensans text-blue-700 leading-tight">
                 {title}
               </h3>
-              <p className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs md:text-sm font-opensans font-medium leading-tight">
+              <p className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs md:text-sm font-opensans font-medium leading-tight w-fit">
                 {subheading}
               </p>
               <div className="flex-1 flex flex-col items-center">
