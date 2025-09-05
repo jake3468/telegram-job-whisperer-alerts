@@ -164,8 +164,8 @@ const HeroSection = () => {
               </SignUpButton>
               
               {/* Discount Badge */}
-              <div className="bg-white border border-green-600 dark:bg-green-900/30 dark:border-green-700 backdrop-blur-sm rounded-full px-4 py-2 md:px-4 md:py-2 shadow-lg shadow-green-500/20 w-auto text-left md:text-center">
-                <span className="text-green-600 dark:text-green-300 text-xs md:text-sm font-normal font-inter">
+              <div className="bg-white border border-green-600 dark:bg-green-900/30 dark:border-green-700 rounded-full px-4 py-2 md:px-4 md:py-2 w-auto text-left md:text-center">
+                <span className="text-green-700 dark:text-green-300 text-xs md:text-sm font-normal font-inter">
                   Get 50% off with code "ASP123"
                 </span>
               </div>
@@ -192,7 +192,7 @@ const HeroSection = () => {
               </div>
               
               <div className="flex flex-col items-start">
-                <div className="flex text-yellow-400 mb-1">
+                <div className="flex text-yellow-400 dark:text-yellow-400 mb-1 [text-shadow:_0_0_2px_rgba(0,0,0,0.8)] dark:[text-shadow:none]">
                   <span>⭐⭐⭐⭐⭐</span>
                 </div>
                 <div className="text-foreground text-xs text-left">
