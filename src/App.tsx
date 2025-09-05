@@ -12,6 +12,7 @@ import { useEnhancedTokenManagerIntegration } from "@/hooks/useEnhancedTokenMana
 import { useLocation } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { useThemeColor } from "@/hooks/useThemeColor";
 import Index from "./pages/Index";
 import JobGuide from "./pages/JobGuide";
 import CoverLetter from "./pages/CoverLetter";
@@ -64,6 +65,7 @@ const AppWithSync = () => {
   
   // Initialize sync in background without blocking UI
   useClerkSupabaseSync();
+  useThemeColor(); // Add theme color management
   
   // Skip enterprise features for job-alerts page to prevent debug messages
   const shouldUseEnterpriseFeatures = !location.pathname.includes('/job-alerts');
