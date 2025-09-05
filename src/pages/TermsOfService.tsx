@@ -178,45 +178,45 @@ const TermsOfService = () => {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">5. Refund and Cancellation Policy</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">5. Refund and Cancellation Policy</h2>
               
-              <h3 className="text-xl font-medium text-sky-400 mb-3">5.1 Refund Eligibility</h3>
-              <p className="text-gray-300 mb-4">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">5.1 Refund Eligibility</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 We offer refunds under the following circumstances:
               </p>
-              <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
+              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
                 <li>Technical issues preventing service access for more than 24 hours</li>
                 <li>Double billing or processing errors</li>
                 <li>Service cancellation within 48 hours of initial subscription</li>
                 <li>Documented service failures that prevent feature utilization</li>
               </ul>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">5.2 Refund Process</h3>
-              <p className="text-gray-300 mb-4">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">5.2 Refund Process</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 Approved refunds will be processed and returned to your original payment method within 48 hours of approval. Contact our support team at support@aspirely.ai to initiate a refund request.
               </p>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">5.3 Subscription Cancellation</h3>
-              <p className="text-gray-300">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">5.3 Subscription Cancellation</h3>
+              <p className="text-gray-700 dark:text-gray-300">
                 Monthly subscriptions can be canceled at any time through your account settings. Cancellation takes effect at the end of the current billing period, and you retain access to paid features until that time.
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">6. Acceptable Use Policy</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">6. Acceptable Use Policy</h2>
               
-              <h3 className="text-xl font-medium text-sky-400 mb-3">6.1 Permitted Uses</h3>
-              <p className="text-gray-300 mb-4">You may use our services for:</p>
-              <ul className="list-disc list-inside text-gray-300 space-y-2 mb-6">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">6.1 Permitted Uses</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">You may use our services for:</p>
+              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-6">
                 <li>Personal job searching and career development activities</li>
                 <li>Creating professional documents and content</li>
                 <li>Research and analysis of career opportunities</li>
                 <li>Professional networking and personal branding</li>
               </ul>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">6.2 Prohibited Uses</h3>
-              <p className="text-gray-300 mb-4">You may not use our services to:</p>
-              <ul className="list-disc list-inside text-gray-300 space-y-2 mb-6">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">6.2 Prohibited Uses</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">You may not use our services to:</p>
+              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-6">
                 <li>Create false, misleading, or fraudulent content</li>
                 <li>Violate any applicable laws or regulations</li>
                 <li>Infringe upon intellectual property rights of others</li>
@@ -227,20 +227,20 @@ const TermsOfService = () => {
                 <li>Generate content that is discriminatory, hateful, or offensive</li>
               </ul>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">6.3 Content Responsibility</h3>
-              <p className="text-gray-300">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">6.3 Content Responsibility</h3>
+              <p className="text-gray-700 dark:text-gray-300">
                 While our AI tools generate content based on your inputs, you are responsible for reviewing, editing, and ensuring the accuracy and appropriateness of all generated content before use in professional contexts.
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibrent text-white mb-4">7. Intellectual Property Rights</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">7. Intellectual Property Rights</h2>
               
-              <h3 className="text-xl font-medium text-sky-400 mb-3">7.1 Your Content Ownership</h3>
-              <p className="text-gray-300 mb-4">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">7.1 Your Content Ownership</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 You retain full ownership of all content generated through our platform, including:
               </p>
-              <ul className="list-disc list-inside text-gray-300 space-y-2 mb-6">
+              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-6">
                 <li>Cover letters and professional documents</li>
                 <li>Resume content and variations</li>
                 <li>LinkedIn posts and social media content</li>
@@ -248,135 +248,135 @@ const TermsOfService = () => {
                 <li>Job analysis reports and insights</li>
               </ul>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">7.2 Platform Rights</h3>
-              <p className="text-gray-300 mb-4">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">7.2 Platform Rights</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 Aspirely.ai retains all rights to our platform, technology, algorithms, and proprietary systems. This includes our AI models, user interface, branding, and underlying software infrastructure.
               </p>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">7.3 Third-Party AI Services</h3>
-              <p className="text-gray-300">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">7.3 Third-Party AI Services</h3>
+              <p className="text-gray-700 dark:text-gray-300">
                 Our services utilize third-party AI providers (OpenAI, Anthropic, Perplexity) that have their own terms of service and intellectual property policies. By using our services, you acknowledge and agree to comply with these third-party terms where applicable.
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">8. Privacy and Data Protection</h2>
-              <p className="text-gray-300 mb-4">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">8. Privacy and Data Protection</h2>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 Your privacy is important to us. Our comprehensive Privacy Policy, which is incorporated by reference into these Terms, explains how we collect, use, and protect your information. Key points include:
               </p>
-              <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
+              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
                 <li>We collect only necessary information to provide our services</li>
                 <li>Your data is shared with AI providers solely for service delivery</li>
                 <li>You can delete your account and data at any time</li>
                 <li>We implement industry-standard security measures</li>
                 <li>Premium users receive priority support for data-related requests</li>
               </ul>
-              <p className="text-gray-300">
+              <p className="text-gray-700 dark:text-gray-300">
                 Please review our complete Privacy Policy for detailed information about our data practices.
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">9. Service Disclaimers and Limitations</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">9. Service Disclaimers and Limitations</h2>
               
-              <h3 className="text-xl font-medium text-sky-400 mb-3">9.1 No Employment Guarantees</h3>
-              <p className="text-gray-300 mb-4">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">9.1 No Employment Guarantees</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 Aspirely.ai does not guarantee job placement, interview success, or any specific career outcomes. Our services are designed to assist and enhance your job search efforts, but success depends on numerous factors beyond our control.
               </p>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">9.2 AI-Generated Content Limitations</h3>
-              <p className="text-gray-300 mb-4">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">9.2 AI-Generated Content Limitations</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 While our AI tools are sophisticated, they may occasionally produce:
               </p>
-              <ul className="list-disc list-inside text-gray-300 space-y-2 mb-6">
+              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-6">
                 <li>Inaccurate or outdated information</li>
                 <li>Content requiring human review and editing</li>
                 <li>Results that vary in quality based on input data</li>
                 <li>Responses that may not perfectly match your expectations</li>
               </ul>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">9.3 Service Availability</h3>
-              <p className="text-gray-300 mb-4">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">9.3 Service Availability</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 We do not guarantee continuous, uninterrupted, or error-free service availability. Factors that may affect service include:
               </p>
-              <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
+              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
                 <li>Scheduled maintenance and updates</li>
                 <li>Third-party AI service limitations or outages</li>
                 <li>High demand periods affecting response times</li>
                 <li>Technical issues beyond our control</li>
               </ul>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">9.4 External Links and Services</h3>
-              <p className="text-gray-300">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">9.4 External Links and Services</h3>
+              <p className="text-gray-700 dark:text-gray-300">
                 Our platform may contain links to external websites, job boards, or career resources. We are not responsible for the content, privacy practices, or availability of these external services.
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">10. Limitation of Liability</h2>
-              <p className="text-gray-300 mb-4">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">10. Limitation of Liability</h2>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 TO THE MAXIMUM EXTENT PERMITTED BY LAW, ASPIRELY.AI SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO:
               </p>
-              <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
+              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
                 <li>Lost profits or business opportunities</li>
                 <li>Data loss or corruption</li>
                 <li>Employment-related decisions based on our content</li>
                 <li>Third-party actions or decisions</li>
                 <li>Service interruptions or technical failures</li>
               </ul>
-              <p className="text-gray-300">
+              <p className="text-gray-700 dark:text-gray-300">
                 Our total liability to you for any claims arising from or related to these Terms or our services shall not exceed the amount you paid to us in the 12 months preceding the claim.
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">11. Indemnification</h2>
-              <p className="text-gray-300">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">11. Indemnification</h2>
+              <p className="text-gray-700 dark:text-gray-300">
                 You agree to indemnify, defend, and hold harmless Aspirely.ai and our officers, directors, employees, and agents from any claims, liabilities, damages, losses, and expenses arising from your use of our services, violation of these Terms, or infringement of any rights of another party.
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">12. Changes to Terms</h2>
-              <p className="text-gray-300 mb-4">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">12. Changes to Terms</h2>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 We reserve the right to modify these Terms at any time. When we make material changes, we will:
               </p>
-              <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
+              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
                 <li>Post the updated Terms on our website</li>
                 <li>Send email notifications to registered users</li>
                 <li>Display prominent notices on our platform</li>
                 <li>Provide at least 30 days notice for significant changes</li>
               </ul>
-              <p className="text-gray-300">
+              <p className="text-gray-700 dark:text-gray-300">
                 Your continued use of our services after the effective date constitutes acceptance of the updated Terms.
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">13. Governing Law and Dispute Resolution</h2>
-              <p className="text-gray-300 mb-4">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">13. Governing Law and Dispute Resolution</h2>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 These Terms shall be governed by and construed in accordance with applicable laws. Any disputes arising from these Terms or our services shall be resolved through:
               </p>
-              <ol className="list-decimal list-inside text-gray-300 space-y-2 mb-4">
+              <ol className="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
                 <li>Good faith negotiations between the parties</li>
                 <li>Mediation if direct negotiations fail</li>
                 <li>Binding arbitration as a final resort</li>
               </ol>
-              <p className="text-gray-300">
+              <p className="text-gray-700 dark:text-gray-300">
                 You may also contact our support team at support@aspirely.ai to resolve any issues informally before pursuing formal dispute resolution.
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">14. Severability and Entire Agreement</h2>
-              <p className="text-gray-300 mb-4">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">14. Severability and Entire Agreement</h2>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 If any provision of these Terms is found to be invalid or unenforceable, the remaining provisions will continue in full force and effect. These Terms, together with our Privacy Policy, constitute the entire agreement between you and Aspirely.ai regarding our services.
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">15. Contact Information</h2>
-              <p className="text-gray-300 mb-4">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">15. Contact Information</h2>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 For questions about these Terms or our services, please contact us:
               </p>
               <div className="bg-gray-100 dark:bg-gray-900 p-6 rounded-lg border border-gray-300 dark:border-gray-800">
@@ -390,8 +390,8 @@ const TermsOfService = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-white mb-4">16. Effective Date</h2>
-              <p className="text-gray-300">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">16. Effective Date</h2>
+              <p className="text-gray-700 dark:text-gray-300">
                 These Terms of Service are effective as of {new Date().toLocaleDateString()} and apply to all use of Aspirely.ai services on or after this date.
               </p>
             </section>
