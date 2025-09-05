@@ -40,7 +40,7 @@ const PricingSection = () => {
   return <section className="py-8 md:py-12 px-4 bg-background">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-6">
-          <h2 className="text-3xl sm:text-5xl font-extrabold bg-gradient-to-r from-primary via-primary to-primary bg-clip-text mb-2 font-inter text-foreground">Pricing Plans</h2>
+          <h2 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-primary via-primary to-primary bg-clip-text mb-2 font-inter text-foreground">Pricing Plans</h2>
           <p className="text-lg text-muted-foreground font-inter font-light mb-6">
             Start with 10 free monthly credits and upgrade anytime with flexible credit packs.
           </p>
