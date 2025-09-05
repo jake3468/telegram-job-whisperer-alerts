@@ -23,110 +23,110 @@ const TermsOfService = () => {
 
           <div className="prose prose-gray dark:prose-invert prose-cyan max-w-none">
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">1. Agreement to Terms</h2>
-              <p className="text-gray-300 leading-relaxed mb-4">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">1. Agreement to Terms</h2>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
                 These Terms of Service ("Terms") constitute a legally binding agreement between you ("User," "you," or "your") and Aspirely.ai ("Company," "we," "us," or "our"). By accessing or using our website, mobile application, or any of our AI-powered career services, you agree to be bound by these Terms.
               </p>
-              <p className="text-gray-300 leading-relaxed mb-4">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
                 If you do not agree to these Terms, you must not access or use our services. These Terms apply to all visitors, users, and others who access or use our services.
               </p>
-              <p className="text-gray-300 leading-relaxed">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                 Aspirely.ai is a comprehensive AI-powered platform designed to assist job seekers with various career-related tasks, including but not limited to cover letter generation, interview preparation, job analysis, company research, LinkedIn content creation, and resume optimization.
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">2. Description of Services</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">2. Description of Services</h2>
               
-              <h3 className="text-xl font-medium text-sky-400 mb-3">2.1 Core Services</h3>
-              <p className="text-gray-300 mb-4">Aspirely.ai provides the following services:</p>
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">2.1 Core Services</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">Aspirely.ai provides the following services:</p>
               
               <div className="space-y-4 mb-6">
-                <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
-                  <h4 className="text-white font-semibold mb-2">Telegram Job Alerts</h4>
-                  <p className="text-gray-300 text-sm">Personalized daily job alerts delivered via Telegram bot, utilizing SerpApi & RapidAPI for job aggregation and OpenAI & Perplexity for job alert message creation. Users can generate tailored resumes, cover letters, company research, and interview preparation materials with one-click directly from job alert messages.</p>
+                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Telegram Job Alerts</h4>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm">Personalized daily job alerts delivered via Telegram bot, utilizing SerpApi & RapidAPI for job aggregation and OpenAI & Perplexity for job alert message creation. Users can generate tailored resumes, cover letters, company research, and interview preparation materials with one-click directly from job alert messages.</p>
                 </div>
 
-                <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
-                  <h4 className="text-white font-semibold mb-2">Job Analysis</h4>
-                  <p className="text-gray-300 text-sm">
+                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Job Analysis</h4>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm">
                     In-depth analysis of job postings using OpenAI, providing match percentages, pros/cons, and recommendations for improving application success rates.
                   </p>
                 </div>
 
-                <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
-                  <h4 className="text-white font-semibold mb-2">Company Decoder</h4>
-                  <p className="text-gray-300 text-sm">
+                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Company Decoder</h4>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm">
                     Comprehensive company and role analysis using Perplexity AI, including company news, job security insights, salary ranges, workplace culture, and interview processes.
                   </p>
                 </div>
 
-                <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
-                  <h4 className="text-white font-semibold mb-2">Interview Preparation</h4>
-                  <p className="text-gray-300 text-sm">
+                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Interview Preparation</h4>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm">
                     Personalized interview preparation materials generated using Claude (by Anthropic), including tailored questions, answering strategies, and downloadable resources.
                   </p>
                 </div>
 
-                <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
-                  <h4 className="text-white font-semibold mb-2">Cover Letter Generation</h4>
-                  <p className="text-gray-300 text-sm">
+                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Cover Letter Generation</h4>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm">
                     AI-powered cover letter creation using Claude (by Anthropic), tailored to specific job postings and user profiles, with PDF and DOCX download options.
                   </p>
                 </div>
 
-                <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
-                  <h4 className="text-white font-semibold mb-2">LinkedIn Content Creation</h4>
-                  <p className="text-gray-300 text-sm">
+                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">LinkedIn Content Creation</h4>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm">
                     Professional LinkedIn post generation using Perplexity and OpenAI, including multiple variations and accompanying images.
                   </p>
                 </div>
 
-                <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
-                  <h4 className="text-white font-semibold mb-2">AI Mock Phone Call Interview</h4>
-                  <p className="text-gray-300 text-sm">
+                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">AI Mock Phone Call Interview</h4>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm">
                     Realistic phone-based interview practice with Grace, our AI interviewer, providing role-specific mock interviews, detailed performance reports, and personalized improvement recommendations using advanced conversation AI.
                   </p>
                 </div>
 
-                <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
-                  <h4 className="text-white font-semibold mb-2">Job Tracker</h4>
-                  <p className="text-gray-300 text-sm">
+                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Job Tracker</h4>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm">
                     Comprehensive application management system with AI-generated tailored checklists, resume suggestions, mock interview preparation, and stage-based tracking from "Interested" to "Interviewing."
                   </p>
                 </div>
 
-                <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
-                  <h4 className="text-white font-semibold mb-2">Job Board</h4>
-                  <p className="text-gray-300 text-sm">
+                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Job Board</h4>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm">
                     Centralized job browsing platform where Telegram job alerts are displayed and organized, allowing users to easily browse, filter, and manage job opportunities with one-click actions to add jobs to the Job Tracker.
                   </p>
                 </div>
 
-                <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
-                  <h4 className="text-white font-semibold mb-2">Telegram Resume Bot</h4>
-                  <p className="text-gray-300 text-sm">
+                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Telegram Resume Bot</h4>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm">
                     Interactive resume building and updating service via Telegram bot, powered by OpenAI for personalized resume optimization.
                   </p>
                 </div>
               </div>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">2.2 Service Availability</h3>
-              <p className="text-gray-300">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">2.2 Service Availability</h3>
+              <p className="text-gray-700 dark:text-gray-300">
                 We strive to maintain high service availability but do not guarantee uninterrupted access to our services. Scheduled maintenance, updates, or technical issues may temporarily affect service availability.
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">3. User Accounts and Registration</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">3. User Accounts and Registration</h2>
               
-              <h3 className="text-xl font-medium text-sky-400 mb-3">3.1 Account Creation</h3>
-              <p className="text-gray-300 mb-4">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">3.1 Account Creation</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 To access our services, you must create an account by providing accurate and complete information. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.
               </p>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">3.2 Account Responsibilities</h3>
-              <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">3.2 Account Responsibilities</h3>
+              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
                 <li>Provide accurate, current, and complete information during registration</li>
                 <li>Maintain and update your account information as necessary</li>
                 <li>Notify us immediately of any unauthorized access or security breaches</li>
@@ -134,45 +134,45 @@ const TermsOfService = () => {
                 <li>Not share your account credentials with third parties</li>
               </ul>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">3.3 Account Termination</h3>
-              <p className="text-gray-300">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">3.3 Account Termination</h3>
+              <p className="text-gray-700 dark:text-gray-300">
                 You may terminate your account at any time through your account settings. We reserve the right to suspend or terminate accounts that violate these Terms or engage in fraudulent, abusive, or illegal activities.
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">4. Pricing Plans</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">4. Pricing Plans</h2>
               
-              <h3 className="text-xl font-medium text-sky-400 mb-3">4.1 Service Tiers</h3>
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">4.1 Service Tiers</h3>
               <div className="space-y-4 mb-6">
-                <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
-                  <h4 className="text-white font-semibold mb-2">Free Plan</h4>
-                  <p className="text-gray-300 text-sm">10 free credits per month with access to all features</p>
+                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Free Plan</h4>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm">10 free credits per month with access to all features</p>
                 </div>
 
-                <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
-                  <h4 className="text-white font-semibold mb-2">Monthly Subscription</h4>
-                  <p className="text-gray-300 text-sm">Monthly recurring subscription with enhanced credit allocation</p>
+                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Monthly Subscription</h4>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm">Monthly recurring subscription with enhanced credit allocation</p>
                 </div>
 
-                <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
-                  <h4 className="text-white font-semibold mb-2">Credit Packs</h4>
-                  <p className="text-gray-300 text-sm">One-time credit purchases without expiration dates</p>
+                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Credit Packs</h4>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm">One-time credit purchases without expiration dates</p>
                 </div>
               </div>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">4.2 Pricing and Location-Based Adjustments</h3>
-              <p className="text-gray-300 mb-4">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">4.2 Pricing and Location-Based Adjustments</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 Our pricing varies by geographic location to ensure fair access to our services. We automatically detect your location to provide appropriate pricing in your local currency. Prices are clearly displayed before any purchase.
               </p>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">4.3 Payment Processing</h3>
-              <p className="text-gray-300 mb-4">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">4.3 Payment Processing</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
                 All payments are processed securely through DodoPayments, our trusted payment processor. We do not store complete payment card information on our servers. By making a purchase, you agree to DodoPayments' terms and conditions.
               </p>
 
-              <h3 className="text-xl font-medium text-sky-400 mb-3">4.4 Credit System</h3>
-              <p className="text-gray-300">
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">4.4 Credit System</h3>
+              <p className="text-gray-700 dark:text-gray-300">
                 Our services operate on a credit-based system where each AI-powered feature consumes a specific number of credits. Credit usage is clearly displayed before each service use. Unused credits from credit packs do not expire, while monthly subscription credits reset each billing cycle.
               </p>
             </section>
@@ -379,11 +379,11 @@ const TermsOfService = () => {
               <p className="text-gray-300 mb-4">
                 For questions about these Terms or our services, please contact us:
               </p>
-              <div className="bg-gray-900 p-6 rounded-lg border border-gray-800">
-                <p className="text-white font-medium mb-2">Aspirely.ai Legal Team</p>
-                <p className="text-gray-300 mb-2">Email: support@aspirely.ai</p>
-                <p className="text-gray-300 mb-2">Response Time: Within 48 hours</p>
-                <p className="text-gray-300">
+              <div className="bg-gray-100 dark:bg-gray-900 p-6 rounded-lg border border-gray-300 dark:border-gray-800">
+                <p className="text-gray-900 dark:text-white font-medium mb-2">Aspirely.ai Legal Team</p>
+                <p className="text-gray-700 dark:text-gray-300 mb-2">Email: support@aspirely.ai</p>
+                <p className="text-gray-700 dark:text-gray-300 mb-2">Response Time: Within 48 hours</p>
+                <p className="text-gray-700 dark:text-gray-300">
                   For urgent legal matters, please mark your email subject with "URGENT - Legal Inquiry"
                 </p>
               </div>
