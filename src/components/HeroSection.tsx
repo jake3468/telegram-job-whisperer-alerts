@@ -105,7 +105,7 @@ const HeroSection = () => {
       <div className="absolute inset-0 z-0 dark:block hidden">
         <LightRays raysOrigin="top-center" raysColor="#00ffff" raysSpeed={1.5} lightSpread={0.8} rayLength={window.innerWidth < 768 ? 6.0 : 4.0} fadeDistance={window.innerWidth < 768 ? 5.0 : 3.0} followMouse={true} mouseInfluence={0.1} noiseAmount={0.1} distortion={0.05} className="w-full h-full" />
       </div>
-      <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
+      <div className="absolute inset-0 z-10 bg-white/90 dark:bg-black/20" aria-hidden="true" />
       
       {/* Main Container with Grid Layout */}
       <div className="max-w-7xl mx-auto z-20 relative w-full">
@@ -164,8 +164,8 @@ const HeroSection = () => {
               </SignUpButton>
               
               {/* Discount Badge */}
-              <div className="bg-green-100 border border-green-300 dark:bg-green-900/30 dark:border-green-700 backdrop-blur-sm rounded-full px-4 py-2 md:px-4 md:py-2 shadow-lg shadow-green-500/20 w-auto text-left md:text-center">
-                <span className="text-green-800 dark:text-green-300 text-xs md:text-sm font-medium font-inter">
+              <div className="bg-green-600 border border-green-700 dark:bg-green-900/30 dark:border-green-700 backdrop-blur-sm rounded-full px-4 py-2 md:px-4 md:py-2 shadow-lg shadow-green-500/20 w-auto text-left md:text-center">
+                <span className="text-white dark:text-green-300 text-xs md:text-sm font-medium font-inter">
                   Get 50% off with code "ASP123"
                 </span>
               </div>
