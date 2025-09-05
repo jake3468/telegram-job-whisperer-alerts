@@ -164,8 +164,8 @@ const HeroSection = () => {
               </SignUpButton>
               
               {/* Discount Badge */}
-              <div className="bg-green-600 border border-green-700 dark:bg-green-900/30 dark:border-green-700 backdrop-blur-sm rounded-full px-4 py-2 md:px-4 md:py-2 shadow-lg shadow-green-500/20 w-auto text-left md:text-center">
-                <span className="text-white dark:text-green-300 text-xs md:text-sm font-normal font-inter">
+              <div className="bg-white border border-green-600 dark:bg-green-900/30 dark:border-green-700 backdrop-blur-sm rounded-full px-4 py-2 md:px-4 md:py-2 shadow-lg shadow-green-500/20 w-auto text-left md:text-center">
+                <span className="text-green-600 dark:text-green-300 text-xs md:text-sm font-normal font-inter">
                   Get 50% off with code "ASP123"
                 </span>
               </div>
