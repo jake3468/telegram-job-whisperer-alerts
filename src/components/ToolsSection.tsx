@@ -3,7 +3,7 @@ const ToolsSection = () => {
   return <section id="features" className="relative bg-background">
       {/* Header Section */}
       <div className="max-w-7xl mx-auto px-4 py-4 text-center">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-foreground mb-2 font-inter">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-2 font-inter">
           Unlock Your Career Potential
         </h2>
         <p className="text-base sm:text-xl text-muted-foreground font-inter font-light">Explore all our AI-powered tools designed to streamline your job search.</p>

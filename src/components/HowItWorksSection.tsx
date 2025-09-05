@@ -24,7 +24,7 @@ const HowItWorksSection = () => {
     <section id="how-it-works" className="bg-background py-12 md:py-16 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <h2 className="text-4xl md:text-5xl font-semibold text-foreground mb-2 font-inter">
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-2 font-inter">
             How It Works
           </h2>
           <p className="text-xl text-muted-foreground font-inter font-light">
