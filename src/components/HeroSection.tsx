@@ -125,18 +125,18 @@ const HeroSection = () => {
           <h1 className="relative z-30 text-3xl md:text-4xl lg:text-5xl mb-1 leading-tight font-sans tracking-tight text-foreground drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">
             {/* Mobile and Desktop view */}
             <div className="block md:hidden lg:block">
-              <span className="bg-primary text-primary-foreground px-0.5 py-0 font-inter">We do the boring stuff.</span>
+              <span className="text-black dark:text-white px-0.5 py-0 font-inter">We do the boring stuff.</span>
               <br />
-              <span className="bg-primary text-primary-foreground px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter">You get the job</span> 🏆
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter">You get the job</span> 🏆
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden">
-              <span className="bg-primary text-primary-foreground px-0.5 py-0">We do the</span>
+              <span className="text-black dark:text-white px-0.5 py-0">We do the</span>
               <br />
-              <span className="bg-primary text-primary-foreground px-0.5 py-0 mt-2 md:mt-3 inline-block">boring stuff.</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block">boring stuff.</span>
               <br />
-              <span className="bg-primary text-primary-foreground px-0.5 py-0 mt-2 md:mt-3 inline-block">You get the job</span> 🏆
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block">You get the job</span> 🏆
             </div>
           </h1>
         </div>
@@ -158,14 +158,14 @@ const HeroSection = () => {
             {/* Button and Badge Container */}
             <div className="flex flex-col items-start md:flex-col md:items-start lg:flex-row lg:items-center lg:justify-start gap-4 md:gap-6 mb-8">
               <SignUpButton mode="modal">
-                <button className="bg-gray-800 hover:bg-gray-900 text-white dark:bg-gray-50 dark:hover:bg-gray-200 dark:text-gray-900 px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-2xl transition-all duration-300 font-inter font-semibold shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-primary/50 flex items-center gap-2 justify-start md:justify-center w-auto">
+                <button className="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white dark:bg-gray-50 dark:hover:bg-gray-200 dark:text-white px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-primary/50 flex items-center gap-2 justify-start md:justify-center w-auto">
                   🎯 Start Free Now
                 </button>
               </SignUpButton>
               
               {/* Discount Badge */}
-              <div className="bg-green-600 border border-green-700 dark:bg-green-900/30 dark:border-green-700 backdrop-blur-sm rounded-full px-4 py-2 md:px-4 md:py-2 shadow-lg shadow-green-500/20 w-auto text-left md:text-center">
-                <span className="text-white dark:text-green-300 text-xs md:text-sm font-medium font-inter">
+              <div className="bg-white border border-green-600 dark:bg-green-900/30 dark:border-green-700 rounded-full px-4 py-2 md:px-4 md:py-2 w-auto text-left md:text-center">
+                <span className="text-green-700 dark:text-green-300 text-xs md:text-sm font-normal font-inter">
                   Get 50% off with code "ASP123"
                 </span>
               </div>
@@ -192,7 +192,7 @@ const HeroSection = () => {
               </div>
               
               <div className="flex flex-col items-start">
-                <div className="flex text-yellow-400 mb-1">
+                <div className="flex text-yellow-400 dark:text-yellow-400 mb-1 [text-shadow:_0_0_2px_rgba(0,0,0,0.8)] dark:[text-shadow:none]">
                   <span>⭐⭐⭐⭐⭐</span>
                 </div>
                 <div className="text-foreground text-xs text-left">
@@ -227,19 +227,19 @@ const HeroSection = () => {
           <p className="text-foreground mb-6 text-sm md:text-base font-inter">Explore the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
           
           <div className="flex flex-col md:flex-row items-start justify-start md:items-center md:justify-center space-y-3 md:space-y-0 md:space-x-3">
-            <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-black dark:border-white rounded-xl px-3 py-2 bg-background/20 dark:bg-black/20 backdrop-blur-sm">
+            <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-gray-700 dark:border-gray-200 rounded-xl px-3 py-2 bg-gray-700 hover:bg-gray-800 dark:bg-gray-200 dark:hover:bg-gray-100">
               <span className="text-lg">👔</span>
-              <span className="italic text-primary drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)] text-sm">Job Application Agent</span>
+              <span className="italic text-white dark:text-gray-900 text-sm">Job Application Agent</span>
             </a>
             
-            <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-black dark:border-white rounded-xl px-3 py-2 bg-background/20 dark:bg-black/20 backdrop-blur-sm">
+            <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-gray-700 dark:border-gray-200 rounded-xl px-3 py-2 bg-gray-700 hover:bg-gray-800 dark:bg-gray-200 dark:hover:bg-gray-100">
               <span className="text-lg">🔔</span>
-              <span className="italic text-primary drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)] text-sm">Job Alerts Agent</span>
+              <span className="italic text-white dark:text-gray-900 text-sm">Job Alerts Agent</span>
             </a>
             
-            <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-black dark:border-white rounded-xl px-3 py-2 bg-background/20 dark:bg-black/20 backdrop-blur-sm">
+            <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-gray-700 dark:border-gray-200 rounded-xl px-3 py-2 bg-gray-700 hover:bg-gray-800 dark:bg-gray-200 dark:hover:bg-gray-100">
               <span className="text-lg">📝</span>
-              <span className="italic text-primary drop-shadow-md [text-shadow:_0_0_10px_rgba(0,229,255,0.8)] text-sm">Resume Builder Agent</span>
+              <span className="italic text-white dark:text-gray-900 text-sm">Resume Builder Agent</span>
             </a>
           </div>
         </div>
