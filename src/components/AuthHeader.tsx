@@ -36,7 +36,7 @@ const AuthHeader = () => {
         {/* Logo and Site Name: Left side */}
         <div className="flex items-center space-x-2 sm:space-x-3 z-40 cursor-pointer" onClick={() => navigate('/')}>
           <img alt="JobBots Logo" className="h-9 w-9 sm:h-10 sm:w-10 drop-shadow-lg" src="/lovable-uploads/924d7c77-405f-4345-8967-693eebdb7865.jpg" />
-          <span className="font-orbitron text-foreground font-extrabold sm:text-3xl text-2xl tracking-wider drop-shadow">
+          <span className="font-orbitron text-foreground font-extrabold sm:text-3xl text-2xl tracking-wider">
             Aspirely.ai
           </span>
         </div>
