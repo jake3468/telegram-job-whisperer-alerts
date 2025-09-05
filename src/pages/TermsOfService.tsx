@@ -8,14 +8,14 @@ const TermsOfService = () => {
   }, []);
   return <div className="min-h-screen bg-background text-foreground font-inter">
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <button onClick={() => navigate('/')} className="flex items-center gap-2 text-cyan-400 dark:text-cyan-300 hover:text-cyan-300 dark:hover:text-cyan-200 transition-colors mb-8">
+        <button onClick={() => navigate('/')} className="flex items-center gap-2 text-gray-800 dark:text-cyan-300 hover:text-gray-900 dark:hover:text-cyan-200 transition-colors mb-8">
           <ArrowLeft size={20} />
           Back to Home
         </button>
 
         <div className="space-y-8">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-300 dark:from-cyan-300 dark:to-cyan-200 bg-clip-text text-transparent mb-4">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-900 dark:from-cyan-300 dark:to-cyan-200 bg-clip-text text-transparent mb-4">
               Terms of Service
             </h1>
             <p className="text-gray-700 dark:text-gray-400">Last updated: {new Date().toLocaleDateString()}</p>

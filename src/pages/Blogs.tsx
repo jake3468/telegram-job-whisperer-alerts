@@ -72,7 +72,7 @@ const Blogs = () => {
       {/* Back to Home Button */}
       <div className="pt-8 px-4">
         <div className="max-w-6xl mx-auto">
-          <Link to="/" className="inline-flex items-center text-cyan-400 dark:text-cyan-300 hover:text-cyan-300 dark:hover:text-cyan-200 mb-8 transition-colors">
+          <Link to="/" className="inline-flex items-center text-gray-800 dark:text-cyan-300 hover:text-gray-900 dark:hover:text-cyan-200 mb-8 transition-colors">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Link>
@@ -82,7 +82,7 @@ const Blogs = () => {
       {/* Hero Section */}
       <div className="pb-12 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-orbitron font-bold mb-6 bg-gradient-to-r from-cyan-400 via-cyan-300 to-cyan-200 dark:from-cyan-300 dark:via-cyan-200 dark:to-cyan-100 bg-clip-text text-transparent">Our Blogs</h1>
+          <h1 className="text-4xl md:text-6xl font-orbitron font-bold mb-6 bg-gradient-to-r from-gray-800 to-gray-900 dark:from-cyan-300 dark:via-cyan-200 dark:to-cyan-100 bg-clip-text text-transparent">Our Blogs</h1>
           <p className="text-xl text-gray-700 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
             Insights, tips, and industry updates to help you excel in your career journey
           </p>
