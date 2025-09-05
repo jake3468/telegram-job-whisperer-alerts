@@ -68,7 +68,7 @@ const AIAgents = () => {
                 <span className="text-gray-600 text-xs sm:text-sm">Loading Activation Key...</span>
               </div>}
             <p className="text-xs sm:text-sm font-medium text-slate-50">
-              2. Click the Activate Now button, one by one, for each of the 3 AI Agents.<br /><br />
+              2. Click the "Activate Now" button, one by one, for each of the 3 AI Agents.<br /><br />
               3. When it asks for your activation key, paste it to start using your AI agents.
             </p>
           </div>
