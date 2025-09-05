@@ -3,7 +3,7 @@ const AboutUsSection = () => {
       <div className="max-w-4xl mx-auto text-center">
         {/* Privacy Policy and Terms Notice */}
         <div className="mt-6 text-center">
-          <p className="text-muted-foreground font-inter font-medium text-xs">
+          <p className="hidden text-muted-foreground font-inter font-medium text-xs">
             By using Aspirely.ai, you agree to our{' '}
             <a href="/privacy-policy" className="text-foreground hover:text-primary underline transition-colors font-semibold">
               Privacy Policy
