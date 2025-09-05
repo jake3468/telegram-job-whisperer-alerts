@@ -101,8 +101,8 @@ const HeroSection = () => {
   };
   return <>
     <section className="relative min-h-[80vh] flex items-center justify-center px-4 pt-20 sm:pt-24 pb-8 overflow-hidden bg-background">
-      {/* Light rays background animation with responsive length for mobile */}
-      <div className="absolute inset-0 z-0">
+      {/* Light rays background animation - only in dark mode */}
+      <div className="absolute inset-0 z-0 dark:block hidden">
         <LightRays raysOrigin="top-center" raysColor="#00ffff" raysSpeed={1.5} lightSpread={0.8} rayLength={window.innerWidth < 768 ? 6.0 : 4.0} fadeDistance={window.innerWidth < 768 ? 5.0 : 3.0} followMouse={true} mouseInfluence={0.1} noiseAmount={0.1} distortion={0.05} className="w-full h-full" />
       </div>
       <div className="absolute inset-0 z-10 bg-black/20" aria-hidden="true" />
@@ -119,10 +119,10 @@ const HeroSection = () => {
           {/* Hero Content - Center aligned with mobile preview */}
           <div className="text-left max-w-2xl mx-auto md:mx-0 md:pl-4 flex flex-col justify-center mt-8 md:mt-0">
         
-        {/* Black background to block particles behind headline */}
+        {/* Background to block particles behind headline in dark mode */}
         <div className="relative mb-8">
           <div className="absolute inset-0 bg-background/80 dark:bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
-          <h1 className="relative z-30 text-3xl md:text-4xl lg:text-5xl mb-1 leading-tight font-sans tracking-tight text-foreground drop-shadow-2xl animate-fade-in [text-shadow:_0_0_40px_rgba(255,255,255,0.5)] dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">
+          <h1 className="relative z-30 text-3xl md:text-4xl lg:text-5xl mb-1 leading-tight font-sans tracking-tight text-foreground drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">
             {/* Mobile and Desktop view */}
             <div className="block md:hidden lg:block">
               <span className="bg-primary text-primary-foreground px-0.5 py-0 font-inter">We do the boring stuff.</span>
@@ -151,7 +151,7 @@ const HeroSection = () => {
           </div>} */}
         
 
-        <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-gilroy font-light leading-relaxed drop-shadow-2xl md:text-base text-sm [text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
+        <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-gilroy font-light leading-relaxed md:text-base text-sm dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-sm md:text-base font-inter">Our AI Agents will update your <span className="font-bold italic text-primary">Resume</span>, send daily <span className="font-bold italic text-primary">Job Alerts</span>, craft tailored <span className="font-bold italic text-primary">Cover Letters</span>, prepare <span className="font-bold italic text-primary">Interview Kits</span>, check <span className="font-bold italic text-primary">Job fit</span>, give insider <span className="font-bold italic text-primary">Company</span> knowledge, and shares the <span className="font-bold italic text-primary">HRs</span> you should contact. Everything you will ever need, all in one place.</p>
           
           <SignedOut>
@@ -165,7 +165,7 @@ const HeroSection = () => {
               
               {/* Discount Badge */}
               <div className="bg-accent/20 border border-accent/40 backdrop-blur-sm rounded-full px-4 py-2 md:px-4 md:py-2 shadow-lg shadow-accent/20 w-auto text-left md:text-center">
-                <span className="text-accent-foreground text-xs md:text-sm font-medium font-inter [text-shadow:_0_0_10px_rgba(34,197,94,0.8)]">
+                <span className="text-accent-foreground text-xs md:text-sm font-medium font-inter dark:[text-shadow:_0_0_10px_rgba(34,197,94,0.8)]">
                   Get 50% off with code "ASP123"
                 </span>
               </div>
