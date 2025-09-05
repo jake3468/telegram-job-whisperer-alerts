@@ -188,7 +188,7 @@ const FeatureSection = ({
                   {animationSection}
                 </>}
             </div>
-          </div> : <div className="relative bg-gray-50 dark:bg-gray-900 rounded-2xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col">
+          </div> : <div className="relative bg-gray-50 dark:bg-gray-900 rounded-3xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col">
             {label && <div className="absolute -left-3 -top-3 bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
                 {label}
               </div>}
@@ -201,25 +201,31 @@ const FeatureSection = ({
                 {subheading}
               </p>
               <div className="flex-1 flex flex-col items-center">
-                <p className="text-xs leading-relaxed font-opensans font-normal text-neutral-950">
+                <p className="text-xs leading-relaxed font-opensans font-normal text-neutral-950 text-left">
                   {description}
                 </p>
                 {title === "👔 Job Application Agent" && <>
-                    <p className="mt-3 text-xs font-medium text-neutral-700">
-                      Example chat below 👇
-                    </p>
+                    <div className="mt-3 inline-block border border-gray-800 bg-gray-100 px-2 py-1 rounded-lg">
+                      <p className="text-xs font-medium text-neutral-700">
+                        Example chat below 👇
+                      </p>
+                    </div>
                     <img src="/lovable-uploads/438fbede-9968-4fe7-9622-807454b576af.png" alt="Job Application Agent conversation interface" className="mt-2 w-full max-w-xs rounded-lg shadow-md" />
                   </>}
                 {title === "📝 Resume Builder Agent" && <>
-                    <p className="mt-3 text-xs font-medium text-neutral-700">
-                      Example chat below 👇
-                    </p>
+                    <div className="mt-3 inline-block border border-gray-800 bg-gray-100 px-2 py-1 rounded-lg">
+                      <p className="text-xs font-medium text-neutral-700">
+                        Example chat below 👇
+                      </p>
+                    </div>
                     <img src="/lovable-uploads/80af4c55-96c8-4c4e-9cb9-f4f6c8530524.png" alt="Resume Builder Agent conversation interface" className="mt-2 w-full max-w-xs rounded-lg shadow-md" />
                   </>}
                 {title === "🔔 Job Alerts Agent" && <>
-                    <p className="mt-3 text-xs font-medium text-neutral-700">
-                      Example chat below 👇
-                    </p>
+                    <div className="mt-3 inline-block border border-gray-800 bg-gray-100 px-2 py-1 rounded-lg">
+                      <p className="text-xs font-medium text-neutral-700">
+                        Example chat below 👇
+                      </p>
+                    </div>
                     <img src="/lovable-uploads/e5a7f299-f690-47de-a1b5-f44cfc229925.png" alt="Job Alerts Agent conversation interface" className="mt-2 w-full max-w-xs rounded-lg shadow-md" />
                   </>}
               </div>
