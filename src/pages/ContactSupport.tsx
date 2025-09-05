@@ -11,11 +11,11 @@ const ContactSupport = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black text-slate-50 font-inter">
+    <div className="min-h-screen bg-background text-foreground font-inter">
       <div className="max-w-4xl mx-auto px-4 py-12">
         <button 
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-sky-400 hover:text-sky-300 transition-colors mb-8"
+          className="flex items-center gap-2 text-cyan-400 dark:text-cyan-300 hover:text-cyan-300 dark:hover:text-cyan-200 transition-colors mb-8"
         >
           <ArrowLeft size={20} />
           Back to Home
@@ -23,20 +23,20 @@ const ContactSupport = () => {
 
         <div className="space-y-8">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent mb-4">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-300 dark:from-cyan-300 dark:to-cyan-200 bg-clip-text text-transparent mb-4">
               Contact Support
             </h1>
-            <p className="text-gray-400 text-lg">We're here to help you succeed in your career journey</p>
+            <p className="text-muted-foreground text-lg">We're here to help you succeed in your career journey</p>
           </div>
 
-          <div className="prose prose-invert prose-sky max-w-none">
+          <div className="prose prose-invert dark:prose-invert prose-cyan max-w-none">
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-white mb-4">Get in Touch</h2>
-              <p className="text-gray-300 leading-relaxed mb-6">
+              <h2 className="text-2xl font-semibold text-foreground mb-4">Get in Touch</h2>
+              <p className="text-muted-foreground leading-relaxed mb-6">
                 Our dedicated support team is committed to helping you make the most of Aspirely.ai's AI-powered career tools. Whether you have questions about our features, need technical assistance, or want guidance on optimizing your job search strategy, we're here to support you every step of the way.
               </p>
               
-              <div className="bg-gradient-to-r from-sky-900/50 to-blue-900/50 p-8 rounded-xl border border-sky-500/30 shadow-2xl">
+              <div className="bg-gradient-to-r from-cyan-100/20 to-cyan-200/20 dark:from-cyan-900/50 dark:to-cyan-800/50 p-8 rounded-xl border border-cyan-500/30 shadow-2xl">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="bg-sky-500 p-3 rounded-full">
                     <Mail className="w-6 h-6 text-white" />

@@ -8,7 +8,7 @@ const PrivacyPolicy = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  return <div className="min-h-screen bg-black text-slate-50 font-inter">
+  return <div className="min-h-screen bg-background text-foreground font-inter">
       <Helmet>
         <title>Privacy Policy - Aspirely.ai | AI-Powered Job Hunting Platform</title>
         <meta name="description" content="Aspirely.ai Privacy Policy - Learn how we collect, use, and protect your data in our AI-powered job hunting platform. Comprehensive data handling and user rights information." />
@@ -39,20 +39,20 @@ const PrivacyPolicy = () => {
         </script>
       </Helmet>
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <button onClick={() => navigate('/')} className="flex items-center gap-2 text-sky-400 hover:text-sky-300 transition-colors mb-8">
+        <button onClick={() => navigate('/')} className="flex items-center gap-2 text-cyan-400 dark:text-cyan-300 hover:text-cyan-300 dark:hover:text-cyan-200 transition-colors mb-8">
           <ArrowLeft size={20} />
           Back to Home
         </button>
 
         <div className="space-y-8">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent mb-4">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-300 dark:from-cyan-300 dark:to-cyan-200 bg-clip-text text-transparent mb-4">
               Privacy Policy
             </h1>
-            <p className="text-gray-400">Last updated: {new Date().toLocaleDateString()}</p>
+            <p className="text-muted-foreground">Last updated: {new Date().toLocaleDateString()}</p>
           </div>
 
-          <div className="prose prose-invert prose-sky max-w-none">
+          <div className="prose prose-invert dark:prose-invert prose-cyan max-w-none">
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-white mb-4">1. Introduction</h2>
               <p className="text-gray-300 leading-relaxed mb-4">

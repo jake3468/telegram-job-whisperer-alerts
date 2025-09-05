@@ -64,15 +64,15 @@ const Blogs = () => {
     });
   };
   if (loading) {
-    return <div className="min-h-screen bg-black text-white flex items-center justify-center">
+    return <div className="min-h-screen bg-background text-foreground">
         <div className="text-xl">Loading blogs...</div>
       </div>;
   }
-  return <div className="min-h-screen bg-black text-white">
+  return <div className="min-h-screen bg-background text-foreground">
       {/* Back to Home Button */}
       <div className="pt-8 px-4">
         <div className="max-w-6xl mx-auto">
-          <Link to="/" className="inline-flex items-center text-sky-400 hover:text-sky-300 mb-8 transition-colors">
+          <Link to="/" className="inline-flex items-center text-cyan-400 dark:text-cyan-300 hover:text-cyan-300 dark:hover:text-cyan-200 mb-8 transition-colors">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Link>
@@ -82,8 +82,8 @@ const Blogs = () => {
       {/* Hero Section */}
       <div className="pb-12 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-orbitron font-bold mb-6 bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-400 bg-clip-text text-transparent">Our Blogs</h1>
-          <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+          <h1 className="text-4xl md:text-6xl font-orbitron font-bold mb-6 bg-gradient-to-r from-cyan-400 via-cyan-300 to-cyan-200 dark:from-cyan-300 dark:via-cyan-200 dark:to-cyan-100 bg-clip-text text-transparent">Our Blogs</h1>
+          <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
             Insights, tips, and industry updates to help you excel in your career journey
           </p>
           
@@ -91,15 +91,15 @@ const Blogs = () => {
           <div className="max-w-2xl mx-auto space-y-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <Input type="text" placeholder="Search blogs..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10 bg-gray-900 border-gray-700 text-white placeholder-gray-400" />
+              <Input type="text" placeholder="Search blogs..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10 bg-card border-border text-foreground placeholder-muted-foreground" />
             </div>
             
             {/* Tags */}
             <div className="flex flex-wrap gap-2 justify-center">
-              <button onClick={() => setSelectedTag(null)} className={`px-3 py-1 rounded-full text-sm transition-colors ${!selectedTag ? 'bg-sky-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}>
+              <button onClick={() => setSelectedTag(null)} className={`px-3 py-1 rounded-full text-sm transition-colors ${!selectedTag ? 'bg-cyan-600 text-white dark:bg-cyan-500 dark:text-white' : 'bg-card border border-border text-foreground hover:bg-muted'}`}>
                 All
               </button>
-              {allTags.map(tag => <button key={tag} onClick={() => setSelectedTag(tag)} className={`px-3 py-1 rounded-full text-sm transition-colors ${selectedTag === tag ? 'bg-sky-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}>
+              {allTags.map(tag => <button key={tag} onClick={() => setSelectedTag(tag)} className={`px-3 py-1 rounded-full text-sm transition-colors ${selectedTag === tag ? 'bg-cyan-600 text-white dark:bg-cyan-500 dark:text-white' : 'bg-card border border-border text-foreground hover:bg-muted'}`}>
                   {tag}
                 </button>)}
             </div>
@@ -112,7 +112,7 @@ const Blogs = () => {
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl font-orbitron font-bold mb-8 text-center">Featured Posts</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredBlogs.map(blog => <Card key={blog.id} className="bg-gray-900 border-gray-700 hover:border-sky-500 transition-colors">
+              {featuredBlogs.map(blog => <Card key={blog.id} className="bg-card border-border hover:border-cyan-500/50 dark:hover:border-cyan-400/50 transition-colors">
                   <Link to={`/blog/${blog.slug}`} onClick={() => window.scrollTo(0, 0)}>
                     {blog.thumbnail_url && <div className="aspect-video bg-gray-800 rounded-t-lg overflow-hidden">
                         <img src={blog.thumbnail_url} alt={blog.title} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
@@ -124,7 +124,7 @@ const Blogs = () => {
                         <User className="w-4 h-4 ml-2" />
                         {blog.author_name}
                       </div>
-                      <h3 className="text-xl font-semibold text-white hover:text-sky-400 transition-colors">
+                      <h3 className="text-xl font-semibold text-foreground hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">
                         {blog.title}
                       </h3>
                     </CardHeader>
