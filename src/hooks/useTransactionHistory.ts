@@ -33,14 +33,19 @@ type TransactionHistoryItem = {
 };
 
 export const useTransactionHistory = () => {
-  const { userProfile } = useUserProfile();
-  const { user } = useUser();
+  const { userProfile, loading: profileLoading } = useUserProfile();
+  const { user, isLoaded: userLoaded } = useUser();
   
   return useQuery({
-    queryKey: ['transaction_history', user?.id, userProfile?.user_id],
+    queryKey: ['transaction_history', user?.id],
     queryFn: async () => {
-      if (!user?.id || !userProfile?.user_id) {
-        console.warn('[useTransactionHistory] No user ID available');
+      if (!user?.id) {
+        console.warn('[useTransactionHistory] No Clerk user ID available');
+        return [];
+      }
+
+      if (!userLoaded) {
+        console.warn('[useTransactionHistory] User not loaded yet');
         return [];
       }
 
@@ -213,7 +218,7 @@ export const useTransactionHistory = () => {
         throw err;
       }
     },
-    enabled: !!userProfile?.user_id && !!user?.id,
+    enabled: !!user?.id && userLoaded && !profileLoading,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
