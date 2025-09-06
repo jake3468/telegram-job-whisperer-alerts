@@ -173,19 +173,19 @@ const HeroSection = () => {
             {/* Avatar Group with Rating */}
             <div className="flex items-center justify-start gap-4 mb-6">
               <div className="flex -space-x-2">
-                <Avatar className="h-8 w-8 border-2 border-white">
+                <Avatar className="h-8 w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Remy Sharp" />
                   <AvatarFallback>RS</AvatarFallback>
                 </Avatar>
-                <Avatar className="h-8 w-8 border-2 border-white">
+                <Avatar className="h-8 w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Travis Howard" />
                   <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
-                <Avatar className="h-8 w-8 border-2 border-white">
+                <Avatar className="h-8 w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="Agnes Walker" />
                   <AvatarFallback>AW</AvatarFallback>
                 </Avatar>
-                <Avatar className="h-8 w-8 border-2 border-white">
+                <Avatar className="h-8 w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="Trevor Henderson" />
                   <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
@@ -196,7 +196,7 @@ const HeroSection = () => {
                   <span>⭐⭐⭐⭐⭐</span>
                 </div>
                 <div className="text-foreground text-sm text-left">
-                  <span className="italic text-sm font-medium">Loved by 300+ users worldwide</span>
+                  <span className="italic text-sm font-medium">Loved by <span className="font-bold">300+</span> users worldwide</span>
                 </div>
               </div>
             </div>
