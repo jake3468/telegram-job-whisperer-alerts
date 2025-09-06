@@ -5,7 +5,7 @@ import { useUser } from '@clerk/clerk-react';
 import Lottie from 'lottie-react';
 import LightRays from './LightRays';
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
-import { HeroVideo } from '@/components/HeroVideo';
+import { YouTubeHeroVideo } from '@/components/YouTubeHeroVideo';
 
 // Preload rocket animation immediately when module loads
 const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json';
@@ -113,7 +113,7 @@ const HeroSection = () => {
           
           {/* Hero Video - Centered in left side, aligned with hero text */}
           <div className="hidden md:flex justify-center items-start mb-8 md:mb-0 md:pr-8">
-            <HeroVideo className="w-full max-w-xs" />
+            <YouTubeHeroVideo className="w-full max-w-xs" />
           </div>
           
           {/* Hero Content - Center aligned with mobile preview */}
@@ -204,7 +204,7 @@ const HeroSection = () => {
 
           {/* Hero Video - Shows fully on mobile, larger size and reduced spacing */}
           <div className="flex md:hidden justify-center items-center mt-6 mb-2 px-2">
-            <HeroVideo className="w-full max-w-[320px]" />
+            <YouTubeHeroVideo className="w-full max-w-[320px]" />
           </div>
 
         <SignedIn>
