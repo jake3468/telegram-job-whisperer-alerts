@@ -161,6 +161,7 @@ const LinkedInPosts = () => {
     onCreditsDeducted: () => {},
     // No longer needed
     onPostsReady: data => {
+      console.log('🎯 Timeout fallback triggered - checking post completion');
       const linkedInPostData: LinkedInPostData = {
         post_heading_1: data.post_heading_1,
         post_content_1: data.post_content_1,
@@ -170,7 +171,18 @@ const LinkedInPosts = () => {
         post_content_3: data.post_content_3
       };
       setPostsData(linkedInPostData);
-      setIsGenerating(false);
+      
+      // Only stop generating if posts are actually ready
+      if (areAllPostsReady(linkedInPostData)) {
+        console.log('✅ All posts ready via timeout fallback - stopping loading');
+        setIsGenerating(false);
+        toast({
+          title: "LinkedIn Posts Generated!",
+          description: "Your 3 LinkedIn post variations have been created successfully."
+        });
+      } else {
+        console.log('⏳ Posts not complete via timeout fallback - keeping loading state');
+      }
     }
   });
   useEffect(() => {
