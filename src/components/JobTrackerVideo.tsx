@@ -1,242 +1,101 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
-import { useVideoRateLimiter } from '@/hooks/useVideoRateLimiter';
+import { logger } from '@/utils/logger';
 
-interface JobTrackerVideoProps {
+interface JobTrackerAnimationProps {
   className?: string;
   showControls?: boolean;
 }
 
-export const JobTrackerVideo: React.FC<JobTrackerVideoProps> = ({ 
-  className = '',
-  showControls = true 
+export const JobTrackerVideo: React.FC<JobTrackerAnimationProps> = ({ 
+  className = ''
 }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
-  const [videoUrls, setVideoUrls] = useState<{ webm: string | null; mp4: string | null }>({ webm: null, mp4: null });
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [rateLimitBlocked, setRateLimitBlocked] = useState(false);
-  const [isInView, setIsInView] = useState(false);
-  const [hasLoaded, setHasLoaded] = useState(false);
-  
-  const { checkRateLimit } = useVideoRateLimiter();
-  const videoPath = 'job-tracker-demo';
+  const [LottieComponent, setLottieComponent] = useState<React.ComponentType<any> | null>(null);
+  const [animationData, setAnimationData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
-  // Generate session ID for tracking
-  const sessionId = useCallback(() => {
-    return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  // Load Lottie React module
+  useEffect(() => {
+    import('lottie-react').then(module => {
+      setLottieComponent(() => module.default);
+    }).catch(error => {
+      logger.error('Failed to load Lottie React module:', error);
+      setHasError(true);
+      setIsLoading(false);
+    });
   }, []);
 
-  // Track video analytics with rate limiting
-  const trackVideoPlay = useCallback(async () => {
-    try {
-      const rateCheck = await checkRateLimit(videoPath, navigator.userAgent, sessionId());
-      
-      if (!rateCheck.allowed) {
-        console.warn('Video access blocked:', rateCheck.reason);
-        setRateLimitBlocked(true);
-        return false;
-      }
-
-      return true;
-    } catch (err) {
-      console.warn('Rate limiting check failed, allowing video to play:', err);
-      // If rate limiter fails, allow the video to play rather than blocking it
-      return true;
-    }
-  }, [videoPath, sessionId, checkRateLimit]);
-
-  // Intersection Observer for lazy loading
+  // Load animation data from Supabase Storage
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        setIsInView(entry.isIntersecting);
+    const fetchAnimation = async () => {
+      try {
+        setIsLoading(true);
+        setHasError(false);
         
-        if (entry.isIntersecting && !hasLoaded) {
-          // Start loading video when it comes into view
-          loadVideos();
-        } else if (!entry.isIntersecting && videoRef.current) {
-          // Pause video when it goes out of view
-          videoRef.current.pause();
-          setIsPlaying(false);
+        const animationUrl = supabase.storage
+          .from('animations')
+          .getPublicUrl('business workshop.json');
+
+        const response = await fetch(animationUrl.data.publicUrl);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch animation: ${response.status} ${response.statusText}`);
         }
-      },
-      {
-        threshold: 0.3, // Trigger when 30% of the video is visible
-        rootMargin: '50px' // Start loading 50px before it's visible
-      }
-    );
-
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
-
-    return () => {
-      if (containerRef.current) {
-        observer.unobserve(containerRef.current);
+        
+        const data = await response.json();
+        setAnimationData(data);
+      } catch (error) {
+        logger.error('Failed to load business workshop animation:', error);
+        setHasError(true);
+      } finally {
+        setIsLoading(false);
       }
     };
-  }, [hasLoaded]);
 
-  // Load video URLs from Supabase Storage
-  const loadVideos = useCallback(async () => {
-    if (hasLoaded) return; // Prevent multiple loads
-    
-    setIsLoading(true);
-    setHasLoaded(true);
-    
-    try {
-      // Skip rate limiting for demo video and load directly
-      const webmData = supabase.storage
-        .from('hero-videos')
-        .getPublicUrl(`${videoPath}.webm`);
+    fetchAnimation();
+  }, []);
 
-      const mp4Data = supabase.storage
-        .from('hero-videos')
-        .getPublicUrl(`${videoPath}.mp4`);
-
-      setVideoUrls({
-        webm: webmData.data.publicUrl,
-        mp4: mp4Data.data.publicUrl
-      });
-    } catch (err) {
-      console.error('Error loading videos:', err);
-      setError('Failed to load videos');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [videoPath, hasLoaded]);
-
-  // Auto-play when video comes into view and is loaded
-  useEffect(() => {
-    if (isInView && videoRef.current && videoUrls.webm && !isPlaying) {
-      videoRef.current.play().catch(() => {
-        // Autoplay might be blocked, that's fine
-        console.log('Autoplay blocked, user interaction required');
-      });
-    }
-  }, [isInView, videoUrls.webm, isPlaying]);
-
-  const togglePlayPause = async () => {
-    if (!videoRef.current) return;
-
-    try {
-      if (isPlaying) {
-        videoRef.current.pause();
-        setIsPlaying(false);
-      } else {
-        await videoRef.current.play();
-        setIsPlaying(true);
-      }
-    } catch (err) {
-      console.error('Play/pause error:', err);
-    }
-  };
-
-  const toggleMute = () => {
-    if (!videoRef.current) return;
-    videoRef.current.muted = !videoRef.current.muted;
-    setIsMuted(videoRef.current.muted);
-  };
-
-  // Show placeholder when not loaded yet
-  if (!hasLoaded || isLoading) {
+  // Loading state
+  if (isLoading) {
     return (
-      <div ref={containerRef} className={`relative ${className}`}>
-        <div className="relative h-[160px] md:h-[200px] lg:h-[240px] rounded-3xl overflow-hidden shadow-2xl border border-gray-800/50">
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-gray-900 to-black">
-            <div className="text-center">
-              <div className="text-4xl mb-3">📋</div>
-              <div className="text-gray-400 text-sm">
-                {isLoading ? 'Loading job tracker demo...' : 'Scroll to view demo'}
-              </div>
-            </div>
-          </div>
+      <div className={`w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center animate-pulse ${className}`}>
+        <div className="text-gray-500 text-sm">Loading animation...</div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (hasError) {
+    return (
+      <div className={`w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300 ${className}`}>
+        <div className="text-center text-gray-500">
+          <div className="text-2xl mb-2">🎬</div>
+          <div className="text-sm">Animation unavailable</div>
         </div>
       </div>
     );
   }
 
-  if (error || rateLimitBlocked || (!videoUrls.webm && !videoUrls.mp4)) {
+  // Render Lottie animation
+  if (LottieComponent && animationData) {
     return (
-      <div ref={containerRef} className={`relative ${className}`}>
-        <div className="relative h-[160px] md:h-[200px] lg:h-[240px] rounded-3xl overflow-hidden shadow-2xl border border-gray-800/50">
-          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-gray-900 to-black p-6 text-center">
-            <div className="text-4xl mb-3">📋</div>
-            <div className="text-gray-300 text-sm mb-1">
-              {rateLimitBlocked ? 'Demo Temporarily Limited' : 'Job Tracker Demo Coming Soon!'}
-            </div>
-            <div className="text-gray-500 text-xs">
-              {rateLimitBlocked ? 'Please try again later' : 'Interactive demo will appear here'}
-            </div>
-          </div>
-        </div>
-      </div>
+      <LottieComponent 
+        animationData={animationData} 
+        loop={true} 
+        autoplay={true} 
+        style={{
+          width: '100%',
+          height: 'auto'
+        }} 
+        className={className}
+      />
     );
   }
 
+  // Fallback loading state
   return (
-    <div ref={containerRef} className={`relative group ${className}`}>
-        <div className="relative h-[160px] md:h-[200px] lg:h-[240px] rounded-3xl overflow-hidden shadow-2xl border border-gray-800/50">
-        {/* Video */}
-        <video
-          ref={videoRef}
-          className="w-full h-full object-cover bg-black"
-          loop
-          playsInline
-          muted={isMuted}
-          preload="metadata"
-          onLoadedData={() => {
-            setIsLoading(false);
-            // Auto-play if in view
-            if (isInView && videoRef.current) {
-              videoRef.current.play().catch(console.warn);
-            }
-          }}
-          onCanPlay={() => {
-            // Auto-play if in view
-            if (isInView && videoRef.current && !isPlaying) {
-              videoRef.current.play().catch(console.warn);
-            }
-          }}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
-        >
-          {videoUrls.webm && <source src={videoUrls.webm} type="video/webm" />}
-          {videoUrls.mp4 && <source src={videoUrls.mp4} type="video/mp4" />}
-          Your browser does not support the video tag.
-        </video>
-
-        {/* Video Controls Overlay */}
-        {showControls && (
-          <div className="absolute inset-0 bg-transparent group-hover:bg-black/10 transition-colors duration-200 pointer-events-none">
-            <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-auto">
-              <button
-                onClick={togglePlayPause}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-colors"
-                aria-label={isPlaying ? 'Pause demo' : 'Play demo'}
-              >
-                {isPlaying ? <Pause className="w-4 h-4 text-white" /> : <Play className="w-4 h-4 text-white ml-0.5" />}
-              </button>
-              <button
-                onClick={toggleMute}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-colors"
-                aria-label={isMuted ? 'Unmute' : 'Mute'}
-              >
-                {isMuted ? <VolumeX className="w-4 h-4 text-white" /> : <Volume2 className="w-4 h-4 text-white" />}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Overlay Content */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/80 via-black/50 to-transparent pointer-events-none" />
-      </div>
+    <div className={`w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center ${className}`}>
+      <div className="text-gray-500 text-sm">Loading animation...</div>
     </div>
   );
 };
