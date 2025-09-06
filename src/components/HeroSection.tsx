@@ -196,7 +196,7 @@ const HeroSection = () => {
                   <span>⭐⭐⭐⭐⭐</span>
                 </div>
                 <div className="text-foreground text-sm text-left">
-                  <span className="italic text-base">Loved by 300+ users worldwide</span>
+                  <span className="italic text-sm font-medium">Loved by 300+ users worldwide</span>
                 </div>
               </div>
             </div>
