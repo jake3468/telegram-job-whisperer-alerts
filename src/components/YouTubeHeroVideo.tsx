@@ -52,21 +52,18 @@ export const YouTubeHeroVideo: React.FC<YouTubeHeroVideoProps> = ({
   if (isLoading) {
     return (
       <div ref={containerRef} className={`relative ${className}`}>
-        {/* iPhone Frame - Loading State */}
-        <div className="relative w-56 h-[480px] mx-auto">
-          {/* iPhone Outer Frame */}
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2.5rem] shadow-2xl border-2 border-slate-700">
-            {/* iPhone Notch */}
-            <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-24 h-6 bg-black rounded-b-2xl z-10"></div>
-            
-            {/* iPhone Inner Screen */}
-            <div className="absolute top-3 left-3 right-3 bottom-3 bg-black rounded-[2rem] overflow-hidden">
+        {/* Mobile Phone Frame - Loading State */}
+        <div className="relative w-64 h-[550px] mx-auto">
+          {/* Phone Outer Frame with thin bezels */}
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2rem] shadow-2xl border border-slate-600">
+            {/* Phone Inner Screen - Very thin bezels */}
+            <div className="absolute top-2 left-2 right-2 bottom-2 bg-slate-800 rounded-[1.5rem] overflow-hidden">
               {/* Thumbnail Loading State */}
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-slate-700 to-slate-800">
                 <img 
                   src={thumbnailUrl} 
                   alt="Video preview"
-                  className="w-full h-full object-cover rounded-[2rem]"
+                  className="w-full h-full object-cover rounded-[1.5rem]"
                   onLoad={() => !isMobile && setIsLoading(false)}
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -77,8 +74,12 @@ export const YouTubeHeroVideo: React.FC<YouTubeHeroVideoProps> = ({
               </div>
             </div>
             
-            {/* iPhone Home Indicator */}
-            <div className="absolute bottom-1.5 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-slate-600 rounded-full"></div>
+            {/* Phone Details - Thin */}
+            <div className="absolute top-0.5 left-1/2 transform -translate-x-1/2 flex items-center gap-1">
+              <div className="w-1.5 h-1.5 bg-slate-500 rounded-full"></div>
+              <div className="w-8 h-0.5 bg-slate-500 rounded-full"></div>
+            </div>
+            <div className="absolute bottom-0.5 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-slate-500 rounded-full"></div>
           </div>
         </div>
       </div>
@@ -87,20 +88,17 @@ export const YouTubeHeroVideo: React.FC<YouTubeHeroVideoProps> = ({
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
-      {/* iPhone Frame */}
-      <div className="relative w-56 h-[480px] mx-auto">
-        {/* iPhone Outer Frame */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2.5rem] shadow-2xl border-2 border-slate-700">
-          {/* iPhone Notch */}
-          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-24 h-6 bg-black rounded-b-2xl z-10"></div>
-          
-          {/* iPhone Inner Screen */}
-          <div className="absolute top-3 left-3 right-3 bottom-3 bg-black rounded-[2rem] overflow-hidden">
+      {/* Mobile Phone Frame - Full outline with thin edges */}
+      <div className="relative w-64 h-[550px] mx-auto">
+        {/* Phone Outer Frame with thinner bezels */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2rem] shadow-2xl border border-slate-600">
+          {/* Phone Inner Screen - Very thin bezels to show full video */}
+          <div className="absolute top-2 left-2 right-2 bottom-2 bg-black rounded-[1.5rem] overflow-hidden">
             {shouldPlay ? (
               /* YouTube Video Embed */
               <iframe
                 src={embedUrl}
-                className="w-full h-full rounded-[2rem]"
+                className="w-full h-full rounded-[1.5rem]"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 title="YouTube video player"
@@ -111,7 +109,7 @@ export const YouTubeHeroVideo: React.FC<YouTubeHeroVideoProps> = ({
                 <img 
                   src={thumbnailUrl} 
                   alt="Video preview"
-                  className="w-full h-full object-cover rounded-[2rem]"
+                  className="w-full h-full object-cover rounded-[1.5rem]"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <button 
@@ -125,8 +123,14 @@ export const YouTubeHeroVideo: React.FC<YouTubeHeroVideoProps> = ({
             )}
           </div>
           
-          {/* iPhone Home Indicator */}
-          <div className="absolute bottom-1.5 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-slate-600 rounded-full"></div>
+          {/* Phone Details - Thin and minimal */}
+          {/* Top notch area */}
+          <div className="absolute top-0.5 left-1/2 transform -translate-x-1/2 flex items-center gap-1">
+            <div className="w-1.5 h-1.5 bg-slate-500 rounded-full"></div>
+            <div className="w-8 h-0.5 bg-slate-500 rounded-full"></div>
+          </div>
+          {/* Bottom home indicator */}
+          <div className="absolute bottom-0.5 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-slate-500 rounded-full"></div>
         </div>
       </div>
     </div>
