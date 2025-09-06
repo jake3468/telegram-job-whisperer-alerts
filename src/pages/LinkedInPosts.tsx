@@ -72,6 +72,7 @@ const LinkedInPosts = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [submissionInProgress, setSubmissionInProgress] = useState(false);
 
   // Use cached LinkedIn posts hook for instant data display
   const {
@@ -161,6 +162,7 @@ const LinkedInPosts = () => {
     onCreditsDeducted: () => {},
     // No longer needed
     onPostsReady: data => {
+      console.log('🎯 Timeout fallback triggered - checking post completion');
       const linkedInPostData: LinkedInPostData = {
         post_heading_1: data.post_heading_1,
         post_content_1: data.post_content_1,
@@ -170,7 +172,18 @@ const LinkedInPosts = () => {
         post_content_3: data.post_content_3
       };
       setPostsData(linkedInPostData);
-      setIsGenerating(false);
+      
+      // Only stop generating if posts are actually ready
+      if (areAllPostsReady(linkedInPostData)) {
+        console.log('✅ All posts ready via timeout fallback - stopping loading');
+        setIsGenerating(false);
+        toast({
+          title: "LinkedIn Posts Generated!",
+          description: "Your 3 LinkedIn post variations have been created successfully."
+        });
+      } else {
+        console.log('⏳ Posts not complete via timeout fallback - keeping loading state');
+      }
     }
   });
   useEffect(() => {
@@ -257,9 +270,9 @@ const LinkedInPosts = () => {
               post_content_3: data.post_content_3
             };
             setPostsData(linkedInPostData);
-            if (areAllPostsReady(linkedInPostData)) {
-              setIsGenerating(false);
-            }
+            // REMOVED: Don't stop loading here - let real-time subscription handle completion
+            // Only display the data, don't change loading state
+            console.log('📋 Data loaded, waiting for real-time confirmation of completion');
           }
         }, 3, 'check existing post data');
       } catch (err) {
@@ -310,6 +323,13 @@ const LinkedInPosts = () => {
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent multiple submissions
+    if (submissionInProgress || isSubmitting || isGenerating) {
+      console.log('🚫 Submission blocked - already in progress');
+      return;
+    }
+    
     if (!user || !userProfile) {
       toast({
         title: "Authentication Required",
@@ -362,6 +382,7 @@ const LinkedInPosts = () => {
       });
       return;
     }
+    setSubmissionInProgress(true);
     setIsSubmitting(true);
     setIsGenerating(true);
     setPostsData(null);
@@ -406,6 +427,7 @@ const LinkedInPosts = () => {
       });
     } finally {
       setIsSubmitting(false);
+      setSubmissionInProgress(false);
     }
   };
   const resetForm = () => {
@@ -419,6 +441,7 @@ const LinkedInPosts = () => {
     setPostsData(null);
     setIsGenerating(false);
     setCurrentPostId(null);
+    setSubmissionInProgress(false);
   };
   const shouldShowResults = postsData && areAllPostsReady(postsData);
   const shouldShowLoading = isGenerating && !shouldShowResults;
@@ -560,8 +583,8 @@ const LinkedInPosts = () => {
                       </div>
 
                       <div className="flex flex-col sm:flex-row gap-3 pt-4 max-w-full">
-                        <Button type="submit" disabled={isSubmitting || !formData.topic.trim() || isGenerating || completionLoading} className="flex-1 bg-gradient-to-r from-white via-white to-white hover:from-white/90 hover:via-white/90 hover:to-white/90 text-black font-orbitron font-bold text-base h-12 shadow-2xl shadow-gray-300/50 border-0 disabled:opacity-50 disabled:cursor-not-allowed min-w-0">
-                          {isSubmitting ? 'Submitting...' : completionLoading ? 'Checking Profile...' : 'Generate LinkedIn Posts'}
+                        <Button type="submit" disabled={isSubmitting || !formData.topic.trim() || isGenerating || completionLoading || submissionInProgress} className="flex-1 bg-gradient-to-r from-white via-white to-white hover:from-white/90 hover:via-white/90 hover:to-white/90 text-black font-orbitron font-bold text-base h-12 shadow-2xl shadow-gray-300/50 border-0 disabled:opacity-50 disabled:cursor-not-allowed min-w-0">
+                          {isSubmitting || submissionInProgress ? 'Submitting...' : completionLoading ? 'Checking Profile...' : isGenerating ? 'Generating...' : 'Generate LinkedIn Posts'}
                         </Button>
                         
                         <Button type="button" onClick={resetForm} variant="outline" className="border-teal-400/25 text-base h-12 px-6 flex-shrink-0 text-zinc-50 bg-blue-800 hover:bg-blue-700">

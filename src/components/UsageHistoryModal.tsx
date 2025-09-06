@@ -1,18 +1,46 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { History, Loader2, CreditCard, Coins, X } from 'lucide-react';
+import { History, Loader2, CreditCard, Coins, X, RefreshCw } from 'lucide-react';
 import { useTransactionHistory } from '@/hooks/useTransactionHistory';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useToast } from '@/hooks/use-toast';
 const UsageHistoryModal = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { toast } = useToast();
+  
   const {
     data: transactions,
     isLoading,
-    error
+    error,
+    refetch,
+    isFetching
   } = useTransactionHistory();
+
+  // Refetch data when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      refetch().catch(err => {
+        toast({
+          title: "Unable to load usage history",
+          description: "Please try again in a moment.",
+          variant: "destructive",
+        });
+      });
+    }
+  }, [isOpen, refetch, toast]);
+
+  const handleRefresh = () => {
+    refetch().catch(err => {
+      toast({
+        title: "Unable to refresh data",
+        description: "Please try again in a moment.",
+        variant: "destructive",
+      });
+    });
+  };
   const formatAmount = (amount: number) => {
     if (amount > 0) {
       return `+${amount}`;
@@ -102,22 +130,49 @@ const UsageHistoryModal = () => {
             <DialogTitle className="text-xl font-orbitron font-bold text-blue-100">
               Transaction History
             </DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsOpen(false)}
-              className="text-blue-200 hover:text-blue-100 hover:bg-blue-800/30"
-            >
-              <X className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleRefresh}
+                disabled={isLoading || isFetching}
+                className="text-blue-200 hover:text-blue-100 hover:bg-blue-800/30"
+              >
+                <RefreshCw className={`w-4 h-4 ${(isLoading || isFetching) ? 'animate-spin' : ''}`} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsOpen(false)}
+                className="text-blue-200 hover:text-blue-100 hover:bg-blue-800/30"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         </DialogHeader>
         
-        {isLoading ? <div className="flex items-center justify-center py-8">
+        {(isLoading || isFetching) ? <div className="flex items-center justify-center py-8">
             <Loader2 className="w-6 h-6 animate-spin text-blue-400" />
-            <span className="ml-2 text-blue-200">Loading transactions...</span>
-          </div> : error ? <div className="text-center py-8 text-red-300">
-            Error loading transaction history
+            <span className="ml-2 text-blue-200">
+              {isLoading ? 'Loading transactions...' : 'Refreshing data...'}
+            </span>
+          </div> : error ? <div className="text-center py-8">
+            <div className="text-red-300 mb-4">
+              Error loading transaction history
+            </div>
+            <div className="text-red-200/70 text-sm mb-4">
+              {error instanceof Error ? error.message : 'Please check your connection and try again'}
+            </div>
+            <Button 
+              onClick={handleRefresh}
+              variant="outline" 
+              size="sm" 
+              className="text-blue-200 border-blue-400/30 hover:bg-blue-800/30"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Try Again
+            </Button>
           </div> : <Tabs defaultValue="credits" className="w-full">
             <TabsList className="grid w-full grid-cols-3 bg-slate-800/50 gap-1 p-1 h-auto min-h-[48px]">
               <TabsTrigger value="credits" className="text-blue-200 data-[state=active]:bg-blue-600/30 data-[state=active]:text-blue-100 text-xs px-1 py-2 flex-col gap-1 whitespace-nowrap overflow-hidden">

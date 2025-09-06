@@ -78,13 +78,10 @@ export default function GetMoreCredits() {
       toast.error('Please wait, authentication is loading...');
       return;
     }
-    
+
     // Find the product details for tracking
-    const product = creditPackProducts.find(p => p.product_id === productId) || 
-                   pricingData?.creditPacks.find(p => p.productId === productId);
-    
+    const product = creditPackProducts.find(p => p.product_id === productId) || pricingData?.creditPacks.find(p => p.productId === productId);
     console.log('Buying credit pack with product:', productId);
-    
     if (product) {
       const productDetails = {
         type: 'credit_pack' as const,
@@ -92,7 +89,6 @@ export default function GetMoreCredits() {
         currency: pricingData?.currency || 'USD',
         credits: 'credits_amount' in product ? product.credits_amount : product.credits
       };
-      
       const session = await createCheckoutSession(productId, productDetails);
       if (!session?.url) {
         toast.error('Failed to create checkout session');
@@ -134,7 +130,7 @@ export default function GetMoreCredits() {
 
   // Get display data (cached data is already handled in the hooks)
   const currentBalance = credits ? Number(credits.current_balance) : 0;
-  
+
   // Track pricing page view on mount
   useEffect(() => {
     Analytics.trackViewPricing();
@@ -145,7 +141,7 @@ export default function GetMoreCredits() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex-1">
               <h1 className="text-2xl xs:text-3xl font-inter font-extrabold text-white mb-1 sm:mb-2 drop-shadow tracking-tight animate-fade-in sm:text-4xl">
-                Flexible Pricing Plans
+                Pricing Plans
               </h1>
             </div>
             
@@ -155,7 +151,7 @@ export default function GetMoreCredits() {
                 Refresh
               </Button>}
           </div>
-          <p className="text-blue-100 font-inter font-light mb-1 sm:mb-2 animate-fade-in sm:text-base text-left text-sm">💬 Start with free monthly credits and upgrade anytime - either by purchasing flexible credit packs or a monthly subscription. For any payment-related queries, feel free to reach out to us at &quot;support@aspirely.ai&quot; we're here to help! </p>
+          <p className="text-blue-100 font-inter font-light mb-1 sm:mb-2 animate-fade-in sm:text-base text-left text-sm">💬 Start with free monthly credits and upgrade anytime by purchasing flexible credit packs as you need. For any payment-related queries, feel free to reach out to us at &quot;support@aspirely.ai&quot; we're here to help!</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
             <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in mt-2 md:mt-0 mb-2 sm:mb-0">
               Current Balance:{" "}
@@ -265,8 +261,8 @@ export default function GetMoreCredits() {
                         </Button>
                       </div>
                     </div>) :
-                  // Only show fallback if no database products and not loading
-                  !isProductsLoading && pricingData?.creditPacks.map(pack => <div key={pack.credits} className="bg-gray-700 rounded-md p-3 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300">
+                // Only show fallback if no database products and not loading
+                !isProductsLoading && pricingData?.creditPacks.map(pack => <div key={pack.credits} className="bg-gray-700 rounded-md p-3 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300">
                       <span className="text-white font-medium text-sm mr-4">{pack.credits} credits</span>
                       <div className="flex items-center gap-3">
                         <span className="text-white font-bold text-sm">{pricingData?.currencySymbol}{pack.price}</span>
@@ -306,11 +302,7 @@ export default function GetMoreCredits() {
                     </li>
                     <li className="mt-4 p-3 bg-gray-800/50 rounded-lg border border-gray-600">
                       <div className="flex items-start gap-3">
-                        <img 
-                          src="/lovable-uploads/e5bac2d4-e5d9-4f9d-accf-c8ac205f690b.png" 
-                          alt="Jobs that will vanish by 2030 e-book cover" 
-                          className="w-20 h-28 object-contain rounded shadow-md flex-shrink-0"
-                        />
+                        <img src="/lovable-uploads/e5bac2d4-e5d9-4f9d-accf-c8ac205f690b.png" alt="Jobs that will vanish by 2030 e-book cover" className="w-20 h-28 object-contain rounded shadow-md flex-shrink-0" />
                         <div className="flex-grow">
                           <div className="text-cyan-400 font-semibold text-xs mb-1">FREE E-book:</div>
                           <div className="text-white font-medium text-xs mb-2">"Jobs that will vanish by 2030: 8 Strategies to Save Your Career Before AI Takes Over"</div>

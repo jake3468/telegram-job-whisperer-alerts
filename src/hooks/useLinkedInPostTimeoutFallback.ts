@@ -62,13 +62,9 @@ export const useLinkedInPostTimeoutFallback = ({
           });
 
           if (hasAllPosts) {
-            console.log('⏰ Posts completed, triggering fallback completion (credits will be deducted by N8N)');
-            
+            console.log('⏰ Posts completed, triggering fallback completion');
             onPostsReady(data);
-            toast({
-              title: "LinkedIn Posts Generated!",
-              description: "Your 3 LinkedIn post variations have been created successfully."
-            });
+            // Toast will be handled by the onPostsReady callback in LinkedInPosts
           }
         }
       } catch (error) {
