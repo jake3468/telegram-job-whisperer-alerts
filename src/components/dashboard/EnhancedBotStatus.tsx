@@ -64,8 +64,8 @@ const EnhancedBotStatus = ({
         
         {/* Bot ID Display */}
         {userProfile?.id && (
-          <div className="bg-orange-900/30 border border-orange-600 rounded-lg p-3">
-            <div className="flex items-center justify-between">
+          <div className="bg-gray-900/80 border border-orange-600 rounded-lg p-3">
+            <div className="flex flex-col gap-2">
               <span className="text-orange-200 text-sm font-medium">Your Activation Key:</span>
               <div className="flex items-center gap-2">
                 <code className="text-orange-100 font-mono text-sm bg-orange-800/50 px-2 py-1 rounded">
