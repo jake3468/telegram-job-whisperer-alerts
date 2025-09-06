@@ -165,7 +165,7 @@ const HeroSection = () => {
               
               {/* Discount Badge */}
               <div className="bg-white border border-green-600 dark:bg-green-900/30 dark:border-green-700 rounded-full px-4 py-2 md:px-4 md:py-2 w-auto text-left md:text-center">
-                <span className="text-green-700 dark:text-green-300 text-xs md:text-sm font-normal font-inter">
+                <span className="text-green-700 dark:text-green-300 text-xs md:text-sm font-medium font-inter">
                   Get 50% off with code "ASP123"
                 </span>
               </div>
@@ -173,19 +173,19 @@ const HeroSection = () => {
             {/* Avatar Group with Rating */}
             <div className="flex items-center justify-start gap-4 mb-6">
               <div className="flex -space-x-2">
-                <Avatar className="h-8 w-8 border-2 border-white">
+                <Avatar className="h-8 w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Remy Sharp" />
                   <AvatarFallback>RS</AvatarFallback>
                 </Avatar>
-                <Avatar className="h-8 w-8 border-2 border-white">
+                <Avatar className="h-8 w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Travis Howard" />
                   <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
-                <Avatar className="h-8 w-8 border-2 border-white">
+                <Avatar className="h-8 w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="Agnes Walker" />
                   <AvatarFallback>AW</AvatarFallback>
                 </Avatar>
-                <Avatar className="h-8 w-8 border-2 border-white">
+                <Avatar className="h-8 w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="Trevor Henderson" />
                   <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
@@ -195,8 +195,8 @@ const HeroSection = () => {
                 <div className="flex text-yellow-400 dark:text-yellow-400 mb-1 [text-shadow:_0_0_2px_rgba(0,0,0,0.8)] dark:[text-shadow:none]">
                   <span>⭐⭐⭐⭐⭐</span>
                 </div>
-                <div className="text-foreground text-xs text-left">
-                  <span className="font-bold">255+</span> <span className="italic">professionals winning while others struggle</span>
+                <div className="text-foreground text-sm text-left">
+                  <span className="italic text-sm font-medium">Loved by <span className="font-bold">300+</span> users worldwide</span>
                 </div>
               </div>
             </div>
