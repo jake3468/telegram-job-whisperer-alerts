@@ -132,9 +132,9 @@ const HeroSection = () => {
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden">
-              <span className="text-black dark:text-white px-0.5 py-0 font-bold">Stop applying to</span>
+              <span className="text-black dark:text-white px-0.5 py-0 not-italic">Stop applying to</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-bold">jobs unprepared.</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic"><span className="italic">jobs</span> unprepared.</span>
               <br />
               <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-bold">We'll make you #1</span> 🏆
             </div>
