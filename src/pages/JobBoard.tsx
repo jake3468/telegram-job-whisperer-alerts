@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { Layout } from '@/components/Layout';
 import { Input } from '@/components/ui/input';
@@ -176,56 +176,6 @@ const JobCard = ({
       </div>
     </div>;
 };
-
-// Load More Button Component with Intersection Observer
-interface LoadMoreButtonProps {
-  hasMore: boolean;
-  isLoading: boolean;
-  onLoadMore: () => void;
-  section: string;
-}
-
-const LoadMoreButton = ({ hasMore, isLoading, onLoadMore, section }: LoadMoreButtonProps) => {
-  const observerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
-          onLoadMore();
-        }
-      },
-      { threshold: 0.1, rootMargin: '100px' }
-    );
-
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [hasMore, isLoading, onLoadMore]);
-
-  if (!hasMore) return null;
-
-  return (
-    <div ref={observerRef} className="flex justify-center py-4">
-      {isLoading ? (
-        <div className="flex items-center gap-2 text-blue-300">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400"></div>
-          <span className="text-sm">Loading more {section}...</span>
-        </div>
-      ) : (
-        <Button 
-          onClick={onLoadMore}
-          variant="ghost"
-          className="text-blue-300 hover:text-blue-100 hover:bg-blue-800/30"
-        >
-          Load More {section}
-        </Button>
-      )}
-    </div>
-  );
-};
 const JobBoard = () => {
   const {
     user,
@@ -249,17 +199,10 @@ const JobBoard = () => {
     loading,
     error,
     connectionIssue,
-    loadingMore,
-    hasMorePostedToday,
-    hasMoreLast7Days,
-    hasMoreSaved,
     saveToTracker,
     markJobAsSaved,
     deleteJobFromBoard,
-    forceRefresh,
-    loadMorePostedToday,
-    loadMoreLast7Days,
-    loadMoreSaved
+    forceRefresh
   } = useJobBoardData();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJob, setSelectedJob] = useState<JobBoardItem | null>(null);
@@ -428,17 +371,9 @@ const JobBoard = () => {
                       <p className="text-gray-400 text-lg">
                         {searchTerm ? `No jobs matching "${searchTerm}" found in posted today.` : "No jobs posted today."}
                       </p>
-                    </div> : <>
-                      <div className="space-y-3 w-full max-w-2xl mx-auto">
-                        {filteredPostedTodayJobs.map(job => <JobCard key={job.id} job={job} onView={() => { updateActivity(); setSelectedJob(job); }} onSaveToTracker={() => { updateActivity(); markJobAsSaved(job); }} section="posted-today" />)}
-                      </div>
-                      <LoadMoreButton 
-                        hasMore={hasMorePostedToday} 
-                        isLoading={loadingMore} 
-                        onLoadMore={loadMorePostedToday} 
-                        section="Jobs Posted Today" 
-                      />
-                    </>}
+                    </div> : <div className="space-y-3 w-full max-w-2xl mx-auto">
+                      {filteredPostedTodayJobs.map(job => <JobCard key={job.id} job={job} onView={() => { updateActivity(); setSelectedJob(job); }} onSaveToTracker={() => { updateActivity(); markJobAsSaved(job); }} section="posted-today" />)}
+                    </div>}
                 </TabsContent>
 
                 <TabsContent value="last-7-days" className="space-y-3 mt-4 w-full">
@@ -446,17 +381,9 @@ const JobBoard = () => {
                       <p className="text-gray-400 text-lg">
                         {searchTerm ? `No jobs matching "${searchTerm}" found in last 7 days.` : "No jobs from the last 7 days."}
                       </p>
-                    </div> : <>
-                      <div className="space-y-3 w-full max-w-2xl mx-auto">
-                        {filteredLast7DaysJobs.map(job => <JobCard key={job.id} job={job} onView={() => { updateActivity(); setSelectedJob(job); }} onSaveToTracker={() => { updateActivity(); markJobAsSaved(job); }} section="last-7-days" />)}
-                      </div>
-                      <LoadMoreButton 
-                        hasMore={hasMoreLast7Days} 
-                        isLoading={loadingMore} 
-                        onLoadMore={loadMoreLast7Days} 
-                        section="Jobs from Last 7 Days" 
-                      />
-                    </>}
+                    </div> : <div className="space-y-3 w-full max-w-2xl mx-auto">
+                      {filteredLast7DaysJobs.map(job => <JobCard key={job.id} job={job} onView={() => { updateActivity(); setSelectedJob(job); }} onSaveToTracker={() => { updateActivity(); markJobAsSaved(job); }} section="last-7-days" />)}
+                    </div>}
                 </TabsContent>
 
                 <TabsContent value="saved-to-tracker" className="space-y-3 mt-4 w-full">
@@ -473,17 +400,9 @@ const JobBoard = () => {
                         {searchTerm ? `No saved jobs matching "${searchTerm}" found.` : "No jobs saved yet."}
                       </p>
                       {!searchTerm && <p className="text-gray-500 mt-2">Save jobs from other sections to see them here.</p>}
-                    </div> : <>
-                      <div className="space-y-3 w-full max-w-2xl mx-auto">
-                        {filteredSavedToTrackerJobs.map(job => <JobCard key={job.id} job={job} onView={() => { updateActivity(); setSelectedJob(job); }} onSaveToTracker={() => { updateActivity(); saveToTracker(job); }} onDelete={() => { updateActivity(); deleteJobFromBoard(job); }} section="saved" isAddedToTracker={job.job_reference_id ? jobTrackerStatus[job.job_reference_id] : false} />)}
-                      </div>
-                      <LoadMoreButton 
-                        hasMore={hasMoreSaved} 
-                        isLoading={loadingMore} 
-                        onLoadMore={loadMoreSaved} 
-                        section="Saved Jobs" 
-                      />
-                    </>}
+                    </div> : <div className="space-y-3 w-full max-w-2xl mx-auto">
+                      {filteredSavedToTrackerJobs.map(job => <JobCard key={job.id} job={job} onView={() => { updateActivity(); setSelectedJob(job); }} onSaveToTracker={() => { updateActivity(); saveToTracker(job); }} onDelete={() => { updateActivity(); deleteJobFromBoard(job); }} section="saved" isAddedToTracker={job.job_reference_id ? jobTrackerStatus[job.job_reference_id] : false} />)}
+                    </div>}
                 </TabsContent>
               </div>
             </Tabs>
