@@ -38,7 +38,7 @@ const AuthHeader = () => {
           <img 
             alt="JobBots Logo" 
             className="h-9 w-9 sm:h-10 sm:w-10 drop-shadow-lg" 
-            src="/lovable-uploads/924d7c77-405f-4345-8967-693eebdb7865.jpg" 
+            src="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/assets/logo.jpg"
             loading="eager"
             decoding="async"
             fetchPriority="high"
