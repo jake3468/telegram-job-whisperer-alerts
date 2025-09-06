@@ -22,12 +22,10 @@ const UsageHistoryModal = () => {
   // Refetch data when modal opens
   useEffect(() => {
     if (isOpen) {
-      console.log('[UsageHistoryModal] Modal opened, refetching data...');
       refetch().catch(err => {
-        console.error('[UsageHistoryModal] Error refetching:', err);
         toast({
-          title: "Error loading data",
-          description: "Failed to load transaction history. Please try again.",
+          title: "Unable to load usage history",
+          description: "Please try again in a moment.",
           variant: "destructive",
         });
       });
@@ -36,10 +34,9 @@ const UsageHistoryModal = () => {
 
   const handleRefresh = () => {
     refetch().catch(err => {
-      console.error('[UsageHistoryModal] Error refreshing:', err);
       toast({
-        title: "Error refreshing data",
-        description: "Failed to refresh transaction history. Please try again.",
+        title: "Unable to refresh data",
+        description: "Please try again in a moment.",
         variant: "destructive",
       });
     });

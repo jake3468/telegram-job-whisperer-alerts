@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@clerk/clerk-react';
-import { useUserProfile } from '@/hooks/useUserProfile';
+import { getUserFriendlyErrorMessage } from '@/utils/errorMessages';
 
 type TransactionHistoryItem = {
   id: string;
@@ -33,25 +33,16 @@ type TransactionHistoryItem = {
 };
 
 export const useTransactionHistory = () => {
-  const { userProfile, loading: profileLoading } = useUserProfile();
   const { user, isLoaded: userLoaded } = useUser();
   
   return useQuery({
     queryKey: ['transaction_history', user?.id],
     queryFn: async () => {
-      if (!user?.id) {
-        console.warn('[useTransactionHistory] No Clerk user ID available');
-        return [];
-      }
-
-      if (!userLoaded) {
-        console.warn('[useTransactionHistory] User not loaded yet');
+      if (!user?.id || !userLoaded) {
         return [];
       }
 
       try {
-        console.log('[useTransactionHistory] Fetching transaction history for Clerk user:', user.id);
-        console.log('[useTransactionHistory] User profile ID:', userProfile.user_id);
         
         // First, get the actual user UUID from the users table using Clerk ID
         const { data: userData, error: userError } = await supabase
@@ -61,12 +52,10 @@ export const useTransactionHistory = () => {
           .single();
 
         if (userError || !userData) {
-          console.error('[useTransactionHistory] Error finding user:', userError);
-          throw new Error('User not found');
+          throw new Error('Unable to load your usage history');
         }
 
         const actualUserId = userData.id;
-        console.log('[useTransactionHistory] Found actual user UUID:', actualUserId);
         
         // Get credit transactions - use actual user UUID
         const { data: creditTransactions, error: creditError } = await supabase
@@ -77,8 +66,7 @@ export const useTransactionHistory = () => {
           .limit(50);
 
         if (creditError) {
-          console.error('[useTransactionHistory] Error fetching credit transactions:', creditError);
-          throw creditError;
+          throw new Error('Unable to load your usage history');
         }
 
         // Get AI interview transactions - use actual user UUID
@@ -90,8 +78,7 @@ export const useTransactionHistory = () => {
           .limit(50);
 
         if (aiError) {
-          console.error('[useTransactionHistory] Error fetching AI interview transactions:', aiError);
-          throw aiError;
+          throw new Error('Unable to load your usage history');
         }
 
         // Get ALL payment records (including failed ones) - use actual user UUID
@@ -114,8 +101,7 @@ export const useTransactionHistory = () => {
           .limit(50);
 
         if (paymentError) {
-          console.error('[useTransactionHistory] Error fetching payment records:', paymentError);
-          throw paymentError;
+          throw new Error('Unable to load your usage history');
         }
 
         // Get product details separately
@@ -210,15 +196,14 @@ export const useTransactionHistory = () => {
         // Sort all transactions by date (newest first)
         allTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-        console.log('[useTransactionHistory] Successfully fetched', allTransactions.length, 'transactions');
         return allTransactions;
 
       } catch (err) {
-        console.error('[useTransactionHistory] Exception during fetch:', err);
-        throw err;
+        const friendlyMessage = getUserFriendlyErrorMessage(err);
+        throw new Error(friendlyMessage);
       }
     },
-    enabled: !!user?.id && userLoaded && !profileLoading,
+    enabled: !!user?.id && userLoaded,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
