@@ -195,8 +195,8 @@ const HeroSection = () => {
                 <div className="flex text-yellow-400 dark:text-yellow-400 mb-1 [text-shadow:_0_0_2px_rgba(0,0,0,0.8)] dark:[text-shadow:none]">
                   <span>⭐⭐⭐⭐⭐</span>
                 </div>
-                <div className="text-foreground text-xs text-left">
-                  <span className="font-bold">255+</span> <span className="italic">professionals winning while others struggle</span>
+                <div className="text-foreground text-sm text-left">
+                  <span className="italic text-base">Loved by 300+ users worldwide</span>
                 </div>
               </div>
             </div>
