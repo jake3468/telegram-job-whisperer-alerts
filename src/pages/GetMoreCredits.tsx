@@ -141,7 +141,7 @@ export default function GetMoreCredits() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex-1">
               <h1 className="text-2xl xs:text-3xl font-inter font-extrabold text-white mb-1 sm:mb-2 drop-shadow tracking-tight animate-fade-in sm:text-4xl">
-                Flexible Pricing Plans
+                Pricing Plans
               </h1>
             </div>
             
