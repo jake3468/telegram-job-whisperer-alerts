@@ -34,31 +34,37 @@ const profileItems = [{
   icon: CreditCard
 }];
 
-const toolItems = [{
-  title: 'Company Decoder',
-  url: '/company-role-analysis',
-  icon: Building2
-}, {
-  title: 'Interview Prep',
-  url: '/interview-prep',
-  icon: MessageSquare
-}, {
+const toolItems = [
+// {
+//   title: 'Company Decoder',
+//   url: '/company-role-analysis',
+//   icon: Building2
+// }, {
+//   title: 'Interview Prep',
+//   url: '/interview-prep',
+//   icon: MessageSquare
+// }, 
+{
   title: 'AI Mock Interview',
   url: '/ai-mock-interview',
   icon: Phone
-}, {
-  title: 'Cover Letter',
-  url: '/cover-letter',
-  icon: FileText
-}, {
+}, 
+// {
+//   title: 'Cover Letter',
+//   url: '/cover-letter',
+//   icon: FileText
+// }, 
+{
   title: 'LinkedIn Posts',
   url: '/linkedin-posts',
   icon: Share2
-}, {
-  title: 'Job Analysis',
-  url: '/job-guide',
-  icon: Target
-}];
+}
+// , {
+//   title: 'Job Analysis',
+//   url: '/job-guide',
+//   icon: Target
+// }
+];
 
 export function AppSidebar() {
   const {
