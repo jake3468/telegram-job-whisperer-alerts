@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/logger';
 
-interface JobTrackerVideoProps {
+interface JobTrackerAnimationProps {
   className?: string;
   showControls?: boolean;
 }
 
-export const JobTrackerVideo: React.FC<JobTrackerVideoProps> = ({ 
+export const JobTrackerVideo: React.FC<JobTrackerAnimationProps> = ({ 
   className = ''
 }) => {
   const [LottieComponent, setLottieComponent] = useState<React.ComponentType<any> | null>(null);
@@ -55,43 +55,47 @@ export const JobTrackerVideo: React.FC<JobTrackerVideoProps> = ({
     fetchAnimation();
   }, []);
 
-  return (
-    <div className={`relative ${className}`}>
-      <div className="relative h-[160px] md:h-[200px] lg:h-[240px] rounded-3xl overflow-hidden shadow-2xl border border-gray-800/50">
-        {isLoading ? (
-          <div className="w-full h-full bg-gradient-to-b from-gray-900 to-black flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-4xl mb-3">🏢</div>
-              <div className="text-gray-400 text-sm">Loading workshop animation...</div>
-            </div>
-          </div>
-        ) : hasError ? (
-          <div className="w-full h-full bg-gradient-to-b from-gray-900 to-black flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-4xl mb-3">🏢</div>
-              <div className="text-gray-300 text-sm mb-1">Business Workshop Coming Soon!</div>
-              <div className="text-gray-500 text-xs">Interactive workshop animation will appear here</div>
-            </div>
-          </div>
-        ) : LottieComponent && animationData ? (
-          <LottieComponent 
-            animationData={animationData} 
-            loop={true} 
-            autoplay={true} 
-            style={{
-              width: '100%',
-              height: '100%'
-            }} 
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-b from-gray-900 to-black flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-4xl mb-3">🏢</div>
-              <div className="text-gray-400 text-sm">Loading workshop...</div>
-            </div>
-          </div>
-        )}
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className={`w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center animate-pulse ${className}`}>
+        <div className="text-gray-500 text-sm">Loading animation...</div>
       </div>
+    );
+  }
+
+  // Error state
+  if (hasError) {
+    return (
+      <div className={`w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300 ${className}`}>
+        <div className="text-center text-gray-500">
+          <div className="text-2xl mb-2">🎬</div>
+          <div className="text-sm">Animation unavailable</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render Lottie animation
+  if (LottieComponent && animationData) {
+    return (
+      <LottieComponent 
+        animationData={animationData} 
+        loop={true} 
+        autoplay={true} 
+        style={{
+          width: '100%',
+          height: 'auto'
+        }} 
+        className={className}
+      />
+    );
+  }
+
+  // Fallback loading state
+  return (
+    <div className={`w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center ${className}`}>
+      <div className="text-gray-500 text-sm">Loading animation...</div>
     </div>
   );
 };
