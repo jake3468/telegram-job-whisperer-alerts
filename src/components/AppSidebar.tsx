@@ -29,6 +29,10 @@ const profileItems = [{
   url: '/job-tracker',
   icon: Kanban
 }, {
+  title: 'AI Mock Interview',
+  url: '/ai-mock-interview',
+  icon: Phone
+}, {
   title: 'Pricing Plans',
   url: '/get-more-credits',
   icon: CreditCard
@@ -44,21 +48,21 @@ const toolItems = [
 //   url: '/interview-prep',
 //   icon: MessageSquare
 // }, 
-{
-  title: 'AI Mock Interview',
-  url: '/ai-mock-interview',
-  icon: Phone
-}, 
+// {
+//   title: 'AI Mock Interview',
+//   url: '/ai-mock-interview',
+//   icon: Phone
+// }, 
 // {
 //   title: 'Cover Letter',
 //   url: '/cover-letter',
 //   icon: FileText
 // }, 
-{
-  title: 'LinkedIn Posts',
-  url: '/linkedin-posts',
-  icon: Share2
-}
+// {
+//   title: 'LinkedIn Posts',
+//   url: '/linkedin-posts',
+//   icon: Share2
+// }
 // , {
 //   title: 'Job Analysis',
 //   url: '/job-guide',
@@ -150,8 +154,8 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Tools Section */}
-        <SidebarGroup className="bg-gray-800/40 mt-1 mx-2 shadow-md rounded-none">
+        {/* Tools Section - Temporarily Commented Out */}
+        {/* <SidebarGroup className="bg-gray-800/40 mt-1 mx-2 shadow-md rounded-none">
           <SidebarGroupLabel className="text-fuchsia-200 font-orbitron text-xs px-3 py-1">
             Tools
           </SidebarGroupLabel>
@@ -163,7 +167,7 @@ export function AppSidebar() {
                     <SidebarMenuButton asChild className="w-full px-0">
                       <NavLink to={item.url} className={`
                           flex items-center gap-2 py-2 
-                          mx-0                          /* remove horizontal margin for full-width highlight */
+                          mx-0                          
                           px-3
                           rounded-none
                           font-orbitron transition-all duration-300 
@@ -181,7 +185,7 @@ export function AppSidebar() {
             })}
             </SidebarMenu>
           </SidebarGroupContent>
-        </SidebarGroup>
+        </SidebarGroup> */}
       </SidebarContent>
 
       <SidebarFooter className="p-2 border-t border-fuchsia-400/10 bg-gradient-to-r from-black/90 to-fuchsia-950/80 mt-2 rounded-none relative">
