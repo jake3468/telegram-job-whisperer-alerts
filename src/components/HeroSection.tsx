@@ -125,7 +125,7 @@ const HeroSection = () => {
           <h1 className="relative z-30 text-3xl md:text-4xl lg:text-5xl mb-1 leading-tight font-sans tracking-tight text-foreground drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">
             {/* Mobile and Desktop view */}
             <div className="block md:hidden lg:block">
-              <span className="text-black dark:text-white px-0.5 py-0 font-inter not-italic">Stop applying to <span className="italic">jobs</span> unprepared.</span>
+              <span className="text-black dark:text-white px-0.5 py-0 font-inter not-italic">Stop applying to <span>jobs</span> unprepared.</span>
               <br />
               <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter font-bold">We'll make you #1</span> 🏆
             </div>
@@ -134,7 +134,7 @@ const HeroSection = () => {
             <div className="hidden md:block lg:hidden">
               <span className="text-black dark:text-white px-0.5 py-0 not-italic">Stop applying to</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic"><span className="italic">jobs</span> unprepared.</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic"><span>jobs</span> unprepared.</span>
               <br />
               <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-bold">We'll make you #1</span> 🏆
             </div>
