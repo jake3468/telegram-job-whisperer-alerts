@@ -6,6 +6,7 @@ import Lottie from 'lottie-react';
 import LightRays from './LightRays';
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 import { YouTubeHeroVideo } from '@/components/YouTubeHeroVideo';
+import HandDrawnArrow from './HandDrawnArrow';
 
 // Preload rocket animation immediately when module loads
 const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json';
@@ -112,8 +113,18 @@ const HeroSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-center">
           
           {/* Hero Video - Centered in left side, aligned with hero text */}
-          <div className="hidden md:flex justify-center items-start mb-8 md:mb-0 md:pr-8">
+          <div className="hidden md:flex justify-center items-start mb-8 md:mb-0 md:pr-8 relative">
             <YouTubeHeroVideo className="w-full max-w-xs" />
+            
+            {/* Desktop Demo Text with Arrow - positioned absolutely to point to video */}
+            <div className="absolute -right-4 top-1/2 transform translate-x-full -translate-y-1/2 z-30 max-w-xs">
+              <div className="flex items-center gap-3">
+                <HandDrawnArrow direction="left" className="flex-shrink-0" />
+                <p className="text-foreground text-sm font-inter leading-relaxed">
+                  hey… here's a boring demo 😅 watch it carefullyyyy… our 3 Agents are right there with the value they bring
+                </p>
+              </div>
+            </div>
           </div>
           
           {/* Hero Content - Center aligned with mobile preview */}
@@ -168,6 +179,14 @@ const HeroSection = () => {
                 <span className="text-green-700 dark:text-green-300 text-xs md:text-sm font-medium font-inter">
                   Get 50% off with code "ASP123"
                 </span>
+              </div>
+              
+              {/* Mobile Demo Text with Arrow - positioned after discount badge */}
+              <div className="flex md:hidden items-start gap-3 mt-4 mb-6">
+                <HandDrawnArrow direction="down-right" className="flex-shrink-0 mt-1" />
+                <p className="text-foreground text-sm font-inter leading-relaxed">
+                  hey… here's a boring demo 😅 watch it carefullyyyy… our 3 Agents are right there with the value they bring
+                </p>
               </div>
             </div>
             {/* Avatar Group with Rating */}
