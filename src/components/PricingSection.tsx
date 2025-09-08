@@ -45,11 +45,6 @@ const PricingSection = () => {
             Start with 10 free monthly credits and upgrade anytime with flexible credit packs.
           </p>
           
-          {/* Payment Partner Information */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-8 justify-center">
-            <span>Powered by</span>
-            <span className="ml-1 font-semibold text-foreground">Dodo Payments</span>
-          </div>
         </div>
 
         <div className="grid gap-6 lg:gap-8 grid-cols-1 md:grid-cols-2 items-stretch max-w-4xl md:max-w-3xl lg:max-w-4xl mx-auto">
@@ -196,7 +191,7 @@ const PricingSection = () => {
                         <div className="text-cyan-400 font-semibold text-xs mb-1">FREE E-book:</div>
                         <div className="text-white font-medium text-xs mb-2">"Jobs that will vanish by 2030: 8 Strategies to Save Your Career Before AI Takes Over"</div>
                         <div className="text-gray-300 text-xs leading-relaxed">
-                          Purchase any of the credit packs above and get a downloadable link sent via email from noreply@dodopayments.com
+                          Purchase any of the credit packs above and get a downloadable link sent via email.
                         </div>
                         <div className="text-gray-400 text-xs mt-1">
                           Instant access, read on any device, keep forever
