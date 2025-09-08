@@ -21,10 +21,6 @@ const HandDrawnArrow = ({ className, direction = 'left' }: HandDrawnArrowProps) 
             strokeWidth="2.5" 
             strokeLinecap="round" 
             fill="none"
-            style={{
-              strokeDasharray: '200',
-              animation: 'drawLine 1.5s ease-in-out infinite alternate'
-            }}
           />
           <path 
             d="M15 12L8 12L8 19" 
@@ -49,10 +45,6 @@ const HandDrawnArrow = ({ className, direction = 'left' }: HandDrawnArrowProps) 
             strokeWidth="2.5" 
             strokeLinecap="round" 
             fill="none"
-            style={{
-              strokeDasharray: '200',
-              animation: 'drawLine 1.5s ease-in-out infinite alternate'
-            }}
           />
           <path 
             d="M58 65L65 65L65 58" 

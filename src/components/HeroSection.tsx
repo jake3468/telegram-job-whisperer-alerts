@@ -113,18 +113,8 @@ const HeroSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-center">
           
           {/* Hero Video - Centered in left side, aligned with hero text */}
-          <div className="hidden md:flex justify-center items-start mb-8 md:mb-0 md:pr-8 relative">
+          <div className="hidden md:flex justify-center items-start mb-8 md:mb-0 md:pr-8">
             <YouTubeHeroVideo className="w-full max-w-xs" />
-            
-            {/* Desktop Demo Text with Arrow - positioned absolutely to point to video */}
-            <div className="absolute -right-4 top-1/2 transform translate-x-full -translate-y-1/2 z-30 max-w-xs">
-              <div className="flex items-center gap-3">
-                <HandDrawnArrow direction="left" className="flex-shrink-0" />
-                <p className="text-foreground text-sm font-inter leading-relaxed">
-                  hey… here's a boring demo 😅 watch it carefullyyyy… our 3 Agents are right there with the value they bring
-                </p>
-              </div>
-            </div>
           </div>
           
           {/* Hero Content - Center aligned with mobile preview */}
@@ -174,19 +164,21 @@ const HeroSection = () => {
                 </button>
               </SignUpButton>
               
-              {/* Discount Badge */}
-              <div className="bg-white border border-green-600 dark:bg-green-900/30 dark:border-green-700 rounded-full px-4 py-2 md:px-4 md:py-2 w-auto text-left md:text-center">
-                <span className="text-green-700 dark:text-green-300 text-xs md:text-sm font-medium font-inter">
-                  Get 50% off with code "ASP123"
-                </span>
-              </div>
-              
-              {/* Mobile Demo Text with Arrow - positioned after discount badge */}
-              <div className="flex md:hidden items-start gap-3 mt-4 mb-6">
-                <HandDrawnArrow direction="down-right" className="flex-shrink-0 mt-1" />
-                <p className="text-foreground text-sm font-inter leading-relaxed">
-                  hey… here's a boring demo 😅 watch it carefullyyyy… our 3 Agents are right there with the value they bring
-                </p>
+              {/* Discount Badge with Mobile Demo Arrow */}
+              <div className="flex items-start gap-3">
+                <div className="bg-white border border-green-600 dark:bg-green-900/30 dark:border-green-700 rounded-full px-4 py-2 md:px-4 md:py-2 w-auto text-left md:text-center">
+                  <span className="text-green-700 dark:text-green-300 text-xs md:text-sm font-medium font-inter">
+                    Get 50% off with code "ASP123"
+                  </span>
+                </div>
+                
+                {/* Mobile Demo Text with Arrow - positioned to the right of badge */}
+                <div className="flex md:hidden items-start gap-2 flex-1">
+                  <HandDrawnArrow direction="down-right" className="flex-shrink-0 mt-1" />
+                  <p className="text-foreground text-xs font-inter leading-relaxed">
+                    hey… here's a boring demo 😅 watch it carefullyyyy… our 3 Agents are right there with the value they bring
+                  </p>
+                </div>
               </div>
             </div>
             {/* Avatar Group with Rating */}
@@ -218,6 +210,14 @@ const HeroSection = () => {
                   <span className="italic text-sm font-medium">Loved by <span className="font-bold">300+</span> users worldwide</span>
                 </div>
               </div>
+            </div>
+            
+            {/* Desktop Demo Text with Arrow - positioned below avatars like a notebook note */}
+            <div className="hidden md:flex items-start gap-3 mb-6 ml-4">
+              <HandDrawnArrow direction="left" className="flex-shrink-0 mt-1" />
+              <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm">
+                hey… here's a boring demo 😅 watch it carefullyyyy… our 3 Agents are right there with the value they bring
+              </p>
             </div>
           </SignedOut>
 
