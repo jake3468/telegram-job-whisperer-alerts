@@ -241,9 +241,9 @@ const HeroSection = () => {
       <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
         <div className="text-left">
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4">
-            <p>hey… you know those job platforms? they dump thousands of listings, but that's not what job seekers actually need.</p>
+            <p>hey… you know those job platforms that dump thousands of listings, and all those online resume builders that make everyone’s pdf look the same? that’s not what job seekers actually need.</p>
             
-            <p>and all those online resume builders? everyone's pdf ends up looking the same.</p>
+            
             
             <p>We’re different……we built this with actual job seekers in mind. people who need something that actually helps them land jobs.</p>
             
