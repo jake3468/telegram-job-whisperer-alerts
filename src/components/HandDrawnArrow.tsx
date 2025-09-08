@@ -16,14 +16,14 @@ const HandDrawnArrow = ({ className, direction = 'left' }: HandDrawnArrowProps) 
           className="text-foreground"
         >
           <path 
-            d="M110 30C105 30 95 28 85 29C75 30 65 32 55 30C45 28 35 30 25 30C20 30 15 29 12 30C10 30 9 30 8 30" 
+            d="M110 30C105 35 95 25 85 32C75 28 65 35 55 30C45 25 35 35 25 30C20 28 15 32 12 30C10 28 9 32 8 30" 
             stroke="currentColor" 
             strokeWidth="2.5" 
             strokeLinecap="round" 
             fill="none"
           />
           <path 
-            d="M15 30L8 30L8 23" 
+            d="M15 25L8 30L15 35" 
             stroke="currentColor" 
             strokeWidth="2.5" 
             strokeLinecap="round" 
@@ -40,14 +40,14 @@ const HandDrawnArrow = ({ className, direction = 'left' }: HandDrawnArrowProps) 
           className="text-foreground"
         >
           <path 
-            d="M40 65C35 60 30 55 35 48C40 41 45 34 40 27C35 20 30 15 25 12" 
+            d="M40 65C45 60 50 55 45 48C40 41 35 34 40 27C45 20 50 15 55 12" 
             stroke="currentColor" 
             strokeWidth="2.5" 
             strokeLinecap="round" 
             fill="none"
           />
           <path 
-            d="M25 19L25 12L32 12" 
+            d="M50 17L55 12L60 17" 
             stroke="currentColor" 
             strokeWidth="2.5" 
             strokeLinecap="round" 
