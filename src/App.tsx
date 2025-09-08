@@ -37,58 +37,26 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Function to hide the initial HTML loader
-const hideInitialLoader = () => {
-  const loader = document.getElementById('initial-loader');
-  if (loader) {
-    loader.classList.add('fade-out');
-    setTimeout(() => {
-      loader.remove();
-    }, 300);
-  }
-};
-
-// Fast loading component - much simpler than the initial one
-const LoadingScreen = () => (
-  <div className="min-h-screen bg-gradient-to-br from-black via-gray-950 to-purple-950 flex items-center justify-center">
-    <div className="text-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400 mx-auto mb-3"></div>
-      <p className="text-white/80 text-sm">Initializing...</p>
-    </div>
-  </div>
-);
+// No longer needed - removed blocking initial loader
 
 // Component to initialize Clerk-Supabase sync
 const AppWithSync = () => {
-  const { isLoaded, isSignedIn } = useAuth();
+  const { isLoaded } = useAuth();
   const location = useLocation();
   
   // Initialize sync in background without blocking UI
   useClerkSupabaseSync();
-  useThemeColor(); // Add theme color management
+  useThemeColor();
   
   // Skip enterprise features for job-alerts page to prevent debug messages
   const shouldUseEnterpriseFeatures = !location.pathname.includes('/job-alerts');
   
   // Enable enterprise session manager for better token management
   useEnhancedTokenManagerIntegration({
-    enabled: shouldUseEnterpriseFeatures && isLoaded && isSignedIn
+    enabled: shouldUseEnterpriseFeatures && isLoaded
   });
   
-  // Hide initial loader once React is ready
-  useEffect(() => {
-    if (isLoaded) {
-      // Small delay to ensure smooth transition
-      setTimeout(() => {
-        hideInitialLoader();
-      }, 100);
-    }
-  }, [isLoaded, isSignedIn]);
-  
-  // Show loading screen only while Clerk auth is loading
-  if (!isLoaded) {
-    return <LoadingScreen />;
-  }
+  // Render immediately - no blocking auth check
   
   return (
     <>
