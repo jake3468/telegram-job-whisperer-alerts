@@ -38,11 +38,7 @@ const AIAgents = () => {
         <div className="max-w-7xl mx-auto px-4 py-4 text-center">
           <h1 className="font-orbitron mb-2 drop-shadow tracking-tight font-bold text-4xl flex items-center justify-center gap-2">
             <span>🤖</span>
-            <span style={{
-            WebkitBackgroundClip: 'text',
-            backgroundClip: 'text',
-            color: 'transparent'
-          }} className="bg-gradient-to-r from-sky-300 via-cyan-400 to-blue-500 bg-clip-text text-left text-cyan-300">Your <em>AI</em> Agents</span>
+            <span className="text-cyan-300 text-left font-inter text-3xl sm:text-3xl md:text-4xl">Your <em>AI</em> Agents</span>
           </h1>
           <p className="text-md text-purple-100 font-inter font-light mb-3 text-sm">
             First, let's meet and activate your personal <span className="italic text-pastel-peach">AI Job agents</span> - they're ready to guide you through every step of your job hunt.
