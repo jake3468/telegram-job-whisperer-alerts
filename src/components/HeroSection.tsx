@@ -241,15 +241,15 @@ const HeroSection = () => {
       <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
         <div className="text-left">
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4">
-            <p>hey… you know those job platforms? they dump thousands of listings, but that's not what job seekers actually need.</p>
+            <p>hey… you know those job platforms that dump thousands of listings, and all those online resume builders that make everyone’s pdf look the same? that’s not what job seekers actually need.</p>
             
-            <p>and all those online resume builders? everyone's pdf ends up looking the same.</p>
             
-            <p>we built this with actual job seekers in mind. people who need something that actually helps them land jobs.</p>
+            
+            <p>We’re different……we built this with actual job seekers in mind. people who need something that actually helps them land jobs.</p>
             
             <p>we're not here to trap you with subscriptions. start free, pay-as-you-go if you want more. no hidden tricks.</p>
             
-            <p>that's why we made Telegram AI Job Agents. if you're wondering why Telegram… who has time to log in to websites every day, click through endless menus, and pretend to care about fancy animations no one actually uses? just open a chat, and your agents are there - fixing resumes, sending alerts, writing cover letters, prepping interviews, even pointing to the right HR contacts. it's like having a friend helping you land the job.</p>
+            <p>that's why we made Telegram AI Job Agents. if you're wondering why Telegram… who has time to go through websites every day when you already have a lot going on? just open a chat, and your agents are there - fixing resumes, sending alerts, writing cover letters, prepping interviews, even pointing to the right HR contacts. it's like having a friend helping you land the job.</p>
             
             <p>this is the stuff that actually works. stuff that actually gets you ahead.</p>
             

@@ -37,21 +37,17 @@ const AIAgents = () => {
         {/* Header Section */}
         <div className="max-w-7xl mx-auto px-4 py-4 text-center">
           <h1 className="font-orbitron mb-2 drop-shadow tracking-tight font-bold text-4xl flex items-center justify-center gap-2">
-            <span>🤖</span>
-            <span style={{
-            WebkitBackgroundClip: 'text',
-            backgroundClip: 'text',
-            color: 'transparent'
-          }} className="bg-gradient-to-r from-sky-300 via-cyan-400 to-blue-500 bg-clip-text text-blue-500 text-left">Your <em>AI</em> Agents</span>
+            <span className="text-2xl sm:text-3xl md:text-4xl">🚀</span>
+            <span className="text-cyan-300 text-left font-inter text-3xl sm:text-3xl md:text-4xl">Your AI Agents</span>
           </h1>
-          <p className="text-md text-purple-100 font-inter font-light mb-3 text-sm">
-            First, let's meet and activate your personal <span className="italic text-pastel-peach">AI Job agents</span> - they're ready to guide you through every step of your job hunt.
+          <p className="text-sm lg:text-base text-white font-inter font-light mb-3 text-left max-w-2xl mx-auto lg:text-left">
+            First, let's meet and activate your personal <span className="whitespace-nowrap">AI Job agents</span> - they're ready to guide you through every step of your job hunt<span className="lg:inline"> </span><br className="lg:hidden" />(😉 you'll be amazed at what they can do!).
           </p>
         </div>
 
         {/* User Profile ID Section */}
         <div className="max-w-2xl mx-auto px-4 mb-8">
-          <div className="p-3 sm:p-4 rounded-lg border border-border bg-gray-950">
+          <div className="p-3 sm:p-4 lg:p-6 rounded-lg border border-border" style={{backgroundColor: '#30313D'}}>
             <p className="mb-3 text-xs sm:text-sm font-medium text-slate-50">
               Follow the steps below to activate all 3 <span className="text-sky-300">Telegram</span> AI Agents👇<br /><br />
               1. Copy your Activation Key given below.
@@ -77,65 +73,26 @@ const AIAgents = () => {
         {/* Agent Sections */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {/* Resume Builder Agent */}
-          <FeatureSection 
-            title="📝 Resume Builder Agent" 
-            subheading="Transform your resume into a sharp, job-ready version." 
-            description="Get a clean, ATS-friendly format that's keyword-optimized and highlights your achievements. You can easily add new projects, update experiences, and tailor your resume for every job - just by chatting with it." 
-            lottieUrl="" 
-            buttonText="Activate Now" 
-            isReversed={false} 
-            label="1" 
-            buttonUrl="https://t.me/Resume_builder_AI_bot"
-            shouldDetectLocation={true}
-            activationStatus={userProfile?.cv_bot_activated}
-          />
+          <FeatureSection title="📝 Resume Builder Agent" subheading="Transform your resume into a sharp, job-ready version." description="Get a clean, ATS-friendly format that's keyword-optimized and highlights your achievements. You can easily add new projects, update experiences, and tailor your resume for every job - just by chatting with it." lottieUrl="" buttonText="Activate Now" isReversed={false} label="1" buttonUrl="https://t.me/Resume_builder_AI_bot" shouldDetectLocation={true} activationStatus={userProfile?.cv_bot_activated} />
 
           {/* Job Alerts Agent */}
-          <FeatureSection 
-            title="🔔 Job Alerts Agent" 
-            subheading="Daily web scanning for the latest jobs at your chosen time." 
-            description="Get fresh, relevant roles delivered right when you need them, with one-click access to tailored resumes, applications, interview prep & more.. for every opportunity." 
-            lottieUrl="" 
-            buttonText="Activate Now" 
-            isReversed={true} 
-            label="2" 
-            buttonUrl="https://t.me/Job_AI_update_bot"
-            shouldDetectLocation={true}
-            activationStatus={userProfile?.bot_activated}
-            additionalContent={
-              <>
+          <FeatureSection title="🔔 Job Alerts Agent" subheading="Daily web scanning for the latest jobs at your chosen time." description="Get fresh, relevant roles delivered right when you need them, with one-click access to tailored resumes, applications, interview prep & more.. for every opportunity." lottieUrl="" buttonText="Activate Now" isReversed={true} label="2" buttonUrl="https://t.me/Job_AI_update_bot" shouldDetectLocation={true} activationStatus={userProfile?.bot_activated} additionalContent={<>
                 <p className="text-xs text-gray-600 mb-2 text-center">
                   After activating the Job Alerts AI Agent, click "Create Job Alerts" below to set your daily preferences.
                 </p>
-                <Button 
-                  onClick={async () => {
-                    // Detect and store location before navigation
-                    await detectAndStoreLocation(userProfile, updateUserProfile);
-                    navigate('/job-alerts');
-                    window.scrollTo(0, 0);
-                  }}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 text-xs"
-                >
+                <Button onClick={async () => {
+            // Detect and store location before navigation
+            await detectAndStoreLocation(userProfile, updateUserProfile);
+            navigate('/job-alerts');
+            window.scrollTo(0, 0);
+          }} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 text-xs">
                   <CalendarPlus className="w-3 h-3" />
                   Create Job Alerts
                 </Button>
-              </>
-            }
-          />
+              </>} />
 
           {/* Job Application Agent */}
-          <FeatureSection 
-            title="👔 Job Application Agent" 
-            subheading="Your quick helper when you find a job." 
-            description="Share a few details and instantly receive a tailored resume, cover letter, HR contacts, interview prep & more.. - everything you need to apply with confidence" 
-            lottieUrl="" 
-            buttonText="Activate Now" 
-            isReversed={false} 
-            label="3" 
-            buttonUrl="https://t.me/add_job_aspirelyai_bot"
-            shouldDetectLocation={true}
-            activationStatus={userProfile?.add_job_bot_activated}
-          />
+          <FeatureSection title="👔 Job Application Agent" subheading="Your quick helper when you find a job." description="Share a few details and instantly receive a tailored resume, cover letter, HR contacts, interview prep & more.. - everything you need to apply with confidence" lottieUrl="" buttonText="Activate Now" isReversed={false} label="3" buttonUrl="https://t.me/add_job_aspirelyai_bot" shouldDetectLocation={true} activationStatus={userProfile?.add_job_bot_activated} />
         </div>
       </div>
     </Layout>;
