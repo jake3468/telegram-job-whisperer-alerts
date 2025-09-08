@@ -12,6 +12,8 @@ import Footer from "@/components/Footer";
 // Temporarily disable SecurityHeaders for debugging
 // import SecurityHeaders from "@/components/SecurityHeaders";
 import { useEffect } from "react";
+import { HeroSkeleton } from '@/components/ui/skeleton';
+import { useProgressiveAuth } from '@/hooks/useProgressiveAuth';
 
 // Global postMessage error handler to suppress external service errors
 const suppressExternalPostMessageErrors = () => {
@@ -33,6 +35,7 @@ const suppressExternalPostMessageErrors = () => {
 };
 
 const Index = () => {
+  const { shouldRender, showSkeleton } = useProgressiveAuth();
   useEffect(() => {
     // Suppress external postMessage errors
     suppressExternalPostMessageErrors();
@@ -62,13 +65,16 @@ const Index = () => {
     };
   }, []);
 
+  // Show skeleton only during very brief auth loading
+  if (showSkeleton) {
+    return <HeroSkeleton />;
+  }
+
+  // Render immediately for professional experience
   return (
     <div className="min-h-screen bg-background font-inter text-foreground">
-      {/* <SecurityHeaders /> - Temporarily disabled for debugging */}
       <AuthHeader />
       <HeroSection />
-      {/* <ComparisonSlider /> */}
-      
       <AboutUsSection />
       <ToolsSection />
       <HowItWorksSection />

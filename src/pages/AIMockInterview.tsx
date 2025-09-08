@@ -75,8 +75,8 @@ const AIMockInterview = () => {
           {/* Hero Section */}
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-3 mb-6 relative">
-              <span className="text-5xl">📞</span>
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent text-left">AI Mock Interview</h1>
+              <span className="text-4xl">📞</span>
+              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent text-left">AI Mock Interview</h1>
               
               {/* Manual Refresh Button */}
               {connectionIssue && (
@@ -114,7 +114,7 @@ const AIMockInterview = () => {
               </Button>
             </div>
             
-            <p className="text-gray-400 max-w-2xl mx-auto leading-relaxed text-left text-sm">Grace, your AI interview assistant from Aspirely AI, will call your phone in about a minute to ask real interview questions based on your job role — and you'll receive a detailed report right after the call.</p>
+            <p className="text-gray-200 max-w-2xl mx-auto leading-relaxed text-left text-sm">Grace, your AI interview assistant from Aspirely AI, will call your phone in about a minute to ask real interview questions based on your job role — and you'll receive a detailed report right after the call.</p>
           </div>
 
           {/* Form Section */}

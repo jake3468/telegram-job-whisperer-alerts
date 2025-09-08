@@ -1,6 +1,7 @@
 import { useAuth } from "@clerk/clerk-react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { PageSkeleton } from "@/components/ui/skeleton";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -16,21 +17,14 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     }
   }, [isLoaded, isSignedIn, navigate]);
 
-  // Show loading while auth is being checked
+  // Show skeleton while auth is being checked - non-blocking
   if (!isLoaded) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-gray-950 to-purple-950 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400 mx-auto mb-3"></div>
-          <p className="text-white/80 text-sm">Loading...</p>
-        </div>
-      </div>
-    );
+    return <PageSkeleton />;
   }
 
-  // If not signed in, don't render children (redirect will happen)
+  // If not signed in, show skeleton during redirect
   if (!isSignedIn) {
-    return null;
+    return <PageSkeleton />;
   }
 
   return <>{children}</>;

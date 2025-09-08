@@ -95,14 +95,11 @@ const FeatureSection = ({
       <h3 className="text-2xl md:text-3xl mb-2 font-inter text-primary font-bold">
         {title}
       </h3>
-      <p className="mb-3 font-inter font-medium text-foreground text-sm">
-        {subheading}
-      </p>
     </div>;
 
   // Mobile: content section (description + button only)
   const mobileContentSection = <div className="lg:hidden flex flex-col space-y-6">
-      <p className="leading-relaxed font-inter text-foreground text-xs font-normal">
+      <p className="leading-relaxed font-inter text-foreground text-base">
         {description}
       </p>
       {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75 text-sm">
@@ -125,10 +122,7 @@ const FeatureSection = ({
         <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-primary">
           {title}
         </h3>
-        <p className="md:text-xl mb-4 font-inter font-medium text-base text-foreground">
-          {subheading}
-        </p>
-        <p className="md:text-lg leading-relaxed font-inter font-light text-sm text-foreground">
+        <p className="text-lg leading-relaxed font-inter text-foreground">
           {description}
         </p>
       </div>
@@ -170,7 +164,7 @@ const FeatureSection = ({
     </div> : null;
   return <section className="py-1 md:py-2 px-4 bg-background rounded-3xl">
       <div className="max-w-7xl mx-auto">
-        {lottieUrl ? <div className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white">
+        {lottieUrl ? <div className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto">
             {/* Mobile Layout */}
             <div className="lg:hidden space-y-6">
               {mobileHeaderSection}

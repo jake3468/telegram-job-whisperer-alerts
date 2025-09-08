@@ -6,6 +6,7 @@ import Lottie from 'lottie-react';
 import LightRays from './LightRays';
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 import { YouTubeHeroVideo } from '@/components/YouTubeHeroVideo';
+import HandDrawnArrow from './HandDrawnArrow';
 
 // Preload rocket animation immediately when module loads
 const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json';
@@ -200,11 +201,27 @@ const HeroSection = () => {
                 </div>
               </div>
             </div>
+            
+            {/* Desktop Demo Text with Arrow - positioned below avatars like a notebook note */}
+            <div className="hidden md:flex items-start gap-3 mb-6 ml-4">
+              <HandDrawnArrow direction="left" className="flex-shrink-0 mt-1" />
+              <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm">
+                hey… here's a boring demo 🥱 watch it carefullyyyy… our 3 Agents are right there with the value they bring
+              </p>
+            </div>
           </SignedOut>
 
           {/* Hero Video - Shows fully on mobile, larger size and reduced spacing */}
           <div className="flex md:hidden justify-center items-center mt-6 mb-2 px-2">
             <YouTubeHeroVideo className="w-full max-w-[320px]" />
+          </div>
+          
+          {/* Mobile Demo Text with Arrow - positioned below video pointing up */}
+          <div className="flex md:hidden items-start gap-3 mt-4 mb-6 justify-center px-4">
+            <HandDrawnArrow direction="up" className="flex-shrink-0 mt-1" />
+            <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm">
+              hey… here's a boring demo 🥱 watch it carefullyyyy… our 3 Agents are right there with the value they bring
+            </p>
           </div>
 
         <SignedIn>
@@ -220,11 +237,24 @@ const HeroSection = () => {
     </section>
     
     {/* Telegram Agents Section - Separate section below hero */}
-    <section className="relative py-12 bg-background">
+    <section className="relative py-4 bg-background">
       <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
         <div className="text-left">
-          <p className="text-foreground mb-4 text-sm md:text-base font-inter">By using our AI Job Agents, you'll <span className="font-semibold font-inter">unlock your true potential</span> and discover opportunities you never knew existed.</p>
-          <p className="text-foreground mb-6 text-sm md:text-base font-inter">Explore the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
+          <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4">
+            <p>hey… you know those job platforms? they dump thousands of listings, but that's not what job seekers actually need.</p>
+            
+            <p>and all those online resume builders? everyone's pdf ends up looking the same.</p>
+            
+            <p>we built this with actual job seekers in mind. people who need something that actually helps them land jobs.</p>
+            
+            <p>we're not here to trap you with subscriptions. start free, pay-as-you-go if you want more. no hidden tricks.</p>
+            
+            <p>that's why we made Telegram AI Job Agents. if you're wondering why Telegram… who has time to log in to websites every day, click through endless menus, and pretend to care about fancy animations no one actually uses? just open a chat, and your agents are there - fixing resumes, sending alerts, writing cover letters, prepping interviews, even pointing to the right HR contacts. it's like having a friend helping you land the job.</p>
+            
+            <p>this is the stuff that actually works. stuff that actually gets you ahead.</p>
+            
+            <p>👇 try your AI Job Agents and see it yourself</p>
+          </div>
           
           <div className="flex flex-col md:flex-row items-start justify-start md:items-center md:justify-center space-y-3 md:space-y-0 md:space-x-3">
             <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-gray-700 dark:border-gray-200 rounded-xl px-3 py-2 bg-gray-700 hover:bg-gray-800 dark:bg-gray-200 dark:hover:bg-gray-100">

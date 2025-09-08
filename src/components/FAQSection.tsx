@@ -19,8 +19,8 @@ const FAQSection = () => {
   return <section className="py-12 md:py-16 px-4 bg-background">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-6">
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary bg-clip-text mb-2 font-inter text-foreground">Frequently Asked Questions (FAQ)</h2>
-          <p className="text-muted-foreground text-lg font-inter">
+          <h2 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary bg-clip-text mb-2 font-inter text-foreground">Frequently Asked Questions (FAQs)</h2>
+          <p className="text-foreground text-base font-inter leading-relaxed">
             Everything you need to know about Aspirely.ai
           </p>
         </div>
@@ -30,7 +30,7 @@ const FAQSection = () => {
               <AccordionTrigger className="px-4 py-3 text-left text-foreground hover:text-primary transition-colors font-inter font-medium">
                 {faq.question}
               </AccordionTrigger>
-              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed font-inter">
+              <AccordionContent className="px-6 pb-4 text-foreground leading-relaxed font-inter text-sm">
                 {faq.answer}
               </AccordionContent>
             </AccordionItem>)}
