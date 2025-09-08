@@ -95,9 +95,6 @@ const FeatureSection = ({
       <h3 className="text-2xl md:text-3xl mb-2 font-inter text-primary font-bold">
         {title}
       </h3>
-      <p className="mb-3 font-inter font-medium text-foreground text-sm">
-        {subheading}
-      </p>
     </div>;
 
   // Mobile: content section (description + button only)
@@ -125,9 +122,6 @@ const FeatureSection = ({
         <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-primary">
           {title}
         </h3>
-        <p className="md:text-xl mb-4 font-inter font-medium text-base text-foreground">
-          {subheading}
-        </p>
         <p className="md:text-lg leading-relaxed font-inter font-light text-sm text-foreground">
           {description}
         </p>
