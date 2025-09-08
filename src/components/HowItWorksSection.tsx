@@ -74,13 +74,6 @@ const HowItWorksSection = () => {
 
           {/* Call to action */}
           <div className="text-center mt-8">
-            <p className="text-foreground text-base mb-6 font-inter leading-relaxed">
-              Ready to transform your job search?
-            </p>
-            <div className="inline-flex items-center gap-2 text-primary font-inter font-medium">
-              <span>Start your journey</span>
-              <Rocket className="w-5 h-5" />
-            </div>
           </div>
         </div>
       </div>
