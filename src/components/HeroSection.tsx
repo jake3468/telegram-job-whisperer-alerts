@@ -240,8 +240,19 @@ const HeroSection = () => {
     <section className="relative py-4 bg-background">
       <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
         <div className="text-left">
-          <p className="text-foreground mb-4 text-sm md:text-base font-inter">By using our AI Job Agents, you'll <span className="font-semibold font-inter">unlock your true potential</span> and discover opportunities you never knew existed.</p>
-          <p className="text-foreground mb-6 text-sm md:text-base font-inter">Explore the most advanced AI Job Agents built to simplify your job hunting. Just click to start using them on Telegram 👇 :</p>
+          <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4">
+            <p>hey… you know those big job sites? they throw listings at you like it's enough. it's not.</p>
+            
+            <p>and those "resume builders"? everyone's pdf ends up looking the same. zero edge. total waste of time.</p>
+            
+            <p>we're not here to trap you with subscriptions. start free, pay-as-you-go if you want more. no hidden tricks.</p>
+            
+            <p>our AI Agents live on Telegram. if you're wondering why Telegram… who has time to log in to websites every day, click through endless menus, and pretend to care about fancy animations no one actually uses? just open a chat, and your agents are there - fixing resumes, sending alerts, writing cover letters, prepping interviews, even pointing to the right HR contacts. it's like having a friend helping you land the job.</p>
+            
+            <p>this is the stuff that actually works. stuff that actually gets you ahead.</p>
+            
+            <p className="font-medium">👇 try your AI Job Agents and see it yourself</p>
+          </div>
           
           <div className="flex flex-col md:flex-row items-start justify-start md:items-center md:justify-center space-y-3 md:space-y-0 md:space-x-3">
             <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-gray-700 dark:border-gray-200 rounded-xl px-3 py-2 bg-gray-700 hover:bg-gray-800 dark:bg-gray-200 dark:hover:bg-gray-100">
