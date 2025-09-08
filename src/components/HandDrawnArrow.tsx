@@ -1,6 +1,6 @@
 interface HandDrawnArrowProps {
   className?: string;
-  direction?: 'left' | 'down-right';
+  direction?: 'left' | 'up';
 }
 
 const HandDrawnArrow = ({ className, direction = 'left' }: HandDrawnArrowProps) => {
@@ -16,14 +16,14 @@ const HandDrawnArrow = ({ className, direction = 'left' }: HandDrawnArrowProps) 
           className="text-foreground"
         >
           <path 
-            d="M110 30C105 25 95 20 85 22C75 24 65 28 55 30C45 32 35 30 25 28C20 27 15 25 12 20C10 17 9 14 8 12" 
+            d="M110 30C105 30 95 28 85 29C75 30 65 32 55 30C45 28 35 30 25 30C20 30 15 29 12 30C10 30 9 30 8 30" 
             stroke="currentColor" 
             strokeWidth="2.5" 
             strokeLinecap="round" 
             fill="none"
           />
           <path 
-            d="M15 12L8 12L8 19" 
+            d="M15 30L8 30L8 23" 
             stroke="currentColor" 
             strokeWidth="2.5" 
             strokeLinecap="round" 
@@ -31,7 +31,7 @@ const HandDrawnArrow = ({ className, direction = 'left' }: HandDrawnArrowProps) 
           />
         </svg>
       ) : (
-        // Mobile arrow pointing down-right
+        // Mobile arrow pointing up to video
         <svg 
           width="80" 
           height="80" 
@@ -40,14 +40,14 @@ const HandDrawnArrow = ({ className, direction = 'left' }: HandDrawnArrowProps) 
           className="text-foreground"
         >
           <path 
-            d="M20 15C25 20 30 25 35 32C40 39 45 46 50 52C55 58 60 62 65 65" 
+            d="M40 65C35 60 30 55 35 48C40 41 45 34 40 27C35 20 30 15 25 12" 
             stroke="currentColor" 
             strokeWidth="2.5" 
             strokeLinecap="round" 
             fill="none"
           />
           <path 
-            d="M58 65L65 65L65 58" 
+            d="M25 19L25 12L32 12" 
             stroke="currentColor" 
             strokeWidth="2.5" 
             strokeLinecap="round" 

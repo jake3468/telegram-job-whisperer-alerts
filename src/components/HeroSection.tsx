@@ -164,21 +164,11 @@ const HeroSection = () => {
                 </button>
               </SignUpButton>
               
-              {/* Discount Badge with Mobile Demo Arrow */}
-              <div className="flex items-start gap-3">
-                <div className="bg-white border border-green-600 dark:bg-green-900/30 dark:border-green-700 rounded-full px-4 py-2 md:px-4 md:py-2 w-auto text-left md:text-center">
-                  <span className="text-green-700 dark:text-green-300 text-xs md:text-sm font-medium font-inter">
-                    Get 50% off with code "ASP123"
-                  </span>
-                </div>
-                
-                {/* Mobile Demo Text with Arrow - positioned to the right of badge */}
-                <div className="flex md:hidden items-start gap-2 flex-1">
-                  <HandDrawnArrow direction="down-right" className="flex-shrink-0 mt-1" />
-                  <p className="text-foreground text-xs font-inter leading-relaxed">
-                    hey… here's a boring demo 😅 watch it carefullyyyy… our 3 Agents are right there with the value they bring
-                  </p>
-                </div>
+              {/* Discount Badge */}
+              <div className="bg-white border border-green-600 dark:bg-green-900/30 dark:border-green-700 rounded-full px-4 py-2 md:px-4 md:py-2 w-auto text-left md:text-center">
+                <span className="text-green-700 dark:text-green-300 text-xs md:text-sm font-medium font-inter">
+                  Get 50% off with code "ASP123"
+                </span>
               </div>
             </div>
             {/* Avatar Group with Rating */}
@@ -224,6 +214,14 @@ const HeroSection = () => {
           {/* Hero Video - Shows fully on mobile, larger size and reduced spacing */}
           <div className="flex md:hidden justify-center items-center mt-6 mb-2 px-2">
             <YouTubeHeroVideo className="w-full max-w-[320px]" />
+          </div>
+          
+          {/* Mobile Demo Text with Arrow - positioned below video pointing up */}
+          <div className="flex md:hidden items-start gap-3 mt-4 mb-6 justify-center px-4">
+            <HandDrawnArrow direction="up" className="flex-shrink-0 mt-1" />
+            <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm">
+              hey… here's a boring demo 😅 watch it carefullyyyy… our 3 Agents are right there with the value they bring
+            </p>
           </div>
 
         <SignedIn>
