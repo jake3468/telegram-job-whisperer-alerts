@@ -22,7 +22,7 @@ const Footer = () => {
               <img alt="JobBots Logo" className="h-8 w-8" src="/lovable-uploads/d1063169-3726-4087-9672-b20c6091d9a4.jpg" />
               <span className="text-xl font-semibold text-foreground font-inter">Aspirely.ai</span>
             </div>
-            <p className="text-muted-foreground text-base font-inter font-light leading-relaxed max-w-md">
+            <p className="text-foreground text-base font-inter leading-relaxed max-w-md">
               The AI-powered platform for finding and creating your perfect career path with advanced job matching and personalized guidance.
             </p>
             <div className="flex items-center space-x-4 mt-4">
@@ -77,13 +77,13 @@ const Footer = () => {
           <div>
             <h3 className="text-foreground font-semibold text-base font-inter mb-4">Product</h3>
             <div className="space-y-3">
-              <button onClick={() => scrollToSection('features')} className="block text-muted-foreground hover:text-primary transition-colors duration-200 text-base font-inter font-light">
+              <button onClick={() => scrollToSection('features')} className="block text-foreground hover:text-primary transition-colors duration-200 text-base font-inter">
                 Features
               </button>
-              <button onClick={() => scrollToSection('how-it-works')} className="block text-muted-foreground hover:text-primary transition-colors duration-200 text-base font-inter font-light">
+              <button onClick={() => scrollToSection('how-it-works')} className="block text-foreground hover:text-primary transition-colors duration-200 text-base font-inter">
                 How It Works
               </button>
-              <button onClick={() => scrollToSection('pricing')} className="block text-muted-foreground hover:text-primary transition-colors duration-200 text-base font-inter font-light">
+              <button onClick={() => scrollToSection('pricing')} className="block text-foreground hover:text-primary transition-colors duration-200 text-base font-inter">
                 Pricing
               </button>
             </div>
@@ -93,10 +93,10 @@ const Footer = () => {
           <div>
             <h3 className="text-foreground font-semibold text-base font-inter mb-4">Company</h3>
             <div className="space-y-3">
-              <Link to="/contact-support" className="block text-muted-foreground hover:text-primary transition-colors duration-200 text-base font-inter font-light">
+              <Link to="/contact-support" className="block text-foreground hover:text-primary transition-colors duration-200 text-base font-inter">
                 Contact Support
               </Link>
-              <Link to="/blogs" className="block text-muted-foreground hover:text-primary transition-colors duration-200 text-base font-inter font-light" onClick={() => window.scrollTo(0, 0)}>
+              <Link to="/blogs" className="block text-foreground hover:text-primary transition-colors duration-200 text-base font-inter" onClick={() => window.scrollTo(0, 0)}>
                 Blogs
               </Link>
             </div>
@@ -106,10 +106,10 @@ const Footer = () => {
           <div>
             <h3 className="text-foreground font-semibold text-base font-inter mb-4">Legal</h3>
             <div className="space-y-3">
-              <a href="/privacy-policy" className="block text-muted-foreground hover:text-primary transition-colors duration-200 text-base font-inter font-light">
+              <a href="/privacy-policy" className="block text-foreground hover:text-primary transition-colors duration-200 text-base font-inter">
                 Privacy Policy
               </a>
-              <a href="/terms-of-service" className="block text-muted-foreground hover:text-primary transition-colors duration-200 text-base font-inter font-light">
+              <a href="/terms-of-service" className="block text-foreground hover:text-primary transition-colors duration-200 text-base font-inter">
                 Terms of Service
               </a>
             </div>

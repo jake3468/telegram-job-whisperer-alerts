@@ -27,7 +27,7 @@ const HowItWorksSection = () => {
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-2 font-inter">
             How It Works
           </h2>
-          <p className="text-lg text-muted-foreground font-inter font-light leading-relaxed">
+          <p className="text-lg text-foreground font-inter leading-relaxed">
             Get started in minutes. It's that simple.
           </p>
         </div>
@@ -57,7 +57,7 @@ const HowItWorksSection = () => {
                   {step.title}
                 </h3>
                 
-                <p className="text-muted-foreground font-inter font-light leading-relaxed text-base max-w-xs">
+                <p className="text-foreground font-inter leading-relaxed text-base max-w-xs">
                   {step.description}
                 </p>
 
@@ -74,7 +74,7 @@ const HowItWorksSection = () => {
 
           {/* Call to action */}
           <div className="text-center mt-8">
-            <p className="text-muted-foreground text-base mb-6 font-inter font-light leading-relaxed">
+            <p className="text-foreground text-base mb-6 font-inter leading-relaxed">
               Ready to transform your job search?
             </p>
             <div className="inline-flex items-center gap-2 text-primary font-inter font-medium">

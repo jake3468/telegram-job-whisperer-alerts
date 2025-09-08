@@ -99,7 +99,7 @@ const FeatureSection = ({
 
   // Mobile: content section (description + button only)
   const mobileContentSection = <div className="lg:hidden flex flex-col space-y-6">
-      <p className="leading-relaxed font-inter text-muted-foreground text-base font-light">
+      <p className="leading-relaxed font-inter text-foreground text-base">
         {description}
       </p>
       {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75 text-sm">
@@ -122,7 +122,7 @@ const FeatureSection = ({
         <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-primary">
           {title}
         </h3>
-        <p className="text-lg leading-relaxed font-inter font-light text-muted-foreground">
+        <p className="text-lg leading-relaxed font-inter text-foreground">
           {description}
         </p>
       </div>
