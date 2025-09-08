@@ -47,11 +47,17 @@ const HandDrawnArrow = ({ className, direction = 'left' }: HandDrawnArrowProps) 
             fill="none"
           />
           <path 
-            d="M50 17L55 12L60 17" 
+            d="M50 17L55 12" 
             stroke="currentColor" 
             strokeWidth="2.5" 
             strokeLinecap="round" 
-            strokeLinejoin="round"
+            fill="none"
+          />
+          <path 
+            d="M60 17L55 12" 
+            stroke="currentColor" 
+            strokeWidth="2.5" 
+            strokeLinecap="round" 
             fill="none"
           />
         </svg>
