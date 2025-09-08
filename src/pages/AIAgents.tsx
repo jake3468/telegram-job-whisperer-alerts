@@ -1,11 +1,12 @@
 import { Layout } from '@/components/Layout';
-import FeatureSection from '@/components/FeatureSection';
 import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Copy, CalendarPlus } from 'lucide-react';
+import { Copy, CalendarPlus, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { detectAndStoreLocation } from '@/utils/locationDetection';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import ActivationStatusTag from '@/components/ActivationStatusTag';
 const AIAgents = () => {
   const {
     userProfile,
@@ -70,29 +71,130 @@ const AIAgents = () => {
           </div>
         </div>
 
-        {/* Agent Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {/* Resume Builder Agent */}
-          <FeatureSection title="📝 Resume Builder Agent" subheading="Transform your resume into a sharp, job-ready version." description="Get a clean, ATS-friendly format that's keyword-optimized and highlights your achievements. You can easily add new projects, update experiences, and tailor your resume for every job - just by chatting with it." lottieUrl="" buttonText="Activate Now" isReversed={false} label="1" buttonUrl="https://t.me/Resume_builder_AI_bot" shouldDetectLocation={true} activationStatus={userProfile?.cv_bot_activated} />
+        {/* AI Agents Accordion */}
+        <div className="max-w-4xl mx-auto px-4">
+          <Accordion type="multiple" className="w-full space-y-4">
+            {/* Resume Builder Agent */}
+            <AccordionItem value="resume-builder" className="border border-border rounded-lg" style={{backgroundColor: '#30313D'}}>
+              <AccordionTrigger className="hover:no-underline px-4 py-3">
+                <div className="flex items-center gap-3 text-left w-full">
+                  <div className="relative">
+                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                      1
+                    </div>
+                    <ActivationStatusTag isActivated={userProfile?.cv_bot_activated} />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-white font-medium text-lg">📝 Resume Builder Agent</h3>
+                    <p className="text-gray-300 text-sm mt-1">Transform your resume into a sharp, job-ready version.</p>
+                  </div>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4">
+                <div className="space-y-4">
+                  <p className="text-gray-300 text-sm">
+                    Get a clean, ATS-friendly format that's keyword-optimized and highlights your achievements. You can easily add new projects, update experiences, and tailor your resume for every job - just by chatting with it.
+                  </p>
+                  <Button 
+                    onClick={async () => {
+                      await detectAndStoreLocation(userProfile, updateUserProfile);
+                      window.open('https://t.me/Resume_builder_AI_bot', '_blank');
+                    }}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-200"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Activate Now
+                  </Button>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
 
-          {/* Job Alerts Agent */}
-          <FeatureSection title="🔔 Job Alerts Agent" subheading="Daily web scanning for the latest jobs at your chosen time." description="Get fresh, relevant roles delivered right when you need them, with one-click access to tailored resumes, applications, interview prep & more.. for every opportunity." lottieUrl="" buttonText="Activate Now" isReversed={true} label="2" buttonUrl="https://t.me/Job_AI_update_bot" shouldDetectLocation={true} activationStatus={userProfile?.bot_activated} additionalContent={<>
-                <p className="text-xs text-gray-600 mb-2 text-center">
-                  After activating the Job Alerts AI Agent, click "Create Job Alerts" below to set your daily preferences.
-                </p>
-                <Button onClick={async () => {
-            // Detect and store location before navigation
-            await detectAndStoreLocation(userProfile, updateUserProfile);
-            navigate('/job-alerts');
-            window.scrollTo(0, 0);
-          }} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 text-xs">
-                  <CalendarPlus className="w-3 h-3" />
-                  Create Job Alerts
-                </Button>
-              </>} />
+            {/* Job Alerts Agent */}
+            <AccordionItem value="job-alerts" className="border border-border rounded-lg" style={{backgroundColor: '#30313D'}}>
+              <AccordionTrigger className="hover:no-underline px-4 py-3">
+                <div className="flex items-center gap-3 text-left w-full">
+                  <div className="relative">
+                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                      2
+                    </div>
+                    <ActivationStatusTag isActivated={userProfile?.bot_activated} />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-white font-medium text-lg">🔔 Job Alerts Agent</h3>
+                    <p className="text-gray-300 text-sm mt-1">Daily web scanning for the latest jobs at your chosen time.</p>
+                  </div>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4">
+                <div className="space-y-4">
+                  <p className="text-gray-300 text-sm">
+                    Get fresh, relevant roles delivered right when you need them, with one-click access to tailored resumes, applications, interview prep & more.. for every opportunity.
+                  </p>
+                  <Button 
+                    onClick={async () => {
+                      await detectAndStoreLocation(userProfile, updateUserProfile);
+                      window.open('https://t.me/Job_AI_update_bot', '_blank');
+                    }}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 mb-3"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Activate Now
+                  </Button>
+                  <div className="pt-2 border-t border-gray-600">
+                    <p className="text-xs text-gray-400 mb-2 text-center">
+                      After activating the Job Alerts AI Agent, click "Create Job Alerts" below to set your daily preferences.
+                    </p>
+                    <Button 
+                      onClick={async () => {
+                        await detectAndStoreLocation(userProfile, updateUserProfile);
+                        navigate('/job-alerts');
+                        window.scrollTo(0, 0);
+                      }} 
+                      className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-200"
+                    >
+                      <CalendarPlus className="w-4 h-4" />
+                      Create Job Alerts
+                    </Button>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
 
-          {/* Job Application Agent */}
-          <FeatureSection title="👔 Job Application Agent" subheading="Your quick helper when you find a job." description="Share a few details and instantly receive a tailored resume, cover letter, HR contacts, interview prep & more.. - everything you need to apply with confidence" lottieUrl="" buttonText="Activate Now" isReversed={false} label="3" buttonUrl="https://t.me/add_job_aspirelyai_bot" shouldDetectLocation={true} activationStatus={userProfile?.add_job_bot_activated} />
+            {/* Job Application Agent */}
+            <AccordionItem value="job-application" className="border border-border rounded-lg" style={{backgroundColor: '#30313D'}}>
+              <AccordionTrigger className="hover:no-underline px-4 py-3">
+                <div className="flex items-center gap-3 text-left w-full">
+                  <div className="relative">
+                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                      3
+                    </div>
+                    <ActivationStatusTag isActivated={userProfile?.add_job_bot_activated} />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-white font-medium text-lg">👔 Job Application Agent</h3>
+                    <p className="text-gray-300 text-sm mt-1">Your quick helper when you find a job.</p>
+                  </div>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4">
+                <div className="space-y-4">
+                  <p className="text-gray-300 text-sm">
+                    Share a few details and instantly receive a tailored resume, cover letter, HR contacts, interview prep & more.. - everything you need to apply with confidence.
+                  </p>
+                  <Button 
+                    onClick={async () => {
+                      await detectAndStoreLocation(userProfile, updateUserProfile);
+                      window.open('https://t.me/add_job_aspirelyai_bot', '_blank');
+                    }}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-200"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Activate Now
+                  </Button>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
       </div>
     </Layout>;
