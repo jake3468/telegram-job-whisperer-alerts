@@ -251,7 +251,7 @@ const HeroSection = () => {
             
             <p>this is the stuff that actually works. stuff that actually gets you ahead.</p>
             
-            <p className="font-medium">👇 try your AI Job Agents and see it yourself</p>
+            <p>👇 try your AI Job Agents and see it yourself</p>
           </div>
           
           <div className="flex flex-col md:flex-row items-start justify-start md:items-center md:justify-center space-y-3 md:space-y-0 md:space-x-3">
