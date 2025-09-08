@@ -237,7 +237,7 @@ const HeroSection = () => {
     </section>
     
     {/* Telegram Agents Section - Separate section below hero */}
-    <section className="relative py-12 bg-background">
+    <section className="relative py-4 bg-background">
       <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
         <div className="text-left">
           <p className="text-foreground mb-4 text-sm md:text-base font-inter">By using our AI Job Agents, you'll <span className="font-semibold font-inter">unlock your true potential</span> and discover opportunities you never knew existed.</p>
