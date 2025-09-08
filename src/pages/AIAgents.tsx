@@ -41,7 +41,7 @@ const AIAgents = () => {
             <span className="text-cyan-300 text-left font-inter text-3xl sm:text-3xl md:text-4xl">Your AI Agents</span>
           </h1>
           <p className="text-sm lg:text-base text-white font-inter font-light mb-3 text-left max-w-2xl mx-auto md:text-center lg:text-left">
-            First, let's meet and activate your personal <span className="italic text-pastel-peach">AI Job agents</span> - they're ready to guide you through every step of your job hunt.
+            First, let's meet and activate your personal <span className="text-pastel-peach whitespace-nowrap">AI Job agents</span> - they're ready to guide you through every step of your job hunt.
           </p>
         </div>
 
