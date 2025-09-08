@@ -206,7 +206,7 @@ const HeroSection = () => {
             <div className="hidden md:flex items-start gap-3 mb-6 ml-4">
               <HandDrawnArrow direction="left" className="flex-shrink-0 mt-1" />
               <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm">
-                hey… here's a boring demo 🥱 watch it carefullyyyy… our 3 Agents are right there with the value they bring
+                check out this demo… our 3 Telegram AI Job Agents are right here, showing how they can help you stand out like the top 1%.
               </p>
             </div>
           </SignedOut>
