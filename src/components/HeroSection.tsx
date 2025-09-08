@@ -245,7 +245,7 @@ const HeroSection = () => {
             
             <p>and all those online resume builders? everyone's pdf ends up looking the same.</p>
             
-            <p>we built this with actual job seekers in mind. people who need something that actually helps them land jobs.</p>
+            <p>We’re different……we built this with actual job seekers in mind. people who need something that actually helps them land jobs.</p>
             
             <p>we're not here to trap you with subscriptions. start free, pay-as-you-go if you want more. no hidden tricks.</p>
             
