@@ -3,7 +3,7 @@ const ToolsSection = () => {
   return <section id="features" className="relative bg-background">
       {/* Header Section */}
       <div className="max-w-7xl mx-auto px-4 py-4 text-center">
-        <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-2 font-inter md:text-3xl">
+        <h2 className="sm:text-4xl font-bold text-foreground mb-2 font-inter md:text-3xl text-2xl">
           Apart from Telegram AI Agents, here's what we offer..
         </h2>
       </div>
