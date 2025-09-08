@@ -75,7 +75,7 @@ const AIMockInterview = () => {
           {/* Hero Section */}
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-3 mb-6 relative">
-              <span className="text-5xl">📞</span>
+              <span className="text-4xl">📞</span>
               <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent text-left">AI Mock Interview</h1>
               
               {/* Manual Refresh Button */}
