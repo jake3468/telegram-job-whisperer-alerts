@@ -206,7 +206,7 @@ const HeroSection = () => {
             <div className="hidden md:flex items-start gap-3 mb-6 ml-4">
               <HandDrawnArrow direction="left" className="flex-shrink-0 mt-1" />
               <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm">
-                hey… here's a boring demo 😅 watch it carefullyyyy… our 3 Agents are right there with the value they bring
+                hey… here's a boring demo 🥱 watch it carefullyyyy… our 3 Agents are right there with the value they bring
               </p>
             </div>
           </SignedOut>
@@ -220,7 +220,7 @@ const HeroSection = () => {
           <div className="flex md:hidden items-start gap-3 mt-4 mb-6 justify-center px-4">
             <HandDrawnArrow direction="up" className="flex-shrink-0 mt-1" />
             <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm">
-              hey… here's a boring demo 😅 watch it carefullyyyy… our 3 Agents are right there with the value they bring
+              hey… here's a boring demo 🥱 watch it carefullyyyy… our 3 Agents are right there with the value they bring
             </p>
           </div>
 
