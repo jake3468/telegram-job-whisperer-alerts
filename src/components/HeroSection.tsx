@@ -206,7 +206,7 @@ const HeroSection = () => {
             <div className="hidden md:flex items-start gap-3 mb-6 ml-4">
               <HandDrawnArrow direction="left" className="flex-shrink-0 mt-1" />
               <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm">
-                check out this demo… our 3 Telegram AI Job Agents are right here, showing how they can help you stand out like the top 1%.
+                hey… here's a boring demo 🥱 watch it carefullyyyy… our 3 Agents are right there with the value they bring
               </p>
             </div>
           </SignedOut>
@@ -220,7 +220,7 @@ const HeroSection = () => {
           <div className="flex md:hidden items-start gap-3 mt-4 mb-6 justify-center px-4">
             <HandDrawnArrow direction="up" className="flex-shrink-0 mt-1" />
             <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm">
-              check out this demo… our 3 Telegram AI Job Agents are right here, showing how they can help you stand out like the top 1%.
+              hey… here's a boring demo 🥱 watch it carefullyyyy… our 3 Agents are right there with the value they bring
             </p>
           </div>
 
@@ -245,13 +245,13 @@ const HeroSection = () => {
             
             
             
-            <p>We’re different……we built this with actual job seekers in mind. people who need something that actually helps them land jobs.</p>
+            <p>we’re not like them… we built our platform for genuine job seekers like you. people who need something that actually helps them land jobs.</p>
             
-            <p>we're not here to trap you with subscriptions. start free, pay-as-you-go if you want more. no hidden tricks.</p>
+            <p><p>we're not here to trap you with subscriptions. <strong>start free</strong>, pay-as-you-go if you want more. no hidden tricks.</p></p>
             
-            <p>that's why we made Telegram AI Job Agents. if you're wondering why Telegram… who has time to go through websites every day when you already have a lot going on? just open a chat, and your agents are there - fixing resumes, sending alerts, writing cover letters, prepping interviews, even pointing to the right HR contacts. it's like having a friend helping you land the job.</p>
+            <p><p>first, we made <strong>Telegram AI Job Agents</strong> just for you.. if you're wondering why Telegram… who has time to go through websites every day when you already have a lot going on? just open a chat, and your agents are there - fixing resumes, sending alerts, writing cover letters, prepping interviews, even pointing to the right HR contacts. it's like having a friend helping you land the job.</p></p>
             
-            <p>this is the stuff that actually works. stuff that actually gets you ahead.</p>
+            <p><p>this is the stuff that actually works. stuff that <strong>actually gets you ahead</strong>.</p></p>
             
             <p>👇 try your AI Job Agents and see it yourself</p>
           </div>
