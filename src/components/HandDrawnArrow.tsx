@@ -51,6 +51,7 @@ const HandDrawnArrow = ({ className, direction = 'left' }: HandDrawnArrowProps) 
             stroke="currentColor" 
             strokeWidth="2.5" 
             strokeLinecap="round" 
+            strokeLinejoin="round"
             fill="none"
           />
         </svg>
