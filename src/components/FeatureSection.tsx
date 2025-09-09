@@ -198,30 +198,6 @@ const FeatureSection = ({
                 <p className="text-xs leading-relaxed font-opensans font-normal text-neutral-950 text-left">
                   {description}
                 </p>
-                {title === "👔 Job Application Agent" && <>
-                    <div className="mt-3 inline-block border border-gray-800 bg-gray-100 px-2 py-1 rounded-lg">
-                      <p className="text-xs font-medium text-neutral-700">
-                        Example chat below 👇
-                      </p>
-                    </div>
-                    <img src="/lovable-uploads/438fbede-9968-4fe7-9622-807454b576af.png" alt="Job Application Agent conversation interface" className="mt-2 w-full max-w-xs rounded-lg shadow-md" />
-                  </>}
-                {title === "📝 Resume Builder Agent" && <>
-                    <div className="mt-3 inline-block border border-gray-800 bg-gray-100 px-2 py-1 rounded-lg">
-                      <p className="text-xs font-medium text-neutral-700">
-                        Example chat below 👇
-                      </p>
-                    </div>
-                    <img src="/lovable-uploads/80af4c55-96c8-4c4e-9cb9-f4f6c8530524.png" alt="Resume Builder Agent conversation interface" className="mt-2 w-full max-w-xs rounded-lg shadow-md" />
-                  </>}
-                {title === "🔔 Job Alerts Agent" && <>
-                    <div className="mt-3 inline-block border border-gray-800 bg-gray-100 px-2 py-1 rounded-lg">
-                      <p className="text-xs font-medium text-neutral-700">
-                        Example chat below 👇
-                      </p>
-                    </div>
-                    <img src="/lovable-uploads/e5a7f299-f690-47de-a1b5-f44cfc229925.png" alt="Job Alerts Agent conversation interface" className="mt-2 w-full max-w-xs rounded-lg shadow-md" />
-                  </>}
               </div>
               <div className="pt-3 md:pt-2 space-y-3">
                 {isComingSoon ? <button type="button" disabled className="w-full bg-gray-700 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm cursor-not-allowed opacity-75">
