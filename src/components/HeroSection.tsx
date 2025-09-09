@@ -282,7 +282,7 @@ const HeroSection = () => {
           {/* Demo Image */}
           <div className="mt-8 flex justify-center">
             <img 
-              src="/lovable-uploads/e4a13c66-9b8a-4b6c-ae89-927ca821253a.png" 
+              src="/lovable-uploads/5b725964-9ba7-4dca-993d-0bac747cccb5.png" 
               alt="Telegram AI Job Agents Demo - showing Job Application, Resume Builder, and Job Alerts agents in action"
               className="max-w-full h-auto rounded-lg shadow-lg"
             />
