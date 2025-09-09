@@ -113,7 +113,7 @@ const HeroSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-center">
           
           {/* Hero Video - Centered in left side, aligned with hero text */}
-          <div className="hidden md:flex justify-center items-start mb-8 md:mb-0 md:pr-8">
+          <div className="hidden md:flex justify-center items-start mb-8 md:mb-0 md:pr-8 md:-mt-8 lg:-mt-12">
             <YouTubeHeroVideo className="w-full max-w-xs" />
           </div>
           
