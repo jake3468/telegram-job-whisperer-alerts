@@ -253,7 +253,7 @@ const HeroSection = () => {
             
             <p>we’re not like them… we built our platform for genuine job seekers like you. people who need something that actually helps them land jobs.</p>
             
-            <p><p>we're not here to trap you with subscriptions. <strong>start free</strong>, pay-as-you-go if you want more. no hidden tricks.</p></p>
+            <p><p>we're not here to trap you with subscriptions. <strong>start free</strong>, pay-as-you-go only if you want more. no hidden tricks.</p></p>
             
             <p><p>first, we made <strong>Telegram AI Job Agents</strong> just for you.. if you're wondering why Telegram… who has time to go through websites every day when you already have a lot going on? just open a chat, and your agents are there - fixing resumes, sending alerts, writing cover letters, prepping interviews, even pointing to the right HR contacts. it's like having a friend helping you land the job.</p></p>
             
