@@ -165,14 +165,14 @@ const HeroSection = () => {
             {/* Button and Badge Container */}
             <div className="flex flex-col items-start md:flex-col md:items-start lg:flex-row lg:items-center lg:justify-start gap-4 md:gap-6 mb-8">
               <SignUpButton mode="modal">
-                <button className="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white dark:bg-gray-50 dark:hover:bg-gray-200 dark:text-white px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-primary/50 flex items-center gap-2 justify-start md:justify-center w-auto">
+                <button className="bg-[#30313D] hover:bg-[#3a3b47] text-white dark:bg-gray-50 dark:hover:bg-gray-200 dark:text-black px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-primary/50 flex items-center gap-2 justify-start md:justify-center w-auto">
                   🎯 Start Free Now
                 </button>
               </SignUpButton>
               
               {/* Discount Badge */}
               <div className="bg-white border border-green-600 dark:bg-green-900/30 dark:border-green-700 rounded-full px-4 py-2 md:px-4 md:py-2 w-auto text-left md:text-center">
-                <span className="text-green-700 dark:text-green-300 text-xs md:text-sm font-medium font-inter">
+                <span className="text-green-700 dark:text-green-300 text-xs md:text-sm font-semibold font-inter">
                   Get 50% off with code "ASP123"
                 </span>
               </div>
@@ -253,7 +253,7 @@ const HeroSection = () => {
             
             <p>we’re not like them… we built our platform for genuine job seekers like you. people who need something that actually helps them land jobs.</p>
             
-            <p><p>we're not here to trap you with subscriptions. <strong>start free</strong>, pay-as-you-go if you want more. no hidden tricks.</p></p>
+            <p><p>we're not here to trap you with subscriptions. <strong>start free</strong>, pay-as-you-go only if you want more. no hidden tricks.</p></p>
             
             <p><p>first, we made <strong>Telegram AI Job Agents</strong> just for you.. if you're wondering why Telegram… who has time to go through websites every day when you already have a lot going on? just open a chat, and your agents are there - fixing resumes, sending alerts, writing cover letters, prepping interviews, even pointing to the right HR contacts. it's like having a friend helping you land the job.</p></p>
             
@@ -263,11 +263,6 @@ const HeroSection = () => {
           </div>
           
           <div className="flex flex-col md:flex-row items-start justify-start md:items-center md:justify-center space-y-3 md:space-y-0 md:space-x-3">
-            <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-gray-700 dark:border-gray-200 rounded-xl px-3 py-2 bg-gray-700 hover:bg-gray-800 dark:bg-gray-200 dark:hover:bg-gray-100">
-              <span className="text-lg">👔</span>
-              <span className="italic text-white dark:text-gray-900 text-sm">Job Application Agent</span>
-            </a>
-            
             <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-gray-700 dark:border-gray-200 rounded-xl px-3 py-2 bg-gray-700 hover:bg-gray-800 dark:bg-gray-200 dark:hover:bg-gray-100">
               <span className="text-lg">📝</span>
               <span className="italic text-white dark:text-gray-900 text-sm">Resume Builder Agent</span>
@@ -277,12 +272,17 @@ const HeroSection = () => {
               <span className="text-lg">🔔</span>
               <span className="italic text-white dark:text-gray-900 text-sm">Job Alerts Agent</span>
             </a>
+            
+            <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-gray-700 dark:border-gray-200 rounded-xl px-3 py-2 bg-gray-700 hover:bg-gray-800 dark:bg-gray-200 dark:hover:bg-gray-100">
+              <span className="text-lg">👔</span>
+              <span className="italic text-white dark:text-gray-900 text-sm">Job Application Agent</span>
+            </a>
           </div>
           
           {/* Demo Image */}
           <div className="mt-8 flex justify-center">
             <img 
-              src="/lovable-uploads/e4a13c66-9b8a-4b6c-ae89-927ca821253a.png" 
+              src="/lovable-uploads/5b725964-9ba7-4dca-993d-0bac747cccb5.png" 
               alt="Telegram AI Job Agents Demo - showing Job Application, Resume Builder, and Job Alerts agents in action"
               className="max-w-full h-auto rounded-lg shadow-lg"
             />
