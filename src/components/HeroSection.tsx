@@ -113,7 +113,7 @@ const HeroSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-center">
           
           {/* Hero Video - Centered in left side, aligned with hero text */}
-          <div className="hidden md:flex justify-center items-start mb-8 md:mb-0 md:pr-8">
+          <div className="hidden md:flex justify-center items-start mb-8 md:mb-0 md:pr-8 md:-mt-8 lg:-mt-12">
             <YouTubeHeroVideo className="w-full max-w-xs" />
           </div>
           
@@ -126,18 +126,24 @@ const HeroSection = () => {
           <h1 className="relative z-30 text-3xl md:text-4xl lg:text-5xl mb-1 leading-tight font-sans tracking-tight text-foreground drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">
             {/* Mobile and Desktop view */}
             <div className="block md:hidden lg:block">
-              <span className="text-black dark:text-white px-0.5 py-0 font-inter not-italic">Stop applying to <span>jobs</span> unprepared.</span>
+              <span className="text-black dark:text-white px-0.5 py-0 font-inter not-italic">Apply to Jobs</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter font-bold">We'll make you #1</span> 🏆
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">like a <span className="font-bold">Pro</span> 😎...</span>
+              <br />
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">Without wasting your</span>
+              <br />
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">precious time.</span>
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden">
-              <span className="text-black dark:text-white px-0.5 py-0 not-italic">Stop applying to</span>
+              <span className="text-black dark:text-white px-0.5 py-0 not-italic">Apply to Jobs</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic"><span>jobs</span> unprepared.</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">like a <span className="font-bold">Pro</span> 😎...</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-bold">We'll make you #1</span> 🏆
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">Without wasting your</span>
+              <br />
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">precious time.</span>
             </div>
           </h1>
         </div>
@@ -153,7 +159,7 @@ const HeroSection = () => {
         
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-gilroy font-light leading-relaxed md:text-base text-sm dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-8 text-base md:text-lg font-inter">Our AI Agents will update your <span className="font-bold italic text-primary">Resume</span>, send daily <span className="font-bold italic text-primary">Job Alerts</span>, craft tailored <span className="font-bold italic text-primary">Cover Letters</span>, prepare <span className="font-bold italic text-primary">Interview Kits</span>, check <span className="font-bold italic text-primary">Job fit</span>, give insider <span className="font-bold italic text-primary">Company</span> knowledge, and shares the <span className="font-bold italic text-primary">HRs</span> you should contact. Everything you will ever need, all in one place.</p>
+          <p className="mb-8 text-base md:text-lg font-inter">Our AI Agents will update your <span className="font-bold italic text-primary">Resume</span>, send daily <span className="font-bold italic text-primary">Job Alerts</span>, craft tailored <span className="font-bold italic text-primary">Cover Letters</span>, create <span className="font-bold italic text-primary">Interview files</span>, check <span className="font-bold italic text-primary">Job fit</span>, give insider <span className="font-bold italic text-primary">Company</span> knowledge, and shares the <span className="font-bold italic text-primary">HRs</span> you should contact. Everything you will ever need, all in one place.</p>
           
           <SignedOut>
             {/* Button and Badge Container */}
@@ -262,15 +268,24 @@ const HeroSection = () => {
               <span className="italic text-white dark:text-gray-900 text-sm">Job Application Agent</span>
             </a>
             
-            <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-gray-700 dark:border-gray-200 rounded-xl px-3 py-2 bg-gray-700 hover:bg-gray-800 dark:bg-gray-200 dark:hover:bg-gray-100">
-              <span className="text-lg">🔔</span>
-              <span className="italic text-white dark:text-gray-900 text-sm">Job Alerts Agent</span>
-            </a>
-            
             <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-gray-700 dark:border-gray-200 rounded-xl px-3 py-2 bg-gray-700 hover:bg-gray-800 dark:bg-gray-200 dark:hover:bg-gray-100">
               <span className="text-lg">📝</span>
               <span className="italic text-white dark:text-gray-900 text-sm">Resume Builder Agent</span>
             </a>
+            
+            <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-gray-700 dark:border-gray-200 rounded-xl px-3 py-2 bg-gray-700 hover:bg-gray-800 dark:bg-gray-200 dark:hover:bg-gray-100">
+              <span className="text-lg">🔔</span>
+              <span className="italic text-white dark:text-gray-900 text-sm">Job Alerts Agent</span>
+            </a>
+          </div>
+          
+          {/* Demo Image */}
+          <div className="mt-8 flex justify-center">
+            <img 
+              src="/lovable-uploads/e4a13c66-9b8a-4b6c-ae89-927ca821253a.png" 
+              alt="Telegram AI Job Agents Demo - showing Job Application, Resume Builder, and Job Alerts agents in action"
+              className="max-w-full h-auto rounded-lg shadow-lg"
+            />
           </div>
         </div>
       </div>
