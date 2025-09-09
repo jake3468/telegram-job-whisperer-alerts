@@ -272,6 +272,15 @@ const HeroSection = () => {
               <span className="italic text-white dark:text-gray-900 text-sm">Resume Builder Agent</span>
             </a>
           </div>
+          
+          {/* Demo Image */}
+          <div className="mt-8 flex justify-center">
+            <img 
+              src="/lovable-uploads/e4a13c66-9b8a-4b6c-ae89-927ca821253a.png" 
+              alt="Telegram AI Job Agents Demo - showing Job Application, Resume Builder, and Job Alerts agents in action"
+              className="max-w-full h-auto rounded-lg shadow-lg"
+            />
+          </div>
         </div>
       </div>
     </section>
