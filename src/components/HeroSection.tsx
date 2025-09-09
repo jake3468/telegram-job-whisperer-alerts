@@ -263,11 +263,6 @@ const HeroSection = () => {
           </div>
           
           <div className="flex flex-col md:flex-row items-start justify-start md:items-center md:justify-center space-y-3 md:space-y-0 md:space-x-3">
-            <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-gray-700 dark:border-gray-200 rounded-xl px-3 py-2 bg-gray-700 hover:bg-gray-800 dark:bg-gray-200 dark:hover:bg-gray-100">
-              <span className="text-lg">👔</span>
-              <span className="italic text-white dark:text-gray-900 text-sm">Job Application Agent</span>
-            </a>
-            
             <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-gray-700 dark:border-gray-200 rounded-xl px-3 py-2 bg-gray-700 hover:bg-gray-800 dark:bg-gray-200 dark:hover:bg-gray-100">
               <span className="text-lg">📝</span>
               <span className="italic text-white dark:text-gray-900 text-sm">Resume Builder Agent</span>
@@ -276,6 +271,11 @@ const HeroSection = () => {
             <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-gray-700 dark:border-gray-200 rounded-xl px-3 py-2 bg-gray-700 hover:bg-gray-800 dark:bg-gray-200 dark:hover:bg-gray-100">
               <span className="text-lg">🔔</span>
               <span className="italic text-white dark:text-gray-900 text-sm">Job Alerts Agent</span>
+            </a>
+            
+            <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-gray-700 dark:border-gray-200 rounded-xl px-3 py-2 bg-gray-700 hover:bg-gray-800 dark:bg-gray-200 dark:hover:bg-gray-100">
+              <span className="text-lg">👔</span>
+              <span className="italic text-white dark:text-gray-900 text-sm">Job Application Agent</span>
             </a>
           </div>
           
