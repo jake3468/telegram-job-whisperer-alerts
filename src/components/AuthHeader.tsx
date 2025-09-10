@@ -37,7 +37,7 @@ const AuthHeader = () => {
         <div className="flex items-center space-x-2 sm:space-x-3 z-40 cursor-pointer" onClick={() => navigate('/')}>
           <img 
             alt="JobBots Logo" 
-            className="h-9 w-9 sm:h-10 sm:w-10 drop-shadow-lg" 
+            className="h-9 w-9 sm:h-10 sm:w-10 drop-shadow-lg rounded-lg" 
             src="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/assets/logo.jpg"
             loading="eager"
             decoding="async"
