@@ -199,34 +199,27 @@ export default function GetMoreCredits() {
                     <span className="text-sm text-white">10 credits every month (auto-renewal)</span>
                   </div>
                   
-                  <div className="text-sm font-semibold text-cyan-300 mb-2">Use credits on any feature you want:</div>
-                  <div className="text-xs text-white space-y-1 ml-4 mb-3">
-                    <div>Resume = 3 credits</div>
-                    <div>Cover Letter = 1.5 credits</div>
-                    <div>Interview Prep = 6 credits</div>
-                    <div>Job Fit Check = 1 credit</div>
-                    <div>Company Insights = 3 credits</div>
-                    <div>Visa Info = 2 credits</div>
-                    <div>HR Profile = 2 credits</div>
-                  </div>
-
-                  <div className="text-xs text-gray-300 bg-gray-800/30 p-2 rounded border-l-2 border-cyan-400/40 mb-3">
-                    <strong>Example:</strong> With 10 credits, you could create 3 Cover Letters + 1 Resume + 2 Job Fit Checks, or run 10 Job Fit Checks - your choice.
-                  </div>
-
-                  <div className="text-sm font-semibold text-cyan-300 mb-2">Plus:</div>
-                  <div className="text-xs text-white space-y-1 ml-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                        <Check className="w-2 h-2 text-black" />
-                      </div>
-                      <span>Up to 100 Job Alert messages included every month</span>
+                  {/* Credit Usage Information Box */}
+                  <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-600 mb-3">
+                    <div className="text-cyan-400 font-semibold text-xs mb-2">Use credits on any feature you want:</div>
+                    <div className="text-xs text-white space-y-1 mb-3">
+                      <div>Resume = 3 credits</div>
+                      <div>Cover Letter = 1.5 credits</div>
+                      <div>Interview Prep = 6 credits</div>
+                      <div>Job Fit Check = 1 credit</div>
+                      <div>Company Insights = 3 credits</div>
+                      <div>Visa Info = 2 credits</div>
+                      <div>HR Profile = 2 credits</div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                        <Check className="w-2 h-2 text-black" />
-                      </div>
-                      <span>2 free phone-call AI mock interviews</span>
+
+                    <div className="text-xs text-gray-300 bg-gray-800/40 p-2 rounded border-l-2 border-cyan-400/40 mb-3">
+                      <strong>Example:</strong> With 10 credits, you could create 3 Cover Letters + 1 Resume + 2 Job Fit Checks, or run 10 Job Fit Checks - your choice.
+                    </div>
+
+                    <div className="text-cyan-400 font-semibold text-xs mb-2">Plus:</div>
+                    <div className="text-xs text-white space-y-1">
+                      <div>• Up to 100 Job Alert messages included every month</div>
+                      <div>• 2 free phone-call AI mock interviews</div>
                     </div>
                   </div>
                 </div>
