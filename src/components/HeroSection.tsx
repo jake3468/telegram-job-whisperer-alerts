@@ -130,7 +130,7 @@ const HeroSection = () => {
               <br />
               <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">like a <span className="font-bold">Pro</span> 😎...</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">Without wasting your</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">without wasting your</span>
               <br />
               <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">precious time.</span>
             </div>
@@ -141,7 +141,7 @@ const HeroSection = () => {
               <br />
               <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">like a <span className="font-bold">Pro</span> 😎...</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">Without wasting your</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">without wasting your</span>
               <br />
               <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">precious time.</span>
             </div>
