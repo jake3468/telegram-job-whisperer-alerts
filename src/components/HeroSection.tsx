@@ -123,7 +123,7 @@ const HeroSection = () => {
         {/* Background to block particles behind headline in dark mode */}
         <div className="relative mb-8">
           <div className="absolute inset-0 bg-background/80 dark:bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
-          <h1 className="relative z-30 text-3xl md:text-4xl lg:text-5xl mb-1 leading-[1] font-sf tracking-[-0.4px] text-foreground drop-shadow-2xl animate-slide-up dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic overflow-hidden">
+          <h1 className="relative z-30 text-3xl md:text-4xl lg:text-5xl mb-1 leading-none font-sans tracking-[-0.4px] text-foreground drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">
             {/* Mobile and Desktop view */}
             <div className="block md:hidden lg:block">
               <span className="text-black dark:text-white px-0.5 py-0 font-inter not-italic">Apply to Jobs</span>

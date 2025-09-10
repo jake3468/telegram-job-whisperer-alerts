@@ -105,23 +105,12 @@ export default {
 				'float': {
 					'0%, 100%': { transform: 'translateY(0px)' },
 					'50%': { transform: 'translateY(-4px)' }
-				},
-				'slide-up': {
-					'0%': { 
-						transform: 'translateY(100%)',
-						opacity: '0'
-					},
-					'100%': { 
-						transform: 'translateY(0)',
-						opacity: '1'
-					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'float': 'float 3s ease-in-out infinite',
-				'slide-up': 'slide-up 0.8s ease-out'
+				'float': 'float 3s ease-in-out infinite'
 			},
 			fontFamily: {
 				'inter': ['Inter', 'system-ui', 'sans-serif'],
@@ -131,7 +120,6 @@ export default {
         'opensans': ['Open Sans', 'system-ui', 'sans-serif'], // Added Open Sans font
         'quattrocento': ['Quattrocento', 'serif'], // Added Quattrocento font
         'gilroy': ['Manrope', 'system-ui', 'sans-serif'], // Added Gilroy-like font (Manrope)
-        'sf': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'system-ui', 'sans-serif'], // San Francisco font
 			}
 		}
 	},
