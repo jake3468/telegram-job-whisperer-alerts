@@ -171,11 +171,11 @@ const HeroSection = () => {
               </SignUpButton>
               
               {/* Discount Badge */}
-              <div className="bg-white border border-green-600 dark:bg-green-900/30 dark:border-green-700 rounded-full px-4 py-2 md:px-4 md:py-2 w-auto text-left md:text-center">
+              {/* <div className="bg-white border border-green-600 dark:bg-green-900/30 dark:border-green-700 rounded-full px-4 py-2 md:px-4 md:py-2 w-auto text-left md:text-center">
                 <span className="text-green-700 dark:text-green-300 text-xs md:text-sm font-semibold font-inter">
                   Get 50% off with code "ASP123"
                 </span>
-              </div>
+              </div> */}
             </div>
             {/* Avatar Group with Rating */}
             <div className="flex items-center justify-start gap-4 mb-6">
