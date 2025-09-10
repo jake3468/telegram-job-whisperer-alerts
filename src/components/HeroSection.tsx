@@ -126,24 +126,24 @@ const HeroSection = () => {
           <h1 className="relative z-30 text-3xl md:text-4xl lg:text-5xl mb-1 leading-none font-sans tracking-[-0.4px] text-foreground drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">
             {/* Mobile and Desktop view */}
             <div className="block md:hidden lg:block">
-              <span className="text-black dark:text-white px-0.5 py-0 font-inter not-italic">Apply to Jobs</span>
+              <span className="text-black dark:text-white px-0.5 py-0 font-inter not-italic font-bold">Apply to Jobs</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">like a <span className="font-bold">Pro</span> 😎...</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic font-bold">like a Pro 😎...</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">without wasting your</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic font-bold">without wasting your</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">precious time.</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic font-bold">precious time.</span>
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden">
-              <span className="text-black dark:text-white px-0.5 py-0 not-italic">Apply to Jobs</span>
+              <span className="text-black dark:text-white px-0.5 py-0 not-italic font-bold">Apply to Jobs</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">like a <span className="font-bold">Pro</span> 😎...</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic font-bold">like a Pro 😎...</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">without wasting your</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic font-bold">without wasting your</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">precious time.</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic font-bold">precious time.</span>
             </div>
           </h1>
         </div>
