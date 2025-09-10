@@ -126,24 +126,24 @@ const HeroSection = () => {
           <h1 className="relative z-30 text-3xl md:text-4xl lg:text-5xl mb-1 leading-none font-sans tracking-[-0.4px] text-foreground drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">
             {/* Mobile and Desktop view */}
             <div className="block md:hidden lg:block">
-              <span className="text-black dark:text-white px-0.5 py-0 font-inter not-italic font-bold">Apply to Jobs</span>
+              <span className="text-black dark:text-white px-0.5 py-0 font-inter not-italic">Apply to Jobs</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic font-bold">like a Pro 😎...</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">like a <span className="font-bold">Pro</span> 😎...</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic font-bold">without wasting your</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">without wasting your</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic font-bold">precious time.</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">precious time.</span>
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden">
-              <span className="text-black dark:text-white px-0.5 py-0 not-italic font-bold">Apply to Jobs</span>
+              <span className="text-black dark:text-white px-0.5 py-0 not-italic">Apply to Jobs</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic font-bold">like a Pro 😎...</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">like a <span className="font-bold">Pro</span> 😎...</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic font-bold">without wasting your</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">without wasting your</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic font-bold">precious time.</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">precious time.</span>
             </div>
           </h1>
         </div>
@@ -159,9 +159,7 @@ const HeroSection = () => {
         
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-gilroy font-light leading-relaxed md:text-base text-sm dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-8 text-base md:text-lg font-inter relative p-6 rounded-2xl bg-cover bg-center bg-no-repeat text-black" style={{backgroundImage: 'url(/lovable-uploads/a34b2b6a-9e61-4c3f-9404-80ea00dd8971.png)'}}>
-            <span className="relative z-10">Our AI Agents will update your <span className="font-bold italic text-black">Resume</span>, send daily <span className="font-bold italic text-black">Job Alerts</span>, craft tailored <span className="font-bold italic text-black">Cover Letters</span>, create <span className="font-bold italic text-black">Interview files</span>, check <span className="font-bold italic text-black">Job fit</span>, give insider <span className="font-bold italic text-black">Company</span> knowledge, and shares the <span className="font-bold italic text-black">HRs</span> you should contact. Everything you will ever need, all in one place.</span>
-          </p>
+          <p className="mb-8 text-base md:text-lg font-inter">Our AI Agents will update your <span className="font-bold italic text-primary">Resume</span>, send daily <span className="font-bold italic text-primary">Job Alerts</span>, craft tailored <span className="font-bold italic text-primary">Cover Letters</span>, create <span className="font-bold italic text-primary">Interview files</span>, check <span className="font-bold italic text-primary">Job fit</span>, give insider <span className="font-bold italic text-primary">Company</span> knowledge, and shares the <span className="font-bold italic text-primary">HRs</span> you should contact. Everything you will ever need, all in one place.</p>
           
           <SignedOut>
             {/* Button and Badge Container */}
