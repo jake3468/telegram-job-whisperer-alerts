@@ -159,7 +159,10 @@ const HeroSection = () => {
         
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-gilroy font-light leading-relaxed md:text-base text-sm dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-8 text-base md:text-lg font-inter">Our AI Agents will update your <span className="font-bold italic text-primary">Resume</span>, send daily <span className="font-bold italic text-primary">Job Alerts</span>, craft tailored <span className="font-bold italic text-primary">Cover Letters</span>, create <span className="font-bold italic text-primary">Interview files</span>, check <span className="font-bold italic text-primary">Job fit</span>, give insider <span className="font-bold italic text-primary">Company</span> knowledge, and shares the <span className="font-bold italic text-primary">HRs</span> you should contact. Everything you will ever need, all in one place.</p>
+          <p className="mb-8 text-base md:text-lg font-inter relative p-6 rounded-2xl bg-cover bg-center bg-no-repeat text-white" style={{backgroundImage: 'url(/lovable-uploads/5f52fada-2b9f-4299-bd7d-dd87aa1880c9.png)'}}>
+            <span className="relative z-10">Our AI Agents will update your <span className="font-bold italic text-white">Resume</span>, send daily <span className="font-bold italic text-white">Job Alerts</span>, craft tailored <span className="font-bold italic text-white">Cover Letters</span>, create <span className="font-bold italic text-white">Interview files</span>, check <span className="font-bold italic text-white">Job fit</span>, give insider <span className="font-bold italic text-white">Company</span> knowledge, and shares the <span className="font-bold italic text-white">HRs</span> you should contact. Everything you will ever need, all in one place.</span>
+            <div className="absolute inset-0 bg-black/30 rounded-2xl z-0"></div>
+          </p>
           
           <SignedOut>
             {/* Button and Badge Container */}
