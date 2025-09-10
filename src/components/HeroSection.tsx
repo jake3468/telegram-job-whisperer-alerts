@@ -130,7 +130,7 @@ const HeroSection = () => {
               <br />
               <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">like a <span className="font-bold">Pro</span> 😎...</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">without wasting your</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">Without wasting your</span>
               <br />
               <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">precious time.</span>
             </div>
@@ -171,11 +171,11 @@ const HeroSection = () => {
               </SignUpButton>
               
               {/* Discount Badge */}
-              <div className="bg-white border border-green-600 dark:bg-green-900/30 dark:border-green-700 rounded-full px-4 py-2 md:px-4 md:py-2 w-auto text-left md:text-center">
+              {/* <div className="bg-white border border-green-600 dark:bg-green-900/30 dark:border-green-700 rounded-full px-4 py-2 md:px-4 md:py-2 w-auto text-left md:text-center">
                 <span className="text-green-700 dark:text-green-300 text-xs md:text-sm font-semibold font-inter">
                   Get 50% off with code "ASP123"
                 </span>
-              </div>
+              </div> */}
             </div>
             {/* Avatar Group with Rating */}
             <div className="flex items-center justify-start gap-4 mb-6">
@@ -281,7 +281,11 @@ const HeroSection = () => {
           
           {/* Demo Image */}
           <div className="mt-8 flex justify-center">
-            <img src="/lovable-uploads/5b725964-9ba7-4dca-993d-0bac747cccb5.png" alt="Telegram AI Job Agents Demo - showing Job Application, Resume Builder, and Job Alerts agents in action" className="max-w-full h-auto rounded-lg shadow-lg" />
+            <img 
+              src="/lovable-uploads/5b725964-9ba7-4dca-993d-0bac747cccb5.png" 
+              alt="Telegram AI Job Agents Demo - showing Job Application, Resume Builder, and Job Alerts agents in action"
+              className="max-w-full h-auto rounded-lg shadow-lg"
+            />
           </div>
         </div>
       </div>
