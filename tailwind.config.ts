@@ -79,7 +79,6 @@ export default {
 			},
 			backgroundImage: {
         'hero-glow': 'radial-gradient(ellipse_80%_60%_at_50%_120%,rgba(239,68,68,0.1),transparent)',
-        'hero-light-gradient': 'linear-gradient(to right, #ffffff 0%, #ffffff 60%, #e6faff 100%)',
       },
 			borderRadius: {
 				lg: 'var(--radius)',
