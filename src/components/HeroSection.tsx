@@ -123,27 +123,27 @@ const HeroSection = () => {
         {/* Background to block particles behind headline in dark mode */}
         <div className="relative mb-8">
           <div className="absolute inset-0 bg-background/80 dark:bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
-          <h1 className="relative z-30 text-3xl md:text-4xl lg:text-5xl mb-1 leading-none font-sans tracking-[-0.4px] text-foreground drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic font-bold">
+          <h1 className="relative z-30 text-3xl md:text-4xl lg:text-5xl mb-1 leading-none font-sans tracking-[-0.4px] text-foreground drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">
             {/* Mobile and Desktop view */}
             <div className="block md:hidden lg:block">
-              <span className="text-black dark:text-white px-0.5 py-0 font-inter not-italic font-bold">Apply to Jobs</span>
+              <span className="text-black dark:text-white px-0.5 py-0 font-inter not-italic">Apply to Jobs</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic font-bold">like a <span className="font-bold">Pro</span> 😎...</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">like a <span className="font-bold">Pro</span> 😎...</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic font-bold">without wasting your</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">without wasting your</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic font-bold">precious time.</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">precious time.</span>
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden">
-              <span className="text-black dark:text-white px-0.5 py-0 not-italic font-bold">Apply to Jobs</span>
+              <span className="text-black dark:text-white px-0.5 py-0 not-italic">Apply to Jobs</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic font-bold">like a <span className="font-bold">Pro</span> 😎...</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">like a <span className="font-bold">Pro</span> 😎...</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic font-bold">without wasting your</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">without wasting your</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic font-bold">precious time.</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">precious time.</span>
             </div>
           </h1>
         </div>
@@ -158,8 +158,8 @@ const HeroSection = () => {
           </div>} */}
         
 
-        <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-gilroy font-bold leading-relaxed md:text-base text-sm dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-8 text-base md:text-lg font-inter font-bold">Our AI Agents will update your <span className="font-bold italic text-primary">Resume</span>, send daily <span className="font-bold italic text-primary">Job Alerts</span>, craft tailored <span className="font-bold italic text-primary">Cover Letters</span>, create <span className="font-bold italic text-primary">Interview files</span>, check <span className="font-bold italic text-primary">Job fit</span>, give insider <span className="font-bold italic text-primary">Company</span> knowledge, and shares the <span className="font-bold italic text-primary">HRs</span> you should contact. Everything you will ever need, all in one place.</p>
+        <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-gilroy font-light leading-relaxed md:text-base text-sm dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
+          <p className="mb-8 text-base md:text-lg font-inter">Our AI Agents will update your <span className="font-bold italic text-primary">Resume</span>, send daily <span className="font-bold italic text-primary">Job Alerts</span>, craft tailored <span className="font-bold italic text-primary">Cover Letters</span>, create <span className="font-bold italic text-primary">Interview files</span>, check <span className="font-bold italic text-primary">Job fit</span>, give insider <span className="font-bold italic text-primary">Company</span> knowledge, and shares the <span className="font-bold italic text-primary">HRs</span> you should contact. Everything you will ever need, all in one place.</p>
           
           <SignedOut>
             {/* Button and Badge Container */}
@@ -170,7 +170,7 @@ const HeroSection = () => {
                 </button>
               </SignUpButton>
               
-              <p className="text-foreground text-sm italic mt-2 font-bold">in just 5 seconds...</p>
+              <p className="text-foreground text-sm italic mt-2 font-semibold">in just 5 seconds...</p>
               
               {/* Discount Badge */}
               {/* <div className="bg-white border border-green-600 dark:bg-green-900/30 dark:border-green-700 rounded-full px-4 py-2 md:px-4 md:py-2 w-auto text-left md:text-center">
@@ -205,7 +205,7 @@ const HeroSection = () => {
                   <span>⭐⭐⭐⭐⭐</span>
                 </div>
                 <div className="text-foreground text-sm text-left">
-                  <span className="italic text-sm font-bold">Loved by <span className="font-bold">300+</span> users worldwide</span>
+                  <span className="italic text-sm font-medium">Loved by <span className="font-bold">300+</span> users worldwide</span>
                 </div>
               </div>
             </div>
@@ -213,7 +213,7 @@ const HeroSection = () => {
             {/* Desktop Demo Text with Arrow - positioned below avatars like a notebook note */}
             <div className="hidden md:flex items-start gap-3 mb-6 ml-4">
               <HandDrawnArrow direction="left" className="flex-shrink-0 mt-1" />
-              <p className="text-foreground text-sm font-inter font-bold leading-relaxed max-w-sm">
+              <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm">
                 check out this demo… our 3 Telegram AI Job Agents are right here, showing how they can help you stand out like the top 1%.
               </p>
             </div>
@@ -227,7 +227,7 @@ const HeroSection = () => {
           {/* Mobile Demo Text with Arrow - positioned below video pointing up */}
           <div className="flex md:hidden items-start gap-3 mt-4 mb-6 justify-center px-4">
             <HandDrawnArrow direction="up" className="flex-shrink-0 mt-1" />
-            <p className="text-foreground text-sm font-inter font-bold leading-relaxed max-w-sm">
+            <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm">
               check out this demo… our 3 Telegram AI Job Agents are right here, showing how they can help you stand out like the top 1%.
             </p>
           </div>
