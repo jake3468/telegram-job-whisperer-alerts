@@ -170,7 +170,7 @@ const HeroSection = () => {
                 </button>
               </SignUpButton>
               
-              <p className="text-foreground text-sm italic mt-2">in just 5 seconds...</p>
+              <p className="text-foreground text-sm italic mt-2 font-semibold">in just 5 seconds...</p>
               
               {/* Discount Badge */}
               {/* <div className="bg-white border border-green-600 dark:bg-green-900/30 dark:border-green-700 rounded-full px-4 py-2 md:px-4 md:py-2 w-auto text-left md:text-center">
