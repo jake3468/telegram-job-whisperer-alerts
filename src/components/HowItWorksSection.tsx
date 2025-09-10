@@ -40,7 +40,7 @@ const HowItWorksSection = () => {
             {steps.map((step, index) => (
               <div 
                 key={index}
-                className="relative flex flex-col items-center text-center group"
+                className="relative flex flex-col items-center text-center group font-inter"
               >
                 {/* Step number and icon */}
                 <div className="relative mb-6">
