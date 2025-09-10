@@ -130,7 +130,7 @@ const HeroSection = () => {
               <br />
               <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">like a <span className="font-bold">Pro</span> 😎...</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">Without wasting your</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">without wasting your</span>
               <br />
               <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-inter not-italic">precious time.</span>
             </div>
@@ -141,7 +141,7 @@ const HeroSection = () => {
               <br />
               <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">like a <span className="font-bold">Pro</span> 😎...</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">Without wasting your</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">without wasting your</span>
               <br />
               <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block not-italic">precious time.</span>
             </div>
@@ -166,16 +166,18 @@ const HeroSection = () => {
             <div className="flex flex-col items-start md:flex-col md:items-start lg:flex-row lg:items-center lg:justify-start gap-4 md:gap-6 mb-8">
               <SignUpButton mode="modal">
                 <button className="bg-[#30313D] hover:bg-[#3a3b47] text-white dark:bg-gray-50 dark:hover:bg-gray-200 dark:text-black px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-primary/50 flex items-center gap-2 justify-start md:justify-center w-auto">
-                  🎯 Start Free Now
+                  🚀 Create free account
                 </button>
               </SignUpButton>
               
+              <p className="text-foreground text-sm italic mt-2 font-semibold">in just 5 seconds...</p>
+              
               {/* Discount Badge */}
-              <div className="bg-white border border-green-600 dark:bg-green-900/30 dark:border-green-700 rounded-full px-4 py-2 md:px-4 md:py-2 w-auto text-left md:text-center">
+              {/* <div className="bg-white border border-green-600 dark:bg-green-900/30 dark:border-green-700 rounded-full px-4 py-2 md:px-4 md:py-2 w-auto text-left md:text-center">
                 <span className="text-green-700 dark:text-green-300 text-xs md:text-sm font-semibold font-inter">
                   Get 50% off with code "ASP123"
                 </span>
-              </div>
+              </div> */}
             </div>
             {/* Avatar Group with Rating */}
             <div className="flex items-center justify-start gap-4 mb-6">
