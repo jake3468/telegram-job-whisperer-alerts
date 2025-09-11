@@ -9,6 +9,18 @@ import { useEnterpriseAuth } from './useEnterpriseAuth';
 type JobBoardItem = Tables<'job_board'>;
 type JobTrackerItem = Tables<'job_tracker'>;
 
+interface PaginationState {
+  currentPage: number;
+  pageSize: number;
+  totalCount: number;
+}
+
+interface SectionPagination {
+  postedToday: PaginationState;
+  last7Days: PaginationState;
+  saved: PaginationState;
+}
+
 export const useJobBoardData = () => {
   const { user: clerkUser } = useUser();
   const { executeWithRetry, isAuthReady } = useEnterpriseAuth();
@@ -20,8 +32,101 @@ export const useJobBoardData = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [connectionIssue, setConnectionIssue] = useState(false);
+  
+  // Pagination states
+  const [pagination, setPagination] = useState<SectionPagination>({
+    postedToday: { currentPage: 1, pageSize: 10, totalCount: 0 },
+    last7Days: { currentPage: 1, pageSize: 10, totalCount: 0 },
+    saved: { currentPage: 1, pageSize: 10, totalCount: 0 }
+  });
 
-  const fetchJobs = async (forceRefresh = false) => {
+  const fetchJobsForSection = async (
+    section: 'postedToday' | 'last7Days' | 'saved',
+    page: number = 1,
+    pageSize: number = 10,
+    userProfileId?: string
+  ) => {
+    if (!clerkUser && section === 'saved') return { jobs: [], count: 0 };
+    
+    const offset = (page - 1) * pageSize;
+    
+    if (!clerkUser) {
+      // For non-logged in users
+      const { data: jobBoardData, error: fetchError } = await supabase
+        .from('job_board')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range(offset, offset + pageSize - 1);
+
+      if (fetchError) throw fetchError;
+
+      const allJobs = jobBoardData || [];
+      const today = new Date();
+      const twentyThreeHoursAgo = new Date(today.getTime() - 23 * 60 * 60 * 1000);
+      const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+      let filteredJobs: JobBoardItem[] = [];
+      if (section === 'postedToday') {
+        filteredJobs = allJobs.filter(job => new Date(job.created_at) > twentyThreeHoursAgo);
+      } else if (section === 'last7Days') {
+        filteredJobs = allJobs.filter(job => {
+          const createdAt = new Date(job.created_at);
+          return createdAt <= twentyThreeHoursAgo && createdAt > sevenDaysAgo;
+        });
+      }
+
+      // Get total count for pagination
+      const { count } = await supabase
+        .from('job_board')
+        .select('*', { count: 'exact', head: true });
+
+      return { jobs: filteredJobs, count: count || 0 };
+    }
+
+    if (!userProfileId) throw new Error('User profile ID required');
+
+    let query = supabase
+      .from('job_board')
+      .select('*')
+      .eq('user_id', userProfileId);
+
+    if (section === 'postedToday') {
+      query = query.eq('section', 'posted_today').eq('is_saved_by_user', false);
+    } else if (section === 'last7Days') {
+      query = query.eq('section', 'last_7_days').eq('is_saved_by_user', false);
+    } else if (section === 'saved') {
+      query = query.eq('is_saved_by_user', true);
+    }
+
+    const { data: jobs, error: fetchError } = await query
+      .order('created_at', { ascending: false })
+      .range(offset, offset + pageSize - 1);
+
+    if (fetchError) throw fetchError;
+
+    // Get count for pagination
+    let countQuery = supabase
+      .from('job_board')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userProfileId);
+
+    if (section === 'postedToday') {
+      countQuery = countQuery.eq('section', 'posted_today').eq('is_saved_by_user', false);
+    } else if (section === 'last7Days') {
+      countQuery = countQuery.eq('section', 'last_7_days').eq('is_saved_by_user', false);
+    } else if (section === 'saved') {
+      countQuery = countQuery.eq('is_saved_by_user', true);
+    }
+
+    const { count } = await countQuery;
+
+    return { jobs: jobs || [], count: count || 0 };
+  };
+
+  const fetchJobs = async (
+    forceRefresh = false,
+    specificSection?: 'postedToday' | 'last7Days' | 'saved'
+  ) => {
     if (!clerkUser) {
       // For non-logged in users, still show jobs but without personalization
       return executeWithRetry(async () => {
@@ -29,33 +134,27 @@ export const useJobBoardData = () => {
         setError(null);
         setConnectionIssue(false);
 
-        const { data: jobBoardData, error: fetchError } = await supabase
-          .from('job_board')
-          .select('*')
-          .order('created_at', { ascending: false });
+        const sectionsToFetch = specificSection ? [specificSection] : ['postedToday', 'last7Days'] as const;
+        
+        for (const section of sectionsToFetch) {
+          const { jobs, count } = await fetchJobsForSection(
+            section,
+            pagination[section].currentPage,
+            pagination[section].pageSize
+          );
 
-        if (fetchError) {
-          throw fetchError;
+          if (section === 'postedToday') {
+            setPostedTodayJobs(jobs);
+          } else if (section === 'last7Days') {
+            setLast7DaysJobs(jobs);
+          }
+
+          setPagination(prev => ({
+            ...prev,
+            [section]: { ...prev[section], totalCount: count }
+          }));
         }
 
-        const allJobs = jobBoardData || [];
-        
-        // Categorize jobs for non-logged in users (no saved functionality)
-        const today = new Date();
-        const twentyThreeHoursAgo = new Date(today.getTime() - 23 * 60 * 60 * 1000);
-        const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-
-        const postedToday = allJobs.filter(job => 
-          new Date(job.created_at) > twentyThreeHoursAgo
-        );
-
-        const lastWeek = allJobs.filter(job => {
-          const createdAt = new Date(job.created_at);
-          return createdAt <= twentyThreeHoursAgo && createdAt > sevenDaysAgo;
-        });
-
-        setPostedTodayJobs(postedToday);
-        setLast7DaysJobs(lastWeek);
         setSavedToTrackerJobs([]);
         return;
       }, 3, 'fetch jobs for non-logged user').catch(err => {
@@ -132,63 +231,56 @@ export const useJobBoardData = () => {
       // Note: Cleanup function now runs automatically every hour via cron job
       // No need to run it manually on every fetch
 
-      // Fetch job_board data for this user
-      const { data: jobBoardData, error: fetchError } = await supabase
-        .from('job_board')
-        .select('*')
-        .eq('user_id', userProfile.id)
-        .order('created_at', { ascending: false });
+      const sectionsToFetch = specificSection ? [specificSection] : ['postedToday', 'last7Days', 'saved'] as const;
+      
+      for (const section of sectionsToFetch) {
+        const { jobs, count } = await fetchJobsForSection(
+          section,
+          pagination[section].currentPage,
+          pagination[section].pageSize,
+          userProfile.id
+        );
 
-      if (fetchError) {
-        throw fetchError;
-      }
-
-      const allJobs = jobBoardData || [];
-
-      // Categorize jobs based on database section column and saved status
-      // Posted Today: Jobs with section='posted_today' that are NOT saved by user
-      const postedToday = allJobs.filter(job => 
-        job.section === 'posted_today' && !job.is_saved_by_user
-      );
-
-      // Last 7 Days: Jobs with section='last_7_days' that are NOT saved by user
-      const lastWeek = allJobs.filter(job => 
-        job.section === 'last_7_days' && !job.is_saved_by_user
-      );
-
-      // Saved: Jobs marked as saved by user (regardless of section)
-      const savedToTracker = allJobs.filter(job => 
-        job.is_saved_by_user === true
-      );
-
-      // Check tracker status for saved jobs (with better error handling)
-      const trackerStatus: Record<string, boolean> = {};
-      if (savedToTracker.length > 0) {
-        try {
-          const { data: trackerJobs } = await supabase
-            .from('job_tracker')
-            .select('job_reference_id')
-            .eq('user_id', userProfile.id)
-            .not('job_reference_id', 'is', null);
-
-          if (trackerJobs) {
-            const trackerJobIds = new Set(trackerJobs.map(tj => tj.job_reference_id));
-            savedToTracker.forEach(job => {
-              if (job.job_reference_id) {
-                trackerStatus[job.job_reference_id] = trackerJobIds.has(job.job_reference_id);
-              }
-            });
-          }
-        } catch (trackerError) {
-          console.error('Error fetching tracker status:', trackerError);
-          // Don't fail the entire fetch, just continue without tracker status
+        if (section === 'postedToday') {
+          setPostedTodayJobs(jobs);
+        } else if (section === 'last7Days') {
+          setLast7DaysJobs(jobs);
+        } else if (section === 'saved') {
+          setSavedToTrackerJobs(jobs);
         }
+
+        setPagination(prev => ({
+          ...prev,
+          [section]: { ...prev[section], totalCount: count }
+        }));
       }
 
-      setPostedTodayJobs(postedToday);
-      setLast7DaysJobs(lastWeek);
-      setSavedToTrackerJobs(savedToTracker);
-      setJobTrackerStatus(trackerStatus);
+      // Check tracker status for saved jobs only if we're fetching saved section
+      if (!specificSection || specificSection === 'saved') {
+        const trackerStatus: Record<string, boolean> = {};
+        if (savedToTrackerJobs.length > 0) {
+          try {
+            const { data: trackerJobs } = await supabase
+              .from('job_tracker')
+              .select('job_reference_id')
+              .eq('user_id', userProfile.id)
+              .not('job_reference_id', 'is', null);
+
+            if (trackerJobs) {
+              const trackerJobIds = new Set(trackerJobs.map(tj => tj.job_reference_id));
+              savedToTrackerJobs.forEach(job => {
+                if (job.job_reference_id) {
+                  trackerStatus[job.job_reference_id] = trackerJobIds.has(job.job_reference_id);
+                }
+              });
+            }
+          } catch (trackerError) {
+            console.error('Error fetching tracker status:', trackerError);
+            // Don't fail the entire fetch, just continue without tracker status
+          }
+        }
+        setJobTrackerStatus(trackerStatus);
+      }
 
     }, 5, 'fetch jobs for logged user').catch(err => {
       console.error('Error fetching job board data:', err);
@@ -540,6 +632,26 @@ export const useJobBoardData = () => {
     }
   };
 
+  const changePage = (section: 'postedToday' | 'last7Days' | 'saved', page: number) => {
+    setPagination(prev => ({
+      ...prev,
+      [section]: { ...prev[section], currentPage: page }
+    }));
+    
+    // Fetch jobs for the specific section with new page
+    fetchJobs(false, section);
+  };
+
+  const changePageSize = (section: 'postedToday' | 'last7Days' | 'saved', size: number) => {
+    setPagination(prev => ({
+      ...prev,
+      [section]: { ...prev[section], pageSize: size, currentPage: 1 }
+    }));
+    
+    // Fetch jobs for the specific section with new page size
+    fetchJobs(false, section);
+  };
+
   useEffect(() => {
     // Only fetch jobs after authentication is ready
     if (isAuthReady || !clerkUser) {
@@ -580,6 +692,9 @@ export const useJobBoardData = () => {
     saveToTracker,
     markJobAsSaved,
     deleteJobFromBoard,
-    deleteJobFromTracker
+    deleteJobFromTracker,
+    pagination,
+    changePage,
+    changePageSize
   };
 };
