@@ -120,6 +120,7 @@ export default {
         'opensans': ['Open Sans', 'system-ui', 'sans-serif'], // Added Open Sans font
         'quattrocento': ['Quattrocento', 'serif'], // Added Quattrocento font
         'gilroy': ['Manrope', 'system-ui', 'sans-serif'], // Added Gilroy-like font (Manrope)
+        'grotesk': ['Space Grotesk', 'system-ui', 'sans-serif'], // Added FK Grotesk-like font (Space Grotesk)
 			}
 		}
 	},

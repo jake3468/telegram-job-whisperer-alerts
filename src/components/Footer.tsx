@@ -109,6 +109,9 @@ const Footer = () => {
               <a href="/privacy-policy" className="block text-foreground hover:text-primary transition-colors duration-200 text-base font-inter">
                 Privacy Policy
               </a>
+              <a href="/cookie-policy" className="block text-foreground hover:text-primary transition-colors duration-200 text-base font-inter">
+                Cookie Policy
+              </a>
               <a href="/terms-of-service" className="block text-foreground hover:text-primary transition-colors duration-200 text-base font-inter">
                 Terms of Service
               </a>

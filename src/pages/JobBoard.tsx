@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, MapPin, Building2, ExternalLink, X, RefreshCw, Check, Trash2 } from 'lucide-react';
 import { useJobBoardData } from '@/hooks/useJobBoardData';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -202,7 +204,13 @@ const JobBoard = () => {
     saveToTracker,
     markJobAsSaved,
     deleteJobFromBoard,
-    forceRefresh
+    forceRefresh,
+    pagination,
+    changePage,
+    changePageSize,
+    sectionLoading,
+    sectionLoaded,
+    loadSectionData
   } = useJobBoardData();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJob, setSelectedJob] = useState<JobBoardItem | null>(null);
@@ -216,16 +224,18 @@ const JobBoard = () => {
     }
   }, [userProfile]);
 
-  // Set up navigation callback for tab switching
-  useEffect(() => {
-    (window as any).jobBoardNavigationCallback = (tabName: string) => {
-      setActiveTab(tabName);
-    };
-
-    return () => {
-      delete (window as any).jobBoardNavigationCallback;
-    };
-  }, []);
+  // Handle tab change and lazy load data
+  const handleTabChange = (tabValue: string) => {
+    updateActivity();
+    setActiveTab(tabValue);
+    
+    // Load section data on demand
+    if (tabValue === 'last-7-days' && !sectionLoaded.last7Days) {
+      loadSectionData('last7Days');
+    } else if (tabValue === 'saved-to-tracker' && !sectionLoaded.saved) {
+      loadSectionData('saved');
+    }
+  };
   const handleCloseOnboarding = () => {
     updateActivity();
     setShowOnboarding(false);
@@ -320,8 +330,8 @@ const JobBoard = () => {
                  </Button>}
             </div>
             <div className="px-2 sm:px-4">
-              <p className="text-gray-300 text-sm sm:text-lg break-words">
-                Browse job alerts received via <span className="italic text-violet-400">Telegram</span>— all jobs posted today appear here, stay visible for 7 days, and are auto-deleted after that. Save the ones you like and move them to your <span className="italic text-indigo-200">Job Tracker</span> page when you're ready to apply.
+              <p className="text-gray-300 text-sm sm:text-lg break-words text-left">
+                Browse job alerts as received via Telegram &quot;Job Alerts&quot; AI Agent — all jobs posted today appear here, stay visible for 7 days, and are auto-deleted after that. Save the ones you like and move them to your <span className="italic text-indigo-200">Job Tracker</span> page when you're ready to apply.
               </p>
             </div>
             {/* Error indicator */}
@@ -336,23 +346,23 @@ const JobBoard = () => {
 
           {/* Job Sections */}
           <div className="w-full overflow-hidden">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
               <div className="px-2 sm:px-4 mb-6">
-                 <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm gap-0.5 sm:gap-1 h-auto p-0.5 sm:p-1 border-0 rounded-xl">
-                   <TabsTrigger value="posted-today" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden" onClick={updateActivity}>
+                  <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm gap-0.5 sm:gap-1 h-auto p-0.5 sm:p-1 border-0 rounded-xl">
+                   <TabsTrigger value="posted-today" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
                      <span className="hidden lg:inline truncate">Posted Today</span>
                      <span className="lg:hidden truncate">Today</span>
-                     <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({filteredPostedTodayJobs.length})</span>
+                     <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({pagination.postedToday.totalCount})</span>
                    </TabsTrigger>
-                   <TabsTrigger value="last-7-days" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden" onClick={updateActivity}>
+                   <TabsTrigger value="last-7-days" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
                      <span className="hidden sm:inline truncate">Last 7 Days</span>
                      <span className="sm:hidden truncate">Week</span>
-                     <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({filteredLast7DaysJobs.length})</span>
+                     <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({pagination.last7Days.totalCount})</span>
                    </TabsTrigger>
-                   <TabsTrigger value="saved-to-tracker" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden" onClick={updateActivity}>
+                   <TabsTrigger value="saved-to-tracker" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
                      <span className="hidden sm:inline truncate">Saved</span>
                      <span className="sm:hidden truncate">Saved</span>
-                     <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({filteredSavedToTrackerJobs.length})</span>
+                     <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({pagination.saved.totalCount})</span>
                    </TabsTrigger>
                  </TabsList>
               </div>
@@ -367,23 +377,173 @@ const JobBoard = () => {
 
               <div className="px-2 sm:px-4 overflow-hidden">
                 <TabsContent value="posted-today" className="space-y-3 mt-4 w-full">
-                  {filteredPostedTodayJobs.length === 0 ? <div className="text-center py-12 w-full">
+                  {sectionLoading.postedToday ? (
+                    <div className="text-center py-12 w-full">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                      <p className="text-gray-400 mt-4">Loading job opportunities...</p>
+                    </div>
+                  ) : filteredPostedTodayJobs.length === 0 ? (
+                    <div className="text-center py-12 w-full">
                       <p className="text-gray-400 text-lg">
                         {searchTerm ? `No jobs matching "${searchTerm}" found in posted today.` : "No jobs posted today."}
                       </p>
-                    </div> : <div className="space-y-3 w-full max-w-2xl mx-auto">
-                      {filteredPostedTodayJobs.map(job => <JobCard key={job.id} job={job} onView={() => { updateActivity(); setSelectedJob(job); }} onSaveToTracker={() => { updateActivity(); markJobAsSaved(job); }} section="posted-today" />)}
-                    </div>}
+                    </div>
+                  ) : (
+                    <>
+                      <div className="space-y-3 w-full max-w-2xl mx-auto">
+                        {filteredPostedTodayJobs.map(job => (
+                          <JobCard 
+                            key={job.id} 
+                            job={job} 
+                            onView={() => { updateActivity(); setSelectedJob(job); }} 
+                            onSaveToTracker={() => { updateActivity(); markJobAsSaved(job); }} 
+                            section="posted-today" 
+                          />
+                        ))}
+                      </div>
+                      
+                      {/* Pagination Controls */}
+                      <div className="flex items-center justify-between mt-6 max-w-2xl mx-auto">
+                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                          <span>
+                            {((pagination.postedToday.currentPage - 1) * pagination.postedToday.pageSize) + 1}-
+                            {Math.min(pagination.postedToday.currentPage * pagination.postedToday.pageSize, pagination.postedToday.totalCount)} of {pagination.postedToday.totalCount}
+                          </span>
+                          <Select 
+                            value={pagination.postedToday.pageSize.toString()} 
+                            onValueChange={(value) => changePageSize('postedToday', parseInt(value))}
+                          >
+                            <SelectTrigger className="w-20 h-8 text-xs bg-white/10 border-gray-600 text-gray-300">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="10">10</SelectItem>
+                              <SelectItem value="25">25</SelectItem>
+                              <SelectItem value="50">50</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <span className="text-gray-400">Results per page</span>
+                        </div>
+                        
+                        {pagination.postedToday.totalCount > pagination.postedToday.pageSize && (
+                          <Pagination className="justify-end">
+                            <PaginationContent>
+                              <PaginationItem>
+                                <PaginationPrevious 
+                                  href="#"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    if (pagination.postedToday.currentPage > 1) {
+                                      changePage('postedToday', pagination.postedToday.currentPage - 1);
+                                    }
+                                  }}
+                                  className={pagination.postedToday.currentPage === 1 ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
+                                />
+                              </PaginationItem>
+                              
+                              <PaginationItem>
+                                <PaginationNext 
+                                  href="#"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    if (pagination.postedToday.currentPage < Math.ceil(pagination.postedToday.totalCount / pagination.postedToday.pageSize)) {
+                                      changePage('postedToday', pagination.postedToday.currentPage + 1);
+                                    }
+                                  }}
+                                  className={pagination.postedToday.currentPage >= Math.ceil(pagination.postedToday.totalCount / pagination.postedToday.pageSize) ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
+                                />
+                              </PaginationItem>
+                            </PaginationContent>
+                          </Pagination>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </TabsContent>
 
                 <TabsContent value="last-7-days" className="space-y-3 mt-4 w-full">
-                  {filteredLast7DaysJobs.length === 0 ? <div className="text-center py-12 w-full">
+                  {sectionLoading.last7Days ? (
+                    <div className="text-center py-12 w-full">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                      <p className="text-gray-400 mt-4">Loading job opportunities...</p>
+                    </div>
+                  ) : filteredLast7DaysJobs.length === 0 ? (
+                    <div className="text-center py-12 w-full">
                       <p className="text-gray-400 text-lg">
                         {searchTerm ? `No jobs matching "${searchTerm}" found in last 7 days.` : "No jobs from the last 7 days."}
                       </p>
-                    </div> : <div className="space-y-3 w-full max-w-2xl mx-auto">
-                      {filteredLast7DaysJobs.map(job => <JobCard key={job.id} job={job} onView={() => { updateActivity(); setSelectedJob(job); }} onSaveToTracker={() => { updateActivity(); markJobAsSaved(job); }} section="last-7-days" />)}
-                    </div>}
+                    </div>
+                  ) : (
+                    <>
+                      <div className="space-y-3 w-full max-w-2xl mx-auto">
+                        {filteredLast7DaysJobs.map(job => (
+                          <JobCard 
+                            key={job.id} 
+                            job={job} 
+                            onView={() => { updateActivity(); setSelectedJob(job); }} 
+                            onSaveToTracker={() => { updateActivity(); markJobAsSaved(job); }} 
+                            section="last-7-days" 
+                          />
+                        ))}
+                      </div>
+                      
+                      {/* Pagination Controls */}
+                      <div className="flex items-center justify-between mt-6 max-w-2xl mx-auto">
+                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                          <span>
+                            {((pagination.last7Days.currentPage - 1) * pagination.last7Days.pageSize) + 1}-
+                            {Math.min(pagination.last7Days.currentPage * pagination.last7Days.pageSize, pagination.last7Days.totalCount)} of {pagination.last7Days.totalCount}
+                          </span>
+                          <Select 
+                            value={pagination.last7Days.pageSize.toString()} 
+                            onValueChange={(value) => changePageSize('last7Days', parseInt(value))}
+                          >
+                            <SelectTrigger className="w-20 h-8 text-xs bg-white/10 border-gray-600 text-gray-300">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="10">10</SelectItem>
+                              <SelectItem value="25">25</SelectItem>
+                              <SelectItem value="50">50</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <span className="text-gray-400">Results per page</span>
+                        </div>
+                        
+                        {pagination.last7Days.totalCount > pagination.last7Days.pageSize && (
+                          <Pagination className="justify-end">
+                            <PaginationContent>
+                              <PaginationItem>
+                                <PaginationPrevious 
+                                  href="#"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    if (pagination.last7Days.currentPage > 1) {
+                                      changePage('last7Days', pagination.last7Days.currentPage - 1);
+                                    }
+                                  }}
+                                  className={pagination.last7Days.currentPage === 1 ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
+                                />
+                              </PaginationItem>
+                              
+                              <PaginationItem>
+                                <PaginationNext 
+                                  href="#"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    if (pagination.last7Days.currentPage < Math.ceil(pagination.last7Days.totalCount / pagination.last7Days.pageSize)) {
+                                      changePage('last7Days', pagination.last7Days.currentPage + 1);
+                                    }
+                                  }}
+                                  className={pagination.last7Days.currentPage >= Math.ceil(pagination.last7Days.totalCount / pagination.last7Days.pageSize) ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
+                                />
+                              </PaginationItem>
+                            </PaginationContent>
+                          </Pagination>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </TabsContent>
 
                 <TabsContent value="saved-to-tracker" className="space-y-3 mt-4 w-full">
@@ -392,17 +552,94 @@ const JobBoard = () => {
                       <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
                       <span className="text-green-300 font-medium text-sm">Saved Jobs Section</span>
                     </div>
-                    <p className="text-gray-300 text-xs">Jobs you've saved are shown here. Click &quot;Add to Job Tracker/Track&quot; to track your application progress.</p>
+                    <p className="text-gray-300 text-xs">Jobs you&apos;ve saved are shown here. Click &quot;Add to Job Tracker/Track&quot; to track your application progress.</p>
                   </div>
                   
-                  {filteredSavedToTrackerJobs.length === 0 ? <div className="text-center py-12 w-full">
+                  {sectionLoading.saved ? (
+                    <div className="text-center py-12 w-full">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                      <p className="text-gray-400 mt-4">Loading job opportunities...</p>
+                    </div>
+                  ) : filteredSavedToTrackerJobs.length === 0 ? (
+                    <div className="text-center py-12 w-full">
                       <p className="text-gray-400 text-lg">
                         {searchTerm ? `No saved jobs matching "${searchTerm}" found.` : "No jobs saved yet."}
                       </p>
                       {!searchTerm && <p className="text-gray-500 mt-2">Save jobs from other sections to see them here.</p>}
-                    </div> : <div className="space-y-3 w-full max-w-2xl mx-auto">
-                      {filteredSavedToTrackerJobs.map(job => <JobCard key={job.id} job={job} onView={() => { updateActivity(); setSelectedJob(job); }} onSaveToTracker={() => { updateActivity(); saveToTracker(job); }} onDelete={() => { updateActivity(); deleteJobFromBoard(job); }} section="saved" isAddedToTracker={job.job_reference_id ? jobTrackerStatus[job.job_reference_id] : false} />)}
-                    </div>}
+                    </div>
+                  ) : (
+                    <>
+                      <div className="space-y-3 w-full max-w-2xl mx-auto">
+                        {filteredSavedToTrackerJobs.map(job => (
+                          <JobCard 
+                            key={job.id} 
+                            job={job} 
+                            onView={() => { updateActivity(); setSelectedJob(job); }} 
+                            onSaveToTracker={() => { updateActivity(); saveToTracker(job); }} 
+                            onDelete={() => { updateActivity(); deleteJobFromBoard(job); }} 
+                            section="saved" 
+                            isAddedToTracker={job.job_reference_id ? jobTrackerStatus[job.job_reference_id] : false} 
+                          />
+                        ))}
+                      </div>
+                      
+                      {/* Pagination Controls */}
+                      <div className="flex items-center justify-between mt-6 max-w-2xl mx-auto">
+                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                          <span>
+                            {((pagination.saved.currentPage - 1) * pagination.saved.pageSize) + 1}-
+                            {Math.min(pagination.saved.currentPage * pagination.saved.pageSize, pagination.saved.totalCount)} of {pagination.saved.totalCount}
+                          </span>
+                          <Select 
+                            value={pagination.saved.pageSize.toString()} 
+                            onValueChange={(value) => changePageSize('saved', parseInt(value))}
+                          >
+                            <SelectTrigger className="w-20 h-8 text-xs bg-white/10 border-gray-600 text-gray-300">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="10">10</SelectItem>
+                              <SelectItem value="25">25</SelectItem>
+                              <SelectItem value="50">50</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <span className="text-gray-400">Results per page</span>
+                        </div>
+                        
+                        {pagination.saved.totalCount > pagination.saved.pageSize && (
+                          <Pagination className="justify-end">
+                            <PaginationContent>
+                              <PaginationItem>
+                                <PaginationPrevious 
+                                  href="#"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    if (pagination.saved.currentPage > 1) {
+                                      changePage('saved', pagination.saved.currentPage - 1);
+                                    }
+                                  }}
+                                  className={pagination.saved.currentPage === 1 ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
+                                />
+                              </PaginationItem>
+                              
+                              <PaginationItem>
+                                <PaginationNext 
+                                  href="#"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    if (pagination.saved.currentPage < Math.ceil(pagination.saved.totalCount / pagination.saved.pageSize)) {
+                                      changePage('saved', pagination.saved.currentPage + 1);
+                                    }
+                                  }}
+                                  className={pagination.saved.currentPage >= Math.ceil(pagination.saved.totalCount / pagination.saved.pageSize) ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
+                                />
+                              </PaginationItem>
+                            </PaginationContent>
+                          </Pagination>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </TabsContent>
               </div>
             </Tabs>

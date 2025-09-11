@@ -11,11 +11,11 @@ const PrivacyPolicy = () => {
   return <div className="min-h-screen bg-background text-foreground font-inter">
       <Helmet>
         <title>Privacy Policy - Aspirely.ai | AI-Powered Job Hunting Platform</title>
-        <meta name="description" content="Aspirely.ai Privacy Policy - Learn how we collect, use, and protect your data in our AI-powered job hunting platform. Comprehensive data handling and user rights information." />
+        <meta name="description" content="Aspirely.ai Privacy Policy - Learn how we collect, use, and protect your data in our AI-powered job hunting platform. EU and UK GDPR compliant data handling and user rights information." />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://aspirely.ai/privacy-policy" />
         <meta property="og:title" content="Privacy Policy - Aspirely.ai" />
-        <meta property="og:description" content="Comprehensive privacy policy for Aspirely.ai covering data collection, Google OAuth integration, and user rights." />
+        <meta property="og:description" content="Comprehensive privacy policy for Aspirely.ai covering data collection, Google OAuth integration, and user rights under EU and UK GDPR." />
         <meta property="og:type" content="article" />
         <meta property="og:url" content="https://aspirely.ai/privacy-policy" />
         <script type="application/ld+json">
@@ -264,7 +264,81 @@ const PrivacyPolicy = () => {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">8. International Data Transfers</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">8. EU and UK GDPR Compliance and Lawful Basis</h2>
+              
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">8.1 Lawful Basis for Processing</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                Under EU GDPR and UK GDPR, we process your personal data based on the following lawful bases:
+              </p>
+              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-6">
+                <li><strong>Consent (Article 6(1)(a)):</strong> For marketing communications, analytics cookies, and optional features</li>
+                <li><strong>Contract (Article 6(1)(b)):</strong> To provide our AI-powered job hunting services as agreed in our Terms of Service</li>
+                <li><strong>Legitimate Interest (Article 6(1)(f)):</strong> For security, fraud prevention, and improving our services</li>
+                <li><strong>Legal Obligation (Article 6(1)(c)):</strong> To comply with legal requirements such as data protection laws and financial regulations</li>
+              </ul>
+
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">8.2 Special Categories of Data</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                We do not intentionally collect special categories of personal data (sensitive data such as health, race, religious beliefs). If such information is inadvertently included in your resume or other content, we process it only with your explicit consent and for the purpose of providing our services.
+              </p>
+
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">8.3 Data Protection Officer</h3>
+              <p className="text-gray-700 dark:text-gray-300">
+                While not legally required due to our size, we have designated a Data Protection Contact for privacy-related inquiries. You can reach them at support@aspirely.ai.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">9. Your Rights Under EU and UK GDPR</h2>
+              
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">9.1 Individual Rights</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                Under EU GDPR and UK GDPR, you have the following rights regarding your personal data:
+              </p>
+              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-3 mb-6">
+                <li><strong>Right of Access (Article 15):</strong> Request a copy of the personal data we hold about you</li>
+                <li><strong>Right to Rectification (Article 16):</strong> Correct inaccurate or incomplete personal data</li>
+                <li><strong>Right to Erasure (Article 17):</strong> Request deletion of your personal data in certain circumstances</li>
+                <li><strong>Right to Restrict Processing (Article 18):</strong> Limit how we use your personal data in specific situations</li>
+                <li><strong>Right to Data Portability (Article 20):</strong> Receive your personal data in a structured, commonly used format</li>
+                <li><strong>Right to Object (Article 21):</strong> Object to processing based on legitimate interests or for direct marketing</li>
+                <li><strong>Rights Related to Automated Decision-Making (Article 22):</strong> Request human review of automated decisions that significantly affect you</li>
+                <li><strong>Right to Withdraw Consent:</strong> Withdraw consent at any time where processing is based on consent</li>
+              </ul>
+
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">9.2 How to Exercise Your Rights</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                To exercise any of your rights, please contact us at support@aspirely.ai. We will:
+              </p>
+              <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-6">
+                <li>Respond to your request within 30 days (or explain if more time is needed)</li>
+                <li>Verify your identity before processing the request</li>
+                <li>Provide the requested information free of charge (unless the request is manifestly unfounded or excessive)</li>
+                <li>Inform you if we cannot comply with your request and explain why</li>
+              </ul>
+
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">9.3 Complaints and Data Protection Authority Contact</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                If you are not satisfied with how we handle your personal data or privacy concerns, you have the right to lodge a complaint with your local data protection supervisory authority:
+              </p>
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border border-blue-200 dark:border-blue-800 mb-4">
+                <p className="text-blue-900 dark:text-blue-100 font-medium mb-3">For EU Users - European Data Protection Board (EDPB)</p>
+                <ul className="list-none text-blue-800 dark:text-blue-200 space-y-1 mb-4">
+                  <li><strong>Website:</strong> <a href="https://edpb.europa.eu" target="_blank" rel="noopener noreferrer" className="underline">edpb.europa.eu</a></li>
+                  <li><strong>Find your local authority:</strong> <a href="https://edpb.europa.eu/about-edpb/about-edpb/members_en" target="_blank" rel="noopener noreferrer" className="underline">Local DPA Directory</a></li>
+                </ul>
+                <p className="text-blue-900 dark:text-blue-100 font-medium mb-3">For UK Users - Information Commissioner's Office (ICO)</p>
+                <ul className="list-none text-blue-800 dark:text-blue-200 space-y-1">
+                  <li><strong>Website:</strong> <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer" className="underline">ico.org.uk</a></li>
+                  <li><strong>Phone:</strong> 0303 123 1113</li>
+                  <li><strong>Email:</strong> <a href="mailto:casework@ico.org.uk" className="underline">casework@ico.org.uk</a></li>
+                  <li><strong>Address:</strong> Wycliffe House, Water Lane, Wilmslow, Cheshire SK9 5AF</li>
+                </ul>
+              </div>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">10. International Data Transfers</h2>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
                 As we use various third-party AI services and tools, your data may be transferred to and processed in countries other than your own. We ensure that such transfers comply with applicable data protection laws and that adequate safeguards are in place.
               </p>
@@ -274,14 +348,14 @@ const PrivacyPolicy = () => {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">9. Children's Privacy</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">11. Children's Privacy</h2>
               <p className="text-gray-700 dark:text-gray-300">
                 While we do not have specific age restrictions, our services are designed for job seekers and professionals. We do not knowingly collect personal information from children under 13. If we become aware that we have collected such information, we will take steps to delete it promptly.
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">10. Changes to This Privacy Policy</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">12. Changes to This Privacy Policy</h2>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
                 We may update this Privacy Policy from time to time to reflect changes in our practices, technology, legal requirements, or other factors. We will notify you of any material changes by:
               </p>
@@ -296,22 +370,28 @@ const PrivacyPolicy = () => {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">11. Contact Information</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">13. Contact Information</h2>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
                 If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:
               </p>
-              <div className="bg-gray-100 dark:bg-gray-900 p-6 rounded-lg border border-gray-300 dark:border-gray-800">
+              <div className="bg-gray-100 dark:bg-gray-900 p-6 rounded-lg border border-gray-300 dark:border-gray-800 mb-6">
                 <p className="text-gray-900 dark:text-white font-medium mb-2">Aspirely.ai Privacy Team</p>
                 <p className="text-gray-700 dark:text-gray-300 mb-2">Email: support@aspirely.ai</p>
-                <p className="text-gray-700 dark:text-gray-300 mb-2">Response Time: Within 48 hours</p>
+                <p className="text-gray-700 dark:text-gray-300 mb-2">General Support: support@aspirely.ai</p>
+                <p className="text-gray-700 dark:text-gray-300 mb-2">Response Time: Within 30 days for data requests, 48 hours for general inquiries</p>
                 <p className="text-gray-700 dark:text-gray-300">
                   For urgent privacy-related matters, please mark your email subject with "URGENT - Privacy Request"
                 </p>
               </div>
+
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">Alternative Contact Methods</h3>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                You can also reach us through our <a href="/contact-support" className="text-primary hover:underline">Contact Support page</a> for privacy-related inquiries.
+              </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">12. Effective Date</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">14. Effective Date</h2>
               <p className="text-gray-700 dark:text-gray-300">
                 This Privacy Policy is effective as of {new Date().toLocaleDateString()} and applies to all information collected by Aspirely.ai on or after this date.
               </p>
