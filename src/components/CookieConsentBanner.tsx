@@ -129,25 +129,25 @@ export const CookieConsentBanner = () => {
                       Customize
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
+                  <DialogContent className="max-w-sm sm:max-w-2xl max-h-[90vh] sm:max-h-none overflow-y-auto">
                     <DialogHeader>
-                      <DialogTitle>Cookie Preferences</DialogTitle>
+                      <DialogTitle className="text-base sm:text-lg">Cookie Preferences</DialogTitle>
                     </DialogHeader>
-                    <div className="space-y-6">
+                    <div className="space-y-4 sm:space-y-6">
                       <div>
-                        <h4 className="font-medium mb-2">Cookie Categories</h4>
-                        <p className="text-sm text-muted-foreground mb-4">
+                        <h4 className="font-medium mb-1 sm:mb-2 text-sm sm:text-base">Cookie Categories</h4>
+                        <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4">
                           Choose which types of cookies you want to allow. You can change these settings at any time.
                         </p>
                       </div>
 
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/30">
-                          <div className="flex-1">
-                            <Label htmlFor="necessary" className="font-medium">
+                      <div className="space-y-3 sm:space-y-4">
+                        <div className="flex items-center justify-between p-2 sm:p-4 border rounded-lg bg-muted/30">
+                          <div className="flex-1 pr-2">
+                            <Label htmlFor="necessary" className="font-medium text-sm sm:text-base">
                               Necessary Cookies
                             </Label>
-                            <p className="text-sm text-muted-foreground mt-1">
+                            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                               Essential for the website to function properly. These cannot be disabled.
                             </p>
                           </div>
@@ -155,15 +155,16 @@ export const CookieConsentBanner = () => {
                             id="necessary"
                             checked={preferences.necessary}
                             disabled
+                            className="scale-75 sm:scale-100"
                           />
                         </div>
 
-                        <div className="flex items-center justify-between p-4 border rounded-lg">
-                          <div className="flex-1">
-                            <Label htmlFor="analytics" className="font-medium">
+                        <div className="flex items-center justify-between p-2 sm:p-4 border rounded-lg">
+                          <div className="flex-1 pr-2">
+                            <Label htmlFor="analytics" className="font-medium text-sm sm:text-base">
                               Analytics Cookies
                             </Label>
-                            <p className="text-sm text-muted-foreground mt-1">
+                            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                               Help us understand how visitors interact with our website through Google Analytics.
                             </p>
                           </div>
@@ -171,15 +172,16 @@ export const CookieConsentBanner = () => {
                             id="analytics"
                             checked={preferences.analytics}
                             onCheckedChange={(checked) => updatePreference('analytics', checked)}
+                            className="scale-75 sm:scale-100"
                           />
                         </div>
 
-                        <div className="flex items-center justify-between p-4 border rounded-lg">
-                          <div className="flex-1">
-                            <Label htmlFor="functional" className="font-medium">
+                        <div className="flex items-center justify-between p-2 sm:p-4 border rounded-lg">
+                          <div className="flex-1 pr-2">
+                            <Label htmlFor="functional" className="font-medium text-sm sm:text-base">
                               Functional Cookies
                             </Label>
-                            <p className="text-sm text-muted-foreground mt-1">
+                            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                               Remember your preferences and settings to improve your experience.
                             </p>
                           </div>
@@ -187,15 +189,16 @@ export const CookieConsentBanner = () => {
                             id="functional"
                             checked={preferences.functional}
                             onCheckedChange={(checked) => updatePreference('functional', checked)}
+                            className="scale-75 sm:scale-100"
                           />
                         </div>
 
-                        <div className="flex items-center justify-between p-4 border rounded-lg">
-                          <div className="flex-1">
-                            <Label htmlFor="marketing" className="font-medium">
+                        <div className="flex items-center justify-between p-2 sm:p-4 border rounded-lg">
+                          <div className="flex-1 pr-2">
+                            <Label htmlFor="marketing" className="font-medium text-sm sm:text-base">
                               Marketing Cookies
                             </Label>
-                            <p className="text-sm text-muted-foreground mt-1">
+                            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                               Currently not used. Reserved for future marketing and advertising purposes.
                             </p>
                           </div>
@@ -203,17 +206,19 @@ export const CookieConsentBanner = () => {
                             id="marketing"
                             checked={preferences.marketing}
                             onCheckedChange={(checked) => updatePreference('marketing', checked)}
+                            className="scale-75 sm:scale-100"
                           />
                         </div>
                       </div>
 
-                      <div className="flex gap-3 pt-4">
-                        <Button onClick={handleSavePreferences} className="flex-1">
+                      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2 sm:pt-4">
+                        <Button onClick={handleSavePreferences} className="flex-1 text-sm h-8 sm:h-9">
                           Save Preferences
                         </Button>
                         <Button 
                           variant="outline" 
                           onClick={() => setShowSettings(false)}
+                          className="text-sm h-8 sm:h-9"
                         >
                           Cancel
                         </Button>
