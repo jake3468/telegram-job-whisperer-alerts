@@ -431,25 +431,6 @@ const JobBoard = () => {
                                 />
                               </PaginationItem>
                               
-                              {Array.from({ length: Math.min(5, Math.ceil(pagination.postedToday.totalCount / pagination.postedToday.pageSize)) }, (_, i) => {
-                                const page = i + 1;
-                                return (
-                                  <PaginationItem key={page}>
-                                    <PaginationLink
-                                      href="#"
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        changePage('postedToday', page);
-                                      }}
-                                      isActive={pagination.postedToday.currentPage === page}
-                                      className="text-gray-300 hover:text-white"
-                                    >
-                                      {page}
-                                    </PaginationLink>
-                                  </PaginationItem>
-                                );
-                              })}
-                              
                               <PaginationItem>
                                 <PaginationNext 
                                   href="#"
@@ -529,25 +510,6 @@ const JobBoard = () => {
                                   className={pagination.last7Days.currentPage === 1 ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
                                 />
                               </PaginationItem>
-                              
-                              {Array.from({ length: Math.min(5, Math.ceil(pagination.last7Days.totalCount / pagination.last7Days.pageSize)) }, (_, i) => {
-                                const page = i + 1;
-                                return (
-                                  <PaginationItem key={page}>
-                                    <PaginationLink
-                                      href="#"
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        changePage('last7Days', page);
-                                      }}
-                                      isActive={pagination.last7Days.currentPage === page}
-                                      className="text-gray-300 hover:text-white"
-                                    >
-                                      {page}
-                                    </PaginationLink>
-                                  </PaginationItem>
-                                );
-                              })}
                               
                               <PaginationItem>
                                 <PaginationNext 
@@ -639,25 +601,6 @@ const JobBoard = () => {
                                   className={pagination.saved.currentPage === 1 ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
                                 />
                               </PaginationItem>
-                              
-                              {Array.from({ length: Math.min(5, Math.ceil(pagination.saved.totalCount / pagination.saved.pageSize)) }, (_, i) => {
-                                const page = i + 1;
-                                return (
-                                  <PaginationItem key={page}>
-                                    <PaginationLink
-                                      href="#"
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        changePage('saved', page);
-                                      }}
-                                      isActive={pagination.saved.currentPage === page}
-                                      className="text-gray-300 hover:text-white"
-                                    >
-                                      {page}
-                                    </PaginationLink>
-                                  </PaginationItem>
-                                );
-                              })}
                               
                               <PaginationItem>
                                 <PaginationNext 
