@@ -207,7 +207,10 @@ const JobBoard = () => {
     forceRefresh,
     pagination,
     changePage,
-    changePageSize
+    changePageSize,
+    sectionLoading,
+    sectionLoaded,
+    loadSectionData
   } = useJobBoardData();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJob, setSelectedJob] = useState<JobBoardItem | null>(null);
@@ -221,16 +224,18 @@ const JobBoard = () => {
     }
   }, [userProfile]);
 
-  // Set up navigation callback for tab switching
-  useEffect(() => {
-    (window as any).jobBoardNavigationCallback = (tabName: string) => {
-      setActiveTab(tabName);
-    };
-
-    return () => {
-      delete (window as any).jobBoardNavigationCallback;
-    };
-  }, []);
+  // Handle tab change and lazy load data
+  const handleTabChange = (tabValue: string) => {
+    updateActivity();
+    setActiveTab(tabValue);
+    
+    // Load section data on demand
+    if (tabValue === 'last-7-days' && !sectionLoaded.last7Days) {
+      loadSectionData('last7Days');
+    } else if (tabValue === 'saved-to-tracker' && !sectionLoaded.saved) {
+      loadSectionData('saved');
+    }
+  };
   const handleCloseOnboarding = () => {
     updateActivity();
     setShowOnboarding(false);
@@ -341,20 +346,20 @@ const JobBoard = () => {
 
           {/* Job Sections */}
           <div className="w-full overflow-hidden">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
               <div className="px-2 sm:px-4 mb-6">
                   <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm gap-0.5 sm:gap-1 h-auto p-0.5 sm:p-1 border-0 rounded-xl">
-                   <TabsTrigger value="posted-today" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden" onClick={updateActivity}>
+                   <TabsTrigger value="posted-today" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
                      <span className="hidden lg:inline truncate">Posted Today</span>
                      <span className="lg:hidden truncate">Today</span>
                      <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({pagination.postedToday.totalCount})</span>
                    </TabsTrigger>
-                   <TabsTrigger value="last-7-days" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden" onClick={updateActivity}>
+                   <TabsTrigger value="last-7-days" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
                      <span className="hidden sm:inline truncate">Last 7 Days</span>
                      <span className="sm:hidden truncate">Week</span>
                      <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({pagination.last7Days.totalCount})</span>
                    </TabsTrigger>
-                   <TabsTrigger value="saved-to-tracker" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden" onClick={updateActivity}>
+                   <TabsTrigger value="saved-to-tracker" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
                      <span className="hidden sm:inline truncate">Saved</span>
                      <span className="sm:hidden truncate">Saved</span>
                      <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({pagination.saved.totalCount})</span>
@@ -372,7 +377,12 @@ const JobBoard = () => {
 
               <div className="px-2 sm:px-4 overflow-hidden">
                 <TabsContent value="posted-today" className="space-y-3 mt-4 w-full">
-                  {filteredPostedTodayJobs.length === 0 ? (
+                  {sectionLoading.postedToday ? (
+                    <div className="text-center py-12 w-full">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                      <p className="text-gray-400 mt-4">Loading job opportunities...</p>
+                    </div>
+                  ) : filteredPostedTodayJobs.length === 0 ? (
                     <div className="text-center py-12 w-full">
                       <p className="text-gray-400 text-lg">
                         {searchTerm ? `No jobs matching "${searchTerm}" found in posted today.` : "No jobs posted today."}
@@ -452,7 +462,12 @@ const JobBoard = () => {
                 </TabsContent>
 
                 <TabsContent value="last-7-days" className="space-y-3 mt-4 w-full">
-                  {filteredLast7DaysJobs.length === 0 ? (
+                  {sectionLoading.last7Days ? (
+                    <div className="text-center py-12 w-full">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                      <p className="text-gray-400 mt-4">Loading job opportunities...</p>
+                    </div>
+                  ) : filteredLast7DaysJobs.length === 0 ? (
                     <div className="text-center py-12 w-full">
                       <p className="text-gray-400 text-lg">
                         {searchTerm ? `No jobs matching "${searchTerm}" found in last 7 days.` : "No jobs from the last 7 days."}
@@ -540,7 +555,12 @@ const JobBoard = () => {
                     <p className="text-gray-300 text-xs">Jobs you&apos;ve saved are shown here. Click &quot;Add to Job Tracker/Track&quot; to track your application progress.</p>
                   </div>
                   
-                  {filteredSavedToTrackerJobs.length === 0 ? (
+                  {sectionLoading.saved ? (
+                    <div className="text-center py-12 w-full">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                      <p className="text-gray-400 mt-4">Loading job opportunities...</p>
+                    </div>
+                  ) : filteredSavedToTrackerJobs.length === 0 ? (
                     <div className="text-center py-12 w-full">
                       <p className="text-gray-400 text-lg">
                         {searchTerm ? `No saved jobs matching "${searchTerm}" found.` : "No jobs saved yet."}

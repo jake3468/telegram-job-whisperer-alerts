@@ -33,6 +33,18 @@ export const useJobBoardData = () => {
   const [error, setError] = useState<Error | null>(null);
   const [connectionIssue, setConnectionIssue] = useState(false);
   
+  // Section-specific loading states
+  const [sectionLoading, setSectionLoading] = useState<Record<string, boolean>>({
+    postedToday: false,
+    last7Days: false,
+    saved: false
+  });
+  const [sectionLoaded, setSectionLoaded] = useState<Record<string, boolean>>({
+    postedToday: false,
+    last7Days: false,
+    saved: false
+  });
+  
   // Pagination states
   const [pagination, setPagination] = useState<SectionPagination>({
     postedToday: { currentPage: 1, pageSize: 10, totalCount: 0 },
@@ -123,36 +135,108 @@ export const useJobBoardData = () => {
     return { jobs: jobs || [], count: count || 0 };
   };
 
+  // Fast count-only query for initial load
+  const fetchAllCounts = async (userProfileId?: string) => {
+    const counts = { postedToday: 0, last7Days: 0, saved: 0 };
+    
+    if (!clerkUser) {
+      // For non-logged in users
+      const { count } = await supabase
+        .from('job_board')
+        .select('*', { count: 'exact', head: true });
+      
+      // Estimate counts based on total (this is approximate)
+      counts.postedToday = Math.floor((count || 0) * 0.3);
+      counts.last7Days = Math.floor((count || 0) * 0.7);
+      counts.saved = 0;
+      return counts;
+    }
+
+    if (!userProfileId) return counts;
+
+    // Get counts for all sections simultaneously for logged in users
+    const [todayCount, weekCount, savedCount] = await Promise.all([
+      supabase
+        .from('job_board')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userProfileId)
+        .eq('section', 'posted_today')
+        .eq('is_saved_by_user', false),
+      supabase
+        .from('job_board')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userProfileId)
+        .eq('section', 'last_7_days')
+        .eq('is_saved_by_user', false),
+      supabase
+        .from('job_board')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userProfileId)
+        .eq('is_saved_by_user', true)
+    ]);
+
+    counts.postedToday = todayCount.count || 0;
+    counts.last7Days = weekCount.count || 0;
+    counts.saved = savedCount.count || 0;
+
+    return counts;
+  };
+
   const fetchJobs = async (
     forceRefresh = false,
     specificSection?: 'postedToday' | 'last7Days' | 'saved'
   ) => {
+    // Set section loading state
+    if (specificSection) {
+      setSectionLoading(prev => ({ ...prev, [specificSection]: true }));
+    }
+
     if (!clerkUser) {
       // For non-logged in users, still show jobs but without personalization
       return executeWithRetry(async () => {
-        setLoading(true);
+        if (!specificSection) {
+          setLoading(true);
+        }
         setError(null);
         setConnectionIssue(false);
 
-        const sectionsToFetch = specificSection ? [specificSection] : ['postedToday', 'last7Days'] as const;
-        
-        for (const section of sectionsToFetch) {
-          const { jobs, count } = await fetchJobsForSection(
-            section,
-            pagination[section].currentPage,
-            pagination[section].pageSize
-          );
-
-          if (section === 'postedToday') {
-            setPostedTodayJobs(jobs);
-          } else if (section === 'last7Days') {
-            setLast7DaysJobs(jobs);
-          }
-
+        // Initial load: fetch counts for all sections + data for "postedToday" only
+        if (!specificSection || specificSection === 'postedToday') {
+          const counts = await fetchAllCounts();
           setPagination(prev => ({
             ...prev,
-            [section]: { ...prev[section], totalCount: count }
+            postedToday: { ...prev.postedToday, totalCount: counts.postedToday },
+            last7Days: { ...prev.last7Days, totalCount: counts.last7Days },
+            saved: { ...prev.saved, totalCount: counts.saved }
           }));
+          
+          // Load "Posted Today" data
+          const { jobs } = await fetchJobsForSection(
+            'postedToday',
+            pagination.postedToday.currentPage,
+            pagination.postedToday.pageSize
+          );
+          setPostedTodayJobs(jobs);
+          setSectionLoaded(prev => ({ ...prev, postedToday: true }));
+        }
+
+        // Load specific section if requested
+        if (specificSection && specificSection !== 'postedToday') {
+          const { jobs, count } = await fetchJobsForSection(
+            specificSection,
+            pagination[specificSection].currentPage,
+            pagination[specificSection].pageSize
+          );
+
+          if (specificSection === 'last7Days') {
+            setLast7DaysJobs(jobs);
+          }
+          
+          setPagination(prev => ({
+            ...prev,
+            [specificSection]: { ...prev[specificSection], totalCount: count }
+          }));
+          setSectionLoaded(prev => ({ ...prev, [specificSection]: true }));
         }
 
         setSavedToTrackerJobs([]);
@@ -162,12 +246,19 @@ export const useJobBoardData = () => {
         setError(err as Error);
         setConnectionIssue(true);
       }).finally(() => {
-        setLoading(false);
+        if (!specificSection) {
+          setLoading(false);
+        }
+        if (specificSection) {
+          setSectionLoading(prev => ({ ...prev, [specificSection]: false }));
+        }
       });
     }
 
     return executeWithRetry(async () => {
-      setLoading(true);
+      if (!specificSection) {
+        setLoading(true);
+      }
       setError(null);
       setConnectionIssue(false);
 
@@ -228,37 +319,54 @@ export const useJobBoardData = () => {
         throw new Error('User profile not found. Please contact support.');
       }
 
-      // Note: Cleanup function now runs automatically every hour via cron job
-      // No need to run it manually on every fetch
-
-      const sectionsToFetch = specificSection ? [specificSection] : ['postedToday', 'last7Days', 'saved'] as const;
-      
-      for (const section of sectionsToFetch) {
-        const { jobs, count } = await fetchJobsForSection(
-          section,
-          pagination[section].currentPage,
-          pagination[section].pageSize,
-          userProfile.id
-        );
-
-        if (section === 'postedToday') {
-          setPostedTodayJobs(jobs);
-        } else if (section === 'last7Days') {
-          setLast7DaysJobs(jobs);
-        } else if (section === 'saved') {
-          setSavedToTrackerJobs(jobs);
-        }
-
+      // Initial load: fetch counts for all sections + data for "postedToday" only
+      if (!specificSection) {
+        const counts = await fetchAllCounts(userProfile.id);
         setPagination(prev => ({
           ...prev,
-          [section]: { ...prev[section], totalCount: count }
+          postedToday: { ...prev.postedToday, totalCount: counts.postedToday },
+          last7Days: { ...prev.last7Days, totalCount: counts.last7Days },
+          saved: { ...prev.saved, totalCount: counts.saved }
         }));
+        
+        // Load "Posted Today" data
+        const { jobs } = await fetchJobsForSection(
+          'postedToday',
+          pagination.postedToday.currentPage,
+          pagination.postedToday.pageSize,
+          userProfile.id
+        );
+        setPostedTodayJobs(jobs);
+        setSectionLoaded(prev => ({ ...prev, postedToday: true }));
+        return;
       }
 
+      // Load specific section when requested
+      const { jobs, count } = await fetchJobsForSection(
+        specificSection,
+        pagination[specificSection].currentPage,
+        pagination[specificSection].pageSize,
+        userProfile.id
+      );
+
+      if (specificSection === 'postedToday') {
+        setPostedTodayJobs(jobs);
+      } else if (specificSection === 'last7Days') {
+        setLast7DaysJobs(jobs);
+      } else if (specificSection === 'saved') {
+        setSavedToTrackerJobs(jobs);
+      }
+
+      setPagination(prev => ({
+        ...prev,
+        [specificSection]: { ...prev[specificSection], totalCount: count }
+      }));
+      setSectionLoaded(prev => ({ ...prev, [specificSection]: true }));
+
       // Check tracker status for saved jobs only if we're fetching saved section
-      if (!specificSection || specificSection === 'saved') {
+      if (specificSection === 'saved') {
         const trackerStatus: Record<string, boolean> = {};
-        if (savedToTrackerJobs.length > 0) {
+        if (jobs.length > 0) {
           try {
             const { data: trackerJobs } = await supabase
               .from('job_tracker')
@@ -268,7 +376,7 @@ export const useJobBoardData = () => {
 
             if (trackerJobs) {
               const trackerJobIds = new Set(trackerJobs.map(tj => tj.job_reference_id));
-              savedToTrackerJobs.forEach(job => {
+              jobs.forEach(job => {
                 if (job.job_reference_id) {
                   trackerStatus[job.job_reference_id] = trackerJobIds.has(job.job_reference_id);
                 }
@@ -287,7 +395,12 @@ export const useJobBoardData = () => {
       setError(err as Error);
       setConnectionIssue(true);
     }).finally(() => {
-      setLoading(false);
+      if (!specificSection) {
+        setLoading(false);
+      }
+      if (specificSection) {
+        setSectionLoading(prev => ({ ...prev, [specificSection]: false }));
+      }
     });
   };
 
@@ -632,6 +745,18 @@ export const useJobBoardData = () => {
     }
   };
 
+  const loadSectionData = async (section: 'postedToday' | 'last7Days' | 'saved') => {
+    if (sectionLoaded[section] && !sectionLoading[section]) {
+      return; // Already loaded
+    }
+    
+    try {
+      await fetchJobs(false, section);
+    } catch (err) {
+      console.error(`Error loading ${section} section:`, err);
+    }
+  };
+
   const changePage = (section: 'postedToday' | 'last7Days' | 'saved', page: number) => {
     setPagination(prev => ({
       ...prev,
@@ -695,6 +820,10 @@ export const useJobBoardData = () => {
     deleteJobFromTracker,
     pagination,
     changePage,
-    changePageSize
+    changePageSize,
+    // New section-specific states and functions
+    sectionLoading,
+    sectionLoaded,
+    loadSectionData
   };
 };
