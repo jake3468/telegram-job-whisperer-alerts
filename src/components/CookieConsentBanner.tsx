@@ -95,31 +95,37 @@ export const CookieConsentBanner = () => {
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-background/95 backdrop-blur-sm border-t">
-        <Card className="max-w-6xl mx-auto p-6">
-          <div className="flex items-start gap-4">
-            <Cookie className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+      <div className="fixed bottom-0 left-0 right-0 z-50 p-2 sm:p-4 bg-background/95 backdrop-blur-sm border-t">
+        <Card className="max-w-6xl mx-auto p-3 sm:p-6">
+          <div className="flex items-start gap-2 sm:gap-4">
+            <Cookie className="h-4 w-4 sm:h-6 sm:w-6 text-primary mt-1 flex-shrink-0" />
             <div className="flex-1">
-              <h3 className="text-lg font-semibold mb-2">Cookie Consent</h3>
-              <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
-                We use cookies to enhance your experience on our website. This includes essential cookies for functionality, 
-                analytics cookies to understand how you interact with our site, and functional cookies to remember your preferences. 
-                You can manage your cookie preferences at any time.{' '}
+              <h3 className="text-sm sm:text-lg font-semibold mb-1 sm:mb-2">Cookie Consent</h3>
+              <p className="text-muted-foreground mb-2 sm:mb-4 text-xs sm:text-sm leading-relaxed">
+                <span className="sm:hidden">
+                  We use cookies to enhance your experience. Manage preferences anytime.{' '}
+                </span>
+                <span className="hidden sm:inline">
+                  We use cookies to enhance your experience on our website. This includes essential cookies for functionality, 
+                  analytics cookies to understand how you interact with our site, and functional cookies to remember your preferences. 
+                  You can manage your cookie preferences at any time.{' '}
+                </span>
                 <Link to="/cookie-policy" className="text-primary hover:underline">
-                  Learn more in our Cookie Policy
+                  <span className="sm:hidden">Learn more</span>
+                  <span className="hidden sm:inline">Learn more in our Cookie Policy</span>
                 </Link>
               </p>
-              <div className="flex flex-wrap gap-3">
-                <Button onClick={handleAcceptAll} size="sm">
-                  Accept All Cookies
+              <div className="flex flex-col sm:flex-row flex-wrap gap-1 sm:gap-3">
+                <Button onClick={handleAcceptAll} size="sm" className="text-xs sm:text-sm h-7 sm:h-8">
+                  Accept All
                 </Button>
-                <Button onClick={handleAcceptNecessary} variant="outline" size="sm">
-                  Accept Necessary Only
+                <Button onClick={handleAcceptNecessary} variant="outline" size="sm" className="text-xs sm:text-sm h-7 sm:h-8">
+                  Necessary Only
                 </Button>
                 <Dialog open={showSettings} onOpenChange={setShowSettings}>
                   <DialogTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Settings className="h-4 w-4 mr-2" />
+                    <Button variant="outline" size="sm" className="text-xs sm:text-sm h-7 sm:h-8">
+                      <Settings className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                       Customize
                     </Button>
                   </DialogTrigger>
@@ -221,9 +227,9 @@ export const CookieConsentBanner = () => {
               variant="ghost"
               size="sm"
               onClick={() => setShowBanner(false)}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground h-6 w-6 sm:h-8 sm:w-8 p-0"
             >
-              <X className="h-4 w-4" />
+              <X className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
           </div>
         </Card>
