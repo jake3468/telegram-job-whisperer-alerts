@@ -85,7 +85,7 @@ const JobAlerts = () => {
           </span>
         </h1>
         
-        <p className="text-md text-orange-100 font-inter font-light mb-4 text-left">
+        <p className="text-md text-orange-100 font-inter font-light mb-4 text-left max-w-2xl mx-auto">
           Set your personalized job alerts here and our Telegram &quot;Job Alerts&quot; AI Agent will send you the latest 24-hour postings straight to your Telegram everyday. They will also appear under &apos;Posted Today&apos; on your Job Board page.
         </p>
 
