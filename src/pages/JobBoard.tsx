@@ -330,7 +330,7 @@ const JobBoard = () => {
                  </Button>}
             </div>
             <div className="px-2 sm:px-4">
-              <p className="text-gray-300 text-sm sm:text-lg break-words">
+              <p className="text-gray-300 text-sm sm:text-lg break-words text-left">
                 Browse job alerts received via <span className="italic text-violet-400">Telegram</span>— all jobs posted today appear here, stay visible for 7 days, and are auto-deleted after that. Save the ones you like and move them to your <span className="italic text-indigo-200">Job Tracker</span> page when you're ready to apply.
               </p>
             </div>
