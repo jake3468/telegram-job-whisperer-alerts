@@ -14,11 +14,11 @@ const CookiePolicy = () => {
     <div className="min-h-screen bg-background text-foreground font-inter">
       <Helmet>
         <title>Cookie Policy - Aspirely.ai | How We Use Cookies</title>
-        <meta name="description" content="Learn about how Aspirely.ai uses cookies to improve your experience. Detailed information about cookie types, purposes, and your rights under UK GDPR." />
+        <meta name="description" content="Learn about how Aspirely.ai uses cookies to improve your experience. Detailed information about cookie types, purposes, and your rights under EU and UK GDPR." />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://aspirely.ai/cookie-policy" />
         <meta property="og:title" content="Cookie Policy - Aspirely.ai" />
-        <meta property="og:description" content="Comprehensive cookie policy explaining how we use cookies and your choices under UK GDPR." />
+        <meta property="og:description" content="Comprehensive cookie policy explaining how we use cookies and your choices under EU and UK GDPR." />
         <meta property="og:type" content="article" />
         <meta property="og:url" content="https://aspirely.ai/cookie-policy" />
         <script type="application/ld+json">
@@ -26,7 +26,7 @@ const CookiePolicy = () => {
             "@context": "https://schema.org",
             "@type": "WebPage",
             "name": "Cookie Policy",
-            "description": "Aspirely.ai Cookie Policy explaining cookie usage and user rights under UK GDPR",
+            "description": "Aspirely.ai Cookie Policy explaining cookie usage and user rights under EU and UK GDPR",
             "url": "https://aspirely.ai/cookie-policy",
             "isPartOf": {
               "@type": "WebSite",
@@ -68,7 +68,7 @@ const CookiePolicy = () => {
                 Cookies are small text files that are stored on your device when you visit our website. They help us provide you with a better experience by remembering your preferences and understanding how you use our site.
               </p>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                Under UK GDPR and the Privacy and Electronic Communications Regulations (PECR), we are required to obtain your consent for non-essential cookies and provide you with clear information about how we use them.
+                Under EU GDPR, UK GDPR, and the Privacy and Electronic Communications Regulations (PECR), we are required to obtain your consent for non-essential cookies and provide you with clear information about how we use them.
               </p>
             </section>
 
@@ -197,19 +197,26 @@ const CookiePolicy = () => {
                 If you have questions about our use of cookies or this Cookie Policy, please contact us:
               </p>
               <ul className="list-none text-gray-700 dark:text-gray-300 space-y-2 mb-6">
-                <li><strong>Email:</strong> privacy@aspirely.ai</li>
+                <li><strong>Email:</strong> support@aspirely.ai</li>
                 <li><strong>Website:</strong> <a href="/contact-support" className="text-primary hover:underline">Contact Support</a></li>
               </ul>
 
-              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">UK Data Protection Authority</h3>
+              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">Data Protection Authorities</h3>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                If you are not satisfied with our response to your cookie-related concerns, you have the right to lodge a complaint with the Information Commissioner's Office (ICO):
+                If you are not satisfied with our response to your cookie-related concerns, you have the right to lodge a complaint with your local data protection authority:
               </p>
-              <ul className="list-none text-gray-700 dark:text-gray-300 space-y-2">
-                <li><strong>Website:</strong> <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">ico.org.uk</a></li>
-                <li><strong>Phone:</strong> 0303 123 1113</li>
-                <li><strong>Address:</strong> Information Commissioner's Office, Wycliffe House, Water Lane, Wilmslow, Cheshire SK9 5AF</li>
-              </ul>
+              <div className="mb-4">
+                <p className="text-gray-700 dark:text-gray-300 font-medium mb-2">For EU Users:</p>
+                <ul className="list-none text-gray-700 dark:text-gray-300 space-y-1 mb-4 ml-4">
+                  <li><strong>Find your local authority:</strong> <a href="https://edpb.europa.eu/about-edpb/about-edpb/members_en" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">European Data Protection Board</a></li>
+                </ul>
+                <p className="text-gray-700 dark:text-gray-300 font-medium mb-2">For UK Users:</p>
+                <ul className="list-none text-gray-700 dark:text-gray-300 space-y-1 ml-4">
+                  <li><strong>Website:</strong> <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">ico.org.uk</a></li>
+                  <li><strong>Phone:</strong> 0303 123 1113</li>
+                  <li><strong>Address:</strong> Information Commissioner's Office, Wycliffe House, Water Lane, Wilmslow, Cheshire SK9 5AF</li>
+                </ul>
+              </div>
             </section>
           </div>
         </div>
