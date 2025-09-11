@@ -130,7 +130,9 @@ const HeroSection = () => {
               <br />
               <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-grotesk not-italic">like a <span className="font-bold">Pro</span> 😎...</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-grotesk not-italic">by just chatting on Telegram.</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-grotesk not-italic">by just chatting</span>
+              <br />
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-grotesk not-italic">on Telegram.</span>
             </div>
             
             {/* Tablet view only */}
@@ -139,7 +141,9 @@ const HeroSection = () => {
               <br />
               <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-grotesk not-italic">like a <span className="font-bold">Pro</span> 😎...</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-grotesk not-italic">by just chatting on Telegram.</span>
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-grotesk not-italic">by just chatting</span>
+              <br />
+              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-grotesk not-italic">on Telegram.</span>
             </div>
           </h1>
         </div>
