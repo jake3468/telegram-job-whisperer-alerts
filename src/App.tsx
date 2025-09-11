@@ -13,6 +13,7 @@ import { useLocation } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import Index from "./pages/Index";
 import JobGuide from "./pages/JobGuide";
 import CoverLetter from "./pages/CoverLetter";
@@ -28,6 +29,7 @@ import JobBoard from "./pages/JobBoard";
 import AIMockInterview from "./pages/AIMockInterview";
 import Upgrade from "./pages/Upgrade";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import CookiePolicy from "./pages/CookiePolicy";
 import TermsOfService from "./pages/TermsOfService";
 import ContactSupport from "./pages/ContactSupport";
 import Blogs from "./pages/Blogs";
@@ -60,12 +62,14 @@ const AppWithSync = () => {
   
   return (
     <>
+      <CookieConsentBanner />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Index />} />
         <Route path="/blogs" element={<Blogs />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/cookie-policy" element={<CookiePolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/contact-support" element={<ContactSupport />} />
         
