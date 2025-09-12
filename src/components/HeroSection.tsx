@@ -122,9 +122,7 @@ const HeroSection = () => {
             <div className="block md:hidden lg:block">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">Get Hired Faster</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">with</span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">AI Job Agents</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">with AI Job Agents</span>
               <br />
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram.</span>
@@ -145,9 +143,7 @@ const HeroSection = () => {
             <div className="hidden md:block lg:hidden">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">Get Hired Faster</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">with</span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">AI Job Agents</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">with AI Job Agents</span>
               <br />
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram.</span>
