@@ -122,7 +122,7 @@ const HeroSection = () => {
             <div className="block md:hidden lg:block">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">First AI Job Agents</span>
               <br />
-              <div className="flex items-center gap-2 mt-2 md:mt-3">
+              <div className="flex items-center gap-2 mt-1">
                 <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram</span>
                 {telegramAnimationData && (
                   <div className="flex-shrink-0">
@@ -135,16 +135,16 @@ const HeroSection = () => {
                   </div>
                 )}
               </div>
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">— Helping You</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">Helping You</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">Land Jobs Faster</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">Get Hired Faster</span>
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">First AI Job Agents</span>
               <br />
-              <div className="flex items-center gap-2 mt-2 md:mt-3">
+              <div className="flex items-center gap-2 mt-1">
                 <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram</span>
                 {telegramAnimationData && (
                   <div className="flex-shrink-0">
@@ -157,9 +157,9 @@ const HeroSection = () => {
                   </div>
                 )}
               </div>
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">— Helping You</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">Helping You</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">Land Jobs Faster</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">Get Hired Faster</span>
             </div>
           </h1>
         </div>
@@ -175,7 +175,7 @@ const HeroSection = () => {
         
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-8 text-[16px] font-notion-inter font-medium text-notion-dark dark:text-white">Our AI Agents will update your Resume, send daily Job Alerts, craft tailored Cover Letters, create Interview files, check Job fit, give insider Company knowledge, and shares the HRs you should contact. Everything you will ever need, all in one place.</p>
+          <p className="mb-8 text-[16px] font-notion-inter font-medium text-notion-dark dark:text-white">Just chat like a friend with our AI Agents to update your resume instantly. Get daily job alerts and one-click access to cover letters, interview prep files, job fit analysis, company insights, HR contacts, and visa sponsorship info — everything you need to get hired, all in one place.</p>
           
           <SignedOut>
             {/* Button and Badge Container */}
