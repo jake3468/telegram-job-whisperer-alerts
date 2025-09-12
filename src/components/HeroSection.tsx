@@ -123,7 +123,7 @@ const HeroSection = () => {
         {/* Background to block particles behind headline in dark mode */}
         <div className="relative mb-8">
           <div className="absolute inset-0 bg-background/80 dark:bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
-          <h1 className="relative z-30 text-3xl md:text-4xl lg:text-5xl mb-1 leading-none font-notion-inter font-semibold tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
+          <h1 className="relative z-30 text-[54px] mb-1 leading-none font-notion-inter font-semibold tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile and Desktop view */}
             <div className="block md:hidden lg:block">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">Apply to Jobs</span>
@@ -158,8 +158,8 @@ const HeroSection = () => {
           </div>} */}
         
 
-        <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-gilroy font-light leading-relaxed md:text-base text-sm dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-8 text-base md:text-lg font-inter">Our AI Agents will update your Resume, send daily Job Alerts, craft tailored Cover Letters, create Interview files, check Job fit, give insider Company knowledge, and shares the HRs you should contact. Everything you will ever need, all in one place.</p>
+        <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
+          <p className="mb-8 text-[16px] font-notion-inter">Our AI Agents will update your Resume, send daily Job Alerts, craft tailored Cover Letters, create Interview files, check Job fit, give insider Company knowledge, and shares the HRs you should contact. Everything you will ever need, all in one place.</p>
           
           <SignedOut>
             {/* Button and Badge Container */}
