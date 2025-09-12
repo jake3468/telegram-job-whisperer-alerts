@@ -13,7 +13,7 @@ const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v
 const CACHE_KEY = 'rocket-animation-data-v1';
 
 // Preload telegram animation immediately when module loads
-const TELEGRAM_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations/telegram%20logo.json';
+const TELEGRAM_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations/telegram.json';
 const TELEGRAM_CACHE_KEY = 'telegram-animation-data-v1';
 
 // Start loading rocket animation data immediately
@@ -134,7 +134,7 @@ const HeroSection = () => {
                       animationData={telegramAnimationData} 
                       loop={true} 
                       autoplay={true} 
-                      className="w-12 h-12"
+                      className="w-16 h-16 md:w-20 md:h-20"
                     />
                   </div>
                 )}
@@ -149,7 +149,19 @@ const HeroSection = () => {
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">by just chatting</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">on Telegram.</span>
+              <div className="flex items-center gap-2 mt-2 md:mt-3">
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram.</span>
+                {telegramAnimationData && (
+                  <div className="flex-shrink-0">
+                    <Lottie 
+                      animationData={telegramAnimationData} 
+                      loop={true} 
+                      autoplay={true} 
+                      className="w-16 h-16 md:w-20 md:h-20"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </h1>
         </div>
