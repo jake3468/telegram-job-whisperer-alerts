@@ -18,36 +18,10 @@ export const YouTubeHeroVideo: React.FC<YouTubeHeroVideoProps> = ({
   const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
   const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&loop=1&playlist=${videoId}&enablejsapi=1`;
 
-  // Desktop: Autoplay after 1 second
+  // Just set loading to false - no autoplay
   useEffect(() => {
-    if (!isMobile) {
-      const timer = setTimeout(() => {
-        setShouldPlay(true);
-        setIsLoading(false);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [isMobile]);
-
-  // Mobile: Intersection Observer for scroll-triggered autoplay
-  useEffect(() => {
-    if (!isMobile || !containerRef.current) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          setShouldPlay(true);
-          setIsLoading(false);
-        }
-      },
-      { threshold: 0.5 }
-    );
-
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, [isMobile]);
+    setIsLoading(false);
+  }, []);
 
   if (isLoading) {
     return (
