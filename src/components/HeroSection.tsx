@@ -117,40 +117,36 @@ const HeroSection = () => {
         {/* Background to block particles behind headline in dark mode */}
         <div className="relative mb-8">
           <div className="absolute inset-0 bg-background/80 dark:bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
-          <h1 className="relative z-30 text-[42px] md:text-[54px] mb-1 leading-none font-notion-inter font-semibold tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
+          <h1 className="relative z-30 text-[36px] md:text-[54px] mb-1 leading-none font-notion-inter font-semibold tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile and Desktop view */}
             <div className="block md:hidden lg:block">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">Apply to Jobs</span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">like a <span className="font-bold">Pro</span> 😎...</span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">by just chatting</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">First AI Job Agents</span>
               <br />
               <div className="flex items-center gap-2 mt-2 md:mt-3">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram.</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram</span>
                 {telegramAnimationData && (
                   <div className="flex-shrink-0">
                     <Lottie 
                       animationData={telegramAnimationData} 
                       loop={true} 
                       autoplay={true} 
-                      className="w-16 h-16 md:w-20 md:h-20"
+                      className="w-12 h-12 md:w-16 md:h-16"
                     />
                   </div>
                 )}
               </div>
+              <br />
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">— Helping You</span>
+              <br />
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">Land Jobs Faster</span>
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">Apply to Jobs</span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">like a <span className="font-bold">Pro</span> 😎...</span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">by just chatting</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">First AI Job Agents</span>
               <br />
               <div className="flex items-center gap-2 mt-2 md:mt-3">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram.</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram</span>
                 {telegramAnimationData && (
                   <div className="flex-shrink-0">
                     <Lottie 
@@ -162,6 +158,10 @@ const HeroSection = () => {
                   </div>
                 )}
               </div>
+              <br />
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">— Helping You</span>
+              <br />
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">Land Jobs Faster</span>
             </div>
           </h1>
         </div>
