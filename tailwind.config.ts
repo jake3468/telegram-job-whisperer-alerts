@@ -76,6 +76,7 @@ export default {
           '700': 'hsl(201, 96%, 32%)',
         },
         highlight: 'hsl(196, 88%, 55%)', // Sky-blue like color for highlighting
+        'notion-dark': 'hsl(60, 2%, 10%)', // Notion-style dark text color (rgb(25, 25, 24))
 			},
 			backgroundImage: {
         'hero-glow': 'radial-gradient(ellipse_80%_60%_at_50%_120%,rgba(239,68,68,0.1),transparent)',
@@ -121,6 +122,7 @@ export default {
         'quattrocento': ['Quattrocento', 'serif'], // Added Quattrocento font
         'gilroy': ['Manrope', 'system-ui', 'sans-serif'], // Added Gilroy-like font (Manrope)
         'grotesk': ['Space Grotesk', 'system-ui', 'sans-serif'], // Added FK Grotesk-like font (Space Grotesk)
+        'notion-inter': ['NotionInter', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Helvetica', 'Apple Color Emoji', 'Arial', 'sans-serif', 'Segoe UI Emoji', 'Segoe UI Symbol'], // Added Notion Inter font stack
 			}
 		}
 	},

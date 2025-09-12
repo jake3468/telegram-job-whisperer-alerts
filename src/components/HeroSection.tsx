@@ -13,8 +13,8 @@ const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v
 const CACHE_KEY = 'rocket-animation-data-v1';
 
 // Preload telegram animation immediately when module loads
-const TELEGRAM_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations/telegram%20logo.json';
-const TELEGRAM_CACHE_KEY = 'telegram-animation-data-v1';
+const TELEGRAM_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations/telegram.json';
+const TELEGRAM_CACHE_KEY = 'telegram-animation-data-v2';
 
 // Start loading rocket animation data immediately
 const rocketAnimationPromise = (async () => {
@@ -110,40 +110,56 @@ const HeroSection = () => {
       
       {/* Main Container with Grid Layout */}
       <div className="max-w-7xl mx-auto z-20 relative w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-center">
-          
-          {/* Hero Video - Centered in left side, aligned with hero text */}
-          <div className="hidden md:flex justify-center items-start mb-8 md:mb-0 md:pr-8 md:-mt-8 lg:-mt-12">
-            <YouTubeHeroVideo className="w-full max-w-xs" />
-          </div>
-          
-          {/* Hero Content - Center aligned with mobile preview */}
-          <div className="text-left max-w-2xl mx-auto md:mx-0 md:pl-4 flex flex-col justify-center mt-8 md:mt-0">
+        <div className="flex justify-center items-center">
+          {/* Hero Content - Center aligned */}
+          <div className="text-left max-w-2xl mx-auto flex flex-col justify-center mt-8 md:mt-0">
         
         {/* Background to block particles behind headline in dark mode */}
         <div className="relative mb-8">
           <div className="absolute inset-0 bg-background/80 dark:bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
-          <h1 className="relative z-30 text-3xl md:text-4xl lg:text-5xl mb-1 leading-none font-sans tracking-[-0.4px] text-foreground drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] italic">
+          <h1 className="relative z-30 text-[36px] md:text-[54px] mb-1 leading-none font-notion-inter font-semibold tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile and Desktop view */}
             <div className="block md:hidden lg:block">
-              <span className="text-black dark:text-white px-0.5 py-0 font-grotesk not-italic">Apply to Jobs</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">First AI Job Agents</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-grotesk not-italic">like a <span className="font-bold">Pro</span> 😎...</span>
+              <div className="flex items-center gap-2 mt-2 md:mt-3">
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram</span>
+                {telegramAnimationData && (
+                  <div className="flex-shrink-0">
+                    <Lottie 
+                      animationData={telegramAnimationData} 
+                      loop={true} 
+                      autoplay={true} 
+                      className="w-12 h-12 md:w-16 md:h-16"
+                    />
+                  </div>
+                )}
+              </div>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">— Helping You</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-grotesk not-italic">by just chatting</span>
-              <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-grotesk not-italic">on Telegram.</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">Land Jobs Faster</span>
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden">
-              <span className="text-black dark:text-white px-0.5 py-0 font-grotesk not-italic">Apply to Jobs</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">First AI Job Agents</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-grotesk not-italic">like a <span className="font-bold">Pro</span> 😎...</span>
+              <div className="flex items-center gap-2 mt-2 md:mt-3">
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram</span>
+                {telegramAnimationData && (
+                  <div className="flex-shrink-0">
+                    <Lottie 
+                      animationData={telegramAnimationData} 
+                      loop={true} 
+                      autoplay={true} 
+                      className="w-16 h-16 md:w-20 md:h-20"
+                    />
+                  </div>
+                )}
+              </div>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">— Helping You</span>
               <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-grotesk not-italic">by just chatting</span>
-              <br />
-              <span className="text-black dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-grotesk not-italic">on Telegram.</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">Land Jobs Faster</span>
             </div>
           </h1>
         </div>
@@ -158,15 +174,15 @@ const HeroSection = () => {
           </div>} */}
         
 
-        <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-gilroy font-light leading-relaxed md:text-base text-sm dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-8 text-base md:text-lg font-inter">Our AI Agents will update your <span className="font-bold italic text-primary">Resume</span>, send daily <span className="font-bold italic text-primary">Job Alerts</span>, craft tailored <span className="font-bold italic text-primary">Cover Letters</span>, create <span className="font-bold italic text-primary">Interview files</span>, check <span className="font-bold italic text-primary">Job fit</span>, give insider <span className="font-bold italic text-primary">Company</span> knowledge, and shares the <span className="font-bold italic text-primary">HRs</span> you should contact. Everything you will ever need, all in one place.</p>
+        <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
+          <p className="mb-8 text-[16px] font-notion-inter font-medium text-notion-dark dark:text-white">Our AI Agents will update your Resume, send daily Job Alerts, craft tailored Cover Letters, create Interview files, check Job fit, give insider Company knowledge, and shares the HRs you should contact. Everything you will ever need, all in one place.</p>
           
           <SignedOut>
             {/* Button and Badge Container */}
             <div className="flex flex-col items-start md:flex-col md:items-start lg:flex-row lg:items-center lg:justify-start gap-4 md:gap-6 mb-8">
               <SignUpButton mode="modal">
-                <button className="bg-[#30313D] hover:bg-[#3a3b47] text-white dark:bg-gray-50 dark:hover:bg-gray-200 dark:text-black px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-primary/50 flex items-center gap-2 justify-start md:justify-center w-auto">
-                  Start for Free
+                <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-lg transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-start md:justify-center w-auto border border-transparent">
+                  Connect with Telegram
                 </button>
               </SignUpButton>
               
@@ -205,17 +221,9 @@ const HeroSection = () => {
                   <span>⭐⭐⭐⭐⭐</span>
                 </div>
                 <div className="text-foreground text-sm text-left">
-                  <span className="italic text-sm font-medium">Trusted by <span className="font-bold">300+</span> job seekers worldwide</span>
+                  <span className="italic text-sm font-medium">Trusted by <span className="font-bold">3000+</span> job seekers worldwide</span>
                 </div>
               </div>
-            </div>
-            
-            {/* Desktop Demo Text with Arrow - positioned below avatars like a notebook note */}
-            <div className="hidden md:flex items-start gap-3 mb-6 ml-4">
-              <HandDrawnArrow direction="left" className="flex-shrink-0 mt-1" />
-              <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm">
-                check out this demo… our 3 Telegram AI Job Agents are right here, showing how they can help you stand out like the top 1%.
-              </p>
             </div>
           </SignedOut>
 
@@ -239,6 +247,26 @@ const HeroSection = () => {
         </SignedIn>
         
         </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    {/* Desktop/Tablet Video Demo Section */}
+    <section className="hidden md:block relative py-8 bg-background">
+      <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
+        <div className="flex flex-col items-center justify-center">
+          {/* Video Component */}
+          <div className="mb-6">
+            <YouTubeHeroVideo className="w-full max-w-xs" />
+          </div>
+          
+          {/* Demo Text with Arrow - centrally aligned */}
+          <div className="flex items-start gap-3 justify-center">
+            <HandDrawnArrow direction="up" className="flex-shrink-0 mt-1" />
+            <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm text-center">
+              check out this demo… our 3 Telegram AI Job Agents are right here, showing how they can help you stand out like the top 1%.
+            </p>
           </div>
         </div>
       </div>
