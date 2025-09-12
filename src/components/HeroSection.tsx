@@ -165,7 +165,7 @@ const HeroSection = () => {
             {/* Button and Badge Container */}
             <div className="flex flex-col items-start md:flex-col md:items-start lg:flex-row lg:items-center lg:justify-start gap-4 md:gap-6 mb-8">
               <SignUpButton mode="modal">
-                <button className="bg-[#24A1DE] hover:bg-[#1e8bc4] text-[#0F1724] dark:bg-[#24A1DE] dark:hover:bg-[#1e8bc4] dark:text-[#0F1724] px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-primary/50 flex items-center gap-2 justify-start md:justify-center w-auto">
+                <button className="bg-[#0075DE] hover:bg-[#0066C3] text-white dark:bg-[#0075DE] dark:hover:bg-[#0066C3] dark:text-white px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-lg transition-all duration-300 font-inter font-bold shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-start md:justify-center w-auto border border-transparent">
                   Connect with Telegram
                 </button>
               </SignUpButton>
