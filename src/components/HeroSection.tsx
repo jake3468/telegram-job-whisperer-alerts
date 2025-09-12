@@ -175,7 +175,7 @@ const HeroSection = () => {
         
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-8 text-[16px] font-notion-inter font-medium text-notion-dark dark:text-white">Our AI Agents will update your Resume, send daily Job Alerts, craft tailored Cover Letters, create Interview files, check Job fit, give insider Company knowledge, and shares the HRs you should contact. Everything you will ever need, all in one place.</p>
+          <p className="mb-8 text-[16px] font-notion-inter font-medium text-notion-dark dark:text-white">Just chat like a friend with our AI Agents to update your resume instantly. Get daily job alerts and one-click access to cover letters, interview prep files, job fit analysis, company insights, HR contacts, and visa sponsorship info — everything you need to get hired, all in one place.</p>
           
           <SignedOut>
             {/* Button and Badge Container */}
