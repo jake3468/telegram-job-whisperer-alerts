@@ -122,7 +122,7 @@ const HeroSection = () => {
             <div className="block md:hidden lg:block">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">First AI Job Agents</span>
               <br />
-              <div className="flex items-center gap-2 mt-2 md:mt-3">
+              <div className="flex items-center gap-2 mt-1">
                 <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram</span>
                 {telegramAnimationData && (
                   <div className="flex-shrink-0">
@@ -135,16 +135,16 @@ const HeroSection = () => {
                   </div>
                 )}
               </div>
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">Helping You</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">Helping You</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">Get Hired Faster</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">Get Hired Faster</span>
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">First AI Job Agents</span>
               <br />
-              <div className="flex items-center gap-2 mt-2 md:mt-3">
+              <div className="flex items-center gap-2 mt-1">
                 <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram</span>
                 {telegramAnimationData && (
                   <div className="flex-shrink-0">
@@ -157,9 +157,9 @@ const HeroSection = () => {
                   </div>
                 )}
               </div>
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">Helping You</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">Helping You</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">Get Hired Faster</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">Get Hired Faster</span>
             </div>
           </h1>
         </div>
