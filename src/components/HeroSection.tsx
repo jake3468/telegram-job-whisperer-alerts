@@ -135,9 +135,9 @@ const HeroSection = () => {
                   </div>
                 )}
               </div>
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">— Helping You</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">Helping You</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">Land Jobs Faster</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">Get Hired Faster</span>
             </div>
             
             {/* Tablet view only */}
@@ -157,9 +157,9 @@ const HeroSection = () => {
                   </div>
                 )}
               </div>
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">— Helping You</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">Helping You</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">Land Jobs Faster</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">Get Hired Faster</span>
             </div>
           </h1>
         </div>
