@@ -126,20 +126,19 @@ const HeroSection = () => {
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">by just chatting</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">
-                on Telegram
+              <div className="flex items-center gap-2 mt-2 md:mt-3">
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram.</span>
                 {telegramAnimationData && (
-                  <span className="inline-block mx-1 align-middle">
+                  <div className="flex-shrink-0">
                     <Lottie 
                       animationData={telegramAnimationData} 
                       loop={true} 
                       autoplay={true} 
-                      className="w-6 h-6 inline-block"
+                      className="w-12 h-12"
                     />
-                  </span>
+                  </div>
                 )}
-                .
-              </span>
+              </div>
             </div>
             
             {/* Tablet view only */}
