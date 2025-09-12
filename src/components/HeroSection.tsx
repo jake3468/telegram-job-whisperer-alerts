@@ -110,15 +110,9 @@ const HeroSection = () => {
       
       {/* Main Container with Grid Layout */}
       <div className="max-w-7xl mx-auto z-20 relative w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 items-center">
-          
-          {/* Hero Video - Centered in left side, aligned with hero text */}
-          <div className="hidden md:flex justify-center items-start mb-8 md:mb-0 md:pr-8 md:-mt-8 lg:-mt-12">
-            <YouTubeHeroVideo className="w-full max-w-xs" />
-          </div>
-          
-          {/* Hero Content - Center aligned with mobile preview */}
-          <div className="text-left max-w-2xl mx-auto md:mx-0 md:pl-4 flex flex-col justify-center mt-8 md:mt-0">
+        <div className="flex justify-center items-center">
+          {/* Hero Content - Center aligned */}
+          <div className="text-left max-w-2xl mx-auto flex flex-col justify-center mt-8 md:mt-0">
         
         {/* Background to block particles behind headline in dark mode */}
         <div className="relative mb-8">
@@ -209,14 +203,6 @@ const HeroSection = () => {
                 </div>
               </div>
             </div>
-            
-            {/* Desktop Demo Text with Arrow - positioned below avatars like a notebook note */}
-            <div className="hidden md:flex items-start gap-3 mb-6 ml-4">
-              <HandDrawnArrow direction="left" className="flex-shrink-0 mt-1" />
-              <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm">
-                check out this demo… our 3 Telegram AI Job Agents are right here, showing how they can help you stand out like the top 1%.
-              </p>
-            </div>
           </SignedOut>
 
           {/* Hero Video - Shows fully on mobile, larger size and reduced spacing */}
@@ -239,6 +225,26 @@ const HeroSection = () => {
         </SignedIn>
         
         </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    {/* Desktop/Tablet Video Demo Section */}
+    <section className="hidden md:block relative py-8 bg-background">
+      <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
+        <div className="flex flex-col items-center justify-center">
+          {/* Video Component */}
+          <div className="mb-6">
+            <YouTubeHeroVideo className="w-full max-w-xs" />
+          </div>
+          
+          {/* Demo Text with Arrow - centrally aligned */}
+          <div className="flex items-start gap-3 justify-center">
+            <HandDrawnArrow direction="up" className="flex-shrink-0 mt-1" />
+            <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm text-center">
+              check out this demo… our 3 Telegram AI Job Agents are right here, showing how they can help you stand out like the top 1%.
+            </p>
           </div>
         </div>
       </div>
