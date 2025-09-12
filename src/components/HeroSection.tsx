@@ -135,7 +135,6 @@ const HeroSection = () => {
                   </div>
                 )}
               </div>
-              <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">— Helping You</span>
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">Land Jobs Faster</span>
@@ -158,7 +157,6 @@ const HeroSection = () => {
                   </div>
                 )}
               </div>
-              <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">— Helping You</span>
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-2 md:mt-3 inline-block font-notion-inter font-semibold not-italic">Land Jobs Faster</span>
