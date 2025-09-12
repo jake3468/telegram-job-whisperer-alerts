@@ -14,7 +14,7 @@ const CACHE_KEY = 'rocket-animation-data-v1';
 
 // Preload telegram animation immediately when module loads
 const TELEGRAM_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations/telegram.json';
-const TELEGRAM_CACHE_KEY = 'telegram-animation-data-v1';
+const TELEGRAM_CACHE_KEY = 'telegram-animation-data-v2';
 
 // Start loading rocket animation data immediately
 const rocketAnimationPromise = (async () => {
