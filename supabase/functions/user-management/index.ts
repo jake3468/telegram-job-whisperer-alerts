@@ -18,9 +18,9 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const { clerk_id, email, first_name, last_name } = await req.json()
+    const { clerk_id, email, first_name, last_name, referral_id } = await req.json()
 
-    console.log('Creating user with data:', { clerk_id, email, first_name, last_name });
+    console.log('Creating user with data:', { clerk_id, email, first_name, last_name, referral_id });
 
     if (!clerk_id || !email) {
       throw new Error('Missing required fields: clerk_id and email are required')
@@ -73,15 +73,24 @@ Deno.serve(async (req) => {
     console.log('Created new user:', newUser.id);
 
     // Create user profile (this will trigger credit initialization via existing trigger)
+    const profileData: any = {
+      user_id: newUser.id,
+      bio: '.',
+      resume: null,
+      bot_activated: false,
+      cv_bot_activated: false
+    };
+
+    // Add referral data if provided
+    if (referral_id) {
+      profileData.referral_id = referral_id;
+      profileData.referred_at = new Date().toISOString();
+      console.log('Adding referral data to profile:', { referral_id });
+    }
+
     const { data: newProfile, error: profileError } = await supabaseClient
       .from('user_profile')
-      .insert({
-        user_id: newUser.id,
-        bio: '.',
-        resume: null,
-        bot_activated: false,
-        cv_bot_activated: false
-      })
+      .insert(profileData)
       .select('id')
       .single()
 

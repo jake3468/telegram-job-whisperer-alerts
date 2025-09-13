@@ -1190,6 +1190,8 @@ export type Database = {
           cv_chat_id: string | null
           id: string
           profile_setup_completed: boolean
+          referral_id: string | null
+          referred_at: string | null
           resume: string | null
           resume_filename: string | null
           resume_uploaded_at: string | null
@@ -1211,6 +1213,8 @@ export type Database = {
           cv_chat_id?: string | null
           id?: string
           profile_setup_completed?: boolean
+          referral_id?: string | null
+          referred_at?: string | null
           resume?: string | null
           resume_filename?: string | null
           resume_uploaded_at?: string | null
@@ -1232,6 +1236,8 @@ export type Database = {
           cv_chat_id?: string | null
           id?: string
           profile_setup_completed?: boolean
+          referral_id?: string | null
+          referred_at?: string | null
           resume?: string | null
           resume_filename?: string | null
           resume_uploaded_at?: string | null
