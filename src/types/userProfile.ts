@@ -18,6 +18,8 @@ export interface UserProfile {
   show_job_tracker_onboarding_popup: boolean;
   user_location: string | null;
   profile_setup_completed: boolean;
+  referral_id: string | null;
+  referred_at: string | null;
 }
 
 export interface UserProfileUpdateData {
@@ -36,4 +38,6 @@ export interface UserProfileUpdateData {
   show_job_tracker_onboarding_popup?: boolean;
   user_location?: string | null;
   profile_setup_completed?: boolean;
+  referral_id?: string | null;
+  referred_at?: string | null;
 }

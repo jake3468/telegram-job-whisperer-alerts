@@ -54,13 +54,34 @@ export const useUserInitialization = () => {
 
     const initPromise = (async () => {
       try {
+        // Get referral ID from URL parameter 'via' (used by Affonso.io)
+        const getReferralId = () => {
+          try {
+            // First check for 'via' parameter in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const viaParam = urlParams.get('via');
+            if (viaParam) {
+              return viaParam;
+            }
+            
+            // Fallback to Affonso cookie if available
+            return (window as any).affonso_referral || null;
+          } catch (error) {
+            console.log('[UserInit] Could not read referral data:', error);
+            return null;
+          }
+        };
+
+        const referralId = getReferralId();
+
         // Call the edge function to create/verify user
         const { data, error } = await supabase.functions.invoke('user-management', {
           body: {
             clerk_id: user.id,
             email: user.emailAddresses?.[0]?.emailAddress || user.primaryEmailAddress?.emailAddress,
             first_name: user.firstName,
-            last_name: user.lastName
+            last_name: user.lastName,
+            referral_id: referralId
           }
         });
 

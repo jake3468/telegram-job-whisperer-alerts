@@ -73,6 +73,18 @@ serve(async (req) => {
 
     logStep("User found", { userId: user.id, email: user.email });
 
+    // Get user profile to fetch referral_id
+    const { data: userProfile, error: profileError } = await supabaseService
+      .from('user_profile')
+      .select('referral_id')
+      .eq('user_id', user.id)
+      .single();
+
+    const referralId = userProfile?.referral_id;
+    if (referralId) {
+      logStep("User has referral ID", { referralId });
+    }
+
     const requestBody = await req.json();
     logStep("Request body received", { body: requestBody });
     
@@ -185,6 +197,12 @@ serve(async (req) => {
     // Add email parameter
     if (userDetails.email) {
       urlObj.searchParams.set('email', userDetails.email);
+    }
+    
+    // Add referral ID as metadata if available
+    if (referralId) {
+      urlObj.searchParams.set('metadata[affonso_referral]', referralId);
+      logStep("Added referral ID to payment URL", { referralId });
     }
     
     paymentUrl = urlObj.toString();
