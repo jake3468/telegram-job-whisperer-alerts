@@ -31,7 +31,7 @@ const AuthHeader = () => {
 
   return (
     // Blended navbar with transparent background
-    <header className="w-full backdrop-blur-md bg-background/30 dark:bg-black/30 fixed top-0 left-0 right-0 z-50 border-b border-border shadow-[0_6px_24px_0px_rgba(16,118,238,0.05)]">
+    <header className="w-full backdrop-blur-md bg-background/30 dark:bg-black/30 fixed top-0 left-0 right-0 z-50 shadow-[0_6px_24px_0px_rgba(16,118,238,0.05)]">
       <div className="flex justify-between items-center px-3 sm:px-6 py-4 max-w-7xl mx-auto">
         {/* Logo and Site Name: Left side */}
         <div className="flex items-center space-x-2 sm:space-x-3 z-40 cursor-pointer" onClick={() => navigate('/')}>
