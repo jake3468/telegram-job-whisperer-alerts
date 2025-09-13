@@ -54,12 +54,20 @@ export const useUserInitialization = () => {
 
     const initPromise = (async () => {
       try {
-        // Get referral ID from Affonso cookie if available
+        // Get referral ID from URL parameter 'via' (used by Affonso.io)
         const getReferralId = () => {
           try {
+            // First check for 'via' parameter in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const viaParam = urlParams.get('via');
+            if (viaParam) {
+              return viaParam;
+            }
+            
+            // Fallback to Affonso cookie if available
             return (window as any).affonso_referral || null;
           } catch (error) {
-            console.log('[UserInit] Could not read referral cookie:', error);
+            console.log('[UserInit] Could not read referral data:', error);
             return null;
           }
         };
