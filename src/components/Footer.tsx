@@ -99,6 +99,9 @@ const Footer = () => {
               <Link to="/blogs" className="block text-foreground hover:text-primary transition-colors duration-200 text-base font-inter" onClick={() => window.scrollTo(0, 0)}>
                 Blogs
               </Link>
+              <a href="https://aspirelyai-affiliate.affonso.io" target="_blank" rel="noopener noreferrer" className="block text-foreground hover:text-primary transition-colors duration-200 text-base font-inter">
+                Affiliate Program
+              </a>
             </div>
           </div>
 
