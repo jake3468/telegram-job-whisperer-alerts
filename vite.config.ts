@@ -38,11 +38,14 @@ export default defineConfig(({ mode }) => ({
     include: [
       "react",
       "react-dom",
+      "react/jsx-runtime"
+    ],
+    // Exclude heavy libraries from pre-bundling for better lazy loading
+    exclude: [
+      "lottie-react", 
       "@clerk/clerk-react",
       "@clerk/types"
     ],
-    // Exclude heavy libraries from pre-bundling for better lazy loading
-    exclude: ["lottie-react"],
     force: mode === 'development'
   },
   build: {
@@ -50,21 +53,36 @@ export default defineConfig(({ mode }) => ({
     // Improved chunk splitting for better caching
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Core dependencies
-          vendor: ['react', 'react-dom'],
+        manualChunks: (id) => {
+          // Core React - smallest possible initial bundle
+          if (id.includes('react') && !id.includes('node_modules')) {
+            return 'vendor';
+          }
           
-          // Authentication
-          clerk: ['@clerk/clerk-react', '@clerk/types'],
+          // Separate Clerk into its own chunk (lazy loaded)
+          if (id.includes('@clerk')) {
+            return 'auth';
+          }
           
-          // UI components
-          ui: ['@radix-ui/react-dialog', '@radix-ui/react-toast', 'lucide-react'],
+          // UI components - separate chunk
+          if (id.includes('@radix-ui') || id.includes('lucide-react')) {
+            return 'ui';
+          }
           
-          // Animation and media (lazy loaded)
-          animations: ['lottie-react'],
+          // Animations - lazy loaded
+          if (id.includes('lottie')) {
+            return 'animations';
+          }
           
           // Utilities
-          utils: ['clsx', 'tailwind-merge', 'date-fns']
+          if (id.includes('clsx') || id.includes('tailwind-merge') || id.includes('date-fns')) {
+            return 'utils';
+          }
+          
+          // Large libraries get their own chunks
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
         }
       }
     },

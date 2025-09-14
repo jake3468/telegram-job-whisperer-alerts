@@ -4,9 +4,19 @@ import { ClerkProvider } from '@clerk/clerk-react'
 import App from './App.tsx'
 import './index.css'
 import { initializePerformanceOptimizations } from '@/utils/preloadCriticalResources'
+import { registerServiceWorker, initializePerformanceMonitoring } from '@/utils/serviceWorkerManager'
+import { inlineCriticalCSS, preloadCriticalFonts } from '@/utils/criticalCSS'
 
-// Initialize performance optimizations
+// Critical performance optimizations - execute immediately
+inlineCriticalCSS();
+preloadCriticalFonts();
 initializePerformanceOptimizations();
+
+// Register service worker for caching
+registerServiceWorker();
+
+// Initialize performance monitoring
+initializePerformanceMonitoring();
 
 // Environment detection
 const isProduction = window.location.hostname === 'aspirely.ai';
