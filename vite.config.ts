@@ -33,28 +33,53 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // Optimized for Clerk and authentication performance
+  // Optimized for performance and code splitting
   optimizeDeps: {
     include: [
       "react",
       "react-dom",
       "@clerk/clerk-react",
-      "@clerk/types",
-      "lottie-react"
+      "@clerk/types"
     ],
-    // Force pre-bundling of Clerk modules
+    // Exclude heavy libraries from pre-bundling for better lazy loading
+    exclude: ["lottie-react"],
     force: mode === 'development'
   },
   build: {
     sourcemap: mode === 'development',
+    // Improved chunk splitting for better caching
     rollupOptions: {
       output: {
         manualChunks: {
+          // Core dependencies
           vendor: ['react', 'react-dom'],
+          
+          // Authentication
           clerk: ['@clerk/clerk-react', '@clerk/types'],
-          ui: ['@radix-ui/react-dialog', '@radix-ui/react-toast']
+          
+          // UI components
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-toast', 'lucide-react'],
+          
+          // Animation and media (lazy loaded)
+          animations: ['lottie-react'],
+          
+          // Utilities
+          utils: ['clsx', 'tailwind-merge', 'date-fns']
         }
       }
-    }
+    },
+    
+    // Performance optimizations
+    target: 'esnext',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: mode === 'production',
+        drop_debugger: mode === 'production'
+      }
+    },
+    
+    // Chunk size warnings
+    chunkSizeWarningLimit: 1000
   }
 }));

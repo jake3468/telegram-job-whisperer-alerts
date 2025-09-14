@@ -1,19 +1,17 @@
 
 import AuthHeader from "@/components/AuthHeader";
-import HeroSection from "@/components/HeroSection";
-// import ComparisonSlider from "@/components/ComparisonSlider";
-
-import AboutUsSection from "@/components/AboutUsSection";
-import ToolsSection from "@/components/ToolsSection";
-import HowItWorksSection from "@/components/HowItWorksSection";
-import PricingSection from "@/components/PricingSection";
-import FAQSection from "@/components/FAQSection";
-import Footer from "@/components/Footer";
-// Temporarily disable SecurityHeaders for debugging
-// import SecurityHeaders from "@/components/SecurityHeaders";
-import { useEffect } from "react";
+import OptimizedHeroSection from "@/components/OptimizedHeroSection";
+import { useEffect, Suspense, lazy } from "react";
 import { HeroSkeleton } from '@/components/ui/skeleton';
 import { useProgressiveAuth } from '@/hooks/useProgressiveAuth';
+
+// Lazy load non-critical sections
+const AboutUsSection = lazy(() => import("@/components/AboutUsSection"));
+const ToolsSection = lazy(() => import("@/components/ToolsSection"));
+const HowItWorksSection = lazy(() => import("@/components/HowItWorksSection"));
+const PricingSection = lazy(() => import("@/components/PricingSection"));
+const FAQSection = lazy(() => import("@/components/FAQSection"));
+const Footer = lazy(() => import("@/components/Footer"));
 
 // Global postMessage error handler to suppress external service errors
 const suppressExternalPostMessageErrors = () => {
@@ -70,21 +68,40 @@ const Index = () => {
     return <HeroSkeleton />;
   }
 
-  // Render immediately for professional experience
+  // Render optimized version with lazy loading
   return (
     <div className="min-h-screen bg-background font-inter text-foreground">
       <AuthHeader />
-      <HeroSection />
-      <AboutUsSection />
-      <ToolsSection />
-      <HowItWorksSection />
+      <OptimizedHeroSection />
+      
+      {/* Lazy load below-the-fold content */}
+      <Suspense fallback={<div className="h-32 bg-muted animate-pulse" />}>
+        <AboutUsSection />
+      </Suspense>
+      
+      <Suspense fallback={<div className="h-64 bg-muted animate-pulse" />}>
+        <ToolsSection />
+      </Suspense>
+      
+      <Suspense fallback={<div className="h-32 bg-muted animate-pulse" />}>
+        <HowItWorksSection />
+      </Suspense>
+      
       <div id="pricing">
-        <PricingSection />
+        <Suspense fallback={<div className="h-64 bg-muted animate-pulse" />}>
+          <PricingSection />
+        </Suspense>
       </div>
+      
       <div id="faq">
-        <FAQSection />
+        <Suspense fallback={<div className="h-48 bg-muted animate-pulse" />}>
+          <FAQSection />
+        </Suspense>
       </div>
-      <Footer />
+      
+      <Suspense fallback={<div className="h-32 bg-muted animate-pulse" />}>
+        <Footer />
+      </Suspense>
     </div>
   );
 };
