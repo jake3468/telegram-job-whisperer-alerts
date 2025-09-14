@@ -33,71 +33,28 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // Optimized for performance and code splitting
+  // Optimized for Clerk and authentication performance
   optimizeDeps: {
     include: [
       "react",
       "react-dom",
-      "react/jsx-runtime"
-    ],
-    // Exclude heavy libraries from pre-bundling for better lazy loading
-    exclude: [
-      "lottie-react", 
       "@clerk/clerk-react",
-      "@clerk/types"
+      "@clerk/types",
+      "lottie-react"
     ],
+    // Force pre-bundling of Clerk modules
     force: mode === 'development'
   },
   build: {
     sourcemap: mode === 'development',
-    // Improved chunk splitting for better caching
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          // Core React - smallest possible initial bundle
-          if (id.includes('react') && !id.includes('node_modules')) {
-            return 'vendor';
-          }
-          
-          // Separate Clerk into its own chunk (lazy loaded)
-          if (id.includes('@clerk')) {
-            return 'auth';
-          }
-          
-          // UI components - separate chunk
-          if (id.includes('@radix-ui') || id.includes('lucide-react')) {
-            return 'ui';
-          }
-          
-          // Animations - lazy loaded
-          if (id.includes('lottie')) {
-            return 'animations';
-          }
-          
-          // Utilities
-          if (id.includes('clsx') || id.includes('tailwind-merge') || id.includes('date-fns')) {
-            return 'utils';
-          }
-          
-          // Large libraries get their own chunks
-          if (id.includes('node_modules')) {
-            return 'vendor';
-          }
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          clerk: ['@clerk/clerk-react', '@clerk/types'],
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-toast']
         }
       }
-    },
-    
-    // Performance optimizations
-    target: 'esnext',
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: mode === 'production',
-        drop_debugger: mode === 'production'
-      }
-    },
-    
-    // Chunk size warnings
-    chunkSizeWarningLimit: 1000
+    }
   }
 }));

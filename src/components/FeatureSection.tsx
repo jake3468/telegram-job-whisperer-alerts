@@ -6,7 +6,6 @@ import { useCachedUserProfile } from "@/hooks/useCachedUserProfile";
 import { detectAndStoreLocation } from "@/utils/locationDetection";
 import ActivationStatusTag from "./ActivationStatusTag";
 import { JobTrackerVideo } from "./JobTrackerVideo";
-import { useLazyLottie } from "@/hooks/useLazyLottie";
 interface FeatureSectionProps {
   title: string;
   subheading: string;
@@ -35,18 +34,14 @@ const FeatureSection = ({
   shouldDetectLocation = false,
   activationStatus
 }: FeatureSectionProps) => {
-  const { userProfile, updateUserProfile } = useCachedUserProfile();
-  
-  // Use lazy Lottie hook for optimized loading
-  const { 
-    elementRef, 
-    isLoading, 
-    hasError, 
-    LottieRenderer 
-  } = useLazyLottie({
-    animationUrl: lottieUrl || '',
-    cacheKey: lottieUrl ? `animation-${title.toLowerCase().replace(/\s+/g, '-')}` : undefined
-  });
+  const [LottieComponent, setLottieComponent] = useState<React.ComponentType<any> | null>(null);
+  const [animationData, setAnimationData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const {
+    userProfile,
+    updateUserProfile
+  } = useCachedUserProfile();
   const handleButtonWithUrlClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!buttonUrl) return;
@@ -63,7 +58,37 @@ const FeatureSection = ({
     // Open the URL immediately (no waiting for location detection)
     window.open(buttonUrl, '_blank', 'noopener,noreferrer');
   };
-  // Removed useEffect hooks - now handled by useLazyLottie
+  useEffect(() => {
+    import('lottie-react').then(module => {
+      setLottieComponent(() => module.default);
+    }).catch(error => {
+      logger.error('Failed to load Lottie React module:', error);
+      setHasError(true);
+      setIsLoading(false);
+    });
+  }, []);
+  useEffect(() => {
+    const fetchAnimation = async () => {
+      try {
+        setIsLoading(true);
+        setHasError(false);
+        const response = await fetch(lottieUrl);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch animation: ${response.status} ${response.statusText}`);
+        }
+        const data = await response.json();
+        setAnimationData(data);
+      } catch (error) {
+        logger.error(`Failed to load Lottie animation for ${title}:`, error);
+        setHasError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    if (lottieUrl) {
+      fetchAnimation();
+    }
+  }, [lottieUrl, title]);
 
   // Mobile: header section (title + subheading only)
   const mobileHeaderSection = <div className="lg:hidden">
@@ -115,23 +140,28 @@ const FeatureSection = ({
            </button>
          </SignUpButton>}
     </div>;
-  const animationSection = lottieUrl ? (
-    <div ref={elementRef} className="flex items-center justify-center">
+  const animationSection = lottieUrl ? <div className="flex items-center justify-center">
       <div className="w-full max-w-48 lg:max-w-md">
         {title === "Job Tracker" ? (
           <JobTrackerVideo 
             className="w-full"
             showControls={true}
           />
-        ) : (
-          <LottieRenderer 
-            className="w-full h-40 lg:h-80"
-            style={{ width: '100%', height: 'auto' }}
-          />
-        )}
+        ) : isLoading ? <div className="w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center animate-pulse">
+            <div className="text-gray-500 text-sm">Loading animation...</div>
+          </div> : hasError ? <div className="w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+            <div className="text-center text-gray-500">
+              <div className="text-2xl mb-2">🎬</div>
+              <div className="text-sm">Animation unavailable</div>
+            </div>
+          </div> : LottieComponent && animationData ? <LottieComponent animationData={animationData} loop={true} autoplay={true} style={{
+        width: '100%',
+        height: 'auto'
+      }} /> : <div className="w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center">
+            <div className="text-gray-500 text-sm">Loading animation...</div>
+          </div>}
       </div>
-    </div>
-  ) : null;
+    </div> : null;
   return <section className="py-1 md:py-2 px-4 bg-background rounded-3xl">
       <div className="max-w-7xl mx-auto">
         {lottieUrl ? <div className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto">

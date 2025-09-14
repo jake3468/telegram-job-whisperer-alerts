@@ -3,20 +3,10 @@ import { createRoot } from 'react-dom/client'
 import { ClerkProvider } from '@clerk/clerk-react'
 import App from './App.tsx'
 import './index.css'
-import { initializePerformanceOptimizations } from '@/utils/preloadCriticalResources'
-import { registerServiceWorker, initializePerformanceMonitoring } from '@/utils/serviceWorkerManager'
-import { inlineCriticalCSS, preloadCriticalFonts } from '@/utils/criticalCSS'
 
-// Critical performance optimizations - execute immediately
-inlineCriticalCSS();
-preloadCriticalFonts();
-initializePerformanceOptimizations();
-
-// Register service worker for caching
-registerServiceWorker();
-
-// Initialize performance monitoring
-initializePerformanceMonitoring();
+// Temporarily disable security headers for debugging
+// import { securityHeaders } from '@/utils/securityHeaders'
+// securityHeaders.setSecurityHeaders();
 
 // Environment detection
 const isProduction = window.location.hostname === 'aspirely.ai';
