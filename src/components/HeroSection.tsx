@@ -101,11 +101,12 @@ const HeroSection = () => {
     navigate('/dashboard');
   };
   return <>
-    <section className="relative min-h-[80vh] flex items-center justify-center px-4 pt-20 sm:pt-24 pb-8 overflow-hidden [background-image:var(--hero-gradient)]">
-      {/* Light rays background animation - commented out for performance */}
-      {/* <div className="absolute inset-0 z-0 dark:block hidden">
+    <section className="relative min-h-[80vh] flex items-center justify-center px-4 pt-20 sm:pt-24 pb-8 overflow-hidden bg-white dark:bg-black">
+      {/* Light rays background animation - only in dark mode */}
+      <div className="absolute inset-0 z-0 dark:block hidden">
         <LightRays raysOrigin="top-center" raysColor="#00ffff" raysSpeed={1.5} lightSpread={0.8} rayLength={window.innerWidth < 768 ? 6.0 : 4.0} fadeDistance={window.innerWidth < 768 ? 5.0 : 3.0} followMouse={true} mouseInfluence={0.1} noiseAmount={0.1} distortion={0.05} className="w-full h-full" />
-      </div> */}
+      </div>
+      <div className="absolute inset-0 z-10 bg-white/90 dark:bg-black/20" aria-hidden="true" />
       
       {/* Main Container with Grid Layout */}
       <div className="max-w-7xl mx-auto z-20 relative w-full">
@@ -113,18 +114,18 @@ const HeroSection = () => {
           {/* Hero Content - Center aligned */}
           <div className="text-left max-w-2xl mx-auto flex flex-col justify-center mt-8 md:mt-0">
         
-        {/* Background to block particles behind headline - removed for light mode only */}
+        {/* Background to block particles behind headline in dark mode */}
         <div className="relative mb-8">
-          {/* <div className="hidden dark:block absolute inset-0 dark:bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div> */}
-          <h1 className="relative z-30 text-[36px] md:text-[54px] mb-1 leading-none font-notion-inter font-semibold tracking-[-0.4px] text-notion-dark drop-shadow-2xl animate-fade-in not-italic">
+          <div className="absolute inset-0 bg-background/80 dark:bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
+          <h1 className="relative z-30 text-[36px] md:text-[54px] mb-1 leading-none font-notion-inter font-semibold tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile and Desktop view */}
             <div className="block md:hidden lg:block">
-              <span className="text-notion-dark px-0.5 py-0 font-notion-inter font-semibold not-italic">World's first</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">World's first</span>
               <br />
-              <span className="text-notion-dark px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">AI Job Agents</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">AI Job Agents</span>
               <br />
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-notion-dark px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram.</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram.</span>
                 {telegramAnimationData && (
                   <div className="flex-shrink-0">
                     <Lottie 
@@ -140,12 +141,12 @@ const HeroSection = () => {
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden">
-              <span className="text-notion-dark px-0.5 py-0 font-notion-inter font-semibold not-italic">World's first</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">World's first</span>
               <br />
-              <span className="text-notion-dark px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">AI Job Agents</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">AI Job Agents</span>
               <br />
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-notion-dark px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram.</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram.</span>
                 {telegramAnimationData && (
                   <div className="flex-shrink-0">
                     <Lottie 
@@ -171,8 +172,8 @@ const HeroSection = () => {
           </div>} */}
         
 
-        <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] text-left [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-8 text-[16px] font-notion-inter font-medium text-notion-dark">Just chat like a friend with our AI Agents to update your resume instantly. Get daily job alerts and one-click access to cover letters, interview prep files, job fit analysis, company insights, HR contacts, and visa sponsorship info — everything you need to get hired, all in one place.</p>
+        <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
+          <p className="mb-8 text-[16px] font-notion-inter font-medium text-notion-dark dark:text-white">Just chat like a friend with our AI Agents to update your resume instantly. Get daily job alerts and one-click access to cover letters, interview prep files, job fit analysis, company insights, HR contacts, and visa sponsorship info — everything you need to get hired, all in one place.</p>
           
           <SignedOut>
             {/* Button and Badge Container */}

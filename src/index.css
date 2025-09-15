@@ -40,9 +40,6 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
-    
-    /* Hero gradient */
-    --hero-gradient: linear-gradient(to bottom, #D1EEF2, #B3DDE4);
   }
 
   .dark {
