@@ -101,7 +101,7 @@ const HeroSection = () => {
     navigate('/dashboard');
   };
   return <>
-    <section className="relative min-h-[80vh] flex items-center justify-center px-4 pt-20 sm:pt-24 pb-8 overflow-hidden bg-[var(--hero-gradient)] dark:bg-black">
+    <section className="relative min-h-[80vh] flex items-center justify-center px-4 pt-20 sm:pt-24 pb-8 overflow-hidden [background-image:var(--hero-gradient)] dark:bg-black">
       {/* Light rays background animation - only in dark mode */}
       <div className="absolute inset-0 z-0 dark:block hidden">
         <LightRays raysOrigin="top-center" raysColor="#00ffff" raysSpeed={1.5} lightSpread={0.8} rayLength={window.innerWidth < 768 ? 6.0 : 4.0} fadeDistance={window.innerWidth < 768 ? 5.0 : 3.0} followMouse={true} mouseInfluence={0.1} noiseAmount={0.1} distortion={0.05} className="w-full h-full" />
@@ -116,7 +116,7 @@ const HeroSection = () => {
         
         {/* Background to block particles behind headline in dark mode */}
         <div className="relative mb-8">
-          <div className="absolute inset-0 bg-background/80 dark:bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
+          <div className="hidden dark:block absolute inset-0 dark:bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
           <h1 className="relative z-30 text-[36px] md:text-[54px] mb-1 leading-none font-notion-inter font-semibold tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile and Desktop view */}
             <div className="block md:hidden lg:block">
