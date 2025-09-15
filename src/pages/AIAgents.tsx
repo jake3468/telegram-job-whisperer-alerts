@@ -72,11 +72,8 @@ const AIAgents = () => {
 
         {/* Agent Sections */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {/* Resume Builder Agent */}
-          <FeatureSection title="📝 Resume Builder Agent" subheading="Transform your resume into a sharp, job-ready version." description="Get a clean, ATS-friendly format that's keyword-optimized and highlights your achievements. You can easily add new projects, update experiences, and tailor your resume for every job - just by chatting with it." lottieUrl="" buttonText="Activate Now" isReversed={false} label="1" buttonUrl="https://t.me/Resume_builder_AI_bot" shouldDetectLocation={true} activationStatus={userProfile?.cv_bot_activated} />
-
           {/* Job Alerts Agent */}
-          <FeatureSection title="🔔 Job Alerts Agent" subheading="Daily web scanning for the latest jobs at your chosen time." description="Get fresh, relevant roles delivered right when you need them, with one-click access to tailored resumes, applications, interview prep & more.. for every opportunity." lottieUrl="" buttonText="Activate Now" isReversed={true} label="2" buttonUrl="https://t.me/Job_AI_update_bot" shouldDetectLocation={true} activationStatus={userProfile?.bot_activated} additionalContent={<>
+          <FeatureSection title="🔔 Job Alerts Agent" subheading="Daily web scanning for the latest jobs at your chosen time." description="Get only the latest relevant roles posted in the last 24 hours when you need them. No spam. No old jobs. Just one click access to today's opportunities plus resumes and interview prep" lottieUrl="" buttonText="Activate Now" isReversed={true} label="1" buttonUrl="https://t.me/Job_AI_update_bot" shouldDetectLocation={true} activationStatus={userProfile?.bot_activated} additionalContent={<>
                 <p className="text-xs text-gray-600 mb-2 text-center">
                   After activating the Job Alerts AI Agent, click "Create Job Alerts" below to set your daily preferences.
                 </p>
@@ -90,6 +87,9 @@ const AIAgents = () => {
                   Create Job Alerts
                 </Button>
               </>} />
+
+          {/* Resume Builder Agent */}
+          <FeatureSection title="📝 Resume Builder Agent" subheading="Transform your resume into a sharp, job-ready version." description="Instantly create an ATS-friendly resume that highlights your achievements. Update and tailor it for every job with just a chat" lottieUrl="" buttonText="Activate Now" isReversed={false} label="2" buttonUrl="https://t.me/Resume_builder_AI_bot" shouldDetectLocation={true} activationStatus={userProfile?.cv_bot_activated} />
 
           {/* Job Application Agent */}
           <FeatureSection title="👔 Job Application Agent" subheading="Your quick helper when you find a job." description="Share a few details and instantly receive a tailored resume, cover letter, HR contacts, interview prep & more.. - everything you need to apply with confidence" lottieUrl="" buttonText="Activate Now" isReversed={false} label="3" buttonUrl="https://t.me/add_job_aspirelyai_bot" shouldDetectLocation={true} activationStatus={userProfile?.add_job_bot_activated} />
