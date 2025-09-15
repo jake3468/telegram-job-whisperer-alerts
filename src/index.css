@@ -42,7 +42,7 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
     
     /* Hero gradient */
-    --hero-gradient: linear-gradient(to bottom, #E0E8F0, #BFD6EB);
+    --hero-gradient: linear-gradient(to bottom, #D1EEF2, #B3DDE4);
   }
 
   .dark {
