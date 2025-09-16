@@ -120,12 +120,12 @@ const HeroSection = () => {
           <h1 className="relative z-30 text-[36px] md:text-[54px] mb-1 leading-none font-notion-inter font-semibold tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile and Desktop view */}
             <div className="block md:hidden lg:block">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">World's first</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">Get resumes, job alerts</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">AI Job Agents</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">& more.. delivered</span>
               <br />
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram.</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram</span>
                 {telegramAnimationData && (
                   <div className="flex-shrink-0">
                     <Lottie 
@@ -137,16 +137,25 @@ const HeroSection = () => {
                   </div>
                 )}
               </div>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">
+                in just <span className="relative">
+                  30 seconds
+                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-red-500" style={{
+                    backgroundImage: 'url("data:image/svg+xml,%3csvg width=\'100\' height=\'2\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3cpath d=\'M0,1 Q25,0 50,1 T100,1\' stroke=\'%23ef4444\' stroke-width=\'2\' fill=\'transparent\'/%3e%3c/svg%3e")',
+                    backgroundRepeat: 'repeat-x'
+                  }}></span>
+                </span>.
+              </span>
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">World's first</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">Get resumes, job alerts</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">AI Job Agents</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">& more.. delivered</span>
               <br />
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram.</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram</span>
                 {telegramAnimationData && (
                   <div className="flex-shrink-0">
                     <Lottie 
@@ -158,6 +167,15 @@ const HeroSection = () => {
                   </div>
                 )}
               </div>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">
+                in just <span className="relative">
+                  30 seconds
+                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-red-500" style={{
+                    backgroundImage: 'url("data:image/svg+xml,%3csvg width=\'100\' height=\'2\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3cpath d=\'M0,1 Q25,0 50,1 T100,1\' stroke=\'%23ef4444\' stroke-width=\'2\' fill=\'transparent\'/%3e%3c/svg%3e")',
+                    backgroundRepeat: 'repeat-x'
+                  }}></span>
+                </span>.
+              </span>
             </div>
           </h1>
         </div>
@@ -176,15 +194,13 @@ const HeroSection = () => {
           <p className="mb-8 text-[16px] font-notion-inter font-medium text-notion-dark dark:text-white">Just chat like a friend with our AI Agents to update your resume instantly. Get daily job alerts and one-click access to cover letters, interview prep files, job fit analysis, company insights, HR contacts, and visa sponsorship info — everything you need to get hired, all in one place.</p>
           
           <SignedOut>
-            {/* Button and Badge Container */}
-            <div className="flex flex-row items-center justify-start gap-4 mb-8">
+            {/* Button Container */}
+            <div className="flex flex-row items-center justify-start mb-8">
               <SignUpButton mode="modal">
-                <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-lg transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-start md:justify-center w-auto border border-transparent">
-                  Get Started
+                <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-start md:justify-center w-auto border border-transparent">
+                  Get started for free
                 </button>
               </SignUpButton>
-              
-              <p className="text-foreground text-sm italic font-semibold">in just 5 seconds...</p>
               
               {/* Discount Badge */}
               {/* <div className="bg-white border border-green-600 dark:bg-green-900/30 dark:border-green-700 rounded-full px-4 py-2 md:px-4 md:py-2 w-auto text-left md:text-center">
