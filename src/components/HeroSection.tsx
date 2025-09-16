@@ -120,9 +120,9 @@ const HeroSection = () => {
           <h1 className="relative z-30 text-[36px] md:text-[54px] mb-1 leading-none font-notion-inter font-semibold tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile and Desktop view */}
             <div className="block md:hidden lg:block">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">Get resumes, job alerts</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">Get resumes,</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">& more.. delivered</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">job alerts & more..</span>
               <br />
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram</span>
@@ -140,8 +140,8 @@ const HeroSection = () => {
               <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">
                 in just <span className="relative">
                   30 seconds
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-red-500" style={{
-                    backgroundImage: 'url("data:image/svg+xml,%3csvg width=\'100\' height=\'2\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3cpath d=\'M0,1 Q25,0 50,1 T100,1\' stroke=\'%23ef4444\' stroke-width=\'2\' fill=\'transparent\'/%3e%3c/svg%3e")',
+                  <span className="absolute bottom-0 left-0 w-full h-1 bg-red-500" style={{
+                    backgroundImage: 'url("data:image/svg+xml,%3csvg width=\'100\' height=\'4\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3cpath d=\'M0,2 Q25,0 50,2 T100,2\' stroke=\'%23ef4444\' stroke-width=\'3\' fill=\'transparent\'/%3e%3c/svg%3e")',
                     backgroundRepeat: 'repeat-x'
                   }}></span>
                 </span>.
@@ -150,9 +150,9 @@ const HeroSection = () => {
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">Get resumes, job alerts</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">Get resumes,</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">& more.. delivered</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">job alerts & more..</span>
               <br />
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram</span>
@@ -170,8 +170,8 @@ const HeroSection = () => {
               <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">
                 in just <span className="relative">
                   30 seconds
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-red-500" style={{
-                    backgroundImage: 'url("data:image/svg+xml,%3csvg width=\'100\' height=\'2\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3cpath d=\'M0,1 Q25,0 50,1 T100,1\' stroke=\'%23ef4444\' stroke-width=\'2\' fill=\'transparent\'/%3e%3c/svg%3e")',
+                  <span className="absolute bottom-0 left-0 w-full h-1 bg-red-500" style={{
+                    backgroundImage: 'url("data:image/svg+xml,%3csvg width=\'100\' height=\'4\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3cpath d=\'M0,2 Q25,0 50,2 T100,2\' stroke=\'%23ef4444\' stroke-width=\'3\' fill=\'transparent\'/%3e%3c/svg%3e")',
                     backgroundRepeat: 'repeat-x'
                   }}></span>
                 </span>.
