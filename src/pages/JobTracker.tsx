@@ -1375,14 +1375,16 @@ const JobTracker = () => {
                            💡 Once you receive the interview call, you can tick mark above and then move this card to the 'Interview' section to unlock the checklist for interview preparation.
                          </p>
                        </div>
-                       <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
-                         <p className="text-blue-700 text-xs font-medium mb-2">
-                           💡 Still waiting on that interview call? Have you posted something impactful on LinkedIn to stand out? Use our AI-powered LinkedIn post generator with custom images to share your ideas, achievements, or insights — and stay visible to recruiters while you wait.
-                         </p>
-                         <Link to="/linkedin-posts" className="text-blue-600 hover:text-blue-800 text-xs font-bold underline">
-                           Create a Post Now 🚀
-                         </Link>
-                       </div>
+                        {/* LinkedIn post promotion section commented out per user request
+                        <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
+                          <p className="text-blue-700 text-xs font-medium mb-2">
+                            💡 Still waiting on that interview call? Have you posted something impactful on LinkedIn to stand out? Use our AI-powered LinkedIn post generator with custom images to share your ideas, achievements, or insights — and stay visible to recruiters while you wait.
+                          </p>
+                          <Link to="/linkedin-posts" className="text-blue-600 hover:text-blue-800 text-xs font-bold underline">
+                            Create a Post Now 🚀
+                          </Link>
+                        </div>
+                        */}
                      </div>}
                     
                       {/* Tips for Interview status */}
