@@ -1310,7 +1310,8 @@ const JobTracker = () => {
                             {item.label}
                           </span>
                         </div>
-                        {item.page && !item.completed && <button onClick={() => {
+                        {/* Comment out buttons except "Call Phone Now" as requested */}
+                        {item.page && !item.completed && item.linkText === 'Call Phone Now' && <button onClick={() => {
                     if (item.page === '/cover-letter') {
                       navigate(item.page, {
                         state: {
