@@ -1188,6 +1188,7 @@ export type Database = {
           created_at: string | null
           cv_bot_activated: boolean
           cv_chat_id: string | null
+          design_for_resume: string | null
           id: string
           profile_setup_completed: boolean
           referral_id: string | null
@@ -1211,6 +1212,7 @@ export type Database = {
           created_at?: string | null
           cv_bot_activated?: boolean
           cv_chat_id?: string | null
+          design_for_resume?: string | null
           id?: string
           profile_setup_completed?: boolean
           referral_id?: string | null
@@ -1234,6 +1236,7 @@ export type Database = {
           created_at?: string | null
           cv_bot_activated?: boolean
           cv_chat_id?: string | null
+          design_for_resume?: string | null
           id?: string
           profile_setup_completed?: boolean
           referral_id?: string | null
