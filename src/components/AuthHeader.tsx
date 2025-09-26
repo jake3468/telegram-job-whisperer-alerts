@@ -101,7 +101,7 @@ const AuthHeader = () => {
 
       {/* Mobile/Tablet Dropdown Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-background/95 dark:bg-black/95 backdrop-blur-md border-b border-border shadow-lg">
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-background dark:bg-black backdrop-blur-md border-b border-border shadow-lg">
           <div className="px-4 py-4 space-y-3">
             {/* Navigation Items */}
             {navItems.map((item) => (
