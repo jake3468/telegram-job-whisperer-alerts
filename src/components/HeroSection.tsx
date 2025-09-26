@@ -116,7 +116,7 @@ const HeroSection = () => {
             <div className="block md:hidden text-left text-[32px] leading-tight">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-normal not-italic whitespace-nowrap">Avoid Job Hunt stress,</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">let our AI agents do</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">Our AI agents will do</span>
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic"><span className="underline decoration-red-500 decoration-2 font-bold">all the work</span> for you</span>
               <br />
