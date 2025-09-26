@@ -210,7 +210,7 @@ const HeroSection = () => {
               </div> */}
             </div>
             {/* Avatar Group with Rating */}
-            <div className="flex items-center justify-start gap-4 mb-6">
+            <div className="flex items-center justify-center gap-4 mb-6">
               <div className="flex -space-x-2">
                 <Avatar className="h-8 w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Remy Sharp" />
