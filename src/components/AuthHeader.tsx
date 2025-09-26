@@ -63,14 +63,6 @@ const AuthHeader = () => {
 
         {/* Desktop Theme Toggle and Auth Buttons: Right side - only show on large screens */}
         <div className="hidden lg:flex items-center space-x-4">
-          {/* Theme Toggle Button */}
-          <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="text-foreground hover:text-primary transition-colors duration-200 p-2 rounded-lg hover:bg-muted"
-            aria-label="Toggle theme"
-          >
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
           
           <SignedOut>
             <div className="flex items-center space-x-4">
@@ -94,16 +86,8 @@ const AuthHeader = () => {
           </SignedIn>
         </div>
 
-        {/* Mobile/Tablet Hamburger Menu and Theme Toggle - show on tablet and mobile */}
+        {/* Mobile/Tablet Hamburger Menu - show on tablet and mobile */}
         <div className="lg:hidden flex items-center space-x-2">
-          {/* Theme Toggle Button for Mobile */}
-          <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="text-foreground hover:text-primary transition-colors duration-200 p-2 rounded-lg hover:bg-muted"
-            aria-label="Toggle theme"
-          >
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
           
           <button
             onClick={toggleMenu}
