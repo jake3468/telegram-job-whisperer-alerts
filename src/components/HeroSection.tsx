@@ -114,7 +114,7 @@ const HeroSection = () => {
           <h1 className="relative z-30 text-[36px] md:text-[54px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile view only */}
             <div className="block md:hidden text-left text-[32px] leading-tight">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-normal not-italic whitespace-nowrap">Avoid Job Hunt stress,</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-normal not-italic whitespace-nowrap">Job Hunting Supercharged</span>
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-semibold not-italic">Our AI agents will do</span>
               <br />
@@ -130,7 +130,7 @@ const HeroSection = () => {
             
             {/* Desktop view only */}
             <div className="hidden lg:block text-center leading-tight">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-normal not-italic">Avoid Job Hunt stress,</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-normal not-italic">Job Hunting Supercharged</span>
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-medium not-italic">Our AI agents will do</span>
               <br />
@@ -146,7 +146,7 @@ const HeroSection = () => {
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden text-center leading-tight">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-normal not-italic">Avoid Job Hunt stress,</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-normal not-italic">Job Hunting Supercharged</span>
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-medium not-italic">Our AI agents will do</span>
               <br />
