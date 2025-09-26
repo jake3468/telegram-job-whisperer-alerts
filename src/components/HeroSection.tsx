@@ -103,18 +103,25 @@ const HeroSection = () => {
   useEffect(() => {
     const observerOptions = {
       root: null,
-      rootMargin: '0px 0px -100px 0px',
-      threshold: 0.1
+      rootMargin: '-20px 0px -50px 0px', // Trigger when 20px from top
+      threshold: 0.3 // Trigger when 30% of element is visible
     };
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('animate-in');
+        if (entry.isIntersecting && !entry.target.classList.contains('animate-in')) {
+          // Find the index of this card
+          const cardIndex = cardsRef.current.findIndex(card => card === entry.target);
+          
+          // Add animation with staggered delay
+          setTimeout(() => {
+            entry.target.classList.add('animate-in');
+          }, cardIndex * 200); // 200ms delay between each card
         }
       });
     }, observerOptions);
 
+    // Observe each card
     cardsRef.current.forEach((card) => {
       if (card) {
         observer.observe(card);
