@@ -110,9 +110,7 @@ const HeroSection = () => {
           {/* Hero Content - Center aligned */}
           <div className="text-left max-w-2xl mx-auto flex flex-col justify-center mt-8 md:mt-0">
         
-        {/* Background to block particles behind headline in dark mode */}
         <div className="relative mb-8">
-          <div className="absolute inset-0 bg-background/80 dark:bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
           <h1 className="relative z-30 text-[36px] md:text-[54px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile view only */}
             <div className="block md:hidden text-left text-[32px] leading-tight">
