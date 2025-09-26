@@ -102,10 +102,6 @@ const HeroSection = () => {
   };
   return <>
     <section className="relative min-h-[80vh] flex items-center justify-center px-4 pt-20 sm:pt-24 pb-8 overflow-hidden bg-gradient-hero dark:bg-black">
-      {/* Light rays background animation - only in dark mode */}
-      <div className="absolute inset-0 z-0 dark:block hidden">
-        <LightRays raysOrigin="top-center" raysColor="#00ffff" raysSpeed={1.5} lightSpread={0.8} rayLength={window.innerWidth < 768 ? 6.0 : 4.0} fadeDistance={window.innerWidth < 768 ? 5.0 : 3.0} followMouse={true} mouseInfluence={0.1} noiseAmount={0.1} distortion={0.05} className="w-full h-full" />
-      </div>
       <div className="absolute inset-0 z-10 bg-white/90 dark:bg-black/20" aria-hidden="true" />
       
       {/* Main Container with Grid Layout */}
