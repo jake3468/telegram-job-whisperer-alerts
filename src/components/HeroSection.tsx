@@ -119,13 +119,13 @@ const HeroSection = () => {
           <div className="absolute inset-0 bg-background/80 dark:bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
           <h1 className="relative z-30 text-[36px] md:text-[54px] mb-1 leading-none font-notion-inter font-semibold tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile and Desktop view */}
-            <div className="block md:hidden lg:block">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">Get resumes,</span>
+            <div className="block md:hidden lg:block text-center">
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">Stop Job Hunting alone.</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">job alerts & more..</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">Let our AI Agents do it</span>
               <br />
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram</span>
+              <div className="flex items-center justify-center gap-2 mt-1">
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">for you on Telegram</span>
                 {telegramAnimationData && (
                   <div className="flex-shrink-0">
                     <Lottie 
@@ -137,25 +137,16 @@ const HeroSection = () => {
                   </div>
                 )}
               </div>
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">
-                in just <span className="relative">
-                  30 seconds
-                  <span className="absolute bottom-0 left-0 w-full h-1 bg-red-500" style={{
-                    backgroundImage: 'url("data:image/svg+xml,%3csvg width=\'100\' height=\'4\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3cpath d=\'M0,2 Q25,0 50,2 T100,2\' stroke=\'%23ef4444\' stroke-width=\'3\' fill=\'transparent\'/%3e%3c/svg%3e")',
-                    backgroundRepeat: 'repeat-x'
-                  }}></span>
-                </span>.
-              </span>
             </div>
             
             {/* Tablet view only */}
-            <div className="hidden md:block lg:hidden">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">Get resumes,</span>
+            <div className="hidden md:block lg:hidden text-center">
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">Stop Job Hunting alone.</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">job alerts & more..</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">Let our AI Agents do it</span>
               <br />
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram</span>
+              <div className="flex items-center justify-center gap-2 mt-1">
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">for you on Telegram</span>
                 {telegramAnimationData && (
                   <div className="flex-shrink-0">
                     <Lottie 
@@ -167,15 +158,6 @@ const HeroSection = () => {
                   </div>
                 )}
               </div>
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">
-                in just <span className="relative">
-                  30 seconds
-                  <span className="absolute bottom-0 left-0 w-full h-1 bg-red-500" style={{
-                    backgroundImage: 'url("data:image/svg+xml,%3csvg width=\'100\' height=\'4\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3cpath d=\'M0,2 Q25,0 50,2 T100,2\' stroke=\'%23ef4444\' stroke-width=\'3\' fill=\'transparent\'/%3e%3c/svg%3e")',
-                    backgroundRepeat: 'repeat-x'
-                  }}></span>
-                </span>.
-              </span>
             </div>
           </h1>
         </div>
@@ -191,7 +173,12 @@ const HeroSection = () => {
         
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-8 text-[16px] font-notion-inter font-medium text-muted-foreground">Just chat like a friend with our AI Agents to update your resume instantly. Get daily job alerts and one-click access to cover letters, interview prep files, job fit analysis, company insights, HR contacts, and visa sponsorship info — everything you need to get hired, all in one place.</p>
+          <p className="mb-8 text-[16px] font-notion-inter font-medium text-muted-foreground text-center">
+            Our AI agents make finding the perfect job for you dramatically easier and faster! <br />
+            Get personalized job alerts, custom resumes, cover letters, interview prep, <br />
+            and direct hiring manager contacts through effortless chat. <br />
+            It's never been this simple before.
+          </p>
           
           <SignedOut>
             {/* Button Container */}
