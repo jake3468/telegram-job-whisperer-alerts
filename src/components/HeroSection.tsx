@@ -278,17 +278,11 @@ const HeroSection = () => {
       <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
         <div className="text-left">
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4">
-            <p>hey… you know those job platforms that dump thousands of listings, and all those online resume builders that make everyone’s pdf look the same? that’s not what job seekers actually need.</p>
+            <p>Job platforms are broken.</p>
             
+            <p>Old postings everywhere. Even when you see a job matching your profile, you skip it. Why? Because it takes forever to customize your resume, prepare a cover letter, find HR contacts, and craft messages. It's boring, repetitive work that nobody has time for.</p>
             
-            
-            <p>we’re not like them… we built our platform for genuine job seekers like you. people who need something that actually helps them land jobs.</p>
-            
-            <p><p>we're not here to trap you with subscriptions. <strong>start free</strong>, pay-as-you-go only if you want more. no hidden tricks.</p></p>
-            
-            <p><p>first, we made <strong>Telegram AI Job Agents</strong> just for you.. if you're wondering why Telegram… who has time to go through websites every day when you already have a lot going on? just open a chat, and your agents are there - fixing resumes, sending alerts, writing cover letters, prepping interviews, even pointing to the right HR contacts. it's like having a friend helping you land the job.</p></p>
-            
-            <p><p>this is the stuff that actually works. stuff that <strong>actually gets you ahead</strong>.</p></p>
+            <p>That's exactly why we built a solution for that first. A Job Alerts AI Agent for you on Telegram.</p>
             
             <p>👇 try your AI Job Agents and see it yourself</p>
           </div>
