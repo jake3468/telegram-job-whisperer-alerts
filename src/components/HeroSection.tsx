@@ -118,7 +118,7 @@ const HeroSection = () => {
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-semibold not-italic">Our AI agents will do</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-semibold not-italic"><span className="underline decoration-red-500 decoration-2 font-bold">all the work</span> for you</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-semibold not-italic"><span className="underline decoration-red-500 decoration-4 underline-offset-4 font-bold">all the work</span> for you</span>
               <br />
               <div className="flex items-center gap-2">
                 <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram</span>
@@ -134,7 +134,7 @@ const HeroSection = () => {
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-medium not-italic">Our AI agents will do</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-medium not-italic"><span className="underline decoration-red-500 decoration-2 font-bold">all the work</span> for you</span>
+               <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-medium not-italic"><span className="underline decoration-red-500 decoration-4 underline-offset-4 font-bold">all the work</span> for you</span>
               <br />
               <div className="flex items-center justify-center gap-2">
                 <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">on Telegram</span>
@@ -150,7 +150,7 @@ const HeroSection = () => {
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-medium not-italic">Our AI agents will do</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-medium not-italic"><span className="underline decoration-red-500 decoration-2 font-bold">all the work</span> for you</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-medium not-italic"><span className="underline decoration-red-500 decoration-4 underline-offset-4 font-bold">all the work</span> for you</span>
               <br />
               <div className="flex items-center justify-center gap-2">
                 <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">on Telegram</span>
