@@ -120,11 +120,11 @@ const HeroSection = () => {
           <h1 className="relative z-30 text-[36px] md:text-[54px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile view only */}
             <div className="block md:hidden text-left text-[32px] leading-tight">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">Stop Job Hunting <span className="underline decoration-red-500 decoration-2">alone</span></span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">Avoid job hunt stress,</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-medium not-italic">Let our AI Agents</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-medium not-italic">let our AI agents do</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-medium not-italic">do it for you</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-medium not-italic">all the work for you</span>
               <br />
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">on Telegram</span>
@@ -143,12 +143,12 @@ const HeroSection = () => {
             
             {/* Desktop view only */}
             <div className="hidden lg:block text-center">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">Stop Job Hunting <span className="underline decoration-red-500 decoration-2">alone</span>.</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">Avoid job hunt stress, let our AI agents</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-medium not-italic">Let our AI Agents do it</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-medium not-italic">do all the work for you</span>
               <br />
               <div className="flex items-center justify-center gap-2 mt-1">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">for you on Telegram</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">on Telegram</span>
                 {telegramAnimationData && (
                   <div className="flex-shrink-0">
                     <Lottie 
@@ -164,12 +164,12 @@ const HeroSection = () => {
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden text-center">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">Stop Job Hunting <span className="underline decoration-red-500 decoration-2">alone</span>.</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">Avoid job hunt stress, let our AI agents</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-medium not-italic">Let our AI Agents do it</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-medium not-italic">do all the work for you</span>
               <br />
               <div className="flex items-center justify-center gap-2 mt-1">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">for you on Telegram</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">on Telegram</span>
                 {telegramAnimationData && (
                   <div className="flex-shrink-0">
                     <Lottie 
