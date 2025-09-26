@@ -122,22 +122,15 @@ const HeroSection = () => {
               <br />
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram</span>
-                {telegramAnimationData && (
-                  <div className="flex-shrink-0">
-                    <Lottie 
-                      animationData={telegramAnimationData} 
-                      loop={true} 
-                      autoplay={true} 
-                      className="w-10 h-10"
-                    />
-                  </div>
-                )}
+                {telegramAnimationData && <div className="flex-shrink-0">
+                    <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-10 h-10" />
+                  </div>}
               </div>
             </div>
             
             {/* Desktop view only */}
             <div className="hidden lg:block text-center">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-normal not-italic">Avoid job hunt stress,</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-normal not-italic">Avoid Job Hunt stress,</span>
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-medium not-italic">let our AI agents do</span>
               <br />
@@ -145,16 +138,9 @@ const HeroSection = () => {
               <br />
               <div className="flex items-center justify-center gap-2 mt-1">
                 <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">on Telegram</span>
-                {telegramAnimationData && (
-                  <div className="flex-shrink-0">
-                    <Lottie 
-                      animationData={telegramAnimationData} 
-                      loop={true} 
-                      autoplay={true} 
-                      className="w-16 h-16"
-                    />
-                  </div>
-                )}
+                {telegramAnimationData && <div className="flex-shrink-0">
+                    <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-16 h-16" />
+                  </div>}
               </div>
             </div>
             
@@ -168,16 +154,9 @@ const HeroSection = () => {
               <br />
               <div className="flex items-center justify-center gap-2 mt-1">
                 <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">on Telegram</span>
-                {telegramAnimationData && (
-                  <div className="flex-shrink-0">
-                    <Lottie 
-                      animationData={telegramAnimationData} 
-                      loop={true} 
-                      autoplay={true} 
-                      className="w-16 h-16 md:w-20 md:h-20"
-                    />
-                  </div>
-                )}
+                {telegramAnimationData && <div className="flex-shrink-0">
+                    <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-16 h-16 md:w-20 md:h-20" />
+                  </div>}
               </div>
             </div>
           </h1>
@@ -215,7 +194,7 @@ const HeroSection = () => {
                 <span className="text-green-700 dark:text-green-300 text-xs md:text-sm font-semibold font-inter">
                   Get 50% off with code "ASP123"
                 </span>
-              </div> */}
+               </div> */}
             </div>
             {/* Avatar Group with Rating */}
             <div className="flex items-center justify-center gap-4 mb-6">
@@ -333,11 +312,7 @@ const HeroSection = () => {
           
           {/* Demo Image */}
           <div className="mt-8 flex justify-center">
-            <img 
-              src="/lovable-uploads/5b725964-9ba7-4dca-993d-0bac747cccb5.png" 
-              alt="Telegram AI Job Agents Demo - showing Job Application, Resume Builder, and Job Alerts agents in action"
-              className="max-w-full h-auto rounded-lg shadow-lg"
-            />
+            <img src="/lovable-uploads/5b725964-9ba7-4dca-993d-0bac747cccb5.png" alt="Telegram AI Job Agents Demo - showing Job Application, Resume Builder, and Job Alerts agents in action" className="max-w-full h-auto rounded-lg shadow-lg" />
           </div>
         </div>
       </div>
