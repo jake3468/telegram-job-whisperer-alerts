@@ -287,52 +287,55 @@ const HeroSection = () => {
           </div>
           
           {/* AI Job Agents Structured Section */}
-          <div className="space-y-12">
+          <div className="space-y-8">
             {/* 1. Job Alerts AI Agent */}
-            <div className="text-left">
-              <h3 className="text-xl font-semibold text-foreground mb-4 font-inter">1. Job Alerts AI Agent</h3>
-              <p className="text-foreground mb-4 text-sm md:text-base font-inter leading-relaxed">
+            <div className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto">
+              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-6 font-inter text-center">1. Job Alerts AI Agent</h3>
+              
+              <div className="flex justify-center mb-6">
+                <img src="/telegram-job-alerts-agent.png" alt="Job Alerts AI Agent demonstration showing personalized job alerts with tailored resumes and cover letters" className="max-w-full h-auto rounded-lg shadow-lg" />
+              </div>
+              
+              <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
                 1 job alert = 7 instant files. Get tailored resumes, cover letters, interview prep, job fit analysis, and HR contacts - all personalized for each role.
               </p>
               
-              <div className="mb-6">
-                <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-lg transition-all duration-200 font-medium">
+              <div className="flex justify-center">
+                <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white hover:opacity-90 px-6 py-3 rounded-xl transition-all duration-200 font-medium" style={{backgroundColor: '#30313d'}}>
                   Try it 👉
                 </a>
-              </div>
-              
-              <div className="flex justify-center">
-                <img src="/telegram-job-alerts-agent.png" alt="Job Alerts AI Agent demonstration showing personalized job alerts with tailored resumes and cover letters" className="max-w-full h-auto rounded-lg shadow-lg" />
               </div>
             </div>
             
             {/* 2. Resume Builder AI Agent */}
-            <div className="text-left">
-              <h3 className="text-xl font-semibold text-foreground mb-4 font-inter">2. Resume Builder AI Agent</h3>
-              <p className="text-foreground mb-4 text-sm md:text-base font-inter leading-relaxed">
+            <div className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto">
+              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-6 font-inter text-center">2. Resume Builder AI Agent</h3>
+              
+              <div className="flex justify-center mb-6">
+                <img src="/telegram-resume-builder-agent.png" alt="Resume Builder AI Agent interface showing conversational resume building and customization" className="max-w-full h-auto rounded-lg shadow-lg" />
+              </div>
+              
+              <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
                 Just chat and get your resume tailored for every role - add new certifications, skills, projects, work experience by just telling it. No long forms, it remembers everything about you. It's like having a resume coach.
               </p>
               
-              <div className="mb-6">
-                <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-lg transition-all duration-200 font-medium">
+              <div className="flex justify-center">
+                <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white hover:opacity-90 px-6 py-3 rounded-xl transition-all duration-200 font-medium" style={{backgroundColor: '#30313d'}}>
                   Try it 👉
                 </a>
-              </div>
-              
-              <div className="flex justify-center">
-                <img src="/telegram-resume-builder-agent.png" alt="Resume Builder AI Agent interface showing conversational resume building and customization" className="max-w-full h-auto rounded-lg shadow-lg" />
               </div>
             </div>
             
             {/* 3. Job Application AI Agent */}
-            <div className="text-left">
-              <h3 className="text-xl font-semibold text-foreground mb-4 font-inter">3. Job Application AI Agent</h3>
-              <p className="text-foreground mb-4 text-sm md:text-base font-inter leading-relaxed">
+            <div className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto">
+              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-6 font-inter text-center">3. Job Application AI Agent</h3>
+              
+              <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
                 Tell it what job you're planning to apply for → Get the full application package, so you can apply to that job fully prepared in minutes.
               </p>
               
-              <div className="mb-6">
-                <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-lg transition-all duration-200 font-medium">
+              <div className="flex justify-center">
+                <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white hover:opacity-90 px-6 py-3 rounded-xl transition-all duration-200 font-medium" style={{backgroundColor: '#30313d'}}>
                   Try it 👉
                 </a>
               </div>
