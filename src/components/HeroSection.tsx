@@ -116,11 +116,11 @@ const HeroSection = () => {
             <div className="block md:hidden text-left text-[32px] leading-tight">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-normal not-italic whitespace-nowrap">Avoid Job Hunt stress,</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">Our AI agents will do</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-semibold not-italic">Our AI agents will do</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic"><span className="underline decoration-red-500 decoration-2 font-bold">all the work</span> for you</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-semibold not-italic"><span className="underline decoration-red-500 decoration-2 font-bold">all the work</span> for you</span>
               <br />
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-center gap-2">
                 <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram</span>
                 {telegramAnimationData && <div className="flex-shrink-0">
                     <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-10 h-10" />
@@ -129,14 +129,14 @@ const HeroSection = () => {
             </div>
             
             {/* Desktop view only */}
-            <div className="hidden lg:block text-center">
+            <div className="hidden lg:block text-center leading-tight">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-normal not-italic">Avoid Job Hunt stress,</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-medium not-italic">let our AI agents do</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-medium not-italic">Our AI agents will do</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-medium not-italic"><span className="underline decoration-red-500 decoration-2 font-bold">all the work</span> for you</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-medium not-italic"><span className="underline decoration-red-500 decoration-2 font-bold">all the work</span> for you</span>
               <br />
-              <div className="flex items-center justify-center gap-2 mt-1">
+              <div className="flex items-center justify-center gap-2">
                 <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">on Telegram</span>
                 {telegramAnimationData && <div className="flex-shrink-0">
                     <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-16 h-16" />
@@ -145,14 +145,14 @@ const HeroSection = () => {
             </div>
             
             {/* Tablet view only */}
-            <div className="hidden md:block lg:hidden text-center">
+            <div className="hidden md:block lg:hidden text-center leading-tight">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-normal not-italic">Avoid Job Hunt stress,</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-medium not-italic">let our AI agents do</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-medium not-italic">Our AI agents will do</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-medium not-italic"><span className="underline decoration-red-500 decoration-2 font-bold">all the work</span> for you</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-medium not-italic"><span className="underline decoration-red-500 decoration-2 font-bold">all the work</span> for you</span>
               <br />
-              <div className="flex items-center justify-center gap-2 mt-1">
+              <div className="flex items-center justify-center gap-2">
                 <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">on Telegram</span>
                 {telegramAnimationData && <div className="flex-shrink-0">
                     <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-16 h-16 md:w-20 md:h-20" />
