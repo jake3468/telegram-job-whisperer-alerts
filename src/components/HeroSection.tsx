@@ -119,15 +119,15 @@ const HeroSection = () => {
           <div className="absolute inset-0 bg-background/80 dark:bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
           <h1 className="relative z-30 text-[36px] md:text-[54px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile view only */}
-            <div className="block md:hidden text-left text-[28px] leading-tight">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-normal not-italic">Stop Job Hunting <span className="underline decoration-red-500 decoration-2">alone</span></span>
+            <div className="block md:hidden text-left text-[32px] leading-tight">
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">Stop Job Hunting <span className="underline decoration-red-500 decoration-2">alone</span></span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-normal not-italic">Let our AI Agents</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-medium not-italic">Let our AI Agents</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-normal not-italic">do it for you</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-medium not-italic">do it for you</span>
               <br />
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-normal not-italic">on Telegram</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">on Telegram</span>
                 {telegramAnimationData && (
                   <div className="flex-shrink-0">
                     <Lottie 
@@ -196,7 +196,7 @@ const HeroSection = () => {
         
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[14px] md:text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-8 text-[14px] md:text-[16px] font-notion-inter font-medium text-muted-foreground text-center">
+          <p className="mb-8 text-[14px] md:text-[16px] font-notion-inter font-medium text-muted-foreground text-left md:text-center">
             Our AI agents make finding the perfect job for you dramatically easier and faster! <br />
             Get personalized job alerts, custom resumes, cover letters, interview prep, <br />
             and direct hiring manager contacts through effortless chat. <br />
