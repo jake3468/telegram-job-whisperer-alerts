@@ -23,7 +23,7 @@ const AuthHeader = () => {
   };
 
   const navItems = [
-    { label: 'Features', id: 'features' },
+    { label: 'Features', id: 'telegram-agents' },
     { label: 'How It Works', id: 'how-it-works' },
     { label: 'Pricing', id: 'pricing' },
     { label: 'FAQ', id: 'faq' },
