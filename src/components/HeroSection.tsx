@@ -278,11 +278,11 @@ const HeroSection = () => {
       <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
         <div className="text-left">
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4">
-            <p>Job platforms are broken.</p>
+            <p>Get access to the world's first Telegram AI Job Agents</p>
             
-            <p>Old postings everywhere. Even when you see a job matching your profile, you skip it. Why? Because it takes forever to customize your resume, prepare a cover letter, find HR contacts, and craft messages. It's boring, repetitive work that nobody has time for.</p>
+            <p>Job platforms are broken. Old postings everywhere. Even when you see a matching job, you skip it because customizing resumes and finding HR contacts takes forever.</p>
             
-            <p>That's exactly why we built a solution for that first. A Job Alerts AI Agent for you on Telegram.</p>
+            <p>That's exactly why we built 3 AI Job Agents on Telegram.</p>
             
             <p>👇 try your AI Job Agents and see it yourself</p>
           </div>
