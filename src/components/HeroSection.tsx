@@ -338,9 +338,9 @@ const HeroSection = () => {
                 <img src="/telegram-job-alerts-agent.png" alt="Job Alerts AI Agent demonstration showing personalized job alerts with tailored resumes and cover letters" className="max-w-full h-auto rounded-lg shadow-lg" />
               </div>
               
-              <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
-                1 job alert = 7 instant files. Get tailored resumes, cover letters, interview prep, job fit analysis, and HR contacts - all personalized for each role.
-              </p>
+            <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
+              1 job alert = 7 instant files with just one-click. Get tailored resumes, cover letters, interview prep, job fit analysis, and HR contacts - all personalized for each role.
+            </p>
               
               <div className="flex justify-center">
                 <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white hover:opacity-90 px-6 py-3 rounded-xl transition-all duration-200 font-medium" style={{backgroundColor: '#30313d'}}>
