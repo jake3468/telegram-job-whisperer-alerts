@@ -106,7 +106,7 @@ export function AppSidebar() {
     ">
       {/* Logo & Name section: hide only on tablet (md to lg), show on mobile and desktop */}
       <SidebarHeader className="flex md:hidden lg:flex py-2 px-3 border-b border-gray-200 bg-white relative flex-col items-center gap-1">
-        <img alt="JobBots Logo" src={cachedLogoUrl} className="max-h-10 mb-1 drop-shadow-2xl object-fill" />
+        <img alt="JobBots Logo" src={cachedLogoUrl} className="max-h-10 mb-1 drop-shadow-2xl object-fill rounded-lg" />
         <span className="font-orbitron drop-shadow bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text select-none tracking-widest text-transparent font-bold min-w-0 truncate text-xl">Aspirely.ai</span>
         {/* X button for mobile - positioned at top right */}
         {isMobile && (
