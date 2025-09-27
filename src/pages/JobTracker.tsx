@@ -377,7 +377,7 @@ const JobTracker = () => {
     canAdd: true,
     bgColor: 'bg-blue-50',
     textColor: 'text-white',
-    borderColor: 'border-blue-200',
+    borderColor: 'border-blue-600',
     headerBg: 'bg-blue-600'
   }, {
     key: 'applied',
@@ -386,7 +386,7 @@ const JobTracker = () => {
     canAdd: true,
     bgColor: 'bg-green-50',
     textColor: 'text-white',
-    borderColor: 'border-green-200',
+    borderColor: 'border-green-600',
     headerBg: 'bg-green-600'
   }, {
     key: 'interview',
@@ -395,7 +395,7 @@ const JobTracker = () => {
     canAdd: true,
     bgColor: 'bg-yellow-50',
     textColor: 'text-white',
-    borderColor: 'border-yellow-200',
+    borderColor: 'border-yellow-600',
     headerBg: 'bg-yellow-600'
   }, {
     key: 'rejected',
@@ -404,7 +404,7 @@ const JobTracker = () => {
     canAdd: false,
     bgColor: 'bg-red-50',
     textColor: 'text-white',
-    borderColor: 'border-red-200',
+    borderColor: 'border-red-600',
     headerBg: 'bg-red-600'
   }, {
     key: 'offer',
@@ -413,7 +413,7 @@ const JobTracker = () => {
     canAdd: false,
     bgColor: 'bg-purple-50',
     textColor: 'text-white',
-    borderColor: 'border-purple-300',
+    borderColor: 'border-purple-600',
     headerBg: 'bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700'
   }];
 
