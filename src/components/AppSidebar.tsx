@@ -123,7 +123,7 @@ export function AppSidebar() {
         </Button>
       </SidebarHeader>
 
-      <SidebarContent className="overflow-x-hidden w-full px-0 !pr-0 pt-2">
+      <SidebarContent className="overflow-x-hidden w-full px-0 !pr-0 pt-2 bg-white text-gray-800">
         {/* Profile Section - visible on all screen sizes with proper spacing for tablet */}
         <SidebarGroup className="bg-gray-50 mt-1 shadow-md rounded-none">
           <SidebarGroupContent>
