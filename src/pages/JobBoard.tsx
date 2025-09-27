@@ -413,7 +413,7 @@ const JobBoard = () => {
                             value={pagination.postedToday.pageSize.toString()} 
                             onValueChange={(value) => changePageSize('postedToday', parseInt(value))}
                           >
-                            <SelectTrigger className="w-20 h-8 text-xs bg-white/10 border-gray-600 text-gray-300">
+                            <SelectTrigger className="w-20 h-8 text-xs bg-white/10 border-gray-600 text-gray-700">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -498,7 +498,7 @@ const JobBoard = () => {
                             value={pagination.last7Days.pageSize.toString()} 
                             onValueChange={(value) => changePageSize('last7Days', parseInt(value))}
                           >
-                            <SelectTrigger className="w-20 h-8 text-xs bg-white/10 border-gray-600 text-gray-300">
+                            <SelectTrigger className="w-20 h-8 text-xs bg-white/10 border-gray-600 text-gray-700">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -594,7 +594,7 @@ const JobBoard = () => {
                             value={pagination.saved.pageSize.toString()} 
                             onValueChange={(value) => changePageSize('saved', parseInt(value))}
                           >
-                            <SelectTrigger className="w-20 h-8 text-xs bg-white/10 border-gray-600 text-gray-300">
+                            <SelectTrigger className="w-20 h-8 text-xs bg-white/10 border-gray-600 text-gray-700">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
