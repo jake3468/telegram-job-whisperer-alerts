@@ -213,7 +213,7 @@ const FeatureSection = ({
                   {animationSection}
                 </>}
             </div>
-          </div> : <div className="relative bg-gray-50 dark:bg-gray-900 rounded-3xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col">
+          </div> : <div className="relative bg-gray-50 dark:bg-gray-900 rounded-3xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col border border-gray-600">
             {label && <div className="absolute -left-3 -top-3 bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
                 {label}
               </div>}
