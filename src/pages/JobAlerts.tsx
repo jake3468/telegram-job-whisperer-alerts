@@ -73,17 +73,16 @@ const JobAlerts = () => {
       </div>;
   }
   return <Layout>
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-orbitron font-extrabold mb-2 drop-shadow tracking-tight flex items-center justify-center gap-2">
+      <div className="text-center mb-8 mt-6">
+        <h1 className="text-4xl font-orbitron font-extrabold mb-2 drop-shadow tracking-tight flex flex-col sm:flex-row items-center justify-center gap-2">
           <span>⏰</span>
           <span style={{
           WebkitBackgroundClip: 'text',
           backgroundClip: 'text',
           color: 'transparent'
-        }} className="bg-gradient-to-r from-orange-400 via-yellow-400 to-pink-500 bg-clip-text text-amber-400 text-left">
+        }} className="bg-gradient-to-r from-orange-600 via-yellow-600 to-pink-700 bg-clip-text text-amber-400 text-center sm:text-left">
             <span className="sm:hidden">
-              Create<br />
-              Job <span className="italic">Alerts</span>
+              Create Job <span className="italic">Alerts</span>
             </span>
             <span className="hidden sm:inline">
               Create Job <span className="italic">Alerts</span>
@@ -91,12 +90,12 @@ const JobAlerts = () => {
           </span>
         </h1>
         
-        <p className="text-md text-orange-100 font-inter font-light mb-4 text-left max-w-2xl mx-auto">
+        <p className="font-inter font-normal text-gray-900 text-sm sm:text-base text-left mb-1 sm:mb-2 max-w-2xl mx-auto">
           Set your personalized job alerts here and our Telegram &quot;Job Alerts&quot; AI Agent will send you the latest 24-hour postings straight to your Telegram everyday. They will also appear under &apos;Posted Today&apos; on your Job Board page.
         </p>
 
         {/* Usage Cost Badge */}
-        <Badge variant="outline" className="bg-orange-900/30 border-orange-600/50 text-orange-300 font-semibold">
+        <Badge variant="outline" className="bg-orange-100 border-orange-400 text-orange-800 font-semibold">
           Usage Fee: 0.1 credits per alert message
         </Badge>
       </div>

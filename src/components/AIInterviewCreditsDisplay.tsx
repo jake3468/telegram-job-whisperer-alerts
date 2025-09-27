@@ -72,7 +72,7 @@ export const AIInterviewCreditsDisplay = ({
         </div>
       </Card>;
   }
-  return <Card className="p-4 border-primary/30 bg-gradient-to-br from-primary/10 via-secondary/15 to-accent/10 shadow-md">
+  return <Card className="p-4 border-primary/50 bg-gradient-to-br from-primary/10 via-secondary/15 to-accent/10 shadow-md">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">

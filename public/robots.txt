@@ -20,7 +20,6 @@ Disallow: /cover-letter
 Disallow: /linkedin-posts
 Disallow: /interview-prep
 Disallow: /company-role-analysis
-Disallow: /resume-builder
 Disallow: /job-alerts
 Disallow: /get-more-credits
 Disallow: /upgrade
@@ -28,5 +27,7 @@ Disallow: /profile
 Disallow: /dashboard
 Disallow: /job-tracker
 Disallow: /ai-mock-interview
+Disallow: /ai-agents
+Disallow: /job-board
 
 Sitemap: https://aspirely.ai/sitemap.xml

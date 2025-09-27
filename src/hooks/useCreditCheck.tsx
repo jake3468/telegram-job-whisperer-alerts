@@ -37,7 +37,7 @@ export function useCreditCheck(requiredCredits: number = 1.5) {
       // Default message for other features
       toast({
         title: "Insufficient Credits",
-        description: `You need ${requiredCredits} credits to use this feature. You currently have ${creditBalance} credits. Your next 30 free credits will reset on ${resetDate}. Click here to get more credits.`,
+        description: `You need ${requiredCredits} credits to use this feature. You currently have ${creditBalance} credits. Your next 10 free credits will reset on ${resetDate}. Click here to get more credits.`,
         duration: 8000,
         action: (
           <ToastAction altText="Get More Credits" onClick={() => navigate('/get-more-credits')}>

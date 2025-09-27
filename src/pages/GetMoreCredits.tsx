@@ -140,7 +140,7 @@ export default function GetMoreCredits() {
         <div className="text-center mb-5 sm:mb-12 px-2 sm:px-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex-1">
-              <h1 className="text-2xl xs:text-3xl font-inter font-extrabold text-white mb-1 sm:mb-2 drop-shadow tracking-tight animate-fade-in sm:text-4xl">
+              <h1 className="text-3xl xs:text-4xl font-inter font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-1 sm:mb-2 mt-6 drop-shadow tracking-tight animate-fade-in sm:text-4xl">
                 Pricing Plans
               </h1>
             </div>
@@ -151,13 +151,13 @@ export default function GetMoreCredits() {
                 Refresh
               </Button>}
           </div>
-          <p className="text-blue-100 font-inter font-light mb-1 sm:mb-2 animate-fade-in sm:text-base text-left text-sm">💬 Start with free monthly credits and upgrade anytime by purchasing flexible credit packs as you need. For any payment-related queries, feel free to reach out to us at &quot;support@aspirely.ai&quot; we're here to help!</p>
+          <p className="text-gray-900 font-inter font-normal mb-1 sm:mb-2 animate-fade-in sm:text-base text-left text-sm">💬 Start with free monthly credits and upgrade anytime by purchasing flexible credit packs as you need. For any payment-related queries, feel free to reach out to us at &quot;support@aspirely.ai&quot; we're here to help!</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
-            <p className="text-xs sm:text-base text-cyan-200 font-inter animate-fade-in mt-2 md:mt-0 mb-2 sm:mb-0">
+            <p className="text-xs sm:text-base text-gray-800 font-inter animate-fade-in mt-2 md:mt-0 mb-2 sm:mb-0">
               Current Balance:{" "}
-              {credits ? <span className="font-bold text-cyan-100">
+              {credits ? <span className="font-bold text-gray-900">
                   {currentBalance.toLocaleString()} credits
-                </span> : <span className="font-bold text-cyan-100">Loading...</span>}
+                </span> : <span className="font-bold text-gray-900">Loading...</span>}
             </p>
             <div className="flex items-center gap-2">
               <SubscriptionBadge credits={credits} />
@@ -166,9 +166,9 @@ export default function GetMoreCredits() {
           </div>
           
           {/* Payment Partner Information */}
-          <div className="flex items-center gap-2 text-sm text-blue-200 mb-4 justify-center">
+          <div className="flex items-center gap-2 text-sm text-gray-600 mb-4 justify-center">
             <span>Powered by</span>
-            <span className="ml-1 font-semibold text-blue-100">Dodo Payments</span>
+            <span className="ml-1 font-semibold text-gray-800">Dodo Payments</span>
           </div>
         </div>
         
@@ -178,9 +178,6 @@ export default function GetMoreCredits() {
             {/* Free Plan */}
             <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-blue-400/30 min-h-[320px]`}>
               <CardHeader className="text-center pb-2 pt-4 px-3">
-                <div className="inline-block px-3 py-1 bg-cyan-400 text-gray-800 text-sm font-bold rounded-full mb-2">
-                  Free Plan
-                </div>
                 <div className="text-2xl font-extrabold text-white mb-1">Free</div>
                 <div className="text-sm font-semibold text-gray-300">10 credits/month</div>
               </CardHeader>

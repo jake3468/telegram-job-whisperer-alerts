@@ -200,12 +200,12 @@ const Profile = () => {
       <div className="text-center mb-8" onClick={updateActivity}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex-1">
-            <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron drop-shadow mb-2">
+            <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron drop-shadow mb-2 lg:mt-8">
               <span className="mr-2">🎉</span>
-              <span className="bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent">Welcome, </span>
-              <span className="italic bg-gradient-to-r from-pastel-peach to-pastel-mint bg-clip-text text-transparent">{user.firstName || 'User'}</span>
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">Welcome, </span>
+              <span className="italic bg-gradient-to-r from-orange-700 to-green-700 bg-clip-text text-transparent">{user.firstName || 'User'}</span>
             </h1>
-            <div className="text-gray-100 font-inter font-light text-left text-sm space-y-3">
+            <div className="font-inter font-normal text-gray-900 text-sm sm:text-base text-left mb-1 sm:mb-2 space-y-3">
               <p>🎯 Add or update your resume and bio here so you can instantly get job-tailored cover letters, resumes, interview prep, and more when your job alerts arrive in Telegram.</p>
               <p>⚡ If you have already completed these steps and set your job alerts, just wait for your first Telegram job updates to start arriving from tomorrow.</p>
             </div>
@@ -251,7 +251,7 @@ const Profile = () => {
             <Button 
               onClick={() => setShowResumeHelp(true)}
               variant="secondary"
-              className="w-full bg-gray-800/50 hover:bg-gray-700/50 text-gray-200 border border-white rounded-lg py-3 text-sm font-medium transition-colors"
+              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-300 rounded-lg py-3 text-sm font-medium transition-colors"
             >
               Need help fixing your resume ?
             </Button>

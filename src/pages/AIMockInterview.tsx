@@ -70,13 +70,13 @@ const AIMockInterview = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-black via-gray-950 to-purple-950 text-white overflow-hidden">
+      <div className="min-h-screen bg-white text-gray-900 overflow-hidden">
         <div className="container mx-auto px-4 py-4 max-w-4xl">
           {/* Hero Section */}
           <div className="text-center mb-12">
-            <div className="flex items-center justify-center gap-3 mb-6 relative">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6 relative">
               <span className="text-4xl">📞</span>
-              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent text-left">AI Mock Interview</h1>
+              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent text-center sm:text-left">AI Mock Interview</h1>
               
               {/* Manual Refresh Button */}
               {connectionIssue && (
@@ -84,7 +84,7 @@ const AIMockInterview = () => {
                   onClick={handleManualRefresh}
                   variant="ghost"
                   size="sm"
-                  className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0 absolute right-0"
+                  className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 h-8 w-8 p-0 absolute right-0"
                   title="Refresh page"
                 >
                   <RefreshCw className="h-4 w-4" />
@@ -92,7 +92,7 @@ const AIMockInterview = () => {
               )}
             </div>
             
-            <h2 className="text-xl md:text-2xl text-gray-300 mb-4 leading-relaxed">Get a Mock Interview Phone Call from 👩🏻 Grace</h2>
+            <h2 className="text-xl md:text-2xl text-gray-700 mb-4 leading-relaxed">Get a Mock Interview Phone Call from 👩🏻 Grace</h2>
             
             {/* Action Buttons */}
             <div className="mb-6 flex flex-wrap gap-3 justify-center">
@@ -114,7 +114,7 @@ const AIMockInterview = () => {
               </Button>
             </div>
             
-            <p className="text-gray-200 max-w-2xl mx-auto leading-relaxed text-left text-sm">Grace, your AI interview assistant from Aspirely AI, will call your phone in about a minute to ask real interview questions based on your job role — and you'll receive a detailed report right after the call.</p>
+            <p className="text-gray-900 font-inter font-normal max-w-2xl mx-auto leading-relaxed text-left text-sm sm:text-base">Grace, your AI interview assistant from Aspirely AI, will call your phone in about a minute to ask real interview questions based on your job role — and you'll receive a detailed report right after the call.</p>
           </div>
 
           {/* Form Section */}

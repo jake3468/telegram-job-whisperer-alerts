@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -38,13 +39,6 @@ const BlogPost = () => {
   }, [slug]);
   useEffect(() => {
     if (blog) {
-      // Update page meta tags for SEO
-      document.title = blog.meta_title || blog.title;
-      const metaDescription = document.querySelector('meta[name="description"]');
-      if (metaDescription) {
-        metaDescription.setAttribute('content', blog.meta_description || blog.excerpt);
-      }
-
       // Fetch related blogs
       fetchRelatedBlogs();
     }
@@ -133,6 +127,64 @@ const BlogPost = () => {
       </div>;
   }
   return <div className="min-h-screen bg-black text-white">
+      <Helmet>
+        <title>{blog.meta_title || blog.title}</title>
+        <meta name="description" content={blog.meta_description || blog.excerpt} />
+        <meta name="keywords" content={blog.tags?.join(', ') || ''} />
+        <link rel="canonical" href={`https://aspirely.ai/blog/${blog.slug}`} />
+        
+        {/* Open Graph tags */}
+        <meta property="og:title" content={blog.meta_title || blog.title} />
+        <meta property="og:description" content={blog.meta_description || blog.excerpt} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={`https://aspirely.ai/blog/${blog.slug}`} />
+        <meta property="og:site_name" content="Aspirely AI" />
+        <meta property="og:image" content={blog.thumbnail_url || "https://aspirely.ai/aspirely-social-preview-updated.png"} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="article:published_time" content={blog.published_at} />
+        <meta property="article:author" content={blog.author_name} />
+        {blog.tags?.map(tag => <meta key={tag} property="article:tag" content={tag} />)}
+        
+        {/* Twitter Card tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={blog.meta_title || blog.title} />
+        <meta name="twitter:description" content={blog.meta_description || blog.excerpt} />
+        <meta name="twitter:image" content={blog.thumbnail_url || "https://aspirely.ai/aspirely-social-preview-updated.png"} />
+        
+        {/* JSON-LD Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "headline": blog.title,
+            "description": blog.meta_description || blog.excerpt,
+            "image": blog.thumbnail_url || "https://aspirely.ai/aspirely-social-preview-updated.png",
+            "author": {
+              "@type": "Person",
+              "name": blog.author_name
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "Aspirely AI",
+              "url": "https://aspirely.ai",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://aspirely.ai/aspirely-social-preview-updated.png"
+              }
+            },
+            "datePublished": blog.published_at,
+            "dateModified": blog.published_at,
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": `https://aspirely.ai/blog/${blog.slug}`
+            },
+            "keywords": blog.tags?.join(", ") || "",
+            "url": `https://aspirely.ai/blog/${blog.slug}`
+          })}
+        </script>
+      </Helmet>
+      
       <div className="pt-8 pb-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
@@ -144,7 +196,7 @@ const BlogPost = () => {
           {/* Blog Header */}
           <div className="mb-8">
             {blog.thumbnail_url && <div className="aspect-video bg-gray-800 rounded-lg overflow-hidden mb-8 w-full">
-                <img src={blog.thumbnail_url} alt={blog.title} className="w-full h-full object-cover" />
+                <img src={blog.thumbnail_url} alt={`${blog.title} - Featured image for blog post about ${blog.tags?.join(', ') || 'career development'}`} className="w-full h-full object-cover" />
               </div>}
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-400 mb-4">
@@ -208,7 +260,7 @@ const BlogPost = () => {
                 {relatedBlogs.map(relatedBlog => <Card key={relatedBlog.id} className="bg-gray-900 border-gray-700 hover:border-sky-500 transition-colors">
                     <Link to={`/blog/${relatedBlog.slug}`} onClick={() => window.scrollTo(0, 0)}>
                       {relatedBlog.thumbnail_url && <div className="aspect-video bg-gray-800 rounded-t-lg overflow-hidden">
-                          <img src={relatedBlog.thumbnail_url} alt={relatedBlog.title} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+                          <img src={relatedBlog.thumbnail_url} alt={`${relatedBlog.title} - Related blog post cover image`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
                         </div>}
                       <CardHeader>
                         <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">

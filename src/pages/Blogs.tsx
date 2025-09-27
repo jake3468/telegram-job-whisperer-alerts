@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -69,6 +70,67 @@ const Blogs = () => {
       </div>;
   }
   return <div className="min-h-screen bg-background text-foreground">
+      <Helmet>
+        <title>Career Insights & Job Search Tips - Aspirely AI Blog</title>
+        <meta name="description" content="Discover career insights, job search strategies, interview tips, and industry updates to accelerate your professional growth with Aspirely AI's expert blog." />
+        <meta name="keywords" content="career advice, job search tips, interview preparation, career development, professional growth, job hunting strategies" />
+        <link rel="canonical" href="https://aspirely.ai/blogs" />
+        
+        {/* Open Graph tags */}
+        <meta property="og:title" content="Career Insights & Job Search Tips - Aspirely AI Blog" />
+        <meta property="og:description" content="Discover career insights, job search strategies, interview tips, and industry updates to accelerate your professional growth with Aspirely AI's expert blog." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://aspirely.ai/blogs" />
+        <meta property="og:site_name" content="Aspirely AI" />
+        <meta property="og:image" content="https://aspirely.ai/aspirely-social-preview-updated.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        
+        {/* Twitter Card tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Career Insights & Job Search Tips - Aspirely AI Blog" />
+        <meta name="twitter:description" content="Discover career insights, job search strategies, interview tips, and industry updates to accelerate your professional growth with Aspirely AI's expert blog." />
+        <meta name="twitter:image" content="https://aspirely.ai/aspirely-social-preview-updated.png" />
+        
+        {/* JSON-LD Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Blog",
+            "name": "Aspirely AI Blog",
+            "description": "Career insights, job search strategies, interview tips, and industry updates to accelerate your professional growth",
+            "url": "https://aspirely.ai/blogs",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Aspirely AI",
+              "url": "https://aspirely.ai",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://aspirely.ai/aspirely-social-preview-updated.png"
+              }
+            },
+            "mainEntity": {
+              "@type": "ItemList",
+              "itemListElement": blogs.slice(0, 10).map((blog, index) => ({
+                "@type": "ListItem",
+                "position": index + 1,
+                "item": {
+                  "@type": "BlogPosting",
+                  "headline": blog.title,
+                  "description": blog.excerpt,
+                  "url": `https://aspirely.ai/blog/${blog.slug}`,
+                  "datePublished": blog.published_at,
+                  "author": {
+                    "@type": "Person",
+                    "name": blog.author_name
+                  }
+                }
+              }))
+            }
+          })}
+        </script>
+      </Helmet>
+      
       {/* Back to Home Button */}
       <div className="pt-8 px-4">
         <div className="max-w-6xl mx-auto">
@@ -115,7 +177,7 @@ const Blogs = () => {
               {featuredBlogs.map(blog => <Card key={blog.id} className="bg-card border-border hover:border-cyan-500/50 dark:hover:border-cyan-400/50 transition-colors">
                   <Link to={`/blog/${blog.slug}`} onClick={() => window.scrollTo(0, 0)}>
                     {blog.thumbnail_url && <div className="aspect-video bg-gray-800 rounded-t-lg overflow-hidden">
-                        <img src={blog.thumbnail_url} alt={blog.title} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+                        <img src={blog.thumbnail_url} alt={`${blog.title} - ${blog.excerpt?.substring(0, 100) || 'Blog post cover image'}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
                       </div>}
                     <CardHeader>
                       <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
@@ -153,7 +215,7 @@ const Blogs = () => {
               {filteredBlogs.map(blog => <Card key={blog.id} className="bg-gray-900 border-gray-700 hover:border-sky-500 transition-colors">
                   <Link to={`/blog/${blog.slug}`} onClick={() => window.scrollTo(0, 0)}>
                     {blog.thumbnail_url && <div className="aspect-video bg-gray-800 rounded-t-lg overflow-hidden">
-                        <img src={blog.thumbnail_url} alt={blog.title} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+                        <img src={blog.thumbnail_url} alt={`${blog.title} - ${blog.excerpt?.substring(0, 100) || 'Blog post cover image'}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
                       </div>}
                     <CardHeader>
                       <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
