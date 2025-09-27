@@ -151,7 +151,7 @@ export default function GetMoreCredits() {
                 Refresh
               </Button>}
           </div>
-          <p className="text-gray-700 font-inter font-light mb-1 sm:mb-2 animate-fade-in sm:text-base text-left text-sm">💬 Start with free monthly credits and upgrade anytime by purchasing flexible credit packs as you need. For any payment-related queries, feel free to reach out to us at &quot;support@aspirely.ai&quot; we're here to help!</p>
+          <p className="text-gray-900 font-inter font-semibold mb-1 sm:mb-2 animate-fade-in sm:text-base text-left text-sm">💬 Start with free monthly credits and upgrade anytime by purchasing flexible credit packs as you need. For any payment-related queries, feel free to reach out to us at &quot;support@aspirely.ai&quot; we're here to help!</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
             <p className="text-xs sm:text-base text-gray-800 font-inter animate-fade-in mt-2 md:mt-0 mb-2 sm:mb-0">
               Current Balance:{" "}
@@ -178,9 +178,6 @@ export default function GetMoreCredits() {
             {/* Free Plan */}
             <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-blue-400/30 min-h-[320px]`}>
               <CardHeader className="text-center pb-2 pt-4 px-3">
-                <div className="inline-block px-3 py-1 bg-cyan-400 text-gray-800 text-sm font-bold rounded-full mb-2">
-                  Free Plan
-                </div>
                 <div className="text-2xl font-extrabold text-white mb-1">Free</div>
                 <div className="text-sm font-semibold text-gray-300">10 credits/month</div>
               </CardHeader>
