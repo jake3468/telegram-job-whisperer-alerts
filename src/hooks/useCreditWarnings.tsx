@@ -76,7 +76,7 @@ export function useCreditWarnings() {
       
       toast({
         title: "Low Credits Warning",
-        description: `You have ${balance} credits remaining. Your next 30 free credits will reset on ${resetDate}. Need more credits now? Click here to get more credits.`,
+        description: `You have ${balance} credits remaining. Your next 10 free credits will reset on ${resetDate}. Need more credits now? Click here to get more credits.`,
         duration: 10000,
         action: (
           <ToastAction altText="Get More Credits" onClick={() => navigate('/get-more-credits')}>
@@ -94,7 +94,7 @@ export function useCreditWarnings() {
       
       toast({
         title: "No Credits Remaining",
-        description: `You have no credits left. Features are temporarily unavailable. Your next 30 free credits will reset on ${resetDate}. Click here to get more credits now.`,
+        description: `You have no credits left. Features are temporarily unavailable. Your next 10 free credits will reset on ${resetDate}. Click here to get more credits now.`,
         duration: 12000,
         action: (
           <ToastAction altText="Get More Credits" onClick={() => navigate('/get-more-credits')}>
