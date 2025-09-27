@@ -347,7 +347,7 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
       )}
 
       {/* Form wrapped in white container */}
-      <div className="bg-white rounded-xl p-6 shadow-lg">
+      <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-300">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="phoneNumber" className="text-gray-700 font-medium">
