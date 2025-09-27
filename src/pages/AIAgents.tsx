@@ -33,37 +33,37 @@ const AIAgents = () => {
     }
   };
   return <Layout>
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen bg-white">
         {/* Header Section */}
         <div className="max-w-7xl mx-auto px-4 py-4 text-center">
           <h1 className="font-orbitron mb-2 drop-shadow tracking-tight font-bold text-4xl flex items-center justify-center gap-2">
             <span className="text-2xl sm:text-3xl md:text-4xl">🚀</span>
-            <span className="text-cyan-300 text-left font-inter text-3xl sm:text-3xl md:text-4xl">Your AI Agents</span>
+            <span className="text-cyan-700 text-left font-inter text-3xl sm:text-3xl md:text-4xl">Your AI Agents</span>
           </h1>
-          <p className="text-sm lg:text-base text-white font-inter font-light mb-3 text-left max-w-2xl mx-auto lg:text-left">
+          <p className="text-sm lg:text-base text-gray-900 font-inter font-normal mb-3 text-left max-w-2xl mx-auto lg:text-left">
             First, let's meet and activate your personal <span className="whitespace-nowrap">AI Job agents</span> - they're ready to guide you through every step of your job hunt<span className="lg:inline"> </span><br className="lg:hidden" />(😉 you'll be amazed at what they can do!).
           </p>
         </div>
 
         {/* User Profile ID Section */}
         <div className="max-w-2xl mx-auto px-4 mb-8">
-          <div className="p-3 sm:p-4 lg:p-6 rounded-lg border border-border" style={{backgroundColor: '#30313D'}}>
-            <p className="mb-3 text-xs sm:text-sm font-medium text-slate-50">
-              Follow the steps below to activate all 3 <span className="text-sky-300">Telegram</span> AI Agents👇<br /><br />
+          <div className="p-3 sm:p-4 lg:p-6 rounded-lg border border-gray-300 bg-gray-50">
+            <p className="mb-3 text-xs sm:text-sm font-medium text-gray-900">
+              Follow the steps below to activate all 3 <span className="text-blue-600">Telegram</span> AI Agents👇<br /><br />
               1. Copy your Activation Key given below.
             </p>
-            {userProfile?.id ? <div className="flex items-center gap-2 rounded-lg p-2 sm:p-3 border border-gray-600 bg-blue-800 mb-4">
-                <code className="text-white font-mono text-xs sm:text-sm flex-1 break-all min-w-0">
+            {userProfile?.id ? <div className="flex items-center gap-2 rounded-lg p-2 sm:p-3 border border-blue-300 bg-blue-100 mb-4">
+                <code className="text-blue-900 font-mono text-xs sm:text-sm flex-1 break-all min-w-0">
                   {userProfile.id}
                 </code>
-                <Button onClick={copyUserProfileId} variant="outline" size="sm" className="hover:bg-blue-50 flex-shrink-0">
+                <Button onClick={copyUserProfileId} variant="outline" size="sm" className="hover:bg-blue-200 border-blue-300 text-blue-700 flex-shrink-0">
                   <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>
               </div> : <div className="flex items-center gap-2 bg-white rounded-lg p-2 sm:p-3 border border-gray-200 mb-4">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
                 <span className="text-gray-600 text-xs sm:text-sm">Loading Activation Key...</span>
               </div>}
-            <p className="text-xs sm:text-sm font-medium text-slate-50">
+            <p className="text-xs sm:text-sm font-medium text-gray-900">
               2. Click the "Activate Now" button, one by one, for each of the 3 AI Agents.<br /><br />
               3. When it asks for your activation key, paste it to start using your AI agents.
             </p>
@@ -74,7 +74,7 @@ const AIAgents = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {/* Job Alerts Agent */}
           <FeatureSection title="🔔 Job Alerts Agent" subheading="Daily web scanning for the latest jobs at your chosen time." description="Get only the latest relevant roles posted in the last 24 hours when you need them. No spam. No old jobs. Just one click access to today's opportunities plus resumes and interview prep" lottieUrl="" buttonText="Activate Now" isReversed={true} label="1" buttonUrl="https://t.me/Job_AI_update_bot" shouldDetectLocation={true} activationStatus={userProfile?.bot_activated} additionalContent={<>
-                <p className="text-xs text-gray-600 mb-2 text-center">
+                <p className="text-xs text-gray-700 mb-2 text-center">
                   After activating the Job Alerts AI Agent, click "Create Job Alerts" below to set your daily preferences.
                 </p>
                 <Button onClick={async () => {
