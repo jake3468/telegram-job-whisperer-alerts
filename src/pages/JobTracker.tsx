@@ -1109,14 +1109,14 @@ const JobTracker = () => {
       <div className="flex flex-col min-h-screen bg-gradient-to-br from-black via-gray-950 to-fuchsia-950">
         
         {/* Header section - scrollable */}
-        <header className="py-6 px-4">
+        <header className="py-6 px-4 bg-white">
           <div className="text-center">
             <div className="flex items-center justify-center gap-4 mb-4">
               <span className="font-semibold text-3xl">📈</span>
               <h1 className="font-extrabold font-orbitron bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent drop-shadow md:text-4xl text-center text-3xl">Job Tracker</h1>
               
               {/* Manual Refresh Button - Always visible for debugging */}
-              <Button onClick={handleManualRefresh} variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0" title="Refresh data">
+              <Button onClick={handleManualRefresh} variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 h-8 w-8 p-0" title="Refresh data">
                 <RefreshCw className="h-4 w-4" />
               </Button>
             </div>
@@ -1132,8 +1132,8 @@ const JobTracker = () => {
                 </div>
               </div>}
 
-            <p className="text-gray-100 font-inter max-w-4xl mx-auto leading-relaxed mb-3 font-extralight text-sm text-left">Each stage has a smart checklist — from resume updates to AI mock interviews — so you always know what’s next. Move jobs between stages using the ⋮⋮ handle, or the stage buttons after clicking ‘View’. Use the ➕ button to add a new job manually.</p>
-            <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-gray-300 font-medium">
+            <p className="text-gray-800 font-inter max-w-4xl mx-auto leading-relaxed mb-3 font-extralight text-sm text-left">Each stage has a smart checklist — from resume updates to AI mock interviews — so you always know what’s next. Move jobs between stages using the ⋮⋮ handle, or the stage buttons after clicking ‘View’. Use the ➕ button to add a new job manually.</p>
+            <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-gray-700 font-medium">
               <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs">Saved</span>
               <span className="hidden sm:inline">→</span>
               <span className="bg-green-600 text-white px-2 py-1 rounded text-xs">Applied</span>
