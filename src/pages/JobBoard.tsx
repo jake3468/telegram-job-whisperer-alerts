@@ -325,7 +325,7 @@ const JobBoard = () => {
               <span className="text-3xl sm:text-3xl">💼</span>
               <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent">Job Board</h1>
               {/* Only show refresh button when there's an error */}
-              {error && <Button onClick={handleManualRefresh} disabled={loading} variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0" title="Refresh jobs data">
+              {error && <Button onClick={handleManualRefresh} disabled={loading} variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 h-8 w-8 p-0" title="Refresh jobs data">
                   <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                  </Button>}
             </div>
@@ -437,7 +437,7 @@ const JobBoard = () => {
                                       changePage('postedToday', pagination.postedToday.currentPage - 1);
                                     }
                                   }}
-                                  className={pagination.postedToday.currentPage === 1 ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
+                                  className={pagination.postedToday.currentPage === 1 ? 'pointer-events-none opacity-50' : 'text-gray-700 hover:text-gray-900'}
                                 />
                               </PaginationItem>
                               
@@ -450,7 +450,7 @@ const JobBoard = () => {
                                       changePage('postedToday', pagination.postedToday.currentPage + 1);
                                     }
                                   }}
-                                  className={pagination.postedToday.currentPage >= Math.ceil(pagination.postedToday.totalCount / pagination.postedToday.pageSize) ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
+                                  className={pagination.postedToday.currentPage >= Math.ceil(pagination.postedToday.totalCount / pagination.postedToday.pageSize) ? 'pointer-events-none opacity-50' : 'text-gray-700 hover:text-gray-900'}
                                 />
                               </PaginationItem>
                             </PaginationContent>
@@ -522,7 +522,7 @@ const JobBoard = () => {
                                       changePage('last7Days', pagination.last7Days.currentPage - 1);
                                     }
                                   }}
-                                  className={pagination.last7Days.currentPage === 1 ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
+                                  className={pagination.last7Days.currentPage === 1 ? 'pointer-events-none opacity-50' : 'text-gray-700 hover:text-gray-900'}
                                 />
                               </PaginationItem>
                               
@@ -535,7 +535,7 @@ const JobBoard = () => {
                                       changePage('last7Days', pagination.last7Days.currentPage + 1);
                                     }
                                   }}
-                                  className={pagination.last7Days.currentPage >= Math.ceil(pagination.last7Days.totalCount / pagination.last7Days.pageSize) ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
+                                  className={pagination.last7Days.currentPage >= Math.ceil(pagination.last7Days.totalCount / pagination.last7Days.pageSize) ? 'pointer-events-none opacity-50' : 'text-gray-700 hover:text-gray-900'}
                                 />
                               </PaginationItem>
                             </PaginationContent>
@@ -618,7 +618,7 @@ const JobBoard = () => {
                                       changePage('saved', pagination.saved.currentPage - 1);
                                     }
                                   }}
-                                  className={pagination.saved.currentPage === 1 ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
+                                  className={pagination.saved.currentPage === 1 ? 'pointer-events-none opacity-50' : 'text-gray-700 hover:text-gray-900'}
                                 />
                               </PaginationItem>
                               
@@ -631,7 +631,7 @@ const JobBoard = () => {
                                       changePage('saved', pagination.saved.currentPage + 1);
                                     }
                                   }}
-                                  className={pagination.saved.currentPage >= Math.ceil(pagination.saved.totalCount / pagination.saved.pageSize) ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
+                                  className={pagination.saved.currentPage >= Math.ceil(pagination.saved.totalCount / pagination.saved.pageSize) ? 'pointer-events-none opacity-50' : 'text-gray-700 hover:text-gray-900'}
                                 />
                               </PaginationItem>
                             </PaginationContent>
@@ -665,7 +665,7 @@ const JobBoard = () => {
                         <span className="font-medium">{selectedJob.company_name}</span>
                       </div>
                     </div>
-                     <Button variant="ghost" size="icon" className="text-gray-500 hover:text-gray-700 flex-shrink-0" onClick={() => { updateActivity(); setSelectedJob(null); }}>
+                     <Button variant="ghost" size="icon" className="text-gray-700 hover:text-gray-900 flex-shrink-0" onClick={() => { updateActivity(); setSelectedJob(null); }}>
                        <X className="h-5 w-5" />
                      </Button>
                   </div>
