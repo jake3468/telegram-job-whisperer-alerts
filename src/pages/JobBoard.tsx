@@ -547,12 +547,12 @@ const JobBoard = () => {
                 </TabsContent>
 
                 <TabsContent value="saved-to-tracker" className="space-y-3 mt-4 w-full">
-                  <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-lg p-3 mb-4 max-w-2xl mx-auto">
+                  <div className="bg-gradient-to-r from-green-100 to-blue-100 border border-green-400 rounded-lg p-3 mb-4 max-w-2xl mx-auto">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                      <span className="text-green-300 font-medium text-sm">Saved Jobs Section</span>
+                      <div className="w-3 h-3 bg-green-600 rounded-full animate-pulse"></div>
+                      <span className="text-green-700 font-medium text-sm">Saved Jobs Section</span>
                     </div>
-                    <p className="text-gray-300 text-xs">Jobs you&apos;ve saved are shown here. Click &quot;Add to Job Tracker/Track&quot; to track your application progress.</p>
+                    <p className="text-gray-700 text-xs">Jobs you&apos;ve saved are shown here. Click &quot;Add to Job Tracker/Track&quot; to track your application progress.</p>
                   </div>
                   
                   {sectionLoading.saved ? (
