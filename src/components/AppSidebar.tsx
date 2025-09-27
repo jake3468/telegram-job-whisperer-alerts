@@ -187,7 +187,7 @@ export function AppSidebar() {
         </SidebarGroup> */}
       </SidebarContent>
 
-      <SidebarFooter className="p-2 border-t border-gray-200 bg-white mt-2 rounded-none relative">
+      <SidebarFooter className="p-2 border-t border-gray-200 bg-white rounded-none relative">
         <SignedIn>
           <div className="flex flex-col gap-2 w-full">
             <div className="flex items-center gap-3 w-full">
@@ -213,7 +213,7 @@ export function AppSidebar() {
               </div>
               {state === 'expanded' && user && <div className="flex-1 min-w-0">
                   {/* Show display name (not email), kept very responsive */}
-                  <p className="text-gray-800 text-base font-orbitron truncate break-all">
+                  <p className="text-gray-900 text-base font-orbitron truncate break-all font-semibold">
                     {getDisplayName()}
                   </p>
                 </div>}
