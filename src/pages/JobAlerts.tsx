@@ -73,14 +73,14 @@ const JobAlerts = () => {
       </div>;
   }
   return <Layout>
-      <div className="text-center mb-8">
+      <div className="text-center mb-8 mt-6">
         <h1 className="text-4xl font-orbitron font-extrabold mb-2 drop-shadow tracking-tight flex items-center justify-center gap-2">
           <span>⏰</span>
           <span style={{
           WebkitBackgroundClip: 'text',
           backgroundClip: 'text',
           color: 'transparent'
-        }} className="bg-gradient-to-r from-orange-400 via-yellow-400 to-pink-500 bg-clip-text text-amber-400 text-left">
+        }} className="bg-gradient-to-r from-orange-600 via-yellow-600 to-pink-700 bg-clip-text text-amber-400 text-left">
             <span className="sm:hidden">
               Create<br />
               Job <span className="italic">Alerts</span>
