@@ -140,9 +140,9 @@ export default function GetMoreCredits() {
         <div className="text-center mb-5 sm:mb-12 px-2 sm:px-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex-1">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3 justify-center">
-                <span className="text-3xl xs:text-4xl sm:order-1">💳</span>
-                <h1 className="text-3xl xs:text-4xl font-inter font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-1 sm:mb-2 mt-6 sm:mt-0 drop-shadow tracking-tight animate-fade-in sm:text-4xl sm:order-2">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
+                <span className="text-4xl">💳</span>
+                <h1 className="text-3xl xs:text-4xl font-inter font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent drop-shadow tracking-tight animate-fade-in sm:text-4xl text-center sm:text-left">
                   Pricing Plans
                 </h1>
               </div>
