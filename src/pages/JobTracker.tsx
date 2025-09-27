@@ -1132,7 +1132,7 @@ const JobTracker = () => {
                 </div>
               </div>}
 
-            <p className="text-gray-900 font-inter max-w-4xl mx-auto leading-relaxed mb-3 font-medium text-sm text-left">Each stage has a smart checklist — from resume updates to AI mock interviews — so you always know what’s next. Move jobs between stages using the ⋮⋮ handle, or the stage buttons after clicking ‘View’. Use the ➕ button to add a new job manually.</p>
+            <p className="text-gray-900 font-inter font-normal max-w-4xl mx-auto leading-relaxed mb-1 sm:mb-2 text-sm sm:text-base text-left">Each stage has a smart checklist — from resume updates to AI mock interviews — so you always know what’s next. Move jobs between stages using the ⋮⋮ handle, or the stage buttons after clicking ‘View’. Use the ➕ button to add a new job manually.</p>
             <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-gray-700 font-medium">
               <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs">Saved</span>
               <span className="hidden sm:inline">→</span>
