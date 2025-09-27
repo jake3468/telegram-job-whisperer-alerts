@@ -323,7 +323,7 @@ const JobBoard = () => {
           <div className="text-center mb-4 sm:mb-6">
             <div className="flex items-center justify-center gap-2 sm:gap-4 mb-2 sm:mb-4 flex-wrap">
               <span className="text-3xl sm:text-3xl">💼</span>
-              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent">Job Board</h1>
+              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-700 to-cyan-600 bg-clip-text text-transparent">Job Board</h1>
               {/* Only show refresh button when there's an error */}
               {error && <Button onClick={handleManualRefresh} disabled={loading} variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 h-8 w-8 p-0" title="Refresh jobs data">
                   <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
