@@ -200,7 +200,7 @@ const Profile = () => {
       <div className="text-center mb-8" onClick={updateActivity}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex-1">
-            <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron drop-shadow mb-2">
+            <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron drop-shadow mb-2 lg:mt-8">
               <span className="mr-2">🎉</span>
               <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">Welcome, </span>
               <span className="italic bg-gradient-to-r from-orange-700 to-green-700 bg-clip-text text-transparent">{user.firstName || 'User'}</span>
