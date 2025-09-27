@@ -96,8 +96,8 @@ export function AppSidebar() {
   };
 
   return <Sidebar className="
-      bg-sidebar
-      border-r border-sidebar-border shadow-2xl shadow-gray-400/10 
+      bg-white
+      border-r border-gray-200 shadow-2xl shadow-gray-400/10 
       backdrop-blur-2xl
       h-full
       overflow-y-auto overflow-x-hidden
@@ -105,27 +105,27 @@ export function AppSidebar() {
       /* No rounded corners for a squared sidebar */
     ">
       {/* Logo & Name section: hide only on tablet (md to lg), show on mobile and desktop */}
-      <SidebarHeader className="flex md:hidden lg:flex py-2 px-3 border-b border-sidebar-border bg-sidebar relative flex-col items-center gap-1">
+      <SidebarHeader className="flex md:hidden lg:flex py-2 px-3 border-b border-gray-200 bg-white relative flex-col items-center gap-1">
         <img alt="JobBots Logo" src={cachedLogoUrl} className="max-h-10 mb-1 drop-shadow-2xl object-fill" />
         <span className="font-orbitron drop-shadow bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text select-none tracking-widest text-transparent font-bold min-w-0 truncate text-xl">Aspirely.ai</span>
         {/* X button for mobile - positioned at top right */}
         {isMobile && (
-          <Button variant="ghost" size="icon" onClick={() => setOpenMobile(false)} className="absolute top-2 right-2 h-8 w-8 text-sidebar-foreground hover:bg-sidebar-accent border border-sidebar-border bg-sidebar rounded-xl transition-all">
+          <Button variant="ghost" size="icon" onClick={() => setOpenMobile(false)} className="absolute top-2 right-2 h-8 w-8 text-gray-600 hover:bg-gray-100 border border-gray-200 bg-white rounded-xl transition-all">
             <X className="h-5 w-5" />
           </Button>
         )}
       </SidebarHeader>
 
       {/* Compact header for tablet view when logo is hidden - with X button at top right */}
-      <SidebarHeader className="hidden md:flex lg:hidden py-2 px-3 border-b border-sidebar-border bg-sidebar relative justify-end">
-        <Button variant="ghost" size="icon" onClick={() => setOpenMobile(false)} className="h-10 w-10 text-sidebar-foreground hover:bg-sidebar-accent border border-sidebar-border bg-sidebar rounded-xl transition-all">
+      <SidebarHeader className="hidden md:flex lg:hidden py-2 px-3 border-b border-gray-200 bg-white relative justify-end">
+        <Button variant="ghost" size="icon" onClick={() => setOpenMobile(false)} className="h-10 w-10 text-gray-600 hover:bg-gray-100 border border-gray-200 bg-white rounded-xl transition-all">
           <X className="h-6 w-6" />
         </Button>
       </SidebarHeader>
 
       <SidebarContent className="overflow-x-hidden w-full px-0 !pr-0 pt-2">
         {/* Profile Section - visible on all screen sizes with proper spacing for tablet */}
-        <SidebarGroup className="bg-sidebar-accent/20 mt-1 shadow-md rounded-none">
+        <SidebarGroup className="bg-gray-50 mt-1 shadow-md rounded-none">
           <SidebarGroupContent>
             <SidebarMenu>
               {profileItems.map(item => {
@@ -187,7 +187,7 @@ export function AppSidebar() {
         </SidebarGroup> */}
       </SidebarContent>
 
-      <SidebarFooter className="p-2 border-t border-sidebar-border bg-sidebar mt-2 rounded-none relative">
+      <SidebarFooter className="p-2 border-t border-gray-200 bg-white mt-2 rounded-none relative">
         <SignedIn>
           <div className="flex flex-col gap-2 w-full">
             <div className="flex items-center gap-3 w-full">
@@ -213,7 +213,7 @@ export function AppSidebar() {
               </div>
               {state === 'expanded' && user && <div className="flex-1 min-w-0">
                   {/* Show display name (not email), kept very responsive */}
-                  <p className="text-sidebar-foreground text-base font-orbitron truncate break-all">
+                  <p className="text-gray-800 text-base font-orbitron truncate break-all">
                     {getDisplayName()}
                   </p>
                 </div>}

@@ -12,7 +12,7 @@ const CreditBalanceDisplay = () => {
   // Only show loading on initial load, not on subsequent fetches
   if ((isLoading || isPending) && !credits) {
     return (
-      <div className="flex items-center gap-2 text-sidebar-foreground text-sm font-orbitron">
+      <div className="flex items-center gap-2 text-gray-700 text-sm font-orbitron">
         <Loader2 className="w-4 h-4 animate-spin" />
         {state === 'expanded' && <span>Loading credits...</span>}
       </div>
@@ -32,7 +32,7 @@ const CreditBalanceDisplay = () => {
 
   return (
     <div className={`text-sm font-orbitron transition-colors ${
-      isLowCredits ? 'text-orange-500' : 'text-sidebar-foreground'
+      isLowCredits ? 'text-orange-500' : 'text-gray-700'
     }`}>
       {state === 'expanded' ? (
         <div className="flex flex-col gap-1">
