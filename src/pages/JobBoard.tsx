@@ -330,7 +330,7 @@ const JobBoard = () => {
                  </Button>}
             </div>
             <div className="px-2 sm:px-4">
-              <p className="text-gray-300 text-sm sm:text-lg break-words text-left">
+              <p className="font-inter font-normal text-gray-900 text-sm sm:text-base text-left break-words mb-1 sm:mb-2">
                 Browse job alerts as received via Telegram &quot;Job Alerts&quot; AI Agent — all jobs posted today appear here, stay visible for 7 days, and are auto-deleted after that. Save the ones you like and move them to your <span className="italic text-indigo-200">Job Tracker</span> page when you're ready to apply.
               </p>
             </div>
