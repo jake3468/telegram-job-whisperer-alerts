@@ -404,7 +404,7 @@ const JobBoard = () => {
                       
                       {/* Pagination Controls */}
                       <div className="flex items-center justify-between mt-6 max-w-2xl mx-auto">
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
                           <span>
                             {((pagination.postedToday.currentPage - 1) * pagination.postedToday.pageSize) + 1}-
                             {Math.min(pagination.postedToday.currentPage * pagination.postedToday.pageSize, pagination.postedToday.totalCount)} of {pagination.postedToday.totalCount}
@@ -422,7 +422,7 @@ const JobBoard = () => {
                               <SelectItem value="50">50</SelectItem>
                             </SelectContent>
                           </Select>
-                          <span className="text-gray-400">Results per page</span>
+                          <span className="text-gray-700">Results per page</span>
                         </div>
                         
                         {pagination.postedToday.totalCount > pagination.postedToday.pageSize && (
@@ -489,7 +489,7 @@ const JobBoard = () => {
                       
                       {/* Pagination Controls */}
                       <div className="flex items-center justify-between mt-6 max-w-2xl mx-auto">
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
                           <span>
                             {((pagination.last7Days.currentPage - 1) * pagination.last7Days.pageSize) + 1}-
                             {Math.min(pagination.last7Days.currentPage * pagination.last7Days.pageSize, pagination.last7Days.totalCount)} of {pagination.last7Days.totalCount}
@@ -507,7 +507,7 @@ const JobBoard = () => {
                               <SelectItem value="50">50</SelectItem>
                             </SelectContent>
                           </Select>
-                          <span className="text-gray-400">Results per page</span>
+                          <span className="text-gray-700">Results per page</span>
                         </div>
                         
                         {pagination.last7Days.totalCount > pagination.last7Days.pageSize && (
@@ -585,7 +585,7 @@ const JobBoard = () => {
                       
                       {/* Pagination Controls */}
                       <div className="flex items-center justify-between mt-6 max-w-2xl mx-auto">
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
                           <span>
                             {((pagination.saved.currentPage - 1) * pagination.saved.pageSize) + 1}-
                             {Math.min(pagination.saved.currentPage * pagination.saved.pageSize, pagination.saved.totalCount)} of {pagination.saved.totalCount}
@@ -603,7 +603,7 @@ const JobBoard = () => {
                               <SelectItem value="50">50</SelectItem>
                             </SelectContent>
                           </Select>
-                          <span className="text-gray-400">Results per page</span>
+                          <span className="text-gray-700">Results per page</span>
                         </div>
                         
                         {pagination.saved.totalCount > pagination.saved.pageSize && (
