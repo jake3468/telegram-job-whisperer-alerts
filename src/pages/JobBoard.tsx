@@ -349,17 +349,17 @@ const JobBoard = () => {
             <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
               <div className="px-2 sm:px-4 mb-6">
                   <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm gap-0.5 sm:gap-1 h-auto p-0.5 sm:p-1 border-0 rounded-xl">
-                   <TabsTrigger value="posted-today" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-700 hover:bg-white/10 hover:text-gray-900 transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
+                   <TabsTrigger value="posted-today" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-700 border border-gray-400 hover:bg-white/10 hover:text-gray-900 transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:border-blue-600 font-medium min-w-0 overflow-hidden">
                      <span className="hidden lg:inline truncate">Posted Today</span>
                      <span className="lg:hidden truncate">Today</span>
                      <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({pagination.postedToday.totalCount})</span>
                    </TabsTrigger>
-                   <TabsTrigger value="last-7-days" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-700 hover:bg-white/10 hover:text-gray-900 transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
+                   <TabsTrigger value="last-7-days" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-700 border border-gray-400 hover:bg-white/10 hover:text-gray-900 transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:border-blue-600 font-medium min-w-0 overflow-hidden">
                      <span className="hidden sm:inline truncate">Last 7 Days</span>
                      <span className="sm:hidden truncate">Week</span>
                      <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({pagination.last7Days.totalCount})</span>
                    </TabsTrigger>
-                   <TabsTrigger value="saved-to-tracker" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-700 hover:bg-white/10 hover:text-gray-900 transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
+                   <TabsTrigger value="saved-to-tracker" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-700 border border-gray-400 hover:bg-white/10 hover:text-gray-900 transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:border-blue-600 font-medium min-w-0 overflow-hidden">
                      <span className="hidden sm:inline truncate">Saved</span>
                      <span className="sm:hidden truncate">Saved</span>
                      <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({pagination.saved.totalCount})</span>
