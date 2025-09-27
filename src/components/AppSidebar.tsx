@@ -125,26 +125,25 @@ export function AppSidebar() {
 
       <SidebarContent className="overflow-x-hidden w-full px-0 !pr-0 pt-2">
         {/* Profile Section - visible on all screen sizes with proper spacing for tablet */}
-        <SidebarGroup className="bg-sidebar-accent/30 mx-2 mt-1 shadow-md rounded-none">
+        <SidebarGroup className="bg-sidebar-accent/20 mt-1 shadow-md rounded-none">
           <SidebarGroupContent>
             <SidebarMenu>
               {profileItems.map(item => {
               const isCurrentlyActive = isActive(item.url);
               return <SidebarMenuItem key={item.title} className="w-full">
-                    <SidebarMenuButton asChild className="w-full px-0">
+                    <SidebarMenuButton asChild className="w-full px-0 mx-0">
                       <NavLink to={item.url} className={`
-                          flex items-center gap-2 py-2 
-                          mx-0                          /* remove horizontal margin for full-width highlight */
-                          px-3
+                          flex items-center gap-2 py-3
+                          mx-0 px-4                     /* full-width highlight with proper padding */
                           rounded-none                   /* squared corners */
                           font-orbitron transition-all duration-300 
                           text-base font-bold w-full
-                          ${isCurrentlyActive ? 'bg-sidebar-accent text-sidebar-primary shadow-xl border-y border-sidebar-border' : 'text-sidebar-foreground hover:bg-sidebar-accent/70 hover:text-sidebar-primary hover:shadow-lg'}
+                          ${isCurrentlyActive ? 'bg-blue-100 text-blue-900 shadow-md border-l-4 border-blue-600' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 hover:shadow-sm'}
                         `} style={{
                     overflow: 'hidden',
                     borderRadius: 0 // Ensures squared corners
                   }}>
-                        <item.icon className={`w-5 h-5 flex-shrink-0 ${isCurrentlyActive ? 'text-sidebar-primary' : 'text-sidebar-foreground'}`} />
+                        <item.icon className={`w-5 h-5 flex-shrink-0 ${isCurrentlyActive ? 'text-blue-900' : 'text-gray-700'}`} />
                         {state === 'expanded' && <span className="truncate">{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>
