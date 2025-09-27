@@ -321,7 +321,7 @@ const JobBoard = () => {
         <div className="w-full max-w-4xl px-2 sm:px-6 mx-auto">
           {/* Header */}
           <div className="text-center mb-4 sm:mb-6">
-            <div className="flex items-center justify-center gap-2 sm:gap-4 mb-2 sm:mb-4 flex-wrap">
+            <div className="flex items-center justify-center gap-2 sm:gap-4 mb-2 sm:mb-4 mt-4 sm:mt-6 flex-wrap">
               <span className="text-3xl sm:text-3xl">💼</span>
               <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-700 to-cyan-600 bg-clip-text text-transparent">Job Board</h1>
               {/* Only show refresh button when there's an error */}
