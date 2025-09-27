@@ -26,16 +26,18 @@ export function Layout({ children }: LayoutProps) {
           </div>
         </div>
       </header>
-      <div className="min-h-screen flex w-full bg-white" style={{
+      <div className={`
+          min-h-screen flex w-full 
+          bg-white
+        `} style={{
       margin: 0,
       padding: 0,
-      boxShadow: "none",
-      backgroundColor: "#ffffff"
+      boxShadow: "none"
     }}>
         <AppSidebar />
         {/* Main content area now has reduced padding-top */}
-        <div className="flex-1 flex flex-col bg-white pt-20 lg:pt-0" style={{backgroundColor: "#ffffff"}}>
-          <main className="flex-1 w-full px-0 py-0 bg-white" style={{backgroundColor: "#ffffff"}}>
+        <div className="flex-1 flex flex-col bg-white pt-20 lg:pt-0">
+          <main className="flex-1 w-full px-0 py-0 bg-transparent">
             <div className="w-full px-3 sm:px-6">
               {children}
             </div>
