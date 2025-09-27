@@ -202,8 +202,8 @@ const Profile = () => {
           <div className="flex-1">
             <h1 className="font-extrabold text-3xl md:text-4xl font-orbitron drop-shadow mb-2">
               <span className="mr-2">🎉</span>
-              <span className="bg-gradient-to-r from-sky-400 via-fuchsia-400 to-pastel-lavender bg-clip-text text-transparent">Welcome, </span>
-              <span className="italic bg-gradient-to-r from-pastel-peach to-pastel-mint bg-clip-text text-transparent">{user.firstName || 'User'}</span>
+              <span className="bg-gradient-to-r from-sky-700 via-fuchsia-700 to-purple-700 bg-clip-text text-transparent">Welcome, </span>
+              <span className="italic bg-gradient-to-r from-orange-700 to-green-700 bg-clip-text text-transparent">{user.firstName || 'User'}</span>
             </h1>
             <div className="font-inter font-normal text-gray-900 text-sm sm:text-base text-left mb-1 sm:mb-2 space-y-3">
               <p>🎯 Add or update your resume and bio here so you can instantly get job-tailored cover letters, resumes, interview prep, and more when your job alerts arrive in Telegram.</p>
