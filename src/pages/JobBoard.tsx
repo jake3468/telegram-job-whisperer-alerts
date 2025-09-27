@@ -57,7 +57,7 @@ const JobCard = ({
       return formatDate(job.created_at);
     }
   };
-  return <div className="w-full max-w-full bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden" onClick={onView}>
+  return <div className="w-full max-w-full bg-white border border-gray-600 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden" onClick={onView}>
       <div className="p-2 sm:p-3 flex gap-2 sm:gap-3">
         {/* Left section: Logo + Content */}
         <div className="flex-1 min-w-0 flex gap-2 sm:gap-3">
