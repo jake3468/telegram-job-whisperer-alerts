@@ -1148,7 +1148,7 @@ const JobTracker = () => {
         </header>
 
         {/* Main content area - responsive flexbox layout */}
-        <main className="flex-1 p-4 overflow-x-hidden md:overflow-x-auto">
+        <main className="flex-1 p-4 overflow-x-hidden md:overflow-x-auto bg-white">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragMove={event => {
           // Implement auto-scroll during drag
           if (event.active && event.delta) {
