@@ -109,7 +109,7 @@ export const ProfileWizard = () => {
       <div className="mb-1 sm:mb-3">
         <div className="w-full bg-gray-700 rounded-full h-1.5 sm:h-2">
           <div 
-            className="h-1.5 sm:h-2 rounded-full bg-green-400 transition-all duration-500"
+            className="h-1.5 sm:h-2 rounded-full bg-green-600 transition-all duration-500"
             style={{ width: `${getProgressPercentage()}%` }}
           />
         </div>
