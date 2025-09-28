@@ -151,7 +151,7 @@ const PricingSection = () => {
           <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-indigo-400/30 min-h-[420px]`}>
             <CardHeader className="text-center pb-4 pt-6 px-4">
               <div className="text-3xl font-extrabold text-white mb-1">
-                Starting {pricingData.currencySymbol}{creditPackProducts.length > 0 ? Math.min(...creditPackProducts.map(p => p.price_amount)) : pricingData.creditPacks[0]?.price}
+                ✨ 200 Credit Pack
               </div>
               <div className="text-sm font-semibold text-gray-300">Select your desired amount:</div>
             </CardHeader>
