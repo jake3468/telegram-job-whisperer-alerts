@@ -177,7 +177,7 @@ export default function GetMoreCredits() {
               We work on a credit-based pricing system, and each feature uses the following credits:
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-900">
-              <div className="flex items-start gap-2 text-left animate-fade-in" style={{animationDelay: '0.1s'}}>
+              <div className="flex items-start gap-2 text-left animate-fade-in border border-gray-300 rounded-lg p-3" style={{animationDelay: '0.1s'}}>
                 <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3 text-white" />
                 </div>
@@ -186,7 +186,7 @@ export default function GetMoreCredits() {
                   <div className="text-gray-600">Personalized job notifications delivered to you</div>
                 </div>
               </div>
-              <div className="flex items-start gap-2 text-left animate-fade-in" style={{animationDelay: '0.2s'}}>
+              <div className="flex items-start gap-2 text-left animate-fade-in border border-gray-300 rounded-lg p-3" style={{animationDelay: '0.2s'}}>
                 <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3 text-white" />
                 </div>
@@ -195,7 +195,7 @@ export default function GetMoreCredits() {
                   <div className="text-gray-600">Personalized, human-tone PDF cover letter</div>
                 </div>
               </div>
-              <div className="flex items-start gap-2 text-left animate-fade-in" style={{animationDelay: '0.3s'}}>
+              <div className="flex items-start gap-2 text-left animate-fade-in border border-gray-300 rounded-lg p-3" style={{animationDelay: '0.3s'}}>
                 <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3 text-white" />
                 </div>
@@ -204,7 +204,7 @@ export default function GetMoreCredits() {
                   <div className="text-gray-600">Customized PDF resume aligned with job posting</div>
                 </div>
               </div>
-              <div className="flex items-start gap-2 text-left animate-fade-in" style={{animationDelay: '0.4s'}}>
+              <div className="flex items-start gap-2 text-left animate-fade-in border border-gray-300 rounded-lg p-3" style={{animationDelay: '0.4s'}}>
                 <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3 text-white" />
                 </div>
@@ -213,7 +213,7 @@ export default function GetMoreCredits() {
                   <div className="text-gray-600">20-page PDF with tailored Q&A and strategies</div>
                 </div>
               </div>
-              <div className="flex items-start gap-2 text-left animate-fade-in" style={{animationDelay: '0.5s'}}>
+              <div className="flex items-start gap-2 text-left animate-fade-in border border-gray-300 rounded-lg p-3" style={{animationDelay: '0.5s'}}>
                 <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3 text-white" />
                 </div>
@@ -222,7 +222,7 @@ export default function GetMoreCredits() {
                   <div className="text-gray-600">Detailed evaluation with personalized fit score</div>
                 </div>
               </div>
-              <div className="flex items-start gap-2 text-left animate-fade-in" style={{animationDelay: '0.6s'}}>
+              <div className="flex items-start gap-2 text-left animate-fade-in border border-gray-300 rounded-lg p-3" style={{animationDelay: '0.6s'}}>
                 <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3 text-white" />
                 </div>
@@ -231,7 +231,7 @@ export default function GetMoreCredits() {
                   <div className="text-gray-600">Deep insights on company culture and expectations</div>
                 </div>
               </div>
-              <div className="flex items-start gap-2 text-left animate-fade-in" style={{animationDelay: '0.7s'}}>
+              <div className="flex items-start gap-2 text-left animate-fade-in border border-gray-300 rounded-lg p-3" style={{animationDelay: '0.7s'}}>
                 <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3 text-white" />
                 </div>
@@ -240,7 +240,7 @@ export default function GetMoreCredits() {
                   <div className="text-gray-600">PDF guide for visa sponsorship clarity</div>
                 </div>
               </div>
-              <div className="flex items-start gap-2 text-left animate-fade-in" style={{animationDelay: '0.8s'}}>
+              <div className="flex items-start gap-2 text-left animate-fade-in border border-gray-300 rounded-lg p-3" style={{animationDelay: '0.8s'}}>
                 <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3 text-white" />
                 </div>
