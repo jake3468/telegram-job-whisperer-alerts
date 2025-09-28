@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.video-rate-limiter]
 verify_jwt = false
+
+[functions.dynamic-sitemap]
+verify_jwt = false

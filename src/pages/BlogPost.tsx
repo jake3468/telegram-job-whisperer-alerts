@@ -129,9 +129,13 @@ const BlogPost = () => {
   return <div className="min-h-screen bg-black text-white">
       <Helmet>
         <title>{blog.meta_title || blog.title}</title>
-        <meta name="description" content={blog.meta_description || blog.excerpt} />
-        <meta name="keywords" content={blog.tags?.join(', ') || ''} />
-        <link rel="canonical" href={`https://aspirely.ai/blog/${blog.slug}`} />
+         <meta name="description" content={blog.meta_description || blog.excerpt} />
+         <meta name="keywords" content={blog.tags?.join(', ') || ''} />
+         <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+         <meta name="article:published_time" content={blog.published_at} />
+         <meta name="article:modified_time" content={blog.published_at} />
+         <meta name="article:author" content={blog.author_name || "Aspirely Team"} />
+         <link rel="canonical" href={`https://aspirely.ai/blog/${blog.slug}`} />
         
         {/* Open Graph tags */}
         <meta property="og:title" content={blog.meta_title || blog.title} />
@@ -146,11 +150,12 @@ const BlogPost = () => {
         <meta property="article:author" content={blog.author_name} />
         {blog.tags?.map(tag => <meta key={tag} property="article:tag" content={tag} />)}
         
-        {/* Twitter Card tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={blog.meta_title || blog.title} />
-        <meta name="twitter:description" content={blog.meta_description || blog.excerpt} />
-        <meta name="twitter:image" content={blog.thumbnail_url || "https://aspirely.ai/aspirely-social-preview-updated.png"} />
+         {/* Twitter Card tags */}
+         <meta name="twitter:card" content="summary_large_image" />
+         <meta name="twitter:site" content="@aspirely_ai" />
+         <meta name="twitter:title" content={blog.meta_title || blog.title} />
+         <meta name="twitter:description" content={blog.meta_description || blog.excerpt} />
+         <meta name="twitter:image" content={blog.thumbnail_url || "https://aspirely.ai/aspirely-social-preview-updated.png"} />
         
         {/* JSON-LD Structured Data */}
         <script type="application/ld+json">
@@ -174,13 +179,19 @@ const BlogPost = () => {
               }
             },
             "datePublished": blog.published_at,
-            "dateModified": blog.published_at,
-            "mainEntityOfPage": {
-              "@type": "WebPage",
-              "@id": `https://aspirely.ai/blog/${blog.slug}`
-            },
-            "keywords": blog.tags?.join(", ") || "",
-            "url": `https://aspirely.ai/blog/${blog.slug}`
+             "dateModified": blog.published_at,
+             "mainEntityOfPage": {
+               "@type": "WebPage",
+               "@id": `https://aspirely.ai/blog/${blog.slug}`
+             },
+             "keywords": blog.tags?.join(", ") || "",
+             "url": `https://aspirely.ai/blog/${blog.slug}`,
+             "isPartOf": {
+               "@type": "Blog",
+               "@id": "https://aspirely.ai/blogs"
+             },
+             "wordCount": blog.content?.replace(/<[^>]*>/g, '').split(' ').length || 0,
+             "articleBody": blog.content?.replace(/<[^>]*>/g, '').substring(0, 500) || blog.excerpt
           })}
         </script>
       </Helmet>
