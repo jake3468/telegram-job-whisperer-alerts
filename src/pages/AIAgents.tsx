@@ -36,8 +36,10 @@ const AIAgents = () => {
       <div className="min-h-screen bg-white">
         {/* Header Section */}
         <div className="max-w-7xl mx-auto px-4 py-4 text-center">
-          <h1 className="font-orbitron mb-2 drop-shadow tracking-tight font-bold text-4xl flex items-center justify-center gap-2">
+          <div className="flex justify-center mb-2">
             <span className="text-2xl sm:text-3xl md:text-4xl">🚀</span>
+          </div>
+          <h1 className="font-orbitron mb-2 drop-shadow tracking-tight font-bold text-4xl flex items-center justify-center">
             <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent text-left font-inter text-3xl sm:text-3xl md:text-4xl">Your AI Agents</span>
           </h1>
           <p className="text-sm lg:text-base text-gray-900 font-inter font-normal mb-3 text-left max-w-2xl mx-auto lg:text-left">
