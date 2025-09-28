@@ -213,9 +213,19 @@ const PricingSection = () => {
                     <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                       <Check className="w-2.5 h-2.5 text-black" />
                     </div>
-                    <div className="text-white text-xs leading-relaxed">
-                      • Up to 2,000 job alerts • Up to 133 cover letters • Up to 66 resumes • Up to 33 interview prep files • Up to 200 job fit checks • Up to 66 company insights • Up to 100 visa sponsorship guides • Up to 100 HR contact lists
+                    <span className="text-white text-xs">No expiration</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-2.5 h-2.5 text-black" />
                     </div>
+                    <span className="text-white text-xs">Instant activation</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-2.5 h-2.5 text-black" />
+                    </div>
+                    <span className="text-white text-xs">Secure payment</span>
                   </li>
                   <li className="mt-4 p-3 bg-gray-800/50 rounded-lg border border-gray-600">
                     <div className="flex items-start gap-3">
