@@ -47,7 +47,7 @@ const PricingSection = () => {
           
           <div className="max-w-2xl mx-auto mb-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-foreground">
-              <div className="flex items-start gap-2 text-left">
+              <div className="flex items-start gap-2 text-left animate-fade-in hover-scale" style={{animationDelay: '0.1s'}}>
                 <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3 text-white" />
                 </div>
@@ -56,7 +56,7 @@ const PricingSection = () => {
                   <div className="text-muted-foreground">Personalized job notifications delivered to you</div>
                 </div>
               </div>
-              <div className="flex items-start gap-2 text-left">
+              <div className="flex items-start gap-2 text-left animate-fade-in hover-scale" style={{animationDelay: '0.2s'}}>
                 <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3 text-white" />
                 </div>
@@ -65,7 +65,7 @@ const PricingSection = () => {
                   <div className="text-muted-foreground">Personalized, human-tone PDF cover letter</div>
                 </div>
               </div>
-              <div className="flex items-start gap-2 text-left">
+              <div className="flex items-start gap-2 text-left animate-fade-in hover-scale" style={{animationDelay: '0.3s'}}>
                 <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3 text-white" />
                 </div>
@@ -74,7 +74,7 @@ const PricingSection = () => {
                   <div className="text-muted-foreground">Customized PDF resume aligned with job posting</div>
                 </div>
               </div>
-              <div className="flex items-start gap-2 text-left">
+              <div className="flex items-start gap-2 text-left animate-fade-in hover-scale" style={{animationDelay: '0.4s'}}>
                 <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3 text-white" />
                 </div>
@@ -83,7 +83,7 @@ const PricingSection = () => {
                   <div className="text-muted-foreground">20-page PDF with tailored Q&A and strategies</div>
                 </div>
               </div>
-              <div className="flex items-start gap-2 text-left">
+              <div className="flex items-start gap-2 text-left animate-fade-in hover-scale" style={{animationDelay: '0.5s'}}>
                 <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3 text-white" />
                 </div>
@@ -92,7 +92,7 @@ const PricingSection = () => {
                   <div className="text-muted-foreground">Detailed evaluation with personalized fit score</div>
                 </div>
               </div>
-              <div className="flex items-start gap-2 text-left">
+              <div className="flex items-start gap-2 text-left animate-fade-in hover-scale" style={{animationDelay: '0.6s'}}>
                 <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3 text-white" />
                 </div>
@@ -101,7 +101,7 @@ const PricingSection = () => {
                   <div className="text-muted-foreground">Deep insights on company culture and expectations</div>
                 </div>
               </div>
-              <div className="flex items-start gap-2 text-left">
+              <div className="flex items-start gap-2 text-left animate-fade-in hover-scale" style={{animationDelay: '0.7s'}}>
                 <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3 text-white" />
                 </div>
@@ -110,7 +110,7 @@ const PricingSection = () => {
                   <div className="text-muted-foreground">PDF guide for visa sponsorship clarity</div>
                 </div>
               </div>
-              <div className="flex items-start gap-2 text-left">
+              <div className="flex items-start gap-2 text-left animate-fade-in hover-scale" style={{animationDelay: '0.8s'}}>
                 <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-3 h-3 text-white" />
                 </div>
