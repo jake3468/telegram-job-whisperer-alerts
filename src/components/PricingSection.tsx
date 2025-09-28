@@ -65,25 +65,74 @@ const PricingSection = () => {
                 
                 {/* Credit Usage Information Box */}
                 <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-600 mb-3">
-                  <div className="text-cyan-400 font-semibold text-xs mb-2">Use credits on any feature you want:</div>
-                  <div className="text-xs text-white space-y-1 mb-3">
-                    <div>Resume = 3 credits</div>
-                    <div>Cover Letter = 1.5 credits</div>
-                    <div>Interview Prep = 6 credits</div>
-                    <div>Job Fit Check = 1 credit</div>
-                    <div>Company Insights = 3 credits</div>
-                    <div>Visa Info = 2 credits</div>
-                    <div>HR Profile = 2 credits</div>
+                  <div className="text-left text-xs text-white space-y-2 mb-3">
+                    <div className="flex items-start gap-2">
+                      <span className="text-green-400 font-bold">✓</span>
+                      <div>
+                        <div className="font-medium">Job Alerts (0.1 credits each)</div>
+                        <div className="text-gray-300">Personalized job notifications delivered to you</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-green-400 font-bold">✓</span>
+                      <div>
+                        <div className="font-medium">Cover Letter (1.5 credits)</div>
+                        <div className="text-gray-300">Personalized, human-tone PDF cover letter</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-green-400 font-bold">✓</span>
+                      <div>
+                        <div className="font-medium">Resume (3 credits)</div>
+                        <div className="text-gray-300">Customized PDF resume aligned with job posting</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-green-400 font-bold">✓</span>
+                      <div>
+                        <div className="font-medium">Interview Prep (6 credits)</div>
+                        <div className="text-gray-300">20-page PDF with tailored Q&A and strategies</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-green-400 font-bold">✓</span>
+                      <div>
+                        <div className="font-medium">Job Fit Check (1 credit)</div>
+                        <div className="text-gray-300">Detailed evaluation with personalized fit score</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-green-400 font-bold">✓</span>
+                      <div>
+                        <div className="font-medium">Company Insights (3 credits)</div>
+                        <div className="text-gray-300">Deep insights on company culture and expectations</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-green-400 font-bold">✓</span>
+                      <div>
+                        <div className="font-medium">Visa Sponsorship Info (2 credits)</div>
+                        <div className="text-gray-300">PDF guide for visa sponsorship clarity</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-green-400 font-bold">✓</span>
+                      <div>
+                        <div className="font-medium">Connect with HRs (2 credits)</div>
+                        <div className="text-gray-300">Direct recruiter profiles + tailored messages</div>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="text-xs text-gray-300 bg-gray-800/40 p-2 rounded border-l-2 border-cyan-400/40 mb-3">
-                    <strong>Example:</strong> With 10 credits, you could create 3 Cover Letters + 1 Resume + 2 Job Fit Checks, or run 10 Job Fit Checks - your choice.
-                  </div>
-
-                  <div className="text-cyan-400 font-semibold text-xs mb-2">Plus:</div>
-                  <div className="text-xs text-white space-y-1">
-                    <div>• Up to 100 Job Alert messages included every month</div>
-                    <div>• 2 free phone-call AI mock interviews</div>
+                  <div className="text-xs text-gray-300 bg-gray-800/40 p-2 rounded border-l-2 border-cyan-400/40">
+                    <div className="font-semibold text-cyan-400 mb-2">What you can do with 10 free credits:</div>
+                    <div className="space-y-1">
+                      <div><strong>Option 1:</strong> 100 Job Alerts (10 credits)</div>
+                      <div><strong>Option 2:</strong> 3 Resumes (9 credits) + 10 Job Alerts (1 credit)</div>
+                      <div><strong>Option 3:</strong> 6 Cover Letters (9 credits) + 10 Job Alerts (1 credit)</div>
+                      <div><strong>Option 4:</strong> 1 Interview Prep (6 credits) + 40 Job Alerts (4 credits)</div>
+                      <div><strong>Option 5:</strong> 10 Job Fit Checks + unlimited combinations with job alerts.. etc</div>
+                    </div>
                   </div>
                 </div>
               </div>
