@@ -55,18 +55,12 @@ const PricingSection = () => {
               <div className="text-sm font-semibold text-gray-300">10 credits/month</div>
             </CardHeader>
             <CardContent className="grow flex flex-col px-3 pb-3">
-              <div className="text-left my-3 flex-grow px-4">
-                <div className="flex items-center gap-2 mb-2">
+              <div className="text-center my-3 flex-grow px-4">
+                <div className="flex items-center justify-center gap-2 mb-3">
                   <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                     <Check className="w-2.5 h-2.5 text-black" />
                   </div>
-                  <span className="text-sm text-white">Access to all features</span>
-                </div>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                    <Check className="w-2.5 h-2.5 text-black" />
-                  </div>
-                  <span className="text-sm text-white">10 credits every month (auto-renewal)</span>
+                  <span className="text-sm text-white">Access to all features + 2 free AI mock interviews</span>
                 </div>
                 
                 {/* Credit Usage Information Box */}
