@@ -167,12 +167,10 @@ const HeroSection = () => {
             
             {/* Desktop view only */}
             <div className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-normal not-italic">Instantly get everything you need to land your</span>
-              <br />
-               <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-medium not-italic"><span className="underline decoration-red-500 decoration-4 underline-offset-4 font-bold">dream job</span>, using AI Agents</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-normal not-italic">Your dream job search <span className="underline decoration-red-500 decoration-4 underline-offset-4 font-bold">made effortless</span> by AI Agents</span>
               <br />
               <div className="flex items-center justify-center gap-2">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">on Telegram</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-normal not-italic">on Telegram</span>
                 {telegramAnimationData && <div className="flex-shrink-0">
                     <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-16 h-16" />
                   </div>}
