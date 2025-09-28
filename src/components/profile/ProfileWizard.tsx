@@ -98,11 +98,21 @@ export const ProfileWizard = () => {
           <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
             Welcome, 
           </span>
-          <span className="italic text-gray-100">
+          <span className="italic bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
             {user?.firstName || 'User'}
           </span>
         </h1>
         <p className="text-white text-sm sm:text-lg mt-1 px-2">Let's set up your profile in just 3 steps</p>
+        <div className="text-gray-400 text-xs mt-2 px-2 text-left">
+          <p className="font-semibold mb-1">Gradient Details:</p>
+          <p><strong>Type:</strong> Linear gradient (bg-gradient-to-r) - flows from left to right</p>
+          <p><strong>Starting color:</strong> from-blue-600 - A medium-dark blue</p>
+          <p><strong>Middle color:</strong> via-purple-600 - A medium-dark purple</p>
+          <p><strong>Ending color:</strong> to-pink-600 - A medium-dark pink</p>
+          <p className="font-semibold mt-2 mb-1">Additional Styling:</p>
+          <p><strong>bg-clip-text</strong> - Clips the gradient to the text shape</p>
+          <p><strong>text-transparent</strong> - Makes the actual text color transparent so the gradient background shows through</p>
+        </div>
       </div>
 
       {/* Progress Bar */}
