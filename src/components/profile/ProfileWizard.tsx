@@ -102,7 +102,7 @@ export const ProfileWizard = () => {
             {user?.firstName || 'User'}
           </span>
         </h1>
-        <p className="font-inter font-normal text-gray-900 text-sm sm:text-base text-left mb-1 sm:mb-2">Let's set up your profile in just 3 steps</p>
+        <p className="font-inter font-normal text-gray-900 text-sm sm:text-base text-center mb-1 sm:mb-2">Let's set up your profile in just 3 steps</p>
       </div>
 
       {/* Progress Bar */}
