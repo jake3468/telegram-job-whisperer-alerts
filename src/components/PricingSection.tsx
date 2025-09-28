@@ -138,7 +138,7 @@ const PricingSection = () => {
                 </div>
                 
                 {/* Credit Usage Information Box */}
-                <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-600 mb-3">
+                <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-600 mb-3 mt-6">
                   <div className="text-xs text-gray-300">
                     <div className="font-semibold text-cyan-400 mb-2">With 10 credits, you could get:</div>
                     <div className="space-y-1 text-left">
