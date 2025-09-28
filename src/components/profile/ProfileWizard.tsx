@@ -95,7 +95,7 @@ export const ProfileWizard = () => {
       <div className="text-center mb-1 sm:mb-2">
         <h1 className="font-extrabold text-2xl sm:text-3xl md:text-4xl font-orbitron drop-shadow mb-1 break-words">
           <span className="mr-1 sm:mr-2">🎉</span>
-          <span className="text-gray-100">
+          <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
             Welcome, 
           </span>
           <span className="italic text-gray-100">
