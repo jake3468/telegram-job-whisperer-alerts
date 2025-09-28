@@ -194,9 +194,8 @@ const PricingSection = () => {
                         </>
                       )}
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-white font-bold text-sm">{pricingData.currencySymbol}{pack.price_amount}</span>
-                    </div>
+                     <div className="flex items-center gap-3">
+                     </div>
                   </div>
                 )}
                 
