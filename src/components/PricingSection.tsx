@@ -200,17 +200,6 @@ const PricingSection = () => {
                       </div>
                     </div>
                   </div>
-
-                  <div className="text-xs text-gray-300 bg-gray-800/40 p-2 rounded border-l-2 border-cyan-400/40">
-                    <div className="font-semibold text-cyan-400 mb-2">What you can do with 10 free credits:</div>
-                    <div className="space-y-1 text-left">
-                      <div><strong>Option 1:</strong> 100 Job Alerts (10 credits)</div>
-                      <div><strong>Option 2:</strong> 3 Resumes (9 credits) + 10 Job Alerts (1 credit)</div>
-                      <div><strong>Option 3:</strong> 6 Cover Letters (9 credits) + 10 Job Alerts (1 credit)</div>
-                      <div><strong>Option 4:</strong> 1 Interview Prep (6 credits) + 40 Job Alerts (4 credits)</div>
-                      <div><strong>Option 5:</strong> 10 Job Fit Checks + unlimited combinations with job alerts.. etc</div>
-                    </div>
-                  </div>
                 </div>
               </div>
               <div className="mt-auto flex justify-center">
