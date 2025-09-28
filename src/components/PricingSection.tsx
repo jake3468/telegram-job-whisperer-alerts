@@ -314,7 +314,7 @@ const PricingSection = () => {
                         <div className="text-cyan-400 font-semibold text-xs mb-1">FREE E-book:</div>
                         <div className="text-white font-medium text-xs mb-2">"Jobs that will vanish by 2030: 8 Strategies to Save Your Career Before AI Takes Over"</div>
                         <div className="text-gray-300 text-xs leading-relaxed">
-                          Purchase any of the credit packs above and get a downloadable link sent via email.
+                          You will also get this free eBook when you buy this pack, with a downloadable link sent via email.
                         </div>
                         <div className="text-gray-400 text-xs mt-1">
                           Instant access, read on any device, keep forever
