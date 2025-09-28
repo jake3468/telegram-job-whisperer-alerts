@@ -245,6 +245,63 @@ const PricingSection = () => {
               
               {/* Features list */}
               <div className="flex flex-col items-center mb-3 mt-1">
+                {/* Credit Usage Information Box */}
+                <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-600 mb-3 w-full max-w-sm">
+                  <div className="text-xs text-gray-300">
+                    <div className="font-semibold text-cyan-400 mb-2">With 200 credits, you could get:</div>
+                    <div className="space-y-1 text-left">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                          <Check className="w-2.5 h-2.5 text-black" />
+                        </div>
+                        <span>Up to <span className="font-bold">2,000</span> job alerts</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                          <Check className="w-2.5 h-2.5 text-black" />
+                        </div>
+                        <span>Up to <span className="font-bold">133</span> cover letters</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                          <Check className="w-2.5 h-2.5 text-black" />
+                        </div>
+                        <span>Up to <span className="font-bold">66</span> resumes</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                          <Check className="w-2.5 h-2.5 text-black" />
+                        </div>
+                        <span>Up to <span className="font-bold">33</span> interview prep files</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                          <Check className="w-2.5 h-2.5 text-black" />
+                        </div>
+                        <span>Up to <span className="font-bold">200</span> job fit checks</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                          <Check className="w-2.5 h-2.5 text-black" />
+                        </div>
+                        <span>Up to <span className="font-bold">66</span> company insights</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                          <Check className="w-2.5 h-2.5 text-black" />
+                        </div>
+                        <span>Up to <span className="font-bold">100</span> visa sponsorship guides</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                          <Check className="w-2.5 h-2.5 text-black" />
+                        </div>
+                        <span>Up to <span className="font-bold">100</span> HR contact lists</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
                 <ul className="space-y-1">
                   <li className="mt-4 p-3 bg-gray-800/50 rounded-lg border border-gray-600">
                     <div className="flex items-start gap-3">
