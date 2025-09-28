@@ -52,10 +52,22 @@ const PricingSection = () => {
           <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-blue-400/30 min-h-[320px]`}>
             <CardHeader className="text-center pb-2 pt-4 px-3">
               <div className="text-2xl font-extrabold text-white mb-1">Free</div>
-              <div className="text-sm font-semibold text-gray-300">Access to all features + 2 free AI mock interviews</div>
+              <div className="text-sm font-semibold text-gray-300">10 credits/month</div>
             </CardHeader>
             <CardContent className="grow flex flex-col px-3 pb-3">
               <div className="text-left my-3 flex-grow px-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-2.5 h-2.5 text-black" />
+                  </div>
+                  <span className="text-sm text-white">Access to all features</span>
+                </div>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-2.5 h-2.5 text-black" />
+                  </div>
+                  <span className="text-sm text-white">10 credits every month (auto-renewal)</span>
+                </div>
                 
                 {/* Credit Usage Information Box */}
                 <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-600 mb-3">
