@@ -155,7 +155,7 @@ const HeroSection = () => {
             <div className="block md:hidden text-left text-[32px] leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-normal not-italic">Instantly get everything you need to land your</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-semibold not-italic"><span className="underline decoration-red-500 decoration-4 underline-offset-4 font-bold">dream job</span></span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-semibold not-italic"><span className="underline decoration-red-500 decoration-4 underline-offset-4">dream job</span></span>
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 inline-block font-notion-inter font-semibold not-italic">using AI Agents</span>
               <br />
