@@ -36,7 +36,7 @@ const AIAgents = () => {
       <div className="min-h-screen bg-white">
         {/* Header Section */}
         <div className="max-w-7xl mx-auto px-4 py-4 text-center">
-          <div className="flex justify-center mb-2">
+          <div className="flex justify-center mb-2 block sm:hidden">
             <span className="text-2xl sm:text-3xl md:text-4xl">🚀</span>
           </div>
           <h1 className="font-orbitron mb-2 drop-shadow tracking-tight font-bold text-4xl flex items-center justify-center">
