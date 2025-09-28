@@ -178,18 +178,30 @@ const PricingSection = () => {
             </CardHeader>
             <CardContent className="grow flex flex-col px-4 pb-4">
               <div className="flex flex-col gap-2 my-3 flex-grow max-w-md mx-auto">
-                {/* 200 Credit Pack */}
-                <div className="rounded-md p-3 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-gray-700">
-                  <span className="text-white font-medium text-sm mr-4">200 credits</span>
-                  <div className="flex items-center gap-3">
-                    <span className="text-white font-bold text-sm">{pricingData.currencySymbol}19.99</span>
-                    <SignUpButton mode="modal">
-                      <Button size="sm" className="bg-gray-50 hover:bg-gray-100 text-gray-800 text-xs px-2 py-1 h-auto rounded-md">
-                        Buy
-                      </Button>
-                    </SignUpButton>
-                  </div>
-                </div>
+                {/* Show database products if available, otherwise show static fallback */}
+                {creditPackProducts.length > 0 ? creditPackProducts.map(pack => <div key={pack.product_id} className="rounded-md p-3 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-gray-700">
+                      <span className="text-white font-medium text-sm mr-4">{pack.credits_amount} credits</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-white font-bold text-sm">{pricingData.currencySymbol}{pack.price_amount}</span>
+                        <SignUpButton mode="modal">
+                          <Button size="sm" className="bg-gray-50 hover:bg-gray-100 text-gray-800 text-xs px-2 py-1 h-auto rounded-md">
+                            Buy
+                          </Button>
+                        </SignUpButton>
+                      </div>
+                    </div>) :
+              // Only show fallback if no database products and not loading
+              !isProductsLoading && pricingData.creditPacks.map(pack => <div key={pack.credits} className="bg-gray-700 rounded-md p-3 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300">
+                      <span className="text-white font-medium text-sm mr-4">{pack.credits} credits</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-white font-bold text-sm">{pricingData.currencySymbol}{pack.price}</span>
+                        <SignUpButton mode="modal">
+                          <Button size="sm" className="bg-gray-50 hover:bg-gray-100 text-gray-800 text-xs px-2 py-1 h-auto rounded-md">
+                            Buy
+                          </Button>
+                        </SignUpButton>
+                      </div>
+                    </div>)}
                 
                 {/* Loading state */}
                 {isProductsLoading && <div className="flex items-center justify-center py-4">
