@@ -181,7 +181,7 @@ const PricingSection = () => {
                 {/* Show only the 200 credit pack from database products */}
                 {creditPackProducts.filter(pack => pack.credits_amount === 200).map(pack => 
                   <div key={pack.product_id} className="rounded-md p-3 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-gray-700">
-                    <div className="flex flex-col items-start">
+                    <div className="flex items-center gap-2">
                       {pricingData.region === 'IN' ? (
                         <>
                           <span className="text-gray-400 text-xs line-through">₹799</span>
