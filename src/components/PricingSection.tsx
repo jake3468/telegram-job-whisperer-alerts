@@ -41,9 +41,70 @@ const PricingSection = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-6">
           <h2 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-primary via-primary to-primary bg-clip-text mb-2 font-inter text-foreground">Pricing Plans</h2>
-          <p className="text-base text-foreground font-inter leading-relaxed mb-6">
-            Start with 10 free monthly credits and upgrade anytime with flexible credit packs.
+          <p className="text-base text-foreground font-inter leading-relaxed mb-4">
+            We work on a credit-based pricing system, and each feature uses the following credits:
           </p>
+          
+          <div className="max-w-2xl mx-auto mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-foreground">
+              <div className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">✓</span>
+                <div>
+                  <div className="font-medium">Job Alerts (0.1 credits each)</div>
+                  <div className="text-muted-foreground">Personalized job notifications delivered to you</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">✓</span>
+                <div>
+                  <div className="font-medium">Cover Letter (1.5 credits)</div>
+                  <div className="text-muted-foreground">Personalized, human-tone PDF cover letter</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">✓</span>
+                <div>
+                  <div className="font-medium">Resume (3 credits)</div>
+                  <div className="text-muted-foreground">Customized PDF resume aligned with job posting</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">✓</span>
+                <div>
+                  <div className="font-medium">Interview Prep (6 credits)</div>
+                  <div className="text-muted-foreground">20-page PDF with tailored Q&A and strategies</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">✓</span>
+                <div>
+                  <div className="font-medium">Job Fit Check (1 credit)</div>
+                  <div className="text-muted-foreground">Detailed evaluation with personalized fit score</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">✓</span>
+                <div>
+                  <div className="font-medium">Company Insights (3 credits)</div>
+                  <div className="text-muted-foreground">Deep insights on company culture and expectations</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">✓</span>
+                <div>
+                  <div className="font-medium">Visa Sponsorship Info (2 credits)</div>
+                  <div className="text-muted-foreground">PDF guide for visa sponsorship clarity</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-green-400 font-bold">✓</span>
+                <div>
+                  <div className="font-medium">Connect with HRs (2 credits)</div>
+                  <div className="text-muted-foreground">Direct recruiter profiles + tailored messages</div>
+                </div>
+              </div>
+            </div>
+          </div>
           
         </div>
 
