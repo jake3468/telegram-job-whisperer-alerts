@@ -31,7 +31,7 @@ const TermsOfService = () => {
                 If you do not agree to these Terms, you must not access or use our services. These Terms apply to all visitors, users, and others who access or use our services.
               </p>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                Aspirely.ai is a comprehensive AI-powered platform designed to assist job seekers with various career-related tasks, including but not limited to cover letter generation, interview preparation, job analysis, company research, LinkedIn content creation, and resume optimization.
+                Aspirely.ai is a comprehensive AI-powered platform featuring three intelligent Telegram AI agents and key web platform tools designed to streamline your job search through personalized job matching, resume building, application management, and interview preparation.
               </p>
             </section>
 
@@ -43,56 +43,21 @@ const TermsOfService = () => {
               
               <div className="space-y-4 mb-6">
                 <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
-                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Telegram Job Alerts</h4>
-                  <p className="text-gray-700 dark:text-gray-300 text-sm">Personalized daily job alerts delivered via Telegram bot, utilizing SerpApi & RapidAPI for job aggregation and OpenAI & Perplexity for job alert message creation. Users can generate tailored resumes, cover letters, company research, and interview preparation materials with one-click directly from job alert messages.</p>
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Job Alerts AI Agent</h4>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm">Personalized job matching delivered via Telegram with 7 instant files per alert, including tailored resumes, cover letters, company research, and interview preparation materials using OpenAI & Perplexity AI.</p>
                 </div>
 
                 <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
-                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Job Analysis</h4>
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Resume Builder AI Agent</h4>
                   <p className="text-gray-700 dark:text-gray-300 text-sm">
-                    In-depth analysis of job postings using OpenAI, providing match percentages, pros/cons, and recommendations for improving application success rates.
+                    Conversational resume building and tailoring service via Telegram bot, powered by OpenAI for personalized resume optimization and instant updates.
                   </p>
                 </div>
 
                 <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
-                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Company Decoder</h4>
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Job Application AI Agent</h4>
                   <p className="text-gray-700 dark:text-gray-300 text-sm">
-                    Comprehensive company and role analysis using Perplexity AI, including company news, job security insights, salary ranges, workplace culture, and interview processes.
-                  </p>
-                </div>
-
-                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
-                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Interview Preparation</h4>
-                  <p className="text-gray-700 dark:text-gray-300 text-sm">
-                    Personalized interview preparation materials generated using Claude (by Anthropic), including tailored questions, answering strategies, and downloadable resources.
-                  </p>
-                </div>
-
-                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
-                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Cover Letter Generation</h4>
-                  <p className="text-gray-700 dark:text-gray-300 text-sm">
-                    AI-powered cover letter creation using Claude (by Anthropic), tailored to specific job postings and user profiles, with PDF and DOCX download options.
-                  </p>
-                </div>
-
-                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
-                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">LinkedIn Content Creation</h4>
-                  <p className="text-gray-700 dark:text-gray-300 text-sm">
-                    Professional LinkedIn post generation using Perplexity and OpenAI, including multiple variations and accompanying images.
-                  </p>
-                </div>
-
-                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
-                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">AI Mock Phone Call Interview</h4>
-                  <p className="text-gray-700 dark:text-gray-300 text-sm">
-                    Realistic phone-based interview practice with Grace, our AI interviewer, providing role-specific mock interviews, detailed performance reports, and personalized improvement recommendations using advanced conversation AI.
-                  </p>
-                </div>
-
-                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
-                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Job Tracker</h4>
-                  <p className="text-gray-700 dark:text-gray-300 text-sm">
-                    Comprehensive application management system with AI-generated tailored checklists, resume suggestions, mock interview preparation, and stage-based tracking from "Interested" to "Interviewing."
+                    Complete application packages for specific jobs via Telegram, generating comprehensive application materials tailored to individual job postings and requirements.
                   </p>
                 </div>
 
@@ -104,9 +69,16 @@ const TermsOfService = () => {
                 </div>
 
                 <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
-                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Telegram Resume Bot</h4>
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Job Tracker</h4>
                   <p className="text-gray-700 dark:text-gray-300 text-sm">
-                    Interactive resume building and updating service via Telegram bot, powered by OpenAI for personalized resume optimization.
+                    Comprehensive application management system with AI-generated tailored checklists, resume suggestions, mock interview preparation, and stage-based tracking from "Interested" to "Interviewing."
+                  </p>
+                </div>
+
+                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">AI Mock Phone Call Interview with Grace</h4>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm">
+                    Realistic phone-based interview practice with Grace, our AI interviewer, providing role-specific mock interviews, detailed performance reports, and personalized improvement recommendations using advanced conversation AI.
                   </p>
                 </div>
               </div>
@@ -151,13 +123,8 @@ const TermsOfService = () => {
                 </div>
 
                 <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
-                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Monthly Subscription</h4>
-                  <p className="text-gray-700 dark:text-gray-300 text-sm">Monthly recurring subscription with enhanced credit allocation</p>
-                </div>
-
-                <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
-                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Credit Packs</h4>
-                  <p className="text-gray-700 dark:text-gray-300 text-sm">One-time credit purchases without expiration dates</p>
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">200 Credit Power Pack</h4>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm">One-time purchase of 200 credits with no expiration date, providing extensive access to all AI-powered features</p>
                 </div>
               </div>
 
@@ -173,7 +140,7 @@ const TermsOfService = () => {
 
               <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">4.4 Credit System</h3>
               <p className="text-gray-700 dark:text-gray-300">
-                Our services operate on a credit-based system where each AI-powered feature consumes a specific number of credits. Credit usage is clearly displayed before each service use. Unused credits from credit packs do not expire, while monthly subscription credits reset each billing cycle.
+                Our services operate on a credit-based system where each AI-powered feature consumes a specific number of credits. Credit usage is clearly displayed before each service use. Credits from the 200 Credit Power Pack do not expire, providing flexible usage over time.
               </p>
             </section>
 
@@ -187,7 +154,7 @@ const TermsOfService = () => {
               <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
                 <li>Technical issues preventing service access for more than 24 hours</li>
                 <li>Double billing or processing errors</li>
-                <li>Service cancellation within 48 hours of initial subscription</li>
+                <li>Credit pack purchase within 48 hours with minimal usage</li>
                 <li>Documented service failures that prevent feature utilization</li>
               </ul>
 
@@ -196,10 +163,6 @@ const TermsOfService = () => {
                 Approved refunds will be processed and returned to your original payment method within 48 hours of approval. Contact our support team at support@aspirely.ai to initiate a refund request.
               </p>
 
-              <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">5.3 Subscription Cancellation</h3>
-              <p className="text-gray-700 dark:text-gray-300">
-                Monthly subscriptions can be canceled at any time through your account settings. Cancellation takes effect at the end of the current billing period, and you retain access to paid features until that time.
-              </p>
             </section>
 
             <section className="mb-8">

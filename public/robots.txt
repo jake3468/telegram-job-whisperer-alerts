@@ -31,3 +31,4 @@ Disallow: /ai-agents
 Disallow: /job-board
 
 Sitemap: https://aspirely.ai/sitemap.xml
+Sitemap: https://aspirely.ai/functions/v1/dynamic-sitemap
