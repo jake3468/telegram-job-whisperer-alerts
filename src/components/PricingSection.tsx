@@ -133,10 +133,7 @@ const PricingSection = () => {
             </CardHeader>
             <CardContent className="grow flex flex-col px-3 pb-3">
               <div className="text-center my-3 flex-grow px-4">
-                <div className="flex items-center justify-center gap-2 mb-3">
-                  <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
-                    <Check className="w-2.5 h-2.5 text-black" />
-                  </div>
+                <div className="text-center mb-3">
                   <span className="text-sm text-white">Access to all features + 2 free AI mock interviews</span>
                 </div>
                 
@@ -145,14 +142,14 @@ const PricingSection = () => {
                   <div className="text-xs text-gray-300">
                     <div className="font-semibold text-cyan-400 mb-2">With 10 credits, you could get:</div>
                     <div className="space-y-1 text-left">
-                      <div>100 job alerts</div>
-                      <div>6 cover letters</div>
-                      <div>3 resumes</div>
-                      <div>1 interview prep file</div>
-                      <div>10 job fit checks</div>
-                      <div>3 company insights</div>
-                      <div>5 visa sponsorship guides</div>
-                      <div>50 HR contact lists</div>
+                      <div>• Up to 100 job alerts</div>
+                      <div>• Up to 6 cover letters</div>
+                      <div>• Up to 3 resumes</div>
+                      <div>• Up to 1 interview prep file</div>
+                      <div>• Up to 10 job fit checks</div>
+                      <div>• Up to 3 company insights</div>
+                      <div>• Up to 5 visa sponsorship guides</div>
+                      <div>• Up to 5 HR contact lists</div>
                     </div>
                   </div>
                 </div>
