@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { SignUpButton } from "@clerk/clerk-react";
 import { ArrowRight, ExternalLink } from "lucide-react";
 import { logger } from "@/utils/logger";
@@ -38,6 +38,7 @@ const FeatureSection = ({
   const [animationData, setAnimationData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const cardRef = useRef<HTMLDivElement | null>(null);
   const {
     userProfile,
     updateUserProfile
@@ -89,6 +90,33 @@ const FeatureSection = ({
       fetchAnimation();
     }
   }, [lottieUrl, title]);
+
+  // Intersection Observer for scroll animation
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20px 0px -50px 0px',
+      threshold: 0.3
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !entry.target.classList.contains('animate-in')) {
+          entry.target.classList.add('animate-in');
+        }
+      });
+    }, observerOptions);
+
+    if (cardRef.current) {
+      observer.observe(cardRef.current);
+    }
+
+    return () => {
+      if (cardRef.current) {
+        observer.unobserve(cardRef.current);
+      }
+    };
+  }, []);
 
   // Mobile: header section (title + subheading only)
   const mobileHeaderSection = <div className="lg:hidden">
@@ -164,7 +192,10 @@ const FeatureSection = ({
     </div> : null;
   return <section className="py-1 md:py-2 px-4 bg-background rounded-3xl">
       <div className="max-w-7xl mx-auto">
-        {lottieUrl ? <div className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto">
+        {lottieUrl ? <div 
+            ref={cardRef}
+            className="animate-on-scroll rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
+          >
             {/* Mobile Layout */}
             <div className="lg:hidden space-y-6">
               {mobileHeaderSection}
@@ -182,7 +213,7 @@ const FeatureSection = ({
                   {animationSection}
                 </>}
             </div>
-          </div> : <div className="relative bg-gray-50 dark:bg-gray-900 rounded-3xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col">
+          </div> : <div className="relative bg-gray-50 dark:bg-gray-900 rounded-3xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col border border-gray-600">
             {label && <div className="absolute -left-3 -top-3 bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
                 {label}
               </div>}

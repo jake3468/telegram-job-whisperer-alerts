@@ -40,6 +40,8 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --hero-gradient: radial-gradient(ellipse at top right, hsl(178, 98%, 70%) 0%, hsl(178, 85%, 78%) 25%, hsl(178, 70%, 88%) 50%, hsl(178, 40%, 95%) 75%, hsl(0, 0%, 100%) 100%);
+    --hero-gradient-mobile: radial-gradient(ellipse 80% 50% at 90% 10%, hsl(178, 70%, 80%) 0%, hsl(178, 55%, 88%) 40%, hsl(178, 35%, 94%) 70%, hsl(0, 0%, 100%) 100%);
   }
 
   .dark {
@@ -104,6 +106,43 @@
   100% { 
     stroke-dasharray: 200, 0; 
   }
+}
+
+/* Hero text animation - bottom to top */
+@keyframes fly-in-from-bottom {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-fly-in-from-bottom {
+  animation: fly-in-from-bottom 1s ease-out forwards;
+}
+
+/* Scroll-triggered card animations */
+@keyframes slide-up-fade-in {
+  from {
+    transform: translateY(80px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(80px);
+}
+
+.animate-on-scroll.animate-in {
+  animation: slide-up-fade-in 0.8s ease-out forwards;
 }
 }
 

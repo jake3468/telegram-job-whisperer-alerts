@@ -1,6 +1,6 @@
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import Lottie from 'lottie-react';
 import LightRays from './LightRays';
@@ -74,6 +74,7 @@ const HeroSection = () => {
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
   const [telegramAnimationData, setTelegramAnimationData] = useState(null);
   const fullText = 'AI finds your next job while you sleep';
+  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
   useEffect(() => {
     if (isLoaded && user) {
       navigate('/dashboard');
@@ -97,16 +98,50 @@ const HeroSection = () => {
     };
     loadAnimations();
   }, []);
+
+  // Intersection Observer for scroll animations
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20px 0px -50px 0px', // Trigger when 20px from top
+      threshold: 0.3 // Trigger when 30% of element is visible
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !entry.target.classList.contains('animate-in')) {
+          // Find the index of this card
+          const cardIndex = cardsRef.current.findIndex(card => card === entry.target);
+          
+          // Add animation with staggered delay
+          setTimeout(() => {
+            entry.target.classList.add('animate-in');
+          }, cardIndex * 200); // 200ms delay between each card
+        }
+      });
+    }, observerOptions);
+
+    // Observe each card
+    cardsRef.current.forEach((card) => {
+      if (card) {
+        observer.observe(card);
+      }
+    });
+
+    return () => {
+      cardsRef.current.forEach((card) => {
+        if (card) {
+          observer.unobserve(card);
+        }
+      });
+    };
+  }, []);
   const goToDashboard = () => {
     navigate('/dashboard');
   };
   return <>
-    <section className="relative min-h-[80vh] flex items-center justify-center px-4 pt-20 sm:pt-24 pb-8 overflow-hidden bg-white dark:bg-black">
-      {/* Light rays background animation - only in dark mode */}
-      <div className="absolute inset-0 z-0 dark:block hidden">
-        <LightRays raysOrigin="top-center" raysColor="#00ffff" raysSpeed={1.5} lightSpread={0.8} rayLength={window.innerWidth < 768 ? 6.0 : 4.0} fadeDistance={window.innerWidth < 768 ? 5.0 : 3.0} followMouse={true} mouseInfluence={0.1} noiseAmount={0.1} distortion={0.05} className="w-full h-full" />
-      </div>
-      <div className="absolute inset-0 z-10 bg-white/90 dark:bg-black/20" aria-hidden="true" />
+    <section className="relative min-h-[80vh] flex items-center justify-center px-4 pt-20 sm:pt-24 pb-8 overflow-hidden bg-gradient-hero-mobile md:bg-gradient-hero dark:bg-black">
+      <div className="absolute inset-0 z-10 bg-white/20 dark:bg-black/20" aria-hidden="true" />
       
       {/* Main Container with Grid Layout */}
       <div className="max-w-7xl mx-auto z-20 relative w-full">
@@ -114,68 +149,56 @@ const HeroSection = () => {
           {/* Hero Content - Center aligned */}
           <div className="text-left max-w-2xl mx-auto flex flex-col justify-center mt-8 md:mt-0">
         
-        {/* Background to block particles behind headline in dark mode */}
         <div className="relative mb-8">
-          <div className="absolute inset-0 bg-background/80 dark:bg-black/80 rounded-lg blur-sm z-10 transform scale-110"></div>
-          <h1 className="relative z-30 text-[36px] md:text-[54px] mb-1 leading-none font-notion-inter font-semibold tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
-            {/* Mobile and Desktop view */}
-            <div className="block md:hidden lg:block">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">Get resumes,</span>
+          <h1 className="relative z-30 text-[36px] md:text-[54px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
+            {/* Mobile view only */}
+            <div className="block md:hidden text-left text-[32px] leading-tight animate-fly-in-from-bottom">
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Your dream job</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">job alerts & more..</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">search made</span>
               <br />
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram</span>
-                {telegramAnimationData && (
-                  <div className="flex-shrink-0">
-                    <Lottie 
-                      animationData={telegramAnimationData} 
-                      loop={true} 
-                      autoplay={true} 
-                      className="w-12 h-12 md:w-16 md:h-16"
-                    />
-                  </div>
-                )}
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic"><span className="underline decoration-red-500 decoration-4 underline-offset-4">effortless</span></span>
+              <br />
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">by AI Agents</span>
+              <br />
+              <div className="flex items-center gap-2">
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">on Telegram</span>
+                {telegramAnimationData && <div className="flex-shrink-0">
+                    <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-10 h-10" />
+                  </div>}
               </div>
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">
-                in just <span className="relative">
-                  30 seconds
-                  <span className="absolute bottom-0 left-0 w-full h-1 bg-red-500" style={{
-                    backgroundImage: 'url("data:image/svg+xml,%3csvg width=\'100\' height=\'4\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3cpath d=\'M0,2 Q25,0 50,2 T100,2\' stroke=\'%23ef4444\' stroke-width=\'3\' fill=\'transparent\'/%3e%3c/svg%3e")',
-                    backgroundRepeat: 'repeat-x'
-                  }}></span>
-                </span>.
-              </span>
+            </div>
+            
+            {/* Desktop view only */}
+            <div className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Your dream job search</span>
+              <br />
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">made <span className="underline decoration-red-500 decoration-4 underline-offset-4">effortless</span></span>
+              <br />
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">by AI Agents</span>
+              <br />
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">on Telegram</span>
+                {telegramAnimationData && <div className="flex-shrink-0">
+                    <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-16 h-16" />
+                  </div>}
+              </div>
             </div>
             
             {/* Tablet view only */}
-            <div className="hidden md:block lg:hidden">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">Get resumes,</span>
+            <div className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Your dream job search</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">job alerts & more..</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">made <span className="underline decoration-red-500 decoration-4 underline-offset-4">effortless</span></span>
               <br />
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-semibold not-italic">on Telegram</span>
-                {telegramAnimationData && (
-                  <div className="flex-shrink-0">
-                    <Lottie 
-                      animationData={telegramAnimationData} 
-                      loop={true} 
-                      autoplay={true} 
-                      className="w-16 h-16 md:w-20 md:h-20"
-                    />
-                  </div>
-                )}
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">by AI Agents</span>
+              <br />
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">on Telegram</span>
+                {telegramAnimationData && <div className="flex-shrink-0">
+                    <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-16 h-16 md:w-20 md:h-20" />
+                  </div>}
               </div>
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 mt-1 inline-block font-notion-inter font-semibold not-italic">
-                in just <span className="relative">
-                  30 seconds
-                  <span className="absolute bottom-0 left-0 w-full h-1 bg-red-500" style={{
-                    backgroundImage: 'url("data:image/svg+xml,%3csvg width=\'100\' height=\'4\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3cpath d=\'M0,2 Q25,0 50,2 T100,2\' stroke=\'%23ef4444\' stroke-width=\'3\' fill=\'transparent\'/%3e%3c/svg%3e")',
-                    backgroundRepeat: 'repeat-x'
-                  }}></span>
-                </span>.
-              </span>
             </div>
           </h1>
         </div>
@@ -190,15 +213,19 @@ const HeroSection = () => {
           </div>} */}
         
 
-        <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-8 text-[16px] font-notion-inter font-medium text-muted-foreground">Just chat like a friend with our AI Agents to update your resume instantly. Get daily job alerts and one-click access to cover letters, interview prep files, job fit analysis, company insights, HR contacts, and visa sponsorship info — everything you need to get hired, all in one place.</p>
+        <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[14px] md:text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
+          <p className="mb-8 text-[14px] md:text-[16px] font-notion-inter font-medium text-foreground text-left md:text-center">
+            Finding your perfect job is now quicker and easier with our AI agents! <br />
+            Get personalized job alerts, then click to instantly receive custom resumes, cover letters, interview prep, hiring manager contacts and more - all through simple chats. <br />
+            Getting a job has never been this easy.
+          </p>
           
           <SignedOut>
             {/* Button Container */}
-            <div className="flex flex-row items-center justify-start mb-8">
+            <div className="flex flex-row items-center justify-center mb-8">
               <SignUpButton mode="modal">
-                <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-start md:justify-center w-auto border border-transparent">
-                  Get started for free
+                <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-6 py-3 md:px-8 md:py-3 text-base md:text-lg rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-center w-auto border border-transparent">
+                  Try Aspirely for Free
                 </button>
               </SignUpButton>
               
@@ -207,10 +234,10 @@ const HeroSection = () => {
                 <span className="text-green-700 dark:text-green-300 text-xs md:text-sm font-semibold font-inter">
                   Get 50% off with code "ASP123"
                 </span>
-              </div> */}
+               </div> */}
             </div>
             {/* Avatar Group with Rating */}
-            <div className="flex items-center justify-start gap-4 mb-6">
+            <div className="flex items-center justify-center gap-4 mb-6">
               <div className="flex -space-x-2">
                 <Avatar className="h-8 w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Remy Sharp" />
@@ -287,49 +314,81 @@ const HeroSection = () => {
     </section>
     
     {/* Telegram Agents Section - Separate section below hero */}
-    <section className="relative py-4 bg-background">
+    <section id="telegram-agents" className="relative py-4 bg-background">
       <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
         <div className="text-left">
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4">
-            <p>hey… you know those job platforms that dump thousands of listings, and all those online resume builders that make everyone’s pdf look the same? that’s not what job seekers actually need.</p>
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter">Get access to the world's first Telegram AI Job Agents</h2>
             
+            <p>Job platforms are broken. Old postings everywhere. Even when you see a matching job, you skip it because customizing resumes and finding HR contacts takes forever.</p>
             
+            <p>That's exactly why we built 3 AI Job Agents on Telegram.</p>
             
-            <p>we’re not like them… we built our platform for genuine job seekers like you. people who need something that actually helps them land jobs.</p>
-            
-            <p><p>we're not here to trap you with subscriptions. <strong>start free</strong>, pay-as-you-go only if you want more. no hidden tricks.</p></p>
-            
-            <p><p>first, we made <strong>Telegram AI Job Agents</strong> just for you.. if you're wondering why Telegram… who has time to go through websites every day when you already have a lot going on? just open a chat, and your agents are there - fixing resumes, sending alerts, writing cover letters, prepping interviews, even pointing to the right HR contacts. it's like having a friend helping you land the job.</p></p>
-            
-            <p><p>this is the stuff that actually works. stuff that <strong>actually gets you ahead</strong>.</p></p>
-            
-            <p>👇 try your AI Job Agents and see it yourself</p>
           </div>
           
-          <div className="flex flex-col md:flex-row items-start justify-start md:items-center md:justify-center space-y-3 md:space-y-0 md:space-x-3">
-            <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-gray-700 dark:border-gray-200 rounded-xl px-3 py-2 bg-gray-700 hover:bg-gray-800 dark:bg-gray-200 dark:hover:bg-gray-100">
-              <span className="text-lg">📝</span>
-              <span className="italic text-white dark:text-gray-900 text-sm">Resume Builder Agent</span>
-            </a>
+          {/* AI Job Agents Structured Section */}
+          <div className="space-y-8">
+            {/* 1. Job Alerts AI Agent */}
+            <div 
+              ref={(el) => cardsRef.current[0] = el}
+              className="animate-on-scroll rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
+            >
+              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-6 font-inter text-center">1. Job Alerts AI Agent</h3>
+              
+              <div className="flex justify-center mb-6">
+                <img src="/telegram-job-alerts-agent.png" alt="Job Alerts AI Agent demonstration showing personalized job alerts with tailored resumes and cover letters" className="max-w-full h-auto rounded-lg shadow-lg" />
+              </div>
+              
+            <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
+              1 job alert = 7 instant files with just one-click. Get tailored resumes, cover letters, interview prep, job fit analysis, and HR contacts - all personalized for each role.
+            </p>
+              
+              <div className="flex justify-center">
+                <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white hover:opacity-90 px-6 py-3 rounded-xl transition-all duration-200 font-medium" style={{backgroundColor: '#30313d'}}>
+                  Try it 👉
+                </a>
+              </div>
+            </div>
             
-            <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-gray-700 dark:border-gray-200 rounded-xl px-3 py-2 bg-gray-700 hover:bg-gray-800 dark:bg-gray-200 dark:hover:bg-gray-100">
-              <span className="text-lg">🔔</span>
-              <span className="italic text-white dark:text-gray-900 text-sm">Job Alerts Agent</span>
-            </a>
+            {/* 2. Resume Builder AI Agent */}
+            <div 
+              ref={(el) => cardsRef.current[1] = el}
+              className="animate-on-scroll rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
+            >
+              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-6 font-inter text-center">2. Resume Builder AI Agent</h3>
+              
+              <div className="flex justify-center mb-6">
+                <img src="/telegram-resume-builder-agent.png" alt="Resume Builder AI Agent interface showing conversational resume building and customization" className="max-w-full h-auto rounded-lg shadow-lg" />
+              </div>
+              
+              <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
+                Just chat and get your resume tailored for every role - add new certifications, skills, projects, work experience by just telling it. No long forms, it remembers everything about you. It's like having a resume coach.
+              </p>
+              
+              <div className="flex justify-center">
+                <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white hover:opacity-90 px-6 py-3 rounded-xl transition-all duration-200 font-medium" style={{backgroundColor: '#30313d'}}>
+                  Try it 👉
+                </a>
+              </div>
+            </div>
             
-            <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-all duration-200 cursor-pointer flex items-center gap-2 border border-gray-700 dark:border-gray-200 rounded-xl px-3 py-2 bg-gray-700 hover:bg-gray-800 dark:bg-gray-200 dark:hover:bg-gray-100">
-              <span className="text-lg">👔</span>
-              <span className="italic text-white dark:text-gray-900 text-sm">Job Application Agent</span>
-            </a>
-          </div>
-          
-          {/* Demo Image */}
-          <div className="mt-8 flex justify-center">
-            <img 
-              src="/lovable-uploads/5b725964-9ba7-4dca-993d-0bac747cccb5.png" 
-              alt="Telegram AI Job Agents Demo - showing Job Application, Resume Builder, and Job Alerts agents in action"
-              className="max-w-full h-auto rounded-lg shadow-lg"
-            />
+            {/* 3. Job Application AI Agent */}
+            <div 
+              ref={(el) => cardsRef.current[2] = el}
+              className="animate-on-scroll rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
+            >
+              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-6 font-inter text-center">3. Job Application AI Agent</h3>
+              
+              <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
+                Tell it what job you're planning to apply for → Get the full application package, so you can apply to that job fully prepared in minutes.
+              </p>
+              
+              <div className="flex justify-center">
+                <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white hover:opacity-90 px-6 py-3 rounded-xl transition-all duration-200 font-medium" style={{backgroundColor: '#30313d'}}>
+                  Try it 👉
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>

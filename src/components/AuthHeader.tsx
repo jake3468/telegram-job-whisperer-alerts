@@ -23,7 +23,7 @@ const AuthHeader = () => {
   };
 
   const navItems = [
-    { label: 'Features', id: 'features' },
+    { label: 'Features', id: 'telegram-agents' },
     { label: 'How It Works', id: 'how-it-works' },
     { label: 'Pricing', id: 'pricing' },
     { label: 'FAQ', id: 'faq' },
@@ -31,7 +31,7 @@ const AuthHeader = () => {
 
   return (
     // Blended navbar with transparent background
-    <header className="w-full backdrop-blur-md bg-background/30 dark:bg-black/30 fixed top-0 left-0 right-0 z-50 shadow-[0_6px_24px_0px_rgba(16,118,238,0.05)]">
+    <header className="w-full backdrop-blur-sm bg-transparent fixed top-0 left-0 right-0 z-50">
       <div className="flex justify-between items-center px-3 sm:px-6 py-4 max-w-7xl mx-auto">
         {/* Logo and Site Name: Left side */}
         <div className="flex items-center space-x-2 sm:space-x-3 z-40 cursor-pointer" onClick={() => navigate('/')}>
@@ -63,14 +63,6 @@ const AuthHeader = () => {
 
         {/* Desktop Theme Toggle and Auth Buttons: Right side - only show on large screens */}
         <div className="hidden lg:flex items-center space-x-4">
-          {/* Theme Toggle Button */}
-          <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="text-foreground hover:text-primary transition-colors duration-200 p-2 rounded-lg hover:bg-muted"
-            aria-label="Toggle theme"
-          >
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
           
           <SignedOut>
             <div className="flex items-center space-x-4">
@@ -94,16 +86,8 @@ const AuthHeader = () => {
           </SignedIn>
         </div>
 
-        {/* Mobile/Tablet Hamburger Menu and Theme Toggle - show on tablet and mobile */}
+        {/* Mobile/Tablet Hamburger Menu - show on tablet and mobile */}
         <div className="lg:hidden flex items-center space-x-2">
-          {/* Theme Toggle Button for Mobile */}
-          <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="text-foreground hover:text-primary transition-colors duration-200 p-2 rounded-lg hover:bg-muted"
-            aria-label="Toggle theme"
-          >
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
           
           <button
             onClick={toggleMenu}
@@ -117,7 +101,7 @@ const AuthHeader = () => {
 
       {/* Mobile/Tablet Dropdown Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-background/95 dark:bg-black/95 backdrop-blur-md border-b border-border shadow-lg">
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-background dark:bg-black backdrop-blur-md border-b border-border shadow-lg">
           <div className="px-4 py-4 space-y-3">
             {/* Navigation Items */}
             {navItems.map((item) => (

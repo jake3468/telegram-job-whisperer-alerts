@@ -57,7 +57,7 @@ const JobCard = ({
       return formatDate(job.created_at);
     }
   };
-  return <div className="w-full max-w-full bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden" onClick={onView}>
+  return <div className="w-full max-w-full bg-white border border-gray-600 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden" onClick={onView}>
       <div className="p-2 sm:p-3 flex gap-2 sm:gap-3">
         {/* Left section: Logo + Content */}
         <div className="flex-1 min-w-0 flex gap-2 sm:gap-3">
@@ -321,17 +321,17 @@ const JobBoard = () => {
         <div className="w-full max-w-4xl px-2 sm:px-6 mx-auto">
           {/* Header */}
           <div className="text-center mb-4 sm:mb-6">
-            <div className="flex items-center justify-center gap-2 sm:gap-4 mb-2 sm:mb-4 flex-wrap">
+            <div className="flex items-center justify-center gap-2 sm:gap-4 mb-2 sm:mb-4 mt-4 sm:mt-6 flex-wrap">
               <span className="text-3xl sm:text-3xl">💼</span>
-              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent">Job Board</h1>
+              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-700 to-cyan-600 bg-clip-text text-transparent">Job Board</h1>
               {/* Only show refresh button when there's an error */}
-              {error && <Button onClick={handleManualRefresh} disabled={loading} variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-800/50 h-8 w-8 p-0" title="Refresh jobs data">
+              {error && <Button onClick={handleManualRefresh} disabled={loading} variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 h-8 w-8 p-0" title="Refresh jobs data">
                   <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                  </Button>}
             </div>
             <div className="px-2 sm:px-4">
-              <p className="text-gray-300 text-sm sm:text-lg break-words text-left">
-                Browse job alerts as received via Telegram &quot;Job Alerts&quot; AI Agent — all jobs posted today appear here, stay visible for 7 days, and are auto-deleted after that. Save the ones you like and move them to your <span className="italic text-indigo-200">Job Tracker</span> page when you're ready to apply.
+              <p className="font-inter font-normal text-gray-900 text-sm sm:text-base text-left break-words mb-1 sm:mb-2">
+                Browse job alerts as received via Telegram &quot;Job Alerts&quot; AI Agent — all jobs posted today appear here, stay visible for 7 days, and are auto-deleted after that. Save the ones you like and move them to your <span className="italic text-indigo-700">Job Tracker</span> page when you're ready to apply.
               </p>
             </div>
             {/* Error indicator */}
@@ -349,17 +349,17 @@ const JobBoard = () => {
             <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
               <div className="px-2 sm:px-4 mb-6">
                   <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm gap-0.5 sm:gap-1 h-auto p-0.5 sm:p-1 border-0 rounded-xl">
-                   <TabsTrigger value="posted-today" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
+                   <TabsTrigger value="posted-today" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-700 border border-gray-400 hover:bg-white/10 hover:text-gray-900 transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:border-blue-600 font-medium min-w-0 overflow-hidden">
                      <span className="hidden lg:inline truncate">Posted Today</span>
                      <span className="lg:hidden truncate">Today</span>
                      <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({pagination.postedToday.totalCount})</span>
                    </TabsTrigger>
-                   <TabsTrigger value="last-7-days" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
+                   <TabsTrigger value="last-7-days" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-700 border border-gray-400 hover:bg-white/10 hover:text-gray-900 transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:border-blue-600 font-medium min-w-0 overflow-hidden">
                      <span className="hidden sm:inline truncate">Last 7 Days</span>
                      <span className="sm:hidden truncate">Week</span>
                      <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({pagination.last7Days.totalCount})</span>
                    </TabsTrigger>
-                   <TabsTrigger value="saved-to-tracker" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-300 hover:bg-white/10 hover:text-white transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg font-medium min-w-0 overflow-hidden">
+                   <TabsTrigger value="saved-to-tracker" className="text-sm sm:text-sm px-1 sm:px-3 py-3 sm:py-3 rounded-lg bg-transparent text-gray-700 border border-gray-400 hover:bg-white/10 hover:text-gray-900 transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:border-blue-600 font-medium min-w-0 overflow-hidden">
                      <span className="hidden sm:inline truncate">Saved</span>
                      <span className="sm:hidden truncate">Saved</span>
                      <span className="ml-0.5 sm:ml-1 flex-shrink-0 text-xs sm:text-xs">({pagination.saved.totalCount})</span>
@@ -404,7 +404,7 @@ const JobBoard = () => {
                       
                       {/* Pagination Controls */}
                       <div className="flex items-center justify-between mt-6 max-w-2xl mx-auto">
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
                           <span>
                             {((pagination.postedToday.currentPage - 1) * pagination.postedToday.pageSize) + 1}-
                             {Math.min(pagination.postedToday.currentPage * pagination.postedToday.pageSize, pagination.postedToday.totalCount)} of {pagination.postedToday.totalCount}
@@ -413,7 +413,7 @@ const JobBoard = () => {
                             value={pagination.postedToday.pageSize.toString()} 
                             onValueChange={(value) => changePageSize('postedToday', parseInt(value))}
                           >
-                            <SelectTrigger className="w-20 h-8 text-xs bg-white/10 border-gray-600 text-gray-300">
+                            <SelectTrigger className="w-20 h-8 text-xs bg-white/10 border-gray-600 text-gray-700">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -422,7 +422,7 @@ const JobBoard = () => {
                               <SelectItem value="50">50</SelectItem>
                             </SelectContent>
                           </Select>
-                          <span className="text-gray-400">Results per page</span>
+                          <span className="text-gray-700">Results per page</span>
                         </div>
                         
                         {pagination.postedToday.totalCount > pagination.postedToday.pageSize && (
@@ -437,7 +437,7 @@ const JobBoard = () => {
                                       changePage('postedToday', pagination.postedToday.currentPage - 1);
                                     }
                                   }}
-                                  className={pagination.postedToday.currentPage === 1 ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
+                                  className={pagination.postedToday.currentPage === 1 ? 'pointer-events-none opacity-50' : 'text-gray-700 hover:text-gray-900'}
                                 />
                               </PaginationItem>
                               
@@ -450,7 +450,7 @@ const JobBoard = () => {
                                       changePage('postedToday', pagination.postedToday.currentPage + 1);
                                     }
                                   }}
-                                  className={pagination.postedToday.currentPage >= Math.ceil(pagination.postedToday.totalCount / pagination.postedToday.pageSize) ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
+                                  className={pagination.postedToday.currentPage >= Math.ceil(pagination.postedToday.totalCount / pagination.postedToday.pageSize) ? 'pointer-events-none opacity-50' : 'text-gray-700 hover:text-gray-900'}
                                 />
                               </PaginationItem>
                             </PaginationContent>
@@ -489,7 +489,7 @@ const JobBoard = () => {
                       
                       {/* Pagination Controls */}
                       <div className="flex items-center justify-between mt-6 max-w-2xl mx-auto">
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
                           <span>
                             {((pagination.last7Days.currentPage - 1) * pagination.last7Days.pageSize) + 1}-
                             {Math.min(pagination.last7Days.currentPage * pagination.last7Days.pageSize, pagination.last7Days.totalCount)} of {pagination.last7Days.totalCount}
@@ -498,7 +498,7 @@ const JobBoard = () => {
                             value={pagination.last7Days.pageSize.toString()} 
                             onValueChange={(value) => changePageSize('last7Days', parseInt(value))}
                           >
-                            <SelectTrigger className="w-20 h-8 text-xs bg-white/10 border-gray-600 text-gray-300">
+                            <SelectTrigger className="w-20 h-8 text-xs bg-white/10 border-gray-600 text-gray-700">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -507,7 +507,7 @@ const JobBoard = () => {
                               <SelectItem value="50">50</SelectItem>
                             </SelectContent>
                           </Select>
-                          <span className="text-gray-400">Results per page</span>
+                          <span className="text-gray-700">Results per page</span>
                         </div>
                         
                         {pagination.last7Days.totalCount > pagination.last7Days.pageSize && (
@@ -522,7 +522,7 @@ const JobBoard = () => {
                                       changePage('last7Days', pagination.last7Days.currentPage - 1);
                                     }
                                   }}
-                                  className={pagination.last7Days.currentPage === 1 ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
+                                  className={pagination.last7Days.currentPage === 1 ? 'pointer-events-none opacity-50' : 'text-gray-700 hover:text-gray-900'}
                                 />
                               </PaginationItem>
                               
@@ -535,7 +535,7 @@ const JobBoard = () => {
                                       changePage('last7Days', pagination.last7Days.currentPage + 1);
                                     }
                                   }}
-                                  className={pagination.last7Days.currentPage >= Math.ceil(pagination.last7Days.totalCount / pagination.last7Days.pageSize) ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
+                                  className={pagination.last7Days.currentPage >= Math.ceil(pagination.last7Days.totalCount / pagination.last7Days.pageSize) ? 'pointer-events-none opacity-50' : 'text-gray-700 hover:text-gray-900'}
                                 />
                               </PaginationItem>
                             </PaginationContent>
@@ -547,12 +547,12 @@ const JobBoard = () => {
                 </TabsContent>
 
                 <TabsContent value="saved-to-tracker" className="space-y-3 mt-4 w-full">
-                  <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-lg p-3 mb-4 max-w-2xl mx-auto">
+                  <div className="bg-gradient-to-r from-green-100 to-blue-100 border border-green-400 rounded-lg p-3 mb-4 max-w-2xl mx-auto">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                      <span className="text-green-300 font-medium text-sm">Saved Jobs Section</span>
+                      <div className="w-3 h-3 bg-green-600 rounded-full animate-pulse"></div>
+                      <span className="text-green-700 font-medium text-sm">Saved Jobs Section</span>
                     </div>
-                    <p className="text-gray-300 text-xs">Jobs you&apos;ve saved are shown here. Click &quot;Add to Job Tracker/Track&quot; to track your application progress.</p>
+                    <p className="text-gray-700 text-xs">Jobs you&apos;ve saved are shown here. Click &quot;Add to Job Tracker/Track&quot; to track your application progress.</p>
                   </div>
                   
                   {sectionLoading.saved ? (
@@ -585,7 +585,7 @@ const JobBoard = () => {
                       
                       {/* Pagination Controls */}
                       <div className="flex items-center justify-between mt-6 max-w-2xl mx-auto">
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
                           <span>
                             {((pagination.saved.currentPage - 1) * pagination.saved.pageSize) + 1}-
                             {Math.min(pagination.saved.currentPage * pagination.saved.pageSize, pagination.saved.totalCount)} of {pagination.saved.totalCount}
@@ -594,7 +594,7 @@ const JobBoard = () => {
                             value={pagination.saved.pageSize.toString()} 
                             onValueChange={(value) => changePageSize('saved', parseInt(value))}
                           >
-                            <SelectTrigger className="w-20 h-8 text-xs bg-white/10 border-gray-600 text-gray-300">
+                            <SelectTrigger className="w-20 h-8 text-xs bg-white/10 border-gray-600 text-gray-700">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -603,7 +603,7 @@ const JobBoard = () => {
                               <SelectItem value="50">50</SelectItem>
                             </SelectContent>
                           </Select>
-                          <span className="text-gray-400">Results per page</span>
+                          <span className="text-gray-700">Results per page</span>
                         </div>
                         
                         {pagination.saved.totalCount > pagination.saved.pageSize && (
@@ -618,7 +618,7 @@ const JobBoard = () => {
                                       changePage('saved', pagination.saved.currentPage - 1);
                                     }
                                   }}
-                                  className={pagination.saved.currentPage === 1 ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
+                                  className={pagination.saved.currentPage === 1 ? 'pointer-events-none opacity-50' : 'text-gray-700 hover:text-gray-900'}
                                 />
                               </PaginationItem>
                               
@@ -631,7 +631,7 @@ const JobBoard = () => {
                                       changePage('saved', pagination.saved.currentPage + 1);
                                     }
                                   }}
-                                  className={pagination.saved.currentPage >= Math.ceil(pagination.saved.totalCount / pagination.saved.pageSize) ? 'pointer-events-none opacity-50' : 'text-gray-300 hover:text-white'}
+                                  className={pagination.saved.currentPage >= Math.ceil(pagination.saved.totalCount / pagination.saved.pageSize) ? 'pointer-events-none opacity-50' : 'text-gray-700 hover:text-gray-900'}
                                 />
                               </PaginationItem>
                             </PaginationContent>
@@ -665,7 +665,7 @@ const JobBoard = () => {
                         <span className="font-medium">{selectedJob.company_name}</span>
                       </div>
                     </div>
-                     <Button variant="ghost" size="icon" className="text-gray-500 hover:text-gray-700 flex-shrink-0" onClick={() => { updateActivity(); setSelectedJob(null); }}>
+                     <Button variant="ghost" size="icon" className="text-gray-700 hover:text-gray-900 flex-shrink-0" onClick={() => { updateActivity(); setSelectedJob(null); }}>
                        <X className="h-5 w-5" />
                      </Button>
                   </div>

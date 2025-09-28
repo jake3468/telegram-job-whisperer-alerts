@@ -95,21 +95,21 @@ export const ProfileWizard = () => {
       <div className="text-center mb-1 sm:mb-2">
         <h1 className="font-extrabold text-2xl sm:text-3xl md:text-4xl font-orbitron drop-shadow mb-1 break-words">
           <span className="mr-1 sm:mr-2">🎉</span>
-          <span className="text-gray-100">
+          <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
             Welcome, 
           </span>
-          <span className="italic text-gray-100">
+          <span className="italic bg-gradient-to-r from-orange-700 to-green-700 bg-clip-text text-transparent">
             {user?.firstName || 'User'}
           </span>
         </h1>
-        <p className="text-white text-sm sm:text-lg mt-1 px-2">Let's set up your profile in just 3 steps</p>
+        <p className="font-inter font-normal text-gray-900 text-sm sm:text-base text-center mb-1 sm:mb-2">Let's set up your profile in just 3 steps</p>
       </div>
 
       {/* Progress Bar */}
       <div className="mb-1 sm:mb-3">
         <div className="w-full bg-gray-700 rounded-full h-1.5 sm:h-2">
           <div 
-            className="h-1.5 sm:h-2 rounded-full bg-green-400 transition-all duration-500"
+            className="h-1.5 sm:h-2 rounded-full bg-green-600 transition-all duration-500"
             style={{ width: `${getProgressPercentage()}%` }}
           />
         </div>
@@ -141,7 +141,7 @@ export const ProfileWizard = () => {
                     {status === 'complete' ? '✓' : stepNum}
                   </div>
                   <span className={`text-xs sm:text-sm font-medium text-center break-words ${
-                    isActive ? 'text-blue-400' : status === 'complete' ? 'text-emerald-400' : 'text-gray-400'
+                    isActive ? 'text-blue-600' : status === 'complete' ? 'text-emerald-400' : 'text-gray-800'
                   }`}>
                     {stepNum === 1 ? 'Resume' : stepNum === 2 ? 'Bio' : 'AI Agents'}
                   </span>
