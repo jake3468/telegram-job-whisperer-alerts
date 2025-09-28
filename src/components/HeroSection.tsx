@@ -215,7 +215,9 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[14px] md:text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[14px] md:text-[16px] font-notion-inter font-medium text-foreground text-left md:text-center">
-            Finding your perfect job is now quicker and easier with our AI agents! Get personalized job alerts, then click to instantly receive custom resumes, cover letters, interview prep, hiring manager contacts and more - all through simple Telegram chat. Getting a job has never been this easy.
+            Finding your perfect job is now quicker and easier with our AI agents! <br />
+            Get personalized job alerts, then click to instantly receive custom resumes, cover letters, interview prep, hiring manager contacts and more - all through simple Telegram chat. <br />
+            Getting a job has never been this easy.
           </p>
           
           <SignedOut>
