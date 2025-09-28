@@ -170,6 +170,87 @@ export default function GetMoreCredits() {
             <span>Powered by</span>
             <span className="ml-1 font-semibold text-gray-800">Dodo Payments</span>
           </div>
+          
+          {/* Credit Information Section */}
+          <div className="max-w-2xl mx-auto mb-6">
+            <p className="text-base text-gray-900 font-inter leading-relaxed mb-6 text-center">
+              We work on a credit-based pricing system, and each feature uses the following credits:
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-900">
+              <div className="flex items-start gap-2 text-left animate-fade-in" style={{animationDelay: '0.1s'}}>
+                <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Check className="w-3 h-3 text-white" />
+                </div>
+                <div>
+                  <div className="font-medium">Job Alerts (0.1 credits each)</div>
+                  <div className="text-gray-600">Personalized job notifications delivered to you</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 text-left animate-fade-in" style={{animationDelay: '0.2s'}}>
+                <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Check className="w-3 h-3 text-white" />
+                </div>
+                <div>
+                  <div className="font-medium">Cover Letter (1.5 credits)</div>
+                  <div className="text-gray-600">Personalized, human-tone PDF cover letter</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 text-left animate-fade-in" style={{animationDelay: '0.3s'}}>
+                <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Check className="w-3 h-3 text-white" />
+                </div>
+                <div>
+                  <div className="font-medium">Resume (3 credits)</div>
+                  <div className="text-gray-600">Customized PDF resume aligned with job posting</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 text-left animate-fade-in" style={{animationDelay: '0.4s'}}>
+                <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Check className="w-3 h-3 text-white" />
+                </div>
+                <div>
+                  <div className="font-medium">Interview Prep (6 credits)</div>
+                  <div className="text-gray-600">20-page PDF with tailored Q&A and strategies</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 text-left animate-fade-in" style={{animationDelay: '0.5s'}}>
+                <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Check className="w-3 h-3 text-white" />
+                </div>
+                <div>
+                  <div className="font-medium">Job Fit Check (1 credit)</div>
+                  <div className="text-gray-600">Detailed evaluation with personalized fit score</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 text-left animate-fade-in" style={{animationDelay: '0.6s'}}>
+                <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Check className="w-3 h-3 text-white" />
+                </div>
+                <div>
+                  <div className="font-medium">Company Insights (3 credits)</div>
+                  <div className="text-gray-600">Deep insights on company culture and expectations</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 text-left animate-fade-in" style={{animationDelay: '0.7s'}}>
+                <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Check className="w-3 h-3 text-white" />
+                </div>
+                <div>
+                  <div className="font-medium">Visa Sponsorship Info (2 credits)</div>
+                  <div className="text-gray-600">PDF guide for visa sponsorship clarity</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-2 text-left animate-fade-in" style={{animationDelay: '0.8s'}}>
+                <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Check className="w-3 h-3 text-white" />
+                </div>
+                <div>
+                  <div className="font-medium">Connect with HRs (2 credits)</div>
+                  <div className="text-gray-600">Direct recruiter profiles + tailored messages</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         
         {/* Responsive grid area with tight spacing for mobile; px for interior gap only */}
