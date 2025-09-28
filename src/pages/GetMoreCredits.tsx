@@ -183,7 +183,7 @@ export default function GetMoreCredits() {
                 </div>
                 <div>
                   <div className="font-medium">Job Alerts (0.1 credits each)</div>
-                  <div className="text-gray-600 text-xs sm:text-sm whitespace-nowrap">Personalized job notifications</div>
+                  <div className="text-gray-600">Personalized job notifications delivered to you</div>
                 </div>
               </div>
               <div className="flex items-start gap-2 text-left animate-fade-in border border-gray-300 rounded-lg p-3" style={{animationDelay: '0.2s'}}>
