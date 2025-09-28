@@ -211,6 +211,9 @@ const PricingSection = () => {
               <div className="text-3xl font-extrabold text-white mb-1">
                 ⚡ Power Pack
               </div>
+              <div className="inline-block px-3 py-1 bg-cyan-400 text-gray-800 text-sm font-bold rounded-full mb-2">
+                Pay-as-you-go
+              </div>
               <div className="text-sm font-semibold text-gray-300">Get 200 credits instantly</div>
               <div className="text-xs text-gray-400 mt-1">Pay once • No expiry • No subscription</div>
             </CardHeader>
