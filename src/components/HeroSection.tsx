@@ -155,11 +155,9 @@ const HeroSection = () => {
             <div className="block md:hidden text-left text-[32px] leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Your dream job search made</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">search made</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic"><span className="underline decoration-red-500 decoration-4 underline-offset-4">effortless</span> by</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic underline decoration-red-500 decoration-4 underline-offset-4">effortless</span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">by AI Agents</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">AI Agents</span>
               <br />
               <div className="flex items-center gap-2">
                 <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">on Telegram</span>
