@@ -98,7 +98,7 @@ export const ProfileWizard = () => {
           <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
             Welcome, 
           </span>
-          <span className="italic text-gray-100">
+          <span className="italic bg-gradient-to-r from-orange-700 to-green-700 bg-clip-text text-transparent">
             {user?.firstName || 'User'}
           </span>
         </h1>
