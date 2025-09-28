@@ -212,6 +212,7 @@ const PricingSection = () => {
                 ⚡ Power Pack
               </div>
               <div className="text-sm font-semibold text-gray-300">Get 200 credits instantly</div>
+              <div className="text-xs text-gray-400 mt-1">Pay once • No expiry • No subscription</div>
             </CardHeader>
             <CardContent className="grow flex flex-col px-4 pb-4">
               <div className="flex flex-col gap-2 my-1 flex-grow max-w-md mx-auto">
