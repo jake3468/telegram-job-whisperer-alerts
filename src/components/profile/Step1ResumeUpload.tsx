@@ -40,7 +40,7 @@ export const Step1ResumeUpload = ({
 
         {/* Success Message */}
         {resumeExists && (
-          <div className="bg-green-100 border border-green-300 rounded-lg p-2 sm:p-3 flex items-center gap-2 mb-4">
+          <div className="bg-green-800 border border-green-600 rounded-lg p-2 sm:p-3 flex items-center gap-2 mb-4">
             <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-green-200 rounded-full flex items-center justify-center">
               <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-700" />
             </div>
