@@ -2,6 +2,7 @@ import { useAuth } from "@clerk/clerk-react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageSkeleton } from "@/components/ui/skeleton";
+import { NoIndexMeta } from "@/components/NoIndexMeta";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -27,5 +28,10 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return <PageSkeleton />;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <NoIndexMeta />
+      {children}
+    </>
+  );
 };
