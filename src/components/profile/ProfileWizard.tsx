@@ -141,7 +141,7 @@ export const ProfileWizard = () => {
                     {status === 'complete' ? '✓' : stepNum}
                   </div>
                   <span className={`text-xs sm:text-sm font-medium text-center break-words ${
-                    isActive ? 'text-blue-400' : status === 'complete' ? 'text-emerald-400' : 'text-gray-400'
+                    isActive ? 'text-blue-600' : status === 'complete' ? 'text-emerald-400' : 'text-gray-200'
                   }`}>
                     {stepNum === 1 ? 'Resume' : stepNum === 2 ? 'Bio' : 'AI Agents'}
                   </span>
