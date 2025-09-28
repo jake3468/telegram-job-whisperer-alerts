@@ -1,14 +1,15 @@
 User-agent: *
 Allow: /
+
+# Blog content - encourage crawling
 Allow: /blogs
 Allow: /blog/
+Crawl-delay: 1
+
+# SEO-friendly pages
 Allow: /privacy-policy
 Allow: /terms-of-service
 Allow: /contact-support
-
-# Important pages for verification
-Allow: /privacy-policy
-Allow: /terms-of-service
 
 # Badge verification content
 Allow: /*badge*
@@ -30,5 +31,12 @@ Disallow: /ai-mock-interview
 Disallow: /ai-agents
 Disallow: /job-board
 
+# Sitemaps for search engines
 Sitemap: https://aspirely.ai/sitemap.xml
 Sitemap: https://aspirely.ai/functions/v1/dynamic-sitemap
+
+# Google-specific optimization
+User-agent: Googlebot
+Allow: /blogs
+Allow: /blog/
+Crawl-delay: 1

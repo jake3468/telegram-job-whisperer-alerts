@@ -73,8 +73,9 @@ const Blogs = () => {
       <Helmet>
         <title>Career Insights & Job Search Tips - Aspirely AI Blog</title>
         <meta name="description" content="Discover career insights, job search strategies, interview tips, and industry updates to accelerate your professional growth with Aspirely AI's expert blog." />
-        <meta name="keywords" content="career advice, job search tips, interview preparation, career development, professional growth, job hunting strategies" />
-        <link rel="canonical" href="https://aspirely.ai/blogs" />
+         <meta name="keywords" content="career advice, job search tips, interview preparation, career development, professional growth, job hunting strategies" />
+         <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+         <link rel="canonical" href="https://aspirely.ai/blogs" />
         
         {/* Open Graph tags */}
         <meta property="og:title" content="Career Insights & Job Search Tips - Aspirely AI Blog" />
@@ -86,32 +87,61 @@ const Blogs = () => {
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         
-        {/* Twitter Card tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Career Insights & Job Search Tips - Aspirely AI Blog" />
-        <meta name="twitter:description" content="Discover career insights, job search strategies, interview tips, and industry updates to accelerate your professional growth with Aspirely AI's expert blog." />
-        <meta name="twitter:image" content="https://aspirely.ai/aspirely-social-preview-updated.png" />
+         {/* Twitter Card tags */}
+         <meta name="twitter:card" content="summary_large_image" />
+         <meta name="twitter:site" content="@aspirely_ai" />
+         <meta name="twitter:title" content="Career Insights & Job Search Tips - Aspirely AI Blog" />
+         <meta name="twitter:description" content="Discover career insights, job search strategies, interview tips, and industry updates to accelerate your professional growth with Aspirely AI's expert blog." />
+         <meta name="twitter:image" content="https://aspirely.ai/aspirely-social-preview-updated.png" />
         
         {/* JSON-LD Structured Data */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Blog",
-            "name": "Aspirely AI Blog",
-            "description": "Career insights, job search strategies, interview tips, and industry updates to accelerate your professional growth",
-            "url": "https://aspirely.ai/blogs",
-            "publisher": {
-              "@type": "Organization",
-              "name": "Aspirely AI",
-              "url": "https://aspirely.ai",
-              "logo": {
-                "@type": "ImageObject",
-                "url": "https://aspirely.ai/aspirely-social-preview-updated.png"
-              }
-            },
-            "mainEntity": {
-              "@type": "ItemList",
-              "itemListElement": blogs.slice(0, 10).map((blog, index) => ({
+         <script type="application/ld+json">
+           {JSON.stringify({
+             "@context": "https://schema.org",
+             "@type": ["Blog", "WebSite"],
+             "name": "Aspirely AI Blog",
+             "description": "Career insights, job search strategies, interview tips, and industry updates to accelerate your professional growth",
+             "url": "https://aspirely.ai/blogs",
+             "publisher": {
+               "@type": "Organization",
+               "name": "Aspirely AI",
+               "url": "https://aspirely.ai",
+               "logo": {
+                 "@type": "ImageObject",
+                 "url": "https://aspirely.ai/aspirely-social-preview-updated.png"
+               }
+             },
+             "breadcrumb": {
+               "@type": "BreadcrumbList",
+               "itemListElement": [
+                 {
+                   "@type": "ListItem",
+                   "position": 1,
+                   "name": "Home",
+                   "item": "https://aspirely.ai"
+                 },
+                 {
+                   "@type": "ListItem",
+                   "position": 2,
+                   "name": "Blog",
+                   "item": "https://aspirely.ai/blogs"
+                 }
+               ]
+             },
+             "blogPost": blogs.map(blog => ({
+               "@type": "BlogPosting",
+               "headline": blog.title,
+               "url": `https://aspirely.ai/blog/${blog.slug}`,
+               "datePublished": blog.published_at,
+               "author": {
+                 "@type": "Person",
+                 "name": blog.author_name
+               },
+               "image": blog.thumbnail_url || "https://aspirely.ai/aspirely-social-preview-updated.png"
+             })),
+             "mainEntity": {
+               "@type": "ItemList",
+               "itemListElement": blogs.slice(0, 10).map((blog, index) => ({
                 "@type": "ListItem",
                 "position": index + 1,
                 "item": {
