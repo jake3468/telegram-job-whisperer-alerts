@@ -36,7 +36,7 @@ refresh_token_rotation_enabled = true
 security_update_password_require_reauthentication = true
 
 [functions]
-enabled = true
+enabled = false
 verify_jwt = true
 
 [functions.create-checkout-session]
