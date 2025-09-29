@@ -36,7 +36,7 @@ refresh_token_rotation_enabled = true
 security_update_password_require_reauthentication = true
 
 [functions]
-enabled = false
+enabled = true
 verify_jwt = true
 
 [functions.create-checkout-session]
@@ -45,3 +45,5 @@ verify_jwt = false
 [functions.video-rate-limiter]
 verify_jwt = false
 
+[functions.dynamic-sitemap]
+verify_jwt = false

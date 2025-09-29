@@ -1,13 +1,24 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { getAllPublishedBlogs, getFeaturedBlogs, Blog } from '@/data/blogData';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Search, Calendar, User, ArrowLeft } from 'lucide-react';
 
 import Footer from '@/components/Footer';
+interface Blog {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  thumbnail_url: string | null;
+  author_name: string;
+  published_at: string;
+  tags: string[];
+  featured: boolean;
+}
 const Blogs = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [featuredBlogs, setFeaturedBlogs] = useState<Blog[]>([]);
@@ -17,15 +28,23 @@ const Blogs = () => {
   useEffect(() => {
     fetchBlogs();
   }, []);
-  
-  const fetchBlogs = () => {
-    setLoading(true);
+  const fetchBlogs = async () => {
     try {
-      const allBlogs = getAllPublishedBlogs();
-      const featured = getFeaturedBlogs();
-      
-      setBlogs(allBlogs);
-      setFeaturedBlogs(featured);
+      // Fetch featured blogs
+      const {
+        data: featured
+      } = await supabase.from('blogs').select('*').eq('published', true).eq('featured', true).order('published_at', {
+        ascending: false
+      }).limit(3);
+
+      // Fetch all published blogs
+      const {
+        data: allBlogs
+      } = await supabase.from('blogs').select('*').eq('published', true).order('published_at', {
+        ascending: false
+      });
+      if (featured) setFeaturedBlogs(featured);
+      if (allBlogs) setBlogs(allBlogs);
     } catch (error) {
       console.error('Error fetching blogs:', error);
     } finally {

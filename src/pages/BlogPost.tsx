@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { getBlogBySlug, getRelatedBlogs, Blog } from '@/data/blogData';
+import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -9,6 +9,19 @@ import { ArrowLeft, Calendar, User, Share2, Twitter, Linkedin } from 'lucide-rea
 
 import Footer from '@/components/Footer';
 import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
+interface Blog {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string;
+  thumbnail_url: string | null;
+  author_name: string;
+  published_at: string;
+  tags: string[];
+  meta_title: string | null;
+  meta_description: string | null;
+}
 const BlogPost = () => {
   const {
     slug
@@ -24,24 +37,44 @@ const BlogPost = () => {
       fetchBlog();
     }
   }, [slug]);
-
-  const fetchBlog = () => {
-    setLoading(true);
+  useEffect(() => {
+    if (blog) {
+      // Fetch related blogs
+      fetchRelatedBlogs();
+    }
+  }, [blog]);
+  const fetchBlog = async () => {
     try {
-      const blogData = getBlogBySlug(slug || '');
-      if (blogData) {
-        setBlog(blogData);
-        // Fetch related blogs
-        const related = getRelatedBlogs(blogData.id, 3);
-        setRelatedBlogs(related);
-      } else {
+      const {
+        data,
+        error
+      } = await supabase.from('blogs').select('*').eq('slug', slug).eq('published', true).single();
+      if (error) {
+        console.error('Error fetching blog:', error);
         setNotFound(true);
+      } else {
+        console.log('Blog data fetched:', data);
+        console.log('Blog content length:', data.content?.length);
+        setBlog(data);
       }
     } catch (error) {
       console.error('Error fetching blog:', error);
       setNotFound(true);
     } finally {
       setLoading(false);
+    }
+  };
+  const fetchRelatedBlogs = async () => {
+    if (!blog) return;
+    try {
+      const {
+        data
+      } = await supabase.from('blogs').select('*').eq('published', true).neq('id', blog.id).order('published_at', {
+        ascending: false
+      }).limit(3);
+      if (data) setRelatedBlogs(data);
+    } catch (error) {
+      console.error('Error fetching related blogs:', error);
     }
   };
   const formatDate = (dateString: string) => {
