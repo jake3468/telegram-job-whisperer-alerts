@@ -152,13 +152,13 @@ const HeroSection = () => {
         <div className="relative mb-8">
           <h1 className="relative z-30 text-[36px] md:text-[54px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile view only - 3 lines */}
-            <div className="block md:hidden text-left text-[28px] leading-tight animate-fly-in-from-bottom">
+            <div className="block md:hidden text-left text-[24px] leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">No More Solo Job Hunting.</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">DO IT WITH</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">DO IT WITH AI AGENTS</span>
               <br />
               <div className="flex items-center gap-2">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">TELEGRAM AI AGENTS</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">ON TELEGRAM</span>
                 {telegramAnimationData && <div className="flex-shrink-0">
                     <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-10 h-10" />
                   </div>}
@@ -170,7 +170,7 @@ const HeroSection = () => {
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">No More Solo Job Hunting.</span>
               <br />
               <div className="flex items-center justify-center gap-2">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">DO IT WITH TELEGRAM AI AGENTS</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">DO IT WITH AI AGENTS ON TELEGRAM</span>
                 {telegramAnimationData && <div className="flex-shrink-0">
                     <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-16 h-16" />
                   </div>}
@@ -182,7 +182,7 @@ const HeroSection = () => {
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">No More Solo Job Hunting.</span>
               <br />
               <div className="flex items-center justify-center gap-2">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">DO IT WITH TELEGRAM AI AGENTS</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">DO IT WITH AI AGENTS ON TELEGRAM</span>
                 {telegramAnimationData && <div className="flex-shrink-0">
                     <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-16 h-16 md:w-20 md:h-20" />
                   </div>}
