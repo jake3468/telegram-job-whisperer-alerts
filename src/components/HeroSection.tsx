@@ -149,7 +149,7 @@ const HeroSection = () => {
           {/* Hero Content - Center aligned */}
           <div className="text-left max-w-2xl mx-auto flex flex-col justify-center mt-8 md:mt-0">
         
-        <div className="relative mb-8">
+        <div className="relative mb-8 md:mt-8">
           <h1 className="relative z-30 text-[36px] md:text-[32px] lg:text-[44px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile view only - 3 lines */}
             <div className="block md:hidden text-left text-[24px] leading-tight animate-fly-in-from-bottom">
@@ -165,24 +165,28 @@ const HeroSection = () => {
               </div>
             </div>
             
-            {/* Desktop view only - 2 lines */}
+            {/* Desktop view only - 3 lines */}
             <div className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic whitespace-nowrap">No More Solo <span className="font-bold underline decoration-red-500 decoration-4 underline-offset-4">Job Hunting</span>.</span>
               <br />
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">DO IT WITH AI AGENTS</span>
+              <br />
               <div className="flex items-center justify-center gap-2">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">DO IT WITH AI AGENTS ON TELEGRAM</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">ON TELEGRAM</span>
                 {telegramAnimationData && <div className="flex-shrink-0">
-                    <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-16 h-16" />
+                    <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-12 h-12" />
                   </div>}
               </div>
             </div>
             
-            {/* Tablet view only - 2 lines */}
+            {/* Tablet view only - 3 lines */}
             <div className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic whitespace-nowrap">No More Solo <span className="font-bold underline decoration-red-500 decoration-4 underline-offset-4">Job Hunting</span>.</span>
               <br />
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">DO IT WITH AI AGENTS</span>
+              <br />
               <div className="flex items-center justify-center gap-2">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">DO IT WITH AI AGENTS ON TELEGRAM</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">ON TELEGRAM</span>
                 {telegramAnimationData && <div className="flex-shrink-0">
                     <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-12 h-12" />
                   </div>}
