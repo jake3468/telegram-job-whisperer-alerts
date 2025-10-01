@@ -151,46 +151,38 @@ const HeroSection = () => {
         
         <div className="relative mb-8">
           <h1 className="relative z-30 text-[36px] md:text-[54px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
-            {/* Mobile view only */}
+            {/* Mobile view only - 3 lines */}
             <div className="block md:hidden text-left text-[28px] leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Your dream job search</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">No More Solo Job Hunting.</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">made <span className="underline decoration-red-500 decoration-4 underline-offset-4">effortless</span> by AI</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">DO IT WITH</span>
               <br />
               <div className="flex items-center gap-2">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Agents on Telegram</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">TELEGRAM AI AGENTS</span>
                 {telegramAnimationData && <div className="flex-shrink-0">
                     <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-10 h-10" />
                   </div>}
               </div>
             </div>
             
-            {/* Desktop view only */}
+            {/* Desktop view only - 2 lines */}
             <div className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Your dream job search</span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">made <span className="underline decoration-red-500 decoration-4 underline-offset-4">effortless</span></span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">by AI Agents</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">No More Solo Job Hunting.</span>
               <br />
               <div className="flex items-center justify-center gap-2">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">on Telegram</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">DO IT WITH TELEGRAM AI AGENTS</span>
                 {telegramAnimationData && <div className="flex-shrink-0">
                     <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-16 h-16" />
                   </div>}
               </div>
             </div>
             
-            {/* Tablet view only */}
+            {/* Tablet view only - 2 lines */}
             <div className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Your dream job search</span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">made <span className="underline decoration-red-500 decoration-4 underline-offset-4">effortless</span></span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">by AI Agents</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">No More Solo Job Hunting.</span>
               <br />
               <div className="flex items-center justify-center gap-2">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">on Telegram</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">DO IT WITH TELEGRAM AI AGENTS</span>
                 {telegramAnimationData && <div className="flex-shrink-0">
                     <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-16 h-16 md:w-20 md:h-20" />
                   </div>}
