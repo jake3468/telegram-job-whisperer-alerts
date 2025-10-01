@@ -18,9 +18,32 @@ export const YouTubeHeroVideo: React.FC<YouTubeHeroVideoProps> = ({
   const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
   const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&loop=1&playlist=${videoId}&enablejsapi=1`;
 
-  // Just set loading to false - no autoplay
+  // Set loading to false
   useEffect(() => {
     setIsLoading(false);
+  }, []);
+
+  // Intersection Observer for autoplay on scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          setShouldPlay(true);
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
+    };
   }, []);
 
   if (isLoading) {

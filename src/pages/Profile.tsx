@@ -154,8 +154,8 @@ const Profile = () => {
   if (!isLoaded || !user) {
     return (
       <Layout>
-        <div className="min-h-screen bg-black flex items-center justify-center">
-          <div className="text-gray-300 text-sm">Loading user...</div>
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <div className="text-gray-800 text-sm">Loading user...</div>
         </div>
       </Layout>
     );
@@ -165,8 +165,8 @@ const Profile = () => {
   if (profileLoading && !userProfile) {
     return (
       <Layout>
-        <div className="min-h-screen bg-black flex items-center justify-center">
-          <div className="text-gray-300 text-sm">Loading profile...</div>
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <div className="text-gray-800 text-sm">Loading profile...</div>
         </div>
       </Layout>
     );

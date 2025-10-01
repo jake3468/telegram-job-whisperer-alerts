@@ -36,12 +36,22 @@ const AIAgents = () => {
       <div className="min-h-screen bg-white">
         {/* Header Section */}
         <div className="max-w-7xl mx-auto px-4 py-4 text-center">
-          <h1 className="font-orbitron mb-2 drop-shadow tracking-tight font-bold text-4xl flex items-center justify-center gap-2">
+          {/* Mobile Layout */}
+          <h1 className="lg:hidden font-orbitron mb-2 drop-shadow tracking-tight font-bold flex flex-col items-center justify-center gap-2">
+            <span className="text-3xl">🚀</span>
+            <div className="flex flex-col items-center">
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent font-inter text-3xl">Activate your</span>
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent font-inter text-3xl">AI Job Agents</span>
+            </div>
+          </h1>
+          
+          {/* Desktop Layout */}
+          <h1 className="hidden lg:flex font-orbitron mb-2 drop-shadow tracking-tight font-bold text-4xl items-center justify-center gap-2">
             <span className="text-2xl sm:text-3xl md:text-4xl">🚀</span>
-            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent text-left font-inter text-3xl sm:text-3xl md:text-4xl">Your AI Agents</span>
+            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent font-inter text-3xl sm:text-3xl md:text-4xl">Activate your AI Job Agents</span>
           </h1>
           <p className="text-sm lg:text-base text-gray-900 font-inter font-normal mb-3 text-left max-w-2xl mx-auto lg:text-left">
-            Your personal AI job assistants are excited to help you land your dream job. Let's activate them in just 3 simple steps 👇
+            Your personal AI job agents on Telegram are excited to help you land your dream job. Let's activate them in just 3 simple steps 👇
           </p>
         </div>
 
