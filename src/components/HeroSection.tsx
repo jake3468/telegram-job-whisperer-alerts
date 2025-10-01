@@ -150,7 +150,7 @@ const HeroSection = () => {
           <div className="text-left max-w-2xl mx-auto flex flex-col justify-center mt-8 md:mt-0">
         
         <div className="relative mb-8">
-          <h1 className="relative z-30 text-[36px] md:text-[54px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
+          <h1 className="relative z-30 text-[36px] md:text-[40px] lg:text-[44px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile view only - 3 lines */}
             <div className="block md:hidden text-left text-[24px] leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">No More Solo Job Hunting.</span>
