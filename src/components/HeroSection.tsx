@@ -99,6 +99,18 @@ const HeroSection = () => {
     loadAnimations();
   }, []);
 
+  // Load Elfsight testimonials script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://elfsightcdn.com/platform.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
   // Intersection Observer for scroll animations
   useEffect(() => {
     const observerOptions = {
@@ -149,50 +161,46 @@ const HeroSection = () => {
           {/* Hero Content - Center aligned */}
           <div className="text-left max-w-2xl mx-auto flex flex-col justify-center mt-8 md:mt-0">
         
-        <div className="relative mb-8">
-          <h1 className="relative z-30 text-[36px] md:text-[54px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
-            {/* Mobile view only */}
-            <div className="block md:hidden text-left text-[28px] leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Your dream job search</span>
+        <div className="relative mb-8 md:mt-8">
+          <h1 className="relative z-30 text-[36px] md:text-[38px] lg:text-[44px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
+            {/* Mobile view only - 3 lines */}
+            <div className="block md:hidden text-left text-[24px] leading-tight animate-fly-in-from-bottom">
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">No More Solo <span className="font-bold underline decoration-red-500 decoration-4 underline-offset-4">Job Hunting</span>.</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">made <span className="underline decoration-red-500 decoration-4 underline-offset-4">effortless</span> by AI</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">DO IT WITH AI AGENTS</span>
               <br />
               <div className="flex items-center gap-2">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Agents on Telegram</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">ON TELEGRAM</span>
                 {telegramAnimationData && <div className="flex-shrink-0">
                     <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-10 h-10" />
                   </div>}
               </div>
             </div>
             
-            {/* Desktop view only */}
+            {/* Desktop view only - 3 lines */}
             <div className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Your dream job search</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic whitespace-nowrap">No More Solo <span className="font-bold underline decoration-red-500 decoration-4 underline-offset-4">Job Hunting</span>.</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">made <span className="underline decoration-red-500 decoration-4 underline-offset-4">effortless</span></span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">by AI Agents</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">DO IT WITH AI AGENTS</span>
               <br />
               <div className="flex items-center justify-center gap-2">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">on Telegram</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">ON TELEGRAM</span>
                 {telegramAnimationData && <div className="flex-shrink-0">
-                    <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-16 h-16" />
+                    <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-12 h-12" />
                   </div>}
               </div>
             </div>
             
-            {/* Tablet view only */}
+            {/* Tablet view only - 3 lines */}
             <div className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Your dream job search</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic whitespace-nowrap">No More Solo <span className="font-bold underline decoration-red-500 decoration-4 underline-offset-4">Job Hunting</span>.</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">made <span className="underline decoration-red-500 decoration-4 underline-offset-4">effortless</span></span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">by AI Agents</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">DO IT WITH AI AGENTS</span>
               <br />
               <div className="flex items-center justify-center gap-2">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">on Telegram</span>
+                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">ON TELEGRAM</span>
                 {telegramAnimationData && <div className="flex-shrink-0">
-                    <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-16 h-16 md:w-20 md:h-20" />
+                    <Lottie animationData={telegramAnimationData} loop={true} autoplay={true} className="w-12 h-12" />
                   </div>}
               </div>
             </div>
@@ -211,9 +219,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[14px] md:text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[14px] md:text-[16px] font-notion-inter font-medium text-foreground text-left md:text-center">
-            Finding your perfect job is now quicker and easier with our AI agents! <br />
-            Get personalized job alerts, then click to instantly receive custom resumes, cover letters, interview prep, hiring manager contacts and more - all through simple chats. <br />
-            Getting a job has never been this easy.
+            Get personalized job alerts, auto-generated resumes & cover letters, interview prep, insider hiring connections & more — all through simple Telegram chats. Finding your dream job has never been this fast or effortless.
           </p>
           
           <SignedOut>
@@ -286,6 +292,13 @@ const HeroSection = () => {
         </div>
           </div>
         </div>
+      </div>
+    </section>
+    
+    {/* Elfsight Testimonials Slider */}
+    <section className="relative py-8 bg-background">
+      <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
+        <div className="elfsight-app-4951d48f-0df4-4724-a25f-ace7b5dfeb22" data-elfsight-app-lazy></div>
       </div>
     </section>
     

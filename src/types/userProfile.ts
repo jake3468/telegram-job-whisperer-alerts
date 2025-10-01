@@ -20,6 +20,7 @@ export interface UserProfile {
   profile_setup_completed: boolean;
   referral_id: string | null;
   referred_at: string | null;
+  job_alert_reminder: string | null;
 }
 
 export interface UserProfileUpdateData {
@@ -40,4 +41,5 @@ export interface UserProfileUpdateData {
   profile_setup_completed?: boolean;
   referral_id?: string | null;
   referred_at?: string | null;
+  job_alert_reminder?: string | null;
 }
