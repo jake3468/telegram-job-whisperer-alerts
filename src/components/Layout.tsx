@@ -37,7 +37,7 @@ export function Layout({ children }: LayoutProps) {
         <AppSidebar />
         {/* Main content area now has reduced padding-top */}
         <div className="flex-1 flex flex-col bg-white pt-20 lg:pt-0">
-          <main className="flex-1 w-full px-0 py-0 bg-transparent">
+          <main className="flex-1 w-full px-0 py-0 bg-white">
             <div className="w-full px-3 sm:px-6">
               {children}
             </div>
