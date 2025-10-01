@@ -312,7 +312,7 @@ const HeroSection = () => {
       <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
         <div className="text-left">
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter">Get access to the world's first Telegram AI Job Agents</h2>
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter">Job Hunting, Finally Fixed</h2>
             
             <p>Job platforms are broken. Old postings everywhere. Even when you see a matching job, you skip it because customizing resumes and finding HR contacts takes forever.</p>
             
