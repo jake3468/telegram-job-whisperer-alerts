@@ -99,6 +99,18 @@ const HeroSection = () => {
     loadAnimations();
   }, []);
 
+  // Load Elfsight testimonials script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://elfsightcdn.com/platform.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
   // Intersection Observer for scroll animations
   useEffect(() => {
     const observerOptions = {
@@ -280,6 +292,13 @@ const HeroSection = () => {
         </div>
           </div>
         </div>
+      </div>
+    </section>
+    
+    {/* Elfsight Testimonials Slider */}
+    <section className="relative py-8 bg-background">
+      <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
+        <div className="elfsight-app-4951d48f-0df4-4724-a25f-ace7b5dfeb22" data-elfsight-app-lazy></div>
       </div>
     </section>
     
