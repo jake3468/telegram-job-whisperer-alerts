@@ -41,7 +41,7 @@ const AIAgents = () => {
             <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent text-left font-inter text-3xl sm:text-3xl md:text-4xl">Your AI Agents</span>
           </h1>
           <p className="text-sm lg:text-base text-gray-900 font-inter font-normal mb-3 text-left max-w-2xl mx-auto lg:text-left">
-            Your personal AI job assistants are excited to help you land your dream job. Let's activate them in just 3 simple steps 👇
+            Your personal AI job assistants on Telegram are excited to help you land your dream job. Let's activate them in just 3 simple steps 👇
           </p>
         </div>
 
