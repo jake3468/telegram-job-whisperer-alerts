@@ -267,43 +267,41 @@ export default function GetMoreCredits() {
               <CardContent className="grow flex flex-col px-3 pb-3">
                 <div className="text-center my-3 flex-grow px-4">
                   <div className="mt-4">
-                    <div className="bg-gray-800/50 border border-gray-600 rounded-lg p-4">
-                      <div className="flex items-center justify-center">
-                        {pricingData?.region === 'IN' ? (
-                          <>
-                            {creditPackProducts.filter(p => p.credits_amount === 30).length > 0 ? (
-                              <>
-                                <span className="text-lg line-through text-gray-400 mr-2">
-                                  ₹199
-                                </span>
-                                <span className="text-xl font-bold text-white">
-                                  ₹{creditPackProducts.find(p => p.credits_amount === 30)?.price_amount || 99}
-                                </span>
-                              </>
-                            ) : pricingData?.creditPacks?.find((p: any) => p.credits === 30) ? (
-                              <>
-                                <span className="text-lg line-through text-gray-400 mr-2">
-                                  ₹199
-                                </span>
-                                <span className="text-xl font-bold text-white">
-                                  ₹{pricingData?.creditPacks.find((p: any) => p.credits === 30)?.price || 99}
-                                </span>
-                              </>
-                            ) : (
-                              <span className="text-xl font-bold text-white">₹99</span>
-                            )}
-                            <span className="text-sm text-gray-400 ml-1">/ one-time</span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="text-lg line-through text-gray-400 mr-2">
-                              $5.99
-                            </span>
-                            <span className="text-xl font-bold text-white">$2.99</span>
-                            <span className="text-sm text-gray-400 ml-1">/ one-time</span>
-                          </>
-                        )}
-                      </div>
+                    <div className="rounded-md p-3 border border-gray-500 flex items-center justify-center shadow hover:shadow-md transition duration-300 bg-gray-700">
+                      {pricingData?.region === 'IN' ? (
+                        <>
+                          {creditPackProducts.filter(p => p.credits_amount === 30).length > 0 ? (
+                            <>
+                              <span className="text-xs line-through text-gray-400 mr-2">
+                                ₹199
+                              </span>
+                              <span className="text-lg font-bold text-white">
+                                ₹{creditPackProducts.find(p => p.credits_amount === 30)?.price_amount || 99}
+                              </span>
+                            </>
+                          ) : pricingData?.creditPacks?.find((p: any) => p.credits === 30) ? (
+                            <>
+                              <span className="text-xs line-through text-gray-400 mr-2">
+                                ₹199
+                              </span>
+                              <span className="text-lg font-bold text-white">
+                                ₹{pricingData?.creditPacks.find((p: any) => p.credits === 30)?.price || 99}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-lg font-bold text-white">₹99</span>
+                          )}
+                          <span className="text-xs text-gray-400 ml-1">/ one-time</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-xs line-through text-gray-400 mr-2">
+                            $5.99
+                          </span>
+                          <span className="text-lg font-bold text-white">$2.99</span>
+                          <span className="text-xs text-gray-400 ml-1">/ one-time</span>
+                        </>
+                      )}
                     </div>
                   </div>
                   
