@@ -543,7 +543,7 @@ export default function GetMoreCredits() {
                         {!isAuthReady ? '...' : isCheckoutLoading(pack.product_id) ? 
                           <Loader2 className="w-4 h-4 animate-spin" /> : 
                           <>
-                            Get Started
+                            Buy 200 Credits
                             <ArrowRight className="w-4 h-4" />
                           </>
                         }
@@ -560,7 +560,7 @@ export default function GetMoreCredits() {
                         {!isAuthReady ? '...' : isCheckoutLoading(pack.productId) ? 
                           <Loader2 className="w-4 h-4 animate-spin" /> : 
                           <>
-                            Get Started
+                            Buy 200 Credits
                             <ArrowRight className="w-4 h-4" />
                           </>
                         }
