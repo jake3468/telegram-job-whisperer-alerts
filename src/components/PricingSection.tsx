@@ -156,58 +156,57 @@ const PricingSection = () => {
                     )}
                 </div>
                 
-                {/* Credit Usage Information Box */}
                 <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-600 mb-3 mt-6">
                   <div className="text-xs text-gray-300">
-                    <div className="font-semibold text-cyan-400 mb-2">With 10 credits, you could get:</div>
+                    <div className="font-semibold text-cyan-400 mb-2">With 30 credits, you could get:</div>
                     <div className="space-y-1 text-left">
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                           <Check className="w-2.5 h-2.5 text-black" />
                         </div>
-                        <span>Up to <span className="font-bold">100</span> job alerts</span>
+                        <span>Up to <span className="font-bold">300</span> job alerts</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                           <Check className="w-2.5 h-2.5 text-black" />
                         </div>
-                        <span>Up to <span className="font-bold">6</span> cover letters</span>
+                        <span>Up to <span className="font-bold">20</span> cover letters</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                           <Check className="w-2.5 h-2.5 text-black" />
                         </div>
-                        <span>Up to <span className="font-bold">3</span> resumes</span>
+                        <span>Up to <span className="font-bold">10</span> resumes</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                           <Check className="w-2.5 h-2.5 text-black" />
                         </div>
-                        <span>Up to <span className="font-bold">1</span> interview prep file</span>
+                        <span>Up to <span className="font-bold">5</span> interview prep files</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                           <Check className="w-2.5 h-2.5 text-black" />
                         </div>
-                        <span>Up to <span className="font-bold">10</span> job fit checks</span>
+                        <span>Up to <span className="font-bold">30</span> job fit checks</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                           <Check className="w-2.5 h-2.5 text-black" />
                         </div>
-                        <span>Up to <span className="font-bold">3</span> company insights</span>
+                        <span>Up to <span className="font-bold">10</span> company insights</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                           <Check className="w-2.5 h-2.5 text-black" />
                         </div>
-                        <span>Up to <span className="font-bold">5</span> visa sponsorship guides</span>
+                        <span>Up to <span className="font-bold">15</span> visa sponsorship guides</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                           <Check className="w-2.5 h-2.5 text-black" />
                         </div>
-                        <span>Up to <span className="font-bold">5</span> HR contact lists</span>
+                        <span>Up to <span className="font-bold">15</span> HR contact lists</span>
                       </div>
                     </div>
                   </div>
