@@ -41,9 +41,9 @@ const Index = () => {
     suppressExternalPostMessageErrors();
     
     // Add JSON-LD structured data for better Google crawlability
-    const structuredDataScript = document.createElement('script');
-    structuredDataScript.type = 'application/ld+json';
-    structuredDataScript.innerHTML = JSON.stringify({
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.innerHTML = JSON.stringify({
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "Aspirely.ai",
@@ -58,17 +58,10 @@ const Index = () => {
       }
     });
     
-    document.head.appendChild(structuredDataScript);
-    
-    // Add CommonNinja widget script
-    const commonNinjaScript = document.createElement('script');
-    commonNinjaScript.src = 'https://cdn.commoninja.com/sdk/latest/commonninja.js';
-    commonNinjaScript.defer = true;
-    document.head.appendChild(commonNinjaScript);
+    document.head.appendChild(script);
     
     return () => {
-      document.head.removeChild(structuredDataScript);
-      document.head.removeChild(commonNinjaScript);
+      document.head.removeChild(script);
     };
   }, []);
 
@@ -92,17 +85,6 @@ const Index = () => {
         <FAQSection />
       </div>
       <Footer />
-      
-      {/* CommonNinja Widget - Floating Bottom Right */}
-      <div 
-        className="commonninja_component pid-c9427851-f03d-4316-86f8-0c6f703560f2"
-        style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          zIndex: 1000
-        }}
-      />
     </div>
   );
 };
