@@ -193,21 +193,21 @@ const BlogPost = () => {
         </script>
       </Helmet>
       
-      <div className="pt-8 pb-16 px-4 sm:px-6 lg:px-8">
+      <div className="pt-8 pb-16 px-4 sm:px-6 lg:px-8 bg-white min-h-screen">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
-          <Link to="/blogs" className="inline-flex items-center text-sky-400 hover:text-sky-300 mb-8">
+          <Link to="/blogs" className="inline-flex items-center text-sky-600 hover:text-sky-700 mb-8 font-medium">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Blogs
           </Link>
 
           {/* Blog Header */}
           <div className="mb-8">
-            {blog.thumbnail_url && <div className="aspect-video bg-gray-800 rounded-lg overflow-hidden mb-8 w-full">
+            {blog.thumbnail_url && <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden mb-8 w-full shadow-lg">
                 <img src={blog.thumbnail_url} alt={`${blog.title} - Featured image for blog post about ${blog.tags?.join(', ') || 'career development'}`} className="w-full h-full object-cover" />
               </div>}
 
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-400 mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-600 mb-4">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
                 {formatDate(blog.published_at)}
@@ -218,29 +218,29 @@ const BlogPost = () => {
               </div>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-orbitron font-bold mb-6 bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-400 bg-clip-text text-transparent break-words">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-orbitron font-bold mb-6 bg-gradient-to-r from-sky-600 via-fuchsia-600 to-indigo-600 bg-clip-text text-transparent break-words">
               {blog.title}
             </h1>
 
             {blog.tags && blog.tags.length > 0 && <div className="flex flex-wrap gap-2 mb-6">
-                {blog.tags.map(tag => <Badge key={tag} variant="secondary" className="text-gray-300 bg-blue-950 text-xs sm:text-sm">
+                {blog.tags.map(tag => <Badge key={tag} variant="secondary" className="text-gray-700 bg-gray-100 border border-gray-200 text-xs sm:text-sm">
                     {tag}
                   </Badge>)}
               </div>}
 
             {/* Share Buttons */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8 pb-8 border-b border-gray-700">
-              <span className="text-gray-400">Share:</span>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8 pb-8 border-b border-gray-200">
+              <span className="text-gray-600 font-medium">Share:</span>
               <div className="flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" onClick={() => handleShare('twitter')} className="border-gray-600 bg-blue-500 hover:bg-blue-400 text-zinc-950 text-xs sm:text-sm">
+                <Button variant="outline" size="sm" onClick={() => handleShare('twitter')} className="border-blue-500 bg-blue-500 hover:bg-blue-600 text-white text-xs sm:text-sm">
                   <Twitter className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                   Twitter
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => handleShare('linkedin')} className="border-gray-600 bg-sky-400 hover:bg-sky-300 text-gray-950 text-xs sm:text-sm">
+                <Button variant="outline" size="sm" onClick={() => handleShare('linkedin')} className="border-sky-500 bg-sky-500 hover:bg-sky-600 text-white text-xs sm:text-sm">
                   <Linkedin className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                   LinkedIn
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => handleShare('copy')} className="border-gray-600 bg-teal-300 hover:bg-teal-200 text-zinc-950 text-xs sm:text-sm">
+                <Button variant="outline" size="sm" onClick={() => handleShare('copy')} className="border-teal-500 bg-teal-500 hover:bg-teal-600 text-white text-xs sm:text-sm">
                   <Share2 className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                   Copy Link
                 </Button>
@@ -249,15 +249,15 @@ const BlogPost = () => {
           </div>
 
           {/* Blog Content */}
-          <div className="prose prose-invert prose-sm sm:prose-base lg:prose-lg max-w-none overflow-hidden word-wrap break-words">
+          <div className="prose prose-lg max-w-none overflow-hidden word-wrap break-words">
             {blog.content ? (
               <SafeHTMLRenderer 
                 content={blog.content}
-                className="text-gray-300 leading-relaxed [&>h2]:text-xl [&>h2]:sm:text-2xl [&>h2]:lg:text-3xl [&>h2]:font-bold [&>h2]:text-white [&>h2]:mb-4 [&>h2]:mt-8 [&>p]:mb-4 [&>p]:text-base [&>p]:sm:text-lg [&_a]:!text-blue-400 [&_a]:!underline [&_a]:!decoration-blue-400 [&_a]:!underline-offset-2 [&_a]:hover:!text-blue-300 [&_a]:break-words [&_a]:cursor-pointer"
+                className="text-gray-800 leading-relaxed [&>h2]:text-xl [&>h2]:sm:text-2xl [&>h2]:lg:text-3xl [&>h2]:font-bold [&>h2]:text-gray-900 [&>h2]:mb-4 [&>h2]:mt-8 [&>p]:mb-4 [&>p]:text-base [&>p]:sm:text-lg [&>p]:text-gray-700 [&_a]:!text-blue-600 [&_a]:!underline [&_a]:!decoration-blue-600 [&_a]:!underline-offset-2 [&_a]:hover:!text-blue-700 [&_a]:break-words [&_a]:cursor-pointer"
                 maxLength={50000}
               />
             ) : (
-              <div className="text-gray-400 italic">No content available</div>
+              <div className="text-gray-500 italic">No content available</div>
             )}
           </div>
 
