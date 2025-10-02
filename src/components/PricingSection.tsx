@@ -193,8 +193,26 @@ const PricingSection = () => {
                     </div>
                   </div>
                 </div>
+                
+                {/* Small Credit Pack Option */}
+                <div className="mt-4 pt-4 border-t border-gray-600">
+                  <div className="text-xs text-gray-300 mb-2 text-center">Or buy a starter pack:</div>
+                  {creditPackProducts.filter(pack => pack.credits_amount !== 200).map(pack => 
+                    <div key={pack.product_id} className="rounded-md p-3 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-gray-700">
+                      <div className="flex flex-col">
+                        <span className="text-white font-bold text-sm">{pack.credits_amount} Credits</span>
+                        <span className="text-gray-400 text-xs">One-time purchase</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-white font-bold text-lg">
+                          {pricingData.region === 'IN' ? `₹${pack.price_amount}` : `$${pack.price_amount}`}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="mt-auto flex justify-center">
+              <div className="mt-auto flex justify-center pt-3">
                 <SignUpButton mode="modal">
                   <Button className="bg-gray-50 hover:bg-gray-100 text-gray-800 font-semibold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
                     Get Started
