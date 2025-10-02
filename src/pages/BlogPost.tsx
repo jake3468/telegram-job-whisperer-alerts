@@ -135,9 +135,7 @@ const BlogPost = () => {
             "image": blog.thumbnail_url || "https://aspirely.ai/aspirely-social-preview-updated.png",
             "author": {
               "@type": "Person",
-              "name": blog.author_name,
-              "url": "https://aspirely.ai/blogs",
-              "jobTitle": "Career Development Expert"
+              "name": blog.author_name
             },
             "publisher": {
               "@type": "Organization",
