@@ -64,48 +64,10 @@ export function useCreditWarnings() {
     });
   };
 
-  // Only show warnings on initial load, not on background updates
-  useEffect(() => {
-    if (isLoading || !credits) return;
-
-    const balance = Number(credits.current_balance);
-
-    // Show low credit warning (when < 3 but > 0) - only once per session
-    if (balance > 0 && balance < 3 && !warningState.hasShownLowCreditWarning) {
-      const resetDate = formatResetDate(credits.next_reset_date);
-      
-      toast({
-        title: "Low Credits Warning",
-        description: `You have ${balance} credits remaining. Your next 10 free credits will reset on ${resetDate}. Need more credits now? Click here to get more credits.`,
-        duration: 10000,
-        action: (
-          <ToastAction altText="Get More Credits" onClick={() => navigate('/get-more-credits')}>
-            Get More Credits
-          </ToastAction>
-        )
-      });
-      
-      updateWarningState({ hasShownLowCreditWarning: true });
-    }
-
-    // Show zero credit warning (when = 0) - only once per session
-    if (balance === 0 && !warningState.hasShownZeroCreditWarning) {
-      const resetDate = formatResetDate(credits.next_reset_date);
-      
-      toast({
-        title: "No Credits Remaining",
-        description: `You have no credits left. Features are temporarily unavailable. Your next 10 free credits will reset on ${resetDate}. Click here to get more credits now.`,
-        duration: 12000,
-        action: (
-          <ToastAction altText="Get More Credits" onClick={() => navigate('/get-more-credits')}>
-            Get More Credits
-          </ToastAction>
-        )
-      });
-      
-      updateWarningState({ hasShownZeroCreditWarning: true });
-    }
-  }, [credits, isLoading, warningState, toast, navigate]);
+  // Credit warnings disabled per user request
+  // useEffect(() => {
+  //   ... warnings logic removed ...
+  // }, [credits, isLoading, warningState, toast, navigate]);
 
   return {
     credits,

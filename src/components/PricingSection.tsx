@@ -2,7 +2,7 @@ import { SignUpButton } from '@clerk/clerk-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Globe, Loader2, ArrowRight } from 'lucide-react';
+import { Check, Globe, Loader2, ArrowRight, Crown } from 'lucide-react';
 import { useLocationPricing } from '@/hooks/useLocationPricing';
 import { usePaymentProducts } from '@/hooks/usePaymentProducts';
 const planGradientBg = {
@@ -128,73 +128,98 @@ const PricingSection = () => {
           {/* Free Plan */}
           <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-blue-400/30 min-h-[320px]`}>
             <CardHeader className="text-center pb-2 pt-4 px-3">
-              <div className="text-2xl font-extrabold text-white mb-1">Free</div>
-              <div className="text-sm font-semibold text-gray-300">10 credits/month</div>
+              <div className="text-2xl font-extrabold text-white mb-1">Trial</div>
+              <div className="text-sm font-semibold text-gray-300">✅ Perfect for trying out our platform</div>
             </CardHeader>
             <CardContent className="grow flex flex-col px-3 pb-3">
               <div className="text-center my-3 flex-grow px-4">
                 <div className="text-center mb-3">
-                  <span className="text-sm text-white">Access to all features + 2 free AI mock interviews</span>
+                  <div className="text-sm font-semibold text-gray-300">Get 30 credits instantly</div>
+                  <div className="text-xs text-gray-400 mt-1">Pay once • No expiry • No subscription</div>
                 </div>
                 
-                {/* Credit Usage Information Box */}
+                {/* Small Credit Pack Option - Only show 30 credits pack */}
+                <div className="mt-4">
+                {creditPackProducts
+                    .filter(pack => pack.credits_amount === 30)
+                    .map(pack => 
+                      <div key={pack.product_id} className="rounded-md p-3 border border-gray-500 flex items-center justify-center shadow hover:shadow-md transition duration-300 bg-gray-700">
+                        <div className="flex items-center gap-2">
+                          {pricingData.region === 'IN' ? (
+                            <>
+                              <span className="text-gray-400 text-xs line-through">₹199</span>
+                              <span className="text-white font-bold text-lg">₹99</span>
+                              <span className="text-gray-400 text-xs">/ one-time</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-gray-400 text-xs line-through">$5.99</span>
+                              <span className="text-white font-bold text-lg">$2.99</span>
+                              <span className="text-gray-400 text-xs">/ one-time</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                </div>
+                
                 <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-600 mb-3 mt-6">
                   <div className="text-xs text-gray-300">
-                    <div className="font-semibold text-cyan-400 mb-2">With 10 credits, you could get:</div>
+                    <div className="font-semibold text-cyan-400 mb-2 text-left">With 30 credits, you could get:</div>
                     <div className="space-y-1 text-left">
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                           <Check className="w-2.5 h-2.5 text-black" />
                         </div>
-                        <span>Up to <span className="font-bold">100</span> job alerts</span>
+                        <span>Up to <span className="font-bold">300</span> job alerts</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                           <Check className="w-2.5 h-2.5 text-black" />
                         </div>
-                        <span>Up to <span className="font-bold">6</span> cover letters</span>
+                        <span>Up to <span className="font-bold">20</span> cover letters</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                           <Check className="w-2.5 h-2.5 text-black" />
                         </div>
-                        <span>Up to <span className="font-bold">3</span> resumes</span>
+                        <span>Up to <span className="font-bold">10</span> resumes</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                           <Check className="w-2.5 h-2.5 text-black" />
                         </div>
-                        <span>Up to <span className="font-bold">1</span> interview prep file</span>
+                        <span>Up to <span className="font-bold">5</span> interview prep files</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                           <Check className="w-2.5 h-2.5 text-black" />
                         </div>
-                        <span>Up to <span className="font-bold">10</span> job fit checks</span>
+                        <span>Up to <span className="font-bold">30</span> job fit checks</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                           <Check className="w-2.5 h-2.5 text-black" />
                         </div>
-                        <span>Up to <span className="font-bold">3</span> company insights</span>
+                        <span>Up to <span className="font-bold">10</span> company insights</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                           <Check className="w-2.5 h-2.5 text-black" />
                         </div>
-                        <span>Up to <span className="font-bold">5</span> visa sponsorship guides</span>
+                        <span>Up to <span className="font-bold">15</span> visa sponsorship guides</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                           <Check className="w-2.5 h-2.5 text-black" />
                         </div>
-                        <span>Up to <span className="font-bold">5</span> HR contact lists</span>
+                        <span>Up to <span className="font-bold">15</span> HR contact lists</span>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="mt-auto flex justify-center">
+              <div className="mt-auto flex justify-center pt-3">
                 <SignUpButton mode="modal">
                   <Button className="bg-gray-50 hover:bg-gray-100 text-gray-800 font-semibold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
                     Get Started
@@ -206,49 +231,59 @@ const PricingSection = () => {
           </Card>
 
           {/* Credit Packs */}
-          <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-indigo-400/30 min-h-[420px]`}>
+          <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-indigo-400/30 min-h-[420px] relative`}>
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+              <Badge className="bg-cyan-400 text-gray-800 hover:bg-cyan-400 text-sm font-bold flex items-center gap-1 px-4 py-2">
+                <Crown className="w-4 h-4" />
+                Most Popular
+              </Badge>
+            </div>
             <CardHeader className="text-center pb-4 pt-6 px-4">
               <div className="text-3xl font-extrabold text-white mb-1">
                 ⚡ Power Pack
               </div>
-              <div className="inline-block px-3 py-1 bg-cyan-400 text-gray-800 text-sm font-bold rounded-full mb-2">
-                Pay-as-you-go
-              </div>
               <div className="text-sm font-semibold text-gray-300">Get 200 credits instantly</div>
               <div className="text-xs text-gray-400 mt-1">Pay once • No expiry • No subscription</div>
             </CardHeader>
-            <CardContent className="grow flex flex-col px-4 pb-4">
-              <div className="flex flex-col gap-2 my-1 flex-grow max-w-md mx-auto">
-                {/* Show only the 200 credit pack from database products */}
-                {creditPackProducts.filter(pack => pack.credits_amount === 200).map(pack => 
-                  <div key={pack.product_id} className="rounded-md p-3 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-gray-700">
+            <CardContent className="grow flex flex-col px-3 pb-3">
+              <div className="text-center px-4">
+                
+                {/* Large Credit Pack Option - Only show 200 credits pack */}
+                <div className="mt-4">
+                  <div className="rounded-md p-3 border border-gray-500 flex items-center justify-center shadow hover:shadow-md transition duration-300 bg-gray-700">
                     <div className="flex items-center gap-2">
                       {pricingData.region === 'IN' ? (
                         <>
-                          <span className="text-gray-400 text-xs line-through">₹799</span>
-                          <span className="text-white font-bold text-lg">₹399</span>
+                          {creditPackProducts.filter(p => p.credits_amount === 200).length > 0 ? (
+                            <>
+                              <span className="text-gray-400 text-xs line-through">₹799</span>
+                              <span className="text-white font-bold text-lg">₹{creditPackProducts.find(p => p.credits_amount === 200)?.price_amount || 399}</span>
+                              <span className="text-gray-400 text-xs">/ one-time</span>
+                            </>
+                          ) : pricingData?.creditPacks?.find((p: any) => p.credits === 200) ? (
+                            <>
+                              <span className="text-gray-400 text-xs line-through">₹799</span>
+                              <span className="text-white font-bold text-lg">₹{pricingData?.creditPacks.find((p: any) => p.credits === 200)?.price || 399}</span>
+                              <span className="text-gray-400 text-xs">/ one-time</span>
+                            </>
+                          ) : (
+                            <span className="text-white font-bold text-lg">₹399</span>
+                          )}
                         </>
                       ) : (
                         <>
-                          <span className="text-gray-400 text-xs line-through">$19.99</span>
-                          <span className="text-white font-bold text-lg">$9.99</span>
+                          <span className="text-gray-400 text-xs line-through">$18</span>
+                          <span className="text-white font-bold text-xl">$9</span>
+                          <span className="text-gray-400 text-xs">/ one-time</span>
                         </>
                       )}
                     </div>
-                     <div className="flex items-center gap-3">
-                     </div>
                   </div>
-                )}
-                
-                {/* Loading state */}
-                {isProductsLoading && <div className="flex items-center justify-center py-4">
-                    <Loader2 className="w-4 h-4 animate-spin text-indigo-300" />
-                    <span className="ml-2 text-indigo-200 text-xs">Loading credit packs...</span>
-                  </div>}
+                </div>
               </div>
               
               {/* Features list */}
-              <div className="flex flex-col items-center mb-3 mt-1">
+              <div className="flex flex-col items-center mb-3 mt-6">
                 {/* Credit Usage Information Box */}
                 <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-600 mb-3 w-full max-w-sm">
                   <div className="text-xs text-gray-300">
@@ -331,14 +366,12 @@ const PricingSection = () => {
               
               {/* Buy Button */}
               <div className="mt-auto flex justify-center">
-                {creditPackProducts.filter(pack => pack.credits_amount === 200).map(pack => (
-                  <SignUpButton key={pack.product_id} mode="modal">
-                    <Button className="bg-gray-50 hover:bg-gray-100 text-gray-800 font-semibold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
-                      Buy {pack.credits_amount} Credits - {pricingData.currencySymbol}{pack.price_amount}
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  </SignUpButton>
-                ))}
+                <SignUpButton mode="modal">
+                  <Button className="bg-gray-50 hover:bg-gray-100 text-gray-800 font-semibold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
+                    Get Started
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </SignUpButton>
               </div>
             </CardContent>
           </Card>

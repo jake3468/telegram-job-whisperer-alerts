@@ -23,31 +23,15 @@ const CreditBalanceDisplay = () => {
   const balance = credits ? Math.max(Number(credits.current_balance) || 0, 0) : 0;
   const isLowCredits = balance < 5;
 
-  // Track low credits warning when balance is low
-  useEffect(() => {
-    if (balance > 0 && isLowCredits) {
-      Analytics.trackCreditsDepletedOrLow(balance);
-    }
-  }, [balance, isLowCredits]);
 
   return (
     <div className={`text-sm font-orbitron transition-colors font-semibold ${
       isLowCredits ? 'text-red-600' : 'text-gray-900'
     }`}>
       {state === 'expanded' ? (
-        <div className="flex flex-col gap-1">
-          <span>Credits: {balance}</span>
-          {isLowCredits && (
-            <span className="text-xs text-red-500 font-medium">
-              Low credits - consider upgrading
-            </span>
-          )}
-        </div>
+        <span>Credits: {balance}</span>
       ) : (
-        <span className="text-xs">
-          {balance}
-          {isLowCredits && '⚠️'}
-        </span>
+        <span className="text-xs">{balance}</span>
       )}
     </div>
   );
