@@ -226,11 +226,13 @@ const PricingSection = () => {
           {/* Credit Packs */}
           <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-indigo-400/30 min-h-[420px]`}>
             <CardHeader className="text-center pb-4 pt-6 px-4">
+              <div className="flex justify-center mb-3">
+                <Badge className="bg-cyan-400 text-gray-800 hover:bg-cyan-400 text-sm font-bold">
+                  Most Popular
+                </Badge>
+              </div>
               <div className="text-3xl font-extrabold text-white mb-1">
                 ⚡ Power Pack
-              </div>
-              <div className="inline-block px-3 py-1 bg-cyan-400 text-gray-800 text-sm font-bold rounded-full mb-2">
-                Pay-as-you-go
               </div>
               <div className="text-sm font-semibold text-gray-300">Get 200 credits instantly</div>
               <div className="text-xs text-gray-400 mt-1">Pay once • No expiry • No subscription</div>
