@@ -140,18 +140,24 @@ const PricingSection = () => {
                 
                 {/* Small Credit Pack Option - Only show 30 credits pack */}
                 <div className="mt-4">
-                  {creditPackProducts
+                {creditPackProducts
                     .filter(pack => pack.credits_amount === 30)
                     .map(pack => 
                       <div key={pack.product_id} className="rounded-md p-3 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-gray-700 max-w-xs mx-auto">
-                        <div className="flex flex-col">
-                          <span className="text-white font-bold text-sm">{pack.credits_amount} Credits</span>
-                          <span className="text-gray-400 text-xs">One-time purchase</span>
-                        </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-white font-bold text-lg">
-                            {pricingData.region === 'IN' ? `₹${pack.price_amount}` : `$${pack.price_amount}`}
-                          </span>
+                          {pricingData.region === 'IN' ? (
+                            <>
+                              <span className="text-gray-400 text-xs line-through">₹199</span>
+                              <span className="text-white font-bold text-lg">₹99</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-gray-400 text-xs line-through">$5.99</span>
+                              <span className="text-white font-bold text-lg">$2.99</span>
+                            </>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3">
                         </div>
                       </div>
                     )}
