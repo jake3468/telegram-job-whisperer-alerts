@@ -260,7 +260,7 @@ export default function GetMoreCredits() {
             <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-blue-400/30 min-h-[320px]`}>
               <CardHeader className="text-center pb-2 pt-4 px-3">
                 <div className="text-2xl font-extrabold text-white mb-1">Trial</div>
-                <div className="text-sm font-semibold text-gray-300">Perfect for trying out our platform</div>
+                <div className="text-sm font-semibold text-gray-300">✅ Perfect for trying out our platform</div>
               </CardHeader>
               <CardContent className="grow flex flex-col px-3 pb-3">
                 <div className="text-center my-3 flex-grow px-4">
