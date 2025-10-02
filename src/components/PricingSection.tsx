@@ -360,14 +360,12 @@ const PricingSection = () => {
               
               {/* Buy Button */}
               <div className="mt-auto flex justify-center">
-                {creditPackProducts.filter(pack => pack.credits_amount === 200).map(pack => (
-                  <SignUpButton key={pack.product_id} mode="modal">
-                    <Button className="bg-gray-50 hover:bg-gray-100 text-gray-800 font-semibold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
-                      Buy {pack.credits_amount} Credits - {pricingData.currencySymbol}{pack.price_amount}
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  </SignUpButton>
-                ))}
+                <SignUpButton mode="modal">
+                  <Button className="bg-gray-50 hover:bg-gray-100 text-gray-800 font-semibold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
+                    Get Started
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </SignUpButton>
               </div>
             </CardContent>
           </Card>
