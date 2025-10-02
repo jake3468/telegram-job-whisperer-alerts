@@ -277,7 +277,7 @@ const PricingSection = () => {
               </div>
               
               {/* Features list */}
-              <div className="flex flex-col items-center mb-3 mt-1">
+              <div className="flex flex-col items-center mb-3 mt-6">
                 {/* Credit Usage Information Box */}
                 <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-600 mb-3 w-full max-w-sm">
                   <div className="text-xs text-gray-300">
