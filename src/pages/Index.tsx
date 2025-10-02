@@ -41,9 +41,9 @@ const Index = () => {
     suppressExternalPostMessageErrors();
     
     // Add JSON-LD structured data for better Google crawlability
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.innerHTML = JSON.stringify({
+    const structuredDataScript = document.createElement('script');
+    structuredDataScript.type = 'application/ld+json';
+    structuredDataScript.innerHTML = JSON.stringify({
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "Aspirely.ai",
@@ -58,10 +58,19 @@ const Index = () => {
       }
     });
     
-    document.head.appendChild(script);
+    document.head.appendChild(structuredDataScript);
+    
+    // Add CommonNinja widget script
+    const commonNinjaScript = document.createElement('script');
+    commonNinjaScript.src = 'https://cdn.commoninja.com/sdk/latest/commonninja.js';
+    commonNinjaScript.defer = true;
+    document.head.appendChild(commonNinjaScript);
     
     return () => {
-      document.head.removeChild(script);
+      document.head.removeChild(structuredDataScript);
+      if (commonNinjaScript.parentNode) {
+        document.head.removeChild(commonNinjaScript);
+      }
     };
   }, []);
 
@@ -74,6 +83,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background font-inter text-foreground">
       <AuthHeader />
+      <div className="w-full flex justify-center pt-20">
+        <div className="commonninja_component pid-c9427851-f03d-4316-86f8-0c6f703560f2" style={{ maxWidth: '200px', transform: 'scale(0.9)' }}></div>
+      </div>
       <HeroSection />
       <AboutUsSection />
       <ToolsSection />
