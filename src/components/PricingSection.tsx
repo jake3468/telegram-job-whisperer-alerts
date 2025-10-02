@@ -137,6 +137,26 @@ const PricingSection = () => {
                   <span className="text-sm text-white">Access to all features + 2 free AI mock interviews</span>
                 </div>
                 
+                {/* Small Credit Pack Option - Only show 30 credits pack */}
+                <div className="mt-4">
+                  <div className="text-xs text-gray-300 mb-2 text-center">Or buy a starter pack:</div>
+                  {creditPackProducts
+                    .filter(pack => pack.credits_amount === 30)
+                    .map(pack => 
+                      <div key={pack.product_id} className="rounded-md p-3 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-gray-700">
+                        <div className="flex flex-col">
+                          <span className="text-white font-bold text-sm">{pack.credits_amount} Credits</span>
+                          <span className="text-gray-400 text-xs">One-time purchase</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-white font-bold text-lg">
+                            {pricingData.region === 'IN' ? `₹${pack.price_amount}` : `$${pack.price_amount}`}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                </div>
+                
                 {/* Credit Usage Information Box */}
                 <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-600 mb-3 mt-6">
                   <div className="text-xs text-gray-300">
@@ -192,24 +212,6 @@ const PricingSection = () => {
                       </div>
                     </div>
                   </div>
-                </div>
-                
-                {/* Small Credit Pack Option */}
-                <div className="mt-4 pt-4 border-t border-gray-600">
-                  <div className="text-xs text-gray-300 mb-2 text-center">Or buy a starter pack:</div>
-                  {creditPackProducts.filter(pack => pack.credits_amount !== 200).map(pack => 
-                    <div key={pack.product_id} className="rounded-md p-3 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-gray-700">
-                      <div className="flex flex-col">
-                        <span className="text-white font-bold text-sm">{pack.credits_amount} Credits</span>
-                        <span className="text-gray-400 text-xs">One-time purchase</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-white font-bold text-lg">
-                          {pricingData.region === 'IN' ? `₹${pack.price_amount}` : `$${pack.price_amount}`}
-                        </span>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
               <div className="mt-auto flex justify-center pt-3">
