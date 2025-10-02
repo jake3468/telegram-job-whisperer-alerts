@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Search, Calendar, User, ArrowLeft } from 'lucide-react';
-import { getAllBlogs, getFeaturedBlogs } from '@/data/blogData';
+import { getAllBlogs } from '@/data/blogData';
 import Footer from '@/components/Footer';
 interface Blog {
   id: string;
@@ -23,7 +23,6 @@ const Blogs = () => {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   
   const blogs = getAllBlogs();
-  const featuredBlogs = getFeaturedBlogs();
   const filteredBlogs = blogs.filter(blog => {
     const matchesSearch = blog.title.toLowerCase().includes(searchTerm.toLowerCase()) || blog.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesTag = !selectedTag || blog.tags?.includes(selectedTag);
@@ -168,18 +167,20 @@ const Blogs = () => {
         </div>
       </div>
 
-      {/* Featured Blogs */}
-      {featuredBlogs.length > 0 && <div className="px-4 mb-16">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-orbitron font-bold mb-8 text-center text-gray-900 dark:text-white">Featured Posts</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredBlogs.map(blog => <Card key={blog.id} className="bg-card border-border hover:border-cyan-500/50 dark:hover:border-cyan-400/50 transition-colors">
+      {/* Blog Posts */}
+      <div className="px-4 pb-16">
+        <div className="max-w-6xl mx-auto">
+          
+          {filteredBlogs.length === 0 ? <div className="text-center py-12">
+              <p className="text-xl text-gray-600 dark:text-gray-400">No blogs found matching your criteria.</p>
+            </div> : <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredBlogs.map(blog => <Card key={blog.id} className="bg-card border-border hover:border-cyan-500/50 dark:hover:border-cyan-400/50 transition-colors">
                   <Link to={`/blog/${blog.slug}`} onClick={() => window.scrollTo(0, 0)}>
-                    {blog.thumbnail_url && <div className="aspect-video bg-gray-800 rounded-t-lg overflow-hidden">
+                    {blog.thumbnail_url && <div className="aspect-video bg-muted rounded-t-lg overflow-hidden">
                         <img src={blog.thumbnail_url} alt={`${blog.title} - ${blog.excerpt?.substring(0, 100) || 'Blog post cover image'}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
                       </div>}
                     <CardHeader>
-                      <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                         <Calendar className="w-4 h-4" />
                         {formatDate(blog.published_at)}
                         <User className="w-4 h-4 ml-2" />
@@ -192,45 +193,7 @@ const Blogs = () => {
                     <CardContent>
                       <p className="text-gray-700 dark:text-gray-300 mb-4">{blog.excerpt}</p>
                       {blog.tags && blog.tags.length > 0 && <div className="flex flex-wrap gap-2">
-                          {blog.tags.map(tag => <Badge key={tag} variant="secondary" className="bg-gray-800 text-gray-300">
-                              {tag}
-                            </Badge>)}
-                        </div>}
-                    </CardContent>
-                  </Link>
-                </Card>)}
-            </div>
-          </div>
-        </div>}
-
-      {/* All Blogs */}
-      <div className="px-4 pb-16">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-orbitron font-bold mb-8 text-center text-gray-900 dark:text-white">All Posts</h2>
-          
-          {filteredBlogs.length === 0 ? <div className="text-center py-12">
-              <p className="text-xl text-gray-400">No blogs found matching your criteria.</p>
-            </div> : <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredBlogs.map(blog => <Card key={blog.id} className="bg-gray-900 border-gray-700 hover:border-sky-500 transition-colors">
-                  <Link to={`/blog/${blog.slug}`} onClick={() => window.scrollTo(0, 0)}>
-                    {blog.thumbnail_url && <div className="aspect-video bg-gray-800 rounded-t-lg overflow-hidden">
-                        <img src={blog.thumbnail_url} alt={`${blog.title} - ${blog.excerpt?.substring(0, 100) || 'Blog post cover image'}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
-                      </div>}
-                    <CardHeader>
-                      <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-                        <Calendar className="w-4 h-4" />
-                        {formatDate(blog.published_at)}
-                        <User className="w-4 h-4 ml-2" />
-                        {blog.author_name}
-                      </div>
-                      <h3 className="text-xl font-semibold text-white hover:text-sky-400 transition-colors">
-                        {blog.title}
-                      </h3>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-gray-300 mb-4">{blog.excerpt}</p>
-                      {blog.tags && blog.tags.length > 0 && <div className="flex flex-wrap gap-2">
-                          {blog.tags.map(tag => <Badge key={tag} variant="secondary" className="bg-gray-800 text-gray-300">
+                          {blog.tags.map(tag => <Badge key={tag} variant="secondary" className="text-muted-foreground">
                               {tag}
                             </Badge>)}
                         </div>}
