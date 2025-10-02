@@ -31,9 +31,9 @@ Disallow: /ai-mock-interview
 Disallow: /ai-agents
 Disallow: /job-board
 
-# Sitemaps for search engines
+# Sitemap for search engines
+# Contains high-quality, comprehensive career development content
 Sitemap: https://aspirely.ai/sitemap.xml
-Sitemap: https://aspirely.ai/functions/v1/dynamic-sitemap
 
 # Google-specific optimization
 User-agent: Googlebot

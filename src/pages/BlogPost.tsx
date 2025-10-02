@@ -1,14 +1,12 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { ArrowLeft, Calendar, User, Share2, Twitter, Linkedin } from 'lucide-react';
-
+import { ArrowLeft, Calendar, User, Share2, Twitter, Linkedin, Clock } from 'lucide-react';
+import { blogData } from '@/data/blogData';
 import Footer from '@/components/Footer';
 import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
+
 interface Blog {
   id: string;
   title: string;
@@ -22,61 +20,28 @@ interface Blog {
   meta_title: string | null;
   meta_description: string | null;
 }
+
 const BlogPost = () => {
-  const {
-    slug
-  } = useParams<{
-    slug: string;
-  }>();
-  const [blog, setBlog] = useState<Blog | null>(null);
-  const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
-  useEffect(() => {
-    if (slug) {
-      fetchBlog();
-    }
-  }, [slug]);
-  useEffect(() => {
-    if (blog) {
-      // Fetch related blogs
-      fetchRelatedBlogs();
-    }
-  }, [blog]);
-  const fetchBlog = async () => {
-    try {
-      const {
-        data,
-        error
-      } = await supabase.from('blogs').select('*').eq('slug', slug).eq('published', true).single();
-      if (error) {
-        console.error('Error fetching blog:', error);
-        setNotFound(true);
-      } else {
-        console.log('Blog data fetched:', data);
-        console.log('Blog content length:', data.content?.length);
-        setBlog(data);
-      }
-    } catch (error) {
-      console.error('Error fetching blog:', error);
-      setNotFound(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-  const fetchRelatedBlogs = async () => {
-    if (!blog) return;
-    try {
-      const {
-        data
-      } = await supabase.from('blogs').select('*').eq('published', true).neq('id', blog.id).order('published_at', {
-        ascending: false
-      }).limit(3);
-      if (data) setRelatedBlogs(data);
-    } catch (error) {
-      console.error('Error fetching related blogs:', error);
-    }
-  };
+  const { slug } = useParams<{ slug: string }>();
+
+  // Get the blog based on the slug
+  const blog = slug ? blogData[slug] : undefined;
+
+  // 404 handling
+  if (!blog) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
+        <div className="text-center">
+          <h1 className="text-4xl font-orbitron font-bold mb-4">Blog Post Not Found</h1>
+          <p className="text-gray-400 mb-8">The blog post you're looking for doesn't exist.</p>
+          <Link to="/blogs" className="inline-flex items-center text-sky-400 hover:text-sky-300">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Blogs
+          </Link>
+        </div>
+      </div>
+    );
+  }
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -84,6 +49,29 @@ const BlogPost = () => {
       day: 'numeric'
     });
   };
+
+  // Calculate reading time (average 200 words per minute)
+  const calculateReadingTime = (content: string): number => {
+    const wordCount = content.replace(/<[^>]*>/g, '').split(/\s+/).length;
+    return Math.ceil(wordCount / 200);
+  };
+
+  // Determine article section based on tags
+  const getArticleSection = (tags: string[]): string => {
+    if (tags.some(tag => tag.toLowerCase().includes('visa') || tag.toLowerCase().includes('immigration'))) {
+      return 'Immigration & Visa';
+    }
+    if (tags.some(tag => tag.toLowerCase().includes('skills') || tag.toLowerCase().includes('career'))) {
+      return 'Career Development';
+    }
+    if (tags.some(tag => tag.toLowerCase().includes('ai') || tag.toLowerCase().includes('technology'))) {
+      return 'Job Search Technology';
+    }
+    return 'Career Advice';
+  };
+
+  const readingTime = blog ? calculateReadingTime(blog.content) : 0;
+  const articleSection = blog ? getArticleSection(blog.tags || []) : 'Career Advice';
   const shareUrl = window.location.href;
   const shareText = blog?.title || '';
   const handleShare = (platform: string) => {
@@ -102,30 +90,6 @@ const BlogPost = () => {
     }
     window.open(url, '_blank');
   };
-  if (loading) {
-    return <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-xl">Loading blog post...</div>
-      </div>;
-  }
-  if (notFound || !blog) {
-    return <div className="min-h-screen bg-black text-white">
-        <div className="pt-8 pb-16 px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl font-orbitron font-bold mb-6">Blog Post Not Found</h1>
-            <p className="text-xl text-gray-300 mb-8">
-              The blog post you're looking for doesn't exist or has been removed.
-            </p>
-            <Link to="/blogs">
-              <Button className="bg-sky-600 hover:bg-sky-700">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Blogs
-              </Button>
-            </Link>
-          </div>
-        </div>
-        <Footer />
-      </div>;
-  }
   return <div className="min-h-screen bg-black text-white">
       <Helmet>
         <title>{blog.meta_title || blog.title}</title>
@@ -156,8 +120,12 @@ const BlogPost = () => {
          <meta name="twitter:title" content={blog.meta_title || blog.title} />
          <meta name="twitter:description" content={blog.meta_description || blog.excerpt} />
          <meta name="twitter:image" content={blog.thumbnail_url || "https://aspirely.ai/aspirely-social-preview-updated.png"} />
+         <meta name="twitter:label1" content="Reading time" />
+         <meta name="twitter:data1" content={`${readingTime} min read`} />
+         <meta name="twitter:label2" content="Written by" />
+         <meta name="twitter:data2" content={blog.author_name} />
         
-        {/* JSON-LD Structured Data */}
+         {/* JSON-LD Structured Data - BlogPosting */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
@@ -179,38 +147,73 @@ const BlogPost = () => {
               }
             },
             "datePublished": blog.published_at,
-             "dateModified": blog.published_at,
-             "mainEntityOfPage": {
-               "@type": "WebPage",
-               "@id": `https://aspirely.ai/blog/${blog.slug}`
-             },
-             "keywords": blog.tags?.join(", ") || "",
-             "url": `https://aspirely.ai/blog/${blog.slug}`,
-             "isPartOf": {
-               "@type": "Blog",
-               "@id": "https://aspirely.ai/blogs"
-             },
-             "wordCount": blog.content?.replace(/<[^>]*>/g, '').split(' ').length || 0,
-             "articleBody": blog.content?.replace(/<[^>]*>/g, '').substring(0, 500) || blog.excerpt
+            "dateModified": blog.published_at,
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": `https://aspirely.ai/blog/${blog.slug}`
+            },
+            "keywords": blog.tags?.join(", ") || "",
+            "url": `https://aspirely.ai/blog/${blog.slug}`,
+            "isPartOf": {
+              "@type": "Blog",
+              "@id": "https://aspirely.ai/blogs",
+              "name": "Aspirely AI Career Blog"
+            },
+            "articleSection": articleSection,
+            "wordCount": blog.content?.replace(/<[^>]*>/g, '').split(/\s+/).length || 0,
+            "timeRequired": `PT${readingTime}M`,
+            "articleBody": blog.content?.replace(/<[^>]*>/g, '').substring(0, 500) || blog.excerpt,
+            "about": {
+              "@type": "Thing",
+              "name": articleSection
+            }
+          })}
+        </script>
+
+        {/* JSON-LD Structured Data - Breadcrumb */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://aspirely.ai"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Blog",
+                "item": "https://aspirely.ai/blogs"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": blog.title,
+                "item": `https://aspirely.ai/blog/${blog.slug}`
+              }
+            ]
           })}
         </script>
       </Helmet>
       
-      <div className="pt-8 pb-16 px-4 sm:px-6 lg:px-8">
+      <div className="pt-8 pb-16 px-4 sm:px-6 lg:px-8 bg-white min-h-screen">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
-          <Link to="/blogs" className="inline-flex items-center text-sky-400 hover:text-sky-300 mb-8">
+          <Link to="/blogs" className="inline-flex items-center text-sky-600 hover:text-sky-700 mb-8 font-medium">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Blogs
           </Link>
 
           {/* Blog Header */}
           <div className="mb-8">
-            {blog.thumbnail_url && <div className="aspect-video bg-gray-800 rounded-lg overflow-hidden mb-8 w-full">
+            {blog.thumbnail_url && <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden mb-8 w-full shadow-lg">
                 <img src={blog.thumbnail_url} alt={`${blog.title} - Featured image for blog post about ${blog.tags?.join(', ') || 'career development'}`} className="w-full h-full object-cover" />
               </div>}
 
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-400 mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-600 mb-4">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
                 {formatDate(blog.published_at)}
@@ -219,31 +222,29 @@ const BlogPost = () => {
                 <User className="w-4 h-4" />
                 {blog.author_name}
               </div>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                {readingTime} min read
+              </div>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-orbitron font-bold mb-6 bg-gradient-to-r from-sky-400 via-fuchsia-400 to-indigo-400 bg-clip-text text-transparent break-words">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-orbitron font-bold mb-6 bg-gradient-to-r from-sky-600 via-fuchsia-600 to-indigo-600 bg-clip-text text-transparent break-words">
               {blog.title}
             </h1>
 
-            {blog.tags && blog.tags.length > 0 && <div className="flex flex-wrap gap-2 mb-6">
-                {blog.tags.map(tag => <Badge key={tag} variant="secondary" className="text-gray-300 bg-blue-950 text-xs sm:text-sm">
-                    {tag}
-                  </Badge>)}
-              </div>}
-
             {/* Share Buttons */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8 pb-8 border-b border-gray-700">
-              <span className="text-gray-400">Share:</span>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8 pb-8 border-b border-gray-200">
+              <span className="text-gray-600 font-medium">Share:</span>
               <div className="flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" onClick={() => handleShare('twitter')} className="border-gray-600 bg-blue-500 hover:bg-blue-400 text-zinc-950 text-xs sm:text-sm">
+                <Button variant="outline" size="sm" onClick={() => handleShare('twitter')} className="border-blue-500 bg-blue-500 hover:bg-blue-600 text-white text-xs sm:text-sm">
                   <Twitter className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                   Twitter
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => handleShare('linkedin')} className="border-gray-600 bg-sky-400 hover:bg-sky-300 text-gray-950 text-xs sm:text-sm">
+                <Button variant="outline" size="sm" onClick={() => handleShare('linkedin')} className="border-sky-500 bg-sky-500 hover:bg-sky-600 text-white text-xs sm:text-sm">
                   <Linkedin className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                   LinkedIn
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => handleShare('copy')} className="border-gray-600 bg-teal-300 hover:bg-teal-200 text-zinc-950 text-xs sm:text-sm">
+                <Button variant="outline" size="sm" onClick={() => handleShare('copy')} className="border-teal-500 bg-teal-500 hover:bg-teal-600 text-white text-xs sm:text-sm">
                   <Share2 className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                   Copy Link
                 </Button>
@@ -252,43 +253,18 @@ const BlogPost = () => {
           </div>
 
           {/* Blog Content */}
-          <div className="prose prose-invert prose-sm sm:prose-base lg:prose-lg max-w-none overflow-hidden word-wrap break-words">
+          <div className="prose prose-lg max-w-none overflow-hidden word-wrap break-words">
             {blog.content ? (
               <SafeHTMLRenderer 
                 content={blog.content}
-                className="text-gray-300 leading-relaxed [&>h2]:text-xl [&>h2]:sm:text-2xl [&>h2]:lg:text-3xl [&>h2]:font-bold [&>h2]:text-white [&>h2]:mb-4 [&>h2]:mt-8 [&>p]:mb-4 [&>p]:text-base [&>p]:sm:text-lg [&_a]:!text-blue-400 [&_a]:!underline [&_a]:!decoration-blue-400 [&_a]:!underline-offset-2 [&_a]:hover:!text-blue-300 [&_a]:break-words [&_a]:cursor-pointer"
+                className="text-gray-800 leading-relaxed [&>h2]:text-xl [&>h2]:sm:text-2xl [&>h2]:lg:text-3xl [&>h2]:font-bold [&>h2]:text-gray-900 [&>h2]:mb-4 [&>h2]:mt-8 [&>p]:mb-4 [&>p]:text-base [&>p]:sm:text-lg [&>p]:text-gray-700 [&_a]:!text-blue-600 [&_a]:!underline [&_a]:!decoration-blue-600 [&_a]:!underline-offset-2 [&_a]:hover:!text-blue-700 [&_a]:break-words [&_a]:cursor-pointer"
                 maxLength={50000}
               />
             ) : (
-              <div className="text-gray-400 italic">No content available</div>
+              <div className="text-gray-500 italic">No content available</div>
             )}
           </div>
 
-          {/* Related Blogs */}
-          {relatedBlogs.length > 0 && <div className="mt-16 pt-16 border-t border-gray-700">
-              <h2 className="text-3xl font-orbitron font-bold mb-8 text-center">Related Posts</h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {relatedBlogs.map(relatedBlog => <Card key={relatedBlog.id} className="bg-gray-900 border-gray-700 hover:border-sky-500 transition-colors">
-                    <Link to={`/blog/${relatedBlog.slug}`} onClick={() => window.scrollTo(0, 0)}>
-                      {relatedBlog.thumbnail_url && <div className="aspect-video bg-gray-800 rounded-t-lg overflow-hidden">
-                          <img src={relatedBlog.thumbnail_url} alt={`${relatedBlog.title} - Related blog post cover image`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
-                        </div>}
-                      <CardHeader>
-                        <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-                          <Calendar className="w-4 h-4" />
-                          {formatDate(relatedBlog.published_at)}
-                        </div>
-                        <h3 className="text-lg font-semibold text-white hover:text-sky-400 transition-colors">
-                          {relatedBlog.title}
-                        </h3>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-gray-300">{relatedBlog.excerpt}</p>
-                      </CardContent>
-                    </Link>
-                  </Card>)}
-              </div>
-            </div>}
         </div>
       </div>
 

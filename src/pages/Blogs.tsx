@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Search, Calendar, User, ArrowLeft } from 'lucide-react';
-
+import { getAllBlogs } from '@/data/blogData';
 import Footer from '@/components/Footer';
 interface Blog {
   id: string;
@@ -20,37 +20,20 @@ interface Blog {
   featured: boolean;
 }
 const Blogs = () => {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [featuredBlogs, setFeaturedBlogs] = useState<Blog[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    fetchBlogs();
-  }, []);
-  const fetchBlogs = async () => {
-    try {
-      // Fetch featured blogs
-      const {
-        data: featured
-      } = await supabase.from('blogs').select('*').eq('published', true).eq('featured', true).order('published_at', {
-        ascending: false
-      }).limit(3);
+  
+  const blogs = getAllBlogs();
 
-      // Fetch all published blogs
-      const {
-        data: allBlogs
-      } = await supabase.from('blogs').select('*').eq('published', true).order('published_at', {
-        ascending: false
-      });
-      if (featured) setFeaturedBlogs(featured);
-      if (allBlogs) setBlogs(allBlogs);
-    } catch (error) {
-      console.error('Error fetching blogs:', error);
-    } finally {
+  useEffect(() => {
+    // Simulate initial loading for smooth UX
+    const timer = setTimeout(() => {
       setLoading(false);
-    }
-  };
+    }, 800);
+    
+    return () => clearTimeout(timer);
+  }, []);
   const filteredBlogs = blogs.filter(blog => {
     const matchesSearch = blog.title.toLowerCase().includes(searchTerm.toLowerCase()) || blog.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesTag = !selectedTag || blog.tags?.includes(selectedTag);
@@ -64,11 +47,7 @@ const Blogs = () => {
       day: 'numeric'
     });
   };
-  if (loading) {
-    return <div className="min-h-screen bg-background text-foreground">
-        <div className="text-xl">Loading blogs...</div>
-      </div>;
-  }
+  
   return <div className="min-h-screen bg-background text-foreground">
       <Helmet>
         <title>Career Insights & Job Search Tips - Aspirely AI Blog</title>
@@ -199,18 +178,50 @@ const Blogs = () => {
         </div>
       </div>
 
-      {/* Featured Blogs */}
-      {featuredBlogs.length > 0 && <div className="px-4 mb-16">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-orbitron font-bold mb-8 text-center text-gray-900 dark:text-white">Featured Posts</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredBlogs.map(blog => <Card key={blog.id} className="bg-card border-border hover:border-cyan-500/50 dark:hover:border-cyan-400/50 transition-colors">
+      {/* Blog Posts */}
+      <div className="px-4 pb-16">
+        <div className="max-w-6xl mx-auto">
+          
+          {loading ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in">
+              {[1, 2, 3, 4].map((i) => (
+                <Card key={i} className="bg-card border-border overflow-hidden">
+                  <Skeleton className="aspect-video w-full" />
+                  <CardHeader className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-4 w-4 rounded-full" />
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-4 w-4 rounded-full ml-2" />
+                      <Skeleton className="h-4 w-16" />
+                    </div>
+                    <Skeleton className="h-6 w-full" />
+                    <Skeleton className="h-6 w-4/5" />
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Skeleton className="h-6 w-20 rounded-full" />
+                      <Skeleton className="h-6 w-24 rounded-full" />
+                      <Skeleton className="h-6 w-16 rounded-full" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : filteredBlogs.length === 0 ? <div className="text-center py-12">
+              <p className="text-xl text-gray-600 dark:text-gray-400">No blogs found matching your criteria.</p>
+            </div> : <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in">
+              {filteredBlogs.map(blog => <Card key={blog.id} className="bg-card border-border hover:border-cyan-500/50 dark:hover:border-cyan-400/50 transition-colors">
                   <Link to={`/blog/${blog.slug}`} onClick={() => window.scrollTo(0, 0)}>
-                    {blog.thumbnail_url && <div className="aspect-video bg-gray-800 rounded-t-lg overflow-hidden">
+                    {blog.thumbnail_url && <div className="aspect-video bg-muted rounded-t-lg overflow-hidden">
                         <img src={blog.thumbnail_url} alt={`${blog.title} - ${blog.excerpt?.substring(0, 100) || 'Blog post cover image'}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
                       </div>}
                     <CardHeader>
-                      <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                         <Calendar className="w-4 h-4" />
                         {formatDate(blog.published_at)}
                         <User className="w-4 h-4 ml-2" />
@@ -223,45 +234,7 @@ const Blogs = () => {
                     <CardContent>
                       <p className="text-gray-700 dark:text-gray-300 mb-4">{blog.excerpt}</p>
                       {blog.tags && blog.tags.length > 0 && <div className="flex flex-wrap gap-2">
-                          {blog.tags.map(tag => <Badge key={tag} variant="secondary" className="bg-gray-800 text-gray-300">
-                              {tag}
-                            </Badge>)}
-                        </div>}
-                    </CardContent>
-                  </Link>
-                </Card>)}
-            </div>
-          </div>
-        </div>}
-
-      {/* All Blogs */}
-      <div className="px-4 pb-16">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-orbitron font-bold mb-8 text-center text-gray-900 dark:text-white">All Posts</h2>
-          
-          {filteredBlogs.length === 0 ? <div className="text-center py-12">
-              <p className="text-xl text-gray-400">No blogs found matching your criteria.</p>
-            </div> : <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredBlogs.map(blog => <Card key={blog.id} className="bg-gray-900 border-gray-700 hover:border-sky-500 transition-colors">
-                  <Link to={`/blog/${blog.slug}`} onClick={() => window.scrollTo(0, 0)}>
-                    {blog.thumbnail_url && <div className="aspect-video bg-gray-800 rounded-t-lg overflow-hidden">
-                        <img src={blog.thumbnail_url} alt={`${blog.title} - ${blog.excerpt?.substring(0, 100) || 'Blog post cover image'}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
-                      </div>}
-                    <CardHeader>
-                      <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-                        <Calendar className="w-4 h-4" />
-                        {formatDate(blog.published_at)}
-                        <User className="w-4 h-4 ml-2" />
-                        {blog.author_name}
-                      </div>
-                      <h3 className="text-xl font-semibold text-white hover:text-sky-400 transition-colors">
-                        {blog.title}
-                      </h3>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-gray-300 mb-4">{blog.excerpt}</p>
-                      {blog.tags && blog.tags.length > 0 && <div className="flex flex-wrap gap-2">
-                          {blog.tags.map(tag => <Badge key={tag} variant="secondary" className="bg-gray-800 text-gray-300">
+                          {blog.tags.map(tag => <Badge key={tag} variant="secondary" className="text-muted-foreground">
                               {tag}
                             </Badge>)}
                         </div>}
