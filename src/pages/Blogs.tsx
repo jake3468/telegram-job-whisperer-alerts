@@ -1,12 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Search, Calendar, User, ArrowLeft } from 'lucide-react';
-
+import { getAllBlogs, getFeaturedBlogs } from '@/data/blogData';
 import Footer from '@/components/Footer';
 interface Blog {
   id: string;
@@ -20,37 +19,11 @@ interface Blog {
   featured: boolean;
 }
 const Blogs = () => {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [featuredBlogs, setFeaturedBlogs] = useState<Blog[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    fetchBlogs();
-  }, []);
-  const fetchBlogs = async () => {
-    try {
-      // Fetch featured blogs
-      const {
-        data: featured
-      } = await supabase.from('blogs').select('*').eq('published', true).eq('featured', true).order('published_at', {
-        ascending: false
-      }).limit(3);
-
-      // Fetch all published blogs
-      const {
-        data: allBlogs
-      } = await supabase.from('blogs').select('*').eq('published', true).order('published_at', {
-        ascending: false
-      });
-      if (featured) setFeaturedBlogs(featured);
-      if (allBlogs) setBlogs(allBlogs);
-    } catch (error) {
-      console.error('Error fetching blogs:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  
+  const blogs = getAllBlogs();
+  const featuredBlogs = getFeaturedBlogs();
   const filteredBlogs = blogs.filter(blog => {
     const matchesSearch = blog.title.toLowerCase().includes(searchTerm.toLowerCase()) || blog.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesTag = !selectedTag || blog.tags?.includes(selectedTag);
@@ -64,11 +37,7 @@ const Blogs = () => {
       day: 'numeric'
     });
   };
-  if (loading) {
-    return <div className="min-h-screen bg-background text-foreground">
-        <div className="text-xl">Loading blogs...</div>
-      </div>;
-  }
+  
   return <div className="min-h-screen bg-background text-foreground">
       <Helmet>
         <title>Career Insights & Job Search Tips - Aspirely AI Blog</title>
