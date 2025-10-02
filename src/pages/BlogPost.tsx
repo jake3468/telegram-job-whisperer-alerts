@@ -232,12 +232,6 @@ const BlogPost = () => {
               {blog.title}
             </h1>
 
-            {blog.tags && blog.tags.length > 0 && <div className="flex flex-wrap gap-2 mb-6">
-                {blog.tags.map(tag => <Badge key={tag} variant="secondary" className="text-gray-700 bg-gray-100 border border-gray-200 text-xs sm:text-sm">
-                    {tag}
-                  </Badge>)}
-              </div>}
-
             {/* Share Buttons */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-8 pb-8 border-b border-gray-200">
               <span className="text-gray-600 font-medium">Share:</span>
