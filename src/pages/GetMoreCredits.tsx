@@ -379,8 +379,17 @@ export default function GetMoreCredits() {
                     }}
                     disabled={!isAuthReady || connectionIssue || (creditPackProducts.filter(p => p.credits_amount === 30).length === 0 && !pricingData?.creditPacks?.find((p: any) => p.credits === 30))}
                   >
-                    Buy 30 Credits
-                    <ArrowRight className="w-4 h-4" />
+                    {!isAuthReady ? '...' : isCheckoutLoading(
+                      creditPackProducts.find(p => p.credits_amount === 30)?.product_id || 
+                      pricingData?.creditPacks?.find((p: any) => p.credits === 30)?.productId || 
+                      '30_credits_pack'
+                    ) ? 
+                      <Loader2 className="w-4 h-4 animate-spin" /> : 
+                      <>
+                        Buy 30 Credits
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    }
                   </Button>
                 </div>
               </CardContent>
