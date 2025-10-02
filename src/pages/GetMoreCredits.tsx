@@ -406,46 +406,36 @@ export default function GetMoreCredits() {
                   
                   {/* Large Credit Pack Option - Only show 200 credits pack */}
                   <div className="mt-4">
-                  {/* Show database products if available, otherwise show static fallback */}
-                  {creditPackProducts.length > 0 ? 
-                    creditPackProducts.filter(pack => pack.credits_amount === 200).map(pack => 
-                      <div key={pack.product_id} className="rounded-md p-3 border border-gray-500 flex items-center justify-center shadow hover:shadow-md transition duration-300 bg-gray-700">
-                        <div className="flex items-center gap-2">
-                          {pricingData?.region === 'IN' ? (
-                            <>
-                              <span className="text-gray-400 text-xs line-through">₹799</span>
+                    <div className="rounded-md p-3 border border-gray-500 flex items-center justify-center shadow hover:shadow-md transition duration-300 bg-gray-700">
+                      <div className="flex items-center gap-2">
+                        {pricingData?.region === 'IN' ? (
+                          <>
+                            {creditPackProducts.filter(p => p.credits_amount === 200).length > 0 ? (
+                              <>
+                                <span className="text-gray-400 text-xs line-through">₹799</span>
+                                <span className="text-white font-bold text-lg">₹{creditPackProducts.find(p => p.credits_amount === 200)?.price_amount || 399}</span>
+                                <span className="text-gray-400 text-xs">/ one-time</span>
+                              </>
+                            ) : pricingData?.creditPacks?.find((p: any) => p.credits === 200) ? (
+                              <>
+                                <span className="text-gray-400 text-xs line-through">₹799</span>
+                                <span className="text-white font-bold text-lg">₹{pricingData?.creditPacks.find((p: any) => p.credits === 200)?.price || 399}</span>
+                                <span className="text-gray-400 text-xs">/ one-time</span>
+                              </>
+                            ) : (
                               <span className="text-white font-bold text-lg">₹399</span>
-                              <span className="text-gray-400 text-xs">/ one-time</span>
-                            </>
-                          ) : (
-                            <>
-                              <span className="text-gray-400 text-xs line-through">$18</span>
-                              <span className="text-white font-bold text-xl">$9</span>
-                              <span className="text-gray-400 text-xs">/ one-time</span>
-                            </>
-                          )}
-                        </div>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-gray-400 text-xs line-through">$18</span>
+                            <span className="text-white font-bold text-lg">$9</span>
+                            <span className="text-gray-400 text-xs">/ one-time</span>
+                          </>
+                        )}
                       </div>
-                    ) :
-                    // Only show fallback if no database products and not loading
-                    !isProductsLoading && pricingData?.creditPacks.filter(pack => pack.credits === 200).map(pack => 
-                      <div key={pack.credits} className="bg-gray-700 rounded-md p-3 border border-gray-500 flex items-center justify-center shadow hover:shadow-md transition duration-300">
-                        <div className="flex items-center gap-2">
-                          <span className="text-gray-400 text-xs line-through">{pricingData?.currencySymbol}{pack.price * 2}</span>
-                          <span className="text-white font-bold text-lg">{pricingData?.currencySymbol}{pack.price}</span>
-                          <span className="text-gray-400 text-xs">/ one-time</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Loading state */}
-                  {isProductsLoading && 
-                    <div className="flex items-center justify-center py-4">
-                      <Loader2 className="w-4 h-4 animate-spin text-indigo-300" />
-                      <span className="ml-2 text-indigo-200 text-xs">Loading credit packs...</span>
                     </div>
-                  }
+                  </div>
                 </div>
                 
                 {/* Features list */}
