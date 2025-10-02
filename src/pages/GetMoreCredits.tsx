@@ -261,47 +261,43 @@ export default function GetMoreCredits() {
               <CardHeader className="text-center pb-2 pt-4 px-3">
                 <div className="text-2xl font-extrabold text-white mb-1">Trial</div>
                 <div className="text-sm font-semibold text-gray-300">Perfect for trying out our platform</div>
-                <p className="text-sm font-medium mt-2 text-white">Get 30 credits instantly</p>
-                <p className="text-xs text-gray-400">Pay once • No expiry • No subscription</p>
               </CardHeader>
               <CardContent className="grow flex flex-col px-3 pb-3">
                 <div className="text-center my-3 flex-grow px-4">
+                  <div className="text-center mb-3">
+                    <div className="text-sm font-semibold text-gray-300">Get 30 credits instantly</div>
+                    <div className="text-xs text-gray-400 mt-1">Pay once • No expiry • No subscription</div>
+                  </div>
+                  
                   <div className="mt-4">
                     <div className="rounded-md p-3 border border-gray-500 flex items-center justify-center shadow hover:shadow-md transition duration-300 bg-gray-700">
-                      {pricingData?.region === 'IN' ? (
-                        <>
-                          {creditPackProducts.filter(p => p.credits_amount === 30).length > 0 ? (
-                            <>
-                              <span className="text-xs line-through text-gray-400 mr-2">
-                                ₹199
-                              </span>
-                              <span className="text-lg font-bold text-white">
-                                ₹{creditPackProducts.find(p => p.credits_amount === 30)?.price_amount || 99}
-                              </span>
-                            </>
-                          ) : pricingData?.creditPacks?.find((p: any) => p.credits === 30) ? (
-                            <>
-                              <span className="text-xs line-through text-gray-400 mr-2">
-                                ₹199
-                              </span>
-                              <span className="text-lg font-bold text-white">
-                                ₹{pricingData?.creditPacks.find((p: any) => p.credits === 30)?.price || 99}
-                              </span>
-                            </>
-                          ) : (
-                            <span className="text-lg font-bold text-white">₹99</span>
-                          )}
-                          <span className="text-xs text-gray-400 ml-1">/ one-time</span>
-                        </>
-                      ) : (
-                        <>
-                          <span className="text-xs line-through text-gray-400 mr-2">
-                            $5.99
-                          </span>
-                          <span className="text-lg font-bold text-white">$2.99</span>
-                          <span className="text-xs text-gray-400 ml-1">/ one-time</span>
-                        </>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {pricingData?.region === 'IN' ? (
+                          <>
+                            {creditPackProducts.filter(p => p.credits_amount === 30).length > 0 ? (
+                              <>
+                                <span className="text-gray-400 text-xs line-through">₹199</span>
+                                <span className="text-white font-bold text-lg">₹{creditPackProducts.find(p => p.credits_amount === 30)?.price_amount || 99}</span>
+                                <span className="text-gray-400 text-xs">/ one-time</span>
+                              </>
+                            ) : pricingData?.creditPacks?.find((p: any) => p.credits === 30) ? (
+                              <>
+                                <span className="text-gray-400 text-xs line-through">₹199</span>
+                                <span className="text-white font-bold text-lg">₹{pricingData?.creditPacks.find((p: any) => p.credits === 30)?.price || 99}</span>
+                                <span className="text-gray-400 text-xs">/ one-time</span>
+                              </>
+                            ) : (
+                              <span className="text-white font-bold text-lg">₹99</span>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-gray-400 text-xs line-through">$5.99</span>
+                            <span className="text-white font-bold text-lg">$2.99</span>
+                            <span className="text-gray-400 text-xs">/ one-time</span>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                   
