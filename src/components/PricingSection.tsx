@@ -134,7 +134,8 @@ const PricingSection = () => {
             <CardContent className="grow flex flex-col px-3 pb-3">
               <div className="text-center my-3 flex-grow px-4">
                 <div className="text-center mb-3">
-                  <span className="text-sm text-white">Access to all features + 2 free AI mock interviews</span>
+                  <div className="text-sm font-semibold text-gray-300">Get 30 credits instantly</div>
+                  <div className="text-xs text-gray-400 mt-1">Pay once • No expiry • No subscription</div>
                 </div>
                 
                 {/* Small Credit Pack Option - Only show 30 credits pack */}
