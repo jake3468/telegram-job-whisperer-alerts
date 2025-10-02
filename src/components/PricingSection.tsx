@@ -143,7 +143,7 @@ const PricingSection = () => {
                 {creditPackProducts
                     .filter(pack => pack.credits_amount === 30)
                     .map(pack => 
-                      <div key={pack.product_id} className="rounded-md p-3 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-gray-700">
+                      <div key={pack.product_id} className="rounded-md p-3 border border-gray-500 flex items-center justify-center shadow hover:shadow-md transition duration-300 bg-gray-700">
                         <div className="flex items-center gap-2">
                           {pricingData.region === 'IN' ? (
                             <>
@@ -156,8 +156,6 @@ const PricingSection = () => {
                               <span className="text-white font-bold text-lg">$2.99</span>
                             </>
                           )}
-                        </div>
-                        <div className="flex items-center gap-3">
                         </div>
                       </div>
                     )}
