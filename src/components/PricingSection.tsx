@@ -243,28 +243,31 @@ const PricingSection = () => {
               <div className="text-sm font-semibold text-gray-300">Get 200 credits instantly</div>
               <div className="text-xs text-gray-400 mt-1">Pay once • No expiry • No subscription</div>
             </CardHeader>
-            <CardContent className="grow flex flex-col px-4 pb-4">
-              <div className="flex flex-col gap-2 my-1 flex-grow max-w-md mx-auto">
-                {/* Show only the 200 credit pack from database products */}
-                {creditPackProducts.filter(pack => pack.credits_amount === 200).map(pack => 
-                  <div key={pack.product_id} className="rounded-md p-3 border border-gray-500 flex items-center justify-center shadow hover:shadow-md transition duration-300 bg-gray-700">
-                    <div className="flex items-center gap-2">
-                      {pricingData.region === 'IN' ? (
-                        <>
-                          <span className="text-gray-400 text-xs line-through">₹799</span>
-                          <span className="text-white font-bold text-lg">₹399</span>
-                        </>
-                      ) : (
-                        <>
-                          <span className="text-gray-400 text-xs line-through">$19.99</span>
-                          <span className="text-white font-bold text-lg">$9.99</span>
-                        </>
-                      )}
-                    </div>
-                     <div className="flex items-center gap-3">
-                     </div>
-                  </div>
-                )}
+            <CardContent className="grow flex flex-col px-3 pb-3">
+              <div className="text-center px-4">
+                
+                {/* Large Credit Pack Option - Only show 200 credits pack */}
+                <div className="mt-4">
+                {creditPackProducts
+                    .filter(pack => pack.credits_amount === 200)
+                    .map(pack => 
+                      <div key={pack.product_id} className="rounded-md p-3 border border-gray-500 flex items-center justify-center shadow hover:shadow-md transition duration-300 bg-gray-700">
+                        <div className="flex items-center gap-2">
+                          {pricingData.region === 'IN' ? (
+                            <>
+                              <span className="text-gray-400 text-xs line-through">₹799</span>
+                              <span className="text-white font-bold text-lg">₹399</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-gray-400 text-xs line-through">$19.99</span>
+                              <span className="text-white font-bold text-lg">$9.99</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                </div>
                 
                 {/* Loading state */}
                 {isProductsLoading && <div className="flex items-center justify-center py-4">
