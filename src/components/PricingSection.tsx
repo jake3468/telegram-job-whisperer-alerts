@@ -126,19 +126,42 @@ const PricingSection = () => {
 
         <div className="grid gap-6 lg:gap-8 grid-cols-1 md:grid-cols-2 items-stretch max-w-4xl md:max-w-3xl lg:max-w-4xl mx-auto">
           {/* Free Plan */}
-          <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-blue-400/30`}>
+          <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-blue-400/30 min-h-[320px]`}>
             <CardHeader className="text-center pb-2 pt-4 px-3">
               <div className="text-2xl font-extrabold text-white mb-1">Trial</div>
               <div className="text-sm font-semibold text-gray-300">Perfect for trying out our platform</div>
             </CardHeader>
             <CardContent className="grow flex flex-col px-3 pb-3">
-              <div className="text-center px-4">
-                <div className="text-center mb-2">
+              <div className="text-center my-3 flex-grow px-4">
+                <div className="text-center mb-3">
                   <div className="text-sm font-semibold text-gray-300">Get 30 credits instantly</div>
                   <div className="text-xs text-gray-400 mt-1">Pay once • No expiry • No subscription</div>
                 </div>
                 
-                <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-600 mt-3">
+                {/* Small Credit Pack Option - Only show 30 credits pack */}
+                <div className="mt-4">
+                {creditPackProducts
+                    .filter(pack => pack.credits_amount === 30)
+                    .map(pack => 
+                      <div key={pack.product_id} className="rounded-md p-3 border border-gray-500 flex items-center justify-center shadow hover:shadow-md transition duration-300 bg-gray-700">
+                        <div className="flex items-center gap-2">
+                          {pricingData.region === 'IN' ? (
+                            <>
+                              <span className="text-gray-400 text-xs line-through">₹199</span>
+                              <span className="text-white font-bold text-lg">₹99</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-gray-400 text-xs line-through">$5.99</span>
+                              <span className="text-white font-bold text-lg">$2.99</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                </div>
+                
+                <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-600 mb-3 mt-6">
                   <div className="text-xs text-gray-300">
                     <div className="font-semibold text-cyan-400 mb-2 text-left">With 30 credits, you could get:</div>
                     <div className="space-y-1 text-left">
@@ -194,7 +217,7 @@ const PricingSection = () => {
                   </div>
                 </div>
               </div>
-              <div className="mt-auto flex justify-center pt-2">
+              <div className="mt-auto flex justify-center pt-3">
                 <SignUpButton mode="modal">
                   <Button className="bg-gray-50 hover:bg-gray-100 text-gray-800 font-semibold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
                     Get Started
