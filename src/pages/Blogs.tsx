@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Search, Calendar, User, ArrowLeft } from 'lucide-react';
 import { getAllBlogs } from '@/data/blogData';
 import Footer from '@/components/Footer';
@@ -21,8 +22,18 @@ interface Blog {
 const Blogs = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   
   const blogs = getAllBlogs();
+
+  useEffect(() => {
+    // Simulate initial loading for smooth UX
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 800);
+    
+    return () => clearTimeout(timer);
+  }, []);
   const filteredBlogs = blogs.filter(blog => {
     const matchesSearch = blog.title.toLowerCase().includes(searchTerm.toLowerCase()) || blog.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesTag = !selectedTag || blog.tags?.includes(selectedTag);
@@ -171,9 +182,39 @@ const Blogs = () => {
       <div className="px-4 pb-16">
         <div className="max-w-6xl mx-auto">
           
-          {filteredBlogs.length === 0 ? <div className="text-center py-12">
+          {loading ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in">
+              {[1, 2, 3, 4].map((i) => (
+                <Card key={i} className="bg-card border-border overflow-hidden">
+                  <Skeleton className="aspect-video w-full" />
+                  <CardHeader className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-4 w-4 rounded-full" />
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-4 w-4 rounded-full ml-2" />
+                      <Skeleton className="h-4 w-16" />
+                    </div>
+                    <Skeleton className="h-6 w-full" />
+                    <Skeleton className="h-6 w-4/5" />
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Skeleton className="h-6 w-20 rounded-full" />
+                      <Skeleton className="h-6 w-24 rounded-full" />
+                      <Skeleton className="h-6 w-16 rounded-full" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : filteredBlogs.length === 0 ? <div className="text-center py-12">
               <p className="text-xl text-gray-600 dark:text-gray-400">No blogs found matching your criteria.</p>
-            </div> : <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            </div> : <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in">
               {filteredBlogs.map(blog => <Card key={blog.id} className="bg-card border-border hover:border-cyan-500/50 dark:hover:border-cyan-400/50 transition-colors">
                   <Link to={`/blog/${blog.slug}`} onClick={() => window.scrollTo(0, 0)}>
                     {blog.thumbnail_url && <div className="aspect-video bg-muted rounded-t-lg overflow-hidden">
