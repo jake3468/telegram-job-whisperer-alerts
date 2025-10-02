@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Calendar, User, Share2, Twitter, Linkedin } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Share2, Twitter, Linkedin, Clock } from 'lucide-react';
 import { blogData } from '@/data/blogData';
 import Footer from '@/components/Footer';
 import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
@@ -223,6 +223,10 @@ const BlogPost = () => {
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4" />
                 {blog.author_name}
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                {readingTime} min read
               </div>
             </div>
 
