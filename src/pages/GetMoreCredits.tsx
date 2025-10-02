@@ -363,12 +363,12 @@ export default function GetMoreCredits() {
                     className="bg-gray-50 hover:bg-gray-100 text-gray-800 font-semibold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
                     onClick={() => {
                       const pack30 = creditPackProducts.find(p => p.credits_amount === 30) || 
-                        (pricingData.creditPacks?.find((p: any) => p.credits === 30) 
+                        (pricingData?.creditPacks?.find((p: any) => p.credits === 30) 
                           ? { 
-                              product_id: pricingData.creditPacks.find((p: any) => p.credits === 30)?.productId || '30_credits_pack',
+                              product_id: pricingData?.creditPacks?.find((p: any) => p.credits === 30)?.productId || '30_credits_pack',
                               credits_amount: 30,
-                              price_amount: pricingData.creditPacks.find((p: any) => p.credits === 30)?.price || 99,
-                              currency: pricingData.currency,
+                              price_amount: pricingData?.creditPacks?.find((p: any) => p.credits === 30)?.price || 99,
+                              currency: pricingData?.currency,
                               product_type: 'credit_pack' as const
                             }
                           : null);
@@ -377,7 +377,7 @@ export default function GetMoreCredits() {
                         handleCreditPackClick(pack30.product_id);
                       }
                     }}
-                    disabled={!isAuthReady || connectionIssue || (creditPackProducts.filter(p => p.credits_amount === 30).length === 0 && !pricingData.creditPacks?.find((p: any) => p.credits === 30))}
+                    disabled={!isAuthReady || connectionIssue || (creditPackProducts.filter(p => p.credits_amount === 30).length === 0 && !pricingData?.creditPacks?.find((p: any) => p.credits === 30))}
                   >
                     Buy 30 Credits
                     <ArrowRight className="w-4 h-4" />
@@ -419,7 +419,7 @@ export default function GetMoreCredits() {
                             ) : pricingData?.creditPacks?.find((p: any) => p.credits === 200) ? (
                               <>
                                 <span className="text-gray-400 text-xs line-through">₹799</span>
-                                <span className="text-white font-bold text-lg">₹{pricingData?.creditPacks.find((p: any) => p.credits === 200)?.price || 399}</span>
+                                <span className="text-white font-bold text-lg">₹{pricingData?.creditPacks?.find((p: any) => p.credits === 200)?.price || 399}</span>
                                 <span className="text-gray-400 text-xs">/ one-time</span>
                               </>
                             ) : (
@@ -536,8 +536,8 @@ export default function GetMoreCredits() {
                       </Button>
                     )) :
                     // Fallback for static data
-                    !isProductsLoading && pricingData?.creditPacks.filter(pack => pack.credits === 200).map(pack => (
-                      <Button 
+                    !isProductsLoading && pricingData?.creditPacks?.filter(pack => pack.credits === 200).map(pack => (
+                      <Button
                         key={pack.productId}
                         onClick={() => handleCreditPackClick(pack.productId)} 
                         className="bg-gray-50 hover:bg-gray-100 text-gray-800 font-semibold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl" 
