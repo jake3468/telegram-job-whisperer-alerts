@@ -21,13 +21,9 @@ const CreditBalanceDisplay = () => {
 
   // Always show credits - use cached data if available, fallback to 0 only if no data at all
   const balance = credits ? Math.max(Number(credits.current_balance) || 0, 0) : 0;
-  const isLowCredits = balance < 5;
-
 
   return (
-    <div className={`text-sm font-orbitron transition-colors font-semibold ${
-      isLowCredits ? 'text-red-600' : 'text-gray-900'
-    }`}>
+    <div className="text-sm font-orbitron transition-colors font-semibold text-gray-900">
       {state === 'expanded' ? (
         <span>Credits: {balance}</span>
       ) : (
