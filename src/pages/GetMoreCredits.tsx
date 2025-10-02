@@ -256,78 +256,135 @@ export default function GetMoreCredits() {
         {/* Responsive grid area with tight spacing for mobile; px for interior gap only */}
         <div className="flex-1 flex flex-col items-center justify-center w-full px-2 sm:px-4">
           <div className="grid gap-6 lg:gap-8 grid-cols-1 lg:grid-cols-2 items-stretch max-w-4xl mx-auto">
-            {/* Free Plan */}
+            {/* Trial Plan */}
             <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.free} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-blue-400/30 min-h-[320px]`}>
               <CardHeader className="text-center pb-2 pt-4 px-3">
-                <div className="text-2xl font-extrabold text-white mb-1">Free</div>
-                <div className="text-sm font-semibold text-gray-300">10 credits/month</div>
+                <div className="text-2xl font-extrabold text-white mb-1">Trial</div>
+                <div className="text-sm font-semibold text-gray-300">Perfect for trying out our platform</div>
+                <p className="text-sm font-medium mt-2 text-white">Get 30 credits instantly</p>
+                <p className="text-xs text-gray-400">Pay once • No expiry • No subscription</p>
               </CardHeader>
               <CardContent className="grow flex flex-col px-3 pb-3">
                 <div className="text-center my-3 flex-grow px-4">
-                  <div className="text-center mb-3">
-                    <span className="text-sm text-white">Access to all features + 2 free AI mock interviews</span>
+                  <div className="mt-4">
+                    <div className="flex items-center justify-center">
+                      {pricingData.region === 'IN' ? (
+                        <>
+                          {creditPackProducts.filter(p => p.credits_amount === 30).length > 0 ? (
+                            <>
+                              <span className="text-lg line-through text-gray-400 mr-2">
+                                ₹199
+                              </span>
+                              <span className="text-xl font-bold text-white">
+                                ₹{creditPackProducts.find(p => p.credits_amount === 30)?.price_amount || 99}
+                              </span>
+                            </>
+                          ) : pricingData.creditPacks?.find((p: any) => p.credits === 30) ? (
+                            <>
+                              <span className="text-lg line-through text-gray-400 mr-2">
+                                ₹199
+                              </span>
+                              <span className="text-xl font-bold text-white">
+                                ₹{pricingData.creditPacks.find((p: any) => p.credits === 30)?.price || 99}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-xl font-bold text-white">₹99</span>
+                          )}
+                          <span className="text-sm text-gray-400 ml-1">/ one-time</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-lg line-through text-gray-400 mr-2">
+                            $5.99
+                          </span>
+                          <span className="text-xl font-bold text-white">$2.99</span>
+                          <span className="text-sm text-gray-400 ml-1">/ one-time</span>
+                        </>
+                      )}
+                    </div>
                   </div>
                   
                   {/* Credit Usage Information Box */}
                   <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-600 mb-3 mt-6">
                     <div className="text-xs text-gray-300">
-                      <div className="font-semibold text-cyan-400 mb-2">With 10 credits, you could get:</div>
+                      <div className="font-semibold text-cyan-400 mb-2">With 30 credits, you could get:</div>
                       <div className="space-y-1 text-left">
                         <div className="flex items-center gap-2">
                           <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                             <Check className="w-2.5 h-2.5 text-black" />
                           </div>
-                          <span>Up to <span className="font-bold">100</span> job alerts</span>
+                          <span>Up to <span className="font-bold">300</span> job alerts</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                             <Check className="w-2.5 h-2.5 text-black" />
                           </div>
-                          <span>Up to <span className="font-bold">6</span> cover letters</span>
+                          <span>Up to <span className="font-bold">20</span> cover letters</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                             <Check className="w-2.5 h-2.5 text-black" />
                           </div>
-                          <span>Up to <span className="font-bold">3</span> resumes</span>
+                          <span>Up to <span className="font-bold">10</span> resumes</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                             <Check className="w-2.5 h-2.5 text-black" />
                           </div>
-                          <span>Up to <span className="font-bold">1</span> interview prep file</span>
+                          <span>Up to <span className="font-bold">5</span> interview prep files</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                             <Check className="w-2.5 h-2.5 text-black" />
                           </div>
-                          <span>Up to <span className="font-bold">10</span> job fit checks</span>
+                          <span>Up to <span className="font-bold">30</span> job fit checks</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                             <Check className="w-2.5 h-2.5 text-black" />
                           </div>
-                          <span>Up to <span className="font-bold">3</span> company insights</span>
+                          <span>Up to <span className="font-bold">10</span> company insights</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                             <Check className="w-2.5 h-2.5 text-black" />
                           </div>
-                          <span>Up to <span className="font-bold">5</span> visa sponsorship guides</span>
+                          <span>Up to <span className="font-bold">15</span> visa sponsorship guides</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                             <Check className="w-2.5 h-2.5 text-black" />
                           </div>
-                          <span>Up to <span className="font-bold">5</span> HR contact lists</span>
+                          <span>Up to <span className="font-bold">15</span> HR contact lists</span>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className="mt-auto flex justify-center">
-                  <Button className="bg-gray-50 hover:bg-gray-100 text-gray-800 font-semibold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl" disabled>
-                    Current Plan
+                  <Button 
+                    className="bg-gray-50 hover:bg-gray-100 text-gray-800 font-semibold py-2 px-6 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl"
+                    onClick={() => {
+                      const pack30 = creditPackProducts.find(p => p.credits_amount === 30) || 
+                        (pricingData.creditPacks?.find((p: any) => p.credits === 30) 
+                          ? { 
+                              product_id: pricingData.creditPacks.find((p: any) => p.credits === 30)?.productId || '30_credits_pack',
+                              credits_amount: 30,
+                              price_amount: pricingData.creditPacks.find((p: any) => p.credits === 30)?.price || 99,
+                              currency: pricingData.currency,
+                              product_type: 'credit_pack' as const
+                            }
+                          : null);
+                      
+                      if (pack30) {
+                        handleCreditPackClick(pack30.product_id);
+                      }
+                    }}
+                    disabled={!isAuthReady || connectionIssue || (creditPackProducts.filter(p => p.credits_amount === 30).length === 0 && !pricingData.creditPacks?.find((p: any) => p.credits === 30))}
+                  >
+                    Buy 30 Credits
+                    <ArrowRight className="w-4 h-4" />
                   </Button>
                 </div>
               </CardContent>
