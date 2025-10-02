@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Loader2, RefreshCw } from 'lucide-react';
+import { Check, Loader2, RefreshCw, Crown, ArrowRight } from 'lucide-react';
 import { useCachedUserCredits } from '@/hooks/useCachedUserCredits';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Layout } from '@/components/Layout';
@@ -334,33 +334,41 @@ export default function GetMoreCredits() {
             </Card>
 
             {/* Credit Packs */}
-            <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-indigo-400/30 min-h-[420px]`}>
+            <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-indigo-400/30 min-h-[420px] relative`}>
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+                <Badge className="bg-cyan-400 text-gray-800 hover:bg-cyan-400 text-sm font-bold flex items-center gap-1 px-4 py-2">
+                  <Crown className="w-4 h-4" />
+                  Most Popular
+                </Badge>
+              </div>
               <CardHeader className="text-center pb-4 pt-6 px-4">
                 <div className="text-3xl font-extrabold text-white mb-1">
                   ⚡ Power Pack
                 </div>
-                <div className="inline-block px-3 py-1 bg-cyan-400 text-gray-800 text-sm font-bold rounded-full mb-2">
-                  Pay-as-you-go
-                </div>
                 <div className="text-sm font-semibold text-gray-300">Get 200 credits instantly</div>
                 <div className="text-xs text-gray-400 mt-1">Pay once • No expiry • No subscription</div>
               </CardHeader>
-              <CardContent className="grow flex flex-col px-4 pb-4">
-                <div className="flex flex-col gap-2 my-1 flex-grow max-w-md mx-auto">
+              <CardContent className="grow flex flex-col px-3 pb-3">
+                <div className="text-center px-4">
+                  
+                  {/* Large Credit Pack Option - Only show 200 credits pack */}
+                  <div className="mt-4">
                   {/* Show database products if available, otherwise show static fallback */}
                   {creditPackProducts.length > 0 ? 
                     creditPackProducts.filter(pack => pack.credits_amount === 200).map(pack => 
-                      <div key={pack.product_id} className="rounded-md p-3 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300 bg-gray-700">
+                      <div key={pack.product_id} className="rounded-md p-3 border border-gray-500 flex items-center justify-center shadow hover:shadow-md transition duration-300 bg-gray-700">
                         <div className="flex items-center gap-2">
                           {pricingData?.region === 'IN' ? (
                             <>
                               <span className="text-gray-400 text-xs line-through">₹799</span>
                               <span className="text-white font-bold text-lg">₹399</span>
+                              <span className="text-gray-400 text-xs">/ one-time</span>
                             </>
                           ) : (
                             <>
-                              <span className="text-gray-400 text-xs line-through">$19.99</span>
-                              <span className="text-white font-bold text-lg">$9.99</span>
+                              <span className="text-gray-400 text-xs line-through">$18</span>
+                              <span className="text-white font-bold text-xl">$9</span>
+                              <span className="text-gray-400 text-xs">/ one-time</span>
                             </>
                           )}
                         </div>
@@ -368,13 +376,15 @@ export default function GetMoreCredits() {
                     ) :
                     // Only show fallback if no database products and not loading
                     !isProductsLoading && pricingData?.creditPacks.filter(pack => pack.credits === 200).map(pack => 
-                      <div key={pack.credits} className="bg-gray-700 rounded-md p-3 border border-gray-500 flex justify-between items-center shadow hover:shadow-md transition duration-300">
+                      <div key={pack.credits} className="bg-gray-700 rounded-md p-3 border border-gray-500 flex items-center justify-center shadow hover:shadow-md transition duration-300">
                         <div className="flex items-center gap-2">
                           <span className="text-gray-400 text-xs line-through">{pricingData?.currencySymbol}{pack.price * 2}</span>
                           <span className="text-white font-bold text-lg">{pricingData?.currencySymbol}{pack.price}</span>
+                          <span className="text-gray-400 text-xs">/ one-time</span>
                         </div>
                       </div>
                     )}
+                  </div>
                   
                   {/* Loading state */}
                   {isProductsLoading && 
@@ -386,7 +396,7 @@ export default function GetMoreCredits() {
                 </div>
                 
                 {/* Features list */}
-                <div className="flex flex-col items-center mb-3 mt-1">
+                <div className="flex flex-col items-center mb-3 mt-6">
                   {/* Credit Usage Information Box */}
                   <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-600 mb-3 w-full max-w-sm">
                     <div className="text-xs text-gray-300">
@@ -475,7 +485,10 @@ export default function GetMoreCredits() {
                       >
                         {!isAuthReady ? '...' : isCheckoutLoading(pack.product_id) ? 
                           <Loader2 className="w-4 h-4 animate-spin" /> : 
-                          <>Buy 200 Credits - {pricingData?.currencySymbol}{pack.price_amount}</>
+                          <>
+                            Get Started
+                            <ArrowRight className="w-4 h-4" />
+                          </>
                         }
                       </Button>
                     )) :
@@ -489,7 +502,10 @@ export default function GetMoreCredits() {
                       >
                         {!isAuthReady ? '...' : isCheckoutLoading(pack.productId) ? 
                           <Loader2 className="w-4 h-4 animate-spin" /> : 
-                          <>Buy 200 Credits - {pricingData?.currencySymbol}{pack.price}</>
+                          <>
+                            Get Started
+                            <ArrowRight className="w-4 h-4" />
+                          </>
                         }
                       </Button>
                     ))
