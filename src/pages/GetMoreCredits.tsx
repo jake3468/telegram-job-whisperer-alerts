@@ -308,7 +308,7 @@ export default function GetMoreCredits() {
                   {/* Credit Usage Information Box */}
                   <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-600 mb-3 mt-6">
                     <div className="text-xs text-gray-300">
-                      <div className="font-semibold text-cyan-400 mb-2">With 30 credits, you could get:</div>
+                      <div className="font-semibold text-cyan-400 mb-2 text-left">With 30 credits, you could get:</div>
                       <div className="space-y-1 text-left">
                         <div className="flex items-center gap-2">
                           <div className="w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
