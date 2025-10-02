@@ -2,7 +2,7 @@ import { SignUpButton } from '@clerk/clerk-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Globe, Loader2, ArrowRight } from 'lucide-react';
+import { Check, Globe, Loader2, ArrowRight, Crown } from 'lucide-react';
 import { useLocationPricing } from '@/hooks/useLocationPricing';
 import { usePaymentProducts } from '@/hooks/usePaymentProducts';
 const planGradientBg = {
@@ -224,13 +224,14 @@ const PricingSection = () => {
           </Card>
 
           {/* Credit Packs */}
-          <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-indigo-400/30 min-h-[420px]`}>
+          <Card className={`flex flex-col rounded-2xl shadow-2xl ${planGradientBg.pack} transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-indigo-400/30 min-h-[420px] relative`}>
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+              <Badge className="bg-cyan-400 text-gray-800 hover:bg-cyan-400 text-sm font-bold flex items-center gap-1 px-4 py-2">
+                <Crown className="w-4 h-4" />
+                Most Popular
+              </Badge>
+            </div>
             <CardHeader className="text-center pb-4 pt-6 px-4">
-              <div className="flex justify-center mb-3">
-                <Badge className="bg-cyan-400 text-gray-800 hover:bg-cyan-400 text-sm font-bold">
-                  Most Popular
-                </Badge>
-              </div>
               <div className="text-3xl font-extrabold text-white mb-1">
                 ⚡ Power Pack
               </div>
