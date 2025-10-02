@@ -268,7 +268,7 @@ export default function GetMoreCredits() {
                 <div className="text-center my-3 flex-grow px-4">
                   <div className="mt-4">
                     <div className="flex items-center justify-center">
-                      {pricingData.region === 'IN' ? (
+                      {pricingData?.region === 'IN' ? (
                         <>
                           {creditPackProducts.filter(p => p.credits_amount === 30).length > 0 ? (
                             <>
@@ -279,13 +279,13 @@ export default function GetMoreCredits() {
                                 ₹{creditPackProducts.find(p => p.credits_amount === 30)?.price_amount || 99}
                               </span>
                             </>
-                          ) : pricingData.creditPacks?.find((p: any) => p.credits === 30) ? (
+                          ) : pricingData?.creditPacks?.find((p: any) => p.credits === 30) ? (
                             <>
                               <span className="text-lg line-through text-gray-400 mr-2">
                                 ₹199
                               </span>
                               <span className="text-xl font-bold text-white">
-                                ₹{pricingData.creditPacks.find((p: any) => p.credits === 30)?.price || 99}
+                                ₹{pricingData?.creditPacks.find((p: any) => p.credits === 30)?.price || 99}
                               </span>
                             </>
                           ) : (
