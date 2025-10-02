@@ -1,7 +1,7 @@
 
 import { SignedIn, SignedOut, SignInButton, SignUpButton } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
@@ -9,6 +9,18 @@ const AuthHeader = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
+
+  useEffect(() => {
+    // Load Elfsight platform script
+    const script = document.createElement('script');
+    script.src = 'https://elfsightcdn.com/platform.js';
+    script.async = true;
+    document.body.appendChild(script);
+    
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -63,6 +75,8 @@ const AuthHeader = () => {
 
         {/* Desktop Theme Toggle and Auth Buttons: Right side - only show on large screens */}
         <div className="hidden lg:flex items-center space-x-4">
+          {/* Website Translator Widget */}
+          <div className="elfsight-app-a83c75dc-18d8-4fe3-84aa-59c961f945a5" data-elfsight-app-lazy style={{ maxWidth: '120px', transform: 'scale(0.85)' }}></div>
           
           <SignedOut>
             <div className="flex items-center space-x-4">
@@ -103,6 +117,11 @@ const AuthHeader = () => {
       {isMenuOpen && (
         <div className="lg:hidden absolute top-full left-0 right-0 bg-background dark:bg-black backdrop-blur-md border-b border-border shadow-lg">
           <div className="px-4 py-4 space-y-3">
+            {/* Website Translator Widget */}
+            <div className="flex justify-center pb-2">
+              <div className="elfsight-app-a83c75dc-18d8-4fe3-84aa-59c961f945a5" data-elfsight-app-lazy style={{ maxWidth: '150px', transform: 'scale(0.9)' }}></div>
+            </div>
+            
             {/* Navigation Items */}
             {navItems.map((item) => (
               <button
