@@ -49,6 +49,29 @@ const BlogPost = () => {
       day: 'numeric'
     });
   };
+
+  // Calculate reading time (average 200 words per minute)
+  const calculateReadingTime = (content: string): number => {
+    const wordCount = content.replace(/<[^>]*>/g, '').split(/\s+/).length;
+    return Math.ceil(wordCount / 200);
+  };
+
+  // Determine article section based on tags
+  const getArticleSection = (tags: string[]): string => {
+    if (tags.some(tag => tag.toLowerCase().includes('visa') || tag.toLowerCase().includes('immigration'))) {
+      return 'Immigration & Visa';
+    }
+    if (tags.some(tag => tag.toLowerCase().includes('skills') || tag.toLowerCase().includes('career'))) {
+      return 'Career Development';
+    }
+    if (tags.some(tag => tag.toLowerCase().includes('ai') || tag.toLowerCase().includes('technology'))) {
+      return 'Job Search Technology';
+    }
+    return 'Career Advice';
+  };
+
+  const readingTime = blog ? calculateReadingTime(blog.content) : 0;
+  const articleSection = blog ? getArticleSection(blog.tags || []) : 'Career Advice';
   const shareUrl = window.location.href;
   const shareText = blog?.title || '';
   const handleShare = (platform: string) => {
@@ -97,8 +120,12 @@ const BlogPost = () => {
          <meta name="twitter:title" content={blog.meta_title || blog.title} />
          <meta name="twitter:description" content={blog.meta_description || blog.excerpt} />
          <meta name="twitter:image" content={blog.thumbnail_url || "https://aspirely.ai/aspirely-social-preview-updated.png"} />
+         <meta name="twitter:label1" content="Reading time" />
+         <meta name="twitter:data1" content={`${readingTime} min read`} />
+         <meta name="twitter:label2" content="Written by" />
+         <meta name="twitter:data2" content={blog.author_name} />
         
-        {/* JSON-LD Structured Data */}
+         {/* JSON-LD Structured Data - BlogPosting */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
@@ -108,7 +135,9 @@ const BlogPost = () => {
             "image": blog.thumbnail_url || "https://aspirely.ai/aspirely-social-preview-updated.png",
             "author": {
               "@type": "Person",
-              "name": blog.author_name
+              "name": blog.author_name,
+              "url": "https://aspirely.ai/blogs",
+              "jobTitle": "Career Development Expert"
             },
             "publisher": {
               "@type": "Organization",
@@ -120,19 +149,54 @@ const BlogPost = () => {
               }
             },
             "datePublished": blog.published_at,
-             "dateModified": blog.published_at,
-             "mainEntityOfPage": {
-               "@type": "WebPage",
-               "@id": `https://aspirely.ai/blog/${blog.slug}`
-             },
-             "keywords": blog.tags?.join(", ") || "",
-             "url": `https://aspirely.ai/blog/${blog.slug}`,
-             "isPartOf": {
-               "@type": "Blog",
-               "@id": "https://aspirely.ai/blogs"
-             },
-             "wordCount": blog.content?.replace(/<[^>]*>/g, '').split(' ').length || 0,
-             "articleBody": blog.content?.replace(/<[^>]*>/g, '').substring(0, 500) || blog.excerpt
+            "dateModified": blog.published_at,
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": `https://aspirely.ai/blog/${blog.slug}`
+            },
+            "keywords": blog.tags?.join(", ") || "",
+            "url": `https://aspirely.ai/blog/${blog.slug}`,
+            "isPartOf": {
+              "@type": "Blog",
+              "@id": "https://aspirely.ai/blogs",
+              "name": "Aspirely AI Career Blog"
+            },
+            "articleSection": articleSection,
+            "wordCount": blog.content?.replace(/<[^>]*>/g, '').split(/\s+/).length || 0,
+            "timeRequired": `PT${readingTime}M`,
+            "articleBody": blog.content?.replace(/<[^>]*>/g, '').substring(0, 500) || blog.excerpt,
+            "about": {
+              "@type": "Thing",
+              "name": articleSection
+            }
+          })}
+        </script>
+
+        {/* JSON-LD Structured Data - Breadcrumb */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://aspirely.ai"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Blog",
+                "item": "https://aspirely.ai/blogs"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": blog.title,
+                "item": `https://aspirely.ai/blog/${blog.slug}`
+              }
+            ]
           })}
         </script>
       </Helmet>
