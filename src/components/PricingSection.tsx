@@ -233,7 +233,7 @@ const PricingSection = () => {
             </div>
             <CardHeader className="text-center pb-4 pt-6 px-4">
               <div className="text-3xl font-extrabold text-white mb-1">
-                ⚡ Power Pack
+                👑 Premium Pack
               </div>
               <div className="text-sm font-semibold text-gray-300">Get 200 credits instantly</div>
               <div className="text-xs text-gray-400 mt-1">Pay once • No expiry • No subscription</div>
