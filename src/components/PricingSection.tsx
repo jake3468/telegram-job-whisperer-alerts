@@ -261,7 +261,7 @@ const PricingSection = () => {
                           ) : (
                             <>
                               <span className="text-gray-400 text-xs line-through">$18</span>
-                              <span className="text-white font-bold text-lg">$9</span>
+                              <span className="text-white font-bold text-xl">$9</span>
                             </>
                           )}
                         </div>
