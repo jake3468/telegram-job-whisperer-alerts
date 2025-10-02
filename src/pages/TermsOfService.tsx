@@ -118,8 +118,8 @@ const TermsOfService = () => {
               <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">4.1 Service Tiers</h3>
               <div className="space-y-4 mb-6">
                 <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
-                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Free Plan</h4>
-                  <p className="text-gray-700 dark:text-gray-300 text-sm">10 free credits per month with access to all features</p>
+                  <h4 className="text-gray-900 dark:text-white font-semibold mb-2">Trial Plan</h4>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm">30 credits with access to all features. Pay once, use anytime - no subscription required.</p>
                 </div>
 
                 <div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg border border-gray-300 dark:border-gray-800">
