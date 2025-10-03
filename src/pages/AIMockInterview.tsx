@@ -76,7 +76,7 @@ const AIMockInterview = () => {
           <div className="text-center mb-12">
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6 relative">
               <span className="text-4xl">📞</span>
-              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent text-center sm:text-left">AI Mock Interview</h1>
+              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent text-center sm:text-left">AI Phone Interview</h1>
               
               {/* Manual Refresh Button */}
               {connectionIssue && (
