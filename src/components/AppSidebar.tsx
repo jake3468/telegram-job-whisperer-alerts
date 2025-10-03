@@ -29,7 +29,7 @@ const profileItems = [{
   url: '/job-tracker',
   icon: Kanban
 }, {
-  title: 'AI Mock Interview',
+  title: 'AI Phone Interview',
   url: '/ai-mock-interview',
   icon: Phone
 }, {
@@ -107,7 +107,7 @@ export function AppSidebar() {
       {/* Logo & Name section: hide only on tablet (md to lg), show on mobile and desktop */}
       <SidebarHeader className="flex md:hidden lg:flex py-2 px-3 border-b border-gray-200 bg-white relative flex-col items-center gap-1">
         <img alt="JobBots Logo" src={cachedLogoUrl} className="max-h-10 mb-1 drop-shadow-2xl object-fill rounded-lg" />
-        <span className="font-orbitron drop-shadow bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text select-none tracking-widest text-transparent font-bold min-w-0 truncate text-xl">Aspirely.ai</span>
+        <span className="font-orbitron drop-shadow text-black select-none tracking-widest font-bold min-w-0 truncate text-xl">Aspirely.ai</span>
         {/* X button for mobile - positioned at top right */}
         {isMobile && (
           <Button variant="ghost" size="icon" onClick={() => setOpenMobile(false)} className="absolute top-2 right-2 h-8 w-8 text-gray-600 hover:bg-gray-100 border border-gray-200 bg-white rounded-xl transition-all">

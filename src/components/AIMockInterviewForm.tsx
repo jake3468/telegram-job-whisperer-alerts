@@ -351,7 +351,7 @@ const AIMockInterviewForm = ({ prefillData, sessionManager }: AIMockInterviewFor
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="phoneNumber" className="text-gray-700 font-medium">
-              Phone Number *
+              Your Phone Number *
             </Label>
             <div className="phone-input-container">
               <PhoneInput

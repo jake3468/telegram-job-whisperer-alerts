@@ -82,22 +82,17 @@ const JobAlerts = () => {
           color: 'transparent'
         }} className="bg-gradient-to-r from-orange-600 via-yellow-600 to-pink-700 bg-clip-text text-amber-400 text-center sm:text-left">
             <span className="sm:hidden">
-              Create Job <span className="italic">Alerts</span>
+              Create Job <span>Alerts</span>
             </span>
             <span className="hidden sm:inline">
-              Create Job <span className="italic">Alerts</span>
+              Create Job <span>Alerts</span>
             </span>
           </span>
         </h1>
         
         <p className="font-inter font-normal text-gray-900 text-sm sm:text-base text-left mb-1 sm:mb-2 max-w-2xl mx-auto">
-          Set your personalized job alerts here and our Telegram &quot;Job Alerts&quot; AI Agent will send you the latest 24-hour postings straight to your Telegram everyday. They will also appear under &apos;Posted Today&apos; on your Job Board page.
+          Create your personalized job alerts and let our Telegram &quot;Job Alerts&quot; AI Agent deliver the latest postings from the past 24 hours straight to your Telegram. You&apos;ll also see them highlighted under &apos;Posted Today&apos; on your Job Board.
         </p>
-
-        {/* Usage Cost Badge */}
-        <Badge variant="outline" className="bg-orange-100 border-orange-400 text-orange-800 font-semibold">
-          Usage Fee: 0.1 credits per alert message
-        </Badge>
       </div>
 
       {/* Job Alerts Onboarding Popup */}

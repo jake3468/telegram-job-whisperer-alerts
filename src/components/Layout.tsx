@@ -22,7 +22,7 @@ export function Layout({ children }: LayoutProps) {
           </SidebarTrigger>
           <div className="flex items-center gap-2">
             <img alt="JobBots Logo" src="/lovable-uploads/3fabfd8d-c393-407c-a35b-e87b89bf88b6.jpg" className="max-h-8 object-fill rounded-lg" />
-            <span className="font-orbitron bg-gradient-to-r from-sky-600 via-fuchsia-600 to-indigo-600 bg-clip-text text-transparent font-bold min-w-0 truncate text-lg">Aspirely.ai</span>
+            <span className="font-orbitron text-black font-bold min-w-0 truncate text-lg">Aspirely.ai</span>
           </div>
         </div>
       </header>

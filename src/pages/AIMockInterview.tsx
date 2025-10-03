@@ -76,7 +76,7 @@ const AIMockInterview = () => {
           <div className="text-center mb-12">
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6 relative">
               <span className="text-4xl">📞</span>
-              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent text-center sm:text-left">AI Mock Interview</h1>
+              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent text-center sm:text-left">AI Phone Interview</h1>
               
               {/* Manual Refresh Button */}
               {connectionIssue && (
@@ -92,7 +92,7 @@ const AIMockInterview = () => {
               )}
             </div>
             
-            <h2 className="text-xl md:text-2xl text-gray-700 mb-4 leading-relaxed">Get a Mock Interview Phone Call from 👩🏻 Grace</h2>
+            <h2 className="text-xl md:text-2xl text-gray-700 mb-4 leading-relaxed">Practice Interviews with Grace 👩🏻, Your AI Coach</h2>
             
             {/* Action Buttons */}
             <div className="mb-6 flex flex-wrap gap-3 justify-center">
@@ -114,7 +114,7 @@ const AIMockInterview = () => {
               </Button>
             </div>
             
-            <p className="text-gray-900 font-inter font-normal max-w-2xl mx-auto leading-relaxed text-left text-sm sm:text-base">Grace, your AI interview assistant from Aspirely AI, will call your phone in about a minute to ask real interview questions based on your job role — and you'll receive a detailed report right after the call.</p>
+            <p className="text-gray-900 font-inter font-normal max-w-2xl mx-auto leading-relaxed text-left text-sm sm:text-base">Your AI Interview coach -  Grace, will give you a quick phone call, ask role-based interview questions, and share a personalized report the moment you're done</p>
           </div>
 
           {/* Form Section */}

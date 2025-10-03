@@ -144,16 +144,18 @@ const JobAlertsSection = ({
 
   // Show fast initial loading state, then content even if auth is still loading
   if (loading && !userProfileId) {
-    return <div className="max-w-2xl mx-auto w-full">
-        <div className="rounded-3xl bg-black/95 border-2 border-emerald-400 shadow-none p-6 mt-3 min-h-[160px] flex items-center justify-center">
-          <div className="text-center space-y-3">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-400 mx-auto"></div>
-            <div className="text-emerald-100 text-xs">Loading job alerts...</div>
+    return <div className="max-w-5xl mx-auto w-full mb-8">
+        <div className="rounded-3xl bg-orange-900/90 border-2 border-orange-400 shadow-none p-6 space-y-4">
+          <div className="h-8 bg-orange-200/40 rounded-lg animate-pulse"></div>
+          <div className="h-4 bg-orange-100/30 rounded animate-pulse w-3/4"></div>
+          <div className="space-y-3 pt-4">
+            <div className="h-24 bg-orange-200/40 rounded-xl animate-pulse"></div>
+            <div className="h-24 bg-orange-200/40 rounded-xl animate-pulse"></div>
           </div>
         </div>
       </div>;
   }
-  return <section className="rounded-3xl border-2 border-orange-400 bg-orange-900/90 shadow-none p-0 max-w-5xl mx-auto">
+  return <section className="rounded-3xl border-2 border-orange-400 bg-orange-900/90 shadow-none p-0 max-w-5xl mx-auto mb-8">
       <div className="pt-4 px-2 sm:px-6">
         {/* Manual Refresh Button */}
         {error && <div className="mb-4 flex justify-end">
@@ -175,7 +177,7 @@ const JobAlertsSection = ({
                 <span>Job Alerts</span>
               </span>
             </div>
-            <p className="text-orange-100 font-inter text-sm drop-shadow-none font-extralight">Set up personalized daily job alerts based on your preferences - just one job title and location per alert to ensure we send you the most accurate matches.</p>
+            <p className="text-white font-inter text-sm drop-shadow-none font-extralight">Choose one job title and location per alert to receive precise, daily matches that fit your preferences.</p>
             
             {/* Alert Usage Counter */}
             {isActivated && <div className="flex items-center gap-2 mt-2">
