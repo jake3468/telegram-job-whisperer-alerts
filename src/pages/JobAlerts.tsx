@@ -82,10 +82,10 @@ const JobAlerts = () => {
           color: 'transparent'
         }} className="bg-gradient-to-r from-orange-600 via-yellow-600 to-pink-700 bg-clip-text text-amber-400 text-center sm:text-left">
             <span className="sm:hidden">
-              Create Job <span className="italic">Alerts</span>
+              Create Job <span>Alerts</span>
             </span>
             <span className="hidden sm:inline">
-              Create Job <span className="italic">Alerts</span>
+              Create Job <span>Alerts</span>
             </span>
           </span>
         </h1>
