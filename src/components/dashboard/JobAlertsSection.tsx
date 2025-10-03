@@ -144,11 +144,13 @@ const JobAlertsSection = ({
 
   // Show fast initial loading state, then content even if auth is still loading
   if (loading && !userProfileId) {
-    return <div className="max-w-2xl mx-auto w-full">
-        <div className="rounded-3xl bg-black/95 border-2 border-emerald-400 shadow-none p-6 mt-3 min-h-[160px] flex items-center justify-center">
-          <div className="text-center space-y-3">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-400 mx-auto"></div>
-            <div className="text-emerald-100 text-xs">Loading job alerts...</div>
+    return <div className="max-w-5xl mx-auto w-full mb-8">
+        <div className="rounded-3xl bg-black/95 border-2 border-orange-400 shadow-none p-6 space-y-4">
+          <div className="h-8 bg-orange-900/30 rounded-lg animate-pulse"></div>
+          <div className="h-4 bg-orange-900/20 rounded animate-pulse w-3/4"></div>
+          <div className="space-y-3 pt-4">
+            <div className="h-24 bg-orange-900/30 rounded-xl animate-pulse"></div>
+            <div className="h-24 bg-orange-900/30 rounded-xl animate-pulse"></div>
           </div>
         </div>
       </div>;
