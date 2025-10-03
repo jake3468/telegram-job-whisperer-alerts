@@ -29,7 +29,7 @@ const profileItems = [{
   url: '/job-tracker',
   icon: Kanban
 }, {
-  title: 'AI Mock Interview',
+  title: 'AI Phone Interview',
   url: '/ai-mock-interview',
   icon: Phone
 }, {
