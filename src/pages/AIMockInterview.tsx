@@ -92,7 +92,7 @@ const AIMockInterview = () => {
               )}
             </div>
             
-            <h2 className="text-xl md:text-2xl text-gray-700 mb-4 leading-relaxed">Get a Mock Interview Phone Call from 👩🏻 Grace</h2>
+            <h2 className="text-xl md:text-2xl text-gray-700 mb-4 leading-relaxed">Practice Interviews with Grace 👩🏻, Your AI Coach</h2>
             
             {/* Action Buttons */}
             <div className="mb-6 flex flex-wrap gap-3 justify-center">
