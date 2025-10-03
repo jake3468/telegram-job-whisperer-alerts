@@ -177,7 +177,7 @@ const JobAlertsSection = ({
                 <span>Job Alerts</span>
               </span>
             </div>
-            <p className="text-orange-100 font-inter text-sm drop-shadow-none font-extralight">Set up personalized daily job alerts based on your preferences - just one job title and location per alert to ensure we send you the most accurate matches.</p>
+            <p className="text-white font-inter text-sm drop-shadow-none font-extralight">Choose one job title and location per alert to receive precise, daily matches that fit your preferences.</p>
             
             {/* Alert Usage Counter */}
             {isActivated && <div className="flex items-center gap-2 mt-2">
