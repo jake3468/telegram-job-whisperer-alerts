@@ -153,7 +153,7 @@ const JobAlertsSection = ({
         </div>
       </div>;
   }
-  return <section className="rounded-3xl border-2 border-orange-400 bg-orange-900/90 shadow-none p-0 max-w-5xl mx-auto">
+  return <section className="rounded-3xl border-2 border-orange-400 bg-orange-900/90 shadow-none p-0 max-w-5xl mx-auto mb-8">
       <div className="pt-4 px-2 sm:px-6">
         {/* Manual Refresh Button */}
         {error && <div className="mb-4 flex justify-end">
