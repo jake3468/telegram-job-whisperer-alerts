@@ -165,12 +165,6 @@ export default function GetMoreCredits() {
             </div>
           </div>
           
-          {/* Payment Partner Information */}
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-4 justify-center">
-            <span>Powered by</span>
-            <span className="ml-1 font-semibold text-gray-800">Dodo Payments</span>
-          </div>
-          
           {/* Credit Information Section */}
           <div className="max-w-2xl mx-auto mb-6">
             <p className="text-gray-900 font-inter font-normal mb-4 sm:mb-6 animate-fade-in sm:text-base text-left text-sm">
