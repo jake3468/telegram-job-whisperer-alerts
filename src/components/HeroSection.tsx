@@ -7,6 +7,7 @@ import LightRays from './LightRays';
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 import { YouTubeHeroVideo } from '@/components/YouTubeHeroVideo';
 import HandDrawnArrow from './HandDrawnArrow';
+import { ArrowRight } from 'lucide-react';
 
 // Preload rocket animation immediately when module loads
 const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json';
@@ -204,7 +205,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[14px] md:text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[14px] md:text-[16px] font-notion-inter font-medium text-foreground text-left md:text-center">
-            Get personalized job alerts, auto-generated resumes & cover letters, interview prep, insider hiring connections & more — all through simple Telegram chats. Finding your dream job has never been this fast or effortless.
+            Get personalized job alerts, ATS-friendly resumes & cover letters, interview prep files, direct HR/recruiter contacts and more — all through simple Telegram chats. Finding your dream job has never been this fast or effortless.
           </p>
           
           <SignedOut>
@@ -212,7 +213,7 @@ const HeroSection = () => {
             <div className="flex flex-row items-center justify-center mb-8">
               <SignUpButton mode="modal">
                 <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-6 py-3 md:px-8 md:py-3 text-lg md:text-xl rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-center w-auto border border-transparent">
-                  Start Now
+                  Start Now <ArrowRight className="w-5 h-5 inline ml-1" />
                 </button>
               </SignUpButton>
               
@@ -224,49 +225,49 @@ const HeroSection = () => {
                </div> */}
             </div>
             {/* Avatar Group with Rating */}
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <div className="flex -space-x-2">
-                <Avatar className="h-8 w-8 border-2 border-white dark:border-white border-gray-300">
+            <div className="flex items-center justify-center gap-2 md:gap-4 mb-6">
+              <div className="flex -space-x-1.5 md:-space-x-2">
+                <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Remy Sharp" />
                   <AvatarFallback>RS</AvatarFallback>
                 </Avatar>
-                <Avatar className="h-8 w-8 border-2 border-white dark:border-white border-gray-300">
+                <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Travis Howard" />
                   <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
-                <Avatar className="h-8 w-8 border-2 border-white dark:border-white border-gray-300">
+                <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="Agnes Walker" />
                   <AvatarFallback>AW</AvatarFallback>
                 </Avatar>
-                <Avatar className="h-8 w-8 border-2 border-white dark:border-white border-gray-300">
+                <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="Trevor Henderson" />
                   <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
               </div>
               
               <div className="flex flex-col items-start">
-                <div className="flex text-yellow-400 dark:text-yellow-400 mb-1 [text-shadow:_0_0_2px_rgba(0,0,0,0.8)] dark:[text-shadow:none]">
+                <div className="flex text-yellow-400 dark:text-yellow-400 mb-0.5 md:mb-1 text-sm md:text-base [text-shadow:_0_0_2px_rgba(0,0,0,0.8)] dark:[text-shadow:none]">
                   <span>⭐⭐⭐⭐⭐</span>
                 </div>
-                <div className="text-foreground text-sm text-left">
-                  <span className="italic text-sm font-medium">Trusted by <span className="font-bold">3000+</span> job seekers worldwide</span>
+                <div className="text-foreground text-xs md:text-sm text-left">
+                  <span className="italic font-medium">Trusted by <span className="font-bold">3000+</span> job seekers worldwide</span>
                 </div>
               </div>
             </div>
-          </SignedOut>
 
-          {/* Hero Video - Shows fully on mobile, larger size and reduced spacing */}
-          <div className="flex md:hidden justify-center items-center mt-6 mb-2 px-2">
-            <YouTubeHeroVideo className="w-full max-w-[320px]" />
-          </div>
-          
-          {/* Mobile Demo Text with Arrow - positioned below video pointing up */}
-          <div className="flex md:hidden items-start gap-3 mt-4 mb-6 justify-center px-4">
-            <HandDrawnArrow direction="up" className="flex-shrink-0 mt-1" />
-            <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm">
-              check out this demo… our 3 Telegram AI Job Agents are right here, showing how they can help you stand out like the top 1%.
-            </p>
-          </div>
+            {/* Full-width YouTube Video */}
+            <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] px-4 md:w-full md:max-w-5xl md:left-0 md:right-0 md:ml-0 md:mr-0 md:mx-auto md:px-8 lg:w-screen lg:max-w-none lg:left-1/2 lg:right-1/2 lg:-ml-[50vw] lg:-mr-[50vw] lg:px-16 my-8">
+              <div className="w-full aspect-video rounded-2xl overflow-hidden">
+                <iframe
+                  className="w-full h-full"
+                  src="https://www.youtube.com/embed/eVKtDxScOEo?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=eVKtDxScOEo"
+                  title="Aspirely Demo Video"
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          </SignedOut>
 
         <SignedIn>
           <button onClick={goToDashboard} className="bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-600 hover:from-sky-600 hover:to-blue-700 text-white px-12 py-4 text-lg sm:text-xl rounded-xl transition-all duration-300 font-inter font-bold shadow-2xl drop-shadow-xl hover:shadow-sky-500/60 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-sky-400/50 mb-2">
@@ -284,26 +285,6 @@ const HeroSection = () => {
     <section className="relative py-8 bg-background">
       <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
         <div className="elfsight-app-4951d48f-0df4-4724-a25f-ace7b5dfeb22" data-elfsight-app-lazy></div>
-      </div>
-    </section>
-    
-    {/* Desktop/Tablet Video Demo Section */}
-    <section className="hidden md:block relative py-8 bg-background">
-      <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
-        <div className="flex flex-col items-center justify-center">
-          {/* Video Component */}
-          <div className="mb-6">
-            <YouTubeHeroVideo className="w-full max-w-xs" />
-          </div>
-          
-          {/* Demo Text with Arrow - centrally aligned */}
-          <div className="flex items-start gap-3 justify-center">
-            <HandDrawnArrow direction="up" className="flex-shrink-0 mt-1" />
-            <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm text-center">
-              check out this demo… our 3 Telegram AI Job Agents are right here, showing how they can help you stand out like the top 1%.
-            </p>
-          </div>
-        </div>
       </div>
     </section>
     
@@ -339,7 +320,7 @@ const HeroSection = () => {
               
               <div className="flex justify-center">
                 <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white hover:opacity-90 px-6 py-3 rounded-xl transition-all duration-200 font-medium" style={{backgroundColor: '#30313d'}}>
-                  Try it 👉
+                  Try it <ArrowRight className="w-4 h-4 inline" />
                 </a>
               </div>
             </div>
@@ -361,7 +342,7 @@ const HeroSection = () => {
               
               <div className="flex justify-center">
                 <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white hover:opacity-90 px-6 py-3 rounded-xl transition-all duration-200 font-medium" style={{backgroundColor: '#30313d'}}>
-                  Try it 👉
+                  Try it <ArrowRight className="w-4 h-4 inline" />
                 </a>
               </div>
             </div>
@@ -379,8 +360,26 @@ const HeroSection = () => {
               
               <div className="flex justify-center">
                 <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white hover:opacity-90 px-6 py-3 rounded-xl transition-all duration-200 font-medium" style={{backgroundColor: '#30313d'}}>
-                  Try it 👉
+                  Try it <ArrowRight className="w-4 h-4 inline" />
                 </a>
+              </div>
+            </div>
+            
+            {/* Demo Video Section - All screen sizes */}
+            <div className="mt-12 mb-8">
+              <div className="flex flex-col items-center justify-center">
+                {/* Video Component - Responsive for all screens */}
+                <div className="mb-6">
+                  <YouTubeHeroVideo className="w-full max-w-[320px] md:max-w-xs" />
+                </div>
+                
+                {/* Demo Text with Arrow - Responsive layout */}
+                <div className="flex items-start gap-3 justify-center px-4">
+                  <HandDrawnArrow direction="up" className="flex-shrink-0 mt-1" />
+                  <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm text-left md:text-center">
+                    check out this demo… our 3 Telegram AI Job Agents are right here, showing how they can help you stand out like the top 1%.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
