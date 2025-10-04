@@ -339,7 +339,7 @@ const HeroSection = () => {
               
               <div className="flex justify-center">
                 <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white hover:opacity-90 px-6 py-3 rounded-xl transition-all duration-200 font-medium" style={{backgroundColor: '#30313d'}}>
-                  Try it 👉
+                  Try it →
                 </a>
               </div>
             </div>
@@ -361,7 +361,7 @@ const HeroSection = () => {
               
               <div className="flex justify-center">
                 <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white hover:opacity-90 px-6 py-3 rounded-xl transition-all duration-200 font-medium" style={{backgroundColor: '#30313d'}}>
-                  Try it 👉
+                  Try it →
                 </a>
               </div>
             </div>
@@ -379,7 +379,7 @@ const HeroSection = () => {
               
               <div className="flex justify-center">
                 <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white hover:opacity-90 px-6 py-3 rounded-xl transition-all duration-200 font-medium" style={{backgroundColor: '#30313d'}}>
-                  Try it 👉
+                  Try it →
                 </a>
               </div>
             </div>
