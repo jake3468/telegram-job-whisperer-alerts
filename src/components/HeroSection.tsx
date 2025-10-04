@@ -254,6 +254,19 @@ const HeroSection = () => {
                 </div>
               </div>
             </div>
+
+            {/* Full-width YouTube Video */}
+            <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] my-8">
+              <div className="w-full aspect-video">
+                <iframe
+                  className="w-full h-full"
+                  src="https://www.youtube.com/embed/eVKtDxScOEo?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&loop=1&playlist=eVKtDxScOEo"
+                  title="Aspirely Demo Video"
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                />
+              </div>
+            </div>
           </SignedOut>
 
         <SignedIn>
