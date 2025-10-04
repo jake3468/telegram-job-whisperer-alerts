@@ -256,8 +256,8 @@ const HeroSection = () => {
             </div>
 
             {/* Full-width YouTube Video */}
-            <div className="w-screen md:w-full md:max-w-4xl relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] md:left-0 md:right-0 md:ml-0 md:mr-0 md:mx-auto my-8">
-              <div className="w-full aspect-video">
+            <div className="w-screen md:w-full md:max-w-7xl relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] md:left-0 md:right-0 md:ml-0 md:mr-0 md:mx-auto md:px-8 my-8">
+              <div className="w-full aspect-video rounded-2xl overflow-hidden">
                 <iframe
                   className="w-full h-full"
                   src="https://www.youtube.com/embed/eVKtDxScOEo?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=eVKtDxScOEo"
