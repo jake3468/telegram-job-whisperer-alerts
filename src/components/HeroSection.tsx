@@ -256,19 +256,6 @@ const HeroSection = () => {
             </div>
           </SignedOut>
 
-          {/* Hero Video - Shows fully on mobile, larger size and reduced spacing */}
-          <div className="flex md:hidden justify-center items-center mt-6 mb-2 px-2">
-            <YouTubeHeroVideo className="w-full max-w-[320px]" />
-          </div>
-          
-          {/* Mobile Demo Text with Arrow - positioned below video pointing up */}
-          <div className="flex md:hidden items-start gap-3 mt-4 mb-6 justify-center px-4">
-            <HandDrawnArrow direction="up" className="flex-shrink-0 mt-1" />
-            <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm">
-              check out this demo… our 3 Telegram AI Job Agents are right here, showing how they can help you stand out like the top 1%.
-            </p>
-          </div>
-
         <SignedIn>
           <button onClick={goToDashboard} className="bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-600 hover:from-sky-600 hover:to-blue-700 text-white px-12 py-4 text-lg sm:text-xl rounded-xl transition-all duration-300 font-inter font-bold shadow-2xl drop-shadow-xl hover:shadow-sky-500/60 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-sky-400/50 mb-2">
             Go to Dashboard
@@ -285,26 +272,6 @@ const HeroSection = () => {
     <section className="relative py-8 bg-background">
       <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
         <div className="elfsight-app-4951d48f-0df4-4724-a25f-ace7b5dfeb22" data-elfsight-app-lazy></div>
-      </div>
-    </section>
-    
-    {/* Desktop/Tablet Video Demo Section */}
-    <section className="hidden md:block relative py-8 bg-background">
-      <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
-        <div className="flex flex-col items-center justify-center">
-          {/* Video Component */}
-          <div className="mb-6">
-            <YouTubeHeroVideo className="w-full max-w-xs" />
-          </div>
-          
-          {/* Demo Text with Arrow - centrally aligned */}
-          <div className="flex items-start gap-3 justify-center">
-            <HandDrawnArrow direction="up" className="flex-shrink-0 mt-1" />
-            <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm text-center">
-              check out this demo… our 3 Telegram AI Job Agents are right here, showing how they can help you stand out like the top 1%.
-            </p>
-          </div>
-        </div>
       </div>
     </section>
     
@@ -382,6 +349,24 @@ const HeroSection = () => {
                 <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white hover:opacity-90 px-6 py-3 rounded-xl transition-all duration-200 font-medium" style={{backgroundColor: '#30313d'}}>
                   Try it <ArrowRight className="w-4 h-4 inline" />
                 </a>
+              </div>
+            </div>
+            
+            {/* Demo Video Section - All screen sizes */}
+            <div className="mt-12 mb-8">
+              <div className="flex flex-col items-center justify-center">
+                {/* Video Component - Responsive for all screens */}
+                <div className="mb-6">
+                  <YouTubeHeroVideo className="w-full max-w-[320px] md:max-w-xs" />
+                </div>
+                
+                {/* Demo Text with Arrow - Responsive layout */}
+                <div className="flex items-start gap-3 justify-center px-4">
+                  <HandDrawnArrow direction="up" className="flex-shrink-0 mt-1" />
+                  <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm text-left md:text-center">
+                    check out this demo… our 3 Telegram AI Job Agents are right here, showing how they can help you stand out like the top 1%.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
