@@ -225,32 +225,32 @@ const HeroSection = () => {
                </div> */}
             </div>
             {/* Avatar Group with Rating */}
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <div className="flex -space-x-2">
-                <Avatar className="h-8 w-8 border-2 border-white dark:border-white border-gray-300">
+            <div className="flex items-center justify-center gap-2 md:gap-4 mb-6">
+              <div className="flex -space-x-1.5 md:-space-x-2">
+                <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Remy Sharp" />
                   <AvatarFallback>RS</AvatarFallback>
                 </Avatar>
-                <Avatar className="h-8 w-8 border-2 border-white dark:border-white border-gray-300">
+                <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Travis Howard" />
                   <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
-                <Avatar className="h-8 w-8 border-2 border-white dark:border-white border-gray-300">
+                <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="Agnes Walker" />
                   <AvatarFallback>AW</AvatarFallback>
                 </Avatar>
-                <Avatar className="h-8 w-8 border-2 border-white dark:border-white border-gray-300">
+                <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="Trevor Henderson" />
                   <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
               </div>
               
               <div className="flex flex-col items-start">
-                <div className="flex text-yellow-400 dark:text-yellow-400 mb-1 [text-shadow:_0_0_2px_rgba(0,0,0,0.8)] dark:[text-shadow:none]">
+                <div className="flex text-yellow-400 dark:text-yellow-400 mb-0.5 md:mb-1 text-sm md:text-base [text-shadow:_0_0_2px_rgba(0,0,0,0.8)] dark:[text-shadow:none]">
                   <span>⭐⭐⭐⭐⭐</span>
                 </div>
-                <div className="text-foreground text-sm text-left">
-                  <span className="italic text-sm font-medium">Trusted by <span className="font-bold">3000+</span> job seekers worldwide</span>
+                <div className="text-foreground text-xs md:text-sm text-left">
+                  <span className="italic font-medium">Trusted by <span className="font-bold">3000+</span> job seekers worldwide</span>
                 </div>
               </div>
             </div>
