@@ -76,6 +76,8 @@ const HeroSection = () => {
   const [telegramAnimationData, setTelegramAnimationData] = useState(null);
   const fullText = 'AI finds your next job while you sleep';
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const videoRef = useRef<HTMLDivElement>(null);
+  const [shouldAutoplay, setShouldAutoplay] = useState(false);
   useEffect(() => {
     if (isLoaded && user) {
       navigate('/dashboard');
@@ -149,6 +151,34 @@ const HeroSection = () => {
       });
     };
   }, []);
+
+  // Intersection Observer for video autoplay
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    const videoObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !shouldAutoplay) {
+            setShouldAutoplay(true);
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.5 // Trigger when 50% of video is visible
+      }
+    );
+
+    videoObserver.observe(videoRef.current);
+
+    return () => {
+      if (videoRef.current) {
+        videoObserver.unobserve(videoRef.current);
+      }
+    };
+  }, [shouldAutoplay]);
   const goToDashboard = () => {
     navigate('/dashboard');
   };
@@ -256,11 +286,14 @@ const HeroSection = () => {
             </div>
 
             {/* Full-width YouTube Video */}
-            <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] px-4 md:w-full md:max-w-5xl md:left-0 md:right-0 md:ml-0 md:mr-0 md:mx-auto md:px-8 lg:w-screen lg:max-w-none lg:left-1/2 lg:right-1/2 lg:-ml-[50vw] lg:-mr-[50vw] lg:px-16 my-8">
+            <div 
+              ref={videoRef}
+              className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] px-4 md:w-full md:max-w-5xl md:left-0 md:right-0 md:ml-0 md:mr-0 md:mx-auto md:px-8 lg:w-screen lg:max-w-none lg:left-1/2 lg:right-1/2 lg:-ml-[50vw] lg:-mr-[50vw] lg:px-16 my-8"
+            >
               <div className="w-full aspect-video rounded-2xl overflow-hidden">
                 <iframe
                   className="w-full h-full"
-                  src="https://www.youtube.com/embed/eVKtDxScOEo?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=eVKtDxScOEo"
+                  src={`https://www.youtube.com/embed/eVKtDxScOEo?${shouldAutoplay ? 'autoplay=1&' : ''}mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=eVKtDxScOEo`}
                   title="Aspirely Demo Video"
                   allow="autoplay; encrypted-media"
                   allowFullScreen
