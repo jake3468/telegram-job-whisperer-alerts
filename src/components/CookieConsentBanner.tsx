@@ -15,6 +15,9 @@ interface CookiePreferences {
 }
 
 export const CookieConsentBanner = () => {
+  // Temporarily disabled - remove the line below to re-enable
+  return null;
+  
   const [showBanner, setShowBanner] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [preferences, setPreferences] = useState<CookiePreferences>({
