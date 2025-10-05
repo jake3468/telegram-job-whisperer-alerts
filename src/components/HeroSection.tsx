@@ -382,7 +382,8 @@ const HeroSection = () => {
               </div>
               
               <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
-                Just chat and get your resume tailored for every role - add new certifications, skills, projects, work experience by just telling it. No long forms, it remembers everything about you. It's like having a resume coach.
+                Your AI resume coach that remembers everything<br />
+                Just chat to add new certifications, skills, projects, or work experience. No forms. No starting over. It remembers everything about you and updates your resume instantly.
               </p>
               
               <div className="flex justify-center">
