@@ -170,10 +170,11 @@ const ComparisonTable = () => {
           <span className="text-2xl flex-shrink-0">💡</span>
           <div className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
             <strong className="font-semibold text-gray-900 dark:text-white">
-              Aspirely.ai is the only platform where your AI agents share one evolving profile.
-            </strong>{" "}
-            Add a new skill once, and your job matches, resumes, cover letters, and interview prep
-            automatically improve everywhere. No other platform connects their features this way.
+              Aspirely.ai is the only platform where you tell us something once, and all your AI agents remember it.
+            </strong>
+            <br />
+            <br />
+            Add a new skill, work experience, or certification—every job-specific resume, cover letter, and application file you generate afterward automatically includes it. Other platforms make you copy-paste and update everywhere manually.
           </div>
         </div>
       </div>

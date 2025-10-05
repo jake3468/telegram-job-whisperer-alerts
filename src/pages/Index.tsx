@@ -14,6 +14,7 @@ import Footer from "@/components/Footer";
 import { useEffect } from "react";
 import { HeroSkeleton } from '@/components/ui/skeleton';
 import { useProgressiveAuth } from '@/hooks/useProgressiveAuth';
+import { useScrollTracking } from '@/hooks/useScrollTracking';
 
 // Global postMessage error handler to suppress external service errors
 const suppressExternalPostMessageErrors = () => {
@@ -36,6 +37,10 @@ const suppressExternalPostMessageErrors = () => {
 
 const Index = () => {
   const { shouldRender, showSkeleton } = useProgressiveAuth();
+  
+  // Track scroll depth for all sections
+  useScrollTracking();
+  
   useEffect(() => {
     // Suppress external postMessage errors
     suppressExternalPostMessageErrors();
@@ -78,12 +83,8 @@ const Index = () => {
       <AboutUsSection />
       <ToolsSection />
       <HowItWorksSection />
-      <div id="pricing">
-        <PricingSection />
-      </div>
-      <div id="faq">
-        <FAQSection />
-      </div>
+      <PricingSection />
+      <FAQSection />
       <Footer />
     </div>
   );

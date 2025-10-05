@@ -37,7 +37,7 @@ const PricingSection = () => {
         </div>
       </section>;
   }
-  return <section className="py-8 md:py-12 px-4 bg-background">
+  return <section id="pricing" className="py-8 md:py-12 px-4 bg-background">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-6">
           <h2 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-primary via-primary to-primary bg-clip-text mb-2 font-inter text-foreground">Pricing Plans</h2>

@@ -11,6 +11,7 @@ export const YouTubeHeroVideo: React.FC<YouTubeHeroVideoProps> = ({
   const [isVisible, setIsVisible] = useState(false);
   const [shouldPlay, setShouldPlay] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showThumbnailDelay, setShowThumbnailDelay] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
@@ -23,28 +24,42 @@ export const YouTubeHeroVideo: React.FC<YouTubeHeroVideoProps> = ({
     setIsLoading(false);
   }, []);
 
-  // Intersection Observer for autoplay on scroll
+  // Mobile: Autoplay after 3 seconds on page load
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          setShouldPlay(true);
-        }
-      },
-      { threshold: 0.5 }
-    );
+    if (isMobile) {
+      // Start 3-second timer immediately on mount
+      const timer = setTimeout(() => {
+        setShowThumbnailDelay(false);
+        setShouldPlay(true);
+      }, 3000);
 
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
+      return () => clearTimeout(timer);
     }
+  }, [isMobile]);
 
-    return () => {
+  // Desktop: Intersection Observer for visibility tracking only
+  useEffect(() => {
+    if (!isMobile) {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          }
+        },
+        { threshold: 0.5 }
+      );
+
       if (containerRef.current) {
-        observer.unobserve(containerRef.current);
+        observer.observe(containerRef.current);
       }
-    };
-  }, []);
+
+      return () => {
+        if (containerRef.current) {
+          observer.unobserve(containerRef.current);
+        }
+      };
+    }
+  }, [isMobile]);
 
   if (isLoading) {
     return (
@@ -91,7 +106,7 @@ export const YouTubeHeroVideo: React.FC<YouTubeHeroVideoProps> = ({
         <div className="absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-black rounded-[2rem] shadow-2xl border border-slate-600">
           {/* Phone Inner Screen - Very thin bezels to show full video */}
           <div className="absolute top-2 left-2 right-2 bottom-2 bg-black rounded-[1.5rem] overflow-hidden">
-            {shouldPlay ? (
+            {shouldPlay && (!isMobile || !showThumbnailDelay) ? (
               /* YouTube Video Embed */
               <iframe
                 src={embedUrl}
@@ -108,14 +123,16 @@ export const YouTubeHeroVideo: React.FC<YouTubeHeroVideoProps> = ({
                   alt="Video preview"
                   className="w-full h-full object-cover rounded-[1.5rem]"
                 />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <button 
-                    onClick={() => setShouldPlay(true)}
-                    className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-lg hover:bg-red-700 transition-colors"
-                  >
-                    <div className="w-0 h-0 border-l-[20px] border-l-white border-y-[12px] border-y-transparent ml-1"></div>
-                  </button>
-                </div>
+                {!isMobile && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <button 
+                      onClick={() => setShouldPlay(true)}
+                      className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-lg hover:bg-red-700 transition-colors"
+                    >
+                      <div className="w-0 h-0 border-l-[20px] border-l-white border-y-[12px] border-y-transparent ml-1"></div>
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
