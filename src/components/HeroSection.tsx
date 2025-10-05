@@ -359,7 +359,8 @@ const HeroSection = () => {
               </div>
               
             <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
-              1 job alert = 7 instant files with just one-click. Get tailored resumes, cover letters, interview prep, job fit analysis, and HR contacts - all personalized for each role.
+              Get 7 instant job-specific files with one click<br />
+              See a job you like? Click once. Get a tailored resume, cover letter, interview prep, job fit analysis, and HR contacts—all personalized for that specific role.
             </p>
               
               <div className="flex justify-center">
