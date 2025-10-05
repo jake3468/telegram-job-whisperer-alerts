@@ -8,6 +8,7 @@ import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 import { YouTubeHeroVideo } from '@/components/YouTubeHeroVideo';
 import HandDrawnArrow from './HandDrawnArrow';
 import { ArrowRight } from 'lucide-react';
+import ComparisonTable from '@/components/ComparisonTable';
 
 // Preload rocket animation immediately when module loads
 const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json';
@@ -76,6 +77,8 @@ const HeroSection = () => {
   const [telegramAnimationData, setTelegramAnimationData] = useState(null);
   const fullText = 'AI finds your next job while you sleep';
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const videoRef = useRef<HTMLDivElement>(null);
+  const [shouldAutoplay, setShouldAutoplay] = useState(false);
   useEffect(() => {
     if (isLoaded && user) {
       navigate('/dashboard');
@@ -149,6 +152,38 @@ const HeroSection = () => {
       });
     };
   }, []);
+
+  // Intersection Observer for video autoplay
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    // Use higher threshold for mobile (95%) and lower for desktop (50%)
+    const isMobile = window.innerWidth < 768;
+    const threshold = isMobile ? 0.95 : 0.5;
+
+    const videoObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !shouldAutoplay) {
+            setShouldAutoplay(true);
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: '0px',
+        threshold // Trigger at 95% for mobile, 50% for desktop
+      }
+    );
+
+    videoObserver.observe(videoRef.current);
+
+    return () => {
+      if (videoRef.current) {
+        videoObserver.unobserve(videoRef.current);
+      }
+    };
+  }, [shouldAutoplay]);
   const goToDashboard = () => {
     navigate('/dashboard');
   };
@@ -165,30 +200,24 @@ const HeroSection = () => {
         <div className="relative mb-8 md:mt-8">
           <h1 className="relative z-30 text-[42px] md:text-[46px] lg:text-[52px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile view only */}
-            <div className="block md:hidden text-left text-[28px] leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">Don't Job Hunt <span className="font-bold underline decoration-red-500 decoration-4 underline-offset-4">Alone</span>.</span>
+            <div className="block md:hidden text-left text-[24px] leading-tight animate-fly-in-from-bottom">
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">AI That Calls <span className="font-bold bg-cyan-200 dark:bg-cyan-900/40 px-2 py-1 rounded border border-black dark:border-white">Your Phone</span></span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">Get Your Own Team of</span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">AI Assistants</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">for a Mock Interview <span style={{color: 'inherit', filter: 'none'}}>📞</span></span>
             </div>
             
             {/* Desktop view only */}
             <div className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic whitespace-nowrap">Don't Job Hunt <span className="font-bold underline decoration-red-500 decoration-4 underline-offset-4">Alone</span>.</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">AI That Calls <span className="font-bold bg-cyan-200 dark:bg-cyan-900/40 px-2 py-1 rounded border border-black dark:border-white">Your Phone</span></span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic whitespace-nowrap">Get Your Own Team of</span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">AI Assistants</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">for a Mock Interview <span style={{color: 'inherit', filter: 'none'}}>📞</span></span>
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic whitespace-nowrap">Don't Job Hunt <span className="font-bold underline decoration-red-500 decoration-4 underline-offset-4">Alone</span>.</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">AI That Calls <span className="font-bold bg-cyan-200 dark:bg-cyan-900/40 px-2 py-1 rounded border border-black dark:border-white">Your Phone</span></span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic whitespace-nowrap">Get Your Own Team of</span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">AI Assistants</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">for a Mock Interview <span style={{color: 'inherit', filter: 'none'}}>📞</span></span>
             </div>
           </h1>
         </div>
@@ -205,15 +234,15 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[14px] md:text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[14px] md:text-[16px] font-notion-inter font-medium text-foreground text-left md:text-center">
-            Get personalized job alerts, ATS-friendly resumes & cover letters, interview prep files, direct HR/recruiter contacts and more — all through simple Telegram chats. Finding your dream job has never been this fast or effortless.
+            Get realistic interview practice with AI phone calls. Plus: Daily job alerts on Telegram, one-click application files, and full tracking on web—everything synced to your profile.
           </p>
           
           <SignedOut>
             {/* Button Container */}
             <div className="flex flex-row items-center justify-center mb-8">
               <SignUpButton mode="modal">
-                <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-6 py-3 md:px-8 md:py-3 text-lg md:text-xl rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-center w-auto border border-transparent">
-                  Start Now <ArrowRight className="w-5 h-5 inline ml-1" />
+                <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-4 py-2 md:px-6 md:py-2.5 text-lg md:text-xl rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-center w-auto border border-transparent">
+                  Try Free AI Interview <ArrowRight className="w-5 h-5 inline ml-1" />
                 </button>
               </SignUpButton>
               
@@ -256,11 +285,23 @@ const HeroSection = () => {
             </div>
 
             {/* Full-width YouTube Video */}
-            <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] px-4 md:w-full md:max-w-5xl md:left-0 md:right-0 md:ml-0 md:mr-0 md:mx-auto md:px-8 lg:w-screen lg:max-w-none lg:left-1/2 lg:right-1/2 lg:-ml-[50vw] lg:-mr-[50vw] lg:px-16 my-8">
-              <div className="w-full aspect-video rounded-2xl overflow-hidden">
+            <div 
+              ref={videoRef}
+              className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] px-4 md:w-full md:max-w-5xl md:left-0 md:right-0 md:ml-0 md:mr-0 md:mx-auto md:px-8 lg:w-screen lg:max-w-none lg:left-1/2 lg:right-1/2 lg:-ml-[50vw] lg:-mr-[50vw] lg:px-16 my-8"
+            >
+              <div className="w-full aspect-video rounded-2xl overflow-hidden relative">
+                {/* Thumbnail - shown until video autoplays */}
+                {!shouldAutoplay && (
+                  <img 
+                    src="/video-thumbnail.png" 
+                    alt="Video thumbnail"
+                    className="absolute inset-0 w-full h-full object-cover z-10"
+                  />
+                )}
+                
                 <iframe
                   className="w-full h-full"
-                  src="https://www.youtube.com/embed/eVKtDxScOEo?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=eVKtDxScOEo"
+                  src={`https://www.youtube.com/embed/eVKtDxScOEo?${shouldAutoplay ? 'autoplay=1&' : ''}mute=1&controls=0&rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&disablekb=1&fs=0&loop=1&playlist=eVKtDxScOEo`}
                   title="Aspirely Demo Video"
                   allow="autoplay; encrypted-media"
                   allowFullScreen
@@ -281,9 +322,12 @@ const HeroSection = () => {
       </div>
     </section>
     
-    {/* Elfsight Testimonials Slider */}
+    {/* Comparison Table Section */}
+    <ComparisonTable />
+    
+    {/* Elfsight Testimonials Slider - Moved below comparison table callout */}
     <section className="relative py-8 bg-background">
-      <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
+      <div className="max-w-7xl mx-auto z-20 relative w-full px-4">
         <div className="elfsight-app-4951d48f-0df4-4724-a25f-ace7b5dfeb22" data-elfsight-app-lazy></div>
       </div>
     </section>
