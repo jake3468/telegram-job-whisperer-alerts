@@ -202,21 +202,21 @@ const HeroSection = () => {
             <div className="block md:hidden text-left text-[24px] leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Simplify Your Job Search</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">with our <span className="font-bold bg-cyan-200 dark:bg-cyan-900/40 px-2 py-1 rounded">AI Agents</span></span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">with our <span className="font-bold bg-[#FEF3C7] dark:bg-[#FEF3C7] px-2 py-1 rounded">AI Agents</span></span>
             </div>
             
             {/* Desktop view only */}
             <div className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Simplify Your Job Search</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">with our <span className="font-bold bg-cyan-200 dark:bg-cyan-900/40 px-2 py-1 rounded">AI Agents</span></span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">with our <span className="font-bold bg-[#FEF3C7] dark:bg-[#FEF3C7] px-2 py-1 rounded">AI Agents</span></span>
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Simplify Your Job Search</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">with our <span className="font-bold bg-cyan-200 dark:bg-cyan-900/40 px-2 py-1 rounded">AI Agents</span></span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">with our <span className="font-bold bg-[#FEF3C7] dark:bg-[#FEF3C7] px-2 py-1 rounded">AI Agents</span></span>
             </div>
           </h1>
         </div>
