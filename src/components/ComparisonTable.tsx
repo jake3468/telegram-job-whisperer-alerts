@@ -61,7 +61,7 @@ const ComparisonTable = () => {
       ],
     },
     {
-      name: "Intelligent Profile System",
+      name: "Intelligent\nProfile System",
       special: true,
       values: [
         { type: "check", text: "Remembers & adapts—update once, everything improves" },
@@ -123,7 +123,7 @@ const ComparisonTable = () => {
                 >
                   <td className="px-4 py-3 font-medium text-gray-900 dark:text-white text-xs md:text-sm border-r border-gray-300 dark:border-gray-600 sticky left-0 bg-white dark:bg-gray-900 z-10">
                     {feature.special && <Star className="inline-block w-3 h-3 md:w-4 md:h-4 text-yellow-500 mr-1" />}
-                    {feature.name}
+                    <span className="whitespace-pre-line">{feature.name}</span>
                   </td>
                   {feature.values.map((value, valueIdx) => (
                     <td
@@ -139,7 +139,7 @@ const ComparisonTable = () => {
                       <div className="flex flex-col items-center gap-1">
                         {renderIcon(value.type)}
                         {value.text && (
-                          <span className="text-[10px] md:text-xs text-gray-600 dark:text-gray-400 leading-tight">
+                          <span className="text-[10px] md:text-xs text-gray-600 dark:text-gray-400 leading-tight max-w-[120px] md:max-w-[150px]">
                             {value.text}
                           </span>
                         )}

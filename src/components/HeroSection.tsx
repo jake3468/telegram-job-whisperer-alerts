@@ -325,9 +325,9 @@ const HeroSection = () => {
     {/* Comparison Table Section */}
     <ComparisonTable />
     
-    {/* Elfsight Testimonials Slider */}
+    {/* Elfsight Testimonials Slider - Moved below comparison table callout */}
     <section className="relative py-8 bg-background">
-      <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
+      <div className="max-w-7xl mx-auto z-20 relative w-full px-4">
         <div className="elfsight-app-4951d48f-0df4-4724-a25f-ace7b5dfeb22" data-elfsight-app-lazy></div>
       </div>
     </section>
