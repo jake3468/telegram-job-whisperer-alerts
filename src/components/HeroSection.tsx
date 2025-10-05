@@ -352,14 +352,14 @@ const HeroSection = () => {
               ref={(el) => cardsRef.current[0] = el}
               className="animate-on-scroll rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
             >
-              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-6 font-inter text-center">1. Job Alerts AI Agent</h3>
+              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 font-inter text-center">1. Job Alerts AI Agent</h3>
+              <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">Get 7 instant job-specific files with one click.</p>
               
               <div className="flex justify-center mb-6">
                 <img src="/telegram-job-alerts-agent.png" alt="Job Alerts AI Agent demonstration showing personalized job alerts with tailored resumes and cover letters" className="max-w-full h-auto rounded-lg shadow-lg" />
               </div>
               
             <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
-              Get 7 instant job-specific files with one click<br />
               See a job you like? Click once. Get a tailored resume, cover letter, interview prep, job fit analysis, and HR contacts—all personalized for that specific role.
             </p>
               
@@ -375,14 +375,14 @@ const HeroSection = () => {
               ref={(el) => cardsRef.current[1] = el}
               className="animate-on-scroll rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
             >
-              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-6 font-inter text-center">2. Resume Builder AI Agent</h3>
+              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 font-inter text-center">2. Resume Builder AI Agent</h3>
+              <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">Your AI resume coach that remembers everything.</p>
               
               <div className="flex justify-center mb-6">
                 <img src="/telegram-resume-builder-agent.png" alt="Resume Builder AI Agent interface showing conversational resume building and customization" className="max-w-full h-auto rounded-lg shadow-lg" />
               </div>
               
               <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
-                Your AI resume coach that remembers everything<br />
                 Just chat to add new certifications, skills, projects, or work experience. No forms. No starting over. It remembers everything about you and updates your resume instantly.
               </p>
               
@@ -398,10 +398,10 @@ const HeroSection = () => {
               ref={(el) => cardsRef.current[2] = el}
               className="animate-on-scroll rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
             >
-              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-6 font-inter text-center">3. Job Application AI Agent</h3>
+              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 font-inter text-center">3. Job Application AI Agent</h3>
+              <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">From job posting to application-ready in minutes.</p>
               
               <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
-                From job posting to application-ready in minutes<br />
                 Tell it which job you're applying for. Get your complete application package—resume, cover letter, interview prep—tailored to that role.
               </p>
               
