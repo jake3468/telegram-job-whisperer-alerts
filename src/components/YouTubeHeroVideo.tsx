@@ -24,16 +24,11 @@ export const YouTubeHeroVideo: React.FC<YouTubeHeroVideoProps> = ({
     setIsLoading(false);
   }, []);
 
-  // Mobile: Autoplay after 3 seconds on page load
+  // Mobile: Autoplay immediately on page load
   useEffect(() => {
     if (isMobile) {
-      // Start 3-second timer immediately on mount
-      const timer = setTimeout(() => {
-        setShowThumbnailDelay(false);
-        setShouldPlay(true);
-      }, 3000);
-
-      return () => clearTimeout(timer);
+      setShowThumbnailDelay(false);
+      setShouldPlay(true);
     }
   }, [isMobile]);
 

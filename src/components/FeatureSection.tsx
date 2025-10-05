@@ -123,6 +123,7 @@ const FeatureSection = ({
       <h3 className="text-2xl md:text-3xl mb-2 font-inter text-primary font-bold">
         {title}
       </h3>
+      {subheading && <p className="text-base md:text-lg text-foreground/70 font-inter mb-4">{subheading}</p>}
     </div>;
 
   // Mobile: content section (description + button only)
@@ -147,9 +148,10 @@ const FeatureSection = ({
   // Desktop: full content section
   const desktopContentSection = <div className="hidden lg:flex flex-col justify-center space-y-8">
       <div>
-        <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-primary">
+        <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-primary whitespace-nowrap">
           {title}
         </h3>
+        {subheading && <p className="text-lg md:text-xl text-foreground/70 font-inter mb-4">{subheading}</p>}
         <p className="text-lg leading-relaxed font-inter text-foreground">
           {description}
         </p>
