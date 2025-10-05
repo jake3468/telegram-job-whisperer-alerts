@@ -156,6 +156,10 @@ const HeroSection = () => {
   useEffect(() => {
     if (!videoRef.current) return;
 
+    // Use higher threshold for mobile (80%) and lower for desktop (50%)
+    const isMobile = window.innerWidth < 768;
+    const threshold = isMobile ? 0.8 : 0.5;
+
     const videoObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -167,7 +171,7 @@ const HeroSection = () => {
       {
         root: null,
         rootMargin: '0px',
-        threshold: 0.5 // Trigger when 50% of video is visible
+        threshold // Trigger at 80% for mobile, 50% for desktop
       }
     );
 
@@ -293,7 +297,7 @@ const HeroSection = () => {
               <div className="w-full aspect-video rounded-2xl overflow-hidden">
                 <iframe
                   className="w-full h-full"
-                  src={`https://www.youtube.com/embed/eVKtDxScOEo?${shouldAutoplay ? 'autoplay=1&' : ''}mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=eVKtDxScOEo`}
+                  src={`https://www.youtube.com/embed/eVKtDxScOEo?${shouldAutoplay ? 'autoplay=1&' : ''}mute=1&controls=0&rel=0&modestbranding=1&showinfo=0&loop=1&playlist=eVKtDxScOEo`}
                   title="Aspirely Demo Video"
                   allow="autoplay; encrypted-media"
                   allowFullScreen
