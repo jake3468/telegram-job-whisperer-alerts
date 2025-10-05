@@ -94,18 +94,18 @@ const ComparisonTable = () => {
           <table className="w-full min-w-[800px] border-collapse">
             <thead>
               <tr className="bg-gray-50 dark:bg-gray-800 border-b-2 border-gray-300 dark:border-gray-600">
-                <th className="pl-3 pr-2 py-3 text-left font-semibold text-gray-900 dark:text-white text-xs md:text-sm border-r border-gray-300 dark:border-gray-600 sticky left-0 bg-gray-50 dark:bg-gray-800 z-10">
+                <th className="pl-3 pr-2 py-3 text-left font-bold text-gray-950 dark:text-white text-xs md:text-sm border-r border-gray-300 dark:border-gray-600 sticky left-0 bg-gray-50 dark:bg-gray-800 z-10 w-32 md:w-40">
                   Feature
                 </th>
                 {competitors.map((competitor, idx) => (
                   <th
                     key={competitor.name}
-                    className={`px-4 py-3 text-center font-semibold text-xs md:text-sm whitespace-nowrap ${
+                    className={`px-4 py-3 text-center font-bold text-xs md:text-sm whitespace-nowrap ${
                       idx < competitors.length - 1 ? "border-r border-gray-300 dark:border-gray-600" : ""
                     } ${
                       competitor.highlight
-                        ? "bg-cyan-50 dark:bg-cyan-900/20 text-cyan-900 dark:text-cyan-100"
-                        : "text-gray-900 dark:text-white"
+                        ? "bg-cyan-50 dark:bg-cyan-900/20 text-cyan-950 dark:text-cyan-100"
+                        : "text-gray-950 dark:text-white"
                     }`}
                   >
                     {competitor.name}
@@ -121,7 +121,7 @@ const ComparisonTable = () => {
                     feature.special ? "bg-yellow-50 dark:bg-yellow-900/10" : ""
                   }`}
                 >
-                  <td className="pl-3 pr-2 py-3 font-medium text-gray-900 dark:text-white text-xs md:text-sm border-r border-gray-300 dark:border-gray-600 sticky left-0 bg-white dark:bg-gray-900 z-10">
+                  <td className="pl-3 pr-2 py-3 font-semibold text-gray-950 dark:text-white text-xs md:text-sm border-r border-gray-300 dark:border-gray-600 sticky left-0 bg-white dark:bg-gray-900 z-10 w-32 md:w-40">
                     {feature.special && <Star className="inline-block w-3 h-3 md:w-4 md:h-4 text-yellow-500 mr-1" />}
                     <span className="whitespace-pre-line">{feature.name}</span>
                   </td>
@@ -139,7 +139,7 @@ const ComparisonTable = () => {
                       <div className="flex flex-col items-center gap-1">
                         {renderIcon(value.type)}
                         {value.text && (
-                          <span className="text-[10px] md:text-xs text-gray-600 dark:text-gray-400 leading-tight max-w-[120px] md:max-w-[150px]">
+                          <span className="text-[10px] md:text-xs text-gray-800 dark:text-gray-300 leading-tight max-w-[120px] md:max-w-[150px] font-medium">
                             {value.text}
                           </span>
                         )}
