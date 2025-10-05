@@ -87,20 +87,22 @@ const ComparisonTable = () => {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-16">
-      {/* Desktop Table View */}
-      <div className="hidden lg:block bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+    <div className="w-full max-w-7xl mx-auto px-4 py-12">
+      {/* Horizontally Scrollable Table for All Devices */}
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden border border-gray-300 dark:border-gray-700">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[800px] border-collapse">
             <thead>
-              <tr className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                <th className="px-6 py-4 text-left font-semibold text-gray-900 dark:text-white text-sm">
+              <tr className="bg-gray-50 dark:bg-gray-800 border-b-2 border-gray-300 dark:border-gray-600">
+                <th className="px-4 py-3 text-left font-semibold text-gray-900 dark:text-white text-xs md:text-sm border-r border-gray-300 dark:border-gray-600 sticky left-0 bg-gray-50 dark:bg-gray-800 z-10">
                   Feature
                 </th>
-                {competitors.map((competitor) => (
+                {competitors.map((competitor, idx) => (
                   <th
                     key={competitor.name}
-                    className={`px-6 py-4 text-center font-semibold text-sm ${
+                    className={`px-4 py-3 text-center font-semibold text-xs md:text-sm whitespace-nowrap ${
+                      idx < competitors.length - 1 ? "border-r border-gray-300 dark:border-gray-600" : ""
+                    } ${
                       competitor.highlight
                         ? "bg-cyan-50 dark:bg-cyan-900/20 text-cyan-900 dark:text-cyan-100"
                         : "text-gray-900 dark:text-white"
@@ -112,21 +114,23 @@ const ComparisonTable = () => {
               </tr>
             </thead>
             <tbody>
-              {features.map((feature, idx) => (
+              {features.map((feature, featIdx) => (
                 <tr
                   key={feature.name}
-                  className={`border-b border-gray-200 dark:border-gray-700 ${
+                  className={`border-b border-gray-300 dark:border-gray-600 ${
                     feature.special ? "bg-yellow-50 dark:bg-yellow-900/10" : ""
                   }`}
                 >
-                  <td className="px-6 py-4 font-medium text-gray-900 dark:text-white text-sm">
-                    {feature.special && <Star className="inline-block w-4 h-4 text-yellow-500 mr-2" />}
+                  <td className="px-4 py-3 font-medium text-gray-900 dark:text-white text-xs md:text-sm border-r border-gray-300 dark:border-gray-600 sticky left-0 bg-white dark:bg-gray-900 z-10">
+                    {feature.special && <Star className="inline-block w-3 h-3 md:w-4 md:h-4 text-yellow-500 mr-1" />}
                     {feature.name}
                   </td>
                   {feature.values.map((value, valueIdx) => (
                     <td
                       key={valueIdx}
-                      className={`px-6 py-4 text-center ${
+                      className={`px-4 py-3 text-center ${
+                        valueIdx < feature.values.length - 1 ? "border-r border-gray-300 dark:border-gray-600" : ""
+                      } ${
                         competitors[valueIdx].highlight
                           ? "bg-cyan-50 dark:bg-cyan-900/20"
                           : ""
@@ -135,7 +139,7 @@ const ComparisonTable = () => {
                       <div className="flex flex-col items-center gap-1">
                         {renderIcon(value.type)}
                         {value.text && (
-                          <span className="text-xs text-gray-600 dark:text-gray-400">
+                          <span className="text-[10px] md:text-xs text-gray-600 dark:text-gray-400 leading-tight">
                             {value.text}
                           </span>
                         )}
@@ -147,57 +151,11 @@ const ComparisonTable = () => {
             </tbody>
           </table>
         </div>
-      </div>
-
-      {/* Mobile Card View */}
-      <div className="lg:hidden space-y-6">
-        {competitors.map((competitor, compIdx) => (
-          <div
-            key={competitor.name}
-            className={`bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 border ${
-              competitor.highlight
-                ? "border-cyan-500 dark:border-cyan-400"
-                : "border-gray-200 dark:border-gray-700"
-            }`}
-          >
-            <h3
-              className={`text-lg font-bold mb-4 ${
-                competitor.highlight
-                  ? "text-cyan-900 dark:text-cyan-100"
-                  : "text-gray-900 dark:text-white"
-              }`}
-            >
-              {competitor.name}
-            </h3>
-            <div className="space-y-4">
-              {features.map((feature, featIdx) => (
-                <div
-                  key={feature.name}
-                  className={`pb-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0 ${
-                    feature.special ? "bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded" : ""
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="font-medium text-sm text-gray-900 dark:text-white flex items-center gap-2">
-                      {feature.special && (
-                        <Star className="w-4 h-4 text-yellow-500 flex-shrink-0" />
-                      )}
-                      <span>{feature.name}</span>
-                    </div>
-                    <div className="flex flex-col items-end gap-1">
-                      {renderIcon(feature.values[compIdx].type)}
-                      {feature.values[compIdx].text && (
-                        <span className="text-xs text-gray-600 dark:text-gray-400 text-right">
-                          {feature.values[compIdx].text}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+        
+        {/* Scroll indicator for mobile */}
+        <div className="lg:hidden text-center py-2 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-300 dark:border-gray-600">
+          ← Scroll to see more →
+        </div>
       </div>
 
       {/* Differentiator Callout */}
