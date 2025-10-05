@@ -174,7 +174,7 @@ const ComparisonTable = () => {
             </strong>
             <br />
             <br />
-            Add a new skill certification—every resume, cover letter, and application files you generate from that moment on automatically includes it. Other platforms make you update everything separately.
+            Add a new skill, work experience, or certification—every job-specific resume, cover letter, and application file you generate afterward automatically includes it. Other platforms make you copy-paste and update everywhere manually.
           </div>
         </div>
       </div>
