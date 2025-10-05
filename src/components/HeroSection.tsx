@@ -200,23 +200,21 @@ const HeroSection = () => {
           <h1 className="relative z-30 text-[42px] md:text-[46px] lg:text-[52px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile view only */}
             <div className="block md:hidden text-left text-[24px] leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic"><span className="font-bold bg-cyan-200 dark:bg-cyan-900/40 px-2 py-1 rounded">Simplify</span> Your Job Search</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">AI That Calls <span className="font-bold bg-cyan-200 dark:bg-cyan-900/40 px-2 py-1 rounded">Your Phone</span> to</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">with our AI Agents</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Prep You for Interviews 📞</span>
             </div>
             
             {/* Desktop view only */}
             <div className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap"><span className="font-bold bg-cyan-200 dark:bg-cyan-900/40 px-2 py-1 rounded">Simplify</span> Your Job Search</span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">with our AI Agents</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">AI That Calls <span className="font-bold bg-cyan-200 dark:bg-cyan-900/40 px-2 py-1 rounded">Your Phone</span> to Prep You for Interviews 📞</span>
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap"><span className="font-bold bg-cyan-200 dark:bg-cyan-900/40 px-2 py-1 rounded">Simplify</span> Your Job Search</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">AI That Calls <span className="font-bold bg-cyan-200 dark:bg-cyan-900/40 px-2 py-1 rounded">Your Phone</span> to</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">with our AI Agents</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Prep You for Interviews 📞</span>
             </div>
           </h1>
         </div>
@@ -233,7 +231,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[14px] md:text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[14px] md:text-[16px] font-notion-inter font-medium text-foreground text-left md:text-center">
-            Get fresh job alerts on Telegram and create all tailored application files with one click. Track every opportunity and practice phone interviews on web—everything synced to your profile.
+            Get fresh job alerts on Telegram and create all tailored application files with one click. Track every opportunity and practice phone interviews on web — everything synced to your profile.
           </p>
           
           <SignedOut>
