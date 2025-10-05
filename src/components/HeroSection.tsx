@@ -199,24 +199,24 @@ const HeroSection = () => {
         <div className="relative mb-8 md:mt-8">
           <h1 className="relative z-30 text-[42px] md:text-[46px] lg:text-[52px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile view only */}
-            <div className="block md:hidden text-left text-[22px] leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">Simplify Your Job Search</span>
+            <div className="block md:hidden text-left text-[24px] leading-tight animate-fly-in-from-bottom">
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Simplify Your Job Search</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">with our <span className="font-bold bg-blue-200 dark:bg-blue-900/40 px-2 py-1 rounded">AI Agents</span></span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">with our <span className="font-bold bg-blue-200 dark:bg-blue-900/40 px-2 py-1 rounded">AI Agents</span></span>
             </div>
             
             {/* Desktop view only */}
             <div className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic whitespace-nowrap">Simplify Your Job Search</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Simplify Your Job Search</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic whitespace-nowrap">with our <span className="font-bold bg-blue-200 dark:bg-blue-900/40 px-2 py-1 rounded">AI Agents</span></span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">with our <span className="font-bold bg-blue-200 dark:bg-blue-900/40 px-2 py-1 rounded">AI Agents</span></span>
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic whitespace-nowrap">Simplify Your Job Search</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Simplify Your Job Search</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic whitespace-nowrap">with our <span className="font-bold bg-blue-200 dark:bg-blue-900/40 px-2 py-1 rounded">AI Agents</span></span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">with our <span className="font-bold bg-blue-200 dark:bg-blue-900/40 px-2 py-1 rounded">AI Agents</span></span>
             </div>
           </h1>
         </div>
