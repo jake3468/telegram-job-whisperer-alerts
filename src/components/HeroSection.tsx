@@ -8,6 +8,7 @@ import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 import { YouTubeHeroVideo } from '@/components/YouTubeHeroVideo';
 import HandDrawnArrow from './HandDrawnArrow';
 import { ArrowRight } from 'lucide-react';
+import ComparisonTable from '@/components/ComparisonTable';
 
 // Preload rocket animation immediately when module loads
 const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json';
@@ -320,6 +321,9 @@ const HeroSection = () => {
         </div>
       </div>
     </section>
+    
+    {/* Comparison Table Section */}
+    <ComparisonTable />
     
     {/* Elfsight Testimonials Slider */}
     <section className="relative py-8 bg-background">
