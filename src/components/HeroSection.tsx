@@ -401,7 +401,8 @@ const HeroSection = () => {
               <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-6 font-inter text-center">3. Job Application AI Agent</h3>
               
               <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
-                Tell it what job you're planning to apply for → Get the full application package, so you can apply to that job fully prepared in minutes.
+                From job posting to application-ready in minutes<br />
+                Tell it which job you're applying for. Get your complete application package—resume, cover letter, interview prep—tailored to that role.
               </p>
               
               <div className="flex justify-center">
