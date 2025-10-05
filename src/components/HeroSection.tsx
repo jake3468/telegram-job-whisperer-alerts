@@ -207,7 +207,9 @@ const HeroSection = () => {
             
             {/* Desktop view only */}
             <div className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">AI That Calls <span className="font-bold bg-cyan-200 dark:bg-cyan-900/40 px-2 py-1 rounded">Your Phone</span> to Prep You for Interviews 📞</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">AI That Calls <span className="font-bold bg-cyan-200 dark:bg-cyan-900/40 px-2 py-1 rounded">Your Phone</span> to</span>
+              <br />
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Prep You for Interviews 📞</span>
             </div>
             
             {/* Tablet view only */}
