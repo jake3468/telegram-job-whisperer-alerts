@@ -156,9 +156,9 @@ const HeroSection = () => {
   useEffect(() => {
     if (!videoRef.current) return;
 
-    // Use higher threshold for mobile (80%) and lower for desktop (50%)
+    // Use higher threshold for mobile (95%) and lower for desktop (50%)
     const isMobile = window.innerWidth < 768;
-    const threshold = isMobile ? 0.8 : 0.5;
+    const threshold = isMobile ? 0.95 : 0.5;
 
     const videoObserver = new IntersectionObserver(
       (entries) => {
@@ -171,7 +171,7 @@ const HeroSection = () => {
       {
         root: null,
         rootMargin: '0px',
-        threshold // Trigger at 80% for mobile, 50% for desktop
+        threshold // Trigger at 95% for mobile, 50% for desktop
       }
     );
 
@@ -294,7 +294,16 @@ const HeroSection = () => {
               ref={videoRef}
               className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] px-4 md:w-full md:max-w-5xl md:left-0 md:right-0 md:ml-0 md:mr-0 md:mx-auto md:px-8 lg:w-screen lg:max-w-none lg:left-1/2 lg:right-1/2 lg:-ml-[50vw] lg:-mr-[50vw] lg:px-16 my-8"
             >
-              <div className="w-full aspect-video rounded-2xl overflow-hidden">
+              <div className="w-full aspect-video rounded-2xl overflow-hidden relative">
+                {/* Thumbnail - shown until video autoplays */}
+                {!shouldAutoplay && (
+                  <img 
+                    src="/video-thumbnail.png" 
+                    alt="Video thumbnail"
+                    className="absolute inset-0 w-full h-full object-cover z-10"
+                  />
+                )}
+                
                 <iframe
                   className="w-full h-full"
                   src={`https://www.youtube.com/embed/eVKtDxScOEo?${shouldAutoplay ? 'autoplay=1&' : ''}mute=1&controls=0&rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&disablekb=1&fs=0&loop=1&playlist=eVKtDxScOEo`}
