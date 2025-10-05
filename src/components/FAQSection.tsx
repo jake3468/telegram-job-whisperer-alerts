@@ -16,7 +16,7 @@ const FAQSection = () => {
     question: "How do I get started and what support is available?",
     answer: "Getting started is easy! Simply create your account and purchase the Trial Plan with 30 credits to get started, upload your resume and preferences in your profile, and start using any of our AI tools. If you need help, our support team responds within 48 hours at support@aspirely.ai. We handle all types of inquiries and provide priority support for premium users. You can also access our tools via Telegram bots for job alerts and resume updates."
   }];
-  return <section className="py-12 md:py-16 px-4 bg-background">
+  return <section id="faq" className="py-12 md:py-16 px-4 bg-background">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-6">
           <h2 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary bg-clip-text mb-2 font-inter text-foreground">Frequently Asked Questions (FAQs)</h2>
