@@ -94,7 +94,7 @@ const ComparisonTable = () => {
           <table className="w-full min-w-[800px] border-collapse">
             <thead>
               <tr className="bg-gray-50 dark:bg-gray-800 border-b-2 border-gray-300 dark:border-gray-600">
-                <th className="px-4 py-3 text-left font-semibold text-gray-900 dark:text-white text-xs md:text-sm border-r border-gray-300 dark:border-gray-600 sticky left-0 bg-gray-50 dark:bg-gray-800 z-10">
+                <th className="pl-3 pr-2 py-3 text-left font-semibold text-gray-900 dark:text-white text-xs md:text-sm border-r border-gray-300 dark:border-gray-600 sticky left-0 bg-gray-50 dark:bg-gray-800 z-10">
                   Feature
                 </th>
                 {competitors.map((competitor, idx) => (
@@ -121,7 +121,7 @@ const ComparisonTable = () => {
                     feature.special ? "bg-yellow-50 dark:bg-yellow-900/10" : ""
                   }`}
                 >
-                  <td className="px-4 py-3 font-medium text-gray-900 dark:text-white text-xs md:text-sm border-r border-gray-300 dark:border-gray-600 sticky left-0 bg-white dark:bg-gray-900 z-10">
+                  <td className="pl-3 pr-2 py-3 font-medium text-gray-900 dark:text-white text-xs md:text-sm border-r border-gray-300 dark:border-gray-600 sticky left-0 bg-white dark:bg-gray-900 z-10">
                     {feature.special && <Star className="inline-block w-3 h-3 md:w-4 md:h-4 text-yellow-500 mr-1" />}
                     <span className="whitespace-pre-line">{feature.name}</span>
                   </td>
