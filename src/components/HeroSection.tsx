@@ -202,21 +202,21 @@ const HeroSection = () => {
             <div className="block md:hidden text-left text-[28px] leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">Simplify Your Job Search</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">with our <span className="font-bold underline decoration-red-500 decoration-4 underline-offset-4">AI Agents</span></span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic">with our <span className="font-bold bg-blue-200 dark:bg-blue-900/40 px-2 py-1 rounded">AI Agents</span></span>
             </div>
             
             {/* Desktop view only */}
             <div className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic whitespace-nowrap">Simplify Your Job Search</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic whitespace-nowrap">with our <span className="font-bold underline decoration-red-500 decoration-4 underline-offset-4">AI Agents</span></span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic whitespace-nowrap">with our <span className="font-bold bg-blue-200 dark:bg-blue-900/40 px-2 py-1 rounded">AI Agents</span></span>
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic whitespace-nowrap">Simplify Your Job Search</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic whitespace-nowrap">with our <span className="font-bold underline decoration-red-500 decoration-4 underline-offset-4">AI Agents</span></span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-medium not-italic whitespace-nowrap">with our <span className="font-bold bg-blue-200 dark:bg-blue-900/40 px-2 py-1 rounded">AI Agents</span></span>
             </div>
           </h1>
         </div>
