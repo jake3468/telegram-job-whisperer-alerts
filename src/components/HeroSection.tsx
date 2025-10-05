@@ -297,7 +297,7 @@ const HeroSection = () => {
               <div className="w-full aspect-video rounded-2xl overflow-hidden">
                 <iframe
                   className="w-full h-full"
-                  src={`https://www.youtube.com/embed/eVKtDxScOEo?${shouldAutoplay ? 'autoplay=1&' : ''}mute=1&controls=0&rel=0&modestbranding=1&showinfo=0&loop=1&playlist=eVKtDxScOEo`}
+                  src={`https://www.youtube.com/embed/eVKtDxScOEo?${shouldAutoplay ? 'autoplay=1&' : ''}mute=1&controls=0&rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&disablekb=1&fs=0&loop=1&playlist=eVKtDxScOEo`}
                   title="Aspirely Demo Video"
                   allow="autoplay; encrypted-media"
                   allowFullScreen
