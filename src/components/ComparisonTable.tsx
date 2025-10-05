@@ -173,6 +173,7 @@ const ComparisonTable = () => {
               Aspirely.ai is the only platform where you tell us something once, and all your AI agents remember it.
             </strong>
             <br />
+            <br />
             Add a new skill certification—every resume, cover letter, and application files you generate from that moment on automatically includes it. Other platforms make you update everything separately.
           </div>
         </div>
