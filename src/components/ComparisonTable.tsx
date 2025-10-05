@@ -88,6 +88,12 @@ const ComparisonTable = () => {
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 py-12">
+      {/* Section Heading */}
+      <div className="text-center mb-8">
+        <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-2 font-inter">
+          See the Difference: Aspirely vs. Others
+        </h2>
+      </div>
       {/* Horizontally Scrollable Table for All Devices */}
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden border border-gray-300 dark:border-gray-700">
         <div className="overflow-x-auto">
