@@ -285,7 +285,7 @@ const HeroSection = () => {
             {/* Full-width YouTube Video */}
             <div 
               ref={videoRef}
-              className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] px-4 md:w-full md:max-w-5xl md:left-0 md:right-0 md:ml-0 md:mr-0 md:mx-auto md:px-8 lg:w-screen lg:max-w-none lg:left-1/2 lg:right-1/2 lg:-ml-[50vw] lg:-mr-[50vw] lg:px-16 my-8"
+              className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] px-4 md:w-full md:max-w-5xl md:left-0 md:right-0 md:ml-0 md:mr-0 md:mx-auto md:px-8 lg:w-full lg:max-w-6xl lg:left-0 lg:right-0 lg:ml-0 lg:mr-0 lg:mx-auto lg:px-16 my-8"
             >
               <div className="w-full aspect-video rounded-2xl overflow-hidden relative">
                 {/* Thumbnail - shown until video autoplays */}
