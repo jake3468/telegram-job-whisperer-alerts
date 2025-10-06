@@ -201,23 +201,21 @@ const HeroSection = () => {
           <h1 className="relative z-30 text-[42px] md:text-[46px] lg:text-[52px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile view only */}
             <div className="block md:hidden text-left text-[24px] leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">AI That Calls <span className="font-bold bg-cyan-200 dark:bg-cyan-900/40 px-2 py-1 rounded border border-black dark:border-white">Your Phone</span></span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">for a Mock Interview <span style={{color: 'inherit', filter: 'none'}}>📞</span></span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">The Only AI <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job Search</span> Platform You'll Ever Need</span>
             </div>
             
             {/* Desktop view only */}
             <div className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">AI That Calls <span className="font-bold bg-cyan-200 dark:bg-cyan-900/40 px-2 py-1 rounded border border-black dark:border-white">Your Phone</span></span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">The Only AI <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job Search</span></span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">for a Mock Interview <span style={{color: 'inherit', filter: 'none'}}>📞</span></span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Platform You'll Ever Need</span>
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">AI That Calls <span className="font-bold bg-cyan-200 dark:bg-cyan-900/40 px-2 py-1 rounded border border-black dark:border-white">Your Phone</span></span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">The Only AI <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job Search</span></span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">for a Mock Interview <span style={{color: 'inherit', filter: 'none'}}>📞</span></span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Platform You'll Ever Need</span>
             </div>
           </h1>
         </div>
@@ -234,7 +232,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[14px] md:text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[14px] md:text-[16px] font-notion-inter font-medium text-foreground text-left md:text-center">
-            Get realistic interview practice with AI phone calls. Plus: Daily job alerts on Telegram, one-click application files, and full tracking on web—everything synced to your profile.
+            Get fresh job alerts on Telegram daily. Click once to generate tailored resumes, cover letters, and interview prep for any role. Track all your applications automatically. Practice with AI phone calls. Add a new skill once—all of this gets better automatically.
           </p>
           
           <SignedOut>
@@ -242,7 +240,7 @@ const HeroSection = () => {
             <div className="flex flex-row items-center justify-center mb-8">
               <SignUpButton mode="modal">
                 <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-4 py-2 md:px-6 md:py-2.5 text-lg md:text-xl rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-center w-auto border border-transparent">
-                  Try Free AI Interview <ArrowRight className="w-5 h-5 inline ml-1" />
+                  Get Started <ArrowRight className="w-5 h-5 inline ml-1" />
                 </button>
               </SignUpButton>
               
