@@ -24,13 +24,10 @@ export const YouTubeHeroVideo: React.FC<YouTubeHeroVideoProps> = ({
     setIsLoading(false);
   }, []);
 
-  // Mobile: Autoplay immediately on page load
+  // Disable autoplay - video stays paused until user clicks play
   useEffect(() => {
-    if (isMobile) {
-      setShowThumbnailDelay(false);
-      setShouldPlay(true);
-    }
-  }, [isMobile]);
+    setShowThumbnailDelay(false);
+  }, []);
 
   // Desktop: Intersection Observer for visibility tracking only
   useEffect(() => {
@@ -118,16 +115,14 @@ export const YouTubeHeroVideo: React.FC<YouTubeHeroVideoProps> = ({
                   alt="Video preview"
                   className="w-full h-full object-cover rounded-[1.5rem]"
                 />
-                {!isMobile && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <button 
-                      onClick={() => setShouldPlay(true)}
-                      className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-lg hover:bg-red-700 transition-colors"
-                    >
-                      <div className="w-0 h-0 border-l-[20px] border-l-white border-y-[12px] border-y-transparent ml-1"></div>
-                    </button>
-                  </div>
-                )}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <button 
+                    onClick={() => setShouldPlay(true)}
+                    className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-lg hover:bg-red-700 transition-colors"
+                  >
+                    <div className="w-0 h-0 border-l-[20px] border-l-white border-y-[12px] border-y-transparent ml-1"></div>
+                  </button>
+                </div>
               </div>
             )}
           </div>
