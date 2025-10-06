@@ -232,7 +232,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[14px] md:text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[14px] md:text-[16px] font-notion-inter font-medium text-foreground text-left md:text-center">
-            Get fresh job alerts on Telegram daily. Click once to generate tailored resumes, cover letters, and interview prep for any role. Track all your applications automatically. Practice with AI phone calls. Add a new skill once—all of this gets better automatically.
+            Get fresh job alerts matched to you on Telegram daily. Click once to generate tailored resumes, cover letters, and interview prep for any role. Track all your applications automatically. Practice with AI phone calls. Add a new skill once—all of this gets better automatically.
           </p>
           
           <SignedOut>
