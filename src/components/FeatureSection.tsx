@@ -145,7 +145,7 @@ const FeatureSection = ({
     </div>;
   const animationSection = lottieUrl ? <div className="flex items-center justify-center">
       <div className="w-full max-w-48 lg:max-w-md">
-        {title === "Job Tracker" ? (
+        {title.includes("Job Tracker") ? (
           <img 
             src={jobTrackerPreview} 
             alt="Job Tracker Preview"
