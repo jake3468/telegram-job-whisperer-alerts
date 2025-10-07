@@ -329,8 +329,8 @@ const HeroSection = () => {
     
     {/* Telegram Agents Section - Separate section below hero */}
     <section id="telegram-agents" className="relative py-4 bg-background">
-      <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
-        <div className="max-w-2xl mx-auto">
+      <div className="z-20 relative w-full px-4">
+        <div className="max-w-2xl mx-auto mb-8">
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4 text-center">
             <h2 ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter">Job Hunting, Finally Fixed</h2>
             
@@ -339,9 +339,10 @@ const HeroSection = () => {
             <p className="text-left">What if we told you, you don't have to do any of this? Our 3 AI Job Agents on Telegram were built and perfected to handle all these daily stresses for you. Just chat, and it's done—no website login required. You get all of the above… and more, with just one click.</p>
             
           </div>
+        </div>
           
-          {/* AI Job Agents Structured Section */}
-          <div className="space-y-8">
+        {/* AI Job Agents Structured Section */}
+        <div className="space-y-8">
             {/* 1. Job Alerts AI Agent */}
             <div 
               className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card max-w-7xl mx-auto"
@@ -540,7 +541,6 @@ const HeroSection = () => {
                   </p>
                 </div>
               </div>
-            </div>
           </div>
         </div>
       </div>
