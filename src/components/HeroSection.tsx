@@ -76,7 +76,6 @@ const HeroSection = () => {
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
   const [telegramAnimationData, setTelegramAnimationData] = useState(null);
   const fullText = 'AI finds your next job while you sleep';
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
   const videoRef = useRef<HTMLDivElement>(null);
   const [shouldAutoplay, setShouldAutoplay] = useState(false);
   useEffect(() => {
@@ -115,43 +114,6 @@ const HeroSection = () => {
     };
   }, []);
 
-  // Intersection Observer for scroll animations
-  useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: '-20px 0px -50px 0px', // Trigger when 20px from top
-      threshold: 0.3 // Trigger when 30% of element is visible
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && !entry.target.classList.contains('animate-in')) {
-          // Find the index of this card
-          const cardIndex = cardsRef.current.findIndex(card => card === entry.target);
-          
-          // Add animation with staggered delay
-          setTimeout(() => {
-            entry.target.classList.add('animate-in');
-          }, cardIndex * 200); // 200ms delay between each card
-        }
-      });
-    }, observerOptions);
-
-    // Observe each card
-    cardsRef.current.forEach((card) => {
-      if (card) {
-        observer.observe(card);
-      }
-    });
-
-    return () => {
-      cardsRef.current.forEach((card) => {
-        if (card) {
-          observer.unobserve(card);
-        }
-      });
-    };
-  }, []);
 
   // Intersection Observer for video autoplay
   useEffect(() => {
@@ -347,8 +309,7 @@ const HeroSection = () => {
           <div className="space-y-8">
             {/* 1. Job Alerts AI Agent */}
             <div 
-              ref={(el) => cardsRef.current[0] = el}
-              className="animate-on-scroll rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
+              className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
             >
               <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 font-inter text-center">1. Job Alerts AI Agent</h3>
               <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">Get 7 instant job-specific files with one click.</p>
@@ -370,8 +331,7 @@ const HeroSection = () => {
             
             {/* 2. Resume Builder AI Agent */}
             <div 
-              ref={(el) => cardsRef.current[1] = el}
-              className="animate-on-scroll rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
+              className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
             >
               <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 font-inter text-center">2. Resume Builder AI Agent</h3>
               <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">Your AI resume coach that remembers everything.</p>
@@ -393,8 +353,7 @@ const HeroSection = () => {
             
             {/* 3. Job Application AI Agent */}
             <div 
-              ref={(el) => cardsRef.current[2] = el}
-              className="animate-on-scroll rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
+              className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
             >
               <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 font-inter text-center">3. Job Application AI Agent</h3>
               <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">From job posting to application-ready in minutes.</p>
