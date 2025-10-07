@@ -228,7 +228,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[14px] md:text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[14px] md:text-[16px] font-notion-inter font-medium text-foreground text-left md:text-center">
-            Get matched jobs on Telegram (&lt;24hrs old). Generate tailored resumes, cover letters, and interview prep with one click. Track everything automatically. Practice with AI phone calls. Update your profile once—all the files you generate from then on automatically include your latest info.
+            Get personalized job alerts on Telegram (&lt;24hrs old). Generate tailored resumes, cover letters, and interview prep with one click. Track everything automatically. Practice with AI phone calls. Update your profile once—all the files you generate from then on automatically include your latest info.
           </p>
           
           <SignedOut>
@@ -236,7 +236,7 @@ const HeroSection = () => {
             <div className="flex flex-row items-center justify-center mb-8">
               <SignUpButton mode="modal">
                 <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-4 py-2 md:px-6 md:py-2.5 text-lg md:text-xl rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-center w-auto border border-transparent">
-                  Start Saving Time <ArrowRight className="w-5 h-5 inline ml-1" />
+                  Get Started Today <ArrowRight className="w-5 h-5 inline ml-1" />
                 </button>
               </SignUpButton>
               
