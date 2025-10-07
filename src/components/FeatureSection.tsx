@@ -161,7 +161,7 @@ const FeatureSection = ({
           <img 
             src={aiPhoneInterviewPreview} 
             alt="AI Phone Interview Preview"
-            className="w-full h-auto scale-110 lg:scale-125"
+            className="w-full h-auto scale-125 lg:scale-125"
           />
         ) : title.includes("Job Board") ? (
           <img 
