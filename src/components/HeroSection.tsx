@@ -10,6 +10,39 @@ import HandDrawnArrow from './HandDrawnArrow';
 import { ArrowRight } from 'lucide-react';
 import ComparisonTable from '@/components/ComparisonTable';
 
+// Add heading animation hook at component level
+const useHeadingAnimation = () => {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20px 0px -50px 0px',
+      threshold: 0.3
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !entry.target.classList.contains('animate-in')) {
+          entry.target.classList.add('animate-in');
+        }
+      });
+    }, observerOptions);
+
+    if (headingRef.current) {
+      observer.observe(headingRef.current);
+    }
+
+    return () => {
+      if (headingRef.current) {
+        observer.unobserve(headingRef.current);
+      }
+    };
+  }, []);
+
+  return headingRef;
+};
+
 // Preload rocket animation immediately when module loads
 const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json';
 const CACHE_KEY = 'rocket-animation-data-v1';
@@ -76,9 +109,9 @@ const HeroSection = () => {
   const [lottieAnimationData, setLottieAnimationData] = useState(null);
   const [telegramAnimationData, setTelegramAnimationData] = useState(null);
   const fullText = 'AI finds your next job while you sleep';
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
   const videoRef = useRef<HTMLDivElement>(null);
   const [shouldAutoplay, setShouldAutoplay] = useState(false);
+  const jobHuntingHeadingRef = useHeadingAnimation();
   useEffect(() => {
     if (isLoaded && user) {
       navigate('/dashboard');
@@ -115,43 +148,6 @@ const HeroSection = () => {
     };
   }, []);
 
-  // Intersection Observer for scroll animations
-  useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: '-20px 0px -50px 0px', // Trigger when 20px from top
-      threshold: 0.3 // Trigger when 30% of element is visible
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && !entry.target.classList.contains('animate-in')) {
-          // Find the index of this card
-          const cardIndex = cardsRef.current.findIndex(card => card === entry.target);
-          
-          // Add animation with staggered delay
-          setTimeout(() => {
-            entry.target.classList.add('animate-in');
-          }, cardIndex * 200); // 200ms delay between each card
-        }
-      });
-    }, observerOptions);
-
-    // Observe each card
-    cardsRef.current.forEach((card) => {
-      if (card) {
-        observer.observe(card);
-      }
-    });
-
-    return () => {
-      cardsRef.current.forEach((card) => {
-        if (card) {
-          observer.unobserve(card);
-        }
-      });
-    };
-  }, []);
 
   // Intersection Observer for video autoplay
   useEffect(() => {
@@ -232,7 +228,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[14px] md:text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[14px] md:text-[16px] font-notion-inter font-medium text-foreground text-left md:text-center">
-            Get fresh job alerts matched to you on Telegram daily. Click once to generate tailored resumes, cover letters, and interview prep for any role. Track all your applications automatically. Practice with AI phone calls. Add a new skill once—all of this gets better automatically.
+            Get personalized job alerts on Telegram (&lt;24hrs old). Generate tailored resumes, cover letters, and interview prep with one click. Track everything automatically. Practice with AI phone calls. Update your profile once—all the files you generate from then on automatically include your latest info.
           </p>
           
           <SignedOut>
@@ -240,7 +236,7 @@ const HeroSection = () => {
             <div className="flex flex-row items-center justify-center mb-8">
               <SignUpButton mode="modal">
                 <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-4 py-2 md:px-6 md:py-2.5 text-lg md:text-xl rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-center w-auto border border-transparent">
-                  Get Started <ArrowRight className="w-5 h-5 inline ml-1" />
+                  Get Started Today <ArrowRight className="w-5 h-5 inline ml-1" />
                 </button>
               </SignUpButton>
               
@@ -335,7 +331,7 @@ const HeroSection = () => {
       <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
         <div className="max-w-2xl mx-auto">
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4 text-center">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter">Job Hunting, Finally Fixed</h2>
+            <h2 ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter">Job Hunting, Finally Fixed</h2>
             
             <p className="text-left">Job platforms are broken. Old postings everywhere. Even when you see a matching job, you skip it because customizing resumes and finding HR contacts takes forever.</p>
             
@@ -347,8 +343,7 @@ const HeroSection = () => {
           <div className="space-y-8">
             {/* 1. Job Alerts AI Agent */}
             <div 
-              ref={(el) => cardsRef.current[0] = el}
-              className="animate-on-scroll rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
+              className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
             >
               <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 font-inter text-center">1. Job Alerts AI Agent</h3>
               <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">Get 7 instant job-specific files with one click.</p>
@@ -370,8 +365,7 @@ const HeroSection = () => {
             
             {/* 2. Resume Builder AI Agent */}
             <div 
-              ref={(el) => cardsRef.current[1] = el}
-              className="animate-on-scroll rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
+              className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
             >
               <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 font-inter text-center">2. Resume Builder AI Agent</h3>
               <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">Your AI resume coach that remembers everything.</p>
@@ -393,8 +387,7 @@ const HeroSection = () => {
             
             {/* 3. Job Application AI Agent */}
             <div 
-              ref={(el) => cardsRef.current[2] = el}
-              className="animate-on-scroll rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
+              className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
             >
               <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 font-inter text-center">3. Job Application AI Agent</h3>
               <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">From job posting to application-ready in minutes.</p>

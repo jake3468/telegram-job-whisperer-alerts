@@ -140,7 +140,7 @@ const TermsOfService = () => {
 
               <h3 className="text-xl font-medium text-gray-700 dark:text-sky-400 mb-3">4.4 Credit System</h3>
               <p className="text-gray-700 dark:text-gray-300">
-                Our services operate on a credit-based system where each AI-powered feature consumes a specific number of credits. Credit usage is clearly displayed before each service use. Credits from the 200 Credit Power Pack do not expire, providing flexible usage over time.
+                Our services operate on a credit-based system where each AI-powered feature consumes a specific number of credits. Credit usage is clearly displayed before each service use. All purchased credits do not expire, providing flexible usage over time.
               </p>
             </section>
 
