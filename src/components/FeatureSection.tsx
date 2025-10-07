@@ -44,10 +44,6 @@ const FeatureSection = ({
     userProfile,
     updateUserProfile
   } = useCachedUserProfile();
-
-  // Hide CTA buttons for specific feature cards to emphasize visuals
-  const showCTA = Boolean(buttonText) && !["AI Phone Interview", "Job Tracker", "Job Board"].some((name) => title.includes(name));
-
   const handleButtonWithUrlClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!buttonUrl) return;
@@ -111,8 +107,8 @@ const FeatureSection = ({
       </p>
     </div>;
 
-  // Mobile: button only (conditionally rendered based on feature)
-  const mobileButtonSection = showCTA ? <div className="lg:hidden">
+  // Mobile: button only
+  const mobileButtonSection = <div className="lg:hidden">
       {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75 text-sm">
           Coming Soon
         </button> : buttonUrl ? <button type="button" onClick={handleButtonWithUrlClick} className="w-fit bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-4 rounded-full flex items-center gap-2 flex-row transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
@@ -125,7 +121,7 @@ const FeatureSection = ({
             <ArrowRight className="w-3 h-3" />
           </button>
         </SignUpButton>}
-    </div> : null;
+    </div>;
 
   // Desktop: full content section
   const desktopContentSection = <div className="hidden lg:flex flex-col justify-center space-y-8">
@@ -139,7 +135,7 @@ const FeatureSection = ({
         </p>
       </div>
       
-      {showCTA && (isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75">
+      {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75">
           Coming Soon
         </button> : buttonUrl ? <button type="button" onClick={handleButtonWithUrlClick} className="w-fit bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 flex-row transition-all duration-200 shadow-lg hover:shadow-xl">
           <ExternalLink className="w-5 h-5" />
@@ -150,7 +146,7 @@ const FeatureSection = ({
              {buttonText}
              <ArrowRight className="w-5 h-5" />
            </button>
-         </SignUpButton>)}
+         </SignUpButton>}
     </div>;
   const animationSection = lottieUrl ? <div className="flex items-center justify-center w-full">
       <div className="w-full max-w-full lg:max-w-3xl">
@@ -222,7 +218,7 @@ const FeatureSection = ({
                 </p>
               </div>
               <div className="pt-3 md:pt-2 space-y-3">
-                {showCTA && (isComingSoon ? <button type="button" disabled className="w-full bg-gray-700 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm cursor-not-allowed opacity-75">
+                {isComingSoon ? <button type="button" disabled className="w-full bg-gray-700 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm cursor-not-allowed opacity-75">
                     Coming Soon
                   </button> : buttonUrl ? <button type="button" onClick={handleButtonWithUrlClick} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200 flex items-center gap-2 justify-center">
                     <ExternalLink className="w-3 h-3" />
@@ -231,7 +227,7 @@ const FeatureSection = ({
                     <button type="button" className="w-full bg-gray-700 text-white dark:bg-white dark:text-black font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200">
                       {buttonText}
                     </button>
-                  </SignUpButton>)}
+                  </SignUpButton>}
                 {additionalContent && <div className="border-t border-gray-200 pt-3">
                     {additionalContent}
                   </div>}
