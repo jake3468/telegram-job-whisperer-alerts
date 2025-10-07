@@ -167,7 +167,7 @@ const FeatureSection = ({
           <img 
             src={jobBoardPreview} 
             alt="Job Board Preview"
-            className="w-full h-auto scale-125 lg:scale-125"
+            className="w-full h-auto max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto rounded-lg mb-4 md:mb-6"
           />
         ) : isLoading ? <div className="w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center animate-pulse">
             <div className="text-gray-500 text-sm">Loading animation...</div>
