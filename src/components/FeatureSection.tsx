@@ -149,25 +149,25 @@ const FeatureSection = ({
            </button>
          </SignUpButton>}
     </div>;
-  const animationSection = lottieUrl ? <div className="flex items-center justify-center w-full">
+  const animationSection = lottieUrl ? <div className="flex items-center justify-center w-full -mx-4 md:-mx-6 lg:mx-0">
       <div className="w-full max-w-full lg:max-w-3xl">
         {title.includes("Job Tracker") ? (
           <img 
             src={jobTrackerPreview} 
             alt="Job Tracker Preview"
-            className="w-full h-auto"
+            className="w-full h-auto scale-110 md:scale-100"
           />
         ) : title.includes("AI Phone Interview") ? (
           <img 
             src={aiPhoneInterviewPreview} 
             alt="AI Phone Interview Preview"
-            className="w-full h-auto"
+            className="w-full h-auto scale-110 md:scale-100"
           />
         ) : title.includes("Job Board") ? (
           <img 
             src={jobBoardPreview} 
             alt="Job Board Preview"
-            className="w-full h-auto"
+            className="w-full h-auto scale-110 md:scale-100"
           />
         ) : isLoading ? <div className="w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center animate-pulse">
             <div className="text-gray-500 text-sm">Loading animation...</div>
