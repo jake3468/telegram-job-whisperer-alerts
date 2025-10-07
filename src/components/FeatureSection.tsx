@@ -109,7 +109,7 @@ const FeatureSection = ({
     </div>;
 
   // Mobile: button only
-  const mobileButtonSection = <div className="lg:hidden mt-6">
+  const mobileButtonSection = <div className={`lg:hidden ${title.includes("Job Tracker") ? "mt-8 md:mt-10" : "mt-6"}`}>
       {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75 text-sm">
           Coming Soon
         </button> : buttonUrl ? <button type="button" onClick={handleButtonWithUrlClick} className="w-fit bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-4 rounded-full flex items-center gap-2 flex-row transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
@@ -155,7 +155,7 @@ const FeatureSection = ({
           <img 
             src={jobTrackerPreview} 
             alt="Job Tracker Preview"
-            className="w-full h-auto"
+            className="w-full h-auto max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto rounded-lg mb-4 md:mb-6"
           />
         ) : title.includes("AI Phone Interview") ? (
           <img 
