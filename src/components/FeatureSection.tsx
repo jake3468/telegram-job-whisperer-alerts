@@ -8,6 +8,7 @@ import ActivationStatusTag from "./ActivationStatusTag";
 import { JobTrackerVideo } from "./JobTrackerVideo";
 import jobTrackerPreview from "@/assets/job-tracker-preview.svg";
 import aiPhoneInterviewPreview from "@/assets/ai-phone-interview-preview.svg";
+import jobBoardPreview from "@/assets/job-board-preview.svg";
 interface FeatureSectionProps {
   title: string;
   subheading: string;
@@ -160,6 +161,12 @@ const FeatureSection = ({
           <img 
             src={aiPhoneInterviewPreview} 
             alt="AI Phone Interview Preview"
+            className="w-full h-auto"
+          />
+        ) : title.includes("Job Board") ? (
+          <img 
+            src={jobBoardPreview} 
+            alt="Job Board Preview"
             className="w-full h-auto"
           />
         ) : isLoading ? <div className="w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center animate-pulse">
