@@ -107,8 +107,8 @@ const FeatureSection = ({
       </p>
     </div>;
 
-  // Mobile: button only
-  const mobileButtonSection = <div className="lg:hidden">
+  // Mobile: button only (conditionally rendered based on buttonText)
+  const mobileButtonSection = buttonText ? <div className="lg:hidden">
       {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75 text-sm">
           Coming Soon
         </button> : buttonUrl ? <button type="button" onClick={handleButtonWithUrlClick} className="w-fit bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-4 rounded-full flex items-center gap-2 flex-row transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
@@ -121,7 +121,7 @@ const FeatureSection = ({
             <ArrowRight className="w-3 h-3" />
           </button>
         </SignUpButton>}
-    </div>;
+    </div> : null;
 
   // Desktop: full content section
   const desktopContentSection = <div className="hidden lg:flex flex-col justify-center space-y-8">
@@ -135,7 +135,7 @@ const FeatureSection = ({
         </p>
       </div>
       
-      {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75">
+      {buttonText && (isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75">
           Coming Soon
         </button> : buttonUrl ? <button type="button" onClick={handleButtonWithUrlClick} className="w-fit bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 flex-row transition-all duration-200 shadow-lg hover:shadow-xl">
           <ExternalLink className="w-5 h-5" />
@@ -146,7 +146,7 @@ const FeatureSection = ({
              {buttonText}
              <ArrowRight className="w-5 h-5" />
            </button>
-         </SignUpButton>}
+         </SignUpButton>)}
     </div>;
   const animationSection = lottieUrl ? <div className="flex items-center justify-center w-full">
       <div className="w-full max-w-full lg:max-w-3xl">
