@@ -346,21 +346,57 @@ const HeroSection = () => {
             <div 
               className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card max-w-7xl mx-auto"
             >
-              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 font-inter text-center">1. Job Alerts AI Agent</h3>
-              <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">Get only &lt;24hr old jobs and instant job-specific files with one click</p>
-              
-              <div className="flex justify-center mb-6">
-                <img src="/telegram-job-alerts-agent.png" alt="Job Alerts AI Agent demonstration showing personalized job alerts with tailored resumes and cover letters" className="max-w-full h-auto rounded-lg shadow-lg" />
+              {/* Mobile Layout */}
+              <div className="lg:hidden space-y-6">
+                <div>
+                  <h3 className="text-2xl md:text-3xl mb-2 font-inter text-primary font-bold">
+                    1. Job Alerts AI Agent
+                  </h3>
+                  <p className="text-base md:text-lg text-foreground/70 font-inter mb-4">
+                    Get only &lt;24hr old jobs and instant job-specific files with one click
+                  </p>
+                </div>
+                <div>
+                  <p className="leading-relaxed font-inter text-foreground text-base mb-6">
+                    Receive daily job alerts with only the latest postings—less than 24 hours old. Each job is matched to your profile. See a job you like? With just one click, generate a tailored resume, cover letter, interview prep, job-fit analysis, and HR contacts. Everything is personalized for that specific role and ready to apply instantly.
+                  </p>
+                </div>
+                <div className="flex justify-center">
+                  <img src="/telegram-job-alerts-agent.png" alt="Job Alerts AI Agent demonstration" className="w-full h-auto rounded-lg" />
+                </div>
+                <div>
+                  <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="w-fit bg-gray-700 text-white dark:bg-white dark:text-black font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
+                    Start on Telegram
+                    <ArrowRight className="w-3 h-3" />
+                  </a>
+                </div>
               </div>
               
-            <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-left max-w-3xl mx-auto">
-              Receive daily job alerts with only the latest postings—less than 24 hours old. Each job is matched to your profile. See a job you like? With just one click, generate a tailored resume, cover letter, interview prep, job-fit analysis, and HR contacts. Everything is personalized for that specific role and ready to apply instantly.
-            </p>
-              
-              <div className="flex justify-center">
-                <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white hover:opacity-90 px-6 py-3 rounded-xl transition-all duration-200 font-medium" style={{backgroundColor: '#30313d'}}>
-                  Start on Telegram <ArrowRight className="w-4 h-4 inline" />
-                </a>
+              {/* Desktop Layout */}
+              <div className="hidden lg:grid grid-cols-2 gap-16 items-center">
+                <div className="flex flex-col justify-center space-y-8">
+                  <div>
+                    <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-primary whitespace-nowrap">
+                      1. Job Alerts AI Agent
+                    </h3>
+                    <p className="text-lg md:text-xl text-foreground/70 font-inter mb-4">
+                      Get only &lt;24hr old jobs and instant job-specific files with one click
+                    </p>
+                    <p className="text-lg leading-relaxed font-inter text-foreground">
+                      Receive daily job alerts with only the latest postings—less than 24 hours old. Each job is matched to your profile. See a job you like? With just one click, generate a tailored resume, cover letter, interview prep, job-fit analysis, and HR contacts. Everything is personalized for that specific role and ready to apply instantly.
+                    </p>
+                  </div>
+                  
+                  <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="w-fit bg-gray-700 text-white dark:bg-white dark:text-black font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
+                    Start on Telegram
+                    <ArrowRight className="w-5 h-5" />
+                  </a>
+                </div>
+                <div className="flex items-center justify-center w-full">
+                  <div className="w-full max-w-full lg:max-w-3xl">
+                    <img src="/telegram-job-alerts-agent.png" alt="Job Alerts AI Agent demonstration" className="w-full h-auto rounded-lg" />
+                  </div>
+                </div>
               </div>
             </div>
             
@@ -368,21 +404,57 @@ const HeroSection = () => {
             <div 
               className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card max-w-7xl mx-auto"
             >
-              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 font-inter text-center">2. Resume Builder AI Agent</h3>
-              <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">Get your polished resume PDF instantly through simple chat</p>
-              
-              <div className="flex justify-center mb-6">
-                <img src="/telegram-resume-builder-agent.png" alt="Resume Builder AI Agent interface showing conversational resume building and customization" className="max-w-full h-auto rounded-lg shadow-lg" />
+              {/* Mobile Layout */}
+              <div className="lg:hidden space-y-6">
+                <div>
+                  <h3 className="text-2xl md:text-3xl mb-2 font-inter text-primary font-bold">
+                    2. Resume Builder AI Agent
+                  </h3>
+                  <p className="text-base md:text-lg text-foreground/70 font-inter mb-4">
+                    Get your polished resume PDF instantly through simple chat
+                  </p>
+                </div>
+                <div>
+                  <p className="leading-relaxed font-inter text-foreground text-base mb-6">
+                    Just chat to update skills, certifications, projects, or work experience. Our AI generates an ATS-friendly resume in final PDF format—no forms, no copy-pasting, no starting over. Each update remembers your previous changes and improves your resume, saving you hours of manual work.
+                  </p>
+                </div>
+                <div className="flex justify-center">
+                  <img src="/telegram-resume-builder-agent.png" alt="Resume Builder AI Agent interface" className="w-full h-auto rounded-lg" />
+                </div>
+                <div>
+                  <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="w-fit bg-gray-700 text-white dark:bg-white dark:text-black font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
+                    Start on Telegram
+                    <ArrowRight className="w-3 h-3" />
+                  </a>
+                </div>
               </div>
               
-              <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-left max-w-3xl mx-auto">
-                Just chat to update skills, certifications, projects, or work experience. Our AI generates an ATS-friendly resume in final PDF format—no forms, no copy-pasting, no starting over. Each update remembers your previous changes and improves your resume, saving you hours of manual work.
-              </p>
-              
-              <div className="flex justify-center">
-                <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white hover:opacity-90 px-6 py-3 rounded-xl transition-all duration-200 font-medium" style={{backgroundColor: '#30313d'}}>
-                  Start on Telegram <ArrowRight className="w-4 h-4 inline" />
-                </a>
+              {/* Desktop Layout - Reversed */}
+              <div className="hidden lg:grid grid-cols-2 gap-16 items-center lg:grid-flow-col-dense">
+                <div className="lg:col-start-2 flex flex-col justify-center space-y-8">
+                  <div>
+                    <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-primary whitespace-nowrap">
+                      2. Resume Builder AI Agent
+                    </h3>
+                    <p className="text-lg md:text-xl text-foreground/70 font-inter mb-4">
+                      Get your polished resume PDF instantly through simple chat
+                    </p>
+                    <p className="text-lg leading-relaxed font-inter text-foreground">
+                      Just chat to update skills, certifications, projects, or work experience. Our AI generates an ATS-friendly resume in final PDF format—no forms, no copy-pasting, no starting over. Each update remembers your previous changes and improves your resume, saving you hours of manual work.
+                    </p>
+                  </div>
+                  
+                  <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="w-fit bg-gray-700 text-white dark:bg-white dark:text-black font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
+                    Start on Telegram
+                    <ArrowRight className="w-5 h-5" />
+                  </a>
+                </div>
+                <div className="lg:col-start-1 flex items-center justify-center w-full">
+                  <div className="w-full max-w-full lg:max-w-3xl">
+                    <img src="/telegram-resume-builder-agent.png" alt="Resume Builder AI Agent interface" className="w-full h-auto rounded-lg" />
+                  </div>
+                </div>
               </div>
             </div>
             
@@ -390,25 +462,65 @@ const HeroSection = () => {
             <div 
               className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card max-w-7xl mx-auto"
             >
-              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 font-inter text-center">3. Job Application AI Agent</h3>
-              <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">From job posting to application-ready in minutes.</p>
-              
-              <div className="flex justify-center mb-6">
-                <img 
-                  src={jobApplicationPreview} 
-                  alt="Job Application AI Agent Preview"
-                  className="w-full h-auto max-w-3xl"
-                />
+              {/* Mobile Layout */}
+              <div className="lg:hidden space-y-6">
+                <div>
+                  <h3 className="text-2xl md:text-3xl mb-2 font-inter text-primary font-bold">
+                    3. Job Application AI Agent
+                  </h3>
+                  <p className="text-base md:text-lg text-foreground/70 font-inter mb-4">
+                    From job posting to application-ready in minutes.
+                  </p>
+                </div>
+                <div>
+                  <p className="leading-relaxed font-inter text-foreground text-base mb-6">
+                    Tell the AI which job you're applying for, and get everything ready in minutes. It generates a tailored resume and cover letter, prepares interview materials, provides HR contacts to message, and checks your fit for the role—everything personalized for that specific job.
+                  </p>
+                </div>
+                <div className="flex justify-center">
+                  <img 
+                    src={jobApplicationPreview} 
+                    alt="Job Application AI Agent Preview"
+                    className="w-full h-auto"
+                  />
+                </div>
+                <div>
+                  <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="w-fit bg-gray-700 text-white dark:bg-white dark:text-black font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
+                    Start on Telegram
+                    <ArrowRight className="w-3 h-3" />
+                  </a>
+                </div>
               </div>
               
-              <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-left max-w-3xl mx-auto">
-                Tell the AI which job you're applying for, and get everything ready in minutes. It generates a tailored resume and cover letter, prepares interview materials, provides HR contacts to message, and checks your fit for the role—everything personalized for that specific job.
-              </p>
-              
-              <div className="flex justify-center">
-                <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white hover:opacity-90 px-6 py-3 rounded-xl transition-all duration-200 font-medium" style={{backgroundColor: '#30313d'}}>
-                  Start on Telegram <ArrowRight className="w-4 h-4 inline" />
-                </a>
+              {/* Desktop Layout */}
+              <div className="hidden lg:grid grid-cols-2 gap-16 items-center">
+                <div className="flex flex-col justify-center space-y-8">
+                  <div>
+                    <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-primary whitespace-nowrap">
+                      3. Job Application AI Agent
+                    </h3>
+                    <p className="text-lg md:text-xl text-foreground/70 font-inter mb-4">
+                      From job posting to application-ready in minutes.
+                    </p>
+                    <p className="text-lg leading-relaxed font-inter text-foreground">
+                      Tell the AI which job you're applying for, and get everything ready in minutes. It generates a tailored resume and cover letter, prepares interview materials, provides HR contacts to message, and checks your fit for the role—everything personalized for that specific job.
+                    </p>
+                  </div>
+                  
+                  <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="w-fit bg-gray-700 text-white dark:bg-white dark:text-black font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
+                    Start on Telegram
+                    <ArrowRight className="w-5 h-5" />
+                  </a>
+                </div>
+                <div className="flex items-center justify-center w-full">
+                  <div className="w-full max-w-full lg:max-w-3xl">
+                    <img 
+                      src={jobApplicationPreview} 
+                      alt="Job Application AI Agent Preview"
+                      className="w-full h-auto"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
             
