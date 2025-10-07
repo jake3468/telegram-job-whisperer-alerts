@@ -200,11 +200,13 @@ const FeatureSection = ({
             {/* Desktop Layout */}
             <div className={`hidden lg:grid grid-cols-2 gap-16 items-center ${isReversed ? 'lg:grid-flow-col-dense' : ''}`}>
               {isReversed ? <>
-                  <div className={isReversed ? 'lg:col-start-2' : ''}>{animationSection}</div>
-                  <div className={isReversed ? 'lg:col-start-1' : ''}>{desktopContentSection}</div>
+                  {/* Reversed: Content on LEFT, Image on RIGHT */}
+                  <div className="lg:col-start-1">{desktopContentSection}</div>
+                  <div className="lg:col-start-2">{animationSection}</div>
                 </> : <>
-                  {desktopContentSection}
+                  {/* Normal: Image on LEFT, Content on RIGHT */}
                   {animationSection}
+                  {desktopContentSection}
                 </>}
             </div>
           </div> : <div className="relative bg-gray-50 dark:bg-gray-900 rounded-3xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col">
