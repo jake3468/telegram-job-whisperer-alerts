@@ -343,10 +343,10 @@ const HeroSection = () => {
           <div className="space-y-8">
             {/* 1. Job Alerts AI Agent */}
             <div 
-              className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
+              className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto shadow-lg hover:shadow-xl transition-shadow duration-300"
             >
               <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 font-inter text-center">1. Job Alerts AI Agent</h3>
-              <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">Get &lt;24hr old jobs and instant job-specific files with one click</p>
+              <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">Get only &lt;24hr old jobs and instant job-specific files with one click</p>
               
               <div className="flex justify-center mb-6">
                 <img src="/telegram-job-alerts-agent.png" alt="Job Alerts AI Agent demonstration showing personalized job alerts with tailored resumes and cover letters" className="max-w-full h-auto rounded-lg shadow-lg" />
@@ -365,7 +365,7 @@ const HeroSection = () => {
             
             {/* 2. Resume Builder AI Agent */}
             <div 
-              className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
+              className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto shadow-lg hover:shadow-xl transition-shadow duration-300"
             >
               <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 font-inter text-center">2. Resume Builder AI Agent</h3>
               <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">Get your polished resume PDF instantly through simple chat</p>
@@ -387,7 +387,7 @@ const HeroSection = () => {
             
             {/* 3. Job Application AI Agent */}
             <div 
-              className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
+              className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto shadow-lg hover:shadow-xl transition-shadow duration-300"
             >
               <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 font-inter text-center">3. Job Application AI Agent</h3>
               <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">From job posting to application-ready in minutes.</p>
