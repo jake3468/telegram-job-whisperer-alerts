@@ -7,6 +7,7 @@ import { detectAndStoreLocation } from "@/utils/locationDetection";
 import ActivationStatusTag from "./ActivationStatusTag";
 import { JobTrackerVideo } from "./JobTrackerVideo";
 import jobTrackerPreview from "@/assets/job-tracker-preview.svg";
+import aiPhoneInterviewPreview from "@/assets/ai-phone-interview-preview.svg";
 interface FeatureSectionProps {
   title: string;
   subheading: string;
@@ -153,6 +154,12 @@ const FeatureSection = ({
           <img 
             src={jobTrackerPreview} 
             alt="Job Tracker Preview"
+            className="w-full h-auto"
+          />
+        ) : title.includes("AI Phone Interview") ? (
+          <img 
+            src={aiPhoneInterviewPreview} 
+            alt="AI Phone Interview Preview"
             className="w-full h-auto"
           />
         ) : isLoading ? <div className="w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center animate-pulse">
