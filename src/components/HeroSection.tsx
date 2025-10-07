@@ -352,7 +352,7 @@ const HeroSection = () => {
                 <img src="/telegram-job-alerts-agent.png" alt="Job Alerts AI Agent demonstration showing personalized job alerts with tailored resumes and cover letters" className="max-w-full h-auto rounded-lg shadow-lg" />
               </div>
               
-            <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
+            <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-left max-w-3xl mx-auto">
               Receive daily job alerts with only the latest postings—less than 24 hours old. Each job is matched to your profile. See a job you like? With just one click, generate a tailored resume, cover letter, interview prep, job-fit analysis, and HR contacts. Everything is personalized for that specific role and ready to apply instantly.
             </p>
               
@@ -374,7 +374,7 @@ const HeroSection = () => {
                 <img src="/telegram-resume-builder-agent.png" alt="Resume Builder AI Agent interface showing conversational resume building and customization" className="max-w-full h-auto rounded-lg shadow-lg" />
               </div>
               
-              <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
+              <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-left max-w-3xl mx-auto">
                 Just chat to update skills, certifications, projects, or work experience. Our AI generates an ATS-friendly resume in final PDF format—no forms, no copy-pasting, no starting over. Each update remembers your previous changes and improves your resume, saving you hours of manual work.
               </p>
               
@@ -392,7 +392,7 @@ const HeroSection = () => {
               <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 font-inter text-center">3. Job Application AI Agent</h3>
               <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">From job posting to application-ready in minutes.</p>
               
-              <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
+              <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-left max-w-3xl mx-auto">
                 Tell the AI which job you're applying for, and get everything ready in minutes. It generates a tailored resume and cover letter, prepares interview materials, provides HR contacts to message, and checks your fit for the role—everything personalized for that specific job.
               </p>
               
