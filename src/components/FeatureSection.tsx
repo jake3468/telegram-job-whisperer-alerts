@@ -5,7 +5,7 @@ import { logger } from "@/utils/logger";
 import { useCachedUserProfile } from "@/hooks/useCachedUserProfile";
 import { detectAndStoreLocation } from "@/utils/locationDetection";
 import ActivationStatusTag from "./ActivationStatusTag";
-import { JobTrackerVideo } from "./JobTrackerVideo";
+import jobTrackerIcon from "@/assets/job-tracker-icon.svg";
 interface FeatureSectionProps {
   title: string;
   subheading: string;
@@ -145,9 +145,10 @@ const FeatureSection = ({
   const animationSection = lottieUrl ? <div className="flex items-center justify-center">
       <div className="w-full max-w-48 lg:max-w-md">
         {title === "Job Tracker" ? (
-          <JobTrackerVideo 
-            className="w-full"
-            showControls={true}
+          <img 
+            src={jobTrackerIcon} 
+            alt="Job Tracker" 
+            className="w-full h-auto"
           />
         ) : isLoading ? <div className="w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center animate-pulse">
             <div className="text-gray-500 text-sm">Loading animation...</div>
