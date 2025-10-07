@@ -9,6 +9,7 @@ import { YouTubeHeroVideo } from '@/components/YouTubeHeroVideo';
 import HandDrawnArrow from './HandDrawnArrow';
 import { ArrowRight } from 'lucide-react';
 import ComparisonTable from '@/components/ComparisonTable';
+import jobApplicationPreview from '@/assets/job-application-preview.svg';
 
 // Add heading animation hook at component level
 const useHeadingAnimation = () => {
@@ -391,6 +392,14 @@ const HeroSection = () => {
             >
               <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 font-inter text-center">3. Job Application AI Agent</h3>
               <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">From job posting to application-ready in minutes.</p>
+              
+              <div className="flex justify-center mb-6">
+                <img 
+                  src={jobApplicationPreview} 
+                  alt="Job Application AI Agent Preview"
+                  className="w-full h-auto max-w-3xl"
+                />
+              </div>
               
               <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-left max-w-3xl mx-auto">
                 Tell the AI which job you're applying for, and get everything ready in minutes. It generates a tailored resume and cover letter, prepares interview materials, provides HR contacts to message, and checks your fit for the role—everything personalized for that specific job.
