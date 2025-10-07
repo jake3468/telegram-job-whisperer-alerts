@@ -6,6 +6,9 @@ import { useCachedUserProfile } from "@/hooks/useCachedUserProfile";
 import { detectAndStoreLocation } from "@/utils/locationDetection";
 import ActivationStatusTag from "./ActivationStatusTag";
 import { JobTrackerVideo } from "./JobTrackerVideo";
+import jobTrackerPreview from "@/assets/job-tracker-preview.svg";
+import aiPhoneInterviewPreview from "@/assets/ai-phone-interview-preview.svg";
+import jobBoardPreview from "@/assets/job-board-preview.svg";
 interface FeatureSectionProps {
   title: string;
   subheading: string;
@@ -98,11 +101,15 @@ const FeatureSection = ({
       {subheading && <p className="text-base md:text-lg text-foreground/70 font-inter mb-4">{subheading}</p>}
     </div>;
 
-  // Mobile: content section (description + button only)
-  const mobileContentSection = <div className="lg:hidden flex flex-col space-y-6">
+  // Mobile: description only
+  const mobileDescriptionSection = <div className="lg:hidden">
       <p className="leading-relaxed font-inter text-foreground text-base">
         {description}
       </p>
+    </div>;
+
+  // Mobile: button only
+  const mobileButtonSection = <div className={`lg:hidden ${title.includes("Job Tracker") ? "mt-8 md:mt-10" : "mt-6"}`}>
       {isComingSoon ? <button type="button" disabled className="w-fit bg-gray-700 hover:bg-gray-600 text-white font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 cursor-not-allowed opacity-75 text-sm">
           Coming Soon
         </button> : buttonUrl ? <button type="button" onClick={handleButtonWithUrlClick} className="w-fit bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-4 rounded-full flex items-center gap-2 flex-row transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
@@ -142,12 +149,25 @@ const FeatureSection = ({
            </button>
          </SignUpButton>}
     </div>;
-  const animationSection = lottieUrl ? <div className="flex items-center justify-center">
-      <div className="w-full max-w-48 lg:max-w-md">
-        {title === "Job Tracker" ? (
-          <JobTrackerVideo 
-            className="w-full"
-            showControls={true}
+  const animationSection = lottieUrl ? <div className="flex items-center justify-center w-full">
+      <div className="w-full max-w-full lg:max-w-3xl">
+        {title.includes("Job Tracker") ? (
+          <img 
+            src={jobTrackerPreview} 
+            alt="Job Tracker Preview"
+            className="w-full h-auto max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto rounded-lg mb-4 md:mb-6"
+          />
+        ) : title.includes("AI Phone Interview") ? (
+          <img 
+            src={aiPhoneInterviewPreview} 
+            alt="AI Phone Interview Preview"
+            className="w-full h-auto max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto rounded-lg mb-4 md:mb-6"
+          />
+        ) : title.includes("Job Board") ? (
+          <img 
+            src={jobBoardPreview} 
+            alt="Job Board Preview"
+            className="w-full h-auto max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto rounded-lg mb-4 md:mb-6"
           />
         ) : isLoading ? <div className="w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center animate-pulse">
             <div className="text-gray-500 text-sm">Loading animation...</div>
@@ -167,26 +187,29 @@ const FeatureSection = ({
   return <section className="py-1 md:py-2 px-4 bg-background rounded-3xl">
       <div className="max-w-7xl mx-auto">
         {lottieUrl ? <div 
-            className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
+            className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card max-w-7xl mx-auto"
           >
             {/* Mobile Layout */}
             <div className="lg:hidden space-y-6">
               {mobileHeaderSection}
+              {mobileDescriptionSection}
               {animationSection}
-              {mobileContentSection}
+              {mobileButtonSection}
             </div>
             
             {/* Desktop Layout */}
-            <div className={`hidden lg:grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center ${isReversed ? 'lg:grid-flow-col-dense' : ''}`}>
+            <div className={`hidden lg:grid grid-cols-2 gap-16 items-center ${isReversed ? 'lg:grid-flow-col-dense' : ''}`}>
               {isReversed ? <>
-                  <div className={isReversed ? 'lg:col-start-2' : ''}>{animationSection}</div>
-                  <div className={isReversed ? 'lg:col-start-1' : ''}>{desktopContentSection}</div>
+                  {/* Reversed: Content on LEFT, Image on RIGHT */}
+                  <div className="lg:col-start-1">{desktopContentSection}</div>
+                  <div className="lg:col-start-2">{animationSection}</div>
                 </> : <>
-                  {desktopContentSection}
+                  {/* Normal: Image on LEFT, Content on RIGHT */}
                   {animationSection}
+                  {desktopContentSection}
                 </>}
             </div>
-          </div> : <div className="relative bg-gray-50 dark:bg-gray-900 rounded-3xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col border border-gray-600">
+          </div> : <div className="relative bg-gray-50 dark:bg-gray-900 rounded-3xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col">
             {label && <div className="absolute -left-3 -top-3 bg-[#30313d] text-white w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
                 {label}
               </div>}
