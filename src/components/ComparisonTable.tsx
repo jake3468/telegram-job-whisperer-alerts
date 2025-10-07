@@ -192,20 +192,6 @@ const ComparisonTable = () => {
         </div>
       </div>
 
-      {/* Differentiator Callout */}
-      <div className="mt-8 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-lg p-6 border border-cyan-200 dark:border-cyan-800 shadow-md">
-        <div className="flex items-start gap-3">
-          <span className="text-2xl flex-shrink-0">💡</span>
-          <div className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
-            <strong className="font-semibold text-gray-900 dark:text-white">
-              Aspirely.ai is the only platform where you tell us something once, and all your AI agents remember it.
-            </strong>
-            <br />
-            <br />
-            Add a new skill, work experience, or certification—every job-specific resume, cover letter, and application file you generate afterward automatically includes it. Other platforms make you copy-paste and update everywhere manually.
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
