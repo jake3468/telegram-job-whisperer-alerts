@@ -10,6 +10,39 @@ import HandDrawnArrow from './HandDrawnArrow';
 import { ArrowRight } from 'lucide-react';
 import ComparisonTable from '@/components/ComparisonTable';
 
+// Add heading animation hook at component level
+const useHeadingAnimation = () => {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20px 0px -50px 0px',
+      threshold: 0.3
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !entry.target.classList.contains('animate-in')) {
+          entry.target.classList.add('animate-in');
+        }
+      });
+    }, observerOptions);
+
+    if (headingRef.current) {
+      observer.observe(headingRef.current);
+    }
+
+    return () => {
+      if (headingRef.current) {
+        observer.unobserve(headingRef.current);
+      }
+    };
+  }, []);
+
+  return headingRef;
+};
+
 // Preload rocket animation immediately when module loads
 const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json';
 const CACHE_KEY = 'rocket-animation-data-v1';
@@ -78,6 +111,7 @@ const HeroSection = () => {
   const fullText = 'AI finds your next job while you sleep';
   const videoRef = useRef<HTMLDivElement>(null);
   const [shouldAutoplay, setShouldAutoplay] = useState(false);
+  const jobHuntingHeadingRef = useHeadingAnimation();
   useEffect(() => {
     if (isLoaded && user) {
       navigate('/dashboard');
@@ -297,7 +331,7 @@ const HeroSection = () => {
       <div className="max-w-4xl mx-auto z-20 relative w-full px-4">
         <div className="max-w-2xl mx-auto">
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4 text-center">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter">Job Hunting, Finally Fixed</h2>
+            <h2 ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter">Job Hunting, Finally Fixed</h2>
             
             <p className="text-left">Job platforms are broken. Old postings everywhere. Even when you see a matching job, you skip it because customizing resumes and finding HR contacts takes forever.</p>
             

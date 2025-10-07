@@ -1,9 +1,39 @@
 import FeatureSection from "./FeatureSection";
+import { useEffect, useRef } from "react";
+
 const ToolsSection = () => {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20px 0px -50px 0px',
+      threshold: 0.3
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !entry.target.classList.contains('animate-in')) {
+          entry.target.classList.add('animate-in');
+        }
+      });
+    }, observerOptions);
+
+    if (headingRef.current) {
+      observer.observe(headingRef.current);
+    }
+
+    return () => {
+      if (headingRef.current) {
+        observer.unobserve(headingRef.current);
+      }
+    };
+  }, []);
+
   return <section id="features" className="relative bg-background">
       {/* Header Section */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <h2 className="text-center sm:text-4xl font-bold text-foreground mb-2 font-inter md:text-3xl text-2xl">and there's more...</h2>
+        <h2 ref={headingRef} className="animate-on-scroll text-center sm:text-4xl font-bold text-foreground mb-2 font-inter md:text-3xl text-2xl">and there's more...</h2>
       </div>
 
       {/* Feature Sections */}

@@ -38,7 +38,6 @@ const FeatureSection = ({
   const [animationData, setAnimationData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const cardRef = useRef<HTMLDivElement | null>(null);
   const {
     userProfile,
     updateUserProfile
@@ -90,33 +89,6 @@ const FeatureSection = ({
       fetchAnimation();
     }
   }, [lottieUrl, title]);
-
-  // Intersection Observer for scroll animation
-  useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: '-20px 0px -50px 0px',
-      threshold: 0.3
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && !entry.target.classList.contains('animate-in')) {
-          entry.target.classList.add('animate-in');
-        }
-      });
-    }, observerOptions);
-
-    if (cardRef.current) {
-      observer.observe(cardRef.current);
-    }
-
-    return () => {
-      if (cardRef.current) {
-        observer.unobserve(cardRef.current);
-      }
-    };
-  }, []);
 
   // Mobile: header section (title + subheading only)
   const mobileHeaderSection = <div className="lg:hidden">
@@ -195,8 +167,7 @@ const FeatureSection = ({
   return <section className="py-1 md:py-2 px-4 bg-background rounded-3xl">
       <div className="max-w-7xl mx-auto">
         {lottieUrl ? <div 
-            ref={cardRef}
-            className="animate-on-scroll rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
+            className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
           >
             {/* Mobile Layout */}
             <div className="lg:hidden space-y-6">

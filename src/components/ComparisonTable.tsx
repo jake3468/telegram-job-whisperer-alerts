@@ -1,6 +1,34 @@
 import { Check, X, AlertCircle, Star } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 const ComparisonTable = () => {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20px 0px -50px 0px',
+      threshold: 0.3
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !entry.target.classList.contains('animate-in')) {
+          entry.target.classList.add('animate-in');
+        }
+      });
+    }, observerOptions);
+
+    if (headingRef.current) {
+      observer.observe(headingRef.current);
+    }
+
+    return () => {
+      if (headingRef.current) {
+        observer.unobserve(headingRef.current);
+      }
+    };
+  }, []);
   const competitors = [
     { name: "Aspirely.ai", highlight: true },
     { name: "LinkedIn", highlight: false },
@@ -90,7 +118,7 @@ const ComparisonTable = () => {
     <div className="w-full max-w-7xl mx-auto px-4 py-12">
       {/* Section Heading */}
       <div className="text-center mb-8">
-        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2 font-inter">
+        <h2 ref={headingRef} className="animate-on-scroll text-3xl md:text-4xl font-bold text-foreground mb-2 font-inter">
           See the Difference: Aspirely vs. Others
         </h2>
       </div>

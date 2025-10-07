@@ -1,5 +1,34 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useEffect, useRef } from "react";
+
 const FAQSection = () => {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20px 0px -50px 0px',
+      threshold: 0.3
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !entry.target.classList.contains('animate-in')) {
+          entry.target.classList.add('animate-in');
+        }
+      });
+    }, observerOptions);
+
+    if (headingRef.current) {
+      observer.observe(headingRef.current);
+    }
+
+    return () => {
+      if (headingRef.current) {
+        observer.unobserve(headingRef.current);
+      }
+    };
+  }, []);
   const faqs = [{
     question: "What is Aspirely.ai and how does it work?",
     answer: "Aspirely.ai is an AI-powered job hunting toolkit that automates the boring parts of job searching. We help you create personalized cover letters, prepare for interviews through our AI mock phone call system with Grace, analyze job postings and companies, generate LinkedIn content, organize your applications with our Job Tracker, browse opportunities on our Job Board, and send you daily job alerts via Telegram. Our AI tools use advanced models like OpenAI, Claude, and Perplexity to provide highly personalized results based on your resume and preferences."
@@ -19,7 +48,7 @@ const FAQSection = () => {
   return <section id="faq" className="py-12 md:py-16 px-4 bg-background">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-6">
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary bg-clip-text mb-2 font-inter text-foreground">Frequently Asked Questions (FAQs)</h2>
+          <h2 ref={headingRef} className="animate-on-scroll text-4xl font-bold bg-gradient-to-r from-primary to-primary bg-clip-text mb-2 font-inter text-foreground">Frequently Asked Questions (FAQs)</h2>
           <p className="text-foreground text-base font-inter leading-relaxed">
             Everything you need to know about Aspirely.ai
           </p>

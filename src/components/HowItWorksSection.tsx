@@ -1,7 +1,34 @@
-
+import { useEffect, useRef } from "react";
 import { UserPlus, Sparkles, Rocket } from "lucide-react";
 
 const HowItWorksSection = () => {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20px 0px -50px 0px',
+      threshold: 0.3
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !entry.target.classList.contains('animate-in')) {
+          entry.target.classList.add('animate-in');
+        }
+      });
+    }, observerOptions);
+
+    if (headingRef.current) {
+      observer.observe(headingRef.current);
+    }
+
+    return () => {
+      if (headingRef.current) {
+        observer.unobserve(headingRef.current);
+      }
+    };
+  }, []);
   const steps = [
     {
       icon: UserPlus,
@@ -24,7 +51,7 @@ const HowItWorksSection = () => {
     <section id="how-it-works" className="bg-background py-12 md:py-16 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-2 font-inter">
+          <h2 ref={headingRef} className="animate-on-scroll text-4xl md:text-5xl font-bold text-foreground mb-2 font-inter">
             How It Works
           </h2>
           <p className="text-lg text-foreground font-inter leading-relaxed">
