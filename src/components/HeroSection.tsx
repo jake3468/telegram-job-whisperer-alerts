@@ -10,6 +10,7 @@ import HandDrawnArrow from './HandDrawnArrow';
 import { ArrowRight } from 'lucide-react';
 import ComparisonTable from '@/components/ComparisonTable';
 import jobApplicationPreview from '@/assets/job-application-preview.svg';
+import jobAlertsAgentPreview from '@/assets/job-alerts-agent-preview.svg';
 
 // Add heading animation hook at component level
 const useHeadingAnimation = () => {
@@ -363,7 +364,7 @@ const HeroSection = () => {
                   </p>
                 </div>
                 <div className="flex justify-center">
-                  <img src="/telegram-job-alerts-agent.png" alt="Job Alerts AI Agent demonstration" className="w-full h-auto rounded-lg" />
+                  <img src={jobAlertsAgentPreview} alt="Job Alerts AI Agent demonstration" className="w-full h-auto rounded-lg" />
                 </div>
                 <div>
                   <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="w-fit bg-gray-700 text-white dark:bg-white dark:text-black font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
@@ -395,7 +396,7 @@ const HeroSection = () => {
                 </div>
                 <div className="flex items-center justify-center w-full">
                   <div className="w-full max-w-full lg:max-w-3xl">
-                    <img src="/telegram-job-alerts-agent.png" alt="Job Alerts AI Agent demonstration" className="w-full h-auto rounded-lg" />
+                    <img src={jobAlertsAgentPreview} alt="Job Alerts AI Agent demonstration" className="w-full h-auto rounded-lg" />
                   </div>
                 </div>
               </div>
