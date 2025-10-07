@@ -526,14 +526,12 @@ const HeroSection = () => {
             </div>
             
             {/* Demo Video Section - All screen sizes */}
-            <div className="mt-12 mb-8">
+            {/* <div className="mt-12 mb-8">
               <div className="flex flex-col items-center justify-center">
-                {/* Video Component - Responsive for all screens */}
                 <div className="mb-6">
                   <YouTubeHeroVideo className="w-full max-w-[320px] md:max-w-xs" />
                 </div>
                 
-                {/* Demo Text with Arrow - Responsive layout */}
                 <div className="flex items-start gap-3 justify-center px-4">
                   <HandDrawnArrow direction="up" className="flex-shrink-0 mt-1" />
                   <p className="text-foreground text-sm font-inter leading-relaxed max-w-sm text-left md:text-center">
@@ -541,7 +539,7 @@ const HeroSection = () => {
                   </p>
                 </div>
               </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>
