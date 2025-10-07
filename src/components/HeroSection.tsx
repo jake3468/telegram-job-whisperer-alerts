@@ -333,9 +333,9 @@ const HeroSection = () => {
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4 text-center">
             <h2 ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter">Job Hunting, Finally Fixed</h2>
             
-            <p className="text-left">Job platforms are broken. Old postings everywhere. Even when you see a matching job, you skip it because customizing resumes and finding HR contacts takes forever.</p>
+            <p className="text-left">Finding a job is stressful. Even when a great opening appears, most people skip it—because applying means tailoring resumes, writing cover letters, checking if the role is a good fit, figuring out visa requirements, and finding the right HR contacts and messaging them to boost your chances.</p>
             
-            <p className="text-left">That's exactly why we built 3 AI Job Agents on Telegram.</p>
+            <p className="text-left">What if we told you, you don't have to do any of this? Our 3 AI Job Agents on Telegram were built and perfected to handle all these daily stresses for you. Just chat, and it's done—no website login required. You get all of the above… and more, with just one click.</p>
             
           </div>
           
@@ -346,14 +346,14 @@ const HeroSection = () => {
               className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
             >
               <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 font-inter text-center">1. Job Alerts AI Agent</h3>
-              <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">Get 7 instant job-specific files with one click.</p>
+              <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">Get &lt;24hr old jobs and instant job-specific files with one click</p>
               
               <div className="flex justify-center mb-6">
                 <img src="/telegram-job-alerts-agent.png" alt="Job Alerts AI Agent demonstration showing personalized job alerts with tailored resumes and cover letters" className="max-w-full h-auto rounded-lg shadow-lg" />
               </div>
               
             <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
-              See a job you like? Click once. Get a tailored resume, cover letter, interview prep, job fit analysis, and HR contacts—all personalized for that specific role.
+              Receive daily job alerts with only the latest postings—less than 24 hours old. Each job is matched to your profile. See a job you like? With just one click, generate a tailored resume, cover letter, interview prep, job-fit analysis, and HR contacts. Everything is personalized for that specific role and ready to apply instantly.
             </p>
               
               <div className="flex justify-center">
@@ -368,14 +368,14 @@ const HeroSection = () => {
               className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card border border-black dark:border-white max-w-4xl mx-auto"
             >
               <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-2 font-inter text-center">2. Resume Builder AI Agent</h3>
-              <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">Your AI resume coach that remembers everything.</p>
+              <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">Get your polished resume PDF instantly through simple chat</p>
               
               <div className="flex justify-center mb-6">
                 <img src="/telegram-resume-builder-agent.png" alt="Resume Builder AI Agent interface showing conversational resume building and customization" className="max-w-full h-auto rounded-lg shadow-lg" />
               </div>
               
               <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
-                Just chat to add new certifications, skills, projects, or work experience. No forms. No starting over. It remembers everything about you and updates your resume instantly.
+                Just chat to update skills, certifications, projects, or work experience. Our AI generates an ATS-friendly resume in final PDF format—no forms, no copy-pasting, no starting over. Each update remembers your previous changes and improves your resume, saving you hours of manual work.
               </p>
               
               <div className="flex justify-center">
@@ -393,7 +393,7 @@ const HeroSection = () => {
               <p className="text-base md:text-lg text-foreground/80 mb-6 font-inter text-center">From job posting to application-ready in minutes.</p>
               
               <p className="text-foreground mb-6 text-sm md:text-base font-inter leading-relaxed text-center max-w-3xl mx-auto">
-                Tell it which job you're applying for. Get your complete application package—resume, cover letter, interview prep—tailored to that role.
+                Tell the AI which job you're applying for, and get everything ready in minutes. It generates a tailored resume and cover letter, prepares interview materials, provides HR contacts to message, and checks your fit for the role—everything personalized for that specific job.
               </p>
               
               <div className="flex justify-center">
