@@ -6,7 +6,7 @@ import { useCachedUserProfile } from "@/hooks/useCachedUserProfile";
 import { detectAndStoreLocation } from "@/utils/locationDetection";
 import ActivationStatusTag from "./ActivationStatusTag";
 import { JobTrackerVideo } from "./JobTrackerVideo";
-import jobTrackerPreview from "@/assets/job-tracker-preview.png";
+import jobTrackerPreview from "@/assets/job-tracker-preview-new.png";
 interface FeatureSectionProps {
   title: string;
   subheading: string;
