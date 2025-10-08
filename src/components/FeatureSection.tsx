@@ -192,8 +192,8 @@ const FeatureSection = ({
             {/* Mobile Layout */}
             <div className="lg:hidden space-y-6">
               {mobileHeaderSection}
-              {mobileDescriptionSection}
               {animationSection}
+              {mobileDescriptionSection}
               {mobileButtonSection}
             </div>
             
