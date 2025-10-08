@@ -6,6 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Copy, CalendarPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { detectAndStoreLocation } from '@/utils/locationDetection';
+import jobAlertsAgentPreview from '@/assets/job-alerts-agent-preview.svg';
+import resumeBuilderAgentPreview from '@/assets/resume-builder-agent-preview.svg';
+import jobApplicationPreview from '@/assets/job-application-preview.svg';
 const AIAgents = () => {
   const {
     userProfile,
@@ -82,8 +85,8 @@ const AIAgents = () => {
         {/* Agent Sections */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {/* Job Alerts Agent */}
-          <FeatureSection title="🔔 Job Alerts Agent" subheading="Daily web scanning for the latest jobs at your chosen time." description="Get only the latest relevant roles posted in the last 24 hours when you need them. No spam. No old jobs. Just one click access to today's opportunities plus resumes and interview prep" lottieUrl="" buttonText="Activate Now" isReversed={true} label="1" buttonUrl="https://t.me/Job_AI_update_bot" shouldDetectLocation={true} activationStatus={userProfile?.bot_activated} additionalContent={<>
-                <p className="text-xs text-gray-700 mb-2 text-center">
+          <FeatureSection title="🔔 Job Alerts Agent" subheading="Daily job updates at your preferred time" description="Get jobs matching your alerts daily—posted in the last 24 hours. No spam, just relevant opportunities. One click gives you tailored resumes, HR contacts, interview prep, and everything you need to apply." lottieUrl="" buttonText="Activate Now" isReversed={true} label="1" buttonUrl="https://t.me/Job_AI_update_bot" shouldDetectLocation={true} activationStatus={userProfile?.bot_activated} imageSrc={jobAlertsAgentPreview} additionalContent={<>
+                <p className="text-sm md:text-base text-gray-700 mb-2 text-center">
                   After activating the Job Alerts AI Agent, click "Create Job Alerts" below to set your daily preferences.
                 </p>
                 <Button onClick={async () => {
@@ -98,10 +101,10 @@ const AIAgents = () => {
               </>} />
 
           {/* Resume Builder Agent */}
-          <FeatureSection title="📝 Resume Builder Agent" subheading="Transform your resume into a sharp, job-ready version." description="Instantly create an ATS-friendly resume that highlights your achievements. Update and tailor it for every job with just a chat" lottieUrl="" buttonText="Activate Now" isReversed={false} label="2" buttonUrl="https://t.me/Resume_builder_AI_bot" shouldDetectLocation={true} activationStatus={userProfile?.cv_bot_activated} />
+          <FeatureSection title="📝 Resume Builder Agent" subheading="Build ATS-friendly resumes fast" description="Create an ATS-friendly Resume/CV PDF highlighting your achievements in minutes. Tailor it for each job by simply chatting—no manual editing needed." lottieUrl="" buttonText="Activate Now" isReversed={false} label="2" buttonUrl="https://t.me/Resume_builder_AI_bot" shouldDetectLocation={true} activationStatus={userProfile?.cv_bot_activated} imageSrc={resumeBuilderAgentPreview} />
 
           {/* Job Application Agent */}
-          <FeatureSection title="👔 Job Application Agent" subheading="Your quick helper when you find a job." description="Share a few details and instantly receive a tailored resume, cover letter, HR contacts, interview prep & more.. - everything you need to apply with confidence" lottieUrl="" buttonText="Activate Now" isReversed={false} label="3" buttonUrl="https://t.me/add_job_aspirelyai_bot" shouldDetectLocation={true} activationStatus={userProfile?.add_job_bot_activated} />
+          <FeatureSection title="👔 Job Application Agent" subheading="Your quick helper when you find a job." description="Share details about the job you're applying for and instantly receive a tailored resume, cover letter, HR contacts, interview prep, and more—everything you need to apply with confidence." lottieUrl="" buttonText="Activate Now" isReversed={false} label="3" buttonUrl="https://t.me/add_job_aspirelyai_bot" shouldDetectLocation={true} activationStatus={userProfile?.add_job_bot_activated} imageSrc={jobApplicationPreview} />
         </div>
       </div>
     </Layout>;

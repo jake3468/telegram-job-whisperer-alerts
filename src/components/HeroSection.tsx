@@ -8,7 +8,6 @@ import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 import { YouTubeHeroVideo } from '@/components/YouTubeHeroVideo';
 import HandDrawnArrow from './HandDrawnArrow';
 import { ArrowRight } from 'lucide-react';
-import ComparisonTable from '@/components/ComparisonTable';
 import jobApplicationPreview from '@/assets/job-application-preview.svg';
 import jobAlertsAgentPreview from '@/assets/job-alerts-agent-preview.svg';
 import resumeBuilderAgentPreview from '@/assets/resume-builder-agent-preview.svg';
@@ -319,10 +318,7 @@ const HeroSection = () => {
       </div>
     </section>
     
-    {/* Comparison Table Section */}
-    <ComparisonTable />
-    
-    {/* Elfsight Testimonials Slider - Moved below comparison table callout */}
+    {/* Elfsight Testimonials Slider */}
     <section className="relative py-8 bg-background">
       <div className="max-w-7xl mx-auto z-20 relative w-full px-4">
         <div className="elfsight-app-4951d48f-0df4-4724-a25f-ace7b5dfeb22" data-elfsight-app-lazy></div>
@@ -334,11 +330,13 @@ const HeroSection = () => {
       <div className="z-20 relative w-full px-4">
         <div className="max-w-2xl mx-auto mb-8">
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4 text-center">
-            <h2 ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter">Job Hunting, Finally Fixed</h2>
+            <h2 ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter">Welcome to the Future of Job Search.</h2>
             
-            <p className="text-left">Finding a job is stressful. Even when a great opening appears, most people skip it—because applying means tailoring resumes, writing cover letters, checking if the role is a good fit, figuring out visa requirements, and finding the right HR contacts and messaging them to boost your chances.</p>
+            <p className="text-left">Job searching is exhausting.</p>
             
-            <p className="text-left">What if we told you, you don't have to do any of this? Our 3 AI Job Agents on Telegram were built and perfected to handle all these daily stresses for you. Just chat, and it's done—no website login required. You get all of the above… and more, with just one click.</p>
+            <p className="text-left">Tailoring resumes, writing cover letters, researching roles, finding HR contacts—it's overwhelming.</p>
+            
+            <p className="text-left"><strong>We fixed it.</strong> Our AI Job Agents handle everything through simple Telegram chats. No logins. No stress. Just results.</p>
             
           </div>
         </div>
@@ -359,13 +357,13 @@ const HeroSection = () => {
                     Get only &lt;24hr old jobs and instant job-specific files with one click
                   </p>
                 </div>
+                <div className="flex justify-center">
+                  <img src={jobAlertsAgentPreview} alt="Job Alerts AI Agent demonstration" className="w-full h-auto rounded-lg" />
+                </div>
                 <div>
                   <p className="leading-relaxed font-inter text-foreground text-base mb-6">
                     Receive daily job alerts with only the latest postings—less than 24 hours old. Each job is matched to your profile. See a job you like? With just one click, generate a tailored resume, cover letter, interview prep, job-fit analysis, and HR contacts. Everything is personalized for that specific role and ready to apply instantly.
                   </p>
-                </div>
-                <div className="flex justify-center">
-                  <img src={jobAlertsAgentPreview} alt="Job Alerts AI Agent demonstration" className="w-full h-auto rounded-lg" />
                 </div>
                 <div>
                   <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="w-fit bg-gray-700 text-white dark:bg-white dark:text-black font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
@@ -417,13 +415,13 @@ const HeroSection = () => {
                     Get your polished resume PDF instantly through simple chat
                   </p>
                 </div>
+                <div className="flex justify-center">
+                  <img src={resumeBuilderAgentPreview} alt="Resume Builder AI Agent interface" className="w-full h-auto rounded-lg" />
+                </div>
                 <div>
                   <p className="leading-relaxed font-inter text-foreground text-base mb-6">
                     Just chat to update skills, certifications, projects, or work experience. Our AI generates an ATS-friendly resume in final PDF format—no forms, no copy-pasting, no starting over. Each update remembers your previous changes and improves your resume, saving you hours of manual work.
                   </p>
-                </div>
-                <div className="flex justify-center">
-                  <img src={resumeBuilderAgentPreview} alt="Resume Builder AI Agent interface" className="w-full h-auto rounded-lg" />
                 </div>
                 <div>
                   <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="w-fit bg-gray-700 text-white dark:bg-white dark:text-black font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
@@ -475,17 +473,17 @@ const HeroSection = () => {
                     From job posting to application-ready in minutes.
                   </p>
                 </div>
-                <div>
-                  <p className="leading-relaxed font-inter text-foreground text-base mb-6">
-                    Tell the AI which job you're applying for, and get everything ready in minutes. It generates a tailored resume and cover letter, prepares interview materials, provides HR contacts to message, and checks your fit for the role—everything personalized for that specific job.
-                  </p>
-                </div>
                 <div className="flex justify-center">
                   <img 
                     src={jobApplicationPreview} 
                     alt="Job Application AI Agent Preview"
                     className="w-full h-auto rounded-lg"
                   />
+                </div>
+                <div>
+                  <p className="leading-relaxed font-inter text-foreground text-base mb-6">
+                    Tell the AI which job you're applying for, and get everything ready in minutes. It generates a tailored resume and cover letter, prepares interview materials, provides HR contacts to message, and checks your fit for the role—everything personalized for that specific job.
+                  </p>
                 </div>
                 <div>
                   <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="w-fit bg-gray-700 text-white dark:bg-white dark:text-black font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-sm">

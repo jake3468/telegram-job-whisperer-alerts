@@ -6,9 +6,9 @@ import { useCachedUserProfile } from "@/hooks/useCachedUserProfile";
 import { detectAndStoreLocation } from "@/utils/locationDetection";
 import ActivationStatusTag from "./ActivationStatusTag";
 import { JobTrackerVideo } from "./JobTrackerVideo";
-import jobTrackerPreview from "@/assets/job-tracker-preview.svg";
-import aiPhoneInterviewPreview from "@/assets/ai-phone-interview-preview.svg";
-import jobBoardPreview from "@/assets/job-board-preview.svg";
+import jobTrackerPreview from "@/assets/job-tracker-preview-new.png";
+import aiPhoneInterviewPreview from "@/assets/ai-phone-interview-preview-new.png";
+import jobBoardPreview from "@/assets/job-board-preview-new.png";
 interface FeatureSectionProps {
   title: string;
   subheading: string;
@@ -22,6 +22,7 @@ interface FeatureSectionProps {
   additionalContent?: React.ReactNode;
   shouldDetectLocation?: boolean;
   activationStatus?: boolean | null;
+  imageSrc?: string;
 }
 const FeatureSection = ({
   title,
@@ -35,7 +36,8 @@ const FeatureSection = ({
   buttonUrl,
   additionalContent,
   shouldDetectLocation = false,
-  activationStatus
+  activationStatus,
+  imageSrc
 }: FeatureSectionProps) => {
   const [LottieComponent, setLottieComponent] = useState<React.ComponentType<any> | null>(null);
   const [animationData, setAnimationData] = useState(null);
@@ -192,8 +194,8 @@ const FeatureSection = ({
             {/* Mobile Layout */}
             <div className="lg:hidden space-y-6">
               {mobileHeaderSection}
-              {mobileDescriptionSection}
               {animationSection}
+              {mobileDescriptionSection}
               {mobileButtonSection}
             </div>
             
@@ -209,20 +211,33 @@ const FeatureSection = ({
                   {desktopContentSection}
                 </>}
             </div>
-          </div> : <div className="relative bg-gray-50 dark:bg-gray-900 rounded-3xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col">
+          </div> : <div className="relative bg-gray-100 dark:bg-gray-900 rounded-3xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col border border-gray-300 dark:border-gray-700">
             {label && <div className="absolute -left-3 -top-3 bg-[#30313d] text-white w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
                 {label}
               </div>}
-            {activationStatus !== undefined && <ActivationStatusTag isActivated={activationStatus} />}
             <div className="text-left space-y-2 md:space-y-3 flex-1 flex flex-col">
-              <h3 className="text-base md:text-lg lg:text-xl font-bold font-opensans text-blue-700 leading-tight pl-4 sm:pl-2">
+              <h3 className="text-lg md:text-xl lg:text-2xl font-bold font-opensans text-blue-700 leading-tight pl-4 sm:pl-2">
                 {title}
               </h3>
               <p className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs md:text-sm font-opensans font-medium leading-tight w-fit">
                 {subheading}
               </p>
+              {activationStatus !== undefined && (
+                <div className="pl-4 sm:pl-2">
+                  <ActivationStatusTag isActivated={activationStatus} />
+                </div>
+              )}
+              {imageSrc && (
+                <div className="my-3">
+                  <img 
+                    src={imageSrc} 
+                    alt={title}
+                    className="w-full h-auto rounded-lg"
+                  />
+                </div>
+              )}
               <div className="flex-1 flex flex-col items-center">
-                <p className="text-xs leading-relaxed font-opensans font-normal text-neutral-950 text-left">
+                <p className="text-sm md:text-base leading-relaxed font-opensans font-normal text-neutral-950 text-left">
                   {description}
                 </p>
               </div>
