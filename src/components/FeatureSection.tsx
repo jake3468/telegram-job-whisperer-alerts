@@ -211,7 +211,7 @@ const FeatureSection = ({
                   {desktopContentSection}
                 </>}
             </div>
-          </div> : <div className="relative bg-gray-50 dark:bg-gray-900 rounded-3xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col border border-gray-300 dark:border-gray-700">
+          </div> : <div className="relative bg-gray-100 dark:bg-gray-900 rounded-3xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col border border-gray-300 dark:border-gray-700">
             {label && <div className="absolute -left-3 -top-3 bg-[#30313d] text-white w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
                 {label}
               </div>}
@@ -219,14 +219,14 @@ const FeatureSection = ({
               <h3 className="text-base md:text-lg lg:text-xl font-bold font-opensans text-blue-700 leading-tight pl-4 sm:pl-2">
                 {title}
               </h3>
+              <p className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs md:text-sm font-opensans font-medium leading-tight w-fit">
+                {subheading}
+              </p>
               {activationStatus !== undefined && (
                 <div className="pl-4 sm:pl-2">
                   <ActivationStatusTag isActivated={activationStatus} />
                 </div>
               )}
-              <p className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs md:text-sm font-opensans font-medium leading-tight w-fit">
-                {subheading}
-              </p>
               {imageSrc && (
                 <div className="my-3">
                   <img 
