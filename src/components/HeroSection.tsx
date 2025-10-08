@@ -162,7 +162,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[14px] md:text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[14px] md:text-[16px] font-notion-inter font-medium text-foreground text-left md:text-center">
-            Get daily job alerts via Telegram with only the latest postings (&lt;24hrs old). AI agents generate tailored resumes, cover letters & interview prep in seconds. Track every job and rehearse interviews with AI phone calls. Just chat to update your resume—our AI automatically syncs it across all features. Join 3000+ job seekers using Aspirely.ai
+            Get fresh jobs alerts daily on Telegram (&lt;24 hours old). Instantly create tailored resumes, cover letters, and interview prep with AI Agents. Track every job, rehearse interviews with AI phone calls, and update your resume just by chatting. Everything stays synced—no more messy copy-paste
           </p>
           
           <SignedOut>
