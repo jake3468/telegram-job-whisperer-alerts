@@ -104,7 +104,7 @@ const AIAgents = () => {
           <FeatureSection title="📝 Resume Builder Agent" subheading="Transform your resume into a sharp, job-ready version." description="Create an ATS-friendly Resume/CV PDF highlighting your achievements in minutes. Tailor it for each job by simply chatting—no manual editing needed." lottieUrl="" buttonText="Activate Now" isReversed={false} label="2" buttonUrl="https://t.me/Resume_builder_AI_bot" shouldDetectLocation={true} activationStatus={userProfile?.cv_bot_activated} imageSrc={resumeBuilderAgentPreview} />
 
           {/* Job Application Agent */}
-          <FeatureSection title="👔 Job Application Agent" subheading="Your quick helper when you find a job." description="Share a few details and instantly receive a tailored resume, cover letter, HR contacts, interview prep & more.. - everything you need to apply with confidence" lottieUrl="" buttonText="Activate Now" isReversed={false} label="3" buttonUrl="https://t.me/add_job_aspirelyai_bot" shouldDetectLocation={true} activationStatus={userProfile?.add_job_bot_activated} imageSrc={jobApplicationPreview} />
+          <FeatureSection title="👔 Job Application Agent" subheading="Your quick helper when you find a job." description="Share details about the job you're applying for and instantly receive a tailored resume, cover letter, HR contacts, interview prep, and more—everything you need to apply with confidence." lottieUrl="" buttonText="Activate Now" isReversed={false} label="3" buttonUrl="https://t.me/add_job_aspirelyai_bot" shouldDetectLocation={true} activationStatus={userProfile?.add_job_bot_activated} imageSrc={jobApplicationPreview} />
         </div>
       </div>
     </Layout>;
