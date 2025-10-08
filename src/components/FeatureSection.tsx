@@ -7,7 +7,7 @@ import { detectAndStoreLocation } from "@/utils/locationDetection";
 import ActivationStatusTag from "./ActivationStatusTag";
 import { JobTrackerVideo } from "./JobTrackerVideo";
 import jobTrackerPreview from "@/assets/job-tracker-preview.svg";
-import aiPhoneInterviewPreview from "@/assets/ai-phone-interview-preview.svg";
+import aiPhoneInterviewPreview from "@/assets/ai-phone-interview-preview-new.png";
 import jobBoardPreview from "@/assets/job-board-preview-new.png";
 interface FeatureSectionProps {
   title: string;
