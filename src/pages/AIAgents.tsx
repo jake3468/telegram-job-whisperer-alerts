@@ -101,7 +101,7 @@ const AIAgents = () => {
               </>} />
 
           {/* Resume Builder Agent */}
-          <FeatureSection title="📝 Resume Builder Agent" subheading="Transform your resume into a sharp, job-ready version." description="Instantly create an ATS-friendly resume that highlights your achievements. Update and tailor it for every job with just a chat" lottieUrl="" buttonText="Activate Now" isReversed={false} label="2" buttonUrl="https://t.me/Resume_builder_AI_bot" shouldDetectLocation={true} activationStatus={userProfile?.cv_bot_activated} imageSrc={resumeBuilderAgentPreview} />
+          <FeatureSection title="📝 Resume Builder Agent" subheading="Transform your resume into a sharp, job-ready version." description="Instantly create an ATS-friendly Resume PDF that highlights your achievements. Update and tailor it for every job with just a chat" lottieUrl="" buttonText="Activate Now" isReversed={false} label="2" buttonUrl="https://t.me/Resume_builder_AI_bot" shouldDetectLocation={true} activationStatus={userProfile?.cv_bot_activated} imageSrc={resumeBuilderAgentPreview} />
 
           {/* Job Application Agent */}
           <FeatureSection title="👔 Job Application Agent" subheading="Your quick helper when you find a job." description="Share a few details and instantly receive a tailored resume, cover letter, HR contacts, interview prep & more.. - everything you need to apply with confidence" lottieUrl="" buttonText="Activate Now" isReversed={false} label="3" buttonUrl="https://t.me/add_job_aspirelyai_bot" shouldDetectLocation={true} activationStatus={userProfile?.add_job_bot_activated} imageSrc={jobApplicationPreview} />
