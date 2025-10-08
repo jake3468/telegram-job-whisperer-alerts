@@ -8,7 +8,6 @@ import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 import { YouTubeHeroVideo } from '@/components/YouTubeHeroVideo';
 import HandDrawnArrow from './HandDrawnArrow';
 import { ArrowRight } from 'lucide-react';
-import ComparisonTable from '@/components/ComparisonTable';
 import jobApplicationPreview from '@/assets/job-application-preview.svg';
 import jobAlertsAgentPreview from '@/assets/job-alerts-agent-preview.svg';
 import resumeBuilderAgentPreview from '@/assets/resume-builder-agent-preview.svg';
@@ -319,10 +318,7 @@ const HeroSection = () => {
       </div>
     </section>
     
-    {/* Comparison Table Section */}
-    <ComparisonTable />
-    
-    {/* Elfsight Testimonials Slider - Moved below comparison table callout */}
+    {/* Elfsight Testimonials Slider */}
     <section className="relative py-8 bg-background">
       <div className="max-w-7xl mx-auto z-20 relative w-full px-4">
         <div className="elfsight-app-4951d48f-0df4-4724-a25f-ace7b5dfeb22" data-elfsight-app-lazy></div>
