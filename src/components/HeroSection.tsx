@@ -359,13 +359,13 @@ const HeroSection = () => {
                     Get only &lt;24hr old jobs and instant job-specific files with one click
                   </p>
                 </div>
+                <div className="flex justify-center">
+                  <img src={jobAlertsAgentPreview} alt="Job Alerts AI Agent demonstration" className="w-full h-auto rounded-lg" />
+                </div>
                 <div>
                   <p className="leading-relaxed font-inter text-foreground text-base mb-6">
                     Receive daily job alerts with only the latest postings—less than 24 hours old. Each job is matched to your profile. See a job you like? With just one click, generate a tailored resume, cover letter, interview prep, job-fit analysis, and HR contacts. Everything is personalized for that specific role and ready to apply instantly.
                   </p>
-                </div>
-                <div className="flex justify-center">
-                  <img src={jobAlertsAgentPreview} alt="Job Alerts AI Agent demonstration" className="w-full h-auto rounded-lg" />
                 </div>
                 <div>
                   <a href="https://t.me/Job_AI_update_bot" target="_blank" rel="noopener noreferrer" className="w-fit bg-gray-700 text-white dark:bg-white dark:text-black font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
@@ -417,13 +417,13 @@ const HeroSection = () => {
                     Get your polished resume PDF instantly through simple chat
                   </p>
                 </div>
+                <div className="flex justify-center">
+                  <img src={resumeBuilderAgentPreview} alt="Resume Builder AI Agent interface" className="w-full h-auto rounded-lg" />
+                </div>
                 <div>
                   <p className="leading-relaxed font-inter text-foreground text-base mb-6">
                     Just chat to update skills, certifications, projects, or work experience. Our AI generates an ATS-friendly resume in final PDF format—no forms, no copy-pasting, no starting over. Each update remembers your previous changes and improves your resume, saving you hours of manual work.
                   </p>
-                </div>
-                <div className="flex justify-center">
-                  <img src={resumeBuilderAgentPreview} alt="Resume Builder AI Agent interface" className="w-full h-auto rounded-lg" />
                 </div>
                 <div>
                   <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="w-fit bg-gray-700 text-white dark:bg-white dark:text-black font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
@@ -475,17 +475,17 @@ const HeroSection = () => {
                     From job posting to application-ready in minutes.
                   </p>
                 </div>
-                <div>
-                  <p className="leading-relaxed font-inter text-foreground text-base mb-6">
-                    Tell the AI which job you're applying for, and get everything ready in minutes. It generates a tailored resume and cover letter, prepares interview materials, provides HR contacts to message, and checks your fit for the role—everything personalized for that specific job.
-                  </p>
-                </div>
                 <div className="flex justify-center">
                   <img 
                     src={jobApplicationPreview} 
                     alt="Job Application AI Agent Preview"
                     className="w-full h-auto rounded-lg"
                   />
+                </div>
+                <div>
+                  <p className="leading-relaxed font-inter text-foreground text-base mb-6">
+                    Tell the AI which job you're applying for, and get everything ready in minutes. It generates a tailored resume and cover letter, prepares interview materials, provides HR contacts to message, and checks your fit for the role—everything personalized for that specific job.
+                  </p>
                 </div>
                 <div>
                   <a href="https://t.me/add_job_aspirelyai_bot" target="_blank" rel="noopener noreferrer" className="w-fit bg-gray-700 text-white dark:bg-white dark:text-black font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
