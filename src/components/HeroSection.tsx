@@ -330,7 +330,7 @@ const HeroSection = () => {
       <div className="z-20 relative w-full px-4">
         <div className="max-w-2xl mx-auto mb-8">
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4 text-center">
-            <h2 ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter">Job Hunting, Finally Fixed</h2>
+            <h2 ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter">Welcome to the Future of Job Search.</h2>
             
             <p className="text-left">Job hunting is exhausting.</p>
             
