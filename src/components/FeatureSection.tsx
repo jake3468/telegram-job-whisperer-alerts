@@ -39,14 +39,7 @@ const FeatureSection = ({
   activationStatus,
   imageSrc
 }: FeatureSectionProps) => {
-  const [LottieComponent, setLottieComponent] = useState<React.ComponentType<any> | null>(null);
-  const [animationData, setAnimationData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
-  const {
-    userProfile,
-    updateUserProfile
-  } = useCachedUserProfile();
+  const { userProfile, updateUserProfile } = useCachedUserProfile();
   const handleButtonWithUrlClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!buttonUrl) return;
@@ -63,37 +56,6 @@ const FeatureSection = ({
     // Open the URL immediately (no waiting for location detection)
     window.open(buttonUrl, '_blank', 'noopener,noreferrer');
   };
-  useEffect(() => {
-    import('lottie-react').then(module => {
-      setLottieComponent(() => module.default);
-    }).catch(error => {
-      logger.error('Failed to load Lottie React module:', error);
-      setHasError(true);
-      setIsLoading(false);
-    });
-  }, []);
-  useEffect(() => {
-    const fetchAnimation = async () => {
-      try {
-        setIsLoading(true);
-        setHasError(false);
-        const response = await fetch(lottieUrl);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch animation: ${response.status} ${response.statusText}`);
-        }
-        const data = await response.json();
-        setAnimationData(data);
-      } catch (error) {
-        logger.error(`Failed to load Lottie animation for ${title}:`, error);
-        setHasError(true);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    if (lottieUrl) {
-      fetchAnimation();
-    }
-  }, [lottieUrl, title]);
 
   // Mobile: header section (title + subheading only)
   const mobileHeaderSection = <div className="lg:hidden">
@@ -156,34 +118,28 @@ const FeatureSection = ({
         {title.includes("Job Tracker") ? (
           <img 
             src={jobTrackerPreview} 
-            alt="Job Tracker Preview"
+            alt="Job Tracker Preview showing application tracking and status management features"
             className="w-full h-auto max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto rounded-lg mb-4 md:mb-6"
+            loading="lazy"
+            decoding="async"
           />
         ) : title.includes("AI Phone Interview") ? (
           <img 
             src={aiPhoneInterviewPreview} 
-            alt="AI Phone Interview Preview"
+            alt="AI Phone Interview feature demonstrating automated interview practice"
             className="w-full h-auto max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto rounded-lg mb-4 md:mb-6"
+            loading="lazy"
+            decoding="async"
           />
         ) : title.includes("Job Board") ? (
           <img 
             src={jobBoardPreview} 
-            alt="Job Board Preview"
+            alt="Job Board displaying curated job listings with AI matching"
             className="w-full h-auto max-w-xs sm:max-w-sm md:max-w-md lg:max-w-3xl mx-auto rounded-lg mb-4 md:mb-6"
+            loading="lazy"
+            decoding="async"
           />
-        ) : isLoading ? <div className="w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center animate-pulse">
-            <div className="text-gray-500 text-sm">Loading animation...</div>
-          </div> : hasError ? <div className="w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
-            <div className="text-center text-gray-500">
-              <div className="text-2xl mb-2">🎬</div>
-              <div className="text-sm">Animation unavailable</div>
-            </div>
-          </div> : LottieComponent && animationData ? <LottieComponent animationData={animationData} loop={true} autoplay={true} style={{
-        width: '100%',
-        height: 'auto'
-      }} /> : <div className="w-full h-40 lg:h-80 bg-gray-100 rounded-lg flex items-center justify-center">
-            <div className="text-gray-500 text-sm">Loading animation...</div>
-          </div>}
+        ) : null}
       </div>
     </div> : null;
   return <section className="py-1 md:py-2 px-4 bg-background rounded-3xl">
@@ -225,15 +181,6 @@ const FeatureSection = ({
               {activationStatus !== undefined && (
                 <div className="pl-4 sm:pl-2">
                   <ActivationStatusTag isActivated={activationStatus} />
-                </div>
-              )}
-              {imageSrc && (
-                <div className="my-3">
-                  <img 
-                    src={imageSrc} 
-                    alt={title}
-                    className="w-full h-auto rounded-lg"
-                  />
                 </div>
               )}
               <div className="flex-1 flex flex-col items-center">

@@ -88,26 +88,6 @@
     @apply bg-background text-foreground;
 }
 
-/* Hide scrollbar but keep functionality */
-.scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Safari and Chrome */
-}
-
-/* Hand-drawn arrow animation */
-@keyframes drawLine {
-  0% { 
-    stroke-dasharray: 0, 200; 
-  }
-  100% { 
-    stroke-dasharray: 200, 0; 
-  }
-}
-
 /* Hero text animation - bottom to top */
 @keyframes fly-in-from-bottom {
   from {

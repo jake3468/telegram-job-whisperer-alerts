@@ -54,7 +54,7 @@ const Index = () => {
       "@type": "WebSite",
       "name": "Aspirely.ai",
       "url": window.location.origin,
-      "description": "The AI-powered platform for finding and creating your perfect career path with advanced job matching and personalized guidance.",
+      "description": "All-in-one AI job search platform with 3 Telegram AI Agents. Get daily job alerts, generate tailored resumes, cover letters & interview prep. Trusted by 3000+ job seekers.",
       "privacyPolicy": `${window.location.origin}/privacy-policy`,
       "termsOfService": `${window.location.origin}/terms-of-service`,
       "publisher": {

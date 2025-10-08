@@ -182,16 +182,6 @@ export const ProfileWizard = () => {
           <span className="text-xs">Go back</span>
         </Button>
 
-        {currentStep === 3 && (
-          <Button
-            onClick={handleHireAgents}
-            disabled={isCompleting}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 h-auto min-h-[36px]"
-            size="sm"
-          >
-            <span className="text-xs">{isCompleting ? 'Setting up...' : 'Yes, I Want Them!'}</span>
-          </Button>
-        )}
         
         {currentStep < TOTAL_STEPS && (
           <Button

@@ -47,6 +47,7 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     sourcemap: mode === 'development',
+    minify: mode === 'production' ? 'esbuild' : false,
     rollupOptions: {
       output: {
         manualChunks: {
