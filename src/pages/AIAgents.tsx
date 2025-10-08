@@ -86,7 +86,7 @@ const AIAgents = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {/* Job Alerts Agent */}
           <FeatureSection title="🔔 Job Alerts Agent" subheading="Daily web scanning for the latest jobs at your chosen time." description="Get only the latest relevant roles posted in the last 24 hours when you need them. No spam. No old jobs. Just one click access to today's opportunities plus resumes and interview prep" lottieUrl="" buttonText="Activate Now" isReversed={true} label="1" buttonUrl="https://t.me/Job_AI_update_bot" shouldDetectLocation={true} activationStatus={userProfile?.bot_activated} imageSrc={jobAlertsAgentPreview} additionalContent={<>
-                <p className="text-xs text-gray-700 mb-2 text-center">
+                <p className="text-sm md:text-base text-gray-700 mb-2 text-center">
                   After activating the Job Alerts AI Agent, click "Create Job Alerts" below to set your daily preferences.
                 </p>
                 <Button onClick={async () => {

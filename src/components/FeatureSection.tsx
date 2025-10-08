@@ -215,11 +215,15 @@ const FeatureSection = ({
             {label && <div className="absolute -left-3 -top-3 bg-[#30313d] text-white w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
                 {label}
               </div>}
-            {activationStatus !== undefined && <ActivationStatusTag isActivated={activationStatus} />}
             <div className="text-left space-y-2 md:space-y-3 flex-1 flex flex-col">
               <h3 className="text-base md:text-lg lg:text-xl font-bold font-opensans text-blue-700 leading-tight pl-4 sm:pl-2">
                 {title}
               </h3>
+              {activationStatus !== undefined && (
+                <div className="pl-4 sm:pl-2">
+                  <ActivationStatusTag isActivated={activationStatus} />
+                </div>
+              )}
               <p className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs md:text-sm font-opensans font-medium leading-tight w-fit">
                 {subheading}
               </p>
