@@ -336,9 +336,11 @@ const HeroSection = () => {
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4 text-center">
             <h2 ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter">Job Hunting, Finally Fixed</h2>
             
-            <p className="text-left">Finding a job is stressful. Even when a great opening appears, most people skip it—because applying means tailoring resumes, writing cover letters, checking if the role is a good fit, figuring out visa requirements, and finding the right HR contacts and messaging them to boost your chances.</p>
+            <p className="text-left">Job hunting is exhausting.</p>
             
-            <p className="text-left">What if we told you, you don't have to do any of this? Our 3 AI Job Agents on Telegram were built and perfected to handle all these daily stresses for you. Just chat, and it's done—no website login required. You get all of the above… and more, with just one click.</p>
+            <p className="text-left">Tailoring resumes, writing cover letters, researching roles, checking visa requirements, finding HR contacts—it's overwhelming.</p>
+            
+            <p className="text-left">What if AI handled it all? Our 3 Telegram Job Agents do everything for you. Just chat—no logins, no stress. One click, and you're done</p>
             
           </div>
         </div>
