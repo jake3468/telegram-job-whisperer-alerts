@@ -233,7 +233,7 @@ const FeatureSection = ({
                 </div>
               )}
               <div className="flex-1 flex flex-col items-center">
-                <p className="text-xs leading-relaxed font-opensans font-normal text-neutral-950 text-left">
+                <p className="text-sm md:text-base leading-relaxed font-opensans font-normal text-neutral-950 text-left">
                   {description}
                 </p>
               </div>
