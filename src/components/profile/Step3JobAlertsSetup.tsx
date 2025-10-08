@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFormTokenKeepAlive } from '@/hooks/useFormTokenKeepAlive';
 import { useCachedUserProfile } from '@/hooks/useCachedUserProfile';
@@ -7,7 +7,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { logger } from '@/utils/logger';
 interface Step3JobAlertsSetupProps {
   onComplete: () => void;
 }
@@ -20,15 +19,7 @@ export const Step3JobAlertsSetup = ({
     refetch
   } = useCachedUserProfile();
   const [isCompleting, setIsCompleting] = useState(false);
-
-  // Lottie animation states
-  const [LottieComponent, setLottieComponent] = useState<any>(null);
-  const [animationData, setAnimationData] = useState(null);
-  const [isAnimationLoading, setIsAnimationLoading] = useState(true);
-  const [hasAnimationError, setHasAnimationError] = useState(false);
-  const {
-    updateActivity
-  } = useFormTokenKeepAlive(true);
+  const { updateActivity } = useFormTokenKeepAlive(true);
   const handleHireAgents = useCallback(async () => {
     if (!userProfile?.id) return;
     updateActivity();
@@ -57,41 +48,6 @@ export const Step3JobAlertsSetup = ({
     }
   }, [navigate, updateActivity, userProfile?.id, refetch]);
 
-  // Load Lottie component dynamically
-  useEffect(() => {
-    const loadLottieComponent = async () => {
-      try {
-        const lottieModule = await import('lottie-react');
-        setLottieComponent(() => lottieModule.default);
-      } catch (error) {
-        logger.error('Failed to load Lottie component:', error);
-        setHasAnimationError(true);
-      }
-    };
-    loadLottieComponent();
-  }, []);
-
-  // Load animation data from Supabase storage
-  useEffect(() => {
-    const loadAnimationData = async () => {
-      try {
-        setIsAnimationLoading(true);
-        const response = await fetch('https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations/AI%20Agent%20profile%20wizard.json');
-        if (!response.ok) {
-          throw new Error(`Failed to fetch animation: ${response.status} ${response.statusText}`);
-        }
-        const data = await response.json();
-        setAnimationData(data);
-        logger.debug('Animation data loaded successfully');
-      } catch (error) {
-        logger.error('Failed to load animation data:', error);
-        setHasAnimationError(true);
-      } finally {
-        setIsAnimationLoading(false);
-      }
-    };
-    loadAnimationData();
-  }, []);
   return <div className="space-y-4 max-w-2xl mx-auto">
       <Card className="bg-gray-800 border border-gray-600 shadow-lg">
         <CardContent className="p-4 sm:p-6 space-y-4">
@@ -113,20 +69,6 @@ export const Step3JobAlertsSetup = ({
             </p>
           </div>
 
-          {/* Lottie Animation */}
-          <div className="flex justify-center my-6">
-            <div className="w-full max-w-xs sm:max-w-sm md:max-w-md">
-              {isAnimationLoading && !hasAnimationError && <div className="flex items-center justify-center h-48 bg-gray-700/30 rounded-lg">
-                  <div className="animate-pulse text-gray-400 text-sm">Loading animation...</div>
-                </div>}
-              
-              {hasAnimationError && <div className="flex items-center justify-center h-48 bg-gray-700/30 rounded-lg">
-                  <div className="text-gray-500 text-sm">Animation not available</div>
-                </div>}
-              
-              {LottieComponent && animationData && !isAnimationLoading && !hasAnimationError && <LottieComponent animationData={animationData} loop={true} autoplay={true} className="w-full h-auto" />}
-            </div>
-          </div>
 
           {/* Call to Action Content */}
           <div className="space-y-4">
@@ -140,5 +82,12 @@ export const Step3JobAlertsSetup = ({
         </CardContent>
       </Card>
 
+      <Button 
+        onClick={handleHireAgents}
+        disabled={isCompleting}
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+      >
+        {isCompleting ? 'Setting up your agents...' : 'Yes, I Want Them!'}
+      </Button>
     </div>;
 };
