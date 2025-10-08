@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { Check, Globe, Loader2, ArrowRight, Crown } from 'lucide-react';
 import { useLocationPricing } from '@/hooks/useLocationPricing';
 import { usePaymentProducts } from '@/hooks/usePaymentProducts';
-import { useEffect, useRef } from 'react';
 const planGradientBg = {
   free: "bg-[#30313d] border border-gray-600",
   subscription: "bg-gradient-to-br from-[#2563eb] via-[#3893ec] to-[#1872ba] dark:from-[#274299] dark:via-[#3177c7] dark:to-[#1b466c]",
@@ -17,7 +16,6 @@ const planTextColor = {
   pack: "text-white"
 };
 const PricingSection = () => {
-  const headingRef = useRef<HTMLHeadingElement>(null);
   const {
     pricingData,
     isLoading: isPricingLoading,
@@ -27,32 +25,6 @@ const PricingSection = () => {
     creditPackProducts,
     isLoading: isProductsLoading
   } = usePaymentProducts();
-
-  useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: '-20px 0px -50px 0px',
-      threshold: 0.3
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && !entry.target.classList.contains('animate-in')) {
-          entry.target.classList.add('animate-in');
-        }
-      });
-    }, observerOptions);
-
-    if (headingRef.current) {
-      observer.observe(headingRef.current);
-    }
-
-    return () => {
-      if (headingRef.current) {
-        observer.unobserve(headingRef.current);
-      }
-    };
-  }, []);
 
   // Prevent rendering if pricing data is not available
   if (!pricingData) {
@@ -68,7 +40,7 @@ const PricingSection = () => {
   return <section id="pricing" className="py-8 md:py-12 px-4 bg-background">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-6">
-          <h2 ref={headingRef} className="animate-on-scroll text-3xl sm:text-5xl font-bold mb-2 font-inter text-foreground">Pricing Plans</h2>
+          <h2 className="text-3xl sm:text-5xl font-bold mb-2 font-inter text-foreground">Pricing Plans</h2>
           <p className="text-base text-foreground font-inter leading-relaxed mb-8">
             We work on a credit-based pricing system, and each feature uses the following credits:
           </p>
