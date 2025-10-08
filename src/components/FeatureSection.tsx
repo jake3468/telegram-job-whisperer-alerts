@@ -183,15 +183,6 @@ const FeatureSection = ({
                   <ActivationStatusTag isActivated={activationStatus} />
                 </div>
               )}
-              {imageSrc && (
-                <div className="my-3">
-                  <img 
-                    src={imageSrc} 
-                    alt={title}
-                    className="w-full h-auto rounded-lg"
-                  />
-                </div>
-              )}
               <div className="flex-1 flex flex-col items-center">
                 <p className="text-sm md:text-base leading-relaxed font-opensans font-normal text-neutral-950 text-left">
                   {description}
