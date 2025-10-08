@@ -68,7 +68,7 @@ const PricingSection = () => {
   return <section id="pricing" className="py-8 md:py-12 px-4 bg-background">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-6">
-          <h2 ref={headingRef} className="animate-on-scroll text-3xl sm:text-5xl font-bold bg-gradient-to-r from-primary via-primary to-primary bg-clip-text mb-2 font-inter text-foreground">Pricing Plans</h2>
+          <h2 ref={headingRef} className="animate-on-scroll text-3xl sm:text-5xl font-bold mb-2 font-inter text-foreground">Pricing Plans</h2>
           <p className="text-base text-foreground font-inter leading-relaxed mb-8">
             We work on a credit-based pricing system, and each feature uses the following credits:
           </p>
