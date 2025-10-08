@@ -1,9 +1,7 @@
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
-import Lottie from 'lottie-react';
-import LightRays from './LightRays';
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 import { YouTubeHeroVideo } from '@/components/YouTubeHeroVideo';
 import HandDrawnArrow from './HandDrawnArrow';
@@ -45,72 +43,9 @@ const useHeadingAnimation = () => {
   return headingRef;
 };
 
-// Preload rocket animation immediately when module loads
-const ROCKET_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations//Businessman%20flies%20up%20with%20rocket.json';
-const CACHE_KEY = 'rocket-animation-data-v1';
-
-// Preload telegram animation immediately when module loads
-const TELEGRAM_ANIMATION_URL = 'https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/animations/telegram.json';
-const TELEGRAM_CACHE_KEY = 'telegram-animation-data-v2';
-
-// Start loading rocket animation data immediately
-const rocketAnimationPromise = (async () => {
-  try {
-    // Check cache first
-    const cachedData = localStorage.getItem(CACHE_KEY);
-    if (cachedData) {
-      return JSON.parse(cachedData);
-    }
-
-    // Fetch with high priority
-    const response = await fetch(ROCKET_ANIMATION_URL, {
-      cache: 'force-cache',
-      priority: 'high'
-    } as RequestInit);
-    const animationData = await response.json();
-
-    // Cache for next time
-    localStorage.setItem(CACHE_KEY, JSON.stringify(animationData));
-    return animationData;
-  } catch (error) {
-    console.error('Failed to preload rocket animation:', error);
-    return null;
-  }
-})();
-
-// Start loading telegram animation data immediately
-const telegramAnimationPromise = (async () => {
-  try {
-    // Check cache first
-    const cachedData = localStorage.getItem(TELEGRAM_CACHE_KEY);
-    if (cachedData) {
-      return JSON.parse(cachedData);
-    }
-
-    // Fetch with high priority
-    const response = await fetch(TELEGRAM_ANIMATION_URL, {
-      cache: 'force-cache',
-      priority: 'high'
-    } as RequestInit);
-    const animationData = await response.json();
-
-    // Cache for next time
-    localStorage.setItem(TELEGRAM_CACHE_KEY, JSON.stringify(animationData));
-    return animationData;
-  } catch (error) {
-    console.error('Failed to preload telegram animation:', error);
-    return null;
-  }
-})();
 const HeroSection = () => {
   const navigate = useNavigate();
-  const {
-    user,
-    isLoaded
-  } = useUser();
-  const [lottieAnimationData, setLottieAnimationData] = useState(null);
-  const [telegramAnimationData, setTelegramAnimationData] = useState(null);
-  const fullText = 'AI finds your next job while you sleep';
+  const { user, isLoaded } = useUser();
   const videoRef = useRef<HTMLDivElement>(null);
   const [shouldAutoplay, setShouldAutoplay] = useState(false);
   const jobHuntingHeadingRef = useHeadingAnimation();
@@ -120,33 +55,30 @@ const HeroSection = () => {
     }
   }, [user, isLoaded, navigate]);
 
-  // Load Lottie animations using preloaded promises
+  // Lazy load Elfsight testimonials script when section is visible
   useEffect(() => {
-    const loadAnimations = async () => {
-      try {
-        const [rocketData, telegramData] = await Promise.all([rocketAnimationPromise, telegramAnimationPromise]);
-        if (rocketData) {
-          setLottieAnimationData(rocketData);
-        }
-        if (telegramData) {
-          setTelegramAnimationData(telegramData);
-        }
-      } catch (error) {
-        console.error('Failed to load animations:', error);
-      }
-    };
-    loadAnimations();
-  }, []);
+    const elfsightObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const script = document.createElement('script');
+            script.src = 'https://elfsightcdn.com/platform.js';
+            script.defer = true;
+            document.body.appendChild(script);
+            elfsightObserver.disconnect();
+          }
+        });
+      },
+      { rootMargin: '200px' }
+    );
 
-  // Load Elfsight testimonials script
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://elfsightcdn.com/platform.js';
-    script.async = true;
-    document.body.appendChild(script);
+    const testimonialSection = document.querySelector('.elfsight-app-4951d48f-0df4-4724-a25f-ace7b5dfeb22');
+    if (testimonialSection?.parentElement) {
+      elfsightObserver.observe(testimonialSection.parentElement);
+    }
 
     return () => {
-      document.body.removeChild(script);
+      elfsightObserver.disconnect();
     };
   }, []);
 
@@ -253,19 +185,19 @@ const HeroSection = () => {
             <div className="flex items-center justify-center gap-2 md:gap-4 mb-6">
               <div className="flex -space-x-1.5 md:-space-x-2">
                 <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
-                  <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Remy Sharp" />
+                  <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Happy Aspirely user testimonial" />
                   <AvatarFallback>RS</AvatarFallback>
                 </Avatar>
                 <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
-                  <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Travis Howard" />
+                  <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Aspirely job seeker success story" />
                   <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
                 <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
-                  <AvatarImage src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="Agnes Walker" />
+                  <AvatarImage src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="Satisfied AI job search platform user" />
                   <AvatarFallback>AW</AvatarFallback>
                 </Avatar>
                 <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
-                  <AvatarImage src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="Trevor Henderson" />
+                  <AvatarImage src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="Professional using Aspirely for job hunting" />
                   <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
               </div>
@@ -290,17 +222,20 @@ const HeroSection = () => {
                 {!shouldAutoplay && (
                   <img 
                     src="/video-thumbnail.png" 
-                    alt="Video thumbnail"
+                    alt="Aspirely.ai demo video thumbnail showing AI job search platform features"
                     className="absolute inset-0 w-full h-full object-cover z-10"
+                    loading="eager"
+                    decoding="async"
                   />
                 )}
                 
                 <iframe
                   className="w-full h-full"
                   src={`https://www.youtube.com/embed/eVKtDxScOEo?${shouldAutoplay ? 'autoplay=1&' : ''}mute=1&controls=0&rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&disablekb=1&fs=0&loop=1&playlist=eVKtDxScOEo`}
-                  title="Aspirely Demo Video"
+                  title="Aspirely.ai Demo - AI Job Search Platform Features Walkthrough"
                   allow="autoplay; encrypted-media"
                   allowFullScreen
+                  loading="lazy"
                 />
               </div>
             </div>
@@ -358,7 +293,13 @@ const HeroSection = () => {
                   </p>
                 </div>
                 <div className="flex justify-center">
-                  <img src={jobAlertsAgentPreview} alt="Job Alerts AI Agent demonstration" className="w-full h-auto rounded-lg" />
+                  <img 
+                    src={jobAlertsAgentPreview} 
+                    alt="Job Alerts AI Agent demonstration showing daily job notifications via Telegram with tailored resumes and cover letters" 
+                    className="w-full h-auto rounded-lg"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
                 <div>
                   <p className="leading-relaxed font-inter text-foreground text-base mb-6">
@@ -416,7 +357,13 @@ const HeroSection = () => {
                   </p>
                 </div>
                 <div className="flex justify-center">
-                  <img src={resumeBuilderAgentPreview} alt="Resume Builder AI Agent interface" className="w-full h-auto rounded-lg" />
+                  <img 
+                    src={resumeBuilderAgentPreview} 
+                    alt="Resume Builder AI Agent interface showing chat-based resume creation with ATS-friendly PDF output" 
+                    className="w-full h-auto rounded-lg"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
                 <div>
                   <p className="leading-relaxed font-inter text-foreground text-base mb-6">
@@ -453,7 +400,13 @@ const HeroSection = () => {
                 </div>
                 <div className="lg:col-start-1 flex items-center justify-center w-full">
                   <div className="w-full max-w-full lg:max-w-3xl">
-                    <img src={resumeBuilderAgentPreview} alt="Resume Builder AI Agent interface" className="w-full h-auto rounded-lg" />
+                    <img 
+                      src={resumeBuilderAgentPreview} 
+                      alt="Resume Builder AI Agent interface showing chat-based resume creation with ATS-friendly PDF output" 
+                      className="w-full h-auto rounded-lg"
+                      loading="lazy"
+                      decoding="async"
+                    />
                   </div>
                 </div>
               </div>
@@ -476,8 +429,10 @@ const HeroSection = () => {
                 <div className="flex justify-center">
                   <img 
                     src={jobApplicationPreview} 
-                    alt="Job Application AI Agent Preview"
+                    alt="Job Application AI Agent showing automated generation of resumes, cover letters, and interview prep materials"
                     className="w-full h-auto rounded-lg"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
                 <div>
@@ -517,8 +472,10 @@ const HeroSection = () => {
                   <div className="w-full max-w-full lg:max-w-3xl">
                     <img 
                       src={jobApplicationPreview} 
-                      alt="Job Application AI Agent Preview"
+                      alt="Job Application AI Agent showing automated generation of resumes, cover letters, and interview prep materials"
                       className="w-full h-auto rounded-lg"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
                 </div>
