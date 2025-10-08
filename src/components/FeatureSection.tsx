@@ -22,6 +22,7 @@ interface FeatureSectionProps {
   additionalContent?: React.ReactNode;
   shouldDetectLocation?: boolean;
   activationStatus?: boolean | null;
+  imageSrc?: string;
 }
 const FeatureSection = ({
   title,
@@ -35,7 +36,8 @@ const FeatureSection = ({
   buttonUrl,
   additionalContent,
   shouldDetectLocation = false,
-  activationStatus
+  activationStatus,
+  imageSrc
 }: FeatureSectionProps) => {
   const [LottieComponent, setLottieComponent] = useState<React.ComponentType<any> | null>(null);
   const [animationData, setAnimationData] = useState(null);
@@ -221,6 +223,15 @@ const FeatureSection = ({
               <p className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs md:text-sm font-opensans font-medium leading-tight w-fit">
                 {subheading}
               </p>
+              {imageSrc && (
+                <div className="my-3">
+                  <img 
+                    src={imageSrc} 
+                    alt={title}
+                    className="w-full h-auto rounded-lg"
+                  />
+                </div>
+              )}
               <div className="flex-1 flex flex-col items-center">
                 <p className="text-xs leading-relaxed font-opensans font-normal text-neutral-950 text-left">
                   {description}
