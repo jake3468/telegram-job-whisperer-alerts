@@ -1,5 +1,7 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useEffect, useRef } from "react";
+import { SignUpButton } from "@clerk/clerk-react";
+import { ArrowRight } from "lucide-react";
 
 const FAQSection = () => {
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -64,6 +66,18 @@ const FAQSection = () => {
               </AccordionContent>
             </AccordionItem>)}
         </Accordion>
+
+        {/* CTA Section */}
+        <div className="mt-16 text-center">
+          <p className="text-xl md:text-2xl font-inter font-medium text-foreground mb-6 max-w-2xl mx-auto">
+            Join thousands of job seekers using AI to discover the right opportunities and apply faster.
+          </p>
+          <SignUpButton mode="modal">
+            <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-6 py-3 text-lg rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-center mx-auto border border-transparent">
+              Start Now <ArrowRight className="w-5 h-5" />
+            </button>
+          </SignUpButton>
+        </div>
       </div>
     </section>;
 };
