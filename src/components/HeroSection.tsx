@@ -127,8 +127,11 @@ const HeroSection = () => {
           {/* Hero Content - Center aligned */}
           <div className="text-left max-w-2xl mx-auto flex flex-col justify-center mt-8 md:mt-0">
         
+        {/* H1 for SEO */}
+        <h1 className="text-center text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 font-notion-inter">Aspirely AI</h1>
+        
         <div className="relative mb-8 md:mt-8">
-          <h1 className="relative z-30 text-[42px] md:text-[46px] lg:text-[52px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
+          <h2 className="relative z-30 text-[42px] md:text-[46px] lg:text-[52px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile view only */}
             <div className="block md:hidden text-left text-[24px] leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">The Only AI <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job Search</span> Platform You'll Ever Need</span>
@@ -147,7 +150,7 @@ const HeroSection = () => {
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Platform You'll Ever Need</span>
             </div>
-          </h1>
+          </h2>
         </div>
         
         {/* Lottie Animation - Rocket - Commented out for now */}
@@ -185,19 +188,19 @@ const HeroSection = () => {
             <div className="flex items-center justify-center gap-2 md:gap-4 mb-6">
               <div className="flex -space-x-1.5 md:-space-x-2">
                 <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
-                  <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Happy Aspirely user testimonial" />
+                  <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Aspirely AI user success story - AI-powered job search testimonial" />
                   <AvatarFallback>RS</AvatarFallback>
                 </Avatar>
                 <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
-                  <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Aspirely job seeker success story" />
+                  <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Professional landed dream job using Aspirely AI platform" />
                   <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
                 <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
-                  <AvatarImage src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="Satisfied AI job search platform user" />
+                  <AvatarImage src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="Job seeker transformed career with Aspirely AI resume builder and job alerts" />
                   <AvatarFallback>AW</AvatarFallback>
                 </Avatar>
                 <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
-                  <AvatarImage src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="Professional using Aspirely for job hunting" />
+                  <AvatarImage src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="Tech professional using automated Telegram job search agent with Aspirely AI" />
                   <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
               </div>
@@ -222,7 +225,7 @@ const HeroSection = () => {
                 {!shouldAutoplay && (
                   <img 
                     src="/video-thumbnail.png" 
-                    alt="Aspirely.ai demo video thumbnail showing AI job search platform features"
+                    alt="Aspirely AI platform demo - AI job search tools and Telegram agents walkthrough"
                     className="absolute inset-0 w-full h-full object-cover z-10"
                     loading="eager"
                     decoding="async"
@@ -295,7 +298,7 @@ const HeroSection = () => {
                 <div className="flex justify-center">
                   <img 
                     src={jobAlertsAgentPreview} 
-                    alt="Job Alerts AI Agent demonstration showing daily job notifications via Telegram with tailored resumes and cover letters" 
+                    alt="Job Alerts AI Agent - Daily fresh jobs via Telegram with Aspirely AI platform" 
                     className="w-full h-auto rounded-lg"
                     loading="lazy"
                     decoding="async"
@@ -359,7 +362,7 @@ const HeroSection = () => {
                 <div className="flex justify-center">
                   <img 
                     src={resumeBuilderAgentPreview} 
-                    alt="Resume Builder AI Agent interface showing chat-based resume creation with ATS-friendly PDF output" 
+                    alt="Resume Builder AI Agent - Chat-based ATS-friendly resume creation with Aspirely AI" 
                     className="w-full h-auto rounded-lg"
                     loading="lazy"
                     decoding="async"
@@ -429,7 +432,7 @@ const HeroSection = () => {
                 <div className="flex justify-center">
                   <img 
                     src={jobApplicationPreview} 
-                    alt="Job Application AI Agent showing automated generation of resumes, cover letters, and interview prep materials"
+                    alt="Job Application AI Agent - Complete application packages with Aspirely AI including resumes and cover letters"
                     className="w-full h-auto rounded-lg"
                     loading="lazy"
                     decoding="async"

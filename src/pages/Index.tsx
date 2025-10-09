@@ -52,14 +52,14 @@ const Index = () => {
     script.innerHTML = JSON.stringify({
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "Aspirely.ai",
+      "name": "Aspirely AI",
       "url": window.location.origin,
-      "description": "All-in-one AI job search platform with 3 Telegram AI Agents. Get daily job alerts, generate tailored resumes, cover letters & interview prep. Trusted by 3000+ job seekers.",
+      "description": "Find jobs faster with Aspirely AI. Get AI job alerts, resume and cover letter tools, and interview preparation - a complete AI job search experience",
       "privacyPolicy": `${window.location.origin}/privacy-policy`,
       "termsOfService": `${window.location.origin}/terms-of-service`,
       "publisher": {
         "@type": "Organization",
-        "name": "Aspirely.ai",
+        "name": "Aspirely AI",
         "url": window.location.origin
       }
     });
