@@ -267,7 +267,7 @@ const HeroSection = () => {
       <div className="z-20 relative w-full px-4">
         <div className="max-w-2xl mx-auto mb-8">
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4 text-center">
-            <h2 ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter">Welcome to the Future of Job Search.</h2>
+            <h2 ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter">Why Job Seekers Choose Us Over LinkedIn and Indeed</h2>
             
             <p className="text-left">Job searching is exhausting.</p>
             
@@ -279,6 +279,7 @@ const HeroSection = () => {
         </div>
           
         {/* AI Job Agents Structured Section */}
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-8 font-inter">Meet Your Three AI Job Agents —</h2>
         <div className="space-y-8">
             {/* 1. Job Alerts AI Agent */}
             <div 
@@ -287,9 +288,9 @@ const HeroSection = () => {
               {/* Mobile Layout */}
               <div className="lg:hidden space-y-6">
                 <div>
-                  <h3 className="text-2xl md:text-3xl mb-2 font-inter text-primary font-bold">
+                  <h2 className="text-2xl md:text-3xl mb-2 font-inter text-primary font-bold">
                     1. Job Alerts AI Agent
-                  </h3>
+                  </h2>
                   <p className="text-base md:text-lg text-foreground/70 font-inter mb-4">
                     Fresh jobs + instant application files
                   </p>
@@ -356,9 +357,9 @@ const HeroSection = () => {
               <div className="hidden lg:grid grid-cols-2 gap-16 items-center">
                 <div className="flex flex-col justify-center space-y-8">
                   <div>
-                    <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-primary whitespace-nowrap">
+                    <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-primary whitespace-nowrap">
                       1. Job Alerts AI Agent
-                    </h3>
+                    </h2>
                     <p className="text-lg md:text-xl text-foreground/70 font-inter mb-4">
                       Fresh jobs + instant application files
                     </p>
@@ -423,9 +424,9 @@ const HeroSection = () => {
               {/* Mobile Layout */}
               <div className="lg:hidden space-y-6">
                 <div>
-                  <h3 className="text-2xl md:text-3xl mb-2 font-inter text-primary font-bold">
+                  <h2 className="text-2xl md:text-3xl mb-2 font-inter text-primary font-bold">
                     2. Resume Builder AI Agent
-                  </h3>
+                  </h2>
                   <p className="text-base md:text-lg text-foreground/70 font-inter mb-4">
                     Build ATS-friendly resumes fast
                   </p>
@@ -475,9 +476,9 @@ const HeroSection = () => {
               <div className="hidden lg:grid grid-cols-2 gap-16 items-center lg:grid-flow-col-dense">
                 <div className="lg:col-start-2 flex flex-col justify-center space-y-8">
                   <div>
-                    <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-primary whitespace-nowrap">
+                    <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-primary whitespace-nowrap">
                       2. Resume Builder AI Agent
-                    </h3>
+                    </h2>
                     <p className="text-lg md:text-xl text-foreground/70 font-inter mb-4">
                       Build ATS-friendly resumes fast
                     </p>
@@ -531,9 +532,9 @@ const HeroSection = () => {
               {/* Mobile Layout */}
               <div className="lg:hidden space-y-6">
                 <div>
-                  <h3 className="text-2xl md:text-3xl mb-2 font-inter text-primary font-bold">
+                  <h2 className="text-2xl md:text-3xl mb-2 font-inter text-primary font-bold">
                     3. Job Application AI Agent
-                  </h3>
+                  </h2>
                   <p className="text-base md:text-lg text-foreground/70 font-inter mb-4">
                     Apply to any job in minutes
                   </p>
@@ -597,9 +598,9 @@ const HeroSection = () => {
               <div className="hidden lg:grid grid-cols-2 gap-16 items-center">
                 <div className="flex flex-col justify-center space-y-8">
                   <div>
-                    <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-primary whitespace-nowrap">
+                    <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 font-inter text-primary whitespace-nowrap">
                       3. Job Application AI Agent
-                    </h3>
+                    </h2>
                     <p className="text-lg md:text-xl text-foreground/70 font-inter mb-4">
                       Apply to any job in minutes
                     </p>
