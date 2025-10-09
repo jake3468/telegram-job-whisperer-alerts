@@ -44,7 +44,7 @@ const AuthHeader = () => {
             fetchPriority="high"
           />
           <span className="font-inter text-foreground font-extrabold sm:text-3xl text-2xl tracking-wide">
-            Aspirely.ai
+            Aspirely AI
           </span>
         </div>
 
