@@ -128,27 +128,32 @@ const HeroSection = () => {
           <div className="text-left max-w-2xl mx-auto flex flex-col justify-center mt-8 md:mt-0">
         
         <div className="relative mb-8 md:mt-8">
-          <h1 className="relative z-30 text-[48px] md:text-[56px] lg:text-[64px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
+          <h1 
+            className="relative z-30 text-[48px] md:text-[56px] lg:text-[64px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic"
+            aria-label="The Future of Job Search with AI Agents"
+          >
             {/* Mobile view only */}
-            <div className="block md:hidden text-center text-[42px] leading-tight animate-fly-in-from-bottom">
+            <span className="block md:hidden text-center text-[42px] leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">The Future of</span>
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic"><span className="underline decoration-red-500 decoration-4 underline-offset-4">Job Search</span></span>
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">with AI Agents</span>
-            </div>
+            </span>
             
             {/* Desktop view only */}
-            <div className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
-              <div className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">The Future of <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job</span></div>
-              <div className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap"><span className="underline decoration-red-500 decoration-4 underline-offset-4">Search</span> with AI Agents</div>
-            </div>
+            <span className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">The Future of <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job</span></span>
+              <br />
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap"><span className="underline decoration-red-500 decoration-4 underline-offset-4">Search</span> with AI Agents</span>
+            </span>
             
             {/* Tablet view only */}
-            <div className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <div className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">The Future of <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job</span></div>
-              <div className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap"><span className="underline decoration-red-500 decoration-4 underline-offset-4">Search</span> with AI Agents</div>
-            </div>
+            <span className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">The Future of <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job</span></span>
+              <br />
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap"><span className="underline decoration-red-500 decoration-4 underline-offset-4">Search</span> with AI Agents</span>
+            </span>
           </h1>
         </div>
         
@@ -164,7 +169,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] md:text-[18px] lg:text-[20px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[16px] md:text-[18px] lg:text-[20px] font-notion-inter font-medium text-foreground text-center">
-            Get hired faster with AI Agents that send fresh job alerts daily, write your applications, and prep you for interviews—everything in one place. Stop manually copying ChatGPT responses.
+            Get hired faster with AI Agents that send fresh job alerts daily, write your CVs and cover letters, and prep you for interviews—everything in one place. Stop manually copying ChatGPT responses.
           </p>
           
           <SignedOut>
