@@ -131,21 +131,21 @@ const HeroSection = () => {
           <h1 className="relative z-30 text-[42px] md:text-[46px] lg:text-[52px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile view only */}
             <div className="block md:hidden text-left text-[24px] leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">The Only AI <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job Search</span> Platform You'll Ever Need</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">The Future of <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job Search</span> with AI Agents</span>
             </div>
             
             {/* Desktop view only */}
             <div className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">The Only AI <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job Search</span></span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">The Future of <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job Search</span></span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Platform You'll Ever Need</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">with AI Agents</span>
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">The Only AI <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job Search</span></span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">The Future of <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job Search</span></span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Platform You'll Ever Need</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">with AI Agents</span>
             </div>
           </h1>
         </div>
@@ -162,7 +162,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[14px] md:text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[14px] md:text-[16px] font-notion-inter font-medium text-foreground text-left md:text-center">
-            Get fresh jobs alerts daily on Telegram (&lt;24 hours old). Instantly create tailored resumes, cover letters, and interview prep with AI Agents. Track every job, rehearse interviews with AI phone calls, and update your resume just by chatting. Everything stays synced—no more messy copy-paste
+            Discover Aspirely AI, the all-in-one platform for job seekers. Find jobs, build AI-powered resumes, apply instantly, and prepare for interviews — all in one place.
           </p>
           
           <SignedOut>
