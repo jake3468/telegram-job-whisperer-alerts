@@ -310,33 +310,33 @@ const HeroSection = () => {
                   <p className="leading-relaxed font-inter text-foreground text-sm mb-3">
                     See a job you like? With just one click, instantly generate:
                   </p>
-                  <ul className="space-y-2 mb-6">
+                  <ul className="space-y-1.5 mb-6">
                     <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
                       <span className="text-foreground text-sm font-inter">Tailored CV/resume</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
                       <span className="text-foreground text-sm font-inter">Cover letter</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
                       <span className="text-foreground text-sm font-inter">Interview prep</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
                       <span className="text-foreground text-sm font-inter">Job-fit analysis</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
                       <span className="text-foreground text-sm font-inter">HR contacts</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
                       <span className="text-foreground text-sm font-inter">Company insights</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
                       <span className="text-foreground text-sm font-inter">Visa sponsorship details (for foreign nationals)</span>
                     </li>
                   </ul>
@@ -368,33 +368,33 @@ const HeroSection = () => {
                     <p className="text-base leading-relaxed font-inter text-foreground mb-3">
                       See a job you like? With just one click, instantly generate:
                     </p>
-                    <ul className="space-y-2 mb-4">
+                    <ul className="space-y-1.5 mb-4">
                       <li className="flex items-start gap-2">
-                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                         <span className="text-foreground text-base font-inter">Tailored CV/resume</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                         <span className="text-foreground text-base font-inter">Cover letter</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                         <span className="text-foreground text-base font-inter">Interview prep</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                         <span className="text-foreground text-base font-inter">Job-fit analysis</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                         <span className="text-foreground text-base font-inter">HR contacts</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                         <span className="text-foreground text-base font-inter">Company insights</span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                         <span className="text-foreground text-base font-inter">Visa sponsorship details (for foreign nationals)</span>
                       </li>
                     </ul>
