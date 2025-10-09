@@ -5,7 +5,7 @@ import { useUser } from '@clerk/clerk-react';
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 import { YouTubeHeroVideo } from '@/components/YouTubeHeroVideo';
 import HandDrawnArrow from './HandDrawnArrow';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 import jobApplicationPreview from '@/assets/job-application-preview.svg';
 import jobAlertsAgentPreview from '@/assets/job-alerts-agent-preview.svg';
 import resumeBuilderAgentPreview from '@/assets/resume-builder-agent-preview.svg';
@@ -304,8 +304,44 @@ const HeroSection = () => {
                   />
                 </div>
                 <div>
-                  <p className="leading-relaxed font-inter text-foreground text-base mb-6">
-                    Receive daily job alerts with only the latest postings—less than 24 hours old. Each job is matched to your profile. See a job you like? With just one click, generate a tailored resume, cover letter, interview prep, job-fit analysis, and HR contacts. Everything is personalized for that specific role and ready to apply instantly.
+                  <p className="leading-relaxed font-inter text-foreground text-base mb-4">
+                    Receive daily job alerts with only the latest postings—less than 24 hours old. Each job is matched to your profile.
+                  </p>
+                  <p className="leading-relaxed font-inter text-foreground text-base mb-3">
+                    See a job you like? With just one click, instantly generate:
+                  </p>
+                  <ul className="space-y-2 mb-6">
+                    <li className="flex items-start gap-2">
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-base font-inter">Tailored CV/resume</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-base font-inter">Cover letter</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-base font-inter">Interview prep</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-base font-inter">Job-fit analysis</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-base font-inter">HR contacts</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-base font-inter">Company insights</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-base font-inter">Visa sponsorship details (for foreign nationals)</span>
+                    </li>
+                  </ul>
+                  <p className="leading-relaxed font-inter text-foreground text-base">
+                    Everything is personalized for that specific role and ready to apply instantly.
                   </p>
                 </div>
                 <div>
@@ -326,8 +362,44 @@ const HeroSection = () => {
                     <p className="text-lg md:text-xl text-foreground/70 font-inter mb-4">
                       Get only &lt;24hr old jobs and instant job-specific files with one click
                     </p>
+                    <p className="text-lg leading-relaxed font-inter text-foreground mb-3">
+                      Receive daily job alerts with only the latest postings—less than 24 hours old. Each job is matched to your profile.
+                    </p>
+                    <p className="text-lg leading-relaxed font-inter text-foreground mb-3">
+                      See a job you like? With just one click, instantly generate:
+                    </p>
+                    <ul className="space-y-2 mb-4">
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-1" />
+                        <span className="text-foreground text-lg font-inter">Tailored CV/resume</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-1" />
+                        <span className="text-foreground text-lg font-inter">Cover letter</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-1" />
+                        <span className="text-foreground text-lg font-inter">Interview prep</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-1" />
+                        <span className="text-foreground text-lg font-inter">Job-fit analysis</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-1" />
+                        <span className="text-foreground text-lg font-inter">HR contacts</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-1" />
+                        <span className="text-foreground text-lg font-inter">Company insights</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-1" />
+                        <span className="text-foreground text-lg font-inter">Visa sponsorship details (for foreign nationals)</span>
+                      </li>
+                    </ul>
                     <p className="text-lg leading-relaxed font-inter text-foreground">
-                      Receive daily job alerts with only the latest postings—less than 24 hours old. Each job is matched to your profile. See a job you like? With just one click, generate a tailored resume, cover letter, interview prep, job-fit analysis, and HR contacts. Everything is personalized for that specific role and ready to apply instantly.
+                      Everything is personalized for that specific role and ready to apply instantly.
                     </p>
                   </div>
                   
