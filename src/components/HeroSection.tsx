@@ -288,7 +288,7 @@ const HeroSection = () => {
         <div className="space-y-8">
             {/* 1. Job Alerts AI Agent */}
             <div 
-              className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card max-w-7xl mx-auto"
+              className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card max-w-7xl mx-auto border-4 border-border"
             >
               {/* Mobile Layout */}
               <div className="lg:hidden space-y-6">
@@ -424,7 +424,7 @@ const HeroSection = () => {
             
             {/* 2. Resume Builder AI Agent */}
             <div 
-              className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card max-w-7xl mx-auto"
+              className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card max-w-7xl mx-auto border-4 border-border"
             >
               {/* Mobile Layout */}
               <div className="lg:hidden space-y-6">
@@ -532,7 +532,7 @@ const HeroSection = () => {
             
             {/* 3. Job Application AI Agent */}
             <div 
-              className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card max-w-7xl mx-auto"
+              className="rounded-3xl p-6 md:p-8 lg:p-10 bg-card max-w-7xl mx-auto border-4 border-border"
             >
               {/* Mobile Layout */}
               <div className="lg:hidden space-y-6">
