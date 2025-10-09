@@ -33,7 +33,7 @@ const ToolsSection = () => {
   return <section id="features" className="relative bg-background">
       {/* Header Section */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <h2 ref={headingRef} className="animate-on-scroll text-center sm:text-4xl font-bold text-foreground mb-2 font-inter md:text-3xl text-2xl">and there's more...</h2>
+        <h2 ref={headingRef} className="animate-on-scroll text-center sm:text-4xl font-bold text-foreground mb-2 font-inter md:text-3xl text-2xl">More AI Job Search Tools</h2>
       </div>
 
       {/* Feature Sections */}
