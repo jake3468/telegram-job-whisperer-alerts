@@ -140,14 +140,14 @@ const HeroSection = () => {
             
             {/* Desktop view only */}
             <div className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
-              <div className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">The Future of</div>
-              <div className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap"><span className="underline decoration-red-500 decoration-4 underline-offset-4">Job Search</span> with AI Agents</div>
+              <div className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">The Future of Job</div>
+              <div className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap"><span className="underline decoration-red-500 decoration-4 underline-offset-4">Search</span> with AI Agents</div>
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <div className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">The Future of</div>
-              <div className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap"><span className="underline decoration-red-500 decoration-4 underline-offset-4">Job Search</span> with AI Agents</div>
+              <div className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">The Future of Job</div>
+              <div className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap"><span className="underline decoration-red-500 decoration-4 underline-offset-4">Search</span> with AI Agents</div>
             </div>
           </h1>
         </div>
