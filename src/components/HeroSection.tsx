@@ -291,7 +291,7 @@ const HeroSection = () => {
                     1. Job Alerts AI Agent
                   </h3>
                   <p className="text-base md:text-lg text-foreground/70 font-inter mb-4">
-                    Get only &lt;24hr old jobs and instant job-specific files with one click
+                    Fresh jobs + instant application files
                   </p>
                 </div>
                 <div className="flex justify-center">
@@ -360,7 +360,7 @@ const HeroSection = () => {
                       1. Job Alerts AI Agent
                     </h3>
                     <p className="text-lg md:text-xl text-foreground/70 font-inter mb-4">
-                      Get only &lt;24hr old jobs and instant job-specific files with one click
+                      Fresh jobs + instant application files
                     </p>
                     <p className="text-base leading-relaxed font-inter text-foreground mb-3">
                       Receive daily job alerts with only the latest postings—less than 24 hours old. Each job is matched to your profile.
