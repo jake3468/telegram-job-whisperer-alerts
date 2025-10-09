@@ -380,7 +380,7 @@ const HeroSection = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span className="text-foreground text-base font-inter">Interview prep</span>
+                        <span className="text-foreground text-base font-inter">Interview prep materials</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
@@ -388,7 +388,7 @@ const HeroSection = () => {
                       </li>
                       <li className="flex items-start gap-2">
                         <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span className="text-foreground text-base font-inter">HR contacts</span>
+                        <span className="text-foreground text-base font-inter">HR contacts to message</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
