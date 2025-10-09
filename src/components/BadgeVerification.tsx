@@ -42,11 +42,6 @@ export const BadgeVerification: React.FC = () => {
                 "@type": "Award", 
                 "name": "Featured on Findly Tools",
                 "url": "https://findly.tools/aspirely-ai"
-              },
-              {
-                "@type": "Award",
-                "name": "Featured on Micro SaaS Examples", 
-                "url": "https://www.microsaasexamples.com/"
               }
             ]
           })}
@@ -90,19 +85,6 @@ export const BadgeVerification: React.FC = () => {
                     data-verification="findly-tools"
                   >
                     View Listing
-                  </a>
-                </div>
-                
-                <div className="flex items-center justify-between p-4 bg-muted rounded">
-                  <span>Micro SaaS Examples</span>
-                  <a 
-                    href="https://www.microsaasexamples.com/" 
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                    data-verification="microsaas-examples"
-                  >
-                    View Site
                   </a>
                 </div>
               </div>

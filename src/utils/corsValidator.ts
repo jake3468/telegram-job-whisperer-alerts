@@ -21,17 +21,14 @@ class CorsValidator {
             'https://findly.tools',
             'https://www.findly.tools',
             'https://startupfa.me',
-            'https://www.startupfa.me',
-            'https://microsaasexamples.com',
-            'https://www.microsaasexamples.com'
+            'https://www.startupfa.me'
           ]
         : [
             'http://localhost:5173', 
             'https://lovable.app', 
             'https://aspirely.lovable.app',
             'https://findly.tools',
-            'https://startupfa.me',
-            'https://microsaasexamples.com'
+            'https://startupfa.me'
           ],
       allowedMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: [
