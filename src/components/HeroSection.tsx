@@ -127,11 +127,8 @@ const HeroSection = () => {
           {/* Hero Content - Center aligned */}
           <div className="text-left max-w-2xl mx-auto flex flex-col justify-center mt-8 md:mt-0">
         
-        {/* H1 for SEO */}
-        <h1 className="text-center text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 font-notion-inter">Aspirely AI</h1>
-        
         <div className="relative mb-8 md:mt-8">
-          <h2 className="relative z-30 text-[42px] md:text-[46px] lg:text-[52px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
+          <h1 className="relative z-30 text-[42px] md:text-[46px] lg:text-[52px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile view only */}
             <div className="block md:hidden text-left text-[24px] leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">The Only AI <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job Search</span> Platform You'll Ever Need</span>
@@ -150,7 +147,7 @@ const HeroSection = () => {
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Platform You'll Ever Need</span>
             </div>
-          </h2>
+          </h1>
         </div>
         
         {/* Lottie Animation - Rocket - Commented out for now */}
