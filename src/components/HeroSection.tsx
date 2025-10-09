@@ -5,7 +5,7 @@ import { useUser } from '@clerk/clerk-react';
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 import { YouTubeHeroVideo } from '@/components/YouTubeHeroVideo';
 import HandDrawnArrow from './HandDrawnArrow';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 import jobApplicationPreview from '@/assets/job-application-preview.svg';
 import jobAlertsAgentPreview from '@/assets/job-alerts-agent-preview.svg';
 import resumeBuilderAgentPreview from '@/assets/resume-builder-agent-preview.svg';
@@ -128,24 +128,26 @@ const HeroSection = () => {
           <div className="text-left max-w-2xl mx-auto flex flex-col justify-center mt-8 md:mt-0">
         
         <div className="relative mb-8 md:mt-8">
-          <h1 className="relative z-30 text-[42px] md:text-[46px] lg:text-[52px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
+          <h1 className="relative z-30 text-[48px] md:text-[56px] lg:text-[64px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic">
             {/* Mobile view only */}
-            <div className="block md:hidden text-left text-[24px] leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">The Only AI <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job Search</span> Platform You'll Ever Need</span>
+            <div className="block md:hidden text-center text-[42px] leading-tight animate-fly-in-from-bottom">
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">The Future of</span>
+              <br />
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic"><span className="underline decoration-red-500 decoration-4 underline-offset-4">Job Search</span></span>
+              <br />
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">with AI Agents</span>
             </div>
             
             {/* Desktop view only */}
             <div className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">The Only AI <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job Search</span></span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Platform You'll Ever Need</span>
+              <div className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">The Future of <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job</span></div>
+              <div className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap"><span className="underline decoration-red-500 decoration-4 underline-offset-4">Search</span> with AI Agents</div>
             </div>
             
             {/* Tablet view only */}
             <div className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">The Only AI <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job Search</span></span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Platform You'll Ever Need</span>
+              <div className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">The Future of <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job</span></div>
+              <div className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap"><span className="underline decoration-red-500 decoration-4 underline-offset-4">Search</span> with AI Agents</div>
             </div>
           </h1>
         </div>
@@ -160,9 +162,9 @@ const HeroSection = () => {
           </div>} */}
         
 
-        <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[14px] md:text-[16px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-left [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-8 text-[14px] md:text-[16px] font-notion-inter font-medium text-foreground text-left md:text-center">
-            Get fresh jobs alerts daily on Telegram (&lt;24 hours old). Instantly create tailored resumes, cover letters, and interview prep with AI Agents. Track every job, rehearse interviews with AI phone calls, and update your resume just by chatting. Everything stays synced—no more messy copy-paste
+        <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] md:text-[18px] lg:text-[20px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
+          <p className="mb-8 text-[16px] md:text-[18px] lg:text-[20px] font-notion-inter font-medium text-foreground text-center">
+            Find your next job faster with AI-powered job alerts, tailored resumes, cover letters, and interview prep — a complete all-in-one job search solution
           </p>
           
           <SignedOut>
@@ -170,7 +172,7 @@ const HeroSection = () => {
             <div className="flex flex-row items-center justify-center mb-8">
               <SignUpButton mode="modal">
                 <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-4 py-2 md:px-6 md:py-2.5 text-lg md:text-xl rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-center w-auto border border-transparent">
-                  Get Started Today <ArrowRight className="w-5 h-5 inline ml-1" />
+                  Get started Free <ArrowRight className="w-5 h-5 inline ml-1" />
                 </button>
               </SignUpButton>
               
@@ -185,19 +187,19 @@ const HeroSection = () => {
             <div className="flex items-center justify-center gap-2 md:gap-4 mb-6">
               <div className="flex -space-x-1.5 md:-space-x-2">
                 <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
-                  <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Happy Aspirely user testimonial" />
+                  <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Aspirely AI user success story - AI-powered job search testimonial" />
                   <AvatarFallback>RS</AvatarFallback>
                 </Avatar>
                 <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
-                  <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Aspirely job seeker success story" />
+                  <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Professional landed dream job using Aspirely AI platform" />
                   <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
                 <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
-                  <AvatarImage src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="Satisfied AI job search platform user" />
+                  <AvatarImage src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="Job seeker transformed career with Aspirely AI resume builder and job alerts" />
                   <AvatarFallback>AW</AvatarFallback>
                 </Avatar>
                 <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
-                  <AvatarImage src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="Professional using Aspirely for job hunting" />
+                  <AvatarImage src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="Tech professional using automated Telegram job search agent with Aspirely AI" />
                   <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
               </div>
@@ -222,7 +224,7 @@ const HeroSection = () => {
                 {!shouldAutoplay && (
                   <img 
                     src="/video-thumbnail.png" 
-                    alt="Aspirely.ai demo video thumbnail showing AI job search platform features"
+                    alt="Aspirely AI platform demo - AI job search tools and Telegram agents walkthrough"
                     className="absolute inset-0 w-full h-full object-cover z-10"
                     loading="eager"
                     decoding="async"
@@ -289,21 +291,57 @@ const HeroSection = () => {
                     1. Job Alerts AI Agent
                   </h3>
                   <p className="text-base md:text-lg text-foreground/70 font-inter mb-4">
-                    Get only &lt;24hr old jobs and instant job-specific files with one click
+                    Fresh jobs + instant application files
                   </p>
                 </div>
                 <div className="flex justify-center">
                   <img 
                     src={jobAlertsAgentPreview} 
-                    alt="Job Alerts AI Agent demonstration showing daily job notifications via Telegram with tailored resumes and cover letters" 
+                    alt="Job Alerts AI Agent - Daily fresh jobs via Telegram with Aspirely AI platform" 
                     className="w-full h-auto rounded-lg"
                     loading="lazy"
                     decoding="async"
                   />
                 </div>
                 <div>
-                  <p className="leading-relaxed font-inter text-foreground text-base mb-6">
-                    Receive daily job alerts with only the latest postings—less than 24 hours old. Each job is matched to your profile. See a job you like? With just one click, generate a tailored resume, cover letter, interview prep, job-fit analysis, and HR contacts. Everything is personalized for that specific role and ready to apply instantly.
+                  <p className="leading-relaxed font-inter text-foreground text-sm mb-4">
+                    Receive daily job alerts with only the latest postings—less than 24 hours old. Each job is matched to your profile.
+                  </p>
+                  <p className="leading-relaxed font-inter text-foreground text-sm mb-3">
+                    See a job you like? With just one click, instantly generate:
+                  </p>
+                  <ul className="space-y-1.5 mb-6">
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-sm font-inter">Tailored CV/resume</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-sm font-inter">Cover letter</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-sm font-inter">Interview prep</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-sm font-inter">Job-fit analysis</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-sm font-inter">HR contacts</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-sm font-inter">Company insights</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-sm font-inter">Visa sponsorship details (for foreign nationals)</span>
+                    </li>
+                  </ul>
+                  <p className="leading-relaxed font-inter text-foreground text-sm">
+                    Everything is personalized for that specific role and ready to apply instantly.
                   </p>
                 </div>
                 <div>
@@ -322,10 +360,46 @@ const HeroSection = () => {
                       1. Job Alerts AI Agent
                     </h3>
                     <p className="text-lg md:text-xl text-foreground/70 font-inter mb-4">
-                      Get only &lt;24hr old jobs and instant job-specific files with one click
+                      Fresh jobs + instant application files
                     </p>
-                    <p className="text-lg leading-relaxed font-inter text-foreground">
-                      Receive daily job alerts with only the latest postings—less than 24 hours old. Each job is matched to your profile. See a job you like? With just one click, generate a tailored resume, cover letter, interview prep, job-fit analysis, and HR contacts. Everything is personalized for that specific role and ready to apply instantly.
+                    <p className="text-base leading-relaxed font-inter text-foreground mb-3">
+                      Receive daily job alerts with only the latest postings—less than 24 hours old. Each job is matched to your profile.
+                    </p>
+                    <p className="text-base leading-relaxed font-inter text-foreground mb-3">
+                      See a job you like? With just one click, instantly generate:
+                    </p>
+                    <ul className="space-y-1.5 mb-4">
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-base font-inter">Tailored CV/resume</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-base font-inter">Cover letter</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-base font-inter">Interview prep</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-base font-inter">Job-fit analysis</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-base font-inter">HR contacts</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-base font-inter">Company insights</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-base font-inter">Visa sponsorship details (for foreign nationals)</span>
+                      </li>
+                    </ul>
+                    <p className="text-base leading-relaxed font-inter text-foreground">
+                      Everything is personalized for that specific role and ready to apply instantly.
                     </p>
                   </div>
                   
@@ -353,22 +427,41 @@ const HeroSection = () => {
                     2. Resume Builder AI Agent
                   </h3>
                   <p className="text-base md:text-lg text-foreground/70 font-inter mb-4">
-                    Get your polished resume PDF instantly through simple chat
+                    Build ATS-friendly resumes fast
                   </p>
                 </div>
                 <div className="flex justify-center">
                   <img 
                     src={resumeBuilderAgentPreview} 
-                    alt="Resume Builder AI Agent interface showing chat-based resume creation with ATS-friendly PDF output" 
+                    alt="Resume Builder AI Agent - Chat-based ATS-friendly resume creation with Aspirely AI" 
                     className="w-full h-auto rounded-lg"
                     loading="lazy"
                     decoding="async"
                   />
                 </div>
                 <div>
-                  <p className="leading-relaxed font-inter text-foreground text-base mb-6">
-                    Just chat to update skills, certifications, projects, or work experience. Our AI generates an ATS-friendly resume in final PDF format—no forms, no copy-pasting, no starting over. Each update remembers your previous changes and improves your resume, saving you hours of manual work.
-                  </p>
+                  <ul className="space-y-1.5 mb-6">
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-sm font-inter">Just chat to update skills, certifications, projects, or work experience</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-sm font-inter">AI generates a polished resume in final PDF format instantly</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-sm font-inter">No forms, no copy-pasting, no starting over</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-sm font-inter">Each update remembers your previous changes and improves your resume</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-sm font-inter">Save hours of manual work</span>
+                    </li>
+                  </ul>
                 </div>
                 <div>
                   <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="w-fit bg-gray-700 text-white dark:bg-white dark:text-black font-medium py-1.5 px-4 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl text-sm">
@@ -386,11 +479,30 @@ const HeroSection = () => {
                       2. Resume Builder AI Agent
                     </h3>
                     <p className="text-lg md:text-xl text-foreground/70 font-inter mb-4">
-                      Get your polished resume PDF instantly through simple chat
+                      Build ATS-friendly resumes fast
                     </p>
-                    <p className="text-lg leading-relaxed font-inter text-foreground">
-                      Just chat to update skills, certifications, projects, or work experience. Our AI generates an ATS-friendly resume in final PDF format—no forms, no copy-pasting, no starting over. Each update remembers your previous changes and improves your resume, saving you hours of manual work.
-                    </p>
+                    <ul className="space-y-1.5 mb-4">
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-base font-inter">Just chat to update skills, certifications, projects, or work experience</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-base font-inter">AI generates a polished resume in final PDF format instantly</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-base font-inter">No forms, no copy-pasting, no starting over</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-base font-inter">Each update remembers your previous changes and improves your resume</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-base font-inter">Save hours of manual work</span>
+                      </li>
+                    </ul>
                   </div>
                   
                   <a href="https://t.me/Resume_builder_AI_bot" target="_blank" rel="noopener noreferrer" className="w-fit bg-gray-700 text-white dark:bg-white dark:text-black font-bold py-3 px-8 rounded-full flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
@@ -423,21 +535,54 @@ const HeroSection = () => {
                     3. Job Application AI Agent
                   </h3>
                   <p className="text-base md:text-lg text-foreground/70 font-inter mb-4">
-                    From job posting to application-ready in minutes.
+                    Apply to any job in minutes
                   </p>
                 </div>
                 <div className="flex justify-center">
                   <img 
                     src={jobApplicationPreview} 
-                    alt="Job Application AI Agent showing automated generation of resumes, cover letters, and interview prep materials"
+                    alt="Job Application AI Agent - Complete application packages with Aspirely AI including resumes and cover letters"
                     className="w-full h-auto rounded-lg"
                     loading="lazy"
                     decoding="async"
                   />
                 </div>
                 <div>
-                  <p className="leading-relaxed font-inter text-foreground text-base mb-6">
-                    Tell the AI which job you're applying for, and get everything ready in minutes. It generates a tailored resume and cover letter, prepares interview materials, provides HR contacts to message, and checks your fit for the role—everything personalized for that specific job.
+                  <p className="leading-relaxed font-inter text-foreground text-sm mb-3">
+                    Planning to apply for a job you discovered? Simply share the job posting and instantly receive:
+                  </p>
+                  <ul className="space-y-1.5 mb-3">
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-sm font-inter">Tailored CV/resume</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-sm font-inter">Cover letter</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-sm font-inter">Interview prep materials</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-sm font-inter">Job-fit analysis</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-sm font-inter">HR contacts to message</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-sm font-inter">Company insights</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground text-sm font-inter">Visa sponsorship details (for foreign nationals)</span>
+                    </li>
+                  </ul>
+                  <p className="leading-relaxed font-inter text-foreground text-sm">
+                    Everything is customized for that specific role and ready to submit immediately.
                   </p>
                 </div>
                 <div>
@@ -456,10 +601,43 @@ const HeroSection = () => {
                       3. Job Application AI Agent
                     </h3>
                     <p className="text-lg md:text-xl text-foreground/70 font-inter mb-4">
-                      From job posting to application-ready in minutes.
+                      Apply to any job in minutes
                     </p>
-                    <p className="text-lg leading-relaxed font-inter text-foreground">
-                      Tell the AI which job you're applying for, and get everything ready in minutes. It generates a tailored resume and cover letter, prepares interview materials, provides HR contacts to message, and checks your fit for the role—everything personalized for that specific job.
+                    <p className="text-base leading-relaxed font-inter text-foreground mb-3">
+                      Planning to apply for a job you discovered? Simply share the job posting and instantly receive:
+                    </p>
+                    <ul className="space-y-1.5 mb-3">
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-base font-inter">Tailored CV/resume</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-base font-inter">Cover letter</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-base font-inter">Interview prep materials</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-base font-inter">Job-fit analysis</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-base font-inter">HR contacts to message</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-base font-inter">Company insights</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-foreground text-base font-inter">Visa sponsorship details (for foreign nationals)</span>
+                      </li>
+                    </ul>
+                    <p className="text-base leading-relaxed font-inter text-foreground">
+                      Everything is customized for that specific role and ready to submit immediately.
                     </p>
                   </div>
                   
