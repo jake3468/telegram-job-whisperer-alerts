@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { Environment } from '@/utils/environment';
 
 interface SectionConfig {
   id: string;
@@ -22,7 +23,9 @@ export const useScrollTracking = () => {
   useEffect(() => {
     // Check if DataFast is available
     if (typeof window === 'undefined' || !window.datafast) {
-      console.warn('DataFast is not available for scroll tracking');
+      if (!Environment.isProduction()) {
+        console.debug('DataFast is not available for scroll tracking');
+      }
       return;
     }
 
@@ -55,7 +58,9 @@ export const useScrollTracking = () => {
                 timestamp: new Date().toISOString(),
               });
 
-              console.log(`Tracked: ${section.displayName} at ${scrollDepth}% scroll depth`);
+              if (!Environment.isProduction()) {
+                console.debug(`Tracked: ${section.displayName} at ${scrollDepth}% scroll depth`);
+              }
             } catch (error) {
               console.error('Error tracking scroll goal:', error);
             }

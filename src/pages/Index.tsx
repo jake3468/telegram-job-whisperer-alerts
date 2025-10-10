@@ -16,6 +16,7 @@ import { useEffect } from "react";
 import { HeroSkeleton } from '@/components/ui/skeleton';
 import { useProgressiveAuth } from '@/hooks/useProgressiveAuth';
 import { useScrollTracking } from '@/hooks/useScrollTracking';
+import { Environment } from '@/utils/environment';
 
 // Global postMessage error handler to suppress external service errors
 const suppressExternalPostMessageErrors = () => {
@@ -43,6 +44,36 @@ const Index = () => {
   useEffect(() => {
     // Suppress external postMessage errors
     suppressExternalPostMessageErrors();
+    
+    // Filter console noise in development/preview environments
+    if (Environment.isLovablePreview() || Environment.isDevelopment()) {
+      const originalWarn = console.warn.bind(console);
+      const originalError = console.error.bind(console);
+
+      const shouldSilence = (firstArg: any) => {
+        if (typeof firstArg !== 'string') return false;
+        return (
+          firstArg.includes('Unrecognized postMessage origin') ||
+          (firstArg.includes('postMessage') && firstArg.includes('lovable.app')) ||
+          firstArg.includes('Understand this warning')
+        );
+      };
+
+      console.warn = (...args: any[]) => {
+        if (shouldSilence(args[0])) return;
+        originalWarn(...args);
+      };
+      console.error = (...args: any[]) => {
+        if (shouldSilence(args[0])) return;
+        originalError(...args);
+      };
+
+      // Cleanup function to restore original console methods
+      return () => {
+        console.warn = originalWarn;
+        console.error = originalError;
+      };
+    }
     
     // Add JSON-LD structured data for better Google crawlability
     const script = document.createElement('script');
