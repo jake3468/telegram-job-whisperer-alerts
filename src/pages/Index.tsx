@@ -30,9 +30,7 @@ const suppressExternalPostMessageErrors = () => {
     ];
     
     // Only suppress errors from known external services
-    if (!allowedOrigins.some(origin => event.origin.includes(origin))) {
-      console.warn('Unrecognized postMessage origin:', event.origin);
-    }
+    // Silently ignore unrecognized origins to avoid console spam
   }, false);
 };
 
