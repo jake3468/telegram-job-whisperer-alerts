@@ -259,13 +259,6 @@ const HeroSection = () => {
       </div>
     </section>
     
-    {/* Elfsight Testimonials Slider */}
-    <section className="relative py-8 bg-background">
-      <div className="max-w-7xl mx-auto z-20 relative w-full px-4">
-        <div className="elfsight-app-4951d48f-0df4-4724-a25f-ace7b5dfeb22" data-elfsight-app-lazy></div>
-      </div>
-    </section>
-    
     {/* Telegram Agents Section - Separate section below hero */}
     <section id="telegram-agents" className="relative py-4 bg-background">
       <div className="z-20 relative w-full px-4">
