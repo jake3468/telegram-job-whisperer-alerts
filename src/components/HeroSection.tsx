@@ -177,7 +177,7 @@ const HeroSection = () => {
             <div className="flex flex-row items-center justify-center mb-8">
               <SignUpButton mode="modal">
                 <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-4 py-2 md:px-6 md:py-2.5 text-lg md:text-xl rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-center w-auto border border-transparent">
-                  Get started Free <ArrowRight className="w-5 h-5 inline ml-1" />
+                  Try it yourself <ArrowRight className="w-5 h-5 inline ml-1" />
                 </button>
               </SignUpButton>
               
@@ -225,25 +225,24 @@ const HeroSection = () => {
               className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] px-4 md:w-full md:max-w-5xl md:left-0 md:right-0 md:ml-0 md:mr-0 md:mx-auto md:px-8 lg:w-screen lg:max-w-none lg:left-1/2 lg:right-1/2 lg:-ml-[50vw] lg:-mr-[50vw] lg:px-16 my-8"
             >
               <div className="w-full aspect-video rounded-2xl overflow-hidden relative">
-                {/* Thumbnail - shown until video autoplays */}
-                {!shouldAutoplay && (
-                  <img 
-                    src="/video-thumbnail.png" 
-                    alt="Aspirely AI platform demo - AI job search tools and Telegram agents walkthrough"
-                    className="absolute inset-0 w-full h-full object-cover z-10"
-                    loading="eager"
-                    decoding="async"
-                  />
-                )}
+                {/* Thumbnail - static for A/B testing */}
+                <img 
+                  src="/video-thumbnail.png" 
+                  alt="Aspirely AI platform demo - AI job search tools and Telegram agents walkthrough"
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                  decoding="async"
+                />
                 
-                <iframe
+                {/* Video temporarily commented out for A/B testing */}
+                {/* <iframe
                   className="w-full h-full"
                   src={`https://www.youtube.com/embed/eVKtDxScOEo?${shouldAutoplay ? 'autoplay=1&' : ''}mute=1&controls=0&rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&disablekb=1&fs=0&loop=1&playlist=eVKtDxScOEo`}
                   title="Aspirely.ai Demo - AI Job Search Platform Features Walkthrough"
                   allow="autoplay; encrypted-media"
                   allowFullScreen
                   loading="lazy"
-                />
+                /> */}
               </div>
             </div>
           </SignedOut>
