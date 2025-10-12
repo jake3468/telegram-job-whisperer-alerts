@@ -158,60 +158,6 @@ const Blogs = () => {
           <p className="text-xl text-gray-700 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
             Insights, tips, and industry updates to help you excel in your career journey
           </p>
-          
-          {/* Search and Filter */}
-          <div className="max-w-2xl mx-auto space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <Input type="text" placeholder="Search blogs..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10 bg-card border-border text-foreground placeholder-muted-foreground" />
-            </div>
-            
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 justify-center">
-              <button 
-                onClick={() => setSelectedTag(null)} 
-                className={`px-3 py-1 rounded-full text-sm transition-colors ${
-                  !selectedTag 
-                    ? 'bg-cyan-600 text-white dark:bg-cyan-500 dark:text-white' 
-                    : 'bg-card border border-border text-foreground hover:bg-muted'
-                }`}
-              >
-                All ({blogs.length})
-              </button>
-              
-              {displayedTags.map(({ tag, count }) => (
-                <button 
-                  key={tag} 
-                  onClick={() => setSelectedTag(tag)} 
-                  className={`px-3 py-1 rounded-full text-sm transition-colors ${
-                    selectedTag === tag 
-                      ? 'bg-cyan-600 text-white dark:bg-cyan-500 dark:text-white' 
-                      : 'bg-card border border-border text-foreground hover:bg-muted'
-                  }`}
-                >
-                  {tag} ({count})
-                </button>
-              ))}
-              
-              {!showAllTags && tagCounts.length > 8 && (
-                <button
-                  onClick={() => setShowAllTags(true)}
-                  className="px-3 py-1 rounded-full text-sm bg-card border border-border text-foreground hover:bg-muted transition-colors"
-                >
-                  +{tagCounts.length - 8} more
-                </button>
-              )}
-              
-              {showAllTags && tagCounts.length > 8 && (
-                <button
-                  onClick={() => setShowAllTags(false)}
-                  className="px-3 py-1 rounded-full text-sm bg-card border border-border text-foreground hover:bg-muted transition-colors"
-                >
-                  Show less
-                </button>
-              )}
-            </div>
-          </div>
         </div>
       </div>
 
@@ -279,6 +225,74 @@ const Blogs = () => {
                   </Link>
                 </Card>)}
             </div>}
+        </div>
+      </div>
+
+      {/* Search and Filter Section - Moved to Bottom */}
+      <div className="px-4 pb-16 bg-background">
+        <div className="max-w-6xl mx-auto">
+          <div className="max-w-2xl mx-auto space-y-4">
+            <h2 className="text-2xl font-orbitron font-bold text-center mb-6 text-foreground">
+              Find More Articles
+            </h2>
+            
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Input 
+                type="text" 
+                placeholder="Search blogs..." 
+                value={searchTerm} 
+                onChange={e => setSearchTerm(e.target.value)} 
+                className="pl-10 bg-card border-border text-foreground placeholder-muted-foreground" 
+              />
+            </div>
+            
+            {/* Tags */}
+            <div className="flex flex-wrap gap-2 justify-center">
+              <button 
+                onClick={() => setSelectedTag(null)} 
+                className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                  !selectedTag 
+                    ? 'bg-cyan-600 text-white dark:bg-cyan-500 dark:text-white' 
+                    : 'bg-card border border-border text-foreground hover:bg-muted'
+                }`}
+              >
+                All ({blogs.length})
+              </button>
+              
+              {displayedTags.map(({ tag, count }) => (
+                <button 
+                  key={tag} 
+                  onClick={() => setSelectedTag(tag)} 
+                  className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                    selectedTag === tag 
+                      ? 'bg-cyan-600 text-white dark:bg-cyan-500 dark:text-white' 
+                      : 'bg-card border border-border text-foreground hover:bg-muted'
+                  }`}
+                >
+                  {tag} ({count})
+                </button>
+              ))}
+              
+              {!showAllTags && tagCounts.length > 8 && (
+                <button
+                  onClick={() => setShowAllTags(true)}
+                  className="px-3 py-1 rounded-full text-sm bg-card border border-border text-foreground hover:bg-muted transition-colors"
+                >
+                  +{tagCounts.length - 8} more
+                </button>
+              )}
+              
+              {showAllTags && tagCounts.length > 8 && (
+                <button
+                  onClick={() => setShowAllTags(false)}
+                  className="px-3 py-1 rounded-full text-sm bg-card border border-border text-foreground hover:bg-muted transition-colors"
+                >
+                  Show less
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
