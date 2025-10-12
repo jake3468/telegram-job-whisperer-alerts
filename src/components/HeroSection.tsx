@@ -133,7 +133,7 @@ const HeroSection = () => {
             aria-label="The Future of Job Search with AI Agents"
           >
             {/* Mobile view only */}
-            <span className="block md:hidden text-center text-[42px] leading-tight animate-fly-in-from-bottom">
+            <span className="block md:hidden text-center text-[36px] leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Tell Us What Jobs You Want.</span>
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">We Find and Send Them <span className="underline decoration-red-600 dark:decoration-red-500 decoration-[3px] underline-offset-4">Every Day</span>.</span>
