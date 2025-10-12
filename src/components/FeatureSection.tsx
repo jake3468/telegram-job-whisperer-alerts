@@ -172,7 +172,7 @@ const FeatureSection = ({
                 {label}
               </div>}
             <div className="text-left space-y-2 md:space-y-3 flex-1 flex flex-col">
-              <h3 className="text-lg md:text-xl lg:text-2xl font-bold font-opensans text-blue-700 leading-tight pl-4 sm:pl-2">
+              <h3 className="text-lg md:text-xl lg:text-2xl font-bold font-opensans text-foreground leading-tight pl-4 sm:pl-2">
                 {title}
               </h3>
               <p className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs md:text-sm font-opensans font-medium leading-tight w-fit">
@@ -189,13 +189,13 @@ const FeatureSection = ({
                 </p>
               </div>
               <div className="pt-3 md:pt-2 space-y-3">
-                {isComingSoon ? <button type="button" disabled className="w-full bg-gray-700 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm cursor-not-allowed opacity-75">
+                {isComingSoon ? <button type="button" disabled className="w-fit mx-auto bg-gray-700 text-white font-medium py-2.5 md:py-3 px-6 md:px-8 rounded-lg text-sm md:text-base cursor-not-allowed opacity-75">
                     Coming Soon
-                  </button> : buttonUrl ? <button type="button" onClick={handleButtonWithUrlClick} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200 flex items-center gap-2 justify-center">
-                    <ExternalLink className="w-3 h-3" />
+                  </button> : buttonUrl ? <button type="button" onClick={handleButtonWithUrlClick} className="w-fit mx-auto bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 md:py-3 px-6 md:px-8 rounded-lg text-sm md:text-base transition-all duration-200 flex items-center gap-2 justify-center">
+                    <ExternalLink className="w-4 h-4" />
                     {buttonText}
                   </button> : <SignUpButton mode="modal">
-                    <button type="button" className="w-full bg-gray-700 text-white dark:bg-white dark:text-black font-medium py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-xs md:text-sm transition-all duration-200">
+                    <button type="button" className="w-fit mx-auto bg-gray-700 text-white dark:bg-white dark:text-black font-medium py-2.5 md:py-3 px-6 md:px-8 rounded-lg text-sm md:text-base transition-all duration-200">
                       {buttonText}
                     </button>
                   </SignUpButton>}

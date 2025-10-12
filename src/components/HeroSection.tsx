@@ -118,7 +118,7 @@ const HeroSection = () => {
     navigate('/dashboard');
   };
   return <>
-    <section id="hero-section" className="relative min-h-[80vh] flex items-center justify-center px-4 pt-20 sm:pt-24 pb-8 overflow-hidden bg-gradient-hero-mobile md:bg-gradient-hero dark:bg-black">
+    <section id="hero-section" className="relative min-h-[80vh] flex items-center justify-center px-4 pt-20 sm:pt-24 pb-2 overflow-hidden bg-gradient-hero-mobile md:bg-gradient-hero dark:bg-black">
       <div className="absolute inset-0 z-10 bg-white/20 dark:bg-black/20" aria-hidden="true" />
       
       {/* Main Container with Grid Layout */}
@@ -129,30 +129,28 @@ const HeroSection = () => {
         
         <div className="relative mb-8 md:mt-8">
           <h1 
-            className="relative z-30 text-[48px] md:text-[56px] lg:text-[64px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic"
+            className="relative z-30 text-[48px] md:text-[48px] lg:text-[52px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic"
             aria-label="The Future of Job Search with AI Agents"
           >
             {/* Mobile view only */}
-            <span className="block md:hidden text-center text-[42px] leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">The Future of</span>
+            <span className="block md:hidden text-center text-[36px] leading-tight animate-fly-in-from-bottom">
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Tell Us What Jobs You Want.</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic"><span className="underline decoration-red-500 decoration-4 underline-offset-4">Job Search</span></span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">with AI Agents</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">We Find and Send Them <span className="underline decoration-red-600 dark:decoration-red-500 decoration-[3px] underline-offset-4">Every Day</span>.</span>
             </span>
             
             {/* Desktop view only */}
             <span className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">The Future of <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job</span></span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Tell Us What Jobs You Want.</span>
               <br />
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap"><span className="underline decoration-red-500 decoration-4 underline-offset-4">Search</span> with AI Agents</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">We Find and Send Them <span className="underline decoration-red-600 dark:decoration-red-500 decoration-[3px] underline-offset-4">Every Day</span>.</span>
             </span>
             
             {/* Tablet view only */}
             <span className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">The Future of <span className="underline decoration-red-500 decoration-4 underline-offset-4">Job</span></span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Tell Us What Jobs You Want.</span>
               <br />
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap"><span className="underline decoration-red-500 decoration-4 underline-offset-4">Search</span> with AI Agents</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">We Find and Send Them <span className="underline decoration-red-600 dark:decoration-red-500 decoration-[3px] underline-offset-4">Every Day</span>.</span>
             </span>
           </h1>
         </div>
@@ -169,7 +167,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] md:text-[18px] lg:text-[20px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[16px] md:text-[18px] lg:text-[20px] font-notion-inter font-medium text-foreground text-center">
-            Get hired faster with AI Agents that send fresh job alerts daily, write your CVs and cover letters, and prep you for interviews—everything in one place. Stop manually copying ChatGPT responses.
+            One-time setup. Our AI agents send matched jobs to your phone, create tailored resumes and cover letters, and conduct phone interview practice. Apply in minutes, not hours.
           </p>
           
           <SignedOut>
@@ -260,7 +258,7 @@ const HeroSection = () => {
     </section>
     
     {/* Telegram Agents Section - Separate section below hero */}
-    <section id="telegram-agents" className="relative py-4 bg-background">
+    <section id="telegram-agents" className="relative pt-0 pb-4 bg-background">
       <div className="z-20 relative w-full px-4">
         <div className="max-w-2xl mx-auto mb-8">
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4 text-center">
