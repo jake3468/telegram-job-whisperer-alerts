@@ -6,6 +6,7 @@ import { ArrowLeft, Calendar, User, Share2, Twitter, Linkedin, Clock } from 'luc
 import { blogData } from '@/data/blogData';
 import Footer from '@/components/Footer';
 import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
+import AuthHeader from '@/components/AuthHeader';
 
 interface Blog {
   id: string;
@@ -70,6 +71,13 @@ const BlogPost = () => {
     return 'Career Advice';
   };
 
+  // Get related posts (exclude current post, show 3 others)
+  const getRelatedPosts = (currentSlug: string): Blog[] => {
+    return Object.values(blogData)
+      .filter(post => post.slug !== currentSlug)
+      .slice(0, 3);
+  };
+
   const readingTime = blog ? calculateReadingTime(blog.content) : 0;
   const articleSection = blog ? getArticleSection(blog.tags || []) : 'Career Advice';
   const shareUrl = window.location.href;
@@ -91,6 +99,7 @@ const BlogPost = () => {
     window.open(url, '_blank');
   };
   return <div className="min-h-screen bg-black text-white">
+      <AuthHeader showSectionNav={false} />
       <Helmet>
         <title>{blog.meta_title || blog.title}</title>
          <meta name="description" content={blog.meta_description || blog.excerpt} />
@@ -199,7 +208,7 @@ const BlogPost = () => {
         </script>
       </Helmet>
       
-      <div className="pt-8 pb-16 px-4 sm:px-6 lg:px-8 bg-white min-h-screen">
+      <div className="pt-28 pb-16 px-4 sm:px-6 lg:px-8 bg-white min-h-screen">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
           <Link to="/blogs" className="inline-flex items-center text-sky-600 hover:text-sky-700 mb-8 font-medium">
@@ -263,6 +272,26 @@ const BlogPost = () => {
             ) : (
               <div className="text-gray-500 italic">No content available</div>
             )}
+          </div>
+
+          {/* Related Posts Section */}
+          <div className="mt-12 pt-8 border-t border-gray-200">
+            <h2 className="text-2xl font-orbitron font-bold text-gray-900 mb-6">
+              Related Posts:
+            </h2>
+            <ol className="space-y-3">
+              {getRelatedPosts(blog.slug).map((relatedPost, index) => (
+                <li key={relatedPost.slug} className="text-gray-700">
+                  <Link 
+                    to={`/blog/${relatedPost.slug}`}
+                    onClick={() => window.scrollTo(0, 0)}
+                    className="text-lg hover:text-sky-600 transition-colors duration-200"
+                  >
+                    {index + 1}. {relatedPost.title}
+                  </Link>
+                </li>
+              ))}
+            </ol>
           </div>
 
         </div>

@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Search, Calendar, User, ArrowLeft } from 'lucide-react';
 import { getAllBlogs } from '@/data/blogData';
 import Footer from '@/components/Footer';
+import AuthHeader from '@/components/AuthHeader';
 interface Blog {
   id: string;
   title: string;
@@ -23,6 +24,7 @@ const Blogs = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showAllTags, setShowAllTags] = useState(false);
   
   const blogs = getAllBlogs();
 
@@ -40,6 +42,15 @@ const Blogs = () => {
     return matchesSearch && matchesTag;
   });
   const allTags = Array.from(new Set(blogs.flatMap(blog => blog.tags || [])));
+  
+  // Calculate tag counts and sort by popularity
+  const tagCounts = allTags.map(tag => ({
+    tag,
+    count: blogs.filter(blog => blog.tags?.includes(tag)).length
+  })).sort((a, b) => b.count - a.count);
+  
+  // Display top 8 tags by default, or all if showAllTags is true
+  const displayedTags = showAllTags ? tagCounts : tagCounts.slice(0, 8);
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -49,6 +60,7 @@ const Blogs = () => {
   };
   
   return <div className="min-h-screen bg-background text-foreground">
+      <AuthHeader showSectionNav={false} />
       <Helmet>
         <title>Career Insights & Job Search Tips - Aspirely AI Blog</title>
         <meta name="description" content="Discover career insights, job search strategies, interview tips, and industry updates to accelerate your professional growth with Aspirely AI's expert blog." />
@@ -140,43 +152,7 @@ const Blogs = () => {
         </script>
       </Helmet>
       
-      {/* Back to Home Button */}
-      <div className="pt-8 px-4">
-        <div className="max-w-6xl mx-auto">
-          <Link to="/" className="inline-flex items-center text-gray-800 dark:text-cyan-300 hover:text-gray-900 dark:hover:text-cyan-200 mb-8 transition-colors">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Home
-          </Link>
-        </div>
-      </div>
-      
-      {/* Hero Section */}
-      <div className="pb-12 px-4">
-        <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-orbitron font-bold mb-6 bg-gradient-to-r from-gray-800 to-gray-900 dark:from-cyan-300 dark:via-cyan-200 dark:to-cyan-100 bg-clip-text text-transparent">Our Blogs</h1>
-          <p className="text-xl text-gray-700 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
-            Insights, tips, and industry updates to help you excel in your career journey
-          </p>
-          
-          {/* Search and Filter */}
-          <div className="max-w-2xl mx-auto space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <Input type="text" placeholder="Search blogs..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10 bg-card border-border text-foreground placeholder-muted-foreground" />
-            </div>
-            
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 justify-center">
-              <button onClick={() => setSelectedTag(null)} className={`px-3 py-1 rounded-full text-sm transition-colors ${!selectedTag ? 'bg-cyan-600 text-white dark:bg-cyan-500 dark:text-white' : 'bg-card border border-border text-foreground hover:bg-muted'}`}>
-                All
-              </button>
-              {allTags.map(tag => <button key={tag} onClick={() => setSelectedTag(tag)} className={`px-3 py-1 rounded-full text-sm transition-colors ${selectedTag === tag ? 'bg-cyan-600 text-white dark:bg-cyan-500 dark:text-white' : 'bg-card border border-border text-foreground hover:bg-muted'}`}>
-                  {tag}
-                </button>)}
-            </div>
-          </div>
-        </div>
-      </div>
+      <div className="pt-28"></div>
 
       {/* Blog Posts */}
       <div className="px-4 pb-16">
@@ -232,16 +208,68 @@ const Blogs = () => {
                       </h3>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-gray-700 dark:text-gray-300 mb-4">{blog.excerpt}</p>
-                      {blog.tags && blog.tags.length > 0 && <div className="flex flex-wrap gap-2">
-                          {blog.tags.map(tag => <Badge key={tag} variant="secondary" className="text-muted-foreground">
-                              {tag}
-                            </Badge>)}
-                        </div>}
+                      <p className="text-gray-700 dark:text-gray-300">{blog.excerpt}</p>
                     </CardContent>
                   </Link>
                 </Card>)}
             </div>}
+        </div>
+      </div>
+
+      {/* Search and Filter Section - Moved to Bottom */}
+      <div className="px-4 pb-16 bg-background">
+        <div className="max-w-6xl mx-auto">
+          <div className="max-w-2xl mx-auto space-y-4">
+            <h2 className="text-2xl font-orbitron font-bold text-center mb-6 text-foreground">
+              Find More Articles
+            </h2>
+            
+            {/* Tags */}
+            <div className="flex flex-wrap gap-2 justify-center">
+              <button 
+                onClick={() => setSelectedTag(null)} 
+                className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                  !selectedTag 
+                    ? 'bg-cyan-600 text-white dark:bg-cyan-500 dark:text-white' 
+                    : 'bg-card border border-border text-foreground hover:bg-muted'
+                }`}
+              >
+                All ({blogs.length})
+              </button>
+              
+              {displayedTags.map(({ tag, count }) => (
+                <button 
+                  key={tag} 
+                  onClick={() => setSelectedTag(tag)} 
+                  className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                    selectedTag === tag 
+                      ? 'bg-cyan-600 text-white dark:bg-cyan-500 dark:text-white' 
+                      : 'bg-card border border-border text-foreground hover:bg-muted'
+                  }`}
+                >
+                  {tag} ({count})
+                </button>
+              ))}
+              
+              {!showAllTags && tagCounts.length > 8 && (
+                <button
+                  onClick={() => setShowAllTags(true)}
+                  className="px-3 py-1 rounded-full text-sm bg-card border border-border text-foreground hover:bg-muted transition-colors"
+                >
+                  +{tagCounts.length - 8} more
+                </button>
+              )}
+              
+              {showAllTags && tagCounts.length > 8 && (
+                <button
+                  onClick={() => setShowAllTags(false)}
+                  className="px-3 py-1 rounded-full text-sm bg-card border border-border text-foreground hover:bg-muted transition-colors"
+                >
+                  Show less
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
