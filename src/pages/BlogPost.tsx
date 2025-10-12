@@ -207,7 +207,7 @@ const BlogPost = () => {
         </script>
       </Helmet>
       
-      <AuthHeader />
+      <AuthHeader showSectionNav={false} />
       <div className="pt-28 pb-16 px-4 sm:px-6 lg:px-8 bg-white min-h-screen">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}

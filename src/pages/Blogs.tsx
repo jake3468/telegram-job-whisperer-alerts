@@ -60,7 +60,7 @@ const Blogs = () => {
   };
   
   return <div className="min-h-screen bg-background text-foreground">
-      <AuthHeader />
+      <AuthHeader showSectionNav={false} />
       <Helmet>
         <title>Career Insights & Job Search Tips - Aspirely AI Blog</title>
         <meta name="description" content="Discover career insights, job search strategies, interview tips, and industry updates to accelerate your professional growth with Aspirely AI's expert blog." />
@@ -155,7 +155,6 @@ const Blogs = () => {
       {/* Hero Section */}
       <div className="pt-28 pb-12 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-orbitron font-bold mb-6 bg-gradient-to-r from-gray-800 to-gray-900 dark:from-cyan-300 dark:via-cyan-200 dark:to-cyan-100 bg-clip-text text-transparent">Our Blogs</h1>
           <p className="text-xl text-gray-700 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
             Insights, tips, and industry updates to help you excel in your career journey
           </p>

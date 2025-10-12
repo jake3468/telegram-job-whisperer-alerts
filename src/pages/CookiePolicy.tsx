@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
+import AuthHeader from '@/components/AuthHeader';
 
 const CookiePolicy = () => {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ const CookiePolicy = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground font-inter">
+      <AuthHeader showSectionNav={false} />
       <Helmet>
         <title>Cookie Policy - Aspirely.ai | How We Use Cookies</title>
         <meta name="description" content="Learn about how Aspirely.ai uses cookies to improve your experience. Detailed information about cookie types, purposes, and your rights under EU and UK GDPR." />
@@ -42,14 +44,7 @@ const CookiePolicy = () => {
         </script>
       </Helmet>
 
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <button 
-          onClick={() => navigate('/')} 
-          className="flex items-center gap-2 text-gray-800 dark:text-cyan-300 hover:text-gray-900 dark:hover:text-cyan-200 transition-colors mb-8"
-        >
-          <ArrowLeft size={20} />
-          Back to Home
-        </button>
+      <div className="max-w-4xl mx-auto px-4 pt-28 pb-12">
 
         <div className="space-y-8">
           <div className="text-center mb-12">
