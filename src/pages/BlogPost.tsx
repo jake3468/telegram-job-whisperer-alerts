@@ -70,6 +70,13 @@ const BlogPost = () => {
     return 'Career Advice';
   };
 
+  // Get related posts (exclude current post, show 3 others)
+  const getRelatedPosts = (currentSlug: string): Blog[] => {
+    return Object.values(blogData)
+      .filter(post => post.slug !== currentSlug)
+      .slice(0, 3);
+  };
+
   const readingTime = blog ? calculateReadingTime(blog.content) : 0;
   const articleSection = blog ? getArticleSection(blog.tags || []) : 'Career Advice';
   const shareUrl = window.location.href;
@@ -263,6 +270,25 @@ const BlogPost = () => {
             ) : (
               <div className="text-gray-500 italic">No content available</div>
             )}
+          </div>
+
+          {/* Related Posts Section */}
+          <div className="mt-12 pt-8 border-t border-gray-200">
+            <h2 className="text-2xl font-orbitron font-bold text-gray-900 mb-6">
+              Related Posts:
+            </h2>
+            <ol className="space-y-3">
+              {getRelatedPosts(blog.slug).map((relatedPost, index) => (
+                <li key={relatedPost.slug} className="text-gray-700">
+                  <Link 
+                    to={`/blog/${relatedPost.slug}`}
+                    className="text-lg hover:text-sky-600 transition-colors duration-200"
+                  >
+                    {index + 1}. {relatedPost.title}
+                  </Link>
+                </li>
+              ))}
+            </ol>
           </div>
 
         </div>
