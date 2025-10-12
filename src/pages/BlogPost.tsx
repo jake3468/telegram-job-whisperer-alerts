@@ -6,6 +6,7 @@ import { ArrowLeft, Calendar, User, Share2, Twitter, Linkedin, Clock } from 'luc
 import { blogData } from '@/data/blogData';
 import Footer from '@/components/Footer';
 import { SafeHTMLRenderer } from '@/components/SafeHTMLRenderer';
+import AuthHeader from '@/components/AuthHeader';
 
 interface Blog {
   id: string;
@@ -206,7 +207,8 @@ const BlogPost = () => {
         </script>
       </Helmet>
       
-      <div className="pt-8 pb-16 px-4 sm:px-6 lg:px-8 bg-white min-h-screen">
+      <AuthHeader />
+      <div className="pt-28 pb-16 px-4 sm:px-6 lg:px-8 bg-white min-h-screen">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
           <Link to="/blogs" className="inline-flex items-center text-sky-600 hover:text-sky-700 mb-8 font-medium">
@@ -282,6 +284,7 @@ const BlogPost = () => {
                 <li key={relatedPost.slug} className="text-gray-700">
                   <Link 
                     to={`/blog/${relatedPost.slug}`}
+                    onClick={() => window.scrollTo(0, 0)}
                     className="text-lg hover:text-sky-600 transition-colors duration-200"
                   >
                     {index + 1}. {relatedPost.title}
