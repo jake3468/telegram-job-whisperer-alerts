@@ -129,7 +129,7 @@ const HeroSection = () => {
         
         <div className="relative mb-8 md:mt-8">
           <h1 
-            className="relative z-30 text-[48px] md:text-[56px] lg:text-[64px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic"
+            className="relative z-30 text-[48px] md:text-[48px] lg:text-[52px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic"
             aria-label="The Future of Job Search with AI Agents"
           >
             {/* Mobile view only */}
@@ -167,7 +167,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] md:text-[18px] lg:text-[20px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[16px] md:text-[18px] lg:text-[20px] font-notion-inter font-medium text-foreground text-center">
-            One-time setup. Our AI agents send matched opportunities to your phone, create tailored resumes and cover letters, and conduct phone interview practice. Apply in minutes, not hours.
+            One-time setup. Our AI agents send matched jobs to your phone, create tailored resumes and cover letters, and conduct phone interview practice. Apply in minutes, not hours.
           </p>
           
           <SignedOut>
