@@ -208,12 +208,7 @@ const Blogs = () => {
                       </h3>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-gray-700 dark:text-gray-300 mb-4">{blog.excerpt}</p>
-                      {blog.tags && blog.tags.length > 0 && <div className="flex flex-wrap gap-2">
-                          {blog.tags.map(tag => <Badge key={tag} variant="secondary" className="text-muted-foreground">
-                              {tag}
-                            </Badge>)}
-                        </div>}
+                      <p className="text-gray-700 dark:text-gray-300">{blog.excerpt}</p>
                     </CardContent>
                   </Link>
                 </Card>)}
