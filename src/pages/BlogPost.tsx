@@ -237,7 +237,7 @@ const BlogPost = () => {
               </div>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-orbitron font-bold mb-6 bg-gradient-to-r from-sky-600 via-fuchsia-600 to-indigo-600 bg-clip-text text-transparent break-words">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-orbitron font-bold mb-6 text-black break-words">
               {blog.title}
             </h1>
 
