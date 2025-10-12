@@ -23,6 +23,7 @@ const Blogs = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showAllTags, setShowAllTags] = useState(false);
   
   const blogs = getAllBlogs();
 
@@ -40,6 +41,15 @@ const Blogs = () => {
     return matchesSearch && matchesTag;
   });
   const allTags = Array.from(new Set(blogs.flatMap(blog => blog.tags || [])));
+  
+  // Calculate tag counts and sort by popularity
+  const tagCounts = allTags.map(tag => ({
+    tag,
+    count: blogs.filter(blog => blog.tags?.includes(tag)).length
+  })).sort((a, b) => b.count - a.count);
+  
+  // Display top 8 tags by default, or all if showAllTags is true
+  const displayedTags = showAllTags ? tagCounts : tagCounts.slice(0, 8);
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -167,12 +177,48 @@ const Blogs = () => {
             
             {/* Tags */}
             <div className="flex flex-wrap gap-2 justify-center">
-              <button onClick={() => setSelectedTag(null)} className={`px-3 py-1 rounded-full text-sm transition-colors ${!selectedTag ? 'bg-cyan-600 text-white dark:bg-cyan-500 dark:text-white' : 'bg-card border border-border text-foreground hover:bg-muted'}`}>
-                All
+              <button 
+                onClick={() => setSelectedTag(null)} 
+                className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                  !selectedTag 
+                    ? 'bg-cyan-600 text-white dark:bg-cyan-500 dark:text-white' 
+                    : 'bg-card border border-border text-foreground hover:bg-muted'
+                }`}
+              >
+                All ({blogs.length})
               </button>
-              {allTags.map(tag => <button key={tag} onClick={() => setSelectedTag(tag)} className={`px-3 py-1 rounded-full text-sm transition-colors ${selectedTag === tag ? 'bg-cyan-600 text-white dark:bg-cyan-500 dark:text-white' : 'bg-card border border-border text-foreground hover:bg-muted'}`}>
-                  {tag}
-                </button>)}
+              
+              {displayedTags.map(({ tag, count }) => (
+                <button 
+                  key={tag} 
+                  onClick={() => setSelectedTag(tag)} 
+                  className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                    selectedTag === tag 
+                      ? 'bg-cyan-600 text-white dark:bg-cyan-500 dark:text-white' 
+                      : 'bg-card border border-border text-foreground hover:bg-muted'
+                  }`}
+                >
+                  {tag} ({count})
+                </button>
+              ))}
+              
+              {!showAllTags && tagCounts.length > 8 && (
+                <button
+                  onClick={() => setShowAllTags(true)}
+                  className="px-3 py-1 rounded-full text-sm bg-card border border-border text-foreground hover:bg-muted transition-colors"
+                >
+                  +{tagCounts.length - 8} more
+                </button>
+              )}
+              
+              {showAllTags && tagCounts.length > 8 && (
+                <button
+                  onClick={() => setShowAllTags(false)}
+                  className="px-3 py-1 rounded-full text-sm bg-card border border-border text-foreground hover:bg-muted transition-colors"
+                >
+                  Show less
+                </button>
+              )}
             </div>
           </div>
         </div>
