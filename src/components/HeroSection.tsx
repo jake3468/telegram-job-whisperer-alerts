@@ -134,21 +134,21 @@ const HeroSection = () => {
           >
             {/* Mobile view only */}
             <span className="block md:hidden text-center text-[42px] leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Get Matched Jobs Daily.</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Tell Us What Jobs You Want.</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Apply in <span className="text-green-700 dark:text-green-600">Minutes</span>, Not Hours.</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">We Send Them <span className="underline decoration-green-600 dark:decoration-green-500 decoration-[3px] underline-offset-4">Daily</span>.</span>
             </span>
             
             {/* Desktop view only */}
             <span className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Get Matched Jobs Daily. Apply in <span className="text-green-700 dark:text-green-600">Minutes</span>, Not Hours.</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Tell Us What Jobs You Want. We Send Them <span className="underline decoration-green-600 dark:decoration-green-500 decoration-[3px] underline-offset-4">Daily</span>.</span>
             </span>
             
             {/* Tablet view only */}
             <span className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Get Matched Jobs Daily.</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Tell Us What Jobs You Want.</span>
               <br />
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Apply in <span className="text-green-700 dark:text-green-600">Minutes</span>, Not Hours.</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">We Send Them <span className="underline decoration-green-600 dark:decoration-green-500 decoration-[3px] underline-offset-4">Daily</span>.</span>
             </span>
           </h1>
         </div>
@@ -165,7 +165,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] md:text-[18px] lg:text-[20px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[16px] md:text-[18px] lg:text-[20px] font-notion-inter font-medium text-foreground text-center">
-            Our AI agents send relevant opportunities to your phone, create tailored resumes and cover letters, and conduct realistic phone interview practice. Track everything in one organized dashboard.
+            One-time setup. Our AI agents send matched opportunities to your phone, create tailored resumes and cover letters, and conduct phone interview practice. Apply in minutes, not hours.
           </p>
           
           <SignedOut>
