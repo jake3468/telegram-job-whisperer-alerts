@@ -152,14 +152,7 @@ const Blogs = () => {
         </script>
       </Helmet>
       
-      {/* Hero Section */}
-      <div className="pt-28 pb-12 px-4">
-        <div className="max-w-6xl mx-auto text-center">
-          <p className="text-xl text-gray-700 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
-            Insights, tips, and industry updates to help you excel in your career journey
-          </p>
-        </div>
-      </div>
+      <div className="pt-28"></div>
 
       {/* Blog Posts */}
       <div className="px-4 pb-16">
@@ -235,17 +228,6 @@ const Blogs = () => {
             <h2 className="text-2xl font-orbitron font-bold text-center mb-6 text-foreground">
               Find More Articles
             </h2>
-            
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <Input 
-                type="text" 
-                placeholder="Search blogs..." 
-                value={searchTerm} 
-                onChange={e => setSearchTerm(e.target.value)} 
-                className="pl-10 bg-card border-border text-foreground placeholder-muted-foreground" 
-              />
-            </div>
             
             {/* Tags */}
             <div className="flex flex-wrap gap-2 justify-center">
