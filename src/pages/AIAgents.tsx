@@ -94,7 +94,7 @@ const AIAgents = () => {
             await detectAndStoreLocation(userProfile, updateUserProfile);
             navigate('/job-alerts');
             window.scrollTo(0, 0);
-          }} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 px-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 text-xs">
+          }} className="w-fit mx-auto bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-6 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 text-xs">
                   <CalendarPlus className="w-3 h-3" />
                   Create Job Alerts
                 </Button>
