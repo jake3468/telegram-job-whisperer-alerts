@@ -5,11 +5,7 @@ import { useState } from 'react';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
-interface AuthHeaderProps {
-  showSectionNav?: boolean;
-}
-
-const AuthHeader = ({ showSectionNav = true }: AuthHeaderProps) => {
+const AuthHeader = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
@@ -53,19 +49,17 @@ const AuthHeader = ({ showSectionNav = true }: AuthHeaderProps) => {
         </div>
 
         {/* Desktop Navigation Menu - only show on large screens */}
-        {showSectionNav && (
-          <nav className="hidden lg:flex items-center space-x-8">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => scrollToSection(item.id)}
-                className="text-foreground hover:text-primary transition-colors duration-200 font-inter font-medium text-base"
-              >
-                {item.label}
-              </button>
-            ))}
-          </nav>
-        )}
+        <nav className="hidden lg:flex items-center space-x-8">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => scrollToSection(item.id)}
+              className="text-foreground hover:text-primary transition-colors duration-200 font-inter font-medium text-base"
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
 
         {/* Desktop Theme Toggle and Auth Buttons: Right side - only show on large screens */}
         <div className="hidden lg:flex items-center space-x-4">
@@ -110,22 +104,18 @@ const AuthHeader = ({ showSectionNav = true }: AuthHeaderProps) => {
         <div className="lg:hidden absolute top-full left-0 right-0 bg-background dark:bg-black backdrop-blur-md border-b border-border shadow-lg">
           <div className="px-4 py-4 space-y-3">
             {/* Navigation Items */}
-            {showSectionNav && (
-              <>
-                {navItems.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => scrollToSection(item.id)}
-                    className="w-full text-left text-foreground hover:text-primary transition-colors duration-200 font-inter font-medium text-base py-2 px-2 rounded hover:bg-muted"
-                  >
-                    {item.label}
-                  </button>
-                ))}
-                
-                {/* Divider */}
-                <div className="border-t border-border my-3"></div>
-              </>
-            )}
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => scrollToSection(item.id)}
+                className="w-full text-left text-foreground hover:text-primary transition-colors duration-200 font-inter font-medium text-base py-2 px-2 rounded hover:bg-muted"
+              >
+                {item.label}
+              </button>
+            ))}
+            
+            {/* Divider */}
+            <div className="border-t border-border my-3"></div>
             
             {/* Auth Buttons */}
             <SignedOut>

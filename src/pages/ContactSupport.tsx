@@ -2,7 +2,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { ArrowLeft, Mail, Clock, Users, Shield } from 'lucide-react';
-import AuthHeader from '@/components/AuthHeader';
 
 const ContactSupport = () => {
   const navigate = useNavigate();
@@ -13,8 +12,14 @@ const ContactSupport = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground font-inter">
-      <AuthHeader showSectionNav={false} />
-      <div className="max-w-4xl mx-auto px-4 pt-28 pb-12">
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        <button 
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 text-gray-800 dark:text-cyan-300 hover:text-gray-900 dark:hover:text-cyan-200 transition-colors mb-8"
+        >
+          <ArrowLeft size={20} />
+          Back to Home
+        </button>
 
         <div className="space-y-8">
           <div className="text-center mb-12">
