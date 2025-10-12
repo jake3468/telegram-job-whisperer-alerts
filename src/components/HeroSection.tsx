@@ -136,19 +136,19 @@ const HeroSection = () => {
             <span className="block md:hidden text-center text-[42px] leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Tell Us What Jobs You Want.</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">We Send Them <span className="underline decoration-green-600 dark:decoration-green-500 decoration-[3px] underline-offset-4">Daily</span>.</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">We Find and Send Them <span className="underline decoration-red-600 dark:decoration-red-500 decoration-[3px] underline-offset-4">Every Day</span>.</span>
             </span>
             
             {/* Desktop view only */}
             <span className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Tell Us What Jobs You Want. We Send Them <span className="underline decoration-green-600 dark:decoration-green-500 decoration-[3px] underline-offset-4">Daily</span>.</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Tell Us What Jobs You Want. We Find and Send Them <span className="underline decoration-red-600 dark:decoration-red-500 decoration-[3px] underline-offset-4">Every Day</span>.</span>
             </span>
             
             {/* Tablet view only */}
             <span className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Tell Us What Jobs You Want.</span>
               <br />
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">We Send Them <span className="underline decoration-green-600 dark:decoration-green-500 decoration-[3px] underline-offset-4">Daily</span>.</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">We Find and Send Them <span className="underline decoration-red-600 dark:decoration-red-500 decoration-[3px] underline-offset-4">Every Day</span>.</span>
             </span>
           </h1>
         </div>
