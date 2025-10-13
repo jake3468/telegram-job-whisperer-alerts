@@ -172,12 +172,12 @@ const HeroSection = () => {
             <span className="block md:hidden">
               Set your preferences once.
               <br />
-              Our <span className="underline decoration-red-600">AI AGENTS</span> send fresh job openings straight to your phone, create custom CVs and cover letters, and run phone interview practice.
+              Our <span className="underline decoration-red-600">AI AGENTS</span> send fresh job openings straight to your phone, create custom CVs and cover letters, even calls your phone for mock interview practice.
             </span>
             
             {/* Desktop/Tablet version - single line */}
             <span className="hidden md:inline">
-              Set your preferences once. Our <span className="underline decoration-red-600">AI AGENTS</span> send fresh job openings straight to your phone, create custom CVs and cover letters, and run phone interview practice.
+              Set your preferences once. Our <span className="underline decoration-red-600">AI AGENTS</span> send fresh job openings straight to your phone, create custom CVs and cover letters, even calls your phone for mock interview practice.
             </span>
           </p>
           
