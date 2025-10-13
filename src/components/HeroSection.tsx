@@ -168,7 +168,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] md:text-[18px] lg:text-[20px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[16px] md:text-[18px] lg:text-[20px] font-notion-inter font-medium text-foreground text-center">
-            Set your preferences once. Our AI Agents send fresh job openings straight to your phone, create custom CVs and cover letters, and run phone interview practice.
+            Set your preferences once. Our <span className="underline decoration-red-600">AI Agents</span> send fresh job openings straight to your phone, create custom CVs and cover letters, and run phone interview practice.
           </p>
           
           <SignedOut>
