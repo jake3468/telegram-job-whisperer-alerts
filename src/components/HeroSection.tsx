@@ -126,7 +126,7 @@ const HeroSection = () => {
       <div className="max-w-7xl mx-auto z-20 relative w-full">
         <div className="flex justify-center items-center">
           {/* Hero Content - Center aligned */}
-          <div className="text-left max-w-2xl mx-auto flex flex-col justify-center mt-8 md:mt-0">
+          <div className="text-left max-w-2xl mx-auto flex flex-col justify-center mt-4 md:mt-0">
         
         <div className="relative mb-8 md:mt-8">
           <h1 
