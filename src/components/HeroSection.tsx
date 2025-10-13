@@ -135,17 +135,17 @@ const HeroSection = () => {
           >
             {/* Mobile view only */}
             <span className="block md:hidden text-center text-[32px] leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">We find your matching jobs. We'll prep all your applications. You just send them.</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">We find jobs. We prep applications. You just apply</span>
             </span>
             
             {/* Desktop view only */}
             <span className="hidden lg:block text-left leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">We find your matching jobs. We'll prep all your applications. You just send them.</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">We find jobs. We prep applications. You just apply</span>
             </span>
             
             {/* Tablet view only */}
             <span className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">We find your matching jobs. We'll prep all your applications. You just send them.</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">We find jobs. We prep applications. You just apply</span>
             </span>
           </h1>
         </div>
