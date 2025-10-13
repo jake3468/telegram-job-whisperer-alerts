@@ -135,7 +135,9 @@ const HeroSection = () => {
           >
             {/* Mobile view only */}
             <span className="block md:hidden text-center text-[32px] leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Get Daily <span className="hand-drawn-circle">Job</span> Alerts.</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Get Daily</span>
+              <br />
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic"><span className="hand-drawn-circle">Job</span> Alerts.</span>
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Apply in <span className="text-green-600 dark:text-green-500">Minutes</span>, Not Hours.</span>
             </span>
