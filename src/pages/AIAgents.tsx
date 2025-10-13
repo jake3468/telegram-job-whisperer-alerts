@@ -87,7 +87,7 @@ const AIAgents = () => {
           {/* Job Alerts Agent */}
           <FeatureSection title="🔔 Job Alerts Agent" subheading="Daily job updates at your preferred time" description="Get jobs matching your alerts daily—posted in the last 24 hours. No spam, just relevant opportunities. One click gives you tailored resumes, HR contacts, interview prep, and everything you need to apply." lottieUrl="" buttonText="Activate Now" isReversed={true} label="1" buttonUrl="https://t.me/Job_AI_update_bot" shouldDetectLocation={true} activationStatus={userProfile?.bot_activated} imageSrc={jobAlertsAgentPreview} additionalContent={<>
                 <p className="text-sm md:text-base text-gray-700 mb-2 text-center">
-                  After activating the Job Alerts AI Agent, click "Create Job Alerts" below to set your daily preferences.
+                  After activation, click the "Create Job Alerts" button below to set your alerts.
                 </p>
                 <Button onClick={async () => {
             // Detect and store location before navigation

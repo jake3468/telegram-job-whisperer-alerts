@@ -168,7 +168,17 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] md:text-[18px] lg:text-[20px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[16px] md:text-[18px] lg:text-[20px] font-notion-inter font-medium text-foreground text-center">
-            Set your preferences once. Our AI Agents send fresh job openings straight to your phone, create custom CVs and cover letters, and run phone interview practice.
+            {/* Mobile version with line break */}
+            <span className="block md:hidden">
+              Set your preferences once.
+              <br />
+              Our <span className="underline decoration-red-600">AI AGENTS</span> send fresh job openings straight to your phone, create custom CVs and cover letters, even calls your phone for mock interview practice.
+            </span>
+            
+            {/* Desktop/Tablet version - single line */}
+            <span className="hidden md:inline">
+              Set your preferences once. Our <span className="underline decoration-red-600">AI AGENTS</span> send fresh job openings straight to your phone, create custom CVs and cover letters, even calls your phone for mock interview practice.
+            </span>
           </p>
           
           <SignedOut>
@@ -263,7 +273,7 @@ const HeroSection = () => {
       <div className="z-20 relative w-full px-4">
         <div className="max-w-2xl mx-auto mb-8">
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4 text-center">
-            <h2 ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter">Why We're Better Than LinkedIn and Indeed</h2>
+            <h2 ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter">Your Complete Job Search Solution (Not Just Alerts)</h2>
             
             <p className="text-left">Job searching is exhausting.</p>
             
