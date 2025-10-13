@@ -174,12 +174,12 @@ const HeroSection = () => {
             <span className="block md:hidden">
               Create your personal Job Alerts.
               <br />
-              Our <span className="underline decoration-red-600">AI AGENTS</span> send jobs posted in the last 24 hours, directly to your Telegram chats, create custom CVs and cover letters, even calls your phone for mock interview practice.
+              Our <span className="underline decoration-red-600">AI AGENTS</span> send jobs posted in the last 24 hours directly to your Telegram chat, create custom CVs and cover letters, even calls your phone for mock interview practice.
             </span>
             
             {/* Desktop/Tablet version - single line */}
             <span className="hidden md:inline">
-              Create your personal Job Alerts. Our <span className="underline decoration-red-600">AI AGENTS</span> send jobs posted in the last 24 hours, directly to your Telegram chats, create custom CVs and cover letters, even calls your phone for mock interview practice.
+              Create your personal Job Alerts. Our <span className="underline decoration-red-600">AI AGENTS</span> send jobs posted in the last 24 hours directly to your Telegram chat, create custom CVs and cover letters, even calls your phone for mock interview practice.
             </span>
           </p>
           
