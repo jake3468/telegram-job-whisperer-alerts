@@ -135,21 +135,21 @@ const HeroSection = () => {
           >
             {/* Mobile view only */}
             <span className="block md:hidden text-center text-[32px] leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Get Daily <span className="hand-drawn-circle">Job</span> Alerts</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Get Daily <span className="hand-drawn-circle">Job</span> Alerts.</span>
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Apply in <span className="text-green-600 dark:text-green-500">Minutes</span>, Not Hours.</span>
             </span>
             
             {/* Desktop view only */}
             <span className="hidden lg:block text-left leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Get Daily <span className="hand-drawn-circle">Job</span> Alerts</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Get Daily <span className="hand-drawn-circle">Job</span> Alerts.</span>
               <br />
               <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Apply in <span className="text-green-600 dark:text-green-500">Minutes</span>, Not Hours.</span>
             </span>
             
             {/* Tablet view only */}
             <span className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Get Daily <span className="hand-drawn-circle">Job</span> Alerts</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Get Daily <span className="hand-drawn-circle">Job</span> Alerts.</span>
               <br />
               <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Apply in <span className="text-green-600 dark:text-green-500">Minutes</span>, Not Hours.</span>
             </span>
@@ -170,14 +170,14 @@ const HeroSection = () => {
           <p className="mb-8 text-[16px] md:text-[18px] lg:text-[20px] font-notion-inter font-medium text-foreground text-center">
             {/* Mobile version with line break */}
             <span className="block md:hidden">
-              Set your preferences once.
+              Create your personal Job Alerts.
               <br />
               Our <span className="underline decoration-red-600">AI AGENTS</span> send fresh job openings straight to your phone, create custom CVs and cover letters, even calls your phone for mock interview practice.
             </span>
             
             {/* Desktop/Tablet version - single line */}
             <span className="hidden md:inline">
-              Set your preferences once. Our <span className="underline decoration-red-600">AI AGENTS</span> send fresh job openings straight to your phone, create custom CVs and cover letters, even calls your phone for mock interview practice.
+              Create your personal Job Alerts. Our <span className="underline decoration-red-600">AI AGENTS</span> send fresh job openings straight to your phone, create custom CVs and cover letters, even calls your phone for mock interview practice.
             </span>
           </p>
           
