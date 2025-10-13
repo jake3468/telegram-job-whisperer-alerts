@@ -342,7 +342,10 @@ const JobAlertForm = ({
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="preferred_time" className="text-white font-inter font-medium text-xs">Preferred Time</Label>
+          <Label htmlFor="preferred_time" className="text-white font-inter font-medium text-xs">Set Your Alert Time</Label>
+          <p className="text-gray-400 text-[10px] leading-tight mb-1">
+            Pick the time you'd like to get your job alerts. To see how it works, choose a time just a few minutes from now — we'll send today's alert!
+          </p>
           <Select value={formData.preferred_time} onValueChange={(value) => handleInputChange('preferred_time', value)}>
             <SelectTrigger className="border-2 border-gray-500 text-white placeholder-gray-300 font-inter focus-visible:border-pastel-blue hover:border-gray-400 bg-orange-950 text-xs h-8">
               <SelectValue />
