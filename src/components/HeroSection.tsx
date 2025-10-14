@@ -170,17 +170,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] md:text-[18px] lg:text-[20px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[16px] md:text-[18px] lg:text-[20px] font-notion-inter font-medium text-foreground text-center">
-            {/* Mobile version with line break */}
-            <span className="block md:hidden">
-              Create your personal Job Alerts.
-              <br />
-              Our <span className="underline decoration-red-600">AI AGENTS</span> send jobs posted in the last 24 hours directly to your Telegram chat, create custom CVs and cover letters, even calls your phone for mock interview practice.
-            </span>
-            
-            {/* Desktop/Tablet version - single line */}
-            <span className="hidden md:inline">
-              Create your personal Job Alerts. Our <span className="underline decoration-red-600">AI AGENTS</span> send jobs posted in the last 24 hours directly to your Telegram chat, create custom CVs and cover letters, even calls your phone for mock interview practice.
-            </span>
+            Just set your job alerts once, and our <span className="underline decoration-red-600">AI AGENTS</span> take over. They scan thousands of job boards daily and deliver brand-new jobs posted in the last 24 hours straight to your Telegram. Plus, they'll create tailored CVs and cover letters for each opportunity, and even call you for realistic mock interview practice.
           </p>
           
           <SignedOut>
