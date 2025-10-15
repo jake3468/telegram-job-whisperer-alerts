@@ -137,9 +137,9 @@ const HeroSection = () => {
             <span className="block md:hidden text-center text-[32px] leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">You're the <span className="hand-drawn-circle">CEO</span>.</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Command Your AI Team</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Command Your</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">to Find <span className="text-green-600 dark:text-green-500">Jobs</span> and</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">AI Team to Find <span className="text-green-600 dark:text-green-500">Jobs</span> and</span>
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Prepare Everything.</span>
             </span>
@@ -153,7 +153,9 @@ const HeroSection = () => {
             
             {/* Tablet view only */}
             <span className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">You're the <span className="hand-drawn-circle">CEO</span>. Command Your AI Team</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">You're the <span className="hand-drawn-circle">CEO</span>.</span>
+              <br />
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Command Your AI Team</span>
               <br />
               <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">to Find <span className="text-green-600 dark:text-green-500">Jobs</span> and Prepare Everything.</span>
             </span>
