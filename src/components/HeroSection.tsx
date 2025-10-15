@@ -141,14 +141,14 @@ const HeroSection = () => {
               <br />
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">AI Team to Find</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic"><span className="text-green-600 dark:text-green-500">Jobs</span> & Create CVs.</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic"><span className="text-green-600 dark:text-green-500">Jobs</span> & Write CVs.</span>
             </span>
             
             {/* Desktop view only */}
             <span className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">You're the <span className="hand-drawn-circle">CEO</span>. Command Your AI Team</span>
               <br />
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap">to Find <span className="text-green-600 dark:text-green-500">Jobs</span> & Create CVs.</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap">to Find <span className="text-green-600 dark:text-green-500">Jobs</span> & Write CVs.</span>
             </span>
             
             {/* Tablet view only */}
@@ -157,7 +157,7 @@ const HeroSection = () => {
               <br />
               <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Command Your AI Team</span>
               <br />
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">to Find <span className="text-green-600 dark:text-green-500">Jobs</span> & Create CVs.</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">to Find <span className="text-green-600 dark:text-green-500">Jobs</span> & Write CVs.</span>
             </span>
           </h1>
         </div>
@@ -174,7 +174,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] md:text-[18px] lg:text-[20px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[15px] md:text-[17px] lg:text-[18px] font-notion-inter font-medium text-foreground text-center">
-            Set your job alerts once — then let our <span className="underline decoration-red-600 decoration-2">AI AGENTS</span> take over. They scan thousands of job boards every day, sending you fresh jobs posted within 24 hours straight to Telegram. Each time, they generate tailored CVs and cover letters, and even conduct mock interviews over a phone call.
+            Set your job alerts once — then let our <span className="underline decoration-red-600 decoration-2">AI AGENTS</span> take over. They scan thousands of job boards every day, sending you fresh jobs posted within 24 hours straight to Telegram. Each time, they prepare tailored resumes and cover letters, and even conduct mock interviews over a phone call.
           </p>
           
           <SignedOut>
