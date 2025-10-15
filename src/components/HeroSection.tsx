@@ -134,26 +134,30 @@ const HeroSection = () => {
             aria-label="The Future of Job Search with AI Agents"
           >
             {/* Mobile view only */}
-            <span className="block md:hidden text-center text-[38px] leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Get Daily</span>
+            <span className="block md:hidden text-center text-[32px] leading-tight animate-fly-in-from-bottom">
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">You're the <span className="hand-drawn-circle">CEO</span>.</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic"><span className="hand-drawn-circle">Job</span> Alerts.</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Command Your</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Apply in <span className="text-green-600 dark:text-green-500">Minutes</span>, Not Hours.</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">AI Team to Find <span className="text-green-600 dark:text-green-500">Jobs</span></span>
+              <br />
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">& Create Files.</span>
             </span>
             
             {/* Desktop view only */}
-            <span className="hidden lg:block text-left leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Get Daily <span className="hand-drawn-circle">Job</span> Alerts.</span>
+            <span className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">You're the <span className="hand-drawn-circle">CEO</span>. Command Your AI Team</span>
               <br />
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap">Apply in <span className="text-green-600 dark:text-green-500">Minutes</span>, Not Hours.</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic whitespace-nowrap">to Find <span className="text-green-600 dark:text-green-500">Jobs</span> & Create Files.</span>
             </span>
             
             {/* Tablet view only */}
             <span className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Get Daily <span className="hand-drawn-circle">Job</span> Alerts.</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">You're the <span className="hand-drawn-circle">CEO</span>.</span>
               <br />
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Apply in <span className="text-green-600 dark:text-green-500">Minutes</span>, Not Hours.</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Command Your AI Team</span>
+              <br />
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">to Find <span className="text-green-600 dark:text-green-500">Jobs</span> & Create Files.</span>
             </span>
           </h1>
         </div>
@@ -169,8 +173,8 @@ const HeroSection = () => {
         
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] md:text-[18px] lg:text-[20px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-8 text-[16px] md:text-[18px] lg:text-[20px] font-notion-inter font-medium text-foreground text-center">
-            Just set your job alerts once, and our <span className="underline decoration-red-600">AI AGENTS</span> take over. They scan thousands of job boards daily and deliver brand-new jobs posted in the last 24 hours straight to your Telegram. Plus, they'll create tailored CVs and cover letters for each opportunity, and even call you for realistic mock interview practice.
+          <p className="mb-8 text-[15px] md:text-[17px] lg:text-[18px] font-notion-inter font-medium text-foreground text-center">
+            Set your job alerts once — then let our <span className="underline decoration-red-600 decoration-2">AI AGENTS</span> take over. They scan thousands of job boards every day, sending you fresh jobs posted within 24 hours straight to Telegram. Each time, they generate tailored CVs and cover letters, and even call you for realistic mock interview practice.
           </p>
           
           <SignedOut>
