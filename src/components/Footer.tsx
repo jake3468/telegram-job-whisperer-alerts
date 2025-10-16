@@ -20,7 +20,7 @@ const Footer = () => {
           <div className="md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
               <img alt="JobBots Logo" className="h-8 w-8 rounded-lg" src="/lovable-uploads/d1063169-3726-4087-9672-b20c6091d9a4.jpg" />
-              <span className="text-xl font-semibold text-foreground font-inter">Aspirely.ai</span>
+              <span className="text-xl font-semibold text-foreground font-inter">Aspirely AI</span>
             </div>
             <p className="text-foreground text-base font-inter leading-relaxed max-w-md">
               The AI-powered platform for finding and creating your perfect career path with advanced job matching and personalized guidance.
