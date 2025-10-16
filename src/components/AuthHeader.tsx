@@ -47,7 +47,7 @@ const AuthHeader = ({ showSectionNav = true }: AuthHeaderProps) => {
             decoding="async"
             fetchPriority="high"
           />
-          <span className="font-inter text-foreground font-extrabold sm:text-3xl text-2xl tracking-wide">
+          <span className="font-inter text-foreground font-semibold sm:text-3xl text-2xl tracking-wide">
             Aspirely AI
           </span>
         </div>
