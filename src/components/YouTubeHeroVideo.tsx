@@ -24,34 +24,34 @@ export const YouTubeHeroVideo: React.FC<YouTubeHeroVideoProps> = ({
     setIsLoading(false);
   }, []);
 
-  // Disable autoplay - video stays paused until user clicks play
+  // Remove thumbnail delay after initial load
   useEffect(() => {
-    setShowThumbnailDelay(false);
+    const timer = setTimeout(() => setShowThumbnailDelay(false), 100);
+    return () => clearTimeout(timer);
   }, []);
 
-  // Desktop: Intersection Observer for visibility tracking only
+  // Intersection Observer for autoplay on scroll
   useEffect(() => {
-    if (!isMobile) {
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-          }
-        },
-        { threshold: 0.5 }
-      );
-
-      if (containerRef.current) {
-        observer.observe(containerRef.current);
-      }
-
-      return () => {
-        if (containerRef.current) {
-          observer.unobserve(containerRef.current);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          setShouldPlay(true); // Autoplay when visible
         }
-      };
+      },
+      { threshold: 0.5 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
     }
-  }, [isMobile]);
+
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
+    };
+  }, []);
 
   if (isLoading) {
     return (
