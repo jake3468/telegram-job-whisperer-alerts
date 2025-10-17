@@ -48,6 +48,7 @@ const HeroSection = () => {
   const { user, isLoaded } = useUser();
   const videoRef = useRef<HTMLDivElement>(null);
   const [shouldAutoplay, setShouldAutoplay] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const jobHuntingHeadingRef = useHeadingAnimation();
   useEffect(() => {
     if (isLoaded && user) {
@@ -230,24 +231,30 @@ const HeroSection = () => {
               className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] px-4 md:w-full md:max-w-5xl md:left-0 md:right-0 md:ml-0 md:mr-0 md:mx-auto md:px-8 lg:w-screen lg:max-w-none lg:left-1/2 lg:right-1/2 lg:-ml-[50vw] lg:-mr-[50vw] lg:px-16 my-8"
             >
               <div className="w-full aspect-video rounded-2xl overflow-hidden relative">
-                {/* Thumbnail - static for A/B testing */}
-                <img 
-                  src="/video-thumbnail.png" 
-                  alt="Aspirely AI platform demo - AI job search tools and Telegram agents walkthrough"
-                  className="w-full h-full object-cover"
-                  loading="eager"
-                  decoding="async"
-                />
-                
-                {/* Video temporarily commented out for A/B testing */}
-                {/* <iframe
-                  className="w-full h-full"
-                  src={`https://www.youtube.com/embed/eVKtDxScOEo?${shouldAutoplay ? 'autoplay=1&' : ''}mute=1&controls=0&rel=0&modestbranding=1&showinfo=0&iv_load_policy=3&disablekb=1&fs=0&loop=1&playlist=eVKtDxScOEo`}
-                  title="Aspirely.ai Demo - AI Job Search Platform Features Walkthrough"
-                  allow="autoplay; encrypted-media"
-                  allowFullScreen
-                  loading="lazy"
-                /> */}
+                {isVideoPlaying ? (
+                  <iframe
+                    className="w-full h-full"
+                    src="https://www.youtube.com/embed/eVKtDxScOEo?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&loop=1&playlist=eVKtDxScOEo&enablejsapi=1"
+                    title="Aspirely.ai Demo - AI Job Search Platform Features Walkthrough"
+                    allow="autoplay; encrypted-media"
+                    allowFullScreen
+                  />
+                ) : (
+                  <div className="relative w-full h-full cursor-pointer" onClick={() => setIsVideoPlaying(true)}>
+                    <img 
+                      src="/video-thumbnail.png" 
+                      alt="Aspirely AI platform demo - AI job search tools and Telegram agents walkthrough"
+                      className="w-full h-full object-cover"
+                      loading="eager"
+                      decoding="async"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-16 h-16 md:w-20 md:h-20 bg-red-600 rounded-full flex items-center justify-center shadow-lg hover:bg-red-700 transition-colors">
+                        <div className="w-0 h-0 border-l-[20px] md:border-l-[24px] border-l-white border-y-[12px] md:border-y-[14px] border-y-transparent ml-1"></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </SignedOut>
