@@ -30,28 +30,26 @@ export const YouTubeHeroVideo: React.FC<YouTubeHeroVideoProps> = ({
     return () => clearTimeout(timer);
   }, []);
 
-  // Intersection Observer for autoplay on scroll
+  // Autoplay when the component scrolls into view (re-attach when layout changes)
   useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
           setShouldPlay(true); // Autoplay when visible
+          observer.unobserve(el); // No need to observe after play starts
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.35 }
     );
 
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
+    observer.observe(el);
 
-    return () => {
-      if (containerRef.current) {
-        observer.unobserve(containerRef.current);
-      }
-    };
-  }, []);
+    return () => observer.disconnect();
+  }, [isLoading]);
 
   if (isLoading) {
     return (
