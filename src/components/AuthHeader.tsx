@@ -1,7 +1,7 @@
 
 import { SignedIn, SignedOut, SignInButton, SignUpButton } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
@@ -12,7 +12,18 @@ interface AuthHeaderProps {
 const AuthHeader = ({ showSectionNav = true }: AuthHeaderProps) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
+
+  // Scroll detection
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -34,20 +45,40 @@ const AuthHeader = ({ showSectionNav = true }: AuthHeaderProps) => {
   ];
 
   return (
-    // Blended navbar with transparent background
-    <header className="w-full backdrop-blur-sm bg-transparent fixed top-0 left-0 right-0 z-50">
-      <div className="flex justify-between items-center px-3 sm:px-6 py-4 max-w-7xl mx-auto">
+    // Floating liquid navbar with shrink-on-scroll
+    <header className={`
+      fixed left-0 right-0 z-50
+      transition-all duration-300 ease-in-out
+      ${isScrolled ? 'top-2' : 'top-4 sm:top-6'}
+    `}>
+      <div className={`
+        flex justify-between items-center mx-auto
+        rounded-full backdrop-blur-md
+        bg-background/80 dark:bg-background/80
+        shadow-lg border border-border/20
+        transition-all duration-300 ease-in-out
+        ${isScrolled 
+          ? 'max-w-5xl px-3 sm:px-4 py-2' 
+          : 'max-w-6xl px-4 sm:px-6 py-3 sm:py-4'
+        }
+      `}>
         {/* Logo and Site Name: Left side */}
-        <div className="flex items-center space-x-2 sm:space-x-3 z-40 cursor-pointer" onClick={() => navigate('/')}>
+        <div className="flex items-center space-x-2 sm:space-x-3 z-40 cursor-pointer transition-all duration-300" onClick={() => navigate('/')}>
           <img 
             alt="JobBots Logo" 
-            className="h-9 w-9 sm:h-10 sm:w-10 drop-shadow-lg rounded-lg" 
+            className={`
+              drop-shadow-lg rounded-lg transition-all duration-300
+              ${isScrolled ? 'h-8 w-8' : 'h-9 w-9 sm:h-10 sm:w-10'}
+            `}
             src="https://fnzloyyhzhrqsvslhhri.supabase.co/storage/v1/object/public/assets/logo.jpg"
             loading="eager"
             decoding="async"
             fetchPriority="high"
           />
-          <span className="font-inter text-foreground font-semibold sm:text-2xl text-xl tracking-normal">
+          <span className={`
+            font-inter text-foreground font-semibold tracking-normal transition-all duration-300
+            ${isScrolled ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl'}
+          `}>
             Aspirely AI
           </span>
         </div>
@@ -107,7 +138,7 @@ const AuthHeader = ({ showSectionNav = true }: AuthHeaderProps) => {
 
       {/* Mobile/Tablet Dropdown Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-background dark:bg-black backdrop-blur-md border-b border-border shadow-lg">
+        <div className="lg:hidden absolute top-full left-4 right-4 mt-2 bg-background dark:bg-background/95 backdrop-blur-md border border-border rounded-3xl shadow-lg">
           <div className="px-4 py-4 space-y-3">
             {/* Navigation Items */}
             {showSectionNav && (
