@@ -45,6 +45,7 @@ export type Database = {
       }
       add_job_telegram: {
         Row: {
+          addj_chat_id: string | null
           company_name: string
           country_code: string
           country_name: string | null
@@ -57,6 +58,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          addj_chat_id?: string | null
           company_name: string
           country_code: string
           country_name?: string | null
@@ -69,6 +71,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          addj_chat_id?: string | null
           company_name?: string
           country_code?: string
           country_name?: string | null
