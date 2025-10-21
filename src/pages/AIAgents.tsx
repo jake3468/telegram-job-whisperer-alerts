@@ -84,8 +84,14 @@ const AIAgents = () => {
 
         {/* Agent Sections */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {/* Job Application Agent */}
+          <FeatureSection title="👔 Job Application Agent" subheading="Your quick helper when you find a job." description="Share details about the job you're applying for and instantly receive a tailored resume, cover letter, HR contacts, interview prep, and more—everything you need to apply with confidence." lottieUrl="" buttonText="Activate Now" isReversed={false} label="1" buttonUrl="https://t.me/add_job_aspirelyai_bot" shouldDetectLocation={true} activationStatus={userProfile?.add_job_bot_activated} imageSrc={jobApplicationPreview} />
+
+          {/* Resume Builder Agent */}
+          <FeatureSection title="📝 Resume Builder Agent" subheading="Build ATS-friendly resumes fast" description="Create an ATS-friendly Resume/CV PDF highlighting your achievements in minutes. Tailor it for each job by simply chatting—no manual editing needed." lottieUrl="" buttonText="Activate Now" isReversed={false} label="2" buttonUrl="https://t.me/Resume_builder_AI_bot" shouldDetectLocation={true} activationStatus={userProfile?.cv_bot_activated} imageSrc={resumeBuilderAgentPreview} />
+
           {/* Job Alerts Agent */}
-          <FeatureSection title="🔔 Job Alerts Agent" subheading="Daily job updates at your preferred time" description="Get jobs matching your alerts daily—posted in the last 24 hours. No spam, just relevant opportunities. One click gives you tailored resumes, HR contacts, interview prep, and everything you need to apply." lottieUrl="" buttonText="Activate Now" isReversed={true} label="1" buttonUrl="https://t.me/Job_AI_update_bot" shouldDetectLocation={true} activationStatus={userProfile?.bot_activated} imageSrc={jobAlertsAgentPreview} additionalContent={<>
+          <FeatureSection title="🔔 Job Alerts Agent" subheading="Daily job updates at your preferred time" description="Get jobs matching your alerts daily—posted in the last 24 hours. No spam, just relevant opportunities. One click gives you tailored resumes, HR contacts, interview prep, and everything you need to apply." lottieUrl="" buttonText="Activate Now" isReversed={true} label="3" buttonUrl="https://t.me/Job_AI_update_bot" shouldDetectLocation={true} activationStatus={userProfile?.bot_activated} imageSrc={jobAlertsAgentPreview} additionalContent={<>
                 <p className="text-sm md:text-base text-gray-700 mb-2 text-center">
                   After activation, click the "Create Job Alerts" button below to set your alerts.
                 </p>
@@ -99,12 +105,6 @@ const AIAgents = () => {
                   Create Job Alerts
                 </Button>
               </>} />
-
-          {/* Resume Builder Agent */}
-          <FeatureSection title="📝 Resume Builder Agent" subheading="Build ATS-friendly resumes fast" description="Create an ATS-friendly Resume/CV PDF highlighting your achievements in minutes. Tailor it for each job by simply chatting—no manual editing needed." lottieUrl="" buttonText="Activate Now" isReversed={false} label="2" buttonUrl="https://t.me/Resume_builder_AI_bot" shouldDetectLocation={true} activationStatus={userProfile?.cv_bot_activated} imageSrc={resumeBuilderAgentPreview} />
-
-          {/* Job Application Agent */}
-          <FeatureSection title="👔 Job Application Agent" subheading="Your quick helper when you find a job." description="Share details about the job you're applying for and instantly receive a tailored resume, cover letter, HR contacts, interview prep, and more—everything you need to apply with confidence." lottieUrl="" buttonText="Activate Now" isReversed={false} label="3" buttonUrl="https://t.me/add_job_aspirelyai_bot" shouldDetectLocation={true} activationStatus={userProfile?.add_job_bot_activated} imageSrc={jobApplicationPreview} />
         </div>
       </div>
     </Layout>;
