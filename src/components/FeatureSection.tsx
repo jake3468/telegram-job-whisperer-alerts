@@ -167,7 +167,7 @@ const FeatureSection = ({
                   {desktopContentSection}
                 </>}
             </div>
-          </div> : <div className="relative bg-gray-100 dark:bg-gray-900 rounded-3xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col border border-gray-300 dark:border-gray-700">
+          </div> : <div className="relative bg-gray-100 dark:bg-gray-900 rounded-3xl p-3 md:p-4 lg:p-6 max-w-md mx-auto flex flex-col border border-gray-300 dark:border-gray-700 transition-shadow duration-300 hover:shadow-lg">
             {label && <div className="absolute -left-3 -top-3 bg-[#30313d] text-white w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
                 {label}
               </div>}
