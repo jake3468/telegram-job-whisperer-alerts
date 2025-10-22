@@ -137,14 +137,16 @@ const HeroSection = () => {
             rel="noopener noreferrer"
             className="inline-block hover:opacity-80 transition-opacity"
           >
-            <img 
-              src="https://fazier.com/api/v1/public/badges/embed_image.svg?launch_id=5237&badge_type=daily&variant=2&theme=neutral" 
-              width="180"
-              alt="Fazier badge - Aspirely AI launch" 
-              loading="eager"
-              fetchPriority="high"
-              className="w-[140px] sm:w-[160px] md:w-[180px]"
-            />
+            <div className="min-h-[42px] sm:min-h-[48px] md:min-h-[54px] flex items-center justify-center bg-background">
+              <img 
+                src="https://fazier.com/api/v1/public/badges/embed_image.svg?launch_id=5237&badge_type=daily&variant=2&theme=neutral" 
+                width="180"
+                alt="Fazier badge - Aspirely AI launch" 
+                loading="eager"
+                fetchPriority="high"
+                className="w-[140px] sm:w-[160px] md:w-[180px]"
+              />
+            </div>
           </a>
         </div>
 
