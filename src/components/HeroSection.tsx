@@ -129,7 +129,28 @@ const HeroSection = () => {
           {/* Hero Content - Center aligned */}
           <div className="text-left max-w-2xl mx-auto flex flex-col justify-center mt-4 md:mt-0">
         
-        <div className="relative mb-8 md:mt-8">
+        {/* Fazier Badge */}
+        <div className="flex justify-center mb-6 mt-2 md:mt-6 lg:mt-8">
+          <a 
+            href="https://fazier.com/launches/aspirely-ai" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-block hover:opacity-80 transition-opacity"
+          >
+            <div className="min-h-[42px] sm:min-h-[48px] md:min-h-[54px] flex items-center justify-center bg-background">
+              <img 
+                src="https://fazier.com/api/v1/public/badges/embed_image.svg?launch_id=5237&badge_type=daily&variant=2&theme=neutral" 
+                width="180"
+                alt="Fazier badge - Aspirely AI launch" 
+                loading="eager"
+                fetchPriority="high"
+                className="w-[140px] sm:w-[160px] md:w-[180px]"
+              />
+            </div>
+          </a>
+        </div>
+
+        <div className="relative mb-8 md:mt-4">
           <h1 
             className="relative z-30 text-[48px] md:text-[48px] lg:text-[52px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic"
             aria-label="The Future of Job Search with AI Agents"
