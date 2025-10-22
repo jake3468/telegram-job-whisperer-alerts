@@ -130,7 +130,7 @@ const HeroSection = () => {
           <div className="text-left max-w-2xl mx-auto flex flex-col justify-center mt-4 md:mt-0">
         
         {/* Fazier Badge */}
-        <div className="flex justify-center mb-4">
+        <div className="flex justify-center mb-6 mt-2">
           <a 
             href="https://fazier.com/launches/aspirely-ai" 
             target="_blank" 
@@ -139,10 +139,11 @@ const HeroSection = () => {
           >
             <img 
               src="https://fazier.com/api/v1/public/badges/embed_image.svg?launch_id=5237&badge_type=daily&variant=2&theme=neutral" 
-              width="270" 
+              width="180"
               alt="Fazier badge - Aspirely AI launch" 
               loading="eager"
               fetchPriority="high"
+              className="w-[140px] sm:w-[160px] md:w-[180px]"
             />
           </a>
         </div>
