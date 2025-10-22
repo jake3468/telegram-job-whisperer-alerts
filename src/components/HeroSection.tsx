@@ -148,7 +148,7 @@ const HeroSection = () => {
           </a>
         </div>
 
-        <div className="relative mb-8 md:mt-8">
+        <div className="relative mb-8 md:mt-4">
           <h1 
             className="relative z-30 text-[48px] md:text-[48px] lg:text-[52px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic"
             aria-label="The Future of Job Search with AI Agents"
