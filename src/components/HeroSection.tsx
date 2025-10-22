@@ -130,7 +130,7 @@ const HeroSection = () => {
           <div className="text-left max-w-2xl mx-auto flex flex-col justify-center mt-4 md:mt-0">
         
         {/* Fazier Badge */}
-        <div className="flex justify-center mb-6 mt-2">
+        <div className="flex justify-center mb-6 mt-2 md:mt-6 lg:mt-8">
           <a 
             href="https://fazier.com/launches/aspirely-ai" 
             target="_blank" 
