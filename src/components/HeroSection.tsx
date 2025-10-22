@@ -129,6 +129,24 @@ const HeroSection = () => {
           {/* Hero Content - Center aligned */}
           <div className="text-left max-w-2xl mx-auto flex flex-col justify-center mt-4 md:mt-0">
         
+        {/* Fazier Badge */}
+        <div className="flex justify-center mb-4">
+          <a 
+            href="https://fazier.com/launches/aspirely-ai" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-block hover:opacity-80 transition-opacity"
+          >
+            <img 
+              src="https://fazier.com/api/v1/public/badges/embed_image.svg?launch_id=5237&badge_type=daily&variant=2&theme=neutral" 
+              width="270" 
+              alt="Fazier badge - Aspirely AI launch" 
+              loading="eager"
+              fetchPriority="high"
+            />
+          </a>
+        </div>
+
         <div className="relative mb-8 md:mt-8">
           <h1 
             className="relative z-30 text-[48px] md:text-[48px] lg:text-[52px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic"
