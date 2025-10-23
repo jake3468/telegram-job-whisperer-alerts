@@ -44,14 +44,6 @@ export const blogData: Record<string, Blog> = {
 
 <h2>What Makes AI Job Alerts Different</h2>
 
-<div class="my-8 w-full flex justify-center">
-  <img 
-    src="https://ik.imagekit.io/xcxe9ubbh/Job%20Alerts%20AI%20Agent%20-%20Final.png?updatedAt=1761202992790" 
-    alt="Telegram job alerts interface showing personalized job recommendations with AI-powered resume and cover letter generation for instant applications"
-    class="w-full max-w-[700px] h-auto rounded-lg shadow-lg"
-    loading="eager"
-  />
-</div>
 
 <p>Smart job alerts powered by AI from <a href="https://aspirely.ai/" target="_blank" rel="noopener noreferrer">Aspirely</a> can actually help you land interviews. Here's how:</p>
 
@@ -67,15 +59,24 @@ export const blogData: Record<string, Blog> = {
 
 <h2>What You Get with Each Job Alert</h2>
 
+<div class="my-6 w-full flex justify-center">
+  <img 
+    src="https://ik.imagekit.io/xcxe9ubbh/Job%20Alerts%20AI%20Agent%20-%20Final.png?updatedAt=1761202992790" 
+    alt="Telegram job alerts interface showing personalized job recommendations with AI-powered resume and cover letter generation for instant applications"
+    class="w-full max-w-[700px] h-auto rounded-lg shadow-lg"
+    loading="eager"
+  />
+</div>
+
 <p>When you receive a job alert from Aspirely's AI agent on Telegram, you get far more than just a notification. Here's what one tap generates:</p>
 
-<p class="font-semibold text-gray-900 mt-6 mb-2">1. Tailored Resume (PDF)</p>
+<p><strong>1. Tailored Resume (PDF)</strong></p>
 <p>A customized resume written for that specific job posting. The AI analyzes what the employer wants and rearranges your experience to highlight those elements. This helps you pass applicant tracking systems and connect with human recruiters.</p>
 
-<p class="font-semibold text-gray-900 mt-6 mb-2">2. Personalized Cover Letter (PDF)</p>
+<p><strong>2. Personalized Cover Letter (PDF)</strong></p>
 <p>Not generic. This is addressed to the specific company by name, mentions the role, and explains why your background makes you the right fit. It sounds human because it uses natural, professional language.</p>
 
-<p class="font-semibold text-gray-900 mt-6 mb-2">3. Interview Preparation Materials (20-page PDF)</p>
+<p><strong>3. Interview Preparation Materials (20-page PDF)</strong></p>
 <p>Fifteen questions tailored to your background and the role, along with detailed answer strategies. These questions anticipate what interviewers might ask based on:</p>
 <ul>
 <li>Your specific resume</li>
@@ -84,20 +85,22 @@ export const blogData: Record<string, Blog> = {
 <li>Industry trends</li>
 </ul>
 
-<p class="font-semibold text-gray-900 mt-6 mb-2">4. Job Fit Analysis</p>
+<p><strong>4. Job Fit Analysis</strong></p>
 <p>An honest assessment before you decide to apply. You receive:</p>
 <ul>
-...
+<li>A personalized fit score with specific reasons</li>
+<li>Potential drawbacks of the role</li>
+<li>Recommendations to improve your application</li>
 <li>Tips on what to emphasize in interviews to overcome gaps</li>
 </ul>
 
-<p class="font-semibold text-gray-900 mt-6 mb-2">5. Company Insights (PDF)</p>
+<p><strong>5. Company Insights (PDF)</strong></p>
 <p>In-depth information about the company culture, recent initiatives, leadership changes, and what it's truly like to work there. This goes beyond what you find on their career page.</p>
 
-<p class="font-semibold text-gray-900 mt-6 mb-2">6. Visa Sponsorship Information (PDF)</p>
+<p><strong>6. Visa Sponsorship Information (PDF)</strong></p>
 <p>For international candidates, you learn if the company sponsors work visas, what the requirements are, and how this specific role fits into their sponsorship practices. No more wasting weeks on applications that lead nowhere.</p>
 
-<p class="font-semibold text-gray-900 mt-6 mb-2">7. HR Contacts with Message Templates</p>
+<p><strong>7. HR Contacts with Message Templates</strong></p>
 <p>Direct LinkedIn profiles of recruiters and hiring managers for that role, plus three short tailored message variations you can use to reach out. Connect directly with decision-makers instead of submitting to a void.</p>
 
 <h2>Why Telegram Changes Everything</h2>
