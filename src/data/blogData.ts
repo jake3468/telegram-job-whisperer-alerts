@@ -30,36 +30,32 @@ export const blogData: Record<string, Blog> = {
 
 <p>Traditional job boards and email alerts are flawed. Here's why:</p>
 
-<p><strong>You see jobs too late.</strong> By the time you find a posting on LinkedIn or Indeed, hundreds of people have already applied. You never had a real chance.</p>
-
-<p><strong>Everything is irrelevant.</strong> You set alerts for "Marketing Manager" but end up getting notifications for entry-level internships and senior positions across the country.</p>
-
-<p><strong>The one-size-fits-all resume fails.</strong> Your generic resume gets auto-rejected by applicant tracking systems before it ever reaches a human. You mention "team leadership," but they look for "people management." Rejected.</p>
-
-<p><strong>Application materials take hours.</strong> For each role, you have to research the company, customize your resume, write a cover letter, and prepare for potential interviews. That's 2-3 hours for each application.</p>
-
-<p><strong>Email alerts get buried.</strong> Job notifications get lost in your inbox with newsletters and spam. By the time you check, the opportunity is gone.</p>
+<ul>
+<li><strong>You see jobs too late.</strong><br>By the time you find a posting on LinkedIn or Indeed, hundreds of people have already applied. You never had a real chance.</li>
+<li><strong>Everything is irrelevant.</strong><br>You set alerts for "Marketing Manager" but end up getting notifications for entry-level internships and senior positions across the country.</li>
+<li><strong>The one-size-fits-all resume fails.</strong><br>Your generic resume gets auto-rejected by applicant tracking systems before it ever reaches a human. You mention "team leadership," but they look for "people management." Rejected.</li>
+<li><strong>Application materials take hours.</strong><br>For each role, you have to research the company, customize your resume, write a cover letter, and prepare for potential interviews. That's 2-3 hours for each application.</li>
+<li><strong>Email alerts get buried.</strong><br>Job notifications get lost in your inbox with newsletters and spam. By the time you check, the opportunity is gone.</li>
+</ul>
 
 <p>The system is designed to overwhelm you, not to help you get hired.</p>
 
 <h2>What Makes AI Job Alerts Different</h2>
 
-
 <p>Smart job alerts powered by AI from <a href="https://aspirely.ai/" target="_blank" rel="noopener noreferrer">Aspirely</a> can actually help you land interviews. Here's how:</p>
 
-<p><strong>Only fresh opportunities.</strong> You see jobs posted in the last 24 hours. You are among the first applicants, not number 500.</p>
-
-<p><strong>Actually relevant matches.</strong> The AI filters opportunities based on your experience level, preferred locations, and roles where you would thrive.</p>
-
-<p><strong>Instant delivery on Telegram.</strong> No more checking email. Alerts come as instant notifications on your phone, just like messages from friends.</p>
-
-<p><strong>Complete application materials in one tap.</strong> Resume, cover letter, interview prep, and company insights. Everything is personalized for that specific role, ready in seconds.</p>
+<ul>
+<li><strong>Only fresh opportunities.</strong><br>You see jobs posted in the last 24 hours. You are among the first applicants, not number 500.</li>
+<li><strong>Actually relevant matches.</strong><br>The AI filters opportunities based on your experience level, preferred locations, and roles where you would thrive.</li>
+<li><strong>Instant delivery on Telegram.</strong><br>No more checking email. Alerts come as instant notifications on your phone, just like messages from friends.</li>
+<li><strong>Complete application materials in one tap.</strong><br>Resume, cover letter, interview prep, and company insights. Everything is personalized for that specific role, ready in seconds.</li>
+</ul>
 
 <p>This is not just an alert. This is your entire application system.</p>
 
 <h2>What You Get with Each Job Alert</h2>
 
-<div class="my-6 w-full flex justify-center">
+<div class="my-8 w-full flex justify-center">
   <img 
     src="https://ik.imagekit.io/xcxe9ubbh/Job%20Alerts%20AI%20Agent%20-%20Final.png?updatedAt=1761202992790" 
     alt="Telegram job alerts interface showing personalized job recommendations with AI-powered resume and cover letter generation for instant applications"
@@ -68,15 +64,15 @@ export const blogData: Record<string, Blog> = {
   />
 </div>
 
-<p>When you receive a job alert from Aspirely's AI agent on Telegram, you get far more than just a notification. Here's what one tap generates:</p>
+<p class="mt-6">When you receive a job alert from Aspirely's AI agent on Telegram, you get far more than just a notification. Here's what one tap generates:</p>
 
 <p><strong>1. Tailored Resume (PDF)</strong></p>
 <p>A customized resume written for that specific job posting. The AI analyzes what the employer wants and rearranges your experience to highlight those elements. This helps you pass applicant tracking systems and connect with human recruiters.</p>
 
-<p><strong>2. Personalized Cover Letter (PDF)</strong></p>
+<p class="mt-6"><strong>2. Personalized Cover Letter (PDF)</strong></p>
 <p>Not generic. This is addressed to the specific company by name, mentions the role, and explains why your background makes you the right fit. It sounds human because it uses natural, professional language.</p>
 
-<p><strong>3. Interview Preparation Materials (20-page PDF)</strong></p>
+<p class="mt-6"><strong>3. Interview Preparation Materials (20-page PDF)</strong></p>
 <p>Fifteen questions tailored to your background and the role, along with detailed answer strategies. These questions anticipate what interviewers might ask based on:</p>
 <ul>
 <li>Your specific resume</li>
@@ -85,7 +81,7 @@ export const blogData: Record<string, Blog> = {
 <li>Industry trends</li>
 </ul>
 
-<p><strong>4. Job Fit Analysis</strong></p>
+<p class="mt-6"><strong>4. Job Fit Analysis</strong></p>
 <p>An honest assessment before you decide to apply. You receive:</p>
 <ul>
 <li>A personalized fit score with specific reasons</li>
@@ -94,13 +90,13 @@ export const blogData: Record<string, Blog> = {
 <li>Tips on what to emphasize in interviews to overcome gaps</li>
 </ul>
 
-<p><strong>5. Company Insights (PDF)</strong></p>
+<p class="mt-6"><strong>5. Company Insights (PDF)</strong></p>
 <p>In-depth information about the company culture, recent initiatives, leadership changes, and what it's truly like to work there. This goes beyond what you find on their career page.</p>
 
-<p><strong>6. Visa Sponsorship Information (PDF)</strong></p>
+<p class="mt-6"><strong>6. Visa Sponsorship Information (PDF)</strong></p>
 <p>For international candidates, you learn if the company sponsors work visas, what the requirements are, and how this specific role fits into their sponsorship practices. No more wasting weeks on applications that lead nowhere.</p>
 
-<p><strong>7. HR Contacts with Message Templates</strong></p>
+<p class="mt-6"><strong>7. HR Contacts with Message Templates</strong></p>
 <p>Direct LinkedIn profiles of recruiters and hiring managers for that role, plus three short tailored message variations you can use to reach out. Connect directly with decision-makers instead of submitting to a void.</p>
 
 <h2>Why Telegram Changes Everything</h2>
@@ -144,33 +140,43 @@ Go to the Create Job Alerts page on Aspirely.ai and personalize your settings:</
 
 <p>You'll notice the difference right away in your daily life:</p>
 
-<p><strong>Time savings:</strong> Instead of spending 2-3 hours each evening scrolling job boards, you receive a curated selection of genuinely relevant opportunities.</p>
-
-<p><strong>Speed advantage:</strong> Complete application packages are ready in minutes rather than hours. You're among the first applicants while others are still researching the company.</p>
-
-<p><strong>Better quality:</strong> Every document is tailored to the specific opportunity. Hiring managers notice the difference between personalized materials and generic copy-paste applications.</p>
-
-<p><strong>Less stress:</strong> No more wondering if you missed important postings. No more anxiety about whether your resume is good enough. The system handles the tough parts.</p>
-
-<p><strong>Smarter decisions:</strong> The job fit analysis helps you avoid roles that look good on paper but wouldn't be right for you. You apply to fewer positions but with much higher success rates.</p>
-
-<p><strong>Direct connections:</strong> Messaging recruiters with personalized introductions opens doors that online applications alone cannot. Many successful hires happen because candidates reached out directly.</p>
+<ul>
+<li><strong>Time savings:</strong><br>Instead of spending 2-3 hours each evening scrolling job boards, you receive a curated selection of genuinely relevant opportunities.</li>
+<li><strong>Speed advantage:</strong><br>Complete application packages are ready in minutes rather than hours. You're among the first applicants while others are still researching the company.</li>
+<li><strong>Better quality:</strong><br>Every document is tailored to the specific opportunity. Hiring managers notice the difference between personalized materials and generic copy-paste applications.</li>
+<li><strong>Less stress:</strong><br>No more wondering if you missed important postings. No more anxiety about whether your resume is good enough. The system handles the tough parts.</li>
+<li><strong>Smarter decisions:</strong><br>The job fit analysis helps you avoid roles that look good on paper but wouldn't be right for you. You apply to fewer positions but with much higher success rates.</li>
+<li><strong>Direct connections:</strong><br>Messaging recruiters with personalized introductions opens doors that online applications alone cannot. Many successful hires happen because candidates reached out directly.</li>
+</ul>
 
 <h2>Real Results: From Hours to Minutes</h2>
 
 <p>Here's what actually happens when you switch to AI-powered job alerts:</p>
 
-<p><strong>Before:</strong> Scroll LinkedIn for 30 minutes. Find 3 relevant jobs. Spend 6 hours customizing applications. Submit and hope.</p>
-
-<p><strong>After:</strong> Receive 3 perfectly matched jobs. Generate all application materials in 15 minutes. Apply as one of the first candidates.</p>
-
-<p><strong>Before:</strong> Wonder if the company sponsors visas. Apply anyway. Get to the final interview. Find out they don't sponsor. Start over.</p>
-
-<p><strong>After:</strong> Know visa sponsorship details upfront. Only apply where you have a genuine path to employment.</p>
-
-<p><strong>Before:</strong> Submit your resume into an applicant tracking system. Never hear back. Have no idea why.</p>
-
-<p><strong>After:</strong> A tailored resume passes ATS filters. A direct message to the recruiter gets you noticed. You receive an interview request within 48 hours.</p>
+<div class="overflow-x-auto my-6">
+  <table class="min-w-full border-collapse border border-gray-300">
+    <thead>
+      <tr class="bg-gray-100">
+        <th class="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-900">Before AI Job Alerts</th>
+        <th class="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-900">After AI Job Alerts</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="border border-gray-300 px-4 py-3 align-top">Scroll LinkedIn for 30 minutes. Find 3 relevant jobs. Spend 6 hours customizing applications. Submit and hope.</td>
+        <td class="border border-gray-300 px-4 py-3 align-top">Receive 3 perfectly matched jobs. Generate all application materials in 15 minutes. Apply as one of the first candidates.</td>
+      </tr>
+      <tr class="bg-gray-50">
+        <td class="border border-gray-300 px-4 py-3 align-top">Wonder if the company sponsors visas. Apply anyway. Get to the final interview. Find out they don't sponsor. Start over.</td>
+        <td class="border border-gray-300 px-4 py-3 align-top">Know visa sponsorship details upfront. Only apply where you have a genuine path to employment.</td>
+      </tr>
+      <tr>
+        <td class="border border-gray-300 px-4 py-3 align-top">Submit your resume into an applicant tracking system. Never hear back. Have no idea why.</td>
+        <td class="border border-gray-300 px-4 py-3 align-top">A tailored resume passes ATS filters. A direct message to the recruiter gets you noticed. You receive an interview request within 48 hours.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 <p>The difference is not just convenience. It's about competing on quality instead of volume.</p>
 
@@ -189,14 +195,9 @@ Go to the Create Job Alerts page on Aspirely.ai and personalize your settings:</
 
 <p><strong>Ready to transform your job search?</strong></p>
 
-<ol>
-<li>Visit <a href="https://aspirely.ai/" target="_blank" rel="noopener noreferrer">Aspirely.ai</a> to get your activation key.</li>
-<li>Activate the AI agent on Telegram.</li>
-<li>Set your preferences on the Create Job Alerts page.</li>
-<li>Start receiving opportunities that match your goals.</li>
-</ol>
+<p class="text-lg font-semibold mt-4">Join <a href="https://aspirely.ai/" target="_blank" rel="noopener noreferrer">Aspirely.ai</a> today.</p>
 
-<p>Your next career move shouldn't require hundreds of hours and countless rejections. Let the right jobs come to you, and present yourself as the strongest candidate from day one.</p>
+<p class="mt-6">Your next career move shouldn't require hundreds of hours and countless rejections. Let the right jobs come to you, and present yourself as the strongest candidate from day one.</p>
 
 <p>That's what smart job alerts provide. That's what you deserve.</p>`,
     excerpt: "Stop wasting hours on job boards. Get fresh job opportunities delivered to Telegram with personalized resumes, cover letters, and interview prep—all generated instantly by AI.",

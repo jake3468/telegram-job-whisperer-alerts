@@ -266,7 +266,7 @@ const BlogPost = () => {
             {blog.content ? (
               <SafeHTMLRenderer 
                 content={blog.content}
-                className="text-gray-800 leading-relaxed [&>h2]:text-xl [&>h2]:sm:text-2xl [&>h2]:lg:text-3xl [&>h2]:font-bold [&>h2]:text-gray-900 [&>h2]:mb-4 [&>h2]:mt-8 [&>p]:mb-4 [&>p]:text-base [&>p]:sm:text-lg [&>p]:text-gray-700 [&_a]:!text-blue-600 [&_a]:!underline [&_a]:!decoration-blue-600 [&_a]:!underline-offset-2 [&_a]:hover:!text-blue-700 [&_a]:break-words [&_a]:cursor-pointer"
+                className="text-gray-800 leading-relaxed [&>h2]:text-xl [&>h2]:sm:text-2xl [&>h2]:lg:text-3xl [&>h2]:font-bold [&>h2]:text-gray-900 [&>h2]:mb-4 [&>h2]:mt-8 [&>p]:mb-4 [&>p]:text-base [&>p]:sm:text-lg [&>p]:text-gray-700 [&_a]:!text-blue-600 [&_a]:!underline [&_a]:!decoration-blue-600 [&_a]:!underline-offset-2 [&_a]:hover:!text-blue-700 [&_a]:break-words [&_a]:cursor-pointer [&_ul]:list-disc [&_ul]:ml-6 [&_ul]:mb-4 [&_ul]:mt-2 [&_ul]:space-y-2 [&_ol]:list-decimal [&_ol]:ml-6 [&_ol]:mb-4 [&_ol]:mt-2 [&_ol]:space-y-2 [&_li]:text-gray-700 [&_li]:text-base [&_li]:sm:text-lg [&_li]:leading-relaxed [&_li]:pl-2 [&_table]:w-full [&_table]:border-collapse [&_table]:my-6 [&_th]:border [&_th]:border-gray-300 [&_th]:px-4 [&_th]:py-3 [&_th]:bg-gray-100 [&_th]:font-semibold [&_th]:text-left [&_td]:border [&_td]:border-gray-300 [&_td]:px-4 [&_td]:py-3 [&_td]:align-top [&_tbody_tr:nth-child(even)]:bg-gray-50"
                 maxLength={50000}
               />
             ) : (
