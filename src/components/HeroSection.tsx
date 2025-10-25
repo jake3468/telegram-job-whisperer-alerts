@@ -157,23 +157,23 @@ const HeroSection = () => {
           >
             {/* Mobile view only */}
             <span className="block md:hidden text-center text-[32px] leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Your AI Job Team</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">What If Finding</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Lives in Your</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Jobs Was Like</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic"><span className="hand-drawn-circle">Telegram</span> Chats</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Scrolling Instagram?</span>
             </span>
             
             {/* Desktop view only */}
             <span className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Your AI Job Team Lives in Your <span className="hand-drawn-circle">Telegram</span> Chats</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">What If Finding Jobs Was Like Scrolling Instagram?</span>
             </span>
             
             {/* Tablet view only */}
             <span className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Your AI Job Team Lives</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">What If Finding Jobs</span>
               <br />
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">in Your <span className="hand-drawn-circle">Telegram</span> Chats</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Was Like Scrolling Instagram?</span>
             </span>
           </h1>
         </div>
@@ -190,7 +190,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] md:text-[18px] lg:text-[20px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[15px] md:text-[17px] lg:text-[18px] font-notion-inter font-medium text-foreground text-center">
-            Stop applying to random jobs with the same old resume. Just chat on Telegram—your AI team finds fresh jobs daily, crafts tailored resumes, and coaches you through mock phone call interviews. Become the top job applicant 🏆.
+            Scroll through fresh jobs daily on Telegram. Pick the ones you like—AI writes your tailored resume, cover letter, and preps you for interviews. Apply first. Stand out always 🏆.
           </p>
           
           <SignedOut>
