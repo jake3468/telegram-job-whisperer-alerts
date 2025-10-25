@@ -166,18 +166,14 @@ const HeroSection = () => {
             
             {/* Desktop view only */}
             <span className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Your AI Job Team Lives in Your</span>
-              <br />
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic"><span className="hand-drawn-circle">Telegram</span> Chats</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Your AI Job Team Lives in Your <span className="hand-drawn-circle">Telegram</span> Chats</span>
             </span>
             
             {/* Tablet view only */}
             <span className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Your AI Job Team</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Your AI Job Team Lives</span>
               <br />
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Lives in Your</span>
-              <br />
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic"><span className="hand-drawn-circle">Telegram</span> Chats</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">in Your <span className="hand-drawn-circle">Telegram</span> Chats</span>
             </span>
           </h1>
         </div>
