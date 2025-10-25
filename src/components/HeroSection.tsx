@@ -190,7 +190,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] md:text-[18px] lg:text-[20px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[15px] md:text-[17px] lg:text-[18px] font-notion-inter font-medium text-foreground text-center">
-            Scroll through fresh jobs daily on Telegram. Pick the ones you like—AI writes your tailored resume, cover letter, and preps you for interviews. Apply first. Stand out always 🏆.
+            Jobs posted in the last 24 hours appear in your Telegram daily—matched to your profile. See one you like? Click once and AI instantly creates your tailored resume, cover letter, and application materials. Apply before everyone else 🏆.
           </p>
           
           <SignedOut>
