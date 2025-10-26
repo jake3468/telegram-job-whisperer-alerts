@@ -215,8 +215,8 @@ const HeroSection = () => {
                 </span>
                </div> */}
             </div>
-            {/* Avatar Group with Rating */}
-            <div className="flex items-center justify-center gap-2 md:gap-4 mb-6">
+            {/* Avatar Group with Rating - Temporarily hidden for A/B testing */}
+            {/* <div className="flex items-center justify-center gap-2 md:gap-4 mb-6">
               <div className="flex -space-x-1.5 md:-space-x-2">
                 <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Aspirely AI user success story - AI-powered job search testimonial" />
@@ -244,7 +244,7 @@ const HeroSection = () => {
                   <span className="italic font-medium">Trusted by <span className="font-bold">3000+</span> job seekers worldwide</span>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Full-width YouTube Video */}
             <div 
