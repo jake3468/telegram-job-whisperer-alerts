@@ -157,23 +157,29 @@ const HeroSection = () => {
           >
             {/* Mobile view only */}
             <span className="block md:hidden text-center text-[32px] leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">What If Finding</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">You've Applied to</span>{' '}
+              <span className="text-red-600 dark:text-red-500 px-0.5 py-0 font-notion-inter font-bold not-italic">100</span>{' '}
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Jobs</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Jobs Was Like</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">and Heard Nothing.</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Scrolling Instagram?</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Here's Why.</span>
             </span>
             
             {/* Desktop view only */}
             <span className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">What If Finding Jobs Was Like Scrolling Instagram?</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">You've Applied to </span>
+              <span className="text-red-600 dark:text-red-500 py-0 font-notion-inter font-bold not-italic">100</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic"> Jobs and Heard Nothing. Here's Why.</span>
             </span>
             
             {/* Tablet view only */}
             <span className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">What If Finding Jobs</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">You've Applied to </span>
+              <span className="text-red-600 dark:text-red-500 py-0 font-notion-inter font-bold not-italic">100</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic"> Jobs</span>
               <br />
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Was Like Scrolling Instagram?</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">and Heard Nothing. Here's Why.</span>
             </span>
           </h1>
         </div>
@@ -190,7 +196,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] md:text-[18px] lg:text-[20px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[15px] md:text-[17px] lg:text-[18px] font-notion-inter font-medium text-foreground text-center">
-            Jobs posted in the last 24 hours appear in your Telegram daily—matched to your profile. See one you like? Click once and AI instantly creates your tailored resume, cover letter, and application materials. Apply before everyone else 🏆.
+            You're too late. Jobs fill in hours, not days. Our Telegram AI Agents deliver roles posted in the last 24 hours and create your tailored resume, cover letter, and materials for you. You just click. Be in the first 10 applicants, not the last 500 🏆.
           </p>
           
           <SignedOut>
@@ -198,7 +204,7 @@ const HeroSection = () => {
             <div className="flex flex-row items-center justify-center mb-8">
               <SignUpButton mode="modal">
                 <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-4 py-2 md:px-6 md:py-2.5 text-lg md:text-xl rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-center w-auto border border-transparent">
-                  Try it for free <ArrowRight className="w-5 h-5 inline ml-1" />
+                  Start Free on Telegram <ArrowRight className="w-5 h-5 inline ml-1" />
                 </button>
               </SignUpButton>
               
