@@ -196,7 +196,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] md:text-[18px] lg:text-[20px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[15px] md:text-[17px] lg:text-[18px] font-notion-inter font-medium text-foreground text-center">
-            You're too late. Jobs fill in hours, not days. Our Telegram AI Agents deliver roles posted in the last 24 hours and create your tailored resume, cover letter, and materials for you. You just click. Be in the first 10 applicants, not the last 500 🏆.
+            You're too late. Jobs fill in hours, not days. <span className="underline decoration-green-500 decoration-2 underline-offset-4">Our Telegram AI AGENTS</span> deliver roles posted in the last 24 hours and create your tailored resume, cover letter, and materials for you. You just click. Be in the first 10 applicants, not the last 500 🏆.
           </p>
           
           <SignedOut>
@@ -204,7 +204,7 @@ const HeroSection = () => {
             <div className="flex flex-row items-center justify-center mb-8">
               <SignUpButton mode="modal">
                 <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-4 py-2 md:px-6 md:py-2.5 text-lg md:text-xl rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-center w-auto border border-transparent">
-                  Start Free on Telegram <ArrowRight className="w-5 h-5 inline ml-1" />
+                  Let me just try this <ArrowRight className="w-5 h-5 inline ml-1" />
                 </button>
               </SignUpButton>
               
