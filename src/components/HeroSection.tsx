@@ -204,7 +204,7 @@ const HeroSection = () => {
             <div className="flex flex-row items-center justify-center mb-8">
               <SignUpButton mode="modal">
                 <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-4 py-2 md:px-6 md:py-2.5 text-lg md:text-xl rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-center w-auto border border-transparent">
-                  Let Me Just Try This <ArrowRight className="w-5 h-5 inline ml-1" />
+                  Let me just try this <ArrowRight className="w-5 h-5 inline ml-1" />
                 </button>
               </SignUpButton>
               
