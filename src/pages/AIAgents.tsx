@@ -53,8 +53,8 @@ const AIAgents = () => {
             <span className="text-2xl sm:text-3xl md:text-4xl">🚀</span>
             <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent font-inter text-3xl sm:text-3xl md:text-4xl">Activate your AI Job Agents</span>
           </h1>
-          <p className="text-sm lg:text-base text-gray-900 font-inter font-normal mb-3 text-left max-w-2xl mx-auto lg:text-left">
-            To get started, let's activate your personal AI job agents on Telegram in just 3 simple steps 👇 to help you land your dream job.
+          <p className="text-sm lg:text-base text-gray-900 font-inter font-normal mt-6 mb-3 text-center max-w-2xl mx-auto">
+            Set up your personal AI job agents on Telegram in 3 simple steps 👇
           </p>
         </div>
 
@@ -77,7 +77,7 @@ const AIAgents = () => {
               </div>}
             <p className="font-inter font-normal text-gray-900 text-sm sm:text-base text-left mb-1 sm:mb-2">
               2. Click the "Activate Now" button, one by one, for each of the 3 AI Agents.<br /><br />
-              3. When it asks for your activation key, paste it to start using your AI agents.
+              3. Paste your Activation Key in the chat that opens, and start using them! 🎉.
             </p>
           </div>
         </div>
