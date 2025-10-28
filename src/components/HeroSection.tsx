@@ -157,36 +157,30 @@ const HeroSection = () => {
             aria-label="You've Applied to 100 Jobs and Heard Nothing"
           >
             {/* Mobile view only */}
-            <span className="block md:hidden text-center text-[32px] leading-tight">
-              <span className="inline-block overflow-hidden whitespace-nowrap animate-typing">
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">You've Applied to</span>{' '}
-                <span className="text-red-600 dark:text-red-500 px-0.5 py-0 font-notion-inter font-bold not-italic">100</span>{' '}
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Jobs</span>
-                <br />
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">and Heard Nothing.</span>
-                <br />
-                <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Here's Why.</span>
-              </span>
+            <span className="block md:hidden text-center text-[32px] leading-tight animate-fly-in-from-bottom">
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">You've Applied to</span>{' '}
+              <span className="text-red-600 dark:text-red-500 px-0.5 py-0 font-notion-inter font-bold not-italic">100</span>{' '}
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Jobs</span>
+              <br />
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">and Heard Nothing.</span>
+              <br />
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Here's Why.</span>
             </span>
             
             {/* Desktop view only */}
-            <span className="hidden lg:block lg:text-left leading-tight">
-              <span className="inline-block overflow-hidden whitespace-nowrap animate-typing">
-                <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">You've Applied to </span>
-                <span className="text-red-600 dark:text-red-500 py-0 font-notion-inter font-bold not-italic">100</span>
-                <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic"> Jobs and Heard Nothing. Here's Why.</span>
-              </span>
+            <span className="hidden lg:block lg:text-left leading-tight animate-fly-in-from-bottom">
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">You've Applied to </span>
+              <span className="text-red-600 dark:text-red-500 py-0 font-notion-inter font-bold not-italic">100</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic"> Jobs and Heard Nothing. Here's Why.</span>
             </span>
             
             {/* Tablet view only */}
-            <span className="hidden md:block lg:hidden text-center leading-tight">
-              <span className="inline-block overflow-hidden whitespace-nowrap animate-typing">
-                <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">You've Applied to </span>
-                <span className="text-red-600 dark:text-red-500 py-0 font-notion-inter font-bold not-italic">100</span>
-                <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic"> Jobs</span>
-                <br />
-                <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">and Heard Nothing. Here's Why.</span>
-              </span>
+            <span className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">You've Applied to </span>
+              <span className="text-red-600 dark:text-red-500 py-0 font-notion-inter font-bold not-italic">100</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic"> Jobs</span>
+              <br />
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">and Heard Nothing. Here's Why.</span>
             </span>
           </h1>
         </div>
