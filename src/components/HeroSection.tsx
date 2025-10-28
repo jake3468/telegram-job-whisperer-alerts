@@ -145,7 +145,7 @@ const HeroSection = () => {
                 alt="Fazier badge - Aspirely AI launch" 
                 loading="eager"
                 fetchPriority="high"
-                className="w-[140px] sm:w-[160px] md:w-[180px]"
+                className="w-[140px] sm:w-[160px] md:w-[180px] lg:hidden"
               />
             </div>
           </a>
