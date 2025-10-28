@@ -158,32 +158,29 @@ const HeroSection = () => {
           >
             {/* Mobile view only */}
             <span className="block md:hidden text-center text-[32px] leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">You've Applied to</span>{' '}
-              <span className="text-red-600 dark:text-red-500 px-0.5 py-0 font-notion-inter font-bold not-italic">100</span>{' '}
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Jobs</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Your </span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic underline decoration-green-500 decoration-2 underline-offset-4">AI Team</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic"> for</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">and Heard Nothing.</span>
-              <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Here's Why.</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Job Applications</span>
             </span>
             
             {/* Desktop view only */}
             <span className="hidden lg:block lg:text-left leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">You've Applied to</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Your </span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic underline decoration-green-500 decoration-2 underline-offset-4">AI Team</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic"> for</span>
               <br />
-              <span className="text-red-600 dark:text-red-500 py-0 font-notion-inter font-bold not-italic">100</span>
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic"> Jobs and Heard</span>
-              <br />
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Nothing. Here's Why.</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Job Applications</span>
             </span>
             
             {/* Tablet view only */}
             <span className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">You've Applied to </span>
-              <span className="text-red-600 dark:text-red-500 py-0 font-notion-inter font-bold not-italic">100</span>
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic"> Jobs</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Your </span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic underline decoration-green-500 decoration-2 underline-offset-4">AI Team</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic"> for</span>
               <br />
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">and Heard Nothing. Here's Why.</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Job Applications</span>
             </span>
           </h1>
         </div>
@@ -200,7 +197,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl lg:max-w-none mx-auto lg:mx-0 font-notion-inter font-light leading-relaxed text-[16px] md:text-[18px] lg:text-[20px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center lg:text-left [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[15px] md:text-[17px] lg:text-[18px] font-notion-inter font-medium text-foreground text-center lg:text-left">
-            You're too late. Jobs fill in hours, not days. <span className="underline decoration-green-500 decoration-2 underline-offset-4">Our Telegram AI AGENTS</span> deliver roles posted in the last 24 hours and create your tailored resume, cover letter, and materials instantly—so you can apply fully prepared in minutes. Be in the first 10 applicants 🏆, not the last 500.
+            With AI-powered assistance right in Telegram chats, receive personalized job alerts, tailored resumes, custom cover letters, and interview coaching—all at your fingertips 24/7. Apply confidently in minutes, fully prepared. 🏆
           </p>
           
           <SignedOut>
@@ -208,7 +205,7 @@ const HeroSection = () => {
             <div className="flex flex-row items-center justify-center lg:justify-start mb-8">
               <SignUpButton mode="modal">
                 <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-4 py-2 md:px-6 md:py-2.5 text-lg md:text-xl rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-center w-auto border border-transparent">
-                  I want this! <ArrowRight className="w-5 h-5 inline ml-1" />
+                  Sign Up Free <ArrowRight className="w-5 h-5 inline ml-1" />
                 </button>
               </SignUpButton>
               
