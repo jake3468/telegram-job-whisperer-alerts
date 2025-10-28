@@ -168,10 +168,10 @@ const HeroSection = () => {
             </span>
             
             {/* Desktop view only */}
-            <span className="hidden lg:block lg:text-left leading-tight animate-fly-in-from-bottom">
+            <span className="hidden lg:block lg:text-left leading-tight">
               <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">You've Applied to </span>
               <span className="text-red-600 dark:text-red-500 py-0 font-notion-inter font-bold not-italic">100</span>
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic"> Jobs and Heard Nothing. Here's Why.</span>
+              <span className="inline-block overflow-hidden whitespace-nowrap animate-typing text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic"> Jobs and Heard Nothing. Here's Why.</span>
             </span>
             
             {/* Tablet view only */}
