@@ -9,6 +9,7 @@ import { ArrowRight, Check } from 'lucide-react';
 import jobApplicationPreview from '@/assets/job-application-preview.svg';
 import jobAlertsAgentPreview from '@/assets/job-alerts-agent-preview.svg';
 import resumeBuilderAgentPreview from '@/assets/resume-builder-agent-preview.svg';
+import jobSuccessHero from '@/assets/job-success-hero.jpg';
 
 // Add heading animation hook at component level
 const useHeadingAnimation = () => {
@@ -125,12 +126,12 @@ const HeroSection = () => {
       
       {/* Main Container with Grid Layout */}
       <div className="max-w-7xl mx-auto z-20 relative w-full">
-        <div className="flex justify-center items-center">
-          {/* Hero Content - Center aligned */}
-          <div className="text-left max-w-2xl mx-auto flex flex-col justify-center mt-4 md:mt-0">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          {/* Left Column - Text Content */}
+          <div className="text-center lg:text-left flex flex-col justify-center">
         
         {/* Fazier Badge */}
-        <div className="flex justify-center mb-6 mt-2 md:mt-6 lg:mt-8">
+        <div className="flex justify-center lg:justify-start mb-6 mt-2 md:mt-6 lg:mt-8">
           <a 
             href="https://fazier.com/launches/aspirely-ai" 
             target="_blank" 
@@ -153,7 +154,7 @@ const HeroSection = () => {
         <div className="relative mb-8 md:mt-4">
           <h1 
             className="relative z-30 text-[48px] md:text-[48px] lg:text-[52px] mb-1 leading-none font-notion-inter font-medium tracking-[-0.4px] text-notion-dark dark:text-white drop-shadow-2xl animate-fade-in dark:[text-shadow:_0_0_40px_rgba(255,255,255,0.5)] not-italic"
-            aria-label="The Future of Job Search with AI Agents"
+            aria-label="You've Applied to 100 Jobs and Heard Nothing"
           >
             {/* Mobile view only */}
             <span className="block md:hidden text-center text-[32px] leading-tight animate-fly-in-from-bottom">
@@ -167,7 +168,7 @@ const HeroSection = () => {
             </span>
             
             {/* Desktop view only */}
-            <span className="hidden lg:block text-center leading-tight animate-fly-in-from-bottom">
+            <span className="hidden lg:block lg:text-left leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">You've Applied to </span>
               <span className="text-red-600 dark:text-red-500 py-0 font-notion-inter font-bold not-italic">100</span>
               <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic"> Jobs and Heard Nothing. Here's Why.</span>
@@ -194,17 +195,17 @@ const HeroSection = () => {
           </div>} */}
         
 
-        <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl mx-auto font-notion-inter font-light leading-relaxed text-[16px] md:text-[18px] lg:text-[20px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center [filter:brightness(1.1)_contrast(1.1)]">
-          <p className="mb-8 text-[15px] md:text-[17px] lg:text-[18px] font-notion-inter font-medium text-foreground text-center">
+        <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl lg:max-w-none mx-auto lg:mx-0 font-notion-inter font-light leading-relaxed text-[16px] md:text-[18px] lg:text-[20px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center lg:text-left [filter:brightness(1.1)_contrast(1.1)]">
+          <p className="mb-8 text-[15px] md:text-[17px] lg:text-[18px] font-notion-inter font-medium text-foreground text-center lg:text-left">
             You're too late. Jobs fill in hours, not days. <span className="underline decoration-green-500 decoration-2 underline-offset-4">Our Telegram AI AGENTS</span> deliver roles posted in the last 24 hours and create your tailored resume, cover letter, and materials instantly—so you can apply fully prepared in minutes. Be in the first 10 applicants 🏆, not the last 500.
           </p>
           
           <SignedOut>
             {/* Button Container */}
-            <div className="flex flex-row items-center justify-center mb-8">
+            <div className="flex flex-row items-center justify-center lg:justify-start mb-8">
               <SignUpButton mode="modal">
                 <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-4 py-2 md:px-6 md:py-2.5 text-lg md:text-xl rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-center w-auto border border-transparent">
-                  Let me just try this <ArrowRight className="w-5 h-5 inline ml-1" />
+                  I want this! <ArrowRight className="w-5 h-5 inline ml-1" />
                 </button>
               </SignUpButton>
               
@@ -215,6 +216,18 @@ const HeroSection = () => {
                 </span>
                </div> */}
             </div>
+            
+            {/* Success Image - Mobile Only (below button) */}
+            <div className="md:hidden mb-8">
+              <img 
+                src={jobSuccessHero} 
+                alt="Job search success with Aspirely AI - professionals landing their dream jobs" 
+                className="w-full h-auto rounded-2xl shadow-lg"
+                loading="eager"
+                decoding="async"
+              />
+            </div>
+            
             {/* Avatar Group with Rating - Temporarily hidden for A/B testing */}
             {/* <div className="flex items-center justify-center gap-2 md:gap-4 mb-6">
               <div className="flex -space-x-1.5 md:-space-x-2">
@@ -245,11 +258,33 @@ const HeroSection = () => {
                 </div>
               </div>
             </div> */}
+          </SignedOut>
 
-            {/* Full-width YouTube Video */}
+        <SignedIn>
+          <button onClick={goToDashboard} className="bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-600 hover:from-sky-600 hover:to-blue-700 text-white px-12 py-4 text-lg sm:text-xl rounded-xl transition-all duration-300 font-inter font-bold shadow-2xl drop-shadow-xl hover:shadow-sky-500/60 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-sky-400/50 mb-2">
+            Go to Dashboard
+          </button>
+        </SignedIn>
+        </div>
+        
+        </div>
+          
+          {/* Right Column - Hero Image (Desktop/Tablet Only) */}
+          <div className="hidden md:block">
+            <img 
+              src={jobSuccessHero} 
+              alt="Job search success with Aspirely AI - professionals landing their dream jobs" 
+              className="w-full h-auto rounded-2xl lg:rounded-3xl shadow-2xl"
+              loading="eager"
+              decoding="async"
+            />
+          </div>
+          
+          {/* YouTube Video - Full Width Below Grid */}
+          <div className="col-span-1 lg:col-span-2">
             <div 
               ref={videoRef}
-              className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] px-4 md:w-full md:max-w-5xl md:left-0 md:right-0 md:ml-0 md:mr-0 md:mx-auto md:px-8 lg:w-screen lg:max-w-none lg:left-1/2 lg:right-1/2 lg:-ml-[50vw] lg:-mr-[50vw] lg:px-16 my-8"
+              className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] px-4 md:w-full md:max-w-5xl md:left-0 md:right-0 md:ml-0 md:mr-0 md:mx-auto md:px-0 lg:w-screen lg:max-w-none lg:left-1/2 lg:right-1/2 lg:-ml-[50vw] lg:-mr-[50vw] lg:px-16 my-8"
             >
               <div className="w-full aspect-video rounded-2xl overflow-hidden relative">
                 {isVideoPlaying ? (
@@ -278,15 +313,6 @@ const HeroSection = () => {
                 )}
               </div>
             </div>
-          </SignedOut>
-
-        <SignedIn>
-          <button onClick={goToDashboard} className="bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-600 hover:from-sky-600 hover:to-blue-700 text-white px-12 py-4 text-lg sm:text-xl rounded-xl transition-all duration-300 font-inter font-bold shadow-2xl drop-shadow-xl hover:shadow-sky-500/60 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-sky-400/50 mb-2">
-            Go to Dashboard
-          </button>
-        </SignedIn>
-        
-        </div>
           </div>
         </div>
       </div>
