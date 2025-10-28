@@ -274,7 +274,7 @@ const HeroSection = () => {
             <img 
               src={jobSuccessHero} 
               alt="Job search success with Aspirely AI - professionals landing their dream jobs" 
-              className="w-full max-w-xs lg:max-w-sm h-auto rounded-2xl lg:rounded-3xl shadow-2xl mx-auto"
+              className="w-full max-w-[200px] lg:max-w-[280px] h-auto rounded-2xl lg:rounded-3xl shadow-2xl mx-auto"
               loading="eager"
               decoding="async"
             />
