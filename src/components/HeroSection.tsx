@@ -159,28 +159,25 @@ const HeroSection = () => {
             {/* Mobile view only */}
             <span className="block md:hidden text-center text-[32px] leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Your </span>
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic underline decoration-green-500 decoration-2 underline-offset-4">AI Team</span>
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic"> for</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic underline decoration-green-500 decoration-2 underline-offset-4">all-in-one</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Job Applications</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Job Search Assistant</span>
             </span>
             
             {/* Desktop view only */}
             <span className="hidden lg:block lg:text-left leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Your </span>
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic underline decoration-green-500 decoration-2 underline-offset-4">AI Team</span>
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic"> for</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic underline decoration-green-500 decoration-2 underline-offset-4">all-in-one</span>
               <br />
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Job Applications</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Job Search Assistant</span>
             </span>
             
             {/* Tablet view only */}
             <span className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Your </span>
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic underline decoration-green-500 decoration-2 underline-offset-4">AI Team</span>
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic"> for</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic underline decoration-green-500 decoration-2 underline-offset-4">all-in-one</span>
               <br />
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Job Applications</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Job Search Assistant</span>
             </span>
           </h1>
         </div>
