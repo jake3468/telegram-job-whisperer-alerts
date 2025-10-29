@@ -29,28 +29,30 @@ export const YouTubeHeroVideo: React.FC<YouTubeHeroVideoProps> = ({
     setShowThumbnailDelay(false);
   }, []);
 
-  // Desktop: Intersection Observer for visibility tracking only
+  // Intersection Observer: autoplay for mobile/tablet, visibility tracking only for desktop
   useEffect(() => {
-    if (!isMobile) {
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          // Autoplay only for mobile and tablet (not desktop)
+          if (isMobile !== undefined && isMobile) {
+            setShouldPlay(true);
           }
-        },
-        { threshold: 0.5 }
-      );
-
-      if (containerRef.current) {
-        observer.observe(containerRef.current);
-      }
-
-      return () => {
-        if (containerRef.current) {
-          observer.unobserve(containerRef.current);
         }
-      };
+      },
+      { threshold: 0.5 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
     }
+
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
+    };
   }, [isMobile]);
 
   if (isLoading) {
