@@ -199,7 +199,7 @@ const HeroSection = () => {
           
           <SignedOut>
             {/* Button Container */}
-            <div className="flex flex-row items-center justify-center lg:justify-start mb-8">
+            <div className="flex flex-row items-center justify-center lg:justify-start mb-4">
               <SignUpButton mode="modal">
                 <button className="bg-[rgb(0,117,222)] hover:bg-[#0066C3] text-[rgb(255,255,255)] dark:bg-[rgb(0,117,222)] dark:hover:bg-[#0066C3] dark:text-[rgb(255,255,255)] px-4 py-2 md:px-6 md:py-2.5 text-lg md:text-xl rounded-2xl transition-all duration-300 font-inter font-medium shadow-lg hover:shadow-primary/40 transform hover:scale-105 z-30 relative focus:outline-none focus:ring-4 focus:ring-[#0075DE]/20 flex items-center gap-2 justify-center w-auto border border-transparent">
                   Sign Up Free <ArrowRight className="w-5 h-5 inline ml-1" />
@@ -214,19 +214,8 @@ const HeroSection = () => {
                </div> */}
             </div>
             
-            {/* Success Image - Mobile Only (below button) */}
-            <div className="md:hidden mb-4">
-              <img 
-                src={jobSuccessHero} 
-                alt="Job search success with Aspirely AI - professionals landing their dream jobs" 
-                className="w-full h-auto rounded-2xl shadow-lg"
-                loading="eager"
-                decoding="async"
-              />
-            </div>
-            
-            {/* Avatar Group with Rating - Temporarily hidden for A/B testing */}
-            {/* <div className="flex items-center justify-center gap-2 md:gap-4 mb-6">
+            {/* Avatar Group with Rating */}
+            <div className="flex items-center justify-center lg:justify-start gap-2 md:gap-4 mb-6">
               <div className="flex -space-x-1.5 md:-space-x-2">
                 <Avatar className="h-6 w-6 md:h-8 md:w-8 border-2 border-white dark:border-white border-gray-300">
                   <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="Aspirely AI user success story - AI-powered job search testimonial" />
@@ -251,10 +240,21 @@ const HeroSection = () => {
                   <span>⭐⭐⭐⭐⭐</span>
                 </div>
                 <div className="text-foreground text-xs md:text-sm text-left">
-                  <span className="italic font-medium">Trusted by <span className="font-bold">3000+</span> job seekers worldwide</span>
+                  <span className="italic font-medium">Trusted by <span className="font-bold">10k+</span> job seekers</span>
                 </div>
               </div>
-            </div> */}
+            </div>
+            
+            {/* Success Image - Mobile Only (below trust indicator) */}
+            <div className="md:hidden mb-4">
+              <img 
+                src={jobSuccessHero} 
+                alt="Job search success with Aspirely AI - professionals landing their dream jobs" 
+                className="w-full h-auto rounded-2xl shadow-lg"
+                loading="eager"
+                decoding="async"
+              />
+            </div>
           </SignedOut>
 
         <SignedIn>
