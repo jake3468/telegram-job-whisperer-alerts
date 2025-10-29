@@ -159,28 +159,25 @@ const HeroSection = () => {
             {/* Mobile view only */}
             <span className="block md:hidden text-center text-[32px] leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Your </span>
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic underline decoration-green-500 decoration-2 underline-offset-4">AI Team</span>
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic"> for</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic underline decoration-green-500 decoration-2 underline-offset-4">all-in-one</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Job Applications</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Job Search Assistant</span>
             </span>
             
             {/* Desktop view only */}
             <span className="hidden lg:block lg:text-left leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Your </span>
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic underline decoration-green-500 decoration-2 underline-offset-4">AI Team</span>
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic"> for</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic underline decoration-green-500 decoration-2 underline-offset-4">all-in-one</span>
               <br />
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Job Applications</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Job Search Assistant</span>
             </span>
             
             {/* Tablet view only */}
             <span className="hidden md:block lg:hidden text-center leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Your </span>
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic underline decoration-green-500 decoration-2 underline-offset-4">AI Team</span>
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic"> for</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic underline decoration-green-500 decoration-2 underline-offset-4">all-in-one</span>
               <br />
-              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Job Applications</span>
+              <span className="text-notion-dark dark:text-white py-0 font-notion-inter font-bold not-italic">Job Search Assistant</span>
             </span>
           </h1>
         </div>
@@ -218,7 +215,7 @@ const HeroSection = () => {
             </div>
             
             {/* Success Image - Mobile Only (below button) */}
-            <div className="md:hidden mb-8">
+            <div className="md:hidden mb-4">
               <img 
                 src={jobSuccessHero} 
                 alt="Job search success with Aspirely AI - professionals landing their dream jobs" 
@@ -269,8 +266,8 @@ const HeroSection = () => {
         
         </div>
           
-          {/* Right Column - Hero Image (Desktop/Tablet Only) */}
-          <div className="hidden md:block">
+          {/* Right Column - Hero Image (Desktop Only) */}
+          <div className="hidden lg:block">
             <img 
               src={jobSuccessHero} 
               alt="Job search success with Aspirely AI - professionals landing their dream jobs" 
@@ -281,10 +278,10 @@ const HeroSection = () => {
           </div>
           
           {/* YouTube Video - Full Width Below Grid */}
-          <div className="col-span-1 lg:col-span-2">
+          <div className="col-span-1 lg:col-span-2 mt-4 md:mt-0 lg:mt-8">
             <div 
               ref={videoRef}
-              className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] px-4 md:w-full md:max-w-5xl md:left-0 md:right-0 md:ml-0 md:mr-0 md:mx-auto md:px-0 lg:w-screen lg:max-w-none lg:left-1/2 lg:right-1/2 lg:-ml-[50vw] lg:-mr-[50vw] lg:px-16 my-8"
+              className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] px-4 md:w-full md:max-w-5xl md:left-0 md:right-0 md:ml-0 md:mr-0 md:mx-auto md:px-0 lg:w-screen lg:max-w-none lg:left-1/2 lg:right-1/2 lg:-ml-[50vw] lg:-mr-[50vw] lg:px-16"
             >
               <div className="w-full aspect-video rounded-2xl overflow-hidden relative">
                 {isVideoPlaying ? (
@@ -323,7 +320,7 @@ const HeroSection = () => {
       <div className="z-20 relative w-full px-4">
         <div className="max-w-2xl mx-auto mb-8">
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4 text-center">
-            <h2 ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter">Your Complete Job Search Solution (Not Just Alerts)</h2>
+            <h2 ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter mt-8">Your Complete Job Search Solution (Not Just Alerts)</h2>
             
             <p className="text-left">Job searching is exhausting.</p>
             
