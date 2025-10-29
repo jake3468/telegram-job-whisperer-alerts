@@ -215,7 +215,7 @@ const HeroSection = () => {
             </div>
             
             {/* Success Image - Mobile Only (below button) */}
-            <div className="md:hidden mb-8">
+            <div className="md:hidden mb-4">
               <img 
                 src={jobSuccessHero} 
                 alt="Job search success with Aspirely AI - professionals landing their dream jobs" 
@@ -266,8 +266,8 @@ const HeroSection = () => {
         
         </div>
           
-          {/* Right Column - Hero Image (Desktop/Tablet Only) */}
-          <div className="hidden md:block">
+          {/* Right Column - Hero Image (Desktop Only) */}
+          <div className="hidden lg:block">
             <img 
               src={jobSuccessHero} 
               alt="Job search success with Aspirely AI - professionals landing their dream jobs" 
