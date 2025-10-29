@@ -9,7 +9,7 @@ import { ArrowRight, Check } from 'lucide-react';
 import jobApplicationPreview from '@/assets/job-application-preview.svg';
 import jobAlertsAgentPreview from '@/assets/job-alerts-agent-preview.svg';
 import resumeBuilderAgentPreview from '@/assets/resume-builder-agent-preview.svg';
-import jobSuccessHero from '@/assets/job-success-hero.jpg';
+import jobSuccessHero from '@/assets/job-success-hero-new.jpg';
 
 // Add heading animation hook at component level
 const useHeadingAnimation = () => {
