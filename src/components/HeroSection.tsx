@@ -157,7 +157,7 @@ const HeroSection = () => {
             aria-label="You've Applied to 100 Jobs and Heard Nothing"
           >
             {/* Mobile view only */}
-            <span className="block md:hidden text-center text-[32px] leading-tight animate-fly-in-from-bottom">
+            <span className="block md:hidden text-center text-[42px] leading-tight animate-fly-in-from-bottom">
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Your </span>
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic underline decoration-green-500 decoration-2 underline-offset-4">all-in-one</span>
               <br />
