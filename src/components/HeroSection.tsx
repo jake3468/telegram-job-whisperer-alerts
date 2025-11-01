@@ -160,7 +160,7 @@ const HeroSection = () => {
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Your </span>
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic underline decoration-green-500 decoration-2 underline-offset-4">all-in-one</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic"><span className="bg-notion-dark dark:bg-white text-white dark:text-notion-dark px-2 py-1 rounded">Job Search</span> Assistant</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic"><span className="bg-notion-dark dark:bg-white text-white dark:text-notion-dark px-2 py-1 rounded">Resume</span> Assistant</span>
             </span>
           </h1>
         </div>
