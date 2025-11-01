@@ -177,7 +177,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl lg:max-w-none mx-auto lg:mx-0 font-notion-inter font-light leading-relaxed text-[16px] md:text-[18px] lg:text-[20px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center lg:text-left [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[15px] md:text-[17px] lg:text-[18px] font-notion-inter font-medium text-foreground text-center lg:text-left">
-            Get personalized job alerts, tailored resumes, custom cover letters, and interview coaching—<span className="text-green-800 dark:text-green-500 font-bold">just by chatting</span> with AI agents on Telegram, available 24/7. Apply in minutes, fully prepared and confident. 🏆
+            Upload your current resume. Chat with our AI agent on Telegram to update and improve it. Download your ATS-optimized PDF instantly. Save hours of work and land interviews faster 🏆—available 24/7.
           </p>
           
           <SignedOut>
