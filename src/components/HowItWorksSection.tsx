@@ -48,10 +48,10 @@ const HowItWorksSection = () => {
   ];
 
   return (
-    <section id="how-it-works" className="bg-background py-12 md:py-16 px-4">
+    <section id="how-it-works" className="bg-background py-12 md:py-16 px-4" aria-labelledby="how-it-works-heading">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <h2 ref={headingRef} className="animate-on-scroll text-4xl md:text-5xl font-bold text-foreground mb-2 font-inter">
+          <h2 id="how-it-works-heading" ref={headingRef} className="animate-on-scroll text-4xl md:text-5xl font-bold text-foreground mb-2 font-inter">
             How It Works
           </h2>
           <p className="text-lg text-foreground font-inter leading-relaxed">
