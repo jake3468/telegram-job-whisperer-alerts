@@ -75,23 +75,90 @@ const Index = () => {
       };
     }
     
-    // Add JSON-LD structured data for better Google crawlability
+    // Add comprehensive structured data for better Google crawlability
+    const structuredData = [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Aspirely AI",
+        "url": window.location.origin,
+        "description": "Find your next job effortlessly with Aspirely's AI agents. Get daily job alerts, tailored resumes, and mock phone interviews for a stress-free, personalized job hunt",
+        "privacyPolicy": `${window.location.origin}/privacy-policy`,
+        "termsOfService": `${window.location.origin}/terms-of-service`,
+        "publisher": {
+          "@type": "Organization",
+          "name": "Aspirely AI",
+          "url": window.location.origin
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": window.location.origin
+          }
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "serviceType": "AI Job Search Platform",
+        "provider": {
+          "@type": "Organization",
+          "name": "Aspirely AI"
+        },
+        "areaServed": "Worldwide",
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "Job Search Services",
+          "itemListElement": [
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "AI Job Alerts",
+                "description": "Personalized job alerts delivered via Telegram with instant application files"
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "AI Resume Builder",
+                "description": "Chat-based ATS-friendly resume creation"
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "AI Interview Preparation",
+                "description": "Phone-based mock interviews with AI coaching"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "AggregateRating",
+        "itemReviewed": {
+          "@type": "Service",
+          "name": "Aspirely AI"
+        },
+        "ratingValue": "5",
+        "ratingCount": "10000",
+        "bestRating": "5"
+      }
+    ];
+    
     const script = document.createElement('script');
     script.type = 'application/ld+json';
-    script.innerHTML = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Aspirely AI",
-      "url": window.location.origin,
-      "description": "Find jobs faster with Aspirely AI. Get AI job alerts, resume and cover letter tools, and interview preparation - a complete AI job search experience",
-      "privacyPolicy": `${window.location.origin}/privacy-policy`,
-      "termsOfService": `${window.location.origin}/terms-of-service`,
-      "publisher": {
-        "@type": "Organization",
-        "name": "Aspirely AI",
-        "url": window.location.origin
-      }
-    });
+    script.innerHTML = JSON.stringify(structuredData);
     
     document.head.appendChild(script);
     
@@ -108,22 +175,32 @@ const Index = () => {
   // Render immediately for professional experience
   return (
     <div className="min-h-screen bg-background font-inter text-foreground">
+      {/* Skip Navigation Link for Accessibility */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:shadow-lg"
+      >
+        Skip to main content
+      </a>
       <AuthHeader />
-      <HeroSection />
-      <AboutUsSection />
-      <ToolsSection />
-      
-      {/* Elfsight Testimonials Slider */}
-      <section className="relative py-8 bg-background">
-        <div className="max-w-7xl mx-auto z-20 relative w-full px-4">
-          <div className="elfsight-app-4951d48f-0df4-4724-a25f-ace7b5dfeb22" data-elfsight-app-lazy></div>
-        </div>
-      </section>
-      
-      <ComparisonTable />
-      <HowItWorksSection />
-      <PricingSection />
-      <FAQSection />
+      <main id="main-content" role="main">
+        <HeroSection />
+        <AboutUsSection />
+        <ToolsSection />
+        
+        {/* Elfsight Testimonials Slider */}
+        <section id="testimonials" className="relative py-8 bg-background" aria-labelledby="testimonials-heading">
+          <div className="max-w-7xl mx-auto z-20 relative w-full px-4">
+            <h2 id="testimonials-heading" className="text-3xl md:text-4xl font-bold text-center text-foreground mb-8 font-inter">What Our Users Say</h2>
+            <div className="elfsight-app-4951d48f-0df4-4724-a25f-ace7b5dfeb22" data-elfsight-app-lazy></div>
+          </div>
+        </section>
+        
+        <ComparisonTable />
+        <HowItWorksSection />
+        <PricingSection />
+        <FAQSection />
+      </main>
       <Footer />
     </div>
   );

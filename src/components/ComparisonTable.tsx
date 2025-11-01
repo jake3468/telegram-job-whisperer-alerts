@@ -115,10 +115,10 @@ const ComparisonTable = () => {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-12">
+    <section id="comparison" className="w-full max-w-7xl mx-auto px-4 py-12" aria-labelledby="comparison-heading">
       {/* Section Heading */}
       <div className="text-center mb-8">
-        <h2 ref={headingRef} className="animate-on-scroll text-3xl md:text-4xl font-bold text-foreground mb-2 font-inter">
+        <h2 id="comparison-heading" ref={headingRef} className="animate-on-scroll text-3xl md:text-4xl font-bold text-foreground mb-2 font-inter">
           See the Difference: Aspirely vs. Others
         </h2>
       </div>
@@ -192,7 +192,7 @@ const ComparisonTable = () => {
         </div>
       </div>
 
-    </div>
+    </section>
   );
 };
 
