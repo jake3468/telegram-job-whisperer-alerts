@@ -82,7 +82,7 @@ const Index = () => {
         "@type": "WebSite",
         "name": "Aspirely AI",
         "url": window.location.origin,
-        "description": "Find jobs faster with Aspirely AI. Get AI job alerts, resume and cover letter tools, and interview preparation - a complete AI job search experience",
+        "description": "Find your next job effortlessly with Aspirely's AI agents. Get daily job alerts, tailored resumes, and mock phone interviews for a stress-free, personalized job hunt",
         "privacyPolicy": `${window.location.origin}/privacy-policy`,
         "termsOfService": `${window.location.origin}/terms-of-service`,
         "publisher": {
