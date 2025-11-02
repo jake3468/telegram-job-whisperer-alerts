@@ -228,11 +228,11 @@ const HeroSection = () => {
               </div>
             </div>
             
-            {/* Success Image - Mobile Only (below trust indicator) */}
-            <div className="md:hidden mb-4">
+            {/* Success Image - Mobile and Tablet (below trust indicator) */}
+            <div className="lg:hidden mb-4">
               <img 
-                src={jobSuccessHero} 
-                alt="Job search success with Aspirely AI - professionals landing their dream jobs" 
+                src="/lovable-uploads/ats-resume-format.png" 
+                alt="ATS-optimized resume format examples - before and after comparison" 
                 className="w-full h-auto rounded-2xl shadow-lg"
                 loading="eager"
                 decoding="async"
@@ -254,7 +254,7 @@ const HeroSection = () => {
             <img 
               src="/lovable-uploads/ats-resume-format.png" 
               alt="ATS-optimized resume format examples - before and after comparison" 
-              className="w-full max-w-[200px] lg:max-w-[280px] h-auto rounded-2xl lg:rounded-3xl shadow-2xl mx-auto"
+              className="w-full max-w-[450px] xl:max-w-[500px] h-auto rounded-2xl lg:rounded-3xl shadow-2xl mx-auto"
               loading="eager"
               decoding="async"
             />
