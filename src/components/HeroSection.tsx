@@ -160,7 +160,7 @@ const HeroSection = () => {
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Your </span>
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic underline decoration-green-500 decoration-2 underline-offset-4">all-in-one</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic"><span className="bg-notion-dark dark:bg-white text-white dark:text-notion-dark px-2 py-1 rounded">Resume</span> Assistant</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic"><span className="bg-notion-dark dark:bg-white text-white dark:text-notion-dark px-2 py-1 rounded">Resume/CV</span> Assistant</span>
             </span>
           </h1>
         </div>
@@ -228,11 +228,11 @@ const HeroSection = () => {
               </div>
             </div>
             
-            {/* Success Image - Mobile Only (below trust indicator) */}
-            <div className="md:hidden mb-4">
+            {/* Success Image - Mobile and Tablet (below trust indicator) */}
+            <div className="lg:hidden mb-4">
               <img 
-                src={jobSuccessHero} 
-                alt="Job search success with Aspirely AI - professionals landing their dream jobs" 
+                src="/lovable-uploads/ats-resume-format.png" 
+                alt="ATS-optimized resume format examples - before and after comparison" 
                 className="w-full h-auto rounded-2xl shadow-lg"
                 loading="eager"
                 decoding="async"
@@ -252,9 +252,9 @@ const HeroSection = () => {
           {/* Right Column - Hero Image (Desktop Only) */}
           <div className="hidden lg:block">
             <img 
-              src={jobSuccessHero} 
-              alt="Job search success with Aspirely AI - professionals landing their dream jobs" 
-              className="w-full max-w-[200px] lg:max-w-[280px] h-auto rounded-2xl lg:rounded-3xl shadow-2xl mx-auto"
+              src="/lovable-uploads/ats-resume-format.png" 
+              alt="ATS-optimized resume format examples - before and after comparison" 
+              className="w-full max-w-[450px] xl:max-w-[500px] h-auto rounded-2xl lg:rounded-3xl shadow-2xl mx-auto"
               loading="eager"
               decoding="async"
             />
@@ -303,7 +303,7 @@ const HeroSection = () => {
       <div className="z-20 relative w-full px-4">
         <div className="max-w-2xl mx-auto mb-8">
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4 text-center">
-            <h2 id="telegram-agents-heading" ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter mt-8">Your Complete Job Search Solution (Not Just Alerts)</h2>
+            <h2 id="telegram-agents-heading" ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter mt-8">Your Complete Job Search Solution (Not Just CVs)</h2>
             
             <p className="text-left">Job searching is exhausting.</p>
             
