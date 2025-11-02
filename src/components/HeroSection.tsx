@@ -252,8 +252,8 @@ const HeroSection = () => {
           {/* Right Column - Hero Image (Desktop Only) */}
           <div className="hidden lg:block">
             <img 
-              src={jobSuccessHero} 
-              alt="Job search success with Aspirely AI - professionals landing their dream jobs" 
+              src="/lovable-uploads/ats-resume-format.png" 
+              alt="ATS-optimized resume format examples - before and after comparison" 
               className="w-full max-w-[200px] lg:max-w-[280px] h-auto rounded-2xl lg:rounded-3xl shadow-2xl mx-auto"
               loading="eager"
               decoding="async"
