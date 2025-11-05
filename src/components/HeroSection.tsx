@@ -303,7 +303,7 @@ const HeroSection = () => {
       <div className="z-20 relative w-full px-4">
         <div className="max-w-2xl mx-auto mb-8">
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4 text-center">
-            <h2 id="telegram-agents-heading" ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter mt-8">Your Complete Job Search Solution (Not Just CVs)</h2>
+            <h2 id="telegram-agents-heading" ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter mt-8">You've done enough work. Let us simplify your job search.</h2>
             
             <p className="text-left">Job searching is exhausting.</p>
             
