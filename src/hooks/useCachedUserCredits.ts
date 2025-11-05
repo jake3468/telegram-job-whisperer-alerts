@@ -18,9 +18,9 @@ export const useCachedUserCredits = () => {
   const { data: freshData, isLoading, error, ...rest } = useUserCredits();
   const [cachedData, setCachedData] = useState<CachedCreditsData | null>(null);
   const [displayData, setDisplayData] = useState<any>({
-    current_balance: 5,
+    current_balance: 8,
     subscription_plan: 'free',
-    free_credits: 5,
+    free_credits: 8,
     paid_credits: 0,
     next_reset_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
   });
