@@ -1301,7 +1301,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           played_at: string
           session_id: string | null
           user_agent: string | null
@@ -1310,7 +1310,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           played_at?: string
           session_id?: string | null
           user_agent?: string | null
@@ -1319,7 +1319,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           played_at?: string
           session_id?: string | null
           user_agent?: string | null
@@ -1376,7 +1376,7 @@ export type Database = {
           fingerprint: string | null
           request_type: string | null
           statuses: string[] | null
-          time_diff_between_first_last: unknown | null
+          time_diff_between_first_last: unknown
         }
         Relationships: []
       }
@@ -1401,14 +1401,8 @@ export type Database = {
         }
         Returns: boolean
       }
-      bytea_to_text: {
-        Args: { data: string }
-        Returns: string
-      }
-      categorize_and_cleanup_jobs: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      bytea_to_text: { Args: { data: string }; Returns: string }
+      categorize_and_cleanup_jobs: { Args: never; Returns: undefined }
       check_and_insert_cover_letter_execution: {
         Args: {
           p_check_minutes?: number
@@ -1434,46 +1428,40 @@ export type Database = {
         Returns: boolean
       }
       cleanup_old_company_analysis_data: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           deleted_analyses: number
         }[]
       }
       cleanup_old_interview_prep_data: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           deleted_interview_prep: number
         }[]
       }
       cleanup_old_job_board_data: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           deleted_jobs: number
         }[]
       }
       cleanup_old_job_telegram_uk_data: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           deleted_jobs: number
         }[]
       }
       cleanup_old_linkedin_data: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           deleted_images: number
           deleted_posts: number
         }[]
       }
-      cleanup_old_webhook_executions: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      debug_jwt_claims: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
+      cleanup_old_webhook_executions: { Args: never; Returns: undefined }
+      debug_jwt_claims: { Args: never; Returns: Json }
       debug_user_auth: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           auth_role: string
           clerk_id: string
@@ -1494,34 +1482,13 @@ export type Database = {
         }
         Returns: boolean
       }
-      delete_old_job_analyses: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      get_clerk_user_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_current_clerk_user_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_current_clerk_user_id_reliable: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_current_user_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_current_user_id_from_clerk: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_current_user_uuid: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      delete_old_job_analyses: { Args: never; Returns: undefined }
+      get_clerk_user_id: { Args: never; Returns: string }
+      get_current_clerk_user_id: { Args: never; Returns: string }
+      get_current_clerk_user_id_reliable: { Args: never; Returns: string }
+      get_current_user_id: { Args: never; Returns: string }
+      get_current_user_id_from_clerk: { Args: never; Returns: string }
+      get_current_user_uuid: { Args: never; Returns: string }
       get_next_order_position: {
         Args: {
           p_status: Database["public"]["Enums"]["job_status"]
@@ -1529,34 +1496,81 @@ export type Database = {
         }
         Returns: number
       }
-      get_vault_secret: {
-        Args: { secret_name: string }
-        Returns: string
-      }
+      get_vault_secret: { Args: { secret_name: string }; Returns: string }
       http: {
         Args: { request: Database["public"]["CompositeTypes"]["http_request"] }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
+        SetofOptions: {
+          from: "http_request"
+          to: "http_response"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
-      http_delete: {
-        Args:
-          | { content: string; content_type: string; uri: string }
-          | { uri: string }
-        Returns: Database["public"]["CompositeTypes"]["http_response"]
-      }
-      http_get: {
-        Args: { data: Json; uri: string } | { uri: string }
-        Returns: Database["public"]["CompositeTypes"]["http_response"]
-      }
+      http_delete:
+        | {
+            Args: { uri: string }
+            Returns: Database["public"]["CompositeTypes"]["http_response"]
+            SetofOptions: {
+              from: "*"
+              to: "http_response"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+        | {
+            Args: { content: string; content_type: string; uri: string }
+            Returns: Database["public"]["CompositeTypes"]["http_response"]
+            SetofOptions: {
+              from: "*"
+              to: "http_response"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+      http_get:
+        | {
+            Args: { uri: string }
+            Returns: Database["public"]["CompositeTypes"]["http_response"]
+            SetofOptions: {
+              from: "*"
+              to: "http_response"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+        | {
+            Args: { data: Json; uri: string }
+            Returns: Database["public"]["CompositeTypes"]["http_response"]
+            SetofOptions: {
+              from: "*"
+              to: "http_response"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
       http_head: {
         Args: { uri: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
+        SetofOptions: {
+          from: "*"
+          to: "http_response"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       http_header: {
         Args: { field: string; value: string }
         Returns: Database["public"]["CompositeTypes"]["http_header"]
+        SetofOptions: {
+          from: "*"
+          to: "http_header"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       http_list_curlopt: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           curlopt: string
           value: string
@@ -1565,21 +1579,45 @@ export type Database = {
       http_patch: {
         Args: { content: string; content_type: string; uri: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
+        SetofOptions: {
+          from: "*"
+          to: "http_response"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
-      http_post: {
-        Args:
-          | { content: string; content_type: string; uri: string }
-          | { data: Json; uri: string }
-        Returns: Database["public"]["CompositeTypes"]["http_response"]
-      }
+      http_post:
+        | {
+            Args: { content: string; content_type: string; uri: string }
+            Returns: Database["public"]["CompositeTypes"]["http_response"]
+            SetofOptions: {
+              from: "*"
+              to: "http_response"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+        | {
+            Args: { data: Json; uri: string }
+            Returns: Database["public"]["CompositeTypes"]["http_response"]
+            SetofOptions: {
+              from: "*"
+              to: "http_response"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
       http_put: {
         Args: { content: string; content_type: string; uri: string }
         Returns: Database["public"]["CompositeTypes"]["http_response"]
+        SetofOptions: {
+          from: "*"
+          to: "http_response"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
-      http_reset_curlopt: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      http_reset_curlopt: { Args: never; Returns: boolean }
       http_set_curlopt: {
         Args: { curlopt: string; value: string }
         Returns: boolean
@@ -1588,10 +1626,7 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: string
       }
-      initialize_user_credits: {
-        Args: { p_user_id: string }
-        Returns: string
-      }
+      initialize_user_credits: { Args: { p_user_id: string }; Returns: string }
       insert_job_analysis: {
         Args: {
           p_company_name: string
@@ -1622,16 +1657,10 @@ export type Database = {
         }
         Returns: Json
       }
-      rebalance_job_tracker_order_positions: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      reset_monthly_credits: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
+      rebalance_job_tracker_order_positions: { Args: never; Returns: undefined }
+      reset_monthly_credits: { Args: never; Returns: number }
       test_jwt_access: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           can_access_users: boolean
           clerk_id: string
@@ -1639,14 +1668,21 @@ export type Database = {
           test_result: string
         }[]
       }
-      text_to_bytea: {
-        Args: { data: string }
-        Returns: string
-      }
-      urlencode: {
-        Args: { data: Json } | { string: string } | { string: string }
-        Returns: string
-      }
+      text_to_bytea: { Args: { data: string }; Returns: string }
+      urlencode:
+        | { Args: { data: Json }; Returns: string }
+        | {
+            Args: { string: string }
+            Returns: {
+              error: true
+            } & "Could not choose the best candidate function between: public.urlencode(string => bytea), public.urlencode(string => varchar). Try renaming the parameters or the function itself in the database so function overloading can be resolved"
+          }
+        | {
+            Args: { string: string }
+            Returns: {
+              error: true
+            } & "Could not choose the best candidate function between: public.urlencode(string => bytea), public.urlencode(string => varchar). Try renaming the parameters or the function itself in the database so function overloading can be resolved"
+          }
       use_ai_interview_credit: {
         Args: { p_description?: string; p_user_id: string }
         Returns: boolean
@@ -1662,7 +1698,7 @@ export type Database = {
         value: string | null
       }
       http_request: {
-        method: unknown | null
+        method: unknown
         uri: string | null
         headers: Database["public"]["CompositeTypes"]["http_header"][] | null
         content_type: string | null
