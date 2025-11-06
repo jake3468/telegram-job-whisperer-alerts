@@ -160,7 +160,7 @@ const HeroSection = () => {
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">Your </span>
               <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic underline decoration-green-500 decoration-2 underline-offset-4">all-in-one</span>
               <br />
-              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic"><span className="bg-notion-dark dark:bg-white text-white dark:text-notion-dark px-2 py-1 rounded">Resume/CV</span> Assistant</span>
+              <span className="text-notion-dark dark:text-white px-0.5 py-0 font-notion-inter font-bold not-italic">AI <span className="bg-notion-dark dark:bg-white text-white dark:text-notion-dark px-2 py-1 rounded">Job Search</span> Assistant</span>
             </span>
           </h1>
         </div>
@@ -177,7 +177,7 @@ const HeroSection = () => {
 
         <div className="text-foreground mb-8 md:mb-10 lg:mb-12 max-w-2xl lg:max-w-none mx-auto lg:mx-0 font-notion-inter font-light leading-relaxed text-[16px] md:text-[18px] lg:text-[20px] dark:[text-shadow:_0_2px_4px_rgba(0,0,0,0.9)] text-center lg:text-left [filter:brightness(1.1)_contrast(1.1)]">
           <p className="mb-8 text-[15px] md:text-[17px] lg:text-[18px] font-notion-inter font-medium text-foreground text-center lg:text-left">
-            Upload your current resume. Chat with our AI agent on Telegram to update and improve it. Download your ATS-optimized PDF instantly. Save hours of work and land interviews faster 🏆—available 24/7.
+            Save hours on every job application. Our AI agents on Telegram handle everything: job alerts, ATS-optimized resumes, cover letters, and phone call interview prep. Just chat, apply, and get hired 🏆
           </p>
           
           <SignedOut>
@@ -303,7 +303,7 @@ const HeroSection = () => {
       <div className="z-20 relative w-full px-4">
         <div className="max-w-2xl mx-auto mb-8">
           <div className="text-foreground mb-6 text-sm md:text-base font-inter space-y-4 text-center">
-            <h2 id="telegram-agents-heading" ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter mt-8">You've done enough work. It's time to let AI simplify your job search.</h2>
+            <h2 id="telegram-agents-heading" ref={jobHuntingHeadingRef} className="animate-on-scroll text-2xl md:text-3xl lg:text-4xl font-bold text-center text-foreground mb-4 font-inter mt-8">Why struggle? Let AI handle it.</h2>
             
             <p className="text-left">Job searching is exhausting.</p>
             

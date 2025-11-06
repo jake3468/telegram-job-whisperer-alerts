@@ -142,17 +142,6 @@ const Index = () => {
             }
           ]
         }
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "AggregateRating",
-        "itemReviewed": {
-          "@type": "Service",
-          "name": "Aspirely AI"
-        },
-        "ratingValue": "5",
-        "ratingCount": "10000",
-        "bestRating": "5"
       }
     ];
     
